@@ -32,11 +32,11 @@ public interface IEWalletService {
     
     void creditToUser(User user, BigDecimal amount);
     
-    void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionKind transactionKind, User counterpartUser);
+    void creditToUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser);
 
     void creditWalletQuietly(User user, BigDecimal amount);
     
-    void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionKind transactionKind, User counterpartUser);
+    void debitFromUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser);
     
     SpendingWarningCheckResponse checkSpendingWarning(BigDecimal amount);
 }

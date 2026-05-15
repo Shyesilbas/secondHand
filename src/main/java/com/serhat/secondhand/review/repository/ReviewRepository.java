@@ -1,6 +1,7 @@
 package com.serhat.secondhand.review.repository;
 
 import com.serhat.secondhand.review.entity.Review;
+import com.serhat.secondhand.review.repository.projection.GreatSellerReviewMetrics;
 import com.serhat.secondhand.review.repository.projection.ListingReviewStatsProjection;
 import com.serhat.secondhand.review.repository.projection.ReviewStatsProjection;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +33,21 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     @Query("SELECT COUNT(DISTINCT r.reviewer.id) FROM Review r WHERE r.reviewedUser.id = :userId")
     long countDistinctReviewersByReviewedUserId(@Param("userId") Long userId);
+
+    @Query("""
+            SELECT COUNT(DISTINCT r.reviewer.id) AS distinctReviewerCount,
+                   COALESCE(AVG(CAST(r.rating AS double)), 0.0) AS averageRating
+            FROM Review r WHERE r.reviewedUser.id = :userId
+            """)
+    GreatSellerReviewMetrics getGreatSellerReviewMetrics(@Param("userId") Long userId);
+
+    /** N+1 önleme: anasayfa Great Seller listesi için toplu metrik. */
+    @Query("""
+            SELECT r.reviewedUser.id, COUNT(DISTINCT r.reviewer.id), COALESCE(AVG(CAST(r.rating AS double)), 0.0)
+            FROM Review r WHERE r.reviewedUser.id IN :sellerIds
+            GROUP BY r.reviewedUser.id
+            """)
+    List<Object[]> aggregateGreatSellerReviewMetricsBySellerIds(@Param("sellerIds") Collection<Long> sellerIds);
 
     @EntityGraph(attributePaths = {"reviewer", "reviewedUser", "orderItem", "orderItem.listing"})
     Optional<Review> findByReviewerIdAndOrderItemId(Long reviewerId, Long orderItemId);

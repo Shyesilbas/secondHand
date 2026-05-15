@@ -22,11 +22,15 @@ public class OrderMapper {
     private final ShippingMapper shippingMapper;
 
     /**
-     * Maps an Order to OrderDto.
-     * cancelledByItemId and refundedByItemId provide pre-computed quantities per OrderItem ID,
-     * avoiding repository calls inside the mapper.
+     * Maps an Order to OrderDto with cancellation/refund details.
      */
-    public OrderDto toDto(Order order, Map<Long, Integer> cancelledByItemId, Map<Long, Integer> refundedByItemId) {
+    public OrderDto toDto(Order order, 
+                         Map<Long, Integer> cancelledByItemId, 
+                         Map<Long, Integer> refundedByItemId,
+                         Map<Long, String> cancelReasons,
+                         Map<Long, String> cancelReasonTexts,
+                         Map<Long, String> refundReasons,
+                         Map<Long, String> refundReasonTexts) {
         if (order == null) {
             return null;
         }
@@ -55,9 +59,17 @@ public class OrderMapper {
                 .paymentMethod(order.getPaymentMethod())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
-                .orderItems(orderItemsToDtoList(order.getOrderItems(), cancelledByItemId, refundedByItemId))
+                .orderItems(orderItemsToDtoList(order.getOrderItems(), 
+                        cancelledByItemId, refundedByItemId, 
+                        cancelReasons, cancelReasonTexts, 
+                        refundReasons, refundReasonTexts))
                 .shipping(shippingMapper.toDto(order.getShipping()))
                 .build();
+    }
+
+    /** Legacy support for mapping without reasons */
+    public OrderDto toDto(Order order, Map<Long, Integer> cancelledByItemId, Map<Long, Integer> refundedByItemId) {
+        return toDto(order, cancelledByItemId, refundedByItemId, Map.of(), Map.of(), Map.of(), Map.of());
     }
 
     /** Convenience overload when no cancellation/refund data is needed (e.g. write-path responses). */
@@ -67,18 +79,29 @@ public class OrderMapper {
 
     private List<OrderItemDto> orderItemsToDtoList(List<OrderItem> orderItems,
                                                     Map<Long, Integer> cancelledByItemId,
-                                                    Map<Long, Integer> refundedByItemId) {
+                                                    Map<Long, Integer> refundedByItemId,
+                                                    Map<Long, String> cancelReasons,
+                                                    Map<Long, String> cancelReasonTexts,
+                                                    Map<Long, String> refundReasons,
+                                                    Map<Long, String> refundReasonTexts) {
         if (orderItems == null) {
             return null;
         }
         return orderItems.stream()
-                .map(item -> orderItemToDto(item, cancelledByItemId, refundedByItemId))
+                .map(item -> orderItemToDto(item, 
+                        cancelledByItemId, refundedByItemId, 
+                        cancelReasons, cancelReasonTexts, 
+                        refundReasons, refundReasonTexts))
                 .toList();
     }
 
     private OrderItemDto orderItemToDto(OrderItem orderItem,
                                          Map<Long, Integer> cancelledByItemId,
-                                         Map<Long, Integer> refundedByItemId) {
+                                         Map<Long, Integer> refundedByItemId,
+                                         Map<Long, String> cancelReasons,
+                                         Map<Long, String> cancelReasonTexts,
+                                         Map<Long, String> refundReasons,
+                                         Map<Long, String> refundReasonTexts) {
         if (orderItem == null) {
             return null;
         }
@@ -107,6 +130,10 @@ public class OrderMapper {
                 .createdAt(orderItem.getCreatedAt())
                 .cancelledQuantity(cancelledQuantity > 0 ? cancelledQuantity : null)
                 .refundedQuantity(refundedQuantity > 0 ? refundedQuantity : null)
+                .cancelReason(cancelReasons.get(orderItem.getId()))
+                .cancelReasonText(cancelReasonTexts.get(orderItem.getId()))
+                .refundReason(refundReasons.get(orderItem.getId()))
+                .refundReasonText(refundReasonTexts.get(orderItem.getId()))
                 .build();
     }
 }

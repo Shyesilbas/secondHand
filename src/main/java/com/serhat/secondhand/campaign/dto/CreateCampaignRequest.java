@@ -4,6 +4,7 @@ import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,9 +33,11 @@ public class CreateCampaignRequest {
     @DecimalMin(value = "0.01", inclusive = true)
     @DecimalMax(value = "1000000000.00", inclusive = true)
     private BigDecimal value;
+    
+    @Min(1)
+    private Integer minQuantity;
+
     private Set<ListingType> eligibleTypes;
     private Set<UUID> eligibleListingIds;
     private Boolean applyToFutureListings;
 }
-
-

@@ -1,35 +1,33 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue', index = 0 }) => {
+const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue', index = 0, badge }) => {
   const iconColorClasses = {
-    blue: 'bg-blue-100/50 text-blue-600 border-blue-200/50',
-    green: 'bg-emerald-100/50 text-emerald-600 border-emerald-200/50',
-    purple: 'bg-indigo-100/50 text-indigo-600 border-indigo-200/50',
-    amber: 'bg-amber-100/50 text-amber-600 border-amber-200/50',
-    red: 'bg-rose-100/50 text-rose-600 border-rose-200/50',
-    gray: 'bg-gray-100/50 text-gray-600 border-gray-200/50',
-    pink: 'bg-pink-100/50 text-pink-600 border-pink-200/50',
+    blue: 'bg-blue-500/10 text-blue-600',
+    green: 'bg-emerald-500/10 text-emerald-600',
+    purple: 'bg-indigo-500/10 text-indigo-600',
+    amber: 'bg-amber-500/10 text-amber-600',
+    red: 'bg-rose-500/10 text-rose-600',
+    gray: 'bg-slate-500/10 text-slate-600',
+    pink: 'bg-pink-500/10 text-pink-600',
+    cyan: 'bg-cyan-500/10 text-cyan-600',
   };
 
-  const glowClasses = {
-    blue: 'shadow-blue-500/10',
-    green: 'shadow-emerald-500/10',
-    purple: 'shadow-indigo-500/10',
-    amber: 'shadow-amber-500/10',
-    red: 'shadow-rose-500/10',
-    gray: 'shadow-gray-500/10',
-    pink: 'shadow-pink-500/10',
+  const accentBorder = {
+    blue: 'border-l-blue-500',
+    green: 'border-l-emerald-500',
+    purple: 'border-l-indigo-500',
+    amber: 'border-l-amber-500',
+    red: 'border-l-rose-500',
+    gray: 'border-l-slate-500',
+    pink: 'border-l-pink-500',
+    cyan: 'border-l-cyan-500',
   };
 
   const formatValue = (val) => {
     if (typeof val === 'number') {
-      if (val >= 1000000) {
-        return (val / 1000000).toFixed(1) + 'M';
-      }
-      if (val >= 1000) {
-        return (val / 1000).toFixed(1) + 'K';
-      }
+      if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+      if (val >= 1000) return (val / 1000).toFixed(1) + 'K';
       return val.toLocaleString();
     }
     return val;
@@ -42,53 +40,57 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
   };
 
   const getTrendColor = () => {
-    if (trend > 0) return 'text-emerald-600 bg-emerald-50';
-    if (trend < 0) return 'text-rose-600 bg-rose-50';
-    return 'text-gray-500 bg-gray-50';
+    if (trend > 0) return 'text-emerald-600 bg-emerald-500/10';
+    if (trend < 0) return 'text-rose-600 bg-rose-500/10';
+    return 'text-slate-500 bg-slate-500/10';
   };
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1, ease: 'easeOut' }}
-      className={`relative bg-white/70 backdrop-blur-xl rounded-[24px] border border-white p-6 shadow-xl ${glowClasses[color] || glowClasses.blue} hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 group overflow-hidden`}
+      transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
+      className={`relative bg-white rounded-2xl border border-slate-100 border-l-[3px] ${accentBorder[color] || accentBorder.blue} p-5 shadow-sm hover:shadow-md transition-shadow duration-300 group`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 pointer-events-none" />
-      <div className="relative flex flex-col h-full">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            {Icon && (
-              <div className={`p-2.5 rounded-2xl border ${iconColorClasses[color] || iconColorClasses.blue} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
-                <Icon className="w-5 h-5" />
-              </div>
-            )}
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{title}</span>
-          </div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2.5">
+          {Icon && (
+            <div className={`p-2 rounded-xl ${iconColorClasses[color] || iconColorClasses.blue}`}>
+              <Icon className="w-4 h-4" />
+            </div>
+          )}
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
+        </div>
+        {badge && (
+          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-200/50">
+            {badge}
+          </span>
+        )}
+      </div>
+      
+      <div>
+        <div className="flex items-end gap-2.5 mb-1">
+          <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">{formatValue(value)}</span>
+          {trend !== undefined && trend !== null && (
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${getTrendColor()} font-bold`}>
+              {getTrendIcon()}
+              <span className="text-[10px]">
+                {Math.abs(trend).toFixed(1)}%
+              </span>
+            </div>
+          )}
         </div>
         
-        <div className="mt-auto">
-          <div className="flex items-end gap-3 mb-2">
-            <span className="text-3xl font-black text-gray-900 tracking-tight">{formatValue(value)}</span>
-            {trend !== undefined && trend !== null && (
-              <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${getTrendColor()} font-bold`}>
-                {getTrendIcon()}
-                <span className="text-[11px]">
-                  {Math.abs(trend).toFixed(1)}%
-                </span>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex flex-col gap-0.5">
+        {(subtitle || trendLabel) && (
+          <div className="flex flex-col">
             {subtitle && (
-              <p className="text-xs text-gray-500 font-medium">{subtitle}</p>
+              <p className="text-[11px] text-slate-500 font-medium">{subtitle}</p>
             )}
             {trendLabel && (
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{trendLabel}</p>
+              <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{trendLabel}</p>
             )}
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   );

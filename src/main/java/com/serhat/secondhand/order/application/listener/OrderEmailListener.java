@@ -11,7 +11,9 @@ import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,10 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -36,6 +40,7 @@ public class OrderEmailListener {
     private final OrderMapper orderMapper;
     private final IUserService userService;
     private final OrderLogService orderLog;
+    private final OrderRepository orderRepository;
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -60,6 +65,33 @@ public class OrderEmailListener {
             Order order = event.order();
             String content = buildCancellationContent(event.requester(), order);
             emailService.sendEmail(event.requester(), emailConfig.getOrder().getCancelledSubject(), content, EmailType.NOTIFICATION);
+
+            Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
+            Set<Long> recipientIds = new LinkedHashSet<>();
+            if (full.getUser() != null && full.getUser().getId() != null) {
+                recipientIds.add(full.getUser().getId());
+            }
+            if (full.getOrderItems() != null) {
+                for (OrderItem oi : full.getOrderItems()) {
+                    if (oi.getSeller() != null && oi.getSeller().getId() != null) {
+                        recipientIds.add(oi.getSeller().getId());
+                    }
+                }
+            }
+            recipientIds.remove(event.requester().getId());
+            for (Long uid : recipientIds) {
+                var userResult = userService.findById(uid);
+                if (userResult.isError() || userResult.getData() == null) {
+                    continue;
+                }
+                User counterparty = userResult.getData();
+                String cp = String.format(
+                        emailConfig.getOrder().getCounterpartyCancellationContentFormat(),
+                        counterparty.getName(),
+                        "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
+                emailService.sendEmail(counterparty, emailConfig.getOrder().getCancelledSubject(), cp, EmailType.NOTIFICATION);
+            }
+
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCancelledEmail", event.order().getOrderNumber(), e.getMessage());

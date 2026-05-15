@@ -1,55 +1,61 @@
-import {Trash2 as TrashIcon} from 'lucide-react';
+import { Trash2 as TrashIcon } from 'lucide-react';
+import { CART_UI, cartBtnSecondary, cartSurfacePanel } from '../uiPalette.js';
 
-const ClearCartModal = ({ 
-    isOpen, 
-    onClose, 
-    onConfirm, 
-    isClearing = false 
-}) => {
-    if (!isOpen) return null;
+const ClearCartModal = ({ isOpen, onClose, onConfirm, isClearing = false }) => {
+  if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-                <div className="p-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="p-2 bg-red-100 rounded-lg">
-                            <TrashIcon className="w-6 h-6 text-red-600" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">Clear Cart</h3>
-                    </div>
-                    
-                    <p className="text-gray-600 mb-6">
-                        Are you sure you want to remove all items from your cart? This action cannot be undone.
-                    </p>
-                    
-                    <div className="flex space-x-3">
-                        <button
-                            onClick={onClose}
-                            disabled={isClearing}
-                            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={onConfirm}
-                            disabled={isClearing}
-                            className="flex-1 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
-                        >
-                            {isClearing ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    <span>Clearing...</span>
-                                </>
-                            ) : (
-                                <span>Clear Cart</span>
-                            )}
-                        </button>
-                    </div>
-                </div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div
+        className={`mx-4 w-full max-w-md ${cartSurfacePanel}`}
+        style={{ borderColor: CART_UI.border }}
+      >
+        <div className="p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="rounded-xl bg-red-50 p-2.5">
+              <TrashIcon className="h-6 w-6 text-red-600" />
             </div>
+            <h3 className="text-lg font-semibold" style={{ color: CART_UI.text }}>
+              Clear Cart
+            </h3>
+          </div>
+
+          <p className="mb-6 text-sm" style={{ color: CART_UI.textMuted }}>
+            Are you sure you want to remove all items from your cart? This action cannot be undone.
+          </p>
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isClearing}
+              className={`flex items-center justify-center ${cartBtnSecondary} flex-1 py-2.5 disabled:opacity-50`}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={isClearing}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 active:scale-[0.99]"
+            >
+              {isClearing ? (
+                <>
+                  <div
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden
+                  />
+                  <span>Clearing...</span>
+                </>
+              ) : (
+                <span>Clear Cart</span>
+              )}
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default ClearCartModal;

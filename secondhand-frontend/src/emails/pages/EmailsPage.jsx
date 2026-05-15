@@ -215,79 +215,96 @@ const EmailsPage = ({ embedded = false }) => {
     }
 
     return (
-        <div className={embedded ? 'min-h-0 bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden h-[800px]' : 'h-screen flex flex-col bg-white overflow-hidden'}>
+        <div className={embedded ? 'min-h-0 bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden h-[clamp(480px,min(88vh,920px))]' : 'min-h-0 h-[min(100dvh,100vh)] flex flex-col bg-white overflow-hidden'}>
             
-            {/* Top Navigation Bar */}
-            <header className="shrink-0 h-14 border-b border-gray-200 bg-white flex items-center justify-between px-4">
-                <div className="flex items-center gap-3">
+            {/* Outlook tarzı üst şerit: arama ortada, aksiyonlar sağda */}
+            <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#edebe9] bg-[#f3f2f1] px-3 sm:px-4">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                     {!embedded && (
                         <button
+                            type="button"
                             onClick={() => navigate(-1)}
-                            className="p-2 -ml-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                            className="shrink-0 rounded-md p-2 text-[#605e5c] transition-colors hover:bg-black/[0.05] hover:text-[#323130]"
+                            aria-label="Back"
                         >
-                            <ArrowLeftIcon className="w-5 h-5" />
+                            <ArrowLeftIcon className="h-5 w-5" />
                         </button>
                     )}
-                    <h1 className="text-base font-bold text-gray-900 tracking-tight hidden sm:block">Mailbox</h1>
-                </div>
-
-                <div className="flex-1 max-w-md px-4 hidden sm:block">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search mail..."
-                            className="w-full h-9 pl-9 pr-3 rounded-md bg-gray-50 border-none text-sm text-gray-900 placeholder:text-gray-400 focus:bg-white focus:ring-1 focus:ring-gray-300 transition-colors outline-none"
-                        />
-                        <MagnifyingGlassIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <div className="hidden min-w-0 sm:block">
+                        <h1 className="truncate text-sm font-semibold text-[#323130]">Mailbox</h1>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="min-w-0 flex-1 px-1 sm:px-4">
+                    <div className="relative mx-auto max-w-2xl xl:max-w-3xl">
+                        <label className="sr-only" htmlFor="mail-search">Search mail</label>
+                        <input
+                            id="mail-search"
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search mail"
+                            className="h-9 w-full rounded border border-[#edebe9] bg-white pl-9 pr-3 text-sm text-[#323130] shadow-sm placeholder:text-[#8a8886] focus:border-[#0078d4] focus:outline-none focus:ring-1 focus:ring-[#0078d4]"
+                        />
+                        <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a8886]" />
+                    </div>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-0.5">
                     <button
+                        type="button"
                         onClick={() => queryClient.invalidateQueries({ queryKey: ['myEmails', user?.id] })}
-                        className="p-2 rounded-md text-gray-400 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                        className="rounded-md p-2 text-[#605e5c] transition-colors hover:bg-black/[0.05] hover:text-[#323130]"
                         title="Refresh"
                     >
-                        <RefreshCw className="w-4 h-4" />
+                        <RefreshCw className="h-4 w-4" />
                     </button>
                     <button
+                        type="button"
                         onClick={handleDeleteAllEmails}
                         disabled={isDeleting || filteredEmails.length === 0}
-                        className="p-2 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                        className="rounded-md p-2 text-[#605e5c] transition-colors hover:bg-red-50 hover:text-[#d13438] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#605e5c]"
                         title="Delete all"
                     >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-4 w-4" />
                     </button>
                 </div>
             </header>
 
-            {/* Main 3-Column Area */}
-            <div className="flex-1 flex overflow-hidden">
+            {/* 3 sütun: klasör | liste | okuma (lg+); okuma 1fr → ekranın çoğu */}
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[220px_minmax(260px,400px)_minmax(0,1fr)]">
                 
-                {/* 1. Sidebar (Folders) - Hidden on Mobile */}
-                <aside className="hidden lg:flex w-60 flex-col border-r border-gray-200 bg-gray-50/30">
-                    <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                        {folderItems.map(item => {
+                {/* 1. Klasörler (Outlook sol navigasyon) */}
+                <aside className="hidden min-h-0 w-full min-w-0 flex-col border-[#edebe9] bg-[#faf9f8] lg:flex lg:border-r">
+                    <div className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
+                        {folderItems.map((item) => {
                             const Icon = item.icon;
                             const active = filterType === item.id;
                             return (
                                 <button
                                     key={item.id}
+                                    type="button"
                                     onClick={() => handleFolderSelect(item.id)}
-                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                                        active ? 'bg-zinc-900 text-white font-medium' : 'text-gray-600 hover:bg-gray-100/50'
+                                    className={`flex w-full items-center justify-between gap-2 rounded-sm py-2.5 pl-3 pr-2 text-left text-sm transition-colors ${
+                                        active
+                                            ? 'border-l-[3px] border-l-[#0078d4] bg-white font-semibold text-[#0078d4] shadow-sm'
+                                            : 'border-l-[3px] border-l-transparent text-[#323130] hover:bg-black/[0.04]'
                                     }`}
                                 >
-                                    <div className="flex items-center gap-2.5">
-                                        <Icon className={`w-4 h-4 ${active ? 'text-gray-300' : 'text-gray-400'}`} />
-                                        <span>{item.label}</span>
-                                    </div>
+                                    <span className="flex min-w-0 items-center gap-2.5">
+                                        <Icon
+                                            className={`h-4 w-4 shrink-0 ${active ? 'text-[#0078d4]' : 'text-[#605e5c]'}`}
+                                        />
+                                        <span className="truncate">{item.label}</span>
+                                    </span>
                                     {counts[item.id] > 0 && (
-                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                                            active ? 'bg-zinc-800 text-gray-300' : 'bg-gray-100 text-gray-500'
-                                        }`}>
+                                        <span
+                                            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
+                                                active
+                                                    ? 'bg-[#deecf9] text-[#0078d4]'
+                                                    : 'bg-[#edebe9] text-[#605e5c]'
+                                            }`}
+                                        >
                                             {counts[item.id]}
                                         </span>
                                     )}
@@ -297,58 +314,66 @@ const EmailsPage = ({ embedded = false }) => {
                     </div>
                 </aside>
 
-                {/* 2. Email List Column */}
-                <section className={`flex-col border-r border-gray-200 bg-white w-full lg:w-[320px] xl:w-[380px] shrink-0 ${
-                    selectedEmail ? 'hidden lg:flex' : 'flex'
-                }`}>
-                    <div className="shrink-0 px-4 py-3 border-b border-gray-200 bg-white/95 backdrop-blur z-10 flex items-center justify-between">
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-sm font-bold text-gray-900 tracking-tight">{selectedFolderLabel}</h2>
-                                {unreadCount > 0 && (
-                                    <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
-                                )}
-                            </div>
+                {/* 2. Mesaj listesi */}
+                <section
+                    className={`flex min-h-0 w-full min-w-0 flex-col border-[#edebe9] bg-white lg:border-r ${
+                        selectedEmail ? 'hidden lg:flex' : 'flex'
+                    }`}
+                >
+                    <div className="flex shrink-0 items-center justify-between border-b border-[#edebe9] bg-[#faf9f8] px-4 py-2.5">
+                        <div className="flex min-w-0 items-center gap-2">
+                            <h2 className="truncate text-xs font-bold uppercase tracking-wide text-[#605e5c]">
+                                {selectedFolderLabel}
+                            </h2>
+                            {unreadCount > 0 && (
+                                <span className="h-2 w-2 shrink-0 rounded-full bg-[#0078d4]" title="Unread" />
+                            )}
                         </div>
-                        
-                        {/* Pagination Inline */}
-                        <div className="flex items-center gap-1.5 bg-gray-50 rounded-md p-0.5 border border-gray-100">
-                            <button 
-                                onClick={() => setPage(p => p - 1)} 
-                                disabled={pageInfo.page === 0} 
-                                className="p-1 rounded-sm text-gray-400 hover:text-gray-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent"
+                        <div className="flex shrink-0 items-center gap-1 rounded border border-[#edebe9] bg-white p-0.5">
+                            <button
+                                type="button"
+                                onClick={() => setPage((p) => p - 1)}
+                                disabled={pageInfo.page === 0}
+                                className="rounded p-1 text-[#605e5c] hover:bg-[#f3f2f1] disabled:opacity-30"
+                                aria-label="Previous page"
                             >
-                                <ArrowLeftIcon className="w-3.5 h-3.5" />
+                                <ArrowLeftIcon className="h-3.5 w-3.5" />
                             </button>
-                            <span className="text-[10px] font-bold text-gray-500 tabular-nums px-1">
+                            <span className="px-1.5 text-[10px] font-semibold tabular-nums text-[#605e5c]">
                                 {pageInfo.page + 1}/{Math.max(pageInfo.totalPages, 1)}
                             </span>
-                            <button 
-                                onClick={() => setPage(p => p + 1)} 
-                                disabled={pageInfo.page + 1 >= pageInfo.totalPages} 
-                                className="p-1 rounded-sm text-gray-400 hover:text-gray-900 hover:bg-white disabled:opacity-30 disabled:hover:bg-transparent"
+                            <button
+                                type="button"
+                                onClick={() => setPage((p) => p + 1)}
+                                disabled={pageInfo.page + 1 >= pageInfo.totalPages}
+                                className="rounded p-1 text-[#605e5c] hover:bg-[#f3f2f1] disabled:opacity-30"
+                                aria-label="Next page"
                             >
-                                <ArrowLeftIcon className="w-3.5 h-3.5 rotate-180" />
+                                <ArrowLeftIcon className="h-3.5 w-3.5 rotate-180" />
                             </button>
                         </div>
                     </div>
-                    
-                    {/* Mobile Folders Dropdown / Horizontal Scroll could go here if needed, but we keep it simple for now */}
-                    <div className="lg:hidden shrink-0 border-b border-gray-100 bg-white px-2 py-2 flex items-center overflow-x-auto no-scrollbar gap-1">
-                        {folderItems.map(item => (
-                            <button
-                                key={item.id}
-                                onClick={() => handleFolderSelect(item.id)}
-                                className={`shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                                    filterType === item.id ? 'bg-zinc-900 text-white' : 'bg-gray-50 text-gray-600 border border-gray-100'
-                                }`}
-                            >
-                                {item.label}
-                            </button>
-                        ))}
+
+                    <div className="lg:hidden shrink-0 border-b border-[#edebe9] bg-white px-2 py-2">
+                        <div className="flex items-center gap-1 overflow-x-auto overflow-y-hidden pb-0.5">
+                            {folderItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    onClick={() => handleFolderSelect(item.id)}
+                                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                                        filterType === item.id
+                                            ? 'bg-[#0078d4] text-white'
+                                            : 'border border-[#edebe9] bg-[#faf9f8] text-[#323130]'
+                                    }`}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="min-h-0 flex-1 overflow-y-auto">
                         <EmailsPageFeedback error={error ? parseError(error).message : null} emails={filteredEmails} filterType={filterType} />
                         {filteredEmails.map(email => (
                             <EmailListItem
@@ -363,50 +388,38 @@ const EmailsPage = ({ embedded = false }) => {
                     </div>
                 </section>
 
-                {/* 3. Email Content Column */}
-                <section className={`flex-1 bg-white flex-col ${
-                    !selectedEmail ? 'hidden lg:flex' : 'flex'
-                }`}>
+                {/* 3. Okuma paneli — kalan tüm genişlik (Outlook’ta en geniş sütun) */}
+                <section
+                    className={`flex min-h-0 min-w-0 flex-1 flex-col border-[#edebe9] bg-white lg:border-l ${
+                        !selectedEmail ? 'hidden lg:flex' : 'flex'
+                    }`}
+                >
                     {selectedEmail ? (
                         <>
-                            <div className="lg:hidden shrink-0 px-4 py-3 border-b border-gray-200 flex justify-between items-center bg-white/95 backdrop-blur z-10">
-                                <button 
-                                    onClick={() => setSelectedEmail(null)} 
-                                    className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900"
+                            <div className="flex shrink-0 items-center justify-between border-b border-[#edebe9] bg-[#faf9f8] px-4 py-2.5 lg:hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedEmail(null)}
+                                    className="flex items-center gap-2 text-sm font-medium text-[#0078d4]"
                                 >
-                                    <ArrowLeftIcon className="w-4 h-4"/> Back
-                                </button>
-                                <button 
-                                    onClick={() => handleDeleteEmail(selectedEmail.id)} 
-                                    disabled={isDeleting}
-                                    className="p-1.5 text-gray-400 hover:text-red-600"
-                                >
-                                    <Trash2 className="w-4 h-4"/>
-                                </button>
-                            </div>
-                            
-                            <div className="hidden lg:flex shrink-0 px-6 py-3 border-b border-gray-100 justify-end">
-                                <button 
-                                    onClick={() => handleDeleteEmail(selectedEmail.id)} 
-                                    disabled={isDeleting}
-                                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                    title="Delete email"
-                                >
-                                    <Trash2 className="w-4 h-4"/>
+                                    <ArrowLeftIcon className="h-4 w-4" />
+                                    List
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto">
-                                <EmailContent email={selectedEmail} />
+                            <div className="min-h-0 flex-1 overflow-hidden">
+                                <EmailContent
+                                    email={selectedEmail}
+                                    onDelete={handleDeleteEmail}
+                                    isDeleting={isDeleting}
+                                />
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center bg-gray-50/30">
-                            <MailOpen className="w-12 h-12 mb-4 opacity-20" />
-                            <p className="text-sm font-bold text-gray-900">No message selected</p>
-                            <p className="text-xs text-gray-500 mt-1 max-w-xs">
-                                Select a message from the list to read it here.
-                            </p>
+                        <div className="flex min-h-[200px] flex-1 flex-col items-center justify-center gap-2 p-10 text-center text-[#605e5c]">
+                            <MailOpen className="h-14 w-14 opacity-[0.2]" aria-hidden />
+                            <p className="text-base font-semibold text-[#323130]">Select an item to read</p>
+                            <p className="max-w-sm text-sm">Nothing is selected. Choose a message in the list.</p>
                         </div>
                     )}
                 </section>

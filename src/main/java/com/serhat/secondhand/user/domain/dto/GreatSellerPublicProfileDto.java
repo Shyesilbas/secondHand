@@ -1,8 +1,15 @@
 package com.serhat.secondhand.user.domain.dto;
 
 import lombok.Builder;
+import java.time.LocalDateTime;
 
 /** Home / discovery için public satıcı kartı — PII içermeden isim görünümü. */
 @Builder
-public record GreatSellerPublicProfileDto(Long id, String name, String surname) {
+public record GreatSellerPublicProfileDto(
+        Long id, 
+        String name, 
+        String surname,
+        Double averageRating,
+        LocalDateTime createdAt
+) {
 }

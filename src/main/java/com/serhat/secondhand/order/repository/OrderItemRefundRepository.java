@@ -16,6 +16,8 @@ public interface OrderItemRefundRepository extends JpaRepository<OrderItemRefund
 
     @Query("SELECT oir.orderItem.id, SUM(oir.refundedQuantity) FROM OrderItemRefund oir WHERE oir.orderItem.id IN :orderItemIds GROUP BY oir.orderItem.id")
     java.util.List<Object[]> findRefundedQuantitiesByOrderItemIds(@Param("orderItemIds") java.util.Collection<Long> orderItemIds);
+
+    java.util.List<OrderItemRefund> findAllByOrderItemIdIn(java.util.Collection<Long> orderItemIds);
 }
 
 

@@ -19,9 +19,11 @@ import com.serhat.secondhand.review.validator.ReviewValidator;
 import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.event.SellerEligibilityRecheckEvent;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -47,6 +49,7 @@ public class ReviewService implements IReviewService {
     private final ReviewValidator reviewValidator;
     private final INotificationService notificationService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @CacheEvict(value = "reviewStatsBatch", allEntries = true)
@@ -92,6 +95,7 @@ public class ReviewService implements IReviewService {
         } catch (RuntimeException e) {
             log.error("Failed to create in-app notification for review received: {}", e.getMessage());
         }
+        eventPublisher.publishEvent(new SellerEligibilityRecheckEvent(reviewedUser.getId()));
         return Result.success(reviewMapper.toDto(savedReview));
     }
 

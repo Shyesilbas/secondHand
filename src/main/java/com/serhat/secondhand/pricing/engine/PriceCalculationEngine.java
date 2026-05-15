@@ -49,6 +49,9 @@ public class PriceCalculationEngine {
             return pricingMapper.toEmptyResult();
         }
 
+        // Calculate total qualifying quantities for each campaign per seller
+        Map<UUID, Integer> campaignQualifyingQuantities = calculateCampaignQualifyingQuantities(cartItems, campaignsBySeller);
+
         BigDecimal originalSubtotal = BigDecimal.ZERO;
         BigDecimal subtotalAfterCampaigns = BigDecimal.ZERO;
         BigDecimal campaignDiscountTotal = BigDecimal.ZERO;
@@ -78,7 +81,7 @@ public class PriceCalculationEngine {
 
             if (!isOfferLine && type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
                 List<Campaign> sellerCampaigns = campaignsBySeller.getOrDefault(listing.getSeller().getId(), List.of());
-                AppliedCampaignDto best = findBestCampaignForListing(sellerCampaigns, listing);
+                AppliedCampaignDto best = findBestCampaignForListing(sellerCampaigns, listing, campaignQualifyingQuantities);
                 if (best != null && best.getDiscountAmount() != null && best.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
                     appliedCampaign = best;
                     campaignUnitPrice = PricingUtil.scale(unitPrice.subtract(best.getDiscountAmount()));
@@ -143,10 +146,27 @@ public class PriceCalculationEngine {
         return map;
     }
 
+    private Map<UUID, Integer> calculateCampaignQualifyingQuantities(List<Cart> cartItems, Map<Long, List<Campaign>> campaignsBySeller) {
+        Map<UUID, Integer> qualifyingQuantities = new HashMap<>();
+        for (Cart item : cartItems) {
+            Listing listing = item.getListing();
+            if (listing == null) continue;
+            Long sellerId = listing.getSeller().getId();
+            List<Campaign> sellerCampaigns = campaignsBySeller.getOrDefault(sellerId, List.of());
+            
+            for (Campaign c : sellerCampaigns) {
+                if (campaignPricingUtil.isApplicable(c, listing.getId(), listing.getListingType())) {
+                    qualifyingQuantities.put(c.getId(), qualifyingQuantities.getOrDefault(c.getId(), 0) + item.getQuantity());
+                }
+            }
+        }
+        return qualifyingQuantities;
+    }
+
     /**
      * Finds the best campaign (highest discount) for a listing.
      */
-    public AppliedCampaignDto findBestCampaignForListing(List<Campaign> campaigns, Listing listing) {
+    public AppliedCampaignDto findBestCampaignForListing(List<Campaign> campaigns, Listing listing, Map<UUID, Integer> qualifyingQuantities) {
         if (campaigns == null || campaigns.isEmpty() || listing == null) {
             return null;
         }
@@ -160,6 +180,12 @@ public class PriceCalculationEngine {
 
         for (Campaign c : campaigns) {
             if (!campaignPricingUtil.isApplicable(c, listingId, type)) {
+                continue;
+            }
+
+            // Check minimum quantity for bundle
+            int qualifyingQty = qualifyingQuantities != null ? qualifyingQuantities.getOrDefault(c.getId(), 0) : 0;
+            if (c.getMinQuantity() != null && qualifyingQty < c.getMinQuantity()) {
                 continue;
             }
 

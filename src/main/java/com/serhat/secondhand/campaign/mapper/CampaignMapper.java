@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Set;
 
 @Component
 public class CampaignMapper {
@@ -29,6 +28,8 @@ public class CampaignMapper {
     public CampaignDto toDto(Campaign campaign) {
         return CampaignDto.builder()
                 .id(campaign.getId())
+                .sellerId(campaign.getSeller() != null ? campaign.getSeller().getId() : null)
+                .sellerName(campaign.getSeller() != null ? campaign.getSeller().getName() : null)
                 .name(campaign.getName())
                 .active(campaign.isActive())
                 .startsAt(campaign.getStartsAt())
@@ -37,6 +38,7 @@ public class CampaignMapper {
                 .value(campaign.getValue())
                 .eligibleTypes(campaign.getEligibleTypes())
                 .eligibleListingIds(campaign.getEligibleListingIds())
+                .minQuantity(campaign.getMinQuantity())
                 .applyToFutureListings(campaign.isApplyToFutureListings())
                 .build();
     }
@@ -60,8 +62,8 @@ public class CampaignMapper {
         if (request.getName() != null) {
             campaign.setName(request.getName());
         }
-        if (request.getActive() != null) {
-            campaign.setActive(request.getActive());
+        if (request.isActive()) {
+            campaign.setActive(request.isActive());
         }
         if (request.getStartsAt() != null) {
             campaign.setStartsAt(request.getStartsAt());
@@ -84,6 +86,9 @@ public class CampaignMapper {
         if (request.getApplyToFutureListings() != null) {
             campaign.setApplyToFutureListings(request.getApplyToFutureListings());
         }
+        if (request.getMinQuantity() != null) {
+            campaign.setMinQuantity(request.getMinQuantity());
+        }
     }
 
     public Campaign fromCreateRequest(CreateCampaignRequest request, User seller) {
@@ -97,6 +102,7 @@ public class CampaignMapper {
                 .value(request.getValue())
                 .eligibleTypes(request.getEligibleTypes())
                 .eligibleListingIds(request.getEligibleListingIds())
+                .minQuantity(request.getMinQuantity() != null ? request.getMinQuantity() : 1)
                 .applyToFutureListings(request.getApplyToFutureListings() != null ? request.getApplyToFutureListings() : false)
                 .build();
     }

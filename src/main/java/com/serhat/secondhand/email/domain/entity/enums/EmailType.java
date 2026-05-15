@@ -19,6 +19,7 @@ public enum EmailType {
     NEW_LISTING_NOTIFICATION("New Listing Notification"),
     /** Yasal metin / sözleşme güncellemeleri — yalnızca gelen kutusu; in-app bildirim değil */
     AGREEMENT_UPDATED("Agreement Updated"),
+    GREAT_SELLER_ACHIEVEMENT("Great Seller Achievement"),
     SYSTEM("System");
 
     private final String label;

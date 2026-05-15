@@ -7,258 +7,213 @@ import {
   Printer,
   X,
   ShieldCheck,
-  Info,
   Calendar,
   CreditCard,
   Hash,
   ShoppingBag,
-  User as UserIcon
+  User as UserIcon,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Copy,
+  Tag
 } from 'lucide-react';
 import {
   formatCurrency,
   formatDateTime,
-  replaceEnumCodesInHtml,
-  resolveEnumLabel,
 } from '../../formatters.js';
-import { useEnums } from '../../hooks/useEnums.js';
 import { 
   PAYMENT_DIRECTIONS,
-  PAYMENT_STATUSES 
+  PAYMENT_STATUSES,
+  TRANSACTION_TYPE_LABELS
 } from '../../../payments/paymentSchema.js';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const DIRECTION_LABEL_EN = {
-  [PAYMENT_DIRECTIONS.INCOMING]: 'Incoming Payment',
-  [PAYMENT_DIRECTIONS.OUTGOING]: 'Outgoing Payment',
-};
-
-const useModalBodyOverflow = (isOpen) => {
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-};
-
-const fullName = (first, last) => [first, last].filter(Boolean).join(' ').trim();
-
-// Modernized row component
-const ReceiptRow = ({ label, value, icon: Icon, mono }) => (
-  <div className="flex items-center justify-between gap-4 py-3.5 group">
-    <div className="flex items-center gap-2.5 shrink-0">
-      {Icon && <Icon className="w-3.5 h-3.5 text-text-muted/70 group-hover:text-primary-500 transition-colors" />}
-      <span className="text-[12px] font-medium text-text-muted">{label}</span>
+const StatusBadge = ({ status, isSuccess }) => {
+  if (status === PAYMENT_STATUSES.ESCROW) {
+    return (
+      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+        <Clock className="w-3.5 h-3.5" />
+        <span className="text-[10px] font-bold uppercase tracking-tight">In Escrow</span>
+      </div>
+    );
+  }
+  if (isSuccess) {
+    return (
+      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+        <CheckCircle2 className="w-3.5 h-3.5" />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Confirmed</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+      <XCircle className="w-3.5 h-3.5" />
+      <span className="text-[10px] font-bold uppercase tracking-tight">Failed</span>
     </div>
-    <span
-      className={`text-[13px] font-bold text-text-primary text-right break-words max-w-[200px] ${
-        mono ? 'font-mono tracking-tight text-secondary-700' : ''
-      }`}
-    >
-      {value || '-'}
-    </span>
+  );
+};
+
+const InfoRow = ({ label, value, icon: Icon, isCopyable, isHighlight }) => (
+  <div className="flex items-center justify-between py-3 border-b border-slate-50 last:border-0 group">
+    <div className="flex items-center gap-2">
+      <div className={`p-1.5 rounded-lg transition-colors ${isHighlight ? 'bg-indigo-50 text-indigo-500' : 'bg-slate-50 text-slate-400 group-hover:text-indigo-500'}`}>
+        <Icon className="w-3.5 h-3.5" />
+      </div>
+      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+    </div>
+    <div className="flex items-center gap-2 max-w-[60%]">
+      <span className={`text-xs font-bold text-right break-words ${isHighlight ? 'text-indigo-600' : 'text-slate-900'}`}>
+        {value || '-'}
+      </span>
+      {isCopyable && value && (
+        <button onClick={() => navigator.clipboard.writeText(value)} className="p-1 text-slate-300 hover:text-indigo-500">
+          <Copy className="w-3 h-3" />
+        </button>
+      )}
+    </div>
   </div>
 );
 
 const PaymentReceiptModal = ({ isOpen, onClose, payment }) => {
-  const { enums } = useEnums();
-  useModalBodyOverflow(isOpen);
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   if (!isOpen || !payment) return null;
 
-  const formatAmount = (amount) => formatCurrency(amount, 'TRY');
-  const formatDate = (dateString) => formatDateTime(dateString);
-
-  const handlePrint = () => window.print();
-
-  const isIncoming = payment.paymentDirection === 'INCOMING';
-  const directionLabel =
-    DIRECTION_LABEL_EN[payment.paymentDirection] || payment.paymentDirection;
-
-  const transactionDisplay = replaceEnumCodesInHtml(
-    payment.transactionType,
-    enums,
-    ['paymentTypes']
-  );
-
-  const senderFull = payment.senderDisplayName || 'N/A';
-  const receiverFull = payment.receiverDisplayName || 'N/A';
+  const isIncoming = payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING;
+  const transactionId = String(payment.paymentId || payment.id || 'N/A').slice(0, 12);
+  const transactionLabel = TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-[2px] transition-all print:static print:inset-auto print:p-0 print:overflow-visible">
-      <div
-        className="absolute inset-0 transition-opacity print:hidden"
-        onClick={onClose}
-        aria-hidden
-      />
-
-      <div
-        className="relative w-full max-w-[440px] max-h-[min(95vh,820px)] flex flex-col bg-card-bg rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] ring-1 ring-white/10 print:shadow-none print:ring-0 print:max-w-none overflow-hidden animate-in fade-in zoom-in-95 duration-300"
-        role="dialog"
-        aria-modal="true"
-      >
-        {/* Decorative Top Gradient */}
-        <div className={`h-2 w-full shrink-0 ${isIncoming ? 'bg-emerald-500' : 'bg-primary-500'}`} />
-
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4 px-6 pt-6 pb-4 print:hidden">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl ${
-              payment.status === PAYMENT_STATUSES.ESCROW ? 'bg-blue-50 text-blue-600' :
-              isIncoming ? 'bg-emerald-50 text-emerald-600' : 'bg-primary-50 text-primary-600'
-            }`}>
-              {payment.status === PAYMENT_STATUSES.ESCROW ? <ShieldCheck className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-sm transition-all print:bg-white print:p-0">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="relative w-full max-w-[420px] max-h-[90vh] flex flex-col bg-white rounded-[2.5rem] shadow-2xl overflow-hidden print:shadow-none print:max-h-none"
+        >
+          {/* Header - Fixed */}
+          <div className="p-5 pb-2 flex items-center justify-between bg-white z-10">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">S</div>
+              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Digital Invoice</span>
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-text-primary tracking-tight">
-                Payment Receipt
-              </h2>
-              <p className="text-[11px] font-medium text-text-muted/80">Reference: {String(payment.paymentId || 'N/A').slice(0, 8)}...</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-secondary-100 text-text-muted hover:text-text-primary transition-all active:scale-90"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="px-6 pb-6 overflow-y-auto custom-scrollbar">
-          {/* Main Amount Card */}
-          <div className="relative mt-2 mb-8 p-8 rounded-[1.75rem] bg-gradient-to-br from-secondary-50 to-white ring-1 ring-secondary-200/50 shadow-inner overflow-hidden text-center">
-             {/* Background Pattern */}
-             <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl" />
-             
-             <p className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] mb-3">
-               Total Amount
-             </p>
-             <div className="flex items-center justify-center gap-2 mb-4">
-                <span className={`text-5xl font-black tracking-tighter ${isIncoming ? 'text-emerald-600' : 'text-text-primary'}`}>
-                  {isIncoming ? '+' : '-'}
-                  {formatAmount(payment.amount)}
-                </span>
-             </div>
-
-             <div className="flex justify-center gap-2">
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold ring-1 ${
-                  payment.status === PAYMENT_STATUSES.ESCROW
-                    ? 'bg-blue-50 text-blue-700 ring-blue-200'
-                    : payment.isSuccess 
-                    ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' 
-                    : 'bg-rose-50 text-rose-700 ring-rose-200'
-                }`}>
-                  {payment.status === PAYMENT_STATUSES.ESCROW ? <Info className="w-3.5 h-3.5" /> : (payment.isSuccess ? <BadgeCheck className="w-3.5 h-3.5" /> : <Info className="w-3.5 h-3.5" />)}
-                  {payment.status === PAYMENT_STATUSES.ESCROW ? 'In Escrow' : (payment.isSuccess ? 'Confirmed' : 'Rejected')}
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-white text-text-secondary ring-1 ring-secondary-200 shadow-sm uppercase tracking-wide">
-                   {isIncoming ? <ArrowDownLeft className="w-3 h-3 text-emerald-500" /> : <ArrowUpRight className="w-3 h-3 text-primary-500" />}
-                   {directionLabel}
-                </div>
-             </div>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-50 transition-colors">
+              <X className="w-5 h-5 text-slate-400" />
+            </button>
           </div>
 
-          <div className="space-y-1">
-             <h3 className="text-[11px] font-black text-text-muted/60 uppercase tracking-widest px-1 mb-3">Transaction Details</h3>
-             <div className="bg-secondary-50/50 rounded-2xl ring-1 ring-secondary-200/40 divide-y divide-secondary-200/40 px-4">
-                <ReceiptRow 
-                  label="Transaction Date" 
-                  value={formatDate(payment.processedAt)} 
-                  icon={Calendar}
-                />
-                <ReceiptRow 
-                  label="Payment Method" 
-                  value={resolveEnumLabel(enums, 'paymentTypes', payment.paymentType)} 
-                  icon={CreditCard}
-                />
-                <ReceiptRow 
-                  label="Transaction Type" 
-                  value={transactionDisplay} 
-                  icon={Info}
-                />
-                {payment.listingTitle && (
-                  <ReceiptRow 
-                    label="Related Listing" 
-                    value={payment.listingTitle} 
-                    icon={ShoppingBag}
-                  />
-                )}
-                {payment.paymentId && (
-                   <ReceiptRow 
-                    label="Transaction ID" 
-                    value={String(payment.paymentId)} 
-                    icon={Hash}
-                    mono
-                  />
-                )}
-             </div>
-          </div>
-
-          <div className="mt-6 space-y-1">
-             <h3 className="text-[11px] font-black text-text-muted/60 uppercase tracking-widest px-1 mb-3">PARTIES</h3>
-             <div className="bg-secondary-50/50 rounded-2xl ring-1 ring-secondary-200/40 divide-y divide-secondary-200/40 px-4">
-                {senderFull && (
-                  <ReceiptRow 
-                    label="Sender" 
-                    value={senderFull} 
-                    icon={UserIcon}
-                  />
-                )}
-                {receiverFull && (
-                  <ReceiptRow 
-                    label="Receiver" 
-                    value={receiverFull} 
-                    icon={UserIcon}
-                  />
-                )}
-             </div>
-          </div>
-
-          {/* Security Stamp & Footer */}
-          <div className="mt-10 pt-8 border-t border-dashed border-secondary-300 relative">
-             {/* Scissors Icon for cut line effect */}
-             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-card-bg px-4 flex gap-1">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="w-1 h-1 rounded-full bg-secondary-300" />
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="p-6 pt-2 text-center border-b border-dashed border-slate-100 relative bg-white">
+              <div className="absolute -bottom-1.5 left-0 right-0 flex justify-between px-2">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className="w-3 h-3 rounded-full bg-[#fafafa] -mb-1.5" />
                 ))}
-             </div>
+              </div>
 
-             <div className="flex flex-col items-center text-center space-y-4">
-                <div className="flex items-center gap-2">
-                   <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-primary-500/20">S</div>
-                   <span className="text-sm font-black tracking-tight text-text-primary">SecondHand <span className="text-primary-500">Pay</span></span>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Total Amount</p>
+              <h2 className={`text-4xl font-black tracking-tighter mb-4 ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
+                {isIncoming ? '+' : '-'}{formatCurrency(payment.amount)}
+              </h2>
+              <div className="flex items-center justify-center gap-2">
+                <StatusBadge status={payment.status} isSuccess={payment.isSuccess} />
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 text-slate-600 border border-slate-100">
+                  {isIncoming ? <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-500" /> : <ArrowUpRight className="w-3.5 h-3.5 text-indigo-500" />}
+                  <span className="text-[10px] font-bold uppercase tracking-tight">{isIncoming ? 'Incoming' : 'Outgoing'}</span>
                 </div>
-                <div className="space-y-1">
-                   <p className="text-[10px] text-text-muted font-medium leading-relaxed max-w-[280px]">
-                     This receipt was automatically generated by the system and 
-                     has no financial validity.
-                   </p>
-                   <div className="flex items-center justify-center gap-1.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full ring-1 ring-emerald-100">
-                      <ShieldCheck className="w-3 h-3" />
-                      SECURE DIGITAL TRANSACTION CERTIFIED
-                   </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-6 bg-[#fafafa]/50">
+              {/* Transaction Type Highlight */}
+              <div className="px-1">
+                <div className="flex items-center gap-3 p-4 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-200">
+                  <div className="p-2 bg-white/20 rounded-xl">
+                    <Tag className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest opacity-70">Transaction Category</p>
+                    <p className="text-sm font-black uppercase tracking-tight">{transactionLabel}</p>
+                  </div>
                 </div>
-             </div>
+              </div>
+
+              {/* Details Section */}
+              <div>
+                <h3 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 px-1">Receipt Details</h3>
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100/50">
+                  <InfoRow label="Date" value={formatDateTime(payment.processedAt || payment.createdAt)} icon={Calendar} />
+                  <InfoRow label="Payment Method" value={payment.paymentType || 'E-Wallet'} icon={CreditCard} />
+                  <InfoRow label="Reference ID" value={transactionId} icon={Hash} isCopyable />
+                  {payment.listingTitle && (
+                    <InfoRow label="Product/Item" value={payment.listingTitle} icon={ShoppingBag} isHighlight />
+                  )}
+                </div>
+              </div>
+
+              {/* Parties Section */}
+              <div>
+                <h3 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mb-3 px-1">Parties</h3>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="p-3.5 bg-white rounded-2xl border border-slate-100/50 shadow-sm">
+                    <p className="text-[8px] font-black text-slate-400 uppercase mb-1.5">Sender</p>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-5 h-5 rounded-md bg-slate-50 flex items-center justify-center shrink-0">
+                        <UserIcon className="w-2.5 h-2.5 text-slate-400" />
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-900 truncate">{payment.senderDisplayName || 'Anonymous'}</span>
+                    </div>
+                  </div>
+                  <div className="p-3.5 bg-white rounded-2xl border border-slate-100/50 shadow-sm">
+                    <p className="text-[8px] font-black text-slate-400 uppercase mb-1.5">Recipient</p>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-5 h-5 rounded-md bg-slate-50 flex items-center justify-center shrink-0">
+                        <UserIcon className="w-2.5 h-2.5 text-slate-400" />
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-900 truncate">{payment.receiverDisplayName || 'Anonymous'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Verification Footer */}
+              <div className="pt-2 flex flex-col items-center gap-2.5 text-center">
+                <div className="flex items-center gap-1.5 py-1.5 px-3 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
+                  <ShieldCheck className="w-3 h-3" />
+                  <span className="text-[8px] font-black uppercase tracking-widest">Verified by SecondHand Pay</span>
+                </div>
+                <p className="text-[8px] text-slate-400 font-medium leading-relaxed px-4">
+                  This digital invoice is a confirmation of a secure transaction on SecondHand. Reference ID is unique for your audit.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="p-6 bg-secondary-50/80 backdrop-blur-md border-t border-secondary-200 flex gap-3 print:hidden">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3.5 px-4 text-sm font-bold rounded-2xl bg-white text-text-secondary hover:bg-secondary-100 ring-1 ring-secondary-200 transition-all active:scale-95"
-          >
-            Close
-          </button>
-          <button
-            onClick={handlePrint}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 text-sm font-bold rounded-2xl bg-primary-600 text-white hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 active:scale-95"
-          >
-            <Printer className="w-4 h-4" />
-            Print
-          </button>
-        </div>
+          {/* Action Buttons - Fixed at bottom */}
+          <div className="p-5 bg-white border-t border-slate-100 flex gap-3 print:hidden shrink-0">
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 px-4 text-[10px] font-bold uppercase tracking-widest rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all active:scale-95"
+            >
+              Back
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="flex-1 flex items-center justify-center gap-2 py-3 px-4 text-[10px] font-bold uppercase tracking-widest rounded-xl bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/10 transition-all active:scale-95"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Download PDF
+            </button>
+          </div>
+        </motion.div>
       </div>
-    </div>,
+    </AnimatePresence>,
     document.body
   );
 };

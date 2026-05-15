@@ -1,65 +1,76 @@
 import React from 'react';
-import {Check as CheckIcon} from 'lucide-react';
+import { Check } from 'lucide-react';
 
 const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
-    return (
-        <div className="w-full px-1">
-            <div className="flex items-center justify-between gap-1 sm:gap-4 flex-wrap sm:flex-nowrap overflow-hidden">
-                    {steps.map((step, index) => {
-                        const isCompleted = currentStep > step.id;
-                        const isCurrent = currentStep === step.id;
-                        const isClickable = currentStep > step.id;
+  return (
+    <nav className="w-full" aria-label="Checkout progress">
+      <ol className="flex items-center">
+        {steps.map((step, index) => {
+          const isCompleted = currentStep > step.id;
+          const isCurrent = currentStep === step.id;
+          const isClickable = currentStep > step.id;
+          const isLast = index === steps.length - 1;
 
-                        return (
-                            <React.Fragment key={step.id}>
-                                <div className="flex items-center shrink-0">
-                                    <button
-                                        onClick={() => isClickable && onStepChange(step.id)}
-                                        disabled={!isClickable}
-                                        aria-label={`${step.title} step`}
-                                        aria-current={isCurrent ? 'step' : undefined}
-                                        className={`group flex items-center gap-3 ${
-                                            isClickable ? 'cursor-pointer' : 'cursor-default'
-                                        }`}
-                                    >
-                                        <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
-                                            isCompleted 
-                                                ? 'bg-emerald-500 text-white shadow-sm' 
-                                                : isCurrent 
-                                                    ? 'bg-indigo-600 text-white shadow-md scale-105 ring-4 ring-indigo-100' 
-                                                    : 'bg-slate-200 text-slate-400 group-hover:bg-slate-300'
-                                        }`}>
-                                            {isCompleted ? (
-                                                <CheckIcon className="w-5 h-5" />
-                                            ) : (
-                                                <span className="text-sm font-semibold tracking-tight">{step.id}</span>
-                                            )}
-                                        </div>
+          return (
+            <li
+              key={step.id}
+              className={`flex items-center ${isLast ? '' : 'flex-1'}`}
+            >
+              <button
+                type="button"
+                onClick={() => isClickable && onStepChange(step.id)}
+                disabled={!isClickable}
+                aria-label={`${step.title} step`}
+                aria-current={isCurrent ? 'step' : undefined}
+                className={`group flex items-center gap-2 ${
+                  isClickable ? 'cursor-pointer' : 'cursor-default'
+                }`}
+              >
+                {/* Step indicator */}
+                <span
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center text-xs font-semibold transition-all duration-200 ${
+                    isCompleted
+                      ? 'rounded-md bg-[#1466c6] text-white'
+                      : isCurrent
+                        ? 'rounded-md border-2 border-[#1466c6] text-[#1466c6]'
+                        : 'rounded-md border border-[#ddd] text-[#999]'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                  ) : (
+                    step.id
+                  )}
+                </span>
 
-                                        <div className="text-left hidden sm:block">
-                                            <div className={`text-sm font-semibold tracking-tight ${
-                                                isCurrent || isCompleted ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'
-                                            }`}>
-                                                {step.title}
-                                            </div>
-                                            <div className="text-xs text-slate-500 tracking-tight">
-                                                {step.description}
-                                            </div>
-                                        </div>
-                                    </button>
-                                </div>
+                {/* Step title — hidden on small screens */}
+                <span
+                  className={`hidden text-sm font-medium sm:inline ${
+                    isCurrent
+                      ? 'text-[#111]'
+                      : isCompleted
+                        ? 'text-[#555] group-hover:text-[#111]'
+                        : 'text-[#999]'
+                  }`}
+                >
+                  {step.title}
+                </span>
+              </button>
 
-                                {index < steps.length - 1 && (
-                                    <div className={`hidden md:block flex-1 h-[2px] mx-2 lg:mx-4 rounded-full transition-all duration-300 ${
-                                        currentStep > step.id ? 'bg-emerald-500/80' : 'bg-slate-200'
-                                    }`} />
-                                )}
-                            </React.Fragment>
-                        );
-                    })}
-                </div>
-        </div>
-    );
+              {/* Connector line */}
+              {!isLast && (
+                <div
+                  className={`mx-3 hidden h-px flex-1 sm:block ${
+                    isCompleted ? 'bg-[#1466c6]' : 'bg-[#e5e3df]'
+                  }`}
+                />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
 };
 
 export default CheckoutProgressBar;

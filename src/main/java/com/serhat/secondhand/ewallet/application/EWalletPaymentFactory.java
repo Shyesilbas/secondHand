@@ -42,7 +42,7 @@ public class EWalletPaymentFactory {
                 .build();
     }
 
-    public Payment buildRefundPayment(User seller, User buyer, BigDecimal amount, UUID listingId) {
+    public Payment buildRefundPayment(User seller, User buyer, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
         return Payment.builder()
                 .fromUser(seller)
                 .toUser(buyer)
@@ -51,12 +51,15 @@ public class EWalletPaymentFactory {
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.INCOMING)
                 .listingId(listingId)
+                .listingTitle(listingTitle)
+                .listingNo(listingNo)
+                .description(String.format("Refund for item: %s (%s)", listingTitle, listingNo))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
     }
 
-    public Payment buildRefundDebitPayment(User seller, User buyer, BigDecimal amount, UUID listingId) {
+    public Payment buildRefundDebitPayment(User seller, User buyer, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
         return Payment.builder()
                 .fromUser(seller)
                 .toUser(buyer)
@@ -65,12 +68,15 @@ public class EWalletPaymentFactory {
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .listingId(listingId)
+                .listingTitle(listingTitle)
+                .listingNo(listingNo)
+                .description(String.format("Refund debit for item: %s (%s)", listingTitle, listingNo))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
     }
 
-    public Payment buildItemSalePayment(User buyer, User seller, BigDecimal amount, UUID listingId) {
+    public Payment buildItemSalePayment(User buyer, User seller, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
         return Payment.builder()
                 .fromUser(buyer)
                 .toUser(seller)
@@ -79,6 +85,9 @@ public class EWalletPaymentFactory {
                 .transactionType(PaymentTransactionType.ITEM_SALE)
                 .paymentDirection(PaymentDirection.INCOMING)
                 .listingId(listingId)
+                .listingTitle(listingTitle)
+                .listingNo(listingNo)
+                .description(String.format("Sale of item: %s (%s)", listingTitle, listingNo))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();

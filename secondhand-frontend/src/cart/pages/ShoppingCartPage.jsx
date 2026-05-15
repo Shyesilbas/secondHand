@@ -1,360 +1,544 @@
-import React, {useMemo, useState} from 'react';
-import {useNavigate, Link} from 'react-router-dom';
-import {AlertTriangle as ExclamationTriangleIcon, ArrowLeft as ArrowLeftIcon, Heart, ShoppingBag, Sparkles} from 'lucide-react';
-import {useCart} from '../hooks/useCart.js';
-import {formatCurrency} from '../../common/formatters.js';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { AlertTriangle, ArrowLeft, Check, Heart, ShoppingBag } from 'lucide-react';
+import { useCart } from '../hooks/useCart.js';
+import { formatCurrency } from '../../common/formatters.js';
 import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
-import {useNotification} from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_MESSAGES } from '../cartConstants.js';
+import { couponService } from '../services/couponService.js';
+import { campaignService } from '../../listing/services/campaignService.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useFavorites } from '../../favorites/hooks/useFavorites.js';
+import {
+  CART_UI,
+  cartBtnPrimary,
+  cartBtnSecondary,
+  cartPageCanvas,
+  cartPageHeader,
+  cartSurfacePanel,
+  CART_SHAPE,
+} from '../uiPalette.js';
 
 const ShoppingCartPage = () => {
-    const navigate = useNavigate();
-    const notification = useNotification();
-    const { user, isAuthenticated } = useAuthState();
-    const { favorites = [], isLoading: favoritesLoading } = useFavorites(0, 8);
-    const { 
-        cartItems, 
-        cartCount, 
-        isLoading, 
-        updateCartItem, 
-        removeFromCart, 
-        clearCart,
-        isUpdatingCart,
-        isRemovingFromCart,
-        isClearingCart
-    } = useCart();
+  const navigate = useNavigate();
+  const notification = useNotification();
+  const { user, isAuthenticated } = useAuthState();
+  const { favorites = [], isLoading: favoritesLoading } = useFavorites(0, 8);
+  const {
+    cartItems,
+    cartCount,
+    isLoading,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    isUpdatingCart,
+    isRemovingFromCart,
+    isClearingCart,
+  } = useCart();
 
-    const [showClearModal, setShowClearModal] = useState(false);
+  const [pricing, setPricing] = useState(null);
+  const [isPricingLoading, setIsPricingLoading] = useState(false);
+  const [sellerCampaigns, setSellerCampaigns] = useState([]);
 
-    const checkReservationStatus = (reservedAt) => {
-        if (!reservedAt) return { isExpired: false, timeRemaining: null };
-        const reservedTime = new Date(reservedAt);
-        const expirationTime = new Date(reservedTime.getTime() + (15 * 60 * 1000));
-        const now = new Date();
-        const diff = expirationTime - now;
-        
-        if (diff <= 0) {
-            return { isExpired: true, timeRemaining: null };
-        }
-        
-        const minutes = Math.floor(diff / 60000);
-        return { isExpired: false, timeRemaining: { minutes, seconds: Math.floor((diff % 60000) / 1000) } };
-    };
+  const [showClearModal, setShowClearModal] = useState(false);
 
-    const hasExpiredReservations = useMemo(() => {
-        return cartItems.some(item => checkReservationStatus(item.reservedAt).isExpired);
-    }, [cartItems]);
+  const checkReservationStatus = (reservedAt) => {
+    if (!reservedAt) return { isExpired: false, timeRemaining: null };
+    const reservedTime = new Date(reservedAt);
+    const expirationTime = new Date(reservedTime.getTime() + 15 * 60 * 1000);
+    const now = new Date();
+    const diff = expirationTime - now;
 
-    const hasExpiringReservations = useMemo(() => {
-        return cartItems.some(item => {
-            const { isExpired, timeRemaining } = checkReservationStatus(item.reservedAt);
-            return !isExpired && timeRemaining && timeRemaining.minutes < 5;
-        });
-    }, [cartItems]);
-
-    const calculateTotal = () => {
-        return cartItems.reduce((total, item) => {
-            const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
-            return total + (price * item.quantity);
-        }, 0);
-    };
-
-    const calculateOriginalTotal = () => {
-        return cartItems.reduce((total, item) => {
-            const price = parseFloat(item.listing.price) || 0;
-            return total + (price * item.quantity);
-        }, 0);
-    };
-    
-    const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
-    const originalTotal = calculateOriginalTotal();
-    const discountedTotal = calculateTotal();
-    const campaignDiscount = Math.max(0, (originalTotal || 0) - (discountedTotal || 0));
-
-    const favoriteListings = useMemo(
-        () =>
-            favorites
-                .map((fav) => {
-                    const listing = fav?.listing;
-                    if (!listing) return null;
-                    const favoriteCount = listing?.favoriteCount ?? listing?.favoriteStats?.favoriteCount ?? 0;
-                    return {
-                        ...listing,
-                        favoriteStats: {
-                            ...listing.favoriteStats,
-                            favoriteCount,
-                            isFavorited: true,
-                            favorited: true,
-                        },
-                    };
-                })
-                .filter(Boolean),
-        [favorites]
-    );
-
-    const handleQuantityChange = (listingId, newQuantity) => {
-        if (newQuantity < 1) return;
-        const item = cartItems.find((ci) => ci?.listing?.id === listingId);
-        const max = item?.listing?.quantity;
-        if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
-            updateCartItem(listingId, Number(max), '');
-            notification?.showError('Stock limit', `Available stock is ${Number(max)}.`);
-            return;
-        }
-        updateCartItem(listingId, newQuantity, '');
-    };
-
-    const handleRemoveItem = (listingId) => {
-        removeFromCart(listingId);
-    };
-
-    const handleClearCart = () => {
-        clearCart();
-        setShowClearModal(false);
-    };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
-            </div>
-        );
+    if (diff <= 0) {
+      return { isExpired: true, timeRemaining: null };
     }
 
+    const minutes = Math.floor(diff / 60000);
+    return {
+      isExpired: false,
+      timeRemaining: { minutes, seconds: Math.floor((diff % 60000) / 1000) },
+    };
+  };
+
+  const hasExpiredReservations = useMemo(
+    () => cartItems.some((item) => checkReservationStatus(item.reservedAt).isExpired),
+    [cartItems]
+  );
+
+  const hasExpiringReservations = useMemo(
+    () =>
+      cartItems.some((item) => {
+        const { isExpired, timeRemaining } = checkReservationStatus(item.reservedAt);
+        return !isExpired && timeRemaining && timeRemaining.minutes < 5;
+      }),
+    [cartItems]
+  );
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      setIsPricingLoading(true);
+      
+      const sellerIds = [...new Set(cartItems.map(item => item.listing.sellerId))];
+      
+      Promise.all([
+        couponService.preview(null),
+        campaignService.listBySellers(sellerIds)
+      ]).then(([pricingRes, campaignsRes]) => {
+        setPricing(pricingRes?.data || pricingRes);
+        setSellerCampaigns(Array.isArray(campaignsRes?.data) ? campaignsRes.data : (Array.isArray(campaignsRes) ? campaignsRes : []));
+      })
+      .catch(() => {
+        setPricing(null);
+        setSellerCampaigns([]);
+      })
+      .finally(() => setIsPricingLoading(false));
+    } else {
+      setPricing(null);
+      setSellerCampaigns([]);
+    }
+  }, [cartItems]);
+
+  const bundleInfo = useMemo(() => {
+    if (!sellerCampaigns.length || !cartItems.length) return { suggestions: [], applied: [] };
+    
+    const suggestions = [];
+    const applied = [];
+    const quantitiesBySeller = {};
+    cartItems.forEach(item => {
+      const sId = item.listing.sellerId;
+      quantitiesBySeller[sId] = (quantitiesBySeller[sId] || 0) + item.quantity;
+    });
+
+    sellerCampaigns.forEach(c => {
+      if (c.minQuantity > 1) {
+        const currentQty = quantitiesBySeller[c.sellerId] || 0;
+        if (currentQty > 0) {
+          if (currentQty < c.minQuantity) {
+            suggestions.push({
+              sellerId: c.sellerId,
+              sellerName: c.sellerName || 'Seller',
+              remaining: c.minQuantity - currentQty,
+              discountValue: c.value,
+              discountKind: c.discountKind,
+              minQuantity: c.minQuantity
+            });
+          } else {
+            applied.push({
+              sellerId: c.sellerId,
+              sellerName: c.sellerName || 'Seller',
+              discountValue: c.value,
+              discountKind: c.discountKind,
+              quantity: currentQty
+            });
+          }
+        }
+      }
+    });
+    return { suggestions, applied };
+  }, [sellerCampaigns, cartItems]);
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
+      return total + price * item.quantity;
+    }, 0);
+  };
+
+  const calculateOriginalTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = parseFloat(item.listing.price) || 0;
+      return total + price * item.quantity;
+    }, 0);
+  };
+
+  const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
+  const originalTotal = pricing?.originalSubtotal != null ? parseFloat(pricing.originalSubtotal) : calculateOriginalTotal();
+  const discountedTotal = pricing?.total != null ? parseFloat(pricing.total) : calculateTotal();
+  const campaignDiscount = pricing?.campaignDiscount != null ? parseFloat(pricing.campaignDiscount) : Math.max(0, (originalTotal || 0) - (discountedTotal || 0));
+
+  const favoriteListings = useMemo(
+    () =>
+      favorites
+        .map((fav) => {
+          const listing = fav?.listing;
+          if (!listing) return null;
+          const favoriteCount =
+            listing?.favoriteCount ?? listing?.favoriteStats?.favoriteCount ?? 0;
+          return {
+            ...listing,
+            favoriteStats: {
+              ...listing.favoriteStats,
+              favoriteCount,
+              isFavorited: true,
+              favorited: true,
+            },
+          };
+        })
+        .filter(Boolean),
+    [favorites]
+  );
+
+  const handleQuantityChange = (listingId, newQuantity) => {
+    if (newQuantity < 1) return;
+    const item = cartItems.find((ci) => ci?.listing?.id === listingId);
+    const max = item?.listing?.quantity;
+    if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
+      updateCartItem(listingId, Number(max), '');
+      notification?.showError(
+        'Stock limit',
+        `Only ${Number(max)} available.`
+      );
+      return;
+    }
+    updateCartItem(listingId, newQuantity, '');
+  };
+
+  const handleRemoveItem = (listingId) => {
+    removeFromCart(listingId);
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    setShowClearModal(false);
+  };
+
+  if (isLoading) {
     return (
-        <div className="min-h-screen bg-slate-50/50 relative">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-indigo-50/60 via-violet-50/20 to-transparent pointer-events-none -z-10" />
-            
-            {/* Sticky header */}
-            <div className="bg-white/70 backdrop-blur-2xl border-b border-slate-200/60 sticky top-0 z-30 shadow-sm">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all duration-300 -ml-2"
-                        >
-                            <ArrowLeftIcon className="w-5 h-5" />
-                        </button>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Shopping Cart</h1>
-                            {cartCount > 0 ? (
-                                <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold tracking-wide">
-                                    {cartCount} {cartCount === 1 ? 'item' : 'items'}
-                                </span>
-                            ) : (
-                                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Empty</span>
-                            )}
-                        </div>
-                    </div>
-                    {cartCount > 0 && (
-                        <div className="flex flex-col items-end justify-center">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-base sm:text-lg font-extrabold text-slate-900 tabular-nums tracking-tight">{formatCurrency(discountedTotal, currency)}</span>
-                            </div>
-                            {campaignDiscount > 0 && (
-                                <div className="flex items-center gap-1.5 -mt-0.5">
-                                    <span className="text-[11px] text-slate-400 line-through tabular-nums">{formatCurrency(originalTotal, currency)}</span>
-                                    <span className="text-[10px] font-bold text-emerald-500">-{formatCurrency(campaignDiscount, currency)}</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-
-            {cartCount === 0 ? (
-                <div className="mt-6 sm:mt-8 space-y-10 pb-12">
-                    <div className="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_12px_40px_-12px_rgba(15,23,42,0.12)]">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-100/80 to-violet-100/40 blur-3xl rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-                        <div className="relative px-6 sm:px-12 py-14 sm:py-16 text-center">
-                            <div className="w-16 h-16 mx-auto rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/25 mb-6">
-                                <ShoppingBag className="w-8 h-8" strokeWidth={1.75} />
-                            </div>
-                            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
-                                {CART_MESSAGES.EMPTY_CART_TITLE}
-                            </h2>
-                            <p className="text-slate-500 text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed">
-                                {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                                <button
-                                    type="button"
-                                    onClick={() => navigate(ROUTES.LISTINGS)}
-                                    className="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-w-[200px] px-8 py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 shadow-md shadow-indigo-600/20 transition-colors"
-                                >
-                                    <Sparkles className="w-4 h-4" />
-                                    Browse listings
-                                </button>
-                                {isAuthenticated ? (
-                                    <Link
-                                        to={ROUTES.FAVORITES}
-                                        className="inline-flex items-center justify-center gap-2 w-full sm:w-auto min-w-[200px] px-8 py-3.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors"
-                                    >
-                                        <Heart className="w-4 h-4 text-rose-500" />
-                                        View favorites
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        to={ROUTES.LOGIN}
-                                        className="inline-flex items-center justify-center w-full sm:w-auto min-w-[200px] px-8 py-3.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                                    >
-                                        {CART_MESSAGES.EMPTY_CART_SIGN_IN}
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {isAuthenticated ? (
-                        <section className="rounded-[2rem] border border-slate-200/90 bg-slate-50/40 p-6 sm:p-8">
-                            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Heart className="w-5 h-5 text-rose-500 fill-rose-500/30" />
-                                        {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
-                                    </h3>
-                                    <p className="text-sm text-slate-500 mt-1">{CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}</p>
-                                </div>
-                                <Link
-                                    to={ROUTES.FAVORITES}
-                                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
-                                >
-                                    {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES} →
-                                </Link>
-                            </div>
-                            {favoritesLoading ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                    {[...Array(4)].map((_, i) => (
-                                        <div key={i} className="rounded-2xl border border-slate-100 bg-white overflow-hidden animate-pulse min-w-0">
-                                            <div className="aspect-[4/3] bg-slate-200/80" />
-                                            <div className="p-3 space-y-2">
-                                                <div className="h-3 bg-slate-100 rounded w-2/3" />
-                                                <div className="h-4 bg-slate-100 rounded w-full" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : favoriteListings.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                    {favoriteListings.map((listing, index) => (
-                                        <div key={listing.id} className="min-w-0 max-w-full">
-                                            <ListingCard
-                                                listing={listing}
-                                                isOwner={user?.id === listing.sellerId}
-                                                currentUserId={user?.id}
-                                                priorityImage={index < 4}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-slate-500 text-center py-8 rounded-xl bg-white/80 border border-dashed border-slate-200">
-                                    No saved favorites yet — tap the heart on a listing to save it for later.
-                                </p>
-                            )}
-                        </section>
-                    ) : (
-                        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <p className="text-sm text-slate-600">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
-                            <Link
-                                to={ROUTES.LOGIN}
-                                className="inline-flex justify-center sm:justify-end px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors shrink-0"
-                            >
-                                {CART_MESSAGES.EMPTY_CART_SIGN_IN}
-                            </Link>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                    {/* Reservation warnings */}
-                    {(hasExpiredReservations || hasExpiringReservations) && (
-                        <div className="lg:col-span-2">
-                            <div className={`mb-4 px-4 py-3 rounded-lg border text-[12px] flex items-start gap-2.5 ${
-                                hasExpiredReservations
-                                    ? 'bg-red-50/80 border-red-100 text-red-700'
-                                    : 'bg-amber-50/80 border-amber-100 text-amber-700'
-                            }`}>
-                                <ExclamationTriangleIcon className="w-4 h-4 mt-0.5 shrink-0" />
-                                <div>
-                                    <p className="font-medium">
-                                        {hasExpiredReservations
-                                            ? 'Some reservations have expired'
-                                            : 'Reservations expiring soon'
-                                        }
-                                    </p>
-                                    <p className="mt-0.5 opacity-80">
-                                        {hasExpiredReservations
-                                            ? 'Update quantities or proceed to checkout immediately.'
-                                            : 'Complete your purchase in the next few minutes to secure these items.'
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Cart items */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                            <div className="px-6 py-5 border-b border-slate-100/50 bg-slate-50/30 flex items-center justify-between">
-                                <h2 className="text-base font-extrabold text-slate-900 tracking-tight">Your Items</h2>
-                                <button
-                                    onClick={() => setShowClearModal(true)}
-                                    className="text-xs text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-colors font-bold"
-                                >
-                                    Clear all
-                                </button>
-                            </div>
-
-                            <div className="divide-y divide-slate-100/60 bg-white/40">
-                                {cartItems.map((item, index) => (
-                                    <CartItemCard
-                                        key={item.id}
-                                        item={item}
-                                        onQuantityChange={handleQuantityChange}
-                                        onRemoveItem={handleRemoveItem}
-                                        isUpdating={isUpdatingCart}
-                                        isRemoving={isRemovingFromCart}
-                                        index={index}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Order summary */}
-                    <div className="lg:col-span-1">
-                        <OrderSummary
-                            cartItems={cartItems}
-                            cartCount={cartCount}
-                            calculateTotal={calculateTotal}
-                            onCheckout={() => navigate(ROUTES.CHECKOUT)}
-                            disabled={cartCount === 0}
-                        />
-                    </div>
-                </div>
-            )}
-
-            <ClearCartModal
-                isOpen={showClearModal}
-                onClose={() => setShowClearModal(false)}
-                onConfirm={handleClearCart}
-                isClearing={isClearingCart}
-            />
-
-            </div>
-        </div>
+      <div className={`flex min-h-screen items-center justify-center ${cartPageCanvas}`}>
+        <div
+          className="h-6 w-6 animate-spin rounded-full border-2 border-[#1466c6] border-t-transparent"
+          aria-hidden
+        />
+      </div>
     );
+  }
+
+  return (
+    <div className={`min-h-screen ${cartPageCanvas}`}>
+      <header className={cartPageHeader}>
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="-ml-2 rounded-xl p-2 text-[#5f5b57] transition hover:bg-black/[0.04] hover:text-[#1a1918]"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
+            </button>
+            <h1 className="truncate text-base font-semibold text-[#1a1918] sm:text-lg">
+              Shopping cart
+            </h1>
+            {cartCount > 0 ? (
+              <span
+                className="shrink-0 rounded-full border bg-white px-2.5 py-0.5 text-xs font-medium tabular-nums text-[#5f5b57]"
+                style={{ borderColor: CART_UI.border }}
+              >
+                {cartCount} {cartCount === 1 ? 'item' : 'items'}
+              </span>
+            ) : (
+              <span className="text-xs font-medium uppercase tracking-wide text-[#9c9894]">
+                Empty
+              </span>
+            )}
+          </div>
+          {cartCount > 0 && (
+            <div className="text-right">
+              <p className="text-sm font-semibold tabular-nums text-[#1a1918] sm:text-base">
+                {formatCurrency(discountedTotal, currency)}
+              </p>
+              {campaignDiscount > 0 && (
+                <p className="text-xs tabular-nums text-[#5f5b57]">
+                  <span className="line-through">{formatCurrency(originalTotal, currency)}</span>
+                  <span className="ml-1.5 text-[#107c10]">
+                    −{formatCurrency(campaignDiscount, currency)}
+                  </span>
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        {cartCount === 0 ? (
+          <div className="space-y-8 pb-12">
+            <div className={cartSurfacePanel} style={{ borderColor: CART_UI.border }}>
+              <div className="px-6 py-12 text-center sm:px-10 sm:py-14">
+                <div
+                  className={`mx-auto mb-5 flex h-12 w-12 items-center justify-center border bg-[#f7f6f5] text-[#5f5b57] ${CART_SHAPE.radiusBox}`}
+                  style={{ borderColor: CART_UI.border }}
+                >
+                  <ShoppingBag className="h-6 w-6" strokeWidth={1.5} />
+                </div>
+                <h2 className="text-lg font-semibold text-[#1a1918] sm:text-xl">
+                  {CART_MESSAGES.EMPTY_CART_TITLE}
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#5f5b57]">
+                  {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
+                </p>
+                <div className="mt-8 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate(ROUTES.LISTINGS)}
+                    className={`${cartBtnPrimary} px-6`}
+                  >
+                    Browse listings
+                  </button>
+                  {isAuthenticated ? (
+                    <Link
+                      to={ROUTES.FAVORITES}
+                      className={`${cartBtnSecondary} px-6 py-2.5 text-center`}
+                    >
+                      <span className="inline-flex items-center justify-center gap-2">
+                        <Heart className="h-4 w-4 text-[#5f5b57]" strokeWidth={1.75} />
+                        Favorites
+                      </span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to={ROUTES.LOGIN}
+                      className={`${cartBtnSecondary} px-6 py-2.5 text-center`}
+                    >
+                      {CART_MESSAGES.EMPTY_CART_SIGN_IN}
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {isAuthenticated ? (
+              <section
+                className={`${cartSurfacePanel} p-5 sm:p-6`}
+                style={{ borderColor: CART_UI.border }}
+              >
+                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h3 className="text-base font-semibold text-[#1a1918]">
+                      {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
+                    </h3>
+                    <p className="mt-1 text-sm text-[#5f5b57]">
+                      {CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}
+                    </p>
+                  </div>
+                  <Link
+                    to={ROUTES.FAVORITES}
+                    className="text-sm font-medium text-[#1466c6] hover:underline"
+                  >
+                    {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES}
+                  </Link>
+                </div>
+                {favoritesLoading ? (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`min-w-0 animate-pulse overflow-hidden border border-[#e0deda] bg-white ${CART_SHAPE.radiusBox}`}
+                      >
+                        <div className="aspect-[4/3] bg-[#e8e6e4]" />
+                        <div className="space-y-2 p-3">
+                          <div className="h-3 w-2/3 rounded bg-[#e8e6e4]" />
+                          <div className="h-4 w-full rounded bg-[#e8e6e4]" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : favoriteListings.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
+                    {favoriteListings.map((listing, index) => (
+                      <div key={listing.id} className="min-w-0 max-w-full">
+                        <ListingCard
+                          listing={listing}
+                          isOwner={user?.id === listing.sellerId}
+                          currentUserId={user?.id}
+                          priorityImage={index < 4}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-xl border border-dashed border-[#e0deda] py-8 text-center text-sm text-[#5f5b57]">
+                    No favorites yet — tap the heart on a listing to save it.
+                  </p>
+                )}
+              </section>
+            ) : (
+              <div
+                className={`${cartSurfacePanel} flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-center sm:justify-between`}
+                style={{ borderColor: CART_UI.border }}
+              >
+                <p className="text-sm text-[#5f5b57]">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
+                <Link
+                  to={ROUTES.LOGIN}
+                  className={`${cartBtnPrimary} shrink-0 px-5 py-2.5 text-center`}
+                >
+                  {CART_MESSAGES.EMPTY_CART_SIGN_IN}
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
+            <div className="space-y-4 lg:col-span-8">
+              {(hasExpiredReservations || hasExpiringReservations) && (
+                <div
+                  className={`flex gap-2.5 rounded-xl border-l-4 px-3 py-2.5 text-sm ${
+                    hasExpiredReservations
+                      ? 'border-[#d13438] bg-[#fdf3f2] text-[#5f5b57]'
+                      : 'border-[#ca5010] bg-[#fff9f5] text-[#5f5b57]'
+                  }`}
+                >
+                  <AlertTriangle
+                    className={`mt-0.5 h-4 w-4 shrink-0 ${
+                      hasExpiredReservations ? 'text-[#d13438]' : 'text-[#ca5010]'
+                    }`}
+                  />
+                  <div>
+                    <p className="font-medium text-[#1a1918]">
+                      {hasExpiredReservations
+                        ? 'Some reservations have expired'
+                        : 'Reservations expiring soon'}
+                    </p>
+                    <p className="mt-0.5 text-[#5f5b57]">
+                      {hasExpiredReservations
+                        ? 'Update quantities or proceed to checkout now.'
+                        : 'Complete your purchase within the next few minutes to hold these items.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Applied Bundles (Success) */}
+              {bundleInfo.applied.length > 0 && (
+                <div className="mb-6 space-y-3">
+                  {bundleInfo.applied.map((a, idx) => (
+                    <div key={idx} className="flex items-center gap-4 p-4 bg-green-50 border border-green-100 rounded-3xl animate-in slide-in-from-top-4 duration-500">
+                      <div className="w-10 h-10 bg-green-600 text-white rounded-xl flex items-center justify-center shrink-0">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-green-900">
+                          Bundle Unlocked!
+                        </p>
+                        <p className="text-xs text-green-700 mt-0.5">
+                          You've earned a <b>{a.discountValue}{a.discountKind === 'PERCENT' ? '%' : ''} discount</b> from <button onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))} className="font-bold underline hover:text-green-800 transition-colors">{a.sellerName}</button> for buying {a.quantity} items!
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Bundle Suggestions (Potential) */}
+              {bundleInfo.suggestions.length > 0 && (
+                <div className="mb-8 space-y-4">
+                  {bundleInfo.suggestions.map((s, idx) => {
+                    const currentQty = s.minQuantity - s.remaining;
+                    const progress = (currentQty / s.minQuantity) * 100;
+                    
+                    return (
+                      <div key={idx} className="group relative overflow-hidden bg-white border-2 border-indigo-100 rounded-3xl p-5 shadow-sm transition-all hover:shadow-md">
+                        <div className="absolute top-0 left-0 w-1 bg-indigo-600 h-full" />
+                        
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              </span>
+                              <h4 className="text-sm font-bold text-[#1a1918]">
+                                Exclusive Bundle from <button onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))} className="underline hover:text-indigo-600 transition-colors">{s.sellerName}</button>
+                              </h4>
+                            </div>
+                            
+                            <p className="text-xs text-[#5f5b57] mb-4">
+                              Add <span className="font-bold text-indigo-600">{s.remaining} more item{s.remaining > 1 ? 's' : ''}</span> to unlock a <span className="px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-bold">{s.discountValue}{s.discountKind === 'PERCENT' ? '%' : ''} discount</span> on your entire bundle!
+                            </p>
+                            
+                            <div className="relative w-full h-2 bg-[#f0efed] rounded-full overflow-hidden">
+                              <div 
+                                className="absolute top-0 left-0 h-full bg-indigo-600 transition-all duration-1000 ease-out"
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                            <div className="flex justify-between mt-2 text-[10px] font-bold uppercase tracking-wider text-[#9c9894]">
+                              <span>{currentQty} items in cart</span>
+                              <span>Target: {s.minQuantity} items</span>
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
+                            className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 bg-[#1a1918] text-white text-xs font-bold rounded-2xl hover:bg-black transition-all shadow-lg shadow-black/5"
+                          >
+                            <ShoppingBag className="w-4 h-4" />
+                            Complete Bundle
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className={cartSurfacePanel} style={{ borderColor: CART_UI.border }}>
+                <div
+                  className="flex items-center justify-between border-b px-4 py-3 sm:px-5"
+                  style={{ borderColor: CART_UI.border, backgroundColor: CART_UI.surface }}
+                >
+                  <h2 className="text-sm font-semibold text-[#1a1918]">Your items</h2>
+                  <button
+                    type="button"
+                    onClick={() => setShowClearModal(true)}
+                    className="text-xs font-medium text-[#5f5b57] underline-offset-2 hover:text-[#1466c6] hover:underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
+                <div className="divide-y divide-[#e0deda]">
+                  {cartItems.map((item) => (
+                    <CartItemCard
+                      key={item.id}
+                      item={item}
+                      onQuantityChange={handleQuantityChange}
+                      onRemoveItem={handleRemoveItem}
+                      isUpdating={isUpdatingCart}
+                      isRemoving={isRemovingFromCart}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4">
+              <OrderSummary
+                cartItems={cartItems}
+                cartCount={cartCount}
+                calculateTotal={calculateTotal}
+                pricing={pricing}
+                onCheckout={() => navigate(ROUTES.CHECKOUT)}
+                disabled={cartCount === 0}
+              />
+            </div>
+          </div>
+        )}
+
+        <ClearCartModal
+          isOpen={showClearModal}
+          onClose={() => setShowClearModal(false)}
+          onConfirm={handleClearCart}
+          isClearing={isClearingCart}
+        />
+      </main>
+    </div>
+  );
 };
 
 export default ShoppingCartPage;
-

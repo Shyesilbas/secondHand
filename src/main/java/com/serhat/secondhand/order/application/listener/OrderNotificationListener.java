@@ -4,11 +4,16 @@ import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.application.OrderLogService;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
+import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
+import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
 import com.serhat.secondhand.order.application.event.OrderStatusChangedEvent;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
+import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -16,8 +21,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +38,7 @@ public class OrderNotificationListener {
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final OrderMapper orderMapper;
     private final OrderLogService orderLog;
+    private final OrderRepository orderRepository;
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -60,8 +69,63 @@ public class OrderNotificationListener {
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderCancelledInApp", event.order().getOrderNumber(), result.getMessage());
             }
+
+            Optional<Order> loaded = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId());
+            Order order = loaded.orElse(event.order());
+            Set<Long> counterparties = collectOrderParticipantIds(order);
+            counterparties.remove(event.requester().getId());
+            for (Long uid : counterparties) {
+                var cr = notificationService.createAndSend(
+                        notificationTemplateCatalog.orderCancelledCounterparty(
+                                uid,
+                                event.order().getId(),
+                                event.order().getOrderNumber()
+                        )
+                );
+                if (cr.isError()) {
+                    orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", event.order().getOrderNumber(), cr.getMessage());
+                }
+            }
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCancelledInApp", event.order().getOrderNumber(), e.getMessage());
+        }
+    }
+
+    @Async("notificationExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onOrderCompleted(OrderCompletedEvent event) {
+        try {
+            var result = notificationService.createAndSend(
+                    notificationTemplateCatalog.orderCompleted(
+                            event.buyer().getId(),
+                            event.order().getId(),
+                            event.order().getOrderNumber()
+                    )
+            );
+            if (result.isError()) {
+                orderLog.logNotificationFailed("orderCompletedInApp", event.order().getOrderNumber(), result.getMessage());
+            }
+        } catch (Exception e) {
+            orderLog.logNotificationFailed("orderCompletedInApp", event.order().getOrderNumber(), e.getMessage());
+        }
+    }
+
+    @Async("notificationExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onOrderRefunded(OrderRefundedEvent event) {
+        try {
+            var result = notificationService.createAndSend(
+                    notificationTemplateCatalog.orderRefunded(
+                            event.buyer().getId(),
+                            event.order().getId(),
+                            event.order().getOrderNumber()
+                    )
+            );
+            if (result.isError()) {
+                orderLog.logNotificationFailed("orderRefundedInApp", event.order().getOrderNumber(), result.getMessage());
+            }
+        } catch (Exception e) {
+            orderLog.logNotificationFailed("orderRefundedInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
 
@@ -87,6 +151,21 @@ public class OrderNotificationListener {
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────
+
+    private static Set<Long> collectOrderParticipantIds(Order order) {
+        Set<Long> ids = new LinkedHashSet<>();
+        if (order.getUser() != null && order.getUser().getId() != null) {
+            ids.add(order.getUser().getId());
+        }
+        if (order.getOrderItems() != null) {
+            for (OrderItem oi : order.getOrderItems()) {
+                if (oi.getSeller() != null && oi.getSeller().getId() != null) {
+                    ids.add(oi.getSeller().getId());
+                }
+            }
+        }
+        return ids;
+    }
 
     private void sendBuyerInAppNotification(Long buyerId, OrderDto orderDto) {
         var result = notificationService.createAndSend(

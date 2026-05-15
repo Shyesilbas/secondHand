@@ -37,6 +37,9 @@ public class EmailConfig {
     private String paymentVerificationSubject;
     private String paymentVerificationContent;
 
+    private String greatSellerSubject;
+    private String greatSellerContent;
+
     private Agreement agreement = new Agreement();
     private Order order = new Order();
     private Offer offer = new Offer();
@@ -82,6 +85,7 @@ public class EmailConfig {
         private String sellerClosing;
 
         private String cancellationContentFormat;
+        private String counterpartyCancellationContentFormat;
         private String refundContentFormat;
         private String completionContentFormat;
         private String completionManualWord;

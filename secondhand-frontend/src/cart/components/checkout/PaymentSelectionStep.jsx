@@ -62,7 +62,7 @@ const PaymentSelectionStep = ({
                         <span className="mr-2">👛</span>
                         eWallet
                         {eWallet && (
-                            <span className="ml-2 text-sm text-gray-500">
+                            <span className="ml-2 text-sm text-[#9c9894]">
                                 ({formatCurrency(eWallet.balance || 0)} available)
                             </span>
                         )}
@@ -73,9 +73,9 @@ const PaymentSelectionStep = ({
             {/* Credit Card Selection */}
             {selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD && (
                 <div className="mt-3">
-                    <div className="text-sm text-gray-600 mb-2">Select a credit card</div>
+                    <div className="mb-2 text-sm text-[#5f5b57]">Select a credit card</div>
                     {(!Array.isArray(cards) || cards.length === 0) ? (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-[#9c9894]">
                             No saved cards. Add one from Payment Methods.
                         </div>
                     ) : (
@@ -92,10 +92,10 @@ const PaymentSelectionStep = ({
                                 return (
                                     <label 
                                         key={selectionValue || idx} 
-                                        className={`p-4 rounded-lg border cursor-pointer ${
+                                        className={`p-4 rounded-xl border cursor-pointer ${
                                             selectedCardNumber === selectionValue 
-                                                ? 'border-blue-500 bg-blue-50' 
-                                                : 'border-gray-200 bg-white hover:shadow-sm'
+                                                ? 'border-[#1466c6] bg-[#eef4fb]'
+                                                : 'border-[#e0deda] bg-white hover:shadow-sm'
                                         }`}
                                     >
                                         <div className="flex items-start">
@@ -108,10 +108,10 @@ const PaymentSelectionStep = ({
                                             />
                                             <div>
                                                 <div className="font-medium text-text-primary">{label}</div>
-                                                <div className="text-xs text-gray-600">Expires: {expiry}</div>
-                                                {c.limit && <div className="text-xs text-gray-600">Limit: {c.limit}</div>}
-                                                {totalSpent && <div className="text-xs text-gray-600">Total Spent: {totalSpent}</div>}
-                                                {typeof limitLeft !== 'undefined' && <div className="text-xs text-gray-600">Limit Left: {limitLeft}</div>}
+                                                <div className="text-xs text-[#5f5b57]">Expires: {expiry}</div>
+                                                {c.limit && <div className="text-xs text-[#5f5b57]">Limit: {c.limit}</div>}
+                                                {totalSpent && <div className="text-xs text-[#5f5b57]">Total Spent: {totalSpent}</div>}
+                                                {typeof limitLeft !== 'undefined' && <div className="text-xs text-[#5f5b57]">Limit Left: {limitLeft}</div>}
                                             </div>
                                         </div>
                                     </label>
@@ -125,9 +125,9 @@ const PaymentSelectionStep = ({
             {/* Bank Transfer Selection */}
             {selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER && (
                 <div className="mt-3">
-                    <div className="text-sm text-gray-600 mb-2">Select a bank account</div>
+                    <div className="mb-2 text-sm text-[#5f5b57]">Select a bank account</div>
                     {(!Array.isArray(bankAccounts) || bankAccounts.length === 0) ? (
-                        <div className="text-sm text-gray-500">No bank account found.</div>
+                        <div className="text-sm text-[#9c9894]">No bank account found.</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {bankAccounts.map((b, idx) => {
@@ -137,10 +137,10 @@ const PaymentSelectionStep = ({
                                 return (
                                     <label 
                                         key={value || idx} 
-                                        className={`p-4 rounded-lg border cursor-pointer ${
+                                        className={`p-4 rounded-xl border cursor-pointer ${
                                             selectedBankAccountIban === value 
-                                                ? 'border-blue-500 bg-blue-50' 
-                                                : 'border-gray-200 bg-white hover:shadow-sm'
+                                                ? 'border-[#1466c6] bg-[#eef4fb]'
+                                                : 'border-[#e0deda] bg-white hover:shadow-sm'
                                         }`}
                                     >
                                         <div className="flex items-start">
@@ -155,9 +155,9 @@ const PaymentSelectionStep = ({
                                                 <div className="font-medium text-text-primary">
                                                     {pretty || 'Bank Account'}
                                                 </div>
-                                                <div className="text-xs text-gray-600">IBAN: {value}</div>
+                                                <div className="text-xs text-[#5f5b57]">IBAN: {value}</div>
                                                 {typeof b.balance !== 'undefined' && (
-                                                    <div className="text-xs text-gray-600">Balance: {b.balance}</div>
+                                                    <div className="text-xs text-[#5f5b57]">Balance: {b.balance}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -173,20 +173,20 @@ const PaymentSelectionStep = ({
             {selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && (
                 <div className="mt-3">
                     {!eWallet ? (
-                        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
                             <div className="text-sm text-yellow-800">
                                 <div className="font-medium mb-1">No eWallet Found</div>
                                 <div>You need to create an eWallet first. Go to Payment Methods to create one.</div>
                                 <button 
                                     onClick={() => navigate(ROUTES.PAYMENT_METHODS)}
-                                    className="mt-2 text-blue-600 hover:text-blue-800 underline"
+                                    className="mt-2 font-medium text-[#1466c6] underline hover:text-[#0f529e]"
                                 >
                                     Go to Payment Methods
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
+                        <div className="rounded-xl border border-purple-200 bg-gradient-to-r from-purple-50 to-purple-100 p-4">
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center">
                                     <span className="text-2xl mr-2">👛</span>

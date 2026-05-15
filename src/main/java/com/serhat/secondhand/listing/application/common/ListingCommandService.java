@@ -3,13 +3,13 @@ package com.serhat.secondhand.listing.application.common;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.entity.Listing;
-import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
+import com.serhat.secondhand.listing.domain.entity.events.PriceDroppedEvent;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
-import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -159,6 +158,18 @@ public class ListingCommandService {
                         price,
                         l.getCurrency(),
                         "Price updated via bulk quick action");
+                
+                // Trigger PriceDroppedEvent if price decreased
+                if (l.getPrice() != null && price != null && price.compareTo(l.getPrice()) < 0) {
+                    eventPublisher.publishEvent(new PriceDroppedEvent(
+                            this,
+                            l.getId(),
+                            l.getTitle(),
+                            l.getPrice(),
+                            price,
+                            l.getCurrency()
+                    ));
+                }
             }
         }
         return Result.success();

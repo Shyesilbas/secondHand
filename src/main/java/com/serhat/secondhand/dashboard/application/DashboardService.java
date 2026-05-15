@@ -208,17 +208,27 @@ public class DashboardService implements IDashboardService {
 
         Map<UUID, FavoriteStatsDto> favoriteStatsMap = favoriteStatisticsPort.getFavoriteStatsForListings(listingIds, userId);
 
-        Map<UUID, ReviewStatsDto> reviewStatsMap = reviewStatisticsPort.getListingReviewStatsDto(listingIds);
+        Map<UUID, ReviewStatsDto> rawReviewStats = reviewStatisticsPort.getListingReviewStatsDto(listingIds);
+
+        // Defensive: Redis cache may deserialize UUID map keys as String,
+        // causing Map.get(UUID) to miss. Normalize to String-keyed map.
+        Map<String, ReviewStatsDto> reviewStatsMap = new HashMap<>();
+        ((Map<?, ?>) rawReviewStats).forEach((k, v) -> reviewStatsMap.put(k.toString(), (ReviewStatsDto) v));
+
+        // Same defensive normalization for favorites (also UUID-keyed, also cached)
+        Map<String, FavoriteStatsDto> favStatsMap = new HashMap<>();
+        ((Map<?, ?>) favoriteStatsMap).forEach((k, v) -> favStatsMap.put(k.toString(), (FavoriteStatsDto) v));
 
         return topListingsData.stream()
                 .limit(10)
                 .map(row -> {
                     UUID id = (UUID) row[0];
+                    String idStr = id.toString();
                     Listing listing = listingMap.get(id);
                     if (listing == null) return null;
 
-                    Long favCount = favoriteStatsMap.getOrDefault(id, FavoriteStatsDto.builder().favoriteCount(0L).build()).getFavoriteCount();
-                    Double avgRating = reviewStatsMap.getOrDefault(id, ReviewStatsDto.empty()).getAverageRating();
+                    Long favCount = favStatsMap.getOrDefault(idStr, FavoriteStatsDto.builder().favoriteCount(0L).build()).getFavoriteCount();
+                    Double avgRating = reviewStatsMap.getOrDefault(idStr, ReviewStatsDto.empty()).getAverageRating();
 
                     return dashboardMapper.toTopListingDto(row, listing, favCount, avgRating);
                 })

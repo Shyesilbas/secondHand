@@ -274,6 +274,7 @@ export const API_ENDPOINTS = {
     CAMPAIGNS: {
         SELLER: '/v1/seller/campaigns',
         BY_ID: (id) => `/v1/seller/campaigns/${id}`,
+        PUBLIC: '/v1/campaigns',
     },
     OFFERS: {
         CREATE: '/v1/offers',

@@ -1,4 +1,4 @@
-import HeaderInboxLink from './HeaderInboxLink.jsx';
+import HeaderInboxMenu from './HeaderInboxMenu.jsx';
 import HeaderIconButton from './HeaderIconButton.jsx';
 import HeaderPaymentsMenu from './HeaderPaymentsMenu.jsx';
 import HeaderListingsMenu from './HeaderListingsMenu.jsx';
@@ -17,18 +17,29 @@ const HeaderAuthActions = ({
     paymentsMenuOpen,
     listingsMenuOpen,
     profileMenuOpen,
+    inboxMenuOpen,
     onTogglePaymentsMenu,
     onToggleListingsMenu,
     onToggleProfileMenu,
+    onToggleInboxMenu,
     closeAllDropdowns,
     paymentsMenuRef,
     listingsMenuRef,
     profileMenuRef,
+    inboxMenuRef,
     onLogout,
 }) => (
     <>
         <div className="flex items-center gap-1 mr-2">
-            <HeaderInboxLink emailCount={emailCount} chatCount={chatCount} />
+            <div className="relative" ref={inboxMenuRef}>
+                <HeaderInboxMenu
+                    isOpen={inboxMenuOpen}
+                    onToggle={onToggleInboxMenu}
+                    onClose={closeAllDropdowns}
+                    emailCount={emailCount}
+                    chatCount={chatCount}
+                />
+            </div>
 
             <HeaderIconButton to={ROUTES.FAVORITES} icon={Heart} title="Favorites" />
             <HeaderIconButton to={ROUTES.SHOPPING_CART} icon={ShoppingBag} badge={cartCount} title="Cart" />

@@ -1,178 +1,177 @@
-import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { ROUTES } from '../../common/constants/routes.js';
-import { 
-    ShoppingBag, 
-    MessageSquare, 
-    DollarSign, 
-    Package, 
-    Star,
-    Heart,
-    AlertCircle,
-    CheckCircle,
-    XCircle,
-    TrendingDown,
-    UserPlus
+import {
+  Award,
+  CheckCircle,
+  ChevronRight,
+  DollarSign,
+  MessageCircle,
+  Package,
+  RefreshCw,
+  ShoppingCart,
+  Star,
+  XCircle,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../common/constants/routes.js';
 
+const MS_BORDER = '#edebe9';
+const MS_ACCENT = '#0078d4';
+
+/** Bildirim tipine göre ikon + rota (Fluent liste satırı). */
+const getNotificationIcon = (type) => {
+  const map = {
+    OFFER_RECEIVED: MessageCircle,
+    OFFER_ACCEPTED: CheckCircle,
+    OFFER_REJECTED: XCircle,
+    OFFER_COUNTERED: MessageCircle,
+    OFFER_EXPIRED: XCircle,
+    ORDER_CREATED: ShoppingCart,
+    ORDER_STATUS_CHANGED: Package,
+    ORDER_CANCELLED: XCircle,
+    ORDER_RECEIVED: Package,
+    ORDER_COMPLETED: CheckCircle,
+    ORDER_REFUNDED: RefreshCw,
+    CHAT_MESSAGE_RECEIVED: MessageCircle,
+    LISTING_PRICE_DROPPED: DollarSign,
+    LISTING_NEW_FROM_FOLLOWED: Package,
+    LISTING_SOLD: Package,
+    LISTING_FAVORITED: Star,
+    REVIEW_RECEIVED: Star,
+    PAYMENT_SUCCESS: CheckCircle,
+    PAYMENT_FAILED: XCircle,
+    AGREEMENT_UPDATED: Package,
+    GREAT_SELLER_ACHIEVED: Award,
+  };
+  return map[type] || MessageCircle;
+};
+
+const getNotificationRoute = (notification) => {
+  const { type, relatedEntityId, metadata } = notification;
+  switch (type) {
+    case 'OFFER_RECEIVED':
+    case 'OFFER_ACCEPTED':
+    case 'OFFER_REJECTED':
+    case 'OFFER_COUNTERED':
+    case 'OFFER_EXPIRED':
+      return ROUTES.OFFERS;
+    case 'ORDER_CREATED':
+    case 'ORDER_STATUS_CHANGED':
+    case 'ORDER_CANCELLED':
+    case 'ORDER_RECEIVED':
+    case 'ORDER_COMPLETED':
+    case 'ORDER_REFUNDED':
+      return relatedEntityId
+        ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(relatedEntityId)}`
+        : ROUTES.MY_ORDERS;
+    case 'CHAT_MESSAGE_RECEIVED': {
+      const cid = metadata?.conversationId;
+      return cid
+        ? `${ROUTES.INBOX}?tab=chat&room=${encodeURIComponent(cid)}`
+        : `${ROUTES.INBOX}?tab=chat`;
+    }
+    case 'LISTING_PRICE_DROPPED':
+    case 'LISTING_NEW_FROM_FOLLOWED':
+    case 'LISTING_SOLD':
+    case 'LISTING_FAVORITED':
+      return relatedEntityId ? ROUTES.LISTING_DETAIL(relatedEntityId) : ROUTES.LISTINGS;
+    case 'REVIEW_RECEIVED':
+      return ROUTES.PROFILE;
+    case 'PAYMENT_SUCCESS':
+    case 'PAYMENT_FAILED':
+      return ROUTES.EWALLET;
+    case 'AGREEMENT_UPDATED':
+      return ROUTES.MY_ORDERS;
+    case 'GREAT_SELLER_ACHIEVED':
+      return ROUTES.PROFILE;
+    default:
+      return ROUTES.HOME;
+  }
+};
+
+const formatRelativeTime = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d`;
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+};
+
+/**
+ * Tek bildirim — Mailbox satırıyla uyumlu: sol accent, ikon, başlık + özet, sağ zaman.
+ */
 const NotificationItem = ({ notification, onMarkAsRead }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const Icon = getNotificationIcon(notification.type);
+  const unread = !notification.isRead;
+  const route = getNotificationRoute(notification);
 
-    const getNotificationIcon = (type) => {
-        const iconMap = {
-            OFFER_RECEIVED: ShoppingBag,
-            OFFER_ACCEPTED: CheckCircle,
-            OFFER_REJECTED: XCircle,
-            OFFER_COUNTERED: DollarSign,
-            OFFER_EXPIRED: AlertCircle,
-            ORDER_CREATED: Package,
-            ORDER_STATUS_CHANGED: Package,
-            ORDER_CANCELLED: XCircle,
-            ORDER_RECEIVED: Package,
-            CHAT_MESSAGE_RECEIVED: MessageSquare,
-            LISTING_PRICE_DROPPED: TrendingDown,
-            LISTING_NEW_FROM_FOLLOWED: UserPlus,
-            LISTING_SOLD: CheckCircle,
-            LISTING_FAVORITED: Heart,
-            REVIEW_RECEIVED: Star,
-            PAYMENT_SUCCESS: CheckCircle,
-            PAYMENT_FAILED: XCircle,
-            AGREEMENT_UPDATED: AlertCircle,
-            ACCOUNT_VERIFIED: CheckCircle,
-            GENERIC_NOTIFICATION: AlertCircle,
-        };
-        return iconMap[type] || AlertCircle;
-    };
+  const handleClick = () => {
+    if (unread) onMarkAsRead(notification.id);
+    navigate(route);
+  };
 
-    const getNotificationColor = (type) => {
-        if (type.includes('SUCCESS') || type.includes('ACCEPTED') || type.includes('VERIFIED')) {
-            return 'text-green-600 bg-green-50';
-        }
-        if (type.includes('REJECTED') || type.includes('FAILED') || type.includes('CANCELLED') || type.includes('EXPIRED')) {
-            return 'text-red-600 bg-red-50';
-        }
-        if (type.includes('PRICE_DROPPED')) {
-            return 'text-blue-600 bg-blue-50';
-        }
-        return 'text-slate-600 bg-slate-50';
-    };
+  const preview =
+    notification.message ||
+    (notification.metadata && typeof notification.metadata.preview === 'string'
+      ? notification.metadata.preview
+      : null);
 
-    const getNotificationRoute = (notification) => {
-        const rawType = notification?.type;
-        const type = rawType ? String(rawType).toUpperCase() : '';
-        const rawMetadata = notification?.metadata;
-        let metadataObj = {};
-        if (rawMetadata && typeof rawMetadata === 'string') {
-            try {
-                metadataObj = JSON.parse(rawMetadata);
-            } catch {
-                metadataObj = {};
-            }
-        } else if (rawMetadata && typeof rawMetadata === 'object') {
-            metadataObj = rawMetadata;
-        }
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className="group relative flex w-full items-start gap-3 border-b px-3 py-3 text-left transition sm:gap-4 sm:px-4 sm:py-3.5"
+      style={{
+        borderColor: MS_BORDER,
+        backgroundColor: unread ? '#f5f9fc' : '#ffffff',
+      }}
+    >
+      {/* Okunmamış sol accent */}
+      <span
+        className="absolute left-0 top-0 h-full w-1 rounded-none"
+        style={{ backgroundColor: unread ? MS_ACCENT : 'transparent' }}
+        aria-hidden
+      />
 
-        switch (type) {
-            case 'OFFER_RECEIVED':
-            case 'OFFER_ACCEPTED':
-            case 'OFFER_REJECTED':
-            case 'OFFER_COUNTERED':
-            case 'OFFER_EXPIRED':
-                return ROUTES.OFFERS;
+      <div
+        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11"
+        style={{
+          backgroundColor: unread ? `${MS_ACCENT}14` : '#f3f2f1',
+          color: unread ? MS_ACCENT : '#605e5c',
+        }}
+      >
+        <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+      </div>
 
-            case 'ORDER_CREATED':
-            case 'ORDER_STATUS_CHANGED':
-            case 'ORDER_CANCELLED':
-                return ROUTES.MY_ORDERS;
-            case 'ORDER_RECEIVED':
-                return ROUTES.I_SOLD;
-
-            case 'CHAT_MESSAGE_RECEIVED':
-                if (metadataObj.chatRoomId) {
-                    return `${ROUTES.INBOX}?tab=chat&room=${metadataObj.chatRoomId}`;
-                }
-                return `${ROUTES.INBOX}?tab=chat`;
-
-            case 'LISTING_PRICE_DROPPED':
-            case 'LISTING_NEW_FROM_FOLLOWED':
-            case 'LISTING_FAVORITED':
-                if (metadataObj.listingId) {
-                    return ROUTES.LISTING_DETAIL(metadataObj.listingId);
-                }
-                return ROUTES.LISTINGS;
-
-            case 'LISTING_SOLD':
-                return ROUTES.I_SOLD;
-
-            case 'REVIEW_RECEIVED':
-                if (metadataObj.userId) {
-                    return ROUTES.USER_REVIEWS(metadataObj.userId);
-                }
-                return ROUTES.DASHBOARD;
-
-            case 'PAYMENT_SUCCESS':
-            case 'PAYMENT_FAILED':
-                return ROUTES.PAYMENTS;
-
-            case 'ACCOUNT_VERIFIED':
-                return ROUTES.DASHBOARD;
-
-            case 'AGREEMENT_UPDATED':
-                return ROUTES.AGREEMENTS_ALL;
-
-            default:
-                if (notification?.actionUrl === ROUTES.AGREEMENTS || notification?.actionUrl === '/agreements') {
-                    return ROUTES.AGREEMENTS_ALL;
-                }
-                if (notification.actionUrl) {
-                    return notification.actionUrl;
-                }
-                return ROUTES.DASHBOARD;
-        }
-    };
-
-    const handleClick = () => {
-        if (!notification.isRead && onMarkAsRead) {
-            onMarkAsRead(notification.id);
-        }
-        const route = getNotificationRoute(notification);
-        navigate(route);
-    };
-
-    const Icon = getNotificationIcon(notification.type);
-    const colorClasses = getNotificationColor(notification.type);
-
-    return (
-        <div
-            onClick={handleClick}
-            className={`px-4 py-3 hover:bg-slate-50/80 transition-all duration-200 cursor-pointer ${
-                !notification.isRead ? 'bg-blue-50/50' : ''
-            }`}
-        >
-            <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg flex-shrink-0 ${colorClasses}`}>
-                    <Icon className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                        <h4 className={`text-sm font-semibold ${!notification.isRead ? 'text-slate-900' : 'text-slate-700'}`}>
-                            {notification.title}
-                        </h4>
-                        {!notification.isRead && (
-                            <span className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-1.5"></span>
-                        )}
-                    </div>
-                    <p className="text-xs text-slate-600 mt-1 line-clamp-2">
-                        {notification.message}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1.5">
-                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                    </p>
-                </div>
-            </div>
+      <div className="min-w-0 flex-1 pt-0.5">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <p
+            className={`min-w-0 truncate text-sm ${unread ? 'font-semibold text-[#323130]' : 'font-medium text-[#605e5c]'}`}
+            title={notification.title}
+          >
+            {notification.title}
+          </p>
+          <span className="ml-auto shrink-0 whitespace-nowrap text-xs text-[#605e5c]">
+            {formatRelativeTime(notification.createdAt)}
+          </span>
         </div>
-    );
+        {preview && (
+          <p className="mt-0.5 line-clamp-2 text-sm leading-snug text-[#605e5c]">{preview}</p>
+        )}
+      </div>
+
+      <ChevronRight
+        className="mt-1.5 h-4 w-4 shrink-0 text-[#c7c7c7] opacity-0 transition group-hover:opacity-100 sm:opacity-70"
+        aria-hidden
+      />
+    </button>
+  );
 };
 
 export default NotificationItem;
-

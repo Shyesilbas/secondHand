@@ -12,7 +12,6 @@ import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
-import { useGreatSellerStatus } from '../../user/hooks/useGreatSellerStatus.js';
 
 const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false, isSelectable = false, isSelected = false, onSelectToggle = null }) => {
     const [showInfo, setShowInfo] = useState(false);
@@ -20,14 +19,9 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
     const { addToCart, isAddingToCart } = useCart({ loadCartItems: false });
     const { isInComparison } = useComparison();
 
-    const sellerId = listing?.sellerId;
-    const { data: greatSellerPayload } = useGreatSellerStatus(sellerId, {
-        staleTime: 10 * 60 * 1000,
-    });
-
     if (!listing) return null;
 
-    const isGreatSeller = Boolean(greatSellerPayload?.eligible);
+    const isGreatSeller = Boolean(listing.sellerGreatSellerEligible);
     const isInCompare = isInComparison(listing.id);
     const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
     const canAddToCart = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
@@ -295,6 +289,7 @@ ListingCard.displayName = 'ListingCard';
 export default memo(ListingCard, (prevProps, nextProps) =>
     prevProps.listing?.id === nextProps.listing?.id &&
     prevProps.listing?.sellerId === nextProps.listing?.sellerId &&
+    prevProps.listing?.sellerGreatSellerEligible === nextProps.listing?.sellerGreatSellerEligible &&
     prevProps.isOwner === nextProps.isOwner &&
     prevProps.currentUserId === nextProps.currentUserId &&
     prevProps.showActions === nextProps.showActions &&

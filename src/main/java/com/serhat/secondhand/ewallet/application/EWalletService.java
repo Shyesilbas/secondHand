@@ -240,12 +240,12 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     public void creditToUser(User user, BigDecimal amount) {
-        creditToUser(user, amount, null, null, null);
+        creditToUser(user, amount, null, null, null, null, null);
     }
 
     @Transactional
     @CacheEvict(value = "paymentStats", allEntries = true)
-    public void creditToUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionKind transactionKind, User counterpartUser) {
+    public void creditToUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
 
         EWallet eWallet = eWalletRepository.findByUserWithLock(user)
@@ -261,14 +261,14 @@ public class EWalletService implements IEWalletService {
         if (transactionKind == PaymentTransactionKind.REFUND) {
             // Refund: counterpartUser = seller (from), user = buyer (to)
             User fromUser = counterpartUser != null ? counterpartUser : user;
-            Payment payment = eWalletPaymentFactory.buildRefundPayment(fromUser, user, amount, listingId);
+            Payment payment = eWalletPaymentFactory.buildRefundPayment(fromUser, user, amount, listingId, listingTitle, listingNo);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund payment record created for user: {} amount: {}", user.getEmail(), amount);
         } else if (transactionKind == PaymentTransactionKind.ITEM_SALE) {
             // Item sale: counterpartUser = buyer (from), user = seller (to)
             User fromUser = counterpartUser != null ? counterpartUser : user;
-            Payment payment = eWalletPaymentFactory.buildItemSalePayment(fromUser, user, amount, listingId);
+            Payment payment = eWalletPaymentFactory.buildItemSalePayment(fromUser, user, amount, listingId, listingTitle, listingNo);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Item sale payment record created for seller: {} amount: {}", user.getEmail(), amount);
@@ -293,7 +293,7 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     @CacheEvict(value = "paymentStats", allEntries = true)
-    public void debitFromUser(User user, BigDecimal amount, UUID listingId, PaymentTransactionKind transactionKind, User counterpartUser) {
+    public void debitFromUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser) {
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
 
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -304,7 +304,7 @@ public class EWalletService implements IEWalletService {
 
         if (transactionKind == PaymentTransactionKind.REFUND) {
             // Refund debit: user = seller (from), counterpartUser = buyer (to)
-            Payment payment = eWalletPaymentFactory.buildRefundDebitPayment(user, counterpartUser, amount, listingId);
+            Payment payment = eWalletPaymentFactory.buildRefundDebitPayment(user, counterpartUser, amount, listingId, listingTitle, listingNo);
             paymentRepository.save(payment);
             eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
             log.info("Refund debit payment record created for seller: {} amount: {}", user.getEmail(), amount);

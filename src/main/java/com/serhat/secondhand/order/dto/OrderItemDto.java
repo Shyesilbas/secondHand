@@ -29,4 +29,8 @@ public class OrderItemDto {
     private LocalDateTime createdAt;
     private Integer cancelledQuantity;
     private Integer refundedQuantity;
+    private String cancelReason;
+    private String cancelReasonText;
+    private String refundReason;
+    private String refundReasonText;
 }

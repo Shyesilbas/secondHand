@@ -1,82 +1,74 @@
-import {Heart, Package, ShoppingBag, Star} from 'lucide-react';
-import {formatCurrency} from '../../common/formatters.js';
-import {motion} from 'framer-motion';
+import { Heart, Package, ShoppingBag, Star } from 'lucide-react';
+import { formatCurrency } from '../../common/formatters.js';
+import { motion } from 'framer-motion';
 
 const TopListingsTable = ({ listings, title = 'Top Listings' }) => {
   if (!listings || listings.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/70 backdrop-blur-xl rounded-[24px] border border-white shadow-xl p-8 text-center"
-      >
-        <div className="w-16 h-16 bg-gray-50 rounded-2xl mx-auto flex items-center justify-center mb-4">
-          <Package className="w-8 h-8 text-gray-300" />
+      <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
+        <div className="w-12 h-12 bg-slate-50 rounded-xl mx-auto flex items-center justify-center mb-3">
+          <Package className="w-6 h-6 text-slate-300" />
         </div>
-        <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
-        <p className="text-gray-500 text-sm font-medium">No listings available</p>
-      </motion.div>
+        <h3 className="text-sm font-bold text-slate-900 mb-1">{title}</h3>
+        <p className="text-slate-400 text-xs font-medium">No listings data for this period</p>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white/70 backdrop-blur-xl rounded-[24px] border border-white shadow-xl p-6"
-    >
-      <h3 className="text-lg font-black text-gray-900 mb-6 tracking-tight">{title}</h3>
-      <div className="space-y-3">
+    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+      <h3 className="text-sm font-bold text-slate-900 mb-4">{title}</h3>
+      <div className="space-y-2">
         {listings.map((listing, index) => (
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.05 }}
+            transition={{ delay: index * 0.04 }}
             key={listing.listingId}
-            className="group flex flex-col sm:flex-row items-center sm:justify-between p-4 rounded-[16px] bg-white border border-gray-100 hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 gap-4"
+            className="group flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50/80 transition-colors duration-200"
           >
-            <div className="flex items-center gap-4 flex-1 min-w-0 w-full">
-              {listing.mainImageUrl ? (
-                <div className="w-12 h-12 rounded-[12px] overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform duration-300 border border-gray-100">
-                  <img src={listing.mainImageUrl} alt={listing.title} className="w-full h-full object-cover" />
-                </div>
-              ) : (
-                <div className="w-12 h-12 bg-indigo-50/50 rounded-[12px] border border-indigo-100/50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                  <Package className="w-6 h-6 text-indigo-600" />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">{listing.title}</p>
-                <p className="text-[11px] text-gray-500 font-bold tracking-wider mt-0.5 uppercase">{listing.listingNo}</p>
+            <span className="text-[10px] font-bold text-slate-400 w-5 text-center">{index + 1}</span>
+            
+            {listing.mainImageUrl ? (
+              <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-slate-100">
+                <img src={listing.mainImageUrl} alt={listing.title} className="w-full h-full object-cover" />
               </div>
+            ) : (
+              <div className="w-10 h-10 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center flex-shrink-0">
+                <Package className="w-5 h-5 text-slate-300" />
+              </div>
+            )}
+            
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-slate-900 truncate">{listing.title}</p>
+              <p className="text-[10px] text-slate-400 font-medium">{listing.listingNo}</p>
             </div>
 
-            <div className="flex items-center sm:gap-6 gap-3 w-full sm:w-auto justify-between sm:justify-end flex-shrink-0 bg-gray-50/50 sm:bg-transparent p-3 sm:p-0 rounded-xl">
-              <div className="flex items-center gap-2 text-gray-600 bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg shadow-sm sm:shadow-none border sm:border-transparent border-gray-100">
-                <ShoppingBag className="w-4 h-4 text-emerald-500" />
-                <span className="text-sm font-bold">{listing.orderCount}</span>
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="flex items-center gap-1 text-slate-500" title="Orders">
+                <ShoppingBag className="w-3 h-3 text-emerald-500" />
+                <span className="text-[11px] font-bold">{listing.orderCount}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg shadow-sm sm:shadow-none border sm:border-transparent border-gray-100">
-                <Heart className="w-4 h-4 text-pink-500" />
-                <span className="text-sm font-bold">{listing.favoriteCount}</span>
+              <div className="flex items-center gap-1 text-slate-500" title="Favorites">
+                <Heart className="w-3 h-3 text-pink-400" />
+                <span className="text-[11px] font-bold">{listing.favoriteCount}</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg shadow-sm sm:shadow-none border sm:border-transparent border-gray-100">
-                <Star className={`w-4 h-4 ${listing.averageRating > 0 ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} />
-                <span className="text-sm font-bold">
-                  {listing.averageRating > 0 ? listing.averageRating.toFixed(1) : '0.0'}
+              <div className="flex items-center gap-1 text-slate-500" title="Rating">
+                <Star className={`w-3 h-3 ${listing.averageRating > 0 ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />
+                <span className="text-[11px] font-bold">
+                  {listing.averageRating > 0 ? listing.averageRating.toFixed(1) : '—'}
                 </span>
               </div>
-              <div className="text-right ml-2">
-                <p className="text-sm font-black text-emerald-600">
+              <div className="text-right min-w-[80px]">
+                <p className="text-xs font-extrabold text-emerald-600">
                   {formatCurrency(listing.revenue, 'TRY')}
                 </p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Revenue</p>
               </div>
             </div>
           </motion.div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

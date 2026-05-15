@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { couponService } from '../../services/couponService.js';
 import { formatCurrency } from '../../../common/formatters.js';
 import { formatCouponDiscount, formatCouponKindLabel } from '../../../coupon/utils/couponUiFormat.js';
+import { X } from 'lucide-react';
 
 const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
   const [coupons, setCoupons] = useState([]);
@@ -31,79 +32,94 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
 
   const modal = (
     <div
-      className="fixed inset-0 z-[120] bg-black/40 flex items-center justify-center px-4"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-black/30 px-4 backdrop-blur-[1px]"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
     >
-      <div className="w-full max-w-3xl bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+      <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#e5e3df] bg-white shadow-lg shadow-black/[0.08]">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#f0efed] px-5 py-4">
           <div>
-            <div className="text-lg font-semibold text-gray-900">Platform coupons</div>
-            <div className="text-sm text-gray-600">Site codes for checkout — not seller listing campaigns.</div>
+            <div className="text-sm font-semibold text-[#111]">Platform coupons</div>
+            <div className="mt-0.5 text-xs text-[#999]">Checkout codes — not seller listing campaigns.</div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-200 text-gray-700"
+            className="p-2 text-[#999] transition-colors hover:text-[#111]"
             aria-label="Close"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="h-5 w-5" strokeWidth={1.5} />
           </button>
         </div>
 
-        <div className="p-6">
+        {/* Body */}
+        <div className="max-h-[60vh] overflow-y-auto p-5">
           {isLoading && (
-            <div className="text-sm text-gray-600">Loading…</div>
+            <div className="text-sm text-[#999]">Loading…</div>
           )}
 
           {!isLoading && error && (
-            <div className="text-sm text-red-600 font-medium">{error}</div>
+            <div className="text-sm font-medium text-[#a4262c]">{error}</div>
           )}
 
           {!isLoading && !error && sorted.length === 0 && (
-            <div className="text-sm text-gray-600">No active coupons available.</div>
+            <div className="text-sm text-[#999]">No active coupons.</div>
           )}
 
           {!isLoading && !error && sorted.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {sorted.map((c) => (
-                <div key={c.id} className="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between gap-4">
+                <div
+                  key={c.id}
+                  className="rounded-lg border border-[#e5e3df] p-4 transition-colors hover:bg-[#fafaf9]"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div className="font-semibold text-gray-900 font-mono">{c.code}</div>
-                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold border bg-indigo-50 text-indigo-700 border-indigo-200">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="font-mono text-sm font-semibold text-[#111]">{c.code}</div>
+                        <span className="rounded border border-[#e5e3df] bg-[#fafaf9] px-2 py-0.5 text-xs font-medium text-[#555]">
                           {formatCouponKindLabel(c.discountKind)}: {formatCouponDiscount(c)}
                         </span>
                       </div>
 
                       {(c.title?.trim?.() || '') && (
-                        <div className="mt-1 text-sm font-semibold text-gray-800 leading-snug">{c.title.trim()}</div>
+                        <div className="mt-1 text-sm font-medium leading-snug text-[#111]">{c.title.trim()}</div>
                       )}
                       {(c.description?.trim?.() || '') && (
-                        <p className="mt-1 text-xs text-gray-600 leading-relaxed">{c.description.trim()}</p>
+                        <p className="mt-1 text-xs leading-relaxed text-[#555]">{c.description.trim()}</p>
                       )}
-                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
+                      <div className="mt-2 grid grid-cols-1 gap-2 text-xs text-[#999] sm:grid-cols-2">
                         <div>
-                          Min subtotal: <span className="font-semibold text-gray-900">{c.minSubtotal != null ? formatCurrency(c.minSubtotal, 'TRY') : '—'}</span>
+                          Min subtotal:{' '}
+                          <span className="font-medium text-[#555]">
+                            {c.minSubtotal != null ? formatCurrency(c.minSubtotal, 'TRY') : '—'}
+                          </span>
                         </div>
                         <div>
-                          Max discount: <span className="font-semibold text-gray-900">{c.maxDiscount != null ? formatCurrency(c.maxDiscount, 'TRY') : '—'}</span>
+                          Max discount:{' '}
+                          <span className="font-medium text-[#555]">
+                            {c.maxDiscount != null ? formatCurrency(c.maxDiscount, 'TRY') : '—'}
+                          </span>
                         </div>
                         <div>
-                          Global left: <span className="font-semibold text-gray-900">{c.usageLimitGlobal != null ? c.usageRemainingGlobal : '—'}</span>
+                          Global left:{' '}
+                          <span className="font-medium text-[#555]">
+                            {c.usageLimitGlobal != null ? c.usageRemainingGlobal : '—'}
+                          </span>
                         </div>
                         <div>
-                          Per-user left: <span className="font-semibold text-gray-900">{c.usageLimitPerUser != null ? c.usageRemainingPerUser : '—'}</span>
+                          Per-user left:{' '}
+                          <span className="font-medium text-[#555]">
+                            {c.usageLimitPerUser != null ? c.usageRemainingPerUser : '—'}
+                          </span>
                         </div>
                       </div>
 
                       {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && (
-                        <div className="mt-2 text-xs text-gray-600">
-                          Eligible types: <span className="font-semibold text-gray-900">{c.eligibleTypes.join(', ')}</span>
+                        <div className="mt-2 text-xs text-[#999]">
+                          Eligible: <span className="font-medium text-[#555]">{c.eligibleTypes.join(', ')}</span>
                         </div>
                       )}
                     </div>
@@ -111,7 +127,7 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
                     <button
                       type="button"
                       onClick={() => onApply?.(c.code)}
-                      className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700"
+                      className="shrink-0 rounded-lg border border-[#1466c6] bg-[#1466c6] px-3 py-2 text-sm font-medium text-white transition-all hover:bg-[#0f529e]"
                     >
                       Apply
                     </button>
@@ -129,5 +145,3 @@ const ActiveCouponsModal = ({ isOpen, onClose, onApply }) => {
 };
 
 export default ActiveCouponsModal;
-
-

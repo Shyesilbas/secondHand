@@ -18,6 +18,8 @@ app:
     sale-notification-subject: "${EMAIL_SALE_NOTIFICATION_SUBJECT:SecondHand - Your Item Has Been Sold!}"
     payment-verification-subject: "${EMAIL_PAYMENT_VERIFICATION_SUBJECT:SecondHand - Payment Verification}"
     payment-verification-content: "${EMAIL_PAYMENT_VERIFICATION_CONTENT:Hello %s, your payment verification code is %s. This code is valid for %d minutes.}"
+    great-seller-subject: "${EMAIL_GREAT_SELLER_SUBJECT:SecondHand - Great Seller badge}"
+    great-seller-content: "${EMAIL_GREAT_SELLER_CONTENT:Hello %s,\nCongratulations — you earned the Great Seller badge on SecondHand. Thank you for reliable sales and great reviews.\n\nBest regards,\nSecondHand Team}"
     agreement:
       subject-prefix: "${EMAIL_AGREEMENT_SUBJECT_PREFIX:SecondHand: }"
       body-footer: "${EMAIL_AGREEMENT_BODY_FOOTER:\n\nOpen Agreements in your account: Profile -> Agreements (or /agreements/all).}"
@@ -49,6 +51,7 @@ app:
       seller-prep-line: "${EMAIL_ORDER_SELLER_PREP_LINE:Please prepare the item(s) for shipping and contact the buyer if needed.}"
       seller-closing: "${EMAIL_ORDER_SELLER_CLOSING:Thank you for using SecondHand!\n\nBest regards,\nSecondHand Team}"
       cancellation-content-format: "${EMAIL_ORDER_CANCELLATION_CONTENT_FORMAT:Hello %s,\n\nYour order %s has been cancelled.\n}"
+      counterparty-cancellation-content-format: "${EMAIL_ORDER_COUNTERPARTY_CANCELLATION_CONTENT_FORMAT:Hello %s,\n\nOrder %s was cancelled by the other party.\n}"
       refund-content-format: "${EMAIL_ORDER_REFUND_CONTENT_FORMAT:Hello %s,\n\nYour order %s has been refunded. The refund amount has been credited to your eWallet.\n}"
       completion-content-format: "${EMAIL_ORDER_COMPLETION_CONTENT_FORMAT:Hello %s,\n\nYour order %s has been %s.\n}"
       completion-manual-word: "${EMAIL_ORDER_COMPLETION_MANUAL_WORD:completed}"

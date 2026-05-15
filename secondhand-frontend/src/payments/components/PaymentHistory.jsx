@@ -1,263 +1,188 @@
 import React from 'react';
-import {Banknote as BanknotesIcon} from 'lucide-react';
+import {Banknote, Receipt, ArrowUpRight, ArrowDownLeft, ShieldCheck, Clock, CheckCircle2, XCircle, MoreVertical} from 'lucide-react';
 import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {
   PAYMENT_DIRECTION_LABELS,
   PAYMENT_DIRECTIONS,
   PAYMENT_STATUS_LABELS,
   PAYMENT_STATUSES,
-  PAYMENT_TYPE_LABELS,
-  PAYMENT_TYPES,
   TRANSACTION_TYPE_LABELS,
 } from '../paymentSchema.js';
+import { motion } from 'framer-motion';
 
-const PaymentItemSkeleton = () => {
-  return (
-    <div className="p-6 animate-pulse">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 flex-1">
-          <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
-
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="h-5 bg-gray-200 rounded w-32"></div>
-              <div className="h-4 bg-gray-200 rounded w-16"></div>
-            </div>
-            <div className="h-4 bg-gray-200 rounded w-48"></div>
-            <div className="h-3 bg-gray-200 rounded w-24"></div>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="text-right space-y-2">
-            <div className="h-6 bg-gray-200 rounded w-20"></div>
-            <div className="h-4 bg-gray-200 rounded w-16"></div>
-          </div>
-
-          <div className="h-8 bg-gray-200 rounded-lg w-20"></div>
-        </div>
+const StatusBadge = ({ status, isSuccess }) => {
+  if (status === PAYMENT_STATUSES.ESCROW) {
+    return (
+      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+        <Clock className="w-2.5 h-2.5" />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Escrow</span>
       </div>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+        <CheckCircle2 className="w-2.5 h-2.5" />
+        <span className="text-[10px] font-bold uppercase tracking-tight">Success</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+      <XCircle className="w-2.5 h-2.5" />
+      <span className="text-[10px] font-bold uppercase tracking-tight">Failed</span>
     </div>
   );
 };
 
-const PaymentListSkeleton = () => {
+const PaymentRow = ({ payment, onShowReceipt, idx }) => {
+  const isIncoming = payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING;
+  const isEscrow = payment.status === PAYMENT_STATUSES.ESCROW;
+  
   return (
-    <div className="bg-card-bg rounded-card shadow-card border overflow-hidden">
-      <div className="px-6 py-4 border-b border-sidebar-border">
-        <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: idx * 0.01 }}
+      onClick={() => onShowReceipt(payment)}
+      className="group grid grid-cols-12 items-center gap-4 px-6 py-4 hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-50 last:border-0"
+    >
+      {/* Transaction & Type */}
+      <div className="col-span-5 flex items-center gap-3 min-w-0">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+          isEscrow ? 'bg-amber-50 text-amber-600' :
+          isIncoming ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+        }`}>
+          {isEscrow ? <ShieldCheck className="w-4 h-4" /> : 
+           isIncoming ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-slate-900 truncate">
+            {TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType}
+          </p>
+          <p className="text-[11px] text-slate-400 font-medium truncate">
+            {payment.listingTitle || 'Platform Transaction'}
+          </p>
+        </div>
       </div>
 
-      <div className="divide-y divide-gray-200">
-        {[...Array(5)].map((_, index) => (
-          <PaymentItemSkeleton key={index} />
+      {/* Date */}
+      <div className="col-span-2 hidden md:block">
+        <p className="text-xs font-bold text-slate-500">
+          {formatDateTime(payment.processedAt || payment.createdAt).split(' ')[0]}
+        </p>
+        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-tight">
+          {formatDateTime(payment.processedAt || payment.createdAt).split(' ')[1]}
+        </p>
+      </div>
+
+      {/* Status */}
+      <div className="col-span-2 hidden sm:flex items-center">
+        <StatusBadge status={payment.status} isSuccess={payment.isSuccess} />
+      </div>
+
+      {/* Payment Method */}
+      <div className="col-span-1 hidden lg:block text-center">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-1.5 py-0.5 rounded">
+          {payment.paymentType || 'Wallet'}
+        </span>
+      </div>
+
+      {/* Amount */}
+      <div className="col-span-2 flex flex-col items-end shrink-0">
+        <p className={`text-sm font-bold tracking-tight ${
+          isIncoming ? 'text-emerald-600' : 'text-slate-900'
+        }`}>
+          {isIncoming ? '+' : '-'}{formatCurrency(payment.amount)}
+        </p>
+        <div className="flex items-center gap-1">
+          <span className="text-[9px] font-bold text-indigo-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity">Receipt</span>
+          <MoreVertical className="w-3 h-3 text-slate-300" />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const PaymentHistory = ({ payments, onShowReceipt, hasActiveFilters, onClearFilters, isLoading }) => {
+  if (isLoading) {
+    return (
+      <div className="divide-y divide-slate-50">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="px-6 py-6 animate-pulse grid grid-cols-12 gap-4">
+            <div className="col-span-5 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-slate-100" />
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+            </div>
+            <div className="col-span-2 bg-slate-50 rounded h-4" />
+            <div className="col-span-2 bg-slate-50 rounded h-4" />
+            <div className="col-span-3 bg-slate-100 rounded h-6 ml-auto w-20" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (payments.length === 0) {
+    return (
+      <div className="py-24 text-center">
+        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
+          <Receipt className="w-7 h-7 text-slate-300" />
+        </div>
+        <h3 className="text-sm font-bold text-slate-900 mb-1">No activity found</h3>
+        <p className="text-[11px] text-slate-400 font-medium max-w-[220px] mx-auto leading-relaxed">
+          {hasActiveFilters 
+            ? 'We couldn\'t find any transactions matching your current filters.' 
+            : 'Your transaction history is empty. Start exploring the marketplace to see activity here.'}
+        </p>
+        {hasActiveFilters && (
+          <button
+            onClick={onClearFilters}
+            className="mt-6 px-4 py-2 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-sm"
+          >
+            Reset Filters
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white">
+      {/* Table Header */}
+      <div className="grid grid-cols-12 items-center gap-4 px-6 py-3 bg-slate-50/50 border-b border-slate-100">
+        <div className="col-span-5">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Transaction & Details</span>
+        </div>
+        <div className="col-span-2 hidden md:block">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Date & Time</span>
+        </div>
+        <div className="col-span-2 hidden sm:block">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Status</span>
+        </div>
+        <div className="col-span-1 hidden lg:block text-center">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Method</span>
+        </div>
+        <div className="col-span-2 text-right">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Amount</span>
+        </div>
+      </div>
+
+      {/* Table Rows */}
+      <div className="divide-y divide-slate-50">
+        {payments.map((payment, idx) => (
+          <PaymentRow
+            key={payment.id || idx}
+            payment={payment}
+            onShowReceipt={onShowReceipt}
+            idx={idx}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-const PaymentItem = React.memo(({ payment, onShowReceipt, layout = 'default' }) => {
-  const orderItems = payment.orderItems || [];
-
-  const getPaymentTypeIcon = (type) => {
-    switch (type) {
-      case PAYMENT_TYPES.CREDIT_CARD:
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
-        );
-      case PAYMENT_TYPES.TRANSFER:
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-        );
-      case PAYMENT_TYPES.EWALLET:
-      default:
-        return (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-          </svg>
-        );
-    }
-  };
-
-  const getDirectionIcon = (direction) => {
-    if (direction === PAYMENT_DIRECTIONS.INCOMING) {
-      return (
-        <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      );
-    }
-    return (
-      <svg className="w-3 h-3 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-      </svg>
-    );
-  };
-
-  const isModern = layout === 'modern';
-
-  return (
-    <div
-      onClick={isModern ? () => onShowReceipt(payment) : undefined}
-      role={isModern ? 'button' : undefined}
-      tabIndex={isModern ? 0 : undefined}
-      onKeyDown={isModern ? (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onShowReceipt(payment);
-        }
-      } : undefined}
-      className={`group bg-white border rounded-lg p-5 transition-all ${
-        isModern
-          ? 'border-slate-200/80 hover:border-indigo-200 hover:shadow-sm cursor-pointer'
-          : 'border-gray-200/60 hover:border-gray-300 hover:shadow-sm'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`p-2 rounded-md flex-shrink-0 ${
-            payment.status === PAYMENT_STATUSES.ESCROW ? 'bg-blue-50' : 
-            payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'bg-green-50' : 'bg-gray-50'
-          }`}>
-            <div className={`${
-              payment.status === PAYMENT_STATUSES.ESCROW ? 'text-blue-600' :
-              payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-600'
-            }`}>
-              {getPaymentTypeIcon(payment.paymentType)}
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="text-sm font-semibold text-gray-900">
-                {TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType}
-              </h4>
-              <div className="flex items-center gap-1">
-                {getDirectionIcon(payment.paymentDirection)}
-                <span className="text-[10px] text-gray-500 font-medium">
-                  {PAYMENT_DIRECTION_LABELS[payment.paymentDirection]}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-gray-500">
-                {PAYMENT_TYPE_LABELS[payment.paymentType] || payment.paymentType}
-              </span>
-              <span className="text-xs text-gray-400">•</span>
-              <span className="text-xs text-gray-500">
-                {formatDateTime(payment.createdAt)}
-              </span>
-            </div>
-            {orderItems.length > 0 ? (
-              <div className="mt-2 space-y-0.5">
-                {orderItems.map((title, index) => (
-                  <p key={index} className="text-xs font-medium text-gray-700 truncate">
-                    {title}
-                  </p>
-                ))}
-              </div>
-            ) : payment.listingTitle ? (
-              <p className="text-xs font-medium text-gray-700 mt-2 truncate">
-                {payment.listingTitle}
-              </p>
-            ) : null}
-            
-            {payment.status === PAYMENT_STATUSES.ESCROW && (
-              <p className="text-[10px] text-blue-500 mt-1.5 flex items-center gap-1 italic">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Will be released to your wallet after delivery confirmation.
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="text-right">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className={`text-sm font-semibold font-mono ${
-                payment.status === PAYMENT_STATUSES.ESCROW ? 'text-blue-600' :
-                payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'text-green-600' : 'text-gray-900'
-              }`}>
-                {payment.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '+' : '-'}
-                {formatCurrency(payment.amount)}
-              </span>
-            </div>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium ${
-              payment.status === PAYMENT_STATUSES.ESCROW ? 'bg-blue-100 text-blue-700 border border-blue-200' :
-              payment.isSuccess ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-            }`}>
-              {PAYMENT_STATUS_LABELS[payment.status] || (payment.isSuccess ? 'Success' : 'Failed')}
-            </span>
-          </div>
-
-          {isModern ? (
-            <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
-              View receipt
-            </span>
-          ) : (
-            <button
-              onClick={() => onShowReceipt(payment)}
-              className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-              title="Show Receipt"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-});
-
-const PaymentHistory = React.memo(({ payments, onShowReceipt, hasActiveFilters, onClearFilters, isLoading, layout = 'default' }) => {
-  if (isLoading) {
-    return <PaymentListSkeleton />;
-  }
-
-  if (payments.length === 0) {
-    return (
-      <div className="bg-white border border-gray-200/60 rounded-lg p-12 text-center">
-        <BanknotesIcon className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-        <p className="text-xs font-medium text-gray-500 mb-1">
-          {hasActiveFilters ? 'No payments match your filters' : 'No payments found'}
-        </p>
-        <p className="text-[11px] text-gray-400">
-          {hasActiveFilters ? 'Try adjusting your filters to see more results.' : "You do not have any payments yet."}
-        </p>
-        {hasActiveFilters ? (
-          <button
-            onClick={onClearFilters}
-            className="mt-4 px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            Clear All Filters
-          </button>
-        ) : null}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {payments.map((payment, index) => (
-        <PaymentItem
-          key={payment.paymentId || index}
-          payment={payment}
-          onShowReceipt={onShowReceipt}
-          layout={layout}
-        />
-      ))}
-    </div>
-  );
-});
-
 export default PaymentHistory;
-

@@ -14,6 +14,9 @@ export const campaignService = {
   remove: async (id) => {
     return del(API_ENDPOINTS.CAMPAIGNS.BY_ID(id));
   },
+  listBySellers: async (sellerIds) => {
+    return get(`${API_ENDPOINTS.CAMPAIGNS.PUBLIC}/active?sellerIds=${sellerIds.join(',')}`);
+  },
 };
 
 

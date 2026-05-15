@@ -72,3 +72,27 @@ export const findLatestOtpFromEmails = (emails, { emailType, maxScan = 12 } = {}
   }
   return null;
 };
+
+/**
+ * Like findLatestOtpFromEmails but returns { code, email } so callers can
+ * display the source email content alongside the extracted OTP.
+ */
+export const findLatestOtpWithEmail = (emails, { emailType, maxScan = 12 } = {}) => {
+  const list = Array.isArray(emails) ? emails : [];
+  const sorted = [...list].sort((a, b) => {
+    const tb = Date.parse(b?.createdAt || b?.sentAt || '') || 0;
+    const ta = Date.parse(a?.createdAt || a?.sentAt || '') || 0;
+    return tb - ta;
+  });
+
+  let scanned = 0;
+  for (const e of sorted) {
+    if (emailType != null && e?.emailType !== emailType) continue;
+    if (scanned >= maxScan) break;
+    scanned += 1;
+    const code = extractOtpFromEmailRecord(e, emailType ? { expectedEmailType: emailType } : {});
+    if (code) return { code, email: e };
+  }
+  return null;
+};
+

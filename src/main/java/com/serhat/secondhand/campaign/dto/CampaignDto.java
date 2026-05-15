@@ -18,12 +18,15 @@ import java.util.UUID;
 @Builder
 public class CampaignDto {
     private UUID id;
+    private Long sellerId;
+    private String sellerName;
     private String name;
     private boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;
     private CampaignDiscountKind discountKind;
     private BigDecimal value;
+    private Integer minQuantity;
     private Set<ListingType> eligibleTypes;
     private Set<UUID> eligibleListingIds;
     private boolean applyToFutureListings;

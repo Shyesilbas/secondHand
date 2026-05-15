@@ -16,6 +16,8 @@ public interface OrderItemCancelRepository extends JpaRepository<OrderItemCancel
 
     @Query("SELECT oic.orderItem.id, SUM(oic.cancelledQuantity) FROM OrderItemCancel oic WHERE oic.orderItem.id IN :orderItemIds GROUP BY oic.orderItem.id")
     java.util.List<Object[]> findCancelledQuantitiesByOrderItemIds(@Param("orderItemIds") java.util.Collection<Long> orderItemIds);
+
+    java.util.List<OrderItemCancel> findAllByOrderItemIdIn(java.util.Collection<Long> orderItemIds);
 }
 
 

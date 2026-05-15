@@ -1,124 +1,162 @@
-import {formatCurrency} from '../../common/formatters.js';
+import { formatCurrency } from '../../common/formatters.js';
+import { Check } from 'lucide-react';
+import { CART_UI, cartBtnPrimaryBlock, cartSurfacePanel } from '../uiPalette.js';
 
-const OrderSummary = ({ 
-    cartItems, 
-    cartCount, 
-    calculateTotal, 
-    onCheckout, 
-    disabled = false 
+const OrderSummary = ({
+  cartItems,
+  cartCount,
+  calculateTotal,
+  onCheckout,
+  pricing,
+  disabled = false,
 }) => {
-    const total = calculateTotal();
-    const originalSubtotal = cartItems.reduce((sum, item) => {
+  const originalSubtotal = pricing?.originalSubtotal != null 
+    ? parseFloat(pricing.originalSubtotal) 
+    : cartItems.reduce((sum, item) => {
         const price = parseFloat(item.listing.price) || 0;
-        return sum + (price * item.quantity);
-    }, 0);
-    const campaignDiscount = Math.max(0, (originalSubtotal || 0) - (total || 0));
-    const shipping = 0;
-    const tax = 0;
-    const finalTotal = total + shipping + tax;
-    
-    const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
+        return sum + price * item.quantity;
+      }, 0);
 
-    const hasCampaign = campaignDiscount > 0;
+  const total = pricing?.total != null 
+    ? parseFloat(pricing.total) 
+    : calculateTotal();
 
-    return (
-        <div className="bg-white/80 backdrop-blur-2xl rounded-3xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] sticky top-[5.5rem] overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100/50 bg-slate-50/30">
-                <h3 className="text-base font-extrabold text-slate-900 tracking-tight">Order Summary</h3>
-                <p className="text-xs font-medium text-slate-500 mt-1 tabular-nums">{cartCount} {cartCount === 1 ? 'item' : 'items'}</p>
-            </div>
-            
-            {/* Item list */}
-            <div className="px-6 py-4 max-h-[300px] overflow-y-auto custom-scrollbar">
-                <div className="space-y-4">
-                    {cartItems.map((item) => {
-                        const itemPrice = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
-                        const itemTotal = itemPrice * item.quantity;
-                        return (
-                            <div key={item.id} className="flex items-center gap-2.5">
-                                {item.listing.imageUrl ? (
-                                    <img
-                                        src={item.listing.imageUrl}
-                                        alt={item.listing.title}
-                                        className="w-8 h-8 object-cover rounded border border-gray-100 shrink-0"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'flex';
-                                        }}
-                                    />
-                                ) : null}
-                                <div className={`w-8 h-8 bg-gray-50 rounded flex items-center justify-center shrink-0 ${item.listing.imageUrl ? 'hidden' : 'flex'}`}>
-                                    <span className="text-[10px] font-medium text-gray-400">
-                                        {item.listing.title.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-slate-800 line-clamp-1 leading-snug">{item.listing.title}</p>
-                                    <p className="text-xs font-medium text-slate-500 tabular-nums mt-0.5">
-                                        {item.quantity} × {formatCurrency(itemPrice, item.listing.currency)}
-                                    </p>
-                                </div>
-                                <span className="text-sm font-bold text-slate-900 tabular-nums shrink-0">
-                                    {formatCurrency(itemTotal, item.listing.currency)}
-                                </span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-            
-            {/* Totals */}
-            <div className="px-6 py-5 border-t border-slate-100/80 bg-slate-50/30">
-                <div className="space-y-3 text-sm">
-                    <div className="flex justify-between items-center">
-                        <span className="text-slate-500 font-medium">Subtotal</span>
-                        <span className="text-slate-900 tabular-nums font-semibold">{formatCurrency(total, currency)}</span>
-                    </div>
+  const campaignDiscount = pricing?.campaignDiscount != null 
+    ? parseFloat(pricing.campaignDiscount) 
+    : Math.max(0, (originalSubtotal || 0) - (total || 0));
 
-                    {hasCampaign && (
-                        <div className="flex justify-between items-center">
-                            <span className="text-slate-500 font-medium">Discount</span>
-                            <span className="text-emerald-600 tabular-nums font-bold">-{formatCurrency(campaignDiscount, currency)}</span>
-                        </div>
-                    )}
-                    
-                    <div className="flex justify-between items-center">
-                        <span className="text-slate-500 font-medium">Shipping</span>
-                        <span className="text-slate-900 font-semibold">Free</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                        <span className="text-slate-500 font-medium">Tax</span>
-                        <span className="text-slate-900 tabular-nums font-semibold">{formatCurrency(tax, currency)}</span>
-                    </div>
-                    
-                    <div className="border-t border-slate-200/60 pt-4 mt-4">
-                        <div className="flex justify-between items-end">
-                            <span className="text-base font-bold text-slate-900">Total</span>
-                            <span className="text-2xl font-extrabold text-slate-900 tabular-nums tracking-tight leading-none">{formatCurrency(finalTotal, currency)}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  const shipping = 0;
+  const tax = 0;
+  const finalTotal = total; // pricing.total already includes tax/shipping logic if any
 
-            <div className="px-6 pb-6 pt-2 bg-slate-50/30">
-                <button
-                    className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg shadow-indigo-500/25 text-sm font-bold disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0"
-                    onClick={onCheckout}
-                    disabled={disabled}
+  const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
+  const hasCampaign = campaignDiscount > 0;
+
+  return (
+    <aside
+      className={`sticky top-14 ${cartSurfacePanel}`}
+      style={{ borderColor: CART_UI.border }}
+    >
+      <div
+        className="border-b px-4 py-3 sm:px-5"
+        style={{ borderColor: CART_UI.border, backgroundColor: CART_UI.surface }}
+      >
+        <h3 className="text-sm font-semibold text-[#1a1918]">Order summary</h3>
+        <p className="mt-0.5 text-xs tabular-nums text-[#5f5b57]">
+          {cartCount} {cartCount === 1 ? 'item' : 'items'}
+        </p>
+      </div>
+
+      <div className="max-h-[min(280px,40vh)] overflow-y-auto px-4 py-3 sm:px-5">
+        <ul className="divide-y divide-[#e0deda]">
+          {cartItems.map((item) => {
+            const itemPrice =
+              parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
+            const itemTotal = itemPrice * item.quantity;
+            return (
+              <li key={item.id} className="flex gap-3 py-3 first:pt-0">
+                {item.listing.imageUrl ? (
+                  <img
+                    src={item.listing.imageUrl}
+                    alt=""
+                    className="h-10 w-10 shrink-0 border object-cover"
+                    style={{ borderColor: CART_UI.border }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center border bg-[#f7f6f5] text-[10px] font-medium text-[#9c9894] ${
+                    item.listing.imageUrl ? 'hidden' : 'flex'
+                  }`}
+                  style={{ borderColor: CART_UI.border }}
                 >
-                    Proceed to Checkout
-                </button>
-                
-                <div className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
-                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <span>Secure checkout · SSL encrypted</span>
+                  {item.listing.title.charAt(0).toUpperCase()}
                 </div>
-            </div>
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-xs font-medium leading-snug text-[#1a1918]">
+                    {item.listing.title}
+                  </p>
+                  <p className="mt-0.5 text-[11px] tabular-nums text-[#5f5b57]">
+                    {item.quantity} × {formatCurrency(itemPrice, item.listing.currency)}
+                  </p>
+                </div>
+                <p className="shrink-0 text-xs font-medium tabular-nums text-[#1a1918]">
+                  {formatCurrency(itemTotal, item.listing.currency)}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div
+        className="space-y-2.5 border-t px-4 py-4 text-sm sm:px-5"
+        style={{ borderColor: CART_UI.border, backgroundColor: CART_UI.surface }}
+      >
+        <div className="flex justify-between gap-4">
+          <span className="text-[#5f5b57]">Subtotal</span>
+          <span className="tabular-nums font-medium text-[#1a1918]">
+            {formatCurrency(total, currency)}
+          </span>
         </div>
-    );
+
+        {hasCampaign && (
+          <div className="space-y-1">
+            <div className="flex justify-between gap-4">
+              <span className="text-[#5f5b57]">Discount</span>
+              <span className="tabular-nums font-medium text-[#107c10]">
+                −{formatCurrency(campaignDiscount, currency)}
+              </span>
+            </div>
+            <div className="flex justify-end">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#dff6dd] px-2 py-0.5 text-[10px] font-bold text-[#107c10]">
+                <Check className="h-3 w-3" strokeWidth={3} />
+                Bundle savings applied
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between gap-4">
+          <span className="text-[#5f5b57]">Shipping</span>
+          <span className="font-medium text-[#1a1918]">Free</span>
+        </div>
+
+        <div className="flex justify-between gap-4">
+          <span className="text-[#5f5b57]">Tax</span>
+          <span className="tabular-nums font-medium text-[#1a1918]">
+            {formatCurrency(tax, currency)}
+          </span>
+        </div>
+
+        <div className="border-t border-[#e0deda] pt-3">
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-base font-semibold text-[#1a1918]">Total</span>
+            <span className="text-lg font-semibold tabular-nums text-[#1466c6]">
+              {formatCurrency(finalTotal, currency)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[#e0deda] px-4 pb-5 pt-2 sm:px-5">
+        <button
+          type="button"
+          className={cartBtnPrimaryBlock}
+          onClick={onCheckout}
+          disabled={disabled}
+        >
+          Proceed to checkout
+        </button>
+        <p className="mt-3 text-center text-[11px] text-[#9c9894]">
+          You will enter address and payment on the next step.
+        </p>
+      </div>
+    </aside>
+  );
 };
 
 export default OrderSummary;

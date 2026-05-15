@@ -4,12 +4,10 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import {FollowButton} from '../../follow/index.js';
 import {Award, ShieldCheck} from 'lucide-react';
-import {useGreatSellerStatus} from '../../user/hooks/useGreatSellerStatus.js';
 
 const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
-  const {data: greatSeller} = useGreatSellerStatus(listing?.sellerId);
   if (!listing) return null;
-  const showGreatSeller = Boolean(greatSeller?.eligible);
+  const showGreatSeller = Boolean(listing.sellerGreatSellerEligible);
 
   return (
     <>

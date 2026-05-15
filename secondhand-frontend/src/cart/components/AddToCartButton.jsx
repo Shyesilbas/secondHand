@@ -67,9 +67,9 @@ const AddToCartButton = ({
                 ${sizeClasses[size]}
                 ${isInCart
                 ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                : 'bg-[#eef4fb] text-[#1466c6] hover:bg-[#e6f0fb]'
             }
-                rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+                rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                 flex items-center space-x-2 ${className}
             `}
             title={isInCart ? 'Added to cart' : 'Add to cart'}

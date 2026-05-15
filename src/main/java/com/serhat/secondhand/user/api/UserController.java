@@ -14,6 +14,7 @@ import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.application.GreatSellerService;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.domain.dto.GreatSellerPublicProfileDto;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;

@@ -59,7 +59,10 @@ public class OrderQueryService {
 
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
-        return Result.success(orders.map(order -> orderMapper.toDto(order, metadata.cancelled(), metadata.refunded())));
+        return Result.success(orders.map(order -> orderMapper.toDto(order, 
+                metadata.cancelled(), metadata.refunded(),
+                metadata.cancelReasons(), metadata.cancelReasonTexts(),
+                metadata.refundReasons(), metadata.refundReasonTexts())));
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
@@ -72,7 +75,12 @@ public class OrderQueryService {
             return Result.success(self.getCachedCompletedOrder(orderId, order));
         }
 
-        return Result.success(orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order)));
+        MetadataContext metadata = fetchMetadata(order);
+
+        return Result.success(orderMapper.toDto(order, 
+                metadata.cancelled(), metadata.refunded(),
+                metadata.cancelReasons(), metadata.cancelReasonTexts(),
+                metadata.refundReasons(), metadata.refundReasonTexts()));
     }
 
     /**
@@ -82,7 +90,11 @@ public class OrderQueryService {
     @Cacheable(value = "completedOrder", key = "#orderId")
     public OrderDto getCachedCompletedOrder(Long orderId, Order order) {
         log.info("[CACHE MISS] completedOrder::{}", orderId);
-        return orderMapper.toDto(order, buildCancelledMap(order), buildRefundedMap(order));
+        MetadataContext metadata = fetchMetadata(order);
+        return orderMapper.toDto(order, 
+                metadata.cancelled(), metadata.refunded(),
+                metadata.cancelReasons(), metadata.cancelReasonTexts(),
+                metadata.refundReasons(), metadata.refundReasonTexts());
     }
 
     private static final Set<OrderStatus> TERMINAL_STATUSES = EnumSet.of(
@@ -93,7 +105,10 @@ public class OrderQueryService {
 
     public Result<OrderDto> getSellerOrderById(Long orderId, Long sellerId) {
         return orderRepository.findByIdForSeller(orderId, sellerId)
-                .map(order -> buildSellerOrderDto(order, sellerId, buildCancelledMap(order), buildRefundedMap(order)))
+                .map(order -> {
+                    MetadataContext metadata = fetchMetadata(order);
+                    return buildSellerOrderDto(order, sellerId, metadata);
+                })
                 .map(Result::success)
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
@@ -116,13 +131,23 @@ public class OrderQueryService {
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
         return Result.success(orders.map(order -> {
-            OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata.cancelled(), metadata.refunded());
+            OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata);
             orderDto.setEscrowAmount(escrowAmounts.getOrDefault(order.getId(), BigDecimal.ZERO));
             return orderDto;
         }));
     }
 
-    private record MetadataContext(Map<Long, Integer> cancelled, Map<Long, Integer> refunded) {}
+    private record MetadataContext(
+            Map<Long, Integer> cancelled, 
+            Map<Long, Integer> refunded,
+            Map<Long, String> cancelReasons,
+            Map<Long, String> cancelReasonTexts,
+            Map<Long, String> refundReasons,
+            Map<Long, String> refundReasonTexts) {}
+
+    private MetadataContext fetchMetadata(Order order) {
+        return fetchBulkMetadata(List.of(order));
+    }
 
     private MetadataContext fetchBulkMetadata(List<Order> orders) {
         Set<Long> itemIds = orders.stream()
@@ -132,20 +157,43 @@ public class OrderQueryService {
                 .collect(Collectors.toSet());
 
         if (itemIds.isEmpty()) {
-            return new MetadataContext(Map.of(), Map.of());
+            return new MetadataContext(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of());
         }
 
-        Map<Long, Integer> cancelled = orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(itemIds).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+        var cancels = orderItemCancelRepository.findAllByOrderItemIdIn(itemIds);
+        var refunds = orderItemRefundRepository.findAllByOrderItemIdIn(itemIds);
 
-        Map<Long, Integer> refunded = orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(itemIds).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+        Map<Long, Integer> cancelled = cancels.stream()
+                .collect(Collectors.groupingBy(c -> c.getOrderItem().getId(), 
+                        Collectors.summingInt(com.serhat.secondhand.order.entity.OrderItemCancel::getCancelledQuantity)));
 
-        return new MetadataContext(cancelled, refunded);
+        Map<Long, Integer> refunded = refunds.stream()
+                .collect(Collectors.groupingBy(r -> r.getOrderItem().getId(), 
+                        Collectors.summingInt(com.serhat.secondhand.order.entity.OrderItemRefund::getRefundedQuantity)));
+
+        // Get latest reasons
+        Map<Long, String> cancelReasons = cancels.stream()
+                .collect(Collectors.toMap(c -> c.getOrderItem().getId(), c -> c.getReason().name(), (a, b) -> b));
+
+        Map<Long, String> cancelReasonTexts = cancels.stream()
+                .filter(c -> c.getReasonText() != null)
+                .collect(Collectors.toMap(c -> c.getOrderItem().getId(), com.serhat.secondhand.order.entity.OrderItemCancel::getReasonText, (a, b) -> b));
+
+        Map<Long, String> refundReasons = refunds.stream()
+                .collect(Collectors.toMap(r -> r.getOrderItem().getId(), r -> r.getReason().name(), (a, b) -> b));
+
+        Map<Long, String> refundReasonTexts = refunds.stream()
+                .filter(r -> r.getReasonText() != null)
+                .collect(Collectors.toMap(r -> r.getOrderItem().getId(), com.serhat.secondhand.order.entity.OrderItemRefund::getReasonText, (a, b) -> b));
+
+        return new MetadataContext(cancelled, refunded, cancelReasons, cancelReasonTexts, refundReasons, refundReasonTexts);
     }
 
-    private OrderDto buildSellerOrderDto(Order order, Long sellerId, Map<Long, Integer> cancelled, Map<Long, Integer> refunded) {
-        OrderDto orderDto = orderMapper.toDto(order, cancelled, refunded);
+    private OrderDto buildSellerOrderDto(Order order, Long sellerId, MetadataContext metadata) {
+        OrderDto orderDto = orderMapper.toDto(order, 
+                metadata.cancelled(), metadata.refunded(),
+                metadata.cancelReasons(), metadata.cancelReasonTexts(),
+                metadata.refundReasons(), metadata.refundReasonTexts());
         if (orderDto.getOrderItems() != null) {
             List<OrderItemDto> sellerOrderItems = orderDto.getOrderItems().stream()
                     .filter(item -> item.getListing() != null &&
@@ -156,24 +204,6 @@ public class OrderQueryService {
         }
         orderDto.setEscrowAmount(null);
         return orderDto;
-    }
-
-    /** Builds a map of orderItemId → cancelledQuantity for all items in the order. */
-    private Map<Long, Integer> buildCancelledMap(Order order) {
-        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return Map.of();
-        
-        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
-        return orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(new HashSet<>(itemIds)).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
-    }
-
-    /** Builds a map of orderItemId → refundedQuantity for all items in the order. */
-    private Map<Long, Integer> buildRefundedMap(Order order) {
-        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return Map.of();
-        
-        List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
-        return orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(new HashSet<>(itemIds)).stream()
-                .collect(Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
     }
 
     @Cacheable(value = "pendingOrders", key = "#userId")

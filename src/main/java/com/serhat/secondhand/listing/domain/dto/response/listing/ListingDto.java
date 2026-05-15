@@ -61,7 +61,9 @@ public abstract class ListingDto {
     private String sellerName;
     private String sellerSurname;
     private Long sellerId;
-    
+    /** İlan listesi/detay: N+1 önleme için API tarafında doldurulur. */
+    private boolean sellerGreatSellerEligible;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate sellerAccountCreationDate;
     

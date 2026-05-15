@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -30,6 +31,29 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             """)
     long countGreatSellerEligibleSales(
             @Param("sellerId") Long sellerId,
+            @Param("completed") PaymentStatus completed,
+            @Param("cancelled") OrderStatus cancelled,
+            @Param("refunded") OrderStatus refunded,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("minUnitPrice") BigDecimal minUnitPrice,
+            @Param("currency") Currency currency);
+
+    /** İlan yanıtında Great Seller rozeti: aynı kurallarla toplu satış sayısı. */
+    @Query("""
+            SELECT oi.seller.id, COUNT(oi) FROM OrderItem oi
+            WHERE oi.seller.id IN :sellerIds
+              AND oi.order.paymentStatus = :completed
+              AND oi.order.status <> :cancelled
+              AND oi.order.status <> :refunded
+              AND oi.order.createdAt >= :startDate
+              AND oi.order.createdAt <= :endDate
+              AND oi.unitPrice >= :minUnitPrice
+              AND oi.currency = :currency
+            GROUP BY oi.seller.id
+            """)
+    List<Object[]> countGreatSellerEligibleSalesBySellerIds(
+            @Param("sellerIds") Collection<Long> sellerIds,
             @Param("completed") PaymentStatus completed,
             @Param("cancelled") OrderStatus cancelled,
             @Param("refunded") OrderStatus refunded,

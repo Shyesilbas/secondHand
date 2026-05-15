@@ -146,6 +146,10 @@ public class User implements UserDetails {
     @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
 
+    /** Great Seller uygunluk geçişi; null = migrasyon/ilk değerlendirme (bildirim gönderilmez). */
+    @Column(name = "great_seller_eligible_snapshot")
+    private Boolean greatSellerEligibleSnapshot;
+
 
     @Override
     public boolean isAccountNonExpired() {

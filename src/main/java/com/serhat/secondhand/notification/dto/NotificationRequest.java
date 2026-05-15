@@ -16,7 +16,6 @@ public class NotificationRequest {
     private String actionUrl;
     private String metadata;
 
-    /** IDE/Lombok uyumsuzluğunda builder iç sınıfına ihtiyaç bırakmaz. */
     public static NotificationRequest of(
             Long userId,
             NotificationType type,

@@ -39,6 +39,8 @@ import {
   X,
 } from 'lucide-react';
 import CancelRefundModal from './CancelRefundModal.jsx';
+import { getCancelRefundReasonLabel } from '../../common/enums/cancelRefundReasons.js';
+import { AlertCircle, RotateCcw as RefundIcon } from 'lucide-react';
 
 const StatusBadge = ({ label, type = 'rose' }) => {
   const styles = {
@@ -385,6 +387,42 @@ const OrderDetailsModal = React.memo(
                                   PROMO: {item.campaignName}
                                 </span>
                               ) : null}
+
+                              {/* Cancellation/Refund Reasons */}
+                              {(item.cancelReason || item.refundReason) && (
+                                <div className="mt-2 space-y-1.5">
+                                  {item.cancelReason && (
+                                    <div className={`flex items-start gap-1.5 p-2 rounded-lg ${isSellerView ? 'bg-rose-50/50' : 'bg-rose-50/80'} border border-rose-100`}>
+                                      <AlertCircle className="w-3 h-3 text-rose-500 mt-0.5 flex-shrink-0" />
+                                      <div className="min-w-0">
+                                        <p className="text-[10px] font-semibold text-rose-700 leading-tight">
+                                          Cancellation: {getCancelRefundReasonLabel(item.cancelReason)}
+                                        </p>
+                                        {item.cancelReasonText && (
+                                          <p className="text-[10px] text-rose-600 mt-0.5 italic leading-tight break-words">
+                                            "{item.cancelReasonText}"
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {item.refundReason && (
+                                    <div className={`flex items-start gap-1.5 p-2 rounded-lg ${isSellerView ? 'bg-amber-50/50' : 'bg-amber-50/80'} border border-amber-100`}>
+                                      <RefundIcon className="w-3 h-3 text-amber-500 mt-0.5 flex-shrink-0" />
+                                      <div className="min-w-0">
+                                        <p className="text-[10px] font-semibold text-amber-700 leading-tight">
+                                          Refund: {getCancelRefundReasonLabel(item.refundReason)}
+                                        </p>
+                                        {item.refundReasonText && (
+                                          <p className="text-[10px] text-amber-600 mt-0.5 italic leading-tight break-words">
+                                            "{item.refundReasonText}"
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <div className="text-right flex flex-col justify-between items-end flex-shrink-0">
                               <span className={`${isSellerView ? 'text-sm font-semibold text-slate-900' : 'text-xs font-semibold text-gray-900'}`}>

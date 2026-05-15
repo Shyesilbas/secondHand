@@ -290,6 +290,72 @@ public class NotificationTemplateCatalog {
                 )));
     }
 
+    public NotificationRequest paymentSucceeded(Long userId, String amountText, String currency, String listingTitle, String transactionTypeLabel) {
+        String title = "Payment received";
+        String listingPart = listingTitle == null || listingTitle.isBlank() ? "" : (" for “" + listingTitle + "”");
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put("amountText", safe(amountText));
+        payload.put("currency", safe(currency));
+        payload.put("transactionType", safe(transactionTypeLabel));
+        return NotificationRequest.of(
+                userId,
+                NotificationType.PAYMENT_SUCCESS,
+                title,
+                "Your payment" + listingPart + " was successful (" + safe(amountText) + " " + safe(currency) + ").",
+                "/profile/wallet",
+                toJson(payload));
+    }
+
+    public NotificationRequest orderCompleted(Long buyerId, Long orderId, String orderNumber) {
+        return NotificationRequest.of(
+                buyerId,
+                NotificationType.ORDER_COMPLETED,
+                "Order completed",
+                "Order #" + safe(orderNumber) + " is completed. Thank you for shopping!",
+                "/profile/orders",
+                toJson(Map.of(
+                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
+                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
+                )));
+    }
+
+    public NotificationRequest orderRefunded(Long buyerId, Long orderId, String orderNumber) {
+        return NotificationRequest.of(
+                buyerId,
+                NotificationType.ORDER_REFUNDED,
+                "Order refunded",
+                "Order #" + safe(orderNumber) + " has been refunded.",
+                "/profile/orders",
+                toJson(Map.of(
+                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
+                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
+                )));
+    }
+
+    public NotificationRequest orderCancelledCounterparty(Long userId, Long orderId, String orderNumber) {
+        return NotificationRequest.of(
+                userId,
+                NotificationType.ORDER_CANCELLED,
+                "Order cancelled",
+                "Order #" + safe(orderNumber) + " was cancelled by the other party.",
+                "/profile/orders",
+                toJson(Map.of(
+                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
+                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
+                )));
+    }
+
+    public NotificationRequest greatSellerAchieved(Long userId) {
+        return NotificationRequest.of(
+                userId,
+                NotificationType.GREAT_SELLER_ACHIEVED,
+                "Great Seller",
+                "You earned the Great Seller badge. Keep up the great work!",
+                "/profile",
+                toJson(Map.of(NotificationMetadataKeys.USER_ID, safeId(userId))));
+    }
+
     private String toJson(Map<String, String> payload) {
         try {
             return objectMapper.writeValueAsString(payload);

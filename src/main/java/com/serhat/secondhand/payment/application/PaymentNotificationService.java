@@ -5,6 +5,8 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.notification.application.NotificationEventPublisher;
+import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ public class PaymentNotificationService {
     private final VerificationConfig verificationConfig;
     private final EmailService emailService;
     private final EmailConfig emailConfig;
+    private final NotificationEventPublisher notificationEventPublisher;
+    private final NotificationTemplateCatalog notificationTemplateCatalog;
 
     @Async("notificationExecutor")
     public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto) {
@@ -31,6 +35,19 @@ public class PaymentNotificationService {
             
             emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
             log.info("Payment success notification sent to user: {}", user.getEmail());
+
+            String amountText = paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "";
+            String cur = paymentDto.currency() != null ? paymentDto.currency() : "";
+            String typeLabel = paymentDto.transactionType() != null ? paymentDto.transactionType().name() : "";
+            notificationEventPublisher.publishDispatch(
+                    notificationTemplateCatalog.paymentSucceeded(
+                            user.getId(),
+                            amountText,
+                            cur,
+                            paymentDto.listingTitle(),
+                            typeLabel),
+                    "payment",
+                    "payment-success:" + user.getId() + ":" + paymentDto.paymentId());
         } catch (Exception e) {
             log.warn("Failed to send payment success notification to user {}: {}", user.getEmail(), e.getMessage());
         }

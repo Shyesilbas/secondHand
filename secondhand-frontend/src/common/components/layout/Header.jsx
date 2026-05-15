@@ -28,14 +28,17 @@ const Header = () => {
     const listingsMenuOpen = dropdowns.isOpen('listings');
     const paymentsMenuOpen = dropdowns.isOpen('payments');
     const profileMenuOpen = dropdowns.isOpen('profile');
+    const inboxMenuOpen = dropdowns.isOpen('inbox');
 
     const listingsMenuRef = useRef(null);
     const paymentsMenuRef = useRef(null);
     const profileMenuRef = useRef(null);
+    const inboxMenuRef = useRef(null);
 
     useClickOutside(listingsMenuRef, dropdowns.closeAll, listingsMenuOpen);
     useClickOutside(paymentsMenuRef, dropdowns.closeAll, paymentsMenuOpen);
     useClickOutside(profileMenuRef, dropdowns.closeAll, profileMenuOpen);
+    useClickOutside(inboxMenuRef, dropdowns.closeAll, inboxMenuOpen);
 
     const { emailCount, chatCount, cartCount, orderCount } = useBadgeCounts({
         enabled: isAuthenticated,
@@ -131,13 +134,16 @@ const Header = () => {
                                     paymentsMenuOpen={paymentsMenuOpen}
                                     listingsMenuOpen={listingsMenuOpen}
                                     profileMenuOpen={profileMenuOpen}
+                                    inboxMenuOpen={inboxMenuOpen}
                                     onTogglePaymentsMenu={() => dropdowns.toggle('payments')}
                                     onToggleListingsMenu={() => dropdowns.toggle('listings')}
                                     onToggleProfileMenu={() => dropdowns.toggle('profile')}
+                                    onToggleInboxMenu={() => dropdowns.toggle('inbox')}
                                     closeAllDropdowns={dropdowns.closeAll}
                                     paymentsMenuRef={paymentsMenuRef}
                                     listingsMenuRef={listingsMenuRef}
                                     profileMenuRef={profileMenuRef}
+                                    inboxMenuRef={inboxMenuRef}
                                     onLogout={handleLogout}
                                 />
                             ) : (

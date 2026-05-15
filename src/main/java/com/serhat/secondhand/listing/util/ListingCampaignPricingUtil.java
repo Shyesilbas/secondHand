@@ -95,6 +95,11 @@ public class ListingCampaignPricingUtil {
         BigDecimal bestDiscount = ZERO;
 
         for (Campaign campaign : campaigns) {
+            // Skip bundle campaigns during static enrichment (listing cards)
+            if (campaign.getMinQuantity() != null && campaign.getMinQuantity() > 1) {
+                continue;
+            }
+
             if (!isApplicable(campaign, listingId, type)) {
                 continue;
             }

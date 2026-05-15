@@ -81,6 +81,10 @@ public class Campaign {
 
     @Column(nullable = false)
     @Builder.Default
+    private Integer minQuantity = 1;
+
+    @Column(nullable = false)
+    @Builder.Default
     private boolean applyToFutureListings = false;
 
     @CreationTimestamp

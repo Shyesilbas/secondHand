@@ -4,6 +4,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {useShowcaseQueries} from '../../showcase/hooks/queries.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   BookOpen,
@@ -17,7 +18,6 @@ import {
   Shirt,
 } from 'lucide-react';
 
-// ListingType ile hizalı; filtre tamamen frontend (listing.type üzerinden)
 const SHOWCASE_CATEGORY_TABS = [
   { value: 'ALL', label: 'All', icon: LayoutGrid },
   { value: 'VEHICLE', label: 'Vehicle', icon: Car },
@@ -59,128 +59,99 @@ const ShowcaseSection = () => {
   }, [showcases, activeTab]);
 
   return (
-    <section className="py-14 bg-gradient-to-b from-slate-50 via-white to-white overflow-hidden border-t border-slate-100/90">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
+    <section className="py-20 bg-[#fafafa]">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+        
+        {/* Header - Simpler & More Direct */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-indigo-600/90 mb-1.5">
-              Discover
-            </p>
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Featured showcases</h2>
-            <p className="text-sm text-slate-500 mt-2 max-w-xl">
-              Premium placements from sellers
+            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Featured Listings</h2>
+            <p className="text-slate-500 mt-2 max-w-lg text-sm font-medium">
+              Discover popular items and top picks from our community of sellers.
             </p>
           </div>
-          {showcases && showcases.length > 0 ? (
-            <Link
-              to={ROUTES.LISTINGS}
-              className="inline-flex items-center justify-center gap-1.5 self-start sm:self-auto text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 rounded-xl shadow-md shadow-indigo-900/10 transition-colors"
-            >
-              Browse marketplace
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          ) : null}
+          <Link
+            to={ROUTES.LISTINGS}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+          >
+            <span>View All Marketplace</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
-        <div className="mb-6 -mx-1 px-1">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 snap-x snap-mandatory md:flex-wrap md:overflow-visible touch-pan-x">
+        {/* Categories - Cleaner & Less 'Appy' */}
+        <div className="mb-8 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1.5 p-1 bg-slate-200/50 rounded-2xl w-fit">
             {SHOWCASE_CATEGORY_TABS.map(({ value, label, icon: Icon }) => {
               const count = tabCounts[value] ?? 0;
               const active = activeTab === value;
+              if (count === 0 && value !== 'ALL') return null;
+              
               return (
                 <button
                   key={value}
-                  type="button"
                   onClick={() => setActiveTab(value)}
                   className={`
-                    snap-start shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all border
-                    ${
-                      active
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-900/15'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-200 hover:text-indigo-700'
-                    }
+                    flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all
+                    ${active 
+                      ? 'bg-white text-slate-900 shadow-sm' 
+                      : 'text-slate-500 hover:text-slate-700'}
                   `}
                 >
-                  <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${active ? 'text-indigo-600' : 'text-slate-400'}`} />
                   <span>{label}</span>
-                  <span
-                    className={`
-                      tabular-nums text-[10px] px-1.5 py-0.5 rounded-md font-bold
-                      ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}
-                    `}
-                  >
-                    {count}
-                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="relative">
-          {showcaseLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-              {[...Array(6)].map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-white border border-slate-100 rounded-2xl overflow-hidden animate-pulse shadow-sm min-w-0"
-                >
-                  <div className="aspect-[4/3] bg-slate-100" />
-                  <div className="p-4 space-y-2">
-                    <div className="w-16 h-3 bg-slate-100 rounded" />
-                    <div className="w-3/4 h-4 bg-slate-100 rounded" />
-                    <div className="w-full h-3 bg-slate-100 rounded" />
-                    <div className="w-1/3 h-5 bg-slate-200 rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : showcaseError ? (
-            <div className="text-center py-16 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
-              <p className="text-sm text-slate-600 mb-4">Featured listings couldn&apos;t load.</p>
-              <button
-                type="button"
-                onClick={() => refetch()}
-                className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 shadow-sm transition-all active:scale-95"
+        {/* Listings Grid */}
+        <div className="min-h-[400px]">
+          <AnimatePresence mode="wait">
+            {showcaseLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-slate-100 rounded-2xl aspect-[3/4] animate-pulse" />
+                ))}
+              </div>
+            ) : showcases && showcases.length > 0 ? (
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6"
               >
-                <RefreshCw className="w-4 h-4" />
-                Retry
-              </button>
-            </div>
-          ) : showcases && showcases.length > 0 ? (
-            <>
-              {!filteredShowcases.length ? (
-                <div className="text-center py-16 rounded-[2rem] border border-dashed border-slate-200 bg-white">
-                  <p className="text-sm text-slate-500">
-                    No featured listings in this category right now — try another tab.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-                  {filteredShowcases.map((showcase, index) => {
-                    const listing = showcase.listing;
-                    if (!listing) return null;
-
-                    return (
-                      <div key={showcase.id} className="min-w-0 max-w-full">
-                        <ListingCard
-                          listing={listing}
-                          showActions={false}
-                          isOwner={user?.id === listing.sellerId}
-                          currentUserId={user?.id}
-                          priorityImage={index < 6}
-                        />
+                {filteredShowcases.length > 0 ? (
+                  filteredShowcases.map((showcase) => (
+                    <div key={showcase.id} className="relative">
+                      {/* Subtle Badge instead of Flashy Zap */}
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="px-2 py-1 rounded-md bg-white/90 backdrop-blur-sm text-[9px] font-bold text-slate-500 uppercase tracking-wider shadow-sm border border-slate-100">
+                          Featured
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-16 rounded-[2rem] border border-dashed border-slate-200 bg-slate-50/80">
-              <p className="text-sm text-slate-400">No featured showcases yet.</p>
-            </div>
-          )}
+                      <ListingCard
+                        listing={showcase.listing}
+                        showActions={false}
+                        isOwner={user?.id === showcase.listing.sellerId}
+                        currentUserId={user?.id}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-100">
+                    <p className="text-sm text-slate-400 font-medium">No items found in this category.</p>
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-slate-200">
+                <p className="text-sm text-slate-400 font-medium">No featured items available at the moment.</p>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>

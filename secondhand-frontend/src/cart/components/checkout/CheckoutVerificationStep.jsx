@@ -1,12 +1,12 @@
-import {useEffect, useMemo, useState} from 'react';
-import {Lock, ShieldCheck as ShieldCheckIcon} from 'lucide-react';
-import {OTP_CODE_LENGTH, sanitizeOtpInput} from '../../../common/constants/otp.js';
-import {findLatestOtpFromEmails} from '../../../payments/utils/otp.js';
+import { useEffect, useMemo, useState } from 'react';
+import { Lock, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../../common/constants/otp.js';
+import { findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
 import OtpDigitInputGroup from '../../../payments/components/verification/OtpDigitInputGroup.jsx';
 import OtpSuggestionBanner from '../../../payments/components/verification/OtpSuggestionBanner.jsx';
-import {useOtpSuggestedToast} from '../../../payments/hooks/useOtpSuggestedToast.js';
-import {useOtpValidityCountdown} from '../../../payments/hooks/useOtpValidityCountdown.js';
-import {EMAIL_TYPES} from '../../../emails/emails.js';
+import { useOtpSuggestedToast } from '../../../payments/hooks/useOtpSuggestedToast.js';
+import { useOtpValidityCountdown } from '../../../payments/hooks/useOtpValidityCountdown.js';
+import { EMAIL_TYPES } from '../../../emails/emails.js';
 
 const CheckoutVerificationStep = ({
   paymentVerificationCode,
@@ -24,11 +24,12 @@ const CheckoutVerificationStep = ({
   const [canResend, setCanResend] = useState(true);
   const [isResending, setIsResending] = useState(false);
 
-  const suggestedFromInbox = useMemo(
-    () =>
-      findLatestOtpFromEmails(emails, {emailType: EMAIL_TYPES.PAYMENT_VERIFICATION, maxScan: 16}),
-    [emails],
+  const otpResult = useMemo(
+    () => findLatestOtpWithEmail(emails, { emailType: EMAIL_TYPES.PAYMENT_VERIFICATION, maxScan: 16 }),
+    [emails]
   );
+  const suggestedFromInbox = otpResult?.code || null;
+  const sourceEmail = otpResult?.email || null;
 
   useOtpSuggestedToast({ suggestedCode: suggestedFromInbox, enabled: true });
 
@@ -59,32 +60,38 @@ const CheckoutVerificationStep = ({
   const isCodeComplete = sanitized.length === OTP_CODE_LENGTH;
 
   return (
-    <div className="p-4 sm:p-5">
-      <div className="flex items-center gap-3 mb-5 px-4 py-3 bg-gradient-to-r from-slate-50 to-indigo-50 rounded-2xl border border-slate-200">
-        <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center shrink-0">
-          <Lock className="w-3.5 h-3.5 text-white" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold text-slate-900 tracking-tight">Secure Verification</h2>
-          <p className="text-xs text-slate-500">{`A ${OTP_CODE_LENGTH}-digit code has been sent to your email.`}</p>
-          {ttlActive ? (
+    <div className="p-5 sm:p-7">
+      {/* Centered content */}
+      <div className="mx-auto max-w-md">
+        {/* Lock icon + heading */}
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-[#e5e3df] bg-[#fafaf9]">
+            <Lock className="h-5 w-5 text-[#555]" strokeWidth={1.5} />
+          </div>
+          <h2 className="text-lg font-semibold tracking-tight text-[#111]">Verify your purchase</h2>
+          <p className="mt-1 text-sm text-[#999]">
+            {`Enter the ${OTP_CODE_LENGTH}-digit code sent to your email.`}
+          </p>
+          {ttlActive && (
             <p
-              className={`text-[11px] font-semibold mt-1 tabular-nums ${
-                ttlExpired ? 'text-amber-700' : 'text-slate-600'
+              className={`mt-2 text-xs font-medium tabular-nums ${
+                ttlExpired ? 'text-[#a4262c]' : 'text-[#555]'
               }`}
             >
-              {ttlExpired ? 'Code expired — resend a new code.' : `Expires in: ${ttlFormatted}`}
+              {ttlExpired ? 'Code expired — request a new one.' : `Expires in ${ttlFormatted}`}
             </p>
-          ) : null}
+          )}
         </div>
-      </div>
 
-      <div className="space-y-5">
-        {suggestedFromInbox ? (
-          <OtpSuggestionBanner suggestedCode={suggestedFromInbox} onApply={setPaymentVerificationCode} />
-        ) : null}
+        {/* OTP suggestion banner */}
+        {suggestedFromInbox && (
+          <div className="mb-5">
+            <OtpSuggestionBanner suggestedCode={suggestedFromInbox} sourceEmail={sourceEmail} onApply={setPaymentVerificationCode} />
+          </div>
+        )}
 
-        <div>
+        {/* OTP input */}
+        <div className="mb-5">
           <OtpDigitInputGroup
             value={paymentVerificationCode}
             onChange={setPaymentVerificationCode}
@@ -92,84 +99,73 @@ const CheckoutVerificationStep = ({
             disabled={!!isCheckingOut || ttlExpired}
           />
 
-          <div className="mt-3 flex justify-center">
+          <div className="mt-3 text-center">
             <button
               type="button"
               onClick={handleResendCode}
               disabled={!canResend || isResending}
-              className={`text-xs font-semibold transition-colors ${
+              className={`text-xs font-medium transition-colors ${
                 canResend && !isResending
-                  ? 'text-slate-600 hover:text-slate-900 underline underline-offset-2'
-                  : 'text-slate-300 cursor-not-allowed'
+                  ? 'text-[#555] underline underline-offset-2 hover:text-[#1466c6]'
+                  : 'cursor-not-allowed text-[#ccc]'
               }`}
             >
               {isResending ? 'Sending…' : canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="hidden sm:flex items-center justify-between pt-6 mt-8 border-t border-slate-200/60">
-        <button
-          type="button"
-          onClick={onBack}
-          className="px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all"
-        >
-          Back
-        </button>
+        {/* Complete purchase button — prominent */}
         <button
           type="button"
           onClick={onCheckout}
           disabled={proceedDisabled || isCheckingOut || !isCodeComplete || ttlExpired}
-          className={`px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 transition-all ${
-            isCodeComplete && !proceedDisabled && !isCheckingOut
-              ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-500/25 hover:from-indigo-700 hover:to-violet-700 hover:-translate-y-0.5 active:translate-y-0'
-              : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed transform-none'
-          }`}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] py-3.5 text-sm font-medium text-white transition-all duration-150 hover:border-[#0f529e] hover:bg-[#0f529e] disabled:cursor-not-allowed disabled:border-[#e8e6e4] disabled:bg-[#e8e6e4] disabled:text-[#9c9894] active:scale-[0.99]"
         >
           {isCheckingOut ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-              <span>Processing…</span>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Processing…
             </>
           ) : (
             <>
-              <ShieldCheckIcon className="w-4 h-4" />
-              <span>Complete Purchase</span>
+              <ShieldCheck className="h-4 w-4" strokeWidth={1.5} />
+              Complete purchase
             </>
           )}
         </button>
+
+        {/* Trust indicators */}
+        <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-[#bbb]">
+          <Lock className="h-3 w-3" strokeWidth={1.5} />
+          <span>256-bit encrypted</span>
+          <span className="text-[#e0deda]">·</span>
+          <span>Secure checkout</span>
+        </div>
       </div>
 
-      <div className="sm:hidden sticky bottom-0 -mx-5 mt-6 px-5 py-4 border-t border-slate-200/60 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="px-4 py-3.5 rounded-2xl border-2 border-slate-200/80 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={onCheckout}
-            disabled={proceedDisabled || isCheckingOut || !isCodeComplete || ttlExpired}
-            className={`px-4 py-3.5 rounded-2xl text-sm font-bold shadow-lg flex justify-center items-center gap-1.5 transition-all ${
-              isCodeComplete && !proceedDisabled && !isCheckingOut
-                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-500/25'
-                : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
-            }`}
-          >
-            {isCheckingOut ? (
-              <>
-                <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-slate-400" />
-                <span>Processing…</span>
-              </>
-            ) : (
-              'Complete'
-            )}
-          </button>
-        </div>
+      {/* Back link — desktop */}
+      <div className="mt-6 hidden border-t border-[#f0efed] pt-5 sm:block">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm font-medium text-[#555] transition-colors hover:text-[#111]"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+          Back
+        </button>
+      </div>
+
+      {/* Back — mobile */}
+      <div className="mt-4 border-t border-[#f0efed] pt-4 sm:hidden">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#e5e3df] bg-white py-3 text-sm font-medium text-[#111] transition-all hover:bg-[#fafaf9]"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+          Back
+        </button>
       </div>
     </div>
   );

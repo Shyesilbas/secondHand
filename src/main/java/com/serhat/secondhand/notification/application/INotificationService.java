@@ -22,5 +22,4 @@ public interface INotificationService {
     
     void markAllAsRead(Long userId);
     
-    boolean existsByIdAndUserId(UUID notificationId, Long userId);
 }

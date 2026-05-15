@@ -8,30 +8,31 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const CATEGORY_COLORS = [
+  'rgb(99, 102, 241)',   // indigo
+  'rgb(16, 185, 129)',   // emerald
+  'rgb(245, 158, 11)',   // amber
+  'rgb(236, 72, 153)',   // pink
+  'rgb(14, 165, 233)',   // sky
+  'rgb(168, 85, 247)',   // purple
+  'rgb(251, 146, 60)',   // orange
+  'rgb(20, 184, 166)',   // teal
+];
+
 const CategoryDistributionChart = ({ data, title = 'Category Distribution' }) => {
   if (!data || Object.keys(data).length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200/60 p-6 flex items-center justify-center h-64">
-        <p className="text-gray-500 text-xs font-medium">No data available</p>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-slate-400 text-xs font-medium">No data available for this period</p>
       </div>
     );
   }
-
-  const colors = [
-    'rgb(59, 130, 246)',   // blue
-    'rgb(16, 185, 129)',   // green
-    'rgb(245, 158, 11)',  // amber
-    'rgb(139, 92, 246)',   // violet
-    'rgb(236, 72, 153)',   // pink
-    'rgb(14, 165, 233)',   // cyan
-  ];
 
   const labels = Object.keys(data);
   const values = Object.values(data).map(v => parseFloat(v || 0));
 
   const chartData = {
     labels: labels.map(label => {
-      // Convert enum to readable format
       return label.replace(/_/g, ' ').toLowerCase()
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -40,9 +41,10 @@ const CategoryDistributionChart = ({ data, title = 'Category Distribution' }) =>
     datasets: [
       {
         data: values,
-        backgroundColor: colors.slice(0, labels.length),
-        borderColor: '#ffffff',
+        backgroundColor: CATEGORY_COLORS.slice(0, labels.length),
+        borderColor: 'rgba(255,255,255,0.8)',
         borderWidth: 2,
+        hoverOffset: 6,
       },
     ],
   };
@@ -54,34 +56,26 @@ const CategoryDistributionChart = ({ data, title = 'Category Distribution' }) =>
       legend: {
         position: 'right',
         labels: {
-          padding: 12,
-          font: {
-            size: 10,
-          },
+          padding: 16,
+          font: { size: 11, weight: '500' },
+          color: '#475569',
           usePointStyle: true,
+          pointStyleWidth: 8,
         },
       },
       title: {
-        display: true,
-        text: title,
-        font: {
-          size: 12,
-          weight: '600',
-        },
-        color: '#111827',
-        padding: {
-          bottom: 20,
-        },
+        display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
-        titleFont: {
-          size: 12,
-        },
-        bodyFont: {
-          size: 12,
-        },
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        padding: { x: 14, y: 10 },
+        titleFont: { size: 11, weight: '600' },
+        bodyFont: { size: 12, weight: '700' },
+        cornerRadius: 10,
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        boxPadding: 4,
         callbacks: {
           label: function(context) {
             const label = context.label || '';
@@ -99,13 +93,10 @@ const CategoryDistributionChart = ({ data, title = 'Category Distribution' }) =>
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200/60 p-6">
-      <div style={{ height: '320px' }}>
-        <Pie data={chartData} options={options} />
-      </div>
+    <div style={{ height: '300px' }}>
+      <Pie data={chartData} options={options} />
     </div>
   );
 };
 
 export default CategoryDistributionChart;
-

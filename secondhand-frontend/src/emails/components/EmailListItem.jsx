@@ -1,73 +1,102 @@
 import React, { useState } from 'react';
 import { formatDateTime } from '../../common/formatters.js';
-import { EMAIL_TYPES } from '../emails.js';
 import { Trash2 } from 'lucide-react';
+
+const listInitials = (subject, senderEmail) => {
+    const s = String(senderEmail || '').split('@')[0] || '';
+    if (s.length >= 2) return s.slice(0, 2).toUpperCase();
+    const sub = String(subject || '').trim();
+    if (sub.length >= 2) return sub.slice(0, 2).toUpperCase();
+    return '•';
+};
 
 const EmailListItem = ({ email, isSelected, onSelect, onDelete, isDeleting }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const formatDate = (dateString) => formatDateTime(dateString);
+    const formatShort = (dateString) => {
+        if (!dateString) return '';
+        try {
+            const d = new Date(dateString);
+            const now = new Date();
+            const sameDay =
+                d.getFullYear() === now.getFullYear() &&
+                d.getMonth() === now.getMonth() &&
+                d.getDate() === now.getDate();
+            if (sameDay) {
+                return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            }
+            return formatDateTime(dateString);
+        } catch {
+            return formatDateTime(dateString);
+        }
+    };
     const previewText = String(email?.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
     const isUnread = !email.read && !email.isRead;
+    const initials = listInitials(email.subject, email.senderEmail);
 
     return (
         <div
-            className={`relative px-4 py-4 transition-all duration-200 ease-out cursor-pointer group border-b border-gray-100 last:border-b-0 ${
-                isSelected 
-                    ? 'bg-gray-100/80' 
-                    : 'hover:bg-gray-50 bg-white'
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelect(email);
+                }
+            }}
+            className={`group relative cursor-pointer border-b border-[#edebe9] transition-colors ${
+                isSelected
+                    ? 'bg-[#e3f2fd] pl-0'
+                    : 'bg-white hover:bg-[#faf9f8]'
             }`}
+            style={isSelected ? { borderLeft: '3px solid #0078d4' } : { borderLeft: '3px solid transparent' }}
             onClick={() => onSelect(email)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-2 w-2">
-                    {isUnread && <div className="w-2 h-2 rounded-full bg-zinc-900"></div>}
+            <div className="flex gap-3 px-3 py-3 pr-2 sm:px-4">
+                <div
+                    className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
+                    style={{ backgroundColor: isSelected ? '#0078d4' : '#8a8886' }}
+                >
+                    {initials}
                 </div>
-                
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                            <h4 className={`text-sm truncate mb-1.5 ${
-                                isUnread ? 'font-bold text-gray-900' : 'font-medium text-gray-700'
-                            }`}>
-                                {email.subject}
-                            </h4>
-                            <div className="flex items-center gap-2 mb-1.5">
-                                <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase">
-                                    {email.emailType || 'EMAIL'}
-                                </span>
-                                <span className="text-gray-300 text-xs">•</span>
-                                <span className="text-xs text-gray-500 font-medium">
-                                    {formatDate(email.sentAt)}
-                                </span>
-                            </div>
-                            <div className="text-xs text-gray-600 truncate mb-1.5">
-                                {email.senderEmail}
-                            </div>
-                            {previewText && (
-                                <p className="text-xs leading-5 text-gray-400 line-clamp-2 pr-2">
-                                    {previewText}
-                                </p>
-                            )}
-                        </div>
-                        
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete(email.id, email.subject);
-                            }}
-                            disabled={isDeleting}
-                            className={`opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed ${
-                                isHovered ? 'opacity-100' : ''
+
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                        <h4
+                            className={`truncate text-[13px] leading-snug sm:text-sm ${
+                                isUnread ? 'font-semibold text-[#323130]' : 'font-normal text-[#605e5c]'
                             }`}
-                            title="Delete email"
                         >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
+                            {email.subject || '(No subject)'}
+                        </h4>
+                        <span className="shrink-0 text-[11px] tabular-nums text-[#605e5c]">
+                            {formatShort(email.sentAt)}
+                        </span>
                     </div>
+                    <p className="mt-0.5 truncate text-xs text-[#605e5c]">{email.senderEmail}</p>
+                    {previewText && (
+                        <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#8a8886] sm:text-xs">
+                            {previewText}
+                        </p>
+                    )}
                 </div>
+
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(email.id, email.subject);
+                    }}
+                    disabled={isDeleting}
+                    className={`mt-1 shrink-0 rounded-md p-1.5 text-[#8a8886] transition-opacity hover:bg-black/[0.05] hover:text-[#d13438] disabled:cursor-not-allowed disabled:opacity-40 ${
+                        isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    }`}
+                    title="Delete"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </button>
             </div>
         </div>
     );

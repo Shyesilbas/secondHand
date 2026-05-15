@@ -2,20 +2,35 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useBuyerDashboard } from '../hooks/useDashboard.js';
 import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
 import MetricCard from '../components/MetricCard.jsx';
+import QuickStatusSummary from '../components/QuickStatusSummary.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import { motion } from 'framer-motion';
 
 const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
-const CategoryDistributionChart = lazy(() => import('../components/CategoryDistributionChart.jsx'));
-const OrderStatusChart = lazy(() => import('../components/OrderStatusChart.jsx'));
+import CategoryBreakdown from '../components/CategoryBreakdown.jsx';
+import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
 import { 
   DollarSign, 
   ShoppingBag, 
   TrendingUp, 
-  Star, 
-  Heart
+  Heart,
+  Tag,
 } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
+
+const ChartCard = ({ children, title, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.4 }}
+    className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm"
+  >
+    {title && (
+      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">{title}</h3>
+    )}
+    {children}
+  </motion.div>
+);
 
 const BuyerDashboardPage = () => {
   const [startDate, setStartDate] = useState(() => {
@@ -34,7 +49,7 @@ const BuyerDashboardPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
         <LoadingIndicator />
       </div>
     );
@@ -44,62 +59,59 @@ const BuyerDashboardPage = () => {
     return (
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        className="min-h-screen bg-gray-50/50 flex items-center justify-center"
+        className="min-h-screen bg-[#f8f9fb] flex items-center justify-center"
       >
-        <div className="text-center p-8 bg-white/60 backdrop-blur-xl rounded-[32px] border border-white shadow-xl">
-          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-[20px] flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag className="w-8 h-8" />
+        <div className="text-center p-8 bg-white rounded-2xl border border-slate-100 shadow-sm max-w-sm">
+          <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <ShoppingBag className="w-7 h-7" />
           </div>
-          <p className="text-xl font-bold text-gray-900 mb-2">Error loading dashboard</p>
-          <p className="text-gray-500 text-sm font-medium">{error.message}</p>
+          <p className="text-lg font-bold text-slate-900 mb-1">Error loading dashboard</p>
+          <p className="text-slate-400 text-sm">{error.message}</p>
         </div>
       </motion.div>
     );
   }
 
-  if (!dashboard) {
-    return null;
-  }
+  if (!dashboard) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-[#f8f9fa] relative overflow-x-hidden"
-    >
-      {/* Decorative gradient backgrounds */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-30 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 blur-[100px] rounded-full mix-blend-multiply" />
-      </div>
-
-      <div className="bg-white/60 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-1">Buyer Dashboard</h1>
-              <p className="text-sm text-gray-500 font-bold uppercase tracking-wider">Track your purchases and spending</p>
+    <div className="min-h-screen bg-[#f8f9fb]">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}>
+              <h1 className="text-xl font-bold text-white tracking-tight">My Purchases</h1>
+              <div className="flex items-center gap-3 mt-0.5">
+                <p className="text-xs text-emerald-300/70 font-medium">Track your spending & orders</p>
+                {dashboard.totalFavorites > 0 && (
+                  <>
+                    <span className="text-emerald-800">·</span>
+                    <div className="flex items-center gap-1">
+                      <Heart className="w-3 h-3 text-pink-400/70" />
+                      <span className="text-[11px] text-slate-400 font-medium">{dashboard.totalFavorites} favorites saved</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}>
+              <TimeRangeSelector
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
+                onPresetSelect={handlePresetSelect}
+              />
             </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <TimeRangeSelector
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-            onPresetSelect={handlePresetSelect}
-          />
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* Primary KPIs — 4 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
             index={0}
             title="Total Spending"
@@ -111,7 +123,7 @@ const BuyerDashboardPage = () => {
           />
           <MetricCard
             index={1}
-            title="Total Orders"
+            title="Orders"
             value={dashboard.totalOrders || 0}
             icon={ShoppingBag}
             subtitle={`${dashboard.completedOrders || 0} completed`}
@@ -119,7 +131,7 @@ const BuyerDashboardPage = () => {
           />
           <MetricCard
             index={2}
-            title="Average Order Value"
+            title="Avg Order Value"
             value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')}
             icon={TrendingUp}
             subtitle="Per order"
@@ -127,57 +139,54 @@ const BuyerDashboardPage = () => {
           />
           <MetricCard
             index={3}
-            title="Reviews Given"
-            value={dashboard.reviewsGiven || 0}
-            icon={Star}
-            subtitle="To sellers"
+            title="Savings"
+            value={(dashboard.cancelledOrders || 0) + (dashboard.refundedOrders || 0) > 0 
+              ? `${dashboard.cancelledOrders || 0} cancelled · ${dashboard.refundedOrders || 0} refunded`
+              : '—'}
+            icon={Tag}
+            subtitle="Cancels & refunds"
             color="amber"
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <MetricCard
-            index={4}
-            title="Favorites"
-            value={dashboard.totalFavorites || 0}
-            icon={Heart}
-            subtitle="Saved listings"
-            color="pink"
-          />
-        </div>
+        {/* Quick Status Summary */}
+        <QuickStatusSummary ordersByStatus={dashboard.ordersByStatus || {}} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-white/50 backdrop-blur-md rounded-[24px] border border-gray-100" />}>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="bg-white/70 backdrop-blur-xl rounded-[24px] border border-white shadow-xl p-6">
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Suspense fallback={<div className="animate-pulse h-80 bg-white rounded-2xl border border-slate-100" />}>
+            <ChartCard title="Spending Trend" delay={0.2}>
               <RevenueChart
                 data={dashboard.spendingTrend || []}
                 title="Spending Trend"
                 label="Spending"
               />
-            </motion.div>
+            </ChartCard>
           </Suspense>
-          <Suspense fallback={<div className="animate-pulse h-80 bg-white/50 backdrop-blur-md rounded-[24px] border border-gray-100" />}>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="bg-white/70 backdrop-blur-xl rounded-[24px] border border-white shadow-xl p-6">
-              <CategoryDistributionChart
-                data={dashboard.categorySpending || {}}
-                title="Spending by Category"
-              />
-            </motion.div>
-          </Suspense>
+          <ChartCard title="Spending by Category" delay={0.25}>
+            <CategoryBreakdown
+              data={dashboard.categorySpending || {}}
+              label="Total Spending"
+            />
+          </ChartCard>
         </div>
 
-        <div className="mb-12">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-white/50 backdrop-blur-md rounded-[24px] border border-gray-100" />}>
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }} className="max-w-2xl bg-white/70 backdrop-blur-xl rounded-[24px] border border-white shadow-xl p-6">
-              <OrderStatusChart
-                data={dashboard.ordersByStatus || {}}
-                title="Orders by Status"
-              />
-            </motion.div>
-          </Suspense>
+        {/* Order Status Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard title="Orders by Status" delay={0.3}>
+            <OrderStatusBreakdown
+              data={dashboard.ordersByStatus || {}}
+            />
+          </ChartCard>
+          
+          {/* Optional: Add a placeholder or future feature card here to keep grid balance */}
+          <div className="hidden lg:block" />
         </div>
+
+        {/* Spacer */}
+        <div className="pb-8" />
       </div>
-    </motion.div>
+    </div>
   );
 };
 

@@ -23,6 +23,7 @@ public class PriceHistoryAspect {
     
     private final ListingRepository listingRepository;
     private final PriceHistoryService priceHistoryService;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
     
     @Around("@annotation(trackPriceChange)")
     public Object trackPriceChange(ProceedingJoinPoint joinPoint, TrackPriceChange trackPriceChange) throws Throwable {
@@ -48,10 +49,29 @@ public class PriceHistoryAspect {
             // Record price change if different
             if (hasPriceChanged(oldPrice, newPrice)) {
                 recordPriceChange(listingId, oldPrice, newPrice, trackPriceChange.reason());
+                
+                // Trigger PriceDroppedEvent if price decreased
+                if (oldPrice != null && newPrice != null && newPrice.compareTo(oldPrice) < 0) {
+                    publishPriceDroppedEvent(listingId, oldPrice, newPrice);
+                }
             }
         }
         
         return result;
+    }
+
+    private void publishPriceDroppedEvent(UUID listingId, BigDecimal oldPrice, BigDecimal newPrice) {
+        listingRepository.findById(listingId).ifPresent(listing -> {
+            eventPublisher.publishEvent(new com.serhat.secondhand.listing.domain.entity.events.PriceDroppedEvent(
+                this,
+                listingId,
+                listing.getTitle(),
+                oldPrice,
+                newPrice,
+                listing.getCurrency()
+            ));
+            log.info("PriceDroppedEvent published for listing {}", listingId);
+        });
     }
     
     private UUID extractListingId(ProceedingJoinPoint joinPoint) {
