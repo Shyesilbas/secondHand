@@ -12,6 +12,8 @@ import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
+import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
+
 
 const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentUserId, isInShowcase = false, priorityImage = false, isSelectable = false, isSelected = false, onSelectToggle = null }) => {
     const [showInfo, setShowInfo] = useState(false);
@@ -110,7 +112,7 @@ const ListingCard = ({ listing, onDeleted, showActions = true, isOwner, currentU
             <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden rounded-t-2xl">
                 {listing.imageUrl ? (
                     <img
-                        src={listing.imageUrl}
+                        src={optimizeCloudinaryUrl(listing.imageUrl, { width: 400, height: 300 })}
                         alt={listing.title}
                         loading={priorityImage ? 'eager' : 'lazy'}
                         fetchPriority={priorityImage ? 'high' : 'auto'}

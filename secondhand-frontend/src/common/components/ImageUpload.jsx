@@ -4,6 +4,7 @@ import {API_ENDPOINTS} from '../constants/apiEndpoints.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import apiClient from '../services/api/interceptors.js';
 import logger from '../utils/logger.js';
+import { compressImage } from '../utils/imageOptimizer.js';
 
 const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -34,8 +35,11 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
     setIsUploading(true);
     
     try {
+      // Compress the image before uploading
+      const compressedFile = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.8 });
+      
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', compressedFile);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);

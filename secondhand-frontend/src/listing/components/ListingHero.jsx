@@ -1,6 +1,8 @@
 import {formatCurrency, formatDateTime} from '../../common/formatters.js';
 import {useActiveReservationCount} from '../../cart/hooks/useActiveReservationCount.js';
 import {Flame} from 'lucide-react';
+import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
+
 
 const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, hasStockInfo, isLowStock }) => {
   const { count: activeReservations } = useActiveReservationCount(listing?.id);
@@ -56,7 +58,7 @@ const ListingHero = ({ listing, variant = 'main', displayPrice, hasCampaign, has
         <div className="min-h-[260px] flex items-center justify-center p-5">
           {listing.imageUrl ? (
             <img
-              src={listing.imageUrl}
+              src={optimizeCloudinaryUrl(listing.imageUrl, { width: 800, height: 600 })}
               alt={listing.title}
               className="max-w-full max-h-[380px] w-auto h-auto object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
               onError={(e) => {
