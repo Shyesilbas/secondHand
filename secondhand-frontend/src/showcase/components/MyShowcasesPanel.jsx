@@ -1,10 +1,11 @@
-import {AlertTriangle, Clock, X, Zap} from 'lucide-react';
-import {formatCurrency, formatDate} from '../../common/formatters.js';
-import {useMyShowcases} from '../hooks/useMyShowcases.js';
-import {AnimatePresence, motion} from 'framer-motion';
-import { useState } from 'react';
+import { AlertTriangle, Clock, X, Zap, ShieldAlert, Sparkles, Image as ImageIcon, Filter } from 'lucide-react';
+import { formatCurrency, formatDate } from '../../common/formatters.js';
+import { useMyShowcases } from '../hooks/useMyShowcases.js';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState, useMemo } from 'react';
 
 const MyShowcasesPanel = ({ userId }) => {
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'active' | 'expired'
   const [extendDays, setExtendDays] = useState({});
   const [localError, setLocalError] = useState(null);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
@@ -53,17 +54,98 @@ const MyShowcasesPanel = ({ userId }) => {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
+  // Processed, sorted and categorized showcases
+  const processedShowcases = useMemo(() => {
+    const now = new Date();
+    const items = showcases.map(item => {
+      const remaining = calculateRemainingDays(item.endDate);
+      const isExpired = new Date(item.endDate) < now || remaining === 0;
+      return {
+        ...item,
+        remaining,
+        isExpired
+      };
+    });
+
+    // Sort: Active ones first (by remaining days ascending, i.e. expiring soonest), then expired ones (by end date descending)
+    return items.sort((a, b) => {
+      if (a.isExpired && !b.isExpired) return 1;
+      if (!a.isExpired && b.isExpired) return -1;
+      if (!a.isExpired && !b.isExpired) {
+        return a.remaining - b.remaining;
+      }
+      return new Date(b.endDate) - new Date(a.endDate);
+    });
+  }, [showcases]);
+
+  // Filtered list based on selected tab
+  const filteredShowcases = useMemo(() => {
+    if (activeTab === 'active') {
+      return processedShowcases.filter(s => !s.isExpired);
+    }
+    if (activeTab === 'expired') {
+      return processedShowcases.filter(s => s.isExpired);
+    }
+    return processedShowcases;
+  }, [processedShowcases, activeTab]);
+
+  const counts = useMemo(() => {
+    const active = processedShowcases.filter(s => !s.isExpired).length;
+    const expired = processedShowcases.filter(s => s.isExpired).length;
+    return {
+      all: processedShowcases.length,
+      active,
+      expired
+    };
+  }, [processedShowcases]);
+
   return (
-    <div className="bg-white rounded-[32px] border border-gray-200/60 p-6 lg:p-8 mt-8 shadow-sm">
-      <div className="flex items-center justify-between mb-8">
+    <div className="bg-white rounded-[32px] border border-slate-100 p-6 lg:p-8 mt-8 shadow-sm">
+      {/* Top Title Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-100">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            My Showcases
-            <span className="inline-flex items-center justify-center bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full border border-indigo-100">
-              {showcases.length}
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              My Showcases
+            </h2>
+            <span className="inline-flex items-center justify-center bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-indigo-100/60 shadow-sm shadow-indigo-100/20">
+              {counts.active} / {counts.all} Active
             </span>
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">Manage your active listing promotions.</p>
+          </div>
+          <p className="text-sm text-slate-500 mt-1">Manage and track your active listing promotions and visual boosts.</p>
+        </div>
+
+        {/* Tab Selection */}
+        <div className="flex bg-slate-50 p-1 rounded-2xl border border-slate-100 shrink-0 self-start md:self-center">
+          {[
+            { id: 'all', label: 'All', count: counts.all },
+            { id: 'active', label: 'Active', count: counts.active },
+            { id: 'expired', label: 'Expired', count: counts.expired }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative px-4 py-2 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 ${
+                activeTab === tab.id
+                  ? 'text-slate-950 shadow-sm border border-slate-200/40'
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute inset-0 bg-white rounded-xl"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{tab.label}</span>
+              <span className={`relative z-10 text-[9px] px-1.5 py-0.2 rounded-md ${
+                activeTab === tab.id ? 'bg-slate-100 text-slate-700' : 'bg-slate-200/50 text-slate-400'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -71,116 +153,185 @@ const MyShowcasesPanel = ({ userId }) => {
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 rounded-2xl border border-red-100 bg-red-50/50 px-4 py-3 text-sm text-red-600 flex items-center gap-3"
+          className="mb-6 rounded-2xl border border-rose-100 bg-rose-50/50 px-4 py-3.5 text-sm text-rose-700 flex items-start gap-3 shadow-sm"
         >
-          <AlertTriangle className="w-5 h-5 shrink-0" />
-          <p className="font-medium">{actionError}</p>
+          <AlertTriangle className="w-5 h-5 shrink-0 text-rose-500 mt-0.5" />
+          <div>
+            <span className="font-bold block mb-0.5">Operation Error</span>
+            <p className="text-rose-600/90 font-medium">{actionError}</p>
+          </div>
         </motion.div>
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[1, 2].map((i) => (
-            <div key={i} className="h-48 rounded-[24px] bg-gray-50 animate-pulse border border-gray-100" />
+            <div key={i} className="h-56 rounded-3xl bg-slate-50/80 animate-pulse border border-slate-100" />
           ))}
         </div>
-      ) : showcases.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50/50 rounded-[24px] border border-dashed border-gray-200">
-          <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
-            <Zap className="w-8 h-8 text-gray-300" />
+      ) : filteredShowcases.length === 0 ? (
+        <div className="text-center py-16 bg-slate-50/40 rounded-[28px] border border-dashed border-slate-200/80 max-w-xl mx-auto px-6">
+          <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md shadow-indigo-500/5 border border-slate-100 text-indigo-500">
+            <Sparkles className="w-6 h-6 animate-pulse" />
           </div>
-          <h3 className="text-gray-900 font-bold mb-1">Boost Your Sales</h3>
-          <p className="text-sm text-gray-500 max-w-xs mx-auto">Promote your listings to reach more buyers and sell faster.</p>
+          <h3 className="text-slate-950 font-extrabold text-base tracking-tight mb-1.5">No Showcases Found</h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {activeTab === 'expired' 
+              ? "You don't have any expired promotions. All your showcases are still working hard!"
+              : activeTab === 'active'
+              ? "You don't have any active promotions currently. Boost one of your listings to start selling faster!"
+              : "Promote your items directly to the top rows and category frontpages. Sell up to 5x faster!"}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          {showcases.map((showcase) => {
-            const remaining = calculateRemainingDays(showcase.endDate);
-            const progress = Math.min(100, Math.max(0, (remaining / 30) * 100)); // assuming 30 days max
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          {filteredShowcases.map((showcase) => {
+            const progress = showcase.isExpired ? 0 : Math.min(100, Math.max(0, (showcase.remaining / 30) * 100));
+            const thumbUrl = showcase.listing?.imageUrl;
             
             return (
               <motion.div 
                 key={showcase.id} 
                 layout
-                className="group relative bg-white rounded-[24px] border border-gray-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 overflow-hidden"
+                className={`group relative bg-white rounded-3xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
+                  showcase.isExpired 
+                    ? 'border-slate-100 hover:border-slate-300/80 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.02)]' 
+                    : 'border-slate-100 hover:border-indigo-200/80 hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.06)]'
+                }`}
               >
-                <div className="p-5 lg:p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
-                        {showcase.listing?.title || 'Premium Listing'}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Status</span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">Active</span>
+                {/* Header Section with Thumbnail and Title */}
+                <div className="p-5 lg:p-6 flex gap-4">
+                  {/* Thumbnail Image Container */}
+                  <div className={`w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 border relative group-hover:scale-[1.02] transition-transform duration-300 ${
+                    showcase.isExpired ? 'bg-slate-50 border-slate-200/60 opacity-60' : 'bg-slate-100 border-slate-100'
+                  }`}>
+                    {thumbUrl ? (
+                      <img src={thumbUrl} alt="" className={`w-full h-full object-cover ${showcase.isExpired ? 'grayscale' : ''}`} />
+                    ) : (
+                      <div className={`w-full h-full flex items-center justify-center ${showcase.isExpired ? 'text-slate-400' : 'text-indigo-400 bg-gradient-to-br from-indigo-50 to-violet-50'}`}>
+                        <ImageIcon className="w-7 h-7 opacity-60" />
                       </div>
-                    </div>
-                    <div className="bg-indigo-50 p-2 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                      <Zap className="w-5 h-5" />
+                    )}
+                    <div className={`absolute top-1 left-1 p-1 rounded-lg text-[9px] font-black flex items-center justify-center shadow ${
+                      showcase.isExpired ? 'bg-slate-400 text-white' : 'bg-[#0f111a] text-white'
+                    }`}>
+                      <Zap className={`w-2.5 h-2.5 fill-current ${showcase.isExpired ? 'text-slate-100' : 'text-amber-400'}`} />
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-gray-500">
-                        <Clock className="w-4 h-4" />
-                        <span>Ends in</span>
+                  <div className="min-w-0 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className={`text-base font-extrabold leading-snug truncate transition-colors ${
+                        showcase.isExpired 
+                          ? 'text-slate-500 group-hover:text-slate-700' 
+                          : 'text-slate-900 group-hover:text-indigo-600'
+                      }`} title={showcase.listing?.title}>
+                        {showcase.listing?.title || 'Premium Promoted Listing'}
+                      </h3>
+                      
+                      <div className="flex items-center gap-2 mt-1">
+                        {showcase.isExpired ? (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider border border-slate-200/50">
+                            Expired
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider border border-emerald-100">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Live Boosting
+                          </span>
+                        )}
                       </div>
-                      <span className="font-bold text-gray-900">{remaining} days left</span>
                     </div>
+                    
+                    <div className="flex items-center gap-1 text-slate-400 text-xs">
+                      <Clock className="w-3.5 h-3.5 shrink-0" />
+                      {showcase.isExpired ? (
+                        <span className="font-semibold text-slate-400">Ended</span>
+                      ) : (
+                        <span>Ends in: <strong className="text-slate-950 font-black">{showcase.remaining} days</strong></span>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                    <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full rounded-full ${remaining < 3 ? 'bg-orange-500' : 'bg-indigo-500'}`}
+                {/* Progress bar and details */}
+                <div className="px-5 lg:px-6 pb-5 space-y-4">
+                  {/* Progress Line */}
+                  <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className={`h-full rounded-full ${
+                        showcase.isExpired 
+                          ? 'bg-slate-200' 
+                          : showcase.remaining < 4 
+                          ? 'bg-gradient-to-r from-orange-500 to-amber-400' 
+                          : 'bg-gradient-to-r from-indigo-600 to-violet-500'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Financial Metrics */}
+                  <div className={`grid grid-cols-2 gap-4 p-3 rounded-2xl border ${
+                    showcase.isExpired 
+                      ? 'bg-slate-50/20 border-slate-100 text-slate-400' 
+                      : 'bg-slate-50/50 border-slate-100/40'
+                  }`}>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Spent Cost</span>
+                      <span className={`text-sm font-black mt-0.5 ${showcase.isExpired ? 'text-slate-500' : 'text-slate-900'}`}>
+                        {formatCurrency(showcase.totalCost, 'TRY')}
+                      </span>
+                    </div>
+                    <div className="flex flex-col border-l border-slate-200/60 pl-4">
+                      <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Ended On</span>
+                      <span className={`text-xs font-bold mt-1 ${showcase.isExpired ? 'text-slate-400' : 'text-slate-600'}`}>
+                        {formatDate(showcase.endDate)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Bar */}
+                  <div className="pt-3.5 flex items-center gap-2 border-t border-slate-100">
+                    <div className="relative flex-1">
+                      <input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={extendDays[showcase.id] ?? 7}
+                        onChange={(e) => setExtendDays((prev) => ({ ...prev, [showcase.id]: e.target.value }))}
+                        className={`w-full h-11 border rounded-xl pl-3 pr-12 text-sm font-extrabold focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none ${
+                          showcase.isExpired 
+                            ? 'bg-slate-50/40 border-slate-200 text-slate-600'
+                            : 'bg-slate-50 border-slate-200/60 text-slate-950'
+                        }`}
                       />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase tracking-wider select-none">Days</span>
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-4 pt-2">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Investment</span>
-                        <span className="text-sm font-bold text-gray-900">{formatCurrency(showcase.totalCost, 'TRY')}</span>
-                      </div>
-                      <div className="h-8 w-px bg-gray-100" />
-                      <div className="flex flex-col">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Valid Until</span>
-                        <span className="text-sm font-bold text-gray-600">{formatDate(showcase.endDate)}</span>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 flex items-center gap-2 border-t border-gray-50">
-                      <div className="relative flex-1">
-                        <input
-                          type="number"
-                          min={1}
-                          max={30}
-                          value={extendDays[showcase.id] ?? 7}
-                          onChange={(e) => setExtendDays((prev) => ({ ...prev, [showcase.id]: e.target.value }))}
-                          className="w-full h-10 bg-gray-50 border border-gray-100 rounded-xl px-3 text-sm font-bold text-gray-900 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 uppercase">Days</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleExtend(showcase.id)}
-                        disabled={isMutating}
-                        className="h-10 px-5 rounded-xl bg-[#0f111a] text-white text-sm font-bold hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-50"
-                      >
-                        Extend
-                      </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExtend(showcase.id)}
+                      disabled={isMutating}
+                      className={`h-11 px-5 rounded-xl text-xs font-extrabold transition-all duration-200 active:scale-95 disabled:opacity-50 tracking-wide uppercase ${
+                        showcase.isExpired
+                          ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/10'
+                          : 'bg-slate-950 text-white hover:bg-indigo-600'
+                      }`}
+                    >
+                      {showcase.isExpired ? 'Re-Boost' : 'Extend'}
+                    </button>
+                    {!showcase.isExpired && (
                       <button
                         type="button"
                         onClick={() => setConfirmCancelId(showcase.id)}
                         disabled={isMutating}
-                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all active:scale-90"
+                        className="h-11 w-11 flex items-center justify-center rounded-xl border border-slate-200/60 text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all active:scale-90"
                         title="Cancel Showcase"
                       >
                         <X className="w-5 h-5" />
                       </button>
-                    </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -192,38 +343,38 @@ const MyShowcasesPanel = ({ userId }) => {
       {/* Confirmation Modal */}
       <AnimatePresence>
         {confirmCancelId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setConfirmCancelId(null)}
-              className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden"
+              className="relative bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden z-10 border border-slate-100"
             >
               <div className="p-8 text-center">
-                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <X className="w-10 h-10 text-red-500" />
+                <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 border border-rose-100/50">
+                  <ShieldAlert className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Cancel Showcase?</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                  Are you sure you want to end this showcase? This action will remove the listing from premium areas.
+                <h3 className="text-lg font-black text-slate-900 mb-1.5 tracking-tight">Cancel Boosting?</h3>
+                <p className="text-slate-500 text-xs leading-relaxed mb-6">
+                  Are you sure you want to stop boosting this listing? This will immediately remove it from all premium showcase slots.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setConfirmCancelId(null)}
-                    className="flex-1 h-12 rounded-2xl bg-gray-100 text-gray-900 font-bold hover:bg-gray-200 transition-all"
+                    className="flex-1 h-12 rounded-xl bg-slate-50 text-slate-800 text-xs font-extrabold hover:bg-slate-100 transition-all uppercase tracking-wide border border-slate-100"
                   >
                     No, stay
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex-1 h-12 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                    className="flex-1 h-12 rounded-xl bg-rose-600 text-white text-xs font-extrabold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 uppercase tracking-wide"
                   >
                     Yes, cancel
                   </button>
@@ -235,13 +386,15 @@ const MyShowcasesPanel = ({ userId }) => {
       </AnimatePresence>
 
       <div className="mt-8 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100/50 flex items-start gap-3">
-        <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600 mt-0.5">
-          <Zap className="w-4 h-4" />
+        <div className="bg-indigo-100/80 p-2 rounded-xl text-indigo-600 mt-0.5">
+          <Zap className="w-4 h-4 fill-current" />
         </div>
-        <p className="text-xs text-indigo-900/70 leading-relaxed font-medium">
-          <strong className="text-indigo-900 block mb-0.5 font-bold uppercase tracking-wider text-[10px]">Information</strong>
-          Cancelling a showcase only ends visibility. The refund process follows the platform&apos;s standard billing cycle. Extend operations apply immediately upon success.
-        </p>
+        <div>
+          <strong className="text-indigo-950 block font-black uppercase tracking-wider text-[10px]">Showcase Operations Guidelines</strong>
+          <p className="text-xs text-indigo-900/70 leading-relaxed font-medium mt-0.5">
+            Cancelling active promotions stops visibility immediately. Refunds are processed securely based on the billing schedule. All extensions are calculated and applied instantly.
+          </p>
+        </div>
       </div>
     </div>
   );
