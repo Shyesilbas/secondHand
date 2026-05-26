@@ -12,8 +12,8 @@ public interface VehicleTypeRepository extends JpaRepository<VehicleType, UUID> 
     
     @Cacheable(value = "vehicleTypes", key = "'all'")
     List<VehicleType> findAll();
-    
-    @Cacheable(value = "vehicleTypes", key = "#name")
+
+    /** Uncached — seed sırasında Hibernate proxy Redis'e yazılmasın. */
     Optional<VehicleType> findByNameIgnoreCase(String name);
 }
 

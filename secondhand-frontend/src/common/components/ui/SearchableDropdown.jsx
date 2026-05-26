@@ -1,6 +1,28 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { ChevronDown, Search, X, Check } from 'lucide-react';
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {AnimatePresence, motion} from 'framer-motion';
+import {Check, ChevronDown, Search, X} from 'lucide-react';
+
+const dropdownVariants = {
+  hidden: { opacity: 0, y: -6, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 500,
+      damping: 30,
+      mass: 0.8,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -4,
+    scale: 0.98,
+    transition: { duration: 0.15, ease: 'easeIn' },
+  },
+};
 
 const SearchableDropdown = ({
   options = [],
@@ -18,6 +40,7 @@ const SearchableDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [portalStyle, setPortalStyle] = useState({});
+  const [portalReady, setPortalReady] = useState(false);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const portalRef = useRef(null);
@@ -30,13 +53,18 @@ const SearchableDropdown = ({
     getOptionLabel(o).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (e) => {
     if (disabled) return;
-    setIsOpen(prev => !prev);
+    if (e && e.stopPropagation) e.stopPropagation();
+    setIsOpen(prev => {
+      const next = !prev;
+      if (next) setPortalReady(false);
+      return next;
+    });
   };
 
   const handleClickOutside = useCallback((e) => {
-    const inTrigger = dropdownRef.current?.contains(e.target);
+    const inTrigger = buttonRef.current?.contains(e.target) || dropdownRef.current?.contains(e.target);
     const inPortal = usePortal && portalRef.current?.contains(e.target);
     if (!inTrigger && !inPortal) {
       setIsOpen(false);
@@ -50,31 +78,53 @@ const SearchableDropdown = ({
   }, [handleClickOutside]);
 
   useEffect(() => {
-    if (isOpen && !disabled) searchInputRef.current?.focus();
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+        setSearchTerm('');
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
   useEffect(() => {
+    if (isOpen && !disabled && (portalReady || !usePortal)) searchInputRef.current?.focus();
+  }, [isOpen, disabled, portalReady, usePortal]);
+
+  useLayoutEffect(() => {
     if (isOpen && usePortal && buttonRef.current) {
+      let rAF = null;
+
       const updatePosition = () => {
         if (!buttonRef.current) return;
         const rect = buttonRef.current.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - rect.bottom;
-        const openUpward = spaceBelow < 280;
+
+        if (rect.width === 0 || rect.height === 0) {
+          rAF = requestAnimationFrame(updatePosition);
+          return;
+        }
+
         setPortalStyle({
           position: 'fixed',
+          top: rect.bottom + 8,
           left: rect.left,
           width: rect.width,
-          zIndex: 9999,
-          ...(openUpward
-            ? { bottom: window.innerHeight - rect.top + 8 }
-            : { top: rect.bottom + 8 }),
-          maxHeight: openUpward ? Math.min(280, rect.top - 16) : Math.min(280, spaceBelow - 16),
+          zIndex: 99999,
+          opacity: 1,
+          pointerEvents: 'auto',
+          isolation: 'isolate',
         });
+        setPortalReady(true);
       };
+
       updatePosition();
+
       window.addEventListener('scroll', updatePosition, true);
       window.addEventListener('resize', updatePosition);
+
       return () => {
+        if (rAF) cancelAnimationFrame(rAF);
         window.removeEventListener('scroll', updatePosition, true);
         window.removeEventListener('resize', updatePosition);
       };
@@ -107,28 +157,33 @@ const SearchableDropdown = ({
     return `${selectedValues.length} selected`;
   };
 
-  const dropdownContent = isOpen && !disabled && (
-    <div
+  const dropdownContent = (
+    <motion.div
+      key="searchable-dropdown"
       ref={usePortal ? portalRef : undefined}
-      className="bg-white rounded-xl shadow-xl border border-slate-200/60 overflow-hidden animation-fade-in"
+      variants={dropdownVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="bg-white/95 backdrop-blur-xl rounded-xl shadow-xl shadow-zinc-200/40 border border-zinc-200/50 overflow-hidden"
       style={usePortal ? portalStyle : {}}
     >
-      <div className="p-3 border-b border-slate-200/60 relative bg-slate-50/50">
-        <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+      <div className="p-3 border-b border-zinc-100/60 relative bg-zinc-50/30">
+        <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
         <input
           ref={searchInputRef}
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder={searchPlaceholder}
-          className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-shadow tracking-tight"
+          className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-400 text-xs transition-all tracking-tight wizard-input-glow hover:border-zinc-300"
         />
       </div>
 
-      <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar overscroll-contain">
+      <div className="max-h-60 overflow-y-auto p-1.5 custom-scrollbar overscroll-contain">
         {filteredOptions.length === 0 ? (
-          <div className="px-4 py-6 text-xs text-slate-500 text-center flex flex-col items-center gap-2 tracking-tight">
-            <Search className="w-8 h-8 text-slate-300" />
+          <div className="px-4 py-6 text-xs text-zinc-500 text-center flex flex-col items-center gap-2 tracking-tight">
+            <Search className="w-8 h-8 text-zinc-300" />
             No options found
           </div>
         ) : (
@@ -140,15 +195,21 @@ const SearchableDropdown = ({
                 key={optionValue}
                 type="button"
                 onClick={() => handleOptionClick(optionValue)}
-                className={`w-full px-4 py-2.5 text-left text-xs rounded-lg flex items-center justify-between transition-colors mb-0.5 tracking-tight ${
+                className={`w-full px-4 py-2.5 text-left text-xs rounded-lg flex items-center justify-between transition-all duration-150 mb-0.5 tracking-tight ${
                   isSelected 
-                    ? 'bg-indigo-50 text-indigo-700 font-medium' 
-                    : 'text-slate-700 hover:bg-slate-50'
+                    ? 'bg-zinc-100/80 text-zinc-900 font-medium' 
+                    : 'text-zinc-700 hover:bg-zinc-50'
                 }`}
               >
                 <span>{getOptionLabel(o)}</span>
                 {isSelected && (
-                  <Check className="w-4 h-4 text-indigo-600" />
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                  >
+                    <Check className="w-4 h-4 text-zinc-900" />
+                  </motion.span>
                 )}
               </button>
             );
@@ -157,23 +218,23 @@ const SearchableDropdown = ({
       </div>
 
       {multiple && selectedValues.length > 0 && (
-        <div className="px-4 py-3 border-t border-slate-200/60 bg-slate-50 text-xs text-slate-500 flex items-center justify-between font-medium tracking-tight">
+        <div className="px-4 py-3 border-t border-zinc-100/60 bg-zinc-50/30 text-xs text-zinc-500 flex items-center justify-between font-medium tracking-tight">
           <span>{selectedValues.length} selected</span>
           <button 
             type="button" 
             onClick={handleClearAll}
-            className="text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+            className="text-zinc-600 hover:text-zinc-900 hover:underline transition-colors"
           >
             Clear all
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {label && <label className="block text-sm font-semibold text-slate-900 mb-3 tracking-tight">{label}</label>}
+      {label && <label className="block text-sm font-semibold text-zinc-900 mb-3 tracking-tight">{label}</label>}
 
       <button
         ref={buttonRef}
@@ -181,15 +242,15 @@ const SearchableDropdown = ({
         onClick={toggleDropdown}
         disabled={disabled}
         aria-disabled={disabled}
-        className={`w-full px-4 py-3 border rounded-xl text-left flex items-center justify-between transition-all duration-200 tracking-tight focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+        className={`w-full px-4 py-3 border rounded-xl text-left flex items-center justify-between transition-all duration-200 tracking-tight focus:outline-none ${
           disabled
-            ? 'border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed'
+            ? 'border-zinc-200/60 bg-zinc-50 text-zinc-400 cursor-not-allowed'
             : isOpen 
-            ? 'border-indigo-500 ring-2 ring-indigo-500/20' 
-            : 'border-slate-200 hover:border-indigo-300 hover:shadow-sm'
+            ? 'border-zinc-400 ring-2 ring-zinc-900/5 shadow-sm' 
+            : 'border-zinc-200/60 hover:border-zinc-300 hover:shadow-sm'
         }`}
       >
-        <span className={`truncate text-sm ${selectedValues.length ? 'text-slate-900 font-medium' : 'text-slate-400'}`}>
+        <span className={`truncate text-sm ${selectedValues.length ? 'text-zinc-900 font-medium' : 'text-zinc-400'}`}>
           {getDisplayText()}
         </span>
         <div className="flex items-center gap-2">
@@ -198,23 +259,32 @@ const SearchableDropdown = ({
               type="button"
               onClick={(e) => { e.stopPropagation(); handleClearAll(); }}
               disabled={disabled}
-              className="text-slate-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-full"
+              className="text-zinc-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-full"
               title="Clear all"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-indigo-500' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-zinc-600' : ''}`} />
         </div>
       </button>
 
-      {usePortal && isOpen && !disabled
-        ? createPortal(dropdownContent, document.body)
-        : !usePortal && isOpen && !disabled && (
+      {usePortal && typeof document !== 'undefined' ? (
+        createPortal(
+          <AnimatePresence>
+            {isOpen && !disabled && portalReady && dropdownContent}
+          </AnimatePresence>,
+          document.body
+        )
+      ) : (
+        <AnimatePresence>
+          {!usePortal && isOpen && !disabled && (
             <div className="absolute top-full left-0 right-0 mt-2 z-50">
               {dropdownContent}
             </div>
           )}
+        </AnimatePresence>
+      )}
     </div>
   );
 };

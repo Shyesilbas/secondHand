@@ -32,8 +32,29 @@ export const sportsConfig = {
           {
             id: 'sports-details', title: 'Sports Equipment Details', description: 'Sport type, equipment type and condition',
             fields: [
-              { name: 'disciplineId', label: 'Sport Type', type: 'enum', enumKey: 'sportDisciplines', required: true },
-              { name: 'equipmentTypeId', label: 'Equipment Type', type: 'enum', enumKey: 'sportEquipmentTypes', required: true },
+              {
+                name: 'disciplineId', label: 'Sport Type', type: 'enum', enumKey: 'sportDisciplines', required: true,
+                onChange: ({ value, ctx }) => { ctx.setValue('disciplineId', value); ctx.setValue('equipmentTypeId', ''); }
+              },
+              {
+                name: 'equipmentTypeId', label: 'Equipment Type', type: 'enum', enumKey: 'sportEquipmentTypes', required: true,
+                disabledWhen: (ctx) => !ctx.formData?.disciplineId,
+                getOptions: (ctx) => {
+                  const discId = ctx.formData?.disciplineId;
+                  const allEquip = ctx.enums?.sportEquipmentTypes || [];
+                  if (!discId) return allEquip;
+                  const disc = (ctx.enums?.sportDisciplines || []).find((d) => String(d.id) === String(discId));
+                  if (!disc) return allEquip;
+                  const discKey = String(disc.name || '').toUpperCase();
+                  return allEquip
+                    .filter((eq) => String(eq.name || '').toUpperCase().startsWith(discKey + '_'))
+                    .map((eq) => ({
+                      ...eq,
+                      label: String(eq.label ?? eq.name ?? ''),
+                      name: String(eq.label ?? eq.name ?? '')
+                    }));
+                }
+              },
               { name: 'conditionId', label: 'Condition', type: 'enum', enumKey: 'sportConditions', required: true },
             ],
           },
@@ -55,7 +76,24 @@ export const sportsConfig = {
   createFlow: {
     subtypeSelector: { enumKey: 'sportDisciplines', queryParamKey: 'disciplineId', initialDataKey: 'disciplineId', title: 'Choose sport discipline', description: 'Select a discipline to tailor the form fields.', paramKey: 'disciplineIds' },
     preFormSelectors: [
-      { enumKey: 'sportEquipmentTypes', initialDataKey: 'equipmentTypeId', title: 'Choose equipment type', description: 'Select an equipment type to tailor the form fields.', kind: 'grid', dependsOn: ['disciplineId'], paramKey: 'equipmentTypeIds' },
+      {
+        enumKey: 'sportEquipmentTypes', initialDataKey: 'equipmentTypeId', title: 'Choose equipment type', description: 'Select an equipment type to tailor the form fields.', kind: 'grid', dependsOn: ['disciplineId'], paramKey: 'equipmentTypeIds',
+        getOptions: ({ enums, selection }) => {
+          const disciplineId = selection?.disciplineId;
+          const allEquip = enums?.sportEquipmentTypes || [];
+          if (!disciplineId) return allEquip;
+          const disc = (enums?.sportDisciplines || []).find((d) => String(d.id) === String(disciplineId));
+          if (!disc) return allEquip;
+          const discKey = String(disc.name || '').toUpperCase();
+          return allEquip
+            .filter((eq) => String(eq.name || '').toUpperCase().startsWith(discKey + '_'))
+            .map((eq) => ({
+              ...eq,
+              label: String(eq.label ?? eq.name ?? ''),
+              name: String(eq.label ?? eq.name ?? '')
+            }));
+        }
+      },
       { enumKey: 'sportConditions', initialDataKey: 'conditionId', title: 'Choose condition', description: 'Select a condition to tailor the form fields.', kind: 'grid', dependsOn: ['disciplineId'], paramKey: 'conditionIds' },
     ],
   },

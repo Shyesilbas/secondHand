@@ -95,10 +95,84 @@ export const realEstateConfig = {
     update: (id, payload) => realEstateService.updateRealEstateListing(id, payload),
   },
   createFlow: {
-    subtypeSelector: { enumKey: 'realEstateTypes', queryParamKey: 'realEstateTypeId', initialDataKey: 'realEstateTypeId', title: 'Choose property type', description: 'Select a type to tailor the form fields.', paramKey: 'realEstateTypeIds' },
+    subtypeSelector: {
+      options: [
+        { value: 'KONUT', label: 'Konut (Residential)', icon: '🏠', description: 'Daire, rezidans, müstakil ev, villa...' },
+        { value: 'ISYERI', label: 'İşyeri (Commercial)', icon: '🏢', description: 'Ofis, dükkan, mağaza, depo, fabrika...' },
+        { value: 'ARSA', label: 'Arsa (Land)', icon: '🌳', description: 'Konut imarlı arsa, tarla, zeytinlik, bağ...' },
+        { value: 'DIGER', label: 'Diğer (Other)', icon: '📦', description: 'Otopark ve diğer tüm gayrimenkuller...' }
+      ],
+      queryParamKey: 'realEstateCategory',
+      initialDataKey: 'realEstateCategory',
+      title: 'Choose property category',
+      description: 'Select a category to narrow down property types.',
+      paramKey: 'realEstateCategory'
+    },
     preFormSelectors: [
+      {
+        enumKey: 'realEstateTypes',
+        initialDataKey: 'realEstateTypeId',
+        title: 'Choose property type',
+        description: 'Select a specific property type.',
+        kind: 'grid',
+        dependsOn: ['realEstateCategory'],
+        paramKey: 'realEstateTypeIds',
+        getOptions: ({ enums, selection }) => {
+          const category = selection?.realEstateCategory;
+          const allTypes = enums?.realEstateTypes || [];
+          if (!category) return allTypes;
+
+          const CATEGORY_MAP = {
+            APARTMENT: 'KONUT',
+            RESIDENCE: 'KONUT',
+            STUDIO: 'KONUT',
+            DUPLEX: 'KONUT',
+            PENTHOUSE: 'KONUT',
+            HOUSE: 'KONUT',
+            VILLA: 'KONUT',
+            TOWNHOUSE: 'KONUT',
+            SUMMER_HOUSE: 'KONUT',
+            CHALET: 'KONUT',
+            MANSION: 'KONUT',
+
+            LAND: 'ARSA',
+            FARM: 'ARSA',
+            VINEYARD: 'ARSA',
+            OLIVE_GROVE: 'ARSA',
+
+            OFFICE: 'ISYERI',
+            COMMERCIAL: 'ISYERI',
+            SHOP: 'ISYERI',
+            WAREHOUSE: 'ISYERI',
+            FACTORY: 'ISYERI',
+            INDUSTRIAL: 'ISYERI',
+            HOTEL: 'ISYERI',
+
+            PARKING: 'DIGER',
+            OTHER: 'DIGER'
+          };
+
+          return allTypes
+            .filter((t) => {
+              const nameKey = String(t?.name || '').toUpperCase();
+              return CATEGORY_MAP[nameKey] === category;
+            })
+            .map((t) => ({
+              ...t,
+              label: String(t?.label ?? t?.name ?? ''),
+              name: String(t?.label ?? t?.name ?? '')
+            }));
+        }
+      },
       { enumKey: 'realEstateAdTypes', initialDataKey: 'adTypeId', title: 'Choose ad type', description: 'Select an ad type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], paramKey: 'adTypeId' },
-      { enumKey: 'heatingTypes', initialDataKey: 'heatingTypeId', title: 'Choose heating type', description: 'Select a heating type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], prefilter: false },
+      { enumKey: 'heatingTypes', initialDataKey: 'heatingTypeId', title: 'Choose heating type', description: 'Select a heating type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], prefilter: false,
+        visibleWhen: (ctx) => {
+          const typeName = ctx.formData?.realEstateTypeId || ctx.selection?.realEstateTypeId
+            ? String(ctx.getName('realEstateTypes', ctx.formData?.realEstateTypeId || ctx.selection?.realEstateTypeId) || '').toUpperCase()
+            : '';
+          return !['LAND', 'FARM', 'ARSA', 'TARLA'].some(x => typeName.includes(x));
+        }
+      },
       { enumKey: 'ownerTypes', initialDataKey: 'ownerTypeId', title: 'Choose owner type', description: 'Select an owner type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], paramKey: 'ownerTypeId' },
     ],
   },

@@ -19,6 +19,9 @@ public class VehicleListingDto extends ListingDto {
     private LookupDto vehicleType;
     private LookupDto brand;
     private ModelDto model;
+    private LookupDto generation;
+    private LookupDto engine;
+    private LookupDto trim;
     private Integer year;
     private Integer mileage;
     private Integer engineCapacity;

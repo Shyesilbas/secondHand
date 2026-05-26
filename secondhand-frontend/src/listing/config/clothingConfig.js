@@ -95,10 +95,27 @@ export const clothingConfig = {
     update: (id, payload) => clothingService.updateClothingListing(id, payload),
   },
   createFlow: {
-    subtypeSelector: { enumKey: 'clothingTypes', queryParamKey: 'clothingTypeId', initialDataKey: 'clothingTypeId', title: 'Choose clothing type', description: 'Select a type to tailor the form fields.', paramKey: 'types' },
+    subtypeSelector: {
+      enumKey: 'clothingTypes',
+      queryParamKey: 'clothingTypeId',
+      initialDataKey: 'clothingTypeId',
+      title: 'Choose clothing type',
+      description: 'Select a type to tailor the form fields.',
+      paramKey: 'types',
+      getOptions: ({ enums }) => {
+        const all = enums?.clothingTypes || [];
+        return all.map((t) => {
+          const fullLabel = String(t?.label ?? t?.name ?? '');
+          const label = fullLabel.includes(' > ') ? fullLabel.split(' > ')[1].trim() : fullLabel;
+          return { ...t, label, name: label };
+        });
+      }
+    },
     preFormSelectors: [
-      { enumKey: 'clothingBrands', initialDataKey: 'brandId', title: 'Choose brand', description: 'Select a brand to tailor the form fields.', kind: 'searchable', paramKey: 'brands' },
-      { enumKey: 'colors', initialDataKey: 'color', title: 'Choose color', description: 'Select a color to tailor the form fields.', kind: 'searchable', dependsOn: ['clothingTypeId'], prefilter: false },
+      {
+        enumKey: 'clothingBrands', initialDataKey: 'brandId', title: 'Choose brand', description: 'Select a brand to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], paramKey: 'brands',
+      },
+      { enumKey: 'colors', initialDataKey: 'color', title: 'Choose color', description: 'Select a color for your clothing item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
       { enumKey: 'clothingConditions', initialDataKey: 'condition', title: 'Choose condition', description: 'Select a condition to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
       {
         enumKey: 'clothingGenders',
@@ -110,6 +127,15 @@ export const clothingConfig = {
         prefilter: false,
       },
       { enumKey: 'clothingCategories', initialDataKey: 'clothingCategory', title: 'Choose clothing category', description: 'Select a clothing category to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
+      {
+        enumKey: 'clothingSizes', initialDataKey: 'size', title: 'Choose size', description: 'Select size of the item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false,
+        visibleWhen: (ctx) => {
+          const t = String(ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId ? ctx.getName('clothingTypes', ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId) : '').toUpperCase();
+          const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
+          const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
+          return Boolean(t) && !footwear && !accessory;
+        }
+      },
     ],
   },
   filterConfig: filterConfigs.CLOTHING,

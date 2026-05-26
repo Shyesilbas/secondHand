@@ -15,7 +15,7 @@ public interface ElectronicTypeRepository extends JpaRepository<ElectronicType, 
     @Cacheable(value = "electronicTypes", key = "'all'")
     List<ElectronicType> findAll();
     
-    @Cacheable(value = "electronicTypes", key = "#name")
+    @Cacheable(value = "electronicTypes", key = "#name", unless = "#result == null")
     Optional<ElectronicType> findByNameIgnoreCase(String name);
 }
 

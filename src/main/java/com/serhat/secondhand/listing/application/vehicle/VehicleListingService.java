@@ -73,7 +73,10 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         return vehicleListingResolver.resolve(
                 request.vehicleTypeId(),
                 request.brandId(),
-                request.vehicleModelId()
+                request.vehicleModelId(),
+                request.vehicleGenerationId(),
+                request.vehicleEngineId(),
+                request.vehicleTrimId()
         );
     }
 
@@ -83,6 +86,9 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         entity.setVehicleType(res.type());
         entity.setBrand(res.brand());
         entity.setModel(res.model());
+        entity.setGeneration(res.generation());
+        entity.setEngine(res.engine());
+        entity.setTrim(res.trim());
     }
 
     @Override
@@ -112,7 +118,15 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
             return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
 
-        Result<Void> applyResult = vehicleListingResolver.apply(existing, request.vehicleTypeId(), request.brandId(), request.vehicleModelId());
+        Result<Void> applyResult = vehicleListingResolver.apply(
+                existing,
+                request.vehicleTypeId(),
+                request.brandId(),
+                request.vehicleModelId(),
+                request.vehicleGenerationId(),
+                request.vehicleEngineId(),
+                request.vehicleTrimId()
+        );
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
 
         listingMapper.updateVehicle(existing, request);

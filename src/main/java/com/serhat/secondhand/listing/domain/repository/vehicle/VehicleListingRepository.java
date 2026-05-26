@@ -30,4 +30,16 @@ public interface VehicleListingRepository extends JpaRepository<VehicleListing, 
     int reassignModel(@Param("keepModel") com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel keepModel,
                       @Param("deleteIds") List<UUID> deleteIds);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            update VehicleListing v
+            set v.model = null,
+                v.brand = null,
+                v.vehicleType = null,
+                v.generation = null,
+                v.engine = null,
+                v.trim = null
+            """)
+    int detachCatalogReferences();
+
 }

@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.sports;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
@@ -9,19 +11,30 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.List;
-import java.util.Locale;
+import java.io.InputStream;
+import java.util.Optional;
 
+/**
+ * Seeds sports reference data (disciplines, equipment types, conditions)
+ * from {@code classpath:seed/sports.json}.
+ *
+ * <p>Uses an <b>upsert</b> strategy for all entities.
+ */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SportsDataInitializer implements SeedTask {
+
+    private static final String CATALOG_PATH = "seed/sports.json";
 
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public String key() {
@@ -30,91 +43,93 @@ public class SportsDataInitializer implements SeedTask {
 
     @Override
     public Result<Void> run() {
-        if (sportDisciplineRepository.count() == 0) {
-            seedDisciplines();
+        try {
+            JsonNode root = loadCatalog();
+            seedDisciplines(root.get("disciplines"));
+            seedEquipmentTypes(root.get("equipmentTypes"));
+            seedConditions(root.get("conditions"));
+            log.info("Sports seed completed successfully");
+            return Result.success();
+        } catch (Exception e) {
+            log.error("Sports seed failed", e);
+            return Result.error("Sports seed failed: " + e.getMessage(), "SEED_FAILED");
         }
-        if (sportEquipmentTypeRepository.count() == 0) {
-            seedEquipmentTypes();
-        }
-        if (sportConditionRepository.count() == 0) {
-            seedConditions();
-        }
-        return Result.success();
     }
 
-    private void seedDisciplines() {
-        List<String> labels = List.of(
-                "Football",
-                "Basketball",
-                "Tennis",
-                "Volleyball",
-                "Running",
-                "Cycling",
-                "Fitness",
-                "Swimming",
-                "Boxing",
-                "Other"
-        );
+    // ── JSON Loading ────────────────────────────────────────────────────
 
-        for (String label : labels) {
-            SportDiscipline discipline = new SportDiscipline();
-            discipline.setName(toKey(label));
+    private JsonNode loadCatalog() throws Exception {
+        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
+            return objectMapper.readTree(is);
+        }
+    }
+
+    // ── Discipline Seeding ──────────────────────────────────────────────
+
+    private void seedDisciplines(JsonNode disciplinesNode) {
+        if (disciplinesNode == null || !disciplinesNode.isArray()) return;
+        for (JsonNode node : disciplinesNode) {
+            upsertDiscipline(node.get("key").asText(), node.get("label").asText());
+        }
+    }
+
+    private void upsertDiscipline(String key, String label) {
+        Optional<SportDiscipline> existing = sportDisciplineRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            SportDiscipline discipline = existing.get();
             discipline.setLabel(label);
             sportDisciplineRepository.save(discipline);
+            return;
+        }
+        SportDiscipline discipline = new SportDiscipline();
+        discipline.setName(key);
+        discipline.setLabel(label);
+        sportDisciplineRepository.save(discipline);
+    }
+
+    // ── Equipment Type Seeding ──────────────────────────────────────────
+
+    private void seedEquipmentTypes(JsonNode equipmentTypesNode) {
+        if (equipmentTypesNode == null || !equipmentTypesNode.isArray()) return;
+        for (JsonNode node : equipmentTypesNode) {
+            upsertEquipmentType(node.get("key").asText(), node.get("label").asText());
         }
     }
 
-    private void seedEquipmentTypes() {
-        List<String> labels = List.of(
-                "Ball",
-                "Shoes",
-                "Cleats",
-                "Jersey",
-                "Shorts",
-                "Sleeve",
-                "Wristband",
-                "Gloves",
-                "Racket",
-                "Helmet",
-                "Treadmill",
-                "Exercise Bike",
-                "Other"
-        );
+    private void upsertEquipmentType(String key, String label) {
+        Optional<SportEquipmentType> existing = sportEquipmentTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            SportEquipmentType type = existing.get();
+            type.setLabel(label);
+            sportEquipmentTypeRepository.save(type);
+            return;
+        }
+        SportEquipmentType type = new SportEquipmentType();
+        type.setName(key);
+        type.setLabel(label);
+        sportEquipmentTypeRepository.save(type);
+    }
 
-        for (String label : labels) {
-            SportEquipmentType equipmentType = new SportEquipmentType();
-            equipmentType.setName(toKey(label));
-            equipmentType.setLabel(label);
-            sportEquipmentTypeRepository.save(equipmentType);
+    // ── Condition Seeding ───────────────────────────────────────────────
+
+    private void seedConditions(JsonNode conditionsNode) {
+        if (conditionsNode == null || !conditionsNode.isArray()) return;
+        for (JsonNode node : conditionsNode) {
+            upsertCondition(node.get("key").asText(), node.get("label").asText());
         }
     }
 
-    private void seedConditions() {
-        List<String> labels = List.of(
-                "New",
-                "Like New",
-                "Good",
-                "Fair",
-                "Worn"
-        );
-
-        for (String label : labels) {
-            SportCondition condition = new SportCondition();
-            condition.setName(toKey(label));
+    private void upsertCondition(String key, String label) {
+        Optional<SportCondition> existing = sportConditionRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            SportCondition condition = existing.get();
             condition.setLabel(label);
             sportConditionRepository.save(condition);
+            return;
         }
-    }
-
-    private String toKey(String label) {
-        String normalized = Normalizer.normalize(label, Normalizer.Form.NFKD)
-                .replaceAll("\\p{M}", "");
-        return normalized.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('&', ' ')
-                .replace('\'', ' ')
-                .replace('-', ' ')
-                .replaceAll("\\s+", "_");
+        SportCondition condition = new SportCondition();
+        condition.setName(key);
+        condition.setLabel(label);
+        sportConditionRepository.save(condition);
     }
 }
-

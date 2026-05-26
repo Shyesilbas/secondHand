@@ -75,4 +75,16 @@ public class VehicleListing extends Listing {
 
     @Enumerated(EnumType.STRING)
     private BodyType bodyType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_generation_id")
+    private VehicleGeneration generation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_engine_id")
+    private VehicleEngine engine;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_trim_id")
+    private VehicleTrim trim;
 }

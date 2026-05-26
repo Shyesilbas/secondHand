@@ -12,8 +12,8 @@ public interface CarBrandRepository extends JpaRepository<CarBrand, UUID> {
     
     @Cacheable(value = "brands", key = "'all'")
     List<CarBrand> findAll();
-    
-    @Cacheable(value = "brands", key = "#name")
+
+    /** Uncached — seed ve yazma sonrası tutarlılık için entity cache'lenmez. */
     Optional<CarBrand> findByNameIgnoreCase(String name);
 }
 

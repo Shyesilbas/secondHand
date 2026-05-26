@@ -13,7 +13,7 @@ public interface BookGenreRepository extends JpaRepository<BookGenre, UUID> {
     @Cacheable(value = "bookGenres", key = "'all'")
     List<BookGenre> findAll();
     
-    @Cacheable(value = "bookGenres", key = "#name")
+    @Cacheable(value = "bookGenres", key = "#name", unless = "#result == null")
     Optional<BookGenre> findByNameIgnoreCase(String name);
 }
 

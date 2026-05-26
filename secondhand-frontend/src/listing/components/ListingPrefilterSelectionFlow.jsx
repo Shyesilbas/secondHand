@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
+import {motion, AnimatePresence} from 'framer-motion';
 import {Search, Check, ChevronRight, ArrowRight, Loader2, Sparkles} from 'lucide-react';
 import {useEnums} from '../../common/hooks/useEnums.js';
 import {
@@ -7,6 +8,7 @@ import {
   getCreateFlowSelectorSteps,
   getListingTypeOptions,
   getPrefilterSelectors,
+  isCreateSelectionComplete,
 } from '../config/listingConfig.js';
 import {
   getAuxiliaryUi,
@@ -19,6 +21,7 @@ import {
 } from '../config/prefilterFlowUi.js';
 import {ROUTES} from '../../common/constants/routes.js';
 import {isPrefilterValueFilled} from '../utils/prefilterSelection.js';
+import {findEngine} from '../../vehicle/utils/vehicleCatalogUtils.js';
 import ListingWizard from './ListingWizard.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 
@@ -48,6 +51,30 @@ const WIZARD_COPY = {
   },
 };
 
+/* Stagger animation for grid items */
+const gridContainerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.03,
+    },
+  },
+};
+
+const gridItemVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.97 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 28,
+    },
+  },
+};
+
 const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) => {
   const {enums} = useEnums();
   const completedRef = useRef(false);
@@ -72,14 +99,33 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
 
   const selectorSteps = useMemo(() => {
     if (!selectedType) return [];
-    if (mode === 'create') {
-      return getCreateFlowSelectorSteps(selectedType);
-    }
-    return getPrefilterSelectors(selectedType).map((s) => ({
-      ...s,
-      title: s.title || s.label || 'Selection',
-    }));
-  }, [selectedType, mode]);
+    const baseSteps =
+      mode === 'create'
+        ? getCreateFlowSelectorSteps(selectedType)
+        : getPrefilterSelectors(selectedType).map((s) => ({
+            ...s,
+            title: s.title || s.label || 'Selection',
+          }));
+
+    const ctx = {
+      formData: selection,
+      selection,
+      enums,
+      getName: (enumKey, idOrValue, { upper = false } = {}) => {
+        const list = enums?.[enumKey] || [];
+        const found = list.find((x) => String(x?.id ?? x?.value ?? '') === String(idOrValue ?? ''));
+        const name = found?.name || found?.label || '';
+        return upper ? name.toUpperCase() : name;
+      },
+    };
+
+    return baseSteps.filter((s) => {
+      if (typeof s.visibleWhen === 'function') {
+        return Boolean(s.visibleWhen(ctx));
+      }
+      return true;
+    });
+  }, [selectedType, mode, selection, enums]);
 
   const selectionSteps = useMemo(() => {
     const c = WIZARD_COPY[mode] || WIZARD_COPY.browse;
@@ -137,6 +183,7 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
     const idx = selectionStep - 2;
     const selector = selectorSteps[idx];
     if (!selector) return false;
+    if (selector.optional) return true;
     return isPrefilterValueFilled(selection?.[selector.initialDataKey]);
   }, [selectedType, selection, selectionStep, selectorSteps]);
 
@@ -172,10 +219,48 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
           const k = selectorSteps[i]?.initialDataKey;
           if (k) next[k] = null;
         }
+
+        if (key === 'vehicleEngineId' && value) {
+          const eng = findEngine(enums, value);
+          if (eng?.fuelType) next.fuelType = eng.fuelType;
+        }
+
+        // Auto-derive electronics attributes in pre-form flow
+        if (key === 'electronicModelId' && value) {
+          const m = (enums?.electronicModels || []).find((x) => String(x?.id ?? '') === String(value));
+          if (m) {
+            const modelName = String(m?.name || '');
+            if (modelName.includes(' > ')) {
+              const parts = modelName.split(' > ').map(p => p.trim());
+              const specPart = parts[parts.length - 1];
+              if (specPart) {
+                const specLower = specPart.toLowerCase();
+                if (specLower.includes('/')) {
+                  const specSub = specLower.split('/');
+                  const ramStr = specSub[0].replace('gb', '').trim();
+                  let storageStr = specSub[1].replace('gb', '').replace('tb', '').trim();
+                  const isTB = specSub[1].includes('tb');
+                  const parsedRam = parseInt(ramStr, 10);
+                  let parsedStorage = parseInt(storageStr, 10);
+                  if (isTB) parsedStorage = parsedStorage * 1024;
+                  if (!isNaN(parsedRam)) next.ram = parsedRam;
+                  if (!isNaN(parsedStorage)) next.storage = parsedStorage;
+                } else if (specLower.endsWith('gb')) {
+                  const storageVal = parseInt(specLower.replace('gb', '').trim(), 10);
+                  if (!isNaN(storageVal)) next.storage = storageVal;
+                } else if (specLower.endsWith('tb')) {
+                  const storageVal = parseInt(specLower.replace('tb', '').trim(), 10) * 1024;
+                  if (!isNaN(storageVal)) next.storage = storageVal;
+                }
+              }
+            }
+          }
+        }
+
         return next;
       });
     },
-    [selectorSteps],
+    [selectorSteps, enums],
   );
 
   const resolveStepOptions = useCallback(
@@ -183,6 +268,9 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
       if (!selector) return [];
       if (typeof selector.getOptions === 'function') {
         return selector.getOptions({enums, selection: selectionState || {}}) || [];
+      }
+      if (selector.options) {
+        return selector.options;
       }
       return enums?.[selector.enumKey] || [];
     },
@@ -193,28 +281,46 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
     (stepId) => {
       if (stepId === 1) {
         const categoryGrid = (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <motion.div
+            variants={gridContainerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+          >
             {listingTypeOptions.map((type) => {
               const isSelected = selectedType === type.value;
               const card = getCategoryCardClasses(flowUiVariant, isSelected);
               return (
-                <button key={type.value} type="button" onClick={() => handleTypeSelect(type.value)} className={card.wrapper}>
+                <motion.button
+                  key={type.value}
+                  variants={gridItemVariants}
+                  whileHover={{ y: -2, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={() => handleTypeSelect(type.value)}
+                  className={card.wrapper}
+                >
                   <div className={card.iconBg}>{type.icon}</div>
                   <div className="min-w-0 flex-1">
                     <h3 className={`text-sm font-semibold transition-colors ${card.title}`}>{type.label}</h3>
                     <p className={`mt-0.5 truncate text-xs transition-colors ${card.desc}`}>{type.description}</p>
                   </div>
                   {isSelected ? (
-                    <div className={card.checkOuter}>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                      className={card.checkOuter}
+                    >
                       <Check className={card.checkInner} strokeWidth={3} />
-                    </div>
+                    </motion.div>
                   ) : (
                     <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />
                   )}
-                </button>
+                </motion.button>
               );
             })}
-          </div>
+          </motion.div>
         );
         if (sellSurface) {
           return <div className={sellSurface}>{categoryGrid}</div>;
@@ -269,33 +375,51 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
                 />
               </div>
             )}
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              variants={gridContainerVariants}
+              initial="hidden"
+              animate="show"
+              key={`grid-${stepId}-${qf}`}
+              className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {filtered.map((opt) => {
                 const id = opt.id || opt.value;
                 const label = opt.label || opt.name;
                 const isSelected = String(selectedValue) === String(id);
                 return (
-                  <button
+                  <motion.button
                     key={id}
+                    variants={gridItemVariants}
+                    whileHover={{ y: -1, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
+                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => setSelectionValue(valueKey, id, selectorIndex)}
                     className={getGridOptionClasses(flowUiVariant, isSelected)}
                   >
                     <span className={getGridOptionLabelClass(flowUiVariant, isSelected)}>{label}</span>
                     {isSelected && (
-                      <div className={getGridCheckDotClass(flowUiVariant)}>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                        className={getGridCheckDotClass(flowUiVariant)}
+                      >
                         <Check className="h-3 w-3 text-white" strokeWidth={3} />
-                      </div>
+                      </motion.div>
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
             {filtered.length === 0 && (
-              <div className={auxUi.emptyFilterBox}>
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={auxUi.emptyFilterBox}
+              >
                 <p className={auxUi.emptyFilterTitle}>{flowCopy.emptyFilterTitle}</p>
                 <p className={auxUi.emptyFilterSubtitle}>{flowCopy.emptyFilterSubtitle}</p>
-              </div>
+              </motion.div>
             )}
           </div>
         );
@@ -361,11 +485,10 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
     if (!selectedType) return false;
     if (mode === 'create') {
       if (!SelectedForm) return false;
-      if (!selectorSteps.length) return true;
-      return selectorSteps.every((s) => isPrefilterValueFilled(selection?.[s.initialDataKey]));
+      return isCreateSelectionComplete(selectedType, selection, enums);
     }
     return false;
-  }, [SelectedForm, mode, selectedType, selection, selectorSteps]);
+  }, [SelectedForm, enums, mode, selectedType, selection]);
 
   useLayoutEffect(() => {
     if (mode !== 'create') return;
@@ -376,12 +499,16 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
 
   if (mode === 'create' && isReadyToFinish && selectedType) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <Loader2 className="mx-auto mb-4 h-6 w-6 animate-spin text-gray-900" aria-hidden />
-          <h2 className="text-[15px] font-medium text-gray-900">{flowCopy.loading}</h2>
-          {flowCopy.loadingSub ? <p className="mt-1 text-[13px] text-gray-500">{flowCopy.loadingSub}</p> : null}
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-sm wizard-glass-elevated rounded-2xl p-8 text-center"
+        >
+          <div className="mx-auto mb-4 h-10 w-10 rounded-full border-[3px] border-zinc-200 border-t-zinc-700 animate-spin" />
+          <h2 className="text-[15px] font-medium text-zinc-900">{flowCopy.loading}</h2>
+          {flowCopy.loadingSub ? <p className="mt-1.5 text-[13px] text-zinc-500">{flowCopy.loadingSub}</p> : null}
+        </motion.div>
       </div>
     );
   }

@@ -15,7 +15,7 @@ public interface ClothingTypeRepository extends JpaRepository<ClothingType, UUID
     @Cacheable(value = "clothingTypes", key = "'all'")
     List<ClothingType> findAll();
     
-    @Cacheable(value = "clothingTypes", key = "#name")
+    @Cacheable(value = "clothingTypes", key = "#name", unless = "#result == null")
     Optional<ClothingType> findByNameIgnoreCase(String name);
 }
 

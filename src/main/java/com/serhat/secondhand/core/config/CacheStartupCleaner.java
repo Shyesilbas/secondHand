@@ -2,29 +2,30 @@ package com.serhat.secondhand.core.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Uygulama her başlatıldığında cache'i temizler.
- * Cache config / serializer değişikliklerinde oluşan format çakışmalarını
- * (Unexpected token, missing type id vb.) kalıcı olarak önler.
- * Cache zaten ephemeral; restart sonrası lazy şekilde tekrar dolar.
+ * Uygulama her başlatıldığında cache'i temizler — seed'lerden önce çalışmalı.
+ * Cache config / serializer değişikliklerinde oluşan format çakışmalarını önler.
  */
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CacheStartupCleaner {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class CacheStartupCleaner implements ApplicationRunner {
 
     private final CacheManager cacheManager;
     private final RedisConnectionFactory redisConnectionFactory;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void clearCachesOnStartup() {
+    @Override
+    public void run(ApplicationArguments args) {
         // 1) Spring Cache abstraction üzerinden temizlik (cacheManager'ın bildiği prefix'ler)
         try {
             for (String name : cacheManager.getCacheNames()) {
@@ -48,3 +49,4 @@ public class CacheStartupCleaner {
         }
     }
 }
+

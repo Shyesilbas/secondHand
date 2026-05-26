@@ -118,6 +118,75 @@ export const electronicsConfig = {
       { id: 3, title: 'Location', description: 'Set the location of your item', kind: 'mediaLocation' },
     ],
     derivedFields: [{ sourceField: 'electronicTypeId', enumKey: 'electronicTypes', targetField: '_electronicTypeName', uppercase: true }],
+    effects: [
+      (ctx) => {
+        const mId = ctx.formData?.electronicModelId;
+        if (!mId) return;
+        const m = (ctx.enums?.electronicModels || []).find((x) => String(x?.id ?? '') === String(mId));
+        if (!m) return;
+
+        const modelName = String(m?.name || '');
+        if (modelName.includes(' > ')) {
+          const parts = modelName.split(' > ').map(p => p.trim());
+          // parts[0] is e.g. "MacBook Pro 16 (M3 Max)" or "iPhone 16 Pro Max"
+          // parts[1] is e.g. "36GB/1TB" or "512GB"
+
+          const specPart = parts[parts.length - 1];
+          if (specPart) {
+            const specLower = specPart.toLowerCase();
+
+            // Check for format: 16GB/512GB or 8GB/256GB
+            if (specLower.includes('/')) {
+              const specSub = specLower.split('/');
+              const ramStr = specSub[0].replace('gb', '').trim();
+              let storageStr = specSub[1].replace('gb', '').replace('tb', '').trim();
+              const isTB = specSub[1].includes('tb');
+
+              const parsedRam = parseInt(ramStr, 10);
+              let parsedStorage = parseInt(storageStr, 10);
+              if (isTB) parsedStorage = parsedStorage * 1024;
+
+              if (!isNaN(parsedRam) && ctx.formData?.ram !== parsedRam) {
+                ctx.setValue('ram', parsedRam);
+              }
+              if (!isNaN(parsedStorage) && ctx.formData?.storage !== parsedStorage) {
+                ctx.setValue('storage', parsedStorage);
+              }
+            }
+            // Check for format: 128GB or 512GB
+            else if (specLower.endsWith('gb')) {
+              const storageVal = parseInt(specLower.replace('gb', '').trim(), 10);
+              if (!isNaN(storageVal) && ctx.formData?.storage !== storageVal) {
+                ctx.setValue('storage', storageVal);
+              }
+            }
+            // Check for format: 1TB
+            else if (specLower.endsWith('tb')) {
+              const storageVal = parseInt(specLower.replace('tb', '').trim(), 10) * 1024;
+              if (!isNaN(storageVal) && ctx.formData?.storage !== storageVal) {
+                ctx.setValue('storage', storageVal);
+              }
+            }
+          }
+
+          // Check if it's a laptop and auto-derive gpuModel if contained
+          const laptopTypeName = String(ctx.formData?._electronicTypeName || '').toUpperCase();
+          if (laptopTypeName === 'LAPTOP' && parts[0]) {
+            const seriesLower = parts[0].toLowerCase();
+            let matchedGpu = null;
+            if (seriesLower.includes('rtx 4080')) matchedGpu = 'NVIDIA GeForce RTX 4080';
+            else if (seriesLower.includes('rtx 4070')) matchedGpu = 'NVIDIA GeForce RTX 4070';
+            else if (seriesLower.includes('rtx 4060')) matchedGpu = 'NVIDIA GeForce RTX 4060';
+            else if (seriesLower.includes('rtx 4050')) matchedGpu = 'NVIDIA GeForce RTX 4050';
+            else if (seriesLower.includes('rtx 3050')) matchedGpu = 'NVIDIA GeForce RTX 3050';
+
+            if (matchedGpu && ctx.formData?.gpuModel !== matchedGpu) {
+              ctx.setValue('gpuModel', matchedGpu);
+            }
+          }
+        }
+      }
+    ],
     getTitle: ({ isEdit }) => (isEdit ? 'Edit Electronics Listing' : 'Create Electronics Listing'),
     getSubtitle: ({ isEdit }) => (isEdit ? 'Update product details and location' : 'Enter product details and location'),
     normalizeInitialData: (data) => {
@@ -132,9 +201,20 @@ export const electronicsConfig = {
   createFlow: {
     subtypeSelector: { enumKey: 'electronicTypes', queryParamKey: 'electronicTypeId', initialDataKey: 'electronicTypeId', title: 'Choose electronics type', description: 'Select a type to tailor the form fields.', paramKey: 'electronicTypeIds' },
     preFormSelectors: [
-      { enumKey: 'electronicBrands', initialDataKey: 'electronicBrandId', title: 'Choose brand', description: 'Select a brand to narrow model options.', kind: 'searchable', paramKey: 'electronicBrandIds' },
       {
-        enumKey: 'electronicModels', initialDataKey: 'electronicModelId', title: 'Choose model', description: 'Select a model to tailor the form fields.', kind: 'searchable', dependsOn: ['electronicTypeId', 'electronicBrandId'], paramKey: 'electronicModelIds',
+        enumKey: 'electronicBrands', initialDataKey: 'electronicBrandId', title: 'Choose brand', description: 'Select a brand to narrow model options.', kind: 'grid', dependsOn: ['electronicTypeId'], paramKey: 'electronicBrandIds',
+        getOptions: ({ enums, selection }) => {
+          const allBrands = enums?.electronicBrands || [];
+          const typeId = selection?.electronicTypeId;
+          if (!typeId) return allBrands;
+          const models = enums?.electronicModels || [];
+          const brandIds = new Set(models.filter((m) => String(m?.typeId ?? m?.type_id ?? '') === String(typeId)).map((m) => m?.brandId ?? m?.brand_id).filter(Boolean).map((x) => String(x)));
+          if (brandIds.size === 0) return allBrands;
+          return allBrands.filter((b) => brandIds.has(String(b?.id ?? b?.value ?? '')));
+        },
+      },
+      {
+        enumKey: 'electronicModels', initialDataKey: 'electronicModelId', title: 'Choose model', description: 'Select a model to tailor the form fields.', kind: 'grid', dependsOn: ['electronicTypeId', 'electronicBrandId'], paramKey: 'electronicModelIds',
         getOptions: ({ enums, selection }) => {
           const brandId = selection?.electronicBrandId;
           const typeId = selection?.electronicTypeId;
@@ -145,6 +225,9 @@ export const electronicsConfig = {
             .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? '') }))
             .filter((o) => o.id && o.label);
         },
+      },
+      {
+        enumKey: 'colors', initialDataKey: 'color', title: 'Choose color', description: 'Select color of your electronic device.', kind: 'grid', dependsOn: ['electronicModelId'], paramKey: 'color', prefilter: false
       },
     ],
   },

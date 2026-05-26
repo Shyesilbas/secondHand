@@ -14,7 +14,10 @@ const toNumber = (v) => {
   return Number.isFinite(n) ? n : null;
 };
 
-const buildValidationCtx = (formData) => ({ formData: formData || {} });
+const buildValidationCtx = (formData, enums = null) => ({
+  formData: formData || {},
+  enums: enums || {},
+});
 
 const validateBaseStep1 = (formData) => {
   const errors = {};
@@ -116,7 +119,7 @@ export const validationRegistry = {
     return cfg?.formSchema || cfg?.validationSchema || null;
   },
 
-  getStepErrors: (listingType, step, data) => {
+  getStepErrors: (listingType, step, data, enums = null) => {
     const formSchema = getFormSchema(listingType);
     if (!formSchema) {
       const legacy = getListingConfig(listingType)?.validationSchema || null;
@@ -126,7 +129,7 @@ export const validationRegistry = {
       return toErrorsObject(res);
     }
 
-    const ctx = buildValidationCtx(data);
+    const ctx = buildValidationCtx(data, enums);
     const stepId = Number(step);
     const stepDef = (formSchema.steps || []).find((s) => Number(s.id) === stepId) || null;
     const kind = stepDef?.kind || (stepId === 1 ? 'basics' : 'details');
@@ -158,7 +161,7 @@ export const validationRegistry = {
     return {};
   },
 
-  getAllErrors: (listingType, data) => {
+  getAllErrors: (listingType, data, enums = null) => {
     const formSchema = getFormSchema(listingType);
     if (!formSchema) {
       const legacy = getListingConfig(listingType)?.validationSchema || null;
@@ -168,12 +171,12 @@ export const validationRegistry = {
       return toErrorsObject(res);
     }
 
-    const ctx = buildValidationCtx(data);
+    const ctx = buildValidationCtx(data, enums);
     const errors = {};
     const steps = formSchema.steps || [];
     steps.forEach((s) => {
       const stepId = Number(s.id);
-      Object.assign(errors, validationRegistry.getStepErrors(listingType, stepId, ctx.formData));
+      Object.assign(errors, validationRegistry.getStepErrors(listingType, stepId, ctx.formData, enums));
     });
     Object.assign(errors, runCustomValidators(formSchema, 'all', ctx));
     return errors;

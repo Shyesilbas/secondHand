@@ -36,11 +36,11 @@ export const getCreateFlowSelectorSteps = (listingType) => {
   if (!config?.createFlow) return [];
   const { subtypeSelector, preFormSelectors = [] } = config.createFlow;
   const list = [];
-  if (subtypeSelector?.enumKey && subtypeSelector?.initialDataKey) {
+  if ((subtypeSelector?.enumKey || subtypeSelector?.options) && subtypeSelector?.initialDataKey) {
     list.push({ ...subtypeSelector, kind: 'grid' });
   }
   preFormSelectors.forEach((s) => {
-    if (s?.enumKey && s?.initialDataKey) list.push(s);
+    if ((s?.enumKey || s?.options) && s?.initialDataKey) list.push(s);
   });
   return list;
 };
@@ -80,11 +80,20 @@ export const createFormRegistry = Object.fromEntries(
   ])
 );
 
-export const isCreateSelectionComplete = (listingType, selection) => {
+export const isCreateSelectionComplete = (listingType, selection, enums = null) => {
   if (!listingType || !createFormRegistry[listingType]) return false;
   const steps = getCreateFlowSelectorSteps(listingType);
   if (!steps.length) return true;
-  return steps.every((s) => isPrefilterValueFilled(selection?.[s.initialDataKey]));
+
+  const ctx = { formData: selection, selection, enums: enums || {} };
+  const visibleSteps = steps.filter((s) => {
+    if (typeof s.visibleWhen === 'function') return Boolean(s.visibleWhen(ctx));
+    return true;
+  });
+
+  return visibleSteps.every(
+    (s) => s.optional || isPrefilterValueFilled(selection?.[s.initialDataKey]),
+  );
 };
 
 export default listingTypeConfig;

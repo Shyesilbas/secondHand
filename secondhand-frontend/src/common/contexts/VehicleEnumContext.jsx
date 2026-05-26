@@ -96,3 +96,18 @@ export const useBodyTypes = () => {
     const { enums } = useVehicleEnums();
     return useMemo(() => enums.bodyTypes, [enums.bodyTypes]);
 };
+
+export const useVehicleGenerations = () => {
+    const { enums } = useVehicleEnums();
+    return useMemo(() => enums.vehicleGenerations, [enums.vehicleGenerations]);
+};
+
+export const useVehicleEngines = () => {
+    const { enums } = useVehicleEnums();
+    return useMemo(() => enums.vehicleEngines, [enums.vehicleEngines]);
+};
+
+export const useVehicleTrims = () => {
+    const { enums } = useVehicleEnums();
+    return useMemo(() => enums.vehicleTrims, [enums.vehicleTrims]);
+};

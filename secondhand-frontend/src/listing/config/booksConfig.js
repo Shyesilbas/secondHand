@@ -98,11 +98,18 @@ export const booksConfig = {
     subtypeSelector: { enumKey: 'bookTypes', queryParamKey: 'bookTypeId', initialDataKey: 'bookTypeId', title: 'Choose book type', description: 'Select a type to tailor the form fields.', paramKey: 'bookTypeIds' },
     preFormSelectors: [
       {
-        enumKey: 'bookGenres', initialDataKey: 'genreId', title: 'Choose genre', description: 'Select a genre to tailor the form fields.', kind: 'searchable', dependsOn: ['bookTypeId'], paramKey: 'genreIds',
+        enumKey: 'bookGenres', initialDataKey: 'genreId', title: 'Choose genre', description: 'Select a genre to tailor the form fields.', kind: 'grid', dependsOn: ['bookTypeId'], paramKey: 'genreIds',
         getOptions: ({ enums, selection }) => {
           const bookTypeId = selection?.bookTypeId;
           const all = enums?.bookGenres || [];
-          return all.filter((g) => !bookTypeId || String(g?.bookTypeId ?? '') === String(bookTypeId)).map((g) => ({ id: String(g?.id ?? ''), label: String(g?.label ?? g?.name ?? '') })).filter((o) => o.id && o.label);
+          return all
+            .filter((g) => !bookTypeId || String(g?.bookTypeId ?? '') === String(bookTypeId))
+            .map((g) => {
+              const fullLabel = String(g?.label ?? g?.name ?? '');
+              const cleanLabel = fullLabel.includes(' > ') ? fullLabel.split(' > ')[1].trim() : fullLabel;
+              return { id: String(g?.id ?? ''), label: cleanLabel };
+            })
+            .filter((o) => o.id && o.label);
         },
       },
       { enumKey: 'bookLanguages', initialDataKey: 'languageId', title: 'Choose language', description: 'Select a language to tailor the form fields.', kind: 'grid', dependsOn: ['bookTypeId'], prefilter: false },

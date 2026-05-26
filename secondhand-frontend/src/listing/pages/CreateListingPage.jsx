@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry, isCreateSelectionComplete } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
 
@@ -8,6 +9,7 @@ const CreateListingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const st = location.state;
+  const { enums } = useEnums();
 
   const listingType = useMemo(() => {
     if (!st?.fromListingPrefilter || !st?.listingType) return null;
@@ -16,8 +18,9 @@ const CreateListingPage = () => {
 
   const selection = st?.selection && typeof st.selection === 'object' ? st.selection : {};
   const SelectedForm = listingType ? createFormRegistry[listingType] : null;
-  const complete =
-    Boolean(listingType && SelectedForm && isCreateSelectionComplete(listingType, selection));
+  const complete = Boolean(
+    listingType && SelectedForm && isCreateSelectionComplete(listingType, selection, enums),
+  );
 
   useLayoutEffect(() => {
     if (complete) return;

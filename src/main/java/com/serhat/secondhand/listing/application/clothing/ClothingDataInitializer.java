@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.clothing;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
@@ -7,18 +9,30 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.List;
-import java.util.Locale;
+import java.io.InputStream;
+import java.util.Optional;
 
+/**
+ * Seeds clothing reference data (brands, types) from
+ * {@code classpath:seed/clothing.json}.
+ *
+ * <p>Uses an <b>upsert</b> strategy: existing rows are left untouched,
+ * missing rows are created.
+ */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ClothingDataInitializer implements SeedTask {
+
+    private static final String CATALOG_PATH = "seed/clothing.json";
 
     private final ClothingBrandRepository brandRepository;
     private final ClothingTypeRepository typeRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public String key() {
@@ -27,60 +41,73 @@ public class ClothingDataInitializer implements SeedTask {
 
     @Override
     public Result<Void> run() {
-        if (brandRepository.count() == 0) {
-            seedBrands();
-        }
-        if (typeRepository.count() == 0) {
-            seedTypes();
-        }
-        return Result.success();
-    }
-
-    private void seedBrands() {
-        List<String> brands = List.of(
-                "Nike", "Adidas", "Puma", "Under Armour", "Reebok", "New Balance", "Converse", "Vans", "Asics",
-                "Zara", "H&M", "Uniqlo", "GAP", "Mango", "Bershka", "Pull&Bear", "Stradivarius", "Massimo Dutti",
-                "Tommy Hilfiger", "Calvin Klein", "Lacoste", "Ralph Lauren", "Levi's", "Diesel", "Armani",
-                "The North Face", "Columbia", "Patagonia",
-                "Gucci", "Prada", "Louis Vuitton", "Chanel", "Hermès", "Burberry",
-                "Decathlon", "Quechua", "Kipsta", "Domyos",
-                "Other"
-        );
-
-        for (String label : brands) {
-            ClothingBrand brand = new ClothingBrand();
-            brand.setName(toKey(label));
-            brand.setLabel(label);
-            brandRepository.save(brand);
+        try {
+            JsonNode root = loadCatalog();
+            seedBrands(root.get("brands"));
+            seedTypes(root.get("types"));
+            log.info("Clothing seed completed successfully");
+            return Result.success();
+        } catch (Exception e) {
+            log.error("Clothing seed failed", e);
+            return Result.error("Clothing seed failed: " + e.getMessage(), "SEED_FAILED");
         }
     }
 
-    private void seedTypes() {
-        List<String> types = List.of(
-                "T-Shirt", "Shirt", "Pants", "Jeans", "Shorts", "Dress", "Skirt", "Jacket", "Coat",
-                "Sweater", "Hoodie", "Sweatshirt", "Suit", "Blazer", "Vest", "Underwear", "Socks",
-                "Hat", "Cap", "Scarf", "Gloves", "Belt", "Tie", "Bag",
-                "Shoes", "Sneakers", "Boots", "Sandals", "Heels", "Flats",
-                "Other"
-        );
+    // ── JSON Loading ────────────────────────────────────────────────────
 
-        for (String label : types) {
-            ClothingType type = new ClothingType();
-            type.setName(toKey(label));
-            type.setLabel(label);
-            typeRepository.save(type);
+    private JsonNode loadCatalog() throws Exception {
+        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
+            return objectMapper.readTree(is);
         }
     }
 
-    private String toKey(String label) {
-        String normalized = Normalizer.normalize(label, Normalizer.Form.NFKD)
-                .replaceAll("\\p{M}", "");
-        return normalized.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('&', ' ')
-                .replace('\'', ' ')
-                .replace('-', ' ')
-                .replaceAll("\\s+", "_");
+    // ── Brand Seeding ───────────────────────────────────────────────────
+
+    private void seedBrands(JsonNode brandsNode) {
+        if (brandsNode == null || !brandsNode.isArray()) return;
+        for (JsonNode node : brandsNode) {
+            upsertBrand(node.get("key").asText(), node.get("label").asText());
+        }
+    }
+
+    private void upsertBrand(String key, String label) {
+        Optional<ClothingBrand> existing = brandRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            ClothingBrand brand = existing.get();
+            if (brand.getLabel() == null || brand.getLabel().isBlank()) {
+                brand.setLabel(label);
+                brandRepository.save(brand);
+            }
+            return;
+        }
+        ClothingBrand brand = new ClothingBrand();
+        brand.setName(key);
+        brand.setLabel(label);
+        brandRepository.save(brand);
+    }
+
+    // ── Type Seeding ────────────────────────────────────────────────────
+
+    private void seedTypes(JsonNode typesNode) {
+        if (typesNode == null || !typesNode.isArray()) return;
+        for (JsonNode node : typesNode) {
+            upsertType(node.get("key").asText(), node.get("label").asText());
+        }
+    }
+
+    private void upsertType(String key, String label) {
+        Optional<ClothingType> existing = typeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            ClothingType type = existing.get();
+            if (type.getLabel() == null || type.getLabel().isBlank()) {
+                type.setLabel(label);
+                typeRepository.save(type);
+            }
+            return;
+        }
+        ClothingType type = new ClothingType();
+        type.setName(key);
+        type.setLabel(label);
+        typeRepository.save(type);
     }
 }
-

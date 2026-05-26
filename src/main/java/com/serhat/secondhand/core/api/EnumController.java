@@ -81,6 +81,18 @@ public class EnumController {
         return ResponseEntity.ok(enumReadService.getVehicleTypes());
     }
 
+    private ResponseEntity<List<Map<String, Object>>> getVehicleGenerations() {
+        return ResponseEntity.ok(enumReadService.getVehicleGenerations());
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getVehicleEngines() {
+        return ResponseEntity.ok(enumReadService.getVehicleEngines());
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getVehicleTrims() {
+        return ResponseEntity.ok(enumReadService.getVehicleTrims());
+    }
+
     private ResponseEntity<List<Map<String, Object>>> getFuelTypes() {
         List<Map<String, Object>> fuelTypes = Arrays.stream(FuelType.values())
                 .map(fuel -> {
@@ -525,6 +537,9 @@ public class EnumController {
         allEnums.put("carBrands", getCarBrands().getBody());
         allEnums.put("vehicleTypes", getVehicleTypes().getBody());
         allEnums.put("vehicleModels", getVehicleModels().getBody());
+        allEnums.put("vehicleGenerations", getVehicleGenerations().getBody());
+        allEnums.put("vehicleEngines", getVehicleEngines().getBody());
+        allEnums.put("vehicleTrims", getVehicleTrims().getBody());
         allEnums.put("fuelTypes", getFuelTypes().getBody());
         allEnums.put("colors", getColors().getBody());
         allEnums.put("doors", getDoors().getBody());

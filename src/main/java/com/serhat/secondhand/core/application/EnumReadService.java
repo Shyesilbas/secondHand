@@ -25,7 +25,10 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportConditionRepo
 import com.serhat.secondhand.listing.domain.repository.sports.SportDisciplineRepository;
 import com.serhat.secondhand.listing.domain.repository.sports.SportEquipmentTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.CarBrandRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleEngineRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleGenerationRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTrimRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,9 @@ public class EnumReadService {
     private final CarBrandRepository carBrandRepository;
     private final VehicleTypeRepository vehicleTypeRepository;
     private final VehicleModelRepository vehicleModelRepository;
+    private final VehicleGenerationRepository vehicleGenerationRepository;
+    private final VehicleEngineRepository vehicleEngineRepository;
+    private final VehicleTrimRepository vehicleTrimRepository;
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
@@ -83,6 +89,7 @@ public class EnumReadService {
                     modelMap.put("name", model.getName());
                     modelMap.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
                     modelMap.put("typeId", model.getType() != null ? model.getType().getId() : null);
+                    modelMap.put("supportedBodyTypes", model.getSupportedBodyTypes());
                     return modelMap;
                 })
                 .toList();
@@ -317,6 +324,46 @@ public class EnumReadService {
                     map.put("id", v.getId());
                     map.put("name", v.getName());
                     map.put("label", v.getLabel());
+                    return map;
+                })
+                .toList();
+    }
+
+    public List<Map<String, Object>> getVehicleGenerations() {
+        return vehicleGenerationRepository.findAll().stream()
+                .sorted(Comparator.comparing(g -> Optional.ofNullable(g.getName()).orElse("")))
+                .map(gen -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", gen.getId());
+                    map.put("name", gen.getName());
+                    map.put("modelId", gen.getModel() != null ? gen.getModel().getId() : null);
+                    return map;
+                })
+                .toList();
+    }
+
+    public List<Map<String, Object>> getVehicleEngines() {
+        return vehicleEngineRepository.findAll().stream()
+                .sorted(Comparator.comparing(e -> Optional.ofNullable(e.getName()).orElse("")))
+                .map(eng -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", eng.getId());
+                    map.put("name", eng.getName());
+                    map.put("generationId", eng.getGeneration() != null ? eng.getGeneration().getId() : null);
+                    map.put("fuelType", eng.getFuelType() != null ? eng.getFuelType().name() : null);
+                    return map;
+                })
+                .toList();
+    }
+
+    public List<Map<String, Object>> getVehicleTrims() {
+        return vehicleTrimRepository.findAll().stream()
+                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getName()).orElse("")))
+                .map(trim -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", trim.getId());
+                    map.put("name", trim.getName());
+                    map.put("generationId", trim.getGeneration() != null ? trim.getGeneration().getId() : null);
                     return map;
                 })
                 .toList();

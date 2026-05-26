@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.realestate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
@@ -11,20 +13,31 @@ import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTy
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.List;
-import java.util.Locale;
+import java.io.InputStream;
+import java.util.Optional;
 
+/**
+ * Seeds real estate reference data (property types, ad types, heating types,
+ * owner types) from {@code classpath:seed/realestate.json}.
+ *
+ * <p>Uses an <b>upsert</b> strategy for all entities.
+ */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RealEstateDataInitializer implements SeedTask {
+
+    private static final String CATALOG_PATH = "seed/realestate.json";
 
     private final RealEstateTypeRepository realEstateTypeRepository;
     private final RealEstateAdTypeRepository realEstateAdTypeRepository;
     private final HeatingTypeRepository heatingTypeRepository;
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public String key() {
@@ -33,80 +46,117 @@ public class RealEstateDataInitializer implements SeedTask {
 
     @Override
     public Result<Void> run() {
-        if (realEstateTypeRepository.count() == 0) {
-            seedRealEstateTypes();
+        try {
+            JsonNode root = loadCatalog();
+            seedPropertyTypes(root.get("propertyTypes"));
+            seedAdTypes(root.get("adTypes"));
+            seedHeatingTypes(root.get("heatingTypes"));
+            seedOwnerTypes(root.get("ownerTypes"));
+            log.info("Real estate seed completed successfully");
+            return Result.success();
+        } catch (Exception e) {
+            log.error("Real estate seed failed", e);
+            return Result.error("Real estate seed failed: " + e.getMessage(), "SEED_FAILED");
         }
-        if (realEstateAdTypeRepository.count() == 0) {
-            seedAdTypes();
-        }
-        if (heatingTypeRepository.count() == 0) {
-            seedHeatingTypes();
-        }
-        if (listingOwnerTypeRepository.count() == 0) {
-            seedOwnerTypes();
-        }
-        return Result.success();
     }
 
-    private void seedRealEstateTypes() {
-        List<String> types = List.of(
-                "Apartment", "Residence", "Studio", "Duplex", "Penthouse",
-                "House", "Villa", "Summer House",
-                "Land", "Farm",
-                "Office", "Commercial", "Shop", "Warehouse", "Industrial",
-                "Other"
-        );
-        for (String label : types) {
-            RealEstateType type = new RealEstateType();
-            type.setName(toKey(label));
+    // ── JSON Loading ────────────────────────────────────────────────────
+
+    private JsonNode loadCatalog() throws Exception {
+        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
+            return objectMapper.readTree(is);
+        }
+    }
+
+    // ── Property Type Seeding ───────────────────────────────────────────
+
+    private void seedPropertyTypes(JsonNode propertyTypesNode) {
+        if (propertyTypesNode == null || !propertyTypesNode.isArray()) return;
+        for (JsonNode node : propertyTypesNode) {
+            upsertPropertyType(node.get("key").asText(), node.get("label").asText());
+        }
+    }
+
+    private void upsertPropertyType(String key, String label) {
+        Optional<RealEstateType> existing = realEstateTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            RealEstateType type = existing.get();
             type.setLabel(label);
             realEstateTypeRepository.save(type);
+            return;
+        }
+        RealEstateType type = new RealEstateType();
+        type.setName(key);
+        type.setLabel(label);
+        realEstateTypeRepository.save(type);
+    }
+
+    // ── Ad Type Seeding ─────────────────────────────────────────────────
+
+    private void seedAdTypes(JsonNode adTypesNode) {
+        if (adTypesNode == null || !adTypesNode.isArray()) return;
+        for (JsonNode node : adTypesNode) {
+            upsertAdType(node.get("key").asText(), node.get("label").asText());
         }
     }
 
-    private void seedAdTypes() {
-        List<String> types = List.of("For Sale", "For Rent");
-        for (String label : types) {
-            RealEstateAdType type = new RealEstateAdType();
-            type.setName(toKey(label));
+    private void upsertAdType(String key, String label) {
+        Optional<RealEstateAdType> existing = realEstateAdTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            RealEstateAdType type = existing.get();
             type.setLabel(label);
             realEstateAdTypeRepository.save(type);
+            return;
+        }
+        RealEstateAdType type = new RealEstateAdType();
+        type.setName(key);
+        type.setLabel(label);
+        realEstateAdTypeRepository.save(type);
+    }
+
+    // ── Heating Type Seeding ────────────────────────────────────────────
+
+    private void seedHeatingTypes(JsonNode heatingTypesNode) {
+        if (heatingTypesNode == null || !heatingTypesNode.isArray()) return;
+        for (JsonNode node : heatingTypesNode) {
+            upsertHeatingType(node.get("key").asText(), node.get("label").asText());
         }
     }
 
-    private void seedHeatingTypes() {
-        List<String> types = List.of(
-                "None", "Stove", "Natural Gas", "Central System", "Combi Boiler",
-                "Air Conditioner", "Geothermal", "Floor Heating", "Solar", "Other"
-        );
-        for (String label : types) {
-            HeatingType type = new HeatingType();
-            type.setName(toKey(label));
+    private void upsertHeatingType(String key, String label) {
+        Optional<HeatingType> existing = heatingTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            HeatingType type = existing.get();
             type.setLabel(label);
             heatingTypeRepository.save(type);
+            return;
+        }
+        HeatingType type = new HeatingType();
+        type.setName(key);
+        type.setLabel(label);
+        heatingTypeRepository.save(type);
+    }
+
+    // ── Owner Type Seeding ──────────────────────────────────────────────
+
+    private void seedOwnerTypes(JsonNode ownerTypesNode) {
+        if (ownerTypesNode == null || !ownerTypesNode.isArray()) return;
+        for (JsonNode node : ownerTypesNode) {
+            upsertOwnerType(node.get("key").asText(), node.get("label").asText());
         }
     }
 
-    private void seedOwnerTypes() {
-        List<String> types = List.of("Owner", "Agency", "Builder");
-        for (String label : types) {
-            ListingOwnerType type = new ListingOwnerType();
-            type.setName(toKey(label));
+    private void upsertOwnerType(String key, String label) {
+        Optional<ListingOwnerType> existing = listingOwnerTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            ListingOwnerType type = existing.get();
             type.setLabel(label);
             listingOwnerTypeRepository.save(type);
+            return;
         }
-    }
-
-    private String toKey(String label) {
-        String normalized = Normalizer.normalize(label, Normalizer.Form.NFKD)
-                .replaceAll("\\p{M}", "");
-        return normalized.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('&', ' ')
-                .replace('\'', ' ')
-                .replace('-', ' ')
-                .replace('.', ' ')
-                .replaceAll("\\s+", "_");
+        ListingOwnerType type = new ListingOwnerType();
+        type.setName(key);
+        type.setLabel(label);
+        listingOwnerTypeRepository.save(type);
     }
 }
-

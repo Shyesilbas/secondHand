@@ -1,5 +1,6 @@
 import React, {useRef, useState} from 'react';
-import {Image as ImageIcon, Loader2, Upload, X} from 'lucide-react';
+import {motion, AnimatePresence} from 'framer-motion';
+import {Image as ImageIcon, Loader2, Upload, X, CheckCircle2} from 'lucide-react';
 import {API_ENDPOINTS} from '../constants/apiEndpoints.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import apiClient from '../services/api/interceptors.js';
@@ -117,83 +118,147 @@ const ImageUpload = ({ onImageUpload, onImageRemove, imageUrl, disabled = false 
 
   return (
     <div className="w-full">
-
+      <AnimatePresence mode="wait">
         {imageUrl ? (
-          <div className="relative group">
-            <div className="w-full h-72 bg-gray-50 rounded-lg overflow-hidden border border-gray-100 flex items-center justify-center">
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative group"
+          >
+            <div className="w-full h-72 bg-zinc-50/50 rounded-xl overflow-hidden border border-zinc-200/40 flex items-center justify-center shadow-sm">
               <img
                 src={imageUrl}
                 alt="Product"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
               />
             </div>
             {!disabled && (
-              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-lg">
-                <button
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-5 rounded-xl">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={handleRemoveImage}
-                  className="bg-white text-red-600 px-4 py-2 rounded-lg text-[13px] font-medium shadow-sm hover:bg-red-50 transition-colors flex items-center gap-1.5 focus:outline-none"
+                  className="bg-white/95 backdrop-blur-sm text-red-600 px-5 py-2.5 rounded-xl text-[13px] font-medium shadow-lg hover:bg-white transition-colors flex items-center gap-1.5 focus:outline-none"
                 >
                   <X className="w-4 h-4" />
                   Remove
-                </button>
+                </motion.button>
               </div>
             )}
-          </div>
+            {/* Success badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 20 }}
+              className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-medium text-white shadow-sm"
+            >
+              <CheckCircle2 className="w-3 w-3" />
+              Uploaded
+            </motion.div>
+          </motion.div>
         ) : (
-          <div
+          <motion.div
+            key="dropzone"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className={`
-              w-full h-56 border border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-150
-              ${dragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'}
-              ${disabled ? 'cursor-not-allowed opacity-40 bg-gray-50' : ''}
+              w-full h-56 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-200 relative overflow-hidden
+              ${dragActive
+                ? 'bg-zinc-50 shadow-inner'
+                : 'bg-white hover:bg-zinc-50/50'
+              }
+              ${disabled ? 'cursor-not-allowed opacity-40 bg-zinc-50' : ''}
               ${isUploading ? 'pointer-events-none' : ''}
-              ${error ? 'border-red-300 bg-red-50/30' : ''}
+              ${error ? 'bg-red-50/30' : ''}
             `}
+            style={{
+              border: dragActive
+                ? '2px dashed #71717a'
+                : error
+                  ? '2px dashed #fca5a5'
+                  : '2px dashed #d4d4d8',
+            }}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onClick={handleClick}
           >
+            {/* Animated background pattern when dragging */}
+            {dragActive && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.05 }}
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, #18181b 1px, transparent 1px)',
+                  backgroundSize: '20px 20px',
+                }}
+              />
+            )}
+
             {isUploading ? (
-              <div className="flex flex-col items-center">
-                <Loader2 className="w-8 h-8 text-gray-400 animate-spin mb-3" />
-                <p className="text-[13px] font-medium text-gray-500">Uploading…</p>
+              <div className="flex flex-col items-center relative z-10">
+                <div className="relative mb-4">
+                  <div className="w-12 h-12 rounded-full border-[3px] border-zinc-200 border-t-zinc-600 animate-spin" />
+                </div>
+                <p className="text-[13px] font-medium text-zinc-600">Uploading…</p>
+                <p className="mt-1 text-[11px] text-zinc-400">Compressing and uploading your image</p>
               </div>
             ) : (
-              <div className="flex flex-col items-center p-6 text-center">
-                <div className={`p-3 rounded-lg mb-3 transition-colors ${dragActive ? 'bg-gray-200' : 'bg-gray-50'}`}>
+              <div className="flex flex-col items-center p-6 text-center relative z-10">
+                <motion.div
+                  animate={dragActive ? { scale: 1.1, y: -4 } : { scale: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className={`p-3.5 rounded-xl mb-3 transition-colors ${
+                    dragActive
+                      ? 'bg-zinc-200/60'
+                      : 'bg-zinc-100/60'
+                  }`}
+                >
                   {dragActive ? (
-                    <Upload className="w-6 h-6 text-gray-500" />
+                    <Upload className="w-6 h-6 text-zinc-600" />
                   ) : (
-                    <ImageIcon className="w-6 h-6 text-gray-300" />
+                    <ImageIcon className="w-6 h-6 text-zinc-400" />
                   )}
-                </div>
-                <p className="text-[13px] font-medium text-gray-700 mb-1">
+                </motion.div>
+                <p className="text-[13px] font-medium text-zinc-700 mb-1">
                   {dragActive ? 'Drop to upload' : 'Drag & drop or click to browse'}
                 </p>
-                <p className="text-[11px] text-gray-400">
+                <p className="text-[11px] text-zinc-400">
                   PNG, JPG or GIF (max 10MB)
                 </p>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
         
+      <AnimatePresence>
         {error && (
-          <div className="mt-3 px-3 py-2 bg-red-50/80 border border-red-100 rounded-lg flex items-start gap-2 text-[12px] text-red-600">
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="mt-3 px-3.5 py-2.5 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2 text-[12px] text-red-600"
+          >
             <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>{error}</span>
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="hidden"
-          disabled={disabled || isUploading}
-        />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+        disabled={disabled || isUploading}
+      />
     </div>
   );
 };

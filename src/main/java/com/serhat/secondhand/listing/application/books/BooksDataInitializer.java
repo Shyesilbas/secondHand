@@ -1,6 +1,9 @@
 package com.serhat.secondhand.listing.application.books;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.SeedKeyNormalizer;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
@@ -13,23 +16,36 @@ import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository
 import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
+import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
+/**
+ * Seeds book reference data (types, genres, languages, formats, conditions)
+ * from {@code classpath:seed/books.json}.
+ *
+ * <p>Uses an <b>upsert</b> strategy for all entities.
+ * Genre entries are keyed as {@code TYPE_KEY + "_" + GENRE_KEY} to maintain
+ * the type→genre hierarchy.
+ */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BooksDataInitializer implements SeedTask {
+
+    private static final String CATALOG_PATH = "seed/books.json";
 
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
     private final BookLanguageRepository bookLanguageRepository;
     private final BookFormatRepository bookFormatRepository;
     private final BookConditionRepository bookConditionRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public String key() {
@@ -38,145 +54,168 @@ public class BooksDataInitializer implements SeedTask {
 
     @Override
     public Result<Void> run() {
-        if (bookTypeRepository.count() == 0) {
-            seedBookTypes();
+        try {
+            JsonNode root = loadCatalog();
+            seedTypes(root.get("types"));
+            seedGenres(root.get("genres"));
+            seedLanguages(root.get("languages"));
+            seedFormats(root.get("formats"));
+            seedConditions(root.get("conditions"));
+            log.info("Books seed completed successfully");
+            return Result.success();
+        } catch (Exception e) {
+            log.error("Books seed failed", e);
+            return Result.error("Books seed failed: " + e.getMessage(), "SEED_FAILED");
         }
-        if (bookGenreRepository.count() == 0) {
-            seedBookGenres();
-        }
-        if (bookLanguageRepository.count() == 0) {
-            seedBookLanguages();
-        }
-        if (bookFormatRepository.count() == 0) {
-            seedBookFormats();
-        }
-        if (bookConditionRepository.count() == 0) {
-            seedBookConditions();
-        }
-        return Result.success();
     }
 
-    private void seedBookTypes() {
-        List<String> labels = List.of(
-                "Ders Kitabı",
-                "Test Kitabı",
-                "Okuma Kitabı",
-                "Dini Kitaplar",
-                "Çocuk Kitapları",
-                "Akademik",
-                "Sınav Hazırlık",
-                "Kişisel Gelişim"
-        );
+    // ── JSON Loading ────────────────────────────────────────────────────
 
-        for (String label : labels) {
-            BookType type = new BookType();
-            type.setName(toKey(label));
+    private JsonNode loadCatalog() throws Exception {
+        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
+            return objectMapper.readTree(is);
+        }
+    }
+
+    // ── Type Seeding ────────────────────────────────────────────────────
+
+    private void seedTypes(JsonNode typesNode) {
+        if (typesNode == null || !typesNode.isArray()) return;
+        for (JsonNode node : typesNode) {
+            String key = node.get("key").asText();
+            String label = node.get("label").asText();
+            upsertType(key, label);
+        }
+    }
+
+    private BookType upsertType(String key, String label) {
+        Optional<BookType> existing = bookTypeRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            BookType type = existing.get();
             type.setLabel(label);
-            bookTypeRepository.save(type);
+            return bookTypeRepository.save(type);
         }
+        BookType type = new BookType();
+        type.setName(key);
+        type.setLabel(label);
+        return bookTypeRepository.save(type);
     }
 
-    private void seedBookGenres() {
-        Map<String, List<String>> genresByTypeLabel = new LinkedHashMap<>();
-        genresByTypeLabel.put("Ders Kitabı", List.of(
-                "Matematik", "Geometri", "Fizik", "Kimya", "Biyoloji", "Tarih", "Coğrafya", "Türkçe", "Edebiyat",
-                "İngilizce", "Almanca", "Fransızca", "Felsefe", "Psikoloji", "Sosyoloji", "Ekonomi",
-                "Bilgisayar Bilimleri", "Yazılım", "Veri Yapıları", "Algoritmalar", "Elektronik", "Makine", "İnşaat"
-        ));
-        genresByTypeLabel.put("Test Kitabı", List.of(
-                "TYT", "AYT", "LGS", "KPSS", "ALES", "DGS", "YDS", "IELTS", "TOEFL",
-                "Branş Denemeleri", "Konu Tarama", "Soru Bankası", "Deneme Sınavı", "Çıkmış Sorular"
-        ));
-        genresByTypeLabel.put("Okuma Kitabı", List.of(
-                "Roman", "Hikâye", "Şiir", "Klasikler", "Bilimkurgu", "Fantastik", "Polisiye", "Gerilim",
-                "Tarihî Roman", "Biyografi", "Anı", "Deneme", "Gezi", "Mizah", "Drama", "Aşk"
-        ));
-        genresByTypeLabel.put("Dini Kitaplar", List.of(
-                "Kur'an-ı Kerim", "Tefsir", "Hadis", "Siyer", "İlmihal", "Fıkıh", "Tasavvuf",
-                "Dua ve Zikir", "Ahlak", "İslam Tarihi"
-        ));
-        genresByTypeLabel.put("Çocuk Kitapları", List.of(
-                "Masal", "Etkinlik", "Boyama", "Okuma Seti", "İlk Okuma", "Eğitici", "Kahramanlık", "Macera"
-        ));
-        genresByTypeLabel.put("Akademik", List.of(
-                "Araştırma", "Tez", "Makale Derlemesi", "Referans", "Sözlük", "Ansiklopedi"
-        ));
-        genresByTypeLabel.put("Sınav Hazırlık", List.of(
-                "Konu Anlatımı", "Hız ve Renk", "Notlar", "Özet", "Pratik", "Video Destekli"
-        ));
-        genresByTypeLabel.put("Kişisel Gelişim", List.of(
-                "Motivasyon", "Zaman Yönetimi", "İletişim", "Liderlik", "Mindfulness", "Kariyer", "Finansal Okuryazarlık"
-        ));
+    // ── Genre Seeding (type→genre hierarchy) ────────────────────────────
 
-        for (var entry : genresByTypeLabel.entrySet()) {
-            BookType type = bookTypeRepository.findByNameIgnoreCase(toKey(entry.getKey())).orElse(null);
-            if (type == null) {
-                continue;
-            }
-            for (String label : entry.getValue()) {
-                BookGenre genre = new BookGenre();
-                genre.setName(toKey(entry.getKey()) + "_" + toKey(label));
-                genre.setLabel(label);
-                genre.setBookType(type);
-                bookGenreRepository.save(genre);
+    private void seedGenres(JsonNode genresNode) {
+        if (genresNode == null || !genresNode.isObject()) return;
+
+        Iterator<Map.Entry<String, JsonNode>> fields = genresNode.properties().iterator();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            String typeKey = entry.getKey();
+            JsonNode genreLabels = entry.getValue();
+
+            BookType type = bookTypeRepository.findByNameIgnoreCase(typeKey).orElse(null);
+            if (type == null || !genreLabels.isArray()) continue;
+
+            for (JsonNode labelNode : genreLabels) {
+                String genreLabel = labelNode.asText();
+                String genreKey = typeKey + "_" + SeedKeyNormalizer.toKey(genreLabel);
+                upsertGenre(genreKey, genreLabel, type);
             }
         }
 
-        BookType otherType = bookTypeRepository.findByNameIgnoreCase(toKey("Okuma Kitabı")).orElse(null);
-        if (otherType != null) {
-            BookGenre other = new BookGenre();
-            other.setName("OTHER");
-            other.setLabel("Other");
-            other.setBookType(otherType);
-            bookGenreRepository.save(other);
+        // Ensure an "OTHER" genre exists (linked to Okuma Kitabı by convention)
+        BookType readingType = bookTypeRepository.findByNameIgnoreCase("OKUMA_KITABI").orElse(null);
+        if (readingType != null) {
+            upsertGenre("OTHER", "Other", readingType);
         }
     }
 
-    private void seedBookLanguages() {
-        List<String> labels = List.of(
-                "Türkçe", "İngilizce", "Almanca", "Fransızca", "İspanyolca", "Arapça", "Rusça", "İtalyanca", "Other"
-        );
-        for (String label : labels) {
-            BookLanguage language = new BookLanguage();
-            language.setName(toKey(label));
-            language.setLabel(label);
-            bookLanguageRepository.save(language);
+    private void upsertGenre(String key, String label, BookType type) {
+        Optional<BookGenre> existing = bookGenreRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            BookGenre genre = existing.get();
+            genre.setLabel(label);
+            bookGenreRepository.save(genre);
+            return;
+        }
+        BookGenre genre = new BookGenre();
+        genre.setName(key);
+        genre.setLabel(label);
+        genre.setBookType(type);
+        bookGenreRepository.save(genre);
+    }
+
+    // ── Language Seeding ────────────────────────────────────────────────
+
+    private void seedLanguages(JsonNode languagesNode) {
+        if (languagesNode == null || !languagesNode.isArray()) return;
+        for (JsonNode labelNode : languagesNode) {
+            String label = labelNode.asText();
+            String key = SeedKeyNormalizer.toKey(label);
+            upsertLanguage(key, label);
         }
     }
 
-    private void seedBookFormats() {
-        List<String> labels = List.of(
-                "Hardcover", "Paperback", "Ebook", "Spiral", "Large Print", "Pocket"
-        );
-        for (String label : labels) {
-            BookFormat format = new BookFormat();
-            format.setName(toKey(label));
+    private void upsertLanguage(String key, String label) {
+        Optional<BookLanguage> existing = bookLanguageRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            BookLanguage lang = existing.get();
+            lang.setLabel(label);
+            bookLanguageRepository.save(lang);
+            return;
+        }
+        BookLanguage lang = new BookLanguage();
+        lang.setName(key);
+        lang.setLabel(label);
+        bookLanguageRepository.save(lang);
+    }
+
+    // ── Format Seeding ──────────────────────────────────────────────────
+
+    private void seedFormats(JsonNode formatsNode) {
+        if (formatsNode == null || !formatsNode.isArray()) return;
+        for (JsonNode labelNode : formatsNode) {
+            String label = labelNode.asText();
+            String key = SeedKeyNormalizer.toKey(label);
+            upsertFormat(key, label);
+        }
+    }
+
+    private void upsertFormat(String key, String label) {
+        Optional<BookFormat> existing = bookFormatRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            BookFormat format = existing.get();
             format.setLabel(label);
             bookFormatRepository.save(format);
+            return;
+        }
+        BookFormat format = new BookFormat();
+        format.setName(key);
+        format.setLabel(label);
+        bookFormatRepository.save(format);
+    }
+
+    // ── Condition Seeding ───────────────────────────────────────────────
+
+    private void seedConditions(JsonNode conditionsNode) {
+        if (conditionsNode == null || !conditionsNode.isArray()) return;
+        for (JsonNode labelNode : conditionsNode) {
+            String label = labelNode.asText();
+            String key = SeedKeyNormalizer.toKey(label);
+            upsertCondition(key, label);
         }
     }
 
-    private void seedBookConditions() {
-        List<String> labels = List.of(
-                "New", "Like New", "Good", "Fair", "Poor"
-        );
-        for (String label : labels) {
-            BookCondition condition = new BookCondition();
-            condition.setName(toKey(label));
+    private void upsertCondition(String key, String label) {
+        Optional<BookCondition> existing = bookConditionRepository.findByNameIgnoreCase(key);
+        if (existing.isPresent()) {
+            BookCondition condition = existing.get();
             condition.setLabel(label);
             bookConditionRepository.save(condition);
+            return;
         }
-    }
-
-    private String toKey(String label) {
-        String normalized = Normalizer.normalize(label, Normalizer.Form.NFKD)
-                .replaceAll("\\p{M}", "");
-        return normalized.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('&', ' ')
-                .replace('\'', ' ')
-                .replace('-', ' ')
-                .replaceAll("\\s+", "_");
+        BookCondition condition = new BookCondition();
+        condition.setName(key);
+        condition.setLabel(label);
+        bookConditionRepository.save(condition);
     }
 }
-
