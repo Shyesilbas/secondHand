@@ -1,0 +1,208 @@
+{
+  "types": [
+    {
+      "key": "DERS_KITABI",
+      "label": "Ders Kitabı"
+    },
+    {
+      "key": "TEST_KITABI",
+      "label": "Test Kitabı"
+    },
+    {
+      "key": "OKUMA_KITABI",
+      "label": "Okuma Kitabı"
+    },
+    {
+      "key": "DINI_KITAPLAR",
+      "label": "Dini Kitaplar"
+    },
+    {
+      "key": "COCUK_KITAPLARI",
+      "label": "Çocuk Kitapları"
+    },
+    {
+      "key": "AKADEMIK",
+      "label": "Akademik"
+    },
+    {
+      "key": "SINAV_HAZIRLIK",
+      "label": "Sınav Hazırlık"
+    },
+    {
+      "key": "KISISEL_GELISIM",
+      "label": "Kişisel Gelişim"
+    },
+    {
+      "key": "IS_VE_EKONOMI",
+      "label": "İş ve Ekonomi"
+    },
+    {
+      "key": "BILIM_VE_TEKNOLOJI",
+      "label": "Bilim ve Teknoloji"
+    }
+  ],
+  "genres": {
+    "DERS_KITABI": [
+      "İlkokul Ders Kitapları",
+      "Ortaokul Ders Kitapları",
+      "Lise Ders Kitapları",
+      "Matematik & Geometri",
+      "Fizik, Kimya & Biyoloji",
+      "Tarih & Coğrafya",
+      "Türkçe & Edebiyat",
+      "Felsefe, Psikoloji & Sosyoloji",
+      "Din Kültürü ve Ahlak Bilgisi",
+      "İngilizce Ders Kitapları",
+      "Almanca Ders Kitapları",
+      "Fransızca Ders Kitapları",
+      "Bilgisayar Bilimleri & Yazılım",
+      "Elektrik-Elektronik Mühendisliği",
+      "Makine & İnşaat Mühendisliği",
+      "Hukuk Ders Kitapları",
+      "Tıp & Diş Hekimliği",
+      "Mimarlık & Güzel Sanatlar"
+    ],
+    "TEST_KITABI": [
+      "LGS Sınav Kitabı",
+      "TYT Genel Soru Bankası",
+      "AYT Sayısal Soru Bankası",
+      "AYT Sözel Soru Bankası",
+      "AYT Eşit Ağırlık Soru Bankası",
+      "KPSS Genel Yetenek Genel Kültür",
+      "KPSS Eğitim Bilimleri",
+      "KPSS ÖABT Öğretmenlik Alan",
+      "ALES Sınav Hazırlık",
+      "DGS Dikey Geçiş",
+      "YDS Yabancı Dil",
+      "YÖKDİL Hazırlık",
+      "IELTS Hazırlık",
+      "TOEFL Hazırlık",
+      "MSÜ Askeri Okullar",
+      "Ehliyet Sınavı Soruları",
+      "Branş Denemeleri",
+      "Genel Deneme Sınavı",
+      "Çıkmış Sorular"
+    ],
+    "OKUMA_KITABI": [
+      "Dünya Klasikleri",
+      "Türk Klasikleri",
+      "Modern Klasikler",
+      "Roman",
+      "Hikâye ve Öykü",
+      "Şiir Kitapları",
+      "Tiyatro ve Drama",
+      "Bilimkurgu",
+      "Fantastik Edebiyat",
+      "Polisiye & Macera",
+      "Korku & Gerilim",
+      "Tarihî Roman",
+      "Psikolojik Roman",
+      "Distopya Edebiyatı",
+      "Biyografi & Otobiyografi",
+      "Anı & Günlük",
+      "Deneme & Makale",
+      "Gezi ve Seyahat",
+      "Çizgi Roman",
+      "Manga",
+      "Mizah & Popüler Kültür"
+    ],
+    "DINI_KITAPLAR": [
+      "Kur'an-ı Kerim ve Tecvid",
+      "Tefsir ve Meal",
+      "Hadis Kitapları",
+      "Siyer-i Nebi (Peygamber Hayatı)",
+      "İslam İlmihali",
+      "Fıkıh ve Kelam",
+      "Tasavvuf ve Ahlak",
+      "Dua, Evrad ve Zikir",
+      "İslam Tarihi",
+      "İnanç ve İtikat"
+    ],
+    "COCUK_KITAPLARI": [
+      "Okul Öncesi Eğitici Setler",
+      "Masal ve Hikâyeler",
+      "İlk Okuma Kitapları",
+      "Macera ve Gençlik Kitapları",
+      "Çocuk Boyama Kitapları",
+      "Çocuk Etkinlik & Zeka Oyunları",
+      "Eğitici Bilim Çocuk Kitapları",
+      "Yapboz ve Hareketli Kitaplar"
+    ],
+    "AKADEMIK": [
+      "Bilimsel Araştırma ve İnceleme",
+      "Yüksek Lisans ve Doktora Tezleri",
+      "Akademik Makale Derlemeleri",
+      "Referans ve Kaynak Kitaplar",
+      "Akademik Sözlük ve Terimler",
+      "Ansiklopediler",
+      "Ders Notları ve Sunumlar"
+    ],
+    "SINAV_HAZIRLIK": [
+      "Konu Anlatımlı Kitaplar",
+      "Hız ve Renk Özetleri",
+      "Ders Özetleri & Formüller",
+      "Video Çözüm Destekli Notlar",
+      "Yaprak Testler"
+    ],
+    "KISISEL_GELISIM": [
+      "Motivasyon ve Başarı",
+      "Popüler Psikoloji",
+      "Meditasyon, Yoga & Mindfulness",
+      "Zaman Yönetimi ve Verimlilik",
+      "Etkili İletişim ve Beden Dili",
+      "Liderlik ve Hitabet",
+      "Kariyer ve Girişimcilik",
+      "Finansal Okuryazarlık",
+      "Alışkanlık Geliştirme"
+    ],
+    "IS_VE_EKONOMI": [
+      "Girişimcilik ve Startups",
+      "İş Yönetimi, Liderlik & CEO",
+      "Pazarlama, Satış ve Reklam",
+      "E-Ticaret & Dijital Pazarlama",
+      "Finans, Yatırım & Makroekonomi",
+      "Borsa, Kripto Para & Hisse",
+      "Muhasebe ve Denetim"
+    ],
+    "BILIM_VE_TEKNOLOJI": [
+      "Yapay Zeka & Makine Öğrenimi",
+      "Programlama Dilleri (Python, Java)",
+      "Siber Güvenlik ve Ağ Yönetimi",
+      "Uzay, Astronomi & Kozmoloji",
+      "Popüler Fizik ve Kuantum",
+      "Biyoteknoloji ve Genetik",
+      "Popüler Bilim Kitapları"
+    ]
+  },
+  "languages": [
+    "Türkçe",
+    "İngilizce",
+    "Almanca",
+    "Fransızca",
+    "İspanyolca",
+    "Arapça",
+    "Rusça",
+    "İtalyanca",
+    "Japonca",
+    "Korece",
+    "Çince",
+    "Farsça",
+    "Other"
+  ],
+  "formats": [
+    "Hardcover",
+    "Paperback",
+    "Ebook",
+    "Spiral",
+    "Large Print",
+    "Pocket Book",
+    "Audio Book"
+  ],
+  "conditions": [
+    "New",
+    "Like New",
+    "Good",
+    "Fair",
+    "Poor"
+  ]
+}

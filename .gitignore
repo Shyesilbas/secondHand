@@ -46,3 +46,6 @@ secondhand_dump.sql
 *.dump
 *.sql.gz
 
+# Katalog seed verileri — repoya gitmez, lokal tutulur.
+# Yol: src/main/resources/data/
+src/main/resources/data/

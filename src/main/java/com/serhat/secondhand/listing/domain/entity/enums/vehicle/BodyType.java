@@ -12,6 +12,7 @@ public enum BodyType {
     WAGON("Wagon"),
     PICKUP("Pickup"),
     VAN("Van"),
+    MPV("MPV"),
     OTHER("Other");
 
     private final String label;

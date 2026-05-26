@@ -1,9 +1,12 @@
 package com.serhat.secondhand.listing.application.electronics;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedTask;
+import com.serhat.secondhand.listing.application.electronics.dto.ElectronicBrandCatalogDto;
+import com.serhat.secondhand.listing.application.electronics.dto.ElectronicBrandTypeFileDto;
+import com.serhat.secondhand.listing.application.electronics.dto.ElectronicSeedModelDto;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
@@ -15,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
@@ -22,7 +26,7 @@ import java.util.Optional;
 
 /**
  * Seeds electronics reference data (brands, types, models) from
- * {@code classpath:seed/electronics.json}.
+ * brand-specific and type-aware directory structure.
  *
  * <p>Uses an <b>upsert</b> strategy: existing rows are left untouched,
  * missing rows are created.
@@ -32,7 +36,8 @@ import java.util.Optional;
 @Slf4j
 public class ElectronicDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/electronics.json";
+    private static final String BASE_PATH = "data/electronics/";
+    private static final String BRANDS_INDEX = BASE_PATH + "brands.json";
 
     private final ElectronicBrandRepository brandRepository;
     private final ElectronicTypeRepository typeRepository;
@@ -47,35 +52,65 @@ public class ElectronicDataInitializer implements SeedTask {
     @Override
     public Result<Void> run() {
         try {
-            JsonNode root = loadCatalog();
-            seedBrands(root.get("brands"));
-            seedTypes(root.get("types"));
-            seedModels(root.get("models"));
-            backfillNullModelTypes();
+            log.info("Loading electronics catalog from {}", BRANDS_INDEX);
+            List<ElectronicBrandCatalogDto> brandCatalogs = loadBrandsIndex();
+
+            for (ElectronicBrandCatalogDto brandCatalog : brandCatalogs) {
+                if (brandCatalog.getBrand() == null || brandCatalog.getBrand().isBlank()) {
+                    continue;
+                }
+                upsertBrand(brandCatalog.getBrand(), brandCatalog.getDisplayName());
+
+                if (brandCatalog.getSupportedTypes() != null) {
+                    for (ElectronicBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
+                        if (typeFile.getType() == null || typeFile.getType().isBlank()) {
+                            continue;
+                        }
+                        upsertType(typeFile.getType(), formatTypeLabel(typeFile.getType()));
+
+                        String relativePath = typeFile.getDataFile();
+                        String fullPath = BASE_PATH + relativePath;
+                        log.info("Loading electronics brand type file: {}", fullPath);
+
+                        List<ElectronicSeedModelDto> models = loadBrandModelsFile(fullPath);
+                        for (ElectronicSeedModelDto modelDto : models) {
+                            ensureModel(brandCatalog.getBrand(), typeFile.getType(), modelDto.getName());
+                        }
+                    }
+                }
+            }
+
             log.info("Electronics seed completed successfully");
             return Result.success();
         } catch (Exception e) {
-            log.error("Electronics seed failed", e);
+            log.error("Electronics seed failed critically", e);
             return Result.error("Electronics seed failed: " + e.getMessage(), "SEED_FAILED");
         }
     }
 
     // ── JSON Loading ────────────────────────────────────────────────────
 
-    private JsonNode loadCatalog() throws Exception {
-        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
-            return objectMapper.readTree(is);
+    private List<ElectronicBrandCatalogDto> loadBrandsIndex() throws Exception {
+        ClassPathResource resource = new ClassPathResource(BRANDS_INDEX);
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Brands index file not found under: " + BRANDS_INDEX);
+        }
+        try (InputStream is = resource.getInputStream()) {
+            return objectMapper.readValue(is, new TypeReference<List<ElectronicBrandCatalogDto>>() {});
+        }
+    }
+
+    private List<ElectronicSeedModelDto> loadBrandModelsFile(String fullPath) throws Exception {
+        ClassPathResource resource = new ClassPathResource(fullPath);
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Electronic data file not found under: " + fullPath);
+        }
+        try (InputStream is = resource.getInputStream()) {
+            return objectMapper.readValue(is, new TypeReference<List<ElectronicSeedModelDto>>() {});
         }
     }
 
     // ── Brand Seeding ───────────────────────────────────────────────────
-
-    private void seedBrands(JsonNode brandsNode) {
-        if (brandsNode == null || !brandsNode.isArray()) return;
-        for (JsonNode node : brandsNode) {
-            upsertBrand(node.get("key").asText(), node.get("label").asText());
-        }
-    }
 
     private void upsertBrand(String key, String label) {
         Optional<ElectronicBrand> existing = brandRepository.findByNameIgnoreCase(key);
@@ -88,19 +123,12 @@ public class ElectronicDataInitializer implements SeedTask {
             return;
         }
         ElectronicBrand brand = new ElectronicBrand();
-        brand.setName(key);
+        brand.setName(key.toUpperCase(Locale.ROOT));
         brand.setLabel(label);
         brandRepository.save(brand);
     }
 
     // ── Type Seeding ────────────────────────────────────────────────────
-
-    private void seedTypes(JsonNode typesNode) {
-        if (typesNode == null || !typesNode.isArray()) return;
-        for (JsonNode node : typesNode) {
-            upsertType(node.get("key").asText(), node.get("label").asText());
-        }
-    }
 
     private void upsertType(String key, String label) {
         Optional<ElectronicType> existing = typeRepository.findByNameIgnoreCase(key);
@@ -113,32 +141,19 @@ public class ElectronicDataInitializer implements SeedTask {
             return;
         }
         ElectronicType type = new ElectronicType();
-        type.setName(key);
+        type.setName(key.toUpperCase(Locale.ROOT));
         type.setLabel(label);
         typeRepository.save(type);
     }
 
     // ── Model Seeding ───────────────────────────────────────────────────
 
-    private void seedModels(JsonNode modelsNode) {
-        if (modelsNode == null || !modelsNode.isArray()) return;
-        for (JsonNode entry : modelsNode) {
-            String brandKey = entry.get("brand").asText();
-            String typeKey = entry.get("type").asText();
-            JsonNode names = entry.get("names");
+    private void ensureModel(String brandKey, String typeKey, String modelName) {
+        if (brandKey == null || typeKey == null || modelName == null || modelName.isBlank()) return;
 
-            ElectronicBrand brand = getBrand(brandKey);
-            ElectronicType type = getType(typeKey);
-            if (brand == null || type == null || names == null) continue;
-
-            for (JsonNode nameNode : names) {
-                ensureModel(brand, type, nameNode.asText());
-            }
-        }
-    }
-
-    private void ensureModel(ElectronicBrand brand, ElectronicType type, String modelName) {
-        if (brand == null || type == null || modelName == null || modelName.isBlank()) return;
+        ElectronicBrand brand = getBrand(brandKey);
+        ElectronicType type = getType(typeKey);
+        if (brand == null || type == null) return;
 
         if (modelRepository.findByBrand_IdAndType_IdAndNameIgnoreCase(
                 brand.getId(), type.getId(), modelName).isEmpty()) {
@@ -147,52 +162,6 @@ public class ElectronicDataInitializer implements SeedTask {
             created.setType(type);
             created.setName(modelName);
             modelRepository.save(created);
-        }
-
-        // Backfill type for existing models that have null type
-        List<ElectronicModel> existingModels = modelRepository.findAllByBrand_IdAndNameIgnoreCase(
-                brand.getId(), modelName);
-        for (ElectronicModel m : existingModels) {
-            if (m.getType() == null) {
-                m.setType(type);
-                modelRepository.save(m);
-            }
-        }
-    }
-
-    // ── Backfill ────────────────────────────────────────────────────────
-
-    private void backfillNullModelTypes() {
-        ElectronicType mobilePhone = getType("MOBILE_PHONE");
-        ElectronicType laptop = getType("LAPTOP");
-        ElectronicType tablet = getType("TABLET");
-        ElectronicType gameConsole = getType("GAME_CONSOLE");
-        ElectronicType headphones = getType("HEADPHONES");
-        ElectronicType other = getType("OTHER");
-
-        List<ElectronicModel> nullTypedModels = modelRepository.findByTypeIsNull();
-        for (ElectronicModel m : nullTypedModels) {
-            String name = m.getName();
-            if (name == null) {
-                if (other != null) {
-                    m.setType(other);
-                    modelRepository.save(m);
-                }
-                continue;
-            }
-            String n = name.trim().toLowerCase(Locale.ROOT);
-            ElectronicType inferred =
-                    (mobilePhone != null && (n.startsWith("iphone") || n.startsWith("pixel") || n.contains("galaxy s") || n.contains("redmi") || n.contains("poco") || n.startsWith("xiaomi "))) ? mobilePhone :
-                    (laptop != null && (n.startsWith("macbook") || n.contains("galaxy book") || n.contains("matebook") || n.contains("thinkpad") || n.contains("ideapad") || n.contains("inspiron") || n.contains("xps") || n.contains("pavilion") || n.contains("spectre") || n.contains("zenbook") || n.contains("vivobook") || n.contains("legion") || n.contains("rog") || n.contains("tuf"))) ? laptop :
-                    (tablet != null && (n.startsWith("ipad") || n.contains("tab ") || n.contains("matepad") || n.contains("pad "))) ? tablet :
-                    (gameConsole != null && (n.startsWith("playstation") || n.startsWith("xbox") || n.contains("nintendo"))) ? gameConsole :
-                    (headphones != null && (n.contains("airpods") || n.contains("buds") || n.startsWith("wh-") || n.startsWith("wf-") || n.contains("freebuds"))) ? headphones :
-                    other;
-
-            if (inferred != null) {
-                m.setType(inferred);
-                modelRepository.save(m);
-            }
         }
     }
 
@@ -204,5 +173,22 @@ public class ElectronicDataInitializer implements SeedTask {
 
     private ElectronicType getType(String name) {
         return name == null ? null : typeRepository.findByNameIgnoreCase(name).orElse(null);
+    }
+
+    private String formatTypeLabel(String key) {
+        if (key == null) return "";
+        if (key.equalsIgnoreCase("DESKTOP")) return "Masaüstü Bilgisayar";
+        if (key.equalsIgnoreCase("TV")) return "TV";
+        if (key.equalsIgnoreCase("TV_STB")) return "TV STB";
+        String[] parts = key.toLowerCase(Locale.ROOT).split("_");
+        StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            if (!part.isEmpty()) {
+                sb.append(Character.toUpperCase(part.charAt(0)))
+                  .append(part.substring(1))
+                  .append(" ");
+            }
+        }
+        return sb.toString().trim();
     }
 }

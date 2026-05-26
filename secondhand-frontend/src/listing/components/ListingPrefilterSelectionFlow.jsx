@@ -78,6 +78,7 @@ const gridItemVariants = {
 const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) => {
   const {enums} = useEnums();
   const completedRef = useRef(false);
+  const autoAdvanceTimeoutRef = useRef(null);
   const flowUiVariant = mode === 'create' ? PREFLOW_WIZARD_VARIANT.SELL : PREFLOW_WIZARD_VARIANT.BROWSE;
   const auxUi = useMemo(() => getAuxiliaryUi(flowUiVariant), [flowUiVariant]);
   const flowCopy = useMemo(() => WIZARD_COPY[mode] || WIZARD_COPY.browse, [mode]);
@@ -93,7 +94,22 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
 
   useEffect(() => {
     setGridOptionFilter('');
+
+    // Clear any pending auto-advance when step changes manually or otherwise
+    return () => {
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current);
+      }
+    };
   }, [selectionStep]);
+
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const listingTypeOptions = useMemo(() => getListingTypeOptions(), []);
 
@@ -155,7 +171,17 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
               ...s,
               title: s.title || s.label || 'Selection',
             }));
-      setSelectionStep(steps.length ? 2 : 1);
+
+      // Auto-advance to step 2 after a brief delay to show category selection
+      if (steps.length > 0) {
+        if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
+        autoAdvanceTimeoutRef.current = setTimeout(() => {
+          setSelectionStep(2);
+        }, 350);
+      } else {
+        setSelectionStep(1);
+      }
+
       window.scrollTo({top: 0, behavior: 'smooth'});
     },
     [mode],
@@ -200,6 +226,7 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
     const maxStep = selectionSteps.length;
     if (selectionStep < maxStep) {
       setSelectionStep((s) => Math.min(s + 1, maxStep));
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
   }, [selectedType, selectionStep, selectionSteps.length]);
 
@@ -393,7 +420,14 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
                     whileHover={{ y: -1, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
                     whileTap={{ scale: 0.98 }}
                     type="button"
-                    onClick={() => setSelectionValue(valueKey, id, selectorIndex)}
+                    onClick={() => {
+                      setSelectionValue(valueKey, id, selectorIndex);
+                      // Auto-advance logic
+                      if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
+                      autoAdvanceTimeoutRef.current = setTimeout(() => {
+                        onSelectionNext();
+                      }, 350);
+                    }}
                     className={getGridOptionClasses(flowUiVariant, isSelected)}
                   >
                     <span className={getGridOptionLabelClass(flowUiVariant, isSelected)}>{label}</span>
@@ -440,6 +474,14 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
               onSelectionChange={(vals) => {
                 const nextValue = Array.isArray(vals) ? (vals[0] ?? null) : null;
                 setSelectionValue(valueKey, nextValue, selectorIndex);
+
+                // Auto-advance logic for dropdown
+                if (nextValue !== null) {
+                  if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
+                  autoAdvanceTimeoutRef.current = setTimeout(() => {
+                    onSelectionNext();
+                  }, 400); // Slightly longer for dropdown to ensure selection is registered
+                }
               }}
               label={selector.title || 'Select'}
               placeholder={isEnabled ? 'Select…' : 'Complete previous steps first'}

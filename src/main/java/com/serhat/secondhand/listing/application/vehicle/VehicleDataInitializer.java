@@ -1,9 +1,10 @@
 package com.serhat.secondhand.listing.application.vehicle;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.SeedTask;
+import com.serhat.secondhand.listing.application.vehicle.dto.*;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.listing.domain.repository.vehicle.*;
 import lombok.RequiredArgsConstructor;
@@ -13,24 +14,17 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Seeds vehicle reference data from {@code classpath:seed/vehicle.json}.
- *
- * <p>Replaces the legacy flat model catalog with brand → type → model → generation → engine/trim.
- * Stale rows not present in the JSON file are removed on each run.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class VehicleDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/vehicle.json";
+    private static final String VEHICLES_BASE_PATH = "data/vehicles/";
+    private static final String BRANDS_METADATA_PATH = VEHICLES_BASE_PATH + "brands.json";
 
     private final CarBrandRepository brandRepository;
     private final VehicleTypeRepository typeRepository;
@@ -51,49 +45,197 @@ public class VehicleDataInitializer implements SeedTask {
     @Transactional
     public Result<Void> run() {
         try {
-            // Stale Redis entries may hold Hibernate proxies — clear before any @Cacheable lookup
             evictVehicleCaches();
 
-            JsonNode root = loadCatalog();
-            Set<String> catalogBrandKeys = collectKeys(root.get("brands"));
-            Set<String> catalogTypeKeys = collectKeys(root.get("types"));
+            log.info("Loading vehicle catalog metadata from {}", BRANDS_METADATA_PATH);
+            List<VehicleBrandCatalogDto> brandCatalogs = loadBrandsMetadata();
+            
+            Set<String> catalogBrandKeys = new HashSet<>();
+            Set<String> catalogTypeKeys = new HashSet<>();
+            
+            for (VehicleBrandCatalogDto brandCatalog : brandCatalogs) {
+                if (brandCatalog.getBrand() == null || brandCatalog.getBrand().isBlank()) {
+                    throw new IllegalStateException("Brand code cannot be null or empty in brands.json");
+                }
+                catalogBrandKeys.add(normalizeKey(brandCatalog.getBrand()));
+                
+                if (brandCatalog.getSupportedTypes() != null) {
+                    for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
+                        if (typeFile.getType() == null || typeFile.getType().isBlank()) {
+                            throw new IllegalStateException("Vehicle type cannot be null or empty in brands.json for brand: " + brandCatalog.getBrand());
+                        }
+                        catalogTypeKeys.add(normalizeKey(typeFile.getType()));
+                    }
+                }
+            }
 
+            log.info("Purging existing vehicle hierarchy references...");
             purgeVehicleHierarchy();
             pruneStaleBrands(catalogBrandKeys);
             pruneStaleTypes(catalogTypeKeys);
 
-            seedBrands(root.get("brands"));
-            seedTypes(root.get("types"));
-            int modelCount = seedModels(root.get("models"));
+            log.info("Seeding brand labels and types...");
+            for (VehicleBrandCatalogDto brandCatalog : brandCatalogs) {
+                upsertBrand(brandCatalog.getBrand(), brandCatalog.getDisplayName());
+                if (brandCatalog.getSupportedTypes() != null) {
+                    for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
+                        upsertType(typeFile.getType(), typeFile.getType());
+                    }
+                }
+            }
+
+            int dataFilesRead = 0;
+            int totalModelsSeeded = 0;
+
+            for (VehicleBrandCatalogDto brandCatalog : brandCatalogs) {
+                if (brandCatalog.getSupportedTypes() == null) {
+                    continue;
+                }
+                for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
+                    String relativePath = typeFile.getDataFile();
+                    String fullPath = VEHICLES_BASE_PATH + relativePath;
+                    
+                    log.info("Loading brand data file: {}", fullPath);
+                    List<VehicleSeedModelDto> models = loadBrandModelsFile(fullPath);
+                    dataFilesRead++;
+                    
+                    int seededForFile = 0;
+                    for (VehicleSeedModelDto modelDto : models) {
+                        validateAndSeedModel(brandCatalog.getBrand(), typeFile.getType(), modelDto, fullPath);
+                        seededForFile++;
+                    }
+                    totalModelsSeeded += seededForFile;
+                    log.info("Seeded {} models from brand file: {}", seededForFile, fullPath);
+                }
+            }
 
             evictVehicleCaches();
             log.info(
-                    "Vehicle seed completed: {} brands, {} types, {} models (catalog)",
-                    catalogBrandKeys.size(),
-                    catalogTypeKeys.size(),
-                    modelCount);
+                    "Vehicle seed successfully completed: {} brands cataloged, {} data files read, {} total models seeded",
+                    brandCatalogs.size(),
+                    dataFilesRead,
+                    totalModelsSeeded);
+            
             return Result.success();
         } catch (Exception e) {
-            log.error("Vehicle seed failed", e);
-            return Result.error("Vehicle seed failed: " + e.getMessage(), "SEED_FAILED");
+            log.error("Vehicle catalog seeding failed critically. Failing application startup.", e);
+            throw new IllegalStateException("Vehicle catalog seed critical failure", e);
         }
     }
 
-    private JsonNode loadCatalog() throws Exception {
-        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
-            return objectMapper.readTree(is);
+    private List<VehicleBrandCatalogDto> loadBrandsMetadata() throws Exception {
+        ClassPathResource resource = new ClassPathResource(BRANDS_METADATA_PATH);
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Brands metadata index file was not found under: " + BRANDS_METADATA_PATH);
+        }
+        try (InputStream is = resource.getInputStream()) {
+            return objectMapper.readValue(is, new TypeReference<List<VehicleBrandCatalogDto>>() {});
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to parse catalog metadata index " + BRANDS_METADATA_PATH, e);
         }
     }
 
-    private Set<String> collectKeys(JsonNode arrayNode) {
-        Set<String> keys = new HashSet<>();
-        if (arrayNode == null || !arrayNode.isArray()) {
-            return keys;
+    private List<VehicleSeedModelDto> loadBrandModelsFile(String fullPath) throws Exception {
+        ClassPathResource resource = new ClassPathResource(fullPath);
+        if (!resource.exists()) {
+            throw new FileNotFoundException("Brand-specific catalog data file was not found under: " + fullPath);
         }
-        for (JsonNode node : arrayNode) {
-            keys.add(normalizeKey(node.get("key").asText()));
+        try (InputStream is = resource.getInputStream()) {
+            return objectMapper.readValue(is, new TypeReference<List<VehicleSeedModelDto>>() {});
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to parse brand-specific catalog array " + fullPath, e);
         }
-        return keys;
+    }
+
+    private void validateAndSeedModel(String parentBrand, String parentType, VehicleSeedModelDto modelDto, String sourceFile) {
+        if (modelDto.getBrand() == null || !modelDto.getBrand().equalsIgnoreCase(parentBrand)) {
+            throw new IllegalArgumentException(String.format(
+                    "Inconsistent brand code in %s: Expected %s but found %s",
+                    sourceFile, parentBrand, modelDto.getBrand()));
+        }
+        if (modelDto.getType() == null || !modelDto.getType().equalsIgnoreCase(parentType)) {
+            throw new IllegalArgumentException(String.format(
+                    "Inconsistent vehicle type in %s: Expected %s but found %s",
+                    sourceFile, parentType, modelDto.getType()));
+        }
+        if (modelDto.getName() == null || modelDto.getName().isBlank()) {
+            throw new IllegalArgumentException("Model name is missing in file: " + sourceFile);
+        }
+
+        String brandKey = normalizeKey(modelDto.getBrand());
+        String typeKey = normalizeKey(modelDto.getType());
+        CarBrand brand = brandRepository.findByNameIgnoreCase(brandKey)
+                .orElseThrow(() -> new IllegalStateException("Brand not found in database: " + brandKey));
+        VehicleType type = typeRepository.findByNameIgnoreCase(typeKey)
+                .orElseThrow(() -> new IllegalStateException("Vehicle type not found in database: " + typeKey));
+
+        VehicleModel model = new VehicleModel();
+        model.setBrand(brand);
+        model.setType(type);
+        model.setName(modelDto.getName());
+
+        if (modelDto.getSupportedBodyTypes() != null) {
+            for (String btStr : modelDto.getSupportedBodyTypes()) {
+                try {
+                    model.getSupportedBodyTypes().add(BodyType.valueOf(btStr.toUpperCase(Locale.ROOT)));
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(String.format(
+                            "Invalid body type '%s' in file: %s", btStr, sourceFile), e);
+                }
+            }
+        }
+        
+        model = modelRepository.save(model);
+
+        if (modelDto.getGenerations() != null) {
+            for (VehicleGenerationDto genDto : modelDto.getGenerations()) {
+                if (genDto.getName() == null || genDto.getName().isBlank()) {
+                    throw new IllegalArgumentException("Generation name cannot be null or empty under model: " + modelDto.getName());
+                }
+                
+                VehicleGeneration generation = new VehicleGeneration();
+                generation.setName(genDto.getName());
+                generation.setModel(model);
+                generation = generationRepository.save(generation);
+
+                if (genDto.getEngines() != null) {
+                    for (VehicleEngineDto engDto : genDto.getEngines()) {
+                        if (engDto.getName() == null || engDto.getName().isBlank()) {
+                            throw new IllegalArgumentException("Engine name cannot be empty under generation: " + genDto.getName());
+                        }
+                        
+                        VehicleEngine engine = new VehicleEngine();
+                        engine.setName(engDto.getName());
+                        engine.setGeneration(generation);
+                        
+                        if (engDto.getFuelType() == null || engDto.getFuelType().isBlank()) {
+                            throw new IllegalArgumentException("Fuel type cannot be empty under engine: " + engDto.getName());
+                        }
+                        
+                        try {
+                            engine.setFuelType(FuelType.valueOf(engDto.getFuelType().toUpperCase(Locale.ROOT)));
+                        } catch (Exception e) {
+                            throw new IllegalArgumentException(String.format(
+                                    "Invalid fuel type '%s' for engine '%s' in file %s",
+                                    engDto.getFuelType(), engDto.getName(), sourceFile), e);
+                        }
+                        engineRepository.save(engine);
+                    }
+                }
+
+                if (genDto.getTrims() != null) {
+                    for (String trimName : genDto.getTrims()) {
+                        if (trimName == null || trimName.isBlank()) {
+                            continue;
+                        }
+                        VehicleTrim trim = new VehicleTrim();
+                        trim.setName(trimName);
+                        trim.setGeneration(generation);
+                        trimRepository.save(trim);
+                    }
+                }
+            }
+        }
     }
 
     private void purgeVehicleHierarchy() {
@@ -105,7 +247,6 @@ public class VehicleDataInitializer implements SeedTask {
         engineRepository.deleteAll();
         generationRepository.deleteAll();
         modelRepository.deleteAll();
-        log.info("Cleared vehicle models, generations, engines and trims");
     }
 
     private void pruneStaleBrands(Set<String> catalogBrandKeys) {
@@ -126,15 +267,6 @@ public class VehicleDataInitializer implements SeedTask {
                 });
     }
 
-    private void seedBrands(JsonNode brandsNode) {
-        if (brandsNode == null || !brandsNode.isArray()) {
-            return;
-        }
-        for (JsonNode node : brandsNode) {
-            upsertBrand(node.get("key").asText(), node.get("label").asText());
-        }
-    }
-
     private void upsertBrand(String key, String label) {
         String normalizedKey = normalizeKey(key);
         CarBrand brand = brandRepository.findByNameIgnoreCase(normalizedKey)
@@ -147,15 +279,6 @@ public class VehicleDataInitializer implements SeedTask {
         brandRepository.save(brand);
     }
 
-    private void seedTypes(JsonNode typesNode) {
-        if (typesNode == null || !typesNode.isArray()) {
-            return;
-        }
-        for (JsonNode node : typesNode) {
-            upsertType(node.get("key").asText(), node.get("label").asText());
-        }
-    }
-
     private void upsertType(String key, String label) {
         String normalizedKey = normalizeKey(key);
         VehicleType type = typeRepository.findByNameIgnoreCase(normalizedKey)
@@ -166,87 +289,6 @@ public class VehicleDataInitializer implements SeedTask {
                 });
         type.setLabel(label);
         typeRepository.save(type);
-    }
-
-    private int seedModels(JsonNode modelsNode) {
-        if (modelsNode == null || !modelsNode.isArray()) {
-            return 0;
-        }
-        int count = 0;
-        for (JsonNode entry : modelsNode) {
-            if (seedModel(entry)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private boolean seedModel(JsonNode entry) {
-        String brandKey = normalizeKey(entry.get("brand").asText());
-        String typeKey = normalizeKey(entry.get("type").asText());
-        String name = entry.get("name").asText();
-
-        CarBrand brand = brandRepository.findByNameIgnoreCase(brandKey).orElse(null);
-        VehicleType type = typeRepository.findByNameIgnoreCase(typeKey).orElse(null);
-        if (brand == null || type == null || name == null || name.isBlank()) {
-            log.warn("Skipping model seed — missing brand={}, type={}, name={}", brandKey, typeKey, name);
-            return false;
-        }
-
-        VehicleModel model = new VehicleModel();
-        model.setBrand(brand);
-        model.setType(type);
-        model.setName(name);
-
-        if (entry.has("supportedBodyTypes") && entry.get("supportedBodyTypes").isArray()) {
-            for (JsonNode btNode : entry.get("supportedBodyTypes")) {
-                try {
-                    model.getSupportedBodyTypes().add(BodyType.valueOf(btNode.asText().toUpperCase(Locale.ROOT)));
-                } catch (Exception e) {
-                    log.warn("Invalid BodyType in seed: {}", btNode.asText());
-                }
-            }
-        }
-        model = modelRepository.save(model);
-
-        if (entry.has("generations") && entry.get("generations").isArray()) {
-            for (JsonNode genNode : entry.get("generations")) {
-                seedGeneration(genNode, model);
-            }
-        }
-        return true;
-    }
-
-    private void seedGeneration(JsonNode genNode, VehicleModel model) {
-        String genName = genNode.get("name").asText();
-        VehicleGeneration generation = new VehicleGeneration();
-        generation.setName(genName);
-        generation.setModel(model);
-        generation = generationRepository.save(generation);
-
-        if (genNode.has("engines") && genNode.get("engines").isArray()) {
-            for (JsonNode engNode : genNode.get("engines")) {
-                VehicleEngine engine = new VehicleEngine();
-                engine.setName(engNode.get("name").asText());
-                engine.setGeneration(generation);
-                String fuelTypeStr = engNode.get("fuelType").asText();
-                try {
-                    engine.setFuelType(FuelType.valueOf(fuelTypeStr.toUpperCase(Locale.ROOT)));
-                } catch (Exception e) {
-                    log.warn("Invalid FuelType in seed: {}", fuelTypeStr);
-                }
-                engineRepository.save(engine);
-            }
-        }
-
-        if (genNode.has("trims") && genNode.get("trims").isArray()) {
-            for (JsonNode trimNode : genNode.get("trims")) {
-                VehicleTrim trim = new VehicleTrim();
-                trim.setName(trimNode.asText());
-                trim.setGeneration(generation);
-                trimRepository.save(trim);
-            }
-        }
     }
 
     private void evictVehicleCaches() {

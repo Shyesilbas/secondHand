@@ -1,0 +1,352 @@
+{
+  "disciplines": [
+    {
+      "key": "FOOTBALL",
+      "label": "Football"
+    },
+    {
+      "key": "BASKETBALL",
+      "label": "Basketball"
+    },
+    {
+      "key": "TENNIS",
+      "label": "Tennis"
+    },
+    {
+      "key": "VOLLEYBALL",
+      "label": "Volleyball"
+    },
+    {
+      "key": "RUNNING",
+      "label": "Running"
+    },
+    {
+      "key": "WALKING",
+      "label": "Walking"
+    },
+    {
+      "key": "CYCLING",
+      "label": "Cycling"
+    },
+    {
+      "key": "FITNESS",
+      "label": "Fitness / Gym"
+    },
+    {
+      "key": "SWIMMING",
+      "label": "Swimming"
+    },
+    {
+      "key": "BOXING",
+      "label": "Boxing"
+    },
+    {
+      "key": "MARTIAL_ARTS",
+      "label": "Martial Arts"
+    },
+    {
+      "key": "HIKING",
+      "label": "Hiking"
+    },
+    {
+      "key": "TREKKING",
+      "label": "Trekking"
+    },
+    {
+      "key": "SKIING",
+      "label": "Skiing"
+    },
+    {
+      "key": "SNOWBOARD",
+      "label": "Snowboard"
+    },
+    {
+      "key": "YOGA",
+      "label": "Yoga"
+    },
+    {
+      "key": "PILATES",
+      "label": "Pilates"
+    },
+    {
+      "key": "TABLE_TENNIS",
+      "label": "Table Tennis"
+    },
+    {
+      "key": "BADMINTON",
+      "label": "Badminton"
+    },
+    {
+      "key": "GOLF",
+      "label": "Golf"
+    },
+    {
+      "key": "CLIMBING",
+      "label": "Climbing"
+    },
+    {
+      "key": "SURFING",
+      "label": "Surfing"
+    },
+    {
+      "key": "SKATEBOARD",
+      "label": "Skateboard"
+    },
+    {
+      "key": "ROLLER_BLADES",
+      "label": "Roller Blades"
+    },
+    {
+      "key": "FISHING",
+      "label": "Fishing"
+    },
+    {
+      "key": "CAMPING",
+      "label": "Camping"
+    },
+    {
+      "key": "ARCHERY",
+      "label": "Archery"
+    },
+    {
+      "key": "DART",
+      "label": "Dart"
+    },
+    {
+      "key": "OTHER",
+      "label": "Other"
+    }
+  ],
+  "equipmentTypes": [
+    {
+      "key": "FOOTBALL_BALL",
+      "label": "Match Ball"
+    },
+    {
+      "key": "FOOTBALL_CLEATS",
+      "label": "Cleats / Boots"
+    },
+    {
+      "key": "FOOTBALL_SHINGUARD",
+      "label": "Shin Guards"
+    },
+    {
+      "key": "FOOTBALL_GLOVES",
+      "label": "Goalkeeper Gloves"
+    },
+    {
+      "key": "FOOTBALL_JERSEY",
+      "label": "Training Jersey"
+    },
+    {
+      "key": "BASKETBALL_BALL",
+      "label": "Indoor/Outdoor Ball"
+    },
+    {
+      "key": "BASKETBALL_HOOP",
+      "label": "Portable Hoop System"
+    },
+    {
+      "key": "BASKETBALL_SHOES",
+      "label": "Performance Shoes"
+    },
+    {
+      "key": "VOLLEYBALL_BALL",
+      "label": "Match Ball"
+    },
+    {
+      "key": "VOLLEYBALL_KNEEPADS",
+      "label": "Protective Knee Pads"
+    },
+    {
+      "key": "VOLLEYBALL_NET",
+      "label": "Professional Net"
+    },
+    {
+      "key": "TENNIS_RACKET",
+      "label": "Graphite Racket"
+    },
+    {
+      "key": "TENNIS_BALL",
+      "label": "Balls (3-Pack)"
+    },
+    {
+      "key": "TENNIS_NET",
+      "label": "Portable Net"
+    },
+    {
+      "key": "TABLE_TENNIS_RACKET",
+      "label": "Racket Set"
+    },
+    {
+      "key": "TABLE_TENNIS_TABLE",
+      "label": "Foldable Table"
+    },
+    {
+      "key": "TABLE_TENNIS_BALL",
+      "label": "Balls (6-Pack)"
+    },
+    {
+      "key": "FITNESS_DUMBBELL",
+      "label": "Hex Dumbbell Set"
+    },
+    {
+      "key": "FITNESS_BARBELL",
+      "label": "Olympic Barbell"
+    },
+    {
+      "key": "FITNESS_PLATES",
+      "label": "Bumper Weight Plates"
+    },
+    {
+      "key": "FITNESS_KETTLEBELL",
+      "label": "Cast Iron Kettlebell"
+    },
+    {
+      "key": "FITNESS_BANDS",
+      "label": "Resistance Bands Loop"
+    },
+    {
+      "key": "FITNESS_TREADMILL",
+      "label": "Folding Automatic Treadmill"
+    },
+    {
+      "key": "FITNESS_BIKE",
+      "label": "Magnetic Exercise Bike"
+    },
+    {
+      "key": "FITNESS_BENCH",
+      "label": "Adjustable Weight Bench"
+    },
+    {
+      "key": "YOGA_MAT",
+      "label": "Non-Slip TPE Mat"
+    },
+    {
+      "key": "YOGA_BLOCK",
+      "label": "Foam Block & Strap Set"
+    },
+    {
+      "key": "PILATES_BALL",
+      "label": "Anti-Burst Exercise Ball"
+    },
+    {
+      "key": "PILATES_RING",
+      "label": "Dual Grip Resistance Ring"
+    },
+    {
+      "key": "CAMPING_TENT",
+      "label": "Waterproof Family Tent"
+    },
+    {
+      "key": "CAMPING_SLEEPING_BAG",
+      "label": "3-Season Sleeping Bag"
+    },
+    {
+      "key": "CAMPING_BACKPACK",
+      "label": "65L Outdoor Backpack"
+    },
+    {
+      "key": "CAMPING_CHAIR",
+      "label": "Foldable Picnic Chair"
+    },
+    {
+      "key": "CAMPING_STOVE",
+      "label": "Portable Gas Stove"
+    },
+    {
+      "key": "CAMPING_THERMOS",
+      "label": "Stainless Steel Thermos"
+    },
+    {
+      "key": "HIKING_POLES",
+      "label": "Anti-Shock Trekking Poles"
+    },
+    {
+      "key": "HIKING_BACKPACK",
+      "label": "30L Waterproof Daypack"
+    },
+    {
+      "key": "SKIING_SKIS",
+      "label": "Carving Skis"
+    },
+    {
+      "key": "SKIING_BOOTS",
+      "label": "All-Mountain Ski Boots"
+    },
+    {
+      "key": "SKIING_HELMET",
+      "label": "MIPS Helmet & Goggles"
+    },
+    {
+      "key": "SNOWBOARD_BOARD",
+      "label": "Freestyle Board"
+    },
+    {
+      "key": "SNOWBOARD_BOOTS",
+      "label": "Quick-Lace Boots"
+    },
+    {
+      "key": "FISHING_ROD",
+      "label": "Telescopic Carbon Rod"
+    },
+    {
+      "key": "FISHING_REEL",
+      "label": "Spinning Reel"
+    },
+    {
+      "key": "FISHING_TACKLE",
+      "label": "Tackle Box & Lure Set"
+    },
+    {
+      "key": "SKATEBOARD_BOARD",
+      "label": "Double Kick Board"
+    },
+    {
+      "key": "ROLLER_BLADES_SHOES",
+      "label": "Inline Rollerblades"
+    },
+    {
+      "key": "ARCHERY_BOW",
+      "label": "Recurve Bow"
+    },
+    {
+      "key": "ARCHERY_ARROWS",
+      "label": "Carbon Arrows (6-Pack)"
+    },
+    {
+      "key": "DART_BOARD",
+      "label": "Electronic Dartboard"
+    },
+    {
+      "key": "DART_DARTS",
+      "label": "Professional Steel Tip Darts"
+    },
+    {
+      "key": "OTHER_EQUIPMENT",
+      "label": "Miscellaneous Gear"
+    }
+  ],
+  "conditions": [
+    {
+      "key": "NEW",
+      "label": "New"
+    },
+    {
+      "key": "LIKE_NEW",
+      "label": "Like New"
+    },
+    {
+      "key": "GOOD",
+      "label": "Good"
+    },
+    {
+      "key": "FAIR",
+      "label": "Fair"
+    },
+    {
+      "key": "WORN",
+      "label": "Worn"
+    }
+  ]
+}

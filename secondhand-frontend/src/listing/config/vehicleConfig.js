@@ -248,7 +248,7 @@ export const vehicleConfig = {
                 type: 'enum',
                 enumKey: 'fuelTypes',
                 required: true,
-                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'SCOOTER', 'OTHER'].includes(getVehicleTypeName(ctx)),
+                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
               },
               { name: 'color', label: 'Color', type: 'enum', enumKey: 'colors' },
               {
@@ -299,14 +299,14 @@ export const vehicleConfig = {
                 name: 'mileage',
                 label: 'Kilometer (km)',
                 type: 'number',
-                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'SCOOTER', 'OTHER'].includes(getVehicleTypeName(ctx)),
+                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
               },
               {
                 name: 'engineCapacity',
                 label: 'Engine Capacity (cc)',
                 type: 'number',
-                requiredWhen: (ctx) => ['MOTORCYCLE', 'SCOOTER'].includes(getVehicleTypeName(ctx)),
-                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'SCOOTER', 'OTHER'].includes(getVehicleTypeName(ctx)),
+                requiredWhen: (ctx) => ['MOTORCYCLE'].includes(getVehicleTypeName(ctx)),
+                visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
               },
               {
                 name: 'horsePower',

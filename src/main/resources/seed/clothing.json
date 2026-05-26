@@ -1,0 +1,474 @@
+{
+  "brands": [
+    {
+      "key": "NIKE",
+      "label": "Nike"
+    },
+    {
+      "key": "ADIDAS",
+      "label": "Adidas"
+    },
+    {
+      "key": "PUMA",
+      "label": "Puma"
+    },
+    {
+      "key": "UNDER_ARMOUR",
+      "label": "Under Armour"
+    },
+    {
+      "key": "REEBOK",
+      "label": "Reebok"
+    },
+    {
+      "key": "NEW_BALANCE",
+      "label": "New Balance"
+    },
+    {
+      "key": "CONVERSE",
+      "label": "Converse"
+    },
+    {
+      "key": "VANS",
+      "label": "Vans"
+    },
+    {
+      "key": "ASICS",
+      "label": "Asics"
+    },
+    {
+      "key": "SALOMON",
+      "label": "Salomon"
+    },
+    {
+      "key": "HOKA",
+      "label": "Hoka"
+    },
+    {
+      "key": "ON_RUNNING",
+      "label": "On Running"
+    },
+    {
+      "key": "SKECHERS",
+      "label": "Skechers"
+    },
+    {
+      "key": "FILA",
+      "label": "Fila"
+    },
+    {
+      "key": "DECATHLON",
+      "label": "Decathlon"
+    },
+    {
+      "key": "QUECHUA",
+      "label": "Quechua"
+    },
+    {
+      "key": "KIPSTA",
+      "label": "Kipsta"
+    },
+    {
+      "key": "DOMYOS",
+      "label": "Domyos"
+    },
+    {
+      "key": "MAVI",
+      "label": "Mavi"
+    },
+    {
+      "key": "LTB",
+      "label": "LTB"
+    },
+    {
+      "key": "LOFT",
+      "label": "Loft"
+    },
+    {
+      "key": "ALTINYILDIZ",
+      "label": "Altınyıldız"
+    },
+    {
+      "key": "RAMSEY",
+      "label": "Ramsey"
+    },
+    {
+      "key": "SARAR",
+      "label": "Sarar"
+    },
+    {
+      "key": "DAMAT_TWEEN",
+      "label": "Damat Tween"
+    },
+    {
+      "key": "BEYMEN",
+      "label": "Beymen"
+    },
+    {
+      "key": "VAKKO",
+      "label": "Vakko"
+    },
+    {
+      "key": "IPEYKOL",
+      "label": "İpekyol"
+    },
+    {
+      "key": "TWIST",
+      "label": "Twist"
+    },
+    {
+      "key": "NETWORK",
+      "label": "Network"
+    },
+    {
+      "key": "DERIMOD",
+      "label": "Derimod"
+    },
+    {
+      "key": "GREYDER",
+      "label": "Greyder"
+    },
+    {
+      "key": "KEMAL_TANCA",
+      "label": "Kemal Tanca"
+    },
+    {
+      "key": "YARGICI",
+      "label": "Yargıcı"
+    },
+    {
+      "key": "DEFACTO",
+      "label": "DeFacto"
+    },
+    {
+      "key": "LC_WAIKIKI",
+      "label": "LC Waikiki"
+    },
+    {
+      "key": "KOTON",
+      "label": "Koton"
+    },
+    {
+      "key": "COLINS",
+      "label": "Colin's"
+    },
+    {
+      "key": "US_POLO",
+      "label": "U.S. Polo Assn."
+    },
+    {
+      "key": "GUCCI",
+      "label": "Gucci"
+    },
+    {
+      "key": "PRADA",
+      "label": "Prada"
+    },
+    {
+      "key": "LOUIS_VUITTON",
+      "label": "Louis Vuitton"
+    },
+    {
+      "key": "CHANEL",
+      "label": "Chanel"
+    },
+    {
+      "key": "HERMES",
+      "label": "Hermès"
+    },
+    {
+      "key": "BURBERRY",
+      "label": "Burberry"
+    },
+    {
+      "key": "DIOR",
+      "label": "Dior"
+    },
+    {
+      "key": "BALENCIAGA",
+      "label": "Balenciaga"
+    },
+    {
+      "key": "VERSACE",
+      "label": "Versace"
+    },
+    {
+      "key": "DOLCE_GABBANA",
+      "label": "Dolce & Gabbana"
+    },
+    {
+      "key": "OFF_WHITE",
+      "label": "Off-White"
+    },
+    {
+      "key": "STONE_ISLAND",
+      "label": "Stone Island"
+    },
+    {
+      "key": "MICHAEL_KORS",
+      "label": "Michael Kors"
+    },
+    {
+      "key": "COACH",
+      "label": "Coach"
+    },
+    {
+      "key": "HUGO_BOSS",
+      "label": "Hugo Boss"
+    },
+    {
+      "key": "ARMANI",
+      "label": "Armani"
+    },
+    {
+      "key": "ZARA",
+      "label": "Zara"
+    },
+    {
+      "key": "H_M",
+      "label": "H&M"
+    },
+    {
+      "key": "UNIQLO",
+      "label": "Uniqlo"
+    },
+    {
+      "key": "GAP",
+      "label": "GAP"
+    },
+    {
+      "key": "MANGO",
+      "label": "Mango"
+    },
+    {
+      "key": "BERSHKA",
+      "label": "Bershka"
+    },
+    {
+      "key": "PULL_BEAR",
+      "label": "Pull&Bear"
+    },
+    {
+      "key": "STRADIVARIUS",
+      "label": "Stradivarius"
+    },
+    {
+      "key": "MASSIMO_DUTTI",
+      "label": "Massimo Dutti"
+    },
+    {
+      "key": "COS",
+      "label": "Cos"
+    },
+    {
+      "key": "JACK_JONES",
+      "label": "Jack & Jones"
+    },
+    {
+      "key": "TOMMY_HILFIGER",
+      "label": "Tommy Hilfiger"
+    },
+    {
+      "key": "CALVIN_KLEIN",
+      "label": "Calvin Klein"
+    },
+    {
+      "key": "LACOSTE",
+      "label": "Lacoste"
+    },
+    {
+      "key": "RALPH_LAUREN",
+      "label": "Ralph Lauren"
+    },
+    {
+      "key": "COLUMBIA",
+      "label": "Columbia"
+    },
+    {
+      "key": "THE_NORTH_FACE",
+      "label": "The North Face"
+    },
+    {
+      "key": "PATAGONIA",
+      "label": "Patagonia"
+    },
+    {
+      "key": "TIMBERLAND",
+      "label": "Timberland"
+    },
+    {
+      "key": "BIRKENSTOCK",
+      "label": "Birkenstock"
+    },
+    {
+      "key": "DR_MARTENS",
+      "label": "Dr. Martens"
+    },
+    {
+      "key": "OTHER",
+      "label": "Other"
+    }
+  ],
+  "types": [
+    {
+      "key": "T_SHIRT",
+      "label": "T-Shirt"
+    },
+    {
+      "key": "SHIRT",
+      "label": "Shirt"
+    },
+    {
+      "key": "SWEATER",
+      "label": "Sweater"
+    },
+    {
+      "key": "HOODIE",
+      "label": "Hoodie"
+    },
+    {
+      "key": "SWEATSHIRT",
+      "label": "Sweatshirt"
+    },
+    {
+      "key": "CARDIGAN",
+      "label": "Cardigan"
+    },
+    {
+      "key": "VEST",
+      "label": "Vest"
+    },
+    {
+      "key": "PANTS",
+      "label": "Pants"
+    },
+    {
+      "key": "JEANS",
+      "label": "Jeans"
+    },
+    {
+      "key": "SHORTS",
+      "label": "Shorts"
+    },
+    {
+      "key": "LEGGINGS",
+      "label": "Leggings"
+    },
+    {
+      "key": "DRESS",
+      "label": "Dress"
+    },
+    {
+      "key": "SKIRT",
+      "label": "Skirt"
+    },
+    {
+      "key": "SUIT",
+      "label": "Suit"
+    },
+    {
+      "key": "JACKET",
+      "label": "Jacket"
+    },
+    {
+      "key": "COAT",
+      "label": "Coat"
+    },
+    {
+      "key": "BLAZER",
+      "label": "Blazer"
+    },
+    {
+      "key": "SNEAKERS",
+      "label": "Sneakers"
+    },
+    {
+      "key": "BOOTS",
+      "label": "Boots"
+    },
+    {
+      "key": "SANDALS",
+      "label": "Sandals"
+    },
+    {
+      "key": "HEELS",
+      "label": "Heels"
+    },
+    {
+      "key": "FLATS",
+      "label": "Flats"
+    },
+    {
+      "key": "SHOES",
+      "label": "Classic Shoes"
+    },
+    {
+      "key": "BAG",
+      "label": "Bag"
+    },
+    {
+      "key": "WATCH",
+      "label": "Watch"
+    },
+    {
+      "key": "SUNGLASSES",
+      "label": "Sunglasses"
+    },
+    {
+      "key": "JEWELRY",
+      "label": "Jewelry"
+    },
+    {
+      "key": "WALLET",
+      "label": "Wallet"
+    },
+    {
+      "key": "BELT",
+      "label": "Belt"
+    },
+    {
+      "key": "HAT",
+      "label": "Hat"
+    },
+    {
+      "key": "CAP",
+      "label": "Cap"
+    },
+    {
+      "key": "SCARF",
+      "label": "Scarf"
+    },
+    {
+      "key": "GLOVES",
+      "label": "Gloves"
+    },
+    {
+      "key": "TIE",
+      "label": "Tie"
+    },
+    {
+      "key": "UNDERWEAR",
+      "label": "Underwear"
+    },
+    {
+      "key": "SOCKS",
+      "label": "Socks"
+    },
+    {
+      "key": "PYJAMA",
+      "label": "Pyjama"
+    },
+    {
+      "key": "TRACKSUIT",
+      "label": "Tracksuit"
+    },
+    {
+      "key": "SWIMWEAR",
+      "label": "Swimwear"
+    },
+    {
+      "key": "OTHER",
+      "label": "Miscellaneous"
+    }
+  ]
+}

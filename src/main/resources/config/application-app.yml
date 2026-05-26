@@ -72,5 +72,3 @@ app:
     outbox:
       fixed-delay-ms: ${PAYMENT_OUTBOX_FIXED_DELAY_MS:5000}
       initial-delay-ms: ${PAYMENT_OUTBOX_INITIAL_DELAY_MS:5000}
-  seed:
-    startup-enabled: ${SEED_STARTUP_ENABLED:true}

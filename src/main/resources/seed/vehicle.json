@@ -1,0 +1,3782 @@
+{
+  "brands": [
+    { "key": "AUDI", "label": "Audi" },
+    { "key": "BMW", "label": "BMW" },
+    { "key": "MERCEDES_BENZ", "label": "Mercedes-Benz" },
+    { "key": "TOYOTA", "label": "Toyota" },
+    { "key": "VOLKSWAGEN", "label": "Volkswagen" },
+    { "key": "HYUNDAI", "label": "Hyundai" },
+    { "key": "PEUGEOT", "label": "Peugeot" },
+    { "key": "NISSAN", "label": "Nissan" },
+    { "key": "KIA", "label": "Kia" },
+    { "key": "FORD", "label": "Ford" },
+    { "key": "RENAULT", "label": "Renault" },
+    { "key": "OPEL", "label": "Opel" },
+    { "key": "FIAT", "label": "Fiat" },
+    { "key": "HONDA", "label": "Honda" },
+    { "key": "YAMAHA", "label": "Yamaha" },
+    { "key": "OTHER", "label": "Other" }
+  ],
+  "types": [
+    { "key": "CAR", "label": "Car" },
+    { "key": "MOTORCYCLE", "label": "Motorcycle" },
+    { "key": "BICYCLE", "label": "Bicycle" },
+    { "key": "OTHER", "label": "Other" }
+  ],
+  "models": [
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Polo",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "Polo VI",
+          "code": "AW",
+          "startYear": 2017,
+          "endYear": null,
+          "engines": [
+            { "name": "1.0 MPI", "fuelType": "GASOLINE" },
+            { "name": "1.0 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Impression", "Life", "Style", "R-Line", "Other"]
+        },
+        {
+          "name": "Polo V",
+          "code": "6C",
+          "startYear": 2009,
+          "endYear": 2017,
+          "engines": [
+            { "name": "1.0 MPI", "fuelType": "GASOLINE" },
+            { "name": "1.2 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "1.4 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "GTI", "Other"]
+        },
+        {
+          "name": "Polo IV",
+          "code": "9N",
+          "startYear": 2001,
+          "endYear": 2009,
+          "engines": [
+            { "name": "1.2", "fuelType": "GASOLINE" },
+            { "name": "1.4", "fuelType": "GASOLINE" },
+            { "name": "1.4 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Sportline", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Golf",
+      "supportedBodyTypes": ["HATCHBACK", "WAGON"],
+      "generations": [
+        {
+          "name": "Golf VIII",
+          "code": "CD",
+          "startYear": 2019,
+          "endYear": null,
+          "engines": [
+            { "name": "1.0 eTSI", "fuelType": "HYBRID" },
+            { "name": "1.5 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.5 eTSI", "fuelType": "HYBRID" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Impression", "Life", "Style", "R-Line", "GTI", "R", "Other"]
+        },
+        {
+          "name": "Golf VII",
+          "code": "5G",
+          "startYear": 2012,
+          "endYear": 2019,
+          "engines": [
+            { "name": "1.0 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.2 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Midline Plus", "Comfortline", "Highline", "GTI", "R", "Other"]
+        },
+        {
+          "name": "Golf VI",
+          "code": "5K",
+          "startYear": 2008,
+          "endYear": 2012,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        },
+        {
+          "name": "Golf V",
+          "code": "1K",
+          "startYear": 2003,
+          "endYear": 2008,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 FSI", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Midline", "Comfortline", "Sportline", "Other"]
+        },
+        {
+          "name": "Golf IV",
+          "code": "1J",
+          "startYear": 1997,
+          "endYear": 2003,
+          "engines": [
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.8T", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Basic", "Comfortline", "Highline", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Passat",
+      "supportedBodyTypes": ["SEDAN", "WAGON"],
+      "generations": [
+        {
+          "name": "Passat B8",
+          "code": "3G",
+          "startYear": 2014,
+          "endYear": 2024,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.5 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Impression", "Business", "Elegance", "R-Line", "Other"]
+        },
+        {
+          "name": "Passat B7",
+          "code": "362",
+          "startYear": 2010,
+          "endYear": 2014,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        },
+        {
+          "name": "Passat B6",
+          "code": "3C",
+          "startYear": 2005,
+          "endYear": 2010,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 FSI", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Exclusive", "Other"]
+        },
+        {
+          "name": "Passat B5.5",
+          "code": "3BG",
+          "startYear": 2000,
+          "endYear": 2005,
+          "engines": [
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.8T", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Comfortline", "Trendline", "Highline", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Arteon",
+      "supportedBodyTypes": ["SEDAN", "WAGON"],
+      "generations": [
+        {
+          "name": "Arteon",
+          "code": "3H",
+          "startYear": 2017,
+          "endYear": null,
+          "engines": [
+            { "name": "1.5 TSI 150 PS", "fuelType": "GASOLINE" },
+            { "name": "2.0 TSI 190 PS 4MOTION", "fuelType": "GASOLINE" },
+            { "name": "2.0 TSI 280 PS 4MOTION", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI 150 PS", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI 200 PS 4MOTION", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Elegance", "R-Line", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Tiguan",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Tiguan III",
+          "code": "CT",
+          "startYear": 2024,
+          "endYear": null,
+          "engines": [
+            { "name": "1.5 eTSI", "fuelType": "HYBRID" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Life", "Elegance", "R-Line", "Other"]
+        },
+        {
+          "name": "Tiguan II",
+          "code": "AD",
+          "startYear": 2016,
+          "endYear": 2024,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.5 TSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Life", "Elegance", "R-Line", "Other"]
+        },
+        {
+          "name": "Tiguan I",
+          "code": "5N",
+          "startYear": 2007,
+          "endYear": 2016,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Trend & Fun", "Sport & Style", "White Night", "Chrome Edition", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Tayron",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Tayron",
+          "code": "CT",
+          "startYear": 2025,
+          "endYear": null,
+          "engines": [
+            { "name": "1.5 eTSI 150 PS DSG", "fuelType": "HYBRID" },
+            { "name": "1.5 eHybrid 204 PS DSG", "fuelType": "HYBRID" },
+            { "name": "1.5 eHybrid 272 PS DSG", "fuelType": "HYBRID" },
+            { "name": "2.0 TDI 193 PS 4MOTION DSG", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Life", "Elegance", "R-Line", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "T-Roc",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "T-Roc",
+          "code": "A1",
+          "startYear": 2017,
+          "endYear": null,
+          "engines": [
+            { "name": "1.0 TSI 110 PS", "fuelType": "GASOLINE" },
+            { "name": "1.5 TSI 150 PS DSG", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI 150 PS", "fuelType": "DIESEL" },
+            { "name": "2.0 TSI 190 PS 4MOTION", "fuelType": "GASOLINE" },
+            { "name": "T-Roc R 2.0 TSI 300 PS", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Life", "Style", "R-Line", "R", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "T-Cross",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "T-Cross",
+          "code": "C1",
+          "startYear": 2019,
+          "endYear": null,
+          "engines": [
+            { "name": "1.0 TSI 95 PS", "fuelType": "GASOLINE" },
+            { "name": "1.0 TSI 116 PS", "fuelType": "GASOLINE" },
+            { "name": "1.0 TSI 116 PS DSG", "fuelType": "GASOLINE" },
+            { "name": "1.5 TSI 150 PS DSG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Life", "Style", "R-Line", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Taigo",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Taigo",
+          "code": "CS",
+          "startYear": 2021,
+          "endYear": null,
+          "engines": [
+            { "name": "1.0 TSI 95 PS", "fuelType": "GASOLINE" },
+            { "name": "1.0 TSI 110 PS", "fuelType": "GASOLINE" },
+            { "name": "1.5 TSI 150 PS DSG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Life", "Style", "R-Line", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Touareg",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Touareg III",
+          "code": "CR",
+          "startYear": 2018,
+          "endYear": null,
+          "engines": [
+            { "name": "3.0 TDI V6", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Elegance", "R-Line", "Other"]
+        },
+        {
+          "name": "Touareg II",
+          "code": "7P",
+          "startYear": 2010,
+          "endYear": 2018,
+          "engines": [
+            { "name": "3.0 TDI V6", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Premium", "Chrome Edition", "R-Line", "Other"]
+        },
+        {
+          "name": "Touareg I",
+          "code": "7L",
+          "startYear": 2002,
+          "endYear": 2010,
+          "engines": [
+            { "name": "2.5 TDI", "fuelType": "DIESEL" },
+            { "name": "3.0 TDI V6", "fuelType": "DIESEL" },
+            { "name": "3.2 V6", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Amarok",
+      "supportedBodyTypes": ["PICKUP"],
+      "generations": [
+        {
+          "name": "Amarok II",
+          "code": "T1",
+          "startYear": 2023,
+          "endYear": null,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "3.0 V6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Life", "Style", "PanAmericana", "Aventura", "Other"]
+        },
+        {
+          "name": "Amarok I",
+          "code": "2H",
+          "startYear": 2010,
+          "endYear": 2022,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 BiTDI", "fuelType": "DIESEL" },
+            { "name": "3.0 V6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Canyon", "Aventura", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "ID.3",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "ID.3",
+          "code": "E1",
+          "startYear": 2019,
+          "endYear": null,
+          "engines": [
+            { "name": "Pure 45 kWh 170 PS", "fuelType": "ELECTRIC" },
+            { "name": "Pro 58 kWh 204 PS", "fuelType": "ELECTRIC" },
+            { "name": "Pro S 77 kWh 204 PS", "fuelType": "ELECTRIC" },
+            { "name": "GTX 79 kWh 286 PS", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Pure", "Pro", "Pro S", "GTX", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "ID.4",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "ID.4",
+          "code": "E2",
+          "startYear": 2020,
+          "endYear": null,
+          "engines": [
+            { "name": "Pure 125 kW 170 PS", "fuelType": "ELECTRIC" },
+            { "name": "Pro 210 kW 286 PS", "fuelType": "ELECTRIC" },
+            { "name": "GTX 220 kW 299 PS AWD", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Pure", "Pro", "GTX", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "ID.7",
+      "supportedBodyTypes": ["SEDAN", "WAGON"],
+      "generations": [
+        {
+          "name": "ID.7",
+          "code": "ED",
+          "startYear": 2023,
+          "endYear": null,
+          "engines": [
+            { "name": "Pro 210 kW 286 PS", "fuelType": "ELECTRIC" },
+            { "name": "Pro S 210 kW 286 PS", "fuelType": "ELECTRIC" },
+            { "name": "GTX 250 kW 340 PS AWD", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Pro", "Pro S", "GTX", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Jetta",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "Jetta VII",
+          "code": "A7",
+          "startYear": 2018,
+          "endYear": null,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        },
+        {
+          "name": "Jetta VI",
+          "code": "162",
+          "startYear": 2010,
+          "endYear": 2018,
+          "engines": [
+            { "name": "1.2 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Exclusive", "Other"]
+        },
+        {
+          "name": "Jetta V",
+          "code": "1K2",
+          "startYear": 2005,
+          "endYear": 2010,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Midline", "Comfortline", "Primeline", "Tour", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Scirocco",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "Scirocco III",
+          "code": "Typ 13",
+          "startYear": 2008,
+          "endYear": 2017,
+          "engines": [
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sportline", "White Edition", "GTS", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Beetle",
+      "supportedBodyTypes": ["HATCHBACK", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "Beetle A5",
+          "code": "A5",
+          "startYear": 2011,
+          "endYear": 2019,
+          "engines": [
+            { "name": "1.2 TSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Design", "Fender Edition", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Caddy",
+      "supportedBodyTypes": ["VAN", "MINIVAN"],
+      "generations": [
+        {
+          "name": "Caddy V",
+          "code": "SB",
+          "startYear": 2020,
+          "endYear": null,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Impression", "Life", "Style", "Other"]
+        },
+        {
+          "name": "Caddy IV",
+          "code": "SA",
+          "startYear": 2015,
+          "endYear": 2020,
+          "engines": [
+            { "name": "1.0 TSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Exclusive", "Other"]
+        },
+        {
+          "name": "Caddy III",
+          "code": "2K",
+          "startYear": 2003,
+          "endYear": 2015,
+          "engines": [
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Kombi", "Life", "Team", "Trendline", "Comfortline", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Transporter",
+      "supportedBodyTypes": ["VAN", "MINIBUS"],
+      "generations": [
+        {
+          "name": "Transporter T6.1",
+          "code": "T6.1",
+          "startYear": 2019,
+          "endYear": null,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["City Van", "Camlı Van", "Panel Van", "Other"]
+        },
+        {
+          "name": "Transporter T6",
+          "code": "T6",
+          "startYear": 2015,
+          "endYear": 2019,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["City Van", "Camlı Van", "Panel Van", "Other"]
+        },
+        {
+          "name": "Transporter T5",
+          "code": "7H",
+          "startYear": 2003,
+          "endYear": 2015,
+          "engines": [
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.5 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["City Van", "Camlı Van", "Panel Van", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "VOLKSWAGEN",
+      "type": "CAR",
+      "name": "Caravelle",
+      "supportedBodyTypes": ["MINIBUS"],
+      "generations": [
+        {
+          "name": "Caravelle T6.1",
+          "code": "T6.1",
+          "startYear": 2019,
+          "endYear": null,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        },
+        {
+          "name": "Caravelle T6",
+          "code": "T6",
+          "startYear": 2015,
+          "endYear": 2019,
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        },
+        {
+          "name": "Caravelle T5",
+          "code": "7H",
+          "startYear": 2003,
+          "endYear": 2015,
+          "engines": [
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.5 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Trendline", "Comfortline", "Highline", "Other"]
+        }
+      ]
+    },
+    {
+      "brand": "RENAULT",
+      "type": "CAR",
+      "name": "Clio",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "Clio V",
+          "engines": [
+            { "name": "1.0 SCe", "fuelType": "GASOLINE" },
+            { "name": "1.0 TCe", "fuelType": "GASOLINE" },
+            { "name": "1.5 Blue dCi", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Joy", "Touch", "Icon", "Equilibre", "Techno"]
+        }
+      ]
+    },
+    {
+      "brand": "RENAULT",
+      "type": "CAR",
+      "name": "Megane",
+      "supportedBodyTypes": ["SEDAN", "HATCHBACK"],
+      "generations": [
+        {
+          "name": "Megane IV",
+          "engines": [
+            { "name": "1.3 TCe", "fuelType": "GASOLINE" },
+            { "name": "1.5 dCi", "fuelType": "DIESEL" },
+            { "name": "1.6 16V", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Joy", "Joy Plus", "Touch", "Touch Plus", "Icon"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "1 Series",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "1 Series (2019–, F40)",
+          "engines": [
+            { "name": "118i", "fuelType": "GASOLINE" },
+            { "name": "116d", "fuelType": "DIESEL" },
+            { "name": "120d xDrive", "fuelType": "DIESEL" },
+            { "name": "M135i xDrive", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport Line", "M Sport", "First Edition Sport Line", "First Edition M Sport"]
+        },
+        {
+          "name": "1 Series (2011–2019, F20)",
+          "engines": [
+            { "name": "116i", "fuelType": "GASOLINE" },
+            { "name": "118i", "fuelType": "GASOLINE" },
+            { "name": "116d", "fuelType": "DIESEL" },
+            { "name": "120d", "fuelType": "DIESEL" },
+            { "name": "M140i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Joy", "Joy Plus", "Urban Line", "Sport Line", "M Sport"]
+        },
+        {
+          "name": "1 Series (2004–2011, E81/E87)",
+          "engines": [
+            { "name": "116i", "fuelType": "GASOLINE" },
+            { "name": "118i", "fuelType": "GASOLINE" },
+            { "name": "120i", "fuelType": "GASOLINE" },
+            { "name": "120d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "Dynamic", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "2 Series Coupe",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "2 Series Coupe (2014–2021, F22)",
+          "engines": [
+            { "name": "218i Coupe", "fuelType": "GASOLINE" },
+            { "name": "220d Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Sport Line", "M Sport"]
+        },
+        {
+          "name": "2 Series Cabrio (2015–2021, F23)",
+          "engines": [
+            { "name": "218i Cabrio", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "2 Series Gran Coupe",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "2 Series Gran Coupe (2020–, F44)",
+          "engines": [
+            { "name": "218i Gran Coupe", "fuelType": "GASOLINE" },
+            { "name": "216d Gran Coupe", "fuelType": "DIESEL" },
+            { "name": "M235i xDrive Gran Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport Line", "Luxury Line", "M Sport", "First Edition M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "2 Series Active Tourer",
+      "supportedBodyTypes": ["HATCHBACK", "WAGON"],
+      "generations": [
+        {
+          "name": "2 Series Active Tourer (2022–, U06)",
+          "engines": [
+            { "name": "218i Active Tourer", "fuelType": "GASOLINE" },
+            { "name": "220i Active Tourer", "fuelType": "HYBRID" },
+            { "name": "225e xDrive Active Tourer", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "3 Series",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "3 Series (2019–, G20)",
+          "engines": [
+            { "name": "320i", "fuelType": "GASOLINE" },
+            { "name": "320d xDrive", "fuelType": "DIESEL" },
+            { "name": "330i", "fuelType": "GASOLINE" },
+            { "name": "330e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Sport Line", "Luxury Line", "M Sport", "First Edition M Sport", "Edition M Sport Shadow"]
+        },
+        {
+          "name": "3 Series (2012–2019, F30)",
+          "engines": [
+            { "name": "316i", "fuelType": "GASOLINE" },
+            { "name": "318i", "fuelType": "GASOLINE" },
+            { "name": "320i EfficientDynamics", "fuelType": "GASOLINE" },
+            { "name": "320d", "fuelType": "DIESEL" },
+            { "name": "320d xDrive", "fuelType": "DIESEL" },
+            { "name": "328i", "fuelType": "GASOLINE" },
+            { "name": "330i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Joy", "Joy Plus", "Techno Line", "Sport Line", "Luxury Line", "Modern Line", "M Sport"]
+        },
+        {
+          "name": "3 Series (2005–2013, E90)",
+          "engines": [
+            { "name": "316i", "fuelType": "GASOLINE" },
+            { "name": "318i", "fuelType": "GASOLINE" },
+            { "name": "320i", "fuelType": "GASOLINE" },
+            { "name": "320d", "fuelType": "DIESEL" },
+            { "name": "325i", "fuelType": "GASOLINE" },
+            { "name": "330i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Comfort", "Premium", "Exclusive", "M Sport"]
+        },
+        {
+          "name": "3 Series (1998–2005, E46)",
+          "engines": [
+            { "name": "316i", "fuelType": "GASOLINE" },
+            { "name": "318i", "fuelType": "GASOLINE" },
+            { "name": "320i", "fuelType": "GASOLINE" },
+            { "name": "320d", "fuelType": "DIESEL" },
+            { "name": "325i", "fuelType": "GASOLINE" },
+            { "name": "330i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "3 Series Touring",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "3 Series Touring (2019–, G21)",
+          "engines": [
+            { "name": "320i Touring", "fuelType": "GASOLINE" },
+            { "name": "320d xDrive Touring", "fuelType": "DIESEL" },
+            { "name": "330i Touring", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        },
+        {
+          "name": "3 Series Touring (2012–2019, F31)",
+          "engines": [
+            { "name": "320d Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Sport Line", "Luxury Line", "M Sport"]
+        },
+        {
+          "name": "3 Series Touring (2005–2013, E91)",
+          "engines": [
+            { "name": "320d Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Comfort", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "4 Series",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE", "SEDAN"],
+      "generations": [
+        {
+          "name": "4 Series Coupe (2020–, G22)",
+          "engines": [
+            { "name": "420i Coupe", "fuelType": "GASOLINE" },
+            { "name": "430i Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport", "Edition M Sport"]
+        },
+        {
+          "name": "4 Series Cabrio (2020–, G23)",
+          "engines": [
+            { "name": "420i Cabrio", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "4 Series Gran Coupe (2021–, G26)",
+          "engines": [
+            { "name": "420i Gran Coupe", "fuelType": "GASOLINE" },
+            { "name": "430i xDrive Gran Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport", "Performance"]
+        },
+        {
+          "name": "4 Series Gran Coupe (2014–2021, F36)",
+          "engines": [
+            { "name": "418i Gran Coupe", "fuelType": "GASOLINE" },
+            { "name": "420d Gran Coupe", "fuelType": "DIESEL" },
+            { "name": "420d xDrive Gran Coupe", "fuelType": "DIESEL" },
+            { "name": "430i Gran Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Prestige", "Sport Line", "Luxury Line", "M Sport"]
+        },
+        {
+          "name": "4 Series Coupe (2013–2020, F32)",
+          "engines": [
+            { "name": "418i Coupe", "fuelType": "GASOLINE" },
+            { "name": "420d Coupe", "fuelType": "DIESEL" },
+            { "name": "428i Coupe", "fuelType": "GASOLINE" },
+            { "name": "430i Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport Line", "Luxury Line", "M Sport"]
+        },
+        {
+          "name": "4 Series Cabrio (2014–2020, F33)",
+          "engines": [
+            { "name": "420d Cabrio", "fuelType": "DIESEL" },
+            { "name": "428i Cabrio", "fuelType": "GASOLINE" },
+            { "name": "430i Cabrio", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "5 Series",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "5 Series (2023–, G60)",
+          "engines": [
+            { "name": "520i", "fuelType": "GASOLINE" },
+            { "name": "520d xDrive", "fuelType": "DIESEL" },
+            { "name": "530e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Edition Professional", "M Sport"]
+        },
+        {
+          "name": "5 Series (2017–2023, G30)",
+          "engines": [
+            { "name": "520i", "fuelType": "GASOLINE" },
+            { "name": "520d", "fuelType": "DIESEL" },
+            { "name": "520d xDrive", "fuelType": "DIESEL" },
+            { "name": "530i xDrive", "fuelType": "GASOLINE" },
+            { "name": "530e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Sport Line", "Luxury Line", "M Sport", "Special Edition M Sport"]
+        },
+        {
+          "name": "5 Series (2010–2017, F10)",
+          "engines": [
+            { "name": "520i 1.6", "fuelType": "GASOLINE" },
+            { "name": "520d", "fuelType": "DIESEL" },
+            { "name": "525d xDrive", "fuelType": "DIESEL" },
+            { "name": "528i xDrive", "fuelType": "GASOLINE" },
+            { "name": "530d", "fuelType": "DIESEL" },
+            { "name": "535d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Business", "Comfort", "Premium", "Exclusive", "Modern Line", "M Sport"]
+        },
+        {
+          "name": "5 Series (2003–2010, E60)",
+          "engines": [
+            { "name": "520i", "fuelType": "GASOLINE" },
+            { "name": "520d", "fuelType": "DIESEL" },
+            { "name": "525d", "fuelType": "DIESEL" },
+            { "name": "530i", "fuelType": "GASOLINE" },
+            { "name": "530d", "fuelType": "DIESEL" },
+            { "name": "545i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Premium", "M Sport"]
+        },
+        {
+          "name": "5 Series (1995–2003, E39)",
+          "engines": [
+            { "name": "520i", "fuelType": "GASOLINE" },
+            { "name": "525tds", "fuelType": "DIESEL" },
+            { "name": "525d", "fuelType": "DIESEL" },
+            { "name": "528i", "fuelType": "GASOLINE" },
+            { "name": "530i", "fuelType": "GASOLINE" },
+            { "name": "530d", "fuelType": "DIESEL" },
+            { "name": "540i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Exclusive", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "5 Series Touring",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "5 Series Touring (2024–, G61)",
+          "engines": [
+            { "name": "520d xDrive Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "5 Series Touring (2017–2023, G31)",
+          "engines": [
+            { "name": "520d xDrive Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        },
+        {
+          "name": "5 Series Touring (2010–2017, F11)",
+          "engines": [
+            { "name": "520d Touring", "fuelType": "DIESEL" },
+            { "name": "525d xDrive Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Exclusive", "M Sport"]
+        },
+        {
+          "name": "5 Series Touring (2004–2010, E61)",
+          "engines": [
+            { "name": "525d Touring", "fuelType": "DIESEL" },
+            { "name": "530d Touring", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "6 Series",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE", "SEDAN"],
+      "generations": [
+        {
+          "name": "6 Series Coupe (2011–2018, F13)",
+          "engines": [
+            { "name": "640d xDrive Coupe", "fuelType": "DIESEL" },
+            { "name": "640i Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        },
+        {
+          "name": "6 Series Cabrio (2011–2018, F12)",
+          "engines": [
+            { "name": "640d Cabrio", "fuelType": "DIESEL" },
+            { "name": "640i Cabrio", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "6 Series Gran Coupe (2012–2018, F06)",
+          "engines": [
+            { "name": "640d Gran Coupe", "fuelType": "DIESEL" },
+            { "name": "640d xDrive Gran Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Luxury Line", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "7 Series",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "7 Series (2022–, G70)",
+          "engines": [
+            { "name": "740d xDrive", "fuelType": "DIESEL" },
+            { "name": "750e xDrive", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Pure Excellence", "M Sport"]
+        },
+        {
+          "name": "7 Series (2015–2022, G11)",
+          "engines": [
+            { "name": "730i", "fuelType": "GASOLINE" },
+            { "name": "730d xDrive", "fuelType": "DIESEL" },
+            { "name": "740Li xDrive", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Pure Excellence", "M Sport"]
+        },
+        {
+          "name": "7 Series (2008–2015, F01)",
+          "engines": [
+            { "name": "730d", "fuelType": "DIESEL" },
+            { "name": "740i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Premium", "Exclusive"]
+        },
+        {
+          "name": "7 Series (2001–2008, E65)",
+          "engines": [
+            { "name": "730d", "fuelType": "DIESEL" },
+            { "name": "730i", "fuelType": "GASOLINE" },
+            { "name": "745i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "8 Series",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE", "SEDAN"],
+      "generations": [
+        {
+          "name": "8 Series Coupe (2018–, G15)",
+          "engines": [
+            { "name": "840i Coupe", "fuelType": "GASOLINE" },
+            { "name": "840d xDrive Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "8 Series Cabrio (2019–, G14)",
+          "engines": [
+            { "name": "840i Cabrio", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "8 Series Gran Coupe (2019–, G16)",
+          "engines": [
+            { "name": "840i Gran Coupe", "fuelType": "GASOLINE" },
+            { "name": "840d xDrive Gran Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X1",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X1 (2022–, U11)",
+          "engines": [
+            { "name": "sDrive18i", "fuelType": "GASOLINE" },
+            { "name": "sDrive20i", "fuelType": "HYBRID" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        },
+        {
+          "name": "X1 (2015–2022, F48)",
+          "engines": [
+            { "name": "sDrive16d", "fuelType": "DIESEL" },
+            { "name": "sDrive18i", "fuelType": "GASOLINE" },
+            { "name": "xDrive20d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Prestige", "Sport Line", "xLine", "M Sport"]
+        },
+        {
+          "name": "X1 (2009–2015, E84)",
+          "engines": [
+            { "name": "sDrive16i", "fuelType": "GASOLINE" },
+            { "name": "sDrive18i", "fuelType": "GASOLINE" },
+            { "name": "sDrive20d", "fuelType": "DIESEL" },
+            { "name": "xDrive20d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Prestige", "Sport Line", "xLine"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X2",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X2 (2024–, U10)",
+          "engines": [
+            { "name": "sDrive20i", "fuelType": "HYBRID" },
+            { "name": "M35i xDrive", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "X2 (2018–2023, F39)",
+          "engines": [
+            { "name": "sDrive18i", "fuelType": "GASOLINE" },
+            { "name": "sDrive16d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["M Sport", "M Sport X"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X3",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X3 (2017–, G01)",
+          "engines": [
+            { "name": "sDrive20i", "fuelType": "GASOLINE" },
+            { "name": "xDrive20d", "fuelType": "DIESEL" },
+            { "name": "xDrive30e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        },
+        {
+          "name": "X3 (2010–2017, F25)",
+          "engines": [
+            { "name": "sDrive20i", "fuelType": "GASOLINE" },
+            { "name": "xDrive20d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Prestige", "xLine", "M Sport"]
+        },
+        {
+          "name": "X3 (2003–2010, E83)",
+          "engines": [
+            { "name": "xDrive20d", "fuelType": "DIESEL" },
+            { "name": "3.0i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X4",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "X4 (2018–, G02)",
+          "engines": [
+            { "name": "xDrive20d", "fuelType": "DIESEL" },
+            { "name": "xDrive20i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        },
+        {
+          "name": "X4 (2014–2018, F26)",
+          "engines": [
+            { "name": "xDrive20d", "fuelType": "DIESEL" },
+            { "name": "xDrive28i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X5",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X5 (2018–, G05)",
+          "engines": [
+            { "name": "xDrive25d", "fuelType": "DIESEL" },
+            { "name": "xDrive30d", "fuelType": "DIESEL" },
+            { "name": "xDrive40i", "fuelType": "GASOLINE" },
+            { "name": "xDrive45e", "fuelType": "HYBRID" },
+            { "name": "xDrive50e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        },
+        {
+          "name": "X5 (2013–2018, F15)",
+          "engines": [
+            { "name": "sDrive25d", "fuelType": "DIESEL" },
+            { "name": "xDrive25d", "fuelType": "DIESEL" },
+            { "name": "xDrive40d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Premium", "Prestige", "M Sport"]
+        },
+        {
+          "name": "X5 (2006–2013, E70)",
+          "engines": [
+            { "name": "3.0d", "fuelType": "DIESEL" },
+            { "name": "30d xDrive", "fuelType": "DIESEL" },
+            { "name": "35d xDrive", "fuelType": "DIESEL" },
+            { "name": "4.8i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "M Sport"]
+        },
+        {
+          "name": "X5 (1999–2006, E53)",
+          "engines": [
+            { "name": "3.0d", "fuelType": "DIESEL" },
+            { "name": "3.0i", "fuelType": "GASOLINE" },
+            { "name": "4.4i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X6",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "X6 (2019–, G06)",
+          "engines": [
+            { "name": "xDrive40d", "fuelType": "DIESEL" },
+            { "name": "xDrive40i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport"]
+        },
+        {
+          "name": "X6 (2014–2019, F16)",
+          "engines": [
+            { "name": "xDrive30d", "fuelType": "DIESEL" },
+            { "name": "xDrive40d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Pure Extravagance", "M Sport"]
+        },
+        {
+          "name": "X6 (2008–2014, E71)",
+          "engines": [
+            { "name": "xDrive30d", "fuelType": "DIESEL" },
+            { "name": "xDrive35d", "fuelType": "DIESEL" },
+            { "name": "xDrive40d", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X7",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X7 (2019–, G07)",
+          "engines": [
+            { "name": "xDrive40d", "fuelType": "DIESEL" },
+            { "name": "M50d", "fuelType": "DIESEL" },
+            { "name": "xDrive40i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Pure Excellence", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "XM",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "XM (2023–, G09)",
+          "engines": [
+            { "name": "XM 4.4 V8", "fuelType": "HYBRID" },
+            { "name": "XM Label Red", "fuelType": "HYBRID" }
+          ],
+          "trims": ["M Sport", "Label Red"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "Z4",
+      "supportedBodyTypes": ["CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "Z4 (2019–, G29)",
+          "engines": [
+            { "name": "sDrive20i", "fuelType": "GASOLINE" },
+            { "name": "M40i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport Line", "M Sport"]
+        },
+        {
+          "name": "Z4 (2009–2016, E89)",
+          "engines": [
+            { "name": "sDrive20i", "fuelType": "GASOLINE" },
+            { "name": "sDrive23i", "fuelType": "GASOLINE" },
+            { "name": "sDrive35i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "M Sport"]
+        },
+        {
+          "name": "Z4 (2002–2008, E85)",
+          "engines": [
+            { "name": "2.0i", "fuelType": "GASOLINE" },
+            { "name": "2.5i", "fuelType": "GASOLINE" },
+            { "name": "3.0i", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "i3",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "i3 (2013–2022, I01)",
+          "engines": [
+            { "name": "i3 94 Ah", "fuelType": "ELECTRIC" },
+            { "name": "i3s 120 Ah", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Standard", "Edition Electric"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "i4",
+      "supportedBodyTypes": ["SEDAN", "COUPE"],
+      "generations": [
+        {
+          "name": "i4 (2021–, G26)",
+          "engines": [
+            { "name": "eDrive35", "fuelType": "ELECTRIC" },
+            { "name": "eDrive40", "fuelType": "ELECTRIC" },
+            { "name": "M50", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "i5",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "i5 (2023–, G60)",
+          "engines": [
+            { "name": "eDrive40", "fuelType": "ELECTRIC" },
+            { "name": "M60 xDrive", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "i7",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "i7 (2022–, G70)",
+          "engines": [
+            { "name": "eDrive50", "fuelType": "ELECTRIC" },
+            { "name": "xDrive60", "fuelType": "ELECTRIC" },
+            { "name": "M70 xDrive", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "iX1",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "iX1 (2022–, U11)",
+          "engines": [
+            { "name": "xDrive30", "fuelType": "ELECTRIC" },
+            { "name": "eDrive20", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["xLine", "M Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "iX3",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "iX3 (2021–, G08)",
+          "engines": [
+            { "name": "iX3", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Impressive"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "iX",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "iX (2021–, I20)",
+          "engines": [
+            { "name": "xDrive40", "fuelType": "ELECTRIC" },
+            { "name": "xDrive50", "fuelType": "ELECTRIC" },
+            { "name": "M60", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["First Edition Essence", "First Edition Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "M2",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "M2 (2023–, G87)",
+          "engines": [
+            { "name": "M2", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["M Sport", "Competition"]
+        },
+        {
+          "name": "M2 (2015–2021, F87)",
+          "engines": [
+            { "name": "M2 Coupe", "fuelType": "GASOLINE" },
+            { "name": "M2 Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Competition"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "M3",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "M3 (2021–, G80)",
+          "engines": [
+            { "name": "M3 Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        },
+        {
+          "name": "M3 (2014–2020, F80)",
+          "engines": [
+            { "name": "M3 Sedan", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "M3 (2007–2013, E90)",
+          "engines": [
+            { "name": "M3 Sedan", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "M4",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "M4 (2021–, G82)",
+          "engines": [
+            { "name": "M4 Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        },
+        {
+          "name": "M4 (2014–2020, F82)",
+          "engines": [
+            { "name": "M4 Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "M5",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "M5 (2024–, G90)",
+          "engines": [
+            { "name": "M5", "fuelType": "HYBRID" }
+          ],
+          "trims": ["M Sport", "Competition"]
+        },
+        {
+          "name": "M5 (2017–2023, F90)",
+          "engines": [
+            { "name": "M5 Sedan", "fuelType": "GASOLINE" },
+            { "name": "M5 Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Competition"]
+        },
+        {
+          "name": "M5 (2011–2016, F10)",
+          "engines": [
+            { "name": "M5 Sedan", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "M5 (2005–2010, E60)",
+          "engines": [
+            { "name": "M5 Sedan", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "M8",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "M8 (2019–, F91/F92/F93)",
+          "engines": [
+            { "name": "M8 Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X3 M",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X3 M (2019–, F97)",
+          "engines": [
+            { "name": "X3 M Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X5 M",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X5 M (2019–, F95)",
+          "engines": [
+            { "name": "X5 M Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        }
+      ]
+    },
+    {
+      "brand": "BMW",
+      "type": "CAR",
+      "name": "X6 M",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "X6 M (2019–, F96)",
+          "engines": [
+            { "name": "X6 M Competition", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Competition"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "A-Class",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "A-Class (2018–, W177)",
+          "engines": [
+            { "name": "A 180 d", "fuelType": "DIESEL" },
+            { "name": "A 180", "fuelType": "GASOLINE" },
+            { "name": "A 200", "fuelType": "HYBRID" },
+            { "name": "A 220 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "A 250 e", "fuelType": "HYBRID" },
+            { "name": "AMG A 35 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG A 45 S 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Style", "AMG Line", "Progressive", "AMG"]
+        },
+        {
+          "name": "A-Class (2012–2018, W176)",
+          "engines": [
+            { "name": "A 180 CDI", "fuelType": "DIESEL" },
+            { "name": "A 180", "fuelType": "GASOLINE" },
+            { "name": "A 200", "fuelType": "GASOLINE" },
+            { "name": "A 220 d", "fuelType": "DIESEL" },
+            { "name": "A 250", "fuelType": "GASOLINE" },
+            { "name": "AMG A 45 4MATIC", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Urban", "Style", "AMG Line", "AMG"]
+        },
+        {
+          "name": "A-Class (2004–2012, W169)",
+          "engines": [
+            { "name": "A 150", "fuelType": "GASOLINE" },
+            { "name": "A 160", "fuelType": "GASOLINE" },
+            { "name": "A 170", "fuelType": "GASOLINE" },
+            { "name": "A 180 CDI", "fuelType": "DIESEL" },
+            { "name": "A 200", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde"]
+        },
+        {
+          "name": "A-Class (1997–2004, W168)",
+          "engines": [
+            { "name": "A 140", "fuelType": "GASOLINE" },
+            { "name": "A 160", "fuelType": "GASOLINE" },
+            { "name": "A 170 CDI", "fuelType": "DIESEL" },
+            { "name": "A 190", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "A-Class Sedan",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "A-Class Sedan (2018–, V177)",
+          "engines": [
+            { "name": "A 180 d", "fuelType": "DIESEL" },
+            { "name": "A 200", "fuelType": "HYBRID" },
+            { "name": "A 220 d", "fuelType": "DIESEL" },
+            { "name": "A 250 4MATIC", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Style", "AMG Line", "Progressive", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "B-Class",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "B-Class (2019–, W247)",
+          "engines": [
+            { "name": "B 180", "fuelType": "GASOLINE" },
+            { "name": "B 180 d", "fuelType": "DIESEL" },
+            { "name": "B 200", "fuelType": "HYBRID" },
+            { "name": "B 220 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "B 250 e", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Progressive", "AMG Line"]
+        },
+        {
+          "name": "B-Class (2011–2019, W246)",
+          "engines": [
+            { "name": "B 180", "fuelType": "GASOLINE" },
+            { "name": "B 180 CDI", "fuelType": "DIESEL" },
+            { "name": "B 200", "fuelType": "GASOLINE" },
+            { "name": "B 220 CDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Style", "Urban", "AMG Line"]
+        },
+        {
+          "name": "B-Class (2005–2011, W245)",
+          "engines": [
+            { "name": "B 150", "fuelType": "GASOLINE" },
+            { "name": "B 160", "fuelType": "GASOLINE" },
+            { "name": "B 170", "fuelType": "GASOLINE" },
+            { "name": "B 180 CDI", "fuelType": "DIESEL" },
+            { "name": "B 200", "fuelType": "GASOLINE" },
+            { "name": "B 200 CDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "C-Class",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "C-Class (2021–, W206)",
+          "engines": [
+            { "name": "C 180", "fuelType": "GASOLINE" },
+            { "name": "C 200", "fuelType": "HYBRID" },
+            { "name": "C 200 4MATIC", "fuelType": "HYBRID" },
+            { "name": "C 220 d", "fuelType": "DIESEL" },
+            { "name": "C 300 e", "fuelType": "HYBRID" },
+            { "name": "AMG C 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG C 63 S E PERFORMANCE", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "C-Class (2014–2021, W205)",
+          "engines": [
+            { "name": "C 180", "fuelType": "GASOLINE" },
+            { "name": "C 200", "fuelType": "GASOLINE" },
+            { "name": "C 200 d", "fuelType": "DIESEL" },
+            { "name": "C 220 d", "fuelType": "DIESEL" },
+            { "name": "C 250 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "C 300", "fuelType": "GASOLINE" },
+            { "name": "AMG C 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG C 63", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "Exclusive", "AMG"]
+        },
+        {
+          "name": "C-Class (2007–2014, W204)",
+          "engines": [
+            { "name": "C 180 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "C 180 CGI", "fuelType": "GASOLINE" },
+            { "name": "C 200 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "C 200 CDI", "fuelType": "DIESEL" },
+            { "name": "C 220 CDI", "fuelType": "DIESEL" },
+            { "name": "C 250 CGI", "fuelType": "GASOLINE" },
+            { "name": "C 320 CDI", "fuelType": "DIESEL" },
+            { "name": "C 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde", "AMG Line"]
+        },
+        {
+          "name": "C-Class (2000–2007, W203)",
+          "engines": [
+            { "name": "C 180", "fuelType": "GASOLINE" },
+            { "name": "C 180 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "C 200 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "C 200 CDI", "fuelType": "DIESEL" },
+            { "name": "C 220 CDI", "fuelType": "DIESEL" },
+            { "name": "C 270 CDI", "fuelType": "DIESEL" },
+            { "name": "C 320", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "C-Class Estate",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "C-Class Estate (2021–, S206)",
+          "engines": [
+            { "name": "C 200 4MATIC", "fuelType": "HYBRID" },
+            { "name": "C 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "C 200 4MATIC All-Terrain", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "All-Terrain"]
+        },
+        {
+          "name": "C-Class Estate (2014–2021, S205)",
+          "engines": [
+            { "name": "C 200", "fuelType": "GASOLINE" },
+            { "name": "C 220 d", "fuelType": "DIESEL" },
+            { "name": "C 250 d 4MATIC", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Avantgarde", "AMG Line"]
+        },
+        {
+          "name": "C-Class Estate (2007–2014, S204)",
+          "engines": [
+            { "name": "C 180 CGI", "fuelType": "GASOLINE" },
+            { "name": "C 200 CDI", "fuelType": "DIESEL" },
+            { "name": "C 220 CDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde", "AMG Line"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "CLA",
+      "supportedBodyTypes": ["COUPE", "SEDAN", "WAGON"],
+      "generations": [
+        {
+          "name": "CLA (2019–, C118)",
+          "engines": [
+            { "name": "CLA 180", "fuelType": "GASOLINE" },
+            { "name": "CLA 200", "fuelType": "HYBRID" },
+            { "name": "CLA 220 d", "fuelType": "DIESEL" },
+            { "name": "CLA 250 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG CLA 35 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG CLA 45 S 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Style", "AMG Line", "AMG"]
+        },
+        {
+          "name": "CLA (2013–2019, C117)",
+          "engines": [
+            { "name": "CLA 180", "fuelType": "GASOLINE" },
+            { "name": "CLA 200", "fuelType": "GASOLINE" },
+            { "name": "CLA 220 d", "fuelType": "DIESEL" },
+            { "name": "AMG CLA 45 4MATIC", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Urban", "Style", "AMG Line"]
+        },
+        {
+          "name": "CLA (2025–)",
+          "engines": [
+            { "name": "CLA 200 e", "fuelType": "HYBRID" },
+            { "name": "CLA e", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Progressive", "AMG Line"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "CLE",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "CLE Coupe (2023–, C236)",
+          "engines": [
+            { "name": "CLE 200", "fuelType": "HYBRID" },
+            { "name": "CLE 220 d", "fuelType": "DIESEL" },
+            { "name": "CLE 300 4MATIC", "fuelType": "HYBRID" },
+            { "name": "AMG CLE 53 4MATIC+", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "CLE Cabriolet (2024–, A236)",
+          "engines": [
+            { "name": "CLE 200 Cabriolet", "fuelType": "HYBRID" },
+            { "name": "CLE 300 4MATIC Cabriolet", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "CLS",
+      "supportedBodyTypes": ["SEDAN", "COUPE"],
+      "generations": [
+        {
+          "name": "CLS (2018–2023, C257)",
+          "engines": [
+            { "name": "CLS 220 d", "fuelType": "DIESEL" },
+            { "name": "CLS 300 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "CLS 350", "fuelType": "GASOLINE" },
+            { "name": "AMG CLS 53 4MATIC+", "fuelType": "HYBRID" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        },
+        {
+          "name": "CLS (2010–2018, C218)",
+          "engines": [
+            { "name": "CLS 250 CDI", "fuelType": "DIESEL" },
+            { "name": "CLS 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "CLS 350", "fuelType": "GASOLINE" },
+            { "name": "CLS 500", "fuelType": "GASOLINE" },
+            { "name": "CLS 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "CLS (2004–2010, C219)",
+          "engines": [
+            { "name": "CLS 320 CDI", "fuelType": "DIESEL" },
+            { "name": "CLS 350", "fuelType": "GASOLINE" },
+            { "name": "CLS 350 CGI", "fuelType": "GASOLINE" },
+            { "name": "CLS 500", "fuelType": "GASOLINE" },
+            { "name": "CLS 55 AMG", "fuelType": "GASOLINE" },
+            { "name": "CLS 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "AMG Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "E-Class",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "E-Class (2023–, W214)",
+          "engines": [
+            { "name": "E 180", "fuelType": "GASOLINE" },
+            { "name": "E 200", "fuelType": "HYBRID" },
+            { "name": "E 220 d", "fuelType": "DIESEL" },
+            { "name": "E 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "E 300 e 4MATIC", "fuelType": "HYBRID" },
+            { "name": "E 300 de 4MATIC", "fuelType": "HYBRID" },
+            { "name": "AMG E 53 Hybrid 4MATIC+", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Exclusive", "AMG Line", "AMG"]
+        },
+        {
+          "name": "E-Class (2016–2023, W213)",
+          "engines": [
+            { "name": "E 180", "fuelType": "GASOLINE" },
+            { "name": "E 200", "fuelType": "GASOLINE" },
+            { "name": "E 220 d", "fuelType": "DIESEL" },
+            { "name": "E 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "E 300 e", "fuelType": "HYBRID" },
+            { "name": "E 350 e", "fuelType": "HYBRID" },
+            { "name": "E 400 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "AMG E 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG E 53 4MATIC+", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "Exclusive", "AMG Line", "AMG"]
+        },
+        {
+          "name": "E-Class (2009–2016, W212)",
+          "engines": [
+            { "name": "E 200", "fuelType": "GASOLINE" },
+            { "name": "E 220 CDI", "fuelType": "DIESEL" },
+            { "name": "E 250 CDI", "fuelType": "DIESEL" },
+            { "name": "E 350", "fuelType": "GASOLINE" },
+            { "name": "E 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde", "AMG"]
+        },
+        {
+          "name": "E-Class (2002–2009, W211)",
+          "engines": [
+            { "name": "E 200 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "E 220 CDI", "fuelType": "DIESEL" },
+            { "name": "E 270 CDI", "fuelType": "DIESEL" },
+            { "name": "E 280", "fuelType": "GASOLINE" },
+            { "name": "E 320 CDI", "fuelType": "DIESEL" },
+            { "name": "E 320", "fuelType": "GASOLINE" },
+            { "name": "E 500", "fuelType": "GASOLINE" },
+            { "name": "E 55 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "Avantgarde", "AMG Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "E-Class Coupe/Cabrio",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "E-Class Coupe (2017–2023, C238)",
+          "engines": [
+            { "name": "E 200 Coupe", "fuelType": "GASOLINE" },
+            { "name": "E 220 d Coupe", "fuelType": "DIESEL" },
+            { "name": "E 300 Coupe", "fuelType": "GASOLINE" },
+            { "name": "AMG E 53 Coupe 4MATIC+", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "E-Class Cabriolet (2017–2023, A238)",
+          "engines": [
+            { "name": "E 200 Cabriolet", "fuelType": "GASOLINE" },
+            { "name": "E 300 Cabriolet", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line"]
+        },
+        {
+          "name": "E-Class Coupe (2009–2017, C207)",
+          "engines": [
+            { "name": "E 250 CGI Coupe", "fuelType": "GASOLINE" },
+            { "name": "E 250 CDI Coupe", "fuelType": "DIESEL" },
+            { "name": "E 350 Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Elegance", "Avantgarde", "AMG Sport"]
+        },
+        {
+          "name": "E-Class Cabriolet (2010–2017, A207)",
+          "engines": [
+            { "name": "E 250 CGI Cabriolet", "fuelType": "GASOLINE" },
+            { "name": "E 250 CDI Cabriolet", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Elegance", "Avantgarde", "AMG Sport"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "S-Class",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "S-Class (2020–, W223)",
+          "engines": [
+            { "name": "S 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "S 400 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "S 450 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "S 500 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "S 580 e 4MATIC", "fuelType": "HYBRID" },
+            { "name": "S 680 4MATIC Maybach", "fuelType": "GASOLINE" },
+            { "name": "AMG S 63 E PERFORMANCE", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Inspiration", "Exclusive", "Maybach", "AMG"]
+        },
+        {
+          "name": "S-Class (2013–2020, W222)",
+          "engines": [
+            { "name": "S 350 d", "fuelType": "DIESEL" },
+            { "name": "S 400", "fuelType": "GASOLINE" },
+            { "name": "S 500", "fuelType": "GASOLINE" },
+            { "name": "S 63 AMG", "fuelType": "GASOLINE" },
+            { "name": "S 65 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "Exclusive", "AMG", "Maybach"]
+        },
+        {
+          "name": "S-Class (2005–2013, W221)",
+          "engines": [
+            { "name": "S 320 CDI", "fuelType": "DIESEL" },
+            { "name": "S 350", "fuelType": "GASOLINE" },
+            { "name": "S 350 BlueTEC", "fuelType": "DIESEL" },
+            { "name": "S 500", "fuelType": "GASOLINE" },
+            { "name": "S 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Elegance", "AMG Sport"]
+        },
+        {
+          "name": "S-Class (1998–2005, W220)",
+          "engines": [
+            { "name": "S 320", "fuelType": "GASOLINE" },
+            { "name": "S 320 CDI", "fuelType": "DIESEL" },
+            { "name": "S 350", "fuelType": "GASOLINE" },
+            { "name": "S 500", "fuelType": "GASOLINE" },
+            { "name": "S 55 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLA",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "GLA (2019–, H247)",
+          "engines": [
+            { "name": "GLA 180", "fuelType": "GASOLINE" },
+            { "name": "GLA 200", "fuelType": "HYBRID" },
+            { "name": "GLA 220 d", "fuelType": "DIESEL" },
+            { "name": "GLA 250 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLA 35 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLA 45 S 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Style", "AMG Line", "AMG"]
+        },
+        {
+          "name": "GLA (2013–2019, X156)",
+          "engines": [
+            { "name": "GLA 180", "fuelType": "GASOLINE" },
+            { "name": "GLA 180 d", "fuelType": "DIESEL" },
+            { "name": "GLA 200", "fuelType": "GASOLINE" },
+            { "name": "GLA 220 d", "fuelType": "DIESEL" },
+            { "name": "AMG GLA 45 4MATIC", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Style", "Urban", "AMG Line", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLB",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "GLB (2019–, X247)",
+          "engines": [
+            { "name": "GLB 180", "fuelType": "GASOLINE" },
+            { "name": "GLB 200", "fuelType": "HYBRID" },
+            { "name": "GLB 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLB 250 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLB 35 4MATIC", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Progressive", "AMG Line", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLC",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "GLC (2022–, X254)",
+          "engines": [
+            { "name": "GLC 200", "fuelType": "HYBRID" },
+            { "name": "GLC 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLC 300 e 4MATIC", "fuelType": "HYBRID" },
+            { "name": "GLC 300 de 4MATIC", "fuelType": "HYBRID" },
+            { "name": "AMG GLC 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLC 63 S E PERFORMANCE", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "GLC (2015–2022, X253)",
+          "engines": [
+            { "name": "GLC 200", "fuelType": "GASOLINE" },
+            { "name": "GLC 220 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLC 250", "fuelType": "GASOLINE" },
+            { "name": "GLC 300 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLC 350 e", "fuelType": "HYBRID" },
+            { "name": "AMG GLC 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLC 63", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "Exclusive", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLC Coupe",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "GLC Coupe (2023–, C254)",
+          "engines": [
+            { "name": "GLC 200 Coupe", "fuelType": "HYBRID" },
+            { "name": "GLC 220 d 4MATIC Coupe", "fuelType": "DIESEL" },
+            { "name": "GLC 300 e 4MATIC Coupe", "fuelType": "HYBRID" },
+            { "name": "AMG GLC 43 4MATIC Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "GLC Coupe (2016–2023, C253)",
+          "engines": [
+            { "name": "GLC 250 Coupe", "fuelType": "GASOLINE" },
+            { "name": "GLC 220 d Coupe", "fuelType": "DIESEL" },
+            { "name": "GLC 300 d Coupe", "fuelType": "DIESEL" },
+            { "name": "AMG GLC 43 Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLE / ML",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "GLE (2019–, V167)",
+          "engines": [
+            { "name": "GLE 300 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLE 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLE 450 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "GLE 350 de 4MATIC", "fuelType": "HYBRID" },
+            { "name": "GLE 580 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLE 53 4MATIC+", "fuelType": "HYBRID" },
+            { "name": "AMG GLE 63 S 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "ML/GLE (2011–2019, W166)",
+          "engines": [
+            { "name": "ML 250 BlueTEC", "fuelType": "DIESEL" },
+            { "name": "ML 350 BlueTEC", "fuelType": "DIESEL" },
+            { "name": "GLE 250 d", "fuelType": "DIESEL" },
+            { "name": "GLE 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLE 400", "fuelType": "GASOLINE" },
+            { "name": "AMG GLE 43 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLE 63 S", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport", "Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "ML (2005–2011, W164)",
+          "engines": [
+            { "name": "ML 280 CDI", "fuelType": "DIESEL" },
+            { "name": "ML 320 CDI", "fuelType": "DIESEL" },
+            { "name": "ML 350", "fuelType": "GASOLINE" },
+            { "name": "ML 350 CDI", "fuelType": "DIESEL" },
+            { "name": "ML 500", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Sport", "Grand Edition"]
+        },
+        {
+          "name": "ML (1997–2005, W163)",
+          "engines": [
+            { "name": "ML 270 CDI", "fuelType": "DIESEL" },
+            { "name": "ML 320", "fuelType": "GASOLINE" },
+            { "name": "ML 350", "fuelType": "GASOLINE" },
+            { "name": "ML 400 CDI", "fuelType": "DIESEL" },
+            { "name": "ML 430", "fuelType": "GASOLINE" },
+            { "name": "ML 55 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Inspiration", "Final Edition"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLE Coupe",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "GLE Coupe (2020–, C167)",
+          "engines": [
+            { "name": "GLE 350 de Coupe", "fuelType": "HYBRID" },
+            { "name": "GLE 400 d Coupe", "fuelType": "DIESEL" },
+            { "name": "AMG GLE 53 Coupe", "fuelType": "HYBRID" },
+            { "name": "AMG GLE 63 S Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        },
+        {
+          "name": "GLE Coupe (2015–2019, C292)",
+          "engines": [
+            { "name": "GLE 350 d Coupe", "fuelType": "DIESEL" },
+            { "name": "GLE 400 Coupe", "fuelType": "GASOLINE" },
+            { "name": "GLE 450 AMG Coupe", "fuelType": "GASOLINE" },
+            { "name": "AMG GLE 43 Coupe", "fuelType": "GASOLINE" },
+            { "name": "AMG GLE 63 S Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "GLS / GL",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "GLS (2019–, X167)",
+          "engines": [
+            { "name": "GLS 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLS 400 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GLS 450 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "GLS 580 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "GLS 600 Maybach 4MATIC", "fuelType": "GASOLINE" },
+            { "name": "AMG GLS 63 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "Maybach", "AMG"]
+        },
+        {
+          "name": "GL/GLS (2012–2019, X166)",
+          "engines": [
+            { "name": "GL 350 BlueTEC", "fuelType": "DIESEL" },
+            { "name": "GLS 350 d 4MATIC", "fuelType": "DIESEL" },
+            { "name": "GL 500", "fuelType": "GASOLINE" },
+            { "name": "AMG GL 63 / GLS 63", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Avantgarde", "AMG Line", "AMG"]
+        },
+        {
+          "name": "GL (2006–2012, X164)",
+          "engines": [
+            { "name": "GL 320 CDI", "fuelType": "DIESEL" },
+            { "name": "GL 350 CDI", "fuelType": "DIESEL" },
+            { "name": "GL 420 CDI", "fuelType": "DIESEL" },
+            { "name": "GL 450", "fuelType": "GASOLINE" },
+            { "name": "GL 500", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "Grand Edition"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "G-Class",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "G-Class (2018–, W463)",
+          "engines": [
+            { "name": "G 350 d", "fuelType": "DIESEL" },
+            { "name": "G 450 d", "fuelType": "DIESEL" },
+            { "name": "G 500", "fuelType": "GASOLINE" },
+            { "name": "G 580 EQ", "fuelType": "ELECTRIC" },
+            { "name": "AMG G 63", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Heritage", "Stronger Than Time", "AMG"]
+        },
+        {
+          "name": "G-Class (1979–2018, W463)",
+          "engines": [
+            { "name": "G 270 CDI", "fuelType": "DIESEL" },
+            { "name": "G 300 CDI", "fuelType": "DIESEL" },
+            { "name": "G 320 CDI", "fuelType": "DIESEL" },
+            { "name": "G 350 CDI", "fuelType": "DIESEL" },
+            { "name": "G 400 CDI", "fuelType": "DIESEL" },
+            { "name": "G 500", "fuelType": "GASOLINE" },
+            { "name": "G 55 AMG", "fuelType": "GASOLINE" },
+            { "name": "G 63 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Classic", "Edition", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "EQA",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "EQA (2021–, H243)",
+          "engines": [
+            { "name": "EQA 250", "fuelType": "ELECTRIC" },
+            { "name": "EQA 300 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "EQA 350 4MATIC", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Style", "AMG Line", "Electric Art"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "EQB",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "EQB (2021–, X243)",
+          "engines": [
+            { "name": "EQB 250", "fuelType": "ELECTRIC" },
+            { "name": "EQB 300 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "EQB 350 4MATIC", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Style", "AMG Line", "Electric Art"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "EQC",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "EQC (2019–, N293)",
+          "engines": [
+            { "name": "EQC 400 4MATIC", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["AMG Line", "Electric Art"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "EQE",
+      "supportedBodyTypes": ["SEDAN", "SUV"],
+      "generations": [
+        {
+          "name": "EQE Sedan (2022–, V295)",
+          "engines": [
+            { "name": "EQE 300", "fuelType": "ELECTRIC" },
+            { "name": "EQE 350", "fuelType": "ELECTRIC" },
+            { "name": "EQE 350 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "EQE 500 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "AMG EQE 43 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "AMG EQE 53 4MATIC+", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["AMG Line", "Electric Art", "AMG"]
+        },
+        {
+          "name": "EQE SUV (2022–, X294)",
+          "engines": [
+            { "name": "EQE 350 4MATIC SUV", "fuelType": "ELECTRIC" },
+            { "name": "EQE 500 4MATIC SUV", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["AMG Line", "Electric Art"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "EQS",
+      "supportedBodyTypes": ["SEDAN", "SUV"],
+      "generations": [
+        {
+          "name": "EQS Sedan (2021–, V297)",
+          "engines": [
+            { "name": "EQS 450+", "fuelType": "ELECTRIC" },
+            { "name": "EQS 450 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "EQS 580 4MATIC", "fuelType": "ELECTRIC" },
+            { "name": "AMG EQS 53 4MATIC+", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Electric Art", "AMG Line", "AMG"]
+        },
+        {
+          "name": "EQS SUV (2022–, X296)",
+          "engines": [
+            { "name": "EQS 450 4MATIC SUV", "fuelType": "ELECTRIC" },
+            { "name": "EQS 580 4MATIC SUV", "fuelType": "ELECTRIC" },
+            { "name": "Maybach EQS 680 SUV", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Electric Art", "Maybach"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "AMG GT",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "AMG GT (2023–, C192)",
+          "engines": [
+            { "name": "AMG GT 43", "fuelType": "HYBRID" },
+            { "name": "AMG GT 55", "fuelType": "GASOLINE" },
+            { "name": "AMG GT 63 S E PERFORMANCE", "fuelType": "HYBRID" }
+          ],
+          "trims": ["AMG"]
+        },
+        {
+          "name": "AMG GT (2014–2023, C190)",
+          "engines": [
+            { "name": "AMG GT", "fuelType": "GASOLINE" },
+            { "name": "AMG GT S", "fuelType": "GASOLINE" },
+            { "name": "AMG GT R", "fuelType": "GASOLINE" },
+            { "name": "AMG GT 63 S 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "SL",
+      "supportedBodyTypes": ["CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "SL (2022–, R232)",
+          "engines": [
+            { "name": "SL 43", "fuelType": "HYBRID" },
+            { "name": "SL 55 4MATIC+", "fuelType": "GASOLINE" },
+            { "name": "AMG SL 63 4MATIC+", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        },
+        {
+          "name": "SL (2012–2020, R231)",
+          "engines": [
+            { "name": "SL 400", "fuelType": "GASOLINE" },
+            { "name": "SL 500", "fuelType": "GASOLINE" },
+            { "name": "SL 63 AMG", "fuelType": "GASOLINE" },
+            { "name": "SL 65 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        }
+      ]
+    },
+    {
+      "brand": "MERCEDES_BENZ",
+      "type": "CAR",
+      "name": "SLK / SLC",
+      "supportedBodyTypes": ["CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "SLC (2016–2020, R172)",
+          "engines": [
+            { "name": "SLC 180", "fuelType": "GASOLINE" },
+            { "name": "SLC 200", "fuelType": "GASOLINE" },
+            { "name": "AMG SLC 43", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        },
+        {
+          "name": "SLK (2011–2016, R172)",
+          "engines": [
+            { "name": "SLK 200", "fuelType": "GASOLINE" },
+            { "name": "SLK 250", "fuelType": "GASOLINE" },
+            { "name": "SLK 350", "fuelType": "GASOLINE" },
+            { "name": "SLK 55 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["AMG Line", "AMG"]
+        },
+        {
+          "name": "SLK (2004–2011, R171)",
+          "engines": [
+            { "name": "SLK 200 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "SLK 280", "fuelType": "GASOLINE" },
+            { "name": "SLK 350", "fuelType": "GASOLINE" },
+            { "name": "SLK 55 AMG", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "AMG Sport"]
+        },
+        {
+          "name": "SLK (1996–2004, R170)",
+          "engines": [
+            { "name": "SLK 200", "fuelType": "GASOLINE" },
+            { "name": "SLK 200 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "SLK 230 Kompressor", "fuelType": "GASOLINE" },
+            { "name": "SLK 320", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A1 Sportback",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "A1 Sportback (2018–, GB)",
+          "engines": [
+            { "name": "30 TFSI", "fuelType": "GASOLINE" },
+            { "name": "35 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "A1 Sportback (2010–2018, 8X)",
+          "engines": [
+            { "name": "1.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Attraction", "Ambition"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A3 Sportback",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "A3 Sportback (2020–, 8Y)",
+          "engines": [
+            { "name": "30 TFSI", "fuelType": "GASOLINE" },
+            { "name": "35 TFSI", "fuelType": "GASOLINE" },
+            { "name": "30 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "A3 Sportback (2012–2020, 8V)",
+          "engines": [
+            { "name": "1.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.2 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.5 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Attraction", "Ambition", "Ambiente", "Dynamic", "Sport", "Design"]
+        },
+        {
+          "name": "A3 Sportback (2003–2012, 8P)",
+          "engines": [
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 MPI", "fuelType": "GASOLINE" },
+            { "name": "1.6 FSI", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Attraction", "Ambition", "Ambiente"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A3 Sedan",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "A3 Sedan (2020–, 8Y)",
+          "engines": [
+            { "name": "30 TFSI", "fuelType": "GASOLINE" },
+            { "name": "35 TFSI", "fuelType": "GASOLINE" },
+            { "name": "30 TDI", "fuelType": "DIESEL" },
+            { "name": "35 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "A3 Sedan (2013–2020, 8V)",
+          "engines": [
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.5 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Ambition", "Ambiente", "Dynamic", "Sport", "Design"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A4 Sedan",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "A4 (2015–2024, B9)",
+          "engines": [
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "3.0 TDI quattro", "fuelType": "DIESEL" },
+            { "name": "40 TFSI", "fuelType": "GASOLINE" },
+            { "name": "40 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Design", "Sport", "S line", "Advanced"]
+        },
+        {
+          "name": "A4 (2008–2015, B8)",
+          "engines": [
+            { "name": "1.8 TFSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "3.0 TDI quattro", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "Comfort", "Exclusive"]
+        },
+        {
+          "name": "A4 (2004–2008, B7)",
+          "engines": [
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.8 T", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "A4 (2000–2004, B6)",
+          "engines": [
+            { "name": "1.6", "fuelType": "GASOLINE" },
+            { "name": "1.8 T", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A4 Avant",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "A4 Avant (2015–2024, B9)",
+          "engines": [
+            { "name": "2.0 TDI Avant", "fuelType": "DIESEL" },
+            { "name": "40 TDI quattro Avant", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Design", "Sport", "S line"]
+        },
+        {
+          "name": "A4 Avant (2008–2015, B8)",
+          "engines": [
+            { "name": "2.0 TDI Avant", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A5",
+      "supportedBodyTypes": ["COUPE", "CONVERTIBLE", "SEDAN"],
+      "generations": [
+        {
+          "name": "A5 Coupe (2016–2024, F5)",
+          "engines": [
+            { "name": "2.0 TFSI Coupe", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Sport", "Design", "S line"]
+        },
+        {
+          "name": "A5 Sportback (2016–2024, F5)",
+          "engines": [
+            { "name": "1.4 TFSI Sportback", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI Sportback", "fuelType": "DIESEL" },
+            { "name": "40 TFSI Sportback", "fuelType": "GASOLINE" },
+            { "name": "45 TFSI quattro Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport", "Design", "S line"]
+        },
+        {
+          "name": "A5 Cabriolet (2016–2024, F5)",
+          "engines": [
+            { "name": "2.0 TFSI Cabriolet", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line"]
+        },
+        {
+          "name": "A5 Coupe (2007–2016, 8T)",
+          "engines": [
+            { "name": "1.8 TFSI Coupe", "fuelType": "GASOLINE" },
+            { "name": "2.0 TFSI Coupe", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI Coupe", "fuelType": "DIESEL" },
+            { "name": "3.0 TDI quattro Coupe", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "S line"]
+        },
+        {
+          "name": "A5 Sportback (2009–2016, 8T)",
+          "engines": [
+            { "name": "1.8 TFSI Sportback", "fuelType": "GASOLINE" },
+            { "name": "2.0 TFSI Sportback", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI Sportback", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "S line"]
+        },
+        {
+          "name": "A5 Cabriolet (2009–2016, 8F)",
+          "engines": [
+            { "name": "1.8 TFSI Cabriolet", "fuelType": "GASOLINE" },
+            { "name": "2.0 TFSI Cabriolet", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A6 Sedan",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "A6 (2018–, C8)",
+          "engines": [
+            { "name": "40 TDI", "fuelType": "DIESEL" },
+            { "name": "45 TFSI", "fuelType": "GASOLINE" },
+            { "name": "50 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Sport", "Design", "S line"]
+        },
+        {
+          "name": "A6 (2011–2018, C7)",
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "3.0 TDI quattro", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "Limousine", "S line"]
+        },
+        {
+          "name": "A6 (2004–2011, C6)",
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.4", "fuelType": "GASOLINE" },
+            { "name": "2.7 TDI", "fuelType": "DIESEL" },
+            { "name": "3.0 TDI quattro", "fuelType": "DIESEL" },
+            { "name": "3.2 FSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "A6 (1997–2004, C5)",
+          "engines": [
+            { "name": "1.8 T", "fuelType": "GASOLINE" },
+            { "name": "1.9 TDI", "fuelType": "DIESEL" },
+            { "name": "2.4", "fuelType": "GASOLINE" },
+            { "name": "2.5 TDI", "fuelType": "DIESEL" },
+            { "name": "3.0", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A6 Avant",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "A6 Avant (2018–, C8)",
+          "engines": [
+            { "name": "40 TDI Avant", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Sport", "S line"]
+        },
+        {
+          "name": "A6 Avant (2011–2018, C7)",
+          "engines": [
+            { "name": "2.0 TDI Avant", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A7",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "A7 Sportback (2018–, 4K8)",
+          "engines": [
+            { "name": "40 TDI Sportback", "fuelType": "DIESEL" },
+            { "name": "55 TFSI Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line"]
+        },
+        {
+          "name": "A7 Sportback (2010–2018, 4G8)",
+          "engines": [
+            { "name": "3.0 TDI Sportback", "fuelType": "DIESEL" },
+            { "name": "3.0 TFSI Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "A8",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "A8 (2017–, D5)",
+          "engines": [
+            { "name": "50 TDI L", "fuelType": "DIESEL" },
+            { "name": "55 TFSI L", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "A8 (2010–2017, D4)",
+          "engines": [
+            { "name": "3.0 TDI L", "fuelType": "DIESEL" },
+            { "name": "4.2 TDI L", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "A8 (2002–2009, D3)",
+          "engines": [
+            { "name": "3.0 TDI", "fuelType": "DIESEL" },
+            { "name": "4.2 quattro", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q2",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q2 (2016–, GA)",
+          "engines": [
+            { "name": "1.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "1.6 TDI", "fuelType": "DIESEL" },
+            { "name": "30 TFSI", "fuelType": "GASOLINE" },
+            { "name": "35 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Dynamic", "Sport", "Design", "S line", "Advanced"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q3",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q3 (2018–, F3)",
+          "engines": [
+            { "name": "35 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "Q3 (2011–2018, 8U)",
+          "engines": [
+            { "name": "1.4 TFSI", "fuelType": "GASOLINE" },
+            { "name": "2.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "Sport", "S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q3 Sportback",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "Q3 Sportback (2019–, F3)",
+          "engines": [
+            { "name": "35 TFSI Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q5",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q5 (2017–2024, FY)",
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "40 TDI", "fuelType": "DIESEL" },
+            { "name": "45 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Sport", "Design", "Advanced", "S line"]
+        },
+        {
+          "name": "Q5 (2008–2017, 8R)",
+          "engines": [
+            { "name": "2.0 TDI", "fuelType": "DIESEL" },
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "3.0 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard", "S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q5 Sportback",
+      "supportedBodyTypes": ["COUPE", "SUV"],
+      "generations": [
+        {
+          "name": "Q5 Sportback (2021–, FY)",
+          "engines": [
+            { "name": "40 TDI Sportback", "fuelType": "DIESEL" },
+            { "name": "45 TFSI Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Advanced", "S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q7",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q7 (2015–, 4M)",
+          "engines": [
+            { "name": "2.0 TFSI", "fuelType": "GASOLINE" },
+            { "name": "3.0 TDI", "fuelType": "DIESEL" },
+            { "name": "50 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["S line", "Premium"]
+        },
+        {
+          "name": "Q7 (2005–2015, 4L)",
+          "engines": [
+            { "name": "3.0 TDI", "fuelType": "DIESEL" },
+            { "name": "4.2 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q8",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q8 (2018–, 4M)",
+          "engines": [
+            { "name": "50 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "TT Coupe",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "TT Coupe (2014–2023, 8S)",
+          "engines": [
+            { "name": "2.0 TFSI Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line"]
+        },
+        {
+          "name": "TT Coupe (2006–2014, 8J)",
+          "engines": [
+            { "name": "1.8 TFSI Coupe", "fuelType": "GASOLINE" },
+            { "name": "2.0 TFSI Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard", "S line"]
+        },
+        {
+          "name": "TT Coupe (1998–2006, 8N)",
+          "engines": [
+            { "name": "1.8 T Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "TT Roadster",
+      "supportedBodyTypes": ["CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "TT Roadster (2014–2023, 8S)",
+          "engines": [
+            { "name": "2.0 TFSI Roadster", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line"]
+        },
+        {
+          "name": "TT Roadster (2006–2014, 8J)",
+          "engines": [
+            { "name": "2.0 TFSI Roadster", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "TT Roadster (1998–2006, 8N)",
+          "engines": [
+            { "name": "1.8 T Roadster", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "R8 Coupe",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "R8 Coupe (2015–2023, 4S)",
+          "engines": [
+            { "name": "5.2 FSI V10 Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "R8 Coupe (2006–2015, 42)",
+          "engines": [
+            { "name": "4.2 FSI V8 Coupe", "fuelType": "GASOLINE" },
+            { "name": "5.2 FSI V10 Coupe", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "R8 Spyder",
+      "supportedBodyTypes": ["CONVERTIBLE"],
+      "generations": [
+        {
+          "name": "R8 Spyder (2016–2023, 4S)",
+          "engines": [
+            { "name": "5.2 FSI V10 Spyder", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "R8 Spyder (2009–2015, 42)",
+          "engines": [
+            { "name": "5.2 FSI V10 Spyder", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "e-tron / Q8 e-tron",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "e-tron SUV (2018–2022, GE)",
+          "engines": [
+            { "name": "55 e-tron", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "e-tron Sportback (2019–2022, GE)",
+          "engines": [
+            { "name": "55 e-tron Sportback", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["S line"]
+        },
+        {
+          "name": "Q8 e-tron (2022–, GE)",
+          "engines": [
+            { "name": "55 e-tron", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "Q8 Sportback e-tron (2022–, GE)",
+          "engines": [
+            { "name": "55 e-tron Sportback", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "Q4 e-tron",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "Q4 e-tron (2021–, F4)",
+          "engines": [
+            { "name": "40 e-tron", "fuelType": "ELECTRIC" },
+            { "name": "50 e-tron", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Advanced", "S line"]
+        },
+        {
+          "name": "Q4 Sportback e-tron (2021–, F4)",
+          "engines": [
+            { "name": "40 e-tron Sportback", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["S line"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "e-tron GT",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "e-tron GT (2021–, J1)",
+          "engines": [
+            { "name": "e-tron GT", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "RS e-tron GT (2021–, J1)",
+          "engines": [
+            { "name": "RS e-tron GT", "fuelType": "ELECTRIC" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S3",
+      "supportedBodyTypes": ["HATCHBACK", "SEDAN"],
+      "generations": [
+        {
+          "name": "S3 (2020–, 8Y)",
+          "engines": [
+            { "name": "S3", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["S line", "RS"]
+        },
+        {
+          "name": "S3 (2013–2020, 8V)",
+          "engines": [
+            { "name": "S3", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S4",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "S4 (2015–2024, B9)",
+          "engines": [
+            { "name": "S4 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "S4 (2008–2015, B8)",
+          "engines": [
+            { "name": "S4 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S5",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "S5 (2016–2024, F5)",
+          "engines": [
+            { "name": "S5 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "S5 (2007–2016, 8T)",
+          "engines": [
+            { "name": "S5 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S6",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "S6 (2018–, C8)",
+          "engines": [
+            { "name": "S6 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "S6 (2012–2018, C7)",
+          "engines": [
+            { "name": "S6 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S7",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "S7 Sportback (2019–, 4K8)",
+          "engines": [
+            { "name": "S7 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "S7 Sportback (2012–2018, 4G8)",
+          "engines": [
+            { "name": "S7 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "S8",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "S8 (2019–, D5)",
+          "engines": [
+            { "name": "S8 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        },
+        {
+          "name": "S8 (2012–2018, D4)",
+          "engines": [
+            { "name": "S8 TFSI", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "RS3",
+      "supportedBodyTypes": ["HATCHBACK", "SEDAN"],
+      "generations": [
+        {
+          "name": "RS3 Sportback (2021–, 8Y)",
+          "engines": [
+            { "name": "RS3", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "RS3 Sportback (2015–2020, 8V)",
+          "engines": [
+            { "name": "RS3", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "RS4 Avant",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "RS4 Avant (2017–, B9)",
+          "engines": [
+            { "name": "RS4 Avant", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "RS4 Avant (2012–2015, B8)",
+          "engines": [
+            { "name": "RS4 Avant", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "RS5",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "RS5 Coupe (2017–, F5)",
+          "engines": [
+            { "name": "RS5", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "RS5 Coupe (2010–2016, 8T)",
+          "engines": [
+            { "name": "RS5", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "RS6 Avant",
+      "supportedBodyTypes": ["WAGON"],
+      "generations": [
+        {
+          "name": "RS6 Avant (2019–, C8)",
+          "engines": [
+            { "name": "RS6", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "RS6 Avant (2013–2018, C7)",
+          "engines": [
+            { "name": "RS6", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "RS7 Sportback",
+      "supportedBodyTypes": ["COUPE", "SEDAN"],
+      "generations": [
+        {
+          "name": "RS7 Sportback (2019–, 4K8)",
+          "engines": [
+            { "name": "RS7 Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        },
+        {
+          "name": "RS7 Sportback (2013–2018, 4G8)",
+          "engines": [
+            { "name": "RS7 Sportback", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["RS"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "SQ5",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "SQ5 (2017–, FY)",
+          "engines": [
+            { "name": "SQ5 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "SQ7",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "SQ7 (2016–, 4M)",
+          "engines": [
+            { "name": "SQ7 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "SQ8",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "SQ8 (2019–, 4M)",
+          "engines": [
+            { "name": "SQ8 TDI", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "TTS",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "TTS Coupe (2014–2023, 8S)",
+          "engines": [
+            { "name": "TTS", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "AUDI",
+      "type": "CAR",
+      "name": "TT RS",
+      "supportedBodyTypes": ["COUPE"],
+      "generations": [
+        {
+          "name": "TT RS Coupe (2016–2023, 8S)",
+          "engines": [
+            { "name": "TT RS", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Standard"]
+        }
+      ]
+    },
+    {
+      "brand": "FIAT",
+      "type": "CAR",
+      "name": "Egea",
+      "supportedBodyTypes": ["SEDAN", "HATCHBACK", "SUV"],
+      "generations": [
+        {
+          "name": "Egea",
+          "engines": [
+            { "name": "1.4 Fire", "fuelType": "GASOLINE" },
+            { "name": "1.3 Multijet", "fuelType": "DIESEL" },
+            { "name": "1.6 Multijet", "fuelType": "DIESEL" },
+            { "name": "1.5 T4 Hybrid", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Easy", "Urban", "Lounge", "Street"]
+        }
+      ]
+    },
+    {
+      "brand": "TOYOTA",
+      "type": "CAR",
+      "name": "Corolla",
+      "supportedBodyTypes": ["SEDAN"],
+      "generations": [
+        {
+          "name": "Corolla E210",
+          "engines": [
+            { "name": "1.5 Vision", "fuelType": "GASOLINE" },
+            { "name": "1.8 Hybrid", "fuelType": "HYBRID" }
+          ],
+          "trims": ["Vision", "Dream", "Flame", "Passion"]
+        }
+      ]
+    },
+    {
+      "brand": "PEUGEOT",
+      "type": "CAR",
+      "name": "208",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "208 II",
+          "engines": [
+            { "name": "1.2 PureTech", "fuelType": "GASOLINE" },
+            { "name": "1.5 BlueHDi", "fuelType": "DIESEL" }
+          ],
+          "trims": ["Active", "Allure", "GT"]
+        }
+      ]
+    },
+    {
+      "brand": "PEUGEOT",
+      "type": "CAR",
+      "name": "3008",
+      "supportedBodyTypes": ["SUV"],
+      "generations": [
+        {
+          "name": "3008 II",
+          "engines": [
+            { "name": "1.5 BlueHDi", "fuelType": "DIESEL" },
+            { "name": "1.6 PureTech", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Active Prime", "Allure", "GT", "GT Line"]
+        }
+      ]
+    },
+    {
+      "brand": "OPEL",
+      "type": "CAR",
+      "name": "Corsa",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "Corsa F",
+          "engines": [
+            { "name": "1.2 PureTech", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Edition", "Elegance", "Ultimate"]
+        }
+      ]
+    },
+    {
+      "brand": "OPEL",
+      "type": "CAR",
+      "name": "Astra",
+      "supportedBodyTypes": ["HATCHBACK"],
+      "generations": [
+        {
+          "name": "Astra L",
+          "engines": [
+            { "name": "1.2 Turbo", "fuelType": "GASOLINE" }
+          ],
+          "trims": ["Edition", "Elegance", "GS Line"]
+        }
+      ]
+    },
+    {
+      "brand": "HONDA",
+      "type": "MOTORCYCLE",
+      "name": "CBR 600RR",
+      "supportedBodyTypes": [],
+      "generations": []
+    },
+    {
+      "brand": "HONDA",
+      "type": "MOTORCYCLE",
+      "name": "CB 250R Neo Sports Cafe",
+      "supportedBodyTypes": [],
+      "generations": []
+    },
+    {
+      "brand": "YAMAHA",
+      "type": "MOTORCYCLE",
+      "name": "YZF-R25",
+      "supportedBodyTypes": [],
+      "generations": []
+    },
+    {
+      "brand": "YAMAHA",
+      "type": "MOTORCYCLE",
+      "name": "XMAX 250 Tech MAX",
+      "supportedBodyTypes": [],
+      "generations": []
+    }
+  ]
+}

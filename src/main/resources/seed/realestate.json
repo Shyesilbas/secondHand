@@ -1,0 +1,190 @@
+{
+  "propertyTypes": [
+    {
+      "key": "APARTMENT",
+      "label": "Daire (Apartment)"
+    },
+    {
+      "key": "RESIDENCE",
+      "label": "Rezidans (Residence)"
+    },
+    {
+      "key": "STUDIO",
+      "label": "Stüdyo (1+0)"
+    },
+    {
+      "key": "DUPLEX",
+      "label": "Dubleks"
+    },
+    {
+      "key": "PENTHOUSE",
+      "label": "Penthouse"
+    },
+    {
+      "key": "HOUSE",
+      "label": "Müstakil Ev"
+    },
+    {
+      "key": "VILLA",
+      "label": "Villa"
+    },
+    {
+      "key": "TOWNHOUSE",
+      "label": "İkiz Ev (Townhouse)"
+    },
+    {
+      "key": "SUMMER_HOUSE",
+      "label": "Yazlık Ev"
+    },
+    {
+      "key": "CHALET",
+      "label": "Dağ Evi (Chalet)"
+    },
+    {
+      "key": "MANSION",
+      "label": "Yalı / Köşk"
+    },
+    {
+      "key": "LAND",
+      "label": "Konut İmarlı Arsa"
+    },
+    {
+      "key": "FARM",
+      "label": "Tarla / Çiftlik"
+    },
+    {
+      "key": "VINEYARD",
+      "label": "Bağ"
+    },
+    {
+      "key": "OLIVE_GROVE",
+      "label": "Zeytinlik"
+    },
+    {
+      "key": "OFFICE",
+      "label": "Ofis / Büro"
+    },
+    {
+      "key": "COMMERCIAL",
+      "label": "Dükkan / Mağaza"
+    },
+    {
+      "key": "SHOP",
+      "label": "Komple Bina"
+    },
+    {
+      "key": "WAREHOUSE",
+      "label": "Depo / Antrepo"
+    },
+    {
+      "key": "FACTORY",
+      "label": "Fabrika"
+    },
+    {
+      "key": "INDUSTRIAL",
+      "label": "Sanayi Tesisi"
+    },
+    {
+      "key": "HOTEL",
+      "label": "Turistik Tesis / Otel"
+    },
+    {
+      "key": "PARKING",
+      "label": "Otopark Alanı"
+    },
+    {
+      "key": "OTHER",
+      "label": "Diğer Gayrimenkuller"
+    }
+  ],
+  "adTypes": [
+    {
+      "key": "FOR_SALE",
+      "label": "For Sale"
+    },
+    {
+      "key": "FOR_RENT",
+      "label": "For Rent"
+    },
+    {
+      "key": "DAILY_RENT",
+      "label": "Daily Rent"
+    },
+    {
+      "key": "ROOMMATE",
+      "label": "Roommate"
+    }
+  ],
+  "heatingTypes": [
+    {
+      "key": "NONE",
+      "label": "None"
+    },
+    {
+      "key": "STOVE",
+      "label": "Stove"
+    },
+    {
+      "key": "NATURAL_GAS",
+      "label": "Natural Gas"
+    },
+    {
+      "key": "CENTRAL_SYSTEM",
+      "label": "Central System"
+    },
+    {
+      "key": "COMBI_BOILER",
+      "label": "Combi Boiler (Kombi)"
+    },
+    {
+      "key": "AIR_CONDITIONER",
+      "label": "Air Conditioner"
+    },
+    {
+      "key": "GEOTHERMAL",
+      "label": "Geothermal"
+    },
+    {
+      "key": "FLOOR_HEATING",
+      "label": "Floor Heating"
+    },
+    {
+      "key": "SOLAR_ENERGY",
+      "label": "Solar Energy"
+    },
+    {
+      "key": "HEAT_PUMP",
+      "label": "Heat Pump"
+    },
+    {
+      "key": "DISTRICT_HEATING",
+      "label": "District Heating"
+    },
+    {
+      "key": "ELECTRIC_RADIATOR",
+      "label": "Electric Radiator"
+    },
+    {
+      "key": "OTHER",
+      "label": "Other"
+    }
+  ],
+  "ownerTypes": [
+    {
+      "key": "OWNER",
+      "label": "Owner"
+    },
+    {
+      "key": "AGENCY",
+      "label": "Agency"
+    },
+    {
+      "key": "BUILDER",
+      "label": "Builder"
+    },
+    {
+      "key": "BANK",
+      "label": "Bank"
+    }
+  ]
+}
