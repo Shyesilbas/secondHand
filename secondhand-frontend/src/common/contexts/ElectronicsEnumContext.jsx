@@ -57,3 +57,8 @@ export const useProcessors = () => {
     const { enums } = useElectronicsEnums();
     return useMemo(() => enums.processors, [enums.processors]);
 };
+
+export const useElectronicConditions = () => {
+    const { enums } = useElectronicsEnums();
+    return useMemo(() => enums.electronicConditions, [enums.electronicConditions]);
+};

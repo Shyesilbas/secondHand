@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, MapPin, Tag } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 
 /** Agent yanıtındaki suggestedListings için tıklanabilir özet kartları */
@@ -7,9 +7,9 @@ export default function AuraSuggestedListingChips({ listings, dense = false }) {
   if (!Array.isArray(listings) || listings.length === 0) return null;
 
   return (
-    <div className={`flex flex-col gap-2 ${dense ? 'mt-2' : 'mt-3'}`}>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Bulunan ilanlar</p>
-      <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2.5 ${dense ? 'mt-2.5' : 'mt-4'}`}>
+      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Related Listings Found</p>
+      <div className="grid grid-cols-1 gap-3">
         {listings.map((l, idx) => {
           const id = l?.id;
           const href = id ? ROUTES.LISTING_DETAIL(id) : null;
@@ -23,31 +23,50 @@ export default function AuraSuggestedListingChips({ listings, dense = false }) {
           return (
             <div
               key={id || `${l?.listingNo || 'row'}-${idx}`}
-              className="flex gap-3 rounded-xl border border-slate-200 bg-white/95 p-2.5 text-left shadow-sm"
+              className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all duration-200 hover:border-slate-400"
             >
               {l?.imageUrl ? (
-                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                  <img src={l.imageUrl} alt="" className="h-full w-full object-cover" />
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shadow-inner group">
+                  <img src={l.imageUrl} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" />
                 </div>
               ) : (
-                <div className="h-14 w-14 shrink-0 rounded-lg bg-slate-100" />
+                <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center">
+                  <Tag className="w-5 h-5 text-slate-300" />
+                </div>
               )}
-              <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-slate-900 line-clamp-2 leading-snug">{l?.title || 'İlan'}</p>
-                {price ? <p className="text-xs font-medium text-indigo-700 mt-0.5">{price}</p> : null}
-                {loc ? <p className="text-[11px] text-slate-500 mt-0.5">{loc}</p> : null}
-                {l?.listingNo ? (
-                  <p className="text-[10px] text-slate-400 font-mono mt-0.5">No: {l.listingNo}</p>
-                ) : null}
-                {href ? (
-                  <Link
-                    to={href}
-                    className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-medium text-indigo-600 hover:text-indigo-800"
-                  >
-                    İlana git
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                ) : null}
+              <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
+                <div>
+                  <p className="text-sm font-bold text-slate-900 line-clamp-1 leading-snug">{l?.title || 'İlan'}</p>
+                  
+                  <div className="flex items-center gap-2 mt-1">
+                    {price ? (
+                      <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-800">
+                        {price}
+                      </span>
+                    ) : null}
+                    {loc ? (
+                      <span className="inline-flex items-center gap-0.5 text-[11px] text-slate-500">
+                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                        {loc}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                  {l?.listingNo ? (
+                    <span className="text-[10px] text-slate-400 font-mono">No: #{l.listingNo}</span>
+                  ) : <span />}
+                  {href ? (
+                    <Link
+                      to={href}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-slate-800 hover:text-slate-950 transition-colors group/link"
+                    >
+                      View Details
+                      <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-0.5" />
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             </div>
           );
@@ -56,3 +75,4 @@ export default function AuraSuggestedListingChips({ listings, dense = false }) {
     </div>
   );
 }
+

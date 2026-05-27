@@ -6,6 +6,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,5 +38,16 @@ public record ElectronicUpdateRequest(
         Optional<Boolean> wireless,
         Optional<Boolean> noiseCancelling,
         Optional<Boolean> hasMicrophone,
-        Optional<Integer> batteryLifeHours
+        Optional<Integer> batteryLifeHours,
+        Optional<Boolean> batteryReplaced,
+        Optional<Boolean> batteryOriginal,
+        Optional<Boolean> screenReplaced,
+        Optional<Boolean> bodyReplaced,
+        Optional<Boolean> faceIdWorking,
+        Optional<Boolean> touchIdWorking,
+        Optional<Boolean> hasBox,
+        Optional<Boolean> hasInvoice,
+        Optional<Boolean> imeiRegistered,
+        Optional<LocalDate> warrantyEndDate,
+        Optional<ElectronicCondition> condition
 ) {}

@@ -14,6 +14,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
@@ -151,6 +152,18 @@ public class EnumController {
                 })
                 .toList();
         return ResponseEntity.ok(connectionTypes);
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getElectronicConditions() {
+        List<Map<String, Object>> conditions = Arrays.stream(ElectronicCondition.values())
+                .map(t -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", t.name());
+                    map.put("label", t.getLabel());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.ok(conditions);
     }
 
     private ResponseEntity<List<Map<String, Object>>> getGenders() {
@@ -552,6 +565,7 @@ public class EnumController {
         allEnums.put("processors", getProcessors().getBody());
         allEnums.put("storageTypes", getStorageTypes().getBody());
         allEnums.put("electronicConnectionTypes", getElectronicConnectionTypes().getBody());
+        allEnums.put("electronicConditions", getElectronicConditions().getBody());
         allEnums.put("drivetrains", getDrivetrains().getBody());
         allEnums.put("bodyTypes", getBodyTypes().getBody());
         allEnums.put("realEstateTypes", getRealEstateTypes().getBody());

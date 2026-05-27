@@ -19,13 +19,13 @@ public class GeminiClient {
     @Value("${gemini.api.key}")
     private String apiKey;
 
-    @Value("${gemini.api.model:gemini-2.5-flash}")
+    @Value("${gemini.api.model:gemini-3.1-flash-lite}")
     private String model;
 
     @Value("${gemini.api.base-url}")
     private String baseUrl;
 
-    @Value("${gemini.api.fallback-memory-model:gemini-2.0-flash-lite}")
+    @Value("${gemini.api.fallback-memory-model:gemini-3.1-flash-lite}")
     private String fallbackMemoryModel;
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -72,7 +72,7 @@ public class GeminiClient {
 
                 if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
                     String responseText = response.candidates().get(0).content().parts().get(0).text();
-                    log.info("Response received successfully: {} characters", responseText.length());
+                    log.info("Response received successfully from model {}: {} characters", modelName, responseText.length());
                     return responseText;
                 }
 

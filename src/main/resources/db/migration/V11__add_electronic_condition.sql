@@ -1,0 +1,1 @@
+ALTER TABLE electronic_listings ADD COLUMN condition VARCHAR(30) DEFAULT 'GOOD' NOT NULL;

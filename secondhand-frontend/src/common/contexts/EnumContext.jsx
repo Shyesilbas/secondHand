@@ -60,6 +60,7 @@ const initialEnumState = {
         storageTypes: [],
         electronicConnectionTypes: [],
         processors: [],
+        electronicConditions: [],
     },
     realEstate: {
         realEstateTypes: [],
@@ -156,6 +157,7 @@ export const EnumProvider = ({ children }) => {
                     storageTypes: allEnumsData.storageTypes || [],
                     electronicConnectionTypes: allEnumsData.electronicConnectionTypes || [],
                     processors: allEnumsData.processors || [],
+                    electronicConditions: allEnumsData.electronicConditions || [],
                 },
                 realEstate: {
                     realEstateTypes: allEnumsData.realEstateTypes || [],

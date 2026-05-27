@@ -289,6 +289,17 @@ public abstract class ListingMapper {
         if (request.noiseCancelling() != null) request.noiseCancelling().ifPresent(entity::setNoiseCancelling);
         if (request.hasMicrophone() != null) request.hasMicrophone().ifPresent(entity::setHasMicrophone);
         if (request.batteryLifeHours() != null) request.batteryLifeHours().ifPresent(entity::setBatteryLifeHours);
+        if (request.batteryReplaced() != null) request.batteryReplaced().ifPresent(entity::setBatteryReplaced);
+        if (request.batteryOriginal() != null) request.batteryOriginal().ifPresent(entity::setBatteryOriginal);
+        if (request.screenReplaced() != null) request.screenReplaced().ifPresent(entity::setScreenReplaced);
+        if (request.bodyReplaced() != null) request.bodyReplaced().ifPresent(entity::setBodyReplaced);
+        if (request.faceIdWorking() != null) request.faceIdWorking().ifPresent(entity::setFaceIdWorking);
+        if (request.touchIdWorking() != null) request.touchIdWorking().ifPresent(entity::setTouchIdWorking);
+        if (request.hasBox() != null) request.hasBox().ifPresent(entity::setHasBox);
+        if (request.hasInvoice() != null) request.hasInvoice().ifPresent(entity::setHasInvoice);
+        if (request.imeiRegistered() != null) request.imeiRegistered().ifPresent(entity::setImeiRegistered);
+        if (request.warrantyEndDate() != null) request.warrantyEndDate().ifPresent(entity::setWarrantyEndDate);
+        if (request.condition() != null) request.condition().ifPresent(entity::setCondition);
     }
 
     public void updateRealEstate(RealEstateListing entity, RealEstateUpdateRequest request) {

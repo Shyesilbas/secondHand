@@ -44,6 +44,10 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         if (filters.getColors() != null && !filters.getColors().isEmpty()) {
             predicates.add(root.get("color").in(filters.getColors()));
         }
+
+        if (filters.getConditions() != null && !filters.getConditions().isEmpty()) {
+            predicates.add(root.get("condition").in(filters.getConditions()));
+        }
         
         // Range filters
         if (filters.getMinYear() != null) {
@@ -126,7 +130,23 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         if (filters.getMaxBatteryLifeHours() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("batteryLifeHours"), filters.getMaxBatteryLifeHours()));
         }
-        
+
+        if (filters.getBatteryOriginal() != null) {
+            predicates.add(cb.equal(root.get("batteryOriginal"), filters.getBatteryOriginal()));
+        }
+        if (filters.getScreenReplaced() != null) {
+            predicates.add(cb.equal(root.get("screenReplaced"), filters.getScreenReplaced()));
+        }
+        if (filters.getHasBox() != null) {
+            predicates.add(cb.equal(root.get("hasBox"), filters.getHasBox()));
+        }
+        if (filters.getHasInvoice() != null) {
+            predicates.add(cb.equal(root.get("hasInvoice"), filters.getHasInvoice()));
+        }
+        if (filters.getImeiRegistered() != null) {
+            predicates.add(cb.equal(root.get("imeiRegistered"), filters.getImeiRegistered()));
+        }
+
         return predicates;
     }
 

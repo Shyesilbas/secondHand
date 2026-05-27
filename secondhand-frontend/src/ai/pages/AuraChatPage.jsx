@@ -3,7 +3,22 @@ import {useLocation} from 'react-router-dom';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {AI_AGENT_MODE_ENABLED} from '../config/agentConfig.js';
 import {aiChatService} from '../services/aiChatService.js';
-import {Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield} from 'lucide-react';
+import {
+  Bot,
+  RotateCcw,
+  Send,
+  Sparkles,
+  Trash2,
+  UserRound,
+  Zap,
+  Shield,
+  PanelLeftClose,
+  PanelLeft,
+  PanelRightClose,
+  PanelRight,
+  Info,
+  Layers
+} from 'lucide-react';
 import {useAuraChat} from '../hooks/useAuraChat.js';
 import {clearAuraPersistedMessages, createChatMessage, getApiErrorMessage} from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
@@ -16,6 +31,8 @@ const AuraChatPage = () => {
   const location = useLocation();
   const listing = location?.state?.listing || null;
   const [agentMode, setAgentMode] = React.useState(AI_AGENT_MODE_ENABLED);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
 
   const userId = user?.id ?? null;
 
@@ -141,136 +158,184 @@ const AuraChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/80 flex flex-col">
+    <div className="h-[calc(100vh-68px)] bg-white flex overflow-hidden min-h-0 relative w-full text-slate-800">
 
-      {/* ── Top Bar ─────────────────────────────────────────── */}
-      <div className="bg-white border-b border-gray-200/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-4 flex items-center justify-between gap-4">
-            {/* Left: Brand */}
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-violet-600/20">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold text-gray-900 tracking-tight">Aura</h1>
-                  <span className="px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-600 bg-violet-50 border border-violet-100 rounded-md">
-                    Beta
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 hidden sm:block">AI Shopping Assistant</p>
-              </div>
+      {/* ── 1. LEFT SIDEBAR PANEL (Navigation & Session) ─────── */}
+      <div className={`
+        ${sidebarOpen ? 'w-64 border-r opacity-100 p-5' : 'w-0 border-r-0 opacity-0 p-0 pointer-events-none'}
+        hidden lg:flex flex-col h-full bg-slate-50 border-slate-200 overflow-y-auto shrink-0 justify-between transition-all duration-300 ease-in-out z-25
+      `}>
+        <div className="space-y-6">
+          {/* Brand header inside sidebar */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
+              <Sparkles className="w-4.5 h-4.5 text-white" />
             </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 leading-none">Aura Workspace</p>
+              <span className="text-[9px] text-slate-400 font-semibold tracking-wider uppercase mt-1 inline-block">AI Console</span>
+            </div>
+          </div>
 
-            {/* Right: Controls */}
-            <div className="flex items-center gap-2">
-              {AI_AGENT_MODE_ENABLED && (
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={agentMode}
-                  onClick={() => setAgentMode((v) => !v)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                    agentMode
-                      ? 'bg-violet-50 text-violet-700 border border-violet-200'
-                      : 'bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <Zap className="w-3 h-3" />
-                  Agent {agentMode ? 'ON' : 'OFF'}
-                </button>
-              )}
+          {/* New Chat Button */}
+          <button
+            type="button"
+            onClick={handleNewChat}
+            disabled={isSending}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            New Conversation
+          </button>
 
-              {userId != null ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] font-medium text-emerald-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Online
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-medium text-amber-700">
-                  Log in
-                </span>
-              )}
+          {/* Settings Section */}
+          <div className="space-y-2 pt-4 border-t border-slate-200">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Controls</p>
+            
+            <button
+              type="button"
+              onClick={handleDeleteHistory}
+              disabled={isSending}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 transition-all"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-slate-400" />
+              Clear History
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteMemory}
+              disabled={isSending}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:border-slate-50 text-xs font-semibold text-slate-600 transition-all"
+            >
+              <Shield className="w-3.5 h-3.5 text-slate-400" />
+              Reset Memory Cache
+            </button>
+          </div>
+        </div>
+
+        {/* Footer info in sidebar */}
+        <div className="pt-4 border-t border-slate-200">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[11px] font-bold text-slate-600 uppercase">
+              {user?.name?.slice(0, 2) || 'US'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-slate-800 truncate">{user?.name || 'Guest User'}</p>
+              <p className="text-[9px] text-slate-400 font-medium truncate">{user?.email || 'Sync enabled'}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Main Chat Area ──────────────────────────────────── */}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4">
+      {/* ── 2. MIDDLE PANEL (Main Conversational Lane) ───────── */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full bg-white relative z-10">
+        
+        {/* Workspace Toolbar (Header) */}
+        <div className="shrink-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-4 z-20">
+          
+          {/* Left tools: sidebar toggle + Brand */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all"
+              title={sidebarOpen ? 'Collapse Navigation' : 'Expand Navigation'}
+            >
+              {sidebarOpen ? <PanelLeftClose className="w-4.5 h-4.5" /> : <PanelLeft className="w-4.5 h-4.5" />}
+            </button>
 
-        {/* Action bar */}
-        <div className="flex items-center gap-2 mb-4">
+            <span className="lg:hidden w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <h2 className="text-sm font-bold text-slate-800 tracking-tight">Aura Assistant</h2>
+            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 rounded">
+              PRO
+            </span>
+          </div>
+
+          {/* Center tools: Agent switch */}
+          {AI_AGENT_MODE_ENABLED && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={agentMode}
+              onClick={() => setAgentMode((v) => !v)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+                agentMode
+                  ? 'bg-slate-900 text-white border border-transparent shadow-sm'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Agent Mode: {agentMode ? 'ON' : 'OFF'}
+            </button>
+          )}
+
+          {/* Right tools: context toggle */}
           <button
             type="button"
-            onClick={handleNewChat}
-            disabled={isSending}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gray-900 text-white text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shadow-sm"
+            onClick={() => setRightPanelOpen((prev) => !prev)}
+            className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all"
+            title={rightPanelOpen ? 'Collapse Information' : 'Expand Information'}
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            New chat
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteHistory}
-            disabled={isSending}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-          >
-            <Trash2 className="w-3 h-3" />
-            History
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteMemory}
-            disabled={isSending}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-red-200 bg-white text-xs font-medium text-red-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-50 transition-colors"
-          >
-            <Shield className="w-3 h-3" />
-            Memory
+            {rightPanelOpen ? <PanelRightClose className="w-4.5 h-4.5" /> : <PanelRight className="w-4.5 h-4.5" />}
           </button>
         </div>
 
-        {/* Listing context */}
-        {listing ? <AuraListingContextCard listing={listing} /> : null}
+        {/* Mobile active context view banner (shown inline only on mobile) */}
+        {listing && (
+          <div className="lg:hidden p-4 pb-0 shrink-0">
+            <AuraListingContextCard listing={listing} />
+          </div>
+        )}
 
-        {/* Chat container */}
-        <div className="flex-1 flex flex-col min-h-0 bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+        {/* Conversation Stream */}
+        <div
+          ref={listRef}
+          className="flex-1 overflow-y-auto w-full custom-scrollbar"
+        >
+          <div className="max-w-3xl mx-auto px-4 py-8 w-full space-y-6">
+            
+            {/* Elegant Welcome Greeting Card if there is only 1 message (initial welcome) */}
+            {messages.length === 1 && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50/40 p-6 text-center space-y-4 mb-6 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center mx-auto shadow-md">
+                  <Bot className="w-6 h-6 text-white" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-800">Secure Agentic Trade Companion</h3>
+                  <p className="text-xs text-slate-500 leading-normal max-w-md mx-auto">
+                    Aura provides automated database queries, pricing checks, trade analysis, and secure shopping support natively.
+                  </p>
+                </div>
+              </div>
+            )}
 
-          {/* Messages */}
-          <div
-            ref={listRef}
-            className="flex-1 overflow-y-auto px-5 py-6 sm:px-6 space-y-5"
-            style={{minHeight: 'min(50vh, 400px)', maxHeight: 'min(60vh, 600px)'}}
-          >
+            {/* Conversation Messages */}
             {messages.map((m) => {
               const isUser = m.role === 'user';
               return (
-                <div key={m.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                <div key={m.id} className={`flex gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end`}>
                   {/* Avatar */}
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm border ${
                     isUser
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-sm shadow-violet-500/20'
+                      ? 'bg-slate-100 border-slate-200 text-slate-800'
+                      : 'bg-slate-900 border-slate-800 text-white'
                   }`}>
-                    {isUser ? <UserRound className="h-4 w-4" /> : <Sparkles className="h-3.5 w-3.5" />}
+                    {isUser ? <UserRound className="h-4.5 w-4.5" /> : <Sparkles className="h-4 w-4" />}
                   </div>
 
-                  {/* Bubble */}
-                  <div className={`min-w-0 max-w-[min(100%,30rem)] ${isUser ? 'text-right' : ''}`}>
-                    <div className={`inline-block rounded-2xl px-4 py-3 text-sm leading-relaxed text-left whitespace-pre-wrap ${
+                  {/* Bubble content */}
+                  <div className={`min-w-0 max-w-[85%] ${isUser ? 'text-right' : ''}`}>
+                    <div className={`inline-block rounded-xl px-4 py-3.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${
                       isUser
-                        ? 'bg-gray-900 text-white'
-                        : 'bg-gray-50 border border-gray-200 text-gray-800'
+                        ? 'bg-slate-900 text-white shadow-sm rounded-br-sm'
+                        : 'bg-slate-50 border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'
                     }`}>
                       {m.typing ? (
                         <div className="flex items-center gap-1.5 py-1 px-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{animationDelay: '0ms'}} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{animationDelay: '150ms'}} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{animationDelay: '300ms'}} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay: '0ms'}} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay: '150ms'}} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{animationDelay: '300ms'}} />
                         </div>
                       ) : (
                         <>
@@ -279,13 +344,13 @@ const AuraChatPage = () => {
                             <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
                           ) : null}
                           {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? (
-                            <div className="mt-2.5 flex flex-wrap gap-1">
+                            <div className="mt-3 flex flex-wrap gap-1 pt-2 border-t border-slate-200">
                               {m.meta.dataSources.map((source) => (
                                 <span
                                   key={`${m.id}-${source.source}`}
-                                  className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] font-mono text-gray-500 border border-gray-200/60"
+                                  className="rounded bg-slate-100 px-2 py-0.5 text-[9px] font-bold font-mono text-slate-500 border border-slate-200"
                                 >
-                                  {source.source}:{source.status}
+                                  {source.source.toUpperCase()}:{source.status}
                                 </span>
                               ))}
                             </div>
@@ -298,43 +363,91 @@ const AuraChatPage = () => {
               );
             })}
           </div>
+        </div>
 
-          {/* Quick prompts */}
-          {showQuickPrompts && (
-            <div className="shrink-0 border-t border-gray-100 px-5 py-4 sm:px-6">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Suggested questions</p>
-              <AuraSuggestedPrompts disabled={isSending} onPick={(msg) => sendMessage({text: msg})} />
-            </div>
-          )}
+        {/* Mobile quick prompts feed panel (only visible if prompts exist and screen is mobile) */}
+        {showQuickPrompts && (
+          <div className="lg:hidden shrink-0 border-t border-slate-100 px-4 py-4 bg-slate-50">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Suggested Questions</p>
+            <AuraSuggestedPrompts disabled={isSending} onPick={(msg) => sendMessage({text: msg})} dense />
+          </div>
+        )}
 
-          {/* Input area */}
-          <div className="border-t border-gray-200 bg-white p-4 sm:p-5">
-            <div className="flex items-end gap-3">
-              <div className="flex-1 relative">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={onKeyDown}
-                  placeholder="Write to Aura… (Enter to send, Shift+Enter for new line)"
-                  className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white min-h-[52px] max-h-[160px] transition-all duration-200"
-                  rows={1}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => sendMessage()}
-                disabled={isSending || !input.trim()}
-                className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20 disabled:opacity-40 disabled:cursor-not-allowed hover:from-violet-500 hover:to-indigo-500 hover:shadow-violet-500/30 active:scale-95 transition-all duration-200"
-              >
-                <Send className="w-5 h-5" />
-              </button>
+        {/* Floating Chat Input Section */}
+        <div className="shrink-0 border-t border-slate-200 bg-white p-4 sm:p-5">
+          <div className="max-w-3xl mx-auto flex items-end gap-3">
+            <div className="flex-1 relative">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder="Type a message or ask a shopping question..."
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4.5 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-450 focus:bg-white min-h-[46px] max-h-[120px] transition-all duration-200 shadow-inner"
+                rows={1}
+              />
             </div>
-            <p className="mt-2 text-[10px] text-gray-400 text-center">
-              Aura can make mistakes. It is recommended to verify important information.
+            <button
+              type="button"
+              onClick={() => sendMessage()}
+              disabled={isSending || !input.trim()}
+              className="inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow hover:bg-slate-950 active:scale-95 transition-all duration-200"
+            >
+              <Send className="w-4.5 h-4.5" />
+            </button>
+          </div>
+          <p className="mt-2.5 text-[9px] text-slate-400 text-center font-medium">
+            Aura agent will guide you securely. Verify important terms during payment.
+          </p>
+        </div>
+      </div>
+
+      {/* ── 3. RIGHT PANEL (Listing Information Canvas) ───────── */}
+      <div className={`
+        ${rightPanelOpen ? 'w-80 border-l opacity-100 p-5' : 'w-0 border-l-0 opacity-0 p-0 pointer-events-none'}
+        hidden lg:flex flex-col h-full bg-slate-50 border-slate-200 overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25
+      `}>
+        
+        {/* Active Product Analysis section */}
+        {listing ? (
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Workspace context</p>
+            <AuraListingContextCard listing={listing} />
+          </div>
+        ) : (
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
+              <Layers className="w-4 h-4 text-slate-400" />
+              General Workspace
+            </div>
+            <p className="text-[10px] text-slate-500 leading-normal">
+              No product is currently active in your chat context. Enter an item description to fetch listings, or select a listing to personalize the AI context.
+            </p>
+          </div>
+        )}
+
+        {/* Quick Suggestions Cards */}
+        {showQuickPrompts && (
+          <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Suggested Queries</p>
+            <AuraSuggestedPrompts disabled={isSending} onPick={(msg) => sendMessage({text: msg})} dense />
+          </div>
+        )}
+
+        {/* Secure shopping widget info */}
+        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
+          <div className="flex-1 flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
+              <Info className="w-4 h-4 text-slate-400" />
+              Security Shield
+            </div>
+            <p className="text-[10px] text-slate-500 leading-normal">
+              For secure payments, always checkout using our integrated Secure Checkout option. Aura will analyze offers, check listing criteria, and guide you away from high-risk external deals.
             </p>
           </div>
         </div>
+
       </div>
+
     </div>
   );
 };

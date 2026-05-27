@@ -1,0 +1,10 @@
+ALTER TABLE electronic_listings ADD COLUMN battery_replaced BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN battery_original BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN screen_replaced BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN body_replaced BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN face_id_working BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN touch_id_working BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN has_box BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN has_invoice BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN imei_registered BOOLEAN;
+ALTER TABLE electronic_listings ADD COLUMN warranty_end_date DATE;

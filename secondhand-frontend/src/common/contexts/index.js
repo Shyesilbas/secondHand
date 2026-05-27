@@ -37,6 +37,7 @@ export {
     useStorageTypes,
     useElectronicConnectionTypes,
     useProcessors,
+    useElectronicConditions,
 } from './ElectronicsEnumContext.jsx';
 
 export {

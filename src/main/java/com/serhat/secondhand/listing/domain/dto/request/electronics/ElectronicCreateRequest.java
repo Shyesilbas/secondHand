@@ -8,7 +8,8 @@ import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreate
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record ElectronicCreateRequest(
@@ -40,5 +41,17 @@ public record ElectronicCreateRequest(
         Boolean wireless,
         Boolean noiseCancelling,
         Boolean hasMicrophone,
-        Integer batteryLifeHours
+        Integer batteryLifeHours,
+        Boolean batteryReplaced,
+        Boolean batteryOriginal,
+        Boolean screenReplaced,
+        Boolean bodyReplaced,
+        Boolean faceIdWorking,
+        Boolean touchIdWorking,
+        Boolean hasBox,
+        Boolean hasInvoice,
+        Boolean imeiRegistered,
+        LocalDate warrantyEndDate,
+        @NotNull(message = "Condition is required")
+        ElectronicCondition condition
 ) {}

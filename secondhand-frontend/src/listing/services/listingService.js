@@ -73,12 +73,29 @@ const serializeFilters = (filters, config, listingType) => {
       return;
     }
 
+    if (field.type === 'boolean') {
+      const val = filters[field.key];
+      payload[field.key] = (val === true || val === false) ? val : null;
+      return;
+    }
+
     if (field.type === 'text') {
       payload[field.key] = toText(filters[field.key]);
     }
   });
 
-  return payload;
+  // Clean up payload: remove null, undefined, empty arrays, and empty strings.
+  // CRITICAL: Ensure boolean 'false' is preserved in the payload.
+  const cleanedPayload = {};
+  Object.keys(payload).forEach((key) => {
+    const val = payload[key];
+    if (val === null || val === undefined) return;
+    if (Array.isArray(val) && val.length === 0) return;
+    if (typeof val === 'string' && val.trim() === '') return;
+    cleanedPayload[key] = val;
+  });
+
+  return cleanedPayload;
 };
 
 export const listingService = {

@@ -237,6 +237,7 @@ const FilterSidebar = ({
                       config={filterConfig}
                       filters={localFilters}
                       onChange={handleInputChange}
+                      enums={enums}
                       title=""
                     />
                   </FilterSection>

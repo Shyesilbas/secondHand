@@ -3,7 +3,7 @@ import FilterChipGroup from './FilterChipGroup.jsx';
 import { Calendar, Hash, Type } from 'lucide-react';
 import { getMinKey, getMaxKey } from '../../filters/filterRangeKeys.js';
 
-const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
+const FilterRenderer = ({ config, filters, onChange, enums, title = 'Filters' }) => {
   if (!config || !config.getFields) return null;
 
   const fields = config.getFields();
@@ -124,6 +124,40 @@ const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
           </div>
         );
 
+      case 'boolean': {
+        const val = filters[field.key];
+        return (
+          <div key={field.key} className="space-y-1.5 min-w-0">
+            <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
+              {field.label}
+            </label>
+            <div className="flex gap-1 rounded-lg bg-slate-100 p-0.5 w-full">
+              {[
+                { label: 'Any', value: null },
+                { label: 'Yes', value: true },
+                { label: 'No', value: false }
+              ].map((opt) => {
+                const isActive = val === opt.value;
+                return (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => onChange(field.key, opt.value)}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${
+                      isActive
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+
       default:
         return null;
     }
@@ -138,11 +172,16 @@ const FilterRenderer = ({ config, filters, onChange, title = 'Filters' }) => {
         </div>
       ) : null}
       <div className="space-y-2">
-        {fields.map((field) => (
-          <div key={field.key} className="py-2 first:pt-0">
-            {renderField(field)}
-          </div>
-        ))}
+        {fields.map((field) => {
+          if (typeof field.visibleWhen === 'function' && !field.visibleWhen(filters, enums)) {
+            return null;
+          }
+          return (
+            <div key={field.key} className="py-2 first:pt-0">
+              {renderField(field)}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

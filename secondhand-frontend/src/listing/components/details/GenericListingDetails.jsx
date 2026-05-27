@@ -67,11 +67,18 @@ const GenericListingDetails = ({ listing }) => {
 
       {active?.title ? <h4 className="text-sm font-semibold text-text-muted mb-3">{active.title}</h4> : null}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(active?.fields || []).map((field) => {
-          const raw = field.key ? getValueByPath(listing, field.key) : undefined;
-          const resolved = typeof field.format === 'function' ? field.format(listing, raw) : toDisplayText(raw, enums, field.enumKey);
-          return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
-        })}
+        {(active?.fields || [])
+          .filter((field) => {
+            if (typeof field.visibleWhen === 'function') {
+              return field.visibleWhen(listing);
+            }
+            return true;
+          })
+          .map((field) => {
+            const raw = field.key ? getValueByPath(listing, field.key) : undefined;
+            const resolved = typeof field.format === 'function' ? field.format(listing, raw) : toDisplayText(raw, enums, field.enumKey);
+            return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
+          })}
       </div>
     </div>
   );

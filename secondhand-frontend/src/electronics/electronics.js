@@ -1,4 +1,4 @@
-import { ListingDTO } from '../listing/types/index.js';
+import {ListingDTO} from '../listing/types/index.js';
 
 export const ElectronicCreateRequestDTO = {
     title: '',
@@ -17,6 +17,7 @@ export const ElectronicCreateRequestDTO = {
   warrantyProof: false,
   year: 0,
   color: '',
+  condition: '',
   ram: '',
   storage: '',
   storageType: '',
@@ -35,6 +36,16 @@ export const ElectronicCreateRequestDTO = {
   noiseCancelling: false,
   hasMicrophone: false,
   batteryLifeHours: '',
+  batteryReplaced: false,
+  batteryOriginal: false,
+  screenReplaced: false,
+  bodyReplaced: false,
+  faceIdWorking: false,
+  touchIdWorking: false,
+  hasBox: false,
+  hasInvoice: false,
+  imeiRegistered: false,
+  warrantyEndDate: '',
 };
 
 export const ElectronicListingDTO = {
@@ -47,6 +58,7 @@ export const ElectronicListingDTO = {
   warrantyProof: false,
   year: 0,
   color: '',
+  condition: '',
   ram: '',
   storage: '',
   storageType: '',
@@ -65,6 +77,16 @@ export const ElectronicListingDTO = {
   noiseCancelling: false,
   hasMicrophone: false,
   batteryLifeHours: '',
+  batteryReplaced: false,
+  batteryOriginal: false,
+  screenReplaced: false,
+  bodyReplaced: false,
+  faceIdWorking: false,
+  touchIdWorking: false,
+  hasBox: false,
+  hasInvoice: false,
+  imeiRegistered: false,
+  warrantyEndDate: '',
 };
 
 export const ElectronicSearchFiltersDTO = {
@@ -132,6 +154,7 @@ export const createElectronicCreateRequest = (data) => {
     warrantyProof: Boolean(data.warrantyProof),
     year: parseInt(data.year) || 0,
     color: data.color || '',
+    condition: data.condition || undefined,
     ram: data.ram ? parseInt(data.ram) : undefined,
     storage: data.storage ? parseInt(data.storage) : undefined,
     storageType: data.storageType || undefined,
@@ -150,6 +173,16 @@ export const createElectronicCreateRequest = (data) => {
     noiseCancelling: data.noiseCancelling === true ? true : (data.noiseCancelling === false ? false : undefined),
     hasMicrophone: data.hasMicrophone === true ? true : (data.hasMicrophone === false ? false : undefined),
     batteryLifeHours: data.batteryLifeHours ? parseInt(data.batteryLifeHours) : undefined,
+    batteryReplaced: data.batteryReplaced === true ? true : (data.batteryReplaced === false ? false : undefined),
+    batteryOriginal: data.batteryOriginal === true ? true : (data.batteryOriginal === false ? false : undefined),
+    screenReplaced: data.screenReplaced === true ? true : (data.screenReplaced === false ? false : undefined),
+    bodyReplaced: data.bodyReplaced === true ? true : (data.bodyReplaced === false ? false : undefined),
+    faceIdWorking: data.faceIdWorking === true ? true : (data.faceIdWorking === false ? false : undefined),
+    touchIdWorking: data.touchIdWorking === true ? true : (data.touchIdWorking === false ? false : undefined),
+    hasBox: data.hasBox === true ? true : (data.hasBox === false ? false : undefined),
+    hasInvoice: data.hasInvoice === true ? true : (data.hasInvoice === false ? false : undefined),
+    imeiRegistered: data.imeiRegistered === true ? true : (data.imeiRegistered === false ? false : undefined),
+    warrantyEndDate: data.warrantyEndDate || undefined,
   };
 };
 
@@ -170,6 +203,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.warrantyProof !== undefined && data.warrantyProof !== '') updateData.warrantyProof = Boolean(data.warrantyProof);
   if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
   if (data.color !== undefined && data.color !== '') updateData.color = data.color;
+  if (data.condition !== undefined && data.condition !== '') updateData.condition = data.condition;
   if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
   if (data.ram !== undefined && data.ram !== '') updateData.ram = parseInt(data.ram);
   if (data.storage !== undefined && data.storage !== '') updateData.storage = parseInt(data.storage);
@@ -189,8 +223,18 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.noiseCancelling !== undefined && data.noiseCancelling !== '') updateData.noiseCancelling = Boolean(data.noiseCancelling);
   if (data.hasMicrophone !== undefined && data.hasMicrophone !== '') updateData.hasMicrophone = Boolean(data.hasMicrophone);
   if (data.batteryLifeHours !== undefined && data.batteryLifeHours !== '') updateData.batteryLifeHours = parseInt(data.batteryLifeHours);
+
+  if (data.batteryReplaced !== undefined && data.batteryReplaced !== '') updateData.batteryReplaced = Boolean(data.batteryReplaced);
+  if (data.batteryOriginal !== undefined && data.batteryOriginal !== '') updateData.batteryOriginal = Boolean(data.batteryOriginal);
+  if (data.screenReplaced !== undefined && data.screenReplaced !== '') updateData.screenReplaced = Boolean(data.screenReplaced);
+  if (data.bodyReplaced !== undefined && data.bodyReplaced !== '') updateData.bodyReplaced = Boolean(data.bodyReplaced);
+  if (data.faceIdWorking !== undefined && data.faceIdWorking !== '') updateData.faceIdWorking = Boolean(data.faceIdWorking);
+  if (data.touchIdWorking !== undefined && data.touchIdWorking !== '') updateData.touchIdWorking = Boolean(data.touchIdWorking);
+  if (data.hasBox !== undefined && data.hasBox !== '') updateData.hasBox = Boolean(data.hasBox);
+  if (data.hasInvoice !== undefined && data.hasInvoice !== '') updateData.hasInvoice = Boolean(data.hasInvoice);
+  if (data.imeiRegistered !== undefined && data.imeiRegistered !== '') updateData.imeiRegistered = Boolean(data.imeiRegistered);
+  if (data.warrantyEndDate !== undefined && data.warrantyEndDate !== '') updateData.warrantyEndDate = data.warrantyEndDate;
+
   if (Object.keys(base).length > 0) updateData.base = base;
   return updateData;
 };
-
-

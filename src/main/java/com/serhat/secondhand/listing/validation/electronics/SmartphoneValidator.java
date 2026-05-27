@@ -17,21 +17,6 @@ public class SmartphoneValidator implements ElectronicSpecValidator {
         if (listing.getStorage() == null || listing.getStorage() <= 0) {
             return Result.error("Storage is required for mobile phone listings", "MOBILE_PHONE_STORAGE_REQUIRED");
         }
-        if (listing.getScreenSize() == null || listing.getScreenSize() <= 0) {
-            return Result.error("Screen size is required for mobile phone listings", "MOBILE_PHONE_SCREEN_SIZE_REQUIRED");
-        }
-        if (listing.getBatteryCapacityMah() == null || listing.getBatteryCapacityMah() <= 0) {
-            return Result.error("Battery capacity is required for mobile phone listings", "MOBILE_PHONE_BATTERY_CAPACITY_REQUIRED");
-        }
-
-        Integer cameraMp = listing.getCameraMegapixels();
-        if (cameraMp != null && cameraMp <= 0) {
-            return Result.error("Camera megapixels must be greater than 0", "MOBILE_PHONE_CAMERA_MP_INVALID");
-        }
-
-        if (listing.getYear() == null || listing.getYear() < 2000) {
-            return Result.error("Year is required for mobile phone listings", "MOBILE_PHONE_YEAR_REQUIRED");
-        }
 
         return Result.success();
     }
@@ -43,15 +28,21 @@ public class SmartphoneValidator implements ElectronicSpecValidator {
         }
         
         {
+            listing.setRam(null);
+            listing.setProcessor(null);
+            listing.setScreenSize(null);
+            listing.setBatteryCapacityMah(null);
+            listing.setCameraMegapixels(null);
             listing.setStorageType(null);
             listing.setGpuModel(null);
             listing.setOperatingSystem(null);
-            listing.setBatteryHealthPercent(null);
             listing.setConnectionType(null);
             listing.setWireless(null);
             listing.setNoiseCancelling(null);
             listing.setHasMicrophone(null);
             listing.setBatteryLifeHours(null);
+            listing.setDualSim(null);
+            listing.setSupports5g(null);
         }
     }
 
@@ -66,4 +57,3 @@ public class SmartphoneValidator implements ElectronicSpecValidator {
         return "MOBILE_PHONE".equalsIgnoreCase(type.getName());
     }
 }
-

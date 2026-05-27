@@ -13,12 +13,98 @@ export const createVehicleFilterConfig = () => {
     .addEnumField('colors', 'Color', 'colors');
 };
 
+const getSelectedTypeNames = (filters, enums) => {
+  const selectedIds = filters.electronicTypeIds || [];
+  const allTypes = enums?.electronicTypes || [];
+  return allTypes
+    .filter(t => selectedIds.includes(t.id || t.value))
+    .map(t => String(t.name || t.value || '').toUpperCase());
+};
+
 export const createElectronicsFilterConfig = () => {
   return new FilterConfig()
-    .addNumericRangeField('year', 'Year', { min: 2000, max: new Date().getFullYear(), placeholder: '2020' })
     .addEnumField('electronicTypeIds', 'Type', 'electronicTypes', { displayAs: 'chips' })
     .addEnumField('electronicBrandIds', 'Brand', 'electronicBrands')
-    .addEnumField('electronicModelIds', 'Model', 'electronicModels');
+    .addEnumField('electronicModelIds', 'Model', 'electronicModels')
+    .addEnumField('conditions', 'Condition', 'electronicConditions', { displayAs: 'chips', multiple: true })
+    .addNumericRangeField('year', 'Year', { min: 2000, max: new Date().getFullYear(), placeholder: '2020' })
+    
+    // Computer Specific Filters (visible only when selected type is LAPTOP or DESKTOP)
+    .addNumericRangeField('ram', 'RAM (GB)', {
+      min: 1,
+      placeholder: '16',
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('LAPTOP') || types.includes('DESKTOP');
+      }
+    })
+    .addNumericRangeField('storage', 'Storage (GB)', {
+      min: 1,
+      placeholder: '512',
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('LAPTOP') || types.includes('DESKTOP');
+      }
+    })
+    .addEnumField('storageTypes', 'Storage Type', 'storageTypes', {
+      displayAs: 'chips',
+      multiple: true,
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('LAPTOP') || types.includes('DESKTOP');
+      }
+    })
+    .addEnumField('processors', 'Processor', 'processors', {
+      displayAs: 'chips',
+      multiple: true,
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('LAPTOP') || types.includes('DESKTOP');
+      }
+    })
+
+    // Screen Size Filter (visible only for LAPTOP, TV, MONITOR, TABLET)
+    .addNumericRangeField('screenSize', 'Screen Size (inch)', {
+      min: 1,
+      placeholder: '15.6',
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('LAPTOP') || types.includes('TV') || types.includes('MONITOR') || types.includes('TABLET');
+      }
+    })
+
+    // Mobile Phone Specific Filters (visible only when MOBILE_PHONE is selected)
+    .addNumericRangeField('batteryHealthPercent', 'Battery Health (%)', {
+      min: 1,
+      max: 100,
+      placeholder: '85',
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('MOBILE_PHONE');
+      }
+    })
+    .addBooleanField('batteryOriginal', 'Original Battery', {
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('MOBILE_PHONE');
+      }
+    })
+    .addBooleanField('screenReplaced', 'Screen Replaced', {
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('MOBILE_PHONE');
+      }
+    })
+    .addBooleanField('imeiRegistered', 'IMEI Registered', {
+      visibleWhen: (filters, enums) => {
+        const types = getSelectedTypeNames(filters, enums);
+        return types.includes('MOBILE_PHONE');
+      }
+    })
+
+    // Generic features
+    .addBooleanField('hasBox', 'Has Box')
+    .addBooleanField('hasInvoice', 'Has Invoice');
 };
 
 export const createRealEstateFilterConfig = () => {
@@ -74,4 +160,3 @@ export const filterConfigs = {
   BOOKS: createBooksFilterConfig(),
   SPORTS: createSportsFilterConfig(),
 };
-

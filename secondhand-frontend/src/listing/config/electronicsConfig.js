@@ -19,11 +19,31 @@ export const electronicsConfig = {
       { label: 'Origin', key: 'origin' },
       { label: 'Year', key: 'year' },
       { label: 'Color', key: 'color', enumKey: 'colors' },
-      { label: 'Warranty Proof', key: 'warrantyProof', format: (_listing, v) => (v ? 'Yes' : 'No') },
-      { label: 'RAM', key: 'ram', format: (_listing, v) => (v ? `${v} GB` : null) },
-      { label: 'Storage', key: 'storage', format: (_listing, v) => (v ? `${v} GB` : null) },
-      { label: 'Screen Size', key: 'screenSize', format: (_listing, v) => (v ? `${v}"` : null) },
-      { label: 'Processor', key: 'processor', enumKey: 'processors' },
+      { label: 'Condition', key: 'condition', enumKey: 'electronicConditions' },
+      { label: 'Warranty Proof', key: 'warrantyProof', format: (_listing, v) => formatBoolean(v) },
+      { label: 'Battery Replaced', key: 'batteryReplaced', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'Battery Original', key: 'batteryOriginal', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'Screen Replaced', key: 'screenReplaced', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'Body Replaced', key: 'bodyReplaced', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'FaceID Working', key: 'faceIdWorking', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'TouchID Working', key: 'touchIdWorking', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'IMEI Registered', key: 'imeiRegistered', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'MOBILE_PHONE' },
+      { label: 'RAM', key: 'ram', format: (_listing, v) => (v ? `${v} GB` : null), visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'DESKTOP'; } },
+      { label: 'Storage Type', key: 'storageType', enumKey: 'storageTypes', visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'DESKTOP'; } },
+      { label: 'Processor', key: 'processor', enumKey: 'processors', visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'DESKTOP'; } },
+      { label: 'GPU Model', key: 'gpuModel', visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'DESKTOP'; } },
+      { label: 'Operating System', key: 'operatingSystem', visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'DESKTOP'; } },
+      { label: 'Storage', key: 'storage', format: (_listing, v) => (v ? `${v} GB` : null), visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'MOBILE_PHONE' || t === 'LAPTOP' || t === 'DESKTOP' || t === 'TABLET'; } },
+      { label: 'Screen Size', key: 'screenSize', format: (_listing, v) => (v ? `${v}"` : null), visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'LAPTOP' || t === 'TABLET' || t === 'TV' || t === 'MONITOR'; } },
+      { label: 'Battery Health (%)', key: 'batteryHealthPercent', visibleWhen: (l) => { const t = getElectronicTypeName(l); return t === 'MOBILE_PHONE' || t === 'LAPTOP' || t === 'TABLET'; } },
+      { label: 'Connection Type', key: 'connectionType', enumKey: 'electronicConnectionTypes', visibleWhen: (l) => getElectronicTypeName(l) === 'HEADPHONES' },
+      { label: 'Wireless', key: 'wireless', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'HEADPHONES' },
+      { label: 'Noise Cancelling', key: 'noiseCancelling', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'HEADPHONES' },
+      { label: 'Microphone', key: 'hasMicrophone', format: (_listing, v) => formatBoolean(v), visibleWhen: (l) => getElectronicTypeName(l) === 'HEADPHONES' },
+      { label: 'Battery Life (hours)', key: 'batteryLifeHours', format: (_listing, v) => (v ? `${v} hours` : null), visibleWhen: (l) => getElectronicTypeName(l) === 'HEADPHONES' },
+      { label: 'Has Box', key: 'hasBox', format: (_listing, v) => formatBoolean(v) },
+      { label: 'Has Invoice', key: 'hasInvoice', format: (_listing, v) => formatBoolean(v) },
+      { label: 'Warranty End Date', key: 'warrantyEndDate' },
     ],
   },
   createComponent: ElectronicCreateForm,
@@ -59,35 +79,41 @@ export const electronicsConfig = {
                 },
               },
               { name: 'origin', label: 'Origin', type: 'text', placeholder: 'e.g. Apple Store TR' },
-              { name: 'year', label: 'Year', type: 'number', required: true, min: 1990, max: new Date().getFullYear() + 1, placeholder: 'YYYY' },
+              { name: 'year', label: 'Year', type: 'number', requiredWhen: (ctx) => { const t = String(ctx.formData?._electronicTypeName || '').toUpperCase(); return t !== 'LAPTOP' && t !== 'DESKTOP'; }, min: 1990, max: new Date().getFullYear() + 1, placeholder: 'YYYY' },
               { name: 'color', label: 'Color', type: 'enum', enumKey: 'colors', required: true },
+              { name: 'condition', label: 'Condition', type: 'enum', enumKey: 'electronicConditions', required: true },
             ],
           },
           {
-            id: 'electronics-laptop', title: 'Technical Specifications', description: 'RAM, storage and screen information',
-            visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'LAPTOP',
+            id: 'electronics-laptop', title: 'Technical Specifications', description: 'RAM, storage and processor information',
+            visibleWhen: (ctx) => { const t = String(ctx.formData?._electronicTypeName || '').toUpperCase(); return t === 'LAPTOP' || t === 'DESKTOP'; },
             fields: [
               { name: 'ram', label: 'RAM (GB)', type: 'number', required: true, min: 1, placeholder: '8, 16, 32...' },
               { name: 'storage', label: 'Storage (GB)', type: 'number', required: true, min: 1, placeholder: '256, 512, 1024...' },
               { name: 'storageType', label: 'Storage Type', type: 'enum', enumKey: 'storageTypes', required: true },
-              { name: 'screenSize', label: 'Screen Size (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '13.3, 15.6...' },
-              { name: 'processor', label: 'Processor', type: 'enum', enumKey: 'processors' },
+              { name: 'screenSize', label: 'Screen Size (inch)', type: 'number', required: false, min: 1, step: 0.1, placeholder: '13.3, 15.6...', visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'LAPTOP' },
+              { name: 'processor', label: 'Processor', type: 'enum', enumKey: 'processors', required: true },
               { name: 'gpuModel', label: 'GPU Model', type: 'text', placeholder: 'e.g. RTX 3060, M2 10-core' },
               { name: 'operatingSystem', label: 'Operating System', type: 'text', placeholder: 'Windows 11, macOS, Linux...' },
-              { name: 'batteryHealthPercent', label: 'Battery Health (%)', type: 'number', min: 1, max: 100, placeholder: 'e.g. 90' },
+              { name: 'batteryHealthPercent', label: 'Battery Health (%)', type: 'number', min: 1, max: 100, placeholder: 'e.g. 90', visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'LAPTOP' },
             ],
           },
           {
-            id: 'electronics-mobile', title: 'Phone Specifications', description: 'Battery, screen and connectivity features',
+            id: 'electronics-mobile', title: 'Phone Specifications', description: 'Battery, screen and condition features',
             visibleWhen: (ctx) => String(ctx.formData?._electronicTypeName || '').toUpperCase() === 'MOBILE_PHONE',
             fields: [
               { name: 'storage', label: 'Storage (GB)', type: 'number', required: true, min: 1, placeholder: '128, 256...' },
-              { name: 'screenSize', label: 'Screen Size (inch)', type: 'number', required: true, min: 1, step: 0.1, placeholder: '6.1, 6.7...' },
-              { name: 'batteryCapacityMah', label: 'Battery (mAh)', type: 'number', required: true, min: 1, placeholder: '4000' },
-              { name: 'cameraMegapixels', label: 'Camera (MP)', type: 'number', min: 1, placeholder: '12, 48...' },
-              { name: 'supports5g', label: '5G Supported', type: 'toggle' },
-              { name: 'dualSim', label: 'Dual SIM', type: 'toggle' },
-              { name: 'hasNfc', label: 'NFC', type: 'toggle' },
+              { name: 'batteryHealthPercent', label: 'Battery Health (%)', type: 'number', min: 1, max: 100, placeholder: 'e.g. 90' },
+              { name: 'batteryReplaced', label: 'Battery Replaced', type: 'toggle' },
+              { name: 'batteryOriginal', label: 'Original Battery', type: 'toggle' },
+              { name: 'screenReplaced', label: 'Screen Replaced', type: 'toggle' },
+              { name: 'bodyReplaced', label: 'Case/Body Replaced', type: 'toggle' },
+              { name: 'faceIdWorking', label: 'FaceID Working', type: 'toggle' },
+              { name: 'touchIdWorking', label: 'TouchID Working', type: 'toggle' },
+              { name: 'hasBox', label: 'Has Original Box', type: 'toggle' },
+              { name: 'hasInvoice', label: 'Has Invoice', type: 'toggle' },
+              { name: 'imeiRegistered', label: 'IMEI TR Registered', type: 'toggle' },
+              { name: 'warrantyEndDate', label: 'Warranty End Date', type: 'date' },
             ],
           },
           {
@@ -246,3 +272,24 @@ export const electronicsConfig = {
   defaultFilters: { minYear: 2000, maxYear: new Date().getFullYear() },
 };
 
+function formatBoolean(v) {
+  if (v === true) return 'Yes';
+  if (v === false) return 'No';
+  return '-';
+}
+
+export const getElectronicTypeName = (listing) => {
+  const typeObj = listing?.electronicType;
+  let typeName = '';
+  if (typeObj) {
+    if (typeof typeObj === 'object') {
+      typeName = typeObj.name || typeObj.label || typeObj.value || '';
+    } else if (typeof typeObj === 'string') {
+      typeName = typeObj;
+    }
+  }
+  if (!typeName) {
+    typeName = listing?.electronicTypeName || '';
+  }
+  return String(typeName).trim().toUpperCase();
+};

@@ -22,6 +22,9 @@ public class ElectronicRequiredFieldsValidator implements ElectronicSpecValidato
         if (listing.getModel() == null) {
             return Result.error("Electronic model is required", "ELECTRONIC_MODEL_REQUIRED");
         }
+        if (listing.getCondition() == null) {
+            return Result.error("Electronic condition is required", "ELECTRONIC_CONDITION_REQUIRED");
+        }
 
         return Result.success();
     }

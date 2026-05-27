@@ -10,7 +10,7 @@ import GlobalActionModal from '../../../listing/components/GlobalActionModal.jsx
 const MainLayout = () => {
     const { pathname } = useLocation();
     const pageName = getPageName(pathname);
-    const fullHeightWizard = pathname === ROUTES.CREATE_LISTING;
+    const fullHeightWizard = pathname === ROUTES.CREATE_LISTING || pathname === ROUTES.AURA_CHAT || pathname === '/aura';
     return (
         <ListingActionProvider>
             <div

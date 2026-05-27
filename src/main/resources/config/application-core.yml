@@ -72,9 +72,9 @@ cloudinary:
 gemini:
   api:
     key: ${GEMINI_API_KEY}
-    model: ${GEMINI_API_MODEL:gemini-2.5-flash}
+    model: ${GEMINI_API_MODEL:gemini-3.1-flash-lite}
     base-url: ${GEMINI_API_BASE_URL}
-    fallback-memory-model: ${GEMINI_API_FALLBACK_MEMORY_MODEL:gemini-2.0-flash-lite}
+    fallback-memory-model: ${GEMINI_API_FALLBACK_MEMORY_MODEL:gemini-3.1-flash-lite}
 
 aura:
   agent:

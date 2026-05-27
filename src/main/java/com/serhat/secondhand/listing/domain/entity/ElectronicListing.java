@@ -79,4 +79,19 @@ public class ElectronicListing extends Listing {
 
     private Integer batteryLifeHours;
 
+    private Boolean batteryReplaced;
+    private Boolean batteryOriginal;
+    private Boolean screenReplaced;
+    private Boolean bodyReplaced;
+    private Boolean faceIdWorking;
+    private Boolean touchIdWorking;
+    private Boolean hasBox;
+    private Boolean hasInvoice;
+    private Boolean imeiRegistered;
+    private java.time.LocalDate warrantyEndDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "condition", nullable = false)
+    private ElectronicCondition condition;
+
 }

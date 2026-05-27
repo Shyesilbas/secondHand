@@ -4,6 +4,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -43,4 +44,10 @@ public class ElectronicListingFilterDto extends ListingFilterDto {
     private Boolean hasMicrophone;
     private Integer minBatteryLifeHours;
     private Integer maxBatteryLifeHours;
+    private Boolean batteryOriginal;
+    private Boolean screenReplaced;
+    private Boolean hasBox;
+    private Boolean hasInvoice;
+    private Boolean imeiRegistered;
+    private List<ElectronicCondition> conditions;
 }
