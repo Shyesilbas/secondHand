@@ -4,6 +4,13 @@ import {
   ArrowRight,
   ChevronDown,
   ShoppingBag,
+  ShieldCheck,
+  Wallet,
+  Plus,
+  MessageSquare,
+  Heart,
+  Sparkles,
+  MapPin,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -58,53 +65,76 @@ const AccountHubPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+      <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex flex-col lg:flex-row">
-      <aside className="w-full lg:w-[300px] bg-white border-r border-gray-200 flex-shrink-0 flex flex-col max-h-[100dvh] lg:max-h-none lg:min-h-screen">
-        <div className="p-5 border-b border-gray-100">
-          <div className="flex items-center gap-4 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50">
-            <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold text-xl shadow-md overflow-hidden">
-              {user?.profilePicture ? (
-                <img src={user.profilePicture} alt="" className="h-full w-full object-cover" />
-              ) : (
-                getInitials(`${user?.name || ''} ${user?.surname || ''}`)
-              )}
-            </div>
-            <div className="overflow-hidden min-w-0">
-              <h2 className="text-base font-bold text-gray-900 truncate">
-                {user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User'}
-              </h2>
-              <p className="text-sm text-gray-500 truncate">{user?.email || ''}</p>
-            </div>
+    <div className="min-h-screen bg-[#faf9f7] flex flex-col lg:flex-row font-sans">
+      {/* Sidebar Navigation */}
+      <aside className="w-full lg:w-[320px] bg-transparent flex-shrink-0 flex flex-col p-6 lg:py-10 lg:pl-10 lg:pr-6 select-none">
+        {/* User Card */}
+        <div className="bg-white rounded-2xl p-5 shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-slate-100/60 mb-6 flex items-center gap-4">
+          <div className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden">
+            {user?.profilePicture ? (
+              <img src={user.profilePicture} alt="" className="h-full w-full object-cover" />
+            ) : (
+              getInitials(`${user?.name || ''} ${user?.surname || ''}`)
+            )}
+          </div>
+          <div className="overflow-hidden min-w-0">
+            <h2 className="text-sm font-bold text-slate-800 truncate">
+              {user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User'}
+            </h2>
+            <p className="text-xs text-slate-400 truncate mt-0.5">{user?.email || ''}</p>
           </div>
         </div>
 
-        <nav className="flex-1 px-3 py-2 pb-8 overflow-y-auto">
-          <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Menu</p>
+        {/* Mobile Horizontal Navigation Tabs */}
+        <nav className="flex lg:hidden overflow-x-auto gap-2 pb-4 scrollbar-none -mx-2 px-2">
+          {navGroups.map((group) => {
+            return group.items.map((item) => {
+              const active = isRouteActive(pathname, item.route);
+              return (
+                <Link
+                  key={`mobile-${group.id}-${item.route}`}
+                  to={item.route}
+                  className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                    active
+                      ? 'bg-slate-900 text-white shadow-sm'
+                      : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            });
+          })}
+        </nav>
+
+        {/* Desktop Navigation Groups */}
+        <nav className="hidden lg:flex flex-col gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 mb-2">Private space</span>
           {navGroups.map((group) => {
             const GroupIcon = group.icon;
             const isOpen = openGroups.has(group.id);
             return (
-              <div key={group.id} className="mb-1">
+              <div key={group.id} className="mb-2">
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.id)}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-left text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold uppercase tracking-wider text-slate-400 hover:bg-slate-950/[0.02] transition-colors"
                 >
                   <ChevronDown
-                    className={`h-4 w-4 text-gray-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
+                    className={`h-3.5 w-3.5 text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-0' : '-rotate-90'}`}
                   />
-                  <GroupIcon className="h-4 w-4 text-gray-500 shrink-0" />
+                  <GroupIcon className="h-4 w-4 text-slate-400 shrink-0" strokeWidth={2} />
                   <span className="truncate">{group.label}</span>
                 </button>
                 {isOpen && (
-                  <div className="mt-0.5 ml-2 pl-2 border-l border-gray-100 space-y-0.5">
+                  <div className="mt-1.5 ml-2.5 pl-3 border-l border-slate-100 space-y-1">
                     {group.items.map((item) => {
                       const ItemIcon = item.icon;
                       const active = isRouteActive(pathname, item.route);
@@ -112,14 +142,14 @@ const AccountHubPage = () => {
                         <Link
                           key={`${group.id}-${item.route}`}
                           to={item.route}
-                          className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${
                             active
-                              ? 'bg-[#0f111a] text-white'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              ? 'bg-slate-900 text-white font-bold shadow-sm'
+                              : 'text-slate-500 font-semibold hover:bg-slate-950/[0.02] hover:text-slate-900'
                           }`}
                         >
-                          <ItemIcon className={`h-4 w-4 shrink-0 ${active ? 'text-gray-300' : 'text-gray-400'}`} />
-                          <span className="font-medium truncate">{item.name}</span>
+                          <ItemIcon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} strokeWidth={active ? 2.5 : 2} />
+                          <span className="truncate">{item.name}</span>
                         </Link>
                       );
                     })}
@@ -131,39 +161,86 @@ const AccountHubPage = () => {
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
-        <div className="max-w-5xl">
-          <div className="mb-7">
-            <h1 className="text-2xl lg:text-[30px] font-bold text-gray-900 tracking-tight">
-              Welcome back, {user?.name?.split(' ')[0] || 'User'}
-            </h1>
-            <p className="mt-1.5 text-sm text-gray-500">Here&apos;s what&apos;s happening with your account today.</p>
+      {/* Main Panel Body */}
+      <main className="flex-1 p-6 lg:p-10 lg:pl-4 overflow-y-auto">
+        <div className="max-w-4xl mx-auto">
+          {/* Header Panel */}
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl lg:text-[28px] font-bold text-slate-900 tracking-tight">
+                Welcome, {user?.name?.split(' ')[0] || 'User'}
+              </h1>
+              <p className="mt-1 text-sm text-slate-500 font-medium">Your personal SecondHand space.</p>
+            </div>
+            {/* Secure Trust Badge */}
+            <div className="inline-flex items-center self-start gap-1.5 rounded-full bg-emerald-50/50 border border-emerald-100/60 px-3.5 py-1.5 text-xs font-bold text-emerald-700 select-none shadow-sm">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2.5} />
+              <span>Escrow Secured Member</span>
+            </div>
           </div>
 
-          <div className="bg-white rounded-[24px] border border-gray-200 p-6 lg:p-8">
+          {/* Mini Summary Row */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            <Link
+              to={ROUTES.MY_LISTINGS}
+              className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <Sparkles className="w-5 h-5 text-indigo-500 mb-1.5" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Listings</span>
+              <span className="text-sm font-bold text-slate-800 mt-0.5">Manage Items</span>
+            </Link>
+            <Link
+              to={ROUTES.FAVORITES}
+              className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <Heart className="w-5 h-5 text-rose-500 mb-1.5" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Saved</span>
+              <span className="text-sm font-bold text-slate-800 mt-0.5">My Favorites</span>
+            </Link>
+            <Link
+              to={ROUTES.CHAT}
+              className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <MessageSquare className="w-5 h-5 text-teal-500 mb-1.5" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Inbox</span>
+              <span className="text-sm font-bold text-slate-800 mt-0.5">Chat History</span>
+            </Link>
+          </div>
+
+          {/* Recent Orders Box */}
+          <div className="bg-white rounded-[28px] border border-slate-100/60 shadow-[0_8px_40px_rgba(0,0,0,0.01)] p-6 lg:p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+              <h2 className="text-base font-bold uppercase tracking-widest text-slate-400">Recent Orders</h2>
               <Link
                 to={ROUTES.MY_ORDERS}
-                className="text-sm font-semibold text-gray-900 flex items-center gap-1 hover:text-indigo-600 transition-colors"
+                className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 hover:text-slate-900 transition-colors"
               >
-                View All <ArrowRight className="w-4 h-4" />
+                View All <ArrowRight className="w-4 h-4" strokeWidth={2} />
               </Link>
             </div>
 
             {ordersLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+              <div className="space-y-4">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-20 rounded-2xl bg-slate-50 animate-pulse border border-slate-100/40" />
                 ))}
               </div>
             ) : recentOrders.length === 0 ? (
-              <div className="text-center py-10 text-gray-400">
-                <ShoppingBag className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">No orders yet.</p>
+              <div className="text-center py-12 select-none">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 border border-slate-100">
+                  <ShoppingBag className="w-5 h-5 text-slate-400" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-800">Your shopping bag is waiting</h3>
+                <p className="text-xs text-slate-400 mt-1">Explore our second-hand listings to find something unique.</p>
+                <Link
+                  to={ROUTES.LISTINGS}
+                  className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-black transition-all"
+                >
+                  Explore listings
+                </Link>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {recentOrders.map((order) => {
                   const items = order.orderItems || order.items || [];
                   const firstItem = items[0];
@@ -172,42 +249,42 @@ const AccountHubPage = () => {
                   const lineTitle = listing?.title || firstItem?.title;
                   const statusColor =
                     order.status === 'DELIVERED' || order.status === 'COMPLETED'
-                      ? 'bg-emerald-50 text-emerald-700'
+                      ? 'bg-emerald-50/50 text-emerald-700 border-emerald-100/50'
                       : order.status === 'CANCELLED'
-                        ? 'bg-red-50 text-red-700'
-                        : 'bg-yellow-50 text-yellow-700';
+                        ? 'bg-red-50/50 text-red-700 border-red-100/50'
+                        : 'bg-amber-50/50 text-amber-700 border-amber-100/50';
 
                   return (
                     <Link
                       key={order.id}
                       to={ROUTES.MY_ORDERS}
-                      className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                      className="flex items-center justify-between p-4 rounded-2xl border border-slate-100/60 bg-slate-50/30 hover:bg-slate-50 hover:shadow-sm transition-all duration-300"
                     >
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-xl bg-white overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-100/80 shadow-sm">
                           {thumbUrl ? (
                             <img src={thumbUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <ShoppingBag className="w-6 h-6 text-gray-400" />
+                            <ShoppingBag className="w-5 h-5 text-slate-400" />
                           )}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">
+                          <h3 className="font-semibold text-slate-800 text-sm leading-tight truncate">
                             {order.name || lineTitle || `Order #${order.orderNumber}`}
                           </h3>
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-slate-400 mt-1 font-medium">
                             {order.orderNumber} •{' '}
                             {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : ''}
                           </p>
                           <span
-                            className={`mt-1.5 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${statusColor}`}
+                            className={`mt-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${statusColor}`}
                           >
                             {order.status?.replace(/_/g, ' ')}
                           </span>
                         </div>
                       </div>
                       <div className="text-right shrink-0 ml-4">
-                        <p className="text-base font-bold text-gray-900 tracking-tight">
+                        <p className="text-base font-bold text-slate-900 tracking-tight">
                           {formatCurrency(order.totalAmount ?? order.total ?? 0, order.currency)}
                         </p>
                       </div>
@@ -216,6 +293,46 @@ const AccountHubPage = () => {
                 })}
               </div>
             )}
+          </div>
+
+          {/* Quick Actions Panel */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Link
+              to={ROUTES.CREATE_LISTING}
+              className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
+                <Plus className="w-5 h-5" strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Sell Item</h3>
+                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Create a listing</p>
+              </div>
+            </Link>
+            <Link
+              to={ROUTES.EWALLET}
+              className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
+                <Wallet className="w-4 h-4" strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">My Wallet</h3>
+                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Top up balance</p>
+              </div>
+            </Link>
+            <Link
+              to={ROUTES.PROFILE}
+              className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]"
+            >
+              <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
+                <MapPin className="w-4 h-4" strokeWidth={2} />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Addresses</h3>
+                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Manage profiles</p>
+              </div>
+            </Link>
           </div>
 
           <MyShowcasesPanel userId={user?.id} />

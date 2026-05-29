@@ -11,9 +11,9 @@ export const CART_CHECKOUT_DEFAULTS = Object.freeze({
 });
 
 export const CART_CHECKOUT_STEPS = Object.freeze([
-  { id: 1, title: 'Review', description: 'Review your order' },
-  { id: 2, title: 'Address & Note', description: 'Shipping and billing' },
-  { id: 3, title: 'Payment Method', description: 'Choose payment option' },
+  { id: 1, title: 'Address & Note', description: 'Shipping and billing' },
+  { id: 2, title: 'Payment Method', description: 'Choose payment option' },
+  { id: 3, title: 'Review & Confirm', description: 'Review details and confirm' },
   { id: 4, title: 'Verification', description: 'Confirm your purchase' },
 ]);
 

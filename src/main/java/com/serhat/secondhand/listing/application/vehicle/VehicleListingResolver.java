@@ -44,6 +44,10 @@ public class VehicleListingResolver {
 
         var model = vehicleModelRepository.findById(modelId).orElse(null);
         if (model == null) {
+            org.slf4j.LoggerFactory.getLogger(VehicleListingResolver.class).error(
+                "VEHICLE_MODEL_NOT_FOUND: Failed to resolve modelId: {} for brandId: {}, vehicleTypeId: {}", 
+                modelId, brandId, vehicleTypeId
+            );
             return Result.error("Vehicle model not found", "VEHICLE_MODEL_NOT_FOUND");
         }
 

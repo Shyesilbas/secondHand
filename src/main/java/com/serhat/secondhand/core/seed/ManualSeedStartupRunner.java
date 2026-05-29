@@ -28,7 +28,7 @@ public class ManualSeedStartupRunner implements ApplicationRunner {
         // DİKKAT: Seed çalıştırmak için sadece ilgili satırı geçici olarak aç.
         // İş bitince tekrar comment'e al.
 
-        //  vehicleDataInitializer.run();
+        // vehicleDataInitializer.run();
         // electronicDataInitializer.run();
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
@@ -147,6 +148,10 @@ public class VehicleDataInitializer implements SeedTask {
         }
     }
 
+    private UUID generateStableUuid(String key) {
+        return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8));
+    }
+
     private void validateAndSeedModel(String parentBrand, String parentType, VehicleSeedModelDto modelDto, String sourceFile) {
         if (modelDto.getBrand() == null || !modelDto.getBrand().equalsIgnoreCase(parentBrand)) {
             throw new IllegalArgumentException(String.format(
@@ -169,7 +174,11 @@ public class VehicleDataInitializer implements SeedTask {
         VehicleType type = typeRepository.findByNameIgnoreCase(typeKey)
                 .orElseThrow(() -> new IllegalStateException("Vehicle type not found in database: " + typeKey));
 
+        String modelNaturalKey = "vehicle-model:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName());
+        UUID modelId = generateStableUuid(modelNaturalKey);
+
         VehicleModel model = new VehicleModel();
+        model.setId(modelId);
         model.setBrand(brand);
         model.setType(type);
         model.setName(modelDto.getName());
@@ -193,7 +202,11 @@ public class VehicleDataInitializer implements SeedTask {
                     throw new IllegalArgumentException("Generation name cannot be null or empty under model: " + modelDto.getName());
                 }
                 
+                String genNaturalKey = "vehicle-generation:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName());
+                UUID genId = generateStableUuid(genNaturalKey);
+
                 VehicleGeneration generation = new VehicleGeneration();
+                generation.setId(genId);
                 generation.setName(genDto.getName());
                 generation.setModel(model);
                 generation = generationRepository.save(generation);
@@ -204,7 +217,11 @@ public class VehicleDataInitializer implements SeedTask {
                             throw new IllegalArgumentException("Engine name cannot be empty under generation: " + genDto.getName());
                         }
                         
+                        String engNaturalKey = "vehicle-engine:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(engDto.getName()) + ":" + normalizeKey(engDto.getFuelType());
+                        UUID engId = generateStableUuid(engNaturalKey);
+
                         VehicleEngine engine = new VehicleEngine();
+                        engine.setId(engId);
                         engine.setName(engDto.getName());
                         engine.setGeneration(generation);
                         
@@ -216,7 +233,7 @@ public class VehicleDataInitializer implements SeedTask {
                             engine.setFuelType(FuelType.valueOf(engDto.getFuelType().toUpperCase(Locale.ROOT)));
                         } catch (Exception e) {
                             throw new IllegalArgumentException(String.format(
-                                    "Invalid fuel type '%s' for engine '%s' in file %s",
+                                     "Invalid fuel type '%s' for engine '%s' in file %s",
                                     engDto.getFuelType(), engDto.getName(), sourceFile), e);
                         }
                         engineRepository.save(engine);
@@ -228,7 +245,11 @@ public class VehicleDataInitializer implements SeedTask {
                         if (trimName == null || trimName.isBlank()) {
                             continue;
                         }
+                        String trimNaturalKey = "vehicle-trim:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(trimName);
+                        UUID trimId = generateStableUuid(trimNaturalKey);
+
                         VehicleTrim trim = new VehicleTrim();
+                        trim.setId(trimId);
                         trim.setName(trimName);
                         trim.setGeneration(generation);
                         trimRepository.save(trim);
@@ -272,6 +293,7 @@ public class VehicleDataInitializer implements SeedTask {
         CarBrand brand = brandRepository.findByNameIgnoreCase(normalizedKey)
                 .orElseGet(() -> {
                     CarBrand created = new CarBrand();
+                    created.setId(generateStableUuid("vehicle-brand:" + normalizedKey));
                     created.setName(normalizedKey);
                     return created;
                 });
@@ -284,6 +306,7 @@ public class VehicleDataInitializer implements SeedTask {
         VehicleType type = typeRepository.findByNameIgnoreCase(normalizedKey)
                 .orElseGet(() -> {
                     VehicleType created = new VehicleType();
+                    created.setId(generateStableUuid("vehicle-type:" + normalizedKey));
                     created.setName(normalizedKey);
                     return created;
                 });

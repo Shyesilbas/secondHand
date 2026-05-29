@@ -15,43 +15,43 @@ const CARDS = [
         title: 'Publish Listings',
         description: 'Create and manage your product listings with ease.\nReach thousands of potential buyers instantly.',
         Icon: PlusCircleIcon,
-        iconBg: 'bg-amber-100',
-        iconColor: 'text-amber-500',
+        iconBg: 'bg-stone-100',
+        iconColor: 'text-stone-700',
     },
     {
         title: 'Make an Offer',
         description: 'Negotiate prices directly on any listing.\nGet the best deal without leaving the app.',
         Icon: TagIcon,
-        iconBg: 'bg-indigo-100',
-        iconColor: 'text-indigo-500',
+        iconBg: 'bg-stone-150',
+        iconColor: 'text-stone-800',
     },
     {
         title: 'Chat with Sellers',
         description: 'Ask questions and confirm details before you buy.\nDirect messaging keeps everything in one place.',
         Icon: MessageCircleIcon,
-        iconBg: 'bg-emerald-100',
-        iconColor: 'text-emerald-500',
+        iconBg: 'bg-stone-100',
+        iconColor: 'text-stone-700',
     },
     {
         title: 'Track Your Order',
         description: 'Follow every step of your purchase in real time.\nFrom payment to delivery — always in the loop.',
         Icon: TruckIcon,
-        iconBg: 'bg-sky-100',
-        iconColor: 'text-sky-500',
+        iconBg: 'bg-stone-150',
+        iconColor: 'text-stone-850',
     },
     {
         title: 'Secure Payments',
         description: 'Escrow-backed transactions protect every deal.\nYour money is safe until delivery is confirmed.',
         Icon: ShieldCheckIcon,
-        iconBg: 'bg-amber-100',
-        iconColor: 'text-amber-500',
+        iconBg: 'bg-stone-100',
+        iconColor: 'text-stone-800',
     },
     {
         title: 'Verified Accounts',
         description: 'Trade with confidence on a trusted marketplace.\nAll sellers go through our verification process.',
         Icon: CheckCircleIcon,
-        iconBg: 'bg-indigo-100',
-        iconColor: 'text-indigo-500',
+        iconBg: 'bg-stone-150',
+        iconColor: 'text-stone-750',
     },
 ];
 
@@ -62,7 +62,7 @@ export const OnboardingCarousel = () => {
     React.useEffect(() => {
         const id = window.setInterval(() => {
             setIndex((prev) => (prev + 1) % total);
-        }, 3000);
+        }, 5000); // Slower, calmer transition
         return () => window.clearInterval(id);
     }, [total]);
 
@@ -73,26 +73,27 @@ export const OnboardingCarousel = () => {
     const CardIcon = card.Icon;
 
     return (
-        <div className="h-full w-full flex flex-col items-center justify-center px-12 py-16 select-none">
-            <div className="flex flex-col items-center text-center w-full max-w-sm gap-6">
-                <div className={`w-24 h-24 rounded-3xl ${card.iconBg} flex items-center justify-center shadow-sm transition-all duration-500`}>
-                    <CardIcon className={`w-12 h-12 ${card.iconColor} transition-all duration-500`} strokeWidth={1.5} />
+        <div className="h-full w-full flex flex-col items-center justify-center px-8 py-12 select-none">
+            <div className="flex flex-col items-center text-center w-full max-w-sm gap-8">
+                {/* Visual Accent Container */}
+                <div className="relative flex items-center justify-center p-8 bg-white rounded-[32px] border border-stone-200/40 shadow-[0_12px_40px_rgba(28,25,23,0.015)] transition-all duration-500">
+                    <CardIcon className={`w-14 h-14 ${card.iconColor} stroke-[1.25]`} />
                 </div>
 
-                <div className="space-y-3">
-                    <h2 className="text-3xl font-bold text-secondary-900 tracking-tight transition-all duration-500">
+                <div className="space-y-3.5">
+                    <h2 className="text-2xl font-normal text-stone-900 tracking-tight transition-all duration-500">
                         {card.title}
                     </h2>
-                    <p className="text-sm text-secondary-500 leading-relaxed whitespace-pre-line transition-all duration-500">
+                    <p className="text-xs text-stone-500 leading-relaxed whitespace-pre-line max-w-[280px] mx-auto transition-all duration-500">
                         {card.description}
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-6 mt-4">
                     <button
                         type="button"
                         onClick={prev}
-                        className="w-9 h-9 rounded-full border border-secondary-200 bg-white flex items-center justify-center text-secondary-500 hover:bg-secondary-100 hover:text-secondary-900 transition-colors shadow-sm"
+                        className="w-8 h-8 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
                     >
                         <ChevronLeftIcon className="w-4 h-4" />
                     </button>
@@ -105,8 +106,8 @@ export const OnboardingCarousel = () => {
                                 onClick={() => setIndex(i)}
                                 className={`rounded-full transition-all duration-300 ${
                                     i === index
-                                        ? 'w-6 h-2 bg-secondary-900'
-                                        : 'w-2 h-2 bg-secondary-300 hover:bg-secondary-400'
+                                        ? 'w-5 h-1 bg-stone-900'
+                                        : 'w-1 h-1 bg-stone-300 hover:bg-stone-400'
                                 }`}
                             />
                         ))}
@@ -115,15 +116,15 @@ export const OnboardingCarousel = () => {
                     <button
                         type="button"
                         onClick={next}
-                        className="w-9 h-9 rounded-full border border-secondary-200 bg-white flex items-center justify-center text-secondary-500 hover:bg-secondary-100 hover:text-secondary-900 transition-colors shadow-sm"
+                        className="w-8 h-8 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
                     >
                         <ChevronRightIcon className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
-            <div className="absolute bottom-6 right-8 text-xs text-secondary-400 font-medium">
-                {index + 1} / {total}
+            <div className="absolute bottom-8 right-10 text-[10px] tracking-widest text-stone-400 font-semibold">
+                {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
             </div>
         </div>
     );

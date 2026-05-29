@@ -214,7 +214,6 @@ const CheckoutPaymentStep = ({
         }
       }
     }
-    await sendVerificationCode();
     onNext();
   };
 
@@ -322,12 +321,12 @@ const CheckoutPaymentStep = ({
           return (
             <div key={method.id}>
               <label
-                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-all duration-150 ${
+                className={`flex cursor-pointer items-center gap-4 rounded-xl border p-5 transition-all duration-300 ${
                   isDisabled
-                    ? 'cursor-not-allowed border-[#e5e3df] bg-[#fafaf9] opacity-45'
+                    ? 'cursor-not-allowed border-slate-100 bg-slate-50/50 opacity-40'
                     : isSelected
-                      ? 'border-l-[3px] border-l-[#1466c6] border-t-[#e5e3df] border-r-[#e5e3df] border-b-[#e5e3df] bg-[#fafcff]'
-                      : 'border-[#e5e3df] bg-white hover:border-[#bcb6b0]'
+                      ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-[0_8px_30px_rgb(79,70,229,0.05)] scale-[1.01]'
+                      : 'border-slate-100 bg-white hover:border-slate-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)]'
                 }`}
               >
                 <input
@@ -345,20 +344,20 @@ const CheckoutPaymentStep = ({
 
                 {/* Radio indicator */}
                 <span
-                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                    isSelected ? 'border-[#1466c6]' : 'border-[#ccc]'
+                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
+                    isSelected ? 'border-indigo-600' : 'border-slate-300'
                   }`}
                 >
-                  {isSelected && <span className="h-2 w-2 rounded-full bg-[#1466c6]" />}
+                  {isSelected && <span className="h-2 w-2 rounded-full bg-indigo-600 animate-scaleUp" />}
                 </span>
 
-                <Icon className={`h-5 w-5 shrink-0 ${isSelected ? 'text-[#1466c6]' : 'text-[#999]'}`} strokeWidth={1.5} />
+                <Icon className={`h-5 w-5 shrink-0 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} strokeWidth={1.5} />
 
                 <div className="min-w-0 flex-1">
-                  <div className={`text-sm font-medium ${isSelected ? 'text-[#111]' : 'text-[#555]'}`}>
+                  <div className={`text-sm font-semibold tracking-tight ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
                     {method.name}
                   </div>
-                  <div className="text-xs text-[#999]">{method.sub}</div>
+                  <div className="text-xs text-slate-400 mt-0.5 font-medium">{method.sub}</div>
                 </div>
               </label>
 
@@ -370,7 +369,7 @@ const CheckoutPaymentStep = ({
       </div>
 
       {/* Agreements */}
-      <div className="mb-5 rounded-lg border border-[#e5e3df] bg-[#fafaf9] p-4">
+      <div className="mb-6 rounded-xl border border-slate-100 bg-white shadow-sm p-5">
         <PaymentAgreementsSection
           acceptedAgreements={acceptedAgreements}
           onToggle={onAgreementToggle}
@@ -380,29 +379,29 @@ const CheckoutPaymentStep = ({
 
       {/* Spending warning */}
       {warningData ? (
-        <div className="mt-4 rounded-lg border border-[#f0dbb8] bg-[#fffdf7] p-4">
+        <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/30 p-5">
           <div className="flex items-start gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#ca5010]" />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-[#111]">Spending limit warning</h3>
-              <p className="mt-1 text-xs leading-relaxed text-[#555]">
+              <h3 className="text-sm font-bold text-slate-900">Spending limit warning</h3>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600 font-medium">
                 With this order, monthly spending reaches{' '}
                 <strong>{formatCurrency(warningData.projectedSpending, cur)}</strong> (
                 {warningData.usagePercentage.toFixed(1)}% of your{' '}
                 {formatCurrency(warningData.warningLimit, cur)} threshold).
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={handleCancelWarning}
-                  className="rounded-lg border border-[#e5e3df] bg-white px-3 py-1.5 text-xs font-medium text-[#111] transition hover:bg-[#fafaf9]"
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="rounded-lg border border-[#1466c6] bg-[#1466c6] px-4 py-1.5 text-xs font-medium text-white transition hover:bg-[#0f529e]"
+                  className="rounded-xl bg-slate-900 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black"
                 >
                   Continue anyway
                 </button>
@@ -413,18 +412,18 @@ const CheckoutPaymentStep = ({
       ) : (
         <>
           {/* Navigation — desktop */}
-          <div className="hidden items-center justify-between border-t border-[#f0efed] pt-5 sm:flex">
+          <div className="hidden items-center justify-between border-t border-slate-100 pt-6 sm:flex">
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center gap-1.5 text-sm font-medium text-[#555] transition-colors hover:text-[#111]"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900"
             >
-              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} />
               Back
             </button>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {!canProceed() && (
-                <p className="max-w-[220px] text-right text-xs text-[#999]">
+                <p className="max-w-[220px] text-right text-xs text-slate-400 font-medium">
                   {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
                 </p>
               )}
@@ -432,7 +431,7 @@ const CheckoutPaymentStep = ({
                 type="button"
                 onClick={handleNext}
                 disabled={!canProceed() || isCheckingWarning}
-                className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] px-6 py-2.5 text-sm font-medium text-white transition-all duration-150 hover:bg-[#0f529e] disabled:cursor-not-allowed disabled:border-[#e8e6e4] disabled:bg-[#e8e6e4] disabled:text-[#9c9894] active:scale-[0.99]"
+                className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98] shadow-sm"
               >
                 {isCheckingWarning ? (
                   <>
@@ -441,8 +440,8 @@ const CheckoutPaymentStep = ({
                   </>
                 ) : (
                   <>
-                    Send verification code
-                    <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+                    Continue
+                    <ArrowRight className="h-4 w-4" strokeWidth={2} />
                   </>
                 )}
               </button>
@@ -450,26 +449,26 @@ const CheckoutPaymentStep = ({
           </div>
 
           {/* Navigation — mobile */}
-          <div className="sticky bottom-0 -mx-5 mt-4 grid grid-cols-2 gap-2 border-t border-[#f0efed] bg-white px-5 py-4 sm:hidden">
+          <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
             <button
               type="button"
               onClick={onBack}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-[#e5e3df] bg-white py-3 text-sm font-medium text-[#111] transition-all hover:bg-[#fafaf9]"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50"
             >
-              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} />
               Back
             </button>
             <button
               type="button"
               onClick={handleNext}
               disabled={!canProceed() || isCheckingWarning}
-              className="flex items-center justify-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] py-3 text-sm font-medium text-white transition-all hover:bg-[#0f529e] disabled:border-[#e8e6e4] disabled:bg-[#e8e6e4] disabled:text-[#9c9894]"
+              className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400"
             >
-              {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send code'}
+              {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
             </button>
           </div>
           {!canProceed() && (
-            <p className="mt-2 text-center text-xs text-[#999] sm:hidden">
+            <p className="mt-2.5 text-center text-xs text-slate-400 font-medium sm:hidden">
               {!isPaymentMethodValid() ? 'Select a payment method' : 'Accept agreements to continue'}
             </p>
           )}

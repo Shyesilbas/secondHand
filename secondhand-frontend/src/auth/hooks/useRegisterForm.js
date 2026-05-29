@@ -25,15 +25,29 @@ export const useRegisterForm = () => {
     
     // Special handling for birthdate to format DD/MM/YYYY
     if (name === 'birthdate') {
-      // Remove all non-numeric characters
-      let formattedValue = value.replace(/\D/g, '');
-      
-      // Add slashes at appropriate positions
-      if (formattedValue.length >= 2) {
-        formattedValue = formattedValue.substring(0, 2) + '/' + formattedValue.substring(2);
-      }
-      if (formattedValue.length >= 5) {
-        formattedValue = formattedValue.substring(0, 5) + '/' + formattedValue.substring(5, 9);
+      const prevValue = formData.birthdate || '';
+      const isDeleting = value.length < prevValue.length;
+      let formattedValue = value;
+
+      if (!isDeleting) {
+        // Strip all non-digits
+        const clean = value.replace(/\D/g, '').substring(0, 8);
+        const day = clean.substring(0, 2);
+        const month = clean.substring(2, 4);
+        const year = clean.substring(4, 8);
+
+        if (clean.length > 4) {
+          formattedValue = `${day}/${month}/${year}`;
+        } else if (clean.length > 2) {
+          formattedValue = `${day}/${month}`;
+        } else {
+          formattedValue = clean;
+        }
+      } else {
+        // If deleting a slash, delete the character before it as well to prevent loops
+        if (prevValue.endsWith('/') && value.length === prevValue.length - 1) {
+          formattedValue = value.slice(0, -1);
+        }
       }
       
       setFormData(prev => ({ ...prev, [name]: formattedValue }));
@@ -47,7 +61,7 @@ export const useRegisterForm = () => {
     }
     
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
-  }, [errors]);
+  }, [errors, formData.birthdate]);
 
   const validateForm = useCallback(() => {
     const newErrors = validateRegisterForm(formData, agreementsApi.acceptedAgreements, agreementsApi.agreements);
@@ -72,11 +86,8 @@ export const useRegisterForm = () => {
       };
       const response = await authService.register(registerData);
 
-      if (response.welcomeMessage) notification.showSuccess('Register Successful', response.welcomeMessage);
-      if (response.importantMessage) notification.showInfo('Important', response.importantMessage);
-      if (response.informationMessage) notification.showInfo('Information', response.informationMessage);
-
-      navigate(ROUTES.LOGIN, { state: { message: 'Registration successful! You can now log in.' } });
+      notification.showSuccess('Account Created', 'Your account has been created. You can now log in with your credentials.');
+      navigate(ROUTES.LOGIN, { state: { message: 'Your account has been created. You can now log in with your credentials.' } });
       return true;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Registration failed';
@@ -103,5 +114,3 @@ export const useRegisterForm = () => {
 };
 
 export default useRegisterForm;
-
-

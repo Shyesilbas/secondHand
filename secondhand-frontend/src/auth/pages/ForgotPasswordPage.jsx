@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
-import {authService} from '../services/authService.js';
-import {ROUTES} from '../../common/constants/routes.js';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { authService } from '../services/authService.js';
+import { ROUTES } from '../../common/constants/routes.js';
 import AuthInput from '../../common/components/ui/AuthInput.jsx';
 import AuthButton from '../../common/components/ui/AuthButton.jsx';
-import {ForgotPasswordRequestDTO} from '../auth.js';
-import {useNotification} from '../../notification/NotificationContext.jsx';
+import { ForgotPasswordRequestDTO } from '../auth.js';
+import { useNotification } from '../../notification/NotificationContext.jsx';
+import { Mail as EnvelopeIcon, Key as KeyIcon, Lock as LockClosedIcon, ArrowLeft as ArrowLeftIcon } from 'lucide-react';
 
 const ForgotPasswordPage = () => {
     const [formData, setFormData] = useState({
@@ -49,21 +50,31 @@ const ForgotPasswordPage = () => {
 
     if (success) {
         return (
-            <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+            <div className="flex flex-col w-full animate-fade-in">
+                {/* Logo Monogram */}
+                <div className="flex items-center gap-2 mb-8">
+                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
+                        <span className="text-amber-400 text-xs font-semibold leading-none">S</span>
+                    </div>
+                    <span className="text-sm font-semibold text-stone-900 tracking-tight">secondHand</span>
                 </div>
-                <h2 className="text-2xl font-bold text-text-primary mb-2">Verification Code Generated</h2>
-                <p className="text-text-secondary mb-2">Since we are in a development environment, we’re showing the code here.</p>
+
+                <div className="text-center mb-8">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-stone-100 rounded-full flex items-center justify-center text-stone-900">
+                        <EnvelopeIcon className="w-5 h-5 stroke-[1.5]" />
+                    </div>
+                    <h2 className="text-2xl font-normal text-stone-900 tracking-tight">Check Verification Code</h2>
+                    <p className="mt-2 text-xs text-stone-500 font-normal max-w-xs mx-auto leading-relaxed">
+                        A verification code has been generated. Use it below to establish your new security password.
+                    </p>
+                </div>
+
                 {verificationCode && (
-                    <div className="mb-4 p-3 border rounded bg-app-bg">
-                        <div className="text-sm text-text-secondary">Verification Code</div>
-                        <div className="text-xl font-mono tracking-widest">{verificationCode}</div>
+                    <div className="mb-6 p-4 rounded-xl border border-stone-200 bg-[#faf9f7] text-center">
+                        <div className="text-[10px] tracking-wider font-semibold text-stone-400 uppercase mb-1">Developer Environment Code</div>
+                        <div className="text-2xl font-mono tracking-[0.2em] font-semibold text-stone-900">{verificationCode}</div>
                     </div>
                 )}
-                <p className="text-text-secondary mb-6">You can now set a new password below.</p>
 
                 <form
                     onSubmit={async (e) => {
@@ -71,6 +82,7 @@ const ForgotPasswordPage = () => {
                         if (!resetForm.newPassword || resetForm.newPassword !== resetForm.confirmPassword) {
                             return setError('Passwords do not match');
                         }
+                        setIsLoading(true);
                         try {
                             await authService.resetPassword({
                                 email: resetForm.email,
@@ -85,50 +97,83 @@ const ForgotPasswordPage = () => {
                             }, 1200);
                         } catch (err) {
                             setError(err.response?.data?.message || 'Password reset failed');
+                        } finally {
+                            setIsLoading(false);
                         }
                     }}
-                    className="space-y-4 text-left"
+                    className="flex flex-col gap-4 text-left"
                 >
-                    <div>
-                        <label className="block text-sm font-medium text-text-secondary">Email</label>
-                        <input className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.email} onChange={(e)=> setResetForm({...resetForm, email: e.target.value})}/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-text-secondary">Verification Code</label>
-                        <input className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.verificationCode} onChange={(e)=> setResetForm({...resetForm, verificationCode: e.target.value})}/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-text-secondary">New Password</label>
-                        <input type="password" className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.newPassword} onChange={(e)=> setResetForm({...resetForm, newPassword: e.target.value})}/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-text-secondary">Confirm New Password</label>
-                        <input type="password" className="mt-1 block w-full border rounded px-3 py-2" value={resetForm.confirmPassword} onChange={(e)=> setResetForm({...resetForm, confirmPassword: e.target.value})}/>
-                    </div>
-                    <AuthButton type="submit" className="w-full">Save New Password</AuthButton>
+                    <AuthInput
+                        label="Email Address"
+                        value={resetForm.email}
+                        onChange={(e)=> setResetForm({...resetForm, email: e.target.value})}
+                        required
+                        leftIcon={<EnvelopeIcon className="w-4 h-4" />}
+                    />
+                    <AuthInput
+                        label="Verification Code"
+                        value={resetForm.verificationCode}
+                        onChange={(e)=> setResetForm({...resetForm, verificationCode: e.target.value})}
+                        required
+                        leftIcon={<KeyIcon className="w-4 h-4" />}
+                    />
+                    <AuthInput
+                        label="New Password"
+                        type="password"
+                        value={resetForm.newPassword}
+                        onChange={(e)=> setResetForm({...resetForm, newPassword: e.target.value})}
+                        required
+                        leftIcon={<LockClosedIcon className="w-4 h-4" />}
+                    />
+                    <AuthInput
+                        label="Confirm New Password"
+                        type="password"
+                        value={resetForm.confirmPassword}
+                        onChange={(e)=> setResetForm({...resetForm, confirmPassword: e.target.value})}
+                        required
+                        leftIcon={<LockClosedIcon className="w-4 h-4" />}
+                    />
+
+                    {error && (
+                        <div className="p-3.5 rounded-xl bg-rose-50/50 border border-rose-100 text-xs text-rose-600">
+                            {error}
+                        </div>
+                    )}
+
+                    <AuthButton type="submit" isLoading={isLoading} className="mt-2">
+                        Save New Password
+                    </AuthButton>
                 </form>
-                <Link
-                    to={ROUTES.LOGIN}
-                    className="text-indigo-600 hover:text-indigo-500 font-medium"
-                >
-                    ← Back to login page
-                </Link>
+
+                <div className="text-center mt-6">
+                    <Link
+                        to={ROUTES.LOGIN}
+                        className="inline-flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition-colors"
+                    >
+                        <ArrowLeftIcon className="w-3.5 h-3.5" />
+                        <span>Back to login</span>
+                    </Link>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="w-full max-w-md mx-auto">
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-text-primary mb-2">
-                    Forgot your password?
-                </h2>
-                <p className="text-text-secondary">
-                    Enter your email address and we’ll send you a password reset link.
-                </p>
+        <div className="flex flex-col w-full animate-fade-in">
+            {/* Logo Monogram */}
+            <div className="flex items-center gap-2 mb-8">
+                <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
+                    <span className="text-amber-400 text-xs font-semibold leading-none">S</span>
+                </div>
+                <span className="text-sm font-semibold text-stone-900 tracking-tight">secondHand</span>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="mb-8">
+                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">Recover Password</h1>
+                <p className="mt-2 text-sm text-stone-500 font-normal">Enter your email and we'll start your recovery flow.</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <AuthInput
                     label="Email Address"
                     type="email"
@@ -137,25 +182,27 @@ const ForgotPasswordPage = () => {
                         ...prev,
                         email: e.target.value
                     }))}
-                    placeholder="example@email.com"
+                    placeholder="name@example.com"
                     error={error}
                     required
+                    leftIcon={<EnvelopeIcon className="w-4 h-4" />}
                 />
 
                 <AuthButton
                     type="submit"
                     isLoading={isLoading}
-                    className="w-full"
+                    className="mt-2"
                 >
-                    {isLoading ? 'Sending...' : 'Send Password Reset Link'}
+                    Send Recovery Code
                 </AuthButton>
 
-                <div className="text-center">
+                <div className="text-center mt-4">
                     <Link
                         to={ROUTES.LOGIN}
-                        className="text-indigo-600 hover:text-indigo-500 font-medium"
+                        className="inline-flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition-colors"
                     >
-                        ← Back to login page
+                        <ArrowLeftIcon className="w-3.5 h-3.5" />
+                        <span>Back to login</span>
                     </Link>
                 </div>
             </form>

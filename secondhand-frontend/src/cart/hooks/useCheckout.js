@@ -25,8 +25,6 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const navigate = useNavigate();
     const { showError, showSuccess } = useNotification();
     
-    const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-    const [step, setStep] = useState(CART_CHECKOUT_DEFAULTS.INITIAL_CHECKOUT_STEP);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     const { addresses } = useAddresses();
@@ -201,28 +199,6 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         }
     };
 
-    const openCheckoutModal = () => {
-        setStep(CART_CHECKOUT_DEFAULTS.INITIAL_CHECKOUT_STEP);
-        setShowCheckoutModal(true);
-    };
-
-    const closeCheckoutModal = () => {
-        setShowCheckoutModal(false);
-        // Reset states when modal closes to prevent stale data
-        setStep(CART_CHECKOUT_DEFAULTS.INITIAL_CHECKOUT_STEP);
-        setSelectedShippingAddressId(null);
-        setSelectedBillingAddressId(null);
-        setSelectedPaymentType(CART_PAYMENT_TYPES.CREDIT_CARD);
-        setCards([]);
-        setSelectedCardNumber(null);
-        setBankAccounts([]);
-        setSelectedBankAccountIban(null);
-        setPaymentVerificationCode('');
-        setPaymentVerificationExpiresAtMs(null);
-        setNotes('');
-        setShowEWalletWarning(false);
-    };
-
     const sendVerificationCode = async () => {
         setIsCheckingOut(true);
         try {
@@ -234,11 +210,13 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
             showSuccess(CART_MESSAGES.VERIFICATION_SENT_TITLE, CART_MESSAGES.VERIFICATION_SENT_DESCRIPTION);
             setPaymentVerificationExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
             try { await fetchEmails(); } catch {}
+            return true;
         } catch (e) {
             showError(
                 CART_MESSAGES.VERIFICATION_SEND_FAILED_TITLE,
                 getCheckoutErrorMessage(e, CART_MESSAGES.VERIFICATION_SEND_FAILED)
             );
+            return false;
         } finally {
             setIsCheckingOut(false);
         }
@@ -275,12 +253,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     };
 
     return {
-        showCheckoutModal,
-        step,
-        setStep,
         isCheckingOut,
-        openCheckoutModal,
-        closeCheckoutModal,
 
         addresses,
         selectedShippingAddressId,

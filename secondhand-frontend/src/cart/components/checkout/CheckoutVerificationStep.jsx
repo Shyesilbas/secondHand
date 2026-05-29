@@ -64,18 +64,18 @@ const CheckoutVerificationStep = ({
       {/* Centered content */}
       <div className="mx-auto max-w-md">
         {/* Lock icon + heading */}
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-[#e5e3df] bg-[#fafaf9]">
-            <Lock className="h-5 w-5 text-[#555]" strokeWidth={1.5} />
+        <div className="mb-6 text-center select-none">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-slate-100 bg-slate-50 shadow-sm">
+            <Lock className="h-4 w-4 text-slate-700" strokeWidth={2} />
           </div>
-          <h2 className="text-lg font-semibold tracking-tight text-[#111]">Verify your purchase</h2>
-          <p className="mt-1 text-sm text-[#999]">
+          <h2 className="text-lg font-bold tracking-tight text-slate-900">Verify your purchase</h2>
+          <p className="mt-1.5 text-sm text-slate-500 font-medium">
             {`Enter the ${OTP_CODE_LENGTH}-digit code sent to your email.`}
           </p>
           {ttlActive && (
             <p
-              className={`mt-2 text-xs font-medium tabular-nums ${
-                ttlExpired ? 'text-[#a4262c]' : 'text-[#555]'
+              className={`mt-2.5 text-xs font-semibold tracking-wide uppercase tabular-nums ${
+                ttlExpired ? 'text-red-600' : 'text-slate-400'
               }`}
             >
               {ttlExpired ? 'Code expired — request a new one.' : `Expires in ${ttlFormatted}`}
@@ -91,7 +91,7 @@ const CheckoutVerificationStep = ({
         )}
 
         {/* OTP input */}
-        <div className="mb-5">
+        <div className="mb-6">
           <OtpDigitInputGroup
             value={paymentVerificationCode}
             onChange={setPaymentVerificationCode}
@@ -99,15 +99,15 @@ const CheckoutVerificationStep = ({
             disabled={!!isCheckingOut || ttlExpired}
           />
 
-          <div className="mt-3 text-center">
+          <div className="mt-4 text-center">
             <button
               type="button"
               onClick={handleResendCode}
               disabled={!canResend || isResending}
-              className={`text-xs font-medium transition-colors ${
+              className={`text-xs font-bold uppercase tracking-wider transition-colors ${
                 canResend && !isResending
-                  ? 'text-[#555] underline underline-offset-2 hover:text-[#1466c6]'
-                  : 'cursor-not-allowed text-[#ccc]'
+                  ? 'text-slate-500 underline underline-offset-4 hover:text-slate-900'
+                  : 'cursor-not-allowed text-slate-300'
               }`}
             >
               {isResending ? 'Sending…' : canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
@@ -120,7 +120,7 @@ const CheckoutVerificationStep = ({
           type="button"
           onClick={onCheckout}
           disabled={proceedDisabled || isCheckingOut || !isCodeComplete || ttlExpired}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] py-3.5 text-sm font-medium text-white transition-all duration-150 hover:border-[#0f529e] hover:bg-[#0f529e] disabled:cursor-not-allowed disabled:border-[#e8e6e4] disabled:bg-[#e8e6e4] disabled:text-[#9c9894] active:scale-[0.99]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]"
         >
           {isCheckingOut ? (
             <>
@@ -129,41 +129,41 @@ const CheckoutVerificationStep = ({
             </>
           ) : (
             <>
-              <ShieldCheck className="h-4 w-4" strokeWidth={1.5} />
+              <ShieldCheck className="h-4 w-4 animate-pulse" strokeWidth={2} />
               Complete purchase
             </>
           )}
         </button>
 
         {/* Trust indicators */}
-        <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-[#bbb]">
-          <Lock className="h-3 w-3" strokeWidth={1.5} />
+        <div className="mt-5 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <Lock className="h-3.5 w-3.5 text-emerald-500" strokeWidth={2} />
           <span>256-bit encrypted</span>
-          <span className="text-[#e0deda]">·</span>
+          <span className="text-slate-200">·</span>
           <span>Secure checkout</span>
         </div>
       </div>
 
       {/* Back link — desktop */}
-      <div className="mt-6 hidden border-t border-[#f0efed] pt-5 sm:block">
+      <div className="mt-6 hidden border-t border-slate-100 pt-6 sm:block">
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1.5 text-sm font-medium text-[#555] transition-colors hover:text-[#111]"
+          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
           Back
         </button>
       </div>
 
       {/* Back — mobile */}
-      <div className="mt-4 border-t border-[#f0efed] pt-4 sm:hidden">
+      <div className="mt-6 border-t border-slate-100 pt-5 sm:hidden">
         <button
           type="button"
           onClick={onBack}
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#e5e3df] bg-white py-3 text-sm font-medium text-[#111] transition-all hover:bg-[#fafaf9]"
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
           Back
         </button>
       </div>

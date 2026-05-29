@@ -1,11 +1,18 @@
 package com.serhat.secondhand.listing.domain.mapper;
 
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
+import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.books.BooksListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.clothing.ClothingListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.common.BookGenreDto;
@@ -17,13 +24,6 @@ import com.serhat.secondhand.listing.domain.dto.response.realestate.RealEstateLi
 import com.serhat.secondhand.listing.domain.dto.response.sports.SportsListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
 import com.serhat.secondhand.listing.domain.entity.*;
-import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.clothing.ClothingUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
-import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Labelable;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModel;
@@ -364,8 +364,6 @@ public abstract class ListingMapper {
         }
 
         Listing unproxied = (Listing) Hibernate.unproxy(listing);
-        // Polymorphic deserialize için type diskriminatörü zorunlu.
-        // listingType null ise DTO null döner ve cache pipeline'ında filtrelenmelidir.
         if (unproxied.getListingType() == null) {
             log.warn("Listing {} has null listingType; skipping mapping (would break cache deserialization)",
                     unproxied.getId());

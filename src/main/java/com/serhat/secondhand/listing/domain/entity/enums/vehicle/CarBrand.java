@@ -8,16 +8,35 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Persistable;
+import jakarta.persistence.Transient;
+
 @Entity
 @Table(name = "car_brands")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CarBrand implements Labelable {
+public class CarBrand implements Labelable, Persistable<UUID> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public UUID getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
 
     @Column(nullable = false, unique = true, length = 120)
     private String name;

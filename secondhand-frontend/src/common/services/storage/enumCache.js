@@ -1,7 +1,7 @@
 import logger from '../../utils/logger.js';
 
 const ENUM_CACHE_KEY = 'secondhand_enums_cache';
-const ENUM_CACHE_VERSION = '7.4';
+const ENUM_CACHE_VERSION = '7.8';
 const REQUIRED_ENUM_PATHS = [
     ['general', 'listingTypes'],
     ['general', 'listingStatuses'],

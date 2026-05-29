@@ -110,12 +110,18 @@ public class ElectronicDataInitializer implements SeedTask {
         }
     }
 
+    private java.util.UUID generateStableUuid(String key) {
+        return java.util.UUID.nameUUIDFromBytes(key.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
     // ── Brand Seeding ───────────────────────────────────────────────────
 
     private void upsertBrand(String key, String label) {
-        Optional<ElectronicBrand> existing = brandRepository.findByNameIgnoreCase(key);
+        String normalizedKey = key.trim().toUpperCase(Locale.ROOT);
+        Optional<ElectronicBrand> existing = brandRepository.findByNameIgnoreCase(normalizedKey);
         if (existing.isPresent()) {
             ElectronicBrand brand = existing.get();
+            brand.setNew(false);
             if (brand.getLabel() == null || brand.getLabel().isBlank()) {
                 brand.setLabel(label);
                 brandRepository.save(brand);
@@ -123,7 +129,8 @@ public class ElectronicDataInitializer implements SeedTask {
             return;
         }
         ElectronicBrand brand = new ElectronicBrand();
-        brand.setName(key.toUpperCase(Locale.ROOT));
+        brand.setId(generateStableUuid("electronic-brand:" + normalizedKey));
+        brand.setName(normalizedKey);
         brand.setLabel(label);
         brandRepository.save(brand);
     }
@@ -131,9 +138,11 @@ public class ElectronicDataInitializer implements SeedTask {
     // ── Type Seeding ────────────────────────────────────────────────────
 
     private void upsertType(String key, String label) {
-        Optional<ElectronicType> existing = typeRepository.findByNameIgnoreCase(key);
+        String normalizedKey = key.trim().toUpperCase(Locale.ROOT);
+        Optional<ElectronicType> existing = typeRepository.findByNameIgnoreCase(normalizedKey);
         if (existing.isPresent()) {
             ElectronicType type = existing.get();
+            type.setNew(false);
             if (type.getLabel() == null || type.getLabel().isBlank()) {
                 type.setLabel(label);
                 typeRepository.save(type);
@@ -141,7 +150,8 @@ public class ElectronicDataInitializer implements SeedTask {
             return;
         }
         ElectronicType type = new ElectronicType();
-        type.setName(key.toUpperCase(Locale.ROOT));
+        type.setId(generateStableUuid("electronic-type:" + normalizedKey));
+        type.setName(normalizedKey);
         type.setLabel(label);
         typeRepository.save(type);
     }
@@ -155,14 +165,27 @@ public class ElectronicDataInitializer implements SeedTask {
         ElectronicType type = getType(typeKey);
         if (brand == null || type == null) return;
 
-        if (modelRepository.findByBrand_IdAndType_IdAndNameIgnoreCase(
-                brand.getId(), type.getId(), modelName).isEmpty()) {
-            ElectronicModel created = new ElectronicModel();
-            created.setBrand(brand);
-            created.setType(type);
-            created.setName(modelName);
-            modelRepository.save(created);
+        String normalizedBrand = brandKey.trim().toUpperCase(Locale.ROOT);
+        String normalizedType = typeKey.trim().toUpperCase(Locale.ROOT);
+        String normalizedModel = modelName.trim().toUpperCase(Locale.ROOT);
+
+        Optional<ElectronicModel> existing = modelRepository.findByBrand_IdAndType_IdAndNameIgnoreCase(
+                brand.getId(), type.getId(), modelName);
+
+        if (existing.isPresent()) {
+            existing.get().setNew(false);
+            return;
         }
+
+        String modelNaturalKey = "electronic-model:" + normalizedBrand + ":" + normalizedType + ":" + normalizedModel;
+        java.util.UUID modelId = generateStableUuid(modelNaturalKey);
+
+        ElectronicModel created = new ElectronicModel();
+        created.setId(modelId);
+        created.setBrand(brand);
+        created.setType(type);
+        created.setName(modelName);
+        modelRepository.save(created);
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────

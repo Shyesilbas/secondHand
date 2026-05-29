@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ShoppingCart } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
 import { useCheckout } from '../hooks/useCheckout.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
@@ -13,6 +13,7 @@ import { listingService } from '../../listing/services/listingService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
 import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendingWarningModal.jsx';
+import { formatCurrency } from '../../common/formatters.js';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const CheckoutPage = () => {
   const [pricing, setPricing] = useState(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
+  const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
 
   const cartKey = useMemo(() => {
     const base = cartItems.map((i) => `${i.id}:${i.quantity}`).join('|');
@@ -189,9 +191,9 @@ const CheckoutPage = () => {
 
   if (!offerId && cartCount === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f3f1] px-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#faf9f7] px-4">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-lg border border-[#e5e3df] bg-white">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-lg border border-[#f0efed] bg-white">
             <svg className="h-6 w-6 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path
                 strokeLinecap="round"
@@ -218,9 +220,9 @@ const CheckoutPage = () => {
   /* ── Main checkout ──────────────────────────────────────── */
 
   return (
-    <div className="min-h-screen bg-[#f4f3f1]">
+    <div className="min-h-screen bg-[#faf9f7]">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[#e5e3df] bg-white">
+      <header className="sticky top-0 z-30 border-b border-[#f0efed] bg-white/80 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <button
@@ -237,6 +239,41 @@ const CheckoutPage = () => {
           </div>
         </div>
       </header>
+
+      {/* Mobile Collapsible Order Summary (Shopify-style accordion) */}
+      <div className="bg-white/90 border-b border-[#f0efed] lg:hidden px-4 py-3 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)}
+          className="flex w-full items-center justify-between text-sm"
+        >
+          <span className="flex items-center gap-1.5 font-medium text-[#111]">
+            <ShoppingCart className="h-4 w-4 text-[#1466c6]" />
+            {isOrderSummaryExpanded ? 'Hide order summary' : 'Show order summary'}
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
+          </span>
+          <span className="font-semibold text-[#1466c6] tabular-nums">
+            {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
+          </span>
+        </button>
+        {isOrderSummaryExpanded && (
+          <div className="mt-3 pt-3 border-t border-[#f0efed] overflow-hidden">
+            <CheckoutOrderSummary
+              cartItems={displayCartItems}
+              calculateTotal={calculateTotal}
+              pricing={pricing}
+              couponInput={couponInput}
+              setCouponInput={setCouponInput}
+              appliedCouponCode={appliedCouponCode}
+              couponError={couponError}
+              isPreviewLoading={isPreviewLoading}
+              onApplyCoupon={onApplyCoupon}
+              onRemoveCoupon={onRemoveCoupon}
+              onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Body */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -282,7 +319,8 @@ const CheckoutPage = () => {
             />
           </div>
 
-          <div className="lg:col-span-4">
+          {/* Desktop-only Order Summary sidebar */}
+          <div className="hidden lg:block lg:col-span-4">
             <CheckoutOrderSummary
               cartItems={displayCartItems}
               calculateTotal={calculateTotal}

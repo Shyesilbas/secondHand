@@ -45,15 +45,6 @@ const CheckoutStep = ({
     switch (step) {
       case 1:
         return (
-          <CheckoutReviewStep
-            cartItems={cartItems}
-            calculateTotal={calculateTotal}
-            onNext={onNext}
-            onBack={onBack}
-          />
-        );
-      case 2:
-        return (
           <CheckoutAddressStep
             addresses={addresses}
             selectedShippingAddressId={selectedShippingAddressId}
@@ -68,7 +59,7 @@ const CheckoutStep = ({
             onBack={onBack}
           />
         );
-      case 3: {
+      case 2: {
         const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
         return (
           <CheckoutPaymentStep
@@ -93,6 +84,25 @@ const CheckoutStep = ({
           />
         );
       }
+      case 3:
+        return (
+          <CheckoutReviewStep
+            cartItems={cartItems}
+            calculateTotal={calculateTotal}
+            addresses={addresses}
+            selectedShippingAddressId={selectedShippingAddressId}
+            selectedBillingAddressId={selectedBillingAddressId}
+            selectedPaymentType={selectedPaymentType}
+            cards={cards}
+            selectedCardNumber={selectedCardNumber}
+            bankAccounts={bankAccounts}
+            selectedBankAccountIban={selectedBankAccountIban}
+            eWallet={eWallet}
+            onNext={onNext}
+            onBack={onBack}
+            sendVerificationCode={sendVerificationCode}
+          />
+        );
       case 4:
         return (
           <CheckoutVerificationStep

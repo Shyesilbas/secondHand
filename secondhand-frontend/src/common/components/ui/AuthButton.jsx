@@ -1,45 +1,44 @@
+import React from 'react';
 
 const AuthButton = ({
-                        children,
-                        type = 'button',
-                        onClick,
-                        isLoading = false,
-                        disabled = false,
-                        variant = 'primary',
-                        size = 'md',
-                        leftIcon = null,
-                        rightIcon = null,
-                        className = ''
-                    }) => {
+    children,
+    type = 'button',
+    onClick,
+    isLoading = false,
+    disabled = false,
+    variant = 'primary',
+    size = 'md',
+    leftIcon = null,
+    rightIcon = null,
+    className = ''
+}) => {
     const baseClasses = `
-    w-full inline-flex items-center justify-center gap-2 border
-    rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2
-    transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-  `;
+        w-full inline-flex items-center justify-center gap-2 border
+        rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-stone-900/5
+        transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed
+        active:scale-[0.985] text-sm
+    `;
 
     const variants = {
         primary: `
-      text-white bg-slate-900 border-slate-900 hover:bg-slate-800
-      focus:ring-slate-700/30
-    `,
+            text-white bg-stone-900 border-stone-900 hover:bg-stone-850 hover:shadow-sm
+            disabled:bg-stone-900 disabled:hover:bg-stone-900
+        `,
         secondary: `
-      text-slate-700 bg-white border-slate-200 hover:bg-slate-50
-      focus:ring-slate-300
-    `,
+            text-stone-850 bg-stone-100/80 border-transparent hover:bg-stone-200/60
+        `,
         outline: `
-      text-slate-800 bg-white border-slate-300 hover:bg-slate-50
-      focus:ring-slate-300
-    `,
+            text-stone-800 bg-white border-stone-200 hover:bg-stone-50 hover:border-stone-300
+        `,
         ghost: `
-      text-slate-700 bg-transparent border-transparent hover:bg-slate-100
-      focus:ring-slate-300
-    `
+            text-stone-700 bg-transparent border-transparent hover:bg-stone-100/60
+        `
     };
 
     const sizes = {
-        sm: 'py-2 px-3 text-sm',
-        md: 'py-2.5 px-4 text-sm',
-        lg: 'py-3.5 px-5 text-sm'
+        sm: 'py-2.5 px-4',
+        md: 'py-3 px-5',
+        lg: 'py-3.5 px-6'
     };
 
     return (
@@ -50,12 +49,12 @@ const AuthButton = ({
             className={`${baseClasses} ${sizes[size] || sizes.md} ${variants[variant] || variants.primary} ${className}`}
         >
             {isLoading ? (
-                <div className="flex items-center">
+                <div className="flex items-center justify-center gap-2">
                     <svg
-                        className="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
+                        className="animate-spin h-4 w-4 text-current"
                         fill="none"
                         viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                     >
                         <circle
                             className="opacity-25"
@@ -63,21 +62,21 @@ const AuthButton = ({
                             cy="12"
                             r="10"
                             stroke="currentColor"
-                            strokeWidth="4"
+                            strokeWidth="3"
                         />
                         <path
-                            className="opacity-75"
+                            className="opacity-80"
                             fill="currentColor"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         />
                     </svg>
-                    Processing...
+                    <span>Processing...</span>
                 </div>
             ) : (
                 <>
-                    {leftIcon}
-                    {children}
-                    {rightIcon}
+                    {leftIcon && <span className="shrink-0">{leftIcon}</span>}
+                    <span>{children}</span>
+                    {rightIcon && <span className="shrink-0">{rightIcon}</span>}
                 </>
             )}
         </button>

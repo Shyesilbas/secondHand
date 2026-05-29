@@ -1,9 +1,10 @@
 import { formatCurrency } from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
 import { useSellerReviewStatsCache } from '../../../reviews/hooks/useSellerReviewStatsCache.js';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { StarIcon, STAR_SHAPE_PATH } from '../../../reviews/components/StarIcon.jsx';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, CreditCard, Banknote, Wallet, Loader2 } from 'lucide-react';
+import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
 
 /* ── Seller inline rating ─────────────────────────────────── */
 
@@ -63,20 +64,88 @@ const SellerRating = ({ sellerId }) => {
 
 /* ── Review Step ───────────────────────────────────────────── */
 
-const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
+const CheckoutReviewStep = ({
+  cartItems,
+  calculateTotal,
+  addresses,
+  selectedShippingAddressId,
+  selectedBillingAddressId,
+  selectedPaymentType,
+  cards,
+  selectedCardNumber,
+  bankAccounts,
+  selectedBankAccountIban,
+  eWallet,
+  onNext,
+  onBack,
+  sendVerificationCode,
+}) => {
+  const [isSendingCode, setIsSendingCode] = useState(false);
   const totalAmount = calculateTotal();
   const currency = cartItems[0]?.listing?.currency || 'TRY';
+
+  const shippingAddress = addresses?.find((a) => String(a.id) === String(selectedShippingAddressId));
+  const billingAddress = addresses?.find((a) => String(a.id) === String(selectedBillingAddressId)) || shippingAddress;
+
+  const getPaymentDisplay = () => {
+    switch (selectedPaymentType) {
+      case CART_PAYMENT_TYPES.CREDIT_CARD: {
+        const card = cards?.find((c) => c.id === selectedCardNumber || c.cardId === selectedCardNumber || c.number === selectedCardNumber || c.cardNumber === selectedCardNumber);
+        const number = card?.number || card?.cardNumber || '';
+        const masked = number.length >= 4 ? `•••• •••• •••• ${number.slice(-4)}` : 'Saved Card';
+        return {
+          name: 'Credit / Debit Card',
+          detail: card?.cardLabel ? `${card.cardLabel} (${masked})` : masked,
+          icon: CreditCard,
+        };
+      }
+      case CART_PAYMENT_TYPES.TRANSFER: {
+        const account = bankAccounts?.find((a) => a.IBAN === selectedBankAccountIban);
+        const iban = account?.IBAN || '';
+        const masked = iban.length >= 4 ? `•••• ${iban.slice(-4)}` : 'Bank Account';
+        return {
+          name: 'Bank Transfer',
+          detail: account ? `${account.holderName || ''} (${masked})` : masked,
+          icon: Banknote,
+        };
+      }
+      case CART_PAYMENT_TYPES.EWALLET:
+        return {
+          name: 'Wallet Balance',
+          detail: eWallet ? `Paid from wallet (${formatCurrency(totalAmount, currency)})` : 'Wallet',
+          icon: Wallet,
+        };
+      default:
+        return { name: 'None Selected', detail: '', icon: CreditCard };
+    }
+  };
+
+  const paymentInfo = getPaymentDisplay();
+  const PaymentIcon = paymentInfo.icon;
+
+  const handleNextClick = async () => {
+    if (isSendingCode) return;
+    setIsSendingCode(true);
+    try {
+      const success = await sendVerificationCode();
+      if (success) {
+        onNext();
+      }
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
 
   return (
     <div className="p-5 sm:p-7">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold tracking-tight text-[#111]">Review your order</h2>
-        <p className="mt-1 text-sm text-[#999]">Confirm items and quantities before continuing.</p>
+        <p className="mt-1 text-sm text-[#999]">Double check details before finishing your purchase.</p>
       </div>
 
       {/* Items list */}
-      <div className="mb-6">
+      <div className="mb-6 rounded-lg border border-[#e5e3df] bg-white divide-y divide-[#f0efed] overflow-hidden px-4">
         {cartItems.map((item, idx) => {
           const isOffer = !!item.isOffer;
           const hasCampaign =
@@ -96,12 +165,7 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
             : parseFloat(unitPrice) * item.quantity;
 
           return (
-            <div
-              key={item.id}
-              className={`flex items-center gap-4 py-4 ${
-                idx < cartItems.length - 1 ? 'border-b border-[#f0efed]' : ''
-              }`}
-            >
+            <div key={item.id} className="flex items-center gap-4 py-4">
               {/* Thumbnail */}
               <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#eee] bg-[#fafaf9] sm:h-16 sm:w-16">
                 {item.listing.imageUrl ? (
@@ -139,17 +203,6 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                     </>
                   )}
                 </div>
-                {item.listing.reviewStats && item.listing.reviewStats.totalReviews > 0 && (
-                  <div className="mt-1">
-                    <ListingReviewStats
-                      listing={item.listing}
-                      listingId={item.listing.id}
-                      size="xs"
-                      showIcon
-                      showText
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Price */}
@@ -160,21 +213,50 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
                 <div className="mt-0.5 text-xs tabular-nums text-[#999]">
                   {item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}
                 </div>
-                {hasCampaign && (
-                  <div className="mt-0.5 text-[11px] font-medium text-[#107c10]">
-                    {item.listing.campaignName || 'Campaign'}
-                  </div>
-                )}
               </div>
             </div>
           );
         })}
       </div>
 
+      {/* Dynamic Summary Panels (Shipping Address & Payment) */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Address Card */}
+        <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+          <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+            <MapPin className="h-4 w-4 text-indigo-600" />
+            <span>Shipping Details</span>
+          </div>
+          {shippingAddress ? (
+            <div className="text-sm">
+              <p className="font-semibold text-slate-900">{shippingAddress.addressLine}</p>
+              <p className="mt-1 text-slate-500 font-medium">
+                {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
+              </p>
+              <p className="mt-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{shippingAddress.country}</p>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 font-medium">No shipping address chosen.</p>
+          )}
+        </div>
+
+        {/* Payment Card */}
+        <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+          <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+            <PaymentIcon className="h-4 w-4 text-indigo-600" />
+            <span>Payment Method</span>
+          </div>
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">{paymentInfo.name}</p>
+            {paymentInfo.detail && <p className="mt-1 text-slate-500 font-mono text-xs font-medium">{paymentInfo.detail}</p>}
+          </div>
+        </div>
+      </div>
+
       {/* Subtotal */}
-      <div className="mb-6 flex items-baseline justify-between border-t border-[#f0efed] pt-4">
-        <span className="text-sm text-[#555]">Subtotal</span>
-        <span className="text-xl font-semibold tabular-nums text-[#111]">
+      <div className="mb-6 flex items-baseline justify-between border-t border-slate-100 pt-5">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Subtotal</span>
+        <span className="text-2xl font-bold tabular-nums text-slate-900">
           {formatCurrency(totalAmount, currency)}
         </span>
       </div>
@@ -184,30 +266,57 @@ const CheckoutReviewStep = ({ cartItems, calculateTotal, onNext, onBack }) => {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1.5 text-sm font-medium text-[#555] transition-colors hover:text-[#111]"
+          disabled={isSendingCode}
+          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
-          Back to cart
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+          Back
         </button>
         <button
           type="button"
-          onClick={onNext}
-          className="flex items-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] px-6 py-2.5 text-sm font-medium text-white transition-all duration-150 hover:border-[#0f529e] hover:bg-[#0f529e] active:scale-[0.99]"
+          onClick={handleNextClick}
+          disabled={isSendingCode}
+          className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]"
         >
-          Continue
-          <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+          {isSendingCode ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Sending code…
+            </>
+          ) : (
+            <>
+              Confirm & Send Code
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
+            </>
+          )}
         </button>
       </div>
 
       {/* Navigation — mobile */}
-      <div className="sticky bottom-0 -mx-5 mt-4 border-t border-[#f0efed] bg-white px-5 py-4 sm:hidden">
+      <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
         <button
           type="button"
-          onClick={onNext}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#1466c6] bg-[#1466c6] py-3 text-sm font-medium text-white transition-all duration-150 hover:bg-[#0f529e] active:scale-[0.99]"
+          onClick={onBack}
+          disabled={isSendingCode}
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50"
         >
-          Continue
-          <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={handleNextClick}
+          disabled={isSendingCode}
+          className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98]"
+        >
+          {isSendingCode ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              Confirm & Send
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
+            </>
+          )}
         </button>
       </div>
     </div>

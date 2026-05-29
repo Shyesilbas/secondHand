@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     ArrowRight as ArrowRightIcon,
@@ -8,7 +8,8 @@ import {
     Lock as LockClosedIcon,
     Mail as EnvelopeIcon,
     Phone as PhoneIcon,
-    User as UserIcon
+    User as UserIcon,
+    ArrowLeft as ArrowLeftIcon
 } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { API_BASE_URL } from '../../common/constants/apiEndpoints.js';
@@ -19,7 +20,7 @@ import AgreementsSection from '../../agreements/components/AgreementsSection.jsx
 
 export const RegisterForm = ({
     formData,
-    errors,
+    errors: parentErrors,
     isLoading,
     genderOptions,
     gendersLoading,
@@ -31,65 +32,89 @@ export const RegisterForm = ({
     onToggleAgreement,
     onReadAgreement
 }) => {
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+    const [step, setStep] = useState(1);
+    const [localErrors, setLocalErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Merge parent errors and local step errors
+    const errors = { ...parentErrors, ...localErrors };
+
+    const validateStep1 = () => {
+        const step1Errors = {};
+        if (!formData.email.trim()) {
+            step1Errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            step1Errors.email = 'Please enter a valid email address';
+        }
+
+        if (!formData.phone.trim()) {
+            step1Errors.phone = 'Phone number is required';
+        }
+
+        if (!formData.password) {
+            step1Errors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            step1Errors.password = 'Password must be at least 6 characters';
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            step1Errors.confirmPassword = 'Passwords do not match';
+        }
+
+        setLocalErrors(step1Errors);
+        return Object.keys(step1Errors).length === 0;
+    };
+
+    const handleNextStep = () => {
+        if (validateStep1()) {
+            setStep(2);
+        }
+    };
+
+    const handlePrevStep = () => {
+        setStep(1);
+    };
 
     return (
-        <div className="flex flex-col gap-1">
-            {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-secondary-900 tracking-tight">Create Account</h1>
-                <p className="mt-1 text-sm text-secondary-500">Join our community and start connecting with sellers.</p>
+        <div className="flex flex-col gap-1 w-full animate-fade-in">
+            {/* Header / Stepper Progress */}
+            <div className="mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[10px] font-semibold tracking-[0.2em] text-stone-400 uppercase">
+                        Step {step} of 2
+                    </span>
+                    <div className="flex gap-1.5 items-center flex-1 max-w-[100px]">
+                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-stone-900' : 'bg-stone-200'}`} />
+                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-stone-900' : 'bg-stone-200'}`} />
+                    </div>
+                </div>
+                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">Create Account</h1>
+                <p className="mt-2.5 text-sm text-stone-500 font-normal leading-relaxed">
+                    {step === 1 
+                        ? 'Set up your credentials and secure your digital space.' 
+                        : 'Tell us a bit about yourself to complete registration.'}
+                </p>
             </div>
 
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
-                {/* Personal Details */}
-                <div className="flex flex-col gap-3">
-                    <p className="text-[11px] font-semibold text-secondary-400 uppercase tracking-widest">Personal Details</p>
-
-                    <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={onSubmit} className="flex flex-col gap-6">
+                {step === 1 && (
+                    <div className="flex flex-col gap-6 animate-slide-right">
                         <AuthInput
-                            label="First Name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="John"
-                            required
-                            error={errors.name}
-                            leftIcon={<UserIcon className="h-4 w-4" />}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
-                        />
-                        <AuthInput
-                            label="Last Name"
-                            name="surname"
-                            value={formData.surname}
-                            onChange={handleChange}
-                            placeholder="Doe"
-                            required
-                            error={errors.surname}
-                            leftIcon={<UserIcon className="h-4 w-4" />}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <AuthInput
-                            label="Email"
+                            label="Email Address"
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="you@example.com"
+                            placeholder="name@example.com"
                             required
                             error={errors.email}
                             leftIcon={<EnvelopeIcon className="h-4 w-4" />}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
+                            autoComplete="email"
                         />
+
                         <AuthInput
-                            label="Phone"
+                            label="Phone Number"
                             type="tel"
                             name="phone"
                             value={formData.phone}
@@ -98,40 +123,91 @@ export const RegisterForm = ({
                             required
                             error={errors.phone}
                             leftIcon={<PhoneIcon className="h-4 w-4" />}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
+                            autoComplete="tel"
                         />
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-secondary-700">
-                                Gender <span className="text-red-500">*</span>
-                            </label>
-                            {gendersLoading ? (
-                                <div className="flex items-center py-2.5 px-3 border border-secondary-200 rounded-xl text-sm text-secondary-500">
-                                    <LoadingIndicator size="h-4 w-4" />
-                                    <span className="ml-2">Loading...</span>
-                                </div>
-                            ) : (
-                                <select
-                                    name="gender"
-                                    value={formData.gender}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2.5 border border-secondary-200 rounded-xl text-sm text-secondary-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
-                                    required
-                                >
-                                    <option value="">Select gender</option>
-                                    {genderOptions.map((g) => (
-                                        <option key={g.value} value={g.value}>{g.label}</option>
-                                    ))}
-                                </select>
-                            )}
-                            {errors.gender && (
-                                <p className="text-xs text-red-600">{errors.gender}</p>
-                            )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <AuthInput
+                                label="Password"
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                required
+                                error={errors.password}
+                                leftIcon={<LockClosedIcon className="h-4 w-4" />}
+                                rightElement={(
+                                    <button
+                                        type="button"
+                                        className="text-stone-400 hover:text-stone-700 transition-colors"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
+                                    </button>
+                                )}
+                            />
+                            <AuthInput
+                                label="Confirm Password"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                required
+                                error={errors.confirmPassword}
+                                leftIcon={<LockClosedIcon className="h-4 w-4" />}
+                                rightElement={(
+                                    <button
+                                        type="button"
+                                        className="text-stone-400 hover:text-stone-700 transition-colors"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
+                                    </button>
+                                )}
+                            />
                         </div>
 
+                        <AuthButton
+                            type="button"
+                            onClick={handleNextStep}
+                            size="lg"
+                            className="mt-3"
+                            rightIcon={<ArrowRightIcon className="h-4 w-4" />}
+                        >
+                            Continue
+                        </AuthButton>
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <div className="flex flex-col gap-6 animate-slide-left">
+                        {/* First & Last Name side-by-side */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <AuthInput
+                                label="First Name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="John"
+                                required
+                                error={errors.name}
+                                leftIcon={<UserIcon className="h-4 w-4" />}
+                            />
+                            <AuthInput
+                                label="Last Name"
+                                name="surname"
+                                value={formData.surname}
+                                onChange={handleChange}
+                                placeholder="Doe"
+                                required
+                                error={errors.surname}
+                                leftIcon={<UserIcon className="h-4 w-4" />}
+                            />
+                        </div>
+
+                        {/* Birth Date full width */}
                         <AuthInput
                             label="Birth Date"
                             name="birthdate"
@@ -141,111 +217,99 @@ export const RegisterForm = ({
                             required
                             error={errors.birthdate}
                             leftIcon={<CalendarIcon className="h-4 w-4" />}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
                         />
-                    </div>
-                </div>
 
-                {/* Security */}
-                <div className="flex flex-col gap-3">
-                    <p className="text-[11px] font-semibold text-secondary-400 uppercase tracking-widest">Security</p>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <AuthInput
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                            required
-                            error={errors.password}
-                            leftIcon={<LockClosedIcon className="h-4 w-4" />}
-                            rightElement={(
-                                <button
-                                    type="button"
-                                    className="text-secondary-400 hover:text-secondary-700 transition-colors"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                                </button>
+                        {/* Gender selection full width */}
+                        <div className="flex flex-col gap-2.5">
+                            <label className="block text-[10px] font-semibold tracking-[0.12em] uppercase text-stone-500">
+                                Gender <span className="text-red-400 font-normal">*</span>
+                            </label>
+                            {gendersLoading ? (
+                                <div className="flex items-center justify-center py-3.5 px-4 border border-stone-200/50 rounded-xl bg-stone-50/30">
+                                    <LoadingIndicator size="h-4 w-4" />
+                                </div>
+                            ) : (
+                                <div className="flex gap-2.5">
+                                    {genderOptions.map((g) => (
+                                        <button
+                                            key={g.value}
+                                            type="button"
+                                            onClick={() => handleChange({ target: { name: 'gender', value: g.value } })}
+                                            className={`flex-1 py-3 px-5 rounded-xl border text-[10px] font-semibold tracking-wider uppercase transition-all duration-300 ${
+                                                formData.gender === g.value
+                                                    ? 'border-stone-900 bg-stone-900 text-white shadow-sm'
+                                                    : 'border-stone-200 bg-stone-100/40 text-stone-500 hover:bg-stone-200/50 hover:text-stone-700'
+                                            }`}
+                                        >
+                                            {g.label}
+                                        </button>
+                                    ))}
+                                </div>
                             )}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
-                        />
-                        <AuthInput
-                            label="Confirm Password"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                            required
-                            error={errors.confirmPassword}
-                            leftIcon={<LockClosedIcon className="h-4 w-4" />}
-                            rightElement={(
-                                <button
-                                    type="button"
-                                    className="text-secondary-400 hover:text-secondary-700 transition-colors"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                >
-                                    {showConfirmPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-                                </button>
+                            {errors.gender && (
+                                <p className="text-xs text-rose-600 mt-1">{errors.gender}</p>
                             )}
-                            inputClassName="rounded-xl"
-                            labelClassName="text-secondary-700 text-xs"
-                        />
+                        </div>
+
+                        {/* Agreements */}
+                        {agreementsLoading && (
+                            <div className="flex items-center gap-2.5 py-3 text-xs text-stone-500">
+                                <LoadingIndicator size="h-3.5 w-3.5" />
+                                <span>Loading legal agreements...</span>
+                            </div>
+                        )}
+                        {!agreementsLoading && (
+                            <div className="rounded-xl border border-stone-200/50 bg-[#faf9f7]/50 p-5">
+                                <AgreementsSection
+                                    agreements={agreements}
+                                    acceptedAgreements={acceptedAgreements}
+                                    onToggle={onToggleAgreement}
+                                    onRead={onReadAgreement}
+                                    error={errors.agreements}
+                                />
+                            </div>
+                        )}
+
+                        {errors.submit && (
+                            <div className="rounded-xl bg-rose-50/50 border border-rose-100 p-4 text-xs text-rose-600">
+                                {errors.submit}
+                            </div>
+                        )}
+
+                        {/* Navigation / Actions */}
+                        <div className="flex gap-4 mt-3">
+                            <AuthButton
+                                type="button"
+                                variant="secondary"
+                                onClick={handlePrevStep}
+                                className="flex-1"
+                                leftIcon={<ArrowLeftIcon className="h-4 w-4" />}
+                            >
+                                Back
+                            </AuthButton>
+                            <AuthButton
+                                type="submit"
+                                isLoading={isLoading}
+                                className="flex-[2]"
+                                rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}
+                            >
+                                Create Account
+                            </AuthButton>
+                        </div>
                     </div>
+                )}
+
+                {/* Silent Divider */}
+                <div className="relative flex items-center my-3">
+                    <div className="flex-1 border-t border-stone-200/50"></div>
+                    <span className="px-3 text-[10px] tracking-[0.2em] text-stone-400 uppercase font-medium">or continue with</span>
+                    <div className="flex-1 border-t border-stone-200/50"></div>
                 </div>
 
-                {/* Agreements */}
-                {agreementsLoading && (
-                    <div className="flex items-center gap-2 py-3 text-sm text-secondary-500">
-                        <LoadingIndicator size="h-4 w-4" />
-                        <span>Loading agreements...</span>
-                    </div>
-                )}
-                {!agreementsLoading && (
-                    <div className="rounded-xl bg-secondary-50 border border-secondary-200 p-4">
-                        <AgreementsSection
-                            agreements={agreements}
-                            acceptedAgreements={acceptedAgreements}
-                            onToggle={onToggleAgreement}
-                            onRead={onReadAgreement}
-                            error={errors.agreements}
-                        />
-                    </div>
-                )}
-
-                {errors.submit && (
-                    <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-                        {errors.submit}
-                    </div>
-                )}
-
-                {/* Submit */}
-                <AuthButton
-                    type="submit"
-                    isLoading={isLoading}
-                    size="lg"
-                    className="rounded-xl"
-                    rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}
-                >
-                    {isLoading ? 'Creating account...' : 'Create Account'}
-                </AuthButton>
-
-                {/* Divider */}
-                <div className="relative flex items-center gap-3">
-                    <div className="flex-1 border-t border-secondary-200" />
-                    <span className="text-xs text-secondary-400 shrink-0">OR CONTINUE WITH</span>
-                    <div className="flex-1 border-t border-secondary-200" />
-                </div>
-
-                {/* Google */}
+                {/* Google SSO */}
                 <a
                     href={`${API_BASE_URL}/auth/oauth2/google`}
-                    className="w-full inline-flex items-center justify-center gap-3 px-5 py-3 border border-secondary-200 rounded-xl bg-white text-sm font-medium text-secondary-700 hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-colors"
+                    className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-stone-200 hover:border-stone-300 rounded-xl bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 active:scale-[0.985] transition-all duration-300"
                 >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                         <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4"/>
@@ -257,11 +321,11 @@ export const RegisterForm = ({
                 </a>
 
                 {/* Sign in link */}
-                <p className="text-center text-sm text-secondary-500">
+                <p className="text-center text-xs text-stone-500 mt-4">
                     Already have an account?{' '}
                     <Link
                         to={ROUTES.LOGIN}
-                        className="font-semibold text-secondary-900 hover:text-indigo-600 transition-colors"
+                        className="font-semibold text-stone-900 hover:underline underline-offset-4 transition-colors"
                     >
                         Sign in
                     </Link>

@@ -66,41 +66,42 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex flex-col gap-1">
-            {/* Logo */}
+        <div className="flex flex-col gap-1 w-full">
+            {/* Logo Monogram */}
             <div className="flex items-center gap-2 mb-8">
-                <div className="w-9 h-9 rounded-xl bg-secondary-900 flex items-center justify-center shrink-0">
-                    <span className="text-amber-400 text-base font-bold leading-none">S</span>
+                <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
+                    <span className="text-amber-400 text-xs font-semibold leading-none">S</span>
                 </div>
-                <span className="text-lg font-bold text-secondary-900 tracking-tight">SecondHand</span>
+                <span className="text-sm font-semibold text-stone-900 tracking-tight">secondHand</span>
             </div>
 
             {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-secondary-900 tracking-tight">Welcome Back</h1>
-                <p className="mt-1 text-sm text-secondary-500">Sign in to continue to your account.</p>
+            <div className="mb-8">
+                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">Welcome Back</h1>
+                <p className="mt-2 text-sm text-stone-500 font-normal">Sign in to continue to your curated space.</p>
             </div>
 
-            {/* Success message from register redirect */}
+            {/* Success message from redirect */}
             {successMessage && (
-                <div className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
-                    {successMessage}
+                <div className="mb-6 p-4 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs text-emerald-700 leading-normal flex items-start gap-2 animate-fade-in">
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{successMessage}</span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <AuthInput
-                    label="Email"
+                    label="Email Address"
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="you@example.com"
+                    placeholder="name@example.com"
                     required
                     error={errors.email}
                     leftIcon={<EnvelopeIcon className="h-4 w-4" />}
-                    inputClassName="rounded-xl"
-                    labelClassName="text-secondary-700 text-xs"
                     autoComplete="email"
                 />
 
@@ -117,35 +118,33 @@ const LoginPage = () => {
                     rightElement={(
                         <button
                             type="button"
-                            className="text-secondary-400 hover:text-secondary-700 transition-colors"
+                            className="text-stone-400 hover:text-stone-700 transition-colors"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword
-                                ? <EyeSlashIcon className="h-4 w-4" />
-                                : <EyeIcon className="h-4 w-4" />}
+                                ? <EyeSlashIcon className="h-4.5 w-4.5" />
+                                : <EyeIcon className="h-4.5 w-4.5" />}
                         </button>
                     )}
-                    inputClassName="rounded-xl"
-                    labelClassName="text-secondary-700 text-xs"
                     autoComplete="current-password"
                 />
 
-                {/* Remember me + Forgot */}
-                <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                {/* Remember me & Forgot */}
+                <div className="flex items-center justify-between mt-1 mb-2">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none group">
                         <input
                             id="remember-me"
                             name="rememberMe"
                             type="checkbox"
                             checked={formData.rememberMe}
                             onChange={handleChange}
-                            className="h-3.5 w-3.5 rounded border-secondary-300 text-secondary-900 focus:ring-secondary-500"
+                            className="h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900/5 focus:ring-offset-0 transition-all"
                         />
-                        <span className="text-xs text-secondary-600">Remember me</span>
+                        <span className="text-xs text-stone-500 group-hover:text-stone-850 transition-colors">Remember me</span>
                     </label>
                     <Link
                         to={ROUTES.FORGOT_PASSWORD}
-                        className="text-xs font-medium text-secondary-600 hover:text-indigo-600 transition-colors"
+                        className="text-xs font-normal text-stone-500 hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-200 hover:decoration-stone-900"
                     >
                         Forgot password?
                     </Link>
@@ -156,23 +155,22 @@ const LoginPage = () => {
                     type="submit"
                     isLoading={isLoading}
                     size="lg"
-                    className="rounded-xl mt-1"
                     rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}
                 >
-                    {isLoading ? 'Signing in...' : 'Sign In'}
+                    Sign In
                 </AuthButton>
 
-                {/* Divider */}
-                <div className="relative flex items-center gap-3">
-                    <div className="flex-1 border-t border-secondary-200" />
-                    <span className="text-[11px] text-secondary-400 shrink-0 uppercase tracking-widest">OR CONTINUE WITH</span>
-                    <div className="flex-1 border-t border-secondary-200" />
+                {/* Silent Divider */}
+                <div className="relative flex items-center my-2">
+                    <div className="flex-1 border-t border-stone-200/50"></div>
+                    <span className="px-3 text-[10px] tracking-[0.2em] text-stone-400 uppercase font-medium">or continue with</span>
+                    <div className="flex-1 border-t border-stone-200/50"></div>
                 </div>
 
-                {/* Google */}
+                {/* Google SSO */}
                 <a
                     href={`${API_BASE_URL}/auth/oauth2/google`}
-                    className="w-full inline-flex items-center justify-center gap-3 px-5 py-3 border border-secondary-200 rounded-xl bg-white text-sm font-medium text-secondary-700 hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-colors"
+                    className="w-full inline-flex items-center justify-center gap-3 py-3 border border-stone-200 hover:border-stone-300 rounded-xl bg-white text-sm font-medium text-stone-700 hover:bg-stone-50 active:scale-[0.985] transition-all duration-300"
                 >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                         <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4"/>
@@ -183,12 +181,12 @@ const LoginPage = () => {
                     Continue with Google
                 </a>
 
-                {/* Sign up link */}
-                <p className="text-center text-sm text-secondary-500">
+                {/* Switch link */}
+                <p className="text-center text-xs text-stone-500 mt-4">
                     Don&apos;t have an account?{' '}
                     <Link
                         to={ROUTES.REGISTER}
-                        className="font-semibold text-secondary-900 hover:text-indigo-600 transition-colors"
+                        className="font-semibold text-stone-900 hover:underline underline-offset-4 transition-colors"
                     >
                         Create one
                     </Link>
