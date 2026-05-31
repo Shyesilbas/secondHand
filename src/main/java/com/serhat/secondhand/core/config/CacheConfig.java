@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -73,6 +74,9 @@ public class CacheConfig {
         // ── Tier 1: Statik Lookup — 24 saat ────────────────────────────
         RedisCacheConfiguration lookupConfig = defaultConfig.entryTtl(Duration.ofHours(24));
 
+        // ── Tier 0: Coğrafi Katalog — 7 gün (restart-safe, JVM heap'te tutulmaz) ────
+        RedisCacheConfiguration locationsConfig = defaultConfig.entryTtl(Duration.ofDays(7));
+
         // ── Tier 2: Tamamlanmış İşlemler — 2 saat ──────────────────────
         RedisCacheConfiguration completedConfig = defaultConfig.entryTtl(Duration.ofHours(2));
 
@@ -92,6 +96,9 @@ public class CacheConfig {
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
+
+                // Tier 0 — Coğrafi katalog (7 gün, restart'ta silinmez)
+                .withCacheConfiguration("locations", locationsConfig)
 
                 // Tier 1 — Statik lookup tabloları (24 saat)
                 .withCacheConfiguration("brands", lookupConfig)
@@ -122,6 +129,26 @@ public class CacheConfig {
                 .withCacheConfiguration("userBadges", ultraShortConfig)
 
                 .build();
+    }
+
+    /**
+     * Genel amaçlı {@link RedisTemplate}&lt;String, Object&gt; bean'i.
+     * {@link com.serhat.secondhand.listing.application.common.LocationCatalogService} tarafından
+     * Spring Cache proxy dışında (self-call) doğrudan Redis'e veri yazmak için kullanılır.
+     * CacheManager ile aynı JSON serializer'ı paylaşır → okunan tipler uyumludur.
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
+        GenericJackson2JsonRedisSerializer jsonSerializer =
+                new GenericJackson2JsonRedisSerializer(buildCacheObjectMapper());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(jsonSerializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(jsonSerializer);
+        template.afterPropertiesSet();
+        return template;
     }
 
     /**

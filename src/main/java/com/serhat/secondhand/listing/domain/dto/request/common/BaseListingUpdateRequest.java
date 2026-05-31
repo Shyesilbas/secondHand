@@ -12,6 +12,8 @@ public record BaseListingUpdateRequest(
         Optional<Currency> currency,
         Optional<String> city,
         Optional<String> district,
+        Optional<String> cityKey,
+        Optional<String> districtKey,
+        Optional<String> neighborhoodKey,
         Optional<String> imageUrl
 ) {}
-

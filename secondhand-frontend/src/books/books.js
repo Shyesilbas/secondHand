@@ -32,6 +32,9 @@ export const createBooksCreateRequest = (data) => ({
     currency: data.currency || 'TRY',
     city: (data.city || '').trim(),
     district: (data.district || '').trim(),
+    cityKey: data.cityKey || '',
+    districtKey: data.districtKey || '',
+    neighborhoodKey: data.neighborhoodKey || undefined,
     imageUrl: data.imageUrl || undefined,
   },
   quantity: parseInt(data.quantity) || 1,
@@ -55,6 +58,9 @@ export const createBooksUpdateRequest = (data) => {
   if (data.currency !== undefined) base.currency = data.currency;
   if (data.city !== undefined) base.city = data.city;
   if (data.district !== undefined) base.district = data.district;
+  if (data.cityKey !== undefined) base.cityKey = data.cityKey;
+  if (data.districtKey !== undefined) base.districtKey = data.districtKey;
+  if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
   if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
   if (Object.keys(base).length > 0) updateData.base = base;
 

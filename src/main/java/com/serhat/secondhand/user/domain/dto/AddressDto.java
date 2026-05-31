@@ -8,6 +8,9 @@ public class AddressDto {
     private Long id;
     private String addressLine;
     private String city;
+    private String cityKey;
+    private String districtKey;
+    private String neighborhoodKey;
     private String state;
     private String postalCode;
     private String country;

@@ -53,6 +53,101 @@ const computeActiveFilterCount = (filters = {}) =>
         return hasGroupValue ? count + 1 : count;
     }, 0);
 
+const mapGroupToTag = (group, filters) => {
+    const activeKeys = group.filter(key => hasMeaningfulValue(filters[key]));
+    if (activeKeys.length === 0) return null;
+
+    if (group.includes('minPrice') || group.includes('maxPrice')) {
+        const min = filters.minPrice;
+        const max = filters.maxPrice;
+        if (min && max) return `Price: ${min}-${max} TL`;
+        if (min) return `Min ${min} TL`;
+        return `Max ${max} TL`;
+    }
+
+    if (group.includes('city') || group.includes('district')) {
+        const city = filters.city;
+        const district = filters.district;
+        if (city && district) return `${city}/${district}`;
+        return city;
+    }
+
+    if (group.includes('minYear') || group.includes('maxYear')) {
+        const min = filters.minYear;
+        const max = filters.maxYear;
+        if (min && max) return `Year: ${min}-${max}`;
+        if (min) return `Min Year: ${min}`;
+        return `Max Year: ${max}`;
+    }
+
+    if (group.includes('minSquareMeters') || group.includes('maxSquareMeters')) {
+        const min = filters.minSquareMeters;
+        const max = filters.maxSquareMeters;
+        if (min && max) return `Area: ${min}-${max} m²`;
+        if (min) return `Min Area: ${min} m²`;
+        return `Max Area: ${max} m²`;
+    }
+
+    if (group.includes('minRoomCount') || group.includes('maxRoomCount')) {
+        const min = filters.minRoomCount;
+        const max = filters.maxRoomCount;
+        if (min && max) return `Rooms: ${min}-${max}`;
+        if (min) return `Min Rooms: ${min}`;
+        return `Max Rooms: ${max}`;
+    }
+
+    const keyLabels = {
+        vehicleTypeIds: 'Vehicle Type',
+        brandIds: 'Brand',
+        vehicleModelIds: 'Model',
+        brands: 'Brand',
+        electronicBrandIds: 'Brand',
+        fuelTypes: 'Fuel',
+        colors: 'Color',
+        gearTypes: 'Gear',
+        seatCounts: 'Seats',
+        electronicTypeIds: 'Type',
+        types: 'Type',
+        conditions: 'Condition',
+        clothingGenders: 'Gender',
+        clothingCategories: 'Clothing Category',
+        genres: 'Genre',
+        languages: 'Language',
+        formats: 'Format',
+        bookTypeIds: 'Book Type',
+        genreIds: 'Genre',
+        languageIds: 'Language',
+        formatIds: 'Format',
+        conditionIds: 'Condition',
+        disciplineIds: 'Discipline',
+        equipmentTypeIds: 'Equipment Type',
+        realEstateTypeIds: 'Real Estate Type',
+        heatingTypeIds: 'Heating',
+        adTypeId: 'Ad Type',
+        ownerTypeId: 'Owner Type',
+        maxMileage: 'Max Mileage',
+        minBuildingAge: 'Age',
+        maxBuildingAge: 'Age',
+        minFloor: 'Floor',
+        maxFloor: 'Floor',
+        minPageCount: 'Pages',
+        maxPageCount: 'Pages',
+        purchaseDateFrom: 'Purchase Date',
+        purchaseDateTo: 'Purchase Date',
+    };
+
+    const key = activeKeys[0];
+    const rawVal = filters[key];
+    const val = Array.isArray(rawVal) 
+        ? rawVal.join(', ') 
+        : typeof rawVal === 'string' && rawVal.length > 20 
+            ? `${rawVal.substring(0, 20)}...` 
+            : String(rawVal);
+            
+    const label = keyLabels[key] || key;
+    return `${label}: ${val}`;
+};
+
 const FilterStatus = ({ 
   totalElements, 
   filters, 
@@ -72,16 +167,27 @@ const FilterStatus = ({
     const hasActive = typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0;
     const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
 
+    const activeTags = GROUPED_FILTERS
+        .map(group => mapGroupToTag(group, filters))
+        .filter(tag => tag !== null);
+
     const FilterBadge = () => (
         hasActive && activeCount > 0 ? (
-            <div className="flex items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <div className="flex flex-wrap items-center gap-1.5">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                     <SlidersHorizontal className="w-3 h-3" />
                     {activeCount} filter{activeCount !== 1 ? 's' : ''}
                 </span>
+
+                {activeTags.map((tag, idx) => (
+                    <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-50 text-slate-600 border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.01)] transition-all duration-200">
+                        {tag}
+                    </span>
+                ))}
+
                 <button
                     onClick={onResetFilters}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1"
                 >
                     <X className="w-3 h-3" />
                     Clear all

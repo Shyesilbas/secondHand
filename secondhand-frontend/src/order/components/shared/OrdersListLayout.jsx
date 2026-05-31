@@ -298,25 +298,25 @@ const SearchToolbar = React.memo(({ search, onSearch, onClearSearch, filtersOpen
 });
 
 const OrderItemSkeleton = () => (
-  <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)] animate-pulse mb-4 overflow-hidden relative">
-    <div className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-slate-200" aria-hidden />
-    <div className="pl-4 flex gap-4 items-start">
-      <div className="flex -space-x-2 shrink-0">
-        <div className="w-14 h-14 rounded-xl bg-slate-200 border-2 border-white" />
-        <div className="w-14 h-14 rounded-xl bg-slate-100 border-2 border-white" />
+  <div className="rounded-2xl border border-slate-100 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)] animate-pulse overflow-hidden relative">
+    <div className="absolute left-0 inset-y-0 w-1 rounded-r bg-slate-200" aria-hidden />
+    <div className="pl-5 flex gap-4 sm:gap-5 items-start">
+      <div className="flex -space-x-3 shrink-0">
+        <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-slate-200 border-2 border-white shadow-sm" />
+        <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-slate-100 border-2 border-white shadow-sm" />
       </div>
-      <div className="flex-1 space-y-3 min-w-0">
-        <div className="h-4 w-40 max-w-full bg-slate-200 rounded-lg" />
-        <div className="h-3 w-28 bg-slate-100 rounded" />
-        <div className="h-3 w-52 max-w-full bg-slate-100 rounded" />
+      <div className="flex-1 space-y-3 min-w-0 pt-1">
+        <div className="h-4 w-44 max-w-full bg-slate-200 rounded-lg" />
+        <div className="h-5 w-20 bg-slate-100 rounded-full" />
+        <div className="h-3 w-32 bg-slate-100 rounded" />
       </div>
-      <div className="shrink-0 text-right space-y-2">
-        <div className="h-3 w-12 bg-slate-100 rounded ml-auto" />
-        <div className="h-7 w-24 bg-slate-200 rounded-lg ml-auto" />
+      <div className="shrink-0 text-right space-y-2 pt-1">
+        <div className="h-3 w-10 bg-slate-100 rounded ml-auto" />
+        <div className="h-8 w-28 bg-slate-200 rounded-xl ml-auto" />
       </div>
     </div>
-    <div className="pl-4 mt-5 flex gap-2 justify-end">
-      <div className="h-10 w-28 bg-slate-100 rounded-xl" />
+    <div className="pl-5 mt-5 pt-4 border-t border-slate-100 flex gap-2 justify-end">
+      <div className="h-10 w-24 bg-slate-100 rounded-xl" />
       <div className="h-10 w-36 bg-slate-200 rounded-xl" />
     </div>
   </div>
@@ -400,57 +400,78 @@ const UnifiedOrderItem = React.memo(
     const displayTotal = viewMode === ORDER_VIEW_MODES.SELLER ? sellerTotalAmount : parseFloat(order.totalAmount);
     const currency = order.currency || 'TRY';
     const statusLabel = resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status;
-    
+
     const displayedItems = items.slice(0, 3);
     const extraCount = items.length > 3 ? items.length - 3 : 0;
+
+    // Status badge dot color
+    const statusDotColor = {
+      [ORDER_STATUSES.COMPLETED]: 'bg-emerald-500',
+      [ORDER_STATUSES.DELIVERED]: 'bg-blue-500',
+      [ORDER_STATUSES.SHIPPED]: 'bg-indigo-500',
+      [ORDER_STATUSES.PROCESSING]: 'bg-amber-500',
+      [ORDER_STATUSES.CONFIRMED]: 'bg-green-500',
+      [ORDER_STATUSES.PENDING]: 'bg-slate-400',
+      [ORDER_STATUSES.CANCELLED]: 'bg-rose-500',
+      [ORDER_STATUSES.REFUNDED]: 'bg-rose-500',
+      [ORDER_STATUSES.PARTIALLY_REFUNDED]: 'bg-amber-500',
+      [ORDER_STATUSES.FAILED]: 'bg-rose-600',
+    }[statusKey(order.status)] || 'bg-slate-400';
 
     let primaryAction = null;
     if (isBuyer) {
       if (isShipped) {
         primaryAction = (
-          <button type="button" onClick={(e) => { e.stopPropagation(); onOpenOrder(order); }} className={`${orderActionBtnBase} bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm`}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onOpenOrder(order); }}
+            className={`${orderActionBtnBase} bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-900/15`}
+          >
             <Truck className="w-4 h-4 opacity-95" strokeWidth={2} />
             {uiCopy.trackShipment}
           </button>
         );
       } else if (isDelivered) {
         primaryAction = (
-          <button type="button" onClick={(e) => { e.stopPropagation(); onCompleteOrder(order.id, e); }} className={`${orderActionBtnBase} bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-900/10`}>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onCompleteOrder(order.id, e); }}
+            className={`${orderActionBtnBase} bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 shadow-sm shadow-emerald-900/15`}
+          >
             <CircleCheck className="w-4 h-4 opacity-95" strokeWidth={2} />
             {uiCopy.confirmReceipt}
           </button>
         );
       } else if (isCompleted && !isReviewed) {
         primaryAction = (
-          <button type="button" onClick={(e) => {
-            e.stopPropagation();
-            if (onOpenQuickReview) onOpenQuickReview(order);
-            else onOpenOrder(order);
-          }} className={`${orderActionBtnBase} bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm`}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onOpenQuickReview) onOpenQuickReview(order);
+              else onOpenOrder(order);
+            }}
+            className={`${orderActionBtnBase} bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-900/15`}
+          >
             <Star className="w-4 h-4 opacity-95" strokeWidth={2} />
             {uiCopy.reviewNow}
           </button>
         );
-      } else {
-        primaryAction = null;
       }
-    } else {
-       primaryAction = null;
     }
 
-    const accentBorder =
-      {
-        [ORDER_STATUSES.COMPLETED]: 'border-l-emerald-400',
-        [ORDER_STATUSES.DELIVERED]: 'border-l-blue-400',
-        [ORDER_STATUSES.SHIPPED]: 'border-l-indigo-400',
-        [ORDER_STATUSES.PROCESSING]: 'border-l-amber-400',
-        [ORDER_STATUSES.CONFIRMED]: 'border-l-green-400',
-        [ORDER_STATUSES.PENDING]: 'border-l-slate-300',
-        [ORDER_STATUSES.CANCELLED]: 'border-l-rose-400',
-        [ORDER_STATUSES.REFUNDED]: 'border-l-rose-400',
-        [ORDER_STATUSES.PARTIALLY_REFUNDED]: 'border-l-amber-400',
-        [ORDER_STATUSES.FAILED]: 'border-l-rose-500',
-      }[statusKey(order.status)] || 'border-l-slate-200';
+    const accentBorder = {
+      [ORDER_STATUSES.COMPLETED]: 'border-l-emerald-400',
+      [ORDER_STATUSES.DELIVERED]: 'border-l-blue-400',
+      [ORDER_STATUSES.SHIPPED]: 'border-l-indigo-400',
+      [ORDER_STATUSES.PROCESSING]: 'border-l-amber-400',
+      [ORDER_STATUSES.CONFIRMED]: 'border-l-green-400',
+      [ORDER_STATUSES.PENDING]: 'border-l-slate-300',
+      [ORDER_STATUSES.CANCELLED]: 'border-l-rose-400',
+      [ORDER_STATUSES.REFUNDED]: 'border-l-rose-400',
+      [ORDER_STATUSES.PARTIALLY_REFUNDED]: 'border-l-amber-400',
+      [ORDER_STATUSES.FAILED]: 'border-l-rose-500',
+    }[statusKey(order.status)] || 'border-l-slate-200';
 
     return (
       <article
@@ -464,12 +485,16 @@ const UnifiedOrderItem = React.memo(
           }
         }}
         aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`}
-        className={`group relative rounded-2xl border border-slate-200 bg-white shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)] hover:shadow-md hover:border-slate-300/90 transition-shadow duration-200 overflow-hidden flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-5 border-l-[3px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2 ${accentBorder}`}
+        className={`group relative rounded-2xl border border-slate-100 bg-white shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)] hover:shadow-[0_8px_30px_-8px_rgba(15,23,42,0.15)] hover:border-slate-200 hover:-translate-y-px transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-[3.5px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2 ${accentBorder}`}
       >
         {/* Thumbnails */}
-        <div className="flex -space-x-3 shrink-0 relative z-10 w-full sm:w-auto justify-center sm:justify-start">
+        <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-1">
           {displayedItems.map((item, i) => (
-            <div key={item.id || i} className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-2 border-white shadow-sm overflow-hidden bg-slate-50 relative`} style={{ zIndex: 30 - i * 10 }}>
+            <div
+              key={item.id || i}
+              className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl border-2 border-white shadow-md overflow-hidden bg-slate-50 relative"
+              style={{ zIndex: 30 - i * 10 }}
+            >
               {item.listing?.imageUrl ? (
                 <img src={item.listing.imageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
               ) : (
@@ -480,79 +505,116 @@ const UnifiedOrderItem = React.memo(
             </div>
           ))}
           {extraCount > 0 && (
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl border-2 border-white shadow-sm flex items-center justify-center bg-slate-50 text-xs font-bold text-slate-600 relative z-0">
-              +{extraCount}
+            <div className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl border-2 border-white shadow-md flex items-center justify-center bg-slate-50 relative z-0">
+              <span className="text-sm font-bold text-slate-500">+{extraCount}</span>
             </div>
           )}
         </div>
 
         {/* Middle: Details */}
-        <div className="flex-1 min-w-0 w-full relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-1.5">
+        <div className="flex-1 min-w-0 w-full relative z-10 flex flex-col gap-2">
           {isBuyer && editingOrderId === order.id ? (
-            <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 flex-wrap" onClick={(e) => e.stopPropagation()}>
               <input
                 type="text"
                 value={editingOrderName}
                 onChange={(e) => setEditingOrderName(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
-                className="w-32 sm:w-48 px-3 py-1.5 text-sm font-bold text-slate-800 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 bg-white"
-                placeholder="Name..."
+                className="w-40 sm:w-52 px-3 py-1.5 text-sm font-semibold text-slate-800 border border-indigo-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/25 bg-white shadow-sm"
+                placeholder="Order name…"
                 maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
                 autoFocus
               />
-              <button type="button" onClick={(e) => { e.stopPropagation(); onSaveOrderName(order.id, e); }} className="p-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-colors" title="Save">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onSaveOrderName(order.id, e); }}
+                className="p-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-colors"
+                title="Save"
+              >
                 <CheckCircle className="w-4 h-4" />
               </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); onCancelEditName(); }} className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors" title="Cancel">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onCancelEditName(); }}
+                className="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors"
+                title="Cancel"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <div className="min-w-0 text-center sm:text-left max-w-[200px] sm:max-w-[320px]">
-                <span className="block text-base font-semibold text-slate-900 tracking-tight truncate">
-                  {order.name || uiCopy.orderCardTitleFallback}
-                </span>
-              </div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Order name */}
+              <span className="text-base font-semibold text-slate-900 tracking-tight truncate max-w-[200px] sm:max-w-xs">
+                {order.name || uiCopy.orderCardTitleFallback}
+              </span>
+
+              {/* Status pill */}
               <span
-                className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border shadow-sm ${getOrderStatusBadgeClass(order.status)}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border ${getOrderStatusBadgeClass(order.status)}`}
               >
-                <ListStatusGlyph status={order.status} className="w-3 h-3" />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDotColor} ${order.status === ORDER_STATUSES.PROCESSING ? 'animate-pulse' : ''}`} aria-hidden />
                 {statusLabel}
               </span>
+
+              {/* Name edit button (buyer only) */}
               {isBuyer ? (
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onStartEditName(order, e); }}
-                  className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40"
-                  title="Edit order name"
+                  className="p-1.5 text-slate-300 hover:text-indigo-500 rounded-lg hover:bg-indigo-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 opacity-0 group-hover:opacity-100"
+                  title="Rename order"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
               ) : null}
             </div>
           )}
-          <div className="flex items-center justify-center sm:justify-start gap-2 text-xs font-medium text-slate-500 tabular-nums">
+
+          {/* Meta: date · items */}
+          <div className="flex items-center gap-2 text-[13px] text-slate-400 tabular-nums">
             <time dateTime={order.createdAt || undefined}>{formatLongDate(order.createdAt, uiCopy.locale)}</time>
-            <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" aria-hidden />
+            <span className="w-1 h-1 rounded-full bg-slate-200 shrink-0" aria-hidden />
             <span>{uiCopy.itemsSummary ? uiCopy.itemsSummary(items.length) : `${items.length} items`}</span>
           </div>
+
+          {/* Order number subtle */}
+          <p className="text-[12px] text-slate-300 font-medium tabular-nums">
+            #{order.orderNumber}
+          </p>
         </div>
 
-        {/* Right: Price & Button */}
-        <div className={`shrink-0 flex relative z-10 mt-3 sm:mt-0 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100/80 ${primaryAction ? 'flex-col sm:flex-row items-center gap-4 sm:gap-6' : 'justify-end items-end'}`}>
-          <div className="text-center sm:text-right flex sm:flex-col justify-between sm:justify-start w-full sm:w-auto items-center sm:items-end">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{uiCopy.totalLabel}</span>
-            <span className={`text-lg sm:text-xl font-bold tabular-nums tracking-tight ${isCompleted ? 'text-emerald-700' : 'text-slate-900'}`}>
+        {/* Right: Price + CTA */}
+        <div className={`shrink-0 flex z-10 mt-1 sm:mt-0 w-full sm:w-auto flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-4`}>
+          {/* Price */}
+          <div className="flex flex-col items-start sm:items-end">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{uiCopy.totalLabel}</span>
+            <span
+              className={`text-xl sm:text-2xl font-bold tabular-nums tracking-tight leading-tight mt-0.5 ${
+                isCompleted ? 'text-emerald-600' : 'text-slate-900'
+              }`}
+            >
               {formatCurrency(displayTotal, currency)}
             </span>
           </div>
-          {primaryAction ? (
-            <div className="w-full sm:w-auto shrink-0" onClick={(e) => e.stopPropagation()}>
-              {primaryAction}
-            </div>
-          ) : null}
+
+          {/* Primary CTA or chevron affordance */}
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            {primaryAction ? (
+              primaryAction
+            ) : (
+              <span
+                className="inline-flex items-center gap-1 text-[12px] font-semibold text-slate-400 group-hover:text-indigo-600 transition-colors"
+                aria-hidden
+              >
+                {uiCopy.detail}
+                <svg className="w-3.5 h-3.5 -rotate-90 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            )}
+          </div>
         </div>
       </article>
     );
@@ -739,15 +801,23 @@ const OrdersListLayout = ({
             ))}
           </div>
         ) : !flow.orders?.length && !flow.search?.isSearchMode ? (
-          <div className="py-24 text-center rounded-3xl border border-dashed border-slate-300/80 bg-white shadow-[0_1px_4px_-1px_rgba(15,23,42,0.05)] relative overflow-hidden">
+          <div className="py-28 text-center rounded-3xl border border-dashed border-slate-200 bg-white shadow-[0_2px_12px_-4px_rgba(15,23,42,0.06)] relative overflow-hidden">
             <div className="relative flex flex-col items-center">
-              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-5 shadow-inner">
-                <Package className="w-10 h-10 text-slate-400" />
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center mb-6 shadow-sm">
+                <Package className="w-11 h-11 text-slate-300" />
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</h3>
-              <p className="text-sm text-slate-500 mb-8 max-w-sm">Looks like you haven't made any orders yet. Discover amazing products and start shopping.</p>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2 tracking-tight">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</h3>
+              <p className="text-sm text-slate-400 mb-8 max-w-xs leading-relaxed">
+                {isSellerView
+                  ? 'Your sold items will appear here once buyers place orders.'
+                  : 'Discover amazing products and place your first order.'}
+              </p>
               {isBuyerView && emptyAction ? (
-                <button type="button" onClick={emptyAction} className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all ring-1 ring-indigo-500/25">
+                <button
+                  type="button"
+                  onClick={emptyAction}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 shadow-md shadow-indigo-900/15 hover:shadow-lg hover:shadow-indigo-900/20 transition-all ring-1 ring-indigo-500/30"
+                >
                   {uiCopy.startShopping}
                 </button>
               ) : null}

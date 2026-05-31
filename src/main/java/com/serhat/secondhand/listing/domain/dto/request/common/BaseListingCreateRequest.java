@@ -12,8 +12,10 @@ public record BaseListingCreateRequest(
         @NotBlank String description,
         @NotNull @Positive BigDecimal price,
         @NotNull Currency currency,
-        @NotBlank String city,
-        @NotBlank String district,
+        String city,
+        String district,
+        @NotBlank String cityKey,
+        @NotBlank String districtKey,
+        String neighborhoodKey,
         String imageUrl
 ) {}
-

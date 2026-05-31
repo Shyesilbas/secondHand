@@ -34,6 +34,9 @@ public abstract class ListingFilterDto {
     private Long sellerId;
     private String city;
     private String district;
+    private String cityKey;
+    private String districtKey;
+    private String neighborhoodKey;
 
     private BigDecimal minPrice;
     private BigDecimal maxPrice;

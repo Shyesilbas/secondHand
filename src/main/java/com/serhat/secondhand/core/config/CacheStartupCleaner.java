@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
  * Uygulama her başlatıldığında cache'i temizler — seed'lerden önce çalışmalı.
  * Cache config / serializer değişikliklerinde oluşan format çakışmalarını önler.
  */
+/*
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class CacheStartupCleaner implements ApplicationRunner {
 
     private final CacheManager cacheManager;
     private final RedisConnectionFactory redisConnectionFactory;
+
 
     @Override
     public void run(ApplicationArguments args) {
@@ -50,3 +52,4 @@ public class CacheStartupCleaner implements ApplicationRunner {
     }
 }
 
+*/

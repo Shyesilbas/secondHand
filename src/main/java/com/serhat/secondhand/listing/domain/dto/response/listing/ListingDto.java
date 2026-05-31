@@ -57,6 +57,9 @@ public abstract class ListingDto {
     private boolean isListingFeePaid;
     private String city;
     private String district;
+    private String cityKey;
+    private String districtKey;
+    private String neighborhoodKey;
     private String imageUrl;
     private String sellerName;
     private String sellerSurname;

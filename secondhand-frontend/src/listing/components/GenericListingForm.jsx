@@ -191,8 +191,26 @@ const GenericListingForm = ({
 
   const totalSteps = wizardSteps?.length || 3;
 
+  const draftKey = `listing_draft_${listingType}`;
+
+  const initialDataWithDraft = useMemo(() => {
+    if (isEdit) return mergedInitialData;
+    try {
+      const draft = localStorage.getItem(draftKey);
+      if (draft) {
+        const parsed = JSON.parse(draft);
+        if (parsed && typeof parsed === 'object') {
+          return { ...mergedInitialData, ...parsed };
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse draft from localStorage', e);
+    }
+    return mergedInitialData;
+  }, [mergedInitialData, isEdit, draftKey]);
+
   const formState = useFormState({
-    initialData: mergedInitialData,
+    initialData: initialDataWithDraft,
     totalSteps,
     listingType,
     validateStep: (step, data) => validationRegistry.getStepErrors(listingType, step, data, enums),
@@ -207,6 +225,10 @@ const GenericListingForm = ({
     successMessage: successMessage || (isEdit ? 'Listing updated successfully!' : (submitIntentRef.current === 'DRAFT' ? 'Listing saved as draft!' : 'Listing created! Redirecting to payment...')),
     errorMessage: errorMessage || (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
     onSuccess: (response) => {
+      if (!isEdit) {
+        localStorage.removeItem(draftKey);
+        localStorage.removeItem(`${draftKey}_step`);
+      }
       if (isEdit || submitIntentRef.current === 'DRAFT') {
         navigate(redirectRoute || ROUTES.MY_LISTINGS);
       } else {
@@ -232,6 +254,36 @@ const GenericListingForm = ({
     goToStep,
     validateCurrentStep,
   } = formState;
+
+  // Persist draft to localStorage on change
+  useEffect(() => {
+    if (!isEdit && formData) {
+      localStorage.setItem(draftKey, JSON.stringify(formData));
+    }
+  }, [formData, isEdit, draftKey]);
+
+  // Persist currentStep to localStorage on change
+  useEffect(() => {
+    if (!isEdit && currentStep) {
+      localStorage.setItem(`${draftKey}_step`, String(currentStep));
+    }
+  }, [currentStep, isEdit, draftKey]);
+
+  // Restore step on mount
+  useEffect(() => {
+    if (isEdit) return;
+    try {
+      const savedStep = localStorage.getItem(`${draftKey}_step`);
+      if (savedStep) {
+        const parsedStep = parseInt(savedStep, 10);
+        if (Number.isInteger(parsedStep) && parsedStep > 1 && parsedStep <= totalSteps) {
+          goToStep(parsedStep);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse saved step from localStorage', e);
+    }
+  }, [goToStep, isEdit, totalSteps, draftKey]);
 
   const ctx = useMemo(() => {
     const setValue = (field, value) => handleDropdownChange(field, value);
@@ -443,6 +495,12 @@ const GenericListingForm = ({
     const location = [
       {label: 'City', value: String(formData?.city ?? '')},
       {label: 'District', value: String(formData?.district ?? '')},
+      {
+        label: 'Neighborhood',
+        value: formData?.neighborhoodKey
+          ? formData.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+          : ''
+      }
     ].filter((x) => String(x.value || '').trim());
 
     const detailFields = [];

@@ -143,6 +143,9 @@ export const createElectronicCreateRequest = (data) => {
       currency: data.currency || 'TRY',
       city: (data.city || '').trim(),
       district: (data.district || '').trim(),
+      cityKey: data.cityKey || '',
+      districtKey: data.districtKey || '',
+      neighborhoodKey: data.neighborhoodKey || undefined,
       imageUrl: data.imageUrl || undefined,
     },
     quantity: parseInt(data.quantity) || 1,
@@ -196,6 +199,9 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.quantity !== undefined && data.quantity !== '') updateData.quantity = parseInt(data.quantity);
   if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
+  if (data.cityKey !== undefined) base.cityKey = data.cityKey;
+  if (data.districtKey !== undefined) base.districtKey = data.districtKey;
+  if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
   if (data.electronicTypeId !== undefined && data.electronicTypeId !== '') updateData.electronicTypeId = data.electronicTypeId;
   if (data.electronicBrandId !== undefined && data.electronicBrandId !== '') updateData.electronicBrandId = data.electronicBrandId;
   if (data.electronicModelId !== undefined && data.electronicModelId !== '') updateData.electronicModelId = data.electronicModelId;

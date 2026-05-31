@@ -138,6 +138,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
@@ -157,6 +160,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
@@ -176,6 +182,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
@@ -195,6 +204,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
@@ -216,6 +228,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
@@ -235,6 +250,9 @@ public abstract class ListingMapper {
     @Mapping(target = "currency", source = "base.currency")
     @Mapping(target = "city", source = "base.city")
     @Mapping(target = "district", source = "base.district")
+    @Mapping(target = "cityKey", source = "base.cityKey")
+    @Mapping(target = "districtKey", source = "base.districtKey")
+    @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
@@ -312,6 +330,36 @@ public abstract class ListingMapper {
         if (request.buildingAge() != null) request.buildingAge().ifPresent(entity::setBuildingAge);
         if (request.furnished() != null) request.furnished().ifPresent(entity::setFurnished);
         if (request.zoningStatus() != null) request.zoningStatus().ifPresent(entity::setZoningStatus);
+
+        // Premium fields
+        if (request.grossAreaM2() != null) request.grossAreaM2().ifPresent(entity::setGrossAreaM2);
+        if (request.netAreaM2() != null) request.netAreaM2().ifPresent(entity::setNetAreaM2);
+        if (request.usageStatus() != null) request.usageStatus().ifPresent(entity::setUsageStatus);
+        if (request.deedStatus() != null) request.deedStatus().ifPresent(entity::setDeedStatus);
+        if (request.roomConfigKey() != null) request.roomConfigKey().ifPresent(entity::setRoomConfigKey);
+        if (request.heatingTypeKey() != null) request.heatingTypeKey().ifPresent(entity::setHeatingTypeKey);
+        if (request.floorNumber() != null) request.floorNumber().ifPresent(entity::setFloorNumber);
+        if (request.totalFloors() != null) request.totalFloors().ifPresent(entity::setTotalFloors);
+        if (request.hasBalcony() != null) request.hasBalcony().ifPresent(entity::setHasBalcony);
+        if (request.hasElevator() != null) request.hasElevator().ifPresent(entity::setHasElevator);
+        if (request.hasParking() != null) request.hasParking().ifPresent(entity::setHasParking);
+        if (request.monthlyFee() != null) request.monthlyFee().ifPresent(entity::setMonthlyFee);
+        if (request.isInSite() != null) request.isInSite().ifPresent(entity::setInSite);
+        if (request.siteName() != null) request.siteName().ifPresent(entity::setSiteName);
+        if (request.gardenAreaM2() != null) request.gardenAreaM2().ifPresent(entity::setGardenAreaM2);
+        if (request.landShareM2() != null) request.landShareM2().ifPresent(entity::setLandShareM2);
+        if (request.hasPool() != null) request.hasPool().ifPresent(entity::setHasPool);
+        if (request.zoningStatusKey() != null) request.zoningStatusKey().ifPresent(entity::setZoningStatusKey);
+        if (request.parcelNo() != null) request.parcelNo().ifPresent(entity::setParcelNo);
+        if (request.blockNo() != null) request.blockNo().ifPresent(entity::setBlockNo);
+        if (request.sheetNo() != null) request.sheetNo().ifPresent(entity::setSheetNo);
+        if (request.floorAreaRatio() != null) request.floorAreaRatio().ifPresent(entity::setFloorAreaRatio);
+        if (request.heightLimit() != null) request.heightLimit().ifPresent(entity::setHeightLimit);
+        if (request.roadFrontage() != null) request.roadFrontage().ifPresent(entity::setRoadFrontage);
+        if (request.infrastructureStatusKey() != null) request.infrastructureStatusKey().ifPresent(entity::setInfrastructureStatusKey);
+        if (request.waterSource() != null) request.waterSource().ifPresent(entity::setWaterSource);
+        if (request.electricityAvailable() != null) request.electricityAvailable().ifPresent(entity::setElectricityAvailable);
+        if (request.roadAccess() != null) request.roadAccess().ifPresent(entity::setRoadAccess);
     }
 
     public void updateSports(SportsListing entity, SportsUpdateRequest request) {
@@ -351,6 +399,9 @@ public abstract class ListingMapper {
         if (base.currency() != null) base.currency().ifPresent(entity::setCurrency);
         if (base.city() != null) base.city().ifPresent(entity::setCity);
         if (base.district() != null) base.district().ifPresent(entity::setDistrict);
+        if (base.cityKey() != null) base.cityKey().ifPresent(entity::setCityKey);
+        if (base.districtKey() != null) base.districtKey().ifPresent(entity::setDistrictKey);
+        if (base.neighborhoodKey() != null) base.neighborhoodKey().ifPresent(entity::setNeighborhoodKey);
         if (base.imageUrl() != null) base.imageUrl().ifPresent(entity::setImageUrl);
     }
 

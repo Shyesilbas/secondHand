@@ -55,7 +55,10 @@ const AddressCard = ({
           
           <div className="text-sm text-text-secondary space-y-1">
             <p className="font-medium">{address.addressLine}</p>
-            <p>{address.city}, {address.state}</p>
+            <p>
+              {address.city}, {address.state}
+              {address.neighborhoodKey ? `, ${address.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}
+            </p>
             <p>{address.postalCode}, {address.country}</p>
           </div>
         </div>

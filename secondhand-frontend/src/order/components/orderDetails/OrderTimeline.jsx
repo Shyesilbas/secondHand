@@ -92,8 +92,8 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
         <div className="relative flex justify-between">
           <div className="absolute top-5 left-0 w-full h-[2px] bg-slate-100 -z-10" />
           <div
-            className="absolute top-5 left-0 h-[2px] bg-emerald-500 transition-all duration-1000 -z-10"
-            style={{ width: `${(currentIndex / (steps.length - 1)) * 100}%` }}
+            className="absolute top-5 left-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 -z-10"
+            style={{ width: `${Math.max(0, (currentIndex / (steps.length - 1)) * 100)}%` }}
           />
 
           {steps.map((step, idx) => {
@@ -105,20 +105,20 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
               <div key={step.key} className="flex flex-col items-center group">
                 <div className="relative">
                   {isCurrent && (
-                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" aria-hidden />
+                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />
                   )}
                   <div
                     className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       isDone
-                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100'
-                        : 'bg-white/90 backdrop-blur-sm border-slate-200/80 text-slate-400'
-                    } ${isCurrent ? 'ring-4 ring-emerald-500/30 ring-offset-2 ring-offset-white' : ''}`}
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-900/20'
+                        : 'bg-white border-slate-200 text-slate-400'
+                    } ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}
                   >
                     <Icon className="w-5 h-5 stroke-[2.5px]" />
                   </div>
                 </div>
                 <span
-                  className={`mt-3 text-[11px] font-semibold uppercase tracking-tight ${
+                  className={`mt-3 text-[11px] font-bold uppercase tracking-tight ${
                     isDone ? 'text-slate-900' : 'text-slate-400'
                   }`}
                 >
@@ -156,25 +156,25 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
                     <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />
                   )}
                   <div
-                    className={`relative w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
-                      isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm' : 'bg-white/90 backdrop-blur-sm border-slate-200/80 text-slate-400'
-                    } ${isCurrent ? 'ring-2 ring-emerald-500/30 ring-offset-1' : ''}`}
+                    className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                      isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-white border-slate-200 text-slate-400'
+                    } ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}
                   >
-                    <Icon className="w-4 h-4 stroke-[2]" />
+                    <Icon className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>
                 <span
-                  className={`mt-2 text-[10px] font-medium uppercase tracking-wide ${
-                    isDone ? 'text-gray-900' : 'text-gray-400'
+                  className={`mt-2.5 text-[10px] uppercase tracking-wide ${
+                    isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'
                   }`}
                 >
                   {step.label}
                 </span>
               </div>
               {!isLast ? (
-                <div className="flex-1 mx-1.5 relative" style={{ height: '1.5px' }}>
-                  <div className="absolute top-0 left-0 w-full h-full bg-gray-100" />
-                  {isDone ? <div className="absolute top-0 left-0 h-full bg-emerald-500 transition-all duration-1000 w-full" /> : null}
+                <div className="flex-1 mx-1 relative" style={{ height: '2px' }}>
+                  <div className="absolute inset-0 bg-slate-100 rounded-full" />
+                  {isDone ? <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000" /> : null}
                 </div>
               ) : null}
             </React.Fragment>
@@ -183,7 +183,7 @@ const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
       </div>
       {isFailed ? (
         <div className="mt-4 flex justify-center">
-          <span className="px-2.5 py-1 bg-rose-50/80 text-rose-600 text-[10px] font-medium rounded-md border border-rose-200/60 flex items-center gap-1.5">
+          <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-[10px] font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
             <AlertCircle className="w-3 h-3" /> {currentStatus}
           </span>
         </div>

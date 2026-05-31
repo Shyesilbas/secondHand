@@ -24,6 +24,7 @@ import java.util.UUID;
     @Index(name = "idx_listing_status", columnList = "status"),
     @Index(name = "idx_listing_type", columnList = "listing_type"),
     @Index(name = "idx_listing_location", columnList = "city, district"),
+    @Index(name = "idx_listing_location_keys", columnList = "city_key, district_key"),
     @Index(name = "idx_listing_created", columnList = "createdAt")
 })
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -62,6 +63,15 @@ public class Listing {
 
     private String city;
     private String district;
+
+    @Column(name = "city_key")
+    private String cityKey;
+
+    @Column(name = "district_key")
+    private String districtKey;
+
+    @Column(name = "neighborhood_key")
+    private String neighborhoodKey;
 
     private String imageUrl;
 

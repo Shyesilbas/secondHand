@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MapPin, X, Save } from 'lucide-react';
 import { USER_ADDRESS_TYPES } from '../../userConstants.js';
+import LocationFields from '../../../common/components/forms/LocationFields.jsx';
 
 const defaultAddress = {
   addressLine: '',
   city: '',
+  cityKey: '',
+  district: '',
+  districtKey: '',
+  neighborhoodKey: '',
   state: '',
   postalCode: '',
   country: '',
@@ -51,6 +56,17 @@ const AddressForm = ({
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleInputChangeEvent = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === 'district') {
+        next.state = value;
+      }
+      return next;
+    });
   };
 
   if (!isOpen) return null;
@@ -111,33 +127,8 @@ const AddressForm = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div>
-                <label htmlFor="address-city" className="mb-2 block text-sm font-medium text-slate-700">
-                  City
-                </label>
-                <input
-                  id="address-city"
-                  className={inputClass}
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="address-state" className="mb-2 block text-sm font-medium text-slate-700">
-                  State / region
-                </label>
-                <input
-                  id="address-state"
-                  className={inputClass}
-                  placeholder="State"
-                  value={formData.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
-                  required
-                />
-              </div>
+            <div className="mb-5">
+              <LocationFields formData={formData} errors={{}} onInputChange={handleInputChangeEvent} />
             </div>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

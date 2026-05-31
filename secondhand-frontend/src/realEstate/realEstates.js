@@ -81,6 +81,9 @@ export const createRealEstateCreateRequest = (data) => {
       currency: data.currency || 'TRY',
       city: (data.city || '').trim(),
       district: (data.district || '').trim(),
+      cityKey: data.cityKey || '',
+      districtKey: data.districtKey || '',
+      neighborhoodKey: data.neighborhoodKey || undefined,
       imageUrl: data.imageUrl || undefined,
     },
     
@@ -108,6 +111,9 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
   if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
   if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
+  if (data.cityKey !== undefined) base.cityKey = data.cityKey;
+  if (data.districtKey !== undefined) base.districtKey = data.districtKey;
+  if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
   if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
   if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
   if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;

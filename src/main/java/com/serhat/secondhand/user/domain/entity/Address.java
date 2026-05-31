@@ -22,6 +22,15 @@ public class Address {
     @Column(nullable = false)
     private String city;
 
+    @Column(name = "city_key", length = 60)
+    private String cityKey;
+
+    @Column(name = "district_key", length = 60)
+    private String districtKey;
+
+    @Column(name = "neighborhood_key", length = 60)
+    private String neighborhoodKey;
+
     @Column(nullable = false)
     private String state;
 

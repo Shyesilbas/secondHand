@@ -32,6 +32,15 @@ public class FilterHelper {
         if (filters.getDistrict() != null && !filters.getDistrict().trim().isEmpty()) {
             predicates.add(cb.like(cb.lower(root.get("district")), "%" + filters.getDistrict().toLowerCase() + "%"));
         }
+        if (filters.getCityKey() != null && !filters.getCityKey().trim().isEmpty()) {
+            predicates.add(cb.equal(root.get("cityKey"), filters.getCityKey().toUpperCase()));
+        }
+        if (filters.getDistrictKey() != null && !filters.getDistrictKey().trim().isEmpty()) {
+            predicates.add(cb.equal(root.get("districtKey"), filters.getDistrictKey().toUpperCase()));
+        }
+        if (filters.getNeighborhoodKey() != null && !filters.getNeighborhoodKey().trim().isEmpty()) {
+            predicates.add(cb.equal(root.get("neighborhoodKey"), filters.getNeighborhoodKey().toUpperCase()));
+        }
         if (filters.getMinPrice() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("price"), filters.getMinPrice()));
         }

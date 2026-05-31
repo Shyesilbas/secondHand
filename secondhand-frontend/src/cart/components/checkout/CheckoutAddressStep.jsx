@@ -105,7 +105,9 @@ const CheckoutAddressStep = ({
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-semibold tracking-tight text-slate-900">{address.addressLine}</div>
                       <div className="mt-1 text-xs text-slate-500 font-medium">
-                        {address.city}, {address.state} {address.postalCode}
+                        {address.city}, {address.state}
+                        {address.neighborhoodKey ? `, ${address.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}
+                        {` ${address.postalCode}`}
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{address.country}</span>
@@ -124,7 +126,7 @@ const CheckoutAddressStep = ({
         )}
       </div>
 
-      {/* Billing toggle */}
+      {/* Section: Billing */}
       {hasAddresses && (
         <div className="mb-6 rounded-xl border border-slate-100 bg-white shadow-sm p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -148,14 +150,15 @@ const CheckoutAddressStep = ({
                   <option value="">Choose billing address</option>
                   {addresses.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.addressLine} — {a.city}
+                      {a.addressLine} — {a.city}, {a.state}
                     </option>
                   ))}
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 {selectedBillingAddress && !billingSameAsShipping && (
                   <p className="mt-1.5 truncate pl-0.5 text-[11px] text-slate-400">
-                    {selectedBillingAddress.city}, {selectedBillingAddress.state}{' '}
+                    {selectedBillingAddress.city}, {selectedBillingAddress.state}
+                    {selectedBillingAddress.neighborhoodKey ? `, ${selectedBillingAddress.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}{' '}
                     {selectedBillingAddress.postalCode}
                   </p>
                 )}

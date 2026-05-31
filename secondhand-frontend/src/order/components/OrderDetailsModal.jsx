@@ -186,27 +186,21 @@ const OrderDetailsModal = React.memo(
           <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-violet-400/5 blur-[60px] rounded-full pointer-events-none mix-blend-multiply" />
 
           <div
-            className={`relative z-10 ${
-              isSellerView ? 'px-8 py-6' : 'px-6 py-5'
-            } bg-white/50 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between group`}
+            className="relative z-10 px-6 sm:px-8 py-5 bg-white/60 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between gap-4"
           >
-            <div className="flex items-center gap-3">
-              <div
-                className={`${
-                  isSellerView ? 'w-12 h-12 rounded-2xl border border-slate-200 bg-slate-50' : 'w-10 h-10 rounded-lg border border-slate-200 bg-slate-50'
-                } flex items-center justify-center`}
-              >
-                <Package className={`${isSellerView ? 'text-slate-600 w-6 h-6' : 'text-slate-600 w-5 h-5'}`} />
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-11 h-11 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
+                <Package className="w-5 h-5 text-slate-500" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2.5 flex-wrap mb-0.5">
                   {!isSellerView && isEditingName ? (
                     <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
                       <input
                         type="text"
                         value={orderName}
                         onChange={(e) => setOrderName(e.target.value)}
-                        className="flex-1 px-2.5 py-1.5 text-sm font-semibold text-gray-900 border border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="flex-1 px-3 py-1.5 text-sm font-semibold text-slate-900 border border-indigo-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400/30 bg-white shadow-sm"
                         placeholder="Order name"
                         maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
                         autoFocus
@@ -214,56 +208,53 @@ const OrderDetailsModal = React.memo(
                       <button
                         onClick={handleSaveName}
                         disabled={isSavingName}
-                        className="p-1.5 hover:bg-blue-50 rounded-md transition-colors text-blue-600 disabled:opacity-50"
+                        className="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-indigo-600 disabled:opacity-50"
                       >
-                        <Check className="w-3.5 h-3.5" />
+                        <Check className="w-4 h-4" />
                       </button>
                       <button
                         onClick={handleCancelEditName}
                         disabled={isSavingName}
-                        className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-600 disabled:opacity-50"
+                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500 disabled:opacity-50"
                       >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
                     <>
-                      <h2 className={`${isSellerView ? 'text-xl font-semibold text-slate-900' : 'text-base font-semibold text-gray-900'}`}>
+                      <h2 className="text-lg font-bold text-slate-900 tracking-tight truncate">
                         {headerTitle}
                       </h2>
-                      {!isSellerView ? (
-                        <>
-                          <button
-                            onClick={() => setIsEditingName(true)}
-                            className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100"
-                            title="Edit order name"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          {selectedOrder.name ? (
-                            <span className="text-xs text-gray-500 font-medium">#{selectedOrder.orderNumber}</span>
-                          ) : null}
-                        </>
+                      {!isSellerView && selectedOrder.name ? (
+                        <span className="text-sm text-slate-400 font-medium">#{selectedOrder.orderNumber}</span>
                       ) : null}
-                      <div className="flex items-center gap-1.5">
-                        <div className={`w-1.5 h-1.5 rounded-full ${getOrderStatusIndicatorClass(selectedOrder.status)}`} />
-                        <span className={`${isSellerView ? 'text-[10px] font-semibold uppercase rounded-md border px-2 py-0.5' : 'text-xs font-medium'} ${getStatusColor(selectedOrder.status)}`}>
-                          {resolveEnumLabel(enums, 'orderStatuses', selectedOrder.status) || selectedOrder.status}
-                        </span>
-                      </div>
+                      {!isSellerView ? (
+                        <button
+                          onClick={() => setIsEditingName(true)}
+                          className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-300 hover:text-slate-500"
+                          title="Edit order name"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      ) : null}
                     </>
                   )}
                 </div>
-                <p className={`${isSellerView ? 'text-sm text-slate-500 font-normal' : 'text-xs text-slate-500 font-medium mt-0.5'}`}>
-                  {formatDateTime(selectedOrder.createdAt)}
-                </p>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${getOrderStatusIndicatorClass(selectedOrder.status)}`} />
+                  <span className={`text-xs font-semibold ${getStatusColor(selectedOrder.status)}`}>
+                    {resolveEnumLabel(enums, 'orderStatuses', selectedOrder.status) || selectedOrder.status}
+                  </span>
+                  <span className="text-slate-200">·</span>
+                  <span className="text-xs text-slate-400 font-medium">{formatDateTime(selectedOrder.createdAt)}</span>
+                </div>
               </div>
             </div>
             <button
               onClick={onClose}
-              className={`${isSellerView ? 'p-2 hover:bg-slate-100 rounded-xl transition-all border border-transparent hover:border-slate-200' : 'p-1.5 hover:bg-slate-100 rounded-md transition-colors'} text-slate-400 hover:text-slate-600`}
+              className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200"
             >
-              <X className={`${isSellerView ? 'w-6 h-6 text-slate-500' : 'w-5 h-5'}`} />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -288,9 +279,9 @@ const OrderDetailsModal = React.memo(
                     {isCancellableStatus(selectedOrder.status, enums) ? (
                       <button
                         onClick={() => setCancelModalOpen(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-rose-600 bg-white border border-rose-200/60 hover:bg-rose-50/80 rounded-md transition-all"
+                        className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-xl transition-all"
                       >
-                        <X className="w-3.5 h-3.5" /> Cancel Order
+                        <X className="w-4 h-4" /> Cancel Order
                       </button>
                     ) : null}
                     {isRefundableStatus(selectedOrder.status, enums) ? (
@@ -298,15 +289,15 @@ const OrderDetailsModal = React.memo(
                         <button
                           onClick={handleCompleteOrder}
                           disabled={isProcessing}
-                          className="flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
-                          <CheckCircle className="w-3.5 h-3.5" /> Approve & Complete
+                          <CheckCircle className="w-4 h-4" /> Approve &amp; Complete
                         </button>
                         <button
                           onClick={() => setRefundModalOpen(true)}
-                          className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-md transition-all"
+                          className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
                         >
-                          <RotateCcw className="w-3.5 h-3.5" /> Request Refund
+                          <RotateCcw className="w-4 h-4" /> Request Refund
                         </button>
                       </>
                     ) : null}

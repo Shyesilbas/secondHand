@@ -364,4 +364,11 @@ export const API_ENDPOINTS = {
         COMMENT_BY_ID: (threadId, commentId) => `/v1/forum/threads/${threadId}/comments/${commentId}`,
         COMMENT_REACTION: (threadId, commentId) => `/v1/forum/threads/${threadId}/comments/${commentId}/reaction`,
     },
+    CATALOG: {
+        LOCATIONS: {
+            CITIES: '/catalog/locations/cities',
+            DISTRICTS: (cityKey) => `/catalog/locations/districts?cityKey=${encodeURIComponent(cityKey)}`,
+            NEIGHBORHOODS: (districtKey) => `/catalog/locations/neighborhoods?districtKey=${encodeURIComponent(districtKey)}`,
+        }
+    }
 };
