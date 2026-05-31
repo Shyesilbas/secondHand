@@ -250,4 +250,46 @@ public class OrderController {
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderShippingService.shipOrder(orderId, request, currentUser));
     }
+
+    @PostMapping("/{orderNumber}/verify-meetup")
+    @Operation(summary = "Verify meetup code", description = "Verify 6-digit meetup OTP code (Seller only)")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> verifyMeetup(
+            @PathVariable String orderNumber,
+            @RequestParam String code,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(orderCompletionService.verifyMeetupCode(orderNumber, code, currentUser));
+    }
+
+    @PostMapping("/{orderNumber}/confirm-handover-completion")
+    @Operation(summary = "Confirm handover completion", description = "Manually finalize order handover to complete order (Buyer/Seller)")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> confirmHandoverCompletion(
+            @PathVariable String orderNumber,
+            @RequestBody Map<String, Boolean> payload,
+            @AuthenticationPrincipal User currentUser) {
+        boolean confirmed = payload != null && payload.getOrDefault("confirmed", false);
+        return ResultResponses.ok(orderCompletionService.confirmHandoverCompletion(orderNumber, confirmed, currentUser));
+    }
+
+    @GetMapping(value = "/{orderNumber}/qr-code", produces = org.springframework.http.MediaType.IMAGE_PNG_VALUE)
+    @Operation(summary = "Get order meetup QR code", description = "Generates and returns order's meetup verification QR code as an image (PNG) locally using ZXing")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<byte[]> getOrderQrCode(
+            @PathVariable String orderNumber,
+            @AuthenticationPrincipal User currentUser) {
+        byte[] qrBytes = orderCompletionService.generateMeetupQrCode(orderNumber, currentUser);
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CACHE_CONTROL, "no-cache")
+                .body(qrBytes);
+    }
+
+    @PostMapping("/{orderNumber}/regenerate-meetup-code")
+    @Operation(summary = "Regenerate meetup code", description = "Regenerates and returns new meetup code and hash (Buyer only)")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> regenerateMeetupCode(
+            @PathVariable String orderNumber,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(orderCompletionService.regenerateMeetupCode(orderNumber, currentUser));
+    }
 }

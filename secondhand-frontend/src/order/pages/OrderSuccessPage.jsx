@@ -27,6 +27,7 @@ const OrderSuccessPage = () => {
   const orderDate = order?.createdAt || state?.createdAt || new Date().toISOString();
   const shippingAddress = order?.shippingAddress || state?.shippingAddress || null;
   const itemCount = order?.orderItems?.length ?? state?.itemCount ?? 0;
+  const deliveryMethod = order?.deliveryMethod || state?.deliveryMethod || 'CARGO';
 
   const itemTitles = useMemo(() => {
     const items = order?.orderItems;
@@ -117,10 +118,10 @@ const OrderSuccessPage = () => {
               </div>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Your order was placed successfully
+              {deliveryMethod === 'SAFE_MEETUP' ? 'Elden Teslimat Siparişiniz Oluşturuldu!' : 'Your order was placed successfully'}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Payment is complete. We&apos;re getting your order ready.
+              {deliveryMethod === 'SAFE_MEETUP' ? 'Ödemeniz alındı. Buluşma noktasında satıcıyla görüşerek teslim alabilirsiniz.' : "Payment is complete. We're getting your order ready."}
             </p>
           </div>
 
@@ -168,11 +169,22 @@ const OrderSuccessPage = () => {
                       <p className="text-xs text-slate-400 mt-1">Line items are unavailable for this order.</p>
                     )}
                   </div>
-                  {shippingAddress?.addressLine && (
+                  {shippingAddress?.addressLine && deliveryMethod !== 'SAFE_MEETUP' && (
                     <p>
                       <span className="font-medium text-slate-700">Shipping:</span>{' '}
                       {shippingAddress.addressLine}, {shippingAddress.city}
                     </p>
+                  )}
+                  {deliveryMethod === 'SAFE_MEETUP' && (
+                    <div className="space-y-2 mt-3 pt-3 border-t border-slate-100">
+                      <p className="flex items-center gap-1.5 text-slate-800">
+                        <span className="font-semibold text-slate-700">📍 Buluşma Konumu:</span>{' '}
+                        <span className="font-medium bg-slate-100 px-2 py-0.5 rounded text-indigo-700">{order?.meetupLocation || state?.meetupLocation || 'Belirtilmemiş'}</span>
+                      </p>
+                      <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-800 leading-relaxed font-medium">
+                        🔒 <strong>Güvenli Teslimat Hatırlatması:</strong> Buluşma noktasına vardığınızda, satıcıya <strong>Siparişlerim</strong> sayfasından erişebileceğiniz 6 haneli doğrulama kodunu veya QR kodunu göstermeyi unutmayınız. Satıcı kodu sisteme girdiğinde paranız güvenli havuzdan satıcıya aktarılacaktır. Buluşma için <strong>4 iş günü</strong> süreniz bulunmaktadır.
+                      </div>
+                    </div>
                   )}
                 </div>
               )}

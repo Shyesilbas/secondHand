@@ -17,6 +17,9 @@ export const ORDER_STATUSES = Object.freeze({
   PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
   FAILED: 'FAILED',
   PAID: 'PAID',
+  MEETUP_PENDING: 'MEETUP_PENDING',
+  HANDOVER_CONFIRMED: 'HANDOVER_CONFIRMED',
+  VERIFICATION_LOCKED: 'VERIFICATION_LOCKED',
 });
 
 /** Tab filters: groups instead of single API status (resolved in useOrderFlow) */
@@ -40,6 +43,9 @@ export const ORDER_STATUS_FILTER_OPTIONS = Object.freeze([
   { value: ORDER_STATUSES.COMPLETED, label: 'Completed' },
   { value: ORDER_STATUSES.CANCELLED, label: 'Cancelled' },
   { value: ORDER_STATUSES.REFUNDED, label: 'Refunded' },
+  { value: ORDER_STATUSES.MEETUP_PENDING, label: 'Meetup Pending' },
+  { value: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Handover Confirmed' },
+  { value: ORDER_STATUSES.VERIFICATION_LOCKED, label: 'Verification Locked' },
 ]);
 
 export const ORDER_STATUS_ACCENT = Object.freeze({
@@ -51,6 +57,9 @@ export const ORDER_STATUS_ACCENT = Object.freeze({
   [ORDER_STATUSES.PENDING]: 'border-l-gray-300',
   [ORDER_STATUSES.CANCELLED]: 'border-l-red-300',
   [ORDER_STATUSES.REFUNDED]: 'border-l-rose-300',
+  [ORDER_STATUSES.MEETUP_PENDING]: 'border-l-indigo-500',
+  [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'border-l-violet-600',
+  [ORDER_STATUSES.VERIFICATION_LOCKED]: 'border-l-purple-700',
 });
 
 export const ORDER_DEFAULTS = Object.freeze({

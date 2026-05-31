@@ -5,6 +5,7 @@ import {ROUTES} from '../../../common/constants/routes.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import ReviewModal from '../../../reviews/components/ReviewModal.jsx';
+import { SafeMeetupOnboardingModal } from './SafeMeetupOnboardingModal.jsx';
 import {
     ORDER_DEFAULTS,
     ORDER_LIMITS,
@@ -639,7 +640,19 @@ const OrdersListLayout = ({
 }) => {
   const uiCopy = useMemo(() => mergeUiCopy(uiCopyProp || {}), [uiCopyProp]);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [deliveryMethodFilter, setDeliveryMethodFilter] = useState('ALL');
   const navigate = useNavigate();
+
+  const displayedOrders = useMemo(() => {
+    let list = flow.orders || [];
+    if (deliveryMethodFilter === 'CARGO') {
+      return list.filter(o => o.deliveryMethod === 'CARGO');
+    }
+    if (deliveryMethodFilter === 'SAFE_MEETUP') {
+      return list.filter(o => o.deliveryMethod === 'SAFE_MEETUP');
+    }
+    return list;
+  }, [flow.orders, deliveryMethodFilter]);
 
   const onPageChange = (page) => {
     if (!flow.search?.isSearchMode) flow.loadPage(page);
@@ -769,6 +782,32 @@ const OrdersListLayout = ({
         
         {topSlot ? <div className="mb-6">{topSlot}</div> : null}
 
+        {/* Modern Segmented Tab Switcher for Delivery Methods */}
+        <div className="mb-8 flex p-1.5 rounded-2xl bg-slate-200/50 border border-slate-200/60 max-w-md shadow-sm">
+          {['ALL', 'CARGO', 'SAFE_MEETUP'].map((method) => {
+            const isActive = deliveryMethodFilter === method;
+            const label = {
+              ALL: 'Tüm Siparişler',
+              CARGO: 'Kargo ile Gönderim',
+              SAFE_MEETUP: 'Elden Güvenli Teslimat'
+            }[method];
+            return (
+              <button
+                key={method}
+                type="button"
+                onClick={() => setDeliveryMethodFilter(method)}
+                className={`flex-1 py-2 rounded-xl text-xs sm:text-[13px] font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${
+                  isActive
+                    ? 'bg-white text-slate-900 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.12)] border border-slate-200/60'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
         {flow.search ? (
           <>
           <div className="mb-6 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-white p-2 sm:p-2.5 rounded-2xl border border-slate-200/80 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]">
@@ -800,7 +839,7 @@ const OrdersListLayout = ({
               <OrderItemSkeleton key={i} />
             ))}
           </div>
-        ) : !flow.orders?.length && !flow.search?.isSearchMode ? (
+        ) : !displayedOrders?.length && !flow.search?.isSearchMode ? (
           <div className="py-28 text-center rounded-3xl border border-dashed border-slate-200 bg-white shadow-[0_2px_12px_-4px_rgba(15,23,42,0.06)] relative overflow-hidden">
             <div className="relative flex flex-col items-center">
               <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center mb-6 shadow-sm">
@@ -825,7 +864,7 @@ const OrdersListLayout = ({
           </div>
         ) : (
           <div className="space-y-4">
-            {(flow.orders || []).map((order) => (
+            {(displayedOrders || []).map((order) => (
               <div key={order.id} id={order.id != null ? `order-card-${order.id}` : undefined}>
                 <UnifiedOrderItem
                   viewMode={viewMode || flow.viewMode}

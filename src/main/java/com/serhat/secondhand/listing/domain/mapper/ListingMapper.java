@@ -142,6 +142,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -164,6 +165,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -186,6 +188,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -208,6 +211,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -232,6 +236,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -254,6 +259,7 @@ public abstract class ListingMapper {
     @Mapping(target = "districtKey", source = "base.districtKey")
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
+    @Mapping(target = "allowMeetup", source = "base.allowMeetup")
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
     // ──────────────────────────────────────────────

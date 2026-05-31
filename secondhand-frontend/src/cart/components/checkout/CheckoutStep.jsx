@@ -28,6 +28,10 @@ const CheckoutStep = ({
   setNotes,
   orderName,
   setOrderName,
+  deliveryMethod,
+  setDeliveryMethod,
+  meetupLocation,
+  setMeetupLocation,
   emails,
   fetchEmails,
   onBack,
@@ -55,6 +59,11 @@ const CheckoutStep = ({
             setNotes={setNotes}
             orderName={orderName}
             setOrderName={setOrderName}
+            deliveryMethod={deliveryMethod}
+            setDeliveryMethod={setDeliveryMethod}
+            meetupLocation={meetupLocation}
+            setMeetupLocation={setMeetupLocation}
+            cartItems={cartItems}
             onNext={onNext}
             onBack={onBack}
           />
@@ -101,6 +110,8 @@ const CheckoutStep = ({
             onNext={onNext}
             onBack={onBack}
             sendVerificationCode={sendVerificationCode}
+            deliveryMethod={deliveryMethod}
+            meetupLocation={meetupLocation}
           />
         );
       case 4:

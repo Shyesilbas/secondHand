@@ -65,6 +65,360 @@ const GlassCard = React.memo(({ children, className = '', critical = false }) =>
 ));
 GlassCard.displayName = 'GlassCard';
 
+import { orderService } from '../services/orderService.js';
+import apiClient from '../../common/services/api/interceptors.js';
+import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
+
+const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
+  const [pinCode, setPinCode] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState('');
+  
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmCheckbox, setConfirmCheckbox] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
+
+  // Lock timer
+  const [lockCountdown, setLockCountdown] = useState(0);
+
+  useEffect(() => {
+    if (order.verificationLockedUntil) {
+      const lockTime = new Date(order.verificationLockedUntil).getTime();
+      const timer = setInterval(() => {
+        const diff = Math.max(0, Math.ceil((lockTime - Date.now()) / 1000));
+        setLockCountdown(diff);
+        if (diff === 0) {
+          clearInterval(timer);
+          onActionSuccess();
+        }
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [order.verificationLockedUntil]);
+
+  // QR expiration countdown (5 mins)
+  const [qrCountdown, setQrCountdown] = useState(300);
+  useEffect(() => {
+    if (!isSeller && order.status === 'MEETUP_PENDING') {
+      const timer = setInterval(() => {
+        setQrCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [order.status, isSeller]);
+
+  // Authenticated dynamic QR Code fetching
+  const [qrImageUrl, setQrImageUrl] = useState('');
+  const [isQrLoading, setIsQrLoading] = useState(false);
+  const [qrFetchTrigger, setQrFetchTrigger] = useState(0);
+
+  useEffect(() => {
+    let url = '';
+    if (order.status === 'MEETUP_PENDING' && !isSeller) {
+      const fetchQrCode = async () => {
+        setIsQrLoading(true);
+        try {
+          const response = await apiClient.get(API_ENDPOINTS.ORDERS.GET_MEETUP_QR(order.orderNumber), {
+            responseType: 'blob'
+          });
+          url = URL.createObjectURL(response.data);
+          setQrImageUrl(url);
+        } catch (err) {
+          console.error('Failed to load QR code image', err);
+        } finally {
+          setIsQrLoading(false);
+        }
+      };
+      fetchQrCode();
+    }
+    return () => {
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [order.status, order.orderNumber, isSeller, qrFetchTrigger]);
+
+  const handleRegenerateCode = async () => {
+    try {
+      await orderService.regenerateMeetupCode(order.orderNumber);
+      setQrCountdown(300);
+      setQrFetchTrigger((prev) => prev + 1);
+      onActionSuccess();
+    } catch (err) {
+      setConfirmError(err?.response?.data?.message || 'Kod yenilenirken hata oluştu.');
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!pinCode || pinCode.trim().length !== 6) {
+      setVerifyError('Lütfen 6 haneli kodu eksiksiz girin.');
+      return;
+    }
+    setIsVerifying(true);
+    setVerifyError('');
+    try {
+      const res = await orderService.verifyMeetupCode(order.orderNumber, pinCode.trim());
+      if (res.error) {
+        setVerifyError(res.message || 'Kod doğrulama başarısız.');
+      } else {
+        setPinCode('');
+        onActionSuccess();
+      }
+    } catch (err) {
+      setVerifyError(err?.response?.data?.message || 'Doğrulama hatası oluştu.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleConfirmCompletion = async () => {
+    if (!confirmCheckbox) {
+      setConfirmError('Lütfen onay kutusunu işaretleyin.');
+      return;
+    }
+    setIsConfirming(true);
+    setConfirmError('');
+    try {
+      const res = await orderService.confirmHandoverCompletion(order.orderNumber, true);
+      if (res.error) {
+        setConfirmError(res.message || 'İşlem tamamlanamadı.');
+      } else {
+        onActionSuccess();
+      }
+    } catch (err) {
+      setConfirmError(err?.response?.data?.message || 'İşlem tamamlanırken hata oluştu.');
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full" />
+      <div className="flex items-center gap-3 border-b border-indigo-100/50 pb-4 mb-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shadow-sm">
+          <MapPin className="h-4 w-4" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">Elden Güvenli Teslimat Detayları</h3>
+          <p className="text-xs text-slate-500">Güvenli buluşma noktasında yüz yüze alışveriş.</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Buluşma Konumu</span>
+          <span className="mt-1 block text-sm font-semibold text-slate-800">{order.meetupLocation || 'Belirtilmedi'}</span>
+        </div>
+
+        {/* Contact Info Card */}
+        <div className="p-3 bg-white rounded-xl border border-indigo-100/50 shadow-sm flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shadow-xs">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </div>
+          <div>
+            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">İletişim Bilgileri</span>
+            {isSeller ? (
+              <p className="text-xs font-semibold text-slate-800 mt-0.5">
+                Alıcı: {order.buyerName} {order.buyerSurname} <span className="text-emerald-600 ml-1">📞 {order.buyerPhone || 'Telefon Yok'}</span>
+              </p>
+            ) : (
+              <p className="text-xs font-semibold text-slate-800 mt-0.5">
+                Satıcı: {order.sellerFullName || 'Satıcı'} <span className="text-emerald-600 ml-1">📞 {order.sellerPhone || 'Telefon Yok'}</span>
+              </p>
+            )}
+          </div>
+        </div>
+
+        {order.status === 'MEETUP_PENDING' && (
+          <>
+            {!isSeller ? (
+              // BUYER VIEW IN MEETUP_PENDING
+              <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 flex flex-col items-center justify-center text-center shadow-inner">
+                <span className="block text-xs font-bold text-indigo-700 uppercase tracking-widest mb-3">Satıcıya Gösterilecek QR ve PIN</span>
+                {qrCountdown > 0 ? (
+                  <>
+                    <div className="relative p-3 bg-white rounded-xl border border-slate-100 shadow-sm mb-4">
+                      {isQrLoading ? (
+                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-slate-50 rounded-lg">
+                          <span className="text-xs text-slate-400">Yükleniyor...</span>
+                        </div>
+                      ) : qrImageUrl ? (
+                        <img
+                          src={qrImageUrl}
+                          alt="Meetup QR Code"
+                          className="w-[150px] h-[150px]"
+                        />
+                      ) : (
+                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-rose-50 rounded-lg border border-rose-100">
+                          <span className="text-xs text-rose-500 text-center px-2">QR yüklenemedi</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="block text-[28px] font-extrabold tracking-[0.25em] text-slate-900 mb-1 font-mono">
+                      {order.meetupVerificationCode || '------'}
+                    </span>
+                    <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5 mt-2">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                      Yenilenme süresi: {formatTime(qrCountdown)}
+                    </p>
+
+                    {/* Buyer Manual Confirmation Option inside MEETUP_PENDING */}
+                    <div className="mt-5 pt-4 border-t border-slate-100 w-full text-left">
+                      <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Alternatif Teslimat Onayı</span>
+                      <p className="text-[11px] text-slate-500 mb-3 leading-relaxed">
+                        Eğer satıcı doğrulama kodunu sisteme giremiyorsa (internet sorunu vb.), ürünü elden teslim aldığınızı aşağıdaki onay kutusunu işaretleyerek kendiniz de doğrudan bildirebilirsiniz.
+                      </p>
+                      <div className="space-y-3">
+                        <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={confirmCheckbox}
+                            onChange={(e) => setConfirmCheckbox(e.target.checked)}
+                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20"
+                          />
+                          <span className="text-[11px] font-semibold text-slate-700 leading-normal">
+                            Ürünü elden teslim aldığımı ve işlemi tamamlamak istediğimi onaylıyorum.
+                          </span>
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={handleConfirmCompletion}
+                          disabled={isConfirming || !confirmCheckbox}
+                          className="w-full py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-slate-950 hover:bg-black transition disabled:opacity-50 shadow-sm"
+                        >
+                          {isConfirming ? 'İşlem Tamamlanıyor...' : 'Teslim Aldım & Onayla'}
+                        </button>
+                        {confirmError && <p className="text-[10px] text-rose-500 font-semibold mt-1">{confirmError}</p>}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-6">
+                    <p className="text-sm text-slate-500 mb-3">QR kod ve PIN kodunun süresi doldu.</p>
+                    <button
+                      type="button"
+                      onClick={handleRegenerateCode}
+                      className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition"
+                    >
+                      Kodu Yenile
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // SELLER VIEW IN MEETUP_PENDING
+              <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 shadow-inner">
+                <span className="block text-xs font-bold text-indigo-700 uppercase tracking-widest mb-4">Alıcı Doğrulama Kodu</span>
+                
+                {order.verificationLockedUntil && lockCountdown > 0 ? (
+                  <div className="text-center py-4 bg-rose-50 border border-rose-100 rounded-xl">
+                    <p className="text-xs font-bold text-rose-700 uppercase tracking-wide">Doğrulama Geçici Olarak Kilitlendi</p>
+                    <p className="text-xs text-rose-500 mt-1">Lütfen {formatTime(lockCountdown)} dakika sonra tekrar deneyin.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleVerify} className="space-y-3">
+                    <p className="text-xs text-slate-500">Alıcının ekranındaki 6 haneli kodu veya QR kodu alarak doğrulayın.</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={pinCode}
+                        onChange={(e) => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
+                        className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 bg-white shadow-sm"
+                        placeholder="000000"
+                        maxLength={6}
+                        disabled={isVerifying}
+                      />
+                      <button
+                        type="submit"
+                        disabled={isVerifying || pinCode.length !== 6}
+                        className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50"
+                      >
+                        {isVerifying ? 'Doğrulanıyor...' : 'Kodu Doğrula'}
+                      </button>
+                    </div>
+                    {verifyError && <p className="text-xs text-rose-500 font-semibold">{verifyError}</p>}
+                  </form>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {order.status === 'HANDOVER_CONFIRMED' && (
+          <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 shadow-inner">
+            <span className="block text-xs font-bold text-emerald-700 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              Ürün Teslimatı Doğrulandı
+            </span>
+            <p className="text-xs text-slate-500 mb-4">
+              Ürünü elden teslim aldığınızı veya teslim ettiğinizi onaylayarak işlemi tamamlayabilirsiniz. Bu işlem havuzdaki (escrow) parayı satıcı cüzdanına aktaracaktır.
+            </p>
+
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={confirmCheckbox}
+                  onChange={(e) => setConfirmCheckbox(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20"
+                />
+                <span className="text-xs font-medium text-slate-800 leading-normal">
+                  Ürünün elden teslim edildiğini ve işlemi tamamlamak istediğimi onaylıyorum.
+                </span>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleConfirmCompletion}
+                disabled={isConfirming || !confirmCheckbox}
+                className="w-full py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-slate-900 rounded-xl hover:bg-black transition disabled:opacity-50 shadow-sm"
+              >
+                {isConfirming ? 'Tamamlanıyor...' : 'Siparişi Tamamla'}
+              </button>
+              {confirmError && <p className="text-xs text-rose-500 font-semibold mt-1">{confirmError}</p>}
+            </div>
+          </div>
+        )}
+
+        {order.status === 'COMPLETED' && (
+          <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="block text-xs font-bold text-emerald-700 uppercase tracking-wider">İşlem Tamamlandı</span>
+              <p className="text-xs text-slate-500 mt-1">
+                Elden güvenli teslimat başarıyla tamamlandı ve bakiye satıcı cüzdanına aktarıldı.
+              </p>
+              {order.completedAt && (
+                <p className="text-[10px] text-slate-400 mt-2 font-medium">
+                  {order.completedByUserName ? `Onaylayan: ${order.completedByUserName}` : 'Sistem tarafından otomatik onaylandı'}
+                  {` — ${formatDateTime(order.completedAt)}`}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const OrderDetailsModal = React.memo(
   ({
     isOpen,
@@ -264,7 +618,7 @@ const OrderDetailsModal = React.memo(
                 <h3 className={`${isSellerView ? 'text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4' : 'text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-5'}`}>
                   Tracking Progress
                 </h3>
-                <OrderProgressStepper currentStatus={selectedOrder.status} variant={stepperVariant} />
+                <OrderProgressStepper currentStatus={selectedOrder.status} deliveryMethod={selectedOrder.deliveryMethod} variant={stepperVariant} />
                 <div className={`${isSellerView ? 'text-xs text-slate-500' : 'text-xs text-slate-500 font-medium'} mt-2`}>
                   Last update: {resolveEnumLabel(enums, 'orderStatuses', lastUpdate.status) || lastUpdate.status}
                   {lastUpdate.updatedAt ? ` • ${formatDateTime(lastUpdate.updatedAt)}` : ''}
@@ -307,6 +661,14 @@ const OrderDetailsModal = React.memo(
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-4">
+                  {selectedOrder.deliveryMethod === 'SAFE_MEETUP' && (
+                    <MeetupHandoverSection
+                      order={selectedOrder}
+                      isSeller={isSellerView}
+                      onActionSuccess={onReviewSuccess}
+                    />
+                  )}
+
                   <GlassCard className={`p-6`}>
                     <div className="flex items-center justify-between mb-5">
                       <h3 className={`${isSellerView ? 'text-sm font-semibold text-slate-900 flex items-center gap-2' : 'text-xs font-semibold text-gray-900 flex items-center gap-2'}`}>

@@ -73,6 +73,10 @@ public class Listing {
     @Column(name = "neighborhood_key")
     private String neighborhoodKey;
 
+    @Column(name = "allow_meetup", nullable = false)
+    @Builder.Default
+    private boolean allowMeetup = false;
+
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

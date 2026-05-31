@@ -4,6 +4,9 @@ import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.mapper.AuditLogMapper;
 import com.serhat.secondhand.core.audit.repository.AuditLogRepository;
+import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.user.domain.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,20 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
     private final AuditLogMapper auditLogMapper;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+
+    private void sendAuditEmail(String userEmail, String subject, String content, EmailType emailType) {
+        if (userEmail == null || userEmail.isBlank()) return;
+        userRepository.findByEmail(userEmail).ifPresent(user -> {
+            try {
+                emailService.sendEmail(user, subject, content, emailType);
+                log.info("Security audit email sent successfully to {} for subject: {}", userEmail, subject);
+            } catch (Exception e) {
+                log.error("Failed to send security audit email to {}: {}", userEmail, e.getMessage());
+            }
+        });
+    }
 
     @Async("taskExecutor")
     @Transactional
@@ -39,6 +56,13 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for login: {} - {}", userEmail, success ? "SUCCESS" : "FAILURE");
+
+            // Send Security Audit Email
+            String subject = success ? "Güvenlik Uyarısı: Başarılı Giriş Yapıldı" : "Güvenlik Uyarısı: Başarısız Giriş Denemesi";
+            String content = success 
+                    ? String.format("Hesabınıza yeni bir başarılı giriş yapıldı.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nZaman: %s\n\nEğer bu işlemi siz yapmadıysanız lütfen hemen şifrenizi sıfırlayın.", ipAddress, userAgent, LocalDateTime.now())
+                    : String.format("Hesabınıza başarısız bir giriş denemesi yapıldı.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nHata: %s\nZaman: %s\n\nEğer bu işlemi siz gerçekleştirmediyseniz hesabınız güvendedir, ancak şüpheli durumlara karşı şifrenizi güncellemeyi düşünebilirsiniz.", ipAddress, userAgent, errorMessage != null ? errorMessage : "Hatalı şifre veya e-posta", LocalDateTime.now());
+            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
         } catch (Exception e) {
             log.error("Failed to save audit log for login: {}", e.getMessage());
         }
@@ -60,6 +84,11 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for Google OAuth login: {}", userEmail);
+
+            // Send Security Audit Email
+            String subject = "Güvenlik Uyarısı: Google ile Giriş Yapıldı";
+            String content = String.format("Hesabınıza Google hesabınız kullanılarak başarılı bir giriş yapıldı.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nZaman: %s\n\nEğer bu işlemi siz yapmadıysanız lütfen Google yetkilendirmelerinizi kontrol edin.", ipAddress, userAgent, LocalDateTime.now());
+            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
         } catch (Exception e) {
             log.error("Failed to save audit log for Google OAuth login: {}", e.getMessage());
         }
@@ -81,6 +110,11 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for logout: {}", userEmail);
+
+            // Send Security Audit Email
+            String subject = "Güvenlik Bildirimi: Başarılı Çıkış Yapıldı";
+            String content = String.format("Hesabınızdan güvenli bir şekilde çıkış yapıldı.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nZaman: %s", ipAddress, userAgent, LocalDateTime.now());
+            sendAuditEmail(userEmail, subject, content, EmailType.SYSTEM);
         } catch (Exception e) {
             log.error("Failed to save audit log for logout: {}", e.getMessage());
         }
@@ -103,6 +137,13 @@ public class AuditLogService {
 
             auditLogRepository.save(auditLog);
             log.info("Audit log saved for password change: {} - {}", userEmail, success ? "SUCCESS" : "FAILURE");
+
+            // Send Security Audit Email
+            String subject = success ? "Güvenlik Uyarısı: Şifreniz Değiştirildi" : "Güvenlik Uyarısı: Başarısız Şifre Değiştirme Denemesi";
+            String content = success
+                    ? String.format("Hesabınızın şifresi başarıyla değiştirildi.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nZaman: %s\n\nEğer bu işlemi siz yapmadıysanız lütfen hemen şifrenizi sıfırlayın veya destek ekibimizle iletişime geçin.", ipAddress, userAgent, LocalDateTime.now())
+                    : String.format("Hesabınızın şifresini değiştirmek için başarısız bir deneme gerçekleştirildi.\n\nDetaylar:\nIP Adresi: %s\nTarayıcı (User-Agent): %s\nHata: %s\nZaman: %s", ipAddress, userAgent, errorMessage != null ? errorMessage : "Hatalı mevcut şifre", LocalDateTime.now());
+            sendAuditEmail(userEmail, subject, content, EmailType.PASSWORD_RESET);
         } catch (Exception e) {
             log.error("Failed to save audit log for password change: {}", e.getMessage());
         }

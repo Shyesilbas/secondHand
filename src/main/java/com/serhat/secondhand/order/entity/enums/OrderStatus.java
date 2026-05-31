@@ -14,7 +14,10 @@ public enum OrderStatus {
     DELIVERED("Delivered"),
     COMPLETED("Completed"),
     CANCELLED("Cancelled"),
-    REFUNDED("Refunded");
+    REFUNDED("Refunded"),
+    MEETUP_PENDING("Meetup Pending"),
+    HANDOVER_CONFIRMED("Handover Confirmed"),
+    VERIFICATION_LOCKED("Verification Locked");
 
     private final String displayName;
 
@@ -26,7 +29,7 @@ public enum OrderStatus {
      * Statuses in which an order can be cancelled by the buyer.
      */
     public static final Set<OrderStatus> CANCELLABLE_STATUSES =
-            EnumSet.of(PENDING, CONFIRMED);
+            EnumSet.of(PENDING, CONFIRMED, MEETUP_PENDING);
 
     /**
      * Statuses in which an order can be refunded by the buyer.
@@ -44,7 +47,7 @@ public enum OrderStatus {
      * Statuses in which an order can be completed (buyer confirms receipt).
      */
     public static final Set<OrderStatus> COMPLETABLE_STATUSES =
-            EnumSet.of(DELIVERED);
+            EnumSet.of(DELIVERED, HANDOVER_CONFIRMED);
 
     public boolean isCancellable() {
         return CANCELLABLE_STATUSES.contains(this);

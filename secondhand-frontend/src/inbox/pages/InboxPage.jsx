@@ -10,8 +10,8 @@ const InboxPage = () => {
   const activeTab = useMemo(() => normalizeInboxTab(searchParams.get('tab')), [searchParams]);
 
   return (
-    <div className="min-h-screen bg-slate-50/90">
-      <div className="mx-auto max-w-[min(100%,1420px)] px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+    <div className="flex flex-col w-full h-[calc(100vh-70px)] bg-slate-50/90 overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-0 mx-auto w-full max-w-[min(100%,1420px)] p-4 sm:p-6 lg:p-8">
         {activeTab === INBOX_TABS.EMAILS && <EmailsPage embedded />}
         {activeTab === INBOX_TABS.NOTIFICATIONS && <InboxNotificationsPanel />}
         {activeTab === INBOX_TABS.CHAT && <ChatPage embedded />}

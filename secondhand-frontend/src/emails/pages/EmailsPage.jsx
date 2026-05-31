@@ -60,8 +60,37 @@ const EmailsPageFeedback = ({ error, emails, filterType }) => {
 
 const getEmailMatchesFilter = (email, filterType) => {
     if (filterType === EMAIL_FILTERS.ALL) return true;
-    if (filterType === EMAIL_FILTERS.OFFER) return String(email?.emailType || '').startsWith('OFFER_');
-    if (filterType === EMAIL_FILTERS.SECURITY) return [EMAIL_TYPES.VERIFICATION_CODE, EMAIL_TYPES.PASSWORD_RESET].includes(email?.emailType);
+
+    const isSecurity = [
+        EMAIL_TYPES.VERIFICATION_CODE,
+        EMAIL_TYPES.PASSWORD_RESET,
+        EMAIL_TYPES.WELCOME
+    ].includes(email?.emailType) || (email?.subject && (email.subject.includes('Güvenlik') || email.subject.includes('Security')));
+
+    if (filterType === EMAIL_FILTERS.ACCOUNT_SECURITY) {
+        return isSecurity;
+    }
+    if (filterType === EMAIL_FILTERS.SYSTEM_NOTIFICATIONS) {
+        if (isSecurity) return false;
+        return [
+            EMAIL_TYPES.NOTIFICATION,
+            'NEW_LISTING_NOTIFICATION',
+            'GREAT_SELLER_ACHIEVEMENT',
+            EMAIL_TYPES.SYSTEM
+        ].includes(email?.emailType);
+    }
+    if (filterType === EMAIL_FILTERS.LEGAL) {
+        return email?.emailType === EMAIL_TYPES.AGREEMENT_UPDATED;
+    }
+    if (filterType === EMAIL_FILTERS.OFFERS) {
+        return String(email?.emailType || '').startsWith('OFFER_');
+    }
+    if (filterType === EMAIL_FILTERS.PAYMENTS) {
+        return email?.emailType === EMAIL_TYPES.PAYMENT_VERIFICATION;
+    }
+    if (filterType === EMAIL_FILTERS.PROMOTIONS) {
+        return email?.emailType === EMAIL_TYPES.PROMOTIONAL;
+    }
     return email?.emailType === filterType;
 };
 
@@ -163,12 +192,13 @@ const EmailsPage = ({ embedded = false }) => {
     );
 
     const folderItems = useMemo(() => ([
-        { id: EMAIL_FILTERS.ALL, label: 'Inbox', icon: MailOpen },
-        { id: EMAIL_FILTERS.OFFER, label: 'Offers', icon: Tag },
-        { id: EMAIL_FILTERS.SECURITY, label: 'Security', icon: Shield },
-        { id: EMAIL_TYPES.PAYMENT_VERIFICATION, label: 'Payments', icon: CreditCard },
-        { id: EMAIL_TYPES.NOTIFICATION, label: 'Notifications', icon: Bell },
-        { id: EMAIL_TYPES.PROMOTIONAL, label: 'Promotions', icon: Megaphone },
+        { id: EMAIL_FILTERS.ALL, label: 'Tüm E-postalar', icon: MailOpen },
+        { id: EMAIL_FILTERS.ACCOUNT_SECURITY, label: 'Hesap & Güvenlik', icon: Shield },
+        { id: EMAIL_FILTERS.OFFERS, label: 'Teklifler', icon: Tag },
+        { id: EMAIL_FILTERS.PAYMENTS, label: 'Ödemeler', icon: CreditCard },
+        { id: EMAIL_FILTERS.SYSTEM_NOTIFICATIONS, label: 'Sistem & Bildirimler', icon: Bell },
+        { id: EMAIL_FILTERS.LEGAL, label: 'Sözleşme & Yasal', icon: MailOpen },
+        { id: EMAIL_FILTERS.PROMOTIONS, label: 'Tanıtımlar & Kampanyalar', icon: Megaphone },
     ]), []);
 
     const counts = useMemo(() => {
@@ -215,8 +245,8 @@ const EmailsPage = ({ embedded = false }) => {
     }
 
     return (
-        <div className={embedded ? 'min-h-0 bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden h-[clamp(480px,min(88vh,920px))]' : 'min-h-0 h-[min(100dvh,100vh)] flex flex-col bg-white overflow-hidden'}>
-            
+        <div className={embedded ? 'min-h-0 h-full w-full bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden' : 'min-h-0 h-[min(100dvh,100vh)] flex flex-col bg-white overflow-hidden'}>
+
             {/* Outlook tarzı üst şerit: arama ortada, aksiyonlar sağda */}
             <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#edebe9] bg-[#f3f2f1] px-3 sm:px-4">
                 <div className="flex min-w-0 items-center gap-2 sm:gap-3">

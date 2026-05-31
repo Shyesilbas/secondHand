@@ -14,6 +14,9 @@ export const getOrderStatusBadgeClass = (status) => {
   if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
   if (s === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'bg-amber-50 text-amber-900 border-amber-200';
   if (s === ORDER_STATUSES.FAILED) return 'bg-rose-50 text-rose-900 border-rose-300';
+  if (s === ORDER_STATUSES.MEETUP_PENDING) return 'bg-indigo-50 text-indigo-800 border-indigo-200';
+  if (s === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-violet-50 text-violet-800 border-violet-200';
+  if (s === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-50 text-purple-900 border-purple-300';
   return 'bg-slate-50 text-slate-700 border-slate-200';
 };
 
@@ -27,6 +30,9 @@ export const getOrderStatusTextClass = (status) => {
   if (value === ORDER_STATUSES.PROCESSING) return 'text-amber-600';
   if (value === ORDER_STATUSES.CONFIRMED) return 'text-green-600';
   if (value === ORDER_STATUSES.PENDING) return 'text-slate-600';
+  if (value === ORDER_STATUSES.MEETUP_PENDING) return 'text-indigo-600';
+  if (value === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'text-violet-600';
+  if (value === ORDER_STATUSES.VERIFICATION_LOCKED) return 'text-purple-600';
 
   if (value === ORDER_STATUSES.PAID) return 'text-emerald-600';
   if (value === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-600';
@@ -43,6 +49,9 @@ export const getOrderStatusIndicatorClass = (status) => {
   if (status === ORDER_STATUSES.SHIPPED) return 'bg-indigo-500';
   if (status === ORDER_STATUSES.PROCESSING) return 'bg-amber-500';
   if (status === ORDER_STATUSES.CONFIRMED) return 'bg-green-500';
+  if (status === ORDER_STATUSES.MEETUP_PENDING) return 'bg-indigo-500';
+  if (status === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-violet-500';
+  if (status === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-500';
   return 'bg-gray-400';
 };
 

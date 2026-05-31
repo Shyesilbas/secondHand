@@ -175,6 +175,30 @@ const ListingBasics = ({
               <FieldError error={errors.quantity} />
             </div>
           )}
+
+          <div className="md:col-span-2 mt-4 pt-4 border-t border-zinc-100">
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="allowMeetup"
+                checked={Boolean(formData.allowMeetup)}
+                onChange={(e) => onInputChange({ target: { name: 'allowMeetup', checked: e.target.checked, type: 'checkbox' } })}
+                className="mt-1 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+              />
+              <div>
+                <span className="block text-[13px] font-medium text-zinc-900">
+                  Sadece kendi şehrimde elden teslimat yapmayı onaylıyorum.
+                </span>
+                <span className="block text-xs text-zinc-500">
+                  Alıcıyla güvenli buluşma noktasında buluşarak ürünü elden teslim etme seçeneğini aktif hale getirir.
+                </span>
+                <span className="block text-xs text-indigo-600/95 mt-1.5 font-medium bg-indigo-50/60 rounded-xl p-2.5 border border-indigo-100/50 shadow-sm max-w-lg leading-relaxed">
+                  ℹ️ Bu alanı işaretlediğinizde, ürününüz sipariş edilirse telefon numaranız alıcıya, alıcının telefon numarası ise size gösterilir.
+                </span>
+              </div>
+            </label>
+            <FieldError error={errors.allowMeetup} />
+          </div>
         </div>
       </SectionCard>
     </div>

@@ -1,7 +1,5 @@
 package com.serhat.secondhand.order.application;
 
-import com.serhat.secondhand.payment.entity.PaymentStatus;
-
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -12,6 +10,8 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.shipping.entity.Shipping;
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,15 +57,17 @@ public class OrderCreationService {
         String couponCode = pricing != null ? pricing.getCouponCode() : null;
         String orderNumber = generateOrderNumber();
 
-        Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request.getNotes(), request.getName());
+        Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request);
         order.setSubtotal(subtotal);
         order.setCampaignDiscount(campaignDiscount);
         order.setCouponCode(couponCode);
         order.setCouponDiscount(couponDiscount);
         order.setDiscountTotal(discountTotal);
 
-        Shipping shipping = buildShipping(order);
-        order.setShipping(shipping);
+        if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP) {
+            Shipping shipping = buildShipping(order);
+            order.setShipping(shipping);
+        }
 
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
         Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
@@ -186,17 +187,26 @@ public class OrderCreationService {
     }
 
     private Order buildOrder(User user, Address shippingAddress, Address billingAddress,
-                             BigDecimal totalAmount, String orderNumber, String notes, String name) {
-        return Order.builder()
+                             BigDecimal totalAmount, String orderNumber, CheckoutRequest request) {
+        DeliveryMethod deliveryMethod = request.getDeliveryMethod() != null ? request.getDeliveryMethod() : DeliveryMethod.CARGO;
+        Order order = Order.builder()
                 .orderNumber(orderNumber)
-                .name(name)
+                .name(request.getName())
                 .user(user)
                 .totalAmount(totalAmount)
                 .currency(Currency.TRY)
                 .shippingAddress(shippingAddress)
                 .billingAddress(billingAddress)
-                .notes(notes)
+                .notes(request.getNotes())
+                .deliveryMethod(deliveryMethod)
+                .meetupLocation(request.getMeetupLocation())
                 .build();
+        
+        if (deliveryMethod == DeliveryMethod.SAFE_MEETUP) {
+            order.setStatus(OrderStatus.MEETUP_PENDING);
+            order.generateVerificationCode();
+        }
+        return order;
     }
 
     private Shipping buildShipping(Order order) {

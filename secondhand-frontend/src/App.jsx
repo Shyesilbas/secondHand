@@ -8,6 +8,7 @@ import {CompareFloatingBar, CompareModal, ComparisonProvider} from './comparison
 import {ReservationModalProvider} from './cart/context/ReservationModalContext.jsx';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
+import { SafeMeetupOnboardingModal } from './order/components/shared/SafeMeetupOnboardingModal.jsx';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -36,6 +37,7 @@ function App() {
                                             <AppRoutes />
                                             <CompareFloatingBar />
                                             <CompareModal />
+                                            <SafeMeetupOnboardingModal />
                                         </div>
                                         </ReservationModalProvider>
                                     </ComparisonProvider>

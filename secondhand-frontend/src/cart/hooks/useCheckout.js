@@ -45,6 +45,8 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const [paymentVerificationExpiresAtMs, setPaymentVerificationExpiresAtMs] = useState(null);
     const [notes, setNotes] = useState('');
     const [orderName, setOrderName] = useState('');
+    const [deliveryMethod, setDeliveryMethod] = useState('CARGO');
+    const [meetupLocation, setMeetupLocation] = useState('');
 
     const findAddressById = (id) => {
         if (!id || !Array.isArray(addresses)) return null;
@@ -176,7 +178,9 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 agreementsAccepted: true,
                 acceptedAgreementIds: getAcceptedAgreementIds(),
                 couponCode: String(couponCode || '').trim() || null,
-                offerId: offerId || null
+                offerId: offerId || null,
+                deliveryMethod: deliveryMethod,
+                meetupLocation: deliveryMethod === 'SAFE_MEETUP' ? meetupLocation : null
             };
 
             logger.debug('Checkout payload prepared:', payload);
@@ -236,7 +240,9 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 agreementsAccepted: true,
                 acceptedAgreementIds: getAcceptedAgreementIds(),
                 couponCode: String(couponCode || '').trim() || null,
-                offerId: offerId || null
+                offerId: offerId || null,
+                deliveryMethod: deliveryMethod,
+                meetupLocation: deliveryMethod === 'SAFE_MEETUP' ? meetupLocation : null
             };
             const checkoutResult = await orderService.checkout(payload);
             await clearCart();
@@ -277,6 +283,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         setNotes,
         orderName,
         setOrderName,
+        deliveryMethod,
+        setDeliveryMethod,
+        meetupLocation,
+        setMeetupLocation,
 
         handleCheckout,
         proceedDisabled,

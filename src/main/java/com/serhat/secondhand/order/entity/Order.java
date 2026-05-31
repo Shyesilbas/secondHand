@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.shipping.entity.Shipping;
@@ -125,6 +126,37 @@ public class Order {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_method", nullable = false)
+    @Builder.Default
+    private DeliveryMethod deliveryMethod = DeliveryMethod.CARGO;
+
+    @Column(name = "meetup_location")
+    private String meetupLocation;
+
+    @Column(name = "meetup_verification_code_hash", length = 64)
+    private String meetupVerificationCodeHash;
+
+    @Column(name = "verification_attempts")
+    @Builder.Default
+    private int verificationAttempts = 0;
+
+    @Column(name = "verification_locked_until")
+    private LocalDateTime verificationLockedUntil;
+
+    @Column(name = "meetup_verified_at")
+    private LocalDateTime meetupVerifiedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "completed_by_user_id")
+    private User completedByUser;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    @Column(name = "meetup_verification_code", length = 10)
+    private String meetupVerificationCode;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
@@ -265,6 +297,31 @@ public class Order {
             this.paymentStatus = PaymentStatus.REFUNDED;
         } else {
             this.paymentStatus = PaymentStatus.PARTIALLY_REFUNDED;
+        }
+    }
+
+    public void generateVerificationCode() {
+        String raw = String.format("%06d", new java.util.Random().nextInt(1000000));
+        this.meetupVerificationCode = raw;
+        this.meetupVerificationCodeHash = hashSha256(raw);
+        this.verificationAttempts = 0;
+        this.verificationLockedUntil = null;
+    }
+
+    public static String hashSha256(String raw) {
+        if (raw == null) return null;
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(raw.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 }

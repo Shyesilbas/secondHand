@@ -5,7 +5,7 @@ export const useActiveReservationCount = (listingId) => {
     const { data, isLoading, error } = useQuery({
         queryKey: ['cart', 'reservations', 'count', listingId],
         queryFn: async () => {
-            const response = await apiClient.get(`/cart/reservations/count/${listingId}`);
+            const response = await apiClient.get(`/v1/cart/reservations/count/${listingId}`);
             return response.data.count || 0;
         },
         enabled: Boolean(listingId),

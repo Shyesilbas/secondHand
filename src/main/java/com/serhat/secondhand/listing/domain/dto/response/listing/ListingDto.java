@@ -61,6 +61,7 @@ public abstract class ListingDto {
     private String districtKey;
     private String neighborhoodKey;
     private String imageUrl;
+    private boolean allowMeetup;
     private String sellerName;
     private String sellerSurname;
     private Long sellerId;

@@ -103,7 +103,8 @@ const formatRelativeTime = (iso) => {
 };
 
 /**
- * Tek bildirim — Mailbox satırıyla uyumlu: sol accent, ikon, başlık + özet, sağ zaman.
+ * Premium Notification Item — Elegant design matching the brand new list systems:
+ * uses dynamic indicator dots, custom rounded boxes, and scale hovers.
  */
 const NotificationItem = ({ notification, onMarkAsRead }) => {
   const navigate = useNavigate();
@@ -122,52 +123,73 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
       ? notification.metadata.preview
       : null);
 
+  // Dynamic style category color for the icon background
+  const getIconTheme = () => {
+    const type = notification.type;
+    if (type?.startsWith('OFFER_')) {
+      return unread
+        ? 'bg-amber-50 border-amber-100 text-amber-600 shadow-amber-100/30'
+        : 'bg-slate-50 border-slate-100 text-amber-500/80';
+    }
+    if (type?.startsWith('ORDER_') || type === 'PAYMENT_SUCCESS') {
+      return unread
+        ? 'bg-emerald-50 border-emerald-100 text-emerald-600 shadow-emerald-100/30'
+        : 'bg-slate-50 border-slate-100 text-emerald-500/80';
+    }
+    if (type === 'PAYMENT_FAILED' || type === 'ORDER_CANCELLED') {
+      return unread
+        ? 'bg-rose-50 border-rose-100 text-rose-600 shadow-rose-100/30'
+        : 'bg-slate-50 border-slate-100 text-rose-500/80';
+    }
+    return unread
+      ? 'bg-indigo-50 border-indigo-100 text-indigo-600 shadow-indigo-100/30'
+      : 'bg-slate-50 border-slate-100 text-indigo-500/80';
+  };
+
   return (
     <button
       type="button"
       onClick={handleClick}
-      className="group relative flex w-full items-start gap-3 border-b px-3 py-3 text-left transition sm:gap-4 sm:px-4 sm:py-3.5"
-      style={{
-        borderColor: MS_BORDER,
-        backgroundColor: unread ? '#f5f9fc' : '#ffffff',
-      }}
+      className={`group relative flex w-full items-start gap-4 p-4 text-left transition-all duration-300 border-b border-slate-100/80 focus:outline-none focus-visible:bg-slate-50 ${
+        unread 
+          ? 'bg-gradient-to-r from-indigo-50/[0.15] to-transparent hover:from-indigo-50/[0.25]' 
+          : 'bg-white hover:bg-slate-50/50'
+      }`}
     >
-      {/* Okunmamış sol accent */}
-      <span
-        className="absolute left-0 top-0 h-full w-1 rounded-none"
-        style={{ backgroundColor: unread ? MS_ACCENT : 'transparent' }}
-        aria-hidden
-      />
+      {/* Unread Indicator dot */}
+      {unread && (
+        <span
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.7)] animate-pulse"
+          aria-hidden
+        />
+      )}
 
+      {/* Styled Icon wrapper */}
       <div
-        className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11"
-        style={{
-          backgroundColor: unread ? `${MS_ACCENT}14` : '#f3f2f1',
-          color: unread ? MS_ACCENT : '#605e5c',
-        }}
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border transition-all duration-300 shadow-sm ${getIconTheme()} group-hover:scale-105`}
       >
-        <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+        <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
       </div>
 
-      <div className="min-w-0 flex-1 pt-0.5">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+      <div className="min-w-0 flex-1 pt-0.5 pl-1.5">
+        <div className="flex items-baseline justify-between gap-3">
           <p
-            className={`min-w-0 truncate text-sm ${unread ? 'font-semibold text-[#323130]' : 'font-medium text-[#605e5c]'}`}
+            className={`min-w-0 truncate text-[13px] sm:text-[14px] leading-snug tracking-tight ${unread ? 'font-bold text-slate-800' : 'font-semibold text-slate-500'}`}
             title={notification.title}
           >
             {notification.title}
           </p>
-          <span className="ml-auto shrink-0 whitespace-nowrap text-xs text-[#605e5c]">
+          <span className="shrink-0 whitespace-nowrap text-xs font-semibold text-slate-400 tabular-nums">
             {formatRelativeTime(notification.createdAt)}
           </span>
         </div>
         {preview && (
-          <p className="mt-0.5 line-clamp-2 text-sm leading-snug text-[#605e5c]">{preview}</p>
+          <p className="mt-1 line-clamp-2 text-[12px] sm:text-[13px] leading-relaxed text-slate-400 font-medium">{preview}</p>
         )}
       </div>
 
       <ChevronRight
-        className="mt-1.5 h-4 w-4 shrink-0 text-[#c7c7c7] opacity-0 transition group-hover:opacity-100 sm:opacity-70"
+        className="mt-2 h-4.5 w-4.5 shrink-0 text-slate-300 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0.5"
         aria-hidden
       />
     </button>

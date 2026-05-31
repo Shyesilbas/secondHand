@@ -73,6 +73,10 @@ export const API_ENDPOINTS = {
         UPDATE_ORDER_ADDRESS: (id) => `/v1/orders/${id}/address`,
         UPDATE_ORDER_NOTES: (id) => `/v1/orders/${id}/notes`,
         SHIP_ORDER: (id) => `/v1/orders/${id}/ship`,
+        VERIFY_MEETUP: (orderNumber, code) => `/v1/orders/${orderNumber}/verify-meetup?code=${encodeURIComponent(code)}`,
+        CONFIRM_HANDOVER: (orderNumber) => `/v1/orders/${orderNumber}/confirm-handover-completion`,
+        GET_MEETUP_QR: (orderNumber) => `/v1/orders/${orderNumber}/qr-code`,
+        REGENERATE_MEETUP_CODE: (orderNumber) => `/v1/orders/${orderNumber}/regenerate-meetup-code`,
     },
     DASHBOARD: {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard

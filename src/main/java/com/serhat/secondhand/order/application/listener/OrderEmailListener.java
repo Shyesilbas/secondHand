@@ -12,6 +12,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.user.application.IUserService;
@@ -179,7 +180,14 @@ public class OrderEmailListener {
         sb.append(cfg.getCustomerPaymentStatusLabel()).append(": **").append(order.getPaymentStatus()).append("**\n");
         sb.append(cfg.getCustomerTotalLabel()).append(": **").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("**\n");
 
-        if (order.getShippingAddress() != null) {
+        if (order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
+            sb.append("\n**Teslimat Yöntemi**: Güvenli Elden Teslimat (Safe Meetup)\n");
+            sb.append("**Buluşma Noktası**: 📍 ").append(order.getMeetupLocation() != null ? order.getMeetupLocation() : "Belirtilmemiş").append("\n");
+            if (order.getMeetupVerificationCode() != null) {
+                sb.append("**Güvenli Teslimat Doğrulama Kodunuz**: **").append(order.getMeetupVerificationCode()).append("**\n");
+            }
+            sb.append("\n*Önemli Not: Buluşma noktasına vardığınızda, satıcıya bu doğrulama kodunu veya mobil uygulamadan sipariş sayfanızdaki QR kodunu göstermeniz gerekmektedir. Buluşma için 4 iş günü süreniz vardır.*\n");
+        } else if (order.getShippingAddress() != null) {
             sb.append("\n**").append(cfg.getCustomerShippingAddressLabel()).append("**:\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')
@@ -236,7 +244,11 @@ public class OrderEmailListener {
             )).append('\n');
         });
 
-        if (order.getShippingAddress() != null) {
+        if (order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
+            sb.append("\n**Teslimat Yöntemi**: Güvenli Elden Teslimat (Safe Meetup)\n");
+            sb.append("**Buluşma Noktası**: 📍 ").append(order.getMeetupLocation() != null ? order.getMeetupLocation() : "Belirtilmemiş").append("\n");
+            sb.append("\n*Önemli Not: Alıcı ile buluştuğunuzda, alıcının sipariş sayfasından size göstereceği 6 haneli doğrulama kodunu sisteme girerek satışı onaylamanız gerekmektedir. Buluşma için 4 iş günü süreniz vardır.*\n");
+        } else if (order.getShippingAddress() != null) {
             sb.append("\n**").append(cfg.getSellerShippingAddressLabel()).append("**:\n");
             sb.append(order.getShippingAddress().getAddressLine()).append('\n');
             sb.append(order.getShippingAddress().getCity()).append(' ')

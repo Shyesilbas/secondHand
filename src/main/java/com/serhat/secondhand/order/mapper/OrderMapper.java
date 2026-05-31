@@ -35,6 +35,16 @@ public class OrderMapper {
             return null;
         }
 
+        String sellerPhone = null;
+        String sellerFullName = null;
+        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+            OrderItem firstItem = order.getOrderItems().get(0);
+            if (firstItem.getSeller() != null) {
+                sellerPhone = firstItem.getSeller().getPhoneNumber();
+                sellerFullName = firstItem.getSeller().getName() + " " + firstItem.getSeller().getSurname();
+            }
+        }
+
         return OrderDto.builder()
                 .id(order.getId())
                 .orderNumber(order.getOrderNumber())
@@ -64,6 +74,18 @@ public class OrderMapper {
                         cancelReasons, cancelReasonTexts, 
                         refundReasons, refundReasonTexts))
                 .shipping(shippingMapper.toDto(order.getShipping()))
+                .deliveryMethod(order.getDeliveryMethod())
+                .meetupLocation(order.getMeetupLocation())
+                .verificationAttempts(order.getVerificationAttempts())
+                .verificationLockedUntil(order.getVerificationLockedUntil())
+                .meetupVerifiedAt(order.getMeetupVerifiedAt())
+                .meetupVerificationCode(order.getMeetupVerificationCode())
+                .completedAt(order.getCompletedAt())
+                .completedByUserId(order.getCompletedByUser() != null ? order.getCompletedByUser().getId() : null)
+                .completedByUserName(order.getCompletedByUser() != null ? (order.getCompletedByUser().getName() != null ? order.getCompletedByUser().getName() + " " + (order.getCompletedByUser().getSurname() != null ? order.getCompletedByUser().getSurname() : "") : order.getCompletedByUser().getEmail()) : null)
+                .buyerPhone(order.getUser().getPhoneNumber())
+                .sellerPhone(sellerPhone)
+                .sellerFullName(sellerFullName)
                 .build();
     }
 

@@ -32,4 +32,7 @@ public class CheckoutRequest {
     private String couponCode;
 
     private UUID offerId;
+
+    private com.serhat.secondhand.order.entity.enums.DeliveryMethod deliveryMethod;
+    private String meetupLocation;
 }

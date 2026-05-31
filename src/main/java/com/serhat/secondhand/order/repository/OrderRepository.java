@@ -19,6 +19,11 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    Optional<Order> findByOrderNumber(String orderNumber);
+
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.orderItems oi LEFT JOIN FETCH oi.seller LEFT JOIN FETCH o.user WHERE o.orderNumber = :orderNumber")
+    Optional<Order> findByOrderNumberWithItemsAndSellers(@Param("orderNumber") String orderNumber);
+
     long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
     @Query("SELECT DISTINCT o FROM Order o " +
            "WHERE o.user.id = :userId")

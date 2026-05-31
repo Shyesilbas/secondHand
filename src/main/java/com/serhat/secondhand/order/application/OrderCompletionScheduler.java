@@ -102,6 +102,56 @@ public class OrderCompletionScheduler {
             }
         }
 
+        List<Order> handoverConfirmedOrders = orderRepository.findByStatusWithShipping(OrderStatus.HANDOVER_CONFIRMED);
+        for (Order order : handoverConfirmedOrders) {
+            if (order.getDeliveryMethod() == com.serhat.secondhand.order.entity.enums.DeliveryMethod.SAFE_MEETUP && order.getMeetupVerifiedAt() != null) {
+                Duration duration = Duration.between(order.getMeetupVerifiedAt(), now);
+                if (duration.toHours() >= 24) {
+                    OrderStatus oldStatus = order.getStatus();
+
+                    // Release escrows first
+                    var orchestratorResult = escrowService.release(order);
+                    if (orchestratorResult.isError()) {
+                        continue;
+                    }
+
+                    order.applyCompletion();
+                    order.setCompletedByUser(null);
+                    order.setCompletedAt(now);
+                    Order savedOrder = orderRepository.save(order);
+
+                    eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, savedOrder.getUser(), true));
+                    eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.COMPLETED.name()));
+                    updatedCount++;
+                    orderLog.logOrderCompleted(savedOrder.getOrderNumber(), true);
+                }
+            }
+        }
+
+        List<Order> pendingMeetupOrders = orderRepository.findByStatusWithShipping(OrderStatus.MEETUP_PENDING);
+        for (Order order : pendingMeetupOrders) {
+            if (order.getDeliveryMethod() == com.serhat.secondhand.order.entity.enums.DeliveryMethod.SAFE_MEETUP) {
+                Duration duration = Duration.between(order.getCreatedAt(), now);
+                if (duration.toDays() >= 7) {
+                    OrderStatus oldStatus = order.getStatus();
+
+                    // Release/Refund escrow back to the buyer
+                    var orchestratorResult = escrowService.cancel(order, order.getOrderItems());
+                    if (orchestratorResult.isError()) {
+                        continue;
+                    }
+
+                    order.setStatus(OrderStatus.CANCELLED);
+                    order.setPaymentStatus(com.serhat.secondhand.payment.entity.PaymentStatus.REFUNDED);
+                    Order savedOrder = orderRepository.save(order);
+
+                    eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.CANCELLED.name()));
+                    updatedCount++;
+                    orderLog.logOrderCancelled(savedOrder.getOrderNumber(), false, "SYSTEM");
+                }
+            }
+        }
+
         orderLog.logSchedulerCompleted(updatedCount);
     }
 

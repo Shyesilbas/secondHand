@@ -12,6 +12,7 @@ import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
@@ -134,7 +135,11 @@ public class CheckoutOrchestrator {
             order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         }
         order.setPaymentStatus(allSuccessful ? PaymentStatus.COMPLETED : PaymentStatus.FAILED);
-        order.setStatus(allSuccessful ? OrderStatus.CONFIRMED : OrderStatus.CANCELLED);
+        if (allSuccessful) {
+            order.setStatus(order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP ? OrderStatus.MEETUP_PENDING : OrderStatus.CONFIRMED);
+        } else {
+            order.setStatus(OrderStatus.CANCELLED);
+        }
         order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
         if (allSuccessful && order.getShipping() != null) {
             order.getShipping().setStatus(ShippingStatus.PENDING);

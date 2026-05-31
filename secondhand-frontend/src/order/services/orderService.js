@@ -69,6 +69,15 @@ export const orderService = {
   shipOrder: async (id, payload) => {
     return put(API_ENDPOINTS.ORDERS.SHIP_ORDER(id), payload);
   },
+  verifyMeetupCode: async (orderNumber, code) => {
+    return post(API_ENDPOINTS.ORDERS.VERIFY_MEETUP(orderNumber, code));
+  },
+  confirmHandoverCompletion: async (orderNumber, confirmed) => {
+    return post(API_ENDPOINTS.ORDERS.CONFIRM_HANDOVER(orderNumber), { confirmed });
+  },
+  regenerateMeetupCode: async (orderNumber) => {
+    return post(API_ENDPOINTS.ORDERS.REGENERATE_MEETUP_CODE(orderNumber));
+  },
 };
 
 

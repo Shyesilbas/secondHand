@@ -8,6 +8,8 @@ import {
   Package2,
   Timer,
   Truck,
+  MapPin,
+  Handshake,
 } from 'lucide-react';
 import { ORDER_STATUSES, ORDER_TIME } from '../../constants/orderUiConstants.js';
 
@@ -73,18 +75,30 @@ const DeliveryCountdown = ({ deliveredAt }) => {
   );
 };
 
-const OrderProgressStepper = ({ currentStatus, variant = 'compact' }) => {
-  const steps = [
-    { key: ORDER_STATUSES.PENDING, label: 'Placed', icon: Clock },
-    { key: ORDER_STATUSES.CONFIRMED, label: 'Confirmed', icon: CheckCircle2 },
-    { key: ORDER_STATUSES.PROCESSING, label: 'Preparing', icon: Package2 },
-    { key: ORDER_STATUSES.SHIPPED, label: 'On Way', icon: Truck },
-    { key: ORDER_STATUSES.DELIVERED, label: 'Delivered', icon: Home },
-    { key: ORDER_STATUSES.COMPLETED, label: 'Finalized', icon: Check },
-  ];
+const OrderProgressStepper = ({ currentStatus, deliveryMethod, variant = 'compact' }) => {
+  const isMeetup = deliveryMethod === 'SAFE_MEETUP';
+  const steps = isMeetup
+    ? [
+        { key: ORDER_STATUSES.PENDING, label: 'Placed', icon: Clock },
+        { key: ORDER_STATUSES.MEETUP_PENDING, label: 'Meetup Pending', icon: MapPin },
+        { key: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Handover Confirmed', icon: Handshake },
+        { key: ORDER_STATUSES.COMPLETED, label: 'Finalized', icon: Check },
+      ]
+    : [
+        { key: ORDER_STATUSES.PENDING, label: 'Placed', icon: Clock },
+        { key: ORDER_STATUSES.CONFIRMED, label: 'Confirmed', icon: CheckCircle2 },
+        { key: ORDER_STATUSES.PROCESSING, label: 'Preparing', icon: Package2 },
+        { key: ORDER_STATUSES.SHIPPED, label: 'On Way', icon: Truck },
+        { key: ORDER_STATUSES.DELIVERED, label: 'Delivered', icon: Home },
+        { key: ORDER_STATUSES.COMPLETED, label: 'Finalized', icon: Check },
+      ];
 
   const currentIndex = steps.findIndex((s) => s.key === currentStatus);
-  const isFailed = currentStatus === ORDER_STATUSES.CANCELLED || currentStatus === ORDER_STATUSES.REFUNDED;
+  const isFailed =
+    currentStatus === ORDER_STATUSES.CANCELLED ||
+    currentStatus === ORDER_STATUSES.REFUNDED ||
+    currentStatus === ORDER_STATUSES.FAILED ||
+    currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
 
   if (variant === 'wide') {
     return (

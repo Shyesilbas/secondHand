@@ -48,6 +48,21 @@ public class OrderDto {
     private List<OrderItemDto> orderItems;
     private ShippingDto shipping;
 
+    private com.serhat.secondhand.order.entity.enums.DeliveryMethod deliveryMethod;
+    private String meetupLocation;
+    private String meetupVerificationCode;
+    private int verificationAttempts;
+    private LocalDateTime verificationLockedUntil;
+    private LocalDateTime meetupVerifiedAt;
+
     /** Populated only in seller view (getSellerOrders / getSellerOrderById). Null in buyer view. */
     private BigDecimal escrowAmount;
+
+    private LocalDateTime completedAt;
+    private Long completedByUserId;
+    private String completedByUserName;
+
+    private String buyerPhone;
+    private String sellerPhone;
+    private String sellerFullName;
 }

@@ -304,6 +304,10 @@ const CheckoutPage = () => {
               setNotes={checkout.setNotes}
               orderName={checkout.orderName}
               setOrderName={checkout.setOrderName}
+              deliveryMethod={checkout.deliveryMethod}
+              setDeliveryMethod={checkout.setDeliveryMethod}
+              meetupLocation={checkout.meetupLocation}
+              setMeetupLocation={checkout.setMeetupLocation}
               emails={checkout.emails}
               fetchEmails={checkout.fetchEmails}
               onBack={handleBack}

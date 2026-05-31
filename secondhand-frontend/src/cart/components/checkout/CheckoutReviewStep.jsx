@@ -79,6 +79,8 @@ const CheckoutReviewStep = ({
   onNext,
   onBack,
   sendVerificationCode,
+  deliveryMethod,
+  meetupLocation,
 }) => {
   const [isSendingCode, setIsSendingCode] = useState(false);
   const totalAmount = calculateTotal();
@@ -221,13 +223,20 @@ const CheckoutReviewStep = ({
 
       {/* Dynamic Summary Panels (Shipping Address & Payment) */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Address Card */}
+        {/* Address or Meetup Card */}
         <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
             <MapPin className="h-4 w-4 text-indigo-600" />
-            <span>Shipping Details</span>
+            <span>{deliveryMethod === 'SAFE_MEETUP' ? 'Buluşma Noktası' : 'Shipping Details'}</span>
           </div>
-          {shippingAddress ? (
+          {deliveryMethod === 'SAFE_MEETUP' ? (
+            <div className="text-sm">
+              <p className="font-semibold text-slate-900">📍 {meetupLocation || 'Belirtilmemiş'}</p>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed font-medium">
+                Siparişinizi elden teslim alırken satıcıya doğrulama kodunuzu iletmeniz gerekmektedir. Lütfen buluşma saatinde konumda hazır bulununuz.
+              </p>
+            </div>
+          ) : shippingAddress ? (
             <div className="text-sm">
               <p className="font-semibold text-slate-900">{shippingAddress.addressLine}</p>
               <p className="mt-1 text-slate-500 font-medium">

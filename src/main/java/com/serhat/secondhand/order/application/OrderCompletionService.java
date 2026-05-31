@@ -17,6 +17,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.order.application.event.OrderStatusChangedEvent;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -48,6 +52,177 @@ public class OrderCompletionService {
 
         orderLog.logOrderCompleted(order.getOrderNumber(), false);
         return Result.success(orderMapper.toDto(savedOrder));
+    }
+
+    public Result<Void> verifyMeetupCode(String orderNumber, String code, User user) {
+        Order order = orderRepository.findByOrderNumberWithItemsAndSellers(orderNumber)
+                .orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
+
+        // Verify that user is the seller of items in this order
+        boolean isSeller = order.getOrderItems().stream()
+                .anyMatch(item -> item.getSeller().getId().equals(user.getId()));
+        if (!isSeller) {
+            return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
+        }
+
+        // Check lock state
+        if (order.getVerificationLockedUntil() != null) {
+            if (order.getVerificationLockedUntil().isAfter(LocalDateTime.now())) {
+                return Result.error("Verification is locked until " + order.getVerificationLockedUntil(), OrderErrorCodes.VERIFICATION_LOCKED.getCode());
+            } else {
+                // Lock expired, reset attempts
+                order.setVerificationAttempts(0);
+                order.setVerificationLockedUntil(null);
+                if (order.getStatus() == OrderStatus.VERIFICATION_LOCKED) {
+                    order.setStatus(OrderStatus.MEETUP_PENDING);
+                }
+            }
+        }
+
+        if (order.getStatus() != OrderStatus.MEETUP_PENDING && order.getStatus() != OrderStatus.VERIFICATION_LOCKED) {
+            return Result.error("Order is not in a verification pending state", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
+        }
+
+        String hashedInput = Order.hashSha256(code);
+        if (hashedInput != null && hashedInput.equals(order.getMeetupVerificationCodeHash())) {
+            OrderStatus oldStatus = order.getStatus();
+            order.setStatus(OrderStatus.HANDOVER_CONFIRMED);
+            order.setMeetupVerifiedAt(LocalDateTime.now());
+            order.setVerificationAttempts(0);
+            order.setVerificationLockedUntil(null);
+            Order savedOrder = orderRepository.save(order);
+
+            eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.HANDOVER_CONFIRMED.name()));
+            orderLog.logStatusChanged(savedOrder.getOrderNumber(), oldStatus.name(), "HANDOVER_CONFIRMED");
+
+            return Result.success();
+        } else {
+            int newAttempts = order.getVerificationAttempts() + 1;
+            order.setVerificationAttempts(newAttempts);
+            if (newAttempts >= 3) {
+                OrderStatus oldStatus = order.getStatus();
+                order.setStatus(OrderStatus.VERIFICATION_LOCKED);
+                order.setVerificationLockedUntil(LocalDateTime.now().plusMinutes(15));
+                Order savedOrder = orderRepository.save(order);
+
+                eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.VERIFICATION_LOCKED.name()));
+                orderLog.logStatusChanged(savedOrder.getOrderNumber(), oldStatus.name(), "VERIFICATION_LOCKED");
+
+                return Result.error("Too many failed attempts. Verification locked for 15 minutes.", OrderErrorCodes.VERIFICATION_LOCKED.getCode());
+            } else {
+                orderRepository.save(order);
+                return Result.error("Meetup verification code is incorrect. Attempts left: " + (3 - newAttempts), OrderErrorCodes.MEETUP_VERIFICATION_FAILED.getCode());
+            }
+        }
+    }
+
+    public Result<OrderDto> confirmHandoverCompletion(String orderNumber, boolean confirmed, User user) {
+        if (!confirmed) {
+            return Result.error("You must check the confirmation checkbox to finalize", "CONFIRMATION_REQUIRED");
+        }
+
+        Order order = orderRepository.findByOrderNumberWithItemsAndSellers(orderNumber)
+                .orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
+
+        boolean isBuyer = order.getUser().getId().equals(user.getId());
+        boolean isSeller = order.getOrderItems().stream()
+                .anyMatch(item -> item.getSeller().getId().equals(user.getId()));
+
+        if (!isBuyer && !isSeller) {
+            return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
+        }
+
+        if (order.getStatus() != OrderStatus.HANDOVER_CONFIRMED && order.getStatus() != OrderStatus.MEETUP_PENDING) {
+            return Result.error("Order handover is not confirmed yet", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
+        }
+
+        if (order.getStatus() == OrderStatus.MEETUP_PENDING && !isBuyer) {
+            return Result.error("Only the buyer can manually complete a pending meetup order without code verification", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
+        }
+
+        Result<Void> releaseResult = releaseEscrowsForOrder(order);
+        if (releaseResult.isError()) return escrowReleaseFailed();
+
+        OrderStatus oldStatus = order.getStatus();
+        order.applyCompletion();
+        order.setCompletedByUser(user);
+        order.setCompletedAt(LocalDateTime.now());
+        
+        Order savedOrder = orderRepository.save(order);
+
+        eventPublisher.publishEvent(new OrderCompletedEvent(savedOrder, user, false));
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(savedOrder, oldStatus.name(), OrderStatus.COMPLETED.name()));
+
+        orderLog.logOrderCompleted(order.getOrderNumber(), false);
+        return Result.success(orderMapper.toDto(savedOrder));
+    }
+
+    public Result<OrderDto> regenerateMeetupCode(String orderNumber, User user) {
+        Order order = orderRepository.findByOrderNumberWithItemsAndSellers(orderNumber)
+                .orElse(null);
+        if (order == null) {
+            return Result.error(OrderErrorCodes.ORDER_NOT_FOUND);
+        }
+
+        boolean isBuyer = order.getUser().getId().equals(user.getId());
+        if (!isBuyer) {
+            return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
+        }
+
+        order.generateVerificationCode();
+        Order savedOrder = orderRepository.save(order);
+
+        OrderDto dto = orderMapper.toDto(savedOrder);
+        dto.setMeetupVerificationCode(savedOrder.getMeetupVerificationCode());
+        return Result.success(dto);
+    }
+
+    public byte[] generateMeetupQrCode(String orderNumber, User user) {
+        Order order = orderRepository.findByOrderNumberWithItemsAndSellers(orderNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        boolean isBuyer = order.getUser().getId().equals(user.getId());
+        if (!isBuyer) {
+            throw new SecurityException("Unauthorized to generate QR code for this order");
+        }
+
+        if (order.getMeetupVerificationCodeHash() == null) {
+            order.generateVerificationCode();
+            orderRepository.save(order);
+        }
+
+        String qrContent = order.getMeetupVerificationCode();
+        if (qrContent == null) {
+            order.generateVerificationCode();
+            orderRepository.save(order);
+            qrContent = order.getMeetupVerificationCode();
+        }
+
+        try {
+            com.google.zxing.qrcode.QRCodeWriter qrCodeWriter = new com.google.zxing.qrcode.QRCodeWriter();
+            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(
+                    qrContent,
+                    com.google.zxing.BarcodeFormat.QR_CODE,
+                    250,
+                    250
+            );
+
+            java.io.ByteArrayOutputStream pngOutputStream = new java.io.ByteArrayOutputStream();
+            com.google.zxing.client.j2se.MatrixToImageWriter.writeToStream(
+                    bitMatrix,
+                    "PNG",
+                    pngOutputStream
+            );
+            return pngOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate QR Code image", e);
+        }
     }
 
     private Result<Order> validateOrderForCompletion(Long orderId, User user) {

@@ -17,5 +17,6 @@ public record BaseListingCreateRequest(
         @NotBlank String cityKey,
         @NotBlank String districtKey,
         String neighborhoodKey,
-        String imageUrl
+        String imageUrl,
+        boolean allowMeetup
 ) {}
