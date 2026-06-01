@@ -100,7 +100,9 @@ const UnifiedSearchBar = ({ className = "" }) => {
         setResults([]);
         setIsVisible(false);
         
-        if (activeTab === 'users') {
+        if (result?.type === 'link') {
+            navigate(result.id);
+        } else if (activeTab === 'users') {
             navigate(`${ROUTES.USER_PROFILE(result.id)}`);
         } else {
             navigate(`${ROUTES.LISTINGS}/${result.id}`);
@@ -115,12 +117,15 @@ const UnifiedSearchBar = ({ className = "" }) => {
             return;
         }
 
-        if (!isVisible || results.length === 0) {
-            // Global shortcut: Ctrl+K to focus search
-            if (e.ctrlKey && e.key === 'k') {
-                e.preventDefault();
-                inputRef.current?.focus();
-            }
+        // Global shortcut: ⌘K or Ctrl+K to focus search globally
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            inputRef.current?.focus();
+            setIsVisible(true);
+            return;
+        }
+
+        if (!isVisible || (query.trim().length >= 2 && results.length === 0)) {
             return;
         }
 
@@ -128,18 +133,33 @@ const UnifiedSearchBar = ({ className = "" }) => {
             case 'ArrowDown':
                 e.preventDefault();
                 setSelectedIndex(prev => 
-                    prev < results.length - 1 ? prev + 1 : 0
+                    prev < (results.length > 0 ? results.length - 1 : 4) ? prev + 1 : 0
                 );
                 break;
             case 'ArrowUp':
                 e.preventDefault();
                 setSelectedIndex(prev => 
-                    prev > 0 ? prev - 1 : results.length - 1
+                    prev > 0 ? prev - 1 : (results.length > 0 ? results.length - 1 : 4)
                 );
                 break;
             case 'Enter':
                 e.preventDefault();
-                if (selectedIndex >= 0 && results[selectedIndex]) {
+                if (query.trim().length < 2) {
+                    // Trigger navigation to selected quick link
+                    const quickLinks = [
+                        { route: ROUTES.LISTINGS_PREFILTER },
+                        { route: ROUTES.LISTINGS_PREFILTER_CREATE },
+                        { route: ROUTES.DASHBOARD },
+                        { route: ROUTES.AURA_CHAT },
+                        { route: ROUTES.INBOX }
+                    ];
+                    const selected = quickLinks[selectedIndex];
+                    if (selected) {
+                        setQuery('');
+                        setIsVisible(false);
+                        navigate(selected.route);
+                    }
+                } else if (selectedIndex >= 0 && results[selectedIndex]) {
                     handleResultSelect(results[selectedIndex]);
                 }
                 break;
@@ -165,12 +185,10 @@ const UnifiedSearchBar = ({ className = "" }) => {
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [handleClickOutside, isVisible, results, selectedIndex, activeTab]);
+    }, [handleClickOutside, isVisible, results, selectedIndex, activeTab, query]);
 
     const handleFocus = () => {
-        if (query.trim().length >= 2 && results.length > 0) {
-            setIsVisible(true);
-        }
+        setIsVisible(true);
     };
 
     return (

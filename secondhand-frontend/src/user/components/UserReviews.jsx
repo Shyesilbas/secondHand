@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {AlertCircle, ChevronLeft, ChevronRight, LayoutGrid, Loader2, Sparkles, Star} from 'lucide-react';
 import ReviewCard from '../../reviews/components/ReviewCard.jsx';
+import AuraSummary from '../../common/components/AuraSummary.jsx';
 import {RatingStarsDisplay} from '../../reviews/components/RatingStarsDisplay.jsx';
 import {reviewService} from '../../reviews/services/reviewService.js';
 import {REVIEW_LIMITS} from '../../reviews/reviewConstants.js';
@@ -211,6 +212,11 @@ const UserReviews = ({
           </div>
 
           {reviewStats && totalReviewsStat > 0 ? <StarBreakdown stats={reviewStats} /> : null}
+          {totalReviewsStat > 0 && (
+            <div className="mt-6">
+              <AuraSummary type="user" id={profileUserId} />
+            </div>
+          )}
         </div>
 
         <div className="shrink-0 min-w-0 w-full px-5 sm:px-7 py-4 border-b border-gray-100 bg-white/60 space-y-3">

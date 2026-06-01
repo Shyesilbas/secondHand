@@ -77,6 +77,9 @@ public class CacheConfig {
         // ── Tier 0: Coğrafi Katalog — 7 gün (restart-safe, JVM heap'te tutulmaz) ────
         RedisCacheConfiguration locationsConfig = defaultConfig.entryTtl(Duration.ofDays(7));
 
+        // ── Tier 0b: AI Yorum Özetleri — 3 gün ────────────────────────────
+        RedisCacheConfiguration aiSummariesConfig = defaultConfig.entryTtl(Duration.ofDays(3));
+
         // ── Tier 2: Tamamlanmış İşlemler — 2 saat ──────────────────────
         RedisCacheConfiguration completedConfig = defaultConfig.entryTtl(Duration.ofHours(2));
 
@@ -99,6 +102,9 @@ public class CacheConfig {
 
                 // Tier 0 — Coğrafi katalog (7 gün, restart'ta silinmez)
                 .withCacheConfiguration("locations", locationsConfig)
+
+                // Tier 0b — AI Yorum Özetleri (3 gün)
+                .withCacheConfiguration("aiSummaries", aiSummariesConfig)
 
                 // Tier 1 — Statik lookup tabloları (24 saat)
                 .withCacheConfiguration("brands", lookupConfig)

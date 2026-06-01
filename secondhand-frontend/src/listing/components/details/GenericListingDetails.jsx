@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
+import AuraSummary from '../../../common/components/AuraSummary.jsx';
 
 const getValueByPath = (obj, path) => {
   if (!obj || !path) return undefined;
@@ -66,7 +67,7 @@ const GenericListingDetails = ({ listing }) => {
       </div>
 
       {active?.title ? <h4 className="text-sm font-semibold text-text-muted mb-3">{active.title}</h4> : null}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {(active?.fields || [])
           .filter((field) => {
             if (typeof field.visibleWhen === 'function') {
@@ -80,6 +81,12 @@ const GenericListingDetails = ({ listing }) => {
             return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
           })}
       </div>
+
+      {listing?.id && (
+        <div className="mt-8 pt-6 border-t border-slate-100">
+          <AuraSummary type="listing" id={listing.id} />
+        </div>
+      )}
     </div>
   );
 };

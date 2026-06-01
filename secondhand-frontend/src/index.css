@@ -229,3 +229,39 @@
 .wizard-card-lift:hover {
   transform: translateY(-1px);
 }
+
+@layer utilities {
+  .bg-page-canvas {
+    background-color: var(--page-page-background, #f8fafc);
+  }
+  .bg-page-hero {
+    background-color: var(--page-hero-background, #ffffff);
+  }
+  .bg-page-section {
+    background-color: var(--page-section-background, #f0fdf4);
+  }
+  .text-page-primary {
+    color: var(--page-text-primary, #0f172a);
+  }
+  .text-page-secondary {
+    color: var(--page-text-secondary, #475569);
+  }
+  .btn-page-primary {
+    background-color: var(--page-hero-button-primary, #059669);
+    color: #ffffff;
+    transition: all 0.20s ease-in-out;
+  }
+  .btn-page-primary:hover {
+    background-color: var(--page-hero-button-primary-hover, #047857);
+  }
+  .btn-page-secondary {
+    background-color: var(--page-hero-button-secondary, transparent);
+    color: var(--page-hero-button-secondary-text, #059669);
+    border: 1px solid var(--page-hero-button-secondary-border, #059669);
+    transition: all 0.20s ease-in-out;
+  }
+  .btn-page-secondary:hover {
+    background-color: var(--page-hero-button-secondary-hover, #ecfdf5);
+  }
+}
+

@@ -374,5 +374,8 @@ export const API_ENDPOINTS = {
             DISTRICTS: (cityKey) => `/catalog/locations/districts?cityKey=${encodeURIComponent(cityKey)}`,
             NEIGHBORHOODS: (districtKey) => `/catalog/locations/neighborhoods?districtKey=${encodeURIComponent(districtKey)}`,
         }
+    },
+    AI: {
+        SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`
     }
 };

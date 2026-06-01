@@ -83,9 +83,7 @@ const ShowcaseSection = () => {
         <div className="mb-8 overflow-x-auto scrollbar-hide">
           <div className="flex gap-1.5 p-1 bg-slate-200/50 rounded-2xl w-fit">
             {SHOWCASE_CATEGORY_TABS.map(({ value, label, icon: Icon }) => {
-              const count = tabCounts[value] ?? 0;
               const active = activeTab === value;
-              if (count === 0 && value !== 'ALL') return null;
               
               return (
                 <button

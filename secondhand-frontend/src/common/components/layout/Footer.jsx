@@ -135,6 +135,14 @@ const Footer = () => {
                             Support
                         </h3>
                         <ul className="space-y-1.5">
+                            <li>
+                                <button
+                                    onClick={() => navigate(ROUTES.FORUM)}
+                                    className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight text-left"
+                                >
+                                    Forum / Community
+                                </button>
+                            </li>
                             {['Help Center', 'Contact Us', 'Safety Tips'].map((item, index) => (
                                 <li key={index}>
                                     <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">

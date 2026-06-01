@@ -1,8 +1,71 @@
 import EmptyState from '../ui/EmptyState.jsx';
 import {formatCurrency} from '../../formatters.js';
-import {Search as MagnifyingGlassIcon} from 'lucide-react';
+import {
+  Search as MagnifyingGlassIcon,
+  Compass,
+  Inbox,
+  PlusSquare,
+  Sparkles,
+  User,
+  ChevronRight
+} from 'lucide-react';
 
-const SearchResults = ({ results, activeTab, selectedIndex, isLoading, query, onResultSelect }) => {
+const SearchResults = ({ results, activeTab, selectedIndex, isLoading, query = "", onResultSelect }) => {
+
+  const renderQuickLinks = () => {
+    const quickLinks = [
+      { label: 'Explore Categories', desc: 'Browse all vehicles, estates, and electronics', id: '/listings/prefilter', icon: Compass },
+      { label: 'Start Selling', desc: 'Post a new item to the community', id: '/listings/prefilter?flow=create', icon: PlusSquare },
+      { label: 'Account Hub & Settings', desc: 'Manage your profile and orders', id: '/dashboard', icon: User },
+      { label: 'Aura AI Assistant', desc: 'Chat with our intelligent price expert', id: '/aura', icon: Sparkles },
+      { label: 'Inbox & Messaging', desc: 'Check your messages and notifications', id: '/inbox', icon: Inbox }
+    ];
+
+    return (
+      <div className="py-1">
+        <div className="px-4 py-2 border-b border-gray-100/60 bg-gray-50/50">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Quick Navigation</span>
+        </div>
+        {quickLinks.map((link, index) => {
+          const Icon = link.icon;
+          const isSelected = index === selectedIndex;
+          return (
+            <div
+              key={link.id}
+              onClick={() => onResultSelect({ id: link.id, type: 'link' })}
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-left cursor-pointer transition-all duration-150 ${
+                isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                isSelected ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-500'
+              }`}>
+                <Icon className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={`text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                  {link.label}
+                </div>
+                <div className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-slate-400 font-medium'}`}>
+                  {link.desc}
+                </div>
+              </div>
+              {isSelected && (
+                <div className="shrink-0 animate-fade-in">
+                  <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {/* Footer */}
+        <div className="px-4 py-2.5 text-[10px] text-gray-400 font-medium bg-gray-50/55 border-t border-gray-100/60 flex items-center justify-between">
+          <div>↑↓ Navigate • Enter Open • Esc Close</div>
+          <div className="hidden sm:block">Ctrl+Tab Switch mode</div>
+        </div>
+      </div>
+    );
+  };
 
   const renderUserResult = (user, index) => (
     <div
@@ -68,6 +131,11 @@ const SearchResults = ({ results, activeTab, selectedIndex, isLoading, query, on
       </div>
     </div>
   );
+
+  // If query is empty or too short, render Quick Links
+  if (query.trim().length < 2) {
+    return renderQuickLinks();
+  }
 
   if (results.length > 0) {
     return (

@@ -18,6 +18,7 @@ import ListingTrustPanel from '../components/ListingTrustPanel.jsx';
 import ListingAnalyticsPanel from '../components/ListingAnalyticsPanel.jsx';
 import ListingSocialPanel from '../components/ListingSocialPanel.jsx';
 import {formatCurrency} from '../../common/formatters.js';
+import AuraSummary from '../../common/components/AuraSummary.jsx';
 
 const ListingDetailPage = () => {
   const { id } = useParams();
@@ -175,6 +176,10 @@ const ListingDetailPage = () => {
               hasStockInfo={hasStockInfo}
               isLowStock={isLowStock}
             />
+
+            {listing?.id && (
+              <AuraSummary type="listing" id={listing.id} />
+            )}
 
             <ListingSocialPanel
               listing={listing}

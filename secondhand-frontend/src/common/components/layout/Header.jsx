@@ -7,13 +7,11 @@ import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
 import HeaderNavLink from './header/HeaderNavLink.jsx';
 import HeaderAuthActions from './header/HeaderAuthActions.jsx';
 import HeaderGuestActions from './header/HeaderGuestActions.jsx';
-import HeaderSpotlight from './header/HeaderSpotlight.jsx';
 import {useHeaderScroll} from '../../hooks/useHeaderScroll.js';
 import {useDropdownManager} from '../../hooks/useDropdownManager.js';
 import {useClickOutside} from '../../hooks/useClickOutside.js';
 import {useBadgeCounts} from '../../hooks/useBadgeCounts.js';
-import {isAdminUser} from '../../utils/admin.js';
-import {ShoppingBag, Search, Command} from 'lucide-react';
+import {ShoppingBag} from 'lucide-react';
 
 const Header = () => {
     const { authState: { isAuthenticated, user }, logout } = useAuth();
@@ -22,7 +20,6 @@ const Header = () => {
     const scrolled = useHeaderScroll();
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [spotlightOpen, setSpotlightOpen] = useState(false);
 
     const dropdowns = useDropdownManager();
     const listingsMenuOpen = dropdowns.isOpen('listings');
@@ -52,19 +49,6 @@ const Header = () => {
         });
     };
 
-    // ⌘K / Ctrl+K global shortcut
-    const handleGlobalKeyDown = useCallback((e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            setSpotlightOpen((v) => !v);
-        }
-    }, []);
-
-    useEffect(() => {
-        document.addEventListener('keydown', handleGlobalKeyDown);
-        return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-    }, [handleGlobalKeyDown]);
-
     return (
         <>
             <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
@@ -90,7 +74,6 @@ const Header = () => {
                         {/* ── Desktop Nav Links ────────────────── */}
                         {isAuthenticated && (
                             <nav className="hidden lg:flex items-center gap-0.5">
-                                <HeaderNavLink to={ROUTES.FORUM}>Forum</HeaderNavLink>
                                 <HeaderNavLink to={ROUTES.LISTINGS_PREFILTER_CREATE}>Sell</HeaderNavLink>
                                 <HeaderNavLink to={ROUTES.LISTINGS_PREFILTER}>Categories</HeaderNavLink>
                             </nav>
@@ -102,22 +85,6 @@ const Header = () => {
                             <div className="hidden md:block flex-1">
                                 <UnifiedSearchBar className="w-full" />
                             </div>
-
-                            {/* In-app spotlight trigger */}
-                            {isAuthenticated && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSpotlightOpen(true)}
-                                    className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-gray-50/80 text-gray-500 hover:text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 shrink-0"
-                                    title="Search app (⌘K)"
-                                >
-                                    <Search className="w-3.5 h-3.5" />
-                                    <span className="text-xs font-medium text-gray-400">Go to...</span>
-                                    <kbd className="hidden lg:inline-flex items-center gap-0.5 ml-1 px-1.5 py-0.5 rounded border border-gray-200 bg-white text-[10px] font-medium text-gray-400">
-                                        <Command className="w-2.5 h-2.5" />K
-                                    </kbd>
-                                </button>
-                            )}
                         </div>
 
                         {/* ── Right Actions ────────────────────── */}
@@ -153,14 +120,6 @@ const Header = () => {
                     </div>
                 </div>
             </header>
-
-            {/* ── Spotlight Modal ───────────────────── */}
-            <HeaderSpotlight
-                userId={user?.id}
-                isAdmin={isAdminUser(user)}
-                isOpen={spotlightOpen}
-                onClose={() => setSpotlightOpen(false)}
-            />
         </>
     );
 };
