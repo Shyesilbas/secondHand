@@ -9,6 +9,9 @@ import ExchangeRatesTab from './ExchangeRatesTab.jsx';
 import ViewStatisticsCard from './ViewStatisticsCard.jsx';
 import ListingReviewStats from '../../reviews/components/ListingReviewStats.jsx';
 import PriceHistoryTab from './PriceHistoryTab.jsx';
+import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
+import { listingTypeRegistry } from '../config/listingConfig.js';
+import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
 import {
   X,
   MapPin,
@@ -21,6 +24,8 @@ import {
   Image as ImageIcon,
   Zap,
   TrendingDown,
+  ShieldCheck,
+  Star,
 } from 'lucide-react';
 
 const INSIGHT_TABS = [
@@ -56,6 +61,9 @@ const ListingInfoModal = ({
 
   const listingId = listing?.id;
   const { priceHistory, loading: historyLoading, error: historyError, fetchPriceHistory } = usePriceHistory(listingId);
+
+  const sellerId = listing?.sellerId;
+  const { stats: sellerStats } = useUserReviewStats(sellerId, { enabled: !!sellerId && isOpen });
 
   const viewStats = viewStatsProp ?? listing?.viewStats ?? null;
   const currency = listing?.currency ?? 'TRY';
@@ -127,7 +135,7 @@ const ListingInfoModal = ({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/70"
+        className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity duration-300"
         aria-label="Close dialog"
         onClick={onClose}
       />
@@ -135,35 +143,37 @@ const ListingInfoModal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-view-title"
-        className="relative flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,820px)] sm:rounded-2xl"
+        className="relative flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] bg-[#faf9f7] shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,820px)] sm:rounded-[28px] transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100/60 bg-white px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Quick view</p>
-            <h2 id="quick-view-title" className="truncate text-base font-bold text-slate-900">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">
+              Quick view
+            </span>
+            <h2 id="quick-view-title" className="truncate text-base font-extrabold text-slate-900 mt-2">
               {title}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-900 hover:scale-105 transition-all shadow-sm"
           >
-            <X className="h-5 w-5" strokeWidth={2} />
+            <X className="h-4.5 w-4.5" strokeWidth={2.5} />
           </button>
         </header>
 
         {/* Tek kaydırma alanı: flex zincirinde min-h-0 şart */}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-          <div className="grid gap-0 sm:grid-cols-2 sm:gap-0">
-            <div className="relative border-b border-slate-100 bg-slate-100 sm:border-b-0 sm:border-r">
-              <div className="aspect-[4/3] w-full sm:aspect-auto sm:min-h-[220px] sm:max-h-[320px]">
+          <div className="grid gap-0 sm:grid-cols-2">
+            <div className="relative border-b border-slate-100/60 bg-slate-50 sm:border-b-0 sm:border-r">
+              <div className="aspect-[4/3] w-full sm:aspect-auto sm:h-full sm:min-h-[260px] sm:max-h-[360px] overflow-hidden">
                 {listing.imageUrl && !imageBroken ? (
                   <img
-                    src={listing.imageUrl}
-                    alt=""
-                    className="h-full w-full object-cover sm:max-h-[320px]"
+                    src={optimizeCloudinaryUrl(listing.imageUrl, { width: 600, height: 450 })}
+                    alt={title}
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     onError={() => setImageBroken(true)}
                   />
                 ) : (
@@ -174,27 +184,27 @@ const ListingInfoModal = ({
                 )}
               </div>
               {isInShowcase && (
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold uppercase text-white shadow">
+                <span className="absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-bold uppercase text-white shadow-sm border border-amber-300/40">
                   <Zap className="h-3 w-3 fill-current" />
                   Featured
                 </span>
               )}
             </div>
 
-            <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">
+            <div className="space-y-5 px-5 py-5 sm:px-6 sm:py-6 bg-white">
               <div>
-                <p className="text-xs text-slate-500">Price</p>
-                <div className="mt-0.5 flex flex-wrap items-end gap-2">
-                  <span className="text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Price</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2.5">
+                  <span className="text-2xl font-black tabular-nums text-slate-900 tracking-tight">
                     {formatCurrency(price, currency)}
                   </span>
                   {hasCampaign && (
                     <>
-                      <span className="text-base font-semibold text-slate-400 line-through tabular-nums">
+                      <span className="text-sm font-semibold text-slate-400 line-through tabular-nums">
                         {formatCurrency(listing.price, currency)}
                       </span>
                       {discountPct > 0 && (
-                        <span className="mb-0.5 inline-flex items-center gap-0.5 rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-rose-500 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
                           <TrendingDown className="h-3 w-3" />
                           -{discountPct}%
                         </span>
@@ -203,117 +213,157 @@ const ListingInfoModal = ({
                   )}
                 </div>
                 {listing.campaignName && hasCampaign && (
-                  <p className="mt-1 text-xs font-semibold text-rose-600">{listing.campaignName}</p>
+                  <p className="mt-1 text-[11px] font-bold text-rose-500">{listing.campaignName}</p>
                 )}
               </div>
 
+              {/* Safe Meetup Visual Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-bold shadow-[0_2px_8px_-2px_rgba(16,185,129,0.05)]">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Escrow & Safe Meetup Protected</span>
+              </div>
+
               <div className="flex flex-wrap gap-2">
-                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold ring-1 ${st.cls}`}>
+                <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 uppercase tracking-wider ${st.cls}`}>
                   {st.label}
                 </span>
                 {listing.listingNo && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                     <Hash className="h-3 w-3 opacity-60" />
                     {listing.listingNo}
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-x-3 gap-y-2 text-sm text-slate-600">
+              {/* Dynamic Category Highlight Badges */}
+              {(() => {
+                const badges = listingTypeRegistry[listing.type]?.compactBadges?.(listing) || [];
+                if (badges.length === 0) return null;
+                return (
+                  <div className="border-t border-slate-100/60 pt-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Highlights</p>
+                    <div className="flex flex-wrap gap-2">
+                      {badges.map((badge, idx) => (
+                        <div
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100/80 text-[11px] font-bold text-slate-700 shadow-sm"
+                        >
+                          <span className="text-[13px] shrink-0">{badge.icon}</span>
+                          <span>{badge.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="flex flex-wrap gap-x-3 gap-y-2 text-[12px] text-slate-500 border-t border-slate-100/60 pt-4">
                 {listing.type && (
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <Package className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="inline-flex items-center gap-1.5 font-bold uppercase tracking-wider text-slate-400">
+                    <Package className="h-3.5 w-3.5 shrink-0 text-slate-300" />
                     {listing.type}
                   </span>
                 )}
                 {listing.city && (
-                  <span className="inline-flex items-center gap-1.5 font-medium">
-                    <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="inline-flex items-center gap-1.5 font-semibold text-slate-600">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
                     {[listing.city, listing.district].filter(Boolean).join(' · ')}
                   </span>
                 )}
                 {stock !== null && (
-                  <span className="font-medium tabular-nums text-slate-600">
+                  <span className="font-semibold tabular-nums text-slate-600">
                     <span className="text-slate-400">Stock</span> {stock}
                   </span>
                 )}
               </div>
 
               {(listing.sellerName || listing.sellerSurname) && (
-                <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-                    {(listing.sellerName || '?')[0]?.toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase text-slate-500">Seller</p>
-                    <p className="truncate text-sm font-semibold text-slate-900">
-                      {[listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ')}
-                    </p>
+                <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-[#faf9f7] p-3.5 shadow-sm">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white shadow-sm">
+                      {(listing.sellerName || '?')[0]?.toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-bold uppercase text-slate-400">Seller</p>
+                      <p className="truncate text-sm font-bold text-slate-900 leading-snug">
+                        {[listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ')}
+                      </p>
+                      
+                      {/* Real ratings stats in the quick view modal! */}
+                      {sellerStats && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Star className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" />
+                          <span className="text-[11px] font-bold text-slate-700">{(sellerStats.averageRating ?? 5.0).toFixed(1)}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">({sellerStats.reviewCount ?? 0} reviews)</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
 
               {hasReviews && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 border-t border-slate-100/60 pt-4">
                   <ListingReviewStats listing={listing} listingId={listing.id} size="md" showIcon showText />
                 </div>
               )}
-            </div>
-          </div>
 
-          <div className="border-t border-slate-100 bg-slate-50/80 px-4 py-4 sm:px-5">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Market insights</p>
-            <div className="flex flex-wrap gap-2">
-              {visibleTabs.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => onInsightChange(id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    activeInsight === id
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
+              {/* Market Insights nested inside the right column */}
+              <div className="border-t border-slate-100/60 pt-5">
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Market insights</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {visibleTabs.map(({ id, label, icon: Icon }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => onInsightChange(id)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
+                        activeInsight === id
+                          ? 'bg-slate-900 text-white shadow-sm'
+                          : 'bg-[#faf9f7] text-slate-600 border border-slate-100 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
 
-            <div className="mt-3 min-h-[200px] rounded-xl border border-slate-200 bg-white p-3 sm:p-4">
-              {activeInsight === 'history' && (
-                <PriceHistoryTab
-                  priceHistory={priceHistory}
-                  loading={historyLoading}
-                  error={historyError}
-                  currency={currency}
-                />
-              )}
-              {activeInsight === 'exchange' && (
-                <ExchangeRatesTab
-                  key={`${listingId}-${currency}-${price}`}
-                  price={price}
-                  currency={currency}
-                  listingId={listingId}
-                />
-              )}
-              {activeInsight === 'views' && isOwner && (
-                <div>
-                  {viewStats ? (
-                    <ViewStatisticsCard viewStats={viewStats} periodDays={viewStats?.periodDays || 7} />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-10 text-center">
-                      <Eye className="mb-2 h-8 w-8 text-slate-300" />
-                      <p className="text-sm font-semibold text-slate-800">No view data</p>
-                      <p className="mt-1 max-w-xs text-xs text-slate-500">Open the full listing to collect views.</p>
+                <div className="mt-3 min-h-[180px] rounded-2xl border border-slate-100 bg-[#faf9f7]/30 p-3 sm:p-4">
+                  {activeInsight === 'history' && (
+                    <PriceHistoryTab
+                      priceHistory={priceHistory}
+                      loading={historyLoading}
+                      error={historyError}
+                      currency={currency}
+                    />
+                  )}
+                  {activeInsight === 'exchange' && (
+                    <ExchangeRatesTab
+                      key={`${listingId}-${currency}-${price}`}
+                      price={price}
+                      currency={currency}
+                      listingId={listingId}
+                    />
+                  )}
+                  {activeInsight === 'views' && isOwner && (
+                    <div>
+                      {viewStats ? (
+                        <ViewStatisticsCard viewStats={viewStats} periodDays={viewStats?.periodDays || 7} />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-6 text-center">
+                          <Eye className="mb-1.5 h-6 w-6 text-slate-300" />
+                          <p className="text-xs font-bold text-slate-800">No view data</p>
+                          <p className="mt-0.5 max-w-xs text-[10px] text-slate-400">Open the full listing to collect views.</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
             </div>
           </div>
         </div>
+      </div>
 
         <footer className="flex shrink-0 flex-col gap-2 border-t border-slate-100 bg-white p-3 sm:flex-row sm:justify-end sm:gap-2 sm:p-4">
           <button

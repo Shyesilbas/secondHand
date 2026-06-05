@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
-import AuraSummary from '../../../common/components/AuraSummary.jsx';
 
 const getValueByPath = (obj, path) => {
   if (!obj || !path) return undefined;
@@ -81,12 +80,6 @@ const GenericListingDetails = ({ listing }) => {
             return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
           })}
       </div>
-
-      {listing?.id && (
-        <div className="mt-8 pt-6 border-t border-slate-100">
-          <AuraSummary type="listing" id={listing.id} />
-        </div>
-      )}
     </div>
   );
 };

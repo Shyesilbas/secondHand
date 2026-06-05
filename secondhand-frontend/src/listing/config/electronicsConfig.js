@@ -263,12 +263,35 @@ export const electronicsConfig = {
     { value: 'type', label: 'Type' }, { value: 'price', label: 'Price' },
     { value: 'createdAt', label: 'Date Added' },
   ],
-  compactBadges: (listing) => [
-    { label: listing.electronicType?.label || listing.electronicType?.name || listing.electronicType, icon: '📱', show: !!listing.electronicType },
-    { label: listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand, icon: '🏷️', show: !!listing.electronicBrand },
-    { label: listing.year, icon: '📅', show: !!listing.year },
-    { label: listing.color, icon: '🎨', show: !!listing.color },
-  ].filter(badge => badge.show),
+  compactBadges: (listing) => {
+    const parts = [];
+    
+    // Core specs
+    if (listing.processor) {
+      parts.push(listing.processor);
+    } else if (listing.electronicModel?.label || listing.electronicModel?.name || listing.model) {
+      parts.push(listing.electronicModel?.label || listing.electronicModel?.name || listing.model);
+    } else if (listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand) {
+      parts.push(listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand);
+    }
+
+    if (listing.storage) {
+      parts.push(`${listing.storage} GB${listing.storageType ? ' ' + listing.storageType : ''}`);
+    }
+    
+    if (listing.ram) {
+      parts.push(`${listing.ram} GB RAM`);
+    }
+    
+    if (listing.color) parts.push(listing.color);
+    if (listing.year) parts.push(listing.year);
+
+    if (parts.length > 0) {
+      return [{ label: parts.join(' • '), show: true }];
+    }
+    
+    return [];
+  },
   defaultFilters: { minYear: 2000, maxYear: new Date().getFullYear() },
 };
 

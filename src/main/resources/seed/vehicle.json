@@ -20,6 +20,7 @@
   "types": [
     { "key": "CAR", "label": "Car" },
     { "key": "MOTORCYCLE", "label": "Motorcycle" },
+    { "key": "SCOOTER", "label": "Scooter" },
     { "key": "BICYCLE", "label": "Bicycle" },
     { "key": "OTHER", "label": "Other" }
   ],
@@ -3773,7 +3774,7 @@
     },
     {
       "brand": "YAMAHA",
-      "type": "MOTORCYCLE",
+      "type": "SCOOTER",
       "name": "XMAX 250 Tech MAX",
       "supportedBodyTypes": [],
       "generations": []
