@@ -17,10 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AiSummaryService {
 
+    private static final String SUMMARY_UNAVAILABLE_MESSAGE = "Sistem yoğunluğu nedeniyle şu an yorum özeti oluşturulamadı.";
+
     private final ReviewRepository reviewRepository;
     private final GeminiClient geminiClient;
 
-    @Cacheable(value = "aiSummaries", key = "'user::' + #userId")
+    @Cacheable(value = "aiSummaries", key = "'user::' + #userId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getUserReviewsSummary(Long userId) {
         log.info("Generating AI summary for user reviews: userId={}", userId);
         
@@ -35,8 +37,8 @@ public class AiSummaryService {
                 .collect(Collectors.joining("\n"));
 
         String prompt = String.format("""
-                Aşağıda bir satıcıya yapılan kullanıcı yorumları listelenmiştir. Lütfen bu yorumları analiz et ve satıcının öne çıkan olumlu ve varsa olumsuz özelliklerini içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur. 
-                Özeti maddeler halinde veya kısa bir paragraf şeklinde sunabilirsin. Cevabında sadece özet yer alsın, giriş/giriş cümleleri kullanma.
+                Aşağıda bir satıcıya yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve satıcının öne çıkan olumlu ve varsa olumsuz özelliklerini içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.
+                Cevabı tek bir düz paragraf olarak yaz. Madde işareti, yıldız, başlık, kategori etiketi, markdown veya liste kullanma. Cevabında sadece özet yer alsın, giriş/giriş cümleleri kullanma.
                 
                 Yorumlar:
                 %s
@@ -46,11 +48,11 @@ public class AiSummaryService {
             return geminiClient.generateText(prompt);
         } catch (Exception e) {
             log.error("Failed to generate AI user review summary: ", e);
-            return "Sistem yoğunluğu nedeniyle şu an yorum özeti oluşturulamadı.";
+            return SUMMARY_UNAVAILABLE_MESSAGE;
         }
     }
 
-    @Cacheable(value = "aiSummaries", key = "'listing::' + #listingId")
+    @Cacheable(value = "aiSummaries", key = "'listing::' + #listingId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getListingReviewsSummary(UUID listingId) {
         log.info("Generating AI summary for listing reviews: listingId={}", listingId);
         
@@ -65,8 +67,8 @@ public class AiSummaryService {
                 .collect(Collectors.joining("\n"));
 
         String prompt = String.format("""
-                Aşağıda bir ilan/ürün için yapılan kullanıcı yorumları listelenmiştir. Lütfen bu yorumları analiz et ve ürünün öne çıkan özelliklerini, kalitesini, olumlu ve varsa olumsuz yanlarını içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.
-                Özeti maddeler halinde veya kısa bir paragraf şeklinde sunabilirsin. Cevabında sadece özet yer alsın, giriş/giriş cümleleri kullanma.
+                Aşağıda bir ilan/ürün için yapılan kullanıcı yorumları listelenmiştir. Bu yorumları analiz et ve ürünün öne çıkan özelliklerini, kalitesini, olumlu ve varsa olumsuz yanlarını içeren, samimi, anlaşılır ve kısa bir Türkçe özet oluştur.
+                Cevabı tek bir düz paragraf olarak yaz. Madde işareti, yıldız, başlık, kategori etiketi, markdown veya liste kullanma. Cevabında sadece özet yer alsın, giriş/giriş cümleleri kullanma.
                 
                 Yorumlar:
                 %s
@@ -76,7 +78,11 @@ public class AiSummaryService {
             return geminiClient.generateText(prompt);
         } catch (Exception e) {
             log.error("Failed to generate AI listing review summary: ", e);
-            return "Sistem yoğunluğu nedeniyle şu an yorum özeti oluşturulamadı.";
+            return SUMMARY_UNAVAILABLE_MESSAGE;
         }
+    }
+
+    public static String summaryUnavailableMessage() {
+        return SUMMARY_UNAVAILABLE_MESSAGE;
     }
 }

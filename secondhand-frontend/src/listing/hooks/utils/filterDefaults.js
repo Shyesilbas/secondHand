@@ -35,8 +35,8 @@ export const buildDefaultsFromFilterConfig = (config) => {
  * Returns default filter object for a listing type
  */
 export const getDefaultFiltersForType = (listingType, initialFilters) => {
-  const type = String(listingType || '').toUpperCase();
-  const cfg = getListingConfig(type);
+  const type = listingType ? String(listingType).toUpperCase() : null;
+  const cfg = type ? getListingConfig(type) : null;
 
   const base = {
     type,
@@ -53,7 +53,7 @@ export const getDefaultFiltersForType = (listingType, initialFilters) => {
     size: LISTING_DEFAULTS.FILTER_PAGE_SIZE,
   };
 
-  const dynamic = buildDefaultsFromFilterConfig(cfg?.filterConfig);
+  const dynamic = cfg ? buildDefaultsFromFilterConfig(cfg?.filterConfig) : {};
   const configDefaults = cfg?.defaultFilters || {};
 
   return { ...base, ...dynamic, ...configDefaults, ...(initialFilters || {}), listingType: type, type };

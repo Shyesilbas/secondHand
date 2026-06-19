@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik yaparken etki alanini hizli kavramasini saglamak
 - Durum gecisi, escrow, iptal/iade ve event akislarinda regresyon riskini azaltmak
 
+## Agent Note
+
+- Read first: `OrderController` -> `OrderCreationService` / `OrderCancellationService` / policy layer.
+- Keep status transitions, payment coupling, and shipping actions explicit.
+- Update this README when order lifecycle, endpoints, or side effects change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `order` paketi, siparis yasam dongusunu yonetir: olusturma, durum ilerletme, tamamlama, iptal, iade ve escrow ile iliskili domain kararlarini verir.

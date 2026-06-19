@@ -3,7 +3,7 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import {FollowButton, FollowStats} from '../../follow/index.js';
 import {formatDate} from '../../common/formatters.js';
-import {ArrowLeft, Award, Star, Calendar} from 'lucide-react';
+import {ArrowLeft, Award, Calendar, MessageCircle, ShieldCheck, Star, UserRound} from 'lucide-react';
 
 const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible}) => {
   const navigate = useNavigate();
@@ -12,15 +12,17 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
   const userInitials = `${name?.[0]?.toUpperCase() || ''}${surname?.[0]?.toUpperCase() || ''}`;
   const memberSince = formatDate(user?.accountCreationDate);
   const hasReviews = reviewStats && reviewStats.totalReviews > 0;
+  const fullName = `${name} ${surname}`.trim() || 'Marketplace member';
 
   return (
-    <div className="bg-white border-b border-gray-200/80">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="relative overflow-hidden bg-[#f8faf8] border-b border-gray-200/80">
+      <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(135deg,#111827_0%,#1f2937_46%,#365314_100%)]" />
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back button */}
         <div className="pt-5">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 hover:text-white transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -28,21 +30,29 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
         </div>
 
         {/* Profile Row */}
-        <div className="py-8 flex flex-col sm:flex-row items-start gap-6">
+        <div className="pt-7 pb-6">
+          <div className="rounded-[1.75rem] border border-white/70 bg-white shadow-xl shadow-gray-900/10">
+            <div className="flex flex-col lg:flex-row lg:items-stretch">
+              <div className="flex flex-1 flex-col sm:flex-row items-start gap-5 p-5 sm:p-6 lg:p-7">
           {/* Avatar */}
-          <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shadow-xl shadow-gray-900/10">
+                <div className="relative shrink-0">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-lime-900 flex items-center justify-center shadow-xl shadow-gray-900/15 ring-4 ring-white">
               <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 {userInitials}
               </span>
             </div>
+                  {greatSellerEligible && (
+                    <span className="absolute -right-2 -bottom-2 flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-400 text-amber-950 shadow-lg ring-4 ring-white">
+                      <Award className="h-[18px] w-[18px]" />
+                    </span>
+                  )}
           </div>
 
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-                {name} {surname}
+              <h1 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
+                {fullName}
               </h1>
               {greatSellerEligible && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-bold rounded-full uppercase tracking-wide">
@@ -56,9 +66,9 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
             </div>
 
             {/* Stats row */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 mb-3">
+            <div className="flex flex-wrap items-center gap-2.5 text-sm text-gray-500 mb-4">
               {hasReviews && (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-100">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100">
                   <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                   <span className="text-xs font-bold text-amber-800 tabular-nums">
                     {(reviewStats.averageRating || 0).toFixed(1)}
@@ -68,13 +78,26 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
                   </span>
                 </div>
               )}
-              <FollowStats userId={user.id} showIcon={true} className="text-gray-500" />
+              <div className="inline-flex items-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5">
+                <FollowStats userId={user.id} showIcon={true} className="text-gray-600" />
+              </div>
               {memberSince && (
-                <span className="inline-flex items-center gap-1.5 text-xs text-gray-400">
-                  <Calendar className="w-3 h-3" />
+                <span className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600">
+                  <Calendar className="w-3.5 h-3.5" />
                   Member since {memberSince}
                 </span>
               )}
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-xs font-semibold text-gray-600">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 ring-1 ring-emerald-100">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Verified marketplace profile
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-gray-700 ring-1 ring-gray-200">
+                <UserRound className="h-3.5 w-3.5" />
+                Seller profile
+              </span>
             </div>
 
             {/* Action buttons */}
@@ -101,8 +124,36 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
               </div>
             )}
           </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-px border-t border-gray-200 bg-gray-200 lg:w-72 lg:grid-cols-1 lg:border-l lg:border-t-0">
+                <div className="bg-gray-50 p-5">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                    <Star className="h-3.5 w-3.5 text-amber-500" />
+                    Rating
+                  </div>
+                  <p className="mt-2 text-2xl font-black text-gray-950">
+                    {hasReviews ? (reviewStats.averageRating || 0).toFixed(1) : '-'}
+                  </p>
+                  <p className="mt-0.5 text-xs font-medium text-gray-500">
+                    {hasReviews ? `${reviewStats.totalReviews} reviews` : 'No reviews yet'}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-5">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                    <MessageCircle className="h-3.5 w-3.5 text-gray-700" />
+                    Response
+                  </div>
+                  <p className="mt-2 text-2xl font-black text-gray-950">Open</p>
+                  <p className="mt-0.5 text-xs font-medium text-gray-500">
+                    {isOwnProfile ? 'This is your public page' : 'Message seller directly'}
+                  </p>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

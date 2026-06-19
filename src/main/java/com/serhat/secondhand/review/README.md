@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik yaparken etki alanini hizli anlamasini saglamak
 - Tekrarli review, yetki hatasi, performans ve istatistik regresyon riskini azaltmak
 
+## Agent Note
+
+- Read first: `ReviewController` -> `ReviewService` -> `ReviewValidator` -> repository/projection -> mapper.
+- Keep delivered-order and duplicate-review rules intact.
+- Update this README when stats, cache keys, or review creation behavior change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `review` paketi, tamamlanmis siparis kalemi uzerinden kullanici degerlendirmesi olusturma ve review istatistiklerini sunma sorumlulugunu tasir.

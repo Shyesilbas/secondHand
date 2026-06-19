@@ -2,6 +2,12 @@
 
 Bu modul, kullanicinin sepete urun ekleme/guncelleme/silme akisini ve dusuk stokta gecici rezervasyon davranisini yonetir.
 
+## Agent Note
+
+- Read first: `CartController` -> `CartService` -> `CartValidator` -> repository.
+- Reservation timing and low-stock rules are critical.
+- Update this README when reservation, quantity, or config behavior changes.
+
 ## Mimari Akis
 
 - `api/CartController`: HTTP endpoint girisi, kimlik dogrulama principal'dan user alir.

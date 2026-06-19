@@ -4,6 +4,12 @@ Bu dokumanin amaci:
 - `auth` paketinin sorumluluklarini tek yerde netlestirmek
 - Degisikliklerde davranissal regresyon ve guvenlik riskini azaltmak
 
+## Agent Note
+
+- Read first: `AuthController` -> `AuthService` -> `TokenService` -> repository.
+- Treat refresh rotation, cookie policy, and password reset as security-sensitive.
+- Keep endpoint and token behavior aligned with code; remove stale routes from docs.
+
 ## 1) Paket Amaci ve Sinirlari
 
 `auth` paketi, kullanici kimlik dogrulama ve oturum surecleriyle ilgilenir.

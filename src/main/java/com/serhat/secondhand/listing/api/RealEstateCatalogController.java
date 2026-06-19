@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Serves non-entity real estate spec catalogs (room configs, zoning statuses).
+ * <p>
+ * Heating types are served from {@code EnumController}
+ * ({@code GET /api/enums/heating-types}) as full DB reference data,
+ * not from this in-memory catalog.
+ */
 @RestController
 @RequestMapping("/api/catalog/real-estate/specs")
 @RequiredArgsConstructor
@@ -21,11 +28,6 @@ public class RealEstateCatalogController {
     @GetMapping("/room-configs")
     public ResponseEntity<List<RealEstateSpecCatalogService.SpecDto>> getRoomConfigs() {
         return ResponseEntity.ok(realEstateSpecCatalogService.getRoomConfigs());
-    }
-
-    @GetMapping("/heating-types")
-    public ResponseEntity<List<RealEstateSpecCatalogService.SpecDto>> getHeatingTypes() {
-        return ResponseEntity.ok(realEstateSpecCatalogService.getHeatingTypes());
     }
 
     @GetMapping("/zoning-statuses")

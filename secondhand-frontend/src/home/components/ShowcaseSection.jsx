@@ -59,20 +59,21 @@ const ShowcaseSection = () => {
   }, [showcases, activeTab]);
 
   return (
-    <section className="py-20 bg-[#fafafa]">
+    <section className="py-12 sm:py-14 bg-[#f5f7fb] border-y border-slate-200/60">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         
         {/* Header - Simpler & More Direct */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Featured Listings</h2>
-            <p className="text-slate-500 mt-2 max-w-lg text-sm font-medium">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-600 mb-2">Fresh from the market</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Featured Listings</h2>
+            <p className="text-slate-500 mt-2 max-w-xl text-sm font-medium">
               Discover popular items and top picks from our community of sellers.
             </p>
           </div>
           <Link
             to={ROUTES.LISTINGS}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
+            className="inline-flex w-fit items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-sm"
           >
             <span>View All Marketplace</span>
             <ArrowRight className="w-4 h-4" />
@@ -80,7 +81,7 @@ const ShowcaseSection = () => {
         </div>
 
         {/* Categories - Cleaner & Less 'Appy' */}
-        <div className="mb-8 overflow-x-auto scrollbar-hide">
+        <div className="mb-6 overflow-x-auto scrollbar-hide">
           <div className="flex gap-1.5 p-1 bg-slate-200/50 rounded-2xl w-fit">
             {SHOWCASE_CATEGORY_TABS.map(({ value, label, icon: Icon }) => {
               const active = activeTab === value;
@@ -90,7 +91,7 @@ const ShowcaseSection = () => {
                   key={value}
                   onClick={() => setActiveTab(value)}
                   className={`
-                    flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all
+                    flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap
                     ${active 
                       ? 'bg-white text-slate-900 shadow-sm' 
                       : 'text-slate-500 hover:text-slate-700'}
@@ -105,11 +106,11 @@ const ShowcaseSection = () => {
         </div>
 
         {/* Listings Grid */}
-        <div className="min-h-[400px]">
+        <div className="min-h-[360px]">
           <AnimatePresence mode="wait">
             {showcaseLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                {[...Array(6)].map((_, i) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                {[...Array(12)].map((_, i) => (
                   <div key={i} className="bg-slate-100 rounded-2xl aspect-[3/4] animate-pulse" />
                 ))}
               </div>
@@ -119,7 +120,7 @@ const ShowcaseSection = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6"
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4"
               >
                 {filteredShowcases.length > 0 ? (
                   filteredShowcases.map((showcase) => (

@@ -1,4 +1,5 @@
 import { SlidersHorizontal, X, ArrowUpDown } from 'lucide-react';
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { LISTING_DEFAULTS, LISTING_SORT_FIELDS } from '../types/index.js';
 
 const GROUPED_FILTERS = [
@@ -53,7 +54,52 @@ const computeActiveFilterCount = (filters = {}) =>
         return hasGroupValue ? count + 1 : count;
     }, 0);
 
-const mapGroupToTag = (group, filters) => {
+const getEnumItemText = (item) => {
+    if (!item) return '';
+    if (typeof item !== 'object') return String(item);
+    return item.label || item.name || item.displayName || item.value || item.id || '';
+};
+
+const getEnumItemId = (item) => {
+    if (!item) return '';
+    if (typeof item !== 'object') return String(item);
+    return item.id || item.value || item.key || item.code || '';
+};
+
+const resolveEnumValue = (value, options = []) => {
+    const stringValue = String(value);
+    const found = options.find((item) => String(getEnumItemId(item)) === stringValue);
+    return getEnumItemText(found) || stringValue;
+};
+
+const resolveFilterValue = (key, rawVal, enums = {}) => {
+    const enumKeys = {
+        vehicleTypeIds: 'vehicleTypes',
+        brandIds: 'carBrands',
+        vehicleModelIds: 'vehicleModels',
+        brands: 'clothingBrands',
+        electronicBrandIds: 'electronicBrands',
+        electronicTypeIds: 'electronicTypes',
+        bookTypeIds: 'bookTypes',
+        genreIds: 'bookGenres',
+        languageIds: 'bookLanguages',
+        formatIds: 'bookFormats',
+        conditionIds: 'bookConditions',
+        disciplineIds: 'sportDisciplines',
+        equipmentTypeIds: 'sportEquipmentTypes',
+        realEstateTypeIds: 'realEstateTypes',
+        heatingTypeIds: 'heatingTypes',
+        adTypeId: 'realEstateAdTypes',
+        ownerTypeId: 'ownerTypes',
+    };
+
+    const values = Array.isArray(rawVal) ? rawVal : [rawVal];
+    const options = enums[enumKeys[key]] || [];
+    const resolved = values.map((value) => resolveEnumValue(value, options));
+    return resolved.join(', ');
+};
+
+const mapGroupToTag = (group, filters, enums) => {
     const activeKeys = group.filter(key => hasMeaningfulValue(filters[key]));
     if (activeKeys.length === 0) return null;
 
@@ -138,11 +184,10 @@ const mapGroupToTag = (group, filters) => {
 
     const key = activeKeys[0];
     const rawVal = filters[key];
-    const val = Array.isArray(rawVal) 
-        ? rawVal.join(', ') 
-        : typeof rawVal === 'string' && rawVal.length > 20 
-            ? `${rawVal.substring(0, 20)}...` 
-            : String(rawVal);
+    const resolvedVal = resolveFilterValue(key, rawVal, enums);
+    const val = typeof resolvedVal === 'string' && resolvedVal.length > 40
+        ? `${resolvedVal.substring(0, 40)}...`
+        : resolvedVal;
             
     const label = keyLabels[key] || key;
     return `${label}: ${val}`;
@@ -157,6 +202,7 @@ const FilterStatus = ({
   getActiveFilterCount,
   updateFilters
 }) => {
+    const { enums } = useEnums();
     const resolvedCount = typeof getActiveFilterCount === 'function'
         ? getActiveFilterCount(filters)
         : computeActiveFilterCount(filters);
@@ -168,7 +214,7 @@ const FilterStatus = ({
     const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
 
     const activeTags = GROUPED_FILTERS
-        .map(group => mapGroupToTag(group, filters))
+        .map(group => mapGroupToTag(group, filters, enums))
         .filter(tag => tag !== null);
 
     const FilterBadge = () => (

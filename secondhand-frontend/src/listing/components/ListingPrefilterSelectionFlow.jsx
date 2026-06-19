@@ -308,46 +308,68 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
     (stepId) => {
       if (stepId === 1) {
         const categoryGrid = (
-          <motion.div
-            variants={gridContainerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2"
-          >
-            {listingTypeOptions.map((type) => {
-              const isSelected = selectedType === type.value;
-              const card = getCategoryCardClasses(flowUiVariant, isSelected);
-              return (
-                <motion.button
-                  key={type.value}
-                  variants={gridItemVariants}
-                  whileHover={{ y: -2, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={() => handleTypeSelect(type.value)}
-                  className={card.wrapper}
+          <div className="space-y-6">
+            {mode === 'browse' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="rounded-2xl border border-indigo-100/80 bg-gradient-to-r from-indigo-50/60 to-violet-50/30 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm backdrop-blur-sm"
+              >
+                <div>
+                  <h4 className="text-[14px] font-bold text-indigo-950">Just want to look around?</h4>
+                  <p className="text-[12px] text-zinc-500 mt-0.5">Skip selecting a category and filters to see all available listings instantly.</p>
+                </div>
+                <Link
+                  to={ROUTES.LISTINGS}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/10 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 active:scale-95 shrink-0"
                 >
-                  <div className={card.iconBg}>{type.icon}</div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className={`text-sm font-semibold transition-colors ${card.title}`}>{type.label}</h3>
-                    <p className={`mt-0.5 truncate text-xs transition-colors ${card.desc}`}>{type.description}</p>
-                  </div>
-                  {isSelected ? (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                      className={card.checkOuter}
-                    >
-                      <Check className={card.checkInner} strokeWidth={3} />
-                    </motion.div>
-                  ) : (
-                    <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />
-                  )}
-                </motion.button>
-              );
-            })}
-          </motion.div>
+                  <span>Browse All Listings</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </motion.div>
+            )}
+            <motion.div
+              variants={gridContainerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+            >
+              {listingTypeOptions.map((type) => {
+                const isSelected = selectedType === type.value;
+                const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
+                return (
+                  <motion.button
+                    key={type.value}
+                    variants={gridItemVariants}
+                    whileHover={{ y: -2, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={() => handleTypeSelect(type.value)}
+                    className={card.wrapper}
+                  >
+                    <div className={card.iconBg}>{type.icon}</div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className={`text-sm font-semibold transition-colors ${card.title}`}>{type.label}</h3>
+                      <p className={`mt-0.5 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
+                    </div>
+                    {isSelected ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                        className={card.checkOuter}
+                      >
+                        <Check className={card.checkInner} strokeWidth={3} />
+                      </motion.div>
+                    ) : (
+                      <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          </div>
         );
         if (sellSurface) {
           return <div className={sellSurface}>{categoryGrid}</div>;
@@ -518,6 +540,7 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
       selectorSteps,
       sellSurface,
       setSelectionValue,
+      onSelectionNext,
     ],
   );
 
@@ -596,9 +619,9 @@ const ListingPrefilterSelectionFlow = ({mode = 'browse', onComplete, onCancel}) 
         continueLabel={mode === 'create' ? 'Next step' : 'Continue'}
       />
       {mode === 'browse' && (
-        <div className="mx-auto max-w-5xl border-t border-slate-200/70 px-6 pb-28 pt-8 text-center">
+        <div className="mx-auto max-w-5xl border-t border-slate-200/70 px-6 pb-12 pt-8 text-center">
           <Link to={ROUTES.LISTINGS} className={auxUi.skipLink}>
-            Skip and browse all listings
+            Skip filters and browse all listings
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

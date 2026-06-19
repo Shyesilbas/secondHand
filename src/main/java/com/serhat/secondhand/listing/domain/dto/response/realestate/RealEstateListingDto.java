@@ -28,7 +28,6 @@ public class RealEstateListingDto extends ListingDto {
     private String usageStatus;
     private String deedStatus;
     private String roomConfigKey;
-    private String heatingTypeKey;
     private Integer floorNumber;
     private Integer totalFloors;
     private boolean hasBalcony;

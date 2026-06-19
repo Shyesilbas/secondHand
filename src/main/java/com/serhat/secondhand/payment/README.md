@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik etkisini hizli ve dogru analiz etmesini saglamak
 - Idempotency, verification, event ve escrow akislarinda davranissal riski azaltmak
 
+## Agent Note
+
+- Read first: `PaymentController` -> `PaymentProcessor` -> pre-check -> strategy -> event flow.
+- Treat idempotency, verification, and escrow orchestration as non-negotiable rules.
+- Update this README when payment statuses, strategies, or event handlers change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `payment` paketi, odeme isleme motorunu saglar: pre-check, strateji secimi, odeme kaydi, event yayini ve escrow para akislarinin orchestrasyonu.

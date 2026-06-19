@@ -189,6 +189,7 @@ public class CacheConfig {
                 .allowIfSubType("java.lang")
                 .allowIfSubType("java.math")
                 .allowIfSubType("org.springframework.data.domain")
+                .allowIfSubTypeIsArray()
                 .build();
 
         // EVERYTHING + As.PROPERTY → her serialize edilen değere @class eklenir.

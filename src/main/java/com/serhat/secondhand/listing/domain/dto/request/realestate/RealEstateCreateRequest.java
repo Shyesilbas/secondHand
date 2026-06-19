@@ -27,7 +27,6 @@ public record RealEstateCreateRequest(
         String usageStatus,
         String deedStatus,
         String roomConfigKey,
-        String heatingTypeKey,
         Integer floorNumber,
         Integer totalFloors,
         boolean hasBalcony,

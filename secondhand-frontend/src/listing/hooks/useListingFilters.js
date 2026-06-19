@@ -17,7 +17,7 @@ export const useListingFilters = ({
   const initialTypeFromNav = navState?.listingType ? String(navState.listingType).trim().toUpperCase() : null;
 
   const [selectedCategory, setSelectedCategory] = useState(
-    mode === 'mine' ? (initialTypeFromNav || null) : (initialTypeFromNav || initialListingType || LISTING_TYPES.VEHICLE)
+    mode === 'mine' ? (initialTypeFromNav || null) : (initialTypeFromNav || initialListingType || null)
   );
 
   const [mineStatus, setMineStatus] = useState(null);
@@ -30,7 +30,7 @@ export const useListingFilters = ({
         listingType: initialTypeFromNav || null,
       };
     }
-    const t = initialTypeFromNav || String(initialListingType || '').trim().toUpperCase() || LISTING_TYPES.VEHICLE;
+    const t = initialTypeFromNav || (initialListingType ? String(initialListingType).trim().toUpperCase() : null);
     return getDefaultFiltersForType(t, { listingType: t });
   });
 
@@ -149,7 +149,7 @@ export const useListingFilters = ({
       setFilters((prev) => ({ ...prev, page: 0, listingType: null }));
       return;
     }
-    const listingType = selectedCategory || initialListingType || LISTING_TYPES.VEHICLE;
+    const listingType = selectedCategory || initialListingType || null;
     setFilters(getDefaultFiltersForType(listingType, { listingType, type: listingType, page: 0 }));
   }, [initialListingType, mode, selectedCategory]);
 
@@ -160,7 +160,7 @@ export const useListingFilters = ({
       setFilters((prev) => ({ ...prev, listingType: normalized || null, page: 0 }));
       return;
     }
-    const listingType = normalized || String(initialListingType || '').trim().toUpperCase() || LISTING_TYPES.VEHICLE;
+    const listingType = normalized || (initialListingType ? String(initialListingType).trim().toUpperCase() : null) || null;
     setFilters(getDefaultFiltersForType(listingType, { listingType, type: listingType, page: 0 }));
   }, [initialListingType, mode]);
 

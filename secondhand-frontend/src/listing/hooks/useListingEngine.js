@@ -53,7 +53,7 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
 
   const canFetch = mode === 'mine'
     ? Boolean(isAuthenticated && user?.id)
-    : !!filterHook.cleanedFilters.listingType;
+    : true;
 
   const { data, isLoading, error: queryError, refetch } = useQuery({
     queryKey,

@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik etkisini hizli ve dogru analiz etmesini saglamak
 - Cüzdan bakiye, para yatirma, para cekme ve guvenlik limit akislarinda (spending warning) davranissal riski azaltmak
 
+## Agent Note
+
+- Read first: `EWalletController` -> service layer -> repository -> mapper.
+- Balance and spending-warning changes are sensitive; keep calculations explicit.
+- Update docs when fields, limits, or transaction semantics change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `ewallet` paketi, platform icerisindeki kullanicilarin dahili elektronik cuzdanlarini, bakiyelerini ve bu cuzdan uzerindeki limit/guvenlik ayarlarini yonetir.

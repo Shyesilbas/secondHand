@@ -1,190 +1,55 @@
 {
   "propertyTypes": [
-    {
-      "key": "APARTMENT",
-      "label": "Daire (Apartment)"
-    },
-    {
-      "key": "RESIDENCE",
-      "label": "Rezidans (Residence)"
-    },
-    {
-      "key": "STUDIO",
-      "label": "Stüdyo (1+0)"
-    },
-    {
-      "key": "DUPLEX",
-      "label": "Dubleks"
-    },
-    {
-      "key": "PENTHOUSE",
-      "label": "Penthouse"
-    },
-    {
-      "key": "HOUSE",
-      "label": "Müstakil Ev"
-    },
-    {
-      "key": "VILLA",
-      "label": "Villa"
-    },
-    {
-      "key": "TOWNHOUSE",
-      "label": "İkiz Ev (Townhouse)"
-    },
-    {
-      "key": "SUMMER_HOUSE",
-      "label": "Yazlık Ev"
-    },
-    {
-      "key": "CHALET",
-      "label": "Dağ Evi (Chalet)"
-    },
-    {
-      "key": "MANSION",
-      "label": "Yalı / Köşk"
-    },
-    {
-      "key": "LAND",
-      "label": "Konut İmarlı Arsa"
-    },
-    {
-      "key": "FARM",
-      "label": "Tarla / Çiftlik"
-    },
-    {
-      "key": "VINEYARD",
-      "label": "Bağ"
-    },
-    {
-      "key": "OLIVE_GROVE",
-      "label": "Zeytinlik"
-    },
-    {
-      "key": "OFFICE",
-      "label": "Ofis / Büro"
-    },
-    {
-      "key": "COMMERCIAL",
-      "label": "Dükkan / Mağaza"
-    },
-    {
-      "key": "SHOP",
-      "label": "Komple Bina"
-    },
-    {
-      "key": "WAREHOUSE",
-      "label": "Depo / Antrepo"
-    },
-    {
-      "key": "FACTORY",
-      "label": "Fabrika"
-    },
-    {
-      "key": "INDUSTRIAL",
-      "label": "Sanayi Tesisi"
-    },
-    {
-      "key": "HOTEL",
-      "label": "Turistik Tesis / Otel"
-    },
-    {
-      "key": "PARKING",
-      "label": "Otopark Alanı"
-    },
-    {
-      "key": "OTHER",
-      "label": "Diğer Gayrimenkuller"
-    }
+    { "id": "10000001-0000-0000-0000-000000000001", "key": "APARTMENT",   "label": "Daire (Apartment)" },
+    { "id": "10000001-0000-0000-0000-000000000002", "key": "RESIDENCE",   "label": "Rezidans (Residence)" },
+    { "id": "10000001-0000-0000-0000-000000000003", "key": "STUDIO",      "label": "Stüdyo (1+0)" },
+    { "id": "10000001-0000-0000-0000-000000000004", "key": "DUPLEX",      "label": "Dubleks" },
+    { "id": "10000001-0000-0000-0000-000000000005", "key": "PENTHOUSE",   "label": "Penthouse" },
+    { "id": "10000001-0000-0000-0000-000000000006", "key": "HOUSE",       "label": "Müstakil Ev" },
+    { "id": "10000001-0000-0000-0000-000000000007", "key": "VILLA",       "label": "Villa" },
+    { "id": "10000001-0000-0000-0000-000000000008", "key": "TOWNHOUSE",   "label": "İkiz Ev (Townhouse)" },
+    { "id": "10000001-0000-0000-0000-000000000009", "key": "SUMMER_HOUSE","label": "Yazlık Ev" },
+    { "id": "10000001-0000-0000-0000-000000000010", "key": "CHALET",      "label": "Dağ Evi (Chalet)" },
+    { "id": "10000001-0000-0000-0000-000000000011", "key": "MANSION",     "label": "Yalı / Köşk" },
+    { "id": "10000001-0000-0000-0000-000000000012", "key": "LAND",        "label": "Konut İmarlı Arsa" },
+    { "id": "10000001-0000-0000-0000-000000000013", "key": "FARM",        "label": "Tarla / Çiftlik" },
+    { "id": "10000001-0000-0000-0000-000000000014", "key": "VINEYARD",    "label": "Bağ" },
+    { "id": "10000001-0000-0000-0000-000000000015", "key": "OLIVE_GROVE", "label": "Zeytinlik" },
+    { "id": "10000001-0000-0000-0000-000000000016", "key": "OFFICE",      "label": "Ofis / Büro" },
+    { "id": "10000001-0000-0000-0000-000000000017", "key": "COMMERCIAL",  "label": "Dükkan / Mağaza" },
+    { "id": "10000001-0000-0000-0000-000000000018", "key": "SHOP",        "label": "Komple Bina" },
+    { "id": "10000001-0000-0000-0000-000000000019", "key": "WAREHOUSE",   "label": "Depo / Antrepo" },
+    { "id": "10000001-0000-0000-0000-000000000020", "key": "FACTORY",     "label": "Fabrika" },
+    { "id": "10000001-0000-0000-0000-000000000021", "key": "INDUSTRIAL",  "label": "Sanayi Tesisi" },
+    { "id": "10000001-0000-0000-0000-000000000022", "key": "HOTEL",       "label": "Turistik Tesis / Otel" },
+    { "id": "10000001-0000-0000-0000-000000000023", "key": "PARKING",     "label": "Otopark Alanı" },
+    { "id": "10000001-0000-0000-0000-000000000024", "key": "OTHER",       "label": "Diğer Gayrimenkuller" }
   ],
   "adTypes": [
-    {
-      "key": "FOR_SALE",
-      "label": "For Sale"
-    },
-    {
-      "key": "FOR_RENT",
-      "label": "For Rent"
-    },
-    {
-      "key": "DAILY_RENT",
-      "label": "Daily Rent"
-    },
-    {
-      "key": "ROOMMATE",
-      "label": "Roommate"
-    }
+    { "id": "20000002-0000-0000-0000-000000000001", "key": "FOR_SALE",    "label": "For Sale" },
+    { "id": "20000002-0000-0000-0000-000000000002", "key": "FOR_RENT",    "label": "For Rent" },
+    { "id": "20000002-0000-0000-0000-000000000003", "key": "DAILY_RENT",  "label": "Daily Rent" },
+    { "id": "20000002-0000-0000-0000-000000000004", "key": "ROOMMATE",    "label": "Roommate" }
   ],
   "heatingTypes": [
-    {
-      "key": "NONE",
-      "label": "None"
-    },
-    {
-      "key": "STOVE",
-      "label": "Stove"
-    },
-    {
-      "key": "NATURAL_GAS",
-      "label": "Natural Gas"
-    },
-    {
-      "key": "CENTRAL_SYSTEM",
-      "label": "Central System"
-    },
-    {
-      "key": "COMBI_BOILER",
-      "label": "Combi Boiler (Kombi)"
-    },
-    {
-      "key": "AIR_CONDITIONER",
-      "label": "Air Conditioner"
-    },
-    {
-      "key": "GEOTHERMAL",
-      "label": "Geothermal"
-    },
-    {
-      "key": "FLOOR_HEATING",
-      "label": "Floor Heating"
-    },
-    {
-      "key": "SOLAR_ENERGY",
-      "label": "Solar Energy"
-    },
-    {
-      "key": "HEAT_PUMP",
-      "label": "Heat Pump"
-    },
-    {
-      "key": "DISTRICT_HEATING",
-      "label": "District Heating"
-    },
-    {
-      "key": "ELECTRIC_RADIATOR",
-      "label": "Electric Radiator"
-    },
-    {
-      "key": "OTHER",
-      "label": "Other"
-    }
+    { "id": "30000003-0000-0000-0000-000000000001", "key": "NONE",             "label": "None" },
+    { "id": "30000003-0000-0000-0000-000000000002", "key": "STOVE",            "label": "Stove" },
+    { "id": "30000003-0000-0000-0000-000000000003", "key": "NATURAL_GAS",      "label": "Natural Gas" },
+    { "id": "30000003-0000-0000-0000-000000000004", "key": "CENTRAL_SYSTEM",   "label": "Central System" },
+    { "id": "30000003-0000-0000-0000-000000000005", "key": "COMBI_BOILER",     "label": "Combi Boiler (Kombi)" },
+    { "id": "30000003-0000-0000-0000-000000000006", "key": "AIR_CONDITIONER",  "label": "Air Conditioner" },
+    { "id": "30000003-0000-0000-0000-000000000007", "key": "GEOTHERMAL",       "label": "Geothermal" },
+    { "id": "30000003-0000-0000-0000-000000000008", "key": "FLOOR_HEATING",    "label": "Floor Heating" },
+    { "id": "30000003-0000-0000-0000-000000000009", "key": "SOLAR_ENERGY",     "label": "Solar Energy" },
+    { "id": "30000003-0000-0000-0000-000000000010", "key": "HEAT_PUMP",        "label": "Heat Pump" },
+    { "id": "30000003-0000-0000-0000-000000000011", "key": "DISTRICT_HEATING", "label": "District Heating" },
+    { "id": "30000003-0000-0000-0000-000000000012", "key": "ELECTRIC_RADIATOR","label": "Electric Radiator" },
+    { "id": "30000003-0000-0000-0000-000000000013", "key": "OTHER",            "label": "Other" }
   ],
   "ownerTypes": [
-    {
-      "key": "OWNER",
-      "label": "Owner"
-    },
-    {
-      "key": "AGENCY",
-      "label": "Agency"
-    },
-    {
-      "key": "BUILDER",
-      "label": "Builder"
-    },
-    {
-      "key": "BANK",
-      "label": "Bank"
-    }
+    { "id": "40000004-0000-0000-0000-000000000001", "key": "OWNER",   "label": "Owner" },
+    { "id": "40000004-0000-0000-0000-000000000002", "key": "AGENCY",  "label": "Agency" },
+    { "id": "40000004-0000-0000-0000-000000000003", "key": "BUILDER", "label": "Builder" },
+    { "id": "40000004-0000-0000-0000-000000000004", "key": "BANK",    "label": "Bank" }
   ]
 }

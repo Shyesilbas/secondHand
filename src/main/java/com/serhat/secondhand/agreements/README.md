@@ -4,6 +4,12 @@ Bu dokumanin amaci:
 - `agreements` paketinin sorumluluklarini tek yerde netlestirmek
 - Degisiklik yaparken regresyon, performans ve tutarlilik riskini azaltmak
 
+## Agent Note
+
+- Read first: `AgreementController` -> `AgreementService` -> repositories -> mappers.
+- Keep agreement versioning and acceptance rules centralized.
+- Update this README if API, versioning, or email behavior changes.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `agreements` paketi, sistemdeki sozlesme/metin yonetimi ve kullanici kabul durumlarinin takibinden sorumludur.

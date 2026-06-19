@@ -1,6 +1,6 @@
 export const HomePageTheme = {
-  pageBackground: '#f8fafc',
-  heroBackground: '#ffffff',
+  pageBackground: '#f3f6fb',
+  heroBackground: '#f8fbff',
   heroButtonPrimary: '#059669',
   heroButtonPrimaryHover: '#047857',
   heroButtonSecondary: 'transparent',
@@ -15,4 +15,3 @@ export const HomePageTheme = {
   textPrimary: '#0f172a',
   textSecondary: '#475569',
 };
-

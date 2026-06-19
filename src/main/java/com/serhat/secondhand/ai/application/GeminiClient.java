@@ -53,8 +53,8 @@ public class GeminiClient {
     }
 
     private String generateTextWithModel(String modelName, String message, boolean swallowRateLimit) {
-        String url = baseUrl + "/" + modelName + ":generateContent?key=" + apiKey;
-        log.debug("Request to model: {} at URL: {}", modelName, baseUrl + "/" + modelName);
+        String url = buildGenerateContentUrl(modelName);
+        log.debug("Request to model: {} at URL: {}", modelName, url.replace(apiKey, "***"));
 
         var request = new GeminiRequest(List.of(
                 new GeminiRequest.Content(List.of(
@@ -112,5 +112,18 @@ public class GeminiClient {
         }
 
         throw new BusinessException("Request failed after maximum retries.", HttpStatus.SERVICE_UNAVAILABLE, "AI_MAX_RETRIES_EXCEEDED");
+    }
+
+    private String buildGenerateContentUrl(String modelName) {
+        String normalizedBaseUrl = baseUrl;
+        while (normalizedBaseUrl.endsWith("/")) {
+            normalizedBaseUrl = normalizedBaseUrl.substring(0, normalizedBaseUrl.length() - 1);
+        }
+
+        if (!normalizedBaseUrl.matches(".*/v\\d+(beta)?/models$")) {
+            normalizedBaseUrl += "/v1beta/models";
+        }
+
+        return normalizedBaseUrl + "/" + modelName + ":generateContent?key=" + apiKey;
     }
 }

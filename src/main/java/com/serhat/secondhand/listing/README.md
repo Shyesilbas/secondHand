@@ -2,6 +2,12 @@
 
 ##  Paket Yapısı ve Sorumluluklar
 
+## Agent Note
+
+- Read first: listing controller -> category service -> validator -> repository -> mapper.
+- Treat listing as a high-traffic, high-risk domain with cache and price history side effects.
+- Update this README when category rules, cache behavior, or public endpoints change.
+
 ###  `api/` - REST API Katmanı (9 dosya)
 
 **Sorumluluk:** HTTP isteklerini karşılar, DTO validasyonu yapar, application katmanına delege eder.
@@ -832,4 +838,3 @@ Listing modülü, ikinci el ürün satış platformunun **kalbi**dir. 6 farklı 
 - **Review Module:** Review istatistikleri
 - **Follow Module:** Yeni ilan bildirimleri (Event-driven)
 - **Dashboard Module:** Global istatistikler
-

@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik etkisini dogru yerde yonetmesini saglamak
 - Performans, tutarlilik ve davranissal regresyon risklerini azaltmak
 
+## Agent Note
+
+- Read first: `OfferController` -> `OfferService` -> validation/repository flow.
+- Keep counter-offer, accept, and reject semantics consistent.
+- Update this README when offer state transitions or pricing interaction changes.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `offer` paketi, listing uzerinden teklif olusturma ve teklif yasam dongusu yonetiminden sorumludur.

@@ -2,6 +2,12 @@
 
 Bu modül, siparişlerin lojistik süreçlerini yönetmekten sorumludur. `order` paketinden ayrıştırılarak bağımsız bir yapı haline getirilmiştir.
 
+## Agent Note
+
+- Read first: shipping controller/service and its order integration points.
+- Keep carrier mapping, status transitions, and ETA logic simple and explicit.
+- Update this README when the shipping endpoint or status model changes.
+
 ## Özellikler
 
 - **Zengin Domain Modeli (Rich Domain Model):** Kargo durum geçişleri, takip URL'i oluşturma ve tahmini teslimat tarihi hesaplama gibi iş mantıkları doğrudan `Shipping` entity'si içindedir.

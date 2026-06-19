@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Odeme sistemiyle olan entegrasyon modelini (Unified Payment Record) tanimlamak
 - Alim-satim guvenligi icin uygulanan kritik is kurallarini belgelemek
 
+## Agent Note
+
+- Read first: `EscrowService` and its payment integrations.
+- Keep hold, release, refund, and cancel rules idempotent.
+- Update this README if payment status coupling or cache invalidation changes.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `escrow` paketi, guvenli odeme (guvenli ticaret) akisini yonetir. Parayi alicidan tahsil edildigi anda sistemde bloke eder ve teslimat onayina kadar satici bakiyesine aktarmaz.

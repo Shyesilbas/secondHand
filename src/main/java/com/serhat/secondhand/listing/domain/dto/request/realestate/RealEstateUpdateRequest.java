@@ -26,7 +26,6 @@ public record RealEstateUpdateRequest(
         Optional<String> usageStatus,
         Optional<String> deedStatus,
         Optional<String> roomConfigKey,
-        Optional<String> heatingTypeKey,
         Optional<Integer> floorNumber,
         Optional<Integer> totalFloors,
         Optional<Boolean> hasBalcony,

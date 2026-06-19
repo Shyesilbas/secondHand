@@ -75,9 +75,6 @@ public class RealEstateListing extends Listing {
     @Column(name = "room_config_key", length = 60)
     private String roomConfigKey;
 
-    @Column(name = "heating_type_key", length = 60)
-    private String heatingTypeKey;
-
     @Column(name = "floor_number")
     private Integer floorNumber;
 

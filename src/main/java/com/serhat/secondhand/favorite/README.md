@@ -4,6 +4,12 @@
 - Degisiklik yaparken dogru dosyaya gitmeyi kolaylastirmak
 - Davranis, performans ve yan etki risklerini azaltmak
 
+## Agent Note
+
+- Read first: `FavoriteController` -> `FavoriteService` -> `FavoriteStatsService` -> repositories.
+- Preserve cache eviction and uniqueness rules.
+- Update this README if stats, cache keys, or notification behavior changes.
+
 ## 1) Paketin Sorumlulugu
 
 `favorite` paketi su islevlerden sorumludur:

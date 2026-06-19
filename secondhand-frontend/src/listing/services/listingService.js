@@ -154,16 +154,14 @@ export const listingService = {
   filterListings: async (filters) => {
     const listingType = String(filters.listingType || filters.type || '').trim().toUpperCase();
     if (!listingType || !Object.values(LISTING_TYPES).includes(listingType)) {
-      return {
-        content: [],
-        totalPages: 0,
-        totalElements: 0,
-        number: 0,
-        size: filters.size || LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-        first: true,
-        last: true,
-        empty: true
-      };
+      const status = filters.status || 'ACTIVE';
+      const page = parseInt(filters.page) || 0;
+      const size = parseInt(filters.size) || LISTING_DEFAULTS.FILTER_PAGE_SIZE;
+      const sortBy = filters.sortBy || 'createdAt';
+      const sortDir = (filters.sortDirection || 'DESC').toLowerCase();
+      
+      const url = `/v1/listings/status/${status}?page=${page}&size=${size}&sort=${sortBy},${sortDir}`;
+      return get(url);
     }
 
     const config = filterConfigs[listingType];

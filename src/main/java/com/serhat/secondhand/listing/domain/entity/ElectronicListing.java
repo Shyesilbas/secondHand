@@ -7,11 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Check;
+
 
 @Entity
 @Table(name = "electronic_listings")
-@Check(constraints = "connection_type IS NULL OR connection_type IN ('WIRED', 'BLUETOOTH', 'HDMI_USB', 'BOTH')")
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder

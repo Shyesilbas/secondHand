@@ -2,6 +2,12 @@
 
 Bu paket, vitrin (showcase) satın alma, listeleme, uzatma, iptal ve süresi dolan kayıtların yönetiminden sorumludur.
 
+## Agent Note
+
+- Read first: `ShowcaseController` -> `ShowcaseService` -> `ShowcaseValidator` -> repository -> mapper.
+- Keep payment verification and ownership checks central.
+- Update this README when pricing, pagination, or expiration behavior changes.
+
 ## Amaç ve Sınır
 
 - Bir listing belirli gün sayısı için vitrine alınır.

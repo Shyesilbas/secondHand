@@ -80,6 +80,94 @@ const ListingWizard = ({
     stepPanelRef.current?.scrollTo({ top: 0, behavior: 'auto' });
   }, [currentStep]);
 
+  const footerElement = (
+    <div className={`${t.bottomBar} shrink-0`}>
+      <div className={uiKey === 'browse' ? 'w-full py-2' : 'mx-auto max-w-5xl px-4 py-3.5 sm:px-6 lg:px-8'}>
+        {footerExtra ? <div className="mb-3">{footerExtra}</div> : null}
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={currentStep === 1 ? onBack : onPrev}
+            className={t.footerBackBtn}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {currentStep === 1 ? 'Cancel' : 'Back'}
+          </button>
+
+          <div className="flex items-center gap-2.5">
+            {onSaveDraft && isLastStep && (
+              <button
+                type="button"
+                onClick={onSaveDraft}
+                disabled={isLoading || !canSubmit}
+                className={`${t.draftBtnClass} disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                <Save className="h-3.5 w-3.5" />
+                Save Draft
+              </button>
+            )}
+
+            {!isLastStep ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNext();
+                }}
+                disabled={!canSubmit}
+                className={t.primaryBtn}
+              >
+                {continueLabel}
+                <ChevronRight className="h-4 w-4" />
+              </motion.button>
+            ) : lastStepAction ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  lastStepAction.onClick?.();
+                }}
+                disabled={Boolean(lastStepAction.disabled)}
+                className={t.primaryBtn}
+              >
+                {lastStepAction.label}
+                <ChevronRight className="h-4 w-4" />
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onSubmit) onSubmit(e);
+                }}
+                disabled={isLoading || !canSubmit}
+                className={t.primaryBtn}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Publishing…
+                  </>
+                ) : (
+                  <>
+                    {onSaveDraft ? 'Publish Now (Pay Fee)' : 'Save Changes'}
+                    <ChevronRight className="h-4 w-4" />
+                  </>
+                )}
+              </motion.button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const shellClass = layoutViewportLocked
     ? `flex flex-col flex-1 min-h-0 w-full overflow-hidden bg-gray-50/50`
     : t.shell;
@@ -437,96 +525,13 @@ const ListingWizard = ({
                 </motion.div>
               </AnimatePresence>
             </div>
+            {uiKey === 'browse' && footerElement}
           </div>
         </div>
       </div>
 
       {/* ── Footer ── */}
-      <div className={`${t.bottomBar} shrink-0`}>
-        <div className="mx-auto max-w-5xl px-4 py-3.5 sm:px-6 lg:px-8">
-          {footerExtra ? <div className="mb-3">{footerExtra}</div> : null}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={currentStep === 1 ? onBack : onPrev}
-              className={t.footerBackBtn}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {currentStep === 1 ? 'Cancel' : 'Back'}
-            </button>
-
-            <div className="flex items-center gap-2.5">
-              {onSaveDraft && isLastStep && (
-                <button
-                  type="button"
-                  onClick={onSaveDraft}
-                  disabled={isLoading || !canSubmit}
-                  className={`${t.draftBtnClass} disabled:cursor-not-allowed disabled:opacity-50`}
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  Save Draft
-                </button>
-              )}
-
-              {!isLastStep ? (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onNext();
-                  }}
-                  disabled={!canSubmit}
-                  className={t.primaryBtn}
-                >
-                  {continueLabel}
-                  <ChevronRight className="h-4 w-4" />
-                </motion.button>
-              ) : lastStepAction ? (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    lastStepAction.onClick?.();
-                  }}
-                  disabled={Boolean(lastStepAction.disabled)}
-                  className={t.primaryBtn}
-                >
-                  {lastStepAction.label}
-                  <ChevronRight className="h-4 w-4" />
-                </motion.button>
-              ) : (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (onSubmit) onSubmit(e);
-                  }}
-                  disabled={isLoading || !canSubmit}
-                  className={t.primaryBtn}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Publishing…
-                    </>
-                  ) : (
-                    <>
-                      {onSaveDraft ? 'Publish Now (Pay Fee)' : 'Save Changes'}
-                      <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
-                </motion.button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      {uiKey !== 'browse' && footerElement}
     </div>
   );
 };

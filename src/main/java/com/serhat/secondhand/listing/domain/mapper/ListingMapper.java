@@ -343,7 +343,6 @@ public abstract class ListingMapper {
         if (request.usageStatus() != null) request.usageStatus().ifPresent(entity::setUsageStatus);
         if (request.deedStatus() != null) request.deedStatus().ifPresent(entity::setDeedStatus);
         if (request.roomConfigKey() != null) request.roomConfigKey().ifPresent(entity::setRoomConfigKey);
-        if (request.heatingTypeKey() != null) request.heatingTypeKey().ifPresent(entity::setHeatingTypeKey);
         if (request.floorNumber() != null) request.floorNumber().ifPresent(entity::setFloorNumber);
         if (request.totalFloors() != null) request.totalFloors().ifPresent(entity::setTotalFloors);
         if (request.hasBalcony() != null) request.hasBalcony().ifPresent(entity::setHasBalcony);

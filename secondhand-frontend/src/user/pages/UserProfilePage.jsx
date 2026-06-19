@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
-import {Plus, Package, Heart, Star, AlertCircle, Award, CheckCircle2} from 'lucide-react';
+import {AlertCircle, Award, CheckCircle2, Grid3X3, Heart, Package, Plus, Sparkles, Star} from 'lucide-react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {userService} from '../services/userService.js';
 import {useUserListings} from '../hooks/useUserListings.js';
@@ -42,11 +42,18 @@ const GreatSellerProgressCard = ({gs}) => {
     );
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
-            <div className="bg-white rounded-2xl border border-gray-200/80 p-5 shadow-sm">
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <Award className="w-5 h-5 text-amber-600 shrink-0" />
-                    <h2 className="text-sm font-bold text-gray-900 tracking-tight">Great Seller milestones</h2>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
+            <div className="bg-white rounded-2xl border border-amber-200/80 p-5 shadow-sm shadow-amber-900/5">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-2">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-100">
+                            <Award className="w-5 h-5 shrink-0" />
+                        </span>
+                        <div>
+                            <h2 className="text-sm font-black text-gray-950 tracking-tight">Great Seller milestones</h2>
+                            <p className="text-xs font-medium text-gray-500">Progress is calculated from completed marketplace activity.</p>
+                        </div>
+                    </div>
                     {gs.eligible ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -55,8 +62,8 @@ const GreatSellerProgressCard = ({gs}) => {
                     ) : null}
                 </div>
 
-                <div className="space-y-5">
-                    <div>
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-[12px] font-semibold text-gray-800">
                                 Paid order lines ({days}&nbsp;days)
@@ -74,14 +81,7 @@ const GreatSellerProgressCard = ({gs}) => {
                         <Bar pct={salesPct} done={gs.salesMet} />
                     </div>
 
-                    <div className="flex justify-between gap-3 text-[12px]">
-                        <span className="text-gray-600 font-medium">Unit price threshold (per line)</span>
-                        <span className={`text-[11px] font-semibold shrink-0 ${gs.qualifyingSalesLastWindow > 0 ? 'text-emerald-700' : 'text-gray-400'}`}>
-                            {gs.qualifyingSalesLastWindow > 0 ? 'Counted in metric above ✓' : '—'}
-                        </span>
-                    </div>
-
-                    <div>
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-[12px] font-semibold text-gray-800">Unique buyer reviews</p>
                             <span className="text-[11px] font-bold tabular-nums text-gray-500">
@@ -94,7 +94,7 @@ const GreatSellerProgressCard = ({gs}) => {
                         <Bar pct={revPct} done={gs.reviewersMet} />
                     </div>
 
-                    <div>
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-[12px] font-semibold text-gray-800">Average rating</p>
                             <span className="text-[11px] font-bold tabular-nums text-gray-500">
@@ -128,6 +128,8 @@ const useUserProfile = (userId) => {
                 if (response && response.id) {
                     setUser(response);
                 }
+            } catch (err) {
+                setError(err?.message || 'Unable to load this profile.');
             } finally {
                 setIsLoading(false);
             }
@@ -177,7 +179,7 @@ const UserProfilePage = () => {
     const handlePageChange = (page) => loadPage(page);
 
     // Loading state
-    if (userLoading || !user) {
+    if (userLoading) {
         return (
             <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
                 <div className="text-center">
@@ -210,7 +212,7 @@ const UserProfilePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/80">
+        <div className="min-h-screen bg-[#f8faf8]">
             {/* ── Profile Header (full-width banner) ──────────── */}
             <UserProfileHeader
                 user={user}
@@ -222,9 +224,9 @@ const UserProfilePage = () => {
             {isOwnProfile && greatSeller ? <GreatSellerProgressCard gs={greatSeller} /> : null}
 
             {/* ── Tab Bar ─────────────────────────────────────── */}
-            <div className="bg-white border-b border-gray-200/80 sticky top-0 z-10">
+            <div className="sticky top-0 z-10 border-y border-gray-200/80 bg-white/90 backdrop-blur">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-1 -mb-px">
+                    <div className="flex items-center gap-2 overflow-x-auto py-3">
                         {TABS.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.key;
@@ -237,17 +239,17 @@ const UserProfilePage = () => {
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-semibold transition-all duration-200 border-b-2 ${
+                                    className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${
                                         isActive
-                                            ? 'border-gray-900 text-gray-900'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            ? 'bg-gray-950 text-white shadow-sm'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'
                                     }`}
                                 >
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
                                     {count !== null && (
                                         <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-[11px] font-bold tabular-nums ${
-                                            isActive ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500'
+                                            isActive ? 'bg-white/15 text-white' : 'bg-white text-gray-500'
                                         }`}>
                                             {count}
                                         </span>
@@ -260,16 +262,20 @@ const UserProfilePage = () => {
             </div>
 
             {/* ── Tab Content ─────────────────────────────────── */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
                 <div key={activeTab} className="animate-fadeIn min-w-0">
 
                     {/* ── Listings Tab ─────────────────────────── */}
                     {activeTab === 'listings' && (
                         <div>
                             {/* Controls row */}
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                                        <Grid3X3 className="h-3.5 w-3.5" />
+                                        Marketplace
+                                    </div>
+                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">
                                         Listings
                                     </h2>
                                     <p className="text-sm text-gray-500 mt-0.5">
@@ -277,11 +283,11 @@ const UserProfilePage = () => {
                                     </p>
                                 </div>
                                 {!listingsLoading && pagination.totalElements > 0 && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm">
                                         <select
                                             value={pagination.size}
                                             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                                            className="h-9 border border-gray-200 rounded-lg px-3 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 cursor-pointer"
+                                            className="h-9 border border-gray-200 rounded-lg px-3 text-sm font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 cursor-pointer"
                                         >
                                             <option value={10}>10</option>
                                             <option value={15}>15</option>
@@ -350,9 +356,13 @@ const UserProfilePage = () => {
                     {/* ── Lists Tab ────────────────────────────── */}
                     {activeTab === 'lists' && (
                         <div>
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">Lists</h2>
+                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                                        <Sparkles className="h-3.5 w-3.5" />
+                                        Curated
+                                    </div>
+                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">Lists</h2>
                                     <p className="text-sm text-gray-500 mt-0.5">
                                         {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
                                     </p>

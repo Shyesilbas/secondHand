@@ -9,6 +9,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Validates and cleans up subtype-specific fields based on the real estate type.
+ * Heating is now enforced exclusively via the {@code heatingType} FK entity
+ * (set through {@code heatingTypeId} in the request).
+ * The legacy {@code heatingTypeKey} String field has been removed.
+ */
 @Component
 public class RealEstateSubtypeFieldPolicy implements RealEstateSpecValidator {
 
@@ -38,8 +44,9 @@ public class RealEstateSubtypeFieldPolicy implements RealEstateSpecValidator {
             if (listing.getRoomConfigKey() != null) {
                 return Result.error("Land listing cannot contain roomConfigKey", "SUBTYPE_INCOMPATIBLE_ROOM_CONFIG");
             }
-            if (listing.getHeatingTypeKey() != null) {
-                return Result.error("Land listing cannot contain heatingTypeKey", "SUBTYPE_INCOMPATIBLE_HEATING");
+            // heatingType FK must be null for land listings
+            if (listing.getHeatingType() != null) {
+                return Result.error("Land listing cannot have a heating type", "SUBTYPE_INCOMPATIBLE_HEATING");
             }
             if (listing.getFloorNumber() != null) {
                 return Result.error("Land listing cannot contain floorNumber", "SUBTYPE_INCOMPATIBLE_FLOOR");
@@ -86,7 +93,7 @@ public class RealEstateSubtypeFieldPolicy implements RealEstateSpecValidator {
         // Defensive cleanup before database write
         if (LAND_SUBTYPES.contains(subtype)) {
             listing.setRoomConfigKey(null);
-            listing.setHeatingTypeKey(null);
+            listing.setHeatingType(null);   // clear FK entity instead of the removed key field
             listing.setFloorNumber(null);
             listing.setTotalFloors(null);
             listing.setBuildingAge(null);

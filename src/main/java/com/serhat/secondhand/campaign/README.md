@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Insan ve AI gelistiricilerin degisiklik yaparken etki alanini hizli anlamasini saglamak
 - Performans (N+1, row explosion), tutarlilik ve regresyon risklerini azaltmak
 
+## Agent Note
+
+- Read first: `CampaignController` -> `CampaignService` -> `CampaignValidator` -> repository.
+- Keep ownership, eligibility, and scheduler behavior in sync.
+- Update README when query shape, visibility, or eligibility rules change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `campaign` paketi, saticinin kampanya olusturma/guncelleme/silme/listeleme akislarini ve kampanya uygunluk kurallarini yonetir.
@@ -366,4 +372,3 @@ Mudahale:
    - Row explosion kontrolu
    - Index etkisi
 5. Son adimda README ve config dokumani guncel birak.
-

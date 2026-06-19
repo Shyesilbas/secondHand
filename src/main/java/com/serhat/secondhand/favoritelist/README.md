@@ -5,6 +5,12 @@ Bu dokumanin amaci:
 - Degisiklik yaparken dogru dosyayi secmeyi kolaylastirmak
 - Performans, N+1, race condition ve davranissal regressions risklerini azaltmak
 
+## Agent Note
+
+- Read first: `FavoriteListController` -> `FavoriteListService` -> repositories -> mapper.
+- Keep list/item/like uniqueness and visibility rules centralized.
+- Update this README when limits, projections, or summary queries change.
+
 ## 1) Paketin Amaci ve Sinirlari
 
 `favoritelist` paketi, kullanicilarin listing koleksiyonlari olusturmasini ve yonetmesini saglar.

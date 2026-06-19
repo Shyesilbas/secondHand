@@ -12,6 +12,19 @@
 
 The platform features an advanced **Escrow payment & E-Wallet** model, **real-time WebSocket STOMP messaging**, **AOP-driven audit logging**, **custom cookie-based OAuth2/JWT session rotation**, and **"Aura"**—a state-of-the-art semantic search and conversational AI assistant powered by Google Gemini.
 
+## Agent Start
+
+For AI agents:
+1. Read [`.artifacts/behaviour.md`](/Users/serhat/IdeaProjects/secondHand/.artifacts/behaviour.md)
+2. Read the relevant backend module `README.md`
+3. Read only the source files involved in the change
+
+Rules of thumb:
+- Keep the diff minimal.
+- Prefer existing module patterns over new abstractions.
+- Treat `auth`, `payment`, `escrow`, `order`, `cart`, and `listing` as high-risk domains.
+- If behavior changes, update the matching README or artifact in the same turn.
+
 ---
 
 ## 🗺️ System Architecture

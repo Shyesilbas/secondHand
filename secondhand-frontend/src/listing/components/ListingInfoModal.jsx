@@ -29,9 +29,9 @@ import {
 } from 'lucide-react';
 
 const INSIGHT_TABS = [
-  { id: 'history', label: 'Price trend', icon: TrendingUp },
-  { id: 'exchange', label: 'Convert', icon: RefreshCw },
-  { id: 'views', label: 'Views', icon: Eye, ownerOnly: true },
+  { id: 'history', label: 'Price history', icon: TrendingUp },
+  { id: 'exchange', label: 'Currency', icon: RefreshCw },
+  { id: 'views', label: 'Audience', icon: Eye, ownerOnly: true },
 ];
 
 function statusBadge(status) {
@@ -143,22 +143,26 @@ const ListingInfoModal = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-view-title"
-        className="relative flex max-h-[100dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] bg-[#faf9f7] shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,820px)] sm:rounded-[28px] transition-all duration-300"
+        className="relative flex max-h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-[28px] bg-slate-50 shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,860px)] sm:rounded-[28px] transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100/60 bg-white px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">
-              Quick view
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-700">
+              <TrendingUp className="h-3 w-3" />
+              Listing insights
             </span>
-            <h2 id="quick-view-title" className="truncate text-base font-extrabold text-slate-900 mt-2">
+            <h2 id="quick-view-title" className="mt-2 truncate text-base font-extrabold text-slate-900">
               {title}
             </h2>
+            <p className="mt-0.5 truncate text-xs font-semibold text-slate-500">
+              Price movement, exchange conversion and performance signals.
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-100 text-slate-400 hover:text-slate-900 hover:scale-105 transition-all shadow-sm"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-50 border border-slate-200 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-all shadow-sm"
           >
             <X className="h-4.5 w-4.5" strokeWidth={2.5} />
           </button>
@@ -166,8 +170,8 @@ const ListingInfoModal = ({
 
         {/* Tek kaydırma alanı: flex zincirinde min-h-0 şart */}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-          <div className="grid gap-0 sm:grid-cols-2">
-            <div className="relative border-b border-slate-100/60 bg-slate-50 sm:border-b-0 sm:border-r">
+          <div className="grid gap-0 lg:grid-cols-[310px_minmax(0,1fr)]">
+            <div className="relative border-b border-slate-200 bg-white lg:border-b-0 lg:border-r">
               <div className="aspect-[4/3] w-full sm:aspect-auto sm:h-full sm:min-h-[260px] sm:max-h-[360px] overflow-hidden">
                 {listing.imageUrl && !imageBroken ? (
                   <img
@@ -191,8 +195,8 @@ const ListingInfoModal = ({
               )}
             </div>
 
-            <div className="space-y-5 px-5 py-5 sm:px-6 sm:py-6 bg-white">
-              <div>
+            <div className="space-y-5 px-5 py-5 sm:px-6 sm:py-6 bg-slate-50">
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Price</p>
                 <div className="mt-1 flex flex-wrap items-center gap-2.5">
                   <span className="text-2xl font-black tabular-nums text-slate-900 tracking-tight">
@@ -309,27 +313,35 @@ const ListingInfoModal = ({
               )}
 
               {/* Market Insights nested inside the right column */}
-              <div className="border-t border-slate-100/60 pt-5">
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Market insights</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {visibleTabs.map(({ id, label, icon: Icon }) => (
+              <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+                <div className="mb-3 flex items-center justify-between gap-3 px-1">
+                  <div>
+                    <p className="text-sm font-black text-slate-900">Analytics</p>
+                    <p className="mt-0.5 text-[11px] font-semibold text-slate-500">Choose a signal to inspect.</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1 sm:flex">
+                  {visibleTabs.map((tab) => {
+                    const TabIcon = tab.icon;
+                    return (
                     <button
-                      key={id}
+                      key={tab.id}
                       type="button"
-                      onClick={() => onInsightChange(id)}
-                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
-                        activeInsight === id
-                          ? 'bg-slate-900 text-white shadow-sm'
-                          : 'bg-[#faf9f7] text-slate-600 border border-slate-100 hover:bg-slate-100'
+                      onClick={() => onInsightChange(tab.id)}
+                      className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+                        activeInsight === tab.id
+                          ? 'bg-white text-slate-950 shadow-sm ring-1 ring-slate-200'
+                          : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
-                      <Icon className="h-3.5 w-3.5" />
-                      {label}
+                      <TabIcon className="h-3.5 w-3.5" />
+                      {tab.label}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
 
-                <div className="mt-3 min-h-[180px] rounded-2xl border border-slate-100 bg-[#faf9f7]/30 p-3 sm:p-4">
+                <div className="mt-4 min-h-[220px] rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
                   {activeInsight === 'history' && (
                     <PriceHistoryTab
                       priceHistory={priceHistory}

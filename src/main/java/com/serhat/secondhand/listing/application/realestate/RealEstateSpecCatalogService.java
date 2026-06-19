@@ -12,6 +12,15 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * Provides in-memory catalog data for real estate listing specs.
+ * <p>
+ * Heating types are <b>not</b> served from this catalog — they are managed as
+ * full DB reference entities (see {@code HeatingType} and
+ * {@code /api/catalog/real-estate/heating-types} from {@code EnumController}).
+ * This service only exposes non-entity catalogs: room configurations and
+ * zoning statuses.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,11 +31,9 @@ public class RealEstateSpecCatalogService {
     private final ObjectMapper objectMapper;
 
     private final List<SpecDto> roomConfigs = new ArrayList<>();
-    private final List<SpecDto> heatingTypes = new ArrayList<>();
     private final List<SpecDto> zoningStatuses = new ArrayList<>();
 
     private final Set<String> validRoomConfigKeys = new HashSet<>();
-    private final Set<String> validHeatingTypeKeys = new HashSet<>();
     private final Set<String> validZoningStatusKeys = new HashSet<>();
 
     @PostConstruct
@@ -43,9 +50,7 @@ public class RealEstateSpecCatalogService {
     private void loadCatalog() throws Exception {
         try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
             JsonNode root = objectMapper.readTree(is);
-
             parseSpecNode(root.get("roomConfigs"), roomConfigs, validRoomConfigKeys);
-            parseSpecNode(root.get("heatingTypes"), heatingTypes, validHeatingTypeKeys);
             parseSpecNode(root.get("zoningStatuses"), zoningStatuses, validZoningStatusKeys);
         }
     }
@@ -66,10 +71,6 @@ public class RealEstateSpecCatalogService {
         return Collections.unmodifiableList(roomConfigs);
     }
 
-    public List<SpecDto> getHeatingTypes() {
-        return Collections.unmodifiableList(heatingTypes);
-    }
-
     public List<SpecDto> getZoningStatuses() {
         return Collections.unmodifiableList(zoningStatuses);
     }
@@ -79,11 +80,6 @@ public class RealEstateSpecCatalogService {
     public boolean isValidRoomConfig(String key) {
         if (key == null) return false;
         return validRoomConfigKeys.contains(key.toUpperCase());
-    }
-
-    public boolean isValidHeatingType(String key) {
-        if (key == null) return false;
-        return validHeatingTypeKeys.contains(key.toUpperCase());
     }
 
     public boolean isValidZoningStatus(String key) {

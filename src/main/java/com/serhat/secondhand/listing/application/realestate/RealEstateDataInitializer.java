@@ -19,12 +19,21 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Seeds real estate reference data (property types, ad types, heating types,
  * owner types) from {@code classpath:seed/realestate.json}.
  *
- * <p>Uses an <b>upsert</b> strategy for all entities.
+ * <p>Uses a <b>deterministic-UUID upsert</b> strategy:
+ * <ul>
+ *   <li>Each entry in the JSON carries a fixed {@code id} field.</li>
+ *   <li>On first run the row is INSERTed with that UUID.</li>
+ *   <li>On subsequent runs the existing row is found by UUID and its label is updated.</li>
+ * </ul>
+ * This guarantees that UUIDs are stable across environments (dev, staging, prod, CI)
+ * so that FK references in {@code real_estate_listings} remain valid regardless of
+ * which environment produced the seed.
  */
 @Component
 @RequiredArgsConstructor
@@ -73,21 +82,28 @@ public class RealEstateDataInitializer implements SeedTask {
     private void seedPropertyTypes(JsonNode propertyTypesNode) {
         if (propertyTypesNode == null || !propertyTypesNode.isArray()) return;
         for (JsonNode node : propertyTypesNode) {
-            upsertPropertyType(node.get("key").asText(), node.get("label").asText());
+            upsertPropertyType(
+                    UUID.fromString(node.get("id").asText()),
+                    node.get("key").asText(),
+                    node.get("label").asText()
+            );
         }
     }
 
-    private void upsertPropertyType(String key, String label) {
-        Optional<RealEstateType> existing = realEstateTypeRepository.findByNameIgnoreCase(key);
+    private void upsertPropertyType(UUID id, String key, String label) {
+        Optional<RealEstateType> existing = realEstateTypeRepository.findById(id);
         if (existing.isPresent()) {
             RealEstateType type = existing.get();
             type.setLabel(label);
+            type.markNotNew();
             realEstateTypeRepository.save(type);
             return;
         }
         RealEstateType type = new RealEstateType();
+        type.setId(id);
         type.setName(key);
         type.setLabel(label);
+        // isNew defaults to true → Spring Data will INSERT
         realEstateTypeRepository.save(type);
     }
 
@@ -96,19 +112,25 @@ public class RealEstateDataInitializer implements SeedTask {
     private void seedAdTypes(JsonNode adTypesNode) {
         if (adTypesNode == null || !adTypesNode.isArray()) return;
         for (JsonNode node : adTypesNode) {
-            upsertAdType(node.get("key").asText(), node.get("label").asText());
+            upsertAdType(
+                    UUID.fromString(node.get("id").asText()),
+                    node.get("key").asText(),
+                    node.get("label").asText()
+            );
         }
     }
 
-    private void upsertAdType(String key, String label) {
-        Optional<RealEstateAdType> existing = realEstateAdTypeRepository.findByNameIgnoreCase(key);
+    private void upsertAdType(UUID id, String key, String label) {
+        Optional<RealEstateAdType> existing = realEstateAdTypeRepository.findById(id);
         if (existing.isPresent()) {
             RealEstateAdType type = existing.get();
             type.setLabel(label);
+            type.markNotNew();
             realEstateAdTypeRepository.save(type);
             return;
         }
         RealEstateAdType type = new RealEstateAdType();
+        type.setId(id);
         type.setName(key);
         type.setLabel(label);
         realEstateAdTypeRepository.save(type);
@@ -119,19 +141,25 @@ public class RealEstateDataInitializer implements SeedTask {
     private void seedHeatingTypes(JsonNode heatingTypesNode) {
         if (heatingTypesNode == null || !heatingTypesNode.isArray()) return;
         for (JsonNode node : heatingTypesNode) {
-            upsertHeatingType(node.get("key").asText(), node.get("label").asText());
+            upsertHeatingType(
+                    UUID.fromString(node.get("id").asText()),
+                    node.get("key").asText(),
+                    node.get("label").asText()
+            );
         }
     }
 
-    private void upsertHeatingType(String key, String label) {
-        Optional<HeatingType> existing = heatingTypeRepository.findByNameIgnoreCase(key);
+    private void upsertHeatingType(UUID id, String key, String label) {
+        Optional<HeatingType> existing = heatingTypeRepository.findById(id);
         if (existing.isPresent()) {
             HeatingType type = existing.get();
             type.setLabel(label);
+            type.markNotNew();
             heatingTypeRepository.save(type);
             return;
         }
         HeatingType type = new HeatingType();
+        type.setId(id);
         type.setName(key);
         type.setLabel(label);
         heatingTypeRepository.save(type);
@@ -142,19 +170,25 @@ public class RealEstateDataInitializer implements SeedTask {
     private void seedOwnerTypes(JsonNode ownerTypesNode) {
         if (ownerTypesNode == null || !ownerTypesNode.isArray()) return;
         for (JsonNode node : ownerTypesNode) {
-            upsertOwnerType(node.get("key").asText(), node.get("label").asText());
+            upsertOwnerType(
+                    UUID.fromString(node.get("id").asText()),
+                    node.get("key").asText(),
+                    node.get("label").asText()
+            );
         }
     }
 
-    private void upsertOwnerType(String key, String label) {
-        Optional<ListingOwnerType> existing = listingOwnerTypeRepository.findByNameIgnoreCase(key);
+    private void upsertOwnerType(UUID id, String key, String label) {
+        Optional<ListingOwnerType> existing = listingOwnerTypeRepository.findById(id);
         if (existing.isPresent()) {
             ListingOwnerType type = existing.get();
             type.setLabel(label);
+            type.markNotNew();
             listingOwnerTypeRepository.save(type);
             return;
         }
         ListingOwnerType type = new ListingOwnerType();
+        type.setId(id);
         type.setName(key);
         type.setLabel(label);
         listingOwnerTypeRepository.save(type);
