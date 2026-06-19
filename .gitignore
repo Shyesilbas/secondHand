@@ -35,6 +35,12 @@ build/
 # Yerel sırlar (spring.config.import optional)
 config/application-local-secret.yml
 .env
+**/.env
+src/main/resources/application-local.yml
+
+# Tek seferlik geliştirici scriptleri (repoya gitmez)
+secondhand-frontend/fix-*.cjs
+secondhand-frontend/i18n-codemod.js
 
 # macOS metadata
 .DS_Store
