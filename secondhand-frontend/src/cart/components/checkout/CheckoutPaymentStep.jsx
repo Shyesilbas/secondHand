@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Wallet, AlertCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import { formatCurrency } from '../../../common/formatters.js';
@@ -177,4 +177,4 @@ const CheckoutPaymentStep = ({
   );
 };
 
-export default CheckoutPaymentStep;
+export default memo(CheckoutPaymentStep);

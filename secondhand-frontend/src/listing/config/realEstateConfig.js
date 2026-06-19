@@ -1,5 +1,6 @@
+import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-import RealEstateCreateForm from '../../realEstate/components/RealEstateCreateForm.jsx';
+const RealEstateCreateForm = lazy(() => import('../../realEstate/components/RealEstateCreateForm.jsx'));
 import {realEstateService} from '../../realEstate/services/realEstateService.js';
 import {RealEstateCreateRequestDTO} from '../../realEstate/realEstates.js';
 import {filterConfigs} from '../filters/filterConfigs.js';

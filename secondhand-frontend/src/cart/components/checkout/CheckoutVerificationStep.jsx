@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, memo } from 'react';
 import { Lock, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../../common/constants/otp.js';
 import { findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
@@ -171,4 +171,4 @@ const CheckoutVerificationStep = ({
   );
 };
 
-export default CheckoutVerificationStep;
+export default memo(CheckoutVerificationStep);

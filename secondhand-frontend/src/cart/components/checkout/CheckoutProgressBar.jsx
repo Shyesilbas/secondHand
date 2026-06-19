@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Check } from 'lucide-react';
 
 const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
@@ -116,4 +116,4 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
   );
 };
 
-export default CheckoutProgressBar;
+export default memo(CheckoutProgressBar);

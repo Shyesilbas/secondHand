@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
 import { useSellerReviewStatsCache } from '../../../reviews/hooks/useSellerReviewStatsCache.js';
@@ -301,4 +302,4 @@ const CheckoutReviewStep = ({
   );
 };
 
-export default CheckoutReviewStep;
+export default memo(CheckoutReviewStep);

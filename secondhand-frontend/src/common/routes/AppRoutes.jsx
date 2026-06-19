@@ -13,8 +13,6 @@ import AdminRoute from './AdminRoute.jsx';
 
 // Critical Routes - Eager loaded (always needed on initial load)
 import HomePage from '../../home/pages/HomePage.jsx';
-import LoginPage from '../../auth/pages/LoginPage.jsx';
-import RegisterPage from '../../auth/pages/RegisterPage.jsx';
 
 // High Priority - Lazy loaded (frequently accessed)
 const ListingsPage = lazy(() => import('../../listing/pages/ListingsPage.jsx'));
@@ -22,6 +20,8 @@ const ListingDetailPage = lazy(() => import('../../listing/pages/ListingDetailPa
 const ListingsPrefilterPage = lazy(() => import('../../listing/pages/ListingsPrefilterPage.jsx'));
 
 // Auth Pages - Lazy loaded
+const LoginPage = lazy(() => import('../../auth/pages/LoginPage.jsx'));
+const RegisterPage = lazy(() => import('../../auth/pages/RegisterPage.jsx'));
 const ForgotPasswordPage = lazy(() => import('../../auth/pages/ForgotPasswordPage.jsx'));
 const ChangePasswordPage = lazy(() => import('../../auth/pages/ChangePasswordPage.jsx'));
 const AccountVerificationPage = lazy(() => import('../../auth/pages/AccountVerificationPage.jsx'));

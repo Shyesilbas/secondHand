@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import { Check } from 'lucide-react';
 
@@ -219,4 +220,4 @@ const CheckoutOrderSummary = ({
   );
 };
 
-export default CheckoutOrderSummary;
+export default memo(CheckoutOrderSummary);

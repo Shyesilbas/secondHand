@@ -1,5 +1,6 @@
+import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-import BooksCreateForm from '../../books/components/BooksCreateForm.jsx';
+const BooksCreateForm = lazy(() => import('../../books/components/BooksCreateForm.jsx'));
 import {booksService} from '../../books/services/booksService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 

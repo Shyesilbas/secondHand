@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, memo } from 'react';
 import { ChevronDown, Plus, ArrowLeft, ArrowRight, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../common/constants/routes.js';
@@ -440,4 +440,4 @@ const CheckoutAddressStep = ({
   );
 };
 
-export default CheckoutAddressStep;
+export default memo(CheckoutAddressStep);

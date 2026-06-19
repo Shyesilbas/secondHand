@@ -1,5 +1,6 @@
+import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-import VehicleCreateForm from '../../vehicle/components/VehicleCreateForm.jsx';
+const VehicleCreateForm = lazy(() => import('../../vehicle/components/VehicleCreateForm.jsx'));
 import { vehicleService } from '../../vehicle/services/vehicleService.js';
 import { VehicleCreateRequestDTO } from '../../vehicle/vehicles.js';
 import { filterConfigs } from '../filters/filterConfigs.js';

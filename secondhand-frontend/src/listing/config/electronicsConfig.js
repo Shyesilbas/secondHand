@@ -1,5 +1,6 @@
+import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-import ElectronicCreateForm from '../../electronics/components/ElectronicCreateForm.jsx';
+const ElectronicCreateForm = lazy(() => import('../../electronics/components/ElectronicCreateForm.jsx'));
 import {electronicService} from '../../electronics/services/electronicService.js';
 import {ElectronicCreateRequestDTO} from '../../electronics/electronics.js';
 import {filterConfigs} from '../filters/filterConfigs.js';

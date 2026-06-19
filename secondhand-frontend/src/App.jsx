@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {AuthProvider} from './auth/AuthProvider.jsx';
@@ -5,11 +6,17 @@ import {NotificationProvider} from './notification/NotificationProvider.jsx';
 import {InAppNotificationProvider} from './notification/InAppNotificationProvider.jsx';
 import {EnumProvider} from './common/contexts/EnumProvider.jsx';
 import {ComparisonProvider} from './comparison/contexts/ComparisonProvider.jsx';
-import {CompareFloatingBar, CompareModal} from './comparison/index.js';
 import {ReservationModalProvider} from './cart/context/ReservationModalProvider.jsx';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
-import { SafeMeetupOnboardingModal } from './order/components/shared/SafeMeetupOnboardingModal.jsx';
+
+const CompareFloatingBar = lazy(() => import('./comparison/components/CompareFloatingBar.jsx'));
+const CompareModal = lazy(() => import('./comparison/components/CompareModal.jsx'));
+const SafeMeetupOnboardingModal = lazy(() =>
+  import('./order/components/shared/SafeMeetupOnboardingModal.jsx').then((m) => ({
+    default: m.SafeMeetupOnboardingModal,
+  }))
+);
 
 
 const queryClient = new QueryClient({
@@ -37,9 +44,11 @@ function App() {
                                         <ReservationModalProvider>
                                         <div className="App">
                                             <AppRoutes />
-                                            <CompareFloatingBar />
-                                            <CompareModal />
-                                            <SafeMeetupOnboardingModal />
+                                            <Suspense fallback={null}>
+                                                <CompareFloatingBar />
+                                                <CompareModal />
+                                                <SafeMeetupOnboardingModal />
+                                            </Suspense>
                                         </div>
                                         </ReservationModalProvider>
                                     </ComparisonProvider>

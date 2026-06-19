@@ -1,3 +1,4 @@
+import React, { memo } from 'react';
 import CheckoutReviewStep from './CheckoutReviewStep.jsx';
 import CheckoutAddressStep from './CheckoutAddressStep.jsx';
 import CheckoutPaymentStep from './CheckoutPaymentStep.jsx';
@@ -125,4 +126,4 @@ const CheckoutStep = ({
   );
 };
 
-export default CheckoutStep;
+export default memo(CheckoutStep);
