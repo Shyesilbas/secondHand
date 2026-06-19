@@ -24,7 +24,7 @@ import java.util.UUID;
 public class UpdateCampaignRequest {
     @NotBlank
     private String name;
-    private boolean active;
+    private Boolean active;
     private LocalDateTime startsAt;
     private LocalDateTime endsAt;
     @NotNull

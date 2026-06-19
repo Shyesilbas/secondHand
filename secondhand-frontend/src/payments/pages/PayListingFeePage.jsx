@@ -154,9 +154,9 @@ const PayListingFeePage = () => {
                         onStartVerification={startVerification}
                         onVerifyAndPay={verifyAndPay}
                         onCancel={() => setShowConfirmModal(false)}
-                        onNavigateToPaymentMethods={(type) => {
+                        onNavigateToPaymentMethods={() => {
                             setShowConfirmModal(false);
-                            navigate(`/payments/${type === 'CREDIT_CARD' ? 'credit-cards' : 'bank-accounts'}`);
+                            navigate('/payments');
                         }}
                         isProcessing={isProcessingPayment}
                         verificationCode={verificationCode}
@@ -175,4 +175,3 @@ const PayListingFeePage = () => {
 };
 
 export default PayListingFeePage;
-

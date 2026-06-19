@@ -17,6 +17,7 @@ public record PaymentRequest(
         String receiverName,
         String receiverSurname,
         UUID listingId,
+        Long orderItemId,
         String listingTitle,
         String listingNo,
         BigDecimal amount,

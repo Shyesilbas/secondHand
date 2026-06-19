@@ -1,8 +1,9 @@
 package com.serhat.secondhand.payment.application;
 
-import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
+import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -14,43 +15,42 @@ import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class PaymentRequestFactory {
 
-    public List<PaymentRequest> buildOrderPaymentRequests(User user, List<Cart> cartItems,
+    public List<PaymentRequest> buildOrderPaymentRequests(User user, Order order,
                                                           CheckoutRequest request, PricingResultDto pricing, String orderNumber, java.util.UUID orderExternalId) {
-        Map<Long, List<Cart>> paymentsBySeller = groupCartItemsBySeller(cartItems);
-
-        return paymentsBySeller.entrySet().stream()
-                .map(entry -> {
-                    Long sellerId = entry.getKey();
-                    List<Cart> sellerItems = entry.getValue();
-                    BigDecimal sellerTotal = resolveSellerTotal(sellerId, sellerItems, pricing);
-                    String idempotencyKey = orderNumber + "-" + sellerId;
-                    return buildOrderPaymentRequestForSeller(user, sellerId, sellerItems, sellerTotal, request, idempotencyKey, orderExternalId);
+        return buildPayableAmountsByOrderItem(order).stream()
+                .map(itemAmount -> {
+                    OrderItem item = itemAmount.orderItem();
+                    String idempotencyKey = orderNumber + "-item-" + item.getId();
+                    return buildOrderPaymentRequestForItem(user, item, itemAmount.amount(), request, idempotencyKey, orderExternalId);
                 })
                 .collect(Collectors.toList());
     }
 
-    public PaymentRequest buildOrderPaymentRequestForSeller(User user, Long sellerId, List<Cart> sellerItems,
-                                                             BigDecimal sellerTotal, CheckoutRequest request, String idempotencyKey, java.util.UUID orderExternalId) {
-        PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.CREDIT_CARD;
+    public PaymentRequest buildOrderPaymentRequestForItem(User user, OrderItem item,
+                                                           BigDecimal itemPayableAmount, CheckoutRequest request, String idempotencyKey, java.util.UUID orderExternalId) {
+        PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.EWALLET;
 
-        Listing firstListing = sellerItems.get(0).getListing();
+        Listing listing = item.getListing();
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
-                .toUserId(sellerId)
+                .toUserId(item.getSeller().getId())
                 .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname(PaymentProcessingConstants.ESCROW_RECEIVER_SURNAME)
-                .listingId(firstListing.getId())
-                .listingTitle(firstListing.getTitle())
-                .listingNo(firstListing.getListingNo())
-                .amount(sellerTotal)
-                .currency(firstListing.getCurrency() != null ? firstListing.getCurrency().name() : "TRY")
+                .listingId(listing.getId())
+                .orderItemId(item.getId())
+                .listingTitle(listing.getTitle())
+                .listingNo(listing.getListingNo())
+                .amount(itemPayableAmount)
+                .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
                 .paymentType(paymentType)
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
                 .paymentDirection(PaymentDirection.OUTGOING)
@@ -71,6 +71,7 @@ public class PaymentRequestFactory {
                 .receiverName(user.getName())
                 .receiverSurname(user.getSurname())
                 .listingId(listing.getId())
+                .orderItemId(null)
                 .listingTitle(listing.getTitle())
                 .listingNo(listing.getListingNo())
                 .amount(totalCost)
@@ -93,6 +94,7 @@ public class PaymentRequestFactory {
                 .receiverName(user.getName())
                 .receiverSurname(user.getSurname())
                 .listingId(listing.getId())
+                .orderItemId(null)
                 .listingTitle(listing.getTitle())
                 .listingNo(listing.getListingNo())
                 .amount(additionalCost)
@@ -107,17 +109,52 @@ public class PaymentRequestFactory {
                 .build();
     }
 
-    private Map<Long, List<Cart>> groupCartItemsBySeller(List<Cart> cartItems) {
-        return cartItems.stream()
-                .collect(Collectors.groupingBy(cart -> cart.getListing().getSeller().getId()));
+    private List<OrderItemAmount> buildPayableAmountsByOrderItem(Order order) {
+        if (order == null || order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return List.of();
+        }
+
+        List<OrderItem> items = new ArrayList<>(order.getOrderItems());
+        items.sort(Comparator.comparing(OrderItem::getId, Comparator.nullsLast(Long::compareTo)));
+
+        BigDecimal itemSubtotal = items.stream()
+                .map(OrderItem::getTotalPrice)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (itemSubtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            return items.stream().map(item -> new OrderItemAmount(item, BigDecimal.ZERO)).toList();
+        }
+
+        BigDecimal payableTotal = order.getTotalAmount() != null ? order.getTotalAmount() : itemSubtotal;
+        if (payableTotal.compareTo(BigDecimal.ZERO) < 0) {
+            payableTotal = BigDecimal.ZERO;
+        }
+        if (payableTotal.compareTo(itemSubtotal) > 0) {
+            payableTotal = itemSubtotal;
+        }
+        payableTotal = payableTotal.setScale(2, RoundingMode.HALF_UP);
+
+        List<OrderItemAmount> result = new ArrayList<>();
+        BigDecimal remaining = payableTotal;
+        for (int i = 0; i < items.size(); i++) {
+            OrderItem item = items.get(i);
+            BigDecimal itemTotal = item.getTotalPrice() != null ? item.getTotalPrice() : BigDecimal.ZERO;
+            BigDecimal amount;
+            if (i == items.size() - 1) {
+                amount = remaining;
+            } else {
+                amount = payableTotal.multiply(itemTotal)
+                        .divide(itemSubtotal, 2, RoundingMode.HALF_UP);
+                if (amount.compareTo(remaining) > 0) {
+                    amount = remaining;
+                }
+            }
+            amount = amount.max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+            result.add(new OrderItemAmount(item, amount));
+            remaining = remaining.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        }
+        return result;
     }
 
-    private BigDecimal resolveSellerTotal(Long sellerId, List<Cart> sellerItems, PricingResultDto pricing) {
-        if (pricing != null && pricing.getPayableBySeller() != null && pricing.getPayableBySeller().containsKey(sellerId)) {
-            return pricing.getPayableBySeller().get(sellerId);
-        }
-        return sellerItems.stream()
-                .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    private record OrderItemAmount(OrderItem orderItem, BigDecimal amount) {}
 }

@@ -1,5 +1,23 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-export const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8080/ws';
+const getApiUrl = () => {
+    if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL;
+    }
+    if (import.meta.env.DEV) {
+        return 'http://localhost:8080/api';
+    }
+    return `${window.location.origin}/api`;
+};
+
+const getWsUrl = () => {
+    if (import.meta.env.VITE_WS_BASE_URL) {
+        return import.meta.env.VITE_WS_BASE_URL;
+    }
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}/ws`;
+};
+
+export const API_BASE_URL = getApiUrl();
+export const WS_BASE_URL = getWsUrl();
 
 export const API_ENDPOINTS = {
     AUTH: {
@@ -82,24 +100,10 @@ export const API_ENDPOINTS = {
         SELLER: '/v1/dashboard/seller',                                                  // GET - Seller dashboard
         BUYER: '/v1/dashboard/buyer',                                                    // GET - Buyer dashboard
     },
-    CREDIT_CARDS: {
-        GET_ALL: '/v1/credit-card',
-        CREATE: '/v1/credit-card',
-        DELETE: (cardId) => `/v1/credit-card/${cardId}`,
-        EXISTS: '/v1/credit-card/exists',
-        AVAILABLE_CREDIT: '/v1/credit-card/available-credit',
-    },
     COMPLAINTS: {
         CREATE: '/v1/complaints',
         MY_COMPLAINTS: '/v1/users/me/complaints',
         ABOUT_ME: '/v1/users/me/complaints/received',
-    },
-    BANK_ACCOUNTS: {
-        GET_ALL: '/v1/bank',
-        CREATE: '/v1/bank',
-        DELETE: '/v1/bank',
-        EXISTS: '/v1/bank/exists',
-        BALANCE: '/v1/bank/balance',
     },
     EMAILS: {
         MY_EMAILS: '/v1/emails/my-emails',

@@ -3,7 +3,6 @@ package com.serhat.secondhand.ewallet.validator;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.ewallet.entity.EWallet;
 import com.serhat.secondhand.ewallet.repository.EWalletRepository;
-import com.serhat.secondhand.payment.entity.Bank;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -43,16 +41,6 @@ public class EWalletValidator {
     public Result<Void> validateSpendingWarningLimit(BigDecimal limit) {
         if (limit != null && limit.compareTo(BigDecimal.ZERO) < 0) {
             return Result.error(PaymentErrorCodes.INVALID_WALLET_LIMIT);
-        }
-        return Result.success();
-    }
-
-    public Result<Void> validateBankAccount(Bank bank, UUID requestBankId) {
-        if (bank == null) {
-            return Result.error(PaymentErrorCodes.BANK_ACCOUNT_NOT_FOUND);
-        }
-        if (!bank.getId().equals(requestBankId)) {
-            return Result.error(PaymentErrorCodes.INVALID_BANK_ACCOUNT);
         }
         return Result.success();
     }
@@ -100,5 +88,15 @@ public class EWalletValidator {
         }
         return eWallet.get().getBalance().compareTo(amount) >= 0;
     }
-}
 
+    public boolean hasSufficientBalance(Long userId, BigDecimal amount) {
+        if (userId == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        Optional<EWallet> eWallet = eWalletRepository.findByUserId(userId);
+        if (eWallet.isEmpty()) {
+            return false;
+        }
+        return eWallet.get().getBalance().compareTo(amount) >= 0;
+    }
+}

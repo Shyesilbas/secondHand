@@ -55,4 +55,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Modifying
     @Query("UPDATE Cart c SET c.isReserved = false, c.reservedAt = null, c.reservationEndTime = null WHERE c.id IN :ids")
     void clearReservationsByIdInBatch(@Param("ids") List<Long> ids);
+
+    @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.user.id = :userId")
+    long sumQuantityByUserId(@Param("userId") Long userId);
 }

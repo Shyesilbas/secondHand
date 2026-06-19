@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.aspect.TrackPriceChange;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent;
 import com.serhat.secondhand.listing.domain.entity.events.PriceDroppedEvent;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
@@ -31,6 +32,11 @@ public class ListingCommandService {
     private final ListingValidationService listingValidationService;
     private final ListingConfig listingConfig;
     private final PriceHistoryService priceHistoryService;
+    private static final List<ListingStatus> EDITABLE_STATUSES = List.of(
+            ListingStatus.DRAFT,
+            ListingStatus.ACTIVE,
+            ListingStatus.INACTIVE
+    );
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> publish(UUID listingId, Long userId) {
@@ -87,11 +93,15 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> deleteListing(UUID listingId, Long userId) {
-        Result<Void> ownershipResult = listingValidationService.validateOwnership(listingId, userId);
-        if (ownershipResult.isError()) return ownershipResult;
-
-        listingRepository.deleteById(listingId);
-        return Result.success();
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            listing.delete();
+            listingRepository.save(listing);
+            log.info("Listing {} soft deleted", listingId);
+            return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
     }
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
@@ -113,10 +123,17 @@ public class ListingCommandService {
         if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
             return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
-        int updated = listingRepository.updateQuantityBatch(listingIds, quantity, userId);
-        if (updated != listingIds.size()) {
-            log.warn("Partial batch quantity update: {} of {} listings updated", updated, listingIds.size());
+        if (listingRepository.countByIdInAndSellerId(listingIds, userId) != listingIds.size()) {
+            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
         }
+        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds.size()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
+        int updated = listingRepository.updateQuantityBatch(listingIds, quantity, userId, EDITABLE_STATUSES);
+        if (updated != listingIds.size()) {
+            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        }
+        log.info("Batch quantity updated to {} for {} listings", quantity, updated);
         return Result.success();
     }
 
@@ -142,12 +159,18 @@ public class ListingCommandService {
         if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {
             return Result.error(ListingErrorCodes.INVALID_PRICE);
         }
+        if (listingRepository.countByIdInAndSellerId(listingIds, userId) != listingIds.size()) {
+            return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds.size()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
         List<Listing> ownedBefore = listingRepository.findAllByIdIn(listingIds).stream()
                 .filter(l -> l.isOwnedBy(userId))
                 .toList();
-        int updated = listingRepository.updatePriceBatch(listingIds, price, userId);
+        int updated = listingRepository.updatePriceBatch(listingIds, price, userId, EDITABLE_STATUSES);
         if (updated != listingIds.size()) {
-            log.warn("Partial batch price update: {} of {} listings updated", updated, listingIds.size());
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
         for (Listing l : ownedBefore) {
             if (priceChanged(l.getPrice(), price)) {
@@ -195,4 +218,3 @@ public class ListingCommandService {
         return fee.add(taxAmount);
     }
 }
-

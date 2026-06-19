@@ -166,8 +166,11 @@ public class OrderCreationService {
         }
         Map<UUID, BigDecimal> map = new HashMap<>();
         for (PricedCartItemDto item : pricing.getItems()) {
-            if (item.getListingId() != null && item.getCampaignUnitPrice() != null) {
-                map.put(item.getListingId(), item.getCampaignUnitPrice());
+            if (item.getListingId() != null) {
+                BigDecimal unitPrice = item.getNetUnitPrice() != null ? item.getNetUnitPrice() : item.getCampaignUnitPrice();
+                if (unitPrice != null) {
+                    map.put(item.getListingId(), unitPrice);
+                }
             }
         }
         return map;
@@ -179,8 +182,11 @@ public class OrderCreationService {
         }
         Map<UUID, BigDecimal> map = new HashMap<>();
         for (PricedCartItemDto item : pricing.getItems()) {
-            if (item.getListingId() != null && item.getLineSubtotal() != null) {
-                map.put(item.getListingId(), item.getLineSubtotal());
+            if (item.getListingId() != null) {
+                BigDecimal lineSubtotal = item.getNetLineTotal() != null ? item.getNetLineTotal() : item.getLineSubtotal();
+                if (lineSubtotal != null) {
+                    map.put(item.getListingId(), lineSubtotal);
+                }
             }
         }
         return map;

@@ -54,6 +54,9 @@ public class CampaignValidator {
                 && campaign.getValue().compareTo(BigDecimal.valueOf(100)) > 0) {
             return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
         }
+        if (campaign.getMinQuantity() != null && campaign.getMinQuantity() < 1) {
+            return Result.error(CampaignErrorCodes.CAMPAIGN_INVALID);
+        }
         return Result.success();
     }
 

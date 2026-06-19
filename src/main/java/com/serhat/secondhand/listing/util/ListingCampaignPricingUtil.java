@@ -145,6 +145,14 @@ public class ListingCampaignPricingUtil {
             return false;
         }
 
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        if (campaign.getStartsAt() != null && now.isBefore(campaign.getStartsAt())) {
+            return false;
+        }
+        if (campaign.getEndsAt() != null && now.isAfter(campaign.getEndsAt())) {
+            return false;
+        }
+
         boolean hasListingFilter = hasFilter(campaign.getEligibleListingIds());
         boolean hasTypeFilter = hasFilter(campaign.getEligibleTypes());
 
@@ -167,11 +175,17 @@ public class ListingCampaignPricingUtil {
     }
 
     private BigDecimal computeDiscount(Campaign campaign, BigDecimal unitPrice) {
+        BigDecimal discount;
         if (campaign.getDiscountKind() == CampaignDiscountKind.PERCENT) {
             BigDecimal percentage = campaign.getValue().divide(HUNDRED, PRECISION, RoundingMode.HALF_UP);
-            return scale(unitPrice.multiply(percentage));
+            discount = scale(unitPrice.multiply(percentage));
+        } else {
+            discount = scale(campaign.getValue());
         }
-        return scale(campaign.getValue());
+        if (discount.compareTo(unitPrice) > 0) {
+            discount = unitPrice;
+        }
+        return discount;
     }
 
     private BigDecimal scale(BigDecimal value) {

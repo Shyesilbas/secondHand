@@ -108,7 +108,7 @@ export const useDraftListings = () => {
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess }) => {
   const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
   const listingFeeIdempotencyKeyRef = useRef(null);
-  const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.CREDIT_CARD);
+  const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.EWALLET);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -256,4 +256,3 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     onRequiredAgreementsChange
   };
 };
-

@@ -27,6 +27,8 @@ public enum OrderErrorCodes implements ErrorCode {
     ORDER_COMPLETION_ESCROW_RELEASE_FAILED("ORDER_COMPLETION_ESCROW_RELEASE_FAILED", "Order completion failed during escrow release", HttpStatus.BAD_REQUEST),
     ORDER_ITEM_MISSING_SELLER("ORDER_ITEM_MISSING_SELLER", "Order item cannot be created: listing has no seller", HttpStatus.UNPROCESSABLE_ENTITY),
     ORDER_ITEM_NOT_BELONG_TO_ORDER("ORDER_ITEM_NOT_BELONG_TO_ORDER", "Order item does not belong to this order", HttpStatus.FORBIDDEN),
+    ORDER_HAS_MULTIPLE_SELLERS("ORDER_HAS_MULTIPLE_SELLERS", "This order contains items from multiple sellers and cannot be shipped as a single seller shipment", HttpStatus.BAD_REQUEST),
+    ORDER_NOT_SHIPPABLE("ORDER_NOT_SHIPPABLE", "Order cannot be shipped", HttpStatus.BAD_REQUEST),
     MEETUP_VERIFICATION_FAILED("MEETUP_VERIFICATION_FAILED", "Meetup verification code is incorrect", HttpStatus.BAD_REQUEST),
     VERIFICATION_LOCKED("VERIFICATION_LOCKED", "Too many failed attempts. Verification is locked temporarily.", HttpStatus.FORBIDDEN),
     NOT_AUTHORIZED_FOR_ORDER("NOT_AUTHORIZED_FOR_ORDER", "You are not authorized to perform this action on this order", HttpStatus.FORBIDDEN);

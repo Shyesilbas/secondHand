@@ -17,7 +17,7 @@ Kapsam:
 - Odeme kayitlariyla senkronizasyon
 
 Kapsam disi:
-- Kredi karti veya banka entegrasyonu (bu `payment` paketindedir)
+- Harici kredi karti veya banka entegrasyonu su an devre disidir; odemeler eWallet uzerinden akar.
 - Siparis lojistik takibi (bu `order` paketindedir)
 
 ## 2) Paket Yapisi

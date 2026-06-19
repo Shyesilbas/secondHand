@@ -1,6 +1,6 @@
-import { get, post, del } from '../../common/services/api/request.js';
+import { get, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { BankDto, PaymentDto, createPaymentRequest } from '../paymentSchema.js';
+import { PaymentDto, createPaymentRequest } from '../paymentSchema.js';
 
 export const paymentService = {
 
@@ -54,45 +54,6 @@ export const paymentService = {
             return get(`${API_ENDPOINTS.PAYMENTS.STATISTICS}?paymentType=${encodeURIComponent(paymentType)}`);
         }
         return get(API_ENDPOINTS.PAYMENTS.STATISTICS);
-    },
-
-    getCreditCards: async () => {
-        return get(API_ENDPOINTS.CREDIT_CARDS.GET_ALL);
-    },
-
-    createCreditCard: async (limit, cardData = null) => {
-        const body = { limit };
-        if (cardData) {
-            if (cardData.cardLabel)   body.cardLabel   = cardData.cardLabel;
-            if (cardData.cardNumber)  body.cardNumber  = cardData.cardNumber.replace(/\s/g, '');
-            if (cardData.cvv)         body.cvv         = cardData.cvv;
-            if (cardData.expiryMonth) body.expiryMonth = parseInt(cardData.expiryMonth, 10);
-            if (cardData.expiryYear)  body.expiryYear  = parseInt(cardData.expiryYear, 10);
-        }
-        return post(API_ENDPOINTS.CREDIT_CARDS.CREATE, body);
-    },
-
-    deleteCreditCard: async (cardId) => {
-        return del(API_ENDPOINTS.CREDIT_CARDS.DELETE(cardId));
-    },
-
-    createBankAccount: async () => {
-        const data = await post(API_ENDPOINTS.BANK_ACCOUNTS.CREATE);
-        return BankDto(data);
-    },
-
-    getBankAccounts: async () => {
-        const data = await get(API_ENDPOINTS.BANK_ACCOUNTS.GET_ALL);
-        const rawData = Array.isArray(data) ? data : [data].filter(Boolean);
-        return rawData.map(BankDto);
-    },
-
-    /** Backend şu an kullanıcı başına tek hesap siliyor; id tıklanan satırla eşleşmeli (çoklu UI için). */
-    deleteBankAccount: async (accountId) => {
-        if (accountId == null || accountId === '') {
-            throw new Error('Bank account id is required');
-        }
-        return del(API_ENDPOINTS.BANK_ACCOUNTS.DELETE);
     },
 
 };

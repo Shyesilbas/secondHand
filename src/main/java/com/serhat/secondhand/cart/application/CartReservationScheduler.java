@@ -28,13 +28,21 @@ public class CartReservationScheduler {
             return;
         }
 
+        int clearedCount = clearExpiredReservationsNow();
+        if (clearedCount > 0) {
+            log.debug("Expired reservations cleared in batch");
+        }
+    }
+
+    @Transactional
+    public int clearExpiredReservationsNow() {
         ZoneId zoneId = ZoneId.of(Optional.ofNullable(cartConfig.getZoneId()).orElse("Europe/Istanbul"));
         LocalDateTime now = LocalDateTime.now(zoneId);
         List<Long> expiredIds = cartRepository.findExpiredReservationIds(now);
-        if (expiredIds.isEmpty()) return;
+        if (expiredIds.isEmpty()) return 0;
 
         log.info("Clearing {} expired cart reservations", expiredIds.size());
         cartRepository.clearReservationsByIdInBatch(expiredIds);
-        log.debug("Expired reservations cleared in batch");
+        return expiredIds.size();
     }
 }

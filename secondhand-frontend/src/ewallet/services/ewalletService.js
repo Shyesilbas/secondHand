@@ -22,19 +22,17 @@ export const ewalletService = {
         return del(API_ENDPOINTS.EWALLET.REMOVE_SPENDING_WARNING);
     },
 
-    deposit: async (amount, bankId, agreementsAccepted = false, acceptedAgreementIds = []) => {
+    deposit: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
         return post(API_ENDPOINTS.EWALLET.DEPOSIT, { 
             amount, 
-            bankId, 
             agreementsAccepted, 
             acceptedAgreementIds 
         });
     },
 
-    withdraw: async (amount, bankId, agreementsAccepted = false, acceptedAgreementIds = []) => {
+    withdraw: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
         return post(API_ENDPOINTS.EWALLET.WITHDRAW, { 
             amount, 
-            bankId, 
             agreementsAccepted, 
             acceptedAgreementIds 
         });

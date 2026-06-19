@@ -16,8 +16,6 @@ export const PAYMENT_QUERY_KEYS = Object.freeze({
   payments: ['payments'],
   paymentStatistics: ['paymentStatistics'],
   paymentMethods: ['paymentMethods'],
-  creditCards: ['creditCards'],
-  bankAccounts: ['bankAccounts'],
   emailsMy: ['emails', 'my'],
   draftListings: ['draftListings'],
 });
@@ -53,8 +51,6 @@ export const pickPaymentStatistic = (stats, keyGroup) => {
 export { normalizeArrayResponse };
 
 export const PAYMENT_TYPES = {
-  CREDIT_CARD: 'CREDIT_CARD',
-  TRANSFER: 'TRANSFER',
   EWALLET: 'EWALLET'
 };
 
@@ -111,7 +107,7 @@ export const PaymentDto = (data) => ({
   receiverDisplayName: data.receiverDisplayName || '',
   amount: data.amount || 0,
   currency: data.currency || 'TRY',
-  paymentType: data.paymentType || PAYMENT_TYPES.CREDIT_CARD,
+  paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
   transactionType: data.transactionType || PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
   paymentDirection: data.paymentDirection || PAYMENT_DIRECTIONS.OUTGOING,
   listingId: data.listingId || null,
@@ -122,17 +118,7 @@ export const PaymentDto = (data) => ({
   status: data.status || (data.isSuccess ? 'COMPLETED' : 'FAILED')
 });
 
-export const BankDto = (data) => ({
-  id: data?.id || data?.ID || null,
-  IBAN: data?.IBAN || '',
-  balance: data?.balance || 0,
-  holderName: data?.holderName || '',
-  holderSurname: data?.holderSurname || '',
-});
-
 export const PAYMENT_TYPE_LABELS = {
-  [PAYMENT_TYPES.CREDIT_CARD]: 'Credit Card',
-  [PAYMENT_TYPES.TRANSFER]: 'Bank Transfer',
   [PAYMENT_TYPES.EWALLET]: 'E-Wallet'
 };
 
@@ -169,10 +155,8 @@ export const createPaymentRequest = (data) => {
     currency: data.currency || 'TRY',
     description: data.description?.trim() || '',
     paymentMethod: data.paymentMethod || '',
-    creditCardId: data.creditCardId || '',
-    bankAccountId: data.bankAccountId || '',
     listingId: data.listingId || '',
-    paymentType: data.paymentType || '',
+    paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
     agreementsAccepted: data.agreementsAccepted || false,
     acceptedAgreementIds: data.acceptedAgreementIds || []
   };
@@ -181,7 +165,7 @@ export const createPaymentRequest = (data) => {
 export const createListingFeePaymentRequest = (data) => {
   return {
     listingId: data.listingId || '',
-    paymentType: data.paymentType || PAYMENT_TYPES.CREDIT_CARD,
+    paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
     transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
     paymentDirection: PAYMENT_DIRECTIONS.OUTGOING,
     verificationCode: data.verificationCode || null,
@@ -190,4 +174,3 @@ export const createListingFeePaymentRequest = (data) => {
     idempotencyKey: data.idempotencyKey,
   };
 };
-

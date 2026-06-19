@@ -167,8 +167,6 @@ const PaymentFilterSidebar = ({
                                 className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all"
                             >
                                 <option value="">All Payment Methods</option>
-                                <option value={PAYMENT_TYPES.CREDIT_CARD}>Credit Card</option>
-                                <option value={PAYMENT_TYPES.TRANSFER}>Bank Transfer</option>
                                 <option value={PAYMENT_TYPES.EWALLET}>eWallet</option>
                             </select>
                         </div>
@@ -304,4 +302,3 @@ const PaymentNavigation = ({
 
 export default PaymentNavigation;
 export { PaymentPagination };
-

@@ -1,27 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useBankAccountsQuery } from '../../hooks/queries.js';
+import React, { useEffect, useState } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import { WALLET_OPERATION_MODES } from '../../paymentSchema.js';
 
 const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWallet }) => {
-  const needsBankAccount =
-    mode === WALLET_OPERATION_MODES.DEPOSIT || mode === WALLET_OPERATION_MODES.WITHDRAW;
-  const { data: bankAccounts = [] } = useBankAccountsQuery({ enabled: isOpen && needsBankAccount });
-
   const [amount, setAmount] = useState('');
-  const [selectedBankId, setSelectedBankId] = useState(null);
-
-  const defaultBankId = useMemo(() => (bankAccounts[0]?.id ? bankAccounts[0].id : null), [bankAccounts]);
 
   useEffect(() => {
     if (!isOpen) return;
     setAmount('');
-    setSelectedBankId(defaultBankId);
-  }, [isOpen, defaultBankId]);
+  }, [isOpen]);
 
   const handleClose = () => {
     setAmount('');
-    setSelectedBankId(null);
     onClose();
   };
 
@@ -33,8 +23,8 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
   })();
 
   const description = (() => {
-    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Transfer money from your eWallet to your bank account.';
-    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Add money from your bank account to your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Mock withdrawal from your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Manually add mock funds to your eWallet.';
     if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Set the maximum allowed balance for your eWallet.';
     return 'Set a threshold to warn you before overspending.';
   })();
@@ -86,12 +76,7 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
     if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) return;
 
     try {
-      if (needsBankAccount) {
-        if (!selectedBankId) return;
-        await onSubmit(numericAmount, selectedBankId);
-      } else {
-        await onSubmit(numericAmount);
-      }
+      await onSubmit(numericAmount);
       onClose();
     } catch {}
   };
@@ -124,7 +109,7 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
                 type="number"
                 step="0.01"
                 min="0"
-                className={`w-full border rounded-lg pr-3 py-2 focus:ring focus:ring-blue-400 outline-none ${needsBankAccount ? 'pl-14' : 'pl-10'}`}
+                className="w-full border rounded-lg pl-10 pr-3 py-2 focus:ring focus:ring-blue-400 outline-none"
                 placeholder={amountPlaceholder}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -134,46 +119,6 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
               <p className="text-xs text-gray-500 mt-2">{amountHelp}</p>
             ) : null}
           </div>
-
-          {needsBankAccount ? (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Bank Account</label>
-              {bankAccounts.length === 0 ? (
-                <p className="p-3 bg-gray-50 border rounded text-sm text-gray-600">
-                  No bank account found. Please create one first.
-                </p>
-              ) : (
-                <div className="space-y-2 max-h-52 overflow-auto">
-                  {bankAccounts.map((bank, index) => (
-                    <label
-                      key={bank.id || index}
-                      className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                      <input
-                        type="radio"
-                        name="bankAccount"
-                        value={bank.id}
-                        checked={selectedBankId == bank.id}
-                        onChange={(e) => setSelectedBankId(e.target.value)}
-                        className="mr-3"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-gray-900">
-                            {bank.holderName} {bank.holderSurname}
-                          </p>
-                          <span className="text-xs rounded-full bg-gray-100 text-gray-700 px-2 py-1">
-                            {formatCurrency(bank.balance || 0)}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">IBAN: {bank.IBAN}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null}
         </div>
 
         <div className="flex gap-3 mt-6">
@@ -197,4 +142,3 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
 };
 
 export default WalletOperationModal;
-

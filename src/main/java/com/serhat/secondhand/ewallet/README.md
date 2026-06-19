@@ -17,7 +17,7 @@ Kapsam:
 - Puan/Bakiye yukleme, satis sonrasi kazanc aktarimi (`creditToUser`) ve iade/iptal dususleri (`debitFromUser`). Bu islemlerde `counterpartUser` (karsi taraf) bilgisi alinarak islem gonderici ve alicisi dogru kaydedilir. Escrow iadelerinde para sistemden (escrow'dan) aliciya dondugu icin `counterpartUser=null` gecirilir ve `fromUser` otomatik olarak aliciya (paranin sahibine) atanir.
 
 Kapsam disi:
-- Gercek banka entegrasyonu detaylari (`payment.bank` altinda yonetilir)
+- Gercek banka entegrasyonu su an devre disidir; manuel mock top-up kullanilir.
 - Odeme orchestration'i ana akisi (`payment` paketinde `CheckoutOrchestrator` ve `PaymentProcessor` tarafindan yonetilir)
 
 ## 2) Paket Yapisi (Nerede Ne Var)
@@ -38,7 +38,7 @@ Kapsam disi:
   - `EWalletRepository`: EWallet DB operasyonlari (pessimistic lock ile).
 
 - `validator/*`
-  - `EWalletValidator`: Bakiye yeterliligi, banka hesabi validasyonu, limit kontrolleri.
+  - `EWalletValidator`: Bakiye yeterliligi ve limit kontrolleri.
 
 - `mapper/*`, `util/*`
   - Donusumler (MapStruct) ve Bakiye islemleri (EWalletBalanceUtil) icin kullanilan utility fonksiyonlari.
@@ -49,7 +49,7 @@ Standart akis:
 1. Kullanici platformda ilk e-cuzdan etkilesiminde (veya kayitta) e-cuzdan otomatik olusturulur (`creditToUser` fallback).
 2. Odemelerde (Checkout), e-cuzdan secildiginde pre-check yapilir.
 3. On-pre-check asamasinda `spending-warning/check` ile eger harcama `spendingWarningLimit`'in %90'ina variyorsa frontend'e uyari donulur.
-4. Cekim ve Yükleme (Withdraw/Deposit) islemlerinde banka hesabi dogrulanir ve islem onaylanir.
+4. Cekim ve yukleme islemleri simdilik mock olarak cüzdan bakiyesini gunceller.
 
 Karar noktasi prensipleri:
 - **Pessimistic Locking:** Bakiye degisiklikleri `findByUserWithLock` kullanilarak concurrency hatalarina (race condition) karsi korunur.
@@ -63,14 +63,14 @@ Karar noktasi prensipleri:
 3. Kullanici onaylarsa islem `payment` paketine gider, `processEWalletPayment` calisir ve bakiye eksi yonde guncellenir.
 
 ### 4.2 Para Yatirma (Deposit)
-1. Kullanici tutar ve Banka ID iletir.
+1. Kullanici tutar iletir.
 2. `EWalletValidator` cüzdan limitine ulasilip ulasilmadigini kontrol eder.
-3. `bankService.debit` ile bankadan para cekilir, `eWallet.setBalance` ile cuzdan artirilir.
+3. Mock top-up olarak `eWallet.setBalance` ile cuzdan artirilir.
 
 ### 4.3 Para Cekme (Withdraw)
-1. Kullanici tutar ve Banka ID iletir.
+1. Kullanici tutar iletir.
 2. Bakiye yeterliligi dogrulanir.
-3. `eWallet.setBalance` ile bakiye dusurulur, `bankService.credit` ile bankaya para gonderilir.
+3. Mock withdraw olarak `eWallet.setBalance` ile bakiye dusurulur.
 
 ## 5) Kritik Is Kurallari
 
@@ -81,7 +81,7 @@ Karar noktasi prensipleri:
 
 ## 6) Performans ve Davranissal Risk Notlari
 
-- `findByUserWithLock` lock suresini uzatmamak icin, lock alinan transaction icerisinde uzun suren dis network cagrilarindan (or. gercek banka API cagirisi) kacinilmalidir.
+- `findByUserWithLock` lock suresini uzatmamak icin, lock alinan transaction icerisinde uzun suren dis network cagrilarindan kacinilmalidir.
 - `sumMonthlyEwalletSpending` query'si her odeme oncesinde calisacagi icin, `Payment` tablosunda `(fromUser, paymentType, paymentDirection, processedAt, isSuccess)` alanlarinda dogru index'leme olmalidir.
 
 ## 7) Bir Degisiklik Yapacaginda Ne Yapacaksin?
@@ -105,7 +105,7 @@ Karar noktasi prensipleri:
 4. Test kapsami:
    - Concurrency (Race condition) senaryosu.
    - Limit asimi senaryosu (ozellikle %90 Spending Warning ve Over-limit testleri).
-   - Deposit / Withdraw banka entegrasyonlarinda exception firlatma rollback testleri.
+   - Deposit / Withdraw mock bakiye guncelleme rollback testleri.
 
 ## 9) AI Ajanlari Icin Kisa Protokol
 

@@ -148,10 +148,12 @@ public class PaymentProcessor {
         boolean amountMatches = existingPayment.getAmount().compareTo(paymentRequest.amount()) == 0;
         boolean listingMatches = (existingPayment.getListingId() == null && paymentRequest.listingId() == null) ||
                 (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
+        boolean orderItemMatches = (existingPayment.getOrderItemId() == null && paymentRequest.orderItemId() == null) ||
+                (existingPayment.getOrderItemId() != null && existingPayment.getOrderItemId().equals(paymentRequest.orderItemId()));
         boolean paymentTypeMatches = existingPayment.getPaymentType() == paymentRequest.paymentType();
         boolean fromUserMatches = existingPayment.getFromUser().getId().equals(userId);
 
-        if (!amountMatches || !listingMatches || !paymentTypeMatches || !fromUserMatches) {
+        if (!amountMatches || !listingMatches || !orderItemMatches || !paymentTypeMatches || !fromUserMatches) {
             return Result.error("Processed already.", PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString());
         }
         return Result.success();
@@ -165,6 +167,7 @@ public class PaymentProcessor {
         return userId + "|" +
                 paymentRequest.paymentType() + "|" +
                 paymentRequest.amount() + "|" +
-                paymentRequest.listingId();
+                paymentRequest.listingId() + "|" +
+                paymentRequest.orderItemId();
     }
 }

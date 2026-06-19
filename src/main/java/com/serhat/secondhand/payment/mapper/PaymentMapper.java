@@ -36,6 +36,7 @@ public interface PaymentMapper {
                 .amount(paymentRequest.amount())
                 .currency(paymentRequest.currency() != null ? paymentRequest.currency() : "TRY")
                 .listingId(paymentRequest.listingId())
+                .orderItemId(paymentRequest.orderItemId())
                 .listingTitle(paymentRequest.listingTitle())
                 .listingNo(paymentRequest.listingNo())
                 .paymentType(paymentRequest.paymentType())
@@ -50,5 +51,4 @@ public interface PaymentMapper {
                 .build();
     }
 }
-
 

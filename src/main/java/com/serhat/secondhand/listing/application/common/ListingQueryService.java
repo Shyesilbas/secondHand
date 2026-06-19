@@ -56,7 +56,9 @@ public class ListingQueryService {
     }
 
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
-        return listingRepository.findByIdWithSeller(id).map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
+        return listingRepository.findByIdWithSeller(id)
+                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
+                .map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
     }
 
     /** İlan numarası (ör. Z4ZW3EQZ) ile; listing_no tekil. */
@@ -65,6 +67,7 @@ public class ListingQueryService {
             return Optional.empty();
         }
         return listingRepository.findByListingNoWithSeller(listingNo.trim())
+                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
                 .map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
     }
 
@@ -108,6 +111,7 @@ public class ListingQueryService {
         if (ids == null || ids.isEmpty()) return List.of();
         List<Listing> listings = listingRepository.findAllByIdIn(ids);
         List<ListingDto> dtos = listings.stream()
+                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
         return enrichList(dtos, userId);

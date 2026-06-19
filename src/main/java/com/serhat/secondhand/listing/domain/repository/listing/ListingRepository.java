@@ -38,8 +38,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     Page<Listing> findByStatus(@Param("status") ListingStatus status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
-    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId",
-           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId")
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED")
     Page<Listing> findBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
@@ -50,8 +50,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
                                           Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
-    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType",
-           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType")
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId AND l.listingType = :listingType AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED")
     Page<Listing> findBySellerIdAndListingType(@Param("sellerId") Long sellerId, @Param("listingType") ListingType listingType, Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
@@ -93,16 +93,16 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     int updateQuantity(@Param("id") UUID id, @Param("qty") int qty, @Param("sellerId") Long sellerId);
 
     @Modifying
-    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId AND l.quantity IS NOT NULL")
-    int updateQuantityBatch(@Param("ids") List<UUID> ids, @Param("qty") int qty, @Param("sellerId") Long sellerId);
+    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId AND l.quantity IS NOT NULL AND l.status IN :statuses")
+    int updateQuantityBatch(@Param("ids") List<UUID> ids, @Param("qty") int qty, @Param("sellerId") Long sellerId, @Param("statuses") Collection<ListingStatus> statuses);
 
     @Modifying
     @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id = :id AND l.seller.id = :sellerId")
     int updatePrice(@Param("id") UUID id, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId);
 
     @Modifying
-    @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId")
-    int updatePriceBatch(@Param("ids") List<UUID> ids, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId);
+    @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId AND l.status IN :statuses")
+    int updatePriceBatch(@Param("ids") List<UUID> ids, @Param("price") BigDecimal price, @Param("sellerId") Long sellerId, @Param("statuses") Collection<ListingStatus> statuses);
 
     @EntityGraph(attributePaths = {"seller"})
     @Query("SELECT l FROM Listing l WHERE l.id IN :ids")
@@ -111,6 +111,8 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     long countByIdIn(Collection<UUID> ids);
 
     long countByIdInAndSellerId(Collection<UUID> ids, Long sellerId);
+
+    long countByIdInAndSellerIdAndStatusIn(Collection<UUID> ids, Long sellerId, Collection<ListingStatus> statuses);
 
     boolean existsByIdInAndListingTypeIn(Collection<UUID> ids, Collection<ListingType> listingTypes);
 

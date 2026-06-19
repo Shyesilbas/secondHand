@@ -103,6 +103,12 @@ export const useCart = (options = {}) => {
         },
     });
 
+    const resetCartState = () => {
+        queryClient.setQueriesData({ queryKey: ['cartItems'] }, []);
+        invalidateCart();
+        syncCartCount(0);
+    };
+
     return {
         cartItems,
         cartCount,
@@ -112,6 +118,7 @@ export const useCart = (options = {}) => {
         updateCartItem: (listingId, quantity, notes = '') => updateCartItemMutation.mutate({ listingId, quantity, notes }),
         removeFromCart: (listingId) => removeFromCartMutation.mutate(listingId),
         clearCart: () => clearCartMutation.mutate(),
+        resetCartState,
         refetchItems,
         isAdding: addToCartMutation.isPending,
         isUpdating: updateCartItemMutation.isPending,

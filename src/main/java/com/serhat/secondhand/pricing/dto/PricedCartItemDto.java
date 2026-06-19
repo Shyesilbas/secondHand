@@ -22,6 +22,9 @@ public class PricedCartItemDto {
     private BigDecimal campaignUnitPrice;
     private BigDecimal lineSubtotal;
     private AppliedCampaignDto appliedCampaign;
+    private BigDecimal couponDiscount;
+    private BigDecimal netUnitPrice;
+    private BigDecimal netLineTotal;
 }
 
 

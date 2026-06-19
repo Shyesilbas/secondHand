@@ -11,7 +11,6 @@ import java.util.UUID;
 @Getter
 public class DepositRequest {
     private BigDecimal amount;
-    private UUID bankId;
     private boolean agreementsAccepted;
     private List<UUID> acceptedAgreementIds;
 }

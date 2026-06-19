@@ -22,6 +22,8 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     List<Payment> findByOrderIdAndToUserId(UUID orderId, Long toUserId);
 
+    List<Payment> findByOrderIdAndToUserIdAndOrderItemId(UUID orderId, Long toUserId, Long orderItemId);
+
 
     @Query("SELECT p FROM Payment p " +
            "LEFT JOIN FETCH p.fromUser " +

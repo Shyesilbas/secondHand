@@ -8,9 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { Lock, ShieldCheck } from 'lucide-react';
-import { usePaymentMethods } from '../../payments/hooks/useFinancialAccountManager.js';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
-import PaymentSelectionStep from '../../cart/components/checkout/PaymentSelectionStep.jsx';
 import { orderService } from '../../order/services/orderService.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
 import { showcaseService } from '../services/showcaseService.js';
@@ -22,14 +20,6 @@ import OtpSuggestionBanner from '../../payments/components/verification/OtpSugge
 import { useOtpSuggestedToast } from '../../payments/hooks/useOtpSuggestedToast.js';
 import { useOtpValidityCountdown } from '../../payments/hooks/useOtpValidityCountdown.js';
 import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
-
-const getCardSelectValue = (card) => (
-  card?.id
-  || card?.cardId
-  || card?.number
-  || card?.cardNumber
-  || null
-);
 
 const ShowcasePayment = forwardRef(function ShowcasePayment({
   listingId,
@@ -52,9 +42,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
 }, ref) {
   const [step, setStep] = useState(1);
   const stepRef = useRef(step);
-  const [paymentType, setPaymentType] = useState('CREDIT_CARD');
-  const [selectedCardNumber, setSelectedCardNumber] = useState(null);
-  const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
+  const [paymentType] = useState('EWALLET');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [verificationCode, setVerificationCode] = useState('');
@@ -85,7 +73,6 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   }));
 
   const { emails, fetchEmails } = useEmails();
-  const { paymentMethods, refetch } = usePaymentMethods();
   const { eWallet, refreshWallet } = useEWallet();
 
   const suggestedFromInbox = useMemo(
@@ -100,18 +87,8 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
     useOtpValidityCountdown(otpTtlExpiresAt);
 
   useEffect(() => {
-    refetch();
     refreshWallet();
   }, []);
-
-  useEffect(() => {
-    if (paymentType === 'CREDIT_CARD' && paymentMethods.creditCards.length > 0) {
-      setSelectedCardNumber(getCardSelectValue(paymentMethods.creditCards[0]));
-    }
-    if (paymentType === 'TRANSFER' && paymentMethods.bankAccounts.length > 0) {
-      setSelectedBankAccountIban(paymentMethods.bankAccounts[0].IBAN);
-    }
-  }, [paymentType, paymentMethods]);
 
   const btnPrimaryClass = embedded
     ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors'
@@ -207,10 +184,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   const otpFilled = sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH).length === OTP_CODE_LENGTH;
 
   const canContinuePayment = Boolean(
-    paymentType
-      && !(paymentType === 'CREDIT_CARD' && paymentMethods.creditCards.length > 0 && !selectedCardNumber)
-      && !(paymentType === 'TRANSFER' && paymentMethods.bankAccounts.length > 0 && !selectedBankAccountIban)
-      && !(paymentType === 'EWALLET' && !eWallet),
+    paymentType && eWallet && Number(eWallet.balance || 0) >= Number(totalCost || 0),
   );
 
   const renderStepBody = () => {
@@ -224,22 +198,27 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               </h3>
               {embedded ? (
                 <p className={mutedClass}>
-                  Choose how you want to pay for this showcase.
+                  Showcase payments currently use wallet balance.
                 </p>
               ) : null}
             </div>
-            <PaymentSelectionStep
-              selectedPaymentType={paymentType}
-              setSelectedPaymentType={setPaymentType}
-              cards={paymentMethods.creditCards}
-              selectedCardNumber={selectedCardNumber}
-              setSelectedCardNumber={setSelectedCardNumber}
-              bankAccounts={paymentMethods.bankAccounts}
-              selectedBankAccountIban={selectedBankAccountIban}
-              setSelectedBankAccountIban={setSelectedBankAccountIban}
-              eWallet={eWallet}
-              calculateTotal={() => totalCost}
-            />
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Wallet</p>
+                  <p className="mt-0.5 text-xs text-slate-500">Balance: {(Number(eWallet?.balance || 0)).toFixed(2)}₺</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Total</p>
+                  <p className="text-sm font-bold text-slate-900">{Number(totalCost || 0).toFixed(2)}₺</p>
+                </div>
+              </div>
+              {!canContinuePayment ? (
+                <p className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                  Insufficient wallet balance.
+                </p>
+              ) : null}
+            </div>
             {embedded ? (
               <button
                 type="button"
@@ -277,7 +256,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               <div className={`flex justify-between ${embedded ? 'text-[13px] text-slate-600' : ''}`}>
                 <span className={embedded ? 'text-slate-500' : 'font-medium'}>Payment method</span>
                 <span>
-                  {paymentType === 'CREDIT_CARD' ? 'Credit card' : paymentType === 'TRANSFER' ? 'Bank transfer' : 'eWallet'}
+	                  eWallet
                 </span>
               </div>
             </div>

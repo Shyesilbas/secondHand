@@ -60,6 +60,9 @@ public class PricingService implements IPricingService {
         List<Campaign> activeCampaigns = campaignService.loadActiveCampaignsForSellers(sellerIds);
         Map<Long, List<Campaign>> campaignsBySeller = priceCalculationEngine.groupCampaignsBySeller(activeCampaigns);
 
+        // 1. Calculate pricing without coupon first to get true subtotal after campaigns
+        PricingResultDto campaignPricing = priceCalculationEngine.calculateCartPricing(cartItems, campaignsBySeller, null, offerOverride);
+
         Coupon coupon = null;
         String normalizedCouponCode = pricingMapper.normalizeCouponCode(couponCode);
 
@@ -67,15 +70,19 @@ public class PricingService implements IPricingService {
             coupon = couponRepository.findByCodeIgnoreCase(normalizedCouponCode).orElse(null);
             if (coupon != null) {
                 Set<ListingType> cartTypes = priceCalculationEngine.extractCartTypes(cartItems);
-                BigDecimal preliminarySubtotal = calculatePreliminarySubtotal(cartItems);
+                BigDecimal postCampaignSubtotal = campaignPricing.getSubtotalAfterCampaigns();
                 
                 Result<Void> validationResult = couponValidator.validateCouponForCart(
-                        coupon, buyer, cartTypes, preliminarySubtotal);
+                        coupon, buyer, cartTypes, postCampaignSubtotal);
                 
                 if (validationResult.isError()) {
                     coupon = null;
                 }
             }
+        }
+
+        if (coupon == null) {
+            return campaignPricing;
         }
 
         return priceCalculationEngine.calculateCartPricing(cartItems, campaignsBySeller, coupon, offerOverride);

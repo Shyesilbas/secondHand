@@ -72,13 +72,13 @@ export const useEWallet = (options = {}) => {
     );
 
     const depositMutation = useMutationWithNotification(
-        ({ amount, bankId }) => ewalletService.deposit(amount, bankId),
-        'Deposit successful',
+        ({ amount }) => ewalletService.deposit(amount),
+        'Mock funds added',
         'Failed to deposit'
     );
 
     const withdrawMutation = useMutationWithNotification(
-        ({ amount, bankId }) => ewalletService.withdraw(amount, bankId),
+        ({ amount }) => ewalletService.withdraw(amount),
         'Withdrawal successful',
         'Failed to withdraw'
     );
@@ -111,8 +111,8 @@ export const useEWallet = (options = {}) => {
         updateLimits: (newLimit) => updateLimitsMutation.mutateAsync(newLimit),
         updateSpendingWarningLimit: (newLimit) => updateSpendingWarningMutation.mutateAsync(newLimit),
         removeSpendingWarningLimit: () => removeSpendingWarningMutation.mutateAsync(),
-        deposit: (amount, bankId) => depositMutation.mutateAsync({ amount, bankId }),
-        withdraw: (amount, bankId) => withdrawMutation.mutateAsync({ amount, bankId }),
+        deposit: (amount) => depositMutation.mutateAsync({ amount }),
+        withdraw: (amount) => withdrawMutation.mutateAsync({ amount }),
         fetchTransactions,
         checkBalance,
         refreshWallet,

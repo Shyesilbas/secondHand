@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "idempotencyKey")
+@Table(name = "payment", indexes = {
+    @Index(name = "idx_payment_from_user_idempotency", columnList = "from_user_id,idempotency_key")
 })
 @Data
 @NoArgsConstructor
@@ -35,7 +35,10 @@ public class Payment {
     private String currency = "TRY";
 
     private UUID listingId;
-    
+
+    @Column(name = "order_item_id")
+    private Long orderItemId;
+	    
     private String listingTitle;
     
     private String listingNo;
@@ -63,7 +66,7 @@ public class Payment {
     @JoinColumn(name = "to_user_id", nullable = true)
     private User toUser;
 
-    @Column(name = "idempotency_key", unique = true, nullable = true, length = 255)
+    @Column(name = "idempotency_key", nullable = true, length = 255)
     private String idempotencyKey;
 
     @Enumerated(EnumType.STRING)

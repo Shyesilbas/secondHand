@@ -1,6 +1,7 @@
 package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -29,15 +30,16 @@ public class CheckoutStockReservationService {
                 return Result.error(ListingErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
             }
 
-            if (listing.getQuantity() != null) {
-                int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;
-                if (listing.getQuantity() < requestedQty) {
-                    releaseReservedStock(reserved);
-                    return Result.error(ListingErrorCodes.STOCK_INSUFFICIENT.toString(), "Stock Insufficient.");
-                }
-                listing.setQuantity(listing.getQuantity() - requestedQty);
+            int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;
+            try {
+                listing.reserveQuantityForCheckout(requestedQty);
                 listingRepository.save(listing);
-                reserved.put(listing.getId(), requestedQty);
+                if (listing.getQuantity() != null) {
+                    reserved.merge(listing.getId(), requestedQty, Integer::sum);
+                }
+            } catch (BusinessException e) {
+                releaseReservedStock(reserved);
+                return Result.error(e.getMessage(), e.getErrorCode());
             }
         }
         return Result.success(reserved);
@@ -47,6 +49,10 @@ public class CheckoutStockReservationService {
         if (reserved == null) {
             return;
         }
-        reserved.forEach(listingRepository::incrementQuantity);
+        reserved.forEach((listingId, quantity) ->
+                listingRepository.findByIdWithLock(listingId).ifPresent(listing -> {
+                    listing.restoreReservedQuantity(quantity);
+                    listingRepository.save(listing);
+                }));
     }
 }

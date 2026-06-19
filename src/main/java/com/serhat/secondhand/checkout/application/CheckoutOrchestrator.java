@@ -83,7 +83,7 @@ public class CheckoutOrchestrator {
 
         try {
             Result<List<PaymentDto>> paymentResult = orderPaymentService.processPaymentsForOrder(
-                    user, effectiveCartItems, request, order.getOrderNumber(), pricing, order.getExternalId());
+                    user, order, request, order.getOrderNumber(), pricing, order.getExternalId());
 
             if (paymentResult.isError()) {
                 markOrderAsFailed(order);
@@ -97,20 +97,17 @@ public class CheckoutOrchestrator {
             applyPaymentResultToOrder(order, paymentResults, allSuccessful, request.getPaymentType());
 
             if (allSuccessful) {
-                try {
-                    Result<Void> escrowResult = escrowService.hold(order);
-                    if (escrowResult.isError()) {
-                        log.error("ESCROW_CREATION_FAILED for order {}: {}. Manual intervention required to create escrows.", 
-                                order.getOrderNumber(), escrowResult.getMessage());
-                        // We don't rollback because payment was successful. 
-                        // The order is CONFIRMED but escrows are missing.
-                    }
-                } catch (Exception e) {
-                    log.error("CRITICAL_ERROR during escrow creation for order {}. Manual intervention required.", 
-                            order.getOrderNumber(), e);
+                Result<Void> escrowResult = escrowService.hold(order);
+                if (escrowResult.isError()) {
+                    throw new IllegalStateException("Escrow creation failed for order "
+                            + order.getOrderNumber() + ": " + escrowResult.getMessage());
                 }
                 
-                handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
+                Result<Void> successResult = handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
+                if (successResult.isError()) {
+                    throw new IllegalStateException("Checkout finalization failed for order "
+                            + order.getOrderNumber() + ": " + successResult.getMessage());
+                }
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
@@ -156,13 +153,17 @@ public class CheckoutOrchestrator {
         log.error("Order {} marked as failed due to payment error", order.getOrderNumber());
     }
 
-    private void handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {
+    private Result<Void> handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {
         if (pricing.getCouponCode() != null) {
-            couponService.redeem(pricing.getCouponCode(), userId, order);
+            Result<Void> redeemResult = couponService.redeem(pricing.getCouponCode(), userId, order);
+            if (redeemResult.isError()) {
+                return redeemResult;
+            }
         }
         if (acceptedOffer != null) {
             offerService.markCompleted(acceptedOffer);
         }
         cartRepository.deleteByUserId(userId);
+        return Result.success();
     }
 }

@@ -18,7 +18,7 @@ import { formatCurrency } from '../../common/formatters.js';
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartItems, cartCount, clearCart } = useCart();
+  const { cartItems, cartCount, resetCartState } = useCart();
 
   const offerId = useMemo(() => new URLSearchParams(location.search).get('offerId'), [location.search]);
 
@@ -92,7 +92,7 @@ const CheckoutPage = () => {
   }, [pricing, displayCartItems]);
 
   const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
-  const checkout = useCheckout(effectiveCartCount, calculateTotal, clearCart, appliedCouponCode, offerId);
+  const checkout = useCheckout(effectiveCartCount, calculateTotal, resetCartState, appliedCouponCode, offerId);
   const [currentStep, setCurrentStep] = useState(CART_CHECKOUT_DEFAULTS.INITIAL_STEP);
 
   const refreshPreviewRef = useRef(null);

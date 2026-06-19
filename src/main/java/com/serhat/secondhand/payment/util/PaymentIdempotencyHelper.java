@@ -21,6 +21,7 @@ public class PaymentIdempotencyHelper {
                 .receiverName(original.receiverName())
                 .receiverSurname(original.receiverSurname())
                 .listingId(original.listingId())
+                .orderItemId(original.orderItemId())
                 .listingTitle(original.listingTitle())
                 .listingNo(original.listingNo())
                 .amount(original.amount())
@@ -34,7 +35,7 @@ public class PaymentIdempotencyHelper {
                 .idempotencyKey(idempotencyKey)
                 .status(original.status())
                 .orderId(original.orderId())
+                .description(original.description())
                 .build();
     }
 }
-

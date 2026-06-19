@@ -19,7 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +56,7 @@ public class EscrowService {
         Set<Long> existingItemIds = escrowRepository.findByOrderItemIdIn(itemIds).stream()
                 .map(e -> e.getOrderItem().getId())
                 .collect(Collectors.toSet());
+        Map<Long, BigDecimal> escrowAmountsByItemId = calculateEscrowAmounts(order);
 
         for (OrderItem item : order.getOrderItems()) {
             if (existingItemIds.contains(item.getId())) continue;
@@ -65,7 +70,7 @@ public class EscrowService {
                     .order(order)
                     .buyer(buyer)
                     .seller(seller)
-                    .amount(item.getTotalPrice())
+                    .amount(escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice()))
                     .status(PaymentStatus.ESCROW)
                     .listingId(item.getListing().getId())
                     .listingTitle(item.getListing().getTitle())
@@ -75,7 +80,9 @@ public class EscrowService {
 
             escrowRepository.save(escrow);
 
-            log.info("Escrowed {} for seller {} (Item: {})", item.getTotalPrice(), seller.getEmail(), item.getListing().getTitle());
+            log.info("Escrowed {} for seller {} (Item: {})",
+                    escrowAmountsByItemId.getOrDefault(item.getId(), item.getTotalPrice()),
+                    seller.getEmail(), item.getListing().getTitle());
         }
 
         return Result.success();
@@ -104,7 +111,7 @@ public class EscrowService {
     @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
     public Result<Void> release(Order order) {
         log.info("Releasing escrows for order: {}", order.getOrderNumber());
-        List<Escrow> escrows = escrowRepository.findByOrderIdAndStatus(order.getId(), PaymentStatus.ESCROW);
+        List<Escrow> escrows = escrowRepository.findByOrderIdAndStatusForUpdate(order.getId(), PaymentStatus.ESCROW);
 
         if (escrows.isEmpty()) {
             log.warn("No pending escrows found for order: {}", order.getOrderNumber());
@@ -118,8 +125,8 @@ public class EscrowService {
             escrowRepository.save(escrow);
 
             // 2. Update the corresponding Seller-Side Payment record in the history
-            List<Payment> sellerPayments = paymentRepository.findByOrderIdAndToUserId(
-                    order.getExternalId(), escrow.getSeller().getId());
+            List<Payment> sellerPayments = paymentRepository.findByOrderIdAndToUserIdAndOrderItemId(
+                    order.getExternalId(), escrow.getSeller().getId(), escrow.getOrderItem().getId());
             
             for (Payment payment : sellerPayments) {
                 if (payment.getStatus() == PaymentStatus.ESCROW && 
@@ -149,14 +156,18 @@ public class EscrowService {
         log.info("Cancelling escrows for {} items in order: {}", itemsToCancel.size(), order.getOrderNumber());
         
         List<Long> itemIds = itemsToCancel.stream().map(OrderItem::getId).toList();
-        List<Escrow> escrows = escrowRepository.findByOrderItemIdIn(itemIds);
+        List<Escrow> escrows = escrowRepository.findByOrderItemIdInForUpdate(itemIds);
+        Result<Void> escrowValidation = validateEscrowsReadyForCompensation(itemIds, escrows, PaymentStatus.ESCROW);
+        if (escrowValidation.isError()) {
+            return escrowValidation;
+        }
 
         for (Escrow escrow : escrows) {
             if (escrow.getStatus() == PaymentStatus.ESCROW) {
                 escrow.setStatus(PaymentStatus.CANCELLED);
                 escrowRepository.save(escrow);
 
-                updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), PaymentStatus.CANCELLED);
+                updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), escrow.getOrderItem().getId(), PaymentStatus.CANCELLED);
 
                 // 3. Refund the Buyer (Real move)
                 // Since this was in ESCROW, money was held by the system (not by the seller).
@@ -176,7 +187,11 @@ public class EscrowService {
         log.info("Refunding escrows for {} items in order: {}", itemsToRefund.size(), order.getOrderNumber());
         
         List<Long> itemIds = itemsToRefund.stream().map(OrderItem::getId).toList();
-        List<Escrow> escrows = escrowRepository.findByOrderItemIdIn(itemIds);
+        List<Escrow> escrows = escrowRepository.findByOrderItemIdInForUpdate(itemIds);
+        Result<Void> escrowValidation = validateEscrowsReadyForCompensation(itemIds, escrows, PaymentStatus.ESCROW);
+        if (escrowValidation.isError()) {
+            return escrowValidation;
+        }
 
         for (Escrow escrow : escrows) {
             if (escrow.getStatus() == PaymentStatus.ESCROW) {
@@ -184,7 +199,7 @@ public class EscrowService {
                 escrow.setRefundedAt(LocalDateTime.now());
                 escrowRepository.save(escrow);
 
-                updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), PaymentStatus.REFUNDED);
+                updateSellerPaymentStatus(order.getExternalId(), escrow.getSeller().getId(), escrow.getOrderItem().getId(), PaymentStatus.REFUNDED);
 
                 // Credit buyer's wallet — money returns from escrow (system), not from seller.
                 // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
@@ -197,8 +212,33 @@ public class EscrowService {
         return Result.success();
     }
 
-    private void updateSellerPaymentStatus(UUID orderId, Long sellerId, PaymentStatus newStatus) {
-        List<Payment> sellerPayments = paymentRepository.findByOrderIdAndToUserId(orderId, sellerId);
+    private Result<Void> validateEscrowsReadyForCompensation(List<Long> itemIds, List<Escrow> escrows, PaymentStatus requiredStatus) {
+        Set<Long> foundItemIds = escrows.stream()
+                .map(escrow -> escrow.getOrderItem().getId())
+                .collect(Collectors.toSet());
+        List<Long> missingItemIds = itemIds.stream()
+                .filter(itemId -> !foundItemIds.contains(itemId))
+                .toList();
+        if (!missingItemIds.isEmpty()) {
+            log.error("Escrow compensation failed. Missing escrow records for order item ids: {}", missingItemIds);
+            return Result.error("Missing escrow records for selected order items.", "ESCROW_NOT_FOUND");
+        }
+
+        List<Long> invalidStatusItemIds = escrows.stream()
+                .filter(escrow -> escrow.getStatus() != requiredStatus)
+                .map(escrow -> escrow.getOrderItem().getId())
+                .toList();
+        if (!invalidStatusItemIds.isEmpty()) {
+            log.error("Escrow compensation failed. Escrows are not in {} for order item ids: {}",
+                    requiredStatus, invalidStatusItemIds);
+            return Result.error("Selected order items are not refundable from escrow.", "ESCROW_STATUS_INVALID");
+        }
+
+        return Result.success();
+    }
+
+    private void updateSellerPaymentStatus(UUID orderId, Long sellerId, Long orderItemId, PaymentStatus newStatus) {
+        List<Payment> sellerPayments = paymentRepository.findByOrderIdAndToUserIdAndOrderItemId(orderId, sellerId, orderItemId);
         for (Payment payment : sellerPayments) {
             if (payment.getTransactionType() == PaymentTransactionType.ITEM_SALE || 
                 payment.getTransactionType() == PaymentTransactionType.ITEM_PURCHASE) {
@@ -218,5 +258,53 @@ public class EscrowService {
      */
     private void creditWalletQuietly(User user, BigDecimal amount) {
         walletService.creditWalletQuietly(user, amount);
+    }
+
+    private Map<Long, BigDecimal> calculateEscrowAmounts(Order order) {
+        Map<Long, BigDecimal> amountsByItemId = new HashMap<>();
+        if (order == null || order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return amountsByItemId;
+        }
+
+        List<OrderItem> items = new ArrayList<>(order.getOrderItems());
+        items.sort(Comparator.comparing(OrderItem::getId, Comparator.nullsLast(Long::compareTo)));
+
+        BigDecimal itemSubtotal = items.stream()
+                .map(OrderItem::getTotalPrice)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (itemSubtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            items.forEach(item -> amountsByItemId.put(item.getId(), BigDecimal.ZERO));
+            return amountsByItemId;
+        }
+
+        BigDecimal payableTotal = order.getTotalAmount() != null ? order.getTotalAmount() : itemSubtotal;
+        if (payableTotal.compareTo(BigDecimal.ZERO) < 0) {
+            payableTotal = BigDecimal.ZERO;
+        }
+        if (payableTotal.compareTo(itemSubtotal) > 0) {
+            payableTotal = itemSubtotal;
+        }
+        payableTotal = payableTotal.setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal remaining = payableTotal;
+        for (int i = 0; i < items.size(); i++) {
+            OrderItem item = items.get(i);
+            BigDecimal itemTotal = item.getTotalPrice() != null ? item.getTotalPrice() : BigDecimal.ZERO;
+            BigDecimal amount;
+            if (i == items.size() - 1) {
+                amount = remaining;
+            } else {
+                amount = payableTotal.multiply(itemTotal)
+                        .divide(itemSubtotal, 2, RoundingMode.HALF_UP);
+                if (amount.compareTo(remaining) > 0) {
+                    amount = remaining;
+                }
+            }
+            amount = amount.max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+            amountsByItemId.put(item.getId(), amount);
+            remaining = remaining.subtract(amount).setScale(2, RoundingMode.HALF_UP);
+        }
+        return amountsByItemId;
     }
 }

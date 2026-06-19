@@ -13,7 +13,7 @@ Kapsam:
 - Odeme istegi calistirma (`PaymentProcessor`)
 - Idempotency ve optimistic lock retry
 - Verification code gereksinimi/validasyonu
-- Strateji tabanli odeme (`credit card`, `bank`, `ewallet`)
+- Strateji tabanli odeme (`ewallet`; yeni yontemler `PaymentStrategy` ile eklenir)
 - Odeme tamamlama event zinciri ve handler dispatch
 - Escrow create/release/cancel-refund/refund akislari (orchestrator + executor)
 
@@ -25,7 +25,7 @@ Kapsam disi:
 ## 2) Paket Yapisi (Nerede Ne Var)
 
 - `api/*`
-  - `PaymentController`, `CreditCardController`, `BankController`.
+  - `PaymentController`.
 
 - `application/*`
   - `PaymentProcessor`, `PaymentPreCheckService`, `PaymentVerificationService`.
@@ -35,7 +35,7 @@ Kapsam disi:
 - `application/handlers/*`
   - Event sonrasi transaction tipine gore domain yan etkisi calistiran handlerlar.
 
-- `strategy/*`, `creditcard/*`, `bank/*`
+- `strategy/*`, `ewallet/*`
   - Odeme yontemi stratejileri ve ilgili validator/service katmanlari.
 
 - `orchestrator/*`

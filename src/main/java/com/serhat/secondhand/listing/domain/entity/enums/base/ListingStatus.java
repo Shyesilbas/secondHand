@@ -8,7 +8,8 @@ public enum ListingStatus {
     RESERVED("Reserved"),
     INACTIVE("Inactive"),
     DRAFT("Draft"),
-    SOLD("Sold");
+    SOLD("Sold"),
+    DELETED("Deleted");
 
     private final String label;
 

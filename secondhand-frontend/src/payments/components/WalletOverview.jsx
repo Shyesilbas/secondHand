@@ -26,14 +26,14 @@ export const PaymentInfo = () => {
             >
               eWallet
             </Link>{' '}
-            account. You can withdraw your earnings from your{' '}
+            account. Manual mock top-up and withdrawal actions are available from your{' '}
             <Link
               to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`}
               className="font-medium text-blue-800 hover:text-blue-900 underline transition-colors"
             >
               eWallet
             </Link>{' '}
-            to your bank account at any time.
+            while external bank transfers are disabled.
           </p>
         </div>
       </div>

@@ -18,6 +18,7 @@ public enum OfferErrorCodes implements ErrorCode {
     OFFER_NOT_ALLOWED("OFFER_NOT_ALLOWED", "You are not allowed to perform this action", HttpStatus.FORBIDDEN),
     OFFER_ALREADY_ACCEPTED_FOR_LISTING("OFFER_ALREADY_ACCEPTED_FOR_LISTING", "There is already an accepted offer for this listing", HttpStatus.CONFLICT),
     INVALID_QUANTITY("OFFER_INVALID_QUANTITY", "Quantity must be at least 1", HttpStatus.BAD_REQUEST),
+    OFFER_QUANTITY_EXCEEDS_STOCK("OFFER_QUANTITY_EXCEEDS_STOCK", "Offer quantity exceeds available listing stock", HttpStatus.CONFLICT),
     INVALID_TOTAL_PRICE("OFFER_INVALID_TOTAL_PRICE", "Total price must be greater than 0", HttpStatus.BAD_REQUEST);
 
     private final String code;
@@ -30,4 +31,3 @@ public enum OfferErrorCodes implements ErrorCode {
         this.httpStatus = httpStatus;
     }
 }
-

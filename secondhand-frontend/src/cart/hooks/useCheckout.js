@@ -5,7 +5,6 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import useAddresses from '../../user/hooks/useAddresses.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
-import { paymentService } from '../../payments/services/paymentService.js';
 import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -13,15 +12,7 @@ import { CART_CHECKOUT_DEFAULTS, CART_MESSAGES, CART_PAYMENT_TYPES } from '../ca
 import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
 import { getCheckoutErrorMessage } from '../utils/checkoutError.js';
 
-const getCardSelectValue = (card) => (
-    card?.id
-    || card?.cardId
-    || card?.number
-    || card?.cardNumber
-    || null
-);
-
-export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, offerId) => {
+export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCode, offerId) => {
     const navigate = useNavigate();
     const { showError, showSuccess } = useNotification();
     
@@ -34,11 +25,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     const [selectedShippingAddressId, setSelectedShippingAddressId] = useState(null);
     const [selectedBillingAddressId, setSelectedBillingAddressId] = useState(null);
 
-    const [selectedPaymentType, setSelectedPaymentType] = useState(CART_PAYMENT_TYPES.CREDIT_CARD);
-    const [cards, setCards] = useState([]);
-    const [selectedCardNumber, setSelectedCardNumber] = useState(null);
-    const [bankAccounts, setBankAccounts] = useState([]);
-    const [selectedBankAccountIban, setSelectedBankAccountIban] = useState(null);
+    const [selectedPaymentType, setSelectedPaymentType] = useState(CART_PAYMENT_TYPES.EWALLET);
 
     const [showEWalletWarning, setShowEWalletWarning] = useState(false);
     const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
@@ -79,59 +66,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
     } = useAgreementsState();
 
     useEffect(() => {
-        
-        paymentService
-            .getCreditCards()
-            .then((data) => {
-                let normalized = [];
-                if (Array.isArray(data)) {
-                    normalized = data;
-                } else if (data && Array.isArray(data.content)) {
-                    normalized = data.content;
-                } else if (data && (data.id || data.cardId || data.number || data.cardNumber)) {
-                    normalized = [data];
-                }
-                setCards(normalized);
-            })
-            .catch((err) => {
-                logger.error('Error loading cards:', err);
-                setCards([]);
-            });
-
-        paymentService
-            .getBankAccounts()
-            .then((data) => {
-                const normalized = Array.isArray(data)
-                    ? data
-                    : (data && Array.isArray(data.content) ? data.content : []);
-                setBankAccounts(normalized);
-            })
-            .catch(() => setBankAccounts([]));
-    }, []);
-
-    useEffect(() => {
-        if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER &&
-            Array.isArray(bankAccounts) &&
-            bankAccounts.length > 0 &&
-            !selectedBankAccountIban) {
-            setSelectedBankAccountIban(bankAccounts[0].IBAN || null);
+        if (selectedPaymentType !== CART_PAYMENT_TYPES.EWALLET) {
+            setSelectedPaymentType(CART_PAYMENT_TYPES.EWALLET);
         }
-        
-        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD &&
-            Array.isArray(cards) &&
-            cards.length > 0 &&
-            !selectedCardNumber) {
-            setSelectedCardNumber(getCardSelectValue(cards[0]));
-        }
-
-        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD &&
-            Array.isArray(cards) &&
-            cards.length > 0 &&
-            selectedCardNumber &&
-            !cards.some(card => getCardSelectValue(card) === selectedCardNumber)) {
-            setSelectedCardNumber(getCardSelectValue(cards[0]));
-        }
-    }, [selectedPaymentType, bankAccounts, selectedBankAccountIban, cards, selectedCardNumber]);
+    }, [selectedPaymentType]);
 
     const proceedDisabled = useMemo(() => {
         // If we have an offer, we don't strictly need cartCount > 0
@@ -140,17 +78,10 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
         // Basic requirement: address
         if (!selectedShippingAddressId) return true;
         
-        // Payment method specific requirements
-        if (selectedPaymentType === CART_PAYMENT_TYPES.CREDIT_CARD) {
-            if (!selectedCardNumber && (!Array.isArray(cards) || cards.length === 0)) return true;
-        } else if (selectedPaymentType === CART_PAYMENT_TYPES.TRANSFER) {
-            if (!selectedBankAccountIban && (!Array.isArray(bankAccounts) || bankAccounts.length === 0)) return true;
-        } else if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET) {
-            if (!eWallet || (eWallet.balance < calculateTotal())) return true;
-        }
+        if (!eWallet || (eWallet.balance < calculateTotal())) return true;
         
         return false;
-    }, [cartCount, offerId, selectedShippingAddressId, selectedPaymentType, cards, selectedCardNumber, bankAccounts, selectedBankAccountIban, eWallet, calculateTotal]);
+    }, [cartCount, offerId, selectedShippingAddressId, eWallet, calculateTotal]);
 
     const handleCheckout = async () => {
         if (isCheckingOut) return;
@@ -189,7 +120,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
             
             logger.info('Checkout successful', { orderId: checkoutResult?.id });
             
-            await clearCart();
+            resetCartState?.();
             showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
             navigateToOrderSuccess(checkoutResult);
         } catch (e) {
@@ -245,7 +176,7 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
                 meetupLocation: deliveryMethod === 'SAFE_MEETUP' ? meetupLocation : null
             };
             const checkoutResult = await orderService.checkout(payload);
-            await clearCart();
+            resetCartState?.();
             showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
             navigateToOrderSuccess(checkoutResult);
         } catch (e) {
@@ -269,12 +200,12 @@ export const useCheckout = (cartCount, calculateTotal, clearCart, couponCode, of
 
         selectedPaymentType,
         setSelectedPaymentType,
-        cards,
-        selectedCardNumber,
-        setSelectedCardNumber,
-        bankAccounts,
-        selectedBankAccountIban,
-        setSelectedBankAccountIban,
+        cards: [],
+        selectedCardNumber: null,
+        setSelectedCardNumber: () => {},
+        bankAccounts: [],
+        selectedBankAccountIban: null,
+        setSelectedBankAccountIban: () => {},
         eWallet,
         paymentVerificationCode,
         setPaymentVerificationCode,

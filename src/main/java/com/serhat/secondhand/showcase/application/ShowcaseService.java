@@ -271,7 +271,7 @@ public class ShowcaseService implements IShowcaseService {
         ShowcasePaymentRequest tempRequest = new ShowcasePaymentRequest(
                 firstListing.getId(), request.days(),
                 request.paymentType() != null ? request.paymentType()
-                        : com.serhat.secondhand.payment.entity.PaymentType.CREDIT_CARD,
+                        : com.serhat.secondhand.payment.entity.PaymentType.EWALLET,
                 request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(),
                 "bulk-showcase-" + userId + "-" + System.currentTimeMillis());
 

@@ -121,15 +121,46 @@ public class Listing {
         validateCanMarkAsSold();
         this.status = ListingStatus.SOLD;
     }
+
+    public void delete() {
+        validateCanDelete();
+        this.status = ListingStatus.DELETED;
+    }
     
     public void updatePrice(BigDecimal newPrice) {
+        validateEditable();
         validatePrice(newPrice);
         this.price = newPrice;
     }
     
     public void updateQuantity(Integer newQuantity) {
+        validateEditable();
         validateQuantity(newQuantity);
         this.quantity = newQuantity;
+    }
+
+    public void reserveQuantityForCheckout(int requestedQuantity) {
+        validateCanReserveForCheckout(requestedQuantity);
+        if (this.quantity == null) {
+            return;
+        }
+        this.quantity -= requestedQuantity;
+        if (this.quantity == 0) {
+            this.status = ListingStatus.SOLD;
+        }
+    }
+
+    public void restoreReservedQuantity(int restoredQuantity) {
+        if (restoredQuantity <= 0) {
+            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+        }
+        if (this.quantity == null) {
+            return;
+        }
+        this.quantity += restoredQuantity;
+        if (this.status == ListingStatus.SOLD && this.quantity > 0) {
+            this.status = ListingStatus.ACTIVE;
+        }
     }
 
     public void incrementQuantity(int delta) {
@@ -181,6 +212,30 @@ public class Listing {
     private void validateCanMarkAsSold() {
         if (this.status != ListingStatus.ACTIVE && this.status != ListingStatus.RESERVED) {
             throw new BusinessException(ListingErrorCodes.INVALID_STATUS_TRANSITION);
+        }
+    }
+
+    private void validateCanDelete() {
+        if (this.status == ListingStatus.DELETED) {
+            throw new BusinessException(ListingErrorCodes.INVALID_STATUS_TRANSITION);
+        }
+    }
+
+    private void validateEditable() {
+        if (!isEditable()) {
+            throw new BusinessException(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
+    }
+
+    private void validateCanReserveForCheckout(int requestedQuantity) {
+        if (this.status != ListingStatus.ACTIVE) {
+            throw new BusinessException(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
+        if (requestedQuantity < 1) {
+            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
+        }
+        if (this.quantity != null && this.quantity < requestedQuantity) {
+            throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
         }
     }
     

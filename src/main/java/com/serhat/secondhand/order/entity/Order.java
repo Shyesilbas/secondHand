@@ -191,13 +191,13 @@ public class Order {
     }
 
     public void calculateTotals() {
-        this.subtotal = orderItems.stream()
+        BigDecimal subtotalBeforeCoupon = orderItems.stream()
                 .map(OrderItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        // subtotal already includes campaign discounts (unit prices are campaign prices)
         BigDecimal couponAmt = couponDiscount != null ? couponDiscount : BigDecimal.ZERO;
-        this.totalAmount = subtotal.subtract(couponAmt).max(BigDecimal.ZERO);
+        this.subtotal = subtotalBeforeCoupon;
+        this.totalAmount = subtotalBeforeCoupon.subtract(couponAmt).max(BigDecimal.ZERO);
         
         BigDecimal totalDisc = couponAmt;
         if (campaignDiscount != null) totalDisc = totalDisc.add(campaignDiscount);

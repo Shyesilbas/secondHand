@@ -4,8 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentType {
-    CREDIT_CARD("Credit Card"),
-    TRANSFER("Bank Transfer"),
     EWALLET("E-Wallet");
 
     private final String label;

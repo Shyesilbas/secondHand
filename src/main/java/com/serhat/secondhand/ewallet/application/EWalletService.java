@@ -10,7 +10,6 @@ import com.serhat.secondhand.ewallet.repository.EWalletRepository;
 import com.serhat.secondhand.ewallet.util.EWalletBalanceUtil;
 import com.serhat.secondhand.ewallet.validator.EWalletValidator;
 import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
-import com.serhat.secondhand.payment.bank.BankService;
 import com.serhat.secondhand.payment.entity.*;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
@@ -37,7 +36,6 @@ import java.util.UUID;
 public class EWalletService implements IEWalletService {
 
     private final EWalletRepository eWalletRepository;
-    private final BankService bankService;
     private final PaymentRepository paymentRepository;
     private final EWalletMapper eWalletMapper;
     private final EWalletValidator eWalletValidator;
@@ -99,18 +97,13 @@ public class EWalletService implements IEWalletService {
 
         ensureValid(eWalletValidator.validateDeposit(eWallet, request.getAmount()));
 
-        Bank bank = bankService.findByUser(user).orElse(null);
-        ensureValid(eWalletValidator.validateBankAccount(bank, request.getBankId()));
-
-        bankService.debit(user, request.getAmount());
-
         eWallet.setBalance(EWalletBalanceUtil.add(eWallet.getBalance(), request.getAmount()));
         eWalletRepository.save(eWallet);
 
         Payment payment = eWalletPaymentFactory.buildDepositPayment(user, request.getAmount());
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
-        log.info("eWallet deposit successful for user: {} amount: {}", user.getEmail(), request.getAmount());
+        log.info("Mock eWallet top-up successful for user: {} amount: {}", user.getEmail(), request.getAmount());
     }
 
     @Transactional
@@ -121,13 +114,8 @@ public class EWalletService implements IEWalletService {
 
         ensureValid(eWalletValidator.validateWithdraw(eWallet, request.getAmount()));
 
-        Bank bank = bankService.findByUser(user).orElse(null);
-        ensureValid(eWalletValidator.validateBankAccount(bank, request.getBankId()));
-
         eWallet.setBalance(EWalletBalanceUtil.subtract(eWallet.getBalance(), request.getAmount()));
         eWalletRepository.save(eWallet);
-
-        bankService.credit(user, request.getAmount());
 
         Payment payment = eWalletPaymentFactory.buildWithdrawalPayment(user, request.getAmount());
         paymentRepository.save(payment);
@@ -196,6 +184,11 @@ public class EWalletService implements IEWalletService {
     @Transactional(readOnly = true)
     public boolean hasSufficientBalance(User user, BigDecimal amount) {
         return eWalletValidator.hasSufficientBalance(user, amount);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasSufficientBalance(Long userId, BigDecimal amount) {
+        return eWalletValidator.hasSufficientBalance(userId, amount);
     }
 
     @Transactional

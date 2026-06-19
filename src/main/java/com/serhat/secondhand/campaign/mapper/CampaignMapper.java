@@ -62,8 +62,8 @@ public class CampaignMapper {
         if (request.getName() != null) {
             campaign.setName(request.getName());
         }
-        if (request.isActive()) {
-            campaign.setActive(request.isActive());
+        if (request.getActive() != null) {
+            campaign.setActive(request.getActive());
         }
         if (request.getStartsAt() != null) {
             campaign.setStartsAt(request.getStartsAt());

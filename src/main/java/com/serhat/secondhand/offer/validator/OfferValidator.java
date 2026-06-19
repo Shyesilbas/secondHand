@@ -59,6 +59,19 @@ public class OfferValidator {
         return Result.success();
     }
 
+    public Result<Void> validateListingStockForOffer(Listing listing, Integer quantity) {
+        if (listing == null) {
+            return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+        }
+        if (quantity == null || quantity < 1) {
+            return Result.error(OfferErrorCodes.INVALID_QUANTITY);
+        }
+        if (listing.getQuantity() != null && listing.getQuantity() < quantity) {
+            return Result.error(OfferErrorCodes.OFFER_QUANTITY_EXCEEDS_STOCK);
+        }
+        return Result.success();
+    }
+
 
     public boolean isBuyerOrSeller(User user, Offer offer) {
         Long userId = user.getId();

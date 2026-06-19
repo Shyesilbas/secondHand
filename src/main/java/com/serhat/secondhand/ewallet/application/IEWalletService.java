@@ -27,6 +27,8 @@ public interface IEWalletService {
     boolean hasSufficientBalance(BigDecimal amount);
     
     boolean hasSufficientBalance(User user, BigDecimal amount);
+
+    boolean hasSufficientBalance(Long userId, BigDecimal amount);
     
     PaymentResult processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId);
     

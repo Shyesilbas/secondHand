@@ -46,9 +46,11 @@ public class CartService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingRepository listingRepository;
     private final CartConfig cartConfig;
+    private final CartReservationScheduler cartReservationScheduler;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
+        clearExpiredReservationsIfEnabled();
         Result<User> userResult = userService.findById(userId);
         if (userResult.isError()) {
             return Result.error(userResult.getErrorCode());
@@ -111,18 +113,21 @@ public class CartService {
             return Result.error(listingValidation.getErrorCode());
         }
 
-        int targetQty = Optional.ofNullable(requestedQty)
-                .orElse(Optional.ofNullable(cartConfig.getDefaults().getQuantity()).orElse(1));
         Optional<Cart> existingCartItemOpt = cartRepository
                 .findByUserIdAndListingId(userId, listing.getId());
 
         int currentInCartQty = existingCartItemOpt
                 .map(Cart::getQuantity)
                 .orElse(0);
+        int targetQty = resolveTargetQuantity(requestedQty, isUpdate, currentInCartQty);
         int finalTotalQty = isUpdate ? targetQty : (currentInCartQty + targetQty);
+        if (finalTotalQty < 1) {
+            return Result.error(CartErrorCodes.INVALID_QUANTITY);
+        }
 
         boolean reservationEnabled = cartConfig.getReservation().isEnabled();
         if (reservationEnabled) {
+            clearExpiredReservationsIfEnabled();
             LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
             LocalDateTime cutoff = now.minus(cartConfig.getReservation().getTimeoutDuration());
             int activeReservationQty = cartRepository.countActiveReservationsByListing(listing.getId(), now, cutoff);
@@ -205,7 +210,7 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public Result<Long> getCartItemCount(Long userId) {
-        return Result.success(cartRepository.countByUserId(userId));
+        return Result.success(cartRepository.sumQuantityByUserId(userId));
     }
 
     @Transactional(readOnly = true)
@@ -213,11 +218,28 @@ public class CartService {
         return Result.success(cartRepository.existsByUserIdAndListingId(userId, listingId));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Result<Integer> getActiveReservationCount(UUID listingId) {
+        clearExpiredReservationsIfEnabled();
         LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
         LocalDateTime cutoff = now.minus(cartConfig.getReservation().getTimeoutDuration());
         int count = cartRepository.countActiveReservationsByListing(listingId, now, cutoff);
         return Result.success(count);
+    }
+
+    private int resolveTargetQuantity(Integer requestedQty, boolean isUpdate, int currentInCartQty) {
+        if (requestedQty != null) {
+            return requestedQty;
+        }
+        if (isUpdate && currentInCartQty > 0) {
+            return currentInCartQty;
+        }
+        return Optional.ofNullable(cartConfig.getDefaults().getQuantity()).orElse(1);
+    }
+
+    private void clearExpiredReservationsIfEnabled() {
+        if (cartConfig.getReservation().isEnabled()) {
+            cartReservationScheduler.clearExpiredReservationsNow();
+        }
     }
 }

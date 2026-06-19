@@ -165,7 +165,10 @@ Taban yol: `/api/auth`
 - `GET /oauth2/google`
 - `POST /oauth2/complete`
 - `POST /revoke-all-sessions`
-- `GET /validate` (deprecated)
+
+Not:
+- `GET /validate` eski dokumantasyonda geciyordu, ancak mevcut kodda endpoint olarak bulunmuyor.
+- Token veya oturum dogrulama ihtiyaci varsa mevcut `login`, `refresh` ve security akislari kullanilmali.
 
 Sifre taban yol: `/api/auth/password`
 - `PUT /change`

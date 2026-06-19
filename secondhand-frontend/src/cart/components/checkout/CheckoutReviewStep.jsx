@@ -3,8 +3,7 @@ import ListingReviewStats from '../../../reviews/components/ListingReviewStats.j
 import { useSellerReviewStatsCache } from '../../../reviews/hooks/useSellerReviewStatsCache.js';
 import { useId, useState } from 'react';
 import { StarIcon, STAR_SHAPE_PATH } from '../../../reviews/components/StarIcon.jsx';
-import { ArrowLeft, ArrowRight, MapPin, CreditCard, Banknote, Wallet, Loader2 } from 'lucide-react';
-import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
+import { ArrowLeft, ArrowRight, MapPin, Wallet, Loader2 } from 'lucide-react';
 
 /* ── Seller inline rating ─────────────────────────────────── */
 
@@ -70,11 +69,6 @@ const CheckoutReviewStep = ({
   addresses,
   selectedShippingAddressId,
   selectedBillingAddressId,
-  selectedPaymentType,
-  cards,
-  selectedCardNumber,
-  bankAccounts,
-  selectedBankAccountIban,
   eWallet,
   onNext,
   onBack,
@@ -90,36 +84,11 @@ const CheckoutReviewStep = ({
   const billingAddress = addresses?.find((a) => String(a.id) === String(selectedBillingAddressId)) || shippingAddress;
 
   const getPaymentDisplay = () => {
-    switch (selectedPaymentType) {
-      case CART_PAYMENT_TYPES.CREDIT_CARD: {
-        const card = cards?.find((c) => c.id === selectedCardNumber || c.cardId === selectedCardNumber || c.number === selectedCardNumber || c.cardNumber === selectedCardNumber);
-        const number = card?.number || card?.cardNumber || '';
-        const masked = number.length >= 4 ? `•••• •••• •••• ${number.slice(-4)}` : 'Saved Card';
-        return {
-          name: 'Credit / Debit Card',
-          detail: card?.cardLabel ? `${card.cardLabel} (${masked})` : masked,
-          icon: CreditCard,
-        };
-      }
-      case CART_PAYMENT_TYPES.TRANSFER: {
-        const account = bankAccounts?.find((a) => a.IBAN === selectedBankAccountIban);
-        const iban = account?.IBAN || '';
-        const masked = iban.length >= 4 ? `•••• ${iban.slice(-4)}` : 'Bank Account';
-        return {
-          name: 'Bank Transfer',
-          detail: account ? `${account.holderName || ''} (${masked})` : masked,
-          icon: Banknote,
-        };
-      }
-      case CART_PAYMENT_TYPES.EWALLET:
-        return {
-          name: 'Wallet Balance',
-          detail: eWallet ? `Paid from wallet (${formatCurrency(totalAmount, currency)})` : 'Wallet',
-          icon: Wallet,
-        };
-      default:
-        return { name: 'None Selected', detail: '', icon: CreditCard };
-    }
+    return {
+      name: 'Wallet Balance',
+      detail: eWallet ? `Paid from wallet (${formatCurrency(totalAmount, currency)})` : 'Wallet',
+      icon: Wallet,
+    };
   };
 
   const paymentInfo = getPaymentDisplay();

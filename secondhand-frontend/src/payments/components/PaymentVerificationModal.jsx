@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { formatCurrency } from '../../common/formatters.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 
 import { EMAIL_TYPES } from '../../emails/emails.js';
@@ -22,96 +21,6 @@ const PaymentMethodsLoading = () => (
     <span className="ml-2 text-text-secondary">Loading...</span>
   </div>
 );
-
-const EmptyPaymentMethod = ({ message, actionLabel, onAction }) => (
-  <div className="text-center py-4 border border-dashed border-header-border rounded-lg">
-    <p className="text-text-muted">{message}</p>
-    <button
-      onClick={onAction}
-      className="mt-2 text-btn-primary hover:text-blue-700 text-sm"
-    >
-      {actionLabel}
-    </button>
-  </div>
-);
-
-const CreditCardPaymentMethods = ({ creditCards, onAdd }) => {
-  if (!Array.isArray(creditCards) || creditCards.length === 0) {
-    return (
-      <EmptyPaymentMethod
-        message="No saved credit cards yet."
-        actionLabel="Add Credit Card"
-        onAction={onAdd}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {creditCards.map((card, index) => {
-        const limit = toNumber(card?.limit);
-        const used = toNumber(card?.amount);
-        const available = limit - used;
-        return (
-          <div key={index} className="border rounded-lg p-3 bg-app-bg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-text-primary">{card?.number}</p>
-                <p className="text-sm text-text-secondary">
-                  {card?.expiryMonth}/{card?.expiryYear}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium text-text-primary">
-                  {formatCurrency(available, 'TRY')}
-                </p>
-                <p className="text-xs text-text-muted">Available Limit</p>
-                <p className="text-xs text-text-muted">
-                  Total: {formatCurrency(limit, 'TRY')} | Used: {formatCurrency(used, 'TRY')}
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const TransferPaymentMethods = ({ bankAccounts, onAdd }) => {
-  if (!Array.isArray(bankAccounts) || bankAccounts.length === 0) {
-    return (
-      <EmptyPaymentMethod
-        message="No saved bank accounts yet."
-        actionLabel="Add Bank Account"
-        onAction={onAdd}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {bankAccounts.map((account, index) => (
-        <div key={index} className="border rounded-lg p-3 bg-app-bg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-text-primary">
-                {account?.holderName} {account?.holderSurname}
-              </p>
-              <p className="text-sm text-text-secondary">{account?.IBAN}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-text-primary">
-                {formatCurrency(toNumber(account?.balance), 'TRY')}
-              </p>
-              <p className="text-xs text-text-muted">Balance</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
   if (!eWallet) {
@@ -178,15 +87,6 @@ const PaymentMethodDetails = ({
     return <PaymentMethodsLoading />;
   }
 
-  const creditCards = paymentMethods?.creditCards ?? [];
-  const bankAccounts = paymentMethods?.bankAccounts ?? [];
-
-  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) {
-    return <CreditCardPaymentMethods creditCards={creditCards} onAdd={() => onNavigateToPaymentMethods(PAYMENT_TYPES.CREDIT_CARD)} />;
-  }
-  if (paymentType === PAYMENT_TYPES.TRANSFER) {
-    return <TransferPaymentMethods bankAccounts={bankAccounts} onAdd={() => onNavigateToPaymentMethods(PAYMENT_TYPES.TRANSFER)} />;
-  }
   if (paymentType === PAYMENT_TYPES.EWALLET) {
     return <EWalletPaymentMethod eWallet={eWallet} feeConfig={feeConfig} />;
   }
@@ -197,17 +97,6 @@ const canProceedWithPaymentMethod = ({ paymentType, paymentMethods, isLoadingPay
   if (isLoadingPaymentMethods) return false;
 
   const fee = toNumber(feeConfig?.totalCreationFee);
-  const creditCards = paymentMethods?.creditCards ?? [];
-  const bankAccounts = paymentMethods?.bankAccounts ?? [];
-
-  if (paymentType === PAYMENT_TYPES.CREDIT_CARD) {
-    if (creditCards.length === 0) return false;
-    return creditCards.some((card) => toNumber(card?.limit) - toNumber(card?.amount) >= fee);
-  }
-  if (paymentType === PAYMENT_TYPES.TRANSFER) {
-    if (bankAccounts.length === 0) return false;
-    return bankAccounts.some((acc) => toNumber(acc?.balance) >= fee);
-  }
   if (paymentType === PAYMENT_TYPES.EWALLET) {
     return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
   }
@@ -416,4 +305,3 @@ const PaymentVerificationModal = ({
 };
 
 export default PaymentVerificationModal;
-

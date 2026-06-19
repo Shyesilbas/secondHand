@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,8 @@ public class OrderItemCompensationPlanner {
 
     public Result<Void> validateCancellableItems(List<OrderItem> items) {
         for (OrderItem item : items) {
-            int alreadyCancelled = cancelledQuantity(item);
-            if (alreadyCancelled >= item.getQuantity()) {
+            int alreadyCompensated = compensatedQuantity(item);
+            if (alreadyCompensated >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
             }
         }
@@ -63,8 +64,8 @@ public class OrderItemCompensationPlanner {
 
     public Result<Void> validateRefundableItems(List<OrderItem> items) {
         for (OrderItem item : items) {
-            int alreadyRefunded = refundedQuantity(item);
-            if (alreadyRefunded >= item.getQuantity()) {
+            int alreadyCompensated = compensatedQuantity(item);
+            if (alreadyCompensated >= item.getQuantity()) {
                 return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_REFUNDED);
             }
         }
@@ -76,12 +77,12 @@ public class OrderItemCompensationPlanner {
         List<OrderItemCancel> cancelRecords = new ArrayList<>();
 
         for (OrderItem item : items) {
-            int availableToCancel = item.getQuantity() - cancelledQuantity(item);
+            int availableToCancel = item.getQuantity() - compensatedQuantity(item);
             if (availableToCancel <= 0) {
                 continue;
             }
 
-            BigDecimal refundAmount = item.getTotalPrice();
+            BigDecimal refundAmount = calculateCompensationAmount(item, availableToCancel);
             totalRefundAmount = totalRefundAmount.add(refundAmount);
 
             OrderItemCancel cancelRecord = OrderItemCancel.builder()
@@ -102,12 +103,12 @@ public class OrderItemCompensationPlanner {
         List<OrderItemRefund> refundRecords = new ArrayList<>();
 
         for (OrderItem item : items) {
-            int availableToRefund = item.getQuantity() - refundedQuantity(item);
+            int availableToRefund = item.getQuantity() - compensatedQuantity(item);
             if (availableToRefund <= 0) {
                 continue;
             }
 
-            BigDecimal refundAmount = item.getTotalPrice();
+            BigDecimal refundAmount = calculateCompensationAmount(item, availableToRefund);
             totalRefundAmount = totalRefundAmount.add(refundAmount);
 
             OrderItemRefund refundRecord = OrderItemRefund.builder()
@@ -129,10 +130,12 @@ public class OrderItemCompensationPlanner {
         List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
         Map<Long, Integer> cancelledMap = orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
                 .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+        Map<Long, Integer> refundedMap = orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
+                .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
 
         for (OrderItem item : order.getOrderItems()) {
-            int cancelled = cancelledMap.getOrDefault(item.getId(), 0);
-            if (cancelled < item.getQuantity()) {
+            int compensated = cancelledMap.getOrDefault(item.getId(), 0) + refundedMap.getOrDefault(item.getId(), 0);
+            if (compensated < item.getQuantity()) {
                 return false;
             }
         }
@@ -145,10 +148,12 @@ public class OrderItemCompensationPlanner {
         List<Long> itemIds = order.getOrderItems().stream().map(OrderItem::getId).toList();
         Map<Long, Integer> refundedMap = orderItemRefundRepository.findRefundedQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
                 .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
+        Map<Long, Integer> cancelledMap = orderItemCancelRepository.findCancelledQuantitiesByOrderItemIds(new java.util.HashSet<>(itemIds)).stream()
+                .collect(java.util.stream.Collectors.toMap(row -> (Long)row[0], row -> ((Long)row[1]).intValue()));
 
         for (OrderItem item : order.getOrderItems()) {
-            int refunded = refundedMap.getOrDefault(item.getId(), 0);
-            if (refunded < item.getQuantity()) {
+            int compensated = refundedMap.getOrDefault(item.getId(), 0) + cancelledMap.getOrDefault(item.getId(), 0);
+            if (compensated < item.getQuantity()) {
                 return false;
             }
         }
@@ -163,6 +168,40 @@ public class OrderItemCompensationPlanner {
     private int refundedQuantity(OrderItem item) {
         Integer refunded = orderItemRefundRepository.sumRefundedQuantityByOrderItem(item);
         return refunded != null ? refunded : 0;
+    }
+
+    private int compensatedQuantity(OrderItem item) {
+        return cancelledQuantity(item) + refundedQuantity(item);
+    }
+
+    private BigDecimal calculateCompensationAmount(OrderItem item, int compensatedQuantity) {
+        if (item == null || item.getOrder() == null || item.getOrder().getOrderItems() == null || item.getOrder().getOrderItems().isEmpty()) {
+            return item != null && item.getTotalPrice() != null ? item.getTotalPrice() : BigDecimal.ZERO;
+        }
+
+        BigDecimal itemSubtotal = item.getOrder().getOrderItems().stream()
+                .map(OrderItem::getTotalPrice)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (itemSubtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal payableTotal = item.getOrder().getTotalAmount() != null ? item.getOrder().getTotalAmount() : itemSubtotal;
+        if (payableTotal.compareTo(BigDecimal.ZERO) < 0) {
+            payableTotal = BigDecimal.ZERO;
+        }
+        if (payableTotal.compareTo(itemSubtotal) > 0) {
+            payableTotal = itemSubtotal;
+        }
+
+        BigDecimal itemTotal = item.getTotalPrice() != null ? item.getTotalPrice() : BigDecimal.ZERO;
+        BigDecimal itemPaidAmount = payableTotal.multiply(itemTotal).divide(itemSubtotal, 2, RoundingMode.HALF_UP);
+        if (item.getQuantity() == null || item.getQuantity() <= 0 || compensatedQuantity >= item.getQuantity()) {
+            return itemPaidAmount.setScale(2, RoundingMode.HALF_UP);
+        }
+        return itemPaidAmount.multiply(BigDecimal.valueOf(compensatedQuantity))
+                .divide(BigDecimal.valueOf(item.getQuantity()), 2, RoundingMode.HALF_UP);
     }
 
     public record CancellationPlan(List<OrderItemCancel> records, BigDecimal totalRefundAmount) {

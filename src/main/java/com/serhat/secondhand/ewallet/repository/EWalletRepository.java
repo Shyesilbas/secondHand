@@ -20,6 +20,8 @@ public interface EWalletRepository extends JpaRepository<EWallet, UUID> {
     Optional<EWallet> findByUserWithLock(@Param("user") User user);
     
     Optional<EWallet> findByUser(User user);
+
+    Optional<EWallet> findByUserId(Long userId);
     
     boolean existsByUser(User user);
 }

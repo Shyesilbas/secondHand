@@ -28,25 +28,6 @@ export const usePaymentsQuery = ({ userId, currentPage, pageSize, filters }) => 
   });
 };
 
-export const useBankAccountsQuery = (options = {}) => {
-  const { enabled = true } = options;
-  const { user, isAuthenticated } = useAuthState();
-
-  return useQuery({
-    queryKey: [...PAYMENT_QUERY_KEYS.bankAccounts, user?.id],
-    queryFn: async () => {
-      const data = await paymentService.getBankAccounts();
-      return Array.isArray(data) ? data : [];
-    },
-    enabled: enabled && !!(isAuthenticated && user?.id),
-    staleTime: 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    retry: 1,
-  });
-};
-
 export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
   const { enabled = true } = options;
   const { user, isAuthenticated } = useAuthState();
@@ -62,4 +43,3 @@ export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
     retry: 1,
   });
 };
-

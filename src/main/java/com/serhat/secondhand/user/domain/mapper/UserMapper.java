@@ -26,8 +26,6 @@ public interface UserMapper {
         @Mapping(target = "lastLoginIp", ignore = true),
         @Mapping(target = "accountVerified", constant = "false"),
         @Mapping(target = "listings", ignore = true),
-        @Mapping(target = "bank", ignore = true),
-        @Mapping(target = "creditCards", ignore = true),
         @Mapping(target = "emails", ignore = true),
         @Mapping(target = "tokens", ignore = true),
         @Mapping(target = "verifications", ignore = true),

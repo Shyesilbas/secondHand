@@ -1,0 +1,14 @@
+.git
+.idea
+.vscode
+.ai
+.cursor
+target/
+secondhand-frontend/dist/
+secondhand-frontend/node_modules/
+node_modules/
+.env
+.env.local
+config/application-local-secret.yml
+*.db
+*.log

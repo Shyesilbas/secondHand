@@ -1,7 +1,9 @@
 package com.serhat.secondhand.coupon.repository;
 
 import com.serhat.secondhand.coupon.entity.Coupon;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,10 @@ import java.util.UUID;
 public interface CouponRepository extends JpaRepository<Coupon, UUID> {
     Optional<Coupon> findByCodeIgnoreCase(String code);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select c from Coupon c where upper(c.code) = upper(:code)")
+    Optional<Coupon> findByCodeIgnoreCaseForUpdate(@Param("code") String code);
+
     @Query("""
         select c from Coupon c
         where c.active = true
@@ -24,5 +30,4 @@ public interface CouponRepository extends JpaRepository<Coupon, UUID> {
         """)
     List<Coupon> findActiveNow(@Param("now") LocalDateTime now);
 }
-
 

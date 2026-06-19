@@ -55,6 +55,9 @@ public class OfferService implements IOfferService {
         Result<Void> listingValidationResult = offerValidator.validateListingForOffer(listing, buyer);
         if (listingValidationResult.isError()) return Result.error(listingValidationResult.getMessage(), listingValidationResult.getErrorCode());
 
+        Result<Void> stockValidationResult = offerValidator.validateListingStockForOffer(listing, request.getQuantity());
+        if (stockValidationResult.isError()) return Result.error(stockValidationResult.getMessage(), stockValidationResult.getErrorCode());
+
         Offer offer = offerMapper.toOffer(request, buyer, listing);
         Offer saved;
         try {
@@ -110,14 +113,14 @@ public class OfferService implements IOfferService {
 
         if (requirePending(offer).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
-        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
-        if (eligibilityResult.isError()) return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
-
         Listing lockedListing = listingService.findByIdWithLock(offer.getListing().getId()).orElse(null);
         if (lockedListing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
         offer.setListing(lockedListing);
 
-        if (offerRepository.existsByListingAndStatusAndIdNot(offer.getListing(), OfferStatus.ACCEPTED, offer.getId())) {
+        Result<Void> eligibilityResult = validateListingForCheckout(offer);
+        if (eligibilityResult.isError()) return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+
+        if (offerRepository.existsByListingAndStatusAndIdNot(lockedListing, OfferStatus.ACCEPTED, offer.getId())) {
             return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
         }
 
@@ -180,8 +183,13 @@ public class OfferService implements IOfferService {
 
         if (requirePending(previous).isError()) return Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
 
-        if (offerValidator.validateListingEligibility(previous.getListing()).isError())
-            return Result.error(OfferErrorCodes.LISTING_TYPE_NOT_ALLOWED);
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(previous.getListing());
+        if (eligibilityResult.isError()) {
+            return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+        }
+
+        Result<Void> stockValidationResult = offerValidator.validateListingStockForOffer(previous.getListing(), request.getQuantity());
+        if (stockValidationResult.isError()) return Result.error(stockValidationResult.getMessage(), stockValidationResult.getErrorCode());
 
         previous.setStatus(OfferStatus.REJECTED);
         try {
@@ -205,7 +213,7 @@ public class OfferService implements IOfferService {
         return Result.success(offerMapper.toDto(saved));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Result<Offer> getAcceptedOfferForCheckout(Long buyerId, UUID offerId) {
         Offer offer = offerRepository.findByIdAndBuyerId(offerId, buyerId).orElse(null);
 
@@ -217,8 +225,16 @@ public class OfferService implements IOfferService {
 
         if (offer.getStatus() != OfferStatus.ACCEPTED) return Result.error(OfferErrorCodes.OFFER_NOT_ACCEPTED);
 
-        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
-        if (eligibilityResult.isError()) return Result.error(eligibilityResult.getErrorCode(), eligibilityResult.getMessage());
+        Listing lockedListing = listingService.findByIdWithLock(offer.getListing().getId()).orElse(null);
+        if (lockedListing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+        offer.setListing(lockedListing);
+
+        Result<Void> eligibilityResult = validateListingForCheckout(offer);
+        if (eligibilityResult.isError()) return Result.error(eligibilityResult.getMessage(), eligibilityResult.getErrorCode());
+
+        if (offerRepository.existsByListingAndStatusAndIdNot(lockedListing, OfferStatus.ACCEPTED, offer.getId())) {
+            return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
+        }
 
         return Result.success(offer);
     }
@@ -226,6 +242,13 @@ public class OfferService implements IOfferService {
     @Transactional
     public void markCompleted(Offer offer) {
         if (offer == null) return;
+        if (offer.getStatus() == OfferStatus.COMPLETED) {
+            return;
+        }
+        if (offer.getStatus() != OfferStatus.ACCEPTED) {
+            log.warn("Skipping markCompleted for offer {} with status {}", offer.getId(), offer.getStatus());
+            return;
+        }
         log.info("Marking offer {} as COMPLETED", offer.getId());
         offer.setStatus(OfferStatus.COMPLETED);
         try {
@@ -284,5 +307,13 @@ public class OfferService implements IOfferService {
 
     private Result<Void> requirePending(Offer offer) {
         return offer.getStatus() == OfferStatus.PENDING ? Result.success() : Result.error(OfferErrorCodes.OFFER_NOT_PENDING);
+    }
+
+    private Result<Void> validateListingForCheckout(Offer offer) {
+        Result<Void> eligibilityResult = offerValidator.validateListingEligibility(offer.getListing());
+        if (eligibilityResult.isError()) {
+            return eligibilityResult;
+        }
+        return offerValidator.validateListingStockForOffer(offer.getListing(), offer.getQuantity());
     }
 }

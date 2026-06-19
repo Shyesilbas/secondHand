@@ -57,6 +57,9 @@ public class PricingMapper {
                 .campaignUnitPrice(campaignUnitPrice)
                 .lineSubtotal(lineSubtotal)
                 .appliedCampaign(appliedCampaign)
+                .couponDiscount(BigDecimal.ZERO)
+                .netUnitPrice(campaignUnitPrice)
+                .netLineTotal(lineSubtotal)
                 .build();
     }
 

@@ -111,10 +111,73 @@ public class PriceCalculationEngine {
         }
 
         BigDecimal couponDiscount = coupon == null ? BigDecimal.ZERO : computeCouponDiscount(coupon, pricedItems);
+
+        // Proportional coupon allocation to pricedItems
+        if (couponDiscount.compareTo(BigDecimal.ZERO) > 0 && subtotalAfterCampaigns.compareTo(BigDecimal.ZERO) > 0) {
+            List<PricedCartItemDto> eligibleItems = new ArrayList<>();
+            Set<ListingType> eligibleTypes = coupon.getEligibleTypes();
+            boolean typeScoped = coupon.getDiscountKind() == CouponDiscountKind.TYPE_FIXED 
+                    || coupon.getDiscountKind() == CouponDiscountKind.TYPE_PERCENT;
+
+            for (PricedCartItemDto item : pricedItems) {
+                boolean eligible = true;
+                if (item.getListingType() == ListingType.REAL_ESTATE || item.getListingType() == ListingType.VEHICLE) {
+                    eligible = false;
+                }
+                if (typeScoped && eligibleTypes != null && !eligibleTypes.isEmpty() && !eligibleTypes.contains(item.getListingType())) {
+                    eligible = false;
+                }
+                if (eligible && item.getLineSubtotal().compareTo(BigDecimal.ZERO) > 0) {
+                    eligibleItems.add(item);
+                }
+            }
+
+            BigDecimal qualifyingSubtotal = eligibleItems.stream()
+                    .map(PricedCartItemDto::getLineSubtotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            if (qualifyingSubtotal.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal remainingDiscount = couponDiscount;
+                for (int i = 0; i < eligibleItems.size(); i++) {
+                    PricedCartItemDto item = eligibleItems.get(i);
+                    BigDecimal share;
+                    if (i == eligibleItems.size() - 1) {
+                        share = remainingDiscount;
+                    } else {
+                        share = PricingUtil.scale(couponDiscount.multiply(item.getLineSubtotal())
+                                .divide(qualifyingSubtotal, 2, RoundingMode.HALF_UP));
+                        if (share.compareTo(remainingDiscount) > 0) {
+                            share = remainingDiscount;
+                        }
+                    }
+                    remainingDiscount = PricingUtil.scale(remainingDiscount.subtract(share));
+
+                    item.setCouponDiscount(share);
+                    BigDecimal netLine = PricingUtil.scale(item.getLineSubtotal().subtract(share).max(BigDecimal.ZERO));
+                    item.setNetLineTotal(netLine);
+                    item.setNetUnitPrice(PricingUtil.scale(netLine.divide(BigDecimal.valueOf(item.getQuantity()), 2, RoundingMode.HALF_UP)));
+                }
+            }
+        }
+
+        // Initialize non-allocated fields
+        for (PricedCartItemDto item : pricedItems) {
+            if (item.getNetLineTotal() == null) {
+                item.setCouponDiscount(BigDecimal.ZERO);
+                item.setNetLineTotal(item.getLineSubtotal());
+                item.setNetUnitPrice(item.getCampaignUnitPrice());
+            }
+        }
+
         BigDecimal total = PricingUtil.scale(subtotalAfterCampaigns.subtract(couponDiscount));
         BigDecimal discountTotal = PricingUtil.scale(campaignDiscountTotal.add(couponDiscount));
 
-        Map<Long, BigDecimal> payableBySeller = allocateDiscountAcrossSellers(sellerSubtotalsAfterCampaign, couponDiscount);
+        // Group netLineTotals by seller for accurate payableBySeller allocation
+        Map<Long, BigDecimal> payableBySeller = new HashMap<>();
+        for (PricedCartItemDto item : pricedItems) {
+            payableBySeller.put(item.getSellerId(),
+                    PricingUtil.scale(payableBySeller.getOrDefault(item.getSellerId(), BigDecimal.ZERO).add(item.getNetLineTotal())));
+        }
 
         String normalizedCouponCode = coupon != null ? coupon.getCode() : null;
 
@@ -207,11 +270,17 @@ public class PriceCalculationEngine {
      * Computes campaign discount amount based on discount kind (percent/fixed).
      */
     public BigDecimal computeCampaignDiscountAmount(Campaign campaign, BigDecimal unitPrice) {
+        BigDecimal discount;
         if (campaign.getDiscountKind() == CampaignDiscountKind.PERCENT) {
             BigDecimal pct = campaign.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
-            return PricingUtil.scale(unitPrice.multiply(pct));
+            discount = PricingUtil.scale(unitPrice.multiply(pct));
+        } else {
+            discount = PricingUtil.scale(campaign.getValue());
         }
-        return PricingUtil.scale(campaign.getValue());
+        if (discount.compareTo(unitPrice) > 0) {
+            discount = unitPrice;
+        }
+        return discount;
     }
 
     /**

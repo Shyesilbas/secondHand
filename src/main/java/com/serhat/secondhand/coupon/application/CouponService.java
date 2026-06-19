@@ -113,8 +113,13 @@ public class CouponService {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
 
-        return couponRepository.findByCodeIgnoreCase(normalizeCode(code))
+        return couponRepository.findByCodeIgnoreCaseForUpdate(normalizeCode(code))
                 .map(coupon -> {
+                    Result<Void> usableResult = couponValidator.validateUsable(coupon, userResult.getData());
+                    if (usableResult.isError()) {
+                        return Result.<Void>error(usableResult.getErrorCode(), usableResult.getMessage());
+                    }
+
                     CouponRedemption redemption = CouponRedemption.builder()
                             .coupon(coupon)
                             .user(userResult.getData())
@@ -126,7 +131,7 @@ public class CouponService {
                 .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PricingResultDto previewPricing(Long userId, CouponPreviewRequest request) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) return null;

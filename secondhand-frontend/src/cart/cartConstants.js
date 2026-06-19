@@ -1,6 +1,4 @@
 export const CART_PAYMENT_TYPES = Object.freeze({
-  CREDIT_CARD: 'CREDIT_CARD',
-  TRANSFER: 'TRANSFER',
   EWALLET: 'EWALLET',
 });
 
