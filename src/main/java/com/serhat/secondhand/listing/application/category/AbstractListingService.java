@@ -174,4 +174,67 @@ public abstract class AbstractListingService<T extends Listing, C> {
         log.info("{} listing updated: {}", getListingType(), existing.getId());
         return Result.success();
     }
+
+    /**
+     * Full update pipeline including optional quantity validation.
+     * <p>
+     * Covers: ownership → find → editable check → quantity → resolver → mapper → validator → save.
+     * Category services with a quantity field can delegate their {@code updateXxx} method here
+     * instead of duplicating the pipeline locally.
+     *
+     * @param id            the listing UUID
+     * @param request       the update request DTO
+     * @param currentUserId the authenticated user's ID
+     * @param quantity      optional quantity from the request (pass {@code Optional.empty()} if not applicable)
+     * @param finder        repository lookup by UUID
+     * @param resolverApply updates the entity's FK references (brand, type, etc.) — may be null
+     * @param mapperUpdate  applies scalar field changes from request to entity
+     * @param validator     runs spec validators and returns a Result
+     */
+    @Transactional
+    @CacheEvict(value = "userProfile", allEntries = true)
+    protected <U> Result<Void> standardUpdate(
+            UUID id,
+            U request,
+            Long currentUserId,
+            Optional<Integer> quantity,
+            java.util.function.Function<UUID, Optional<T>> finder,
+            java.util.function.Function<T, Result<Void>> resolverApply,
+            java.util.function.BiConsumer<T, U> mapperUpdate,
+            java.util.function.Function<T, Result<Void>> validator) {
+
+        log.info("Updating {} listing: {} by user: {}", getListingType(), id, currentUserId);
+
+        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
+        if (ownershipResult.isError()) return ownershipResult;
+
+        Optional<T> existingOpt = finder.apply(id);
+        if (existingOpt.isEmpty()) {
+            return Result.error(getListingType() + " listing not found",
+                    ListingErrorCodes.LISTING_NOT_FOUND.toString());
+        }
+
+        T existing = existingOpt.get();
+
+        if (!existing.isEditable()) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
+
+        Result<Void> quantityResult = applyQuantityUpdate(existing, quantity);
+        if (quantityResult.isError()) return quantityResult;
+
+        if (resolverApply != null) {
+            Result<Void> resolveResult = resolverApply.apply(existing);
+            if (resolveResult.isError()) return resolveResult;
+        }
+
+        mapperUpdate.accept(existing, request);
+
+        Result<Void> validationResult = validator.apply(existing);
+        if (validationResult.isError()) return validationResult;
+
+        save(existing);
+        log.info("{} listing updated: {}", getListingType(), existing.getId());
+        return Result.success();
+    }
 }

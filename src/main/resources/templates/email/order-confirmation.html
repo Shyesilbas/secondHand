@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #1f2937; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 30px 24px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+        .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
+        .content { padding: 32px; }
+        .content p { margin: 0 0 16px 0; line-height: 1.6; }
+        .order-details { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px; }
+        .detail-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .detail-label { font-weight: 600; color: #475569; }
+        .detail-value { font-weight: 700; color: #0f172a; text-align: right; }
+        
+        .items-section { margin-top: 24px; }
+        .item-row { display: flex; align-items: center; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
+        .item-info { flex-grow: 1; }
+        .item-title { font-weight: 600; font-size: 16px; color: #1e293b; margin-bottom: 4px; }
+        .item-meta { font-size: 14px; color: #64748b; }
+        .item-price { font-weight: 700; font-size: 16px; color: #0f172a; }
+        
+        .address-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-top: 24px; }
+        .address-box h3 { margin: 0 0 12px 0; color: #166534; font-size: 16px; }
+        
+        .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
+        .highlight { color: #2563eb; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Siparişiniz Onaylandı!</h1>
+            <p>Sipariş Numaranız: <span th:text="${orderNumber}">#ORD-1234</span></p>
+        </div>
+        <div class="content">
+            <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
+            <p>Siparişiniz başarıyla alındı ve onaylandı. İşte siparişinizin detayları:</p>
+            
+            <div class="order-details">
+                <div class="detail-row">
+                    <span class="detail-label">Durum:</span>
+                    <span class="detail-value" th:text="${status}">ONAYLANDI</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Ödeme Durumu:</span>
+                    <span class="detail-value" th:text="${paymentStatus}">ÖDENDİ</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Toplam Tutar:</span>
+                    <span class="detail-value highlight" th:text="${totalAmount}">0.00 TL</span>
+                </div>
+            </div>
+
+            <div class="items-section">
+                <h3 style="color: #334155; margin-bottom: 16px;">Sipariş Edilen Ürünler</h3>
+                <!-- Iterate over items here -->
+                <div class="item-row" th:each="item : ${items}">
+                    <div class="item-info">
+                        <div class="item-title" th:text="${item.title}">Ürün Adı</div>
+                        <div class="item-meta">Adet: <span th:text="${item.quantity}">1</span></div>
+                    </div>
+                    <div class="item-price" th:text="${item.price}">0.00 TL</div>
+                </div>
+            </div>
+
+            <div class="address-box" th:if="${deliveryMethod == 'SHIPPING'}">
+                <h3>Teslimat Adresi</h3>
+                <p style="margin: 0;" th:utext="${shippingAddress}">Adres detayları...</p>
+            </div>
+            
+            <div class="address-box" th:if="${deliveryMethod == 'SAFE_MEETUP'}" style="background-color: #fffbeb; border-color: #fde68a;">
+                <h3 style="color: #92400e;">Güvenli Elden Teslimat</h3>
+                <p><strong>Buluşma Noktası:</strong> 📍 <span th:text="${meetupLocation}">Konum</span></p>
+                <p th:if="${meetupVerificationCode != null}" style="margin-top: 10px;">
+                    <strong>Doğrulama Kodunuz:</strong> <span style="font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #b45309;" th:text="${meetupVerificationCode}">123456</span>
+                </p>
+                <p style="font-size: 13px; color: #78350f; margin-top: 8px;">
+                    * Satıcı ile buluştuğunuzda bu kodu göstermeniz gerekmektedir.
+                </p>
+            </div>
+
+            <p style="margin-top: 32px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
+        </div>
+        <div class="footer">
+            &copy; 2026 SecondHand. Tüm hakları saklıdır.
+        </div>
+    </div>
+</body>
+</html>

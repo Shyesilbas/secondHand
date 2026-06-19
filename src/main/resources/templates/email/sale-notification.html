@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #1f2937; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px 24px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+        .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
+        .content { padding: 32px; }
+        .content p { margin: 0 0 16px 0; line-height: 1.6; }
+        .summary-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px; }
+        .summary-box h2 { margin: 0 0 8px 0; color: #166534; font-size: 24px; font-weight: 700; }
+        .summary-box p { margin: 0; color: #15803d; font-weight: 600; }
+        
+        .items-section { margin-top: 24px; }
+        .item-row { display: flex; align-items: center; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
+        .item-info { flex-grow: 1; }
+        .item-title { font-weight: 600; font-size: 16px; color: #1e293b; margin-bottom: 4px; }
+        .item-meta { font-size: 14px; color: #64748b; }
+        
+        .action-box { background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px; margin-top: 24px; }
+        .action-box h3 { margin: 0 0 8px 0; color: #1e40af; font-size: 16px; }
+        .action-box p { margin: 0; color: #1e3a8a; font-size: 14px; }
+
+        .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Tebrikler, Ürününüz Satıldı!</h1>
+            <p>Sipariş Numaranız: <span th:text="${orderNumber}">#ORD-1234</span></p>
+        </div>
+        <div class="content">
+            <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
+            <p>Harika haber! Ürünlerinizden biri satın alındı. Kazancınız e-cüzdanınıza aktarılmak üzere güvenli havuz hesabına alındı.</p>
+            
+            <div class="summary-box">
+                <h2 th:text="${totalAmount}">0.00 TL</h2>
+                <p>Toplam Kazanç</p>
+            </div>
+
+            <div class="items-section">
+                <h3 style="color: #334155; margin-bottom: 16px;">Satılan Ürünler</h3>
+                <div class="item-row" th:each="item : ${items}">
+                    <div class="item-info">
+                        <div class="item-title" th:text="${item.title}">Ürün Adı</div>
+                        <div class="item-meta">Adet: <span th:text="${item.quantity}">1</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-box" th:if="${deliveryMethod == 'SHIPPING'}">
+                <h3>Sıradaki Adım: Kargolama</h3>
+                <p>Lütfen ürünü güvenli bir şekilde paketleyin ve alıcının aşağıdaki adresine kargolayın. Uygulama üzerinden kargo takip numarasını girmeyi unutmayın.</p>
+                <div style="margin-top: 12px; padding: 12px; background: #fff; border-radius: 6px; font-size: 14px;" th:utext="${shippingAddress}">
+                    Adres detayları...
+                </div>
+            </div>
+
+            <div class="action-box" th:if="${deliveryMethod == 'SAFE_MEETUP'}" style="background-color: #fffbeb; border-color: #f59e0b;">
+                <h3 style="color: #b45309;">Sıradaki Adım: Buluşma</h3>
+                <p>Lütfen alıcı ile belirlenen konumda buluşun: <strong>📍 <span th:text="${meetupLocation}">Konum</span></strong></p>
+                <p style="margin-top: 8px;"><strong>ÖNEMLİ:</strong> Ürünü teslim ederken, alıcının size vereceği 6 haneli doğrulama kodunu sisteme girmelisiniz.</p>
+            </div>
+
+            <p style="margin-top: 32px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
+        </div>
+        <div class="footer">
+            &copy; 2026 SecondHand. Tüm hakları saklıdır.
+        </div>
+    </div>
+</body>
+</html>

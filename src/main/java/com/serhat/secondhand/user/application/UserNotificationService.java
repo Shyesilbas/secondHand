@@ -35,8 +35,14 @@ public class UserNotificationService {
     public void sendWelcomeNotification(User user) {
         try {
             String subject = emailConfig.getWelcomeSubject();
-            String content = String.format(emailConfig.getWelcomeContent(), user.getName());
-            emailService.sendEmail(user, subject, content, EmailType.WELCOME);
+            String content = "SecondHand'e Hoş Geldiniz! Hesabınız başarıyla oluşturuldu. Artık ikinci el eşyalarınızı satabilir, beğendiğiniz ürünleri satın alabilir ve diğer kullanıcılarla güvenli bir şekilde iletişim kurabilirsiniz. Keyifli alışverişler!";
+            
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Hoş Geldiniz!");
+            ctx.setVariable("message", content);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.WELCOME);
             log.info("Welcome notification sent to user: {}", user.getEmail());
         } catch (Exception e) {
             log.warn("Failed to send welcome notification to user {}: {}", user.getEmail(), e.getMessage());
@@ -46,21 +52,32 @@ public class UserNotificationService {
     public void sendVerificationCodeNotification(User user, String verificationCode) {
         try {
             String subject = emailConfig.getVerificationSubject();
-            String content = String.format(emailConfig.getVerificationContent(), user.getName(), verificationCode);
-            emailService.sendEmail(user, subject, content, EmailType.VERIFICATION_CODE);
+            String content = String.format("Doğrulama kodunuz: %s. Bu kod 15 dakika boyunca geçerlidir.", verificationCode);
+            
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "E-posta Doğrulama");
+            ctx.setVariable("message", content);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.VERIFICATION_CODE);
             log.info("Verification code notification sent to user: {}", user.getEmail());
         } catch (Exception e) {
             log.warn("Failed to send verification code notification to user {}: {}", user.getEmail(), e.getMessage());
         }
     }
 
-    // Şifre sıfırlama kodu gönderimi: kod yalnızca e-posta kanalında bulunmalı, log/HTTP yanıtında olmamalı.
     @Async("notificationExecutor")
     public void sendPasswordResetCodeNotification(User user, String verificationCode) {
         try {
             String subject = emailConfig.getPasswordResetSubject();
-            String content = String.format(emailConfig.getPasswordResetContent(), user.getName(), verificationCode);
-            emailService.sendEmail(user, subject, content, EmailType.PASSWORD_RESET);
+            String content = String.format("Şifre sıfırlama kodunuz: %s. Bu kod 15 dakika boyunca geçerlidir.", verificationCode);
+            
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Şifre Sıfırlama");
+            ctx.setVariable("message", content);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.PASSWORD_RESET);
             log.info("Password reset code notification sent to user: {}", user.getEmail());
         } catch (Exception e) {
             log.warn("Failed to send password reset code notification to user {}: {}", user.getEmail(), e.getMessage());
@@ -71,8 +88,14 @@ public class UserNotificationService {
     public void sendPhoneNumberUpdatedNotification(User user) {
         try {
             String subject = emailConfig.getPhoneUpdateSubject();
-            String content = String.format(emailConfig.getPhoneUpdateContent(), user.getName());
-            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
+            String content = "Telefon numaranız güncellendi. Bu işlemi siz yapmadıysanız lütfen hemen bizimle iletişime geçin.";
+            
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Telefon Numarası Güncellendi");
+            ctx.setVariable("message", content);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.NOTIFICATION);
             log.info("Phone number update notification sent to user: {}", user.getEmail());
         } catch (Exception e) {
             log.warn("Failed to send phone update notification to user {}: {}", user.getEmail(), e.getMessage());
@@ -83,8 +106,16 @@ public class UserNotificationService {
     public void sendPriceChangeNotification(User user, String listingTitle, String oldPriceStr, String newPriceStr, UUID listingId) {
         try {
             String subject = emailConfig.getPriceChangeSubject();
-            String content = String.format(emailConfig.getPriceChangeContent(), user.getName(), listingTitle, oldPriceStr, newPriceStr);
-            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
+            String content = String.format("Favorilerinizdeki '%s' ilanının fiyatı %s'den %s'ye düştü.", listingTitle, oldPriceStr, newPriceStr);
+            
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Fiyat Düştü!");
+            ctx.setVariable("message", content);
+            ctx.setVariable("actionText", "İlanı İncele");
+            ctx.setVariable("actionUrl", "/listings/" + listingId);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.NOTIFICATION);
             log.info("Price change notification sent to user: {}", user.getEmail());
             
             var request = notificationTemplateCatalog.listingPriceDropped(

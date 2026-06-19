@@ -69,8 +69,11 @@ public class GreatSellerEligibilitySyncService {
         }
         try {
             String subject = emailConfig.getGreatSellerSubject();
-            String content = String.format(emailConfig.getGreatSellerContent(), user.getName());
-            emailService.sendEmail(user, subject, content, EmailType.GREAT_SELLER_ACHIEVEMENT);
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Harika Satıcı Rozeti!");
+            ctx.setVariable("message", "Tebrikler — SecondHand'de Harika Satıcı rozeti kazandınız. Güvenilir satışlarınız ve harika yorumlarınız için teşekkür ederiz.");
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.GREAT_SELLER_ACHIEVEMENT);
         } catch (Exception e) {
             log.warn("Great Seller email failed for {}: {}", user.getId(), e.getMessage());
         }

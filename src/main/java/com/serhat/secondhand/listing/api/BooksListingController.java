@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.application.books.BooksListingService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksUpdateRequest;
@@ -18,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -36,11 +36,7 @@ public class BooksListingController {
             @Valid @RequestBody BooksCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
         var result = booksListingService.createBooksListing(request, currentUser.getId());
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-        URI location = URI.create("/api/v1/books/" + result.getData());
-        return ResponseEntity.created(location).build();
+        return CategoryListingControllerSupport.buildCreateResponse(result, "/api/v1/books");
     }
 
     @PutMapping("/{id}")

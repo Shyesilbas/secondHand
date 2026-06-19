@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicUpdateRequest;
@@ -20,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -40,15 +39,8 @@ public class ElectronicListingController {
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Creating electronic listing for user: {}", currentUser.getId());
-
         var result = electronicListingService.createElectronicListing(request, currentUser.getId());
-
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-
-        URI location = URI.create("/api/v1/electronics/" + result.getData());
-        return ResponseEntity.created(location).body(Map.of("id", result.getData()));
+        return CategoryListingControllerSupport.buildCreateResponse(result, "/api/v1/electronics");
     }
 
     @PutMapping("/{id}")

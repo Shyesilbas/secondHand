@@ -1,9 +1,16 @@
+import { useTranslation } from "react-i18next";
 import React, { useState, useCallback } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { fetchExchangeRate } from '../services/listingAddonService.js';
 import { ArrowRightLeft, RefreshCw } from 'lucide-react';
-
-const ExchangeRatesTab = ({ price, currency, listingId }) => {
+const ExchangeRatesTab = ({
+  price,
+  currency,
+  listingId
+}) => {
+  const {
+    t
+  } = useTranslation();
   const [selected, setSelected] = useState(currency === 'USD' ? 'EUR' : 'USD');
   const [rates, setRates] = useState({});
   const [exLoading, setExLoading] = useState(false);
@@ -13,34 +20,30 @@ const ExchangeRatesTab = ({ price, currency, listingId }) => {
   React.useEffect(() => {
     handleExchangeQuery(selected);
   }, [selected]);
-
-  const handleExchangeQuery = useCallback(async (targetCurrency) => {
+  const handleExchangeQuery = useCallback(async targetCurrency => {
     if (currency === targetCurrency) return;
-    
     setExError('');
     setExLoading(true);
     try {
       const data = await fetchExchangeRate(currency, targetCurrency, listingId);
-      setRates(prev => ({ ...prev, [targetCurrency]: data.rate }));
+      setRates(prev => ({
+        ...prev,
+        [targetCurrency]: data.rate
+      }));
     } catch (e) {
       setExError('Unable to fetch live exchange rates');
     } finally {
       setExLoading(false);
     }
   }, [currency, listingId]);
-
-  const convertedValue = rates[selected] != null ? (price * rates[selected]) : null;
-
-  return (
-    <div className="flex flex-col items-center justify-center py-8 space-y-8 animate-fade-in">
+  const convertedValue = rates[selected] != null ? price * rates[selected] : null;
+  return <div className="flex flex-col items-center justify-center py-8 space-y-8 animate-fade-in">
       <div className="text-center space-y-2">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-indigo-50 rounded-full text-indigo-600 mb-2">
           <ArrowRightLeft className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900">Currency Converter</h3>
-        <p className="text-gray-500 text-sm max-w-xs mx-auto">
-          View this listing's price in different currencies with real-time exchange rates.
-        </p>
+        <h3 className="text-xl font-bold text-gray-900">{t("currency_converter")}</h3>
+        <p className="text-gray-500 text-sm max-w-xs mx-auto">{t("view_this_listing_s_price_in_different_c")}</p>
       </div>
 
       <div className="w-full max-w-md bg-gray-50 rounded-2xl p-6 border border-gray-100">
@@ -51,7 +54,7 @@ const ExchangeRatesTab = ({ price, currency, listingId }) => {
               {currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'TRY' ? '₺' : currency[0]}
             </div>
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Original</p>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t("original")}</p>
               <p className="text-lg font-bold text-gray-900">{formatCurrency(price, currency)}</p>
             </div>
           </div>
@@ -72,51 +75,32 @@ const ExchangeRatesTab = ({ price, currency, listingId }) => {
         {/* Target */}
         <div className="space-y-4">
           <div className="flex gap-2 justify-center">
-            {['USD', 'EUR', 'TRY'].filter(c => c !== currency).map(curr => (
-              <button
-                key={curr}
-                onClick={() => setSelected(curr)}
-                className={`
+            {['USD', 'EUR', 'TRY'].filter(c => c !== currency).map(curr => <button key={curr} onClick={() => setSelected(curr)} className={`
                   flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all
-                  ${selected === curr 
-                    ? 'bg-indigo-600 text-white shadow-md' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                  }
-                `}
-              >
+                  ${selected === curr ? 'bg-indigo-600 text-white shadow-md' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'}
+                `}>
                 {curr}
-              </button>
-            ))}
+              </button>)}
           </div>
 
           <div className="p-6 bg-indigo-600 rounded-xl text-white text-center shadow-lg shadow-indigo-200 transition-all duration-300">
-            {exLoading ? (
-              <div className="flex items-center justify-center gap-2 h-[72px]">
+            {exLoading ? <div className="flex items-center justify-center gap-2 h-[72px]">
                 <RefreshCw className="w-5 h-5 animate-spin opacity-75" />
-                <span className="font-medium">Updating rates...</span>
-              </div>
-            ) : exError ? (
-              <div className="text-red-200 text-sm h-[72px] flex items-center justify-center">{exError}</div>
-            ) : (
-              <div className="animate-fade-in">
-                <p className="text-indigo-200 text-xs font-medium uppercase tracking-wider mb-1">Converted Price</p>
+                <span className="font-medium">{t("updating_rates")}</span>
+              </div> : exError ? <div className="text-red-200 text-sm h-[72px] flex items-center justify-center">{exError}</div> : <div className="animate-fade-in">
+                <p className="text-indigo-200 text-xs font-medium uppercase tracking-wider mb-1">{t("converted_price")}</p>
                 <p className="text-3xl font-bold tracking-tight">
                   {formatCurrency(convertedValue, selected)}
                 </p>
                 <p className="text-indigo-200 text-xs mt-2">
                   1 {currency} = {(rates[selected] || 0).toFixed(4)} {selected}
                 </p>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </div>
       
-      <p className="text-xs text-gray-400">
-        * Exchange rates are updated daily and may vary from actual transaction rates.
-      </p>
-    </div>
-  );
+      <p className="text-xs text-gray-400">{t("exchange_rates_are_updated_daily_and_may")}</p>
+    </div>;
 };
-
 export default ExchangeRatesTab;

@@ -39,6 +39,7 @@ import java.util.UUID;
 })
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
+    private static final java.security.SecureRandom VERIFICATION_CODE_RANDOM = new java.security.SecureRandom();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -301,7 +302,7 @@ public class Order {
     }
 
     public void generateVerificationCode() {
-        String raw = String.format("%06d", new java.util.Random().nextInt(1000000));
+        String raw = String.format("%06d", VERIFICATION_CODE_RANDOM.nextInt(1000000));
         this.meetupVerificationCode = raw;
         this.meetupVerificationCodeHash = hashSha256(raw);
         this.verificationAttempts = 0;

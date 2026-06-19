@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -105,33 +104,14 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) return ownershipResult;
-
-        return clothingRepository.findById(id)
-                .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
-    }
-
-    private Result<Void> performUpdate(ClothingListing existing, ClothingUpdateRequest request) {
-        if (!existing.isEditable()) {
-            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
-        }
-
-        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return quantityResult;
-
-        Result<Void> applyResult = clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId());
-        if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
-
-        listingMapper.updateClothing(existing, request);
-
-        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators);
-        if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-
-        clothingRepository.save(existing);
-        log.info("Clothing listing updated: {}", existing.getId());
-        return Result.success();
+        return standardUpdate(
+                id, request, currentUserId,
+                request.quantity(),
+                clothingRepository::findById,
+                existing -> clothingListingResolver.apply(existing, request.brandId(), request.clothingTypeId()),
+                (existing, req) -> listingMapper.updateClothing(existing, req),
+                existing -> listingValidationEngine.cleanupAndValidate(existing, clothingSpecValidators)
+        );
     }
 
     public Page<ClothingListingDto> findByBrandAndClothingType(UUID brandId, UUID clothingTypeId, Pageable pageable) {

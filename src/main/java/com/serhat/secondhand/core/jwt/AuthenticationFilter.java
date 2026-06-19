@@ -2,6 +2,7 @@ package com.serhat.secondhand.core.jwt;
 
 import com.serhat.secondhand.auth.domain.entity.enums.TokenStatus;
 import com.serhat.secondhand.core.security.CookieUtils;
+import com.serhat.secondhand.core.security.PublicEndpointRegistry;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,26 +35,33 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
+    private final PublicEndpointRegistry publicEndpointRegistry;
 
-        private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList(
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/auth/refresh",              "/api/auth/debug/cookies",             "/api/test/rate-limit",             "/swagger-ui",
+    /**
+     * Non-controller system paths that are always bypassed by prefix match.
+     * These are infrastructure endpoints without a Spring MVC handler method
+     * and therefore cannot be annotated with {@code @PublicEndpoint}.
+     */
+    private static final List<String> SYSTEM_PATH_PREFIXES = List.of(
+            "/swagger-ui",
             "/api-docs",
             "/v3/api-docs",
             "/swagger-resources",
-            "/api/auth/oauth2/**",
-            "/login/oauth2/code/**",
-            "/oauth2/**",
             "/webjars",
-            "/ws/**",
+            "/oauth2/",
+            "/login/oauth2/",
             "/ws"
     );
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return PUBLIC_ENDPOINTS.stream().anyMatch(path::startsWith);
+        // 1. Annotation-driven public controller endpoints (O(1) set lookup after warmup)
+        if (publicEndpointRegistry.getPublicEndpoints().contains(path)) {
+            return true;
+        }
+        // 2. Non-controller infrastructure paths — prefix match
+        return SYSTEM_PATH_PREFIXES.stream().anyMatch(path::startsWith);
     }
 
     @Override

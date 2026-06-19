@@ -27,8 +27,13 @@ export const setAuthContextRef = (authContext) => {
     authContextRef = authContext;
 };
 
+import i18n from '../../../i18n.js';
+
 apiClient.interceptors.request.use(
     (config) => {
+        if (i18n.language) {
+            config.headers['Accept-Language'] = i18n.language;
+        }
                         if (!isCookieBasedAuth()) {
             const token = getToken();
             if (token) {

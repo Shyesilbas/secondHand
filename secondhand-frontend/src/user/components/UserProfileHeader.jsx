@@ -1,11 +1,19 @@
-import {useNavigate} from 'react-router-dom';
+import { useTranslation } from "react-i18next";
+import { useNavigate } from 'react-router-dom';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
-import {FollowButton, FollowStats} from '../../follow/index.js';
-import {formatDate} from '../../common/formatters.js';
-import {ArrowLeft, Award, Calendar, MessageCircle, ShieldCheck, Star, UserRound} from 'lucide-react';
-
-const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible}) => {
+import { FollowButton, FollowStats } from '../../follow/index.js';
+import { formatDate } from '../../common/formatters.js';
+import { ArrowLeft, Award, Calendar, MessageCircle, ShieldCheck, Star, UserRound } from 'lucide-react';
+const UserProfileHeader = ({
+  user,
+  isOwnProfile,
+  reviewStats,
+  greatSellerEligible
+}) => {
+  const {
+    t
+  } = useTranslation();
   const navigate = useNavigate();
   const name = user?.name || '';
   const surname = user?.surname || '';
@@ -13,20 +21,13 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
   const memberSince = formatDate(user?.accountCreationDate);
   const hasReviews = reviewStats && reviewStats.totalReviews > 0;
   const fullName = `${name} ${surname}`.trim() || 'Marketplace member';
-
-  return (
-    <div className="relative overflow-hidden bg-[#f8faf8] border-b border-gray-200/80">
+  return <div className="relative overflow-hidden bg-[#f8faf8] border-b border-gray-200/80">
       <div className="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(135deg,#111827_0%,#1f2937_46%,#365314_100%)]" />
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back button */}
         <div className="pt-5">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 hover:text-white transition-colors duration-200"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
+          <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 hover:text-white transition-colors duration-200">
+            <ArrowLeft className="w-4 h-4" />{t("back")}</button>
         </div>
 
         {/* Profile Row */}
@@ -41,11 +42,9 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
                 {userInitials}
               </span>
             </div>
-                  {greatSellerEligible && (
-                    <span className="absolute -right-2 -bottom-2 flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-400 text-amber-950 shadow-lg ring-4 ring-white">
+                  {greatSellerEligible && <span className="absolute -right-2 -bottom-2 flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-400 text-amber-950 shadow-lg ring-4 ring-white">
                       <Award className="h-[18px] w-[18px]" />
-                    </span>
-                  )}
+                    </span>}
           </div>
 
           {/* Info */}
@@ -54,21 +53,14 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
               <h1 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
                 {fullName}
               </h1>
-              {greatSellerEligible && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-bold rounded-full uppercase tracking-wide">
-                  <Award className="w-3.5 h-3.5" />
-                  Great Seller
-                </span>
-              )}
-              {isOwnProfile && (
-                <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full uppercase tracking-wider">You</span>
-              )}
+              {greatSellerEligible && <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-bold rounded-full uppercase tracking-wide">
+                  <Award className="w-3.5 h-3.5" />{t("great_seller")}</span>}
+              {isOwnProfile && <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full uppercase tracking-wider">{t("you")}</span>}
             </div>
 
             {/* Stats row */}
             <div className="flex flex-wrap items-center gap-2.5 text-sm text-gray-500 mb-4">
-              {hasReviews && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100">
+              {hasReviews && <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100">
                   <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                   <span className="text-xs font-bold text-amber-800 tabular-nums">
                     {(reviewStats.averageRating || 0).toFixed(1)}
@@ -76,62 +68,41 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
                   <span className="text-xs text-amber-600">
                     ({reviewStats.totalReviews})
                   </span>
-                </div>
-              )}
+                </div>}
               <div className="inline-flex items-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5">
                 <FollowStats userId={user.id} showIcon={true} className="text-gray-600" />
               </div>
-              {memberSince && (
-                <span className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600">
-                  <Calendar className="w-3.5 h-3.5" />
-                  Member since {memberSince}
-                </span>
-              )}
+              {memberSince && <span className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600">
+                  <Calendar className="w-3.5 h-3.5" />{t("member_since")}{memberSince}
+                </span>}
             </div>
 
             <div className="flex flex-wrap gap-2 text-xs font-semibold text-gray-600">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 ring-1 ring-emerald-100">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Verified marketplace profile
-              </span>
+                <ShieldCheck className="h-3.5 w-3.5" />{t("verified_marketplace_profile")}</span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-gray-700 ring-1 ring-gray-200">
-                <UserRound className="h-3.5 w-3.5" />
-                Seller profile
-              </span>
+                <UserRound className="h-3.5 w-3.5" />{t("seller_profile")}</span>
             </div>
 
             {/* Action buttons */}
-            {!isOwnProfile && (
-              <div className="flex flex-wrap items-center gap-2.5 mt-4">
+            {!isOwnProfile && <div className="flex flex-wrap items-center gap-2.5 mt-4">
                 <FollowButton userId={user.id} size="md" />
-                <ContactSellerButton
-                  listing={{
+                <ContactSellerButton listing={{
                     id: `user-chat-${user.id}`,
                     title: `Chat with ${name} ${surname}`,
                     sellerId: user.id,
                     sellerName: name,
-                    sellerSurname: surname,
-                  }}
-                  isDirectChat={true}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
-                />
-                <ComplaintButton
-                  targetUserId={user.id}
-                  targetUserName={`${name} ${surname}`}
-                  targetUser={user}
-                  className="inline-flex items-center gap-1.5 px-3 py-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-all duration-200"
-                />
-              </div>
-            )}
+                    sellerSurname: surname
+                  }} isDirectChat={true} className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200" />
+                <ComplaintButton targetUserId={user.id} targetUserName={`${name} ${surname}`} targetUser={user} className="inline-flex items-center gap-1.5 px-3 py-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-all duration-200" />
+              </div>}
           </div>
               </div>
 
               <div className="grid grid-cols-2 gap-px border-t border-gray-200 bg-gray-200 lg:w-72 lg:grid-cols-1 lg:border-l lg:border-t-0">
                 <div className="bg-gray-50 p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
-                    <Star className="h-3.5 w-3.5 text-amber-500" />
-                    Rating
-                  </div>
+                    <Star className="h-3.5 w-3.5 text-amber-500" />{t("rating")}</div>
                   <p className="mt-2 text-2xl font-black text-gray-950">
                     {hasReviews ? (reviewStats.averageRating || 0).toFixed(1) : '-'}
                   </p>
@@ -141,10 +112,8 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
                 </div>
                 <div className="bg-gray-50 p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
-                    <MessageCircle className="h-3.5 w-3.5 text-gray-700" />
-                    Response
-                  </div>
-                  <p className="mt-2 text-2xl font-black text-gray-950">Open</p>
+                    <MessageCircle className="h-3.5 w-3.5 text-gray-700" />{t("response")}</div>
+                  <p className="mt-2 text-2xl font-black text-gray-950">{t("open")}</p>
                   <p className="mt-0.5 text-xs font-medium text-gray-500">
                     {isOwnProfile ? 'This is your public page' : 'Message seller directly'}
                   </p>
@@ -154,8 +123,6 @@ const UserProfileHeader = ({user, isOwnProfile, reviewStats, greatSellerEligible
         </div>
       </div>
     </div>
-    </div>
-  );
+    </div>;
 };
-
 export default UserProfileHeader;

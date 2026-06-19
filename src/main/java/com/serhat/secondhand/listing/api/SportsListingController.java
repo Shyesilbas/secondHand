@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -19,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,15 +38,8 @@ public class SportsListingController {
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Request to create sports listing by user: {}", currentUser.getId());
-
         var result = sportsListingService.createSportsListing(request, currentUser.getId());
-
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-
-        URI location = URI.create("/api/v1/sports/" + result.getData());
-        return ResponseEntity.created(location).body(Map.of("id", result.getData()));
+        return CategoryListingControllerSupport.buildCreateResponse(result, "/api/v1/sports");
     }
 
     @PutMapping("/{id}")

@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -102,33 +101,14 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) return ownershipResult;
-
-        return sportsRepository.findById(id)
-                .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
-    }
-
-    private Result<Void> performUpdate(SportsListing existing, SportsUpdateRequest request) {
-        if (!existing.isEditable()) {
-            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
-        }
-
-        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return quantityResult;
-
-        Result<Void> applyResult = sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId());
-        if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
-
-        listingMapper.updateSports(existing, request);
-
-        Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators);
-        if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
-
-        sportsRepository.save(existing);
-        log.info("Sports listing updated: {}", existing.getId());
-        return Result.success();
+        return standardUpdate(
+                id, request, currentUserId,
+                request.quantity(),
+                sportsRepository::findById,
+                existing -> sportsListingResolver.apply(existing, request.disciplineId(), request.equipmentTypeId(), request.conditionId()),
+                (existing, req) -> listingMapper.updateSports(existing, req),
+                existing -> listingValidationEngine.cleanupAndValidate(existing, sportsSpecValidators)
+        );
     }
 
     public SportsListingDto getSportsDetails(UUID id) {

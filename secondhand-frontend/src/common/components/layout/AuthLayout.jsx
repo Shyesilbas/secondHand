@@ -1,18 +1,18 @@
+import { useTranslation } from "react-i18next";
 import { Outlet, useLocation } from 'react-router-dom';
 import { getPageName } from '../../utils/getPageName.js';
 import { OnboardingCarousel } from '../../../auth/components/OnboardingCarousel.jsx';
-
 const AuthLayout = () => {
-    const { pathname } = useLocation();
-    const pageName = getPageName(pathname);
+  const {
+    t
+  } = useTranslation();
+  const {
+    pathname
+  } = useLocation();
+  const pageName = getPageName(pathname);
 
-    // Serene split-screen layout with spacious proportions (Left: 56% width, Right: 44% width)
-    return (
-        <div 
-            className="flex min-h-screen w-full bg-[#faf9f7]" 
-            data-page={pageName ?? undefined} 
-            data-path={pathname}
-        >
+  // Serene split-screen layout with spacious proportions (Left: 56% width, Right: 44% width)
+  return <div className="flex min-h-screen w-full bg-[#faf9f7]" data-page={pageName ?? undefined} data-path={pathname}>
             {/* ── Left: Form Area (56% width to give inputs generous space) ── */}
             <div className="flex flex-col w-full lg:w-[56%] min-h-screen overflow-y-auto bg-white shadow-[0_8px_32px_rgba(28,25,23,0.015)] z-15 relative">
                 <div className="flex flex-col flex-1 justify-between px-6 py-10 sm:px-12 md:px-16 lg:px-18 xl:px-20 max-w-xl mx-auto w-full">
@@ -22,9 +22,7 @@ const AuthLayout = () => {
                     </div>
 
                     <footer className="pt-8 text-center border-t border-stone-100 mt-auto">
-                        <p className="text-[10px] tracking-wider text-stone-400 font-medium">
-                            © 2026 SECONDHAND. ALL RIGHTS RESERVED.
-                        </p>
+                        <p className="text-[10px] tracking-wider text-stone-400 font-medium">{t("2026_secondhand_all_rights_reserved")}</p>
                     </footer>
                 </div>
             </div>
@@ -39,8 +37,6 @@ const AuthLayout = () => {
                     <OnboardingCarousel />
                 </div>
             </div>
-        </div>
-    );
+        </div>;
 };
-
 export default AuthLayout;

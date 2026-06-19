@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
@@ -19,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,15 +38,8 @@ public class VehicleListingController {
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Creating vehicle listing for user: {}", currentUser.getId());
-
         var result = vehicleListingService.createVehicleListing(request, currentUser.getId());
-
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-
-        URI location = URI.create("/api/v1/vehicles/" + result.getData());
-        return ResponseEntity.created(location).body(Map.of("id", result.getData()));
+        return CategoryListingControllerSupport.buildCreateResponse(result, "/api/v1/vehicles");
     }
 
     @PutMapping("/{id}")

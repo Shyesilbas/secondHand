@@ -29,11 +29,16 @@ public class PaymentNotificationService {
     public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto) {
         try {
             String subject = emailConfig.getPaymentSuccessSubject();
-            String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Payment";
-            String content = String.format(emailConfig.getPaymentSuccessContent(), 
-                    user.getName(), listingTitle, paymentDto.amount(), paymentDto.transactionType());
+            String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Ödeme";
+            String content = String.format("'%s' başlıklı ilan için %s tutarındaki %s işleminiz başarıyla tamamlandı.",
+                    listingTitle, paymentDto.amount(), paymentDto.transactionType());
             
-            emailService.sendEmail(user, subject, content, EmailType.NOTIFICATION);
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Ödeme Başarılı");
+            ctx.setVariable("message", content);
+            
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.NOTIFICATION);
             log.info("Payment success notification sent to user: {}", user.getEmail());
 
             String amountText = paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "";
@@ -41,13 +46,8 @@ public class PaymentNotificationService {
             String typeLabel = paymentDto.transactionType() != null ? paymentDto.transactionType().name() : "";
             notificationEventPublisher.publishDispatch(
                     notificationTemplateCatalog.paymentSucceeded(
-                            user.getId(),
-                            amountText,
-                            cur,
-                            paymentDto.listingTitle(),
-                            typeLabel),
-                    "payment",
-                    "payment-success:" + user.getId() + ":" + paymentDto.paymentId());
+                            user.getId(), amountText, cur, paymentDto.listingTitle(), typeLabel),
+                    "payment", "payment-success:" + user.getId() + ":" + paymentDto.paymentId());
         } catch (Exception e) {
             log.warn("Failed to send payment success notification to user {}: {}", user.getEmail(), e.getMessage());
         }
@@ -56,12 +56,17 @@ public class PaymentNotificationService {
     public void sendPaymentVerificationNotification(User user, String code, String extraDetails) {
         try {
             String subject = emailConfig.getPaymentVerificationSubject();
-            String base = String.format(emailConfig.getPaymentVerificationContent(), 
-                    user.getName(), code, verificationConfig.getExpiryMinutes());
+            String base = String.format("Ödeme doğrulama kodunuz: %s. Bu kod %d dakika boyunca geçerlidir.", 
+                    code, verificationConfig.getExpiryMinutes());
             String content = base + (extraDetails != null ? ("\n" + extraDetails) : "");
 
+            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+            ctx.setVariable("userName", user.getName());
+            ctx.setVariable("headerTitle", "Ödeme Doğrulama");
+            ctx.setVariable("message", content);
+
             log.info("Attempting to send payment verification email to user: {}, code: {}", user.getEmail(), code);
-            emailService.sendEmail(user, subject, content, EmailType.PAYMENT_VERIFICATION);
+            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.PAYMENT_VERIFICATION);
             log.info("Payment verification notification sent successfully to user: {}", user.getEmail());
         } catch (Exception e) {
             log.error("Failed to send payment verification notification to user {}: {}", user.getEmail(), e.getMessage(), e);

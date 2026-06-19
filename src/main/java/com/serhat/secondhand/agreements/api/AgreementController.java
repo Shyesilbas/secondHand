@@ -44,7 +44,6 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
-    @PublicEndpoint
     @PostMapping("/initialize")
     @Operation(summary = "Initialize agreements", description = "Creates default agreements and required agreement-group mappings")
     public ResponseEntity<List<AgreementDto>> initializeAgreements() {

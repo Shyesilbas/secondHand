@@ -16,6 +16,7 @@ public class RateLimitConfig {
     private General general = new General();
     private Ai ai = new Ai();
     private int windowSizeSeconds = 60;
+    private boolean trustForwardedHeaders = false;
 
     @Getter
     @Setter
@@ -41,4 +42,3 @@ public class RateLimitConfig {
         private int requestsPerSecond = 6;
     }
 }
-

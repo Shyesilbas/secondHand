@@ -1,7 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { lazy, Suspense } from 'react';
-import {Navigate, Route, Routes, useSearchParams} from 'react-router-dom';
-import {useAuth} from '../../auth/AuthContext.jsx';
-import {ROUTES} from '../constants/routes.js';
+import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../auth/AuthContext.jsx';
+import { ROUTES } from '../constants/routes.js';
 import LoadingIndicator from '../components/ui/LoadingIndicator.jsx';
 
 // Layouts - Always loaded
@@ -46,16 +47,18 @@ const BuyerDashboardPage = lazy(() => import('../../dashboard/pages/BuyerDashboa
 // Chat & Communication - Lazy loaded
 const AuraChatPage = lazy(() => import('../../ai/pages/AuraChatPage.jsx'));
 const InboxPage = lazy(() => import('../../inbox/pages/InboxPage.jsx'));
-
 const LegacyChatInboxRedirect = () => {
-    const [sp] = useSearchParams();
-    const room = sp.get('room');
-    const q = new URLSearchParams();
-    q.set('tab', 'chat');
-    if (room) {
-        q.set('room', room);
-    }
-    return <Navigate to={`${ROUTES.INBOX}?${q.toString()}`} replace />;
+  const {
+    t
+  } = useTranslation();
+  const [sp] = useSearchParams();
+  const room = sp.get('room');
+  const q = new URLSearchParams();
+  q.set('tab', 'chat');
+  if (room) {
+    q.set('room', room);
+  }
+  return <Navigate to={`${ROUTES.INBOX}?${q.toString()}`} replace />;
 };
 
 // Forum - Lazy loaded
@@ -91,432 +94,199 @@ const AdminCouponsPage = lazy(() => import('../../admin/pages/AdminCouponsPage.j
 const OffersPage = lazy(() => import('../../offer/pages/OffersPage.jsx'));
 
 // Suspense Fallback Component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="text-center">
-      <LoadingIndicator size="h-12 w-12" />
-      <p className="mt-4 text-sm text-gray-600">Loading...</p>
+const PageLoader = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <LoadingIndicator size="h-12 w-12" />
+        <p className="mt-4 text-sm text-gray-600">{t("loading")}</p>
+      </div>
     </div>
-  </div>
-);
-
-
+  );
+};
 const AppRoutes = () => {
-    const authContext = useAuth();
-    const { isLoading } = authContext;
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
+  const {
+    t
+  } = useTranslation();
+  const authContext = useAuth();
+  const {
+    isLoading
+  } = authContext;
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
-            </div>
-        );
-    }
-
-    return (
-        <Suspense fallback={<PageLoader />}>
+            </div>;
+  }
+  return <Suspense fallback={<PageLoader />}>
             <Routes>
                 {/* Public Routes with Auth Layout */}
                 <Route element={<AuthLayout />}>
-                    <Route
-                        path={ROUTES.LOGIN}
-                        element={
-                            <PublicRoute>
+                    <Route path={ROUTES.LOGIN} element={<PublicRoute>
                                 <LoginPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.AUTH_CALLBACK}
-                        element={
-                            <PublicRoute>
+                            </PublicRoute>} />
+                    <Route path={ROUTES.AUTH_CALLBACK} element={<PublicRoute>
                                 <Suspense fallback={<PageLoader />}>
                                     <OAuthCallbackPage />
                                 </Suspense>
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.AUTH_ERROR}
-                        element={
-                            <PublicRoute>
+                            </PublicRoute>} />
+                    <Route path={ROUTES.AUTH_ERROR} element={<PublicRoute>
                                 <Suspense fallback={<PageLoader />}>
                                     <OAuthErrorPage />
                                 </Suspense>
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.AUTH_COMPLETE}
-                        element={
-                            <PublicRoute>
+                            </PublicRoute>} />
+                    <Route path={ROUTES.AUTH_COMPLETE} element={<PublicRoute>
                                 <Suspense fallback={<PageLoader />}>
                                     <OAuthCompletePage />
                                 </Suspense>
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.REGISTER}
-                        element={
-                            <PublicRoute>
+                            </PublicRoute>} />
+                    <Route path={ROUTES.REGISTER} element={<PublicRoute>
                                 <RegisterPage />
-                            </PublicRoute>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.FORGOT_PASSWORD}
-                        element={
-                            <PublicRoute>
+                            </PublicRoute>} />
+                    <Route path={ROUTES.FORGOT_PASSWORD} element={<PublicRoute>
                                 <Suspense fallback={<PageLoader />}>
                                     <ForgotPasswordPage />
                                 </Suspense>
-                            </PublicRoute>
-                        }
-                    />
+                            </PublicRoute>} />
                 </Route>
 
                 {/* Public Routes with Main Layout */}
                 <Route element={<MainLayout />}>
                     <Route path={ROUTES.HOME} element={<HomePage />} />
-                    <Route 
-                        path={ROUTES.LISTINGS_PREFILTER} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                    <Route path={ROUTES.LISTINGS_PREFILTER} element={<Suspense fallback={<PageLoader />}>
                                 <ListingsPrefilterPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.LISTINGS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.LISTINGS} element={<Suspense fallback={<PageLoader />}>
                                 <ListingsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.FORUM} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.FORUM} element={<Suspense fallback={<PageLoader />}>
                                 <ForumPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.LISTING_DETAIL(':id')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.LISTING_DETAIL(':id')} element={<Suspense fallback={<PageLoader />}>
                                 <ListingDetailPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.FAVORITE_LIST_DETAIL(':listId')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.FAVORITE_LIST_DETAIL(':listId')} element={<Suspense fallback={<PageLoader />}>
                                 <FavoriteListDetailPage />
-                            </Suspense>
-                        } 
-                    />
+                            </Suspense>} />
                 </Route>
 
                 {/* Protected Routes with Main Layout */}
-                <Route
-                    element={
-                        <ProtectedRoute>
+                <Route element={<ProtectedRoute>
                             <MainLayout />
-                        </ProtectedRoute>
-                    }
-                >
-                    <Route 
-                        path={ROUTES.DASHBOARD} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                        </ProtectedRoute>}>
+                    <Route path={ROUTES.DASHBOARD} element={<Suspense fallback={<PageLoader />}>
                                 <AccountHubPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.SELLER_DASHBOARD} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.SELLER_DASHBOARD} element={<Suspense fallback={<PageLoader />}>
                                 <SellerDashboardPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.BUYER_DASHBOARD} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.BUYER_DASHBOARD} element={<Suspense fallback={<PageLoader />}>
                                 <BuyerDashboardPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.PROFILE} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.PROFILE} element={<Suspense fallback={<PageLoader />}>
                                 <ProfilePage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.CHANGE_PASSWORD} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.CHANGE_PASSWORD} element={<Suspense fallback={<PageLoader />}>
                                 <ChangePasswordPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.VERIFY_ACCOUNT} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.VERIFY_ACCOUNT} element={<Suspense fallback={<PageLoader />}>
                                 <AccountVerificationPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.MY_LISTINGS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.MY_LISTINGS} element={<Suspense fallback={<PageLoader />}>
                                 <MyListingsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.COMPLAINTS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.COMPLAINTS} element={<Suspense fallback={<PageLoader />}>
                                 <ComplaintsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.FAVORITES} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.FAVORITES} element={<Suspense fallback={<PageLoader />}>
                                 <FavoritesPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.CREATE_LISTING} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.CREATE_LISTING} element={<Suspense fallback={<PageLoader />}>
                                 <CreateListingPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route
-                      path="/listings/create/:listingType/subtype"
-                      element={<Navigate to={ROUTES.CREATE_LISTING} replace />}
-                    />
-                    <Route 
-                        path={ROUTES.PAY_LISTING_FEE} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path="/listings/create/:listingType/subtype" element={<Navigate to={ROUTES.CREATE_LISTING} replace />} />
+                    <Route path={ROUTES.PAY_LISTING_FEE} element={<Suspense fallback={<PageLoader />}>
                                 <PayListingFeePage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.PAYMENT_METHODS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.PAYMENT_METHODS} element={<Suspense fallback={<PageLoader />}>
                                 <PaymentMethodsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.PAYMENTS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.PAYMENTS} element={<Suspense fallback={<PageLoader />}>
                                 <PaymentsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route
-                        path={ROUTES.INBOX}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.INBOX} element={<Suspense fallback={<PageLoader />}>
                                 <InboxPage />
-                            </Suspense>
-                        }
-                    />
+                            </Suspense>} />
                     <Route path={ROUTES.EMAILS} element={<Navigate to={`${ROUTES.INBOX}?tab=emails`} replace />} />
                     <Route path={ROUTES.CHAT} element={<LegacyChatInboxRedirect />} />
-                    <Route 
-                        path={ROUTES.AURA_CHAT} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                    <Route path={ROUTES.AURA_CHAT} element={<Suspense fallback={<PageLoader />}>
                                 <AuraChatPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.USER_PROFILE(':userId')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.USER_PROFILE(':userId')} element={<Suspense fallback={<PageLoader />}>
                                 <UserProfilePage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.USER_REVIEWS(':userId')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.USER_REVIEWS(':userId')} element={<Suspense fallback={<PageLoader />}>
                                 <UserReviewsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.REVIEWS_RECEIVED(':userId')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.REVIEWS_RECEIVED(':userId')} element={<Suspense fallback={<PageLoader />}>
                                 <UserReviewsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.REVIEWS_GIVEN(':userId')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.REVIEWS_GIVEN(':userId')} element={<Suspense fallback={<PageLoader />}>
                                 <UserReviewsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.EDIT_LISTING(':id')} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.EDIT_LISTING(':id')} element={<Suspense fallback={<PageLoader />}>
                                 <EditListingPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.AGREEMENTS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.AGREEMENTS} element={<Suspense fallback={<PageLoader />}>
                                 <AgreementsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.AGREEMENTS_ALL} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.AGREEMENTS_ALL} element={<Suspense fallback={<PageLoader />}>
                                 <AgreementsPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.MY_ORDERS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.MY_ORDERS} element={<Suspense fallback={<PageLoader />}>
                                 <MyOrdersPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route
-                        path={`${ROUTES.MY_ORDERS}/:orderId/shipment`}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={`${ROUTES.MY_ORDERS}/:orderId/shipment`} element={<Suspense fallback={<PageLoader />}>
                                 <OrderShipmentPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route 
-                        path={ROUTES.I_SOLD} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.I_SOLD} element={<Suspense fallback={<PageLoader />}>
                                 <ISoldPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route
-                        path={`${ROUTES.I_SOLD}/:orderId/shipment`}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={`${ROUTES.I_SOLD}/:orderId/shipment`} element={<Suspense fallback={<PageLoader />}>
                                 <OrderShipmentPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route 
-                        path={ROUTES.SECURITY} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.SECURITY} element={<Suspense fallback={<PageLoader />}>
                                 <SecurityPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.SHOPPING_CART} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.SHOPPING_CART} element={<Suspense fallback={<PageLoader />}>
                                 <ShoppingCartPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path={ROUTES.CHECKOUT} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.CHECKOUT} element={<Suspense fallback={<PageLoader />}>
                                 <CheckoutPage />
-                            </Suspense>
-                        } 
-                    />
-                    <Route
-                        path={ROUTES.ORDER_SUCCESS}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.ORDER_SUCCESS} element={<Suspense fallback={<PageLoader />}>
                                 <OrderSuccessPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.PLATFORM_COUPONS}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.PLATFORM_COUPONS} element={<Suspense fallback={<PageLoader />}>
                                 <PlatformCouponsPage />
-                            </Suspense>
-                        }
-                    />
-                    <Route
-                        path={ROUTES.SELLER_CAMPAIGNS}
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </Suspense>} />
+                    <Route path={ROUTES.SELLER_CAMPAIGNS} element={<Suspense fallback={<PageLoader />}>
                                 <SellerCampaignsPage />
-                            </Suspense>
-                        }
-                    />
+                            </Suspense>} />
                     <Route path={ROUTES.MY_COUPONS} element={<Navigate to={ROUTES.SELLER_CAMPAIGNS} replace />} />
-                    <Route
-                        path={ROUTES.ADMIN_COUPONS}
-                        element={
-                            <AdminRoute>
+                    <Route path={ROUTES.ADMIN_COUPONS} element={<AdminRoute>
                                 <Suspense fallback={<PageLoader />}>
                                     <AdminCouponsPage />
                                 </Suspense>
-                            </AdminRoute>
-                        }
-                    />
-                    <Route 
-                        path={ROUTES.OFFERS} 
-                        element={
-                            <Suspense fallback={<PageLoader />}>
+                            </AdminRoute>} />
+                    <Route path={ROUTES.OFFERS} element={<Suspense fallback={<PageLoader />}>
                                 <OffersPage />
-                            </Suspense>
-                        } 
-                    />
+                            </Suspense>} />
                 </Route>
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
             </Routes>
-        </Suspense>
-    );
+        </Suspense>;
 };
-
 export default AppRoutes;

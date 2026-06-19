@@ -46,15 +46,20 @@ public class AgreementEmailNotificationService {
         if (emailRepository.existsByUser_IdAndEmailTypeAndSubject(user.getId(), EmailType.AGREEMENT_UPDATED, subject)) {
             return;
         }
-        String body = template.getMessage() + emailConfig.getAgreement().getBodyFooter();
-        emailService.sendEmail(user, subject, body, EmailType.AGREEMENT_UPDATED);
+        org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+        ctx.setVariable("userName", user.getName());
+        ctx.setVariable("headerTitle", template.getTitle());
+        ctx.setVariable("message", template.getMessage());
+        ctx.setVariable("actionText", "Sözleşmeleri Görüntüle");
+        ctx.setVariable("actionUrl", "/profile/agreements");
+
+        emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.AGREEMENT_UPDATED);
         log.debug("Agreement outdated email queued for userId={} type={}", userId, agreementType);
     }
 
     public void notifyAllUsersAgreementPublished(AgreementType agreementType, String version) {
         NotificationRequest template = notificationTemplateCatalog.agreementUpdatedBroadcast(agreementType.name(), version);
         String subject = buildSubject(template);
-        String body = template.getMessage() + emailConfig.getAgreement().getBodyFooter();
 
         int page = 0;
         Pageable pageable = PageRequest.of(page, BROADCAST_BATCH_SIZE);
@@ -73,7 +78,14 @@ public class AgreementEmailNotificationService {
                 if (alreadySentUserIds.contains(u.getId())) {
                     continue;
                 }
-                emailService.sendEmail(u, subject, body, EmailType.AGREEMENT_UPDATED);
+                org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+                ctx.setVariable("userName", u.getName());
+                ctx.setVariable("headerTitle", template.getTitle());
+                ctx.setVariable("message", template.getMessage());
+                ctx.setVariable("actionText", "Sözleşmeleri Görüntüle");
+                ctx.setVariable("actionUrl", "/profile/agreements");
+
+                emailService.sendTemplateEmail(u, subject, "generic-notification", ctx, EmailType.AGREEMENT_UPDATED);
             }
             pageable = batch.nextPageable();
         } while (batch.hasNext());

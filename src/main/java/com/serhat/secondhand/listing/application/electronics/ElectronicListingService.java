@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import com.serhat.secondhand.listing.util.ListingErrorCodes;
 
 @Service
 @Slf4j
@@ -98,38 +97,18 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
     public Result<Void> updateElectronicListings(UUID id, ElectronicUpdateRequest request, Long currentUserId) {
-        Result<Void> ownershipResult = validateOwnership(id, currentUserId);
-        if (ownershipResult.isError()) return ownershipResult;
-
-        return repository.findById(id)
-                .map(existing -> performUpdate(existing, request))
-                .orElseGet(() -> Result.error(ListingErrorCodes.LISTING_NOT_FOUND));
-    }
-
-    private Result<Void> performUpdate(ElectronicListing existing, ElectronicUpdateRequest request) {
-        if (!existing.isEditable()) {
-            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
-        }
-
-        Result<Void> quantityResult = applyQuantityUpdate(existing, request.quantity());
-        if (quantityResult.isError()) return quantityResult;
-
-        Result<Void> resolutionResult = electronicListingResolver.apply(
-                existing,
-                request.electronicTypeId(),
-                request.electronicBrandId(),
-                request.electronicModelId()
+        return standardUpdate(
+                id, request, currentUserId,
+                request.quantity(),
+                repository::findById,
+                existing -> electronicListingResolver.apply(
+                        existing,
+                        request.electronicTypeId(),
+                        request.electronicBrandId(),
+                        request.electronicModelId()),
+                (existing, req) -> listingMapper.updateElectronic(existing, req),
+                existing -> listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators)
         );
-        if (resolutionResult.isError()) return Result.error(resolutionResult.getMessage(), resolutionResult.getErrorCode());
-
-        listingMapper.updateElectronic(existing, request);
-
-        Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators);
-        if (specResult.isError()) return Result.error(specResult.getMessage(), specResult.getErrorCode());
-
-        repository.save(existing);
-        log.info("Electronic listing updated: {}", existing.getId());
-        return Result.success();
     }
 
     public Page<ElectronicListingDto> findByElectronicType(UUID electronicTypeId, Pageable pageable) {

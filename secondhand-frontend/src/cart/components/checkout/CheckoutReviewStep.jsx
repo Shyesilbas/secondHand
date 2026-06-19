@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { memo } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import ListingReviewStats from '../../../reviews/components/ListingReviewStats.jsx';
@@ -8,31 +9,33 @@ import { ArrowLeft, ArrowRight, MapPin, Wallet, Loader2 } from 'lucide-react';
 
 /* ── Seller inline rating ─────────────────────────────────── */
 
-const SellerRating = ({ sellerId }) => {
-  const { stats, loading } = useSellerReviewStatsCache(sellerId);
+const SellerRating = ({
+  sellerId
+}) => {
+  const {
+    t
+  } = useTranslation();
+  const {
+    stats,
+    loading
+  } = useSellerReviewStatsCache(sellerId);
   const halfStarGradientId = `seller-rating-half-${useId().replace(/:/g, '')}`;
-
   const total = Number(stats?.totalReviews);
   const avgRaw = Number(stats?.averageRating);
   const safeAvg = Number.isFinite(avgRaw) ? avgRaw : 0;
-
   if (loading || !stats || !Number.isFinite(total) || total <= 0) {
     return null;
   }
-
-  const renderStars = (rating) => {
+  const renderStars = rating => {
     const capped = Math.min(5, Math.max(0, rating));
     const stars = [];
     const fullStars = Math.floor(capped);
     const hasHalfStar = capped % 1 !== 0;
-
     for (let i = 0; i < fullStars; i += 1) {
       stars.push(<StarIcon key={`f-${i}`} className="h-3 w-3 shrink-0 text-[#ca5010]" />);
     }
-
     if (hasHalfStar) {
-      stars.push(
-        <svg key="half" className="h-3 w-3 shrink-0 text-[#ca5010]" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+      stars.push(<svg key="half" className="h-3 w-3 shrink-0 text-[#ca5010]" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
           <defs>
             <linearGradient id={halfStarGradientId}>
               <stop offset="50%" stopColor="currentColor" />
@@ -40,26 +43,20 @@ const SellerRating = ({ sellerId }) => {
             </linearGradient>
           </defs>
           <path fill={`url(#${halfStarGradientId})`} d={STAR_SHAPE_PATH} />
-        </svg>
-      );
+        </svg>);
     }
-
     const emptyStars = 5 - Math.ceil(capped);
     for (let i = 0; i < emptyStars; i += 1) {
       stars.push(<StarIcon key={`e-${i}`} className="h-3 w-3 shrink-0 text-[#e0deda]" />);
     }
-
     return stars;
   };
-
-  return (
-    <div className="flex items-center gap-1">
+  return <div className="flex items-center gap-1">
       <div className="flex items-center">{renderStars(safeAvg)}</div>
       <span className="text-xs text-[#999]">
         {safeAvg.toFixed(1)} ({total})
       </span>
-    </div>
-  );
+    </div>;
 };
 
 /* ── Review Step ───────────────────────────────────────────── */
@@ -75,26 +72,25 @@ const CheckoutReviewStep = ({
   onBack,
   sendVerificationCode,
   deliveryMethod,
-  meetupLocation,
+  meetupLocation
 }) => {
+  const {
+    t
+  } = useTranslation();
   const [isSendingCode, setIsSendingCode] = useState(false);
   const totalAmount = calculateTotal();
   const currency = cartItems[0]?.listing?.currency || 'TRY';
-
-  const shippingAddress = addresses?.find((a) => String(a.id) === String(selectedShippingAddressId));
-  const billingAddress = addresses?.find((a) => String(a.id) === String(selectedBillingAddressId)) || shippingAddress;
-
+  const shippingAddress = addresses?.find(a => String(a.id) === String(selectedShippingAddressId));
+  const billingAddress = addresses?.find(a => String(a.id) === String(selectedBillingAddressId)) || shippingAddress;
   const getPaymentDisplay = () => {
     return {
       name: 'Wallet Balance',
       detail: eWallet ? `Paid from wallet (${formatCurrency(totalAmount, currency)})` : 'Wallet',
-      icon: Wallet,
+      icon: Wallet
     };
   };
-
   const paymentInfo = getPaymentDisplay();
   const PaymentIcon = paymentInfo.icon;
-
   const handleNextClick = async () => {
     if (isSendingCode) return;
     setIsSendingCode(true);
@@ -107,46 +103,26 @@ const CheckoutReviewStep = ({
       setIsSendingCode(false);
     }
   };
-
-  return (
-    <div className="p-5 sm:p-7">
+  return <div className="p-5 sm:p-7">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold tracking-tight text-[#111]">Review your order</h2>
-        <p className="mt-1 text-sm text-[#999]">Double check details before finishing your purchase.</p>
+        <h2 className="text-lg font-semibold tracking-tight text-[#111]">{t("review_your_order")}</h2>
+        <p className="mt-1 text-sm text-[#999]">{t("double_check_details_before_finishing_yo")}</p>
       </div>
 
       {/* Items list */}
       <div className="mb-6 rounded-lg border border-[#e5e3df] bg-white divide-y divide-[#f0efed] overflow-hidden px-4">
         {cartItems.map((item, idx) => {
-          const isOffer = !!item.isOffer;
-          const hasCampaign =
-            !isOffer &&
-            item.listing.campaignId &&
-            item.listing.campaignPrice != null &&
-            parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
-          const unitPrice = isOffer
-            ? item.offerTotalPrice != null && item.quantity
-              ? parseFloat(item.offerTotalPrice) / item.quantity
-              : item.listing.price
-            : hasCampaign
-              ? item.listing.campaignPrice
-              : item.listing.price;
-          const lineTotal = isOffer
-            ? parseFloat(item.offerTotalPrice) || 0
-            : parseFloat(unitPrice) * item.quantity;
-
-          return (
-            <div key={item.id} className="flex items-center gap-4 py-4">
+        const isOffer = !!item.isOffer;
+        const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
+        const unitPrice = isOffer ? item.offerTotalPrice != null && item.quantity ? parseFloat(item.offerTotalPrice) / item.quantity : item.listing.price : hasCampaign ? item.listing.campaignPrice : item.listing.price;
+        const lineTotal = isOffer ? parseFloat(item.offerTotalPrice) || 0 : parseFloat(unitPrice) * item.quantity;
+        return <div key={item.id} className="flex items-center gap-4 py-4">
               {/* Thumbnail */}
               <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#eee] bg-[#fafaf9] sm:h-16 sm:w-16">
-                {item.listing.imageUrl ? (
-                  <img src={item.listing.imageUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="text-sm font-medium text-[#bbb]">
+                {item.listing.imageUrl ? <img src={item.listing.imageUrl} alt="" className="h-full w-full object-cover" /> : <span className="text-sm font-medium text-[#bbb]">
                     {item.listing.title.charAt(0).toUpperCase()}
-                  </span>
-                )}
+                  </span>}
               </div>
 
               {/* Info */}
@@ -155,25 +131,19 @@ const CheckoutReviewStep = ({
                   <h3 className="truncate text-sm font-medium text-[#111]">
                     {item.listing.title}
                   </h3>
-                  {isOffer && (
-                    <span className="rounded border border-[#e5e3df] bg-[#fafaf9] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">
-                      Offer
-                    </span>
-                  )}
+                  {isOffer && <span className="rounded border border-[#e5e3df] bg-[#fafaf9] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">{t("offer")}</span>}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#999]">
                   <span>
                     {item.listing.type} · {item.listing.city}
                   </span>
-                  {(item.listing.sellerName || item.listing.sellerSurname) && (
-                    <>
+                  {(item.listing.sellerName || item.listing.sellerSurname) && <>
                       <span className="text-[#e0deda]">·</span>
                       <span>
                         {item.listing.sellerName} {item.listing.sellerSurname}
                       </span>
                       <SellerRating sellerId={item.listing.sellerId} />
-                    </>
-                  )}
+                    </>}
                 </div>
               </div>
 
@@ -186,9 +156,8 @@ const CheckoutReviewStep = ({
                   {item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}
                 </div>
               </div>
-            </div>
-          );
-        })}
+            </div>;
+      })}
       </div>
 
       {/* Dynamic Summary Panels (Shipping Address & Payment) */}
@@ -199,31 +168,23 @@ const CheckoutReviewStep = ({
             <MapPin className="h-4 w-4 text-indigo-600" />
             <span>{deliveryMethod === 'SAFE_MEETUP' ? 'Buluşma Noktası' : 'Shipping Details'}</span>
           </div>
-          {deliveryMethod === 'SAFE_MEETUP' ? (
-            <div className="text-sm">
+          {deliveryMethod === 'SAFE_MEETUP' ? <div className="text-sm">
               <p className="font-semibold text-slate-900">📍 {meetupLocation || 'Belirtilmemiş'}</p>
-              <p className="mt-2 text-xs text-slate-500 leading-relaxed font-medium">
-                Siparişinizi elden teslim alırken satıcıya doğrulama kodunuzu iletmeniz gerekmektedir. Lütfen buluşma saatinde konumda hazır bulununuz.
-              </p>
-            </div>
-          ) : shippingAddress ? (
-            <div className="text-sm">
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed font-medium">{t("sipari_inizi_elden_teslim_al_rken_sat_c_")}</p>
+            </div> : shippingAddress ? <div className="text-sm">
               <p className="font-semibold text-slate-900">{shippingAddress.addressLine}</p>
               <p className="mt-1 text-slate-500 font-medium">
                 {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
               </p>
               <p className="mt-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{shippingAddress.country}</p>
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 font-medium">No shipping address chosen.</p>
-          )}
+            </div> : <p className="text-xs text-slate-400 font-medium">{t("no_shipping_address_chosen")}</p>}
         </div>
 
         {/* Payment Card */}
         <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
             <PaymentIcon className="h-4 w-4 text-indigo-600" />
-            <span>Payment Method</span>
+            <span>{t("payment_method")}</span>
           </div>
           <div className="text-sm">
             <p className="font-semibold text-slate-900">{paymentInfo.name}</p>
@@ -234,7 +195,7 @@ const CheckoutReviewStep = ({
 
       {/* Subtotal */}
       <div className="mb-6 flex items-baseline justify-between border-t border-slate-100 pt-5">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Subtotal</span>
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">{t("subtotal")}</span>
         <span className="text-2xl font-bold tabular-nums text-slate-900">
           {formatCurrency(totalAmount, currency)}
         </span>
@@ -242,64 +203,24 @@ const CheckoutReviewStep = ({
 
       {/* Navigation — desktop */}
       <div className="hidden items-center justify-between sm:flex">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isSendingCode}
-          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={handleNextClick}
-          disabled={isSendingCode}
-          className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]"
-        >
-          {isSendingCode ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Sending code…
-            </>
-          ) : (
-            <>
-              Confirm & Send Code
-              <ArrowRight className="h-4 w-4" strokeWidth={2} />
-            </>
-          )}
+        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed">
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
+        <button type="button" onClick={handleNextClick} disabled={isSendingCode} className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]">
+          {isSendingCode ? <>
+              <Loader2 className="h-4 w-4 animate-spin" />{t("sending_code")}</> : <>{t("confirm_send_code")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
+            </>}
         </button>
       </div>
 
       {/* Navigation — mobile */}
       <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={isSendingCode}
-          className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50"
-        >
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={handleNextClick}
-          disabled={isSendingCode}
-          className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98]"
-        >
-          {isSendingCode ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <>
-              Confirm & Send
-              <ArrowRight className="h-4 w-4" strokeWidth={2} />
-            </>
-          )}
+        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50">
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
+        <button type="button" onClick={handleNextClick} disabled={isSendingCode} className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98]">
+          {isSendingCode ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t("confirm_send")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
+            </>}
         </button>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default memo(CheckoutReviewStep);

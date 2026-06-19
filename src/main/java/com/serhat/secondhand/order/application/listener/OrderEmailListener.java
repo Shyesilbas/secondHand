@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.thymeleaf.context.Context;
 
 @Component
 @RequiredArgsConstructor
@@ -64,8 +65,13 @@ public class OrderEmailListener {
     public void onOrderCancelled(OrderCancelledEvent event) {
         try {
             Order order = event.order();
-            String content = buildCancellationContent(event.requester(), order);
-            emailService.sendEmail(event.requester(), emailConfig.getOrder().getCancelledSubject(), content, EmailType.NOTIFICATION);
+            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iptal edilmiştir.";
+            
+            Context ctx1 = new Context();
+            ctx1.setVariable("userName", event.requester().getName());
+            ctx1.setVariable("message", content);
+            ctx1.setVariable("headerTitle", "Sipariş İptali");
+            emailService.sendTemplateEmail(event.requester(), emailConfig.getOrder().getCancelledSubject(), "generic-notification", ctx1, EmailType.NOTIFICATION);
 
             Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
             Set<Long> recipientIds = new LinkedHashSet<>();
@@ -86,11 +92,11 @@ public class OrderEmailListener {
                     continue;
                 }
                 User counterparty = userResult.getData();
-                String cp = String.format(
-                        emailConfig.getOrder().getCounterpartyCancellationContentFormat(),
-                        counterparty.getName(),
-                        "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
-                emailService.sendEmail(counterparty, emailConfig.getOrder().getCancelledSubject(), cp, EmailType.NOTIFICATION);
+                Context ctx = new Context();
+                ctx.setVariable("userName", counterparty.getName());
+                ctx.setVariable("message", "Sipariş " + getOrderDisplayName(order.getName(), order.getOrderNumber()) + " karşı taraf tarafından iptal edildi.");
+                ctx.setVariable("headerTitle", "Sipariş İptali");
+                emailService.sendTemplateEmail(counterparty, emailConfig.getOrder().getCancelledSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
             }
 
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
@@ -104,8 +110,14 @@ public class OrderEmailListener {
     public void onOrderCompleted(OrderCompletedEvent event) {
         try {
             Order order = event.order();
-            String content = buildCompletionContent(event.buyer(), order, event.isAutomatic());
-            emailService.sendEmail(event.buyer(), emailConfig.getOrder().getCompletedSubject(), content, EmailType.NOTIFICATION);
+            String completionWord = event.isAutomatic() ? "otomatik olarak tamamlandı" : "tamamlandı";
+            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") " + completionWord + ".";
+            
+            Context ctx = new Context();
+            ctx.setVariable("userName", event.buyer().getName());
+            ctx.setVariable("message", content);
+            ctx.setVariable("headerTitle", "Sipariş Tamamlandı");
+            emailService.sendTemplateEmail(event.buyer(), emailConfig.getOrder().getCompletedSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("orderCompletedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCompletedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -117,8 +129,13 @@ public class OrderEmailListener {
     public void onOrderRefunded(OrderRefundedEvent event) {
         try {
             Order order = event.order();
-            String content = buildRefundContent(event.buyer(), order);
-            emailService.sendEmail(event.buyer(), emailConfig.getOrder().getRefundedSubject(), content, EmailType.NOTIFICATION);
+            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iade edilmiştir. İade tutarı e-cüzdanınıza aktarıldı.";
+            
+            Context ctx = new Context();
+            ctx.setVariable("userName", event.buyer().getName());
+            ctx.setVariable("message", content);
+            ctx.setVariable("headerTitle", "Sipariş İade");
+            emailService.sendTemplateEmail(event.buyer(), emailConfig.getOrder().getRefundedSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("orderRefundedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderRefundedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -130,8 +147,28 @@ public class OrderEmailListener {
     private void sendCustomerConfirmationEmail(User customer, OrderDto orderDto) {
         try {
             String subject = emailConfig.getOrderConfirmationSubject();
-            String content = buildOrderConfirmationContent(customer, orderDto);
-            emailService.sendEmail(customer, subject, content, EmailType.NOTIFICATION);
+            Context ctx = new Context();
+            ctx.setVariable("userName", customer.getName());
+            ctx.setVariable("orderNumber", getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()));
+            ctx.setVariable("status", orderDto.getStatus());
+            ctx.setVariable("paymentStatus", orderDto.getPaymentStatus());
+            ctx.setVariable("totalAmount", orderDto.getTotalAmount() + " " + orderDto.getCurrency());
+            ctx.setVariable("items", orderDto.getOrderItems());
+            ctx.setVariable("deliveryMethod", orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "");
+            
+            if (orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
+                ctx.setVariable("meetupLocation", orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş");
+                ctx.setVariable("meetupVerificationCode", orderDto.getMeetupVerificationCode());
+            } else if (orderDto.getShippingAddress() != null) {
+                String address = orderDto.getShippingAddress().getAddressLine() + "<br>" +
+                                 orderDto.getShippingAddress().getCity() + " " +
+                                 orderDto.getShippingAddress().getState() + " " +
+                                 orderDto.getShippingAddress().getPostalCode() + "<br>" +
+                                 orderDto.getShippingAddress().getCountry();
+                ctx.setVariable("shippingAddress", address);
+            }
+
+            emailService.sendTemplateEmail(customer, subject, "order-confirmation", ctx, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("customerConfirmationEmail", orderDto.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("customerConfirmationEmail", orderDto.getOrderNumber(), e.getMessage());
@@ -162,120 +199,38 @@ public class OrderEmailListener {
             }
             User seller = sellerResult.getData();
             String subject = emailConfig.getSaleNotificationSubject();
-            String content = buildSaleNotificationContent(seller, orderDto, sellerItems);
-            emailService.sendEmail(seller, subject, content, EmailType.NOTIFICATION);
+            
+            Context ctx = new Context();
+            ctx.setVariable("userName", seller.getName());
+            ctx.setVariable("orderNumber", getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()));
+            BigDecimal total = sellerItems.stream()
+                .map(OrderItemDto::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+            ctx.setVariable("totalAmount", total + " " + orderDto.getCurrency());
+            ctx.setVariable("items", sellerItems);
+            ctx.setVariable("deliveryMethod", orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "");
+            
+            if (orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
+                ctx.setVariable("meetupLocation", orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş");
+            } else if (orderDto.getShippingAddress() != null) {
+                String address = orderDto.getShippingAddress().getAddressLine() + "<br>" +
+                                 orderDto.getShippingAddress().getCity() + " " +
+                                 orderDto.getShippingAddress().getState() + " " +
+                                 orderDto.getShippingAddress().getPostalCode() + "<br>" +
+                                 orderDto.getShippingAddress().getCountry();
+                ctx.setVariable("shippingAddress", address);
+            }
+
+            emailService.sendTemplateEmail(seller, subject, "sale-notification", ctx, EmailType.NOTIFICATION);
             orderLog.logNotificationSent("sellerSaleEmail", orderDto.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("sellerSaleEmail", orderDto.getOrderNumber(), e.getMessage());
         }
     }
 
-    private String buildOrderConfirmationContent(User user, OrderDto order) {
-        EmailConfig.Order cfg = emailConfig.getOrder();
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(cfg.getCustomerGreetingFormat(), user.getName())).append("\n\n");
-        sb.append(cfg.getCustomerIntroLine()).append("\n\n");
-        sb.append(cfg.getCustomerOrderNumberLabel()).append(": **").append(getOrderDisplayName(order.getName(), order.getOrderNumber())).append("**\n");
-        sb.append(cfg.getCustomerStatusLabel()).append(": **").append(order.getStatus()).append("**\n");
-        sb.append(cfg.getCustomerPaymentStatusLabel()).append(": **").append(order.getPaymentStatus()).append("**\n");
-        sb.append(cfg.getCustomerTotalLabel()).append(": **").append(order.getTotalAmount()).append(' ').append(order.getCurrency()).append("**\n");
+    // StringBuilder methods removed in favor of Thymeleaf templates
 
-        if (order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
-            sb.append("\n**Teslimat Yöntemi**: Güvenli Elden Teslimat (Safe Meetup)\n");
-            sb.append("**Buluşma Noktası**: 📍 ").append(order.getMeetupLocation() != null ? order.getMeetupLocation() : "Belirtilmemiş").append("\n");
-            if (order.getMeetupVerificationCode() != null) {
-                sb.append("**Güvenli Teslimat Doğrulama Kodunuz**: **").append(order.getMeetupVerificationCode()).append("**\n");
-            }
-            sb.append("\n*Önemli Not: Buluşma noktasına vardığınızda, satıcıya bu doğrulama kodunu veya mobil uygulamadan sipariş sayfanızdaki QR kodunu göstermeniz gerekmektedir. Buluşma için 4 iş günü süreniz vardır.*\n");
-        } else if (order.getShippingAddress() != null) {
-            sb.append("\n**").append(cfg.getCustomerShippingAddressLabel()).append("**:\n");
-            sb.append(order.getShippingAddress().getAddressLine()).append('\n');
-            sb.append(order.getShippingAddress().getCity()).append(' ')
-              .append(order.getShippingAddress().getState()).append(' ')
-              .append(order.getShippingAddress().getPostalCode()).append('\n');
-            sb.append(order.getShippingAddress().getCountry()).append('\n');
-        }
-
-        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-            sb.append("\n**").append(cfg.getCustomerItemsLabel()).append("**:\n");
-            order.getOrderItems().forEach(it -> {
-                String title = it.getListing() != null ? it.getListing().getTitle() : cfg.getCustomerItemFallbackTitle();
-                sb.append(String.format(
-                        cfg.getCustomerItemLineFormat(),
-                        title,
-                        it.getQuantity(),
-                        it.getTotalPrice(),
-                        order.getCurrency()
-                )).append('\n');
-            });
-        }
-
-        if (order.getNotes() != null && !order.getNotes().isBlank()) {
-            sb.append("\n**").append(cfg.getCustomerNotesLabel()).append("**: ").append(order.getNotes()).append('\n');
-        }
-        if (order.getPaymentReference() != null) {
-            sb.append("**").append(cfg.getCustomerPaymentReferenceLabel()).append("**: ").append(order.getPaymentReference()).append('\n');
-        }
-        sb.append("\n").append(cfg.getCustomerClosing()).append('\n');
-        return sb.toString();
-    }
-
-    private String buildSaleNotificationContent(User seller, OrderDto order, List<OrderItemDto> sellerItems) {
-        EmailConfig.Order cfg = emailConfig.getOrder();
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(cfg.getSellerGreetingFormat(), seller.getName())).append("\n\n");
-        sb.append(cfg.getSellerIntroLine()).append("\n\n");
-        sb.append(cfg.getSellerOrderNumberLabel()).append(": **").append(getOrderDisplayName(order.getName(), order.getOrderNumber())).append("**\n");
-
-        BigDecimal total = sellerItems.stream()
-                .map(OrderItemDto::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        sb.append(cfg.getSellerTotalAmountLabel()).append(": **").append(total).append(' ').append(order.getCurrency()).append("**\n\n");
-
-        sb.append("**").append(cfg.getSellerSoldItemsLabel()).append("**:\n");
-        sellerItems.forEach(item -> {
-            String title = item.getListing() != null ? item.getListing().getTitle() : cfg.getSellerItemFallbackTitle();
-            sb.append(String.format(
-                    cfg.getSellerItemLineFormat(),
-                    title,
-                    item.getQuantity(),
-                    item.getTotalPrice(),
-                    order.getCurrency()
-            )).append('\n');
-        });
-
-        if (order.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
-            sb.append("\n**Teslimat Yöntemi**: Güvenli Elden Teslimat (Safe Meetup)\n");
-            sb.append("**Buluşma Noktası**: 📍 ").append(order.getMeetupLocation() != null ? order.getMeetupLocation() : "Belirtilmemiş").append("\n");
-            sb.append("\n*Önemli Not: Alıcı ile buluştuğunuzda, alıcının sipariş sayfasından size göstereceği 6 haneli doğrulama kodunu sisteme girerek satışı onaylamanız gerekmektedir. Buluşma için 4 iş günü süreniz vardır.*\n");
-        } else if (order.getShippingAddress() != null) {
-            sb.append("\n**").append(cfg.getSellerShippingAddressLabel()).append("**:\n");
-            sb.append(order.getShippingAddress().getAddressLine()).append('\n');
-            sb.append(order.getShippingAddress().getCity()).append(' ')
-              .append(order.getShippingAddress().getState()).append(' ')
-              .append(order.getShippingAddress().getPostalCode()).append('\n');
-            sb.append(order.getShippingAddress().getCountry()).append('\n');
-        }
-
-        sb.append("\n*").append(cfg.getSellerPrepLine()).append("*\n\n");
-        sb.append(cfg.getSellerClosing()).append('\n');
-        return sb.toString();
-    }
-
-    private String buildCancellationContent(User user, Order order) {
-        return String.format(emailConfig.getOrder().getCancellationContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
-    }
-
-    private String buildRefundContent(User user, Order order) {
-        return String.format(emailConfig.getOrder().getRefundContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**");
-    }
-
-    private String buildCompletionContent(User user, Order order, boolean isAutomatic) {
-        String completionWord = isAutomatic
-                ? emailConfig.getOrder().getCompletionAutomaticWord()
-                : emailConfig.getOrder().getCompletionManualWord();
-        return String.format(emailConfig.getOrder().getCompletionContentFormat(), user.getName(), "**" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + "**", completionWord);
-    }
+    // StringBuilder methods removed in favor of Thymeleaf templates
 
     private String getOrderDisplayName(String orderName, String orderNumber) {
         if (orderName != null && !orderName.trim().isEmpty()) {

@@ -54,4 +54,3 @@ public class ElectronicModel implements Persistable<UUID> {
     @JoinColumn(name = "type_id")
     private ElectronicType type;
 }
-

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
@@ -203,8 +204,21 @@ public class SellerFollowService {
         
         for (SellerFollow follow : followers) {
             try {
-                String content = buildNewListingEmailContent(follow.getFollower(), seller, listing);
-                emailService.sendEmail(follow.getFollower(), subject, content, EmailType.NEW_LISTING_NOTIFICATION);
+                Context ctx = new Context();
+                ctx.setVariable("userName", follow.getFollower().getName());
+                ctx.setVariable("headerTitle", "Yeni Bir İlan Eklendi!");
+                ctx.setVariable("introText", "Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname() + " yeni bir ilan ekledi:");
+                ctx.setVariable("listingTitle", listing.getTitle());
+                ctx.setVariable("listingPrice", listing.getPrice() + " " + listing.getCurrency());
+                ctx.setVariable("listingCity", listing.getCity());
+                ctx.setVariable("listingUrl", "/listings/" + listing.getId());
+                ctx.setVariable("manageNotificationText", "Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.");
+                
+                if (listing.getImageUrl() != null && !listing.getImageUrl().isEmpty()) {
+                    ctx.setVariable("listingImage", listing.getImageUrl());
+                }
+
+                emailService.sendTemplateEmail(follow.getFollower(), subject, "new-listing", ctx, EmailType.NEW_LISTING_NOTIFICATION);
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
                 
                 var request = notificationTemplateCatalog.listingNewFromFollowed(
@@ -225,17 +239,4 @@ public class SellerFollowService {
         }
     }
 
-    private String buildNewListingEmailContent(User follower, User seller, Listing listing) {
-        EmailConfig.Follow cfg = emailConfig.getFollow();
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(cfg.getGreetingFormat(), follower.getName())).append("\n\n");
-        sb.append(String.format(cfg.getSellerIntroFormat(), seller.getName(), seller.getSurname())).append("\n\n");
-        sb.append(cfg.getTitlePrefix()).append(": ").append(listing.getTitle()).append("\n");
-        sb.append(cfg.getPricePrefix()).append(": ").append(listing.getPrice()).append(" ").append(listing.getCurrency()).append("\n");
-        sb.append(cfg.getCityPrefix()).append(": ").append(listing.getCity()).append("\n\n");
-        sb.append(cfg.getVisitLine()).append("\n\n");
-        sb.append(cfg.getFooterSeparator()).append("\n");
-        sb.append(cfg.getManageNotificationLine());
-        return sb.toString();
-    }
 }

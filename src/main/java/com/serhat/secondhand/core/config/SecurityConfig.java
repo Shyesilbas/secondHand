@@ -72,8 +72,7 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/ws/**",
                 "/actuator/health/**",
-                "/actuator/info",
-                "/api/agreements/**" // Many agreements are public
+                "/actuator/info"
         ));
         
         Set<String> allPublicEndpoints = new java.util.HashSet<>(dynamicPublicEndpoints);
@@ -208,4 +207,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(10);
     }
 }
-

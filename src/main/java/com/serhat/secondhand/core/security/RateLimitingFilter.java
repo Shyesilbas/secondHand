@@ -214,6 +214,10 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getClientIpAddress(HttpServletRequest request) {
+        if (!rateLimitConfig.isTrustForwardedHeaders()) {
+            return request.getRemoteAddr();
+        }
+
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
             return xForwardedFor.split(",")[0].trim();

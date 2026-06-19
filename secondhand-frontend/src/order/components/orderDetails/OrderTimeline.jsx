@@ -1,208 +1,178 @@
+import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from 'react';
-import {
-  AlertCircle,
-  Check,
-  CheckCircle2,
-  Clock,
-  Home,
-  Package2,
-  Timer,
-  Truck,
-  MapPin,
-  Handshake,
-} from 'lucide-react';
+import { AlertCircle, Check, CheckCircle2, Clock, Home, Package2, Timer, Truck, MapPin, Handshake } from 'lucide-react';
 import { ORDER_STATUSES, ORDER_TIME } from '../../constants/orderUiConstants.js';
-
-const DeliveryCountdown = ({ deliveredAt }) => {
+const DeliveryCountdown = ({
+  deliveredAt
+}) => {
+  const {
+    t
+  } = useTranslation();
   const [timeRemaining, setTimeRemaining] = useState(null);
-
   useEffect(() => {
     if (!deliveredAt) return;
-
     const update = () => {
       const deadline = new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS);
       const diff = deadline - new Date();
       if (diff <= 0) {
-        setTimeRemaining({ expired: true });
+        setTimeRemaining({
+          expired: true
+        });
         return;
       }
       setTimeRemaining({
         h: Math.floor(diff / 3600000),
-        m: Math.floor((diff % 3600000) / 60000),
-        s: Math.floor((diff % 60000) / 1000),
-        expired: false,
+        m: Math.floor(diff % 3600000 / 60000),
+        s: Math.floor(diff % 60000 / 1000),
+        expired: false
       });
     };
-
     update();
     const timer = setInterval(update, ORDER_TIME.SECOND_MS);
     return () => clearInterval(timer);
   }, [deliveredAt]);
-
   if (!timeRemaining) return null;
-
   const critical = !timeRemaining.expired;
-  const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${
-    critical
-      ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10'
-      : 'bg-white/80 border-slate-200/60 shadow-sm'
-  }`;
-
-  return (
-    <div className={cardClass}>
+  const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${critical ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10' : 'bg-white/80 border-slate-200/60 shadow-sm'}`;
+  return <div className={cardClass}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className={`p-1.5 rounded-md ${critical ? 'bg-white/10' : 'bg-slate-200'}`}>
             <Timer className={`w-3.5 h-3.5 ${critical ? 'text-emerald-400' : 'text-slate-600'}`} />
           </div>
           <div>
-            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-slate-900'}`}>Confirmation Window</p>
+            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-slate-900'}`}>{t("confirmation_window")}</p>
             <p className={`text-[11px] font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
               {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
             </p>
           </div>
         </div>
-        {critical ? (
-          <div className="flex gap-1.5 items-baseline">
+        {critical ? <div className="flex gap-1.5 items-baseline">
             <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.h).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase">h</span>
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">{t("h")}</span>
             <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.m).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase">m</span>
-          </div>
-        ) : null}
+            <span className="text-[10px] font-semibold text-slate-400 uppercase">{t("m")}</span>
+          </div> : null}
       </div>
-    </div>
-  );
+    </div>;
 };
-
-const OrderProgressStepper = ({ currentStatus, deliveryMethod, variant = 'compact' }) => {
+const OrderProgressStepper = ({
+  currentStatus,
+  deliveryMethod,
+  variant = 'compact'
+}) => {
+  const {
+    t
+  } = useTranslation();
   const isMeetup = deliveryMethod === 'SAFE_MEETUP';
-  const steps = isMeetup
-    ? [
-        { key: ORDER_STATUSES.PENDING, label: 'Placed', icon: Clock },
-        { key: ORDER_STATUSES.MEETUP_PENDING, label: 'Meetup Pending', icon: MapPin },
-        { key: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Handover Confirmed', icon: Handshake },
-        { key: ORDER_STATUSES.COMPLETED, label: 'Finalized', icon: Check },
-      ]
-    : [
-        { key: ORDER_STATUSES.PENDING, label: 'Placed', icon: Clock },
-        { key: ORDER_STATUSES.CONFIRMED, label: 'Confirmed', icon: CheckCircle2 },
-        { key: ORDER_STATUSES.PROCESSING, label: 'Preparing', icon: Package2 },
-        { key: ORDER_STATUSES.SHIPPED, label: 'On Way', icon: Truck },
-        { key: ORDER_STATUSES.DELIVERED, label: 'Delivered', icon: Home },
-        { key: ORDER_STATUSES.COMPLETED, label: 'Finalized', icon: Check },
-      ];
-
-  const currentIndex = steps.findIndex((s) => s.key === currentStatus);
-  const isFailed =
-    currentStatus === ORDER_STATUSES.CANCELLED ||
-    currentStatus === ORDER_STATUSES.REFUNDED ||
-    currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
-
+  const steps = isMeetup ? [{
+    key: ORDER_STATUSES.PENDING,
+    label: 'Placed',
+    icon: Clock
+  }, {
+    key: ORDER_STATUSES.MEETUP_PENDING,
+    label: 'Meetup Pending',
+    icon: MapPin
+  }, {
+    key: ORDER_STATUSES.HANDOVER_CONFIRMED,
+    label: 'Handover Confirmed',
+    icon: Handshake
+  }, {
+    key: ORDER_STATUSES.COMPLETED,
+    label: 'Finalized',
+    icon: Check
+  }] : [{
+    key: ORDER_STATUSES.PENDING,
+    label: 'Placed',
+    icon: Clock
+  }, {
+    key: ORDER_STATUSES.CONFIRMED,
+    label: 'Confirmed',
+    icon: CheckCircle2
+  }, {
+    key: ORDER_STATUSES.PROCESSING,
+    label: 'Preparing',
+    icon: Package2
+  }, {
+    key: ORDER_STATUSES.SHIPPED,
+    label: 'On Way',
+    icon: Truck
+  }, {
+    key: ORDER_STATUSES.DELIVERED,
+    label: 'Delivered',
+    icon: Home
+  }, {
+    key: ORDER_STATUSES.COMPLETED,
+    label: 'Finalized',
+    icon: Check
+  }];
+  const currentIndex = steps.findIndex(s => s.key === currentStatus);
+  const isFailed = currentStatus === ORDER_STATUSES.CANCELLED || currentStatus === ORDER_STATUSES.REFUNDED || currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
   if (variant === 'wide') {
-    return (
-      <div className="py-8 px-2">
+    return <div className="py-8 px-2">
         <div className="relative flex justify-between">
           <div className="absolute top-5 left-0 w-full h-[2px] bg-slate-100 -z-10" />
-          <div
-            className="absolute top-5 left-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 -z-10"
-            style={{ width: `${Math.max(0, (currentIndex / (steps.length - 1)) * 100)}%` }}
-          />
+          <div className="absolute top-5 left-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 -z-10" style={{
+          width: `${Math.max(0, currentIndex / (steps.length - 1) * 100)}%`
+        }} />
 
           {steps.map((step, idx) => {
-            const Icon = step.icon;
-            const isDone = idx <= currentIndex;
-            const isCurrent = idx === currentIndex;
-
-            return (
-              <div key={step.key} className="flex flex-col items-center group">
-                <div className="relative">
-                  {isCurrent && (
-                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />
-                  )}
-                  <div
-                    className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      isDone
-                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-900/20'
-                        : 'bg-white border-slate-200 text-slate-400'
-                    } ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}
-                  >
-                    <Icon className="w-5 h-5 stroke-[2.5px]" />
-                  </div>
-                </div>
-                <span
-                  className={`mt-3 text-[11px] font-bold uppercase tracking-tight ${
-                    isDone ? 'text-slate-900' : 'text-slate-400'
-                  }`}
-                >
-                  {step.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        {isFailed ? (
-          <div className="mt-4 flex justify-center">
-            <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-semibold rounded-full border border-rose-100 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" /> Status: {currentStatus}
-            </span>
-          </div>
-        ) : null}
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-6 px-1">
-      <div className="relative flex items-center">
-        {steps.map((step, idx) => {
           const Icon = step.icon;
           const isDone = idx <= currentIndex;
           const isCurrent = idx === currentIndex;
-          const isLast = idx === steps.length - 1;
-
-          return (
-            <React.Fragment key={step.key}>
+          return <div key={step.key} className="flex flex-col items-center group">
+                <div className="relative">
+                  {isCurrent && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />}
+                  <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-900/20' : 'bg-white border-slate-200 text-slate-400'} ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}>
+                    <Icon className="w-5 h-5 stroke-[2.5px]" />
+                  </div>
+                </div>
+                <span className={`mt-3 text-[11px] font-bold uppercase tracking-tight ${isDone ? 'text-slate-900' : 'text-slate-400'}`}>
+                  {step.label}
+                </span>
+              </div>;
+        })}
+        </div>
+        {isFailed ? <div className="mt-4 flex justify-center">
+            <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-semibold rounded-full border border-rose-100 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />{t("status")}{currentStatus}
+            </span>
+          </div> : null}
+      </div>;
+  }
+  return <div className="py-6 px-1">
+      <div className="relative flex items-center">
+        {steps.map((step, idx) => {
+        const Icon = step.icon;
+        const isDone = idx <= currentIndex;
+        const isCurrent = idx === currentIndex;
+        const isLast = idx === steps.length - 1;
+        return <React.Fragment key={step.key}>
               <div className="flex flex-col items-center group relative z-10">
                 <div className="relative">
-                  {isCurrent && (
-                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />
-                  )}
-                  <div
-                    className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-white border-slate-200 text-slate-400'
-                    } ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}
-                  >
+                  {isCurrent && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />}
+                  <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-white border-slate-200 text-slate-400'} ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}>
                     <Icon className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>
-                <span
-                  className={`mt-2.5 text-[10px] uppercase tracking-wide ${
-                    isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'
-                  }`}
-                >
+                <span className={`mt-2.5 text-[10px] uppercase tracking-wide ${isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'}`}>
                   {step.label}
                 </span>
               </div>
-              {!isLast ? (
-                <div className="flex-1 mx-1 relative" style={{ height: '2px' }}>
+              {!isLast ? <div className="flex-1 mx-1 relative" style={{
+            height: '2px'
+          }}>
                   <div className="absolute inset-0 bg-slate-100 rounded-full" />
                   {isDone ? <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000" /> : null}
-                </div>
-              ) : null}
-            </React.Fragment>
-          );
-        })}
+                </div> : null}
+            </React.Fragment>;
+      })}
       </div>
-      {isFailed ? (
-        <div className="mt-4 flex justify-center">
+      {isFailed ? <div className="mt-4 flex justify-center">
           <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-[10px] font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
             <AlertCircle className="w-3 h-3" /> {currentStatus}
           </span>
-        </div>
-      ) : null}
-    </div>
-  );
+        </div> : null}
+    </div>;
 };
-
 export { DeliveryCountdown, OrderProgressStepper };

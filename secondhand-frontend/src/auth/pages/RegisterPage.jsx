@@ -1,60 +1,45 @@
+import { useTranslation } from "react-i18next";
 import React from 'react';
 import useRegisterForm from '../hooks/useRegisterForm.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import { RegisterForm } from '../components/RegisterForm.jsx';
-
 const RegisterPage = () => {
-    const {
-        formData,
-        errors,
-        isLoading,
-        genderOptions,
-        gendersLoading,
-        handleChange,
-        submit,
-        agreements,
-        agreementsLoading,
-        acceptedAgreements,
-        selectedAgreement,
-        showAgreementModal,
-        handleAgreementToggle,
-        handleAgreementClick,
-        handleCloseModal
-    } = useRegisterForm();
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        submit();
-    };
-
-    return (
-        <div className="w-full flex flex-col">
+  const {
+    t
+  } = useTranslation();
+  const {
+    formData,
+    errors,
+    isLoading,
+    genderOptions,
+    gendersLoading,
+    handleChange,
+    submit,
+    agreements,
+    agreementsLoading,
+    acceptedAgreements,
+    selectedAgreement,
+    showAgreementModal,
+    handleAgreementToggle,
+    handleAgreementClick,
+    handleCloseModal
+  } = useRegisterForm();
+  const handleSubmit = e => {
+    e.preventDefault();
+    submit();
+  };
+  return <div className="w-full flex flex-col">
             {/* Logo Monogram */}
             <div className="flex items-center gap-2 mb-8">
                 <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
-                    <span className="text-amber-400 text-xs font-semibold leading-none">S</span>
+                    <span className="text-amber-400 text-xs font-semibold leading-none">{t("s")}</span>
                 </div>
-                <span className="text-sm font-semibold text-stone-900 tracking-tight">secondHand</span>
+                <span className="text-sm font-semibold text-stone-900 tracking-tight">{t("secondhand")}</span>
             </div>
 
-            <RegisterForm
-                formData={formData}
-                errors={errors}
-                isLoading={isLoading}
-                genderOptions={genderOptions}
-                gendersLoading={gendersLoading}
-                handleChange={handleChange}
-                onSubmit={handleSubmit}
-                agreements={agreements}
-                agreementsLoading={agreementsLoading}
-                acceptedAgreements={acceptedAgreements}
-                onToggleAgreement={handleAgreementToggle}
-                onReadAgreement={handleAgreementClick}
-            />
+            <RegisterForm formData={formData} errors={errors} isLoading={isLoading} genderOptions={genderOptions} gendersLoading={gendersLoading} handleChange={handleChange} onSubmit={handleSubmit} agreements={agreements} agreementsLoading={agreementsLoading} acceptedAgreements={acceptedAgreements} onToggleAgreement={handleAgreementToggle} onReadAgreement={handleAgreementClick} />
 
             <AgreementModal agreement={selectedAgreement} open={showAgreementModal} onClose={handleCloseModal} />
-        </div>
-    );
+        </div>;
 };
-
 export default RegisterPage;

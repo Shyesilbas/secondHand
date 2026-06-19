@@ -27,6 +27,12 @@ public class EmailService {
     private final EmailRepository emailRepository;
     private final EmailMapper emailMapper;
     private final EmailConfig emailConfig;
+    private final org.thymeleaf.TemplateEngine templateEngine;
+
+    public EmailDto sendTemplateEmail(User user, String subject, String templateName, org.thymeleaf.context.Context context, EmailType emailType) {
+        String content = templateEngine.process("email/" + templateName, context);
+        return sendEmail(user, subject, content, emailType);
+    }
 
 
     public EmailDto sendEmail(User user, String subject, String content, EmailType emailType) {
