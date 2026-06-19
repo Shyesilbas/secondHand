@@ -5,7 +5,7 @@ import {campaignService} from '../../listing/services/campaignService.js';
 import {listingService} from '../../listing/services/listingService.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
-import {formatDateTime} from '../../common/formatters.js';
+import {formatDateTime, formatCurrency} from '../../common/formatters.js';
 import {ArrowLeft, CalendarDays, Clock, Edit2, Layers, Plus, RefreshCw, Search, Tag, Target, Trash2} from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 
@@ -15,6 +15,7 @@ const MyCouponsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [listingTitleById, setListingTitleById] = useState({});
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);

@@ -17,7 +17,8 @@ export const createClothingCreateRequest = (data) => ({
         cityKey: data.cityKey || '',
         districtKey: data.districtKey || '',
         neighborhoodKey: data.neighborhoodKey || undefined,
-        imageUrl: data.imageUrl || undefined
+        imageUrl: data.imageUrl || undefined,
+        allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false
     },
     quantity: parseInt(data.quantity) || 1,
     brandId: data.brandId,
@@ -45,6 +46,7 @@ export const createClothingUpdateRequest = (data) => {
     if (data.districtKey !== undefined) base.districtKey = data.districtKey;
     if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
     if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
+    if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
     if (Object.keys(base).length > 0) updateData.base = base;
 
     updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;

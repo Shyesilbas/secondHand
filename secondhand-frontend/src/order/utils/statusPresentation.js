@@ -1,4 +1,5 @@
 import { ORDER_STATUSES } from '../constants/orderUiConstants.js';
+import { PAYMENT_STATUSES } from '../../payments/paymentSchema.js';
 
 const statusUpper = (status) => String(status || '').toUpperCase();
 
@@ -12,8 +13,6 @@ export const getOrderStatusBadgeClass = (status) => {
   if (s === ORDER_STATUSES.CONFIRMED) return 'bg-green-50 text-green-800 border-green-200';
   if (s === ORDER_STATUSES.PENDING) return 'bg-slate-100 text-slate-700 border-slate-200';
   if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
-  if (s === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'bg-amber-50 text-amber-900 border-amber-200';
-  if (s === ORDER_STATUSES.FAILED) return 'bg-rose-50 text-rose-900 border-rose-300';
   if (s === ORDER_STATUSES.MEETUP_PENDING) return 'bg-indigo-50 text-indigo-800 border-indigo-200';
   if (s === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-violet-50 text-violet-800 border-violet-200';
   if (s === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-50 text-purple-900 border-purple-300';
@@ -33,11 +32,7 @@ export const getOrderStatusTextClass = (status) => {
   if (value === ORDER_STATUSES.MEETUP_PENDING) return 'text-indigo-600';
   if (value === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'text-violet-600';
   if (value === ORDER_STATUSES.VERIFICATION_LOCKED) return 'text-purple-600';
-
-  if (value === ORDER_STATUSES.PAID) return 'text-emerald-600';
-  if (value === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-600';
   if (value === ORDER_STATUSES.REFUNDED) return 'text-rose-600';
-  if (value === ORDER_STATUSES.FAILED) return 'text-rose-600';
   if (value === ORDER_STATUSES.CANCELLED) return 'text-rose-600';
 
   return 'text-slate-600';
@@ -56,17 +51,19 @@ export const getOrderStatusIndicatorClass = (status) => {
 };
 
 export const getPaymentStatusIndicatorClass = (status) => {
-  if (status === ORDER_STATUSES.PAID) return 'bg-emerald-400';
-  if (status === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'bg-amber-400';
-  if (status === ORDER_STATUSES.REFUNDED) return 'bg-rose-400';
-  if (status === ORDER_STATUSES.PENDING) return 'bg-slate-400';
+  const s = String(status || '').toUpperCase();
+  if (s === PAYMENT_STATUSES.PAID) return 'bg-emerald-400';
+  if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'bg-amber-400';
+  if (s === PAYMENT_STATUSES.REFUNDED) return 'bg-rose-400';
+  if (s === PAYMENT_STATUSES.PENDING) return 'bg-slate-400';
   return 'bg-red-400';
 };
 
 export const getPaymentStatusTextClass = (status) => {
-  if (status === ORDER_STATUSES.PAID) return 'text-emerald-400';
-  if (status === ORDER_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-400';
-  if (status === ORDER_STATUSES.REFUNDED) return 'text-rose-400';
-  if (status === ORDER_STATUSES.PENDING) return 'text-slate-400';
+  const s = String(status || '').toUpperCase();
+  if (s === PAYMENT_STATUSES.PAID) return 'text-emerald-400';
+  if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-400';
+  if (s === PAYMENT_STATUSES.REFUNDED) return 'text-rose-400';
+  if (s === PAYMENT_STATUSES.PENDING) return 'text-slate-400';
   return 'text-red-400';
 };

@@ -26,7 +26,7 @@ export const PaymentInfo = () => {
             >
               eWallet
             </Link>{' '}
-            account. Manual mock top-up and withdrawal actions are available from your{' '}
+            account. Manual top-up and withdrawal actions are available from your{' '}
             <Link
               to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`}
               className="font-medium text-blue-800 hover:text-blue-900 underline transition-colors"

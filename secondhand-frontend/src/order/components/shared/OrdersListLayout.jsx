@@ -118,8 +118,9 @@ const ORDER_STATUS_LIST_ICON = {
   [ORDER_STATUSES.COMPLETED]: CircleCheck,
   [ORDER_STATUSES.CANCELLED]: XCircle,
   [ORDER_STATUSES.REFUNDED]: RotateCcw,
-  [ORDER_STATUSES.PARTIALLY_REFUNDED]: RotateCcw,
-  [ORDER_STATUSES.FAILED]: AlertTriangle,
+  [ORDER_STATUSES.MEETUP_PENDING]: Clock,
+  [ORDER_STATUSES.HANDOVER_CONFIRMED]: PackageCheck,
+  [ORDER_STATUSES.VERIFICATION_LOCKED]: AlertTriangle,
 };
 
 const ListStatusGlyph = ({ status, className }) => {
@@ -415,8 +416,9 @@ const UnifiedOrderItem = React.memo(
       [ORDER_STATUSES.PENDING]: 'bg-slate-400',
       [ORDER_STATUSES.CANCELLED]: 'bg-rose-500',
       [ORDER_STATUSES.REFUNDED]: 'bg-rose-500',
-      [ORDER_STATUSES.PARTIALLY_REFUNDED]: 'bg-amber-500',
-      [ORDER_STATUSES.FAILED]: 'bg-rose-600',
+      [ORDER_STATUSES.MEETUP_PENDING]: 'bg-indigo-500',
+      [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'bg-violet-500',
+      [ORDER_STATUSES.VERIFICATION_LOCKED]: 'bg-purple-500',
     }[statusKey(order.status)] || 'bg-slate-400';
 
     let primaryAction = null;
@@ -470,8 +472,9 @@ const UnifiedOrderItem = React.memo(
       [ORDER_STATUSES.PENDING]: 'border-l-slate-300',
       [ORDER_STATUSES.CANCELLED]: 'border-l-rose-400',
       [ORDER_STATUSES.REFUNDED]: 'border-l-rose-400',
-      [ORDER_STATUSES.PARTIALLY_REFUNDED]: 'border-l-amber-400',
-      [ORDER_STATUSES.FAILED]: 'border-l-rose-500',
+      [ORDER_STATUSES.MEETUP_PENDING]: 'border-l-indigo-500',
+      [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'border-l-violet-600',
+      [ORDER_STATUSES.VERIFICATION_LOCKED]: 'border-l-purple-700',
     }[statusKey(order.status)] || 'border-l-slate-200';
 
     return (

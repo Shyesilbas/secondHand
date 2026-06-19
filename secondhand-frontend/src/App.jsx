@@ -1,14 +1,16 @@
 import {BrowserRouter as Router} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {AuthProvider} from './auth/AuthContext.jsx';
-import {NotificationProvider} from './notification/NotificationContext.jsx';
-import {InAppNotificationProvider} from './notification/InAppNotificationContext.jsx';
-import {EnumProvider} from './common/contexts/index.js';
-import {CompareFloatingBar, CompareModal, ComparisonProvider} from './comparison/index.js';
-import {ReservationModalProvider} from './cart/context/ReservationModalContext.jsx';
+import {AuthProvider} from './auth/AuthProvider.jsx';
+import {NotificationProvider} from './notification/NotificationProvider.jsx';
+import {InAppNotificationProvider} from './notification/InAppNotificationProvider.jsx';
+import {EnumProvider} from './common/contexts/EnumProvider.jsx';
+import {ComparisonProvider} from './comparison/contexts/ComparisonProvider.jsx';
+import {CompareFloatingBar, CompareModal} from './comparison/index.js';
+import {ReservationModalProvider} from './cart/context/ReservationModalProvider.jsx';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
 import AppRoutes from './common/routes/AppRoutes';
 import { SafeMeetupOnboardingModal } from './order/components/shared/SafeMeetupOnboardingModal.jsx';
+
 
 const queryClient = new QueryClient({
     defaultOptions: {

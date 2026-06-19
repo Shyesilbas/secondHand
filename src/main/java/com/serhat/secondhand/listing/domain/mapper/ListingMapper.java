@@ -409,6 +409,7 @@ public abstract class ListingMapper {
         if (base.districtKey() != null) base.districtKey().ifPresent(entity::setDistrictKey);
         if (base.neighborhoodKey() != null) base.neighborhoodKey().ifPresent(entity::setNeighborhoodKey);
         if (base.imageUrl() != null) base.imageUrl().ifPresent(entity::setImageUrl);
+        if (base.allowMeetup() != null) entity.setAllowMeetup(base.allowMeetup());
     }
 
     // ──────────────────────────────────────────────

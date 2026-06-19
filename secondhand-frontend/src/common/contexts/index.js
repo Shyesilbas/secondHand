@@ -1,79 +1,25 @@
 // Main EnumContext (backward compatible)
-export { EnumProvider, useEnumContext } from './EnumContext.jsx';
+export { useEnumContext } from './EnumContext.jsx';
+export { EnumProvider } from './EnumProvider.jsx';
 
 // Domain-specific contexts
-export {
-    GeneralEnumProvider,
-    useGeneralEnums,
-    useListingTypes,
-    useCurrencies,
-    useOrderStatuses,
-    useListingStatuses,
-    usePaymentTypes,
-    useShippingStatuses,
-} from './GeneralEnumContext.jsx';
+export { useGeneralEnums, useListingTypes, useCurrencies, useOrderStatuses, useListingStatuses, usePaymentTypes, useShippingStatuses } from './GeneralEnumContext.jsx';
+export { GeneralEnumProvider } from './GeneralEnumProvider.jsx';
 
-export {
-    VehicleEnumProvider,
-    useVehicleEnums,
-    useCarBrands,
-    useVehicleTypes,
-    useVehicleModels,
-    useFuelTypes,
-    useColors,
-    useDoors,
-    useGearTypes,
-    useSeatCounts,
-    useDrivetrains,
-    useBodyTypes,
-} from './VehicleEnumContext.jsx';
+export { useVehicleEnums, useCarBrands, useVehicleTypes, useVehicleModels, useFuelTypes, useColors, useDoors, useGearTypes, useSeatCounts, useDrivetrains, useBodyTypes, useVehicleGenerations, useVehicleEngines, useVehicleTrims } from './VehicleEnumContext.jsx';
+export { VehicleEnumProvider } from './VehicleEnumProvider.jsx';
 
-export {
-    ElectronicsEnumProvider,
-    useElectronicsEnums,
-    useElectronicTypes,
-    useElectronicBrands,
-    useElectronicModels,
-    useStorageTypes,
-    useElectronicConnectionTypes,
-    useProcessors,
-    useElectronicConditions,
-} from './ElectronicsEnumContext.jsx';
+export { useElectronicsEnums, useElectronicTypes, useElectronicBrands, useElectronicModels, useStorageTypes, useElectronicConnectionTypes, useProcessors, useElectronicConditions } from './ElectronicsEnumContext.jsx';
+export { ElectronicsEnumProvider } from './ElectronicsEnumProvider.jsx';
 
-export {
-    RealEstateEnumProvider,
-    useRealEstateEnums,
-    useRealEstateTypes,
-    useRealEstateAdTypes,
-    useHeatingTypes,
-    useOwnerTypes,
-} from './RealEstateEnumContext.jsx';
+export { useRealEstateEnums, useRealEstateTypes, useRealEstateAdTypes, useHeatingTypes, useOwnerTypes } from './RealEstateEnumContext.jsx';
+export { RealEstateEnumProvider } from './RealEstateEnumProvider.jsx';
 
-export {
-    ClothingEnumProvider,
-    useClothingEnums,
-    useClothingBrands,
-    useClothingTypes,
-    useClothingConditions,
-    useClothingGenders,
-    useClothingCategories,
-    useClothingSizes,
-} from './ClothingEnumContext.jsx';
+export { useClothingEnums, useClothingBrands, useClothingTypes, useClothingConditions, useClothingGenders, useClothingCategories, useClothingSizes } from './ClothingEnumContext.jsx';
+export { ClothingEnumProvider } from './ClothingEnumProvider.jsx';
 
-export {
-    BookEnumProvider,
-    useBookEnums,
-    useBookTypes,
-    useBookGenres,
-    useBookLanguages,
-    useBookFormats,
-    useBookConditions,
-} from './BookEnumContext.jsx';
+export { useBookEnums, useBookTypes, useBookGenres, useBookLanguages, useBookFormats, useBookConditions } from './BookEnumContext.jsx';
+export { BookEnumProvider } from './BookEnumProvider.jsx';
 
-export {
-    SportEnumProvider,
-    useSportEnums,
-    useSportDisciplines,
-    useSportEquipmentTypes,
-    useSportConditions,
-} from './SportEnumContext.jsx';
+export { useSportEnums, useSportDisciplines, useSportEquipmentTypes, useSportConditions } from './SportEnumContext.jsx';
+export { SportEnumProvider } from './SportEnumProvider.jsx';

@@ -36,6 +36,7 @@ export const createBooksCreateRequest = (data) => ({
     districtKey: data.districtKey || '',
     neighborhoodKey: data.neighborhoodKey || undefined,
     imageUrl: data.imageUrl || undefined,
+    allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
   },
   quantity: parseInt(data.quantity) || 1,
   author: (data.author || '').trim(),
@@ -62,6 +63,7 @@ export const createBooksUpdateRequest = (data) => {
   if (data.districtKey !== undefined) base.districtKey = data.districtKey;
   if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
   if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
+  if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
   if (Object.keys(base).length > 0) updateData.base = base;
 
   updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;

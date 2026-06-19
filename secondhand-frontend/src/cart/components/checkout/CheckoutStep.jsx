@@ -14,12 +14,6 @@ const CheckoutStep = ({
   setSelectedBillingAddressId,
   selectedPaymentType,
   setSelectedPaymentType,
-  cards,
-  selectedCardNumber,
-  setSelectedCardNumber,
-  bankAccounts,
-  selectedBankAccountIban,
-  setSelectedBankAccountIban,
   eWallet,
   paymentVerificationCode,
   setPaymentVerificationCode,
@@ -74,12 +68,6 @@ const CheckoutStep = ({
           <CheckoutPaymentStep
             selectedPaymentType={selectedPaymentType}
             setSelectedPaymentType={setSelectedPaymentType}
-            cards={cards}
-            selectedCardNumber={selectedCardNumber}
-            setSelectedCardNumber={setSelectedCardNumber}
-            bankAccounts={bankAccounts}
-            selectedBankAccountIban={selectedBankAccountIban}
-            setSelectedBankAccountIban={setSelectedBankAccountIban}
             eWallet={eWallet}
             calculateTotal={calculateTotal}
             currency={currency}
@@ -102,10 +90,6 @@ const CheckoutStep = ({
             selectedShippingAddressId={selectedShippingAddressId}
             selectedBillingAddressId={selectedBillingAddressId}
             selectedPaymentType={selectedPaymentType}
-            cards={cards}
-            selectedCardNumber={selectedCardNumber}
-            bankAccounts={bankAccounts}
-            selectedBankAccountIban={selectedBankAccountIban}
             eWallet={eWallet}
             onNext={onNext}
             onBack={onBack}

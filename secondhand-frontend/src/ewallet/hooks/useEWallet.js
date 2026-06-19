@@ -73,7 +73,7 @@ export const useEWallet = (options = {}) => {
 
     const depositMutation = useMutationWithNotification(
         ({ amount }) => ewalletService.deposit(amount),
-        'Mock funds added',
+        'Funds added',
         'Failed to deposit'
     );
 

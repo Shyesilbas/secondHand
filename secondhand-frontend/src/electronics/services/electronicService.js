@@ -5,15 +5,11 @@ import { createElectronicCreateRequest, createElectronicUpdateRequest } from '..
 export const electronicService = {
   createElectronicListing: async (data) => {
     const payload = createElectronicCreateRequest(data);
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return post(API_ENDPOINTS.ELECTRONICS.CREATE, payload);
   },
 
   updateElectronicListing: async (id, data) => {
     const payload = createElectronicUpdateRequest(data);
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return put(API_ENDPOINTS.ELECTRONICS.UPDATE(id), payload);
   },
 

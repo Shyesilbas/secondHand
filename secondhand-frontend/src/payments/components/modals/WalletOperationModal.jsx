@@ -23,8 +23,8 @@ const WalletOperationModal = ({ isOpen, onClose, mode, onSubmit, loading, eWalle
   })();
 
   const description = (() => {
-    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Mock withdrawal from your eWallet.';
-    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Manually add mock funds to your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw from your eWallet.';
+    if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit funds to your eWallet.';
     if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Set the maximum allowed balance for your eWallet.';
     return 'Set a threshold to warn you before overspending.';
   })();

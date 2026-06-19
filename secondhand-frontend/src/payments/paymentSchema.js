@@ -1,5 +1,6 @@
 import { normalizeArrayResponse } from '../common/utils/normalizeArrayResponse.js';
 import { OTP_CODE_LENGTH as COMMON_OTP_CODE_LENGTH } from '../common/constants/otp.js';
+import { cleanObject } from '../common/formatters.js';
 
 export const DEFAULT_PAYMENT_FILTERS = Object.freeze({
   seller: '',
@@ -150,16 +151,27 @@ export const PAYMENT_DIRECTION_LABELS = {
 };
 
 export const createPaymentRequest = (data) => {
-  return {
+  return cleanObject({
     amount: parseFloat(data.amount) || 0,
     currency: data.currency || 'TRY',
     description: data.description?.trim() || '',
-    paymentMethod: data.paymentMethod || '',
-    listingId: data.listingId || '',
+    listingId: data.listingId || undefined,
     paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
     agreementsAccepted: data.agreementsAccepted || false,
-    acceptedAgreementIds: data.acceptedAgreementIds || []
-  };
+    acceptedAgreementIds: data.acceptedAgreementIds || [],
+    fromUserId: data.fromUserId || undefined,
+    toUserId: data.toUserId || undefined,
+    receiverName: data.receiverName || undefined,
+    receiverSurname: data.receiverSurname || undefined,
+    orderItemId: data.orderItemId || undefined,
+    listingTitle: data.listingTitle || undefined,
+    listingNo: data.listingNo || undefined,
+    transactionType: data.transactionType || undefined,
+    paymentDirection: data.paymentDirection || undefined,
+    verificationCode: data.verificationCode || undefined,
+    status: data.status || undefined,
+    orderId: data.orderId || undefined,
+  });
 };
 
 export const createListingFeePaymentRequest = (data) => {

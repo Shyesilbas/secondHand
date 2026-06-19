@@ -33,6 +33,7 @@ ChartJS.register(
   Filler
 );
 
+// eslint-disable-next-line no-unused-vars
 const StatItem = ({ title, value, subtext, icon: Icon }) => (
   <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm hover:border-slate-300 transition-colors duration-300">
     <div className="flex items-center justify-between gap-3">
@@ -49,43 +50,10 @@ const StatItem = ({ title, value, subtext, icon: Icon }) => (
 );
 
 const PriceHistoryTab = ({ priceHistory, loading, error, currency }) => {
-  if (error) {
-    return (
-      <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
-        <div className="mx-auto w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center mb-3">
-          <TrendingUp className="w-5 h-5" />
-        </div>
-        <p className="text-sm font-semibold text-slate-900">Unable to load price history</p>
-        <p className="text-sm text-slate-500 mt-1">Please try again later.</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="rounded-xl border border-slate-200 bg-white p-10 flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-        <p className="text-sm text-slate-600 mt-4">Analyzing price trends...</p>
-      </div>
-    );
-  }
-
-  if (!priceHistory || priceHistory.length === 0) {
-    return (
-      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-        <div className="mx-auto w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
-          <Clock className="w-5 h-5" />
-        </div>
-        <p className="text-sm font-semibold text-slate-900">No price history yet</p>
-        <p className="text-sm text-slate-500 mt-1">This listing hasn't had any price changes.</p>
-      </div>
-    );
-  }
-
-  const stats = useMemo(() => computeHistoryStats(priceHistory, currency), [priceHistory, currency]);
+  const stats = useMemo(() => computeHistoryStats(priceHistory || [], currency), [priceHistory, currency]);
   const currencyCode = stats?.currency || currency || 'TRY';
 
-  const historyAsc = useMemo(() => sortPriceHistoryAsc(priceHistory), [priceHistory]);
+  const historyAsc = useMemo(() => sortPriceHistoryAsc(priceHistory || []), [priceHistory]);
   const chartData = useMemo(() => {
     const labels = historyAsc.map((item) => formatHistoryDateLabel(item?.changeDate));
     const prices = historyAsc.map((item) => item?.newPrice);
@@ -157,7 +125,7 @@ const PriceHistoryTab = ({ priceHistory, loading, error, currency }) => {
     interaction: { intersect: false, mode: 'index' }
   }), [currencyCode, historyAsc]);
 
-  const historyDesc = useMemo(() => sortPriceHistoryDesc(priceHistory), [priceHistory]);
+  const historyDesc = useMemo(() => sortPriceHistoryDesc(priceHistory || []), [priceHistory]);
 
   const statItems = useMemo(() => {
     const pct = Number(stats?.pct);
@@ -178,6 +146,40 @@ const PriceHistoryTab = ({ priceHistory, loading, error, currency }) => {
       { title: 'Range', value: rangeValue, subtext: rangeSubtext, icon: ArrowLeftRight, trend: 'neutral' },
     ];
   }, [currencyCode, stats]);
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+        <div className="mx-auto w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center mb-3">
+          <TrendingUp className="w-5 h-5" />
+        </div>
+        <p className="text-sm font-semibold text-slate-900">Unable to load price history</p>
+        <p className="text-sm text-slate-500 mt-1">Please try again later.</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-10 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+        <p className="text-sm text-slate-600 mt-4">Analyzing price trends...</p>
+      </div>
+    );
+  }
+
+  if (!priceHistory || priceHistory.length === 0) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+        <div className="mx-auto w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
+          <Clock className="w-5 h-5" />
+        </div>
+        <p className="text-sm font-semibold text-slate-900">No price history yet</p>
+        <p className="text-sm text-slate-500 mt-1">This listing hasn't had any price changes.</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="space-y-5">

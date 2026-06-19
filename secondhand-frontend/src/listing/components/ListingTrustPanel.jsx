@@ -7,10 +7,12 @@ import {useUserReviewStats} from '../../reviews/hooks/useReviews.js';
 import {Award, ShieldCheck, Star, CheckCircle, ShieldAlert, QrCode, MapPin, Wallet} from 'lucide-react';
 
 const ListingTrustPanel = ({ listing, isOwner, onShowcaseSuccess }) => {
+  const sellerId = listing?.sellerId;
+  const { stats } = useUserReviewStats(sellerId, { enabled: !!sellerId });
+
   if (!listing) return null;
 
   const showGreatSeller = Boolean(listing.sellerGreatSellerEligible);
-  const { stats, loading } = useUserReviewStats(listing.sellerId, { enabled: !!listing.sellerId });
 
   const ratingAvg = stats?.averageRating ?? 5.0;
   const reviewCount = stats?.reviewCount ?? 0;

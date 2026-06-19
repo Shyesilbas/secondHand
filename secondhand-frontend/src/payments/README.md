@@ -2,7 +2,7 @@
 
 The payments UI is currently eWallet-only.
 
-- `pages/PaymentMethodsPage.jsx`: wallet balance, limits, mock top-up and mock withdrawal.
+- `pages/PaymentMethodsPage.jsx`: wallet balance, limits, top-up and withdrawal.
 - `paymentSchema.js`: payment constants and DTO normalizers.
 - `services/paymentService.js`: payment history, listing-fee payment, statistics and verification calls.
 - `hooks/queries.js`: payment list and statistics queries.

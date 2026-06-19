@@ -144,7 +144,11 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
             });
             showSuccess(CART_MESSAGES.VERIFICATION_SENT_TITLE, CART_MESSAGES.VERIFICATION_SENT_DESCRIPTION);
             setPaymentVerificationExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
-            try { await fetchEmails(); } catch {}
+            try {
+                await fetchEmails();
+            } catch (err) {
+                logger.warn('Failed to fetch emails:', err);
+            }
             return true;
         } catch (e) {
             showError(
@@ -200,12 +204,6 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
         selectedPaymentType,
         setSelectedPaymentType,
-        cards: [],
-        selectedCardNumber: null,
-        setSelectedCardNumber: () => {},
-        bankAccounts: [],
-        selectedBankAccountIban: null,
-        setSelectedBankAccountIban: () => {},
         eWallet,
         paymentVerificationCode,
         setPaymentVerificationCode,

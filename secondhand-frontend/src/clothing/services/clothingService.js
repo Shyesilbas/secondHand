@@ -5,15 +5,11 @@ import { createClothingCreateRequest, createClothingUpdateRequest, createClothin
 export const clothingService = {
     createClothingListing: async (clothingData) => {
     const createData = createClothingCreateRequest(clothingData);
-        if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return post(API_ENDPOINTS.CLOTHING.CREATE, createData);
   },
 
     updateClothingListing: async (id, clothingData) => {
     const updateData = createClothingUpdateRequest(clothingData);
-    if (import.meta && import.meta.env && import.meta.env.DEV) {
-    }
     return put(API_ENDPOINTS.CLOTHING.UPDATE(id), updateData);
   },
 

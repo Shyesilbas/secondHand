@@ -4,7 +4,7 @@ import Footer from './Footer.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { getPageName } from '../../utils/getPageName.js';
 import AuraChatWidget from '../../../ai/components/AuraChatWidget.jsx';
-import { ListingActionProvider } from '../../../listing/context/ListingActionContext.jsx';
+import { ListingActionProvider } from '../../../listing/context/ListingActionProvider.jsx';
 import GlobalActionModal from '../../../listing/components/GlobalActionModal.jsx';
 
 const MainLayout = () => {

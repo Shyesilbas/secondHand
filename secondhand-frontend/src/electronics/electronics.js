@@ -147,6 +147,7 @@ export const createElectronicCreateRequest = (data) => {
       districtKey: data.districtKey || '',
       neighborhoodKey: data.neighborhoodKey || undefined,
       imageUrl: data.imageUrl || undefined,
+      allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
     },
     quantity: parseInt(data.quantity) || 1,
 
@@ -202,6 +203,7 @@ export const createElectronicUpdateRequest = (data) => {
   if (data.cityKey !== undefined) base.cityKey = data.cityKey;
   if (data.districtKey !== undefined) base.districtKey = data.districtKey;
   if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
+  if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
   if (data.electronicTypeId !== undefined && data.electronicTypeId !== '') updateData.electronicTypeId = data.electronicTypeId;
   if (data.electronicBrandId !== undefined && data.electronicBrandId !== '') updateData.electronicBrandId = data.electronicBrandId;
   if (data.electronicModelId !== undefined && data.electronicModelId !== '') updateData.electronicModelId = data.electronicModelId;

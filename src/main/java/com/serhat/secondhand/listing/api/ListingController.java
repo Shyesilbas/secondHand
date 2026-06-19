@@ -113,6 +113,17 @@ public class ListingController {
         return ResponseEntity.ok(listingSearchService.globalSearch(query, page, size, userId));
     }
 
+    @PublicEndpoint
+    @GetMapping("/search/listing-no/{no}")
+    public ResponseEntity<ListingDto> getListingByNo(
+            @PathVariable String no,
+            @AuthenticationPrincipal User currentUser) {
+        Long userId = currentUser != null ? currentUser.getId() : null;
+        return listingQueryService.findByListingNoAsDto(no, userId, userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/my-listings")
     public ResponseEntity<Page<ListingDto>> getMyListings(
             @RequestParam(defaultValue = "0") int page,

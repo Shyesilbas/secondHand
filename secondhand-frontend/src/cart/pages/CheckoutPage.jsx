@@ -290,12 +290,6 @@ const CheckoutPage = () => {
               setSelectedBillingAddressId={checkout.setSelectedBillingAddressId}
               selectedPaymentType={checkout.selectedPaymentType}
               setSelectedPaymentType={checkout.setSelectedPaymentType}
-              cards={checkout.cards}
-              selectedCardNumber={checkout.selectedCardNumber}
-              setSelectedCardNumber={checkout.setSelectedCardNumber}
-              bankAccounts={checkout.bankAccounts}
-              selectedBankAccountIban={checkout.selectedBankAccountIban}
-              setSelectedBankAccountIban={checkout.setSelectedBankAccountIban}
               eWallet={checkout.eWallet}
               paymentVerificationCode={checkout.paymentVerificationCode}
               setPaymentVerificationCode={checkout.setPaymentVerificationCode}

@@ -1,8 +1,6 @@
-import React, { createContext, useContext } from 'react';
-import { theme } from './theme.js';
+import React from 'react';
 import { createPageTheme } from './createPageTheme.js';
-
-const ThemeContext = createContext(theme);
+import { ThemeContext } from './PageThemeContext.jsx';
 
 export const PageThemeProvider = ({ children, pageTheme = {} }) => {
   const mergedTheme = createPageTheme(pageTheme);
@@ -14,15 +12,8 @@ export const PageThemeProvider = ({ children, pageTheme = {} }) => {
   );
 };
 
-export const usePageTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    return theme;
-  }
-  return context;
-};
-
 export default PageThemeProvider;
+
 
 
 

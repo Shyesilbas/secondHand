@@ -86,6 +86,7 @@ export const createVehicleCreateRequest = (data) => ({
     districtKey: data.districtKey || '',
     neighborhoodKey: data.neighborhoodKey || undefined,
     imageUrl: data.imageUrl || undefined,
+    allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
   },
 
   vehicleTypeId: toUuidOrNull(data.vehicleTypeId),
@@ -128,6 +129,7 @@ export const createVehicleUpdateRequest = (data) => {
   if (data.cityKey !== undefined) base.cityKey = data.cityKey;
   if (data.districtKey !== undefined) base.districtKey = data.districtKey;
   if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
+  if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
 
   if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') {
     updateData.vehicleTypeId = data.vehicleTypeId;

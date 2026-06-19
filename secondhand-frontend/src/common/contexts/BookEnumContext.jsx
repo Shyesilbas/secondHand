@@ -1,6 +1,6 @@
 import {createContext, useContext, useMemo} from 'react';
 
-const BookEnumContext = createContext();
+export const BookEnumContext = createContext();
 
 export const useBookEnums = () => {
     const context = useContext(BookEnumContext);
@@ -8,23 +8,6 @@ export const useBookEnums = () => {
         throw new Error('useBookEnums must be used within a BookEnumProvider');
     }
     return context;
-};
-
-export const BookEnumProvider = ({ children, enums, isLoading, error }) => {
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-        }),
-        [enums, isLoading, error]
-    );
-
-    return (
-        <BookEnumContext.Provider value={value}>
-            {children}
-        </BookEnumContext.Provider>
-    );
 };
 
 // Selector hooks for specific book enums
@@ -52,3 +35,4 @@ export const useBookConditions = () => {
     const { enums } = useBookEnums();
     return useMemo(() => enums.bookConditions, [enums.bookConditions]);
 };
+

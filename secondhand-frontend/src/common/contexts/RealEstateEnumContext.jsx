@@ -1,6 +1,6 @@
 import {createContext, useContext, useMemo} from 'react';
 
-const RealEstateEnumContext = createContext();
+export const RealEstateEnumContext = createContext();
 
 export const useRealEstateEnums = () => {
     const context = useContext(RealEstateEnumContext);
@@ -8,23 +8,6 @@ export const useRealEstateEnums = () => {
         throw new Error('useRealEstateEnums must be used within a RealEstateEnumProvider');
     }
     return context;
-};
-
-export const RealEstateEnumProvider = ({ children, enums, isLoading, error }) => {
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-        }),
-        [enums, isLoading, error]
-    );
-
-    return (
-        <RealEstateEnumContext.Provider value={value}>
-            {children}
-        </RealEstateEnumContext.Provider>
-    );
 };
 
 // Selector hooks for specific real estate enums
@@ -47,3 +30,4 @@ export const useOwnerTypes = () => {
     const { enums } = useRealEstateEnums();
     return useMemo(() => enums.ownerTypes, [enums.ownerTypes]);
 };
+

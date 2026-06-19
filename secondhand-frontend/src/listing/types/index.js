@@ -6,6 +6,7 @@ export const LISTING_TYPES = {
   CLOTHING: 'CLOTHING',
   BOOKS: 'BOOKS',
   SPORTS: 'SPORTS',
+  OTHER: 'OTHER',
 };
 
 /** Types that cannot be added to cart or receive offers */
@@ -17,6 +18,8 @@ export const LISTING_STATUS = {
   SOLD: 'SOLD',
   PENDING: 'PENDING',
   DRAFT: 'DRAFT',
+  RESERVED: 'RESERVED',
+  DELETED: 'DELETED',
 };
 
 export const LISTING_STATUSES = [
@@ -25,6 +28,7 @@ export const LISTING_STATUSES = [
   { value: 'DRAFT', label: 'Draft' },
   { value: 'SOLD', label: 'Sold' },
   { value: 'RESERVED', label: 'Reserved' },
+  { value: 'DELETED', label: 'Deleted' },
 ];
 
 // Shared defaults to avoid scattered magic strings across UI and service layers.

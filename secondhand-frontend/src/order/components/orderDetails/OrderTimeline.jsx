@@ -97,7 +97,6 @@ const OrderProgressStepper = ({ currentStatus, deliveryMethod, variant = 'compac
   const isFailed =
     currentStatus === ORDER_STATUSES.CANCELLED ||
     currentStatus === ORDER_STATUSES.REFUNDED ||
-    currentStatus === ORDER_STATUSES.FAILED ||
     currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
 
   if (variant === 'wide') {

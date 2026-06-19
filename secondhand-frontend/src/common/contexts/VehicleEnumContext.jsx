@@ -1,7 +1,6 @@
-import {createContext, useCallback, useContext, useMemo} from 'react';
-import {getCarBrandLabel, getFuelTypeLabel, getColorLabel} from '../enums/vehicleEnums.js';
+import {createContext, useContext, useMemo} from 'react';
 
-const VehicleEnumContext = createContext();
+export const VehicleEnumContext = createContext();
 
 export const useVehicleEnums = () => {
     const context = useContext(VehicleEnumContext);
@@ -9,41 +8,6 @@ export const useVehicleEnums = () => {
         throw new Error('useVehicleEnums must be used within a VehicleEnumProvider');
     }
     return context;
-};
-
-export const VehicleEnumProvider = ({ children, enums, isLoading, error }) => {
-    const getCarBrandLabelMemo = useCallback(
-        (value) => getCarBrandLabel(value, enums.carBrands),
-        [enums.carBrands]
-    );
-
-    const getFuelTypeLabelMemo = useCallback(
-        (value) => getFuelTypeLabel(value, enums.fuelTypes),
-        [enums.fuelTypes]
-    );
-
-    const getColorLabelMemo = useCallback(
-        (value) => getColorLabel(value, enums.colors),
-        [enums.colors]
-    );
-
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-            getCarBrandLabel: getCarBrandLabelMemo,
-            getFuelTypeLabel: getFuelTypeLabelMemo,
-            getColorLabel: getColorLabelMemo,
-        }),
-        [enums, isLoading, error, getCarBrandLabelMemo, getFuelTypeLabelMemo, getColorLabelMemo]
-    );
-
-    return (
-        <VehicleEnumContext.Provider value={value}>
-            {children}
-        </VehicleEnumContext.Provider>
-    );
 };
 
 // Selector hooks for specific vehicle enums
@@ -111,3 +75,4 @@ export const useVehicleTrims = () => {
     const { enums } = useVehicleEnums();
     return useMemo(() => enums.vehicleTrims, [enums.vehicleTrims]);
 };
+

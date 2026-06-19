@@ -85,6 +85,7 @@ export const createRealEstateCreateRequest = (data) => {
       districtKey: data.districtKey || '',
       neighborhoodKey: data.neighborhoodKey || undefined,
       imageUrl: data.imageUrl || undefined,
+      allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
     },
     
         adTypeId: data.adTypeId || null,
@@ -114,6 +115,7 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.cityKey !== undefined) base.cityKey = data.cityKey;
   if (data.districtKey !== undefined) base.districtKey = data.districtKey;
   if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
+  if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
   if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
   if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
   if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;

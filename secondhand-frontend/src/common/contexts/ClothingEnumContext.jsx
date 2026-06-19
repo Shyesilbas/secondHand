@@ -1,6 +1,6 @@
 import {createContext, useContext, useMemo} from 'react';
 
-const ClothingEnumContext = createContext();
+export const ClothingEnumContext = createContext();
 
 export const useClothingEnums = () => {
     const context = useContext(ClothingEnumContext);
@@ -8,23 +8,6 @@ export const useClothingEnums = () => {
         throw new Error('useClothingEnums must be used within a ClothingEnumProvider');
     }
     return context;
-};
-
-export const ClothingEnumProvider = ({ children, enums, isLoading, error }) => {
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-        }),
-        [enums, isLoading, error]
-    );
-
-    return (
-        <ClothingEnumContext.Provider value={value}>
-            {children}
-        </ClothingEnumContext.Provider>
-    );
 };
 
 // Selector hooks for specific clothing enums
@@ -57,3 +40,4 @@ export const useClothingSizes = () => {
     const { enums } = useClothingEnums();
     return useMemo(() => enums.clothingSizes, [enums.clothingSizes]);
 };
+

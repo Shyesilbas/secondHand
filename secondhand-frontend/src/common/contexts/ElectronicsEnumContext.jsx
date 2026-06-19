@@ -1,6 +1,6 @@
 import {createContext, useContext, useMemo} from 'react';
 
-const ElectronicsEnumContext = createContext();
+export const ElectronicsEnumContext = createContext();
 
 export const useElectronicsEnums = () => {
     const context = useContext(ElectronicsEnumContext);
@@ -8,23 +8,6 @@ export const useElectronicsEnums = () => {
         throw new Error('useElectronicsEnums must be used within an ElectronicsEnumProvider');
     }
     return context;
-};
-
-export const ElectronicsEnumProvider = ({ children, enums, isLoading, error }) => {
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-        }),
-        [enums, isLoading, error]
-    );
-
-    return (
-        <ElectronicsEnumContext.Provider value={value}>
-            {children}
-        </ElectronicsEnumContext.Provider>
-    );
 };
 
 // Selector hooks for specific electronics enums
@@ -62,3 +45,4 @@ export const useElectronicConditions = () => {
     const { enums } = useElectronicsEnums();
     return useMemo(() => enums.electronicConditions, [enums.electronicConditions]);
 };
+

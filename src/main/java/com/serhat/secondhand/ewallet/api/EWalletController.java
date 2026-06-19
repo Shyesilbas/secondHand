@@ -2,6 +2,16 @@ package com.serhat.secondhand.ewallet.api;
 
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
+import com.serhat.secondhand.payment.application.PaymentStatsService;
+import com.serhat.secondhand.payment.dto.PaymentDto;
+import com.serhat.secondhand.payment.dto.PaymentFilter;
+import com.serhat.secondhand.payment.entity.PaymentType;
+import com.serhat.secondhand.user.domain.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +28,7 @@ import java.math.BigDecimal;
 public class EWalletController {
 
     private final IEWalletService eWalletService;
+    private final PaymentStatsService paymentStatsService;
 
     @PostMapping
     public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {
@@ -83,5 +94,27 @@ public class EWalletController {
         log.debug("Checking spending warning threshold for authenticated user");
         SpendingWarningCheckResponse response = eWalletService.checkSpendingWarning(amount);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<Page<PaymentDto>> getTransactions(
+            @AuthenticationPrincipal User currentUser,
+            @PageableDefault(size = 10, sort = "processedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Fetching eWallet transactions for user: {}", currentUser.getEmail());
+        PaymentFilter filter = new PaymentFilter(
+                null,
+                PaymentType.EWALLET,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        Page<PaymentDto> payments = paymentStatsService.getMyPayments(
+                currentUser.getId(),
+                pageable,
+                filter);
+        return ResponseEntity.ok(payments);
     }
 }
