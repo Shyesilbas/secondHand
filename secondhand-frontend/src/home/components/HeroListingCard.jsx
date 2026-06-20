@@ -21,26 +21,26 @@ const HeroListingCard = ({
   // Determine dynamic badge
   const isAuraApproved = listing.price && listing.price < 150000; // Simulated algorithm for demo
 
-  return <div onClick={handleClick} style={style} className={`w-80 bg-background-primary border border-slate-900/5 rounded-2xl p-4 shadow-sm cursor-pointer transition-all duration-300 hover:border-border-light hover:-translate-y-1 hover:shadow-sm select-none ${className}`}>
-      <div className="relative aspect-video rounded-xl bg-slate-50 overflow-hidden border border-slate-100 flex items-center justify-center">
-        {listing.imageUrl ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" /> : <div className="text-slate-300 text-xs font-semibold">{t("no_image")}</div>}
+  return <div onClick={handleClick} style={style} className={`w-80 bg-background-primary border border-border-light rounded-xl p-4 shadow-sm cursor-pointer transition-all duration-300 hover:border-border hover:-translate-y-1 hover:shadow-md select-none ${className}`}>
+      <div className="relative aspect-video rounded-lg bg-background-secondary overflow-hidden border border-border-light flex items-center justify-center">
+        {listing.imageUrl ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" /> : <div className="text-text-muted text-xs font-semibold">{t("no_image")}</div>}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
-          <span className="px-2 py-0.5 rounded bg-status-success-bg text-[9px] font-bold text-white uppercase tracking-wider shadow-sm flex items-center gap-0.5">
+          <span className="px-2 py-0.5 rounded bg-status-success-bg text-caption font-bold text-status-success-text uppercase tracking-wider shadow-sm flex items-center gap-0.5">
             <ShieldCheck className="w-2.5 h-2.5" />{t("verified")}</span>
-          {isAuraApproved && <span className="px-2 py-0.5 rounded bg-primary text-[9px] font-bold text-white uppercase tracking-wider shadow-sm flex items-center gap-0.5">
+          {isAuraApproved && <span className="px-2 py-0.5 rounded bg-primary text-caption font-bold text-white uppercase tracking-wider shadow-sm flex items-center gap-0.5">
               <Sparkles className="w-2.5 h-2.5" />{t("aura_pick")}</span>}
         </div>
       </div>
 
       <div className="mt-3 flex flex-col">
-        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">
+        <span className="text-caption font-bold text-text-muted uppercase tracking-wider">
           {listing.type || 'Listing'}
         </span>
         <h4 className="text-sm font-bold text-text-primary mt-1 truncate group-hover:text-primary transition-colors">
           {listing.title}
         </h4>
-        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-50">
-          <span className="text-xs font-semibold text-slate-400">
+        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-border-light">
+          <span className="text-xs font-semibold text-text-muted">
             #{listing.listingNo}
           </span>
           <span className="text-sm font-bold text-status-success font-mono">

@@ -5,7 +5,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { userService } from '../../user/services/userService.js';
 import { ArrowRight, Award, Star, CalendarDays } from 'lucide-react';
 import GreatSellerRulesCallout from './GreatSellerRulesCallout.jsx';
-import { motion } from 'framer-motion';
+import { SkeletonCard } from '../../common/components/ui/Skeleton.jsx';
 const formatDate = dateStr => {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -20,9 +20,9 @@ const HeaderBlock = () => {
     <div className="relative z-10 mb-12">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
         <div className="max-w-2xl">
-          <p className="text-caption font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">{t("community_spotlight")}</p>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-text-muted mb-3">{t("community_spotlight")}</p>
           <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("trust_verified_sellers")}</h2>
-          <p className="text-base text-slate-500 mt-4 font-medium leading-relaxed">{t("high_performance_sellers_recognized_for_")}</p>
+          <p className="text-base text-text-secondary mt-4 font-medium leading-relaxed">{t("high_performance_sellers_recognized_for_")}</p>
         </div>
 
         <Link to={ROUTES.LISTINGS} className="group inline-flex items-center justify-center gap-2 text-sm font-bold text-text-primary hover:text-primary transition-colors">{t("view_all_marketplace_listings")}<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -32,28 +32,19 @@ const HeaderBlock = () => {
   );
 };
 const SellerCard = ({
-  s,
-  idx
+  s
 }) => {
   const {
     t
   } = useTranslation();
   const fullName = `${s.name || ''} ${s.surname || ''}`.trim() || 'Anonymous Seller';
   const initials = `${s.name?.[0] || ''}${s.surname?.[0] || ''}`.toUpperCase() || 'S';
-  return <motion.div initial={{
-    opacity: 0,
-    y: 12
-  }} animate={{
-    opacity: 1,
-    y: 0
-  }} transition={{
-    delay: idx * 0.03
-  }}>
-      <Link to={ROUTES.USER_PROFILE(s.id)} className="group block bg-background-primary border border-slate-100 rounded-2xl p-5 transition-all duration-300 hover:border-border-light hover:shadow-md">
+  return <div>
+      <Link to={ROUTES.USER_PROFILE(s.id)} className="group block bg-background-primary border border-border-light rounded-xl p-5 transition-all duration-300 hover:border-border hover:shadow-md">
         <div className="flex items-start gap-4">
           {/* Avatar - Calm Slate */}
-          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 transition-colors group-hover:bg-slate-100">
-            <span className="text-sm font-bold text-slate-600">{initials}</span>
+          <div className="w-12 h-12 rounded-full bg-background-secondary border border-border-light flex items-center justify-center shrink-0 transition-colors group-hover:bg-background-tertiary">
+            <span className="text-sm font-bold text-text-secondary">{initials}</span>
           </div>
           
           <div className="min-w-0 flex-1">
@@ -65,14 +56,14 @@ const SellerCard = ({
               {/* Rating / Trust Score */}
               <div className="flex items-center gap-1">
                 <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span className="text-caption font-bold text-slate-700">{s.averageRating?.toFixed(1) || '0.0'}</span>
-                <span className="text-caption text-slate-400 font-medium">{t("score")}</span>
+                <span className="text-caption font-bold text-text-secondary">{s.averageRating?.toFixed(1) || '0.0'}</span>
+                <span className="text-caption text-text-muted font-medium">{t("score")}</span>
               </div>
               
-              <div className="w-1 h-1 rounded-full bg-slate-200" />
+              <div className="w-1 h-1 rounded-full bg-border-light" />
               
               {/* Join Date */}
-              <div className="flex items-center gap-1 text-slate-400">
+              <div className="flex items-center gap-1 text-text-muted">
                 <CalendarDays className="w-3 h-3" />
                 <span className="text-caption font-medium">{formatDate(s.createdAt)}</span>
               </div>
@@ -81,15 +72,15 @@ const SellerCard = ({
         </div>
 
         {/* Footer Badge - Subtle */}
-        <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 py-0.5 px-2 bg-indigo-50 rounded-md">
+        <div className="mt-4 pt-3 border-t border-border-light flex items-center justify-between">
+          <div className="flex items-center gap-1.5 py-0.5 px-2 bg-primary-light rounded-md">
             <Award className="w-3 h-3 text-primary" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-primary">{t("great_seller")}</span>
+            <span className="text-caption font-bold uppercase tracking-wider text-primary">{t("great_seller")}</span>
           </div>
-          <ArrowRight className="w-3.5 h-3.5 text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+          <ArrowRight className="w-3.5 h-3.5 text-text-muted opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
         </div>
       </Link>
-    </motion.div>;
+    </div>;
 };
 const GreatSellersSection = () => {
   const {
@@ -105,12 +96,12 @@ const GreatSellersSection = () => {
     queryFn: () => userService.listGreatSellers(limit),
     staleTime: 10 * 60 * 1000
   });
-  return <section className="py-20 bg-[#fafafa] border-y border-slate-100">
+  return <section className="py-20 bg-background-secondary border-y border-border-light">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <HeaderBlock />
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {isLoading ? [...Array(8)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-background-primary border border-slate-100 animate-pulse" />) : error ? <div className="col-span-full py-12 text-center text-slate-400 text-sm italic">{t("unable_to_load_featured_sellers_at_this_")}</div> : !sellers.length ? <div className="col-span-full py-12 text-center text-slate-400 text-sm">{t("new_community_verified_sellers_will_appe")}</div> : sellers.map((s, idx) => <SellerCard key={s.id} s={s} idx={idx} />)}
+          {isLoading ? [...Array(8)].map((_, i) => <SkeletonCard key={i} />) : error ? <div className="col-span-full py-12 text-center text-text-muted text-sm italic">{t("unable_to_load_featured_sellers_at_this_")}</div> : !sellers.length ? <div className="col-span-full py-12 text-center text-text-muted text-sm">{t("new_community_verified_sellers_will_appe")}</div> : sellers.map((s) => <SellerCard key={s.id} s={s} />)}
         </div>
 
         <div className="mt-16">

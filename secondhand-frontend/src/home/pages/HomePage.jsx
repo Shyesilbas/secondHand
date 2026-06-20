@@ -3,7 +3,6 @@ import React, { lazy, Suspense } from 'react';
 import { usePageTheme } from '../../common/theme/usePageTheme.js';
 import { HomePageTheme } from '../themes/index.js';
 const HeroSection = lazy(() => import('../components/HeroSection.jsx'));
-const CategoryHub = lazy(() => import('../components/CategoryHub.jsx'));
 const MarketplaceStatsSection = lazy(() => import('../components/MarketplaceStatsSection.jsx'));
 const ShowcaseSection = lazy(() => import('../components/ShowcaseSection.jsx'));
 const GreatSellersSection = lazy(() => import('../components/GreatSellersSection.jsx'));
@@ -19,7 +18,6 @@ const HomePage = () => {
         <HeroSection />
         <TrustBand />
         <MarketplaceStatsSection />
-        <CategoryHub />
         <ShowcaseSection />
         <GreatSellersSection />
         <TrustExperienceSection />

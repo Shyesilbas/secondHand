@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useListingStatistics } from '../../listing/hooks/useListingStatistics.js';
 import { Layers, Car, Laptop, Building2 } from 'lucide-react';
+import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
 
 const MarketplaceStatsSection = () => {
   const { statistics, isLoading, error } = useListingStatistics();
@@ -26,41 +27,37 @@ const MarketplaceStatsSection = () => {
         value: totalActive.toLocaleString('tr-TR'),
         desc: 'Live items ready for trade',
         icon: Layers,
-        color: 'text-status-success bg-status-success-bg border-emerald-100/50'
+        color: 'text-status-success bg-status-success-bg border-status-success-border'
       },
       {
         label: 'Vehicles',
         value: vehicles.toLocaleString('tr-TR'),
         desc: 'Cars, motorcycles & parts',
         icon: Car,
-        color: 'text-primary bg-blue-50 border-primary/50'
+        color: 'text-primary bg-primary-light border-primary-200'
       },
       {
         label: 'Electronics',
         value: electronics.toLocaleString('tr-TR'),
         desc: 'Laptops, phones & watches',
         icon: Laptop,
-        color: 'text-primary bg-indigo-50 border-primary/50'
+        color: 'text-primary bg-primary-light border-primary-200'
       },
       {
         label: 'Real Estate',
         value: realEstate.toLocaleString('tr-TR'),
         desc: 'Apartments, villas & offices',
         icon: Building2,
-        color: 'text-status-warning bg-status-warning-bg border-amber-100/50'
+        color: 'text-status-warning bg-status-warning-bg border-status-warning-border'
       }
     ];
   }, [statistics]);
 
   if (isLoading) {
     return (
-      <section className="py-8 bg-transparent border-b border-slate-100/40">
+      <section className="py-8 bg-transparent border-b border-border-light">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 rounded-2xl bg-background-primary border border-slate-100/80 animate-pulse" />
-            ))}
-          </div>
+          <SkeletonGrid count={4} columns="grid-cols-2 lg:grid-cols-4" />
         </div>
       </section>
     );
@@ -70,7 +67,7 @@ const MarketplaceStatsSection = () => {
   if (error || !metrics) return null;
 
   return (
-    <section className="py-8 bg-transparent border-b border-slate-100/40">
+    <section className="py-8 bg-transparent border-b border-border-light">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {metrics.map((metric) => {
@@ -78,18 +75,18 @@ const MarketplaceStatsSection = () => {
             return (
               <div
                 key={metric.label}
-                className="bg-background-primary border border-slate-100 rounded-2xl p-5 shadow-sm transition-all hover:border-border-light/80"
+                className="bg-background-primary border border-border-light rounded-xl p-5 shadow-sm transition-all hover:border-border"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>
+                  <div className={`w-9 h-9 rounded-md flex items-center justify-center border ${metric.color}`}>
                     <Icon className="w-4.5 h-4.5 shrink-0" />
                   </div>
                   <div>
-                    <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{metric.label}</span>
+                    <span className="text-caption font-bold text-text-muted uppercase tracking-wider">{metric.label}</span>
                     <h3 className="text-sm font-medium text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
                   </div>
                 </div>
-                <p className="text-caption text-slate-400 font-medium mt-3 border-t border-slate-50 pt-2 leading-relaxed">
+                <p className="text-caption text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
                   {metric.desc}
                 </p>
               </div>

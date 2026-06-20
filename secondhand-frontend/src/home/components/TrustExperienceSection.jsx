@@ -31,24 +31,24 @@ const TrustExperienceSection = () => {
   const {
     t
   } = useTranslation();
-  return <section className="py-16 bg-background-primary border-t border-slate-100">
+  return <section className="py-16 bg-background-primary border-t border-border-light">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="max-w-2xl mb-12">
           <p className="text-caption font-bold uppercase tracking-[0.2em] text-status-success mb-2">{t("built_in_protection")}</p>
           <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("real_product_capabilities_ensuring_safe_")}</h2>
-          <p className="text-slate-500 text-sm mt-3 leading-relaxed font-medium">{t("we_prioritize_real_working_technology_ov")}</p>
+          <p className="text-text-secondary text-sm mt-3 leading-relaxed font-medium">{t("we_prioritize_real_working_technology_ov")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TRUST_FEATURES.map(feat => {
           const Icon = feat.icon;
-          return <div key={feat.title} className="group border border-slate-100 rounded-2xl p-6 bg-slate-50/30 transition-all duration-200 hover:bg-background-primary hover:border-border-light/80 hover:shadow-sm flex flex-col justify-between">
+          return <div key={feat.title} className="group border border-border-light rounded-xl p-6 bg-background-secondary transition-all duration-200 hover:bg-background-primary hover:border-border hover:shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center transition-colors group-hover:bg-status-success-bg group-hover:text-status-success">
+                    <div className="w-10 h-10 rounded-md bg-background-tertiary text-text-secondary flex items-center justify-center transition-colors group-hover:bg-status-success-bg group-hover:text-status-success">
                       <Icon className="w-5 h-5 shrink-0" />
                     </div>
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded border border-slate-100">
+                    <span className="text-caption font-bold uppercase tracking-wider text-text-secondary bg-secondary-light px-2 py-0.5 rounded-md border border-border-light">
                       {feat.badge}
                     </span>
                   </div>
@@ -56,7 +56,7 @@ const TrustExperienceSection = () => {
                   <h3 className="text-sm font-medium text-text-primary tracking-tight mt-4 group- transition-colors">
                     {feat.title}
                   </h3>
-                  <p className="text-body text-slate-500 leading-relaxed mt-2.5 font-medium">
+                  <p className="text-body text-text-secondary leading-relaxed mt-2.5 font-medium">
                     {feat.desc}
                   </p>
                 </div>

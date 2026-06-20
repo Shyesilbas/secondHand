@@ -42,7 +42,7 @@ Bu adımı atlamak yasaktır.
 
 ## 2. Skills
 Skill detayları `.agents/skills/` klasöründe tanımlıdır.
-Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver, code-quality, design-system, frontend-quality, frontend-audit.
+Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver, code-quality-control, frontend-quality, design-system, frontend-audit, **backend-audit**
 
 ## 3. Projects Structure
 

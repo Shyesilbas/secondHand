@@ -21,14 +21,14 @@ const features = [
 
 const TrustBand = () => {
   return (
-    <section className="border-t border-gray-100 bg-secondary-light/50">
+    <section className="border-t border-border-light bg-secondary-light">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
               <div key={feature.title} className="flex items-start gap-3.5">
-                <div className="w-9 h-9 rounded-xl bg-background-primary border border-gray-100 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-md bg-background-primary border border-border-light flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-text-muted" />
                 </div>
                 <div>
