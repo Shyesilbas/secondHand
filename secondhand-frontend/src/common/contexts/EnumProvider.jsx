@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { clearEnumCache, getCachedEnums, setCachedEnums } from '../services/storage/enumCache.js';
+import { useMemo } from 'react';
 import { enumService } from '../services/enumService.js';
 import { GeneralEnumProvider } from './GeneralEnumProvider.jsx';
 import { VehicleEnumProvider } from './VehicleEnumProvider.jsx';
@@ -8,7 +7,6 @@ import { RealEstateEnumProvider } from './RealEstateEnumProvider.jsx';
 import { ClothingEnumProvider } from './ClothingEnumProvider.jsx';
 import { BookEnumProvider } from './BookEnumProvider.jsx';
 import { SportEnumProvider } from './SportEnumProvider.jsx';
-import logger from '../utils/logger.js';
 import { EnumContext } from './EnumContext.jsx';
 
 const initialEnumState = {
@@ -80,35 +78,14 @@ const initialEnumState = {
     },
 };
 
+import { useQuery } from '@tanstack/react-query';
+
 export const EnumProvider = ({ children }) => {
-    const [enums, setEnums] = useState(initialEnumState);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isInitialized, setIsInitialized] = useState(false);
-
-    const fetchAllEnums = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-
-            const cachedEnums = getCachedEnums();
-
-            // Validate cache structure - ensure it's the new nested structure
-            if (cachedEnums && cachedEnums.general && cachedEnums.vehicle) {
-                setEnums(cachedEnums);
-                setIsLoading(false);
-                setIsInitialized(true);
-                return;
-            }
-
-            // If cache is invalid or old flat structure, clear it and fetch fresh
-            if (cachedEnums) {
-                clearEnumCache();
-            }
-
+    const { data: enums = initialEnumState, isLoading, error, refetch: refreshEnums } = useQuery({
+        queryKey: ['enums'],
+        queryFn: async () => {
             const allEnumsData = await enumService.getAllEnums();
-
-            const fetchedEnums = {
+            return {
                 general: {
                     listingTypes: allEnumsData.listingTypes || [],
                     listingStatuses: allEnumsData.listingStatuses || [],
@@ -176,28 +153,11 @@ export const EnumProvider = ({ children }) => {
                     sportConditions: allEnumsData.sportConditions || [],
                 },
             };
-
-            setEnums(fetchedEnums);
-            setCachedEnums(fetchedEnums);
-            setIsInitialized(true);
-        } catch (err) {
-            setError(err.response?.data?.message || 'An error occurred while fetching enums.');
-            logger.error('Error fetching enums:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    const refreshEnums = useCallback(async () => {
-        clearEnumCache();
-        await fetchAllEnums();
-    }, [fetchAllEnums]);
-
-    useEffect(() => {
-        if (!isInitialized) {
-            fetchAllEnums();
-        }
-    }, [isInitialized, fetchAllEnums]);
+        },
+        staleTime: 24 * 60 * 60 * 1000, // 24 hours
+        gcTime: 24 * 60 * 60 * 1000, // 24 hours
+        refetchOnWindowFocus: false,
+    });
 
     const value = useMemo(
         () => ({

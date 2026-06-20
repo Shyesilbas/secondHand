@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Performans, tutarlilik ve davranissal regresyon risklerini azaltmak
 
 ## Agent Note
-
-- Read first: `OfferController` -> `OfferService` -> validation/repository flow.
-- Keep counter-offer, accept, and reject semantics consistent.
-- Update this README when offer state transitions or pricing interaction changes.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Cüzdan bakiye, para yatirma, para cekme ve guvenlik limit akislarinda (spending warning) davranissal riski azaltmak
 
 ## Agent Note
-
-- Read first: `EWalletController` -> service layer -> repository -> mapper.
-- Balance and spending-warning changes are sensitive; keep calculations explicit.
-- Update docs when fields, limits, or transaction semantics change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

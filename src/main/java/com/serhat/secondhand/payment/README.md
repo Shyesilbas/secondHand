@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Idempotency, verification, event ve escrow akislarinda davranissal riski azaltmak
 
 ## Agent Note
-
-- Read first: `PaymentController` -> `PaymentProcessor` -> pre-check -> strategy -> event flow.
-- Treat idempotency, verification, and escrow orchestration as non-negotiable rules.
-- Update this README when payment statuses, strategies, or event handlers change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

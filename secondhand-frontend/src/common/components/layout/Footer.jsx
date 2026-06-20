@@ -102,7 +102,7 @@ const Footer = () => {
                             <li>
                                 <button onClick={() => navigate(ROUTES.FORUM)} className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight text-left">{t("forum_community")}</button>
                             </li>
-                            {['Help Center', 'Contact Us', 'Safety Tips'].map((item, index) => <li key={index}>
+                            {['Help Center', 'Contact Us', 'Safety Tips'].map((item) => <li key={item}>
                                     <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">
                                         {item}
                                     </button>
@@ -160,7 +160,7 @@ const Footer = () => {
                                                 </button>
                                             </li>)}
                                     </ul> : <ul className="space-y-2">
-                                        {['Terms of Service', 'Privacy Policy', 'KVKK'].map((item, index) => <li key={index}>
+                                        {['Terms of Service', 'Privacy Policy', 'KVKK'].map((item) => <li key={item}>
                                                 <button className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight">
                                                     <span className="inline-block">{item}</span>
                                                 </button>

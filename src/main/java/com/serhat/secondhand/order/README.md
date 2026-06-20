@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Durum gecisi, escrow, iptal/iade ve event akislarinda regresyon riskini azaltmak
 
 ## Agent Note
-
-- Read first: `OrderController` -> `OrderCreationService` / `OrderCancellationService` / policy layer.
-- Keep status transitions, payment coupling, and shipping actions explicit.
-- Update this README when order lifecycle, endpoints, or side effects change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

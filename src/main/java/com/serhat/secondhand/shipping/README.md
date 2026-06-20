@@ -3,17 +3,8 @@
 Bu modül, siparişlerin lojistik süreçlerini yönetmekten sorumludur. `order` paketinden ayrıştırılarak bağımsız bir yapı haline getirilmiştir.
 
 ## Agent Note
-
-- Read first: shipping controller/service and its order integration points.
-- Keep carrier mapping, status transitions, and ETA logic simple and explicit.
-- Update this README when the shipping endpoint or status model changes.
-
-## Özellikler
-
-- **Zengin Domain Modeli (Rich Domain Model):** Kargo durum geçişleri, takip URL'i oluşturma ve tahmini teslimat tarihi hesaplama gibi iş mantıkları doğrudan `Shipping` entity'si içindedir.
-- **Kargo Firması Stratejisi:** `Carrier` enum yapısı sayesinde yeni kargo firmaları eklemek oldukça kolaydır (Aras, Yurtiçi, MNG vb.).
-- **Tahmini Teslimat:** Kargo verildiği andan itibaren otomatik olarak (varsayılan 3 gün) tahmini teslimat tarihi hesaplanır.
-- **Dinamik Takip Linkleri:** Kargo firmasına ve takip numarasına göre otomatik takip URL'leri oluşturulur.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## Kullanım
 

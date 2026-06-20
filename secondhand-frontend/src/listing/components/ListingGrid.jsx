@@ -26,7 +26,7 @@ const ListingGrid = memo(({
   }, [showcases]);
   if (isLoading) {
     return <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {[...Array(8)].map((_, index) => <div key={index} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-pulse">
+                {[...Array(8)].map((_, index) => <div key={'skeleton-' + index} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-pulse">
                         <div className="aspect-video bg-slate-200"></div>
                         <div className="p-5">
                             <div className="flex justify-between items-start mb-4">

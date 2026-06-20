@@ -1,5 +1,10 @@
 # Reviews Paketi Teknik Rehber
 
+## Agent Note
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `../../../.agents/PROJECT_REPORT.md` ve `../../../GEMINI.md` dosyalarını oku.
+
+
 Bu doküman `secondhand-frontend/src/reviews` modülünde geliştirme yaparken hızlı karar almanız için yazıldı. Amaç: akışı, sorumluluk sınırlarını ve değişiklik stratejisini tek yerde netleştirmek.
 
 ## AI Çalışma Protokolü

@@ -3,10 +3,8 @@
 Bu paket, vitrin (showcase) satın alma, listeleme, uzatma, iptal ve süresi dolan kayıtların yönetiminden sorumludur.
 
 ## Agent Note
-
-- Read first: `ShowcaseController` -> `ShowcaseService` -> `ShowcaseValidator` -> repository -> mapper.
-- Keep payment verification and ownership checks central.
-- Update this README when pricing, pagination, or expiration behavior changes.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## Amaç ve Sınır
 

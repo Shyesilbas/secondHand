@@ -12,12 +12,13 @@
 
 The platform features an advanced **Escrow payment & E-Wallet** model, **real-time WebSocket STOMP messaging**, **AOP-driven audit logging**, **custom cookie-based OAuth2/JWT session rotation**, and **"Aura"**—a state-of-the-art semantic search and conversational AI assistant powered by Google Gemini.
 
-## Agent Start
+## Agent Start (AI Coding Rules)
 
-For AI agents:
-1. Read [`.artifacts/behaviour.md`](/Users/serhat/IdeaProjects/secondHand/.artifacts/behaviour.md)
-2. Read the relevant backend module `README.md`
-3. Read only the source files involved in the change
+For AI agents (Antigravity, Cursor, etc.):
+1. **MANDATORY**: Start by reading the [`GEMINI.md`](GEMINI.md) file in the root directory. It contains all project rules, context, and the central runbook.
+2. Skill behaviors (Documentation Sync, Domain Editor, Repo Navigator, Token Saver) are explicitly defined under the `.agents/skills/` directory. Use them strictly when needed.
+3. Read the relevant backend module `README.md` for domain-specific business rules.
+4. Read only the source files involved in the change.
 
 Rules of thumb:
 - Keep the diff minimal.

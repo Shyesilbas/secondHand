@@ -15,7 +15,7 @@ const ReviewsList = memo(({
     return <div className="space-y-4">
                 {Array.from({
         length: REVIEW_LIMITS.SKELETON_ROWS
-      }).map((_, index) => <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm animate-pulse">
+      }).map((_, index) => <div key={'skeleton-' + index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm animate-pulse">
                         <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-gray-200 rounded-full"></div>

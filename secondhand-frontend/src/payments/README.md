@@ -1,5 +1,10 @@
 # Payments Frontend
 
+## Agent Note
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `../../../.agents/PROJECT_REPORT.md` ve `../../../GEMINI.md` dosyalarını oku.
+
+
 The payments UI is currently eWallet-only.
 
 - `pages/PaymentMethodsPage.jsx`: wallet balance, limits, top-up and withdrawal.

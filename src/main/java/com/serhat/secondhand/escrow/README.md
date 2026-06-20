@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Alim-satim guvenligi icin uygulanan kritik is kurallarini belgelemek
 
 ## Agent Note
-
-- Read first: `EscrowService` and its payment integrations.
-- Keep hold, release, refund, and cancel rules idempotent.
-- Update this README if payment status coupling or cache invalidation changes.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

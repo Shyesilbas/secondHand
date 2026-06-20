@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Tekrarli review, yetki hatasi, performans ve istatistik regresyon riskini azaltmak
 
 ## Agent Note
-
-- Read first: `ReviewController` -> `ReviewService` -> `ReviewValidator` -> repository/projection -> mapper.
-- Keep delivered-order and duplicate-review rules intact.
-- Update this README when stats, cache keys, or review creation behavior change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 

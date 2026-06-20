@@ -3,10 +3,8 @@
 ##  Paket Yapısı ve Sorumluluklar
 
 ## Agent Note
-
-- Read first: listing controller -> category service -> validator -> repository -> mapper.
-- Treat listing as a high-traffic, high-risk domain with cache and price history side effects.
-- Update this README when category rules, cache behavior, or public endpoints change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ###  `api/` - REST API Katmanı (9 dosya)
 

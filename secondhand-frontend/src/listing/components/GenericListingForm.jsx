@@ -18,6 +18,7 @@ import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.j
 import { ROUTES } from '../../common/constants/routes.js';
 import { PREFLOW_WIZARD_VARIANT } from '../config/prefilterFlowUi.js';
 import { AlertCircle, ImageIcon, MapPin, Package, FileText, CheckCircle2 } from 'lucide-react';
+import { cacheService } from '../../common/services/cacheService.js';
 
 /* ── Small UI Primitives ───────────────────────────────────── */
 
@@ -163,18 +164,15 @@ const GenericListingForm = ({
   const initialDataWithDraft = useMemo(() => {
     if (isEdit) return mergedInitialData;
     try {
-      const draft = localStorage.getItem(draftKey);
-      if (draft) {
-        const parsed = JSON.parse(draft);
-        if (parsed && typeof parsed === 'object') {
-          return {
-            ...mergedInitialData,
-            ...parsed
-          };
-        }
+      const draft = cacheService.get(draftKey);
+      if (draft && typeof draft === 'object') {
+        return {
+          ...mergedInitialData,
+          ...draft
+        };
       }
     } catch (e) {
-      console.error('Failed to parse draft from localStorage', e);
+      console.error('Failed to parse draft from cache', e);
     }
     return mergedInitialData;
   }, [mergedInitialData, isEdit, draftKey]);
@@ -195,8 +193,8 @@ const GenericListingForm = ({
     errorMessage: errorMessage || (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
     onSuccess: response => {
       if (!isEdit) {
-        localStorage.removeItem(draftKey);
-        localStorage.removeItem(`${draftKey}_step`);
+        cacheService.remove(draftKey);
+        cacheService.remove(`${draftKey}_step`);
       }
       if (isEdit || submitIntentRef.current === 'DRAFT') {
         navigate(redirectRoute || ROUTES.MY_LISTINGS);
@@ -223,17 +221,15 @@ const GenericListingForm = ({
     validateCurrentStep
   } = formState;
 
-  // Persist draft to localStorage on change
   useEffect(() => {
     if (!isEdit && formData) {
-      localStorage.setItem(draftKey, JSON.stringify(formData));
+      cacheService.set(draftKey, formData);
     }
   }, [formData, isEdit, draftKey]);
 
-  // Persist currentStep to localStorage on change
   useEffect(() => {
     if (!isEdit && currentStep) {
-      localStorage.setItem(`${draftKey}_step`, String(currentStep));
+      cacheService.set(`${draftKey}_step`, String(currentStep));
     }
   }, [currentStep, isEdit, draftKey]);
 
@@ -241,7 +237,7 @@ const GenericListingForm = ({
   useEffect(() => {
     if (isEdit) return;
     try {
-      const savedStep = localStorage.getItem(`${draftKey}_step`);
+      const savedStep = cacheService.get(`${draftKey}_step`);
       if (savedStep) {
         const parsedStep = parseInt(savedStep, 10);
         if (Number.isInteger(parsedStep) && parsedStep > 1 && parsedStep <= totalSteps) {
@@ -249,7 +245,7 @@ const GenericListingForm = ({
         }
       }
     } catch (e) {
-      console.error('Failed to parse saved step from localStorage', e);
+      console.error('Failed to parse saved step from cache', e);
     }
   }, [goToStep, isEdit, totalSteps, draftKey]);
   const ctx = useMemo(() => {
@@ -290,13 +286,16 @@ const GenericListingForm = ({
         ctx.setValue(d.targetField, nextValue ?? '');
       }
     });
-  }, [ctx, formData, formSchema]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, formSchema]); 
+
   useEffect(() => {
     if (!formSchema?.effects?.length) return;
     formSchema.effects.forEach(fn => {
       if (typeof fn === 'function') fn(ctx);
     });
-  }, [ctx, formSchema]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, formSchema]);
 
   /* ── Field Renderer ────────────────────────────────────── */
 

@@ -6,10 +6,8 @@ Bu dokumanin amaci:
 - Performans, N+1, race condition ve davranissal regressions risklerini azaltmak
 
 ## Agent Note
-
-- Read first: `FavoriteListController` -> `FavoriteListService` -> repositories -> mapper.
-- Keep list/item/like uniqueness and visibility rules centralized.
-- Update this README when limits, projections, or summary queries change.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Amaci ve Sinirlari
 
@@ -199,17 +197,3 @@ Bu pakette otomatik degisiklik yapan ajanlar su sirayi izlemeli:
 5. Summary endpointlerde entity collection uzerinden hesap yapma; projection kullan.
 6. Yazma akislarda unique constraint ihlali icin deterministic hata davranisini koru.
 
-## 11) Degisiklik Oncesi/ Sonrasi Kisa Checklist
-
-Degisiklik oncesi:
-- Hangi endpoint/akis etkilenecek netlestir
-- Query tarafinda N+1 veya cartesian riskini not et
-- DTO backward compatibility etkisini belirle
-
-Degisiklik sonrasi:
-- Compile al
-- Ilgili endpoint response alanlarini manuel dogrula
-- Error code ve status davranisini kontrol et
-- Pagination + summary alanlari tutarliligini kontrol et
-
-Bu rehber korunursa `favoritelist` paketi daha ongorulebilir, performansli ve bakimi kolay kalir.

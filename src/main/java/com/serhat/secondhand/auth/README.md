@@ -5,10 +5,8 @@ Bu dokumanin amaci:
 - Degisikliklerde davranissal regresyon ve guvenlik riskini azaltmak
 
 ## Agent Note
-
-- Read first: `AuthController` -> `AuthService` -> `TokenService` -> repository.
-- Treat refresh rotation, cookie policy, and password reset as security-sensitive.
-- Keep endpoint and token behavior aligned with code; remove stale routes from docs.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paket Amaci ve Sinirlari
 
@@ -220,27 +218,3 @@ Sifre taban yol: `/api/auth/password`
 - Refresh token dogrulamasinda sadece JWT'ye guvenme; DB status kontrolu zorunlu.
 - Auth kodunda magic number/hardcoded hata kodu dagitma.
 
-## 11) AI Ajanlari Icin Hizli Protokol
-
-Bu pakette otomatik degisiklik yapan ajanlar su sirayi izlemeli:
-1. `Controller -> Service -> Repository -> DTO/Exception` akisini oku.
-2. Request/response kontrati degisiyorsa ilgili controller ve DTO'lari birlikte guncelle.
-3. Yeni auth hata durumlarinda `AuthErrorCodes` kullan.
-4. Token status degisikligini `TokenService` uzerinden yonet.
-5. Refresh/login akisi degistiyse cookie ve token rotasyon davranisini birlikte kontrol et.
-6. Bilincli korunmus davranislari (verification code donusu gibi) izinsiz kaldirma.
-
-## 12) Degisiklik Oncesi/Sonrasi Checklist
-
-Degisiklik oncesi:
-- Etkilenen endpoint ve service methodunu netlestir
-- Token persistence veya agreement kuralina etkisini not et
-- Error code standardina etkisini belirle
-
-Degisiklik sonrasi:
-- Derleme/lint durumunu kontrol et
-- Login/refresh/logout akisini davranissal test et
-- Password reset akisinda code + confirm password senaryosunu test et
-- Register akisinda zorunlu agreement eksigi senaryosunu test et
-
-Bu rehber korunursa `auth` paketi daha ongorulebilir, bakimi kolay ve regresyona daha direncli kalir.

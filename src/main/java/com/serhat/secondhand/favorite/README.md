@@ -5,10 +5,8 @@
 - Davranis, performans ve yan etki risklerini azaltmak
 
 ## Agent Note
-
-- Read first: `FavoriteController` -> `FavoriteService` -> `FavoriteStatsService` -> repositories.
-- Preserve cache eviction and uniqueness rules.
-- Update this README if stats, cache keys, or notification behavior changes.
+> [!IMPORTANT]
+> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
 
 ## 1) Paketin Sorumlulugu
 
@@ -203,10 +201,3 @@ Bu paket uzerinde otomatik degisiklik yapacak ajanlar:
 - Yeni config ihtiyaclari `FavoriteApiConfig` altina alinmali
 - Yan etki (notification gibi) islemlerinde fail-safe davranis korunmali
 
-## 11) Bilinen Gelistirme Firsatlari
-
-- `FavoriteStatsService` cache key stabil hale getirilebilir (siradan bagimsiz key).
-- `FavoriteRepository.countByListingIds` typed projection'a tasinarak `Object[]` bagimliligi azaltilabilir.
-- Favori liste endpointlerinde metrik/telemetry arttirilabilir (P95, cache hit-rate).
-
-Bu rehberdeki prensipler korunursa, favorite paketi daha ongorulebilir, performansli ve bakimi kolay kalir.

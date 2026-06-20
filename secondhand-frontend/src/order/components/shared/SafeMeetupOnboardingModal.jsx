@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, ShieldCheck, QrCode, Wallet, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { cacheService } from '../../../common/services/cacheService';
 const ONBOARDING_STEPS = [{
   id: 1,
   title: "Elden Güvenli Alışveriş",
@@ -40,7 +41,7 @@ export const SafeMeetupOnboardingModal = () => {
   const [countdown, setCountdown] = useState(5);
   useEffect(() => {
     // Check if user already completed the onboarding walkthrough
-    const hasShown = localStorage.getItem('safe_meetup_onboarding_shown');
+    const hasShown = cacheService.get('safe_meetup_onboarding_shown');
     if (hasShown !== 'true') {
       setIsOpen(true);
     }
@@ -72,7 +73,7 @@ export const SafeMeetupOnboardingModal = () => {
   }, [isOpen]);
   const handleClose = () => {
     if (!showClose) return;
-    localStorage.setItem('safe_meetup_onboarding_shown', 'true');
+    cacheService.set('safe_meetup_onboarding_shown', 'true');
     setIsOpen(false);
   };
   const handleNext = () => {

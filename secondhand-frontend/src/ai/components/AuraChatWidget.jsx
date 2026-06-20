@@ -11,6 +11,7 @@ import { createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js
 import { buildAuraWidgetUiContext } from '../utils/auraWidgetContext.js';
 import AuraSuggestedPrompts from './AuraSuggestedPrompts.jsx';
 import AuraSuggestedListingChips from './AuraSuggestedListingChips.jsx';
+import { cacheService } from '../../common/services/cacheService.js';
 const AuraChatWidget = () => {
   const {
     t
@@ -76,7 +77,7 @@ const AuraChatWidget = () => {
     queueMicrotask(scrollToBottom);
   }, [isOpen, messages.length, scrollToBottom]);
   const ensureGreeting = useCallback(async () => {
-    const started = localStorage.getItem(storageKey) === '1';
+    const started = cacheService.get(storageKey) === '1';
     if (started) return;
     if (!isAuthenticated || userId == null) {
       setMessages(prev => [...prev, {
@@ -85,7 +86,7 @@ const AuraChatWidget = () => {
         content: "Hi, I'm Aura. You need to log in to chat; with your account, I can offer personalized recommendations.",
         createdAt: Date.now()
       }]);
-      localStorage.setItem(storageKey, '1');
+      cacheService.set(storageKey, '1');
       return;
     }
     setIsGreeting(true);
@@ -105,7 +106,7 @@ const AuraChatWidget = () => {
           content: answer
         })]);
       }
-      localStorage.setItem(storageKey, '1');
+      cacheService.set(storageKey, '1');
     } catch (e) {
       const errorMessage = getApiErrorMessage(e, 'Could not start chat. Please try again in a moment.');
       setMessages(prev => [...prev, {

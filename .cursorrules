@@ -1,0 +1,8 @@
+# secondHand Project Rules
+MANDATORY INSTRUCTION: All agent and project rules have been centralized. 
+You MUST read `GEMINI.md` located in the root directory before doing any work!
+
+Read Order:
+1. `GEMINI.md`
+2. `.agents/CONTEXT.md`
+3. `.agents/PROJECT_REPORT.md`

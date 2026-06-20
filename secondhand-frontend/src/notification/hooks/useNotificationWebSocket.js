@@ -92,8 +92,14 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
             broadcastSubscription.current = null;
         }
 
-        if (stompClient.current?.connected) {
-            stompClient.current.disconnect();
+        if (stompClient.current) {
+            try {
+                stompClient.current.deactivate();
+            } catch(e) {
+                if (stompClient.current.connected) {
+                    stompClient.current.disconnect();
+                }
+            }
         }
     }, []);
 

@@ -7,15 +7,14 @@ import {
   getAuraChatMessagesStorageKey,
   getAuraChatStorageKey,
 } from '../utils/auraChatUtils.js';
+import { cacheService } from '../../common/services/cacheService.js';
 
 const MAX_PERSISTED_MESSAGES = 80;
 
 function loadPersistedMessages(persistSurface, userId) {
   if (!persistSurface || userId == null) return null;
   try {
-    const raw = localStorage.getItem(getAuraChatMessagesStorageKey(userId, persistSurface));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
+    const parsed = cacheService.get(getAuraChatMessagesStorageKey(userId, persistSurface));
     if (!Array.isArray(parsed) || parsed.length === 0) return null;
     return parsed.filter((m) => m && !m.typing).slice(-MAX_PERSISTED_MESSAGES);
   } catch {
@@ -65,9 +64,9 @@ export const useAuraChat = ({
     if (persistFlushRef.current === 1) return;
     const toSave = messages.filter((m) => !m.typing).slice(-MAX_PERSISTED_MESSAGES);
     try {
-      localStorage.setItem(
+      cacheService.set(
         getAuraChatMessagesStorageKey(userId, persistMessagesSurface),
-        JSON.stringify(toSave)
+        toSave
       );
     } catch {
       /* quota */

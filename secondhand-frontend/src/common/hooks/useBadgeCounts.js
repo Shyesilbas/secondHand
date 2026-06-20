@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { userBadgesService } from '../../user/services/userBadgesService.js';
 
+import { cacheService } from '../services/cacheService.js';
+
 const getStoredCartCount = () => {
-  const raw = Number(localStorage.getItem('cartCount'));
+  const raw = Number(cacheService.get('cartCount'));
   return Number.isFinite(raw) && raw >= 0 ? raw : 0;
 };
 

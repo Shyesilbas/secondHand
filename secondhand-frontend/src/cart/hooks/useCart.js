@@ -3,6 +3,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {cartService} from '../services/cartService.js';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useNotification} from '../../notification/NotificationContext.jsx';
+import {cacheService} from '../../common/services/cacheService.js';
 
 export const useCart = (options = {}) => {
     const { user } = useAuthState();
@@ -14,7 +15,7 @@ export const useCart = (options = {}) => {
 
     const syncCartCount = (nextCount) => {
         const safeCount = Math.max(0, Number(nextCount) || 0);
-        localStorage.setItem('cartCount', safeCount.toString());
+        cacheService.set('cartCount', safeCount.toString());
         window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: safeCount }));
     };
 
@@ -52,7 +53,7 @@ export const useCart = (options = {}) => {
     };
 
     const getStoredCartCount = () => {
-        const raw = Number(localStorage.getItem('cartCount'));
+        const raw = Number(cacheService.get('cartCount'));
         return Number.isFinite(raw) && raw >= 0 ? raw : 0;
     };
 

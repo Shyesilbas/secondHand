@@ -98,8 +98,13 @@ const useWebSocket = (userId) => {
             });
             subscriptions.current.clear();
             
-            if (stompClient.current.connected) {
-                stompClient.current.disconnect();
+            // Use deactivate() to ensure cleanup even if still in 'connecting' state
+            try {
+                stompClient.current.deactivate();
+            } catch (e) {
+                if (stompClient.current.connected) {
+                    stompClient.current.disconnect();
+                }
             }
             setIsConnected(false);
         }
