@@ -111,7 +111,7 @@ const AddToListModal = ({
               const isInList = containingListIds.includes(list.id);
               const isProcessing = (addMutation.isPending || removeMutation.isPending) && (addMutation.variables?.listId === list.id || removeMutation.variables?.listId === list.id);
               return <button type="button" key={list.id} onClick={() => handleToggleList(list.id)} disabled={isProcessing} className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all group ${isInList ? 'border-primary bg-indigo-50 shadow-sm' : 'border-border-light hover:border-primary hover:bg-secondary'} ${isProcessing ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}>
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isInList ? 'bg-indigo-500 shadow-md' : 'bg-tertiary group-hover:bg-indigo-100'}`}>
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isInList ? 'bg-primary shadow-md' : 'bg-tertiary group-hover:bg-primary-50'}`}>
                                                 {isProcessing ? <Loader2 className={`w-6 h-6 animate-spin ${isInList ? 'text-white' : 'text-primary'}`} /> : isInList ? <Check className="w-6 h-6 text-white" strokeWidth={3} /> : <Plus className="w-6 h-6 text-text-muted group-hover:text-primary transition-colors" />}
                                             </div>
                                             <div className="flex-1 text-left min-w-0">

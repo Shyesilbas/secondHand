@@ -10,10 +10,10 @@ const STATUS_CONFIG = {
   },
   CONFIRMED: {
     label: 'Confirmed',
-    color: 'bg-blue-500',
+    color: 'bg-primary',
     light: 'bg-blue-50',
-    text: 'text-blue-700',
-    dot: 'bg-blue-400'
+    text: 'text-primary',
+    dot: 'bg-primary'
   },
   PROCESSING: {
     label: 'Processing',
@@ -40,7 +40,7 @@ const STATUS_CONFIG = {
     label: 'Completed',
     color: 'bg-status-success-bg',
     light: 'bg-status-success-bg',
-    text: 'text-green-700',
+    text: 'text-status-success-text',
     dot: 'bg-status-success-bg'
   },
   CANCELLED: {

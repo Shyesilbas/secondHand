@@ -49,7 +49,7 @@ const TopListingsTable = ({
                 <span className="text-caption font-bold">{listing.orderCount}</span>
               </div>
               <div className="flex items-center gap-1 text-slate-500" title={t("favorites")}>
-                <Heart className="w-3 h-3 text-pink-400" />
+                <Heart className="w-3 h-3 text-primary-50" />
                 <span className="text-caption font-bold">{listing.favoriteCount}</span>
               </div>
               <div className="flex items-center gap-1 text-slate-500" title={t("rating")}>

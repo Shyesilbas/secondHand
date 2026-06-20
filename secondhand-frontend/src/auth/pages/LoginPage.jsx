@@ -78,20 +78,20 @@ const LoginPage = () => {
   return <div className="flex flex-col gap-1 w-full">
             {/* Logo Monogram */}
             <div className="flex items-center gap-2 mb-8">
-                <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
-                    <span className="text-amber-400 text-xs font-semibold leading-none">{t("s")}</span>
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
+                    <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
                 </div>
-                <span className="text-sm font-semibold text-stone-900 tracking-tight">{t("secondhand")}</span>
+                <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
             </div>
 
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("welcome_back")}</h1>
-                <p className="mt-2 text-sm text-stone-500 font-normal">{t("sign_in_to_continue_to_your_curated_spac")}</p>
+                <p className="mt-2 text-sm text-text-secondary font-normal">{t("sign_in_to_continue_to_your_curated_spac")}</p>
             </div>
 
             {/* Success message from redirect */}
-            {successMessage && <div className="mb-6 p-4 rounded-xl bg-status-success-bg/50 border border-emerald-100 text-xs text-emerald-700 leading-normal flex items-start gap-2 animate-fade-in">
+            {successMessage && <div className="mb-6 p-4 rounded-xl bg-status-success-bg border border-status-success/30 text-xs text-status-success leading-normal flex items-start gap-2 animate-fade-in">
                     <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -101,17 +101,17 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <AuthInput label={t("email_address")} type="email" name="email" value={formData.email} onChange={handleChange} placeholder={t("name_example_com")} required error={errors.email} leftIcon={<EnvelopeIcon className="h-4 w-4" />} autoComplete="email" />
 
-                <AuthInput label={t("password")} type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required error={errors.password} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-stone-400 hover:text-stone-700 transition-colors" onClick={() => setShowPassword(!showPassword)}>
+                <AuthInput label={t("password")} type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required error={errors.password} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-text-muted hover:text-text-primary transition-colors" onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
                         </button>} autoComplete="current-password" />
 
                 {/* Remember me & Forgot */}
                 <div className="flex items-center justify-between mt-1 mb-2">
                     <label className="flex items-center gap-2.5 cursor-pointer select-none group">
-                        <input id="remember-me" name="rememberMe" type="checkbox" checked={formData.rememberMe} onChange={handleChange} className="h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900/5 focus:ring-offset-0 transition-all" />
-                        <span className="text-xs text-stone-500 group-hover:text-stone-850 transition-colors">{t("remember_me")}</span>
+                        <input id="remember-me" name="rememberMe" type="checkbox" checked={formData.rememberMe} onChange={handleChange} className="h-4 w-4 rounded border-border-DEFAULT text-primary focus:ring-primary/20 focus:ring-offset-0 transition-all" />
+                        <span className="text-xs text-text-secondary group-hover:text-text-primary transition-colors">{t("remember_me")}</span>
                     </label>
-                    <Link to={ROUTES.FORGOT_PASSWORD} className="text-xs font-normal text-stone-500 hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-200 hover:decoration-stone-900">{t("forgot_password")}</Link>
+                    <Link to={ROUTES.FORGOT_PASSWORD} className="text-xs font-normal text-text-muted hover:text-text-primary transition-colors underline underline-offset-4 decoration-border-DEFAULT hover:decoration-text-primary">{t("forgot_password")}</Link>
                 </div>
 
                 {/* Submit */}
@@ -119,13 +119,13 @@ const LoginPage = () => {
 
                 {/* Silent Divider */}
                 <div className="relative flex items-center my-2">
-                    <div className="flex-1 border-t border-stone-200/50"></div>
-                    <span className="px-3 text-caption tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
-                    <div className="flex-1 border-t border-stone-200/50"></div>
+                    <div className="flex-1 border-t border-border-light"></div>
+                    <span className="px-3 text-caption tracking-widest text-text-muted uppercase font-medium">{t("or_continue_with")}</span>
+                    <div className="flex-1 border-t border-border-light"></div>
                 </div>
 
                 {/* Google SSO */}
-                <a href={`${API_BASE_URL}/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3 border border-stone-200 hover:border-stone-300 rounded-xl bg-background-primary text-sm font-medium text-stone-700 hover:bg-stone-50 active:scale-[0.985] transition-all duration-300">
+                <a href={`${API_BASE_URL}/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3 border border-border-light hover:border-border-DEFAULT rounded-xl bg-background-primary text-sm font-medium text-text-secondary hover:bg-background-secondary active:scale-[0.985] transition-all duration-300">
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                         <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4" />
                         <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853" />
@@ -134,8 +134,8 @@ const LoginPage = () => {
                     </svg>{t("continue_with_google")}</a>
 
                 {/* Switch link */}
-                <p className="text-center text-xs text-stone-500 mt-4">{t("don_t_have_an_account")}{' '}
-                    <Link to={ROUTES.REGISTER} className="font-semibold text-stone-900 hover:underline underline-offset-4 transition-colors">{t("create_one")}</Link>
+                <p className="text-center text-xs text-text-secondary mt-4">{t("don_t_have_an_account")}{' '}
+                    <Link to={ROUTES.REGISTER} className="font-semibold text-text-primary hover:text-primary hover:underline underline-offset-4 transition-colors">{t("create_one")}</Link>
                 </p>
             </form>
         </div>;

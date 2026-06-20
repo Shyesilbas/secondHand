@@ -68,14 +68,14 @@ export const RegisterForm = ({
             {/* Header / Stepper Progress */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">
-                    <span className="text-caption font-semibold tracking-[0.2em] text-stone-400 uppercase">{t("step")}{step}{t("of_2")}</span>
+                    <span className="text-caption font-semibold tracking-widest text-text-muted uppercase">{t("step")}{step}{t("of_2")}</span>
                     <div className="flex gap-1.5 items-center flex-1 max-w-[100px]">
-                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-stone-900' : 'bg-stone-200'}`} />
-                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-stone-900' : 'bg-stone-200'}`} />
+                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-primary' : 'bg-border-light'}`} />
+                        <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary' : 'bg-border-light'}`} />
                     </div>
                 </div>
                 <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("create_account")}</h1>
-                <p className="mt-2.5 text-sm text-stone-500 font-normal leading-relaxed">
+                <p className="mt-2.5 text-sm text-text-secondary font-normal leading-relaxed">
                     {step === 1 ? 'Set up your credentials and secure your digital space.' : 'Tell us a bit about yourself to complete registration.'}
                 </p>
             </div>
@@ -87,10 +87,10 @@ export const RegisterForm = ({
                         <AuthInput label={t("phone_number")} type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={t("90_5xx_xxx_xx_xx")} required error={errors.phone} leftIcon={<PhoneIcon className="h-4 w-4" />} autoComplete="tel" />
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <AuthInput label={t("password")} type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required error={errors.password} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-stone-400 hover:text-stone-700 transition-colors" onClick={() => setShowPassword(!showPassword)}>
+                            <AuthInput label={t("password")} type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required error={errors.password} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-text-muted hover:text-text-primary transition-colors" onClick={() => setShowPassword(!showPassword)}>
                                         {showPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
                                     </button>} />
-                            <AuthInput label={t("confirm_password")} type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" required error={errors.confirmPassword} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-stone-400 hover:text-stone-700 transition-colors" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                            <AuthInput label={t("confirm_password")} type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" required error={errors.confirmPassword} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-text-muted hover:text-text-primary transition-colors" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                                         {showConfirmPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
                                     </button>} />
                         </div>
@@ -110,9 +110,9 @@ export const RegisterForm = ({
 
                         {/* Gender selection full width */}
                         <div className="flex flex-col gap-2.5">
-                            <label className="block text-caption font-semibold tracking-[0.12em] uppercase text-stone-500">{t("gender")}<span className="text-red-400 font-normal">*</span>
+                            <label className="block text-caption font-semibold tracking-widest uppercase text-text-secondary">{t("gender")}<span className="text-status-error font-normal">*</span>
                             </label>
-                            {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-stone-200/50 rounded-xl bg-stone-50/30">
+                            {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-border-light rounded-xl bg-background-secondary">
                                     <LoadingIndicator size="h-4 w-4" />
                                 </div> : <div className="flex gap-2.5">
                                     {genderOptions.map(g => <button key={g.value} type="button" onClick={() => handleChange({
@@ -120,23 +120,23 @@ export const RegisterForm = ({
                 name: 'gender',
                 value: g.value
               }
-            })} className={`flex-1 py-3 px-5 rounded-xl border text-caption font-semibold tracking-wider uppercase transition-all duration-300 ${formData.gender === g.value ? 'border-stone-900 bg-stone-900 text-white shadow-sm' : 'border-stone-200 bg-stone-100/40 text-stone-500 hover:bg-stone-200/50 hover:text-stone-700'}`}>
+            })} className={`flex-1 py-3 px-5 rounded-xl border text-caption font-semibold tracking-wider uppercase transition-all duration-300 ${formData.gender === g.value ? 'border-primary bg-primary text-primary-content shadow-sm' : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}>
                                             {g.label}
                                         </button>)}
                                 </div>}
-                            {errors.gender && <p className="text-xs text-rose-600 mt-1">{errors.gender}</p>}
+                            {errors.gender && <p className="text-xs text-status-error mt-1">{errors.gender}</p>}
                         </div>
 
                         {/* Agreements */}
-                        {agreementsLoading && <div className="flex items-center gap-2.5 py-3 text-xs text-stone-500">
+                        {agreementsLoading && <div className="flex items-center gap-2.5 py-3 text-xs text-text-secondary">
                                 <LoadingIndicator size="h-3.5 w-3.5" />
                                 <span>{t("loading_legal_agreements")}</span>
                             </div>}
-                        {!agreementsLoading && <div className="rounded-xl border border-stone-200/50 bg-[#faf9f7]/50 p-5">
+                        {!agreementsLoading && <div className="rounded-xl border border-border-light bg-background-secondary p-5">
                                 <AgreementsSection agreements={agreements} acceptedAgreements={acceptedAgreements} onToggle={onToggleAgreement} onRead={onReadAgreement} error={errors.agreements} />
                             </div>}
 
-                        {errors.submit && <div className="rounded-xl bg-rose-50/50 border border-rose-100 p-4 text-xs text-rose-600">
+                        {errors.submit && <div className="rounded-xl bg-status-error-bg border border-status-error-border p-4 text-xs text-status-error">
                                 {errors.submit}
                             </div>}
 
@@ -149,13 +149,13 @@ export const RegisterForm = ({
 
                 {/* Silent Divider */}
                 <div className="relative flex items-center my-3">
-                    <div className="flex-1 border-t border-stone-200/50"></div>
-                    <span className="px-3 text-caption tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
-                    <div className="flex-1 border-t border-stone-200/50"></div>
+                    <div className="flex-1 border-t border-border-light"></div>
+                    <span className="px-3 text-caption tracking-widest text-text-muted uppercase font-medium">{t("or_continue_with")}</span>
+                    <div className="flex-1 border-t border-border-light"></div>
                 </div>
 
                 {/* Google SSO */}
-                <a href={`${API_BASE_URL}/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-stone-200 hover:border-stone-300 rounded-xl bg-background-primary text-sm font-medium text-stone-700 hover:bg-stone-50 active:scale-[0.985] transition-all duration-300">
+                <a href={`${API_BASE_URL}/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-border-light hover:border-border-DEFAULT rounded-xl bg-background-primary text-sm font-medium text-text-secondary hover:bg-background-secondary active:scale-[0.985] transition-all duration-300">
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                         <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4" />
                         <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853" />
@@ -164,8 +164,8 @@ export const RegisterForm = ({
                     </svg>{t("continue_with_google")}</a>
 
                 {/* Sign in link */}
-                <p className="text-center text-xs text-stone-500 mt-4">{t("already_have_an_account")}{' '}
-                    <Link to={ROUTES.LOGIN} className="font-semibold text-stone-900 hover:underline underline-offset-4 transition-colors">{t("sign_in")}</Link>
+                <p className="text-center text-xs text-text-secondary mt-4">{t("already_have_an_account")}{' '}
+                    <Link to={ROUTES.LOGIN} className="font-semibold text-text-primary hover:text-primary hover:underline underline-offset-4 transition-colors">{t("sign_in")}</Link>
                 </p>
             </form>
         </div>;

@@ -91,7 +91,7 @@ const OtpDigitInputGroup = ({
                 disabled ? 'opacity-50 cursor-not-allowed border border-slate-100 bg-slate-50 text-slate-400' :
                 hasValue
                   ? 'border-primary bg-primary text-white border'
-                  : 'border border-border-light bg-background-primary text-text-primary focus:border-primary focus:ring-4 focus:ring-indigo-100'
+                  : 'border border-border-light bg-background-primary text-text-primary focus:border-primary focus:ring-4 focus:ring-primary-200'
               }`}
               maxLength={1}
               data-otp-slot={`${dataSlotPrefix}-${index}`}

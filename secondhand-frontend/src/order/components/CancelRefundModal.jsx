@@ -87,13 +87,13 @@ const CancelRefundModal = ({
           {order.orderItems && order.orderItems.length > 0 && <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-slate-700">{t("select_items")}{selectedItems.length}{t("of")}{order.orderItems.length}{t("selected")}</label>
-                {order.orderItems.length > 1 && <button type="button" onClick={handleSelectAll} className="text-xs font-medium text-primary hover:text-blue-700">
+                {order.orderItems.length > 1 && <button type="button" onClick={handleSelectAll} className="text-xs font-medium text-primary hover:text-primary">
                     {allItemsSelected ? 'Deselect All' : 'Select All'}
                   </button>}
               </div>
               <div className="border border-border-light rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
                 {order.orderItems.map(item => <label key={item.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded cursor-pointer">
-                    <input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemToggle(item.id)} className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-blue-500" />
+                    <input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemToggle(item.id)} className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-text-primary">
                         {item.listing?.title || item.listing?.listingNo}
@@ -108,7 +108,7 @@ const CancelRefundModal = ({
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">{t("reason")}<span className="text-status-error">*</span>
             </label>
-            <select value={reason} onChange={e => setReason(e.target.value)} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-primary text-sm" required>
+            <select value={reason} onChange={e => setReason(e.target.value)} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm" required>
               <option value="">{t("select_a_reason")}</option>
               {Object.entries(CANCEL_REFUND_REASON_LABELS).map(([value, label]) => <option key={value} value={value}>
                   {label}
@@ -118,16 +118,16 @@ const CancelRefundModal = ({
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">{t("additional_details_optional")}</label>
-            <textarea value={reasonText} onChange={e => setReasonText(e.target.value)} rows={4} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-primary text-sm resize-none" placeholder={t("please_provide_more_details_about_your_r")} />
+            <textarea value={reasonText} onChange={e => setReasonText(e.target.value)} rows={4} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm resize-none" placeholder={t("please_provide_more_details_about_your_r")} />
           </div>
 
-          {error && <div className="bg-status-error-bg border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-700">{error}</p>
+          {error && <div className="bg-status-error-bg border border-status-error-border rounded-lg p-3">
+              <p className="text-sm text-status-error-text">{error}</p>
             </div>}
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-light">
             <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-text-primary hover:bg-slate-100 rounded-lg transition-colors" disabled={isSubmitting}>{t("cancel")}</button>
-            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={isSubmitting || !reason}>
+            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={isSubmitting || !reason}>
               {isSubmitting ? 'Processing...' : submitLabel}
             </button>
           </div>

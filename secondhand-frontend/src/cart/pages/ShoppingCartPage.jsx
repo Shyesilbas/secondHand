@@ -285,13 +285,13 @@ const ShoppingCartPage = () => {
 
               {/* Applied Bundles (Success) */}
               {bundleInfo.applied.length > 0 && <div className="mb-6 space-y-3">
-                  {bundleInfo.applied.map((a, idx) => <div key={idx} className="flex items-center gap-4 p-4 bg-status-success-bg border border-green-100 rounded-2xl animate-in slide-in-from-top-4 duration-500">
+                  {bundleInfo.applied.map((a, idx) => <div key={idx} className="flex items-center gap-4 p-4 bg-status-success-bg border border-status-success-border rounded-2xl animate-in slide-in-from-top-4 duration-500">
                       <div className="w-10 h-10 bg-status-success-bg text-white rounded-xl flex items-center justify-center shrink-0">
                         <Check className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-green-900">{t("bundle_unlocked")}</p>
-                        <p className="text-xs text-green-700 mt-0.5">{t("you_ve_earned_a")}<b>{a.discountValue}{a.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</b>{t("from")}<button onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))} className="font-bold underline hover:text-green-800 transition-colors">{a.sellerName}</button>{t("for_buying")}{a.quantity}{t("items")}</p>
+                        <p className="text-sm font-semibold text-status-success-text">{t("bundle_unlocked")}</p>
+                        <p className="text-xs text-status-success-text mt-0.5">{t("you_ve_earned_a")}<b>{a.discountValue}{a.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</b>{t("from")}<button onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))} className="font-bold underline hover:text-status-success-text transition-colors">{a.sellerName}</button>{t("for_buying")}{a.quantity}{t("items")}</p>
                       </div>
                     </div>)}
                 </div>}
@@ -307,7 +307,7 @@ const ShoppingCartPage = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-primary">
+                              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-50 text-primary">
                                 <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -316,7 +316,7 @@ const ShoppingCartPage = () => {
                               </h4>
                             </div>
                             
-                            <p className="text-xs text-text-secondary mb-4">{t("add")}<span className="font-bold text-primary">{s.remaining}{t("more_item")}{s.remaining > 1 ? 's' : ''}</span>{t("to_unlock_a")}<span className="px-1.5 py-0.5 rounded bg-status-success-bg text-green-700 font-bold">{s.discountValue}{s.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</span>{t("on_your_entire_bundle")}</p>
+                            <p className="text-xs text-text-secondary mb-4">{t("add")}<span className="font-bold text-primary">{s.remaining}{t("more_item")}{s.remaining > 1 ? 's' : ''}</span>{t("to_unlock_a")}<span className="px-1.5 py-0.5 rounded bg-status-success-bg text-status-success-text font-bold">{s.discountValue}{s.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</span>{t("on_your_entire_bundle")}</p>
                             
                             <div className="relative w-full h-2 bg-[#f0efed] rounded-full overflow-hidden">
                               <div className="absolute top-0 left-0 h-full bg-primary transition-all duration-1000 ease-out" style={{

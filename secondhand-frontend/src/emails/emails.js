@@ -47,18 +47,18 @@ export const EMAIL_TYPE_LABELS = {
 };
 
 export const EMAIL_TYPE_BADGE_COLORS = {
-    [EMAIL_TYPES.VERIFICATION_CODE]: 'bg-blue-100 text-blue-800',
-    [EMAIL_TYPES.PASSWORD_RESET]: 'bg-orange-100 text-orange-800',
-    [EMAIL_TYPES.WELCOME]: 'bg-status-success-bg text-green-800',
-    [EMAIL_TYPES.NOTIFICATION]: 'bg-purple-100 text-purple-800',
+    [EMAIL_TYPES.VERIFICATION_CODE]: 'bg-primary-50 text-primary',
+    [EMAIL_TYPES.PASSWORD_RESET]: 'bg-status-warning-bg text-status-warning-text',
+    [EMAIL_TYPES.WELCOME]: 'bg-status-success-bg text-status-success-text',
+    [EMAIL_TYPES.NOTIFICATION]: 'bg-primary-50 text-primary',
     [EMAIL_TYPES.OFFER_RECEIVED]: 'bg-status-success-bg text-emerald-800',
     [EMAIL_TYPES.OFFER_COUNTER_RECEIVED]: 'bg-status-success-bg text-emerald-800',
     [EMAIL_TYPES.OFFER_ACCEPTED]: 'bg-status-success-bg text-emerald-800',
     [EMAIL_TYPES.OFFER_REJECTED]: 'bg-rose-100 text-rose-800',
     [EMAIL_TYPES.OFFER_EXPIRED]: 'bg-tertiary text-gray-800',
-    [EMAIL_TYPES.OFFER_COMPLETED]: 'bg-indigo-100 text-primary',
-    [EMAIL_TYPES.PROMOTIONAL]: 'bg-pink-100 text-pink-800',
-    [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-status-error-bg text-red-800',
+    [EMAIL_TYPES.OFFER_COMPLETED]: 'bg-primary-50 text-primary',
+    [EMAIL_TYPES.PROMOTIONAL]: 'bg-primary-50 text-primary',
+    [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-status-error-bg text-status-error-text',
     [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-status-warning-bg text-amber-900',
     [EMAIL_TYPES.SYSTEM]: 'bg-tertiary text-gray-800'
 };

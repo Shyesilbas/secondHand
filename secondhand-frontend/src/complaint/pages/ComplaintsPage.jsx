@@ -21,7 +21,7 @@ const ComplaintsPage = () => {
             <div className="sticky top-0 z-20 border-b border-border-light/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
                 <PageContainer className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
-                        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-sm ring-1 ring-indigo-500/40">
+                        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-sm ring-1 ring-primary/40">
                             <div className="absolute inset-px rounded-2xl bg-background-primary/60 backdrop-blur-md" />
                             <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-slate-900 text-white">
                                 <ShieldAlert className="h-5 w-5" />
@@ -36,7 +36,7 @@ const ComplaintsPage = () => {
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
                         <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-indigo-50/80 px-3 py-1 text-xs font-medium tracking-tight text-primary">
-                            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-sm animate-pulse" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-sm animate-pulse" />
                             <span>
                                 {complaints?.length || 0}{t("complaint")}{complaints?.length !== 1 ? 's' : ''}
                             </span>

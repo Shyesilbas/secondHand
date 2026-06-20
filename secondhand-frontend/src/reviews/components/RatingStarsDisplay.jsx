@@ -15,7 +15,7 @@ export function RatingStarsDisplay({ value, iconClassName = 'w-4 h-4', mode = 'r
       {Array.from({ length: REVIEW_LIMITS.MAX_RATING }, (_, i) => (
         <StarIcon
           key={i}
-          className={`${iconClassName} ${i < filled ? 'text-yellow-400' : 'text-gray-300'}`}
+          className={`${iconClassName} ${i < filled ? 'text-status-warning-text' : 'text-gray-300'}`}
         />
       ))}
     </>

@@ -216,8 +216,8 @@ const PriceHistoryTab = ({
           const isUp = hasPct ? pctValue > 0 : false;
           const isDown = hasPct ? pctValue < 0 : false;
           const entryCurrency = getHistoryCurrency(entry, currencyCode) || currencyCode;
-          const badgeClass = isUp ? 'bg-status-error-bg text-red-700 border-red-100' : isDown ? 'bg-status-success-bg text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-border-light';
-          const dotClass = isUp ? 'bg-status-error-bg' : isDown ? 'bg-status-success-bg' : 'bg-indigo-500';
+          const badgeClass = isUp ? 'bg-status-error-bg text-status-error-text border-status-error-border' : isDown ? 'bg-status-success-bg text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-border-light';
+          const dotClass = isUp ? 'bg-status-error-bg' : isDown ? 'bg-status-success-bg' : 'bg-primary';
           return <div key={entry.id ?? idx} className="px-5 py-4 hover:bg-slate-50/40 transition-colors duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">

@@ -62,7 +62,7 @@ const BulkSelectionModal = ({
         <div className="px-8 py-3 border-b border-slate-100 flex items-center justify-between gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder={t("search_listings")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-border-light rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
+            <input type="text" placeholder={t("search_listings")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-border-light rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none transition-all" />
           </div>
           
           {availableListings.length > 0 && <button onClick={() => {

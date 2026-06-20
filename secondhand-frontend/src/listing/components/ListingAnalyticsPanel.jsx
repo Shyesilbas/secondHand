@@ -21,7 +21,7 @@ const ListingAnalyticsPanel = ({
         {/* Header row */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-primary group-hover:bg-indigo-100 transition-colors">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-primary group-hover:bg-primary-50 transition-colors">
               <BarChart3 className="h-[18px] w-[18px]" />
             </div>
             <div>

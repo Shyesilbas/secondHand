@@ -39,7 +39,7 @@ const UserSearchResults = ({
                                         {user.name} {user.surname}
                                     </p>
                                 </div>
-                                <p className={`text-xs truncate ${index === selectedIndex ? 'text-blue-100' : 'text-text-muted'}`}>
+                                <p className={`text-xs truncate ${index === selectedIndex ? 'text-primary-50' : 'text-text-muted'}`}>
                                     {user.email}
                                 </p>
                             </div>

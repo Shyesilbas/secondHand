@@ -89,11 +89,11 @@ const CounterOfferModal = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">{t("quantity")}</label>
-              <input type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary" />
+              <input type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">{t("total_price")}</label>
-              <input type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary" />
+              <input type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
             </div>
           </div>
 
@@ -108,7 +108,7 @@ const CounterOfferModal = ({
 
           <div className="flex items-center justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-border-DEFAULT text-text-secondary font-semibold hover:bg-secondary" disabled={isSubmitting}>{t("cancel")}</button>
-            <button type="submit" className="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-indigo-700 disabled:opacity-60" disabled={isSubmitting}>
+            <button type="submit" className="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary disabled:opacity-60" disabled={isSubmitting}>
               {isSubmitting ? 'Sending…' : 'Send Counter'}
             </button>
           </div>

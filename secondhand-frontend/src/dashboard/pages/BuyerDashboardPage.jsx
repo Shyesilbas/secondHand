@@ -87,7 +87,7 @@ const BuyerDashboardPage = () => {
                 {dashboard.totalFavorites > 0 && <>
                     <span className="text-emerald-800">·</span>
                     <div className="flex items-center gap-1">
-                      <Heart className="w-3 h-3 text-pink-400/70" />
+                      <Heart className="w-3 h-3 text-primary-50/70" />
                       <span className="text-caption text-slate-400 font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
                     </div>
                   </>}

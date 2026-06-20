@@ -41,7 +41,7 @@ const AddressCard = ({
             <h3 className="text-sm font-medium text-text-primary">
               {getAddressTypeLabel(address.addressType)}
             </h3>
-            {address.mainAddress && <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">{t("main")}</span>}
+            {address.mainAddress && <span className="px-2 py-0.5 text-xs bg-primary-50 text-primary rounded-full font-medium">{t("main")}</span>}
           </div>
           
           <div className="text-sm text-text-secondary space-y-1">
@@ -67,7 +67,7 @@ const AddressCard = ({
             </svg>
           </button>
           
-          {!address.mainAddress && <button onClick={() => onSelectAsMain(address.id)} className="text-xs px-2 py-1 border border-primary text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors" title={t("set_as_main_address")}>{t("set_main")}</button>}
+          {!address.mainAddress && <button onClick={() => onSelectAsMain(address.id)} className="text-xs px-2 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white transition-colors" title={t("set_as_main_address")}>{t("set_main")}</button>}
         </div>
       </div>
     </div>;

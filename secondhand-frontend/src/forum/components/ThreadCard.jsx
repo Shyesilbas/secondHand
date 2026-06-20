@@ -8,7 +8,7 @@ import {formatForumDate} from '../utils/forumDateFormat.js';
 
 const categoryMeta = {
   [FORUM_CATEGORIES.SUGGESTIONS]: {label: 'Suggestion', icon: Lightbulb, color: 'text-status-warning bg-status-warning-bg border-amber-200'},
-  [FORUM_CATEGORIES.COMPLAINTS]: {label: 'Complaint', icon: AlertTriangle, color: 'text-status-error bg-status-error-bg border-red-200'},
+  [FORUM_CATEGORIES.COMPLAINTS]: {label: 'Complaint', icon: AlertTriangle, color: 'text-status-error bg-status-error-bg border-status-error-border'},
 };
 
 const statusMeta = {
@@ -18,7 +18,7 @@ const statusMeta = {
   },
   [FORUM_THREAD_STATUSES.IN_PROGRESS]: {
     label: 'In Progress',
-    dot: 'bg-blue-500',
+    dot: 'bg-primary',
   },
   [FORUM_THREAD_STATUSES.RESOLVED]: {
     label: 'Resolved',

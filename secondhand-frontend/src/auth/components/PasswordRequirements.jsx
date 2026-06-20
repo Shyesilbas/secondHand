@@ -23,7 +23,7 @@ const PasswordRequirements = ({
   }];
   const getIcon = valid => {
     if (valid) {
-      return <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      return <svg className="w-4 h-4 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>;
     }
@@ -34,7 +34,7 @@ const PasswordRequirements = ({
   return <div className="bg-secondary rounded-lg p-3 border border-border-light">
             <p className="text-xs font-medium text-text-secondary mb-2">{t("requirements")}</p>
             <div className="space-y-1">
-                {rules.map((rule, idx) => <div key={idx} className={`flex items-center text-xs ${rule.valid ? 'text-green-700' : 'text-text-secondary'}`}>
+                {rules.map((rule, idx) => <div key={idx} className={`flex items-center text-xs ${rule.valid ? 'text-status-success-text' : 'text-text-secondary'}`}>
                         <span className="mr-2 flex-shrink-0">
                             {getIcon(rule.valid)}
                         </span>

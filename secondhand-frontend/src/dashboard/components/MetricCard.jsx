@@ -3,13 +3,13 @@ import { motion } from 'framer-motion';
 
 const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue', index = 0, badge }) => {
   const iconColorClasses = {
-    blue: 'bg-blue-500/10 text-primary',
+    blue: 'bg-primary/10 text-primary',
     green: 'bg-status-success-bg/10 text-status-success',
-    purple: 'bg-indigo-500/10 text-primary',
+    purple: 'bg-primary/10 text-primary',
     amber: 'bg-status-warning-bg/10 text-status-warning',
     red: 'bg-rose-500/10 text-rose-600',
     gray: 'bg-text-muted/10 text-slate-600',
-    pink: 'bg-pink-500/10 text-pink-600',
+    pink: 'bg-primary/10 text-primary',
     cyan: 'bg-cyan-500/10 text-cyan-600',
   };
 

@@ -81,9 +81,9 @@ const PaymentPanel = ({
                             <label className="mb-3 block text-sm font-medium text-slate-600">{t("payment_type")}</label>
                             <div className="space-y-2">
                                 <label className={`flex items-center rounded-2xl border p-4 cursor-pointer transition-all duration-300 ${paymentType === PAYMENT_TYPES.EWALLET ? 'border-primary bg-indigo-50/50 shadow-sm shadow-indigo-100/50' : 'border-border-light/80 hover:border-slate-300 hover:bg-slate-50/50'}`}>
-                                    <input type="radio" name="paymentType" value={PAYMENT_TYPES.EWALLET} checked={paymentType === PAYMENT_TYPES.EWALLET} onChange={e => onPaymentTypeChange(e.target.value)} className="w-4 h-4 text-primary border-slate-300 focus:ring-indigo-500 focus:ring-offset-2" />
+                                    <input type="radio" name="paymentType" value={PAYMENT_TYPES.EWALLET} checked={paymentType === PAYMENT_TYPES.EWALLET} onChange={e => onPaymentTypeChange(e.target.value)} className="w-4 h-4 text-primary border-slate-300 focus:ring-primary focus:ring-offset-2" />
                                     <div className="ml-4 flex items-center flex-1">
-                                        <div className="h-10 w-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 mr-3">
+                                        <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary-50 text-primary mr-3">
                                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                             </svg>
@@ -106,12 +106,12 @@ const PaymentPanel = ({
                                             </svg>
                                             <span className="text-xs text-emerald-800">{t("sufficient_balance_available_for_payment")}</span>
                                         </div>
-                                    </div> : <div className="rounded-2xl border border-red-200 bg-status-error-bg px-3 py-2.5">
+                                    </div> : <div className="rounded-2xl border border-status-error-border bg-status-error-bg px-3 py-2.5">
                                         <div className="flex items-center">
                                             <svg className="mr-2 h-5 w-5 text-status-error" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                             </svg>
-                                            <span className="text-xs text-red-800">{t("insufficient_balance_you_need")}{formatPaymentAmount(feeConfig.totalCreationFee - eWallet.balance)}{t("more")}</span>
+                                            <span className="text-xs text-status-error-text">{t("insufficient_balance_you_need")}{formatPaymentAmount(feeConfig.totalCreationFee - eWallet.balance)}{t("more")}</span>
                                         </div>
                                     </div>}
                             </div>}

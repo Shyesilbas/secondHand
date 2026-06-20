@@ -47,18 +47,18 @@ const ReviewForm = ({
 
         <div>
           <label htmlFor="comment" className="block text-sm font-medium text-text-secondary mb-2">{t("comment")}</label>
-          <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="w-full px-3 py-2 border border-border-DEFAULT rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t("share_your_thoughts_about_the_product")} />
+          <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="w-full px-3 py-2 border border-border-DEFAULT rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder={t("share_your_thoughts_about_the_product")} />
           <p className="text-xs text-text-muted mt-1">
             {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH}{t("characters")}</p>
         </div>
 
-        {error && <div className="bg-status-error-bg border border-red-200 rounded-md p-3">
+        {error && <div className="bg-status-error-bg border border-status-error-border rounded-md p-3">
             <p className="text-sm text-status-error">{error}</p>
           </div>}
 
         <div className="flex justify-end space-x-3">
           <button type="button" onClick={onCancel} className="px-4 py-2 text-text-secondary bg-tertiary rounded-md hover:bg-tertiary transition-colors">{t("cancel")}</button>
-          <button type="submit" disabled={loading || rating === REVIEW_DEFAULTS.INITIAL_RATING} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <button type="submit" disabled={loading || rating === REVIEW_DEFAULTS.INITIAL_RATING} className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
           </button>
         </div>

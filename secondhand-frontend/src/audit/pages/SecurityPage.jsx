@@ -88,11 +88,11 @@ const SecurityPage = () => {
                         <p className="text-text-muted max-w-lg">{t("keep_track_of_where_you_ve_signed_in_and")}</p>
                     </div>
 
-                    <button onClick={() => setShowRevokeModal(true)} className="flex items-center justify-center gap-2 bg-background-primary border border-red-100 text-status-error px-5 py-3 rounded-xl font-semibold text-sm hover:bg-status-error-bg hover:border-red-200 transition-all shadow-sm active:scale-95">
+                    <button onClick={() => setShowRevokeModal(true)} className="flex items-center justify-center gap-2 bg-background-primary border border-status-error-border text-status-error px-5 py-3 rounded-xl font-semibold text-sm hover:bg-status-error-bg hover:border-status-error-border transition-all shadow-sm active:scale-95">
                         <LogOut size={18} />{t("revoke_all_sessions")}</button>
                 </div>
 
-                {error && <div className="mb-8 p-4 bg-status-error-bg border border-red-100 rounded-2xl flex items-center gap-3 text-red-700">
+                {error && <div className="mb-8 p-4 bg-status-error-bg border border-status-error-border rounded-2xl flex items-center gap-3 text-status-error-text">
                         <ShieldAlert className="shrink-0" />
                         <p className="text-sm font-medium">{error}</p>
                     </div>}

@@ -81,12 +81,12 @@ const NotificationModal = ({
       default:
         return {
           icon: Info,
-          iconWrap: 'bg-indigo-100 text-primary',
+          iconWrap: 'bg-primary-50 text-primary',
           heading: 'text-text-primary',
           text: 'text-slate-500',
-          primaryButton: 'bg-primary hover:bg-indigo-700 text-white',
+          primaryButton: 'bg-primary hover:bg-primary text-white',
           secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
-          progress: 'bg-indigo-500'
+          progress: 'bg-primary'
         };
     }
   }, [type]);

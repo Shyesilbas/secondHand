@@ -141,7 +141,7 @@ const ListStatusGlyph = ({
   return <Cmp className={`shrink-0 ${spin ? 'animate-spin' : ''} ${className || ''}`} aria-hidden strokeWidth={2} />;
 };
 const btnToolbarIcon = 'inline-flex items-center justify-center rounded-xl bg-background-primary text-slate-600 hover:text-text-primary border border-border-light/90 shadow-sm hover:border-slate-300 hover:bg-slate-50 transition-all';
-const orderActionBtnBase = 'w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2';
+const orderActionBtnBase = 'w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2';
 const Header = React.memo(({
   title,
   subtitle,
@@ -207,7 +207,7 @@ const StatusTabs = React.memo(({
   return <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-200/50 border border-border-light/60 w-full lg:w-auto" role="tablist" aria-label={t("order_status_filters")}>
       {tabs.map(tab => {
       const active = (statusFilter || '') === (tab.value || '');
-      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 focus-visible:ring-offset-1 ${active ? 'bg-background-primary text-text-primary shadow-sm ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/70'}`}>
+      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 focus-visible:ring-offset-1 ${active ? 'bg-background-primary text-text-primary shadow-sm ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/70'}`}>
             {tab.label}
           </button>;
     })}
@@ -238,19 +238,19 @@ const SearchToolbar = React.memo(({
       <div className="flex items-center gap-2 w-full">
         <form onSubmit={onSearch} className="flex items-center relative group w-full sm:w-64 transition-all duration-300 focus-within:w-full sm:focus-within:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" strokeWidth={2.5} />
-          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-primary placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-primary transition-all duration-200 shadow-sm" />
+          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-primary placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition-all duration-200 shadow-sm" />
           {searchTerm ? <button type="button" onClick={isSearchMode ? onClearSearch : () => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors" aria-label={uiCopy.clear}>
               <X className="w-3.5 h-3.5" />
             </button> : null}
           <button type="submit" className="sr-only" disabled={searchLoading || !searchTerm.trim()}>{uiCopy.searchSubmit}</button>
         </form>
-        <button type="button" onClick={() => setFiltersOpen(v => !v)} aria-expanded={filtersOpen} aria-controls={filtersPopoverId} className={`p-2.5 rounded-xl border transition-all duration-200 shrink-0 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${filtersOpen ? 'border-primary bg-background-primary text-primary ring-2 ring-indigo-500/15' : 'border-border-light/90 bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`} title={uiCopy.openFilters} aria-label={uiCopy.openFilters}>
+        <button type="button" onClick={() => setFiltersOpen(v => !v)} aria-expanded={filtersOpen} aria-controls={filtersPopoverId} className={`p-2.5 rounded-xl border transition-all duration-200 shrink-0 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 ${filtersOpen ? 'border-primary bg-background-primary text-primary ring-2 ring-primary/15' : 'border-border-light/90 bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`} title={uiCopy.openFilters} aria-label={uiCopy.openFilters}>
           <SlidersHorizontal className="w-4 h-4" />
         </button>
       </div>
       {filtersOpen && !isSearchMode ? <div className="absolute top-full right-0 mt-2 z-20 flex items-center gap-3 rounded-xl border border-border-light/80 bg-background-primary px-4 py-2.5 shadow-lg shadow-slate-900/5 min-w-[200px]" id={filtersPopoverId} role="region" aria-label={uiCopy.pageSizeHint}>
           <span className="text-xs font-semibold text-slate-500">{uiCopy.pageSizeHint}</span>
-          <select className="px-2 py-1.5 text-xs font-bold text-slate-800 border border-border-light rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 flex-1 cursor-pointer" value={pagination?.size ?? ORDER_DEFAULTS.INITIAL_PAGE_SIZE} onChange={e => onPageSizeChange(Number(e.target.value))}>
+          <select className="px-2 py-1.5 text-xs font-bold text-slate-800 border border-border-light rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary/20 flex-1 cursor-pointer" value={pagination?.size ?? ORDER_DEFAULTS.INITIAL_PAGE_SIZE} onChange={e => onPageSizeChange(Number(e.target.value))}>
             {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map(option => <option key={option} value={option}>
                 {uiCopy.paginationPerPage(option)}
               </option>)}
@@ -315,7 +315,7 @@ const Pagination = React.memo(({
           {uiCopy.paginationNext}
         </button>
         <span className="hidden sm:inline w-px h-5 bg-slate-200 mx-1" />
-        <select className="px-3 py-2.5 text-sm font-semibold text-slate-800 border border-border-light rounded-xl bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-primary shadow-sm cursor-pointer transition-all" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
+        <select className="px-3 py-2.5 text-sm font-semibold text-slate-800 border border-border-light rounded-xl bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm cursor-pointer transition-all" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
           {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map(option => <option key={option} value={option}>
               {uiCopy.paginationPerPage(option)}
             </option>)}
@@ -357,16 +357,16 @@ const UnifiedOrderItem = React.memo(({
   // Status badge dot color
   const statusDotColor = {
     [ORDER_STATUSES.COMPLETED]: 'bg-status-success-bg',
-    [ORDER_STATUSES.DELIVERED]: 'bg-blue-500',
-    [ORDER_STATUSES.SHIPPED]: 'bg-indigo-500',
+    [ORDER_STATUSES.DELIVERED]: 'bg-primary',
+    [ORDER_STATUSES.SHIPPED]: 'bg-primary',
     [ORDER_STATUSES.PROCESSING]: 'bg-status-warning-bg',
     [ORDER_STATUSES.CONFIRMED]: 'bg-status-success-bg',
     [ORDER_STATUSES.PENDING]: 'bg-text-muted',
     [ORDER_STATUSES.CANCELLED]: 'bg-rose-500',
     [ORDER_STATUSES.REFUNDED]: 'bg-rose-500',
-    [ORDER_STATUSES.MEETUP_PENDING]: 'bg-indigo-500',
+    [ORDER_STATUSES.MEETUP_PENDING]: 'bg-primary',
     [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'bg-primary',
-    [ORDER_STATUSES.VERIFICATION_LOCKED]: 'bg-purple-500'
+    [ORDER_STATUSES.VERIFICATION_LOCKED]: 'bg-primary'
   }[statusKey(order.status)] || 'bg-text-muted';
   let primaryAction = null;
   if (isBuyer) {
@@ -374,7 +374,7 @@ const UnifiedOrderItem = React.memo(({
       primaryAction = <button type="button" onClick={e => {
         e.stopPropagation();
         onOpenOrder(order);
-      }} className={`${orderActionBtnBase} bg-primary text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-900/15`}>
+      }} className={`${orderActionBtnBase} bg-primary text-white hover:bg-primary active:bg-primary shadow-sm shadow-indigo-900/15`}>
             <Truck className="w-4 h-4 opacity-95" strokeWidth={2} />
             {uiCopy.trackShipment}
           </button>;
@@ -390,7 +390,7 @@ const UnifiedOrderItem = React.memo(({
       primaryAction = <button type="button" onClick={e => {
         e.stopPropagation();
         if (onOpenQuickReview) onOpenQuickReview(order);else onOpenOrder(order);
-      }} className={`${orderActionBtnBase} bg-primary text-white hover:bg-indigo-700 active:bg-indigo-800 shadow-sm shadow-indigo-900/15`}>
+      }} className={`${orderActionBtnBase} bg-primary text-white hover:bg-primary active:bg-primary shadow-sm shadow-indigo-900/15`}>
             <Star className="w-4 h-4 opacity-95" strokeWidth={2} />
             {uiCopy.reviewNow}
           </button>;
@@ -415,7 +415,7 @@ const UnifiedOrderItem = React.memo(({
       e.preventDefault();
       onOpenOrder(order);
     }
-  }} aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`} className={`group relative rounded-2xl border border-slate-100 bg-background-primary shadow-sm hover:shadow-sm hover:border-border-light hover:-translate-y-px transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-[3.5px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2 ${accentBorder}`}>
+  }} aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`} className={`group relative rounded-2xl border border-slate-100 bg-background-primary shadow-sm hover:shadow-sm hover:border-border-light hover:-translate-y-px transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-[3.5px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 ${accentBorder}`}>
         {/* Thumbnails */}
         <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-1">
           {displayedItems.map((item, i) => <div key={item.id || i} className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl border-2 border-white shadow-md overflow-hidden bg-slate-50 relative" style={{
@@ -433,7 +433,7 @@ const UnifiedOrderItem = React.memo(({
         {/* Middle: Details */}
         <div className="flex-1 min-w-0 w-full relative z-10 flex flex-col gap-2">
           {isBuyer && editingOrderId === order.id ? <div className="flex items-center gap-2 flex-wrap" onClick={e => e.stopPropagation()}>
-              <input type="text" value={editingOrderName} onChange={e => setEditingOrderName(e.target.value)} onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()} className="w-40 sm:w-52 px-3 py-1.5 text-sm font-semibold text-slate-800 border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/25 bg-background-primary shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
+              <input type="text" value={editingOrderName} onChange={e => setEditingOrderName(e.target.value)} onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()} className="w-40 sm:w-52 px-3 py-1.5 text-sm font-semibold text-slate-800 border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/25 bg-background-primary shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
               <button type="button" onClick={e => {
           e.stopPropagation();
           onSaveOrderName(order.id, e);
@@ -462,7 +462,7 @@ const UnifiedOrderItem = React.memo(({
               {isBuyer ? <button type="button" onClick={e => {
           e.stopPropagation();
           onStartEditName(order, e);
-        }} className="p-1.5 text-slate-300 hover:text-primary rounded-lg hover:bg-indigo-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 opacity-0 group-hover:opacity-100" title={t("rename_order")}>
+        }} className="p-1.5 text-slate-300 hover:text-primary rounded-lg hover:bg-indigo-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 opacity-0 group-hover:opacity-100" title={t("rename_order")}>
                   <Pencil className="w-3.5 h-3.5" />
                 </button> : null}
             </div>}
@@ -610,7 +610,7 @@ const OrdersListLayout = ({
           </div>
         </div>
       </div> : null;
-  return <div className="min-h-screen bg-slate-50 relative selection:bg-indigo-100 selection:text-primary pb-20">
+  return <div className="min-h-screen bg-slate-50 relative selection:bg-primary-50 selection:text-primary pb-20">
       {/* Decorative background glows - Fixed behind content so it doesn't break scrolling or stacking */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-1/4 w-[600px] h-[600px] bg-primary/[0.055] blur-[120px] rounded-full" />
@@ -624,7 +624,7 @@ const OrdersListLayout = ({
         {banner ? <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-primary/50 text-primary text-xs font-bold shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             {uiCopy.nameBannerTitle}
-            <button onClick={flow.ui.dismissNameBanner} className="ml-2 p-0.5 hover:bg-indigo-100 rounded-full transition-colors text-primary hover:text-primary">
+            <button onClick={flow.ui.dismissNameBanner} className="ml-2 p-0.5 hover:bg-primary-50 rounded-full transition-colors text-primary hover:text-primary">
               <X className="w-3 h-3" />
             </button>
           </div> : null}
@@ -640,7 +640,7 @@ const OrdersListLayout = ({
               CARGO: 'Kargo ile Gönderim',
               SAFE_MEETUP: 'Elden Güvenli Teslimat'
             }[method];
-            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${isActive ? 'bg-background-primary text-text-primary shadow-sm border border-border-light/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/40'}`}>
+            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 ${isActive ? 'bg-background-primary text-text-primary shadow-sm border border-border-light/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/40'}`}>
                 {label}
               </button>;
           })}
@@ -669,7 +669,7 @@ const OrdersListLayout = ({
               <p className="text-sm text-slate-400 mb-8 max-w-xs leading-relaxed">
                 {isSellerView ? 'Your sold items will appear here once buyers place orders.' : 'Discover amazing products and place your first order.'}
               </p>
-              {isBuyerView && emptyAction ? <button type="button" onClick={emptyAction} className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-primary text-white text-sm font-semibold hover:bg-indigo-700 active:bg-indigo-800 shadow-md shadow-indigo-900/15 hover:shadow-lg hover:shadow-indigo-900/20 transition-all ring-1 ring-indigo-500/30">
+              {isBuyerView && emptyAction ? <button type="button" onClick={emptyAction} className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-primary text-white text-sm font-semibold hover:bg-primary active:bg-primary shadow-md shadow-indigo-900/15 hover:shadow-lg hover:shadow-indigo-900/20 transition-all ring-1 ring-primary/30">
                   {uiCopy.startShopping}
                 </button> : null}
             </div>

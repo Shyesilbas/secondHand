@@ -27,7 +27,7 @@ const AuthInput = ({
                     htmlFor={name}
                     className={`block text-caption font-semibold tracking-[0.12em] uppercase text-stone-500 mb-2 ${labelClassName}`}
                 >
-                    {label} {required && <span className="text-red-400 font-normal">*</span>}
+                    {label} {required && <span className="text-status-error font-normal">*</span>}
                 </label>
             )}
             <div className="relative w-full group">

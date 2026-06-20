@@ -107,7 +107,7 @@ export const ThreadComposerModal = ({
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
-          {error && <div className="rounded-xl border border-red-200 bg-status-error-bg px-4 py-3 text-sm text-red-700 font-medium">
+          {error && <div className="rounded-xl border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text font-medium">
               {error}
             </div>}
 

@@ -229,10 +229,10 @@ const MyShowcasesPanel = ({
                       <input type="number" min={1} max={30} value={extendDays[showcase.id] ?? 7} onChange={e => setExtendDays(prev => ({
                   ...prev,
                   [showcase.id]: e.target.value
-                }))} className={`w-full h-11 border rounded-xl pl-3 pr-12 text-sm font-bold focus:bg-background-primary focus:border-primary focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none ${showcase.isExpired ? 'bg-slate-50/40 border-border-light text-slate-600' : 'bg-slate-50 border-border-light/60 text-slate-950'}`} />
+                }))} className={`w-full h-11 border rounded-xl pl-3 pr-12 text-sm font-bold focus:bg-background-primary focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${showcase.isExpired ? 'bg-slate-50/40 border-border-light text-slate-600' : 'bg-slate-50 border-border-light/60 text-slate-950'}`} />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 uppercase tracking-wider select-none">{t("days")}</span>
                     </div>
-                    <button type="button" onClick={() => handleExtend(showcase.id)} disabled={isMutating} className={`h-11 px-5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 tracking-wide uppercase ${showcase.isExpired ? 'bg-primary text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/10' : 'bg-slate-950 text-white hover:bg-primary'}`}>
+                    <button type="button" onClick={() => handleExtend(showcase.id)} disabled={isMutating} className={`h-11 px-5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 tracking-wide uppercase ${showcase.isExpired ? 'bg-primary text-white hover:bg-primary shadow-md shadow-indigo-600/10' : 'bg-slate-950 text-white hover:bg-primary'}`}>
                       {showcase.isExpired ? 'Re-Boost' : 'Extend'}
                     </button>
                     {!showcase.isExpired && <button type="button" onClick={() => setConfirmCancelId(showcase.id)} disabled={isMutating} className="h-11 w-11 flex items-center justify-center rounded-xl border border-border-light/60 text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all active:scale-90" title={t("cancel_showcase")}>
@@ -283,7 +283,7 @@ const MyShowcasesPanel = ({
       </AnimatePresence>
 
       <div className="mt-8 p-4 rounded-2xl bg-indigo-50/50 border border-primary/50 flex items-start gap-3">
-        <div className="bg-indigo-100/80 p-2 rounded-xl text-primary mt-0.5">
+        <div className="bg-primary-50/80 p-2 rounded-xl text-primary mt-0.5">
           <Zap className="w-4 h-4 fill-current" />
         </div>
         <div>

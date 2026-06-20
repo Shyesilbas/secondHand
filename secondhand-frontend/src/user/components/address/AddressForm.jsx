@@ -17,7 +17,7 @@ const defaultAddress = {
   addressType: USER_ADDRESS_TYPES.HOME,
   mainAddress: false
 };
-const inputClass = 'w-full rounded-xl border border-border-light bg-background-primary px-4 py-3 text-sm text-text-primary shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-indigo-500/20';
+const inputClass = 'w-full rounded-xl border border-border-light bg-background-primary px-4 py-3 text-sm text-text-primary shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20';
 const AddressForm = ({
   isOpen,
   onClose,
@@ -126,8 +126,8 @@ const AddressForm = ({
               </select>
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border-light bg-background-primary p-4 shadow-sm transition-colors hover:border-slate-300 focus-within:ring-2 focus-within:ring-indigo-500/20">
-              <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-primary accent-indigo-600 focus:ring-indigo-500/30" checked={formData.mainAddress} onChange={e => handleInputChange('mainAddress', e.target.checked)} />
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border-light bg-background-primary p-4 shadow-sm transition-colors hover:border-slate-300 focus-within:ring-2 focus-within:ring-primary/20">
+              <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-primary accent-indigo-600 focus:ring-primary/30" checked={formData.mainAddress} onChange={e => handleInputChange('mainAddress', e.target.checked)} />
               <span className="text-sm leading-snug text-slate-700">
                 <span className="font-medium text-text-primary">{t("main_address")}</span>
                 <span className="mt-0.5 block text-slate-500">{t("use_as_default_for_checkout_and_delivery")}</span>
@@ -142,7 +142,7 @@ const AddressForm = ({
           <div className="shrink-0 border-t border-border-light/80 bg-background-primary px-5 py-4 sm:px-6">
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button type="button" onClick={onClose} className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-border-light bg-background-primary px-5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:min-w-[7.5rem]">{t("cancel")}</button>
-              <button type="submit" disabled={loading} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[10rem]">
+              <button type="submit" disabled={loading} className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[10rem]">
                 <Save className="h-4 w-4 shrink-0" aria-hidden />
                 {loading ? isEditing ? 'Updating…' : 'Saving…' : isEditing ? 'Save changes' : 'Save address'}
               </button>

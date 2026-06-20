@@ -187,7 +187,7 @@ const MyCouponsPage = () => {
           const isBundle = c.minQuantity > 1;
           const hasListings = c.eligibleListingIds?.length > 0;
           return <div key={c.id} className="group bg-background-primary rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
-                  <div className={`absolute top-0 left-0 w-full h-1 ${c.active ? 'bg-indigo-500' : 'bg-slate-200'}`} />
+                  <div className={`absolute top-0 left-0 w-full h-1 ${c.active ? 'bg-primary' : 'bg-slate-200'}`} />
                   
                   <div className="flex justify-between items-start mb-4">
                     <div className="min-w-0">
@@ -207,7 +207,7 @@ const MyCouponsPage = () => {
                 }} className="p-1.5 rounded-lg border border-slate-100 hover:bg-slate-50 text-slate-400 hover:text-text-primary transition-all">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => deleteCampaign(c.id)} className="p-1.5 rounded-lg border border-red-50 hover:bg-status-error-bg text-red-300 hover:text-status-error transition-all">
+                      <button onClick={() => deleteCampaign(c.id)} className="p-1.5 rounded-lg border border-red-50 hover:bg-status-error-bg text-status-error hover:text-status-error transition-all">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>

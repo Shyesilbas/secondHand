@@ -45,7 +45,7 @@ const SectionCard = ({
 };
 const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
 const inputNormal = `${inputBase} border-zinc-200/60 bg-background-primary focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
-const inputError = `${inputBase} border-red-300 bg-status-error-bg/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+const inputError = `${inputBase} border-status-error-border bg-status-error-bg/30 focus:border-status-error-border focus:ring-2 focus:ring-status-error/10`;
 const ListingBasics = ({
   formData,
   errors = {},

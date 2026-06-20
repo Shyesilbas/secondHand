@@ -95,7 +95,7 @@ export const SafeMeetupOnboardingModal = () => {
       <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/50 bg-[#faf9f7] p-8 shadow-2xl transition-all duration-300">
         
         {/* Floating Background Glows */}
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-indigo-500/5 blur-3xl" />
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-status-success-bg/5 blur-3xl" />
 
         {/* Header Section */}

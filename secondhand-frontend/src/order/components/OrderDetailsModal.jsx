@@ -175,7 +175,7 @@ const MeetupHandoverSection = ({
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
   return <div className="rounded-2xl border border-primary bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl rounded-full" />
       <div className="flex items-center gap-3 border-b border-primary/50 pb-4 mb-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-primary shadow-sm">
           <MapPin className="h-4 w-4" />
@@ -224,7 +224,7 @@ const MeetupHandoverSection = ({
                       {order.meetupVerificationCode || '------'}
                     </span>
                     <p className="text-caption text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5 mt-2">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />{t("yenilenme_s_resi")}{formatTime(qrCountdown)}
+                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />{t("yenilenme_s_resi")}{formatTime(qrCountdown)}
                     </p>
 
                     {/* Buyer Manual Confirmation Option inside MEETUP_PENDING */}
@@ -233,7 +233,7 @@ const MeetupHandoverSection = ({
                       <p className="text-caption text-slate-500 mb-3 leading-relaxed">{t("e_er_sat_c_do_rulama_kodunu_sisteme_gire")}</p>
                       <div className="space-y-3">
                         <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-500/20" />
+                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
                           <span className="text-caption font-semibold text-slate-700 leading-normal">{t("r_n_elden_teslim_ald_m_ve_i_lemi_tamamla")}</span>
                         </label>
 
@@ -245,7 +245,7 @@ const MeetupHandoverSection = ({
                     </div>
                   </> : <div className="py-6">
                     <p className="text-sm text-slate-500 mb-3">{t("qr_kod_ve_pin_kodunun_s_resi_doldu")}</p>
-                    <button type="button" onClick={handleRegenerateCode} className="px-4 py-2 text-xs font-bold text-white bg-primary rounded-lg hover:bg-indigo-700 transition">{t("kodu_yenile")}</button>
+                    <button type="button" onClick={handleRegenerateCode} className="px-4 py-2 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary transition">{t("kodu_yenile")}</button>
                   </div>}
               </div> :
         // SELLER VIEW IN MEETUP_PENDING
@@ -258,8 +258,8 @@ const MeetupHandoverSection = ({
                   </div> : <form onSubmit={handleVerify} className="space-y-3">
                     <p className="text-xs text-slate-500">{t("al_c_n_n_ekran_ndaki_6_haneli_kodu_veya_")}</p>
                     <div className="flex gap-2">
-                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-border-light rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-indigo-500/20 bg-background-primary shadow-sm" placeholder="000000" maxLength={6} disabled={isVerifying} />
-                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-primary rounded-xl hover:bg-indigo-700 transition disabled:opacity-50">
+                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-border-light rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-background-primary shadow-sm" placeholder="000000" maxLength={6} disabled={isVerifying} />
+                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-primary rounded-xl hover:bg-primary transition disabled:opacity-50">
                         {isVerifying ? 'Doğrulanıyor...' : 'Kodu Doğrula'}
                       </button>
                     </div>
@@ -275,7 +275,7 @@ const MeetupHandoverSection = ({
 
             <div className="space-y-3">
               <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-500/20" />
+                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
                 <span className="text-xs font-medium text-slate-800 leading-normal">{t("r_n_n_elden_teslim_edildi_ini_ve_i_lemi_")}</span>
               </label>
 
@@ -416,7 +416,7 @@ const OrderDetailsModal = React.memo(({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2.5 flex-wrap mb-0.5">
                   {!isSellerView && isEditingName ? <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
-                      <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-sm font-semibold text-text-primary border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400/30 bg-background-primary shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
+                      <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-sm font-semibold text-text-primary border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background-primary shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
                       <button onClick={handleSaveName} disabled={isSavingName} className="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-primary disabled:opacity-50">
                         <Check className="w-4 h-4" />
                       </button>

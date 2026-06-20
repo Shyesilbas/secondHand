@@ -82,14 +82,14 @@ const ReviewModal = ({
 
             <div>
               <label htmlFor="comment" className="block text-sm font-medium text-text-secondary mb-2">{t("comment")}</label>
-              <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="w-full px-4 py-3 border border-border-DEFAULT rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder={t("share_your_thoughts_about_this_product")} />
+              <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="w-full px-4 py-3 border border-border-DEFAULT rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder={t("share_your_thoughts_about_this_product")} />
               <p className="text-xs text-text-muted mt-1 text-right">
                 {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH}{t("characters")}</p>
             </div>
 
-            {error && <div className="bg-status-error-bg border border-red-200 rounded-lg p-4">
+            {error && <div className="bg-status-error-bg border border-status-error-border rounded-lg p-4">
                 <div className="flex">
-                  <svg className="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-status-error mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                   </svg>
                   <p className="text-sm text-status-error">{error}</p>
@@ -98,7 +98,7 @@ const ReviewModal = ({
 
             <div className="flex space-x-3 pt-4">
               <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-text-secondary bg-secondary-light rounded-lg hover:bg-secondary-light/80 transition-colors font-medium">{t("cancel")}</button>
-              <button type="submit" disabled={loading || rating < REVIEW_LIMITS.MIN_RATING} className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">
+              <button type="submit" disabled={loading || rating < REVIEW_LIMITS.MIN_RATING} className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">
                 {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
               </button>
             </div>

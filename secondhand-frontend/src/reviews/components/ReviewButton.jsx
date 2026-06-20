@@ -101,7 +101,7 @@ const ReviewButton = ({
             <button onClick={e => {
       e.stopPropagation();
       setShowModal(true);
-    }} disabled={loading} className="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">
+    }} disabled={loading} className="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-primary disabled:opacity-50 transition-colors">
                 {loading ? REVIEW_MESSAGES.CHECKING : REVIEW_MESSAGES.REVIEW}
             </button>
             

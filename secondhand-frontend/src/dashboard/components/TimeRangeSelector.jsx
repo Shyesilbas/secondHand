@@ -63,7 +63,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
             const date = e.target.value ? new Date(e.target.value) : null;
             onStartDateChange(date);
           }}
-          className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-primary bg-background-primary font-medium"
+          className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
         />
         <span className="text-caption text-slate-400 font-bold">→</span>
         <input
@@ -74,7 +74,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
             onEndDateChange(date);
           }}
           max={new Date().toISOString().split('T')[0]}
-          className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-primary bg-background-primary font-medium"
+          className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
         />
       </div>
     </div>

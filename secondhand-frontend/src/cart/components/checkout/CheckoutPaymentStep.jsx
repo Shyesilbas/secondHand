@@ -55,7 +55,7 @@ const CheckoutPaymentStep = ({
       </div>
 
       <div className="mb-5">
-        <label className="flex items-center gap-4 rounded-xl border border-transparent bg-indigo-50/15 p-5 ring-2 ring-indigo-600 shadow-sm">
+        <label className="flex items-center gap-4 rounded-xl border border-transparent bg-indigo-50/15 p-5 ring-2 ring-primary shadow-sm">
           <input type="radio" name="payment" value={CART_PAYMENT_TYPES.EWALLET} checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET} onChange={event => setSelectedPaymentType(event.target.value)} className="sr-only" />
           <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary">
             <span className="h-2 w-2 rounded-full bg-primary" />

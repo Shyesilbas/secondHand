@@ -107,7 +107,7 @@ const PlatformCouponsPage = () => {
             <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-600 border-t-transparent" />
           </div>}
 
-        {!loading && error && <div className="rounded-2xl border border-red-200 bg-status-error-bg px-4 py-3 text-sm text-red-800">
+        {!loading && error && <div className="rounded-2xl border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text">
             {error?.response?.data?.message || error?.message || 'Yüklenemedi.'}
           </div>}
 

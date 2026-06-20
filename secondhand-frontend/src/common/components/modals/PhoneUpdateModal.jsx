@@ -29,12 +29,12 @@ const PhoneUpdateModal = ({
                         <input type="tel" value={formData.newPhone} onChange={e => {
             const formattedPhone = formatPhoneNumber(e.target.value, true);
             handleChange('newPhone', formattedPhone);
-          }} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t("90_5xx_xxx_xx_xx")} />
+          }} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder={t("90_5xx_xxx_xx_xx")} />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-text-secondary mb-2">{t("password")}</label>
-                        <input type="password" value={formData.password} onChange={e => handleChange('password', e.target.value)} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t("enter_your_password")} />
+                        <input type="password" value={formData.password} onChange={e => handleChange('password', e.target.value)} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder={t("enter_your_password")} />
                     </div>
                 </div>
 

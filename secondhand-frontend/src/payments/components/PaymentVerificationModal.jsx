@@ -40,7 +40,7 @@ const EWalletPaymentMethod = ({
   const totalFee = toNumber(feeConfig?.totalCreationFee);
   const hasSufficientBalance = balance >= totalFee;
   return <div className="space-y-3">
-      <div className={`border rounded-lg p-4 ${hasSufficientBalance ? 'bg-status-success-bg border-green-200' : 'bg-status-error-bg border-red-200'}`}>
+      <div className={`border rounded-lg p-4 ${hasSufficientBalance ? 'bg-status-success-bg border-status-success-border' : 'bg-status-error-bg border-status-error-border'}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${hasSufficientBalance ? 'bg-status-success-bg' : 'bg-status-error-bg'}`}>
@@ -62,8 +62,8 @@ const EWalletPaymentMethod = ({
             </p>
           </div>
         </div>
-        {!hasSufficientBalance && <div className="mt-3 p-2 bg-status-error-bg rounded border border-red-200">
-            <p className="text-sm text-red-800">{t("you_need")}{formatPaymentAmount(totalFee - balance)}{t("more_to_complete_this_payment")}</p>
+        {!hasSufficientBalance && <div className="mt-3 p-2 bg-status-error-bg rounded border border-status-error-border">
+            <p className="text-sm text-status-error-text">{t("you_need")}{formatPaymentAmount(totalFee - balance)}{t("more_to_complete_this_payment")}</p>
           </div>}
       </div>
     </div>;

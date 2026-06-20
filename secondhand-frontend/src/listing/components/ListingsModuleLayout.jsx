@@ -25,7 +25,7 @@ const ListingsModuleLayout = ({
   if (!engine) return null;
 
   return (
-    <div className="min-h-screen bg-background-secondary/50 relative">
+    <div className="min-h-screen bg-background-secondary relative">
       <FilterSidebar
         mode={mode}
         isOpen={engine.showFilterSidebar}

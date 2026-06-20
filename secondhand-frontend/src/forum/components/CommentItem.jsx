@@ -76,7 +76,7 @@ export const CommentItem = ({
                 <span className={`text-xs font-bold tabular-nums min-w-[16px] text-center ${netVotes > 0 ? 'text-violet-600' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'}`}>
                   {netVotes}
                 </span>
-                <button type="button" className={`inline-flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 ${voteDownActive ? 'text-status-error bg-status-error-bg ring-1 ring-red-200/60' : 'text-text-muted hover:text-status-error hover:bg-status-error-bg'}`} onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.DISLIKE)}>
+                <button type="button" className={`inline-flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 ${voteDownActive ? 'text-status-error bg-status-error-bg ring-1 ring-status-error-border/60' : 'text-text-muted hover:text-status-error hover:bg-status-error-bg'}`} onClick={() => onReact?.(threadId, comment?.id, FORUM_REACTIONS.DISLIKE)}>
                   <ChevronDown className="w-4 h-4" />
                 </button>
 

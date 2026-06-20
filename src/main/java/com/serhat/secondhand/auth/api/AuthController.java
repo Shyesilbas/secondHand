@@ -1,6 +1,8 @@
 package com.serhat.secondhand.auth.api;
 
-import com.serhat.secondhand.auth.application.IAuthService;
+import com.serhat.secondhand.auth.application.LoginService;
+import com.serhat.secondhand.auth.application.RegistrationService;
+import com.serhat.secondhand.auth.application.OAuthService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
@@ -32,14 +34,16 @@ import java.net.URI;
 @Tag(name = "Authentication", description = "User authentication and authorization operations")
 public class AuthController {
 
-    private final IAuthService authService;
+    private final LoginService loginService;
+    private final RegistrationService registrationService;
+    private final OAuthService oauthService;
     private final CookieUtils cookieUtils;
 
     @PublicEndpoint
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request for email: {}", request.getEmail());
-        return ResultResponses.ok(authService.register(request));
+        return ResultResponses.ok(registrationService.register(request));
     }
 
     @PublicEndpoint
@@ -48,7 +52,7 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse httpResponse) {
         log.info("Login request for email: {}", request.email());
-        LoginResponse response = authService.login(request);
+        LoginResponse response = loginService.login(request);
 
         setAuthCookies(httpResponse, response);
 
@@ -76,7 +80,7 @@ public class AuthController {
             HttpServletResponse httpResponse) {
         
         log.info("Logout request for user: {}", authentication.getName());
-        AuthMessageResponse response = authService.logout(authentication, request);
+        AuthMessageResponse response = loginService.logout(authentication, request);
 
         cookieUtils.clearAuthCookies(httpResponse);
 
@@ -94,7 +98,7 @@ public class AuthController {
         String refreshToken = cookieUtils.getRefreshTokenFromCookies(request)
                 .orElseThrow(InvalidRefreshTokenException::notFound);
 
-        LoginResponse response = authService.refreshToken(refreshToken);
+        LoginResponse response = loginService.refreshToken(refreshToken);
 
         setAuthCookies(httpResponse, response);
 
@@ -110,7 +114,7 @@ public class AuthController {
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
         log.info("Completing OAuth registration for email: {}", request.getEmail());
-        LoginResponse response = authService.completeOAuthRegistration(request, httpRequest);
+        LoginResponse response = oauthService.completeOAuthRegistration(request, httpRequest);
         
         setAuthCookies(httpResponse, response);
 
@@ -126,7 +130,7 @@ public class AuthController {
             HttpServletResponse httpResponse) {
         
         log.info("Revoke all sessions request for user: {}", authentication.getName());
-        AuthMessageResponse response = authService.revokeAllSessions(authentication, request);
+        AuthMessageResponse response = loginService.revokeAllSessions(authentication, request);
 
         cookieUtils.clearAuthCookies(httpResponse);
 

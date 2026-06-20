@@ -120,7 +120,7 @@ const BulkShowcaseModal = ({
               </div>
               <div className="flex justify-between items-center pt-4 border-t">
                  <button onClick={handleBack} className="px-6 py-3 text-slate-600 font-semibold hover:bg-slate-50 rounded-xl transition-all">{t("back")}</button>
-                 <button onClick={handleNext} disabled={!areAllAgreementsAccepted()} className="px-8 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all disabled:opacity-40">{t("continue_to_payment")}</button>
+                 <button onClick={handleNext} disabled={!areAllAgreementsAccepted()} className="px-8 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 hover:bg-primary transition-all disabled:opacity-40">{t("continue_to_payment")}</button>
               </div>
             </div> : <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
               {/* Promotion Header */}

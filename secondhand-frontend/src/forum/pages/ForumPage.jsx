@@ -114,7 +114,7 @@ const ForumPage = () => {
           {/* ── Thread List (Left) ─────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-4">
             <div className="rounded-2xl border border-border-light/70 bg-background-primary/70 backdrop-blur-sm p-2 shadow-sm lg:sticky lg:top-6 space-y-2 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
-              {forum.threadsError && <div className="rounded-xl border border-red-200 bg-status-error-bg px-4 py-3 text-sm text-red-700 font-medium">
+              {forum.threadsError && <div className="rounded-xl border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text font-medium">
                   {forum.threadsError}
                 </div>}
 

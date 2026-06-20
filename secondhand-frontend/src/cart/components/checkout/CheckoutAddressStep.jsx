@@ -161,7 +161,7 @@ const CheckoutAddressStep = ({
           </div> : <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {addresses.map(address => {
           const isSelected = String(selectedShippingAddressId) === String(address.id);
-          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-sm scale-[1.01]' : 'border-slate-100 bg-background-primary hover:border-slate-300 hover:shadow-sm'}`}>
+          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-primary bg-indigo-50/15 shadow-sm scale-[1.01]' : 'border-slate-100 bg-background-primary hover:border-slate-300 hover:shadow-sm'}`}>
                   <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
                   <div className="flex items-start gap-3">
                     {/* Radio indicator */}
@@ -191,12 +191,12 @@ const CheckoutAddressStep = ({
       {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && <div className="mb-6 rounded-xl border border-slate-100 bg-background-primary shadow-sm p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <label className="flex cursor-pointer select-none items-center gap-3">
-              <input type="checkbox" checked={billingSameAsShipping} onChange={handleBillingToggle} className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-600/20" />
+              <input type="checkbox" checked={billingSameAsShipping} onChange={handleBillingToggle} className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
               <span className="text-sm font-semibold text-slate-800">{t("billing_same_as_shipping")}</span>
             </label>
 
             {!billingSameAsShipping && <div className="relative w-full sm:w-64">
-                <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(Number(e.target.value))} className="w-full appearance-none rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-2.5 pr-10 text-sm text-text-primary outline-none transition focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-indigo-100 shadow-inner">
+                <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(Number(e.target.value))} className="w-full appearance-none rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-2.5 pr-10 text-sm text-text-primary outline-none transition focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-primary-200 shadow-inner">
                   <option value="">{t("choose_billing_address")}</option>
                   {addresses.map(a => <option key={a.id} value={a.id}>
                       {a.addressLine} — {a.city}, {a.state}
@@ -217,12 +217,12 @@ const CheckoutAddressStep = ({
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{t("order_name")}<span className="font-normal text-slate-400 capitalize">{t("optional")}</span>
           </label>
-          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-indigo-100" placeholder={t("e_g_birthday_gift")} value={orderName || ''} onChange={e => setOrderName(e.target.value)} maxLength={100} />
+          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-200" placeholder={t("e_g_birthday_gift")} value={orderName || ''} onChange={e => setOrderName(e.target.value)} maxLength={100} />
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{t("notes")}<span className="font-normal text-slate-400 capitalize">{t("optional")}</span>
           </label>
-          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-indigo-100" placeholder={t("delivery_notes")} value={notes} onChange={e => setNotes(e.target.value)} />
+          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-primary-200" placeholder={t("delivery_notes")} value={notes} onChange={e => setNotes(e.target.value)} />
         </div>
       </div>
 

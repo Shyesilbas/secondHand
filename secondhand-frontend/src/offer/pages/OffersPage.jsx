@@ -183,12 +183,12 @@ const OffersPage = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative min-w-[200px] flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-xl border border-border-light bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm text-text-primary placeholder:text-slate-400 focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-xl border border-border-light bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm text-text-primary placeholder:text-slate-400 focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" aria-hidden />
                 <label className="sr-only" htmlFor="offer-sort">{t("sort")}</label>
-                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm font-medium text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:w-auto">
+                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm font-medium text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto">
                   <option value={SORT.NEWEST}>{t("newest_first")}</option>
                   <option value={SORT.EXPIRING}>{t("expiring_soon")}</option>
                 </select>
@@ -212,8 +212,8 @@ const OffersPage = () => {
 
           {isLoading ? <div className="space-y-4">
               {[...Array(3)].map((_, i) => <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-100" />)}
-            </div> : error ? <div className="rounded-2xl border border-red-200 bg-status-error-bg/80 px-4 py-3">
-              <p className="text-sm font-medium text-red-800">{error}</p>
+            </div> : error ? <div className="rounded-2xl border border-status-error-border bg-status-error-bg/80 px-4 py-3">
+              <p className="text-sm font-medium text-status-error-text">{error}</p>
             </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-light bg-slate-50/60 px-6 py-16 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15">
                 <Handshake className="h-8 w-8 text-primary" />

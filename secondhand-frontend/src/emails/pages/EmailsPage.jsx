@@ -26,7 +26,7 @@ const EmailsPageFeedback = ({
   emails,
   filterType
 }) => {
-  if (error) return <div className="m-4 bg-status-error-bg border border-red-100 rounded-lg p-4">
+  if (error) return <div className="m-4 bg-status-error-bg border border-status-error-border rounded-lg p-4">
             <h3 className="text-sm font-medium text-text-primary">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
             <p className="text-sm text-status-error mt-1">{error}</p>
         </div>;

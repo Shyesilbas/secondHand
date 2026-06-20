@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import { Search, Check, ChevronRight, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry, getCreateFlowSelectorSteps, getListingTypeOptions, getPrefilterSelectors, isCreateSelectionComplete } from '../config/listingConfig.js';
@@ -286,7 +287,7 @@ const ListingPrefilterSelectionFlow = ({
   }, [enums]);
   const renderSelectionStep = useCallback(stepId => {
     if (stepId === 1) {
-      const categoryGrid = <div className="space-y-6">
+      const categoryGrid = <div className="space-y-4">
             {mode === 'browse' && <motion.div initial={{
           opacity: 0,
           y: -10
@@ -295,17 +296,17 @@ const ListingPrefilterSelectionFlow = ({
           y: 0
         }} transition={{
           duration: 0.3
-        }} className="rounded-2xl border border-primary/80 bg-gradient-to-r from-indigo-50/60 to-violet-50/30 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm backdrop-blur-sm">
+        }} className="rounded-xl border border-border-light bg-background-primary p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
                 <div>
-                  <h4 className="text-sm font-bold text-primary">{t("just_want_to_look_around")}</h4>
-                  <p className="text-body text-zinc-500 mt-0.5">{t("skip_selecting_a_category_and_filters_to")}</p>
+                  <h4 className="text-sm font-bold text-text-primary">{t("just_want_to_look_around")}</h4>
+                  <p className="text-body text-text-secondary mt-0.5">{t("skip_selecting_a_category_and_filters_to")}</p>
                 </div>
-                <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/10 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 active:scale-95 shrink-0">
+                <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-primary-hover hover:shadow-md active:scale-95 shrink-0">
                   <span>{t("browse_all_listings")}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </motion.div>}
-            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {listingTypeOptions.map(type => {
             const isSelected = selectedType === type.value;
             const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
@@ -356,14 +357,14 @@ const ListingPrefilterSelectionFlow = ({
         return label.includes(qf);
       }) : options;
       const showGridSearch = options.length > 6;
-      const searchIconClass = flowUiVariant === PREFLOW_WIZARD_VARIANT.BROWSE ? 'text-sky-500/80' : flowUiVariant === PREFLOW_WIZARD_VARIANT.SELL ? 'text-status-warning/70' : 'text-text-muted';
-      const gridBlock = <div>
-            {mode === 'create' && flowCopy.sellStepReassurance ? <p className="mb-4 text-xs leading-relaxed text-stone-600">{flowCopy.sellStepReassurance}</p> : null}
-            {showGridSearch && <div className="relative mb-4">
+      const searchIconClass = 'text-text-muted';
+      const gridBlock = <div className="space-y-3">
+            {mode === 'create' && flowCopy.sellStepReassurance ? <p className="text-xs leading-relaxed text-text-secondary">{flowCopy.sellStepReassurance}</p> : null}
+            {showGridSearch && <div className="relative">
                 <Search className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 ${searchIconClass}`} />
                 <input type="search" value={gridOptionFilter} onChange={e => setGridOptionFilter(e.target.value)} placeholder={flowCopy.gridFilterPlaceholder} className={auxUi.gridSearchInput} aria-label={t("filter_options")} />
               </div>}
-            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" key={`grid-${stepId}-${qf}`} className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" key={`grid-${stepId}-${qf}`} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map(opt => {
             const id = opt.id || opt.value;
             const label = opt.label || opt.name;
@@ -434,7 +435,7 @@ const ListingPrefilterSelectionFlow = ({
       return <div className={sellSurface}>{dropdownBlock}</div>;
     }
     return dropdownBlock;
-  }, [auxUi.dependentSelectorHint, auxUi.dropdownCard, auxUi.emptyFilterBox, auxUi.emptyFilterSubtitle, auxUi.emptyFilterTitle, auxUi.gridSearchInput, flowCopy, flowUiVariant, gridOptionFilter, handleTypeSelect, listingTypeOptions, mode, resolveStepOptions, selection, selectedType, selectorSteps, sellSurface, setSelectionValue, onSelectionNext]);
+  }, [auxUi.dependentSelectorHint, auxUi.dropdownCard, auxUi.emptyFilterBox, auxUi.emptyFilterSubtitle, auxUi.emptyFilterTitle, auxUi.gridSearchInput, flowCopy, flowUiVariant, gridOptionFilter, handleTypeSelect, listingTypeOptions, mode, resolveStepOptions, selection, selectedType, selectorSteps, sellSurface, setSelectionValue, onSelectionNext, t]);
   const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
   const isReadyToFinish = useMemo(() => {
     if (!selectedType) return false;
@@ -456,17 +457,17 @@ const ListingPrefilterSelectionFlow = ({
     });
   }, [isReadyToFinish, mode, onComplete, selectedType, selection]);
   if (mode === 'create' && isReadyToFinish && selectedType) {
-    return <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    return <div className="flex min-h-screen items-center justify-center bg-background-secondary px-4">
         <motion.div initial={{
         opacity: 0,
         scale: 0.95
       }} animate={{
         opacity: 1,
         scale: 1
-      }} className="w-full max-w-sm wizard-glass-elevated rounded-2xl p-8 text-center">
-          <div className="mx-auto mb-4 h-10 w-10 rounded-full border-[3px] border-zinc-200 border-t-zinc-700 animate-spin" />
+      }} className="w-full max-w-sm bg-background-primary border border-border-light shadow-sm rounded-xl p-8 text-center">
+          <div className="mx-auto mb-4 h-8 w-8 rounded-full border-2 border-border-light border-t-primary animate-spin" />
           <h2 className="text-lg font-semibold text-text-primary">{flowCopy.loading}</h2>
-          {flowCopy.loadingSub ? <p className="mt-1.5 text-sm text-zinc-500">{flowCopy.loadingSub}</p> : null}
+          {flowCopy.loadingSub ? <p className="mt-1.5 text-sm text-text-secondary">{flowCopy.loadingSub}</p> : null}
         </motion.div>
       </div>;
   }

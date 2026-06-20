@@ -29,7 +29,7 @@ const ReviewsList = memo(({
                 </div>
                 <h3 className="text-sm font-medium text-text-primary mb-2">{REVIEW_MESSAGES.ERROR_OCCURRED_TITLE}</h3>
                 <p className="text-text-secondary mb-4">{error}</p>
-                <button type="button" onClick={() => (onRetry ?? onLoadMore)?.()} className="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                <button type="button" onClick={() => (onRetry ?? onLoadMore)?.()} className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary transition-colors">
                     {REVIEW_MESSAGES.TRY_AGAIN}
                 </button>
             </div>;
@@ -49,7 +49,7 @@ const ReviewsList = memo(({
             {reviews.map(review => <ReviewCard key={review.id} review={review} />)}
             
             {hasMore && showLoadMore && <div className="text-center py-4">
-                    <button onClick={onLoadMore} disabled={loading} className="bg-primary text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <button onClick={onLoadMore} disabled={loading} className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                         {loading ? REVIEW_MESSAGES.LOADING : REVIEW_MESSAGES.LOAD_MORE}
                     </button>
                 </div>}

@@ -31,7 +31,7 @@ const DataPagination = ({
 
         <div className="flex items-center space-x-2">
           <label htmlFor="pageSize" className="text-xs text-slate-500">{t("per_page")}</label>
-          <select id="pageSize" className="px-2 py-1 text-xs border border-border-light rounded-lg bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-100" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
+          <select id="pageSize" className="px-2 py-1 text-xs border border-border-light rounded-lg bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary-200" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
             {(pageSizeOptions ?? []).map(size => <option key={size} value={size}>
                 {size}
               </option>)}

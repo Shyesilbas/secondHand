@@ -38,7 +38,7 @@ export function InteractiveStarRating({
             key={index}
             type="button"
             onClick={handleClick}
-            className={`${button} ${active ? 'text-yellow-400' : 'text-gray-300'} hover:text-yellow-400`}
+            className={`${button} ${active ? 'text-status-warning-text' : 'text-gray-300'} hover:text-status-warning-text`}
           >
             <StarIcon className={icon} />
           </button>

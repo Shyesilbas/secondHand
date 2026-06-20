@@ -89,7 +89,7 @@ const CheckoutOrderSummary = ({
                 </span>
                 <button type="button" onClick={onRemoveCoupon} className="text-xs font-bold uppercase tracking-wider text-slate-500 transition hover:text-primary">{t("remove")}</button>
               </div> : <div className="flex items-stretch gap-2">
-                <input value={couponInput} onChange={e => setCouponInput(e.target.value)} placeholder={t("enter_code")} className="min-w-0 flex-1 rounded-xl border border-slate-100 bg-slate-50/50 px-3.5 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-slate-300 focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-indigo-100 shadow-inner" />
+                <input value={couponInput} onChange={e => setCouponInput(e.target.value)} placeholder={t("enter_code")} className="min-w-0 flex-1 rounded-xl border border-slate-100 bg-slate-50/50 px-3.5 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-slate-300 focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-primary-200 shadow-inner" />
                 <button type="button" onClick={onApplyCoupon} disabled={isPreviewLoading || !couponInput.trim()} className="shrink-0 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black disabled:bg-slate-100 disabled:text-slate-400">{t("apply")}</button>
                 <button type="button" onClick={onOpenCouponsModal} className="shrink-0 rounded-xl border border-border-light bg-background-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50">{t("browse")}</button>
               </div>}

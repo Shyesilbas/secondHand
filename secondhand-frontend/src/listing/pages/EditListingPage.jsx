@@ -30,7 +30,7 @@ const PageError = ({ error, onBack }) => {
             </div>
             <h3 className="text-sm font-medium text-text-primary mb-2">{t("something_went_wrong")}</h3>
             <p className="text-text-secondary mb-8">{error}</p>
-            <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium w-full justify-center">
+            <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-colors font-medium w-full justify-center">
                 <ArrowLeft className="w-4 h-4" />{t("go_back_to_listings")}</button>
         </div>
       </div>

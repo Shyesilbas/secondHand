@@ -87,7 +87,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   useEffect(() => {
     refreshWallet();
   }, []);
-  const btnPrimaryClass = embedded ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors' : 'w-full py-2.5 rounded-xl text-sm font-bold text-white bg-status-success-bg hover:bg-status-success-bg disabled:opacity-45 transition-colors';
+  const btnPrimaryClass = embedded ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors' : 'w-full py-2.5 rounded-xl text-sm font-bold text-white bg-status-success-bg hover:bg-status-success-bg disabled:opacity-45 transition-colors';
   const headingClass = embedded ? 'text-base font-bold text-text-primary' : 'text-lg font-semibold text-text-primary';
   const mutedClass = embedded ? 'text-sm text-slate-500' : 'text-sm text-text-secondary';
   const innerBack = useCallback(() => {

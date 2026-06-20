@@ -177,7 +177,7 @@ const AccountHubPage = () => {
               const listing = firstItem?.listing;
               const thumbUrl = listing?.imageUrl || firstItem?.imageUrl;
               const lineTitle = listing?.title || firstItem?.title;
-              const statusColor = order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-status-success-bg/50 text-emerald-700 border-emerald-100/50' : order.status === 'CANCELLED' ? 'bg-status-error-bg/50 text-red-700 border-red-100/50' : 'bg-status-warning-bg/50 text-amber-700 border-amber-100/50';
+              const statusColor = order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-status-success-bg/50 text-emerald-700 border-emerald-100/50' : order.status === 'CANCELLED' ? 'bg-status-error-bg/50 text-status-error-text border-status-error-border/50' : 'bg-status-warning-bg/50 text-amber-700 border-amber-100/50';
               return <Link key={order.id} to={ROUTES.MY_ORDERS} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100/60 bg-slate-50/30 hover:bg-slate-50 hover:shadow-sm transition-all duration-300">
                       <div className="flex items-center gap-4 min-w-0">
                         <div className="w-14 h-14 rounded-xl bg-background-primary overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-100/80 shadow-sm">

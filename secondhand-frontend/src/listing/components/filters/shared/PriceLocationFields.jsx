@@ -6,7 +6,7 @@ import { get } from '../../../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../../../common/constants/apiEndpoints.js';
 import { useAuthState } from '../../../../auth/AuthContext.jsx';
 import { userService } from '../../../../user/services/userService.js';
-const inp = 'w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm tabular-nums text-text-primary placeholder:text-slate-400 shadow-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
+const inp = 'w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm tabular-nums text-text-primary placeholder:text-slate-400 shadow-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
 const selectWrapper = 'relative flex items-center';
 const dropdownIcon = <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 flex items-center justify-center">
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

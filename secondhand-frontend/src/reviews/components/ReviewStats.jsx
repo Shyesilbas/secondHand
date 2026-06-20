@@ -11,7 +11,7 @@ const ReviewStats = ({
   const getRatingColor = rating => {
     if (rating >= 4.5) return 'text-status-success';
     if (rating >= 3.5) return 'text-status-warning';
-    if (rating >= 2.5) return 'text-orange-600';
+    if (rating >= 2.5) return 'text-status-warning-text';
     return 'text-status-error';
   };
   if (loading) {

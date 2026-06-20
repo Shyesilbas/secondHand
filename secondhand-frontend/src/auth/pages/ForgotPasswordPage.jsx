@@ -58,23 +58,23 @@ const ForgotPasswordPage = () => {
     return <div className="flex flex-col w-full animate-fade-in">
                 {/* Logo Monogram */}
                 <div className="flex items-center gap-2 mb-8">
-                    <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
-                        <span className="text-amber-400 text-xs font-semibold leading-none">{t("s")}</span>
+                    <div className="w-8 h-8 rounded-lg bg-primary shadow-sm flex items-center justify-center shrink-0">
+                        <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
                     </div>
-                    <span className="text-sm font-semibold text-stone-900 tracking-tight">{t("secondhand")}</span>
+                    <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
                 </div>
 
                 <div className="text-center mb-8">
-                    <div className="w-12 h-12 mx-auto mb-4 bg-stone-100 rounded-full flex items-center justify-center text-stone-900">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-background-secondary rounded-full flex items-center justify-center text-text-primary">
                         <EnvelopeIcon className="w-5 h-5 stroke-[1.5]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("check_verification_code")}</h2>
-                    <p className="mt-2 text-xs text-stone-500 font-normal max-w-xs mx-auto leading-relaxed">{t("a_verification_code_has_been_generated_u")}</p>
+                    <p className="mt-2 text-xs text-text-secondary font-normal max-w-xs mx-auto leading-relaxed">{t("a_verification_code_has_been_generated_u")}</p>
                 </div>
 
-                {verificationCode && <div className="mb-6 p-4 rounded-xl border border-stone-200 bg-[#faf9f7] text-center">
-                        <div className="text-caption tracking-wider font-semibold text-stone-400 uppercase mb-1">{t("developer_environment_code")}</div>
-                        <div className="text-2xl font-mono tracking-[0.2em] font-semibold text-stone-900">{verificationCode}</div>
+                {verificationCode && <div className="mb-6 p-4 rounded-xl border border-border-light bg-background-secondary text-center">
+                        <div className="text-caption tracking-wider font-semibold text-text-muted uppercase mb-1">{t("developer_environment_code")}</div>
+                        <div className="text-2xl font-mono tracking-widest font-semibold text-text-primary">{verificationCode}</div>
                     </div>}
 
                 <form onSubmit={async e => {
@@ -120,7 +120,7 @@ const ForgotPasswordPage = () => {
           confirmPassword: e.target.value
         })} required leftIcon={<LockClosedIcon className="w-4 h-4" />} />
 
-                    {error && <div className="p-3.5 rounded-xl bg-rose-50/50 border border-rose-100 text-xs text-rose-600">
+                    {error && <div className="p-3.5 rounded-xl bg-status-error-bg border border-status-error-border text-xs text-status-error">
                             {error}
                         </div>}
 
@@ -128,7 +128,7 @@ const ForgotPasswordPage = () => {
                 </form>
 
                 <div className="text-center mt-6">
-                    <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition-colors">
+                    <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
                         <ArrowLeftIcon className="w-3.5 h-3.5" />
                         <span>{t("back_to_login")}</span>
                     </Link>
@@ -138,15 +138,15 @@ const ForgotPasswordPage = () => {
   return <div className="flex flex-col w-full animate-fade-in">
             {/* Logo Monogram */}
             <div className="flex items-center gap-2 mb-8">
-                <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
-                    <span className="text-amber-400 text-xs font-semibold leading-none">{t("s")}</span>
+                <div className="w-8 h-8 rounded-lg bg-primary shadow-sm flex items-center justify-center shrink-0">
+                    <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
                 </div>
-                <span className="text-sm font-semibold text-stone-900 tracking-tight">{t("secondhand")}</span>
+                <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
             </div>
 
             <div className="mb-8">
                 <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("recover_password")}</h1>
-                <p className="mt-2 text-sm text-stone-500 font-normal">{t("enter_your_email_and_we_ll_start_your_re")}</p>
+                <p className="mt-2 text-sm text-text-secondary font-normal">{t("enter_your_email_and_we_ll_start_your_re")}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -158,7 +158,7 @@ const ForgotPasswordPage = () => {
                 <AuthButton type="submit" isLoading={isLoading} className="mt-2">{t("send_recovery_code")}</AuthButton>
 
                 <div className="text-center mt-4">
-                    <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition-colors">
+                    <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
                         <ArrowLeftIcon className="w-3.5 h-3.5" />
                         <span>{t("back_to_login")}</span>
                     </Link>

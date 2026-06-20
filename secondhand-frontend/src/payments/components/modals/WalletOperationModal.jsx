@@ -92,7 +92,7 @@ const WalletOperationModal = ({
             <label className="block text-sm font-medium text-text-secondary mb-1">{amountLabel}</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">{t("try")}</span>
-              <input type="number" step="0.01" min="0" className="w-full border rounded-lg pl-10 pr-3 py-2 focus:ring focus:ring-blue-400 outline-none" placeholder={amountPlaceholder} value={amount} onChange={e => setAmount(e.target.value)} />
+              <input type="number" step="0.01" min="0" className="w-full border rounded-lg pl-10 pr-3 py-2 focus:ring focus:ring-primary outline-none" placeholder={amountPlaceholder} value={amount} onChange={e => setAmount(e.target.value)} />
             </div>
             {amountHelp ? <p className="text-xs text-text-muted mt-2">{amountHelp}</p> : null}
           </div>
@@ -100,7 +100,7 @@ const WalletOperationModal = ({
 
         <div className="flex gap-3 mt-6">
           <button onClick={handleClose} className="flex-1 px-4 py-2 border rounded-lg text-text-secondary hover:bg-secondary">{t("cancel")}</button>
-          <button onClick={handleSubmit} disabled={loading} className="flex-1 px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-700 disabled:opacity-50">
+          <button onClick={handleSubmit} disabled={loading} className="flex-1 px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary disabled:opacity-50">
             {loading ? 'Processing...' : submitLabel}
           </button>
         </div>

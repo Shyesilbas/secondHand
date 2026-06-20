@@ -89,7 +89,7 @@ const audienceSummary = row => {
 };
 
 /** Tutarlı form kontrolleri */
-const inputCn = 'mt-1.5 w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm placeholder:text-slate-400 transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-indigo-500/15 disabled:cursor-not-allowed disabled:bg-slate-100/90 disabled:text-slate-500';
+const inputCn = 'mt-1.5 w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm placeholder:text-slate-400 transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-100/90 disabled:text-slate-500';
 function FormSection({
   Icon,
   title,
@@ -360,7 +360,7 @@ const AdminCouponsPage = () => {
               <ArrowLeft className="w-4 h-4" />{t("account")}</Link>
             <div className="h-8 w-px bg-slate-200 hidden sm:block" />
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-2 rounded-xl bg-indigo-100 text-primary">
+              <div className="p-2 rounded-xl bg-primary-50 text-primary">
                 <Shield className="w-5 h-5" />
               </div>
               <div className="min-w-0">
@@ -372,7 +372,7 @@ const AdminCouponsPage = () => {
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border-light bg-background-primary text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60">
               <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />{t("refresh")}</button>
-            <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-indigo-700 shadow-sm">
+            <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary shadow-sm">
               <Plus className="w-4 h-4" />{t("new_coupon")}</button>
           </div>
         </div>
@@ -385,7 +385,7 @@ const AdminCouponsPage = () => {
                 <label className="relative block min-w-0 flex-1 sm:max-w-sm">
                   <span className="sr-only">{t("filter_by_coupon_code")}</span>
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
-                  <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded-xl border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary shadow-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-indigo-500/15" />
+                  <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded-xl border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary shadow-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15" />
                 </label>
                 {normalizedCodeQuery ? <span className="shrink-0 text-xs font-medium tabular-nums text-slate-500">
                     {filteredSorted.length}{t("of")}{sorted.length}
@@ -525,8 +525,8 @@ const AdminCouponsPage = () => {
                     <div className="grid gap-2 sm:grid-cols-1">
                       {AUDIENCES.map(opt => {
                     const selected = form.audience === opt.value;
-                    return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-indigo-50/90 shadow-md shadow-indigo-500/10 ring-2 ring-indigo-500/20' : 'border-border-light bg-background-primary hover:border-slate-300 hover:bg-slate-50/80'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
-                            <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-slate-300 text-primary focus:ring-indigo-500" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
+                    return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-indigo-50/90 shadow-md shadow-indigo-500/10 ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-slate-300 hover:bg-slate-50/80'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
+                            <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-slate-300 text-primary focus:ring-primary" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-semibold text-text-primary">{opt.label}</span>
                               <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">{opt.hint}</span>
@@ -539,7 +539,7 @@ const AdminCouponsPage = () => {
 
                   {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/80 bg-gradient-to-r from-indigo-50 to-violet-50 px-4 py-3.5">
                       <div className="flex items-center gap-2.5 text-sm text-primary">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background-primary shadow-sm ring-1 ring-indigo-100">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background-primary shadow-sm ring-1 ring-primary-200">
                           <Users className="h-5 w-5 text-primary" />
                         </div>
                         <div>
@@ -547,7 +547,7 @@ const AdminCouponsPage = () => {
                           <p className="text-xs text-primary/80">{t("tamamlanm_demeli_sipari_i_olmayan_kay_tl")}</p>
                         </div>
                       </div>
-                      <div className="rounded-xl bg-background-primary px-4 py-2 text-center shadow-sm ring-1 ring-indigo-100">
+                      <div className="rounded-xl bg-background-primary px-4 py-2 text-center shadow-sm ring-1 ring-primary-200">
                         <span className="block text-2xl font-bold tabular-nums tracking-tight text-primary">
                           {audienceStatsLoading ? '…' : audienceStats?.eligibleUserCount ?? '—'}
                         </span>
@@ -571,7 +571,7 @@ const AdminCouponsPage = () => {
                     <input type="checkbox" checked={form.active} onChange={e => setForm(p => ({
                   ...p,
                   active: e.target.checked
-                }))} className="h-5 w-5 shrink-0 rounded-md border-slate-300 text-primary focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0" />
+                }))} className="h-5 w-5 shrink-0 rounded-md border-slate-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0" />
                   </label>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
@@ -633,7 +633,7 @@ const AdminCouponsPage = () => {
                   <div className="flex flex-wrap gap-2">
                     {LISTING_TYPES.map(t => {
                   const on = form.eligibleTypes.includes(t);
-                  return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-indigo-50 text-primary shadow-sm ring-1 ring-indigo-500/15' : 'border-border-light bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`}>
+                  return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-indigo-50 text-primary shadow-sm ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`}>
                           {t.replace(/_/g, ' ')}
                         </button>;
                 })}

@@ -14,9 +14,9 @@ const statusConfig = {
   [USER_ACCOUNT_STATUSES.SUSPENDED]: {
     label: 'Suspended',
     icon: XCircle,
-    color: 'text-red-700',
+    color: 'text-status-error-text',
     bg: 'bg-status-error-bg',
-    border: 'border-red-200',
+    border: 'border-status-error-border',
     dot: 'bg-status-error-bg',
     description: 'Your account has been suspended. Contact support for assistance.',
   },
@@ -65,7 +65,7 @@ const ProfileAccountStatus = ({user}) => {
 
       {/* Email Verification Card */}
       <div className={`flex items-start gap-4 p-5 rounded-xl border ${
-        isVerified ? 'border-emerald-200 bg-status-success-bg' : 'border-red-200 bg-status-error-bg'
+        isVerified ? 'border-emerald-200 bg-status-success-bg' : 'border-status-error-border bg-status-error-bg'
       }`}>
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
           isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'
@@ -77,7 +77,7 @@ const ProfileAccountStatus = ({user}) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-sm font-bold ${isVerified ? 'text-emerald-700' : 'text-red-700'}`}>
+            <span className={`text-sm font-bold ${isVerified ? 'text-emerald-700' : 'text-status-error-text'}`}>
               {isVerified ? 'Email Verified' : 'Email Not Verified'}
             </span>
             <span className={`w-2 h-2 rounded-full ${isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'}`} />

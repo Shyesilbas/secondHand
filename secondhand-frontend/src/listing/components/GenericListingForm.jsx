@@ -25,9 +25,6 @@ import { cacheService } from '../../common/services/cacheService.js';
 const FieldError = ({
   error
 }) => {
-  const {
-    t
-  } = useTranslation();
   if (!error) return null;
   return <motion.p initial={{
     opacity: 0,
@@ -46,17 +43,14 @@ const SectionCard = ({
   icon: Icon,
   children
 }) => {
-  const {
-    t
-  } = useTranslation();
-  return <div className="wizard-glass-elevated wizard-card-lift rounded-xl overflow-visible">
-      <div className="flex items-center gap-3 border-b border-zinc-100/60 px-5 py-3.5">
-        {Icon && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-50 to-zinc-100 shadow-sm">
-            <Icon className="h-4 w-4 text-zinc-600" />
+  return <div className="bg-background-primary shadow-sm ring-1 ring-border-light rounded-xl overflow-visible">
+      <div className="flex items-center gap-3 border-b border-border-light px-5 py-4">
+        {Icon && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background-secondary border border-border-light">
+            <Icon className="h-4 w-4 text-text-secondary" />
           </div>}
         <div>
           <h3 className="text-sm font-medium text-text-primary">{title}</h3>
-          {description && <p className="mt-0.5 text-xs text-zinc-500">{description}</p>}
+          {description && <p className="mt-0.5 text-xs text-text-secondary">{description}</p>}
         </div>
       </div>
       <div className="p-5 sm:p-6">{children}</div>
@@ -68,13 +62,13 @@ const ToggleCardField = ({
   description,
   value,
   onToggle
-}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded-xl border px-4 py-3.5 transition-all duration-200 ${value ? 'border-zinc-900/20 bg-zinc-50/80 shadow-sm border-l-[3px] border-l-zinc-900' : 'border-zinc-200/60 bg-background-primary hover:border-zinc-300 hover:shadow-sm'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
+}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded-xl border px-4 py-3.5 transition-all duration-200 ${value ? 'border-primary bg-primary/5 shadow-sm border-l-[3px] border-l-primary' : 'border-border-light bg-background-primary hover:border-border-focus hover:shadow-sm'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
     onToggle();
   }
 }}>
-    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${value ? 'border-zinc-900 bg-zinc-900' : 'border-zinc-300 bg-background-primary'}`}>
+    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${value ? 'border-primary bg-primary' : 'border-border-dark bg-background-primary'}`}>
       {value && <motion.svg initial={{
       scale: 0
     }} animate={{
@@ -89,10 +83,10 @@ const ToggleCardField = ({
     </div>
     <input id={name} type="checkbox" name={name} checked={Boolean(value)} onChange={() => onToggle()} className="sr-only" />
     <div>
-      <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-zinc-900">
+      <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-text-primary">
         {label}
       </label>
-      {description && <p className="mt-0.5 text-body text-zinc-500">
+      {description && <p className="mt-0.5 text-body text-text-secondary">
           {description}
         </p>}
     </div>
@@ -101,8 +95,8 @@ const ToggleCardField = ({
 /* ── Input Classes ─────────────────────────────────────────── */
 
 const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
-const inputNormal = `${inputBase} border-zinc-200/60 bg-background-primary focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
-const inputError = `${inputBase} border-red-300 bg-status-error-bg/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+const inputNormal = `${inputBase} border-border-light bg-background-primary focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT`;
+const inputError = `${inputBase} border-status-error-border bg-status-error-bg focus:border-status-error-border focus:ring-2 focus:ring-status-error/20`;
 
 /* ── Main Form ─────────────────────────────────────────────── */
 
@@ -129,12 +123,11 @@ const GenericListingForm = ({
   const listingConfig = useMemo(() => getListingConfig(listingType), [listingType]);
   const formSchema = listingConfig?.formSchema || null;
   const uiChrome = useMemo(() => !isEdit ? 'composer' : 'neutral', [isEdit]);
-  const sectionTone = uiChrome === 'composer' ? 'composer' : 'neutral';
   const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
-  const labelClass = uiChrome === 'composer' ? 'text-zinc-950' : 'text-zinc-900';
-  const descFieldClass = uiChrome === 'composer' ? 'text-zinc-500' : 'text-zinc-400';
-  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-zinc-200/60 bg-background-primary px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5 hover:border-zinc-300 wizard-input-glow' : inputNormal, [uiChrome]);
-  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-red-200 bg-status-error-bg/40 px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 focus:border-red-400 focus:ring-2 focus:ring-red-400/25' : inputError, [uiChrome]);
+  const labelClass = 'text-text-primary';
+  const descFieldClass = 'text-text-secondary';
+  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-border-light bg-background-primary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT' : inputNormal, [uiChrome]);
+  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-status-error-border bg-status-error-bg px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 focus:border-status-error-border focus:ring-2 focus:ring-status-error/20' : inputError, [uiChrome]);
   const wizardSteps = useMemo(() => {
     const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
     if (!steps.length) return steps;
@@ -345,7 +338,7 @@ const GenericListingForm = ({
     if (field.type === 'toggle') {
       return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
           <ToggleCardField name={field.name} label={field.label} description={field.description} value={Boolean(value)} chrome={toggleChrome} onToggle={() => {
-          const next = !Boolean(value);
+          const next = !value;
           if (typeof field.onChange === 'function') {
             field.onChange({
               value: next,
@@ -445,17 +438,17 @@ const GenericListingForm = ({
     const typeLabel = listingConfig?.label || listingType;
     return <div className="space-y-4 wizard-stagger">
         {/* Hero preview card */}
-        <div className="wizard-glass-elevated rounded-xl overflow-hidden">
+        <div className="bg-background-primary ring-1 ring-border-light shadow-sm rounded-xl overflow-hidden">
           <div className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
-                <span className="inline-flex items-center rounded-lg bg-zinc-100/80 px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-zinc-600">
+                <span className="inline-flex items-center rounded-lg bg-background-secondary border border-border-light px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-text-secondary">
                   {typeLabel}
                 </span>
                 <h3 className={`text-sm font-medium text-text-primary mt-2.5 tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
                 {formData?.description && <p className={`mt-2 whitespace-pre-wrap line-clamp-3 text-sm leading-relaxed ${descFieldClass}`}>{formData.description}</p>}
               </div>
-              {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200/50 bg-zinc-50 shadow-sm">
+              {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border-light bg-background-secondary shadow-sm">
                   <img src={formData.imageUrl} alt={t("listing")} className="h-full w-full object-cover" />
                 </div>}
             </div>
@@ -475,9 +468,9 @@ const GenericListingForm = ({
         y: 0
       }} transition={{
         delay: 0.3
-      }} className="flex items-center gap-2.5 rounded-xl border border-emerald-200/60 bg-status-success-bg/50 px-4 py-3">
+      }} className="flex items-center gap-2.5 rounded-xl border border-status-success-border bg-status-success-bg px-4 py-3">
           <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
-          <p className="text-sm text-emerald-700 font-medium">{t("your_listing_is_ready_to_publish")}</p>
+          <p className="text-sm text-status-success font-medium">{t("your_listing_is_ready_to_publish")}</p>
         </motion.div>
       </div>;
   };
@@ -541,15 +534,12 @@ const SummarySection = ({
   icon: Icon,
   rows
 }) => {
-  const {
-    t
-  } = useTranslation();
-  return <div className="wizard-glass-elevated rounded-xl overflow-hidden">
-      <div className="border-b border-zinc-100/60 bg-zinc-50/50 px-4 py-2.5 flex items-center gap-2">
-        {Icon && <Icon className="h-3.5 w-3.5 text-zinc-500" />}
-        <h4 className="text-caption font-semibold uppercase tracking-wider text-zinc-600">{title}</h4>
+  return <div className="bg-background-primary ring-1 ring-border-light shadow-sm rounded-xl overflow-hidden">
+      <div className="border-b border-border-light bg-background-secondary px-4 py-2.5 flex items-center gap-2">
+        {Icon && <Icon className="h-3.5 w-3.5 text-text-secondary" />}
+        <h4 className="text-caption font-semibold uppercase tracking-wider text-text-secondary">{title}</h4>
       </div>
-      <div className="divide-y divide-zinc-100/60">
+      <div className="divide-y divide-border-light">
         {rows.map((row, i) => <motion.div key={`${row.label}-${row.value}`} initial={{
         opacity: 0,
         x: -8
@@ -559,8 +549,8 @@ const SummarySection = ({
       }} transition={{
         delay: i * 0.05
       }} className="flex items-start justify-between gap-3 px-4 py-3">
-            <span className="text-body text-zinc-500">{row.label}</span>
-            <span className="text-right text-sm font-medium tabular-nums text-zinc-900">{row.value}</span>
+            <span className="text-body text-text-secondary">{row.label}</span>
+            <span className="text-right text-sm font-medium tabular-nums text-text-primary">{row.value}</span>
           </motion.div>)}
       </div>
     </div>;

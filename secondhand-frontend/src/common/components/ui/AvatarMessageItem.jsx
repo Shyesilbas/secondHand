@@ -36,7 +36,7 @@ const AvatarMessageItem = ({
             <p className="text-sm text-text-secondary mt-1">{content}</p>
           )}
           {unread && !isOwn && (
-            <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mt-2"></span>
+            <span className="inline-block w-2 h-2 bg-primary rounded-full mt-2"></span>
           )}
         </div>
       </div>

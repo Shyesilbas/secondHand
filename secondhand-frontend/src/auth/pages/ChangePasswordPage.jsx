@@ -122,7 +122,7 @@ const ChangePasswordPage = () => {
     if (score <= 4) return {
       level: score,
       label: 'Good',
-      color: 'bg-blue-500'
+      color: 'bg-primary'
     };
     return {
       level: score,
@@ -135,8 +135,8 @@ const ChangePasswordPage = () => {
             <div className="max-w-md w-full">
                 <div className="bg-background-primary rounded-lg shadow-sm border border-border-light p-6">
                     <div className="text-center mb-6">
-                        <div className="w-10 h-10 bg-tertiary rounded-lg flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 bg-background-secondary border border-border-light rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                             </svg>
                         </div>
@@ -162,7 +162,7 @@ const ChangePasswordPage = () => {
                                                     {passwordStrength.label}
                                                 </span>
                                             </div>
-                                            <div className="w-full bg-tertiary rounded-full h-1.5">
+                                            <div className="w-full bg-background-tertiary rounded-full h-1.5">
                                                 <div className={`h-1.5 rounded-full transition-all duration-300 ${passwordStrength.color}`} style={{
                     width: `${passwordStrength.level / 5 * 100}%`
                   }}></div>
@@ -178,7 +178,7 @@ const ChangePasswordPage = () => {
                                 {isLoading ? 'Updating...' : 'Update Password'}
                             </AuthButton>
                             
-                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="w-full py-2 px-4 border border-border-DEFAULT rounded-lg text-sm font-medium text-text-secondary bg-background-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">{t("cancel")}</button>
+                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="w-full py-2 px-4 border border-border-light rounded-lg text-sm font-medium text-text-secondary bg-background-primary hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">{t("cancel")}</button>
                         </div>
                     </form>
 

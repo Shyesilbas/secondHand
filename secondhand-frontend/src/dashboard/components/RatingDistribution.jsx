@@ -14,7 +14,7 @@ const RatingDistribution = ({
     5: 'bg-status-success-bg',
     4: 'bg-status-success-bg',
     3: 'bg-status-warning-bg',
-    2: 'bg-orange-400',
+    2: 'bg-status-warning',
     1: 'bg-rose-400'
   };
   return <div>

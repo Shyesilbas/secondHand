@@ -55,7 +55,7 @@ class ErrorBoundary extends React.Component {
 
             {/* Action Buttons */}
             <div className="mt-6 flex gap-3">
-              <button onClick={this.handleRefresh} className="flex-1 bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">{t("refresh_page")}</button>
+              <button onClick={this.handleRefresh} className="flex-1 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary transition-colors">{t("refresh_page")}</button>
               <button onClick={this.handleGoHome} className="flex-1 bg-tertiary text-text-secondary px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">{t("go_home")}</button>
             </div>
 

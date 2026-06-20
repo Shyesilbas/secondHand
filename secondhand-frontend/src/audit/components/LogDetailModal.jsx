@@ -100,12 +100,12 @@ const LogDetailModal = ({
                     
                     {selectedLog.errorMessage && <>
                             <div className="h-px bg-tertiary"></div>
-                            <div className="p-4 bg-status-error-bg border border-red-200 rounded-xl">
+                            <div className="p-4 bg-status-error-bg border border-status-error-border rounded-xl">
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-status-error flex-shrink-0 mt-0.5" />
                                     <div className="flex-1 min-w-0">
                                         <label className="text-xs font-semibold text-status-error uppercase tracking-wide block mb-1">{t("error_message")}</label>
-                                        <p className="text-sm text-red-800 font-medium">{selectedLog.errorMessage}</p>
+                                        <p className="text-sm text-status-error-text font-medium">{selectedLog.errorMessage}</p>
                                     </div>
                                 </div>
                             </div>

@@ -87,7 +87,7 @@ const ExchangeRatesTab = ({
             {exLoading ? <div className="flex items-center justify-center gap-2 h-[72px]">
                 <RefreshCw className="w-5 h-5 animate-spin opacity-75" />
                 <span className="font-medium">{t("updating_rates")}</span>
-              </div> : exError ? <div className="text-red-200 text-sm h-[72px] flex items-center justify-center">{exError}</div> : <div className="animate-fade-in">
+              </div> : exError ? <div className="text-status-error text-sm h-[72px] flex items-center justify-center">{exError}</div> : <div className="animate-fade-in">
                 <p className="text-primary text-xs font-medium uppercase tracking-wider mb-1">{t("converted_price")}</p>
                 <p className="text-3xl font-bold tracking-tight">
                   {formatCurrency(convertedValue, selected)}

@@ -57,7 +57,7 @@ const DraftListingsList = ({
                                         </div>
                                         
                                         <div className="ml-4 flex flex-col items-end gap-3">
-                                            <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-300 ${isSelected ? 'border-primary bg-indigo-500 shadow-sm shadow-indigo-200' : 'border-slate-300 bg-slate-50'}`}>
+                                            <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-300 ${isSelected ? 'border-primary bg-primary shadow-sm shadow-indigo-200' : 'border-slate-300 bg-slate-50'}`}>
                                                 {isSelected && (
                                                     <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

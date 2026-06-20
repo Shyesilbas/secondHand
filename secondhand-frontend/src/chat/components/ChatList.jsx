@@ -41,7 +41,7 @@ const ChatList = ({
         </div>
         
         <div className="relative group">
-          <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-border-light rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-primary bg-background-primary transition-all duration-300 ease-in-out tracking-tight" />
+          <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-border-light rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary bg-background-primary transition-all duration-300 ease-in-out tracking-tight" />
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-400 transition-colors duration-300 ease-in-out group-focus-within:text-primary" />
           </div>

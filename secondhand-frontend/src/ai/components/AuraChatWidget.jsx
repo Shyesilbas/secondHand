@@ -197,7 +197,7 @@ const AuraChatWidget = () => {
 
             <div className="shrink-0 border-t border-border-light/90 bg-background-primary/95 backdrop-blur-md p-3">
               <div className="flex items-end gap-2">
-                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-2xl border border-border-light bg-slate-50/80 px-3.5 py-2.5 text-sm text-text-primary placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-primary focus:bg-background-primary" rows={2} />
+                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-2xl border border-border-light bg-slate-50/80 px-3.5 py-2.5 text-sm text-text-primary placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary focus:bg-background-primary" rows={2} />
                 <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-violet-500 transition-all" aria-label={t("send")}>
                   <Send className="w-4 h-4" />
                 </button>

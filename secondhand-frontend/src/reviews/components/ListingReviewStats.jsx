@@ -51,13 +51,13 @@ const ListingReviewStats = ({ listing, listingId, size = 'sm', showIcon = true, 
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <StarIcon key={i} className={`${config.icon} text-yellow-400`} />
+        <StarIcon key={i} className={`${config.icon} text-status-warning-text`} />
       );
     }
 
     if (hasHalfStar) {
       stars.push(
-        <svg key="half" className={`${config.icon} text-yellow-400`} fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+        <svg key="half" className={`${config.icon} text-status-warning-text`} fill="currentColor" viewBox="0 0 20 20" aria-hidden>
           <defs>
             <linearGradient id={halfStarGradientId}>
               <stop offset="50%" stopColor="currentColor" />

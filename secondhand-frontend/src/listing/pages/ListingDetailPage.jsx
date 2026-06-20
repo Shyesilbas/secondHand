@@ -230,7 +230,7 @@ const ListingDetailPage = () => {
   if (isLoading) return <DetailSkeleton />;
   if (error) return <DetailError error={error} />;
   if (!listing) return null;
-  return <div className="min-h-screen bg-background-secondary pb-28 lg:pb-16 text-text-primary selection:bg-indigo-100 selection:text-primary">
+  return <div className="min-h-screen bg-background-secondary pb-28 lg:pb-16 text-text-primary selection:bg-primary-50 selection:text-primary">
 
       {/* ▸ Sticky Navigation Header */}
       <header className="sticky top-0 z-40 bg-background-primary border-b border-border-light text-sm">
@@ -343,7 +343,7 @@ const ListingDetailPage = () => {
 
               {/* Thumbnail strip */}
               {images.length > 1 && <div className="mt-2 flex gap-2 overflow-x-auto pb-1 px-0.5 scrollbar-thin">
-                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-[48px] w-[60px] shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-primary ring-2 ring-indigo-500/20 listing-thumb-active shadow-sm' : 'border-border-light/80 opacity-60 hover:opacity-100 hover:border-border-DEFAULT'}`}>
+                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-[48px] w-[60px] shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-primary ring-2 ring-primary/20 listing-thumb-active shadow-sm' : 'border-border-light/80 opacity-60 hover:opacity-100 hover:border-border-DEFAULT'}`}>
                       <img src={optimizeCloudinaryUrl(imgUrl, {
                   width: 180
                 })} alt="" className="h-full w-full object-cover" />
@@ -425,12 +425,12 @@ const ListingDetailPage = () => {
 
                   {/* Stock & Reservation Info */}
                   {(hasStockInfo || activeReservations > 0) && <div className="flex flex-wrap items-center gap-2 mt-4">
-                      {hasStockInfo && <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-200/80' : 'bg-background-secondary text-text-secondary border border-border-light'}`}>
-                          {isLowStock && <span className="w-2 h-2 rounded-full bg-status-warning-bg listing-stock-pulse" />}
+                      {hasStockInfo && <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${isLowStock ? 'bg-status-error-bg text-status-error-text border border-status-error-border' : 'bg-background-secondary text-text-secondary border border-border-light'}`}>
+                          {isLowStock && <span className="w-2 h-2 rounded-full bg-status-error listing-stock-pulse" />}
                           <Package className="w-3 h-3" />
                           {isLowStock ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
                         </span>}
-                      {activeReservations > 0 && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 text-rose-600 text-xs font-bold border border-rose-100">
+                      {activeReservations > 0 && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-error-bg text-status-error-text text-xs font-bold border border-status-error-border">
                           <Flame className="w-3 h-3" />
                           {activeReservations} {activeReservations === 1 ? 'person' : 'people'}{t("looking")}</span>}
                     </div>}

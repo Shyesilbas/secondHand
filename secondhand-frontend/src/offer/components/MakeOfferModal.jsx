@@ -183,7 +183,7 @@ const MakeOfferModal = ({
             </p>
           </div>
 
-          {error ? <div className="text-sm font-medium text-red-700">{error}</div> : null}
+          {error ? <div className="text-sm font-medium text-status-error-text">{error}</div> : null}
 
           <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
             <button type="button" onClick={onClose} className="rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" disabled={isSubmitting}>{t("cancel")}</button>

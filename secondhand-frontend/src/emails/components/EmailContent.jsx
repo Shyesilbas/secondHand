@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { formatDateTime, formatPricesInHtml, replaceEnumCodesInHtml } from '../../common/formatters.js';
-import { useEnums } from '../../common/hooks/useEnums.js';
+import { formatDateTime } from '../../common/formatters.js';
 import { Trash2 } from 'lucide-react';
 const MS_HEADER = '#f3f2f1';
 const MS_BORDER = '#edebe9';
@@ -26,7 +25,15 @@ const EmailContent = ({
   const formatDate = dateString => formatDateTime(dateString);
   if (!email) return null;
   const initials = senderInitials(email.senderEmail);
-  return <div className="flex h-full min-h-0 flex-col bg-background-primary">
+    const getProcessedContent = (content) => {
+        if (!content) return '';
+        const isHtml = /<[a-z][\s\S]*>/i.test(content);
+        if (isHtml) return content;
+        
+        return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; line-height: 1.6; color: #323130; white-space: pre-wrap; word-wrap: break-word; margin: 0; }</style></head><body>${content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</body></html>`;
+    };
+
+    return <div className="flex h-full min-h-0 flex-col bg-background-primary">
             {/* Üst: konu + araç (Outlook’ta sağda sil vb.) */}
             <header className="shrink-0 border-b px-4 py-4 sm:px-6 lg:px-8 lg:py-5" style={{
       borderColor: MS_BORDER,
@@ -75,7 +82,7 @@ const EmailContent = ({
 
             {/* Gövde: render full HTML inside an iframe to prevent CSS bleeding */}
             <div className="min-h-0 flex-1 bg-background-primary relative">
-                <iframe srcDoc={email.content} title={t("email_content")} className="absolute inset-0 w-full h-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
+                <iframe srcDoc={getProcessedContent(email.content)} title={t("email_content")} className="absolute inset-0 w-full h-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
             </div>
         </div>;
 };

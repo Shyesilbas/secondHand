@@ -21,7 +21,7 @@ const SelectField = ({
         value={value}
         onChange={onChange}
         required={required}
-        className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary ${error ? 'border-red-300' : 'border-header-border'}`}
+        className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary ${error ? 'border-status-error-border' : 'border-header-border'}`}
       >
         {placeholder && (
           <option value="" disabled>

@@ -88,7 +88,7 @@ const ListingCard = ({
             hover:shadow-xl hover:-translate-y-1
             ${isOutOfStock ? 'opacity-55' : ''}
             ${isSelectable && isInShowcase ? 'opacity-40 grayscale-[0.5] cursor-not-allowed' : ''}
-            ${isSelected ? 'border-primary ring-2 ring-indigo-600/20 shadow-lg shadow-indigo-100' : isInCompare ? 'border-primary shadow-md shadow-indigo-100 ring-2 ring-indigo-100' : 'border-border-light/80 shadow-sm hover:border-slate-300'}
+            ${isSelected ? 'border-primary ring-2 ring-primary/20 shadow-lg shadow-indigo-100' : isInCompare ? 'border-primary shadow-md shadow-indigo-100 ring-2 ring-primary-200' : 'border-border-light/80 shadow-sm hover:border-slate-300'}
         `}>
             {isSelectable && <div className="absolute inset-0 z-40 cursor-pointer" onClick={e => {
       e.preventDefault();
@@ -205,7 +205,7 @@ const ListingCard = ({
                 {/* Footer */}
                 <div className="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
                     {listing.sellerName ? <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
-                            <div className="w-5 h-5 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-primary">
+                            <div className="w-5 h-5 shrink-0 rounded-full bg-primary-50 flex items-center justify-center text-[9px] font-bold text-primary">
                                 {listing.sellerName[0]?.toUpperCase()}
                             </div>
                             <span className="text-caption font-medium text-slate-500 truncate max-w-[88px]" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>

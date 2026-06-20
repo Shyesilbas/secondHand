@@ -47,7 +47,7 @@ export const ShippingDetailsSection = React.memo(({
       case 'CANCELLED':
         return 'text-rose-600 bg-rose-50 border-rose-100';
       case 'RETURNED':
-        return 'text-purple-600 bg-purple-50 border-purple-100';
+        return 'text-primary bg-purple-50 border-primary-200';
       default:
         return 'text-slate-600 bg-slate-50 border-slate-100';
     }
@@ -81,9 +81,9 @@ export const ShippingDetailsSection = React.memo(({
               <p className="text-caption font-semibold text-slate-400 uppercase tracking-widest mb-1">{t("tracking_number")}</p>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <p className="text-sm font-mono font-bold text-primary break-all">{shipping.trackingNumber}</p>
-                {useInternalLinks ? <button type="button" onClick={goInternalTracking} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-caption font-bold text-white bg-primary hover:bg-indigo-700 shadow-sm shadow-indigo-900/10 transition-colors">{t("track_in_app")}<ArrowRight className="w-3.5 h-3.5" />
+                {useInternalLinks ? <button type="button" onClick={goInternalTracking} className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-caption font-bold text-white bg-primary hover:bg-primary shadow-sm shadow-indigo-900/10 transition-colors">{t("track_in_app")}<ArrowRight className="w-3.5 h-3.5" />
                   </button> : null}
-                {canOpenCarrier ? <a href={shipping.trackingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-caption font-bold text-primary bg-indigo-50 border border-primary hover:bg-indigo-100 transition-colors">{t("open_carrier_site")}</a> : null}
+                {canOpenCarrier ? <a href={shipping.trackingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-caption font-bold text-primary bg-indigo-50 border border-primary hover:bg-primary-50 transition-colors">{t("open_carrier_site")}</a> : null}
               </div>
               {useInternalLinks && shipping.trackingUrl ? <p className="text-caption text-slate-400 mt-2">{t("full_tracking_page_also_offers_the_carri")}</p> : null}
             </div>}

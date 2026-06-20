@@ -55,10 +55,9 @@ const UserProfileHeader = ({
               </h1>
               {greatSellerEligible && <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-status-warning-bg text-amber-900 border border-amber-200 text-caption font-bold rounded-full uppercase tracking-wide">
                   <Award className="w-3.5 h-3.5" />{t("great_seller")}</span>}
-              {isOwnProfile && <span className="px-2.5 py-1 bg-tertiary text-text-secondary text-caption font-semibold rounded-full uppercase tracking-wider">{t("you")}</span>}
+              {isOwnProfile && <span className="px-2.5 py-1 bg-background-secondary text-text-secondary text-caption font-semibold rounded-full uppercase tracking-wider">{t("you")}</span>}
             </div>
 
-            {/* Stats row */}
             <div className="flex flex-wrap items-center gap-2.5 text-sm text-text-muted mb-4">
               {hasReviews && <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-status-warning-bg border border-amber-100">
                   <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
@@ -69,10 +68,10 @@ const UserProfileHeader = ({
                     ({reviewStats.totalReviews})
                   </span>
                 </div>}
-              <div className="inline-flex items-center rounded-xl border border-border-light bg-secondary px-3 py-1.5">
+              <div className="inline-flex items-center rounded-xl border border-border-light bg-background-secondary px-3 py-1.5">
                 <FollowStats userId={user.id} showIcon={true} className="text-text-secondary" />
               </div>
-              {memberSince && <span className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-secondary px-3 py-1.5 text-xs font-medium text-text-secondary">
+              {memberSince && <span className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-background-secondary px-3 py-1.5 text-xs font-medium text-text-secondary">
                   <Calendar className="w-3.5 h-3.5" />{t("member_since")}{memberSince}
                 </span>}
             </div>
@@ -80,7 +79,7 @@ const UserProfileHeader = ({
             <div className="flex flex-wrap gap-2 text-xs font-semibold text-text-secondary">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-status-success-bg px-3 py-1 text-emerald-700 ring-1 ring-emerald-100">
                 <ShieldCheck className="h-3.5 w-3.5" />{t("verified_marketplace_profile")}</span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary px-3 py-1 text-text-secondary ring-1 ring-gray-200">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-background-secondary px-3 py-1 text-text-secondary ring-1 ring-gray-200">
                 <UserRound className="h-3.5 w-3.5" />{t("seller_profile")}</span>
             </div>
 
@@ -99,8 +98,8 @@ const UserProfileHeader = ({
           </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-px border-t border-border-light bg-tertiary lg:w-72 lg:grid-cols-1 lg:border-l lg:border-t-0">
-                <div className="bg-secondary p-5">
+              <div className="grid grid-cols-2 gap-px border-t border-border-light bg-border-light lg:w-72 lg:grid-cols-1 lg:border-l lg:border-t-0">
+                <div className="bg-background-secondary p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-text-muted">
                     <Star className="h-3.5 w-3.5 text-amber-500" />{t("rating")}</div>
                   <p className="mt-2 text-2xl font-bold text-gray-950">
@@ -110,7 +109,7 @@ const UserProfileHeader = ({
                     {hasReviews ? `${reviewStats.totalReviews} reviews` : 'No reviews yet'}
                   </p>
                 </div>
-                <div className="bg-secondary p-5">
+                <div className="bg-background-secondary p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-text-muted">
                     <MessageCircle className="h-3.5 w-3.5 text-text-secondary" />{t("response")}</div>
                   <p className="mt-2 text-2xl font-bold text-gray-950">{t("open")}</p>

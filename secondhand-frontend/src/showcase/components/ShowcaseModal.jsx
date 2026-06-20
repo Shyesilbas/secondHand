@@ -209,7 +209,7 @@ const ShowcaseModal = ({
                             <div className="flex items-center justify-between relative">
                                 {/* Connecting line */}
                                 <div className="absolute left-0 right-0 top-4 h-px bg-slate-200 z-0" />
-                                <div className="absolute left-0 top-4 h-px bg-indigo-500 z-0 transition-all duration-500" style={{
+                                <div className="absolute left-0 top-4 h-px bg-primary z-0 transition-all duration-500" style={{
                 width: `${(step - 1) / (STEPS.length - 1) * 100}%`
               }} />
                                 {STEPS.map(({
@@ -241,7 +241,7 @@ const ShowcaseModal = ({
                             <button className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors rounded-xl hover:bg-slate-100" onClick={handlePrevStep}>
                                 {step > 1 ? '← Back' : 'Cancel'}
                             </button>
-                            {step < 3 && <button className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none" onClick={handleNextStep} disabled={step === 1 && (days < 1 || days > 30) || step === 2 && !allAgreementsAccepted}>
+                            {step < 3 && <button className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none" onClick={handleNextStep} disabled={step === 1 && (days < 1 || days > 30) || step === 2 && !allAgreementsAccepted}>
                                     {step === 1 ? 'Continue →' : 'Proceed to Payment →'}
                                 </button>}
                         </div>

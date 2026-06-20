@@ -81,7 +81,7 @@ const OrderSuccessPage = () => {
 
       {/* Subtle ambient motion — professional, not playful */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="absolute -top-32 -right-24 h-[420px] w-[420px] rounded-full bg-indigo-200/40 blur-3xl" style={{
+        <div className="absolute -top-32 -right-24 h-[420px] w-[420px] rounded-full bg-primary-50/40 blur-3xl" style={{
         animation: 'successOrb1 14s ease-in-out infinite'
       }} />
         <div className="absolute -bottom-40 -left-28 h-[380px] w-[380px] rounded-full bg-status-success-bg/35 blur-3xl" style={{
@@ -163,8 +163,8 @@ const OrderSuccessPage = () => {
               state: {
                 focusOrderId: orderId
               }
-            })} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-                  <Receipt className="w-4 h-4" />{t("view_order")}</button> : <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+            })} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary transition-colors">
+                  <Receipt className="w-4 h-4" />{t("view_order")}</button> : <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary transition-colors">
                   <Receipt className="w-4 h-4" />{t("my_orders")}</Link>}
 
               <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">

@@ -97,7 +97,7 @@ export const ThreadDetail = ({
             const ok = window.confirm(FORUM_MESSAGES.DELETE_THREAD_CONFIRM);
             if (!ok) return;
             await onDeleteThread?.(threadId);
-          }} className="h-9 w-9 rounded-lg border border-border-light bg-background-primary hover:bg-status-error-bg hover:border-red-200 text-text-muted hover:text-status-error inline-flex items-center justify-center transition-all duration-200" title={t("delete")}>
+          }} className="h-9 w-9 rounded-lg border border-border-light bg-background-primary hover:bg-status-error-bg hover:border-status-error-border text-text-muted hover:text-status-error inline-flex items-center justify-center transition-all duration-200" title={t("delete")}>
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>}
@@ -118,7 +118,7 @@ export const ThreadDetail = ({
           <span className={`inline-flex items-center justify-center min-w-[36px] h-9 text-sm font-bold tabular-nums ${netVotes > 0 ? 'text-violet-600' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'}`}>
             {netVotes}
           </span>
-          <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-all duration-200 ${isDisliked ? 'border-red-300 bg-status-error-bg text-status-error' : 'border-border-light bg-background-primary text-text-muted hover:text-status-error hover:border-red-200 hover:bg-status-error-bg'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)} title={t("downvote")}>
+          <button type="button" className={`inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-all duration-200 ${isDisliked ? 'border-status-error-border bg-status-error-bg text-status-error' : 'border-border-light bg-background-primary text-text-muted hover:text-status-error hover:border-status-error-border hover:bg-status-error-bg'}`} onClick={() => onReactThread?.(threadId, FORUM_REACTIONS.DISLIKE)} title={t("downvote")}>
             <ChevronDown className="w-5 h-5" />
           </button>
         </div>
@@ -153,7 +153,7 @@ export const ThreadDetail = ({
           </div>}
 
         {commentsError && <div className="px-6 pb-4">
-            <div className="rounded-lg border border-red-200 bg-status-error-bg px-4 py-3 text-sm text-red-700 font-medium">
+            <div className="rounded-lg border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text font-medium">
               {commentsError}
             </div>
           </div>}

@@ -91,7 +91,7 @@ const FilterSidebar = ({
                 <p className="text-xs font-medium text-text-muted">{t("refine_listings_then_apply")}</p>
               </div>
             </div>
-            <button type="button" onClick={onClose} className="shrink-0 rounded-xl border border-transparent p-2 text-text-muted transition-colors hover:bg-secondary-light hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 lg:hidden" aria-label={t("close_filters")}>
+            <button type="button" onClick={onClose} className="shrink-0 rounded-xl border border-transparent p-2 text-text-muted transition-colors hover:bg-secondary-light hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 lg:hidden" aria-label={t("close_filters")}>
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -156,8 +156,8 @@ const FilterSidebar = ({
 
         <footer className="flex-shrink-0 border-t border-border-light/80 bg-background-primary px-4 py-3">
           <div className="flex gap-2">
-            {mode !== 'mine' && <button type="button" onClick={handleApplyFilters} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-colors hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/45 focus-visible:ring-offset-2">{t("apply_filters")}</button>}
-            <button type="button" onClick={handleReset} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-light bg-background-primary px-3 py-3 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:border-border-DEFAULT focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35">
+            {mode !== 'mine' && <button type="button" onClick={handleApplyFilters} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-colors hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-2">{t("apply_filters")}</button>}
+            <button type="button" onClick={handleReset} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-light bg-background-primary px-3 py-3 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:border-border-DEFAULT focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35">
               <RotateCcw className="w-4 h-4 shrink-0" />{t("reset")}</button>
           </div>
         </footer>

@@ -30,12 +30,12 @@ const RevokeSessionsModal = ({
                     <div className="mb-6">
                         <p className="text-text-secondary mb-4">{t("this_action_will_immediately_log_you_out")}</p>
                         
-                        <div className="bg-status-error-bg border border-red-200 rounded-lg p-4">
+                        <div className="bg-status-error-bg border border-status-error-border rounded-lg p-4">
                             <div className="flex items-start space-x-3">
                                 <ExclamationTriangleIcon className="w-5 h-5 text-status-error mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <h4 className="text-sm font-medium text-red-800 mb-1">{t("important_security_notice")}</h4>
-                                    <ul className="text-sm text-red-700 space-y-1">
+                                    <h4 className="text-sm font-medium text-status-error-text mb-1">{t("important_security_notice")}</h4>
+                                    <ul className="text-sm text-status-error-text space-y-1">
                                         <li>{t("all_active_sessions_will_be_terminated")}</li>
                                         <li>{t("you_ll_be_logged_out_from_all_devices")}</li>
                                         <li>{t("this_action_cannot_be_undone")}</li>

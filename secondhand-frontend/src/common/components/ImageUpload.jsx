@@ -212,7 +212,7 @@ const ImageUpload = ({
       }} exit={{
         opacity: 0,
         y: -4
-      }} className="mt-3 px-3.5 py-2.5 bg-status-error-bg/80 border border-red-100 rounded-xl flex items-start gap-2 text-body text-status-error">
+      }} className="mt-3 px-3.5 py-2.5 bg-status-error-bg/80 border border-status-error-border rounded-xl flex items-start gap-2 text-body text-status-error">
             <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>{error}</span>
           </motion.div>}

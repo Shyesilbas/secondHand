@@ -16,7 +16,7 @@ const statusPresentation = {
   },
   [OFFER_STATUSES.REJECTED]: {
     label: 'Rejected',
-    badge: 'bg-status-error-bg text-red-800 border-red-200/80',
+    badge: 'bg-status-error-bg text-status-error-text border-status-error-border/80',
     icon: XCircle
   },
   [OFFER_STATUSES.EXPIRED]: {
@@ -147,12 +147,12 @@ const OfferTrackingCard = ({
         </div>
 
         <div className="flex shrink-0 flex-row flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4 sm:w-44 sm:flex-col sm:border-t-0 sm:pt-0">
-          {isExpired ? <span className="text-xs font-medium text-slate-500">{t("offer_expired")}</span> : canCheckout ? <button type="button" onClick={() => onCheckout(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700">
+          {isExpired ? <span className="text-xs font-medium text-slate-500">{t("offer_expired")}</span> : canCheckout ? <button type="button" onClick={() => onCheckout(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary">
               <ShoppingCart className="mr-1.5 h-4 w-4" />{t("checkout")}</button> : canActAsSeller ? <>
               <button type="button" onClick={() => onAccept(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-emerald-200 bg-status-success-bg px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-status-success-bg">
                 <CheckCircle2 className="mr-1.5 h-4 w-4" />{t("accept")}</button>
               <button type="button" onClick={() => onCounter(o)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-semibold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50">{t("counter")}</button>
-              <button type="button" onClick={() => onReject(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-status-error-bg hover:text-red-700">
+              <button type="button" onClick={() => onReject(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-status-error-border hover:bg-status-error-bg hover:text-status-error-text">
                 <XCircle className="mr-1.5 h-4 w-4" />{t("reject")}</button>
             </> : <p className="text-center text-caption leading-relaxed text-slate-500">
               {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING ? 'Waiting for the seller to respond.' : 'No action required.'}

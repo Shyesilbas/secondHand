@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { formatCurrency } from '../../common/formatters.js';
 const CATEGORY_COLORS = {
   VEHICLE: {
-    bg: 'bg-indigo-500',
+    bg: 'bg-primary',
     light: 'bg-indigo-50',
     text: 'text-primary',
     border: 'border-primary'
@@ -21,10 +21,10 @@ const CATEGORY_COLORS = {
     border: 'border-amber-200'
   },
   CLOTHING: {
-    bg: 'bg-pink-500',
+    bg: 'bg-primary',
     light: 'bg-pink-50',
-    text: 'text-pink-700',
-    border: 'border-pink-200'
+    text: 'text-primary',
+    border: 'border-primary-200'
   },
   BOOKS: {
     bg: 'bg-sky-500',
@@ -33,10 +33,10 @@ const CATEGORY_COLORS = {
     border: 'border-sky-200'
   },
   SPORTS: {
-    bg: 'bg-purple-500',
+    bg: 'bg-primary',
     light: 'bg-purple-50',
-    text: 'text-purple-700',
-    border: 'border-purple-200'
+    text: 'text-primary',
+    border: 'border-primary-200'
   }
 };
 const DEFAULT_COLOR = {

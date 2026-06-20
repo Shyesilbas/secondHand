@@ -50,15 +50,12 @@ const ListingCardActions = ({
     label,
     variant = 'default'
   }) => {
-    const {
-      t
-    } = useTranslation();
     const colorMap = {
-      default: 'text-slate-600 hover:bg-slate-50 hover:text-text-primary',
-      green: 'text-emerald-700 hover:bg-status-success-bg',
-      indigo: 'text-primary hover:bg-indigo-50',
-      amber: 'text-amber-700 hover:bg-status-warning-bg',
-      red: 'text-rose-600 hover:bg-rose-50'
+      default: 'text-text-secondary hover:bg-background-secondary hover:text-text-primary',
+      green: 'text-status-success hover:bg-status-success-bg',
+      indigo: 'text-primary hover:bg-primary/5',
+      amber: 'text-status-warning hover:bg-status-warning-bg',
+      red: 'text-status-error hover:bg-status-error-bg'
     };
     return <button onClick={onClick} className={`w-full px-3.5 py-2 text-left text-body font-medium flex items-center gap-2.5 rounded-lg transition-colors ${colorMap[variant]}`}>
         <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -70,15 +67,15 @@ const ListingCardActions = ({
       e.preventDefault();
       e.stopPropagation();
       setIsDropdownOpen(!isDropdownOpen);
-    }} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-background-primary transition-colors" title={t("actions")}>
+    }} className="w-8 h-8 rounded-full bg-background-primary shadow-sm flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors ring-1 ring-border-light/50" title={t("actions")}>
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
 
-      {isDropdownOpen && <div className="absolute right-0 top-full mt-2 w-52 bg-background-primary rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden">
+      {isDropdownOpen && <div className="absolute right-0 top-full mt-2 w-52 bg-background-primary rounded-xl shadow-xl ring-1 ring-border-light py-2 z-50 overflow-hidden">
 
           {/* Quick edit section */}
-          {canEdit && <div className="px-3 pb-2 mb-1 border-b border-slate-100">
-              <p className="text-caption font-bold text-slate-400 uppercase tracking-widest mb-2 px-0.5">{t("quick_actions")}</p>
+          {canEdit && <div className="px-3 pb-2 mb-1 border-b border-border-light">
+              <p className="text-caption font-bold text-text-muted uppercase tracking-widest mb-2 px-0.5">{t("quick_actions")}</p>
               <ListingQuickEdit listing={listing} onChanged={onChanged} showSuccess={showSuccess} showError={showError} compact />
             </div>}
 
@@ -100,7 +97,7 @@ const ListingCardActions = ({
             <MenuItem onClick={actions.handleOpenCampaign} icon={Megaphone} label={t("create_campaign")} variant="indigo" />
           </div>
 
-          <div className="border-t border-slate-100 mt-2 pt-2 px-1.5">
+          <div className="border-t border-border-light mt-2 pt-2 px-1.5">
             <MenuItem onClick={actions.handleDelete} icon={Trash2} label={t("delete_listing")} variant="red" />
           </div>
         </div>}

@@ -7,15 +7,15 @@ const statusUpper = (status) => String(status || '').toUpperCase();
 export const getOrderStatusBadgeClass = (status) => {
   const s = statusUpper(status);
   if (s === ORDER_STATUSES.COMPLETED) return 'bg-status-success-bg text-emerald-800 border-emerald-200';
-  if (s === ORDER_STATUSES.DELIVERED) return 'bg-blue-50 text-blue-800 border-primary';
+  if (s === ORDER_STATUSES.DELIVERED) return 'bg-blue-50 text-primary border-primary';
   if (s === ORDER_STATUSES.SHIPPED) return 'bg-indigo-50 text-primary border-primary';
   if (s === ORDER_STATUSES.PROCESSING) return 'bg-status-warning-bg text-amber-900 border-amber-200';
-  if (s === ORDER_STATUSES.CONFIRMED) return 'bg-status-success-bg text-green-800 border-green-200';
+  if (s === ORDER_STATUSES.CONFIRMED) return 'bg-status-success-bg text-status-success-text border-status-success-border';
   if (s === ORDER_STATUSES.PENDING) return 'bg-slate-100 text-slate-700 border-border-light';
   if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
   if (s === ORDER_STATUSES.MEETUP_PENDING) return 'bg-indigo-50 text-primary border-primary';
   if (s === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-primary text-violet-800 border-violet-200';
-  if (s === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-50 text-purple-900 border-purple-300';
+  if (s === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-50 text-primary border-primary-200';
   return 'bg-slate-50 text-slate-700 border-border-light';
 };
 
@@ -31,7 +31,7 @@ export const getOrderStatusTextClass = (status) => {
   if (value === ORDER_STATUSES.PENDING) return 'text-slate-600';
   if (value === ORDER_STATUSES.MEETUP_PENDING) return 'text-primary';
   if (value === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'text-violet-600';
-  if (value === ORDER_STATUSES.VERIFICATION_LOCKED) return 'text-purple-600';
+  if (value === ORDER_STATUSES.VERIFICATION_LOCKED) return 'text-primary';
   if (value === ORDER_STATUSES.REFUNDED) return 'text-rose-600';
   if (value === ORDER_STATUSES.CANCELLED) return 'text-rose-600';
 
@@ -40,13 +40,13 @@ export const getOrderStatusTextClass = (status) => {
 
 export const getOrderStatusIndicatorClass = (status) => {
   if (status === ORDER_STATUSES.COMPLETED) return 'bg-status-success-bg';
-  if (status === ORDER_STATUSES.DELIVERED) return 'bg-blue-500';
-  if (status === ORDER_STATUSES.SHIPPED) return 'bg-indigo-500';
+  if (status === ORDER_STATUSES.DELIVERED) return 'bg-primary';
+  if (status === ORDER_STATUSES.SHIPPED) return 'bg-primary';
   if (status === ORDER_STATUSES.PROCESSING) return 'bg-status-warning-bg';
   if (status === ORDER_STATUSES.CONFIRMED) return 'bg-status-success-bg';
-  if (status === ORDER_STATUSES.MEETUP_PENDING) return 'bg-indigo-500';
+  if (status === ORDER_STATUSES.MEETUP_PENDING) return 'bg-primary';
   if (status === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-primary';
-  if (status === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-500';
+  if (status === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-primary';
   return 'bg-gray-400';
 };
 
@@ -65,5 +65,5 @@ export const getPaymentStatusTextClass = (status) => {
   if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-400';
   if (s === PAYMENT_STATUSES.REFUNDED) return 'text-rose-400';
   if (s === PAYMENT_STATUSES.PENDING) return 'text-slate-400';
-  return 'text-red-400';
+  return 'text-status-error';
 };

@@ -10,7 +10,6 @@ const ListingsNavigation = ({
   engineSearch,
   filteredListings,
   title = 'Browse Listings',
-  icon = <ShoppingBag className="w-6 h-6 text-white" />,
   extraActions = null,
   topSlot = null,
   children
@@ -29,13 +28,13 @@ const ListingsNavigation = ({
   const loadAllPages = engineSearch?.title?.loadAllPages;
   const clear = engineSearch?.clear;
   return <>
-        <div className="bg-background-primary border-b border-gray-100">
+        <div className="bg-background-primary border-b border-border-light">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center gap-3">
                 <button onClick={onToggleFilterSidebar} className="p-2 rounded-lg hover:bg-secondary-light transition-colors text-text-muted hover:text-text-primary relative">
                   <Menu className="w-5 h-5" />
-                  {hasActiveFilters ? <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-900" /> : null}
+                  {hasActiveFilters ? <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" /> : null}
                 </button>
                 <div>
                   <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>
@@ -43,7 +42,7 @@ const ListingsNavigation = ({
                   <span className="text-sm font-medium text-text-secondary">
                     {getListingTypeLabel(selectedCategory || filters?.listingType) || 'All Categories'}
                   </span>
-                    <span className="text-gray-300">·</span>
+                    <span className="text-border-DEFAULT">·</span>
                     <span className="text-text-muted text-sm">{totalElements?.toLocaleString()}{t("results")}</span>
                   </div>
                 </div>
@@ -59,7 +58,7 @@ const ListingsNavigation = ({
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-text-muted group-focus-within:text-text-secondary transition-colors" />
                   </div>
-                  <input type="text" value={term} onChange={e => engineSearch?.setTerm?.(e.target.value)} placeholder={t("search_by_title_or_listing_number")} className="block w-full pl-10 pr-4 py-2.5 bg-secondary-light border border-gray-100 text-text-primary placeholder-gray-400 focus:ring-2 focus:ring-gray-200 focus:border-border-DEFAULT focus:bg-background-primary rounded-xl transition-all text-sm font-medium" />
+                  <input type="text" value={term} onChange={e => engineSearch?.setTerm?.(e.target.value)} placeholder={t("search_by_title_or_listing_number")} className="block w-full pl-10 pr-4 py-2.5 bg-secondary-light border border-border-light text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-background-primary rounded-xl transition-all text-sm font-medium" />
                   {term ? <button onClick={() => clear?.()} className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-secondary cursor-pointer">
                         <span className="text-caption font-semibold px-1.5 py-0.5 bg-secondary-light rounded-md">{t("esc")}</span>
                       </button> : null}

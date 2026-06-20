@@ -53,7 +53,7 @@ export const ShipOrderForm = ({
           <label className="block text-caption font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("tracking_number")}</label>
           <div className="relative">
             <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border-light focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-primary text-sm font-semibold bg-background-primary" placeholder={t("e_g_ar123456789")} />
+            <input type="text" value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border-light focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-semibold bg-background-primary" placeholder={t("e_g_ar123456789")} />
           </div>
         </div>
 

@@ -72,7 +72,7 @@ const CompareFloatingBar = memo(() => {
                             <div className="flex sm:flex-col flex-shrink-0 justify-center sm:justify-between gap-2 sm:border-l sm:border-slate-100 sm:pl-4 sm:min-w-[8.5rem]">
                                 <button type="button" onClick={openModal} disabled={!canCompare} className={`
                                         w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200
-                                        ${canCompare ? 'bg-primary text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/25' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}
+                                        ${canCompare ? 'bg-primary text-white hover:bg-primary shadow-md shadow-indigo-600/25' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}
                                     `}>
                                     <Scale className="w-4 h-4 shrink-0" />{t("compare")}</button>
                                 {!canCompare && <p className="text-center text-caption text-slate-400 sm:text-left">{t("add_at_least_2_items")}</p>}
