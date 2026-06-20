@@ -115,11 +115,11 @@ const AddressList = memo(({
 
       {loading ? <div className="text-center py-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-btn-primary"></div>
-          <p className="mt-2 text-gray-600">{t("loading_addresses")}</p>
+          <p className="mt-2 text-text-secondary">{t("loading_addresses")}</p>
         </div> : error ? <div className="text-center py-8">
-          <div className="text-red-500">{t("failed_to_load_addresses")}</div>
+          <div className="text-status-error">{t("failed_to_load_addresses")}</div>
         </div> : addresses.length === 0 ? <div className="text-center py-8">
-          <div className="text-gray-500">{t("no_addresses_found_add_your_first_addres")}</div>
+          <div className="text-text-muted">{t("no_addresses_found_add_your_first_addres")}</div>
         </div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {addresses.map(address => <AddressCard key={address.id} address={address} onEdit={handleEditAddress} onDelete={handleDeleteAddress} onSelectAsMain={handleSelectAsMain} />)}
         </div>}

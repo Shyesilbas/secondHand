@@ -23,8 +23,8 @@ const ChatList = ({
     const searchLower = searchTerm.toLowerCase();
     return room.otherParticipantName?.toLowerCase().includes(searchLower) || room.listingTitle?.toLowerCase().includes(searchLower) || room.title?.toLowerCase().includes(searchLower) || room.roomName?.toLowerCase().includes(searchLower) || room.lastMessage?.toLowerCase().includes(searchLower);
   });
-  return <div className="bg-white h-full flex flex-col overflow-hidden">
-      <div className="px-6 py-5 border-b border-slate-200/60 flex-shrink-0">
+  return <div className="bg-background-primary h-full flex flex-col overflow-hidden">
+      <div className="px-6 py-5 border-b border-border-light/60 flex-shrink-0">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("conversations")}</h2>
@@ -32,7 +32,7 @@ const ChatList = ({
           </div>
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-1.5 bg-slate-100 rounded-full px-3 py-1.5">
-              <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-text-muted'}`}></div>
               <span className="text-xs font-semibold text-slate-600 tracking-tight">
                 {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
               </span>
@@ -41,9 +41,9 @@ const ChatList = ({
         </div>
         
         <div className="relative group">
-          <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 bg-white transition-all duration-300 ease-in-out tracking-tight" />
+          <input type="text" placeholder={t("search_conversations")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full px-4 py-3 pl-11 text-sm border border-border-light rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-primary bg-background-primary transition-all duration-300 ease-in-out tracking-tight" />
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-slate-400 transition-colors duration-300 ease-in-out group-focus-within:text-indigo-500" />
+            <Search className="h-4 w-4 text-slate-400 transition-colors duration-300 ease-in-out group-focus-within:text-primary" />
           </div>
           {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute inset-y-0 right-0 pr-3.5 flex items-center hover:bg-slate-50 rounded-r-xl transition-colors duration-300 ease-in-out">
               <svg className="h-4 w-4 text-slate-400 hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

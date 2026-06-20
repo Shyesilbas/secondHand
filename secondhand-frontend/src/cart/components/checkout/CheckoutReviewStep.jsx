@@ -111,7 +111,7 @@ const CheckoutReviewStep = ({
       </div>
 
       {/* Items list */}
-      <div className="mb-6 rounded-lg border border-[#e5e3df] bg-white divide-y divide-[#f0efed] overflow-hidden px-4">
+      <div className="mb-6 rounded-lg border border-[#e5e3df] bg-background-primary divide-y divide-[#f0efed] overflow-hidden px-4">
         {cartItems.map((item, idx) => {
         const isOffer = !!item.isOffer;
         const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
@@ -163,16 +163,16 @@ const CheckoutReviewStep = ({
       {/* Dynamic Summary Panels (Shipping Address & Payment) */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Address or Meetup Card */}
-        <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-100 bg-background-primary p-5 shadow-sm">
           <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-            <MapPin className="h-4 w-4 text-indigo-600" />
+            <MapPin className="h-4 w-4 text-primary" />
             <span>{deliveryMethod === 'SAFE_MEETUP' ? 'Buluşma Noktası' : 'Shipping Details'}</span>
           </div>
           {deliveryMethod === 'SAFE_MEETUP' ? <div className="text-sm">
-              <p className="font-semibold text-slate-900">📍 {meetupLocation || 'Belirtilmemiş'}</p>
+              <p className="font-semibold text-text-primary">📍 {meetupLocation || 'Belirtilmemiş'}</p>
               <p className="mt-2 text-xs text-slate-500 leading-relaxed font-medium">{t("sipari_inizi_elden_teslim_al_rken_sat_c_")}</p>
             </div> : shippingAddress ? <div className="text-sm">
-              <p className="font-semibold text-slate-900">{shippingAddress.addressLine}</p>
+              <p className="font-semibold text-text-primary">{shippingAddress.addressLine}</p>
               <p className="mt-1 text-slate-500 font-medium">
                 {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
               </p>
@@ -181,13 +181,13 @@ const CheckoutReviewStep = ({
         </div>
 
         {/* Payment Card */}
-        <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-100 bg-background-primary p-5 shadow-sm">
           <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-            <PaymentIcon className="h-4 w-4 text-indigo-600" />
+            <PaymentIcon className="h-4 w-4 text-primary" />
             <span>{t("payment_method")}</span>
           </div>
           <div className="text-sm">
-            <p className="font-semibold text-slate-900">{paymentInfo.name}</p>
+            <p className="font-semibold text-text-primary">{paymentInfo.name}</p>
             {paymentInfo.detail && <p className="mt-1 text-slate-500 font-mono text-xs font-medium">{paymentInfo.detail}</p>}
           </div>
         </div>
@@ -196,14 +196,14 @@ const CheckoutReviewStep = ({
       {/* Subtotal */}
       <div className="mb-6 flex items-baseline justify-between border-t border-slate-100 pt-5">
         <span className="text-xs font-bold uppercase tracking-wider text-slate-400">{t("subtotal")}</span>
-        <span className="text-2xl font-bold tabular-nums text-slate-900">
+        <span className="text-2xl font-bold tabular-nums text-text-primary">
           {formatCurrency(totalAmount, currency)}
         </span>
       </div>
 
       {/* Navigation — desktop */}
       <div className="hidden items-center justify-between sm:flex">
-        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-text-primary disabled:opacity-50 disabled:cursor-not-allowed">
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
         <button type="button" onClick={handleNextClick} disabled={isSendingCode} className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]">
           {isSendingCode ? <>
@@ -213,8 +213,8 @@ const CheckoutReviewStep = ({
       </div>
 
       {/* Navigation — mobile */}
-      <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
-        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50">
+      <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-background-primary px-5 py-4 sm:hidden">
+        <button type="button" onClick={onBack} disabled={isSendingCode} className="flex items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50">
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
         <button type="button" onClick={handleNextClick} disabled={isSendingCode} className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98]">
           {isSendingCode ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t("confirm_send")}<ArrowRight className="h-4 w-4" strokeWidth={2} />

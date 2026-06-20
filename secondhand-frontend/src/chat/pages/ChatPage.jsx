@@ -104,8 +104,8 @@ const ChatPage = ({
                 <p className="text-slate-500 mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 bg-white px-5 py-2.5 rounded-xl border border-slate-200/60 shadow-sm">
-                  <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`}></div>
+                <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded-xl border border-border-light/60 shadow-sm">
+                  <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-slate-300'}`}></div>
                   <span className="text-sm font-semibold text-slate-700 tracking-tight">
                     {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                   </span>
@@ -114,17 +114,17 @@ const ChatPage = ({
             </div>}
 
           {embedded && <div className="mb-3 flex justify-end">
-              <div className="flex items-center space-x-2 rounded-xl border border-slate-200/60 bg-white px-4 py-2 shadow-sm">
-                <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-300'}`} />
+              <div className="flex items-center space-x-2 rounded-xl border border-border-light/60 bg-background-primary px-4 py-2 shadow-sm">
+                <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-slate-300'}`} />
                 <span className="text-xs font-semibold text-slate-700">
                   {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                 </span>
               </div>
             </div>}
 
-          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-3xl border border-slate-200/60 bg-white shadow-sm`}>
+          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-3xl border border-border-light/60 bg-background-primary shadow-sm`}>
             {/* Chat Rooms List */}
-            <div className="lg:col-span-4 border-r border-slate-200/60 h-full flex flex-col overflow-hidden">
+            <div className="lg:col-span-4 border-r border-border-light/60 h-full flex flex-col overflow-hidden">
               <ChatList chatRooms={chatRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
             </div>
 
@@ -133,7 +133,7 @@ const ChatPage = ({
             <div className="lg:col-span-8 flex flex-col h-full overflow-hidden">
               {selectedChatRoom ? <div className="h-full flex flex-col overflow-hidden">
                     {/* Chat Header */}
-                    <div className="bg-white/80 backdrop-blur-md px-6 py-4 border-b border-slate-200/60 flex items-center justify-between flex-shrink-0">
+                    <div className="bg-background-primary/80 backdrop-blur-md px-6 py-4 border-b border-border-light/60 flex items-center justify-between flex-shrink-0">
                       <div className="flex items-center space-x-4">
                         <button onClick={() => {
                   selectChatRoom(null);
@@ -153,7 +153,7 @@ const ChatPage = ({
                             {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
                           </h3>
                           <div className="flex items-center space-x-2 mt-1">
-                            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+                            <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-text-muted'}`}></div>
                             <span className="text-xs font-medium text-slate-500 tracking-tight">
                               {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
                             </span>

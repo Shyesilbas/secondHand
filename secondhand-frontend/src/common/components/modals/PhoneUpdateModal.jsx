@@ -13,7 +13,7 @@ const PhoneUpdateModal = ({
   } = useTranslation();
   if (!isOpen) return null;
   return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="bg-background-primary rounded-lg p-6 max-w-md w-full mx-4">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-medium text-text-primary">{t("update_phone_number")}</h3>
                     <button onClick={closeModal} className="text-text-muted hover:text-text-secondary">

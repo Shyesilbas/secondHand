@@ -101,7 +101,7 @@ const OAuthCompletePage = () => {
 
             {/* User avatar + header */}
             <div className="flex items-center gap-4 mb-6">
-                {baseInfo.picture ? <img src={baseInfo.picture} alt={baseInfo.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary-200" /> : <div className="w-12 h-12 rounded-full bg-amber-100 border-2 border-amber-200 flex items-center justify-center shrink-0">
+                {baseInfo.picture ? <img src={baseInfo.picture} alt={baseInfo.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary-200" /> : <div className="w-12 h-12 rounded-full bg-status-warning-bg border-2 border-amber-200 flex items-center justify-center shrink-0">
                         <span className="text-amber-700 font-bold text-sm">{initials || '?'}</span>
                     </div>}
                 <div>
@@ -112,7 +112,7 @@ const OAuthCompletePage = () => {
             </div>
 
             {/* Error banner */}
-            {errors.submit && <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            {errors.submit && <div className="mb-4 rounded-xl bg-status-error-bg border border-red-200 px-4 py-3 text-sm text-status-error">
                     {errors.submit}
                 </div>}
 
@@ -147,16 +147,16 @@ const OAuthCompletePage = () => {
 
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-medium text-secondary-700">{t("gender")}<span className="text-red-500">*</span>
+                            <label className="text-xs font-medium text-secondary-700">{t("gender")}<span className="text-status-error">*</span>
                             </label>
                             {gendersLoading ? <div className="flex items-center gap-2 px-3 py-2.5 border border-secondary-200 rounded-xl text-sm text-secondary-500">
                                     <LoadingIndicator size="h-4 w-4" />
                                     <span>{t("loading")}</span>
-                                </div> : <select name="gender" value={form.gender} onChange={handleChange} className="w-full px-3 py-2.5 border border-secondary-200 rounded-xl text-sm text-secondary-900 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors" required>
+                                </div> : <select name="gender" value={form.gender} onChange={handleChange} className="w-full px-3 py-2.5 border border-secondary-200 rounded-xl text-sm text-secondary-900 bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors" required>
                                     <option value="">{t("select_gender")}</option>
                                     {genders.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                                 </select>}
-                            {errors.gender && <p className="text-xs text-red-600">{errors.gender}</p>}
+                            {errors.gender && <p className="text-xs text-status-error">{errors.gender}</p>}
                         </div>
 
                         <AuthInput label={t("birth_date")} name="birthdate" value={form.birthdate} onChange={handleChange} placeholder={t("dd_mm_yyyy")} required error={errors.birthdate} leftIcon={<CalendarIcon className="h-4 w-4" />} inputClassName="rounded-xl" labelClassName="text-secondary-700 text-xs" />

@@ -57,12 +57,12 @@ const CheckoutPaymentStep = ({
       <div className="mb-5">
         <label className="flex items-center gap-4 rounded-xl border border-transparent bg-indigo-50/15 p-5 ring-2 ring-indigo-600 shadow-[0_8px_30px_rgb(79,70,229,0.05)]">
           <input type="radio" name="payment" value={CART_PAYMENT_TYPES.EWALLET} checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET} onChange={event => setSelectedPaymentType(event.target.value)} className="sr-only" />
-          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-indigo-600">
-            <span className="h-2 w-2 rounded-full bg-indigo-600" />
+          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary">
+            <span className="h-2 w-2 rounded-full bg-primary" />
           </span>
-          <Wallet className="h-5 w-5 shrink-0 text-indigo-600" strokeWidth={1.5} />
+          <Wallet className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold tracking-tight text-slate-900">{t("wallet")}</div>
+            <div className="text-sm font-semibold tracking-tight text-text-primary">{t("wallet")}</div>
             <div className="mt-0.5 text-xs font-medium text-slate-400">
               {eWallet ? `Balance: ${formatCurrency(walletBalance, cur)}` : 'No wallet available'}
             </div>
@@ -82,27 +82,27 @@ const CheckoutPaymentStep = ({
         </div>
       </div>
 
-      <div className="mb-6 rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+      <div className="mb-6 rounded-xl border border-slate-100 bg-background-primary p-5 shadow-sm">
         <PaymentAgreementsSection acceptedAgreements={acceptedAgreements} onToggle={onAgreementToggle} onRequiredAgreementsChange={onRequiredAgreementsChange} />
       </div>
 
-      {warningData ? <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/30 p-5">
+      {warningData ? <div className="mt-4 rounded-xl border border-amber-100 bg-status-warning-bg/30 p-5">
           <div className="flex items-start gap-3">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-status-warning" />
             <div className="min-w-0">
               <h3 className="text-sm font-medium text-text-primary">{t("spending_limit_warning")}</h3>
               <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">{t("with_this_order_monthly_spending_reaches")}{' '}
                 <strong>{formatCurrency(warningData.projectedSpending, cur)}</strong>.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <button type="button" onClick={() => setWarningData(null)} className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50">{t("cancel")}</button>
+                <button type="button" onClick={() => setWarningData(null)} className="rounded-xl border border-border-light bg-background-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50">{t("cancel")}</button>
                 <button type="button" onClick={handleNext} className="rounded-xl bg-slate-900 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black">{t("continue_anyway")}</button>
               </div>
             </div>
           </div>
         </div> : <>
           <div className="hidden items-center justify-between border-t border-slate-100 pt-6 sm:flex">
-            <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900">
+            <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-text-primary">
               <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
             <button type="button" onClick={handleNext} disabled={!canProceed || isCheckingWarning} className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 active:scale-[0.98]">
               {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
@@ -110,8 +110,8 @@ const CheckoutPaymentStep = ({
             </button>
           </div>
 
-          <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
-            <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
+          <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 bg-background-primary px-5 py-4 sm:hidden">
+            <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
               <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
             <button type="button" onClick={handleNext} disabled={!canProceed || isCheckingWarning} className="flex items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400">
               {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}

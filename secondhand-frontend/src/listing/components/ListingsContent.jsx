@@ -49,7 +49,7 @@ const ListingsContent = React.memo(({
                 </div> : <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} onDeleted={onListingChanged} isSelectable={isSelectable} selectedIds={selectedIds} onSelectToggle={onToggleSelect} />}
             
             {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && <div className="mt-10 flex justify-center">
-                    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-1.5">
+                    <div className="bg-background-primary border border-border-light rounded-2xl shadow-sm p-1.5">
                         <Pagination page={currentPage || 0} totalPages={totalPages || 0} onPageChange={onPageChange} />
                     </div>
                 </div>}

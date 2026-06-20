@@ -30,7 +30,7 @@ const AuthButton = ({
             text-stone-850 bg-stone-100/80 border-transparent hover:bg-stone-200/60
         `,
     outline: `
-            text-stone-800 bg-white border-stone-200 hover:bg-stone-50 hover:border-stone-300
+            text-stone-800 bg-background-primary border-stone-200 hover:bg-stone-50 hover:border-stone-300
         `,
     ghost: `
             text-stone-700 bg-transparent border-transparent hover:bg-stone-100/60

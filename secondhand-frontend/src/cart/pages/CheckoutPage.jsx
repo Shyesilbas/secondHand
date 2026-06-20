@@ -172,7 +172,7 @@ const CheckoutPage = () => {
   if (!offerId && cartCount === 0) {
     return <div className="flex min-h-screen items-center justify-center bg-[#faf9f7] px-4">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-lg border border-[#f0efed] bg-white">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-lg border border-[#f0efed] bg-background-primary">
             <svg className="h-6 w-6 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
@@ -188,7 +188,7 @@ const CheckoutPage = () => {
 
   return <div className="min-h-screen bg-[#faf9f7]">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[#f0efed] bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b border-[#f0efed] bg-background-primary/80 backdrop-blur-md">
         <PageContainer className="py-3">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-[#555] transition-colors hover:text-[#111]" aria-label={t("back_to_cart")}>
@@ -202,7 +202,7 @@ const CheckoutPage = () => {
       </header>
 
       {/* Mobile Collapsible Order Summary (Shopify-style accordion) */}
-      <div className="bg-white/90 border-b border-[#f0efed] lg:hidden px-4 py-3 backdrop-blur-md">
+      <div className="bg-background-primary/90 border-b border-[#f0efed] lg:hidden px-4 py-3 backdrop-blur-md">
         <button type="button" onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} className="flex w-full items-center justify-between text-sm">
           <span className="flex items-center gap-1.5 font-medium text-[#111]">
             <ShoppingCart className="h-4 w-4 text-[#1466c6]" />

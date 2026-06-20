@@ -12,7 +12,7 @@ const DraftListingsList = ({
   } = useTranslation();
     return (
         <div className="lg:col-span-7 xl:col-span-8">
-            <div className="rounded-[2rem] border border-white/60 bg-white/70 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="rounded-[2rem] border border-white/60 bg-background-primary/70 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <div className="mb-4 flex items-baseline justify-between">
                     <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("draft_listings")}</h2>
                     <span className="text-xs text-slate-500">
@@ -28,8 +28,8 @@ const DraftListingsList = ({
                                     onClick={() => onSelectListing(listing)}
                                     className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 ease-out border overflow-hidden
                                         ${isSelected 
-                                            ? 'border-indigo-500 bg-indigo-50/30 shadow-[0_8px_20px_rgba(99,102,241,0.12)] -translate-y-0.5' 
-                                            : 'border-slate-200 bg-white hover:border-indigo-200 hover:shadow-md hover:-translate-y-0.5'
+                                            ? 'border-primary bg-indigo-50/30 shadow-[0_8px_20px_rgba(99,102,241,0.12)] -translate-y-0.5' 
+                                            : 'border-border-light bg-background-primary hover:border-primary hover:shadow-md hover:-translate-y-0.5'
                                         }`}
                                 >
                                     {isSelected && (
@@ -50,14 +50,14 @@ const DraftListingsList = ({
                                                 <span className="text-slate-300">•</span>
                                                 <span className="truncate max-w-[120px] font-medium">{listing.city}</span>
                                                 <span className="text-slate-300">•</span>
-                                                <span className="rounded-full bg-amber-100/50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-500/20">
+                                                <span className="rounded-full bg-status-warning-bg/50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-500/20">
                                                     {t("draft")}
                                                 </span>
                                             </div>
                                         </div>
                                         
                                         <div className="ml-4 flex flex-col items-end gap-3">
-                                            <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-300 ${isSelected ? 'border-indigo-500 bg-indigo-500 shadow-sm shadow-indigo-200' : 'border-slate-300 bg-slate-50'}`}>
+                                            <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-300 ${isSelected ? 'border-primary bg-indigo-500 shadow-sm shadow-indigo-200' : 'border-slate-300 bg-slate-50'}`}>
                                                 {isSelected && (
                                                     <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

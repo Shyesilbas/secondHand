@@ -3,9 +3,9 @@ const Alert = ({ type = 'error', message }) => {
     if (!message) return null;
 
     const colors = {
-        error: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', icon: 'text-red-400' },
-        success: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', icon: 'text-green-400' },
-        warning: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-800', icon: 'text-yellow-400' },
+        error: { bg: 'bg-status-error-bg', border: 'border-red-200', text: 'text-red-800', icon: 'text-red-400' },
+        success: { bg: 'bg-status-success-bg', border: 'border-green-200', text: 'text-green-800', icon: 'text-green-400' },
+        warning: { bg: 'bg-status-warning-bg', border: 'border-yellow-200', text: 'text-yellow-800', icon: 'text-yellow-400' },
     };
 
     const c = colors[type];

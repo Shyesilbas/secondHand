@@ -24,7 +24,7 @@ const StatusBadge = ({
 }) => {
   const styles = {
     rose: 'bg-rose-50 border-rose-200 text-rose-700',
-    amber: 'bg-amber-50 border-amber-200 text-amber-700'
+    amber: 'bg-status-warning-bg border-amber-200 text-amber-700'
   };
   return <span className={`px-2 py-0.5 text-caption font-medium rounded-md border ${styles[type]}`}>{label}</span>;
 };
@@ -32,7 +32,7 @@ const GlassCard = React.memo(({
   children,
   className = '',
   critical = false
-}) => <div className={`rounded-3xl border transition-all duration-300 ${critical ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg' : 'bg-white/60 backdrop-blur-lg border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'} ${className}`}>
+}) => <div className={`rounded-3xl border transition-all duration-300 ${critical ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg' : 'bg-background-primary/60 backdrop-blur-lg border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'} ${className}`}>
     {children}
   </div>);
 GlassCard.displayName = 'GlassCard';
@@ -174,10 +174,10 @@ const MeetupHandoverSection = ({
     const s = secs % 60;
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
-  return <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
+  return <div className="rounded-3xl border border-primary bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full" />
-      <div className="flex items-center gap-3 border-b border-indigo-100/50 pb-4 mb-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 shadow-sm">
+      <div className="flex items-center gap-3 border-b border-primary/50 pb-4 mb-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-primary shadow-sm">
           <MapPin className="h-4 w-4" />
         </div>
         <div>
@@ -193,16 +193,16 @@ const MeetupHandoverSection = ({
         </div>
 
         {/* Contact Info Card */}
-        <div className="p-3 bg-white rounded-xl border border-indigo-100/50 shadow-sm flex items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 shadow-xs">
+        <div className="p-3 bg-background-primary rounded-xl border border-primary/50 shadow-sm flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-status-success-bg text-status-success shadow-xs">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
           </div>
           <div>
             <span className="block text-caption font-bold text-slate-400 uppercase tracking-wider">{t("i_leti_im_bilgileri")}</span>
-            {isSeller ? <p className="text-xs font-semibold text-slate-800 mt-0.5">{t("al_c")}{order.buyerName} {order.buyerSurname} <span className="text-emerald-600 ml-1">📞 {order.buyerPhone || 'Telefon Yok'}</span>
-              </p> : <p className="text-xs font-semibold text-slate-800 mt-0.5">{t("sat_c")}{order.sellerFullName || 'Satıcı'} <span className="text-emerald-600 ml-1">📞 {order.sellerPhone || 'Telefon Yok'}</span>
+            {isSeller ? <p className="text-xs font-semibold text-slate-800 mt-0.5">{t("al_c")}{order.buyerName} {order.buyerSurname} <span className="text-status-success ml-1">📞 {order.buyerPhone || 'Telefon Yok'}</span>
+              </p> : <p className="text-xs font-semibold text-slate-800 mt-0.5">{t("sat_c")}{order.sellerFullName || 'Satıcı'} <span className="text-status-success ml-1">📞 {order.sellerPhone || 'Telefon Yok'}</span>
               </p>}
           </div>
         </div>
@@ -210,17 +210,17 @@ const MeetupHandoverSection = ({
         {order.status === 'MEETUP_PENDING' && <>
             {!isSeller ?
         // BUYER VIEW IN MEETUP_PENDING
-        <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 flex flex-col items-center justify-center text-center shadow-inner">
-                <span className="block text-xs font-bold text-indigo-700 uppercase tracking-widest mb-3">{t("sat_c_ya_g_sterilecek_qr_ve_pin")}</span>
+        <div className="bg-background-primary rounded-2xl border border-primary/60 p-5 flex flex-col items-center justify-center text-center shadow-inner">
+                <span className="block text-xs font-bold text-primary uppercase tracking-widest mb-3">{t("sat_c_ya_g_sterilecek_qr_ve_pin")}</span>
                 {qrCountdown > 0 ? <>
-                    <div className="relative p-3 bg-white rounded-xl border border-slate-100 shadow-sm mb-4">
+                    <div className="relative p-3 bg-background-primary rounded-xl border border-slate-100 shadow-sm mb-4">
                       {isQrLoading ? <div className="w-[150px] h-[150px] flex items-center justify-center bg-slate-50 rounded-lg">
                           <span className="text-xs text-slate-400">{t("y_kleniyor")}</span>
                         </div> : qrImageUrl ? <img src={qrImageUrl} alt={t("meetup_qr_code")} className="w-[150px] h-[150px]" /> : <div className="w-[150px] h-[150px] flex items-center justify-center bg-rose-50 rounded-lg border border-rose-100">
                           <span className="text-xs text-rose-500 text-center px-2">{t("qr_y_klenemedi")}</span>
                         </div>}
                     </div>
-                    <span className="block text-3xl font-bold tracking-[0.25em] text-slate-900 mb-1 font-mono">
+                    <span className="block text-3xl font-bold tracking-[0.25em] text-text-primary mb-1 font-mono">
                       {order.meetupVerificationCode || '------'}
                     </span>
                     <p className="text-caption text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5 mt-2">
@@ -233,7 +233,7 @@ const MeetupHandoverSection = ({
                       <p className="text-caption text-slate-500 mb-3 leading-relaxed">{t("e_er_sat_c_do_rulama_kodunu_sisteme_gire")}</p>
                       <div className="space-y-3">
                         <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20" />
+                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-500/20" />
                           <span className="text-caption font-semibold text-slate-700 leading-normal">{t("r_n_elden_teslim_ald_m_ve_i_lemi_tamamla")}</span>
                         </label>
 
@@ -245,12 +245,12 @@ const MeetupHandoverSection = ({
                     </div>
                   </> : <div className="py-6">
                     <p className="text-sm text-slate-500 mb-3">{t("qr_kod_ve_pin_kodunun_s_resi_doldu")}</p>
-                    <button type="button" onClick={handleRegenerateCode} className="px-4 py-2 text-xs font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">{t("kodu_yenile")}</button>
+                    <button type="button" onClick={handleRegenerateCode} className="px-4 py-2 text-xs font-bold text-white bg-primary rounded-lg hover:bg-indigo-700 transition">{t("kodu_yenile")}</button>
                   </div>}
               </div> :
         // SELLER VIEW IN MEETUP_PENDING
-        <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 shadow-inner">
-                <span className="block text-xs font-bold text-indigo-700 uppercase tracking-widest mb-4">{t("al_c_do_rulama_kodu")}</span>
+        <div className="bg-background-primary rounded-2xl border border-primary/60 p-5 shadow-inner">
+                <span className="block text-xs font-bold text-primary uppercase tracking-widest mb-4">{t("al_c_do_rulama_kodu")}</span>
                 
                 {order.verificationLockedUntil && lockCountdown > 0 ? <div className="text-center py-4 bg-rose-50 border border-rose-100 rounded-xl">
                     <p className="text-xs font-bold text-rose-700 uppercase tracking-wide">{t("do_rulama_ge_ici_olarak_kilitlendi")}</p>
@@ -258,8 +258,8 @@ const MeetupHandoverSection = ({
                   </div> : <form onSubmit={handleVerify} className="space-y-3">
                     <p className="text-xs text-slate-500">{t("al_c_n_n_ekran_ndaki_6_haneli_kodu_veya_")}</p>
                     <div className="flex gap-2">
-                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 bg-white shadow-sm" placeholder="000000" maxLength={6} disabled={isVerifying} />
-                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50">
+                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-border-light rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-indigo-500/20 bg-background-primary shadow-sm" placeholder="000000" maxLength={6} disabled={isVerifying} />
+                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-primary rounded-xl hover:bg-indigo-700 transition disabled:opacity-50">
                         {isVerifying ? 'Doğrulanıyor...' : 'Kodu Doğrula'}
                       </button>
                     </div>
@@ -268,14 +268,14 @@ const MeetupHandoverSection = ({
               </div>}
           </>}
 
-        {order.status === 'HANDOVER_CONFIRMED' && <div className="bg-white rounded-2xl border border-indigo-100/60 p-5 shadow-inner">
+        {order.status === 'HANDOVER_CONFIRMED' && <div className="bg-background-primary rounded-2xl border border-primary/60 p-5 shadow-inner">
             <span className="block text-xs font-bold text-emerald-700 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />{t("r_n_teslimat_do_ruland")}</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-status-success-bg animate-pulse" />{t("r_n_teslimat_do_ruland")}</span>
             <p className="text-xs text-slate-500 mb-4">{t("r_n_elden_teslim_ald_n_z_veya_teslim_ett")}</p>
 
             <div className="space-y-3">
               <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20" />
+                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-500/20" />
                 <span className="text-xs font-medium text-slate-800 leading-normal">{t("r_n_n_elden_teslim_edildi_ini_ve_i_lemi_")}</span>
               </label>
 
@@ -286,8 +286,8 @@ const MeetupHandoverSection = ({
             </div>
           </div>}
 
-        {order.status === 'COMPLETED' && <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+        {order.status === 'COMPLETED' && <div className="bg-status-success-bg/50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-status-success mt-0.5 flex-shrink-0" />
             <div>
               <span className="block text-xs font-bold text-emerald-700 uppercase tracking-wider">{t("i_lem_tamamland")}</span>
               <p className="text-xs text-slate-500 mt-1">{t("elden_g_venli_teslimat_ba_ar_yla_tamamla")}</p>
@@ -405,19 +405,19 @@ const OrderDetailsModal = React.memo(({
   }}>
         <div className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-[2rem] border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-xl overflow-hidden flex flex-col relative`}>
           {/* Decorative glows inside the modal */}
-          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-indigo-400/5 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
-          <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-violet-400/5 blur-[60px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/5 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-primary/5 blur-[60px] rounded-full pointer-events-none mix-blend-multiply" />
 
-          <div className="relative z-10 px-6 sm:px-8 py-5 bg-white/60 backdrop-blur-xl border-b border-slate-200/50 flex items-center justify-between gap-4">
+          <div className="relative z-10 px-6 sm:px-8 py-5 bg-background-primary/60 backdrop-blur-xl border-b border-border-light/50 flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="w-11 h-11 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-2xl border border-border-light bg-slate-50 flex items-center justify-center shrink-0">
                 <Package className="w-5 h-5 text-slate-500" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2.5 flex-wrap mb-0.5">
                   {!isSellerView && isEditingName ? <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
-                      <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-sm font-semibold text-slate-900 border border-indigo-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400/30 bg-white shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
-                      <button onClick={handleSaveName} disabled={isSavingName} className="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-indigo-600 disabled:opacity-50">
+                      <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-sm font-semibold text-text-primary border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400/30 bg-background-primary shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
+                      <button onClick={handleSaveName} disabled={isSavingName} className="p-2 hover:bg-indigo-50 rounded-xl transition-colors text-primary disabled:opacity-50">
                         <Check className="w-4 h-4" />
                       </button>
                       <button onClick={handleCancelEditName} disabled={isSavingName} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500 disabled:opacity-50">
@@ -443,7 +443,7 @@ const OrderDetailsModal = React.memo(({
                 </div>
               </div>
             </div>
-            <button onClick={onClose} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-600 border border-transparent hover:border-slate-200">
+            <button onClick={onClose} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-600 border border-transparent hover:border-border-light">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -478,10 +478,10 @@ const OrderDetailsModal = React.memo(({
                   <GlassCard className={`p-6`}>
                     <div className="flex items-center justify-between mb-5">
                       <h3 className={`text-sm font-medium text-text-primary ${isSellerView ? ' flex items-center gap-2' : ' flex items-center gap-2'}`}>
-                        <Package2 className={`${isSellerView ? 'w-4 h-4 text-indigo-500' : 'w-3.5 h-3.5 text-gray-600'}`} />{' '}
+                        <Package2 className={`${isSellerView ? 'w-4 h-4 text-primary' : 'w-3.5 h-3.5 text-text-secondary'}`} />{' '}
                         {isSellerView ? 'Sold Items' : 'Order Items'}
                       </h3>
-                      <span className={`${isSellerView ? 'text-xs text-slate-400 font-normal' : 'text-caption text-gray-500 font-medium'}`}>
+                      <span className={`${isSellerView ? 'text-xs text-slate-400 font-normal' : 'text-caption text-text-muted font-medium'}`}>
                         {orderItems.length} {orderItems.length === 1 ? 'item' : 'items'}
                       </span>
                     </div>
@@ -496,7 +496,7 @@ const OrderDetailsModal = React.memo(({
                     const rawOi = item?.id ?? item?.orderItemId;
                     const reviewKey = rawOi === undefined || rawOi === null || rawOi === '' ? null : String(rawOi);
                     return <div key={reviewKey || `row-${idx}`} className={`py-4 first:pt-0 last:pb-0 flex gap-3 ${isFullyCancelled || isFullyRefunded ? 'opacity-60' : ''}`}>
-                            <div className={`${isSellerView ? 'w-20 h-20 rounded-xl border border-slate-100 bg-slate-50' : 'w-16 h-16 rounded-lg border border-gray-200/60 bg-gray-50'} overflow-hidden flex-shrink-0 relative`}>
+                            <div className={`${isSellerView ? 'w-20 h-20 rounded-xl border border-slate-100 bg-slate-50' : 'w-16 h-16 rounded-lg border border-border-light/60 bg-secondary'} overflow-hidden flex-shrink-0 relative`}>
                               <img src={item.listing?.imageUrl} className="w-full h-full object-cover" alt={item.listing?.title || 'Listing'} />
                               {isFullyCancelled || isFullyRefunded ? <div className={`absolute inset-0 ${isSellerView ? 'bg-slate-900/40' : 'bg-gray-900/40'} flex items-center justify-center`}>
                                   <X className={`${isSellerView ? 'w-6 h-6' : 'w-5 h-5'} text-white`} />
@@ -504,7 +504,7 @@ const OrderDetailsModal = React.memo(({
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className={`${isSellerView ? 'text-sm font-semibold text-slate-900' : 'text-xs font-semibold text-gray-900'} line-clamp-1`}>
+                                <h4 className={`${isSellerView ? 'text-sm font-semibold text-text-primary' : 'text-xs font-semibold text-text-primary'} line-clamp-1`}>
                                   {item.listing?.title}
                                 </h4>
                                 {isFullyCancelled ? <StatusBadge label={t("cancelled")} type="rose" /> : null}
@@ -512,16 +512,16 @@ const OrderDetailsModal = React.memo(({
                                 {isPartiallyCancelled ? <StatusBadge label={t("partially_cancelled")} type="rose" /> : null}
                                 {isPartiallyRefunded ? <StatusBadge label={t("partially_refunded")} type="amber" /> : null}
                               </div>
-                              <p className={`${isSellerView ? 'text-xs text-slate-500 mt-1 font-normal' : 'text-caption text-gray-600 mt-1 font-medium'}`}>{t("qty")}{item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}
+                              <p className={`${isSellerView ? 'text-xs text-slate-500 mt-1 font-normal' : 'text-caption text-text-secondary mt-1 font-medium'}`}>{t("qty")}{item.quantity} × {formatCurrency(item.unitPrice, selectedOrder.currency)}
                                 {isCancelled ? <span className="ml-2 text-rose-600">({item.cancelledQuantity}{t("cancelled")}</span> : null}
-                                {isRefunded ? <span className="ml-2 text-amber-600">({item.refundedQuantity}{t("refunded")}</span> : null}
+                                {isRefunded ? <span className="ml-2 text-status-warning">({item.refundedQuantity}{t("refunded")}</span> : null}
                               </p>
-                              {!isSellerView ? <p className="text-caption text-gray-600 mt-1 font-medium">{t("seller")}{' '}
+                              {!isSellerView ? <p className="text-caption text-text-secondary mt-1 font-medium">{t("seller")}{' '}
                                   <span className="font-semibold">
                                     {[item.sellerName, item.sellerSurname].filter(Boolean).join(' ') || '—'}
                                   </span>
                                 </p> : null}
-                              {item.campaignName ? <span className={`inline-block mt-1.5 text-caption px-2 py-0.5 ${isSellerView ? 'bg-emerald-50 text-emerald-600 font-semibold' : 'bg-emerald-50/80 text-emerald-600 font-medium border border-emerald-200/60'} rounded-md`}>{t("promo")}{item.campaignName}
+                              {item.campaignName ? <span className={`inline-block mt-1.5 text-caption px-2 py-0.5 ${isSellerView ? 'bg-status-success-bg text-status-success font-semibold' : 'bg-status-success-bg/80 text-status-success font-medium border border-emerald-200/60'} rounded-md`}>{t("promo")}{item.campaignName}
                                 </span> : null}
 
                               {/* Cancellation/Refund Reasons */}
@@ -536,12 +536,12 @@ const OrderDetailsModal = React.memo(({
                                           </p>}
                                       </div>
                                     </div>}
-                                  {item.refundReason && <div className={`flex items-start gap-1.5 p-2 rounded-lg ${isSellerView ? 'bg-amber-50/50' : 'bg-amber-50/80'} border border-amber-100`}>
+                                  {item.refundReason && <div className={`flex items-start gap-1.5 p-2 rounded-lg ${isSellerView ? 'bg-status-warning-bg/50' : 'bg-status-warning-bg/80'} border border-amber-100`}>
                                       <RefundIcon className="w-3 h-3 text-amber-500 mt-0.5 flex-shrink-0" />
                                       <div className="min-w-0">
                                         <p className="text-caption font-semibold text-amber-700 leading-tight">{t("refund")}{getCancelRefundReasonLabel(item.refundReason)}
                                         </p>
-                                        {item.refundReasonText && <p className="text-caption text-amber-600 mt-0.5 italic leading-tight break-words">
+                                        {item.refundReasonText && <p className="text-caption text-status-warning mt-0.5 italic leading-tight break-words">
                                             "{item.refundReasonText}"
                                           </p>}
                                       </div>
@@ -549,7 +549,7 @@ const OrderDetailsModal = React.memo(({
                                 </div>}
                             </div>
                             <div className="text-right flex flex-col justify-between items-end flex-shrink-0">
-                              <span className={`${isSellerView ? 'text-sm font-semibold text-slate-900' : 'text-xs font-semibold text-gray-900'}`}>
+                              <span className={`${isSellerView ? 'text-sm font-semibold text-text-primary' : 'text-xs font-semibold text-text-primary'}`}>
                                 {formatCurrency(item.totalPrice, selectedOrder.currency)}
                               </span>
                               {!isSellerView ? <ReviewButton key={reviewKey || `rev-${idx}`} orderItem={item} existingReview={reviewKey ? orderReviews[reviewKey] : null} reviewsLoading={reviewsLoading} skipIndividualFetch onReviewCreated={onReviewSuccess} orderStatus={selectedOrder.status} /> : null}
@@ -582,7 +582,7 @@ const OrderDetailsModal = React.memo(({
                           <User className="w-5 h-5 text-slate-600" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-slate-900 truncate">
+                          <div className="text-sm font-semibold text-text-primary truncate">
                             {selectedOrder.buyerName || selectedOrder.buyerSurname ? `${selectedOrder.buyerName || ''} ${selectedOrder.buyerSurname || ''}`.trim() : `User #${selectedOrder.userId}`}
                           </div>
                           {selectedOrder.buyerEmail ? <div className="text-xs text-slate-500 mt-0.5 truncate">{selectedOrder.buyerEmail}</div> : null}

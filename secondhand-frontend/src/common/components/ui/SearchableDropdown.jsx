@@ -141,10 +141,10 @@ const SearchableDropdown = ({
     }
     return `${selectedValues.length} selected`;
   };
-  const dropdownContent = <motion.div key="searchable-dropdown" ref={usePortal ? portalRef : undefined} variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="bg-white/95 backdrop-blur-xl rounded-xl shadow-xl shadow-zinc-200/40 border border-zinc-200/50 overflow-hidden" style={usePortal ? portalStyle : {}}>
+  const dropdownContent = <motion.div key="searchable-dropdown" ref={usePortal ? portalRef : undefined} variants={dropdownVariants} initial="hidden" animate="visible" exit="exit" className="bg-background-primary/95 backdrop-blur-xl rounded-xl shadow-xl shadow-zinc-200/40 border border-zinc-200/50 overflow-hidden" style={usePortal ? portalStyle : {}}>
       <div className="p-3 border-b border-zinc-100/60 relative bg-zinc-50/30">
         <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
-        <input ref={searchInputRef} type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={searchPlaceholder} className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-400 text-xs transition-all tracking-tight wizard-input-glow hover:border-zinc-300" />
+        <input ref={searchInputRef} type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={searchPlaceholder} className="w-full pl-10 pr-4 py-2.5 bg-background-primary border border-zinc-200/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-400 text-xs transition-all tracking-tight wizard-input-glow hover:border-zinc-300" />
       </div>
 
       <div className="max-h-60 overflow-y-auto p-1.5 custom-scrollbar overscroll-contain">
@@ -185,7 +185,7 @@ const SearchableDropdown = ({
           {multiple && selectedValues.length > 0 && <button type="button" onClick={e => {
           e.stopPropagation();
           handleClearAll();
-        }} disabled={disabled} className="text-zinc-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-full" title={t("clear_all")}>
+        }} disabled={disabled} className="text-zinc-400 hover:text-status-error transition-colors p-1 hover:bg-status-error-bg rounded-full" title={t("clear_all")}>
               <X className="w-4 h-4" />
             </button>}
           <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${!disabled && isOpen ? 'rotate-180 text-zinc-600' : ''}`} />

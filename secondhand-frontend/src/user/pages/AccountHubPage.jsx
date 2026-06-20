@@ -66,7 +66,7 @@ const AccountHubPage = () => {
       {/* Sidebar Navigation */}
       <aside className="w-full lg:w-[320px] bg-transparent flex-shrink-0 flex flex-col p-6 lg:py-10 lg:pl-10 lg:pr-6 select-none">
         {/* User Card */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-slate-100/60 mb-6 flex items-center gap-4">
+        <div className="bg-background-primary rounded-2xl p-5 shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-slate-100/60 mb-6 flex items-center gap-4">
           <div className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden">
             {user?.profilePicture ? <img src={user.profilePicture} alt="" className="h-full w-full object-cover" /> : getInitials(`${user?.name || ''} ${user?.surname || ''}`)}
           </div>
@@ -83,7 +83,7 @@ const AccountHubPage = () => {
           {navGroups.map(group => {
           return group.items.map(item => {
             const active = isRouteActive(pathname, item.route);
-            return <Link key={`mobile-${group.id}-${item.route}`} to={item.route} className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${active ? 'bg-slate-900 text-white shadow-sm' : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'}`}>
+            return <Link key={`mobile-${group.id}-${item.route}`} to={item.route} className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${active ? 'bg-slate-900 text-white shadow-sm' : 'bg-background-primary text-slate-500 border border-slate-100 hover:bg-slate-50'}`}>
                   {item.name}
                 </Link>;
           });
@@ -106,7 +106,7 @@ const AccountHubPage = () => {
                     {group.items.map(item => {
                 const ItemIcon = item.icon;
                 const active = isRouteActive(pathname, item.route);
-                return <Link key={`${group.id}-${item.route}`} to={item.route} className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${active ? 'bg-slate-900 text-white font-bold shadow-sm' : 'text-slate-500 font-semibold hover:bg-slate-950/[0.02] hover:text-slate-900'}`}>
+                return <Link key={`${group.id}-${item.route}`} to={item.route} className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${active ? 'bg-slate-900 text-white font-bold shadow-sm' : 'text-slate-500 font-semibold hover:bg-slate-950/[0.02] hover:text-text-primary'}`}>
                           <ItemIcon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} strokeWidth={active ? 2.5 : 2} />
                           <span className="truncate">{item.name}</span>
                         </Link>;
@@ -128,25 +128,25 @@ const AccountHubPage = () => {
               <p className="mt-1 text-sm text-slate-500 font-medium">{t("your_personal_secondhand_space")}</p>
             </div>
             {/* Secure Trust Badge */}
-            <div className="inline-flex items-center self-start gap-1.5 rounded-full bg-emerald-50/50 border border-emerald-100/60 px-3.5 py-1.5 text-xs font-bold text-emerald-700 select-none shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2.5} />
+            <div className="inline-flex items-center self-start gap-1.5 rounded-full bg-status-success-bg/50 border border-emerald-100/60 px-3.5 py-1.5 text-xs font-bold text-emerald-700 select-none shadow-sm">
+              <ShieldCheck className="w-3.5 h-3.5 text-status-success" strokeWidth={2.5} />
               <span>{t("escrow_secured_member")}</span>
             </div>
           </div>
 
           {/* Mini Summary Row */}
           <div className="grid grid-cols-3 gap-3 mb-8">
-            <Link to={ROUTES.MY_LISTINGS} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
-              <Sparkles className="w-5 h-5 text-indigo-500 mb-1.5" />
+            <Link to={ROUTES.MY_LISTINGS} className="bg-background-primary rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
+              <Sparkles className="w-5 h-5 text-primary mb-1.5" />
               <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("listings")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("manage_items")}</span>
             </Link>
-            <Link to={ROUTES.FAVORITES} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
+            <Link to={ROUTES.FAVORITES} className="bg-background-primary rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
               <Heart className="w-5 h-5 text-rose-500 mb-1.5" />
               <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("saved")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("my_favorites")}</span>
             </Link>
-            <Link to={ROUTES.CHAT} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
+            <Link to={ROUTES.CHAT} className="bg-background-primary rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
               <MessageSquare className="w-5 h-5 text-teal-500 mb-1.5" />
               <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("inbox")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("chat_history")}</span>
@@ -154,10 +154,10 @@ const AccountHubPage = () => {
           </div>
 
           {/* Recent Orders Box */}
-          <div className="bg-white rounded-[28px] border border-slate-100/60 shadow-[0_8px_40px_rgba(0,0,0,0.01)] p-6 lg:p-8 mb-8">
+          <div className="bg-background-primary rounded-[28px] border border-slate-100/60 shadow-[0_8px_40px_rgba(0,0,0,0.01)] p-6 lg:p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("recent_orders")}</h2>
-              <Link to={ROUTES.MY_ORDERS} className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 hover:text-slate-900 transition-colors">{t("view_all")}<ArrowRight className="w-4 h-4" strokeWidth={2} />
+              <Link to={ROUTES.MY_ORDERS} className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 hover:text-text-primary transition-colors">{t("view_all")}<ArrowRight className="w-4 h-4" strokeWidth={2} />
               </Link>
             </div>
 
@@ -177,10 +177,10 @@ const AccountHubPage = () => {
               const listing = firstItem?.listing;
               const thumbUrl = listing?.imageUrl || firstItem?.imageUrl;
               const lineTitle = listing?.title || firstItem?.title;
-              const statusColor = order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-emerald-50/50 text-emerald-700 border-emerald-100/50' : order.status === 'CANCELLED' ? 'bg-red-50/50 text-red-700 border-red-100/50' : 'bg-amber-50/50 text-amber-700 border-amber-100/50';
+              const statusColor = order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-status-success-bg/50 text-emerald-700 border-emerald-100/50' : order.status === 'CANCELLED' ? 'bg-status-error-bg/50 text-red-700 border-red-100/50' : 'bg-status-warning-bg/50 text-amber-700 border-amber-100/50';
               return <Link key={order.id} to={ROUTES.MY_ORDERS} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100/60 bg-slate-50/30 hover:bg-slate-50 hover:shadow-sm transition-all duration-300">
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className="w-14 h-14 rounded-xl bg-white overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-100/80 shadow-sm">
+                        <div className="w-14 h-14 rounded-xl bg-background-primary overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-100/80 shadow-sm">
                           {thumbUrl ? <img src={thumbUrl} alt="" className="w-full h-full object-cover" /> : <ShoppingBag className="w-5 h-5 text-slate-400" />}
                         </div>
                         <div className="min-w-0">
@@ -197,7 +197,7 @@ const AccountHubPage = () => {
                         </div>
                       </div>
                       <div className="text-right shrink-0 ml-4">
-                        <p className="text-base font-bold text-slate-900 tracking-tight">
+                        <p className="text-base font-bold text-text-primary tracking-tight">
                           {formatCurrency(order.totalAmount ?? order.total ?? 0, order.currency)}
                         </p>
                       </div>
@@ -208,7 +208,7 @@ const AccountHubPage = () => {
 
           {/* Quick Actions Panel */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <Link to={ROUTES.CREATE_LISTING} className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
+            <Link to={ROUTES.CREATE_LISTING} className="bg-background-primary rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
               <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
                 <Plus className="w-5 h-5" strokeWidth={2} />
               </div>
@@ -217,7 +217,7 @@ const AccountHubPage = () => {
                 <p className="text-caption text-slate-400 font-medium mt-0.5">{t("create_a_listing")}</p>
               </div>
             </Link>
-            <Link to={ROUTES.EWALLET} className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
+            <Link to={ROUTES.EWALLET} className="bg-background-primary rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
               <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
                 <Wallet className="w-4 h-4" strokeWidth={2} />
               </div>
@@ -226,7 +226,7 @@ const AccountHubPage = () => {
                 <p className="text-caption text-slate-400 font-medium mt-0.5">{t("top_up_balance")}</p>
               </div>
             </Link>
-            <Link to={ROUTES.PROFILE} className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
+            <Link to={ROUTES.PROFILE} className="bg-background-primary rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
               <div className="h-10 w-10 shrink-0 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-700">
                 <MapPin className="w-4 h-4" strokeWidth={2} />
               </div>

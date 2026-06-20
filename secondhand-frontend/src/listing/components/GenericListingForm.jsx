@@ -35,7 +35,7 @@ const FieldError = ({
   }} animate={{
     opacity: 1,
     y: 0
-  }} className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
+  }} className="mt-1.5 flex items-center gap-1 text-xs text-status-error">
       <AlertCircle className="w-3 h-3 shrink-0" />
       {error}
     </motion.p>;
@@ -68,13 +68,13 @@ const ToggleCardField = ({
   description,
   value,
   onToggle
-}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded-xl border px-4 py-3.5 transition-all duration-200 ${value ? 'border-zinc-900/20 bg-zinc-50/80 shadow-sm border-l-[3px] border-l-zinc-900' : 'border-zinc-200/60 bg-white hover:border-zinc-300 hover:shadow-sm'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
+}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded-xl border px-4 py-3.5 transition-all duration-200 ${value ? 'border-zinc-900/20 bg-zinc-50/80 shadow-sm border-l-[3px] border-l-zinc-900' : 'border-zinc-200/60 bg-background-primary hover:border-zinc-300 hover:shadow-sm'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
     onToggle();
   }
 }}>
-    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${value ? 'border-zinc-900 bg-zinc-900' : 'border-zinc-300 bg-white'}`}>
+    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${value ? 'border-zinc-900 bg-zinc-900' : 'border-zinc-300 bg-background-primary'}`}>
       {value && <motion.svg initial={{
       scale: 0
     }} animate={{
@@ -101,8 +101,8 @@ const ToggleCardField = ({
 /* ── Input Classes ─────────────────────────────────────────── */
 
 const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
-const inputNormal = `${inputBase} border-zinc-200/60 bg-white focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
-const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+const inputNormal = `${inputBase} border-zinc-200/60 bg-background-primary focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
+const inputError = `${inputBase} border-red-300 bg-status-error-bg/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
 
 /* ── Main Form ─────────────────────────────────────────────── */
 
@@ -133,8 +133,8 @@ const GenericListingForm = ({
   const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
   const labelClass = uiChrome === 'composer' ? 'text-zinc-950' : 'text-zinc-900';
   const descFieldClass = uiChrome === 'composer' ? 'text-zinc-500' : 'text-zinc-400';
-  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-zinc-200/60 bg-white px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5 hover:border-zinc-300 wizard-input-glow' : inputNormal, [uiChrome]);
-  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-red-200 bg-red-50/40 px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 focus:border-red-400 focus:ring-2 focus:ring-red-400/25' : inputError, [uiChrome]);
+  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-zinc-200/60 bg-background-primary px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5 hover:border-zinc-300 wizard-input-glow' : inputNormal, [uiChrome]);
+  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-red-200 bg-status-error-bg/40 px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 focus:border-red-400 focus:ring-2 focus:ring-red-400/25' : inputError, [uiChrome]);
   const wizardSteps = useMemo(() => {
     const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
     if (!steps.length) return steps;
@@ -475,8 +475,8 @@ const GenericListingForm = ({
         y: 0
       }} transition={{
         delay: 0.3
-      }} className="flex items-center gap-2.5 rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-3">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+      }} className="flex items-center gap-2.5 rounded-xl border border-emerald-200/60 bg-status-success-bg/50 px-4 py-3">
+          <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
           <p className="text-sm text-emerald-700 font-medium">{t("your_listing_is_ready_to_publish")}</p>
         </motion.div>
       </div>;

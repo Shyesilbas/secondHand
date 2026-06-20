@@ -70,8 +70,8 @@ const CompareButton = memo(({ listing, size = 'sm', className = '' }) => {
                 ${sizeClasses[size]}
                 rounded-full flex items-center justify-center transition-all duration-200
                 ${isAdded
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/25'
-                    : 'bg-white/90 backdrop-blur border border-slate-200 hover:border-indigo-200 text-slate-600 hover:text-indigo-600 shadow-sm'
+                    ? 'bg-primary text-white shadow-md shadow-indigo-600/25'
+                    : 'bg-background-primary/90 backdrop-blur border border-border-light hover:border-primary text-slate-600 hover:text-primary shadow-sm'
                 }
                 ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''}
                 ${className}

@@ -70,7 +70,7 @@ const ListingWizard = ({
   } = useTranslation();
   const uiKey = resolveWizardUiKey(wizardVariant);
   const theme = getWizardTheme(uiKey);
-  const stepScrollWell = theme.stepScrollWell || 'border-gray-200 bg-white';
+  const stepScrollWell = theme.stepScrollWell || 'border-border-light bg-background-primary';
   const stepPanelRef = useRef(null);
   const [direction, setDirection] = useState(1);
   const prevStepRef = useRef(currentStep);
@@ -136,7 +136,7 @@ const ListingWizard = ({
         </div>
       </div>
     </div>;
-  const shellClass = layoutViewportLocked ? `flex flex-col flex-1 min-h-0 w-full overflow-hidden bg-gray-50/50` : t.shell;
+  const shellClass = layoutViewportLocked ? `flex flex-col flex-1 min-h-0 w-full overflow-hidden bg-secondary/50` : t.shell;
   const isComposerDock = layoutViewportLocked && uiKey === PREFLOW_WIZARD_VARIANT.COMPOSER;
 
   /* ── Composer Dock (Create form: locked viewport) ── */

@@ -26,28 +26,28 @@ const MarketplaceStatsSection = () => {
         value: totalActive.toLocaleString('tr-TR'),
         desc: 'Live items ready for trade',
         icon: Layers,
-        color: 'text-emerald-600 bg-emerald-50 border-emerald-100/50'
+        color: 'text-status-success bg-status-success-bg border-emerald-100/50'
       },
       {
         label: 'Vehicles',
         value: vehicles.toLocaleString('tr-TR'),
         desc: 'Cars, motorcycles & parts',
         icon: Car,
-        color: 'text-blue-600 bg-blue-50 border-blue-100/50'
+        color: 'text-primary bg-blue-50 border-primary/50'
       },
       {
         label: 'Electronics',
         value: electronics.toLocaleString('tr-TR'),
         desc: 'Laptops, phones & watches',
         icon: Laptop,
-        color: 'text-indigo-600 bg-indigo-50 border-indigo-100/50'
+        color: 'text-primary bg-indigo-50 border-primary/50'
       },
       {
         label: 'Real Estate',
         value: realEstate.toLocaleString('tr-TR'),
         desc: 'Apartments, villas & offices',
         icon: Building2,
-        color: 'text-amber-600 bg-amber-50 border-amber-100/50'
+        color: 'text-status-warning bg-status-warning-bg border-amber-100/50'
       }
     ];
   }, [statistics]);
@@ -58,7 +58,7 @@ const MarketplaceStatsSection = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 rounded-2xl bg-white border border-slate-100/80 animate-pulse" />
+              <div key={i} className="h-24 rounded-2xl bg-background-primary border border-slate-100/80 animate-pulse" />
             ))}
           </div>
         </div>
@@ -78,7 +78,7 @@ const MarketplaceStatsSection = () => {
             return (
               <div
                 key={metric.label}
-                className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_2px_8px_-1px_rgba(15,23,42,0.01),0_4px_20px_-2px_rgba(15,23,42,0.02)] transition-all hover:border-slate-200/80"
+                className="bg-background-primary border border-slate-100 rounded-2xl p-5 shadow-[0_2px_8px_-1px_rgba(15,23,42,0.01),0_4px_20px_-2px_rgba(15,23,42,0.02)] transition-all hover:border-border-light/80"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${metric.color}`}>

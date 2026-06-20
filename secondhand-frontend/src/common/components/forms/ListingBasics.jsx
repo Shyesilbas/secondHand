@@ -16,7 +16,7 @@ const FieldError = ({
   }} animate={{
     opacity: 1,
     y: 0
-  }} className="mt-1.5 flex items-center gap-1 text-body text-red-500">
+  }} className="mt-1.5 flex items-center gap-1 text-body text-status-error">
       <AlertCircle className="h-3 w-3 shrink-0" />
       {error}
     </motion.p>;
@@ -44,8 +44,8 @@ const SectionCard = ({
     </div>;
 };
 const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
-const inputNormal = `${inputBase} border-zinc-200/60 bg-white focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
-const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
+const inputNormal = `${inputBase} border-zinc-200/60 bg-background-primary focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
+const inputError = `${inputBase} border-red-300 bg-status-error-bg/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
 const ListingBasics = ({
   formData,
   errors = {},
@@ -58,12 +58,12 @@ const ListingBasics = ({
   } = useTranslation();
   const titleLen = formData.title?.length || 0;
   const titleProgress = Math.min(titleLen / 100, 1);
-  const titleCountColor = titleProgress > 0.9 ? 'text-red-500' : titleProgress > 0.7 ? 'text-amber-500' : 'text-zinc-400';
+  const titleCountColor = titleProgress > 0.9 ? 'text-status-error' : titleProgress > 0.7 ? 'text-amber-500' : 'text-zinc-400';
   return <div className="space-y-6 wizard-stagger">
       <SectionCard title={t("general_information")} description="Basic listing details" icon={Type}>
         <div className="space-y-5">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("listing_title")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("listing_title")}<span className="text-status-error">*</span>
             </label>
             <div className="relative">
               <input type="text" name="title" value={formData.title} onChange={onInputChange} className={errors.title ? inputError : inputNormal} placeholder={t("e_g_iphone_13_pro_excellent_condition")} maxLength={100} />
@@ -85,7 +85,7 @@ const ListingBasics = ({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("description")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("description")}<span className="text-status-error">*</span>
             </label>
             <div className="relative">
               <textarea name="description" value={formData.description} onChange={onInputChange} rows={5} className={`${errors.description ? inputError : inputNormal} resize-none pb-7`} placeholder={t("describe_your_item_in_detail_condition_f")} />
@@ -101,7 +101,7 @@ const ListingBasics = ({
       <SectionCard title={t("pricing")} description="Set the price and quantity" icon={DollarSign}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("price")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("price")}<span className="text-status-error">*</span>
             </label>
             <div className="relative flex">
               <PriceInput value={parsePrice(formData.price) ?? 0} onChange={n => onInputChange({
@@ -131,7 +131,7 @@ const ListingBasics = ({
           </div>
 
           {showQuantity && <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("quantity")}<span className="text-red-500">*</span>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("quantity")}<span className="text-status-error">*</span>
               </label>
               <input type="number" name="quantity" value={formData.quantity ?? ''} onChange={onInputChange} className={errors.quantity ? inputError : inputNormal} placeholder={t("e_g_5")} min="1" step="1" />
               <FieldError error={errors.quantity} />
@@ -149,7 +149,7 @@ const ListingBasics = ({
               <div>
                 <span className="block text-sm font-medium text-zinc-900">{t("sadece_kendi_ehrimde_elden_teslimat_yapm")}</span>
                 <span className="block text-xs text-zinc-500">{t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu")}</span>
-                <span className="block text-xs text-indigo-600/95 mt-1.5 font-medium bg-indigo-50/60 rounded-xl p-2.5 border border-indigo-100/50 shadow-sm max-w-lg leading-relaxed">{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari")}</span>
+                <span className="block text-xs text-primary/95 mt-1.5 font-medium bg-indigo-50/60 rounded-xl p-2.5 border border-primary/50 shadow-sm max-w-lg leading-relaxed">{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari")}</span>
               </div>
             </label>
             <FieldError error={errors.allowMeetup} />

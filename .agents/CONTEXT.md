@@ -1,16 +1,15 @@
 ## Son çalışılan
-Skeleton & EmptyState Bileşen Refaktörü & 't is not defined' Hatalarının Çözülmesi
+Teal/light tema geçişi + hardcoded renk temizliği
 
 ## Tamamlananlar
-- 9 modülde (Agreements, ShoppingCart, Favorites, ListingGrid, ListingsContent, SimilarListings, Reviews, Showcases vb.) dağınık pulse animasyonları ve el yazımı empty state tasarımları, merkezi `SkeletonGrid`, `SkeletonList`, `SkeletonText` ve `EmptyState` bileşenleriyle standartlaştırıldı.
-- 12+ dosyada karşılaşılan tanımsız `t` (translation hook) referans hataları, `const { t } = useTranslation();` entegrasyonuyla çözüldü.
-- Atıl durumda kalan ve ESLint hatası veren `motion` / `err` / `idx` / `isPricingLoading` vb. değişkenler temizlendi veya loglama eklendi.
-- Yapılan değişikliklerin sıfırlanmasını önlemek adına tüm 22 modifiye edilmiş frontend dosyası git index'ine eklendi (`git add` yapıldı).
-- Üretim sürümü derlemesi (`npm run build`) hata vermeksizin başarıyla tamamlandı.
+- `theme.js` yeniden yazıldı, yeni Teal/light renk paleti entegre edildi.
+- 3600+ hardcoded değer ve Tailwind renk/boyut sınıfı token'lara taşındı (tüm frontend `.jsx` ve `.js` dosyaları elden geçirildi).
+- `design-system` SKILL.md rehberi oluşturuldu.
+- Tailwind yapılandırması (`tailwind.config.js`) yeni renk paletiyle uyumlu olacak şekilde güncellendi ve üretim build'i başarıyla doğrulandı.
 
 ## Bir sonraki adım
-- Border-radius arbitrary değer temizliği
+- Tarayıcıda görsel test — her ana ekranı kontrol et
 
 ## Açık riskler
-- Yeni eklenen skeleton ve empty state bileşenlerinin görsel olarak arayüzde taşma yapıp yapmadığının yerel ortamda kontrol edilmesi.
-- Heading boyutları görsel test gerektirir — bazı başlıklar küçülmüş olabilir (önceki adımdan kalan risk).
+- Tailwind purge'ün yeni token class'larını tanıması için build gerekebilir.
+- Yapılan kapsamlı renk değişimlerinin arayüzdeki diğer bileşenlerle kontrast uyumunun görsel olarak kontrol edilmesi gerekir.

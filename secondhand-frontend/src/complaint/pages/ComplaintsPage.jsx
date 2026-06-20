@@ -18,11 +18,11 @@ const ComplaintsPage = () => {
     getUserComplaints();
   }, [getUserComplaints]);
   return <div className="min-h-screen bg-[#F8FAFC]">
-            <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
+            <div className="sticky top-0 z-20 border-b border-border-light/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
                 <PageContainer className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
                         <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-[0_18px_55px_rgba(15,23,42,0.18)] ring-1 ring-indigo-500/40">
-                            <div className="absolute inset-px rounded-2xl bg-white/60 backdrop-blur-md" />
+                            <div className="absolute inset-px rounded-2xl bg-background-primary/60 backdrop-blur-md" />
                             <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-slate-900 text-white">
                                 <ShieldAlert className="h-5 w-5" />
                             </div>
@@ -35,7 +35,7 @@ const ComplaintsPage = () => {
                         </div>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50/80 px-3 py-1 text-xs font-medium tracking-tight text-indigo-700">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-indigo-50/80 px-3 py-1 text-xs font-medium tracking-tight text-primary">
                             <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_0_4px_rgba(79,70,229,0.35)] animate-pulse" />
                             <span>
                                 {complaints?.length || 0}{t("complaint")}{complaints?.length !== 1 ? 's' : ''}
@@ -47,7 +47,7 @@ const ComplaintsPage = () => {
 
             <PageContainer className="pb-10 pt-6">
                 {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {[...Array(6)].map((_, i) => <div key={i} className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-sm animate-pulse">
+                        {[...Array(6)].map((_, i) => <div key={i} className="rounded-3xl border border-border-light/70 bg-background-primary/80 p-6 shadow-sm animate-pulse">
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3">
                                         <div className="h-9 w-9 rounded-2xl bg-slate-100" />
@@ -65,7 +65,7 @@ const ComplaintsPage = () => {
                                 </div>
                             </div>)}
                     </div> : error ? <div className="flex items-center justify-center py-16">
-                        <div className="w-full max-w-md rounded-3xl border border-rose-200/80 bg-white/90 p-8 text-center shadow-[0_18px_55px_rgba(248,113,113,0.18)]">
+                        <div className="w-full max-w-md rounded-3xl border border-rose-200/80 bg-background-primary/90 p-8 text-center shadow-[0_18px_55px_rgba(248,113,113,0.18)]">
                             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-rose-50">
                                 <ShieldAlert className="h-7 w-7 text-rose-500" />
                             </div>
@@ -76,19 +76,19 @@ const ComplaintsPage = () => {
                             <button onClick={() => getUserComplaints()} className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">{t("try_again")}</button>
                         </div>
                     </div> : complaints && complaints.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-3xl border border-slate-200/70 bg-white/90 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
+                        {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-3xl border border-border-light/70 bg-background-primary/90 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
                                 <ComplaintCard complaint={complaint} />
                             </div>)}
                     </div> : <div className="flex items-center justify-center py-20">
                         <div className="mx-auto max-w-md text-center">
                             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/10 via-slate-100 to-slate-50">
-                                <FileSearch className="h-10 w-10 text-indigo-500" />
+                                <FileSearch className="h-10 w-10 text-primary" />
                             </div>
                             <h3 className="text-sm font-medium text-text-primary tracking-tighter">{t("no_complaints_submitted")}</h3>
                             <p className="mt-2 text-sm leading-relaxed text-slate-500">{t("if_you_encounter_inappropriate_behavior_")}</p>
                             <button className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">
                                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800">
-                                    <span className="h-2 w-2 rounded-full bg-white" />
+                                    <span className="h-2 w-2 rounded-full bg-background-primary" />
                                 </span>{t("submit_new_complaint")}</button>
                         </div>
                     </div>}

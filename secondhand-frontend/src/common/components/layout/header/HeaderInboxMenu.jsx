@@ -27,9 +27,9 @@ const HeaderInboxMenu = ({
     unreadCount
   } = useInAppNotificationsContext();
   const hubTotal = (Number(unreadCount) || 0) + (Number(emailCount) || 0) + (Number(chatCount) || 0);
-  const rowClass = 'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50/80 hover:text-slate-900';
+  const rowClass = 'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50/80 hover:text-text-primary';
   return <div className="relative">
-            <button type="button" onClick={onToggle} title={t("inbox")} className="group relative rounded-xl p-2.5 text-slate-600 transition-all duration-300 ease-in-out hover:bg-slate-100/50 hover:text-slate-900">
+            <button type="button" onClick={onToggle} title={t("inbox")} className="group relative rounded-xl p-2.5 text-slate-600 transition-all duration-300 ease-in-out hover:bg-slate-100/50 hover:text-text-primary">
                 <Inbox className="h-5 w-5 stroke-[1.5px]" />
                 {hubTotal > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gray-900 px-1 text-caption font-bold leading-none text-white">
                         {hubTotal > 99 ? '99+' : hubTotal}

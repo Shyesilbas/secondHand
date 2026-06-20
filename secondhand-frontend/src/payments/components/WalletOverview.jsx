@@ -9,10 +9,10 @@ export const PaymentInfo = () => {
   const {
     t
   } = useTranslation();
-  return <div className="bg-blue-50/80 border border-blue-200/60 rounded-lg p-4">
+  return <div className="bg-blue-50/80 border border-primary/60 rounded-lg p-4">
       <div className="flex items-start gap-3">
         <div className="p-1.5 bg-blue-100 rounded-md flex-shrink-0">
-          <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
@@ -41,18 +41,18 @@ export const EWalletBalance = ({
       {/* Wallet Virtual Card */}
       <div className="lg:col-span-1">
         <div className="relative h-full rounded-3xl bg-gradient-to-bl from-slate-900 via-slate-800 to-black p-6 text-white shadow-2xl overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-white/5 blur-xl pointer-events-none" />
+          <div className="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-background-primary/5 blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-background-primary/5 blur-xl pointer-events-none" />
           
           <div className="relative z-10 flex items-start justify-between">
             <div className="flex items-center gap-2 text-slate-300">
               <Wallet className="w-5 h-5 opacity-80" />
               <span className="text-xs font-semibold tracking-wider uppercase letter-spacing-1">{t("prime_card")}</span>
             </div>
-            <div className="w-10 h-6 rounded-md bg-white/10 backdrop-blur border border-white/20 flex flex-col items-center justify-center gap-0.5 pointer-events-none">
-              <div className="h-[2px] w-4 bg-white/40 rounded-full" />
-              <div className="h-[2px] w-4 bg-white/40 rounded-full" />
-              <div className="h-[2px] w-4 bg-white/40 rounded-full" />
+            <div className="w-10 h-6 rounded-md bg-background-primary/10 backdrop-blur border border-white/20 flex flex-col items-center justify-center gap-0.5 pointer-events-none">
+              <div className="h-[2px] w-4 bg-background-primary/40 rounded-full" />
+              <div className="h-[2px] w-4 bg-background-primary/40 rounded-full" />
+              <div className="h-[2px] w-4 bg-background-primary/40 rounded-full" />
             </div>
           </div>
 
@@ -67,7 +67,7 @@ export const EWalletBalance = ({
             <div className="flex flex-col">
               <span className="text-caption text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("status")}</span>
               <span className="font-medium text-emerald-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />{t("active")}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-status-success-bg animate-pulse" />{t("active")}</span>
             </div>
             <div className="flex flex-col text-right">
               <span className="text-caption text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("currency")}</span>
@@ -81,16 +81,16 @@ export const EWalletBalance = ({
       <div className="lg:col-span-2 flex justify-between flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
           {/* Wallet Limit Card */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div className="bg-background-primary rounded-3xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-primary flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t("account_limit")}</span>
             </div>
             <div>
               <p className="text-sm text-slate-500 mb-1">{t("maximum_allowed")}</p>
-              <p className="text-xl font-bold text-slate-900 tracking-tight">
+              <p className="text-xl font-bold text-text-primary tracking-tight">
                 {eWallet.limit ? formatCurrency(eWallet.limit) : 'Unlimited'}
               </p>
             </div>
@@ -100,7 +100,7 @@ export const EWalletBalance = ({
           </div>
 
           {/* Spending Warning Card */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div className="bg-background-primary rounded-3xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
                 <ShieldAlert className="w-5 h-5" />
@@ -110,7 +110,7 @@ export const EWalletBalance = ({
             <div>
               <p className="text-sm text-slate-500 mb-1">{t("warning_threshold")}</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-xl font-bold text-slate-900 tracking-tight">
+                <p className="text-xl font-bold text-text-primary tracking-tight">
                   {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not configured'}
                 </p>
               </div>
@@ -118,10 +118,10 @@ export const EWalletBalance = ({
               {eWallet.spendingWarningLimit && <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="flex justify-between items-end mb-2">
                      <span className="text-xs font-medium text-slate-500">{t("current_period_spend")}</span>
-                     {statisticsLoaded && totalAmount != null ? <span className="text-xs font-bold text-slate-700">{formatCurrency(totalAmount)}</span> : <button onClick={onLoadStatistics} className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">{t("reveal")}</button>}
+                     {statisticsLoaded && totalAmount != null ? <span className="text-xs font-bold text-slate-700">{formatCurrency(totalAmount)}</span> : <button onClick={onLoadStatistics} className="text-xs text-primary font-semibold hover:text-primary transition-colors">{t("reveal")}</button>}
                   </div>
                   {statisticsLoaded && totalAmount != null && <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-500 ${spentPercentage > 90 ? 'bg-red-500' : spentPercentage > 75 ? 'bg-amber-400' : 'bg-emerald-400'}`} style={{
+                      <div className={`h-full rounded-full transition-all duration-500 ${spentPercentage > 90 ? 'bg-status-error-bg' : spentPercentage > 75 ? 'bg-status-warning-bg' : 'bg-status-success-bg'}`} style={{
                   width: `${spentPercentage}%`
                 }} />
                     </div>}
@@ -158,15 +158,15 @@ export const EWalletActions = ({
       <div className="flex flex-wrap items-center gap-3">
         <button onClick={() => setActiveModal('deposit')} className="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-zinc-900 text-sm font-semibold text-white hover:bg-zinc-800 transition-colors shadow-sm">
           <ArrowDownRight className="w-4 h-4 text-emerald-400 group-hover:translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />{t("deposit")}</button>
-        <button onClick={() => setActiveModal('withdraw')} className="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors shadow-sm">
+        <button onClick={() => setActiveModal('withdraw')} className="group flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-background-primary border border-border-light text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors shadow-sm">
           <ArrowUpRight className="w-4 h-4 text-rose-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />{t("withdraw")}</button>
 
         <div className="h-6 w-px bg-slate-200 hidden sm:block mx-1" />
 
-        <button onClick={() => setActiveModal('updateLimit')} className="p-2.5 rounded-2xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shadow-sm" title={t("update_account_limit")}>
+        <button onClick={() => setActiveModal('updateLimit')} className="p-2.5 rounded-2xl bg-background-primary border border-border-light text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shadow-sm" title={t("update_account_limit")}>
           <Settings className="w-4 h-4" />
         </button>
-        <button onClick={() => setActiveModal('updateWarning')} className="p-2.5 rounded-2xl bg-white border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shadow-sm" title={t("update_spending_warning_limit")}>
+        <button onClick={() => setActiveModal('updateWarning')} className="p-2.5 rounded-2xl bg-background-primary border border-border-light text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all shadow-sm" title={t("update_spending_warning_limit")}>
           <AlertCircle className="w-4 h-4" />
         </button>
       </div>

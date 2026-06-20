@@ -163,12 +163,12 @@ const AuraChatPage = () => {
       setIsSending(false);
     }
   };
-  return <div className="h-[calc(100vh-68px)] bg-white flex overflow-hidden min-h-0 relative w-full text-slate-800">
+  return <div className="h-[calc(100vh-68px)] bg-background-primary flex overflow-hidden min-h-0 relative w-full text-slate-800">
 
       {/* ── 1. LEFT SIDEBAR PANEL (Navigation & Session) ─────── */}
       <div className={`
         ${sidebarOpen ? 'w-64 border-r opacity-100 p-5' : 'w-0 border-r-0 opacity-0 p-0 pointer-events-none'}
-        hidden lg:flex flex-col h-full bg-slate-50 border-slate-200 overflow-y-auto shrink-0 justify-between transition-all duration-300 ease-in-out z-25
+        hidden lg:flex flex-col h-full bg-slate-50 border-border-light overflow-y-auto shrink-0 justify-between transition-all duration-300 ease-in-out z-25
       `}>
         <div className="space-y-6">
           {/* Brand header inside sidebar */}
@@ -177,7 +177,7 @@ const AuraChatPage = () => {
               <Sparkles className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-900 leading-none">{t("aura_workspace")}</p>
+              <p className="text-xs font-bold text-text-primary leading-none">{t("aura_workspace")}</p>
               <span className="text-[9px] text-slate-400 font-semibold tracking-wider uppercase mt-1 inline-block">{t("ai_console")}</span>
             </div>
           </div>
@@ -187,19 +187,19 @@ const AuraChatPage = () => {
             <RotateCcw className="w-3.5 h-3.5" />{t("new_conversation")}</button>
 
           {/* Settings Section */}
-          <div className="space-y-2 pt-4 border-t border-slate-200">
+          <div className="space-y-2 pt-4 border-t border-border-light">
             <p className="text-caption font-bold text-slate-400 uppercase tracking-wider mb-2">{t("controls")}</p>
             
-            <button type="button" onClick={handleDeleteHistory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 transition-all">
+            <button type="button" onClick={handleDeleteHistory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-background-primary hover:bg-slate-50 text-xs font-semibold text-slate-600 transition-all">
               <Trash2 className="w-3.5 h-3.5 text-slate-400" />{t("clear_history")}</button>
 
-            <button type="button" onClick={handleDeleteMemory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:border-slate-50 text-xs font-semibold text-slate-600 transition-all">
+            <button type="button" onClick={handleDeleteMemory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-background-primary hover:border-slate-50 text-xs font-semibold text-slate-600 transition-all">
               <Shield className="w-3.5 h-3.5 text-slate-400" />{t("reset_memory_cache")}</button>
           </div>
         </div>
 
         {/* Footer info in sidebar */}
-        <div className="pt-4 border-t border-slate-200">
+        <div className="pt-4 border-t border-border-light">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-caption font-bold text-slate-600 uppercase">
               {user?.name?.slice(0, 2) || 'US'}
@@ -213,10 +213,10 @@ const AuraChatPage = () => {
       </div>
 
       {/* ── 2. MIDDLE PANEL (Main Conversational Lane) ───────── */}
-      <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full bg-white relative z-10">
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full bg-background-primary relative z-10">
         
         {/* Workspace Toolbar (Header) */}
-        <div className="shrink-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-4 z-20">
+        <div className="shrink-0 bg-background-primary border-b border-border-light px-4 py-3 flex items-center justify-between gap-4 z-20">
           
           {/* Left tools: sidebar toggle + Brand */}
           <div className="flex items-center gap-3">
@@ -224,13 +224,13 @@ const AuraChatPage = () => {
               {sidebarOpen ? <PanelLeftClose className="w-4.5 h-4.5" /> : <PanelLeft className="w-4.5 h-4.5" />}
             </button>
 
-            <span className="lg:hidden w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="lg:hidden w-1.5 h-1.5 rounded-full bg-status-success-bg" />
             <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("aura_assistant")}</h2>
-            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 rounded">{t("pro")}</span>
+            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-border-light rounded">{t("pro")}</span>
           </div>
 
           {/* Center tools: Agent switch */}
-          {AI_AGENT_MODE_ENABLED && <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${agentMode ? 'bg-slate-900 text-white border border-transparent shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`}>
+          {AI_AGENT_MODE_ENABLED && <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${agentMode ? 'bg-slate-900 text-white border border-transparent shadow-sm' : 'bg-background-primary text-slate-600 border border-border-light hover:bg-slate-50'}`}>
               <Zap className="w-3.5 h-3.5" />{t("agent_mode")}{agentMode ? 'ON' : 'OFF'}
             </button>}
 
@@ -250,7 +250,7 @@ const AuraChatPage = () => {
           <PageContainer narrow className="py-8 w-full space-y-6">
             
             {/* Elegant Welcome Greeting Card if there is only 1 message (initial welcome) */}
-            {messages.length === 1 && <div className="rounded-xl border border-slate-200 bg-slate-50/40 p-6 text-center space-y-4 mb-6 shadow-inner">
+            {messages.length === 1 && <div className="rounded-xl border border-border-light bg-slate-50/40 p-6 text-center space-y-4 mb-6 shadow-inner">
                 <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center mx-auto shadow-md">
                   <Bot className="w-6 h-6 text-white" />
                 </div>
@@ -265,28 +265,28 @@ const AuraChatPage = () => {
             const isUser = m.role === 'user';
             return <div key={m.id} className={`flex gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end`}>
                   {/* Avatar */}
-                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm border ${isUser ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-white'}`}>
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm border ${isUser ? 'bg-slate-100 border-border-light text-slate-800' : 'bg-slate-900 border-slate-800 text-white'}`}>
                     {isUser ? <UserRound className="h-4.5 w-4.5" /> : <Sparkles className="h-4 w-4" />}
                   </div>
 
                   {/* Bubble content */}
                   <div className={`min-w-0 max-w-[85%] ${isUser ? 'text-right' : ''}`}>
-                    <div className={`inline-block rounded-xl px-4 py-3.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-slate-900 text-white shadow-sm rounded-br-sm' : 'bg-slate-50 border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'}`}>
+                    <div className={`inline-block rounded-xl px-4 py-3.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-slate-900 text-white shadow-sm rounded-br-sm' : 'bg-slate-50 border border-border-light text-slate-800 rounded-bl-sm shadow-sm'}`}>
                       {m.typing ? <div className="flex items-center gap-1.5 py-1 px-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{
+                          <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
                       animationDelay: '0ms'
                     }} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{
+                          <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
                       animationDelay: '150ms'
                     }} />
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{
+                          <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
                       animationDelay: '300ms'
                     }} />
                         </div> : <>
                           {m.content}
                           {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 ? <AuraSuggestedListingChips listings={m.meta.suggestedListings} /> : null}
-                          {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-3 flex flex-wrap gap-1 pt-2 border-t border-slate-200">
-                              {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded bg-slate-100 px-2 py-0.5 text-[9px] font-bold font-mono text-slate-500 border border-slate-200">
+                          {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-3 flex flex-wrap gap-1 pt-2 border-t border-border-light">
+                              {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded bg-slate-100 px-2 py-0.5 text-[9px] font-bold font-mono text-slate-500 border border-border-light">
                                   {source.source.toUpperCase()}:{source.status}
                                 </span>)}
                             </div> : null}
@@ -307,10 +307,10 @@ const AuraChatPage = () => {
           </div>}
 
         {/* Floating Chat Input Section */}
-        <div className="shrink-0 border-t border-slate-200 bg-white p-4 sm:p-5">
+        <div className="shrink-0 border-t border-border-light bg-background-primary p-4 sm:p-5">
           <div className="max-w-3xl mx-auto flex items-end gap-3">
             <div className="flex-1 relative">
-              <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("type_a_message_or_ask_a_shopping_questio")} className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-4.5 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-450 focus:bg-white min-h-[46px] max-h-[120px] transition-all duration-200 shadow-inner" rows={1} />
+              <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("type_a_message_or_ask_a_shopping_questio")} className="w-full resize-none rounded-xl border border-border-light bg-slate-50/50 px-4.5 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-450 focus:bg-background-primary min-h-[46px] max-h-[120px] transition-all duration-200 shadow-inner" rows={1} />
             </div>
             <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow hover:bg-slate-950 active:scale-95 transition-all duration-200">
               <Send className="w-4.5 h-4.5" />
@@ -323,14 +323,14 @@ const AuraChatPage = () => {
       {/* ── 3. RIGHT PANEL (Listing Information Canvas) ───────── */}
       <div className={`
         ${rightPanelOpen ? 'w-80 border-l opacity-100 p-5' : 'w-0 border-l-0 opacity-0 p-0 pointer-events-none'}
-        hidden lg:flex flex-col h-full bg-slate-50 border-slate-200 overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25
+        hidden lg:flex flex-col h-full bg-slate-50 border-border-light overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25
       `}>
         
         {/* Active Product Analysis section */}
         {listing ? <div>
             <p className="text-caption font-bold text-slate-400 uppercase tracking-wider mb-2">{t("workspace_context")}</p>
             <AuraListingContextCard listing={listing} />
-          </div> : <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
+          </div> : <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
               <Layers className="w-4 h-4 text-slate-400" />{t("general_workspace")}</div>
             <p className="text-caption text-slate-500 leading-normal">{t("no_product_is_currently_active_in_your_c")}</p>
@@ -345,7 +345,7 @@ const AuraChatPage = () => {
           </div>}
 
         {/* Secure shopping widget info */}
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
+        <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
           <div className="flex-1 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
               <Info className="w-4 h-4 text-slate-400" />{t("security_shield")}</div>

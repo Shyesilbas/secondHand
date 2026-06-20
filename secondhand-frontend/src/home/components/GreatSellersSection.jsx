@@ -25,7 +25,7 @@ const HeaderBlock = () => {
           <p className="text-base text-slate-500 mt-4 font-medium leading-relaxed">{t("high_performance_sellers_recognized_for_")}</p>
         </div>
 
-        <Link to={ROUTES.LISTINGS} className="group inline-flex items-center justify-center gap-2 text-sm font-bold text-slate-900 hover:text-indigo-600 transition-colors">{t("view_all_marketplace_listings")}<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        <Link to={ROUTES.LISTINGS} className="group inline-flex items-center justify-center gap-2 text-sm font-bold text-text-primary hover:text-primary transition-colors">{t("view_all_marketplace_listings")}<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>
@@ -49,7 +49,7 @@ const SellerCard = ({
   }} transition={{
     delay: idx * 0.03
   }}>
-      <Link to={ROUTES.USER_PROFILE(s.id)} className="group block bg-white border border-slate-100 rounded-2xl p-5 transition-all duration-300 hover:border-slate-200 hover:shadow-md">
+      <Link to={ROUTES.USER_PROFILE(s.id)} className="group block bg-background-primary border border-slate-100 rounded-2xl p-5 transition-all duration-300 hover:border-border-light hover:shadow-md">
         <div className="flex items-start gap-4">
           {/* Avatar - Calm Slate */}
           <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 transition-colors group-hover:bg-slate-100">
@@ -83,8 +83,8 @@ const SellerCard = ({
         {/* Footer Badge - Subtle */}
         <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-1.5 py-0.5 px-2 bg-indigo-50 rounded-md">
-            <Award className="w-3 h-3 text-indigo-600" />
-            <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-700">{t("great_seller")}</span>
+            <Award className="w-3 h-3 text-primary" />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-primary">{t("great_seller")}</span>
           </div>
           <ArrowRight className="w-3.5 h-3.5 text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
         </div>
@@ -110,7 +110,7 @@ const GreatSellersSection = () => {
         <HeaderBlock />
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {isLoading ? [...Array(8)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-white border border-slate-100 animate-pulse" />) : error ? <div className="col-span-full py-12 text-center text-slate-400 text-sm italic">{t("unable_to_load_featured_sellers_at_this_")}</div> : !sellers.length ? <div className="col-span-full py-12 text-center text-slate-400 text-sm">{t("new_community_verified_sellers_will_appe")}</div> : sellers.map((s, idx) => <SellerCard key={s.id} s={s} idx={idx} />)}
+          {isLoading ? [...Array(8)].map((_, i) => <div key={i} className="h-32 rounded-2xl bg-background-primary border border-slate-100 animate-pulse" />) : error ? <div className="col-span-full py-12 text-center text-slate-400 text-sm italic">{t("unable_to_load_featured_sellers_at_this_")}</div> : !sellers.length ? <div className="col-span-full py-12 text-center text-slate-400 text-sm">{t("new_community_verified_sellers_will_appe")}</div> : sellers.map((s, idx) => <SellerCard key={s.id} s={s} idx={idx} />)}
         </div>
 
         <div className="mt-16">

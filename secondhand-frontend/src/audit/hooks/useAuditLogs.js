@@ -97,13 +97,13 @@ export const useAuditLogs = (filters = {}, page = 0, size = 10) => {
     const getEventStatusColor = (eventStatus) => {
         switch (eventStatus) {
             case 'SUCCESS':
-                return 'text-green-600 bg-green-100';
+                return 'text-status-success bg-status-success-bg';
             case 'FAILURE':
-                return 'text-red-600 bg-red-100';
+                return 'text-status-error bg-status-error-bg';
             case 'ATTEMPT':
-                return 'text-yellow-600 bg-yellow-100';
+                return 'text-status-warning bg-status-warning-bg';
             default:
-                return 'text-gray-600 bg-gray-100';
+                return 'text-text-secondary bg-tertiary';
         }
     };
 

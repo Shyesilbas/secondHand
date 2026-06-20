@@ -25,13 +25,13 @@ const ListingReviewsSection = ({
       };
     });
   }, [stats]);
-  return <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
+  return <div className="bg-background-primary rounded-2xl border border-border-light/60 shadow-sm p-6">
       <h3 className="text-sm font-medium text-text-primary mb-6 tracking-tight">{t("product_reviews")}</h3>
 
-      {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-slate-200/40">
+      {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-border-light/40">
           <div className="flex flex-wrap items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-slate-900">
+              <span className="text-2xl font-bold text-text-primary">
                 {Number(stats.averageRating ?? 0).toFixed(1)}
               </span>
               <div className="flex gap-0.5">
@@ -42,7 +42,7 @@ const ListingReviewsSection = ({
               {stats.totalReviews}{t("reviews")}</span>
           </div>
 
-          {ratingBreakdown.length > 0 && <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+          {ratingBreakdown.length > 0 && <div className="space-y-2.5 pt-2 border-t border-border-light/60">
               {ratingBreakdown.map(({
           rating,
           count,
@@ -51,7 +51,7 @@ const ListingReviewsSection = ({
                   <span className="w-6 text-slate-500 font-medium">{rating}</span>
                   <Star className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />
                   <div className="flex-1 min-w-0 h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-400 rounded-full transition-all duration-300" style={{
+                    <div className="h-full bg-status-warning-bg rounded-full transition-all duration-300" style={{
               width: `${Math.min(percentage, 100)}%`
             }} />
                   </div>

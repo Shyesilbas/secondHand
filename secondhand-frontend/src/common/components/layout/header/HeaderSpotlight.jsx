@@ -127,15 +127,15 @@ const HeaderSpotlight = ({
   return <div className="fixed inset-0 z-[100]">
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
       <div className="relative flex justify-center pt-[15vh] px-4">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="w-full max-w-lg bg-background-primary rounded-2xl shadow-2xl border border-border-light overflow-hidden">
           {/* Search input */}
           <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
-            <Search className="w-4.5 h-4.5 text-gray-400 shrink-0" />
+            <Search className="w-4.5 h-4.5 text-text-muted shrink-0" />
             <input ref={inputRef} value={query} onChange={e => {
             setQuery(e.target.value);
             setSelectedIndex(0);
-          }} onKeyDown={handleKeyDown} placeholder={t("search_pages_and_features")} className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent focus:outline-none" />
-            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0">
+          }} onKeyDown={handleKeyDown} placeholder={t("search_pages_and_features")} className="flex-1 text-sm text-text-primary placeholder-gray-400 bg-transparent focus:outline-none" />
+            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-secondary hover:bg-tertiary transition-colors shrink-0">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -143,12 +143,12 @@ const HeaderSpotlight = ({
           {/* Results */}
           <div ref={listRef} className="max-h-[320px] overflow-y-auto py-2">
             {filteredItems.length === 0 ? <div className="px-4 py-8 text-center">
-                <p className="text-sm text-gray-500 font-medium">{t("no_results_for")}{query}"</p>
-                <p className="text-xs text-gray-400 mt-1">{t("try_a_different_search_term")}</p>
+                <p className="text-sm text-text-muted font-medium">{t("no_results_for")}{query}"</p>
+                <p className="text-xs text-text-muted mt-1">{t("try_a_different_search_term")}</p>
               </div> : grouped.map((entry, i) => {
             if (entry.type === 'header') {
               return <div key={`h-${entry.label}`} className="px-4 pt-3 pb-1">
-                      <span className="text-caption font-semibold text-gray-400 uppercase tracking-wider">{entry.label}</span>
+                      <span className="text-caption font-semibold text-text-muted uppercase tracking-wider">{entry.label}</span>
                     </div>;
             }
             itemIndex++;
@@ -158,15 +158,15 @@ const HeaderSpotlight = ({
             } = entry;
             const Icon = item.icon;
             const isSelected = idx === selectedIndex;
-            return <button key={item.route} data-spotlight-item type="button" onClick={() => handleSelect(item)} onMouseEnter={() => setSelectedIndex(idx)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 ${isSelected ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-50'}`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-white/15' : 'bg-gray-100'}`}>
+            return <button key={item.route} data-spotlight-item type="button" onClick={() => handleSelect(item)} onMouseEnter={() => setSelectedIndex(idx)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 ${isSelected ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-background-primary/15' : 'bg-tertiary'}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                      <div className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-text-primary'}`}>
                         {item.name}
                       </div>
-                      <div className={`text-caption truncate ${isSelected ? 'text-white/60' : 'text-gray-400'}`}>
+                      <div className={`text-caption truncate ${isSelected ? 'text-white/60' : 'text-text-muted'}`}>
                         {item.description || item.group}
                       </div>
                     </div>
@@ -178,13 +178,13 @@ const HeaderSpotlight = ({
           </div>
 
           {/* Footer hints */}
-          <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center gap-4 text-caption text-gray-400">
+          <div className="px-4 py-2.5 border-t border-gray-100 bg-secondary/60 flex items-center gap-4 text-caption text-text-muted">
             <span className="inline-flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded border border-gray-200 bg-white text-[9px] font-medium">↑↓</kbd>{t("navigate")}</span>
+              <kbd className="px-1 py-0.5 rounded border border-border-light bg-background-primary text-[9px] font-medium">↑↓</kbd>{t("navigate")}</span>
             <span className="inline-flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded border border-gray-200 bg-white text-[9px] font-medium">↵</kbd>{t("open")}</span>
+              <kbd className="px-1 py-0.5 rounded border border-border-light bg-background-primary text-[9px] font-medium">↵</kbd>{t("open")}</span>
             <span className="inline-flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded border border-gray-200 bg-white text-[9px] font-medium">{t("esc")}</kbd>{t("close")}</span>
+              <kbd className="px-1 py-0.5 rounded border border-border-light bg-background-primary text-[9px] font-medium">{t("esc")}</kbd>{t("close")}</span>
           </div>
         </div>
       </div>

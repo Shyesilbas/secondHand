@@ -7,17 +7,17 @@ const BulkShowcaseBanner = ({
   const {
     t
   } = useTranslation();
-  return <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+  return <div className="bg-slate-50 border border-border-light/60 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
       <div className="flex-1 space-y-2">
         {/* Minimalist Badge */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.8 bg-slate-200/50 rounded-lg text-caption font-bold uppercase tracking-wider text-slate-600 border border-slate-200/40 select-none">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.8 bg-slate-200/50 rounded-lg text-caption font-bold uppercase tracking-wider text-slate-600 border border-border-light/40 select-none">
           <Sparkles className="w-3 h-3 text-slate-500" />{t("bulk_promotion")}</div>
         
         {/* Simple crisp title */}
         <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("boost_your_listing_visibility")}</h2>
         
         {/* Simple quiet description */}
-        <p className="text-slate-500 text-xs leading-relaxed max-w-xl">{t("promote")}<strong className="text-slate-800 font-bold">{t("4_or_more_items")}</strong>{t("at_the_same_time_and_instantly_receive_a")}<strong className="text-indigo-600 font-bold">{t("10_discount")}</strong>{t("on_the_total_cost")}</p>
+        <p className="text-slate-500 text-xs leading-relaxed max-w-xl">{t("promote")}<strong className="text-slate-800 font-bold">{t("4_or_more_items")}</strong>{t("at_the_same_time_and_instantly_receive_a")}<strong className="text-primary font-bold">{t("10_discount")}</strong>{t("on_the_total_cost")}</p>
 
         {/* Quiet labels */}
         <div className="flex flex-wrap items-center gap-3 pt-1">

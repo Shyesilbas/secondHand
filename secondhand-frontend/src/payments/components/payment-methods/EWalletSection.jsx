@@ -45,7 +45,7 @@ const EWalletSection = () => {
                 {eWallet && <EWalletActions eWallet={eWallet} loading={loading} onCreateEWallet={createEWallet} onUpdateLimits={updateLimits} onUpdateSpendingWarningLimit={updateSpendingWarningLimit} onDeposit={deposit} onWithdraw={withdraw} />}
             </div>
 
-            {error && <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+            {error && <div className="mb-6 p-3 bg-status-error-bg border border-red-200 rounded-xl text-sm text-status-error">
                     {error}
                 </div>}
 

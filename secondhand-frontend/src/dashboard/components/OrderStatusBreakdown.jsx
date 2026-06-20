@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 const STATUS_CONFIG = {
   PENDING: {
     label: 'Pending',
-    color: 'bg-amber-500',
-    light: 'bg-amber-50',
+    color: 'bg-status-warning-bg',
+    light: 'bg-status-warning-bg',
     text: 'text-amber-700',
-    dot: 'bg-amber-400'
+    dot: 'bg-status-warning-bg'
   },
   CONFIRMED: {
     label: 'Confirmed',
@@ -17,10 +17,10 @@ const STATUS_CONFIG = {
   },
   PROCESSING: {
     label: 'Processing',
-    color: 'bg-violet-500',
-    light: 'bg-violet-50',
+    color: 'bg-primary',
+    light: 'bg-primary',
     text: 'text-violet-700',
-    dot: 'bg-violet-400'
+    dot: 'bg-primary'
   },
   SHIPPED: {
     label: 'Shipped',
@@ -31,17 +31,17 @@ const STATUS_CONFIG = {
   },
   DELIVERED: {
     label: 'Delivered',
-    color: 'bg-emerald-500',
-    light: 'bg-emerald-50',
+    color: 'bg-status-success-bg',
+    light: 'bg-status-success-bg',
     text: 'text-emerald-700',
-    dot: 'bg-emerald-400'
+    dot: 'bg-status-success-bg'
   },
   COMPLETED: {
     label: 'Completed',
-    color: 'bg-green-500',
-    light: 'bg-green-50',
+    color: 'bg-status-success-bg',
+    light: 'bg-status-success-bg',
     text: 'text-green-700',
-    dot: 'bg-green-400'
+    dot: 'bg-status-success-bg'
   },
   CANCELLED: {
     label: 'Cancelled',
@@ -52,10 +52,10 @@ const STATUS_CONFIG = {
   },
   REFUNDED: {
     label: 'Refunded',
-    color: 'bg-slate-400',
+    color: 'bg-text-muted',
     light: 'bg-slate-50',
     text: 'text-slate-600',
-    dot: 'bg-slate-400'
+    dot: 'bg-text-muted'
   }
 };
 const DISPLAY_ORDER = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'COMPLETED', 'CANCELLED', 'REFUNDED'];
@@ -105,13 +105,13 @@ const OrderStatusBreakdown = ({
           y: 0
         }} transition={{
           delay: idx * 0.04 + 0.3
-        }} className={`flex items-center justify-between px-3 py-2 rounded-lg ${entry.light} border border-transparent hover:border-slate-200 transition-colors`}>
+        }} className={`flex items-center justify-between px-3 py-2 rounded-lg ${entry.light} border border-transparent hover:border-border-light transition-colors`}>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${entry.dot}`} />
                 <span className={`text-caption font-semibold ${entry.text}`}>{entry.label}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-900">{entry.count}</span>
+                <span className="text-xs font-bold text-text-primary">{entry.count}</span>
                 <span className="text-caption font-medium text-slate-400">{pct}%</span>
               </div>
             </motion.div>;
@@ -121,7 +121,7 @@ const OrderStatusBreakdown = ({
       {/* Total */}
       <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
         <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("total_orders")}</span>
-        <span className="text-sm font-bold text-slate-900">{total}</span>
+        <span className="text-sm font-bold text-text-primary">{total}</span>
       </div>
     </div>;
 };

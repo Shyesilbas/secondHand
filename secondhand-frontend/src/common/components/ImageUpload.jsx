@@ -130,7 +130,7 @@ const ImageUpload = ({
             scale: 1.05
           }} whileTap={{
             scale: 0.95
-          }} type="button" onClick={handleRemoveImage} className="bg-white/95 backdrop-blur-sm text-red-600 px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg hover:bg-white transition-colors flex items-center gap-1.5 focus:outline-none">
+          }} type="button" onClick={handleRemoveImage} className="bg-background-primary/95 backdrop-blur-sm text-status-error px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg hover:bg-background-primary transition-colors flex items-center gap-1.5 focus:outline-none">
                   <X className="w-4 h-4" />{t("remove")}</motion.button>
               </div>}
             {/* Success badge */}
@@ -147,7 +147,7 @@ const ImageUpload = ({
           type: 'spring',
           stiffness: 400,
           damping: 20
-        }} className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-caption font-medium text-white shadow-sm">
+        }} className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-status-success-bg/90 backdrop-blur-sm px-2.5 py-1 text-caption font-medium text-white shadow-sm">
               <CheckCircle2 className="w-3 w-3" />{t("uploaded")}</motion.div>
           </motion.div> : <motion.div key="dropzone" initial={{
         opacity: 0
@@ -157,10 +157,10 @@ const ImageUpload = ({
         opacity: 0
       }} className={`
               w-full h-56 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-200 relative overflow-hidden
-              ${dragActive ? 'bg-zinc-50 shadow-inner' : 'bg-white hover:bg-zinc-50/50'}
+              ${dragActive ? 'bg-zinc-50 shadow-inner' : 'bg-background-primary hover:bg-zinc-50/50'}
               ${disabled ? 'cursor-not-allowed opacity-40 bg-zinc-50' : ''}
               ${isUploading ? 'pointer-events-none' : ''}
-              ${error ? 'bg-red-50/30' : ''}
+              ${error ? 'bg-status-error-bg/30' : ''}
             `} style={{
         border: dragActive ? '2px dashed #71717a' : error ? '2px dashed #fca5a5' : '2px dashed #d4d4d8'
       }} onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onClick={handleClick}>
@@ -212,7 +212,7 @@ const ImageUpload = ({
       }} exit={{
         opacity: 0,
         y: -4
-      }} className="mt-3 px-3.5 py-2.5 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2 text-body text-red-600">
+      }} className="mt-3 px-3.5 py-2.5 bg-status-error-bg/80 border border-red-100 rounded-xl flex items-start gap-2 text-body text-status-error">
             <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>{error}</span>
           </motion.div>}

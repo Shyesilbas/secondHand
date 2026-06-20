@@ -4,10 +4,10 @@ const InfoField = ({
   value,
   isVerified
 }) => <div className="space-y-1">
-    <label className="text-sm font-medium text-gray-700">{label}</label>
-    {isVerified !== undefined ? <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isVerified ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+    <label className="text-sm font-medium text-text-secondary">{label}</label>
+    {isVerified !== undefined ? <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isVerified ? 'bg-status-success-bg text-green-700 border border-green-200' : 'bg-status-error-bg text-red-700 border border-red-200'}`}>
         {value}
-      </span> : <p className="text-gray-900">{value}</p>}
+      </span> : <p className="text-text-primary">{value}</p>}
   </div>;
 const CompactReviewStats = ({
   stats,
@@ -25,25 +25,25 @@ const CompactReviewStats = ({
   };
   if (loading) {
     return <div className="animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+        <div className="h-4 bg-tertiary rounded w-1/4 mb-4"></div>
         <div className="space-y-3">
-          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-3 bg-tertiary rounded w-1/2"></div>
+          <div className="h-3 bg-tertiary rounded w-1/3"></div>
         </div>
       </div>;
   }
   if (!stats) {
-    return <p className="text-gray-500">{t("no_review_information_found")}</p>;
+    return <p className="text-text-muted">{t("no_review_information_found")}</p>;
   }
   return <div className="flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
           {renderStars(Math.round(stats.averageRating || 0))}
-          <span className="text-lg font-semibold text-gray-900">
+          <span className="text-lg font-semibold text-text-primary">
             {(stats.averageRating || 0).toFixed(1)}
           </span>
         </div>
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-text-secondary">
           {stats.totalReviews || 0}{t("reviews")}</span>
       </div>
     </div>;
@@ -57,10 +57,10 @@ const UserStats = ({
     t
   } = useTranslation();
   return <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-background-primary border border-border-light rounded-lg">
+        <div className="p-6 border-b border-border-light">
           <h2 className="text-lg font-semibold text-text-primary">{t("personal_information")}</h2>
-          <p className="text-sm text-gray-600 mt-1">{t("basic_account_details_and_contact_inform")}</p>
+          <p className="text-sm text-text-secondary mt-1">{t("basic_account_details_and_contact_inform")}</p>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -73,8 +73,8 @@ const UserStats = ({
         </div>
       </div>
 
-      {reviewStats && reviewStats.totalReviews > 0 && <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="p-6 border-b border-gray-200">
+      {reviewStats && reviewStats.totalReviews > 0 && <div className="bg-background-primary border border-border-light rounded-lg">
+          <div className="p-6 border-b border-border-light">
             <h2 className="text-lg font-semibold text-text-primary">{t("review_summary")}</h2>
           </div>
           <div className="p-6">

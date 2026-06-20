@@ -76,7 +76,7 @@ export const OnboardingCarousel = () => {
         <div className="h-full w-full flex flex-col items-center justify-center px-8 py-12 select-none">
             <div className="flex flex-col items-center text-center w-full max-w-sm gap-8">
                 {/* Visual Accent Container */}
-                <div className="relative flex items-center justify-center p-8 bg-white rounded-[32px] border border-stone-200/40 shadow-[0_12px_40px_rgba(28,25,23,0.015)] transition-all duration-500">
+                <div className="relative flex items-center justify-center p-8 bg-background-primary rounded-[32px] border border-stone-200/40 shadow-[0_12px_40px_rgba(28,25,23,0.015)] transition-all duration-500">
                     <CardIcon className={`w-14 h-14 ${card.iconColor} stroke-[1.25]`} />
                 </div>
 
@@ -93,7 +93,7 @@ export const OnboardingCarousel = () => {
                     <button
                         type="button"
                         onClick={prev}
-                        className="w-8 h-8 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
+                        className="w-8 h-8 rounded-full border border-stone-200 bg-background-primary flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
                     >
                         <ChevronLeftIcon className="w-4 h-4" />
                     </button>
@@ -116,7 +116,7 @@ export const OnboardingCarousel = () => {
                     <button
                         type="button"
                         onClick={next}
-                        className="w-8 h-8 rounded-full border border-stone-200 bg-white flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
+                        className="w-8 h-8 rounded-full border border-stone-200 bg-background-primary flex items-center justify-center text-stone-400 hover:text-stone-850 active:scale-95 transition-all shadow-sm"
                     >
                         <ChevronRightIcon className="w-4 h-4" />
                     </button>

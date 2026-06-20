@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 
 const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue', index = 0, badge }) => {
   const iconColorClasses = {
-    blue: 'bg-blue-500/10 text-blue-600',
-    green: 'bg-emerald-500/10 text-emerald-600',
-    purple: 'bg-indigo-500/10 text-indigo-600',
-    amber: 'bg-amber-500/10 text-amber-600',
+    blue: 'bg-blue-500/10 text-primary',
+    green: 'bg-status-success-bg/10 text-status-success',
+    purple: 'bg-indigo-500/10 text-primary',
+    amber: 'bg-status-warning-bg/10 text-status-warning',
     red: 'bg-rose-500/10 text-rose-600',
-    gray: 'bg-slate-500/10 text-slate-600',
+    gray: 'bg-text-muted/10 text-slate-600',
     pink: 'bg-pink-500/10 text-pink-600',
     cyan: 'bg-cyan-500/10 text-cyan-600',
   };
@@ -40,9 +40,9 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
   };
 
   const getTrendColor = () => {
-    if (trend > 0) return 'text-emerald-600 bg-emerald-500/10';
+    if (trend > 0) return 'text-status-success bg-status-success-bg/10';
     if (trend < 0) return 'text-rose-600 bg-rose-500/10';
-    return 'text-slate-500 bg-slate-500/10';
+    return 'text-slate-500 bg-text-muted/10';
   };
 
   return (
@@ -50,7 +50,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
-      className={`relative bg-white rounded-2xl border border-slate-100 border-l-[3px] ${accentBorder[color] || accentBorder.blue} p-5 shadow-sm hover:shadow-md transition-shadow duration-300 group`}
+      className={`relative bg-background-primary rounded-2xl border border-slate-100 border-l-[3px] ${accentBorder[color] || accentBorder.blue} p-5 shadow-sm hover:shadow-md transition-shadow duration-300 group`}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
@@ -62,7 +62,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
           <span className="text-caption font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
         </div>
         {badge && (
-          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-200/50">
+          <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-status-success-bg/10 text-status-success border border-emerald-200/50">
             {badge}
           </span>
         )}
@@ -70,7 +70,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
       
       <div>
         <div className="flex items-end gap-2.5 mb-1">
-          <span className="text-2xl font-bold text-slate-900 tracking-tight leading-none">{formatValue(value)}</span>
+          <span className="text-2xl font-bold text-text-primary tracking-tight leading-none">{formatValue(value)}</span>
           {trend !== undefined && trend !== null && (
             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${getTrendColor()} font-bold`}>
               {getTrendIcon()}

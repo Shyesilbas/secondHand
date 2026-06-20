@@ -122,7 +122,7 @@ const FavoriteButton = ({
     : `${config.button} rounded-full flex items-center justify-center transition-colors ${
         isFavorited 
           ? 'bg-status-error-50 text-status-error-DEFAULT hover:bg-status-error-100' 
-          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          : 'bg-tertiary text-text-muted hover:bg-tertiary'
       }`;
 
   const buttonClass = className || defaultButtonClass;
@@ -156,7 +156,7 @@ const FavoriteButton = ({
     return (
       <div className="flex items-center gap-1">
         {ButtonContent}
-        <span className={`${config.text} text-gray-600`}>
+        <span className={`${config.text} text-text-secondary`}>
           {favoriteCount}
         </span>
       </div>

@@ -8,11 +8,11 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {listingService} from '../../listing/services/listingService.js';
 import {Loader2} from 'lucide-react';
 
-const listingFooterClass = 'group/footer w-full rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 text-left transition-colors hover:border-amber-200/80 hover:bg-amber-50/60';
+const listingFooterClass = 'group/footer w-full rounded-xl border border-gray-100 bg-secondary px-3 py-2.5 text-left transition-colors hover:border-amber-200/80 hover:bg-status-warning-bg/60';
 const labelBlock = (review, t) => <>
-    <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-gray-400">{t("listed_item")}</span>
+    <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-text-muted">{t("listed_item")}</span>
     <span className="min-w-0 truncate font-medium text-gray-800">{review.listingTitle || '—'}</span>
-    {review.listingNo ? <span className="shrink-0 font-normal tabular-nums text-gray-500">#{review.listingNo}</span> : null}
+    {review.listingNo ? <span className="shrink-0 font-normal tabular-nums text-text-muted">#{review.listingNo}</span> : null}
   </>;
 
 /** Yalnızca o ilanın detayına; listings / prefilter yönlendirmesi yok. */
@@ -37,8 +37,8 @@ function ProfileReviewedListingLink({
       </Link>;
   }
   if (!rawNo) {
-    return <div className="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">{labelBlock(review, t)}</div>
+    return <div className="rounded-xl border border-gray-100 bg-secondary px-3 py-2.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">{labelBlock(review, t)}</div>
       </div>;
   }
   const go = async () => {
@@ -63,13 +63,13 @@ const ReviewCard = ({
     t
   } = useTranslation();
   const isProfile = variant === 'profile';
-  const shell = isProfile ? 'rounded-2xl border border-gray-200/90 bg-white p-5 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-gray-300/90 hover:shadow-md' : 'rounded-lg border border-gray-200 bg-white p-4 shadow-sm';
-  const initials = <span className={isProfile ? 'text-sm font-bold text-white' : 'text-sm font-medium text-gray-600'}>
+  const shell = isProfile ? 'rounded-2xl border border-border-light/90 bg-background-primary p-5 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-border-DEFAULT/90 hover:shadow-md' : 'rounded-lg border border-border-light bg-background-primary p-4 shadow-sm';
+  const initials = <span className={isProfile ? 'text-sm font-bold text-white' : 'text-sm font-medium text-text-secondary'}>
       {review.reviewerName?.[0]?.toUpperCase() || '?'}
     </span>;
   const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 text-white shadow-sm ring-2 ring-gray-100">
       {initials}
-    </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200">{initials}</div>;
+    </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tertiary">{initials}</div>;
   const nameLine = `${review.reviewerName || ''} ${review.reviewerSurname || ''}`.trim() || 'Buyer';
   const listingId = review?.listingId != null && String(review.listingId).trim() !== '' ? String(review.listingId).trim() : '';
   return <article className={shell}>
@@ -79,15 +79,15 @@ const ReviewCard = ({
               {avatar}
             </Link> : avatar}
           <div className="min-w-0">
-            {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="block truncate text-base font-semibold leading-tight text-gray-900 hover:text-amber-800 hover:underline underline-offset-2">
+            {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="block truncate text-base font-semibold leading-tight text-text-primary hover:text-amber-800 hover:underline underline-offset-2">
                 {nameLine}
-              </Link> : <p className={`font-medium text-gray-900 ${isProfile ? 'truncate text-base leading-tight' : ''}`}>{nameLine}</p>}
-            <time className={`${isProfile ? 'text-xs' : 'text-sm'} mt-1 block text-gray-500`} dateTime={review.createdAt}>
+              </Link> : <p className={`font-medium text-text-primary ${isProfile ? 'truncate text-base leading-tight' : ''}`}>{nameLine}</p>}
+            <time className={`${isProfile ? 'text-xs' : 'text-sm'} mt-1 block text-text-muted`} dateTime={review.createdAt}>
               {formatReviewDate(review.createdAt)}
             </time>
           </div>
         </div>
-        <div className={isProfile ? 'flex w-fit shrink-0 items-center gap-2 self-start rounded-xl border border-amber-100/90 bg-amber-50/85 px-3 py-2 sm:self-start' : 'flex shrink-0 items-center space-x-1'}>
+        <div className={isProfile ? 'flex w-fit shrink-0 items-center gap-2 self-start rounded-xl border border-amber-100/90 bg-status-warning-bg/85 px-3 py-2 sm:self-start' : 'flex shrink-0 items-center space-x-1'}>
           <RatingStarsDisplay value={review.rating} iconClassName="h-4 w-4" mode="ceil" />
           <span className="ml-1 text-xs font-bold tabular-nums text-gray-800">
             {review.rating}/{REVIEW_LIMITS.MAX_RATING}
@@ -95,14 +95,14 @@ const ReviewCard = ({
         </div>
       </div>
 
-      {review.comment ? <p className={isProfile ? 'mb-4 border-l-[3px] border-amber-200/95 pl-4 text-sm leading-relaxed text-gray-800' : 'mb-3 text-sm leading-relaxed text-gray-700'}>
+      {review.comment ? <p className={isProfile ? 'mb-4 border-l-[3px] border-amber-200/95 pl-4 text-sm leading-relaxed text-gray-800' : 'mb-3 text-sm leading-relaxed text-text-secondary'}>
           {review.comment}
         </p> : null}
 
       {isProfile ? <ProfileReviewedListingLink review={review} /> : <footer className="border-t pt-3">
-          {listingId ? <Link to={ROUTES.LISTING_DETAIL(listingId)} className="text-xs leading-snug text-gray-500 underline-offset-2 hover:text-amber-800 hover:underline">{t("product")}<span className="font-medium text-gray-800">{review.listingTitle}</span>
+          {listingId ? <Link to={ROUTES.LISTING_DETAIL(listingId)} className="text-xs leading-snug text-text-muted underline-offset-2 hover:text-amber-800 hover:underline">{t("product")}<span className="font-medium text-gray-800">{review.listingTitle}</span>
               {review.listingNo ? <span className="ml-2 tabular-nums">({review.listingNo})</span> : null}
-            </Link> : <p className="text-xs leading-snug text-gray-500">{t("product")}<span className="font-medium text-gray-800">{review.listingTitle}</span>
+            </Link> : <p className="text-xs leading-snug text-text-muted">{t("product")}<span className="font-medium text-gray-800">{review.listingTitle}</span>
               {review.listingNo ? <span className="ml-2 tabular-nums">({review.listingNo})</span> : null}
             </p>}
         </footer>}

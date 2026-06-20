@@ -54,10 +54,10 @@ const ListingCardActions = ({
       t
     } = useTranslation();
     const colorMap = {
-      default: 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-      green: 'text-emerald-700 hover:bg-emerald-50',
-      indigo: 'text-indigo-700 hover:bg-indigo-50',
-      amber: 'text-amber-700 hover:bg-amber-50',
+      default: 'text-slate-600 hover:bg-slate-50 hover:text-text-primary',
+      green: 'text-emerald-700 hover:bg-status-success-bg',
+      indigo: 'text-primary hover:bg-indigo-50',
+      amber: 'text-amber-700 hover:bg-status-warning-bg',
       red: 'text-rose-600 hover:bg-rose-50'
     };
     return <button onClick={onClick} className={`w-full px-3.5 py-2 text-left text-body font-medium flex items-center gap-2.5 rounded-lg transition-colors ${colorMap[variant]}`}>
@@ -70,11 +70,11 @@ const ListingCardActions = ({
       e.preventDefault();
       e.stopPropagation();
       setIsDropdownOpen(!isDropdownOpen);
-    }} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-white transition-colors" title={t("actions")}>
+    }} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-background-primary transition-colors" title={t("actions")}>
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
 
-      {isDropdownOpen && <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden">
+      {isDropdownOpen && <div className="absolute right-0 top-full mt-2 w-52 bg-background-primary rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden">
 
           {/* Quick edit section */}
           {canEdit && <div className="px-3 pb-2 mb-1 border-b border-slate-100">

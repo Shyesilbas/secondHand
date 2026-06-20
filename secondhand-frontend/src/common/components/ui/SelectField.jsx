@@ -13,7 +13,7 @@ const SelectField = ({
   return (
     <div className={`space-y-1 ${className}`}>
       <label htmlFor={name} className="block text-sm font-medium text-text-secondary">
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required && <span className="text-status-error">*</span>}
       </label>
       <select
         id={name}
@@ -21,7 +21,7 @@ const SelectField = ({
         value={value}
         onChange={onChange}
         required={required}
-        className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${error ? 'border-red-300' : 'border-header-border'}`}
+        className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary ${error ? 'border-red-300' : 'border-header-border'}`}
       >
         {placeholder && (
           <option value="" disabled>
@@ -34,7 +34,7 @@ const SelectField = ({
           </option>
         ))}
       </select>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-status-error">{error}</p>}
     </div>
   );
 };

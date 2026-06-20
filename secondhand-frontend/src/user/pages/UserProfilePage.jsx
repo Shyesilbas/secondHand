@@ -48,45 +48,45 @@ const GreatSellerProgressCard = ({
   const Bar = ({
     pct,
     done
-  }) => <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-1.5">
-            <div className={`h-full rounded-full transition-all ${done ? 'bg-emerald-500' : 'bg-gray-900'}`} style={{
+  }) => <div className="h-1.5 bg-tertiary rounded-full overflow-hidden mt-1.5">
+            <div className={`h-full rounded-full transition-all ${done ? 'bg-status-success-bg' : 'bg-gray-900'}`} style={{
       width: `${Math.min(100, pct)}%`
     }} />
         </div>;
   return <PageContainer className="pb-5">
-            <div className="bg-white rounded-2xl border border-amber-200/80 p-5 shadow-sm shadow-amber-900/5">
+            <div className="bg-background-primary rounded-2xl border border-amber-200/80 p-5 shadow-sm shadow-amber-900/5">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-2">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700 ring-1 ring-amber-100">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-status-warning-bg text-amber-700 ring-1 ring-amber-100">
                             <Award className="w-5 h-5 shrink-0" />
                         </span>
                         <div>
                             <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("great_seller_milestones")}</h2>
-                            <p className="text-xs font-medium text-gray-500">{t("progress_is_calculated_from_completed_ma")}</p>
+                            <p className="text-xs font-medium text-text-muted">{t("progress_is_calculated_from_completed_ma")}</p>
                         </div>
                     </div>
-                    {gs.eligible ? <span className="inline-flex items-center gap-1 text-caption font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    {gs.eligible ? <span className="inline-flex items-center gap-1 text-caption font-semibold text-emerald-800 bg-status-success-bg px-2 py-0.5 rounded-full border border-emerald-100">
                             <CheckCircle2 className="w-3.5 h-3.5" />{t("completed")}</span> : null}
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("paid_order_lines")}{days}{t("days")}</p>
-                            <span className="text-caption font-bold tabular-nums text-gray-500">
+                            <span className="text-caption font-bold tabular-nums text-text-muted">
                                 {gs.qualifyingSalesLastWindow}&nbsp;/&nbsp;{gs.qualifyingSalesTarget}
                                 {gs.salesMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" /> : null}
                             </span>
                         </div>
-                        <p className="text-caption text-gray-400 mt-0.5 leading-snug">{t("completed_checkout_try_lines_with_unit_p")}{minTry.toLocaleString('tr-TR')}
+                        <p className="text-caption text-text-muted mt-0.5 leading-snug">{t("completed_checkout_try_lines_with_unit_p")}{minTry.toLocaleString('tr-TR')}
                         </p>
                         <Bar pct={salesPct} done={gs.salesMet} />
                     </div>
 
-                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("unique_buyer_reviews")}</p>
-                            <span className="text-caption font-bold tabular-nums text-gray-500">
+                            <span className="text-caption font-bold tabular-nums text-text-muted">
                                 {gs.distinctReviewerCount}&nbsp;/&nbsp;{gs.distinctReviewerTarget}
                                 {gs.reviewersMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" /> : null}
                             </span>
@@ -94,10 +94,10 @@ const GreatSellerProgressCard = ({
                         <Bar pct={revPct} done={gs.reviewersMet} />
                     </div>
 
-                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("average_rating")}</p>
-                            <span className="text-caption font-bold tabular-nums text-gray-500">
+                            <span className="text-caption font-bold tabular-nums text-text-muted">
                                 {(avg ?? 0).toFixed(2)}
                                 {' / '}
                                 {minRating.toFixed(1)}
@@ -201,23 +201,23 @@ const UserProfilePage = () => {
 
   // Loading state
   if (userLoading) {
-    return <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+    return <div className="min-h-screen bg-secondary/80 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="w-10 h-10 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-sm text-gray-500 font-medium">{t("loading_profile")}</p>
+                    <div className="w-10 h-10 border-2 border-border-DEFAULT border-t-gray-800 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-sm text-text-muted font-medium">{t("loading_profile")}</p>
                 </div>
             </div>;
   }
 
   // Error state
   if (userError || !user) {
-    return <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+    return <div className="min-h-screen bg-secondary/80 flex items-center justify-center">
                 <div className="text-center max-w-sm">
-                    <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle className="w-6 h-6 text-red-500" />
+                    <div className="w-14 h-14 rounded-2xl bg-status-error-bg flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="w-6 h-6 text-status-error" />
                     </div>
-                    <p className="text-lg font-semibold text-gray-900 mb-1">{t("user_not_found")}</p>
-                    <p className="text-sm text-gray-500 mb-6">{userError || 'The profile you\'re looking for doesn\'t exist.'}</p>
+                    <p className="text-lg font-semibold text-text-primary mb-1">{t("user_not_found")}</p>
+                    <p className="text-sm text-text-muted mb-6">{userError || 'The profile you\'re looking for doesn\'t exist.'}</p>
                     <button onClick={() => navigate(-1)} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors">{t("go_back")}</button>
                 </div>
             </div>;
@@ -229,7 +229,7 @@ const UserProfilePage = () => {
             {isOwnProfile && greatSeller ? <GreatSellerProgressCard gs={greatSeller} /> : null}
 
             {/* ── Tab Bar ─────────────────────────────────────── */}
-            <div className="sticky top-0 z-10 border-y border-gray-200/80 bg-white/90 backdrop-blur">
+            <div className="sticky top-0 z-10 border-y border-border-light/80 bg-background-primary/90 backdrop-blur">
                 <PageContainer>
                     <div className="flex items-center gap-2 overflow-x-auto py-3">
                         {TABS.map(tab => {
@@ -239,10 +239,10 @@ const UserProfilePage = () => {
             if (tab.key === 'listings' && pagination.totalElements > 0) count = pagination.totalElements;
             if (tab.key === 'lists' && favoriteLists.length > 0) count = favoriteLists.length;
             if (tab.key === 'reviews' && reviewStats?.totalReviews > 0) count = reviewStats.totalReviews;
-            return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${isActive ? 'bg-gray-950 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'}`}>
+            return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${isActive ? 'bg-gray-950 text-white shadow-sm' : 'bg-tertiary text-text-secondary hover:bg-tertiary hover:text-text-primary'}`}>
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
-                                    {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-caption font-bold tabular-nums ${isActive ? 'bg-white/15 text-white' : 'bg-white text-gray-500'}`}>
+                                    {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-caption font-bold tabular-nums ${isActive ? 'bg-background-primary/15 text-white' : 'bg-background-primary text-text-muted'}`}>
                                             {count}
                                         </span>}
                                 </button>;
@@ -260,32 +260,32 @@ const UserProfilePage = () => {
                             {/* Controls row */}
                             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-text-muted">
                                         <Grid3X3 className="h-3.5 w-3.5" />{t("marketplace")}</div>
                                     <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("listings")}</h2>
-                                    <p className="text-sm text-gray-500 mt-0.5">
+                                    <p className="text-sm text-text-muted mt-0.5">
                                         {isOwnProfile ? 'Your active listings' : 'All active listings by this user'}
                                     </p>
                                 </div>
-                                {!listingsLoading && pagination.totalElements > 0 && <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm">
-                                        <select value={pagination.size} onChange={e => handlePageSizeChange(Number(e.target.value))} className="h-9 border border-gray-200 rounded-lg px-3 text-sm font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 cursor-pointer">
+                                {!listingsLoading && pagination.totalElements > 0 && <div className="flex items-center gap-2 rounded-xl border border-border-light bg-background-primary p-1.5 shadow-sm">
+                                        <select value={pagination.size} onChange={e => handlePageSizeChange(Number(e.target.value))} className="h-9 border border-border-light rounded-lg px-3 text-sm font-semibold text-text-secondary bg-background-primary focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-border-DEFAULT cursor-pointer">
                                             <option value={10}>10</option>
                                             <option value={15}>15</option>
                                             <option value={20}>20</option>
                                         </select>
-                                        <span className="text-xs text-gray-400 font-medium">{t("per_page")}</span>
+                                        <span className="text-xs text-text-muted font-medium">{t("per_page")}</span>
                                     </div>}
                             </div>
 
                             {listingsLoading ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                    {[...Array(8)].map((_, i) => <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
-                                            <div className="aspect-square bg-gray-100" />
+                                    {[...Array(8)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
+                                            <div className="aspect-square bg-tertiary" />
                                             <div className="p-3.5 space-y-2">
-                                                <div className="h-4 bg-gray-100 rounded w-3/4" />
-                                                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                                                <div className="h-4 bg-tertiary rounded w-3/4" />
+                                                <div className="h-3 bg-tertiary rounded w-1/2" />
                                             </div>
                                         </div>)}
-                                </div> : listingsError ? <EmptyState icon={AlertCircle} iconColor="text-red-500" iconBg="bg-red-50" title={t("failed_to_load_listings")} description="Please try again later" /> : listings.length === 0 ? <EmptyState icon={Package} title={t("no_listings_yet")} description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"} action={isOwnProfile ? {
+                                </div> : listingsError ? <EmptyState icon={AlertCircle} iconColor="text-status-error" iconBg="bg-status-error-bg" title={t("failed_to_load_listings")} description="Please try again later" /> : listings.length === 0 ? <EmptyState icon={Package} title={t("no_listings_yet")} description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"} action={isOwnProfile ? {
             label: 'Create Listing',
             onClick: () => navigate(ROUTES.CREATE_LISTING)
           } : null} /> : <>
@@ -302,10 +302,10 @@ const UserProfilePage = () => {
                     {activeTab === 'lists' && <div>
                             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
+                                    <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-text-muted">
                                         <Sparkles className="h-3.5 w-3.5" />{t("curated")}</div>
                                     <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("lists")}</h2>
-                                    <p className="text-sm text-gray-500 mt-0.5">
+                                    <p className="text-sm text-text-muted mt-0.5">
                                         {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
                                     </p>
                                 </div>
@@ -314,11 +314,11 @@ const UserProfilePage = () => {
                             </div>
 
                             {listsLoading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {[...Array(3)].map((_, i) => <div key={i} className="bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse">
-                                            <div className="aspect-[4/3] bg-gray-100" />
+                                    {[...Array(3)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
+                                            <div className="aspect-[4/3] bg-tertiary" />
                                             <div className="p-4 space-y-2">
-                                                <div className="h-4 bg-gray-100 rounded w-3/4" />
-                                                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                                                <div className="h-4 bg-tertiary rounded w-3/4" />
+                                                <div className="h-3 bg-tertiary rounded w-1/2" />
                                             </div>
                                         </div>)}
                                 </div> : favoriteLists.length === 0 ? <EmptyState icon={Heart} title={t("no_lists_yet")} description={isOwnProfile ? "You haven't created any lists yet" : "This user hasn't shared any public lists yet"} action={isOwnProfile ? {
@@ -326,11 +326,11 @@ const UserProfilePage = () => {
             onClick: () => setShowCreateListModal(true)
           } : null} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {favoriteLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
-                                    {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="aspect-[4/3] bg-white border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 group">
-                                            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:bg-gray-200 transition-colors">
-                                                <Plus className="w-5 h-5 text-gray-500" />
+                                    {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="aspect-[4/3] bg-background-primary border-2 border-dashed border-border-light rounded-2xl flex flex-col items-center justify-center hover:border-border-DEFAULT hover:bg-secondary transition-all duration-200 group">
+                                            <div className="w-12 h-12 rounded-xl bg-tertiary flex items-center justify-center mb-3 group-hover:bg-tertiary transition-colors">
+                                                <Plus className="w-5 h-5 text-text-muted" />
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-500 group-hover:text-gray-700">{t("new_list")}</span>
+                                            <span className="text-sm font-semibold text-text-muted group-hover:text-text-secondary">{t("new_list")}</span>
                                         </button>}
                                 </div>}
                         </div>}
@@ -358,17 +358,17 @@ const UserProfilePage = () => {
 /* ── Reusable Empty State ──────────────────────────────── */
 const EmptyState = ({
   icon: Icon,
-  iconColor = 'text-gray-400',
-  iconBg = 'bg-gray-100',
+  iconColor = 'text-text-muted',
+  iconBg = 'bg-tertiary',
   title,
   description,
   action
-}) => <div className="rounded-2xl border border-gray-200 bg-white py-16 px-8 text-center">
+}) => <div className="rounded-2xl border border-border-light bg-background-primary py-16 px-8 text-center">
         <div className={`w-14 h-14 rounded-2xl ${iconBg} flex items-center justify-center mx-auto mb-4`}>
             <Icon className={`w-6 h-6 ${iconColor}`} />
         </div>
         <h3 className="text-sm font-medium text-text-primary mb-1">{title}</h3>
-        <p className="text-sm text-gray-500 max-w-xs mx-auto">{description}</p>
+        <p className="text-sm text-text-muted max-w-xs mx-auto">{description}</p>
         {action && <button onClick={action.onClick} className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
                 {action.label}
             </button>}

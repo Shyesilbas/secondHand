@@ -84,7 +84,7 @@ export const ThreadComposerModal = ({
   const descLen = String(description || '').trim().length;
   return <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
-      <div className="relative w-full max-w-2xl rounded-2xl bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-2xl rounded-2xl bg-background-primary shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
         {/* Header with gradient accent */}
         <div className="relative overflow-hidden">
@@ -96,10 +96,10 @@ export const ThreadComposerModal = ({
               </div>
               <div>
                 <h3 className="text-sm font-medium text-text-primary tracking-tight">{FORUM_MESSAGES.NEW_THREAD}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{catConfig.label}</p>
+                <p className="text-xs text-text-muted mt-0.5">{catConfig.label}</p>
               </div>
             </div>
-            <button type="button" className="h-9 w-9 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-400 hover:text-gray-600 inline-flex items-center justify-center transition-all duration-200 disabled:opacity-50" onClick={handleClose} disabled={submitting}>
+            <button type="button" className="h-9 w-9 rounded-lg border border-border-light bg-background-primary hover:bg-secondary text-text-muted hover:text-text-secondary inline-flex items-center justify-center transition-all duration-200 disabled:opacity-50" onClick={handleClose} disabled={submitting}>
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -107,41 +107,41 @@ export const ThreadComposerModal = ({
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5">
-          {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">
+          {error && <div className="rounded-xl border border-red-200 bg-status-error-bg px-4 py-3 text-sm text-red-700 font-medium">
               {error}
             </div>}
 
           {/* Title */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">{t("title")}</label>
-              <span className={`text-caption tabular-nums font-medium ${titleLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{titleLen}{t("3_min")}</span>
+              <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider">{t("title")}</label>
+              <span className={`text-caption tabular-nums font-medium ${titleLen >= 3 ? 'text-text-muted' : 'text-amber-500'}`}>{titleLen}{t("3_min")}</span>
             </div>
-            <input value={title} onChange={e => setTitle(e.target.value)} className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50/60 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white transition-all duration-200" placeholder={t("write_a_clear_descriptive_title")} disabled={submitting} />
+            <input value={title} onChange={e => setTitle(e.target.value)} className="w-full h-11 rounded-xl border border-border-light bg-secondary/60 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-background-primary transition-all duration-200" placeholder={t("write_a_clear_descriptive_title")} disabled={submitting} />
           </div>
 
           {/* Description */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">{t("description")}</label>
-              <span className={`text-caption tabular-nums font-medium ${descLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{descLen}{t("3_min")}</span>
+              <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider">{t("description")}</label>
+              <span className={`text-caption tabular-nums font-medium ${descLen >= 3 ? 'text-text-muted' : 'text-amber-500'}`}>{descLen}{t("3_min")}</span>
             </div>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full min-h-[140px] rounded-xl border border-gray-200 bg-gray-50/60 p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white transition-all duration-200 resize-none" placeholder={t("add_details_about_your_thread")} disabled={submitting} />
+            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full min-h-[140px] rounded-xl border border-border-light bg-secondary/60 p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-background-primary transition-all duration-200 resize-none" placeholder={t("add_details_about_your_thread")} disabled={submitting} />
           </div>
 
           {/* Author preview */}
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-secondary border border-gray-100">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center text-xs font-bold text-violet-700">
               {authorPreview.charAt(0).toUpperCase()}
             </div>
-            <div className="text-xs text-gray-500">{t("posting_as")}<span className="font-semibold text-gray-800">{authorPreview}</span>
+            <div className="text-xs text-text-muted">{t("posting_as")}<span className="font-semibold text-gray-800">{authorPreview}</span>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/40 flex items-center justify-end gap-3">
-          <button type="button" onClick={handleClose} disabled={submitting} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+        <div className="px-6 py-4 border-t border-gray-100 bg-secondary/40 flex items-center justify-end gap-3">
+          <button type="button" onClick={handleClose} disabled={submitting} className="px-4 py-2.5 rounded-xl text-sm font-semibold text-text-secondary hover:text-gray-800 hover:bg-tertiary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
             {FORUM_MESSAGES.CLOSE}
           </button>
           <button type="button" onClick={handleSubmit} disabled={!canSubmit} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/35 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">

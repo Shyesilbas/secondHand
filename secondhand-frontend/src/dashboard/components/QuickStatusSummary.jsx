@@ -5,8 +5,8 @@ const statuses = [{
   key: 'pending',
   label: 'Pending',
   icon: Clock,
-  color: 'text-amber-600',
-  bg: 'bg-amber-50',
+  color: 'text-status-warning',
+  bg: 'bg-status-warning-bg',
   border: 'border-amber-200/50',
   keys: ['PENDING', 'CONFIRMED', 'PROCESSING']
 }, {
@@ -21,8 +21,8 @@ const statuses = [{
   key: 'delivered',
   label: 'Delivered',
   icon: PackageCheck,
-  color: 'text-emerald-600',
-  bg: 'bg-emerald-50',
+  color: 'text-status-success',
+  bg: 'bg-status-success-bg',
   border: 'border-emerald-200/50',
   keys: ['DELIVERED', 'COMPLETED']
 }, {
@@ -54,7 +54,7 @@ const QuickStatusSummary = ({
     y: 0
   }} transition={{
     delay: 0.25
-  }} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+  }} className="bg-background-primary rounded-2xl border border-slate-100 p-4 shadow-sm">
       <div className="flex items-center gap-3 flex-wrap">
         <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("order_status")}</span>
         <div className="h-4 w-px bg-slate-200" />

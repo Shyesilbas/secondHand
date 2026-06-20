@@ -33,15 +33,15 @@ const DeliveryCountdown = ({
   }, [deliveredAt]);
   if (!timeRemaining) return null;
   const critical = !timeRemaining.expired;
-  const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${critical ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10' : 'bg-white/80 border-slate-200/60 shadow-sm'}`;
+  const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${critical ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10' : 'bg-background-primary/80 border-border-light/60 shadow-sm'}`;
   return <div className={cardClass}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className={`p-1.5 rounded-md ${critical ? 'bg-white/10' : 'bg-slate-200'}`}>
+          <div className={`p-1.5 rounded-md ${critical ? 'bg-background-primary/10' : 'bg-slate-200'}`}>
             <Timer className={`w-3.5 h-3.5 ${critical ? 'text-emerald-400' : 'text-slate-600'}`} />
           </div>
           <div>
-            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-slate-900'}`}>{t("confirmation_window")}</p>
+            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-text-primary'}`}>{t("confirmation_window")}</p>
             <p className={`text-caption font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
               {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
             </p>
@@ -122,12 +122,12 @@ const OrderProgressStepper = ({
           const isCurrent = idx === currentIndex;
           return <div key={step.key} className="flex flex-col items-center group">
                 <div className="relative">
-                  {isCurrent && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />}
-                  <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-900/20' : 'bg-white border-slate-200 text-slate-400'} ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}>
+                  {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
+                  <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-emerald-500 text-white shadow-md shadow-emerald-900/20' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}>
                     <Icon className="w-5 h-5 stroke-[2.5px]" />
                   </div>
                 </div>
-                <span className={`mt-3 text-caption font-bold uppercase tracking-tight ${isDone ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`mt-3 text-caption font-bold uppercase tracking-tight ${isDone ? 'text-text-primary' : 'text-slate-400'}`}>
                   {step.label}
                 </span>
               </div>;
@@ -150,8 +150,8 @@ const OrderProgressStepper = ({
         return <React.Fragment key={step.key}>
               <div className="flex flex-col items-center group relative z-10">
                 <div className="relative">
-                  {isCurrent && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-30" aria-hidden />}
-                  <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-white border-slate-200 text-slate-400'} ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}>
+                  {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
+                  <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}>
                     <Icon className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>

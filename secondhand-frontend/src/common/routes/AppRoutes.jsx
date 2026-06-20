@@ -100,7 +100,7 @@ const PageLoader = () => {
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <LoadingIndicator size="h-12 w-12" />
-        <p className="mt-4 text-sm text-gray-600">{t("loading")}</p>
+        <p className="mt-4 text-sm text-text-secondary">{t("loading")}</p>
       </div>
     </div>
   );
@@ -115,7 +115,7 @@ const AppRoutes = () => {
   } = authContext;
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
             </div>;
   }
   return <Suspense fallback={<PageLoader />}>

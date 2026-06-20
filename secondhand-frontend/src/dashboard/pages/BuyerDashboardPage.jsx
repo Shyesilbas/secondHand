@@ -25,7 +25,7 @@ const ChartCard = ({
 }} transition={{
   delay,
   duration: 0.4
-}} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+}} className="bg-background-primary rounded-2xl border border-slate-100 p-5 shadow-sm">
     {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
     {children}
   </motion.div>;
@@ -59,11 +59,11 @@ const BuyerDashboardPage = () => {
     }} animate={{
       opacity: 1
     }} className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-2xl border border-slate-100 shadow-sm max-w-sm">
+        <div className="text-center p-8 bg-background-primary rounded-2xl border border-slate-100 shadow-sm max-w-sm">
           <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mx-auto mb-4">
             <ShoppingBag className="w-7 h-7" />
           </div>
-          <p className="text-lg font-bold text-slate-900 mb-1">{t("error_loading_dashboard")}</p>
+          <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
           <p className="text-slate-400 text-sm">{error.message}</p>
         </div>
       </motion.div>;
@@ -121,7 +121,7 @@ const BuyerDashboardPage = () => {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-white rounded-2xl border border-slate-100" />}>
+          <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-slate-100" />}>
             <ChartCard title={t("spending_trend")} delay={0.2}>
               <RevenueChart data={dashboard.spendingTrend || []} title={t("spending_trend")} label={t("spending")} />
             </ChartCard>

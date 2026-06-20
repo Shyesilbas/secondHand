@@ -49,7 +49,7 @@ const OtpSuggestionBanner = ({
   const emailSubject = sourceEmail?.subject || null;
   const emailDate = sourceEmail?.sentAt || sourceEmail?.createdAt || null;
   if (!suggestedCode || String(suggestedCode).length !== OTP_CODE_LENGTH) return null;
-  return <div className="overflow-hidden rounded-lg border border-[#e5e3df] bg-white shadow-sm">
+  return <div className="overflow-hidden rounded-lg border border-[#e5e3df] bg-background-primary shadow-sm">
       {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-[#f0efed] bg-[#fafaf9] px-4 py-2.5">
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#111] text-white">
@@ -79,7 +79,7 @@ const OtpSuggestionBanner = ({
         </span>
         <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-lg border border-[#1466c6] bg-[#1466c6] px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-[#0f529e]">
           <Copy className="h-3.5 w-3.5 shrink-0" />{t("copy")}</button>
-        <button type="button" onClick={apply} className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e3df] bg-white px-3 py-1.5 text-xs font-medium text-[#111] transition-all hover:bg-[#fafaf9]">
+        <button type="button" onClick={apply} className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e3df] bg-background-primary px-3 py-1.5 text-xs font-medium text-[#111] transition-all hover:bg-[#fafaf9]">
           <CornerDownRight className="h-3.5 w-3.5 shrink-0" />{t("fill_inputs")}</button>
       </div>
     </div>;

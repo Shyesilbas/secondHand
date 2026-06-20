@@ -83,7 +83,7 @@ const BulkShowcaseModal = ({
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-3xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-3xl bg-background-primary rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 shrink-0">
           <div>
@@ -102,13 +102,13 @@ const BulkShowcaseModal = ({
         {/* Step Progress Bar */}
         <div className="px-8 pt-2 shrink-0">
            <div className="flex gap-2">
-             {[1, 2, 3].map(s => <div key={s} className={`h-1 flex-1 rounded-full ${step >= s ? 'bg-indigo-600' : 'bg-slate-100'}`} />)}
+             {[1, 2, 3].map(s => <div key={s} className={`h-1 flex-1 rounded-full ${step >= s ? 'bg-primary' : 'bg-slate-100'}`} />)}
            </div>
         </div>
 
         <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
           {loading ? <div className="flex flex-col items-center py-12">
-              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+              <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
               <p className="text-slate-500 font-medium">{t("calculating_best_prices")}</p>
             </div> : step === 3 ? <ShowcasePayment isBulk={true} listingIds={uniqueListings.map(l => l.id)} listingTitle={`Bulk Showcase Payment (${itemCount} Items)`} days={days} totalCost={finalTotal} showcasePricing={pricing} calculateSubtotal={() => (pricing?.dailyCost || 0) * days * itemCount} calculateTax={() => ((pricing?.totalDailyCost || 0) - (pricing?.dailyCost || 0)) * days * itemCount} onSuccess={() => {
           showSuccess('Success', 'Bulk showcase activated successfully!');
@@ -120,18 +120,18 @@ const BulkShowcaseModal = ({
               </div>
               <div className="flex justify-between items-center pt-4 border-t">
                  <button onClick={handleBack} className="px-6 py-3 text-slate-600 font-semibold hover:bg-slate-50 rounded-xl transition-all">{t("back")}</button>
-                 <button onClick={handleNext} disabled={!areAllAgreementsAccepted()} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all disabled:opacity-40">{t("continue_to_payment")}</button>
+                 <button onClick={handleNext} disabled={!areAllAgreementsAccepted()} className="px-8 py-3 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all disabled:opacity-40">{t("continue_to_payment")}</button>
               </div>
             </div> : <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
               {/* Promotion Header */}
               {pricing && !hasDiscount && <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl p-5 text-white shadow-lg shadow-indigo-200">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-white/20 rounded-lg">
+                    <div className="p-2 bg-background-primary/20 rounded-lg">
                       <Star className="w-5 h-5 fill-white" />
                     </div>
                     <h3 className="text-sm font-medium text-text-primary">{t("bulk_showcase_benefit")}</h3>
                   </div>
-                  <p className="text-indigo-50 text-sm leading-relaxed">{t("add")}{pricing.bulkDiscountThreshold}{t("or_more_listings_to_get_an_instant")}<span className="font-bold text-white mx-1">{pricing.bulkDiscountPercentage}{t("discount")}</span>{t("on_your_total_showcase_fee")}</p>
+                  <p className="text-primary text-sm leading-relaxed">{t("add")}{pricing.bulkDiscountThreshold}{t("or_more_listings_to_get_an_instant")}<span className="font-bold text-white mx-1">{pricing.bulkDiscountPercentage}{t("discount")}</span>{t("on_your_total_showcase_fee")}</p>
                 </div>}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -141,7 +141,7 @@ const BulkShowcaseModal = ({
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{t("selected_listings")}{itemCount})</label>
                     <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                       {uniqueListings.map(l => <div key={l.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
-                          <div className="w-10 h-10 rounded-lg bg-white overflow-hidden shrink-0 border border-slate-200/50">
+                          <div className="w-10 h-10 rounded-lg bg-background-primary overflow-hidden shrink-0 border border-border-light/50">
                             {l.imageUrl || l.images?.[0]?.url ? <img src={l.imageUrl || l.images[0].url} alt={l.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300">
                                 <Search className="w-4 h-4" />
                               </div>}
@@ -154,7 +154,7 @@ const BulkShowcaseModal = ({
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{t("showcase_duration")}</label>
                     <div className="grid grid-cols-3 gap-2">
-                      {[7, 14, 30].map(d => <button key={d} onClick={() => setDays(d)} className={`py-2.5 rounded-xl text-sm font-semibold transition-all border ${days === d ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-100' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'}`}>
+                      {[7, 14, 30].map(d => <button key={d} onClick={() => setDays(d)} className={`py-2.5 rounded-xl text-sm font-semibold transition-all border ${days === d ? 'bg-primary text-white border-primary shadow-md shadow-indigo-100' : 'bg-background-primary text-slate-600 border-border-light hover:border-slate-300'}`}>
                           {d}{t("days")}</button>)}
                     </div>
                   </div>
@@ -167,18 +167,18 @@ const BulkShowcaseModal = ({
                       <span>{t("base_price")}{itemCount}{t("x")}</span>
                       <span>{formatCurrency(totalBeforeDiscount, 'TRY')}</span>
                     </div>
-                    {hasDiscount && <div className="flex justify-between text-sm text-emerald-600 font-bold bg-emerald-50 p-3 rounded-xl border border-emerald-100 animate-in zoom-in-95">
+                    {hasDiscount && <div className="flex justify-between text-sm text-status-success font-bold bg-status-success-bg p-3 rounded-xl border border-emerald-100 animate-in zoom-in-95">
                         <div className="flex items-center gap-1.5">
                           <Sparkles className="w-4 h-4 fill-emerald-600" />
                           <span>{pricing.bulkDiscountPercentage}{t("discount_applied")}</span>
                         </div>
                         <span>-{formatCurrency(discountAmount, 'TRY')}</span>
                       </div>}
-                    {!hasDiscount && pricing && <div className="text-caption text-indigo-600 font-semibold bg-indigo-50 p-2 rounded-lg flex items-center gap-1.5">
+                    {!hasDiscount && pricing && <div className="text-caption text-primary font-semibold bg-indigo-50 p-2 rounded-lg flex items-center gap-1.5">
                         <Star className="w-3 h-3 fill-indigo-600" />{t("add")}{pricing.bulkDiscountThreshold - itemCount}{t("more_to_unlock_discount")}</div>}
-                    <div className="pt-3 border-t border-slate-200 flex justify-between items-end">
-                      <span className="text-sm font-bold text-slate-900">{t("total_payable")}</span>
-                      <span className="text-2xl font-bold text-slate-900">{formatCurrency(finalTotal, 'TRY')}</span>
+                    <div className="pt-3 border-t border-border-light flex justify-between items-end">
+                      <span className="text-sm font-bold text-text-primary">{t("total_payable")}</span>
+                      <span className="text-2xl font-bold text-text-primary">{formatCurrency(finalTotal, 'TRY')}</span>
                     </div>
                   </div>
 

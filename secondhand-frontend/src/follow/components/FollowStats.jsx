@@ -44,18 +44,18 @@ const FollowStats = memo(({
   return <>
             <div className={`flex items-center gap-4 text-sm ${className}`}>
                 {showIcon && <Users className="w-4 h-4 text-text-muted" />}
-                <button onClick={handleFollowersClick} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                <button onClick={handleFollowersClick} className="flex items-center gap-1 hover:text-primary transition-colors">
                     <span className="font-semibold text-text-primary">
                         {formatCount(stats.followersCount)}
                     </span>
-                    <span className="text-text-secondary hover:text-indigo-600">{t("followers")}</span>
+                    <span className="text-text-secondary hover:text-primary">{t("followers")}</span>
                 </button>
                 <span className="text-text-muted">•</span>
-                <button onClick={handleFollowingClick} className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                <button onClick={handleFollowingClick} className="flex items-center gap-1 hover:text-primary transition-colors">
                     <span className="font-semibold text-text-primary">
                         {formatCount(stats.followingCount)}
                     </span>
-                    <span className="text-text-secondary hover:text-indigo-600">{t("following")}</span>
+                    <span className="text-text-secondary hover:text-primary">{t("following")}</span>
                 </button>
             </div>
 

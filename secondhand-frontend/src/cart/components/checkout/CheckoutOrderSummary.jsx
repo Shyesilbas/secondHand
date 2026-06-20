@@ -28,7 +28,7 @@ const CheckoutOrderSummary = ({
   const total = pricing?.total != null ? parseFloat(pricing.total) : subtotal + shipping + tax;
   const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
   return <aside className="sticky top-14 lg:top-[4.5rem]">
-      <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/75 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
+      <div className="overflow-hidden rounded-2xl border border-white/50 bg-background-primary/75 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
         {/* Header */}
         <div className="px-6 py-5">
           <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest">{t("order_summary")}</h3>
@@ -59,7 +59,7 @@ const CheckoutOrderSummary = ({
                   <p className="line-clamp-2 text-xs font-semibold leading-snug text-slate-800">
                     {item.listing.title}
                   </p>
-                  {isOffer && <p className="mt-1 text-caption font-bold uppercase tracking-wider text-emerald-600">{t("offer")}</p>}
+                  {isOffer && <p className="mt-1 text-caption font-bold uppercase tracking-wider text-status-success">{t("offer")}</p>}
                   <p className="mt-1 text-xs font-medium text-slate-400 tabular-nums">
                     {item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}
                   </p>
@@ -82,19 +82,19 @@ const CheckoutOrderSummary = ({
               {isPreviewLoading && <span className="text-xs text-slate-400 font-medium">{t("applying")}</span>}
             </div>
 
-            {appliedCouponCode ? <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-100 bg-emerald-50/20 px-4 py-2.5">
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600">
+            {appliedCouponCode ? <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-100 bg-status-success-bg/20 px-4 py-2.5">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-status-success">
                   <Check className="h-4 w-4" strokeWidth={2.5} />
                   {appliedCouponCode}
                 </span>
-                <button type="button" onClick={onRemoveCoupon} className="text-xs font-bold uppercase tracking-wider text-slate-500 transition hover:text-indigo-600">{t("remove")}</button>
+                <button type="button" onClick={onRemoveCoupon} className="text-xs font-bold uppercase tracking-wider text-slate-500 transition hover:text-primary">{t("remove")}</button>
               </div> : <div className="flex items-stretch gap-2">
-                <input value={couponInput} onChange={e => setCouponInput(e.target.value)} placeholder={t("enter_code")} className="min-w-0 flex-1 rounded-xl border border-slate-100 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-300 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 shadow-inner" />
+                <input value={couponInput} onChange={e => setCouponInput(e.target.value)} placeholder={t("enter_code")} className="min-w-0 flex-1 rounded-xl border border-slate-100 bg-slate-50/50 px-3.5 py-2.5 text-sm text-text-primary outline-none transition placeholder:text-slate-300 focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-indigo-100 shadow-inner" />
                 <button type="button" onClick={onApplyCoupon} disabled={isPreviewLoading || !couponInput.trim()} className="shrink-0 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-black disabled:bg-slate-100 disabled:text-slate-400">{t("apply")}</button>
-                <button type="button" onClick={onOpenCouponsModal} className="shrink-0 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50">{t("browse")}</button>
+                <button type="button" onClick={onOpenCouponsModal} className="shrink-0 rounded-xl border border-border-light bg-background-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50">{t("browse")}</button>
               </div>}
 
-            {couponError && <div className="text-xs font-bold text-red-600">{couponError}</div>}
+            {couponError && <div className="text-xs font-bold text-status-error">{couponError}</div>}
           </div>
 
           {/* Price breakdown */}
@@ -108,14 +108,14 @@ const CheckoutOrderSummary = ({
 
             {campaignDiscount > 0 && <div className="flex justify-between gap-4">
                 <span className="text-slate-500 font-medium">{t("campaign")}</span>
-                <span className="font-semibold tabular-nums text-emerald-600">
+                <span className="font-semibold tabular-nums text-status-success">
                   −{formatCurrency(campaignDiscount, currency)}
                 </span>
               </div>}
 
             {couponDiscount > 0 && <div className="flex justify-between gap-4">
                 <span className="text-slate-500 font-medium">{t("coupon")}</span>
-                <span className="font-semibold tabular-nums text-emerald-600">
+                <span className="font-semibold tabular-nums text-status-success">
                   −{formatCurrency(couponDiscount, currency)}
                 </span>
               </div>}
@@ -135,7 +135,7 @@ const CheckoutOrderSummary = ({
           <div className="border-t border-slate-100/60 pt-4">
             <div className="flex items-baseline justify-between gap-4">
               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">{t("total")}</span>
-              <span className="text-2xl font-bold tabular-nums text-indigo-600">
+              <span className="text-2xl font-bold tabular-nums text-primary">
                 {formatCurrency(total, currency)}
               </span>
             </div>

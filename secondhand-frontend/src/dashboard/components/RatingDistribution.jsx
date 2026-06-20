@@ -11,16 +11,16 @@ const RatingDistribution = ({
   } = useTranslation();
   const maxCount = Math.max(...Object.values(ratingDistribution).map(Number), 1);
   const starColors = {
-    5: 'bg-emerald-500',
-    4: 'bg-green-400',
-    3: 'bg-amber-400',
+    5: 'bg-status-success-bg',
+    4: 'bg-status-success-bg',
+    3: 'bg-status-warning-bg',
     2: 'bg-orange-400',
     1: 'bg-rose-400'
   };
   return <div>
       <div className="flex items-center gap-4 mb-6">
         <div className="text-center">
-          <div className="text-3xl font-bold text-slate-900 tracking-tight">
+          <div className="text-3xl font-bold text-text-primary tracking-tight">
             {averageRating > 0 ? averageRating.toFixed(1) : '—'}
           </div>
           <div className="flex items-center gap-0.5 justify-center mt-1">

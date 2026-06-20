@@ -128,12 +128,12 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
     const type = notification.type;
     if (type?.startsWith('OFFER_')) {
       return unread
-        ? 'bg-amber-50 border-amber-100 text-amber-600 shadow-amber-100/30'
+        ? 'bg-status-warning-bg border-amber-100 text-status-warning shadow-amber-100/30'
         : 'bg-slate-50 border-slate-100 text-amber-500/80';
     }
     if (type?.startsWith('ORDER_') || type === 'PAYMENT_SUCCESS') {
       return unread
-        ? 'bg-emerald-50 border-emerald-100 text-emerald-600 shadow-emerald-100/30'
+        ? 'bg-status-success-bg border-emerald-100 text-status-success shadow-emerald-100/30'
         : 'bg-slate-50 border-slate-100 text-emerald-500/80';
     }
     if (type === 'PAYMENT_FAILED' || type === 'ORDER_CANCELLED') {
@@ -142,8 +142,8 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
         : 'bg-slate-50 border-slate-100 text-rose-500/80';
     }
     return unread
-      ? 'bg-indigo-50 border-indigo-100 text-indigo-600 shadow-indigo-100/30'
-      : 'bg-slate-50 border-slate-100 text-indigo-500/80';
+      ? 'bg-indigo-50 border-primary text-primary shadow-indigo-100/30'
+      : 'bg-slate-50 border-slate-100 text-primary/80';
   };
 
   return (
@@ -153,13 +153,13 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
       className={`group relative flex w-full items-start gap-4 p-4 text-left transition-all duration-300 border-b border-slate-100/80 focus:outline-none focus-visible:bg-slate-50 ${
         unread 
           ? 'bg-gradient-to-r from-indigo-50/[0.15] to-transparent hover:from-indigo-50/[0.25]' 
-          : 'bg-white hover:bg-slate-50/50'
+          : 'bg-background-primary hover:bg-slate-50/50'
       }`}
     >
       {/* Unread Indicator dot */}
       {unread && (
         <span
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.7)] animate-pulse"
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(79,70,229,0.7)] animate-pulse"
           aria-hidden
         />
       )}

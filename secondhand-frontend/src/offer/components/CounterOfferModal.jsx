@@ -72,13 +72,13 @@ const CounterOfferModal = ({
   const modal = <div className="fixed inset-0 z-[120] bg-black/40 flex items-center justify-center px-4" onMouseDown={e => {
     if (e.target === e.currentTarget) onClose?.();
   }}>
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+      <div className="w-full max-w-lg bg-background-primary rounded-2xl shadow-xl border border-border-light overflow-hidden">
+        <div className="px-6 py-4 border-b border-border-light bg-secondary flex items-center justify-between">
           <div>
-            <div className="text-lg font-semibold text-gray-900">{t("counter_offer")}</div>
-            <div className="text-sm text-gray-600">{listingTitle}</div>
+            <div className="text-lg font-semibold text-text-primary">{t("counter_offer")}</div>
+            <div className="text-sm text-text-secondary">{listingTitle}</div>
           </div>
-          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-gray-200 text-gray-700" aria-label={t("close")}>
+          <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-tertiary text-text-secondary" aria-label={t("close")}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -89,26 +89,26 @@ const CounterOfferModal = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">{t("quantity")}</label>
-              <input type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-1">{t("total_price")}</label>
-              <input type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+              <input type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className="w-full border border-border-DEFAULT rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-primary" />
             </div>
           </div>
 
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-            <div className="text-xs text-gray-600">{t("countering_for")}<span className="font-semibold text-gray-900">{Number(quantity) || 1}</span>{t("item_s")}{previewTotal != null && <>
-                  {' '}{t("total")}<span className="font-semibold text-gray-900">{formatCurrency(previewTotal, currency)}</span>
+          <div className="rounded-xl border border-border-light bg-secondary px-4 py-3">
+            <div className="text-xs text-text-secondary">{t("countering_for")}<span className="font-semibold text-text-primary">{Number(quantity) || 1}</span>{t("item_s")}{previewTotal != null && <>
+                  {' '}{t("total")}<span className="font-semibold text-text-primary">{formatCurrency(previewTotal, currency)}</span>
                 </>}
             </div>
           </div>
 
-          {error && <div className="text-sm text-red-600 font-semibold">{error}</div>}
+          {error && <div className="text-sm text-status-error font-semibold">{error}</div>}
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50" disabled={isSubmitting}>{t("cancel")}</button>
-            <button type="submit" className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-60" disabled={isSubmitting}>
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border border-border-DEFAULT text-text-secondary font-semibold hover:bg-secondary" disabled={isSubmitting}>{t("cancel")}</button>
+            <button type="submit" className="px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-indigo-700 disabled:opacity-60" disabled={isSubmitting}>
               {isSubmitting ? 'Sending…' : 'Send Counter'}
             </button>
           </div>

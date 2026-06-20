@@ -50,7 +50,7 @@ const ListingCard = ({
     switch (status) {
       case LISTING_STATUS.ACTIVE:
         return {
-          cls: 'bg-emerald-500 text-white',
+          cls: 'bg-status-success-bg text-white',
           label: 'Active'
         };
       case LISTING_STATUS.SOLD:
@@ -60,12 +60,12 @@ const ListingCard = ({
         };
       case LISTING_STATUS.INACTIVE:
         return {
-          cls: 'bg-slate-400 text-white',
+          cls: 'bg-text-muted text-white',
           label: 'Inactive'
         };
       default:
         return {
-          cls: 'bg-slate-400 text-white',
+          cls: 'bg-text-muted text-white',
           label: status
         };
     }
@@ -83,12 +83,12 @@ const ListingCard = ({
   const statusConfig = getStatusConfig(listing.status);
   return <div className={`
             group relative flex flex-col h-full
-            bg-white rounded-2xl
+            bg-background-primary rounded-2xl
             border transition-[transform,box-shadow,border-color] duration-200 ease-out
             hover:shadow-xl hover:-translate-y-1
             ${isOutOfStock ? 'opacity-55' : ''}
             ${isSelectable && isInShowcase ? 'opacity-40 grayscale-[0.5] cursor-not-allowed' : ''}
-            ${isSelected ? 'border-indigo-600 ring-2 ring-indigo-600/20 shadow-lg shadow-indigo-100' : isInCompare ? 'border-indigo-400 shadow-md shadow-indigo-100 ring-2 ring-indigo-100' : 'border-slate-200/80 shadow-sm hover:border-slate-300'}
+            ${isSelected ? 'border-primary ring-2 ring-indigo-600/20 shadow-lg shadow-indigo-100' : isInCompare ? 'border-primary shadow-md shadow-indigo-100 ring-2 ring-indigo-100' : 'border-border-light/80 shadow-sm hover:border-slate-300'}
         `}>
             {isSelectable && <div className="absolute inset-0 z-40 cursor-pointer" onClick={e => {
       e.preventDefault();
@@ -104,14 +104,14 @@ const ListingCard = ({
         e.preventDefault();
         e.stopPropagation();
         addToCart(listing.id);
-      }} disabled={isAddingToCart} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-white transition-colors" title={t("add_to_cart")}>
+      }} disabled={isAddingToCart} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-primary hover:bg-background-primary transition-colors" title={t("add_to_cart")}>
                         <ShoppingBag className="w-3.5 h-3.5" />
                     </button>}
                 {canMakeOffer && <button onClick={e => {
         e.preventDefault();
         e.stopPropagation();
         setIsOfferModalOpen(true);
-      }} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-emerald-600 hover:bg-white transition-colors" title={t("make_offer")}>
+      }} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
                         <HandCoins className="w-3.5 h-3.5" />
                     </button>}
                 <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
@@ -139,9 +139,9 @@ const ListingCard = ({
                     {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
                             {statusConfig.label}
                         </span>}
-                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-amber-400 text-white shadow-sm">
+                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-status-warning-bg text-white shadow-sm">
                             <Zap className="w-2.5 h-2.5 fill-current" />{t("featured")}</span>}
-                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-sm">
+                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-status-warning-bg text-amber-900 border border-amber-200 shadow-sm">
                             <Award className="w-2.5 h-2.5 shrink-0" />{t("great_seller")}</span>}
                     {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-caption font-bold bg-rose-500 text-white shadow-sm">
                             <TrendingDown className="w-2.5 h-2.5" />
@@ -154,7 +154,7 @@ const ListingCard = ({
         e.preventDefault();
         e.stopPropagation();
         setShowInfo(true);
-      }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+      }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-background-primary/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
                     <Eye className="w-3 h-3" />{t("quick_view")}</button>
             </div>
 
@@ -179,7 +179,7 @@ const ListingCard = ({
 
                 {/* Price row */}
                 <div className="flex items-end gap-2 flex-wrap mb-1">
-                    <span className={`text-base font-bold text-slate-900 tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
+                    <span className={`text-base font-bold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
                         {formatCurrency(displayPrice, listing.currency)}
                     </span>
                     {hasCampaign && <span className="text-caption text-slate-400 line-through font-medium">
@@ -193,7 +193,7 @@ const ListingCard = ({
                     </span>}
 
                 {/* Stock badge */}
-                {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold mb-1.5 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
+                {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold mb-1.5 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
                         {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
                     </span>}
 
@@ -205,13 +205,13 @@ const ListingCard = ({
                 {/* Footer */}
                 <div className="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
                     {listing.sellerName ? <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
-                            <div className="w-5 h-5 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-indigo-600">
+                            <div className="w-5 h-5 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-primary">
                                 {listing.sellerName[0]?.toUpperCase()}
                             </div>
                             <span className="text-caption font-medium text-slate-500 truncate max-w-[88px]" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
                                 {listing.sellerName}
                             </span>
-                            {isGreatSeller && <Award className="w-3 h-3 text-amber-600 shrink-0" aria-label={t("great_seller")} />}
+                            {isGreatSeller && <Award className="w-3 h-3 text-status-warning shrink-0" aria-label={t("great_seller")} />}
                         </div> : <div />}
                     <div className="flex items-center gap-2.5 ml-auto">
                         {listing.city && <div className="flex items-center gap-0.5 text-caption text-slate-400">

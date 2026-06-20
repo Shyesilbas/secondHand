@@ -93,7 +93,7 @@ const PayListingFeePage = () => {
     <div className="min-h-screen bg-slate-50 relative overflow-hidden">
         {/* Ambient Background Glows */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-            <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/10 blur-[120px]" />
+            <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px]" />
             <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-400/10 blur-[120px]" />
             <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[60%] rounded-full bg-blue-300/10 blur-[120px]" />
         </div>
@@ -138,14 +138,14 @@ const PayListingFeePage = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
-                    className="mt-6 rounded-[2.5rem] border border-white/60 bg-white/60 backdrop-blur-xl px-8 py-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                    className="mt-6 rounded-[2.5rem] border border-white/60 bg-background-primary/60 backdrop-blur-xl px-8 py-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                 >
                     <EmptyState 
                         title={t("no_draft_listings")} 
                         description={
                             <>
                                 {t("no_draft_listings_found_you_can_create_a")}{' '}
-                                <button onClick={() => navigate(ROUTES.CREATE_LISTING)} className="font-semibold text-indigo-600 underline decoration-indigo-200 underline-offset-4 transition-colors hover:text-indigo-800 hover:decoration-indigo-400">
+                                <button onClick={() => navigate(ROUTES.CREATE_LISTING)} className="font-semibold text-primary underline decoration-indigo-200 underline-offset-4 transition-colors hover:text-primary hover:decoration-indigo-400">
                                     {t("clicking_here")}
                                 </button>.
                             </>

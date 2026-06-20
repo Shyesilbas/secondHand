@@ -87,9 +87,9 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   useEffect(() => {
     refreshWallet();
   }, []);
-  const btnPrimaryClass = embedded ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors' : 'w-full py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-45 transition-colors';
-  const headingClass = embedded ? 'text-base font-bold text-slate-900' : 'text-lg font-semibold text-gray-900';
-  const mutedClass = embedded ? 'text-sm text-slate-500' : 'text-sm text-gray-600';
+  const btnPrimaryClass = embedded ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors' : 'w-full py-2.5 rounded-xl text-sm font-bold text-white bg-status-success-bg hover:bg-status-success-bg disabled:opacity-45 transition-colors';
+  const headingClass = embedded ? 'text-base font-bold text-text-primary' : 'text-lg font-semibold text-text-primary';
+  const mutedClass = embedded ? 'text-sm text-slate-500' : 'text-sm text-text-secondary';
   const innerBack = useCallback(() => {
     if (loading) return;
     if (step > 1) {
@@ -175,15 +175,15 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               <h3 className={`text-sm font-medium text-text-primary ${headingClass} ${embedded ? 'mb-1' : 'mb-4 '}`}>{t("payment_method")}</h3>
               {embedded ? <p className={mutedClass}>{t("showcase_payments_currently_use_wallet_b")}</p> : null}
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-border-light bg-background-primary p-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{t("wallet")}</p>
+                  <p className="text-sm font-semibold text-text-primary">{t("wallet")}</p>
                   <p className="mt-0.5 text-xs text-slate-500">{t("balance")}{Number(eWallet?.balance || 0).toFixed(2)}₺</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-slate-500">{t("total")}</p>
-                  <p className="text-sm font-bold text-slate-900">{Number(totalCost || 0).toFixed(2)}₺</p>
+                  <p className="text-sm font-bold text-text-primary">{Number(totalCost || 0).toFixed(2)}₺</p>
                 </div>
               </div>
               {!canContinuePayment ? <p className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">{t("insufficient_wallet_balance")}</p> : null}
@@ -196,10 +196,10 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               <h3 className={`text-sm font-medium text-text-primary ${headingClass} ${embedded ? 'mb-1' : 'mb-4 '}`}>{t("summary")}</h3>
               {embedded ? <p className={mutedClass}>{t("confirm_the_total_then_send_the_verifica")}</p> : null}
             </div>
-            <div className={`${embedded ? 'rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-2' : 'space-y-2 mb-4'}`}>
+            <div className={`${embedded ? 'rounded-2xl border border-border-light bg-slate-50/80 p-4 space-y-2' : 'space-y-2 mb-4'}`}>
               <div className="flex justify-between gap-3 text-sm">
                 <span className={`${embedded ? 'text-slate-500' : 'font-medium'} shrink-0`}>{t("listing")}</span>
-                <span className={`text-right ${embedded ? 'font-semibold text-slate-900' : ''}`}>{listingTitle}</span>
+                <span className={`text-right ${embedded ? 'font-semibold text-text-primary' : ''}`}>{listingTitle}</span>
               </div>
               <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : ''}`}>
                 <span className={embedded ? 'text-slate-500' : 'font-medium'}>{t("duration")}</span>
@@ -210,7 +210,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                 <span>{t("ewallet")}</span>
               </div>
             </div>
-            {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-slate-200 p-4 space-y-2' : 'p-3 bg-gray-50 rounded-lg space-y-2'}`}>
+            {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-border-light p-4 space-y-2' : 'p-3 bg-secondary rounded-lg space-y-2'}`}>
                 <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
                   <span>{t("subtotal")}{days}{t("days")}</span>
                   <span className="font-mono tabular-nums">{calculateSubtotal().toFixed(2)}₺</span>
@@ -219,13 +219,13 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                   <span>{t("tax")}{showcasePricing.taxPercentage}%)</span>
                   <span className="font-mono tabular-nums">{calculateTax().toFixed(2)}₺</span>
                 </div>
-                <div className={`flex justify-between font-bold border-t pt-2 ${embedded ? 'text-sm text-slate-900' : 'text-lg'}`}>
+                <div className={`flex justify-between font-bold border-t pt-2 ${embedded ? 'text-sm text-text-primary' : 'text-lg'}`}>
                   <span>{t("total")}</span>
-                  <span className={`tabular-nums ${embedded ? 'text-indigo-600' : 'text-emerald-600'}`}>{totalCost.toFixed(2)}₺</span>
+                  <span className={`tabular-nums ${embedded ? 'text-primary' : 'text-status-success'}`}>{totalCost.toFixed(2)}₺</span>
                 </div>
-              </div> : <div className={`flex justify-between ${embedded ? 'rounded-2xl border border-slate-200 p-4' : 'p-3 bg-gray-50 rounded'}`}>
+              </div> : <div className={`flex justify-between ${embedded ? 'rounded-2xl border border-border-light p-4' : 'p-3 bg-secondary rounded'}`}>
                 <span className="font-bold text-lg">{t("total")}</span>
-                <span className={`text-xl font-bold ${embedded ? 'text-indigo-600' : 'text-emerald-600'} tabular-nums`}>{totalCost}₺</span>
+                <span className={`text-xl font-bold ${embedded ? 'text-primary' : 'text-status-success'} tabular-nums`}>{totalCost}₺</span>
               </div>}
             {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800">
                 {error}
@@ -237,7 +237,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       case 3:
         return <div className="space-y-4">
             <div className="flex gap-3 items-start">
-              {embedded ? <div className="w-10 h-10 shrink-0 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-500/25">
+              {embedded ? <div className="w-10 h-10 shrink-0 rounded-xl bg-primary flex items-center justify-center shadow-md shadow-indigo-500/25">
                   <Lock className="w-5 h-5 text-white" aria-hidden />
                 </div> : null}
               <div className={`min-w-0 flex-1 ${embedded ? '' : 'text-center'}`}>
@@ -247,7 +247,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                   <span className="font-semibold text-slate-700">{t("finish_payment")}</span>
                   .
                 </p>
-                {otpTtlActive ? <p className={`text-caption font-semibold mt-2 tabular-nums ${otpTtlExpired ? 'text-amber-700' : embedded ? 'text-slate-600' : 'text-gray-600'}`}>
+                {otpTtlActive ? <p className={`text-caption font-semibold mt-2 tabular-nums ${otpTtlExpired ? 'text-amber-700' : embedded ? 'text-slate-600' : 'text-text-secondary'}`}>
                     {otpTtlExpired ? 'Code expired — go back and send a new code.' : `Expires in: ${otpTtlFormatted}`}
                   </p> : null}
               </div>
@@ -255,7 +255,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
 
             {suggestedFromInbox ? <OtpSuggestionBanner suggestedCode={suggestedFromInbox} onApply={setVerificationCode} /> : null}
 
-            <div className={`${embedded ? 'rounded-2xl border border-slate-200 bg-white p-4' : ''}`}>
+            <div className={`${embedded ? 'rounded-2xl border border-border-light bg-background-primary p-4' : ''}`}>
               <OtpDigitInputGroup value={verificationCode} onChange={setVerificationCode} dataSlotPrefix="showcase-otp" disabled={loading || otpTtlExpired} />
             </div>
 
@@ -278,14 +278,14 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   }
   return <div>
       <div className="flex items-center gap-2 mb-6">
-        {[1, 2, 3].map(s => <div key={s} className={`h-1.5 flex-1 rounded-full ${step >= s ? 'bg-emerald-500' : 'bg-gray-200'}`} />)}
+        {[1, 2, 3].map(s => <div key={s} className={`h-1.5 flex-1 rounded-full ${step >= s ? 'bg-status-success-bg' : 'bg-tertiary'}`} />)}
       </div>
       {renderStepBody()}
       {step !== 3 ? <div className="flex items-center justify-between mt-6">
           <button type="button" className="px-4 py-2 border rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-45" onClick={() => innerBack()} disabled={loading}>
             {step > 1 ? 'Back' : 'Cancel'}
           </button>
-          {step === 1 ? <button type="button" className="px-5 py-2 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-45" onClick={() => setStep(2)} disabled={!canContinuePayment || loading}>{t("continue")}</button> : null}
+          {step === 1 ? <button type="button" className="px-5 py-2 rounded-lg text-sm font-bold text-white bg-status-success-bg hover:bg-status-success-bg disabled:opacity-45" onClick={() => setStep(2)} disabled={!canContinuePayment || loading}>{t("continue")}</button> : null}
         </div> : null}
     </div>;
 });

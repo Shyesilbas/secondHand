@@ -295,12 +295,12 @@ const ListingPrefilterSelectionFlow = ({
           y: 0
         }} transition={{
           duration: 0.3
-        }} className="rounded-2xl border border-indigo-100/80 bg-gradient-to-r from-indigo-50/60 to-violet-50/30 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm backdrop-blur-sm">
+        }} className="rounded-2xl border border-primary/80 bg-gradient-to-r from-indigo-50/60 to-violet-50/30 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h4 className="text-sm font-bold text-indigo-950">{t("just_want_to_look_around")}</h4>
+                  <h4 className="text-sm font-bold text-primary">{t("just_want_to_look_around")}</h4>
                   <p className="text-body text-zinc-500 mt-0.5">{t("skip_selecting_a_category_and_filters_to")}</p>
                 </div>
-                <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/10 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 active:scale-95 shrink-0">
+                <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/10 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 active:scale-95 shrink-0">
                   <span>{t("browse_all_listings")}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
@@ -356,7 +356,7 @@ const ListingPrefilterSelectionFlow = ({
         return label.includes(qf);
       }) : options;
       const showGridSearch = options.length > 6;
-      const searchIconClass = flowUiVariant === PREFLOW_WIZARD_VARIANT.BROWSE ? 'text-sky-500/80' : flowUiVariant === PREFLOW_WIZARD_VARIANT.SELL ? 'text-amber-600/70' : 'text-gray-400';
+      const searchIconClass = flowUiVariant === PREFLOW_WIZARD_VARIANT.BROWSE ? 'text-sky-500/80' : flowUiVariant === PREFLOW_WIZARD_VARIANT.SELL ? 'text-status-warning/70' : 'text-text-muted';
       const gridBlock = <div>
             {mode === 'create' && flowCopy.sellStepReassurance ? <p className="mb-4 text-xs leading-relaxed text-stone-600">{flowCopy.sellStepReassurance}</p> : null}
             {showGridSearch && <div className="relative mb-4">
@@ -481,7 +481,7 @@ const ListingPrefilterSelectionFlow = ({
   } : null;
   return <>
       <ListingWizard title={flowCopy.title} subtitle={flowCopy.subtitle} steps={selectionSteps} currentStep={selectionStep} onBack={onCancel} onPrev={onSelectionBackOrPrev} onNext={onSelectionNext} canSubmit={canGoNextSelection} renderStep={step => renderSelectionStep(step)} footerExtra={browseFooterExtra} lastStepAction={browseLastStepAction} wizardVariant={flowUiVariant} headerEyebrow={mode === 'create' ? 'New listing' : 'Shopping'} continueLabel={mode === 'create' ? 'Next step' : 'Continue'} />
-      {mode === 'browse' && <div className="mx-auto max-w-5xl border-t border-slate-200/70 px-6 pb-12 pt-8 text-center">
+      {mode === 'browse' && <div className="mx-auto max-w-5xl border-t border-border-light/70 px-6 pb-12 pt-8 text-center">
           <Link to={ROUTES.LISTINGS} className={auxUi.skipLink}>{t("skip_filters_and_browse_all_listings")}<ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>}

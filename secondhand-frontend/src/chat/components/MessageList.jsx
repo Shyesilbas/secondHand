@@ -15,7 +15,7 @@ const MessageBubble = memo(({
     onDeleteMessage(message.id);
   };
   return <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
-      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl relative group shadow-sm transition-all duration-300 ease-in-out ${isOwnMessage ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-white text-slate-800 border border-slate-200/60 rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
+      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl relative group shadow-sm transition-all duration-300 ease-in-out ${isOwnMessage ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-background-primary text-slate-800 border border-border-light/60 rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
         <p className="text-sm break-words leading-relaxed tracking-tight">{message.content}</p>
         <div className="flex items-center justify-between mt-2">
           <p className={`text-xs tracking-tight ${isOwnMessage ? 'text-slate-300' : 'text-slate-500'}`}>
@@ -24,9 +24,9 @@ const MessageBubble = memo(({
             locale: enUS
           })}
           </p>
-          {isOwnMessage && <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-slate-300' : 'bg-slate-400'}`}></div>}
+          {isOwnMessage && <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-slate-300' : 'bg-text-muted'}`}></div>}
         </div>
-        {isOwnMessage && showDeleteButton && onDeleteMessage && <button type="button" onClick={handleDeleteClick} className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-110" title={t("delete_message")}>
+        {isOwnMessage && showDeleteButton && onDeleteMessage && <button type="button" onClick={handleDeleteClick} className="absolute -top-2 -right-2 bg-status-error-bg text-white rounded-full p-1.5 hover:bg-status-error-bg transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-110" title={t("delete_message")}>
             <TrashIcon className="w-3 h-3" />
           </button>}
       </div>

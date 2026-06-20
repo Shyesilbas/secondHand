@@ -32,7 +32,7 @@ const ActiveCouponsModal = ({
   const modal = <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/30 px-4 backdrop-blur-[1px]" onMouseDown={e => {
     if (e.target === e.currentTarget) onClose?.();
   }}>
-      <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#e5e3df] bg-white shadow-lg shadow-black/[0.08]">
+      <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-[#e5e3df] bg-background-primary shadow-lg shadow-black/[0.08]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#f0efed] px-5 py-4">
           <div>

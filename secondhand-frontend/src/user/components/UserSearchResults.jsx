@@ -13,7 +13,7 @@ const UserSearchResults = ({
     t
   } = useTranslation();
   if (!isVisible) return null;
-  return <div className={`absolute top-full left-0 right-0 mt-1 bg-white border border-sidebar-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto ${className}`}>
+  return <div className={`absolute top-full left-0 right-0 mt-1 bg-background-primary border border-sidebar-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto ${className}`}>
             {isLoading ? <div className="p-4 text-center">
                     <div className="flex items-center justify-center">
                         <svg className="animate-spin h-5 w-5 text-text-muted mr-2" fill="none" viewBox="0 0 24 24">

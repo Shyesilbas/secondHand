@@ -90,7 +90,7 @@ const ChatWindow = ({
     }
 
     return (
-        <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-white rounded border border-gray-200 flex flex-col z-50">
+        <div className="fixed bottom-4 right-4 w-96 h-[500px] bg-background-primary rounded border border-border-light flex flex-col z-50">
             <ChatHeader
                 selectedChatRoom={selectedChatRoom}
                 isConnected={isConnected}

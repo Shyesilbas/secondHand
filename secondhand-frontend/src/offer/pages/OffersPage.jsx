@@ -159,13 +159,13 @@ const OffersPage = () => {
   const pageTo = Math.min(totalElements, page * size + items.length);
   return <div className="min-h-screen bg-slate-50/90">
       <PageContainer className="py-6 sm:py-7">
-        <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
+        <div className="rounded-3xl border border-border-light/80 bg-background-primary/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="inline-flex rounded-2xl bg-slate-100 p-1">
               <button type="button" onClick={() => {
               setActiveTab(OFFER_TABS.MADE);
               setStatusFilter(STATUS_FILTER.ALL);
-            }} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.MADE ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+            }} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.MADE ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-600 hover:text-text-primary'}`}>
                 <LayoutGrid className="h-4 w-4 opacity-70" />{t("made")}<span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
                   {madeTotalElements}
                 </span>
@@ -173,7 +173,7 @@ const OffersPage = () => {
               <button type="button" onClick={() => {
               setActiveTab(OFFER_TABS.RECEIVED);
               setStatusFilter(STATUS_FILTER.ALL);
-            }} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.RECEIVED ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+            }} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.RECEIVED ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-600 hover:text-text-primary'}`}>
                 <Handshake className="h-4 w-4 opacity-70" />{t("received")}<span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
                   {receivedTotalElements}
                 </span>
@@ -183,12 +183,12 @@ const OffersPage = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative min-w-[200px] flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-xl border border-border-light bg-slate-50/80 py-2.5 pl-10 pr-3 text-sm text-text-primary placeholder:text-slate-400 focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
               </div>
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="hidden h-4 w-4 text-slate-400 sm:block" aria-hidden />
                 <label className="sr-only" htmlFor="offer-sort">{t("sort")}</label>
-                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:w-auto">
+                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm font-medium text-slate-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:w-auto">
                   <option value={SORT.NEWEST}>{t("newest_first")}</option>
                   <option value={SORT.EXPIRING}>{t("expiring_soon")}</option>
                 </select>
@@ -200,32 +200,32 @@ const OffersPage = () => {
             {statusChips.map(({
             key,
             label
-          }) => <button key={key} type="button" onClick={() => setStatusFilter(key)} className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${statusFilter === key ? 'border-indigo-300 bg-indigo-50 text-indigo-800' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+          }) => <button key={key} type="button" onClick={() => setStatusFilter(key)} className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition ${statusFilter === key ? 'border-primary bg-indigo-50 text-primary' : 'border-border-light bg-background-primary text-slate-600 hover:border-slate-300'}`}>
                 {label}
                 <span className="ml-1.5 tabular-nums text-slate-400">({statusCounts[key] ?? 0})</span>
               </button>)}
           </div>
         </div>
 
-        <div className="mt-6 rounded-[1.75rem] border border-slate-200/80 bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.06)] sm:p-6">
+        <div className="mt-6 rounded-[1.75rem] border border-border-light/80 bg-background-primary p-4 shadow-[0_24px_80px_rgba(15,23,42,0.06)] sm:p-6">
           {totalElements > 0 ? <p className="mb-4 text-xs text-slate-500">{t("showing")}{pageFrom}–{pageTo}{t("of")}{totalElements}{t("offers")}</p> : null}
 
           {isLoading ? <div className="space-y-4">
               {[...Array(3)].map((_, i) => <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-100" />)}
-            </div> : error ? <div className="rounded-2xl border border-red-200 bg-red-50/80 px-4 py-3">
+            </div> : error ? <div className="rounded-2xl border border-red-200 bg-status-error-bg/80 px-4 py-3">
               <p className="text-sm font-medium text-red-800">{error}</p>
-            </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-16 text-center">
+            </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border-light bg-slate-50/60 px-6 py-16 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15">
-                <Handshake className="h-8 w-8 text-indigo-600" />
+                <Handshake className="h-8 w-8 text-primary" />
               </div>
               <h2 className="text-lg font-semibold text-text-primary">{t("no")}{activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'}{t("yet")}</h2>
               <p className="mt-2 max-w-md text-sm text-slate-500">{t("when_you_send_or_receive_offers_they_wil")}</p>
-            </div> : processedItems.length === 0 ? <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 px-4 py-8 text-center">
+            </div> : processedItems.length === 0 ? <div className="rounded-2xl border border-amber-200/80 bg-status-warning-bg/50 px-4 py-8 text-center">
               <p className="text-sm font-medium text-amber-900">{t("no_offers_match_your_filters")}</p>
               <button type="button" onClick={() => {
             setStatusFilter(STATUS_FILTER.ALL);
             setSearchQuery('');
-          }} className="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-700">{t("clear_filters")}</button>
+          }} className="mt-3 text-sm font-semibold text-primary hover:text-primary">{t("clear_filters")}</button>
             </div> : <>
               <ul className="space-y-4">
                 {processedItems.map(o => <li key={o.id}>

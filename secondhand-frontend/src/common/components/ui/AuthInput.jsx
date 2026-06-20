@@ -47,7 +47,7 @@ const AuthInput = ({
                     className={`
                         appearance-none block w-full rounded-xl text-sm font-normal text-stone-900
                         placeholder-stone-400 bg-stone-100/40 border border-stone-200/60
-                        focus:bg-white focus:border-stone-900 focus:ring-4 focus:ring-stone-900/5
+                        focus:bg-background-primary focus:border-stone-900 focus:ring-4 focus:ring-stone-900/5
                         transition-all duration-300 outline-none
                         ${hasLeftIcon ? 'pl-10' : 'px-4'}
                         ${hasRightElement ? 'pr-12' : 'pr-4'}

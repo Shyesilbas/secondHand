@@ -58,7 +58,7 @@ const Header = () => {
     });
   };
   return <>
-            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-gray-200/60 shadow-sm' : 'bg-white border-b border-gray-200/40'}`}>
+            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-background-primary/90 backdrop-blur-xl border-b border-border-light/60 shadow-sm' : 'bg-background-primary border-b border-border-light/40'}`}>
                 <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
                     <div className={`flex items-center justify-between gap-4 transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}>
 
@@ -67,7 +67,7 @@ const Header = () => {
                             <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:rotate-6">
                                 <ShoppingBag className="w-4 h-4 text-white" />
                             </div>
-                            <span className="text-lg font-bold tracking-tight text-gray-900 hidden sm:inline">{t("sh")}<span className="text-gray-400">.</span>
+                            <span className="text-lg font-bold tracking-tight text-text-primary hidden sm:inline">{t("sh")}<span className="text-text-muted">.</span>
                             </span>
                         </Link>
 

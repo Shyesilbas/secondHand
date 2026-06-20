@@ -36,14 +36,14 @@ const ListingTrustPanel = ({
                 <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm border border-slate-900/5">
                   {listing.sellerName?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-slate-50">
+                <div className="absolute -bottom-1 -right-1 bg-background-primary rounded-full p-0.5 shadow-sm border border-slate-50">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-500 fill-white" />
                 </div>
               </div>
               
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Link to={ROUTES.USER_PROFILE(listing.sellerId)} className="text-sm font-bold text-slate-900 hover:text-indigo-600 transition-colors truncate">
+                  <Link to={ROUTES.USER_PROFILE(listing.sellerId)} className="text-sm font-bold text-text-primary hover:text-primary transition-colors truncate">
                     {listing.sellerName} {listing.sellerSurname}
                   </Link>
                 </div>
@@ -69,8 +69,8 @@ const ListingTrustPanel = ({
             </div>
           </div>
 
-          {showGreatSeller && <div className="flex items-center gap-2 py-2 px-3 bg-amber-50/50 border border-amber-100/60 rounded-xl mb-4">
-              <Award className="w-4 h-4 text-amber-600 shrink-0" />
+          {showGreatSeller && <div className="flex items-center gap-2 py-2 px-3 bg-status-warning-bg/50 border border-amber-100/60 rounded-xl mb-4">
+              <Award className="w-4 h-4 text-status-warning shrink-0" />
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("great_seller_status")}</span>
                 <p className="text-xs text-amber-700/80 font-medium mt-0.5 leading-tight">{t("highly_rated_for_excellent_customer_resp")}</p>

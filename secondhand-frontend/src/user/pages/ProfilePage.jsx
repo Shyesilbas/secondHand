@@ -64,9 +64,9 @@ const ProfilePage = () => {
     const ActiveIcon = activeTabData?.icon || UserIcon;
 
     return (
-        <div className="min-h-screen bg-gray-50/80">
+        <div className="min-h-screen bg-secondary/80">
             {/* ── Profile Hero ────────────────────────────────── */}
-            <div className="bg-white border-b border-gray-200/80">
+            <div className="bg-background-primary border-b border-border-light/80">
                 <PageContainer className="py-8">
                     <ProfileHeader user={user} />
                 </PageContainer>
@@ -78,7 +78,7 @@ const ProfilePage = () => {
 
                     {/* ── Left Sidebar Nav ─────────────────────── */}
                     <div className="lg:w-72 shrink-0">
-                        <nav className="bg-white rounded-2xl border border-gray-200 overflow-hidden lg:sticky lg:top-6">
+                        <nav className="bg-background-primary rounded-2xl border border-border-light overflow-hidden lg:sticky lg:top-6">
                             <div className="p-2">
                                 {TABS.map((tab) => {
                                     const Icon = tab.icon;
@@ -90,26 +90,26 @@ const ProfilePage = () => {
                                             className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 group ${
                                                 isActive
                                                     ? 'bg-gray-900 text-white shadow-sm'
-                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                                    : 'text-text-secondary hover:bg-secondary hover:text-text-primary'
                                             }`}
                                         >
                                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
                                                 isActive
-                                                    ? 'bg-white/15'
-                                                    : 'bg-gray-100 group-hover:bg-gray-200'
+                                                    ? 'bg-background-primary/15'
+                                                    : 'bg-tertiary group-hover:bg-tertiary'
                                             }`}>
                                                 <Icon className="w-4.5 h-4.5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <div className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                                                <div className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-text-primary'}`}>
                                                     {tab.label}
                                                 </div>
-                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
+                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-text-muted'}`}>
                                                     {tab.description}
                                                 </div>
                                             </div>
                                             <ChevronRight className={`w-4 h-4 shrink-0 transition-all duration-200 ${
-                                                isActive ? 'text-white/40' : 'text-gray-300 group-hover:text-gray-400 group-hover:translate-x-0.5'
+                                                isActive ? 'text-white/40' : 'text-gray-300 group-hover:text-text-muted group-hover:translate-x-0.5'
                                             }`} />
                                         </button>
                                     );
@@ -120,18 +120,18 @@ const ProfilePage = () => {
 
                     {/* ── Right Content Panel ─────────────────── */}
                     <div className="flex-1 min-w-0">
-                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                        <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden">
                             {/* Panel Header */}
                             <div className="px-8 py-6 border-b border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                                        <ActiveIcon className="w-5 h-5 text-gray-700" />
+                                    <div className="w-10 h-10 rounded-xl bg-tertiary flex items-center justify-center">
+                                        <ActiveIcon className="w-5 h-5 text-text-secondary" />
                                     </div>
                                     <div>
                                         <h2 className="text-lg font-semibold text-text-primary tracking-tight">
                                             {activeTabData?.label}
                                         </h2>
-                                        <p className="text-sm text-gray-500 mt-0.5">
+                                        <p className="text-sm text-text-muted mt-0.5">
                                             {activeTabData?.description}
                                         </p>
                                     </div>

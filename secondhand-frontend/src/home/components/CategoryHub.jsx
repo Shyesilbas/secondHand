@@ -7,17 +7,17 @@ const CATEGORIES = [{
   value: 'VEHICLE',
   label: 'Vehicles',
   icon: Car,
-  bg: 'bg-blue-50/60 hover:bg-blue-50 text-blue-600 border-blue-100/60'
+  bg: 'bg-blue-50/60 hover:bg-blue-50 text-primary border-primary/60'
 }, {
   value: 'REAL_ESTATE',
   label: 'Real Estate',
   icon: Building2,
-  bg: 'bg-amber-50/60 hover:bg-amber-50 text-amber-600 border-amber-100/60'
+  bg: 'bg-status-warning-bg/60 hover:bg-status-warning-bg text-status-warning border-amber-100/60'
 }, {
   value: 'ELECTRONICS',
   label: 'Electronics',
   icon: Laptop,
-  bg: 'bg-indigo-50/60 hover:bg-indigo-50 text-indigo-600 border-indigo-100/60'
+  bg: 'bg-indigo-50/60 hover:bg-indigo-50 text-primary border-primary/60'
 }, {
   value: 'CLOTHING',
   label: 'Fashion',
@@ -27,7 +27,7 @@ const CATEGORIES = [{
   value: 'HOME_LIVING',
   label: 'Home & Living',
   icon: Home,
-  bg: 'bg-emerald-50/60 hover:bg-emerald-50 text-emerald-600 border-emerald-100/60',
+  bg: 'bg-status-success-bg/60 hover:bg-status-success-bg text-status-success border-emerald-100/60',
   routeValue: 'OTHER'
 }, {
   value: 'SPORTS',
@@ -60,7 +60,7 @@ const CategoryHub = () => {
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="mb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
-          <p className="text-caption font-bold uppercase tracking-[0.2em] text-emerald-600 mb-1">{t("browse_categories")}</p>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-status-success mb-1">{t("browse_categories")}</p>
           <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("what_are_you_looking_for")}</h2>
           </div>
           <p className="text-xs font-medium text-slate-500 max-w-sm">{t("jump_into_the_most_active_marketplace_la")}</p>
@@ -70,11 +70,11 @@ const CategoryHub = () => {
         <div className="flex gap-3 overflow-x-auto pb-4 pt-1 px-1 scrollbar-hide md:grid md:grid-cols-4 lg:grid-cols-8 md:overflow-x-visible md:pb-0">
           {CATEGORIES.map(cat => {
           const Icon = cat.icon;
-          return <button key={cat.value} onClick={() => handleCategoryClick(cat)} className="flex flex-col items-center justify-center shrink-0 w-28 h-24 md:w-auto md:h-24 rounded-2xl border border-slate-100 bg-white p-3 transition-all duration-200 hover:border-slate-300 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] group">
+          return <button key={cat.value} onClick={() => handleCategoryClick(cat)} className="flex flex-col items-center justify-center shrink-0 w-28 h-24 md:w-auto md:h-24 rounded-2xl border border-slate-100 bg-background-primary p-3 transition-all duration-200 hover:border-slate-300 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] group">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-105 ${cat.bg}`}>
                   <Icon className="w-5 h-5 shrink-0" />
                 </div>
-                <span className="text-body font-bold text-slate-700 mt-2.5 group-hover:text-slate-900 transition-colors truncate w-full text-center">
+                <span className="text-body font-bold text-slate-700 mt-2.5 group-hover:text-text-primary transition-colors truncate w-full text-center">
                   {cat.label}
                 </span>
               </button>;

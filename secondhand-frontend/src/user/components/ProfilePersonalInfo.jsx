@@ -66,16 +66,16 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
         {fields.map((field, i) => (
           <div
             key={field.label}
-            className={`flex items-center justify-between px-4 py-4 rounded-xl hover:bg-gray-50 transition-colors duration-150 group ${
+            className={`flex items-center justify-between px-4 py-4 rounded-xl hover:bg-secondary transition-colors duration-150 group ${
               i < fields.length - 1 ? 'border-b border-gray-100' : ''
             }`}
           >
             <div className="min-w-0">
-              <div className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-0.5">{field.label}</div>
+              <div className="text-xs font-medium text-text-muted uppercase tracking-wider mb-0.5">{field.label}</div>
               <div className={`text-sm font-semibold ${
                 field.value === 'Not provided' || field.value === 'Not specified'
-                  ? 'text-gray-400 italic'
-                  : 'text-gray-900'
+                  ? 'text-text-muted italic'
+                  : 'text-text-primary'
               }`}>
                 {field.value}
               </div>
@@ -83,7 +83,7 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
             {field.action && (
               <button
                 onClick={field.action.onClick}
-                className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                className="opacity-0 group-hover:opacity-100 p-2 text-text-muted hover:text-text-secondary hover:bg-tertiary rounded-lg transition-all duration-200"
                 title={field.action.title || 'Edit'}
               >
                 <Pencil className="w-3.5 h-3.5" />

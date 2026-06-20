@@ -17,34 +17,34 @@ export function getWizardTheme(variant) {
   if (isBrowse) {
     return {
       shell: 'min-h-screen bg-gradient-to-tr from-slate-50 via-zinc-50/80 to-indigo-50/20 pb-16',
-      stickyOuter: 'border-b border-zinc-200/40 bg-white/70 backdrop-blur-xl',
+      stickyOuter: 'border-b border-zinc-200/40 bg-background-primary/70 backdrop-blur-xl',
       cancelBtn:
         'group flex items-center gap-1.5 rounded-lg py-2 pl-2 pr-3 text-xs font-medium text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 hover:shadow-sm',
-      stepActiveMob: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10',
-      stepDoneMob: 'bg-indigo-50 text-indigo-700 font-semibold',
+      stepActiveMob: 'bg-primary text-white shadow-md shadow-indigo-600/10',
+      stepDoneMob: 'bg-indigo-50 text-primary font-semibold',
       stepTodoMob: 'bg-transparent text-zinc-400 border border-zinc-200/60',
-      connectorDone: 'bg-indigo-600',
+      connectorDone: 'bg-primary',
       connectorTodo: 'bg-zinc-200',
       progressTrack: 'bg-zinc-100',
       progressFill: 'from-indigo-600 to-violet-700',
       sidebarCardActive: 'border-transparent bg-transparent',
-      sidebarStepActive: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10',
-      sidebarStepDone: 'bg-indigo-50 text-indigo-700 font-semibold',
+      sidebarStepActive: 'bg-primary text-white shadow-md shadow-indigo-600/10',
+      sidebarStepDone: 'bg-indigo-50 text-primary font-semibold',
       sidebarStepTodo: 'bg-transparent text-zinc-400 border border-zinc-200/60',
       sidebarTitleActive: 'text-zinc-900 font-semibold',
-      sidebarTitleDone: 'text-indigo-600/80',
+      sidebarTitleDone: 'text-primary/80',
       sidebarTitleTodo: 'text-zinc-400',
-      sidebarStepDesc: 'text-[11px] text-zinc-500',
+      sidebarStepDesc: 'text-caption text-zinc-500',
       descMuted: 'text-zinc-500',
       stepMeta: 'text-zinc-500 font-medium',
       eyebrowWrap: 'mb-3 inline-flex items-center',
-      eyebrowBadge: 'rounded-lg bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-indigo-600',
+      eyebrowBadge: 'rounded-lg bg-indigo-50 px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-primary',
       pageTitle: 'text-zinc-900',
       bottomBar: 'relative mt-10 border-t border-zinc-200/60 bg-transparent py-6', // relative layout for browse mode!
       footerBackBtn:
         'flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 hover:shadow-sm',
       primaryBtn:
-        'flex items-center gap-2 rounded-xl bg-indigo-600 px-8 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-600/15 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none',
+        'flex items-center gap-2 rounded-xl bg-primary px-8 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-600/15 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none',
       draftBtnClass: 'hidden',
       stepScrollWell: '',
     };
@@ -53,7 +53,7 @@ export function getWizardTheme(variant) {
   // Default theme for Sell / Composer variants
   return {
     shell: 'min-h-screen bg-gradient-to-b from-zinc-50 via-zinc-50/80 to-white pb-28',
-    stickyOuter: 'border-b border-zinc-200/40 bg-white/80 backdrop-blur-xl',
+    stickyOuter: 'border-b border-zinc-200/40 bg-background-primary/80 backdrop-blur-xl',
     cancelBtn:
       'group flex items-center gap-1.5 rounded-lg py-2 pl-2 pr-3 text-xs font-medium text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900 hover:shadow-sm',
     stepActiveMob: 'bg-zinc-900 text-white shadow-sm',
@@ -70,19 +70,19 @@ export function getWizardTheme(variant) {
     sidebarTitleActive: 'text-zinc-900 font-medium',
     sidebarTitleDone: 'text-zinc-600',
     sidebarTitleTodo: 'text-zinc-400',
-    sidebarStepDesc: 'text-[11px] text-zinc-500',
+    sidebarStepDesc: 'text-caption text-zinc-500',
     descMuted: 'text-zinc-500',
     stepMeta: 'text-zinc-500',
     eyebrowWrap: 'mb-3 inline-flex items-center',
-    eyebrowBadge: 'rounded-lg bg-zinc-100/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600',
+    eyebrowBadge: 'rounded-lg bg-zinc-100/80 px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-zinc-600',
     pageTitle: 'text-zinc-900',
-    bottomBar: 'fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200/40 bg-white/90 backdrop-blur-xl',
+    bottomBar: 'fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200/40 bg-background-primary/90 backdrop-blur-xl',
     footerBackBtn:
       'flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900 hover:shadow-sm',
     primaryBtn:
       'flex items-center gap-2 rounded-xl bg-zinc-900 px-8 py-2.5 text-sm font-medium text-white shadow-md shadow-zinc-900/15 transition-all hover:bg-zinc-800 hover:shadow-lg hover:shadow-zinc-900/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 disabled:shadow-none',
     draftBtnClass:
-      'flex items-center gap-1.5 rounded-xl border border-zinc-200/60 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:opacity-50',
+      'flex items-center gap-1.5 rounded-xl border border-zinc-200/60 bg-background-primary px-5 py-2.5 text-sm font-medium text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:opacity-50',
     stepScrollWell: '',
   };
 }
@@ -94,16 +94,16 @@ export function getCategoryCardClasses(variant, isSelected, typeValue) {
   // Config mapping for category-specific colors
   const colorMap = {
     REAL_ESTATE: {
-      activeBorder: 'border-blue-500/30 bg-blue-50/40 shadow-blue-100/50',
-      activeIcon: 'bg-blue-600 text-white shadow-blue-600/20',
-      hoverIcon: 'group-hover:bg-blue-100/70 group-hover:text-blue-600',
-      accentText: 'text-blue-600',
+      activeBorder: 'border-primary/30 bg-blue-50/40 shadow-blue-100/50',
+      activeIcon: 'bg-primary text-white shadow-blue-600/20',
+      hoverIcon: 'group-hover:bg-blue-100/70 group-hover:text-primary',
+      accentText: 'text-primary',
     },
     VEHICLE: {
-      activeBorder: 'border-amber-500/30 bg-amber-50/40 shadow-amber-100/50',
-      activeIcon: 'bg-amber-600 text-white shadow-amber-600/20',
-      hoverIcon: 'group-hover:bg-amber-100/70 group-hover:text-amber-600',
-      accentText: 'text-amber-600',
+      activeBorder: 'border-amber-500/30 bg-status-warning-bg/40 shadow-amber-100/50',
+      activeIcon: 'bg-status-warning-bg text-white shadow-amber-600/20',
+      hoverIcon: 'group-hover:bg-status-warning-bg/70 group-hover:text-status-warning',
+      accentText: 'text-status-warning',
     },
     ELECTRONICS: {
       activeBorder: 'border-cyan-500/30 bg-cyan-50/40 shadow-cyan-100/50',
@@ -118,15 +118,15 @@ export function getCategoryCardClasses(variant, isSelected, typeValue) {
       accentText: 'text-rose-600',
     },
     BOOKS: {
-      activeBorder: 'border-emerald-500/30 bg-emerald-50/40 shadow-emerald-100/50',
-      activeIcon: 'bg-emerald-600 text-white shadow-emerald-600/20',
-      hoverIcon: 'group-hover:bg-emerald-100/70 group-hover:text-emerald-600',
-      accentText: 'text-emerald-600',
+      activeBorder: 'border-emerald-500/30 bg-status-success-bg/40 shadow-emerald-100/50',
+      activeIcon: 'bg-status-success-bg text-white shadow-emerald-600/20',
+      hoverIcon: 'group-hover:bg-status-success-bg/70 group-hover:text-status-success',
+      accentText: 'text-status-success',
     },
     SPORTS: {
-      activeBorder: 'border-violet-500/30 bg-violet-50/40 shadow-violet-100/50',
-      activeIcon: 'bg-violet-600 text-white shadow-violet-600/20',
-      hoverIcon: 'group-hover:bg-violet-100/70 group-hover:text-violet-600',
+      activeBorder: 'border-violet-500/30 bg-primary/40 shadow-violet-100/50',
+      activeIcon: 'bg-primary text-white shadow-violet-600/20',
+      hoverIcon: 'group-hover:bg-primary/70 group-hover:text-violet-600',
       accentText: 'text-violet-600',
     },
   };
@@ -143,7 +143,7 @@ export function getCategoryCardClasses(variant, isSelected, typeValue) {
       wrapper: `group relative flex w-full items-center gap-4 rounded-2xl border px-5 py-5 text-left transition-all duration-300 focus:outline-none ${
         isSelected
           ? `border-2 ${scheme.activeBorder} shadow-lg scale-[1.01]`
-          : 'border-zinc-200/70 bg-white hover:border-zinc-300 hover:shadow-md hover:scale-[1.01] hover:translate-y-[-1px]'
+          : 'border-zinc-200/70 bg-background-primary hover:border-zinc-300 hover:shadow-md hover:scale-[1.01] hover:translate-y-[-1px]'
       }`,
       iconBg: `flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-xl transition-all duration-300 ${
         isSelected ? `${scheme.activeIcon} shadow-md` : `bg-zinc-50 text-zinc-500 ${scheme.hoverIcon}`
@@ -161,7 +161,7 @@ export function getCategoryCardClasses(variant, isSelected, typeValue) {
     wrapper: `group relative flex w-full items-center gap-4 rounded-xl border px-4 py-4 text-left transition-all duration-200 focus:outline-none ${
       isSelected
         ? 'border-zinc-900/20 bg-zinc-50/80 shadow-md shadow-zinc-200/50'
-        : 'border-zinc-200/60 bg-white hover:border-zinc-300 hover:shadow-sm'
+        : 'border-zinc-200/60 bg-background-primary hover:border-zinc-300 hover:shadow-sm'
     }`,
     iconBg: `flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-all duration-200 ${
       isSelected ? 'bg-zinc-900 text-white shadow-sm' : 'bg-zinc-100/80 text-zinc-500 group-hover:bg-zinc-200/60'
@@ -182,15 +182,15 @@ export function getGridOptionClasses(variant, isSelected) {
   if (isBrowse) {
     return `relative flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all duration-300 focus:outline-none ${
       isSelected
-        ? 'border-indigo-500/30 bg-indigo-50/30 shadow-md shadow-indigo-100/40 border-2'
-        : 'border-zinc-200/70 bg-white hover:border-zinc-300 hover:shadow-sm hover:scale-[1.005]'
+        ? 'border-primary/30 bg-indigo-50/30 shadow-md shadow-indigo-100/40 border-2'
+        : 'border-zinc-200/70 bg-background-primary hover:border-zinc-300 hover:shadow-sm hover:scale-[1.005]'
     }`;
   }
 
   return `relative flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all duration-200 focus:outline-none ${
     isSelected
       ? 'border-zinc-900/20 bg-zinc-50/80 shadow-md shadow-zinc-200/50'
-      : 'border-zinc-200/60 bg-white hover:border-zinc-300 hover:shadow-sm'
+      : 'border-zinc-200/60 bg-background-primary hover:border-zinc-300 hover:shadow-sm'
   }`;
 }
 
@@ -198,17 +198,17 @@ export function getGridOptionLabelClass(variant, isSelected) {
   const isBrowse = variant === PREFLOW_WIZARD_VARIANT.BROWSE || variant === 'browse';
 
   if (isBrowse) {
-    return `text-[13px] font-semibold transition-colors ${isSelected ? 'text-indigo-900' : 'text-zinc-700'}`;
+    return `text-body font-semibold transition-colors ${isSelected ? 'text-primary' : 'text-zinc-700'}`;
   }
 
-  return `text-[13px] font-medium ${isSelected ? 'text-zinc-900' : 'text-zinc-700'}`;
+  return `text-body font-medium ${isSelected ? 'text-zinc-900' : 'text-zinc-700'}`;
 }
 
 export function getGridCheckDotClass(variant) {
   const isBrowse = variant === PREFLOW_WIZARD_VARIANT.BROWSE || variant === 'browse';
 
   if (isBrowse) {
-    return 'ml-2 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-indigo-600 shadow-sm';
+    return 'ml-2 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-primary shadow-sm';
   }
 
   return 'ml-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-zinc-900 shadow-sm';
@@ -221,34 +221,34 @@ export function getAuxiliaryUi(variant) {
   if (isBrowse) {
     return {
       gridSearchInput:
-        'w-full rounded-2xl border border-zinc-200 bg-white py-3 pl-11 pr-4 text-[13px] text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 hover:border-zinc-300 shadow-sm',
-      dropdownCard: 'rounded-2xl border border-zinc-200/60 bg-white/70 backdrop-blur-md p-6 shadow-sm',
+        'w-full rounded-2xl border border-zinc-200 bg-background-primary py-3 pl-11 pr-4 text-body text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-indigo-100 hover:border-zinc-300 shadow-sm',
+      dropdownCard: 'rounded-2xl border border-zinc-200/60 bg-background-primary/70 backdrop-blur-md p-6 shadow-sm',
       skipLink:
-        'inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-500 transition-all hover:text-indigo-600 hover:gap-2.5',
+        'inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-500 transition-all hover:text-primary hover:gap-2.5',
       midSearchBtn:
-        'inline-flex items-center gap-2 rounded-xl border border-indigo-200/50 bg-indigo-50/50 text-indigo-700 px-4 py-2.5 text-sm font-semibold transition-all hover:bg-indigo-50 hover:shadow-sm',
+        'inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-indigo-50/50 text-primary px-4 py-2.5 text-sm font-semibold transition-all hover:bg-indigo-50 hover:shadow-sm',
       dependentSelectorHint:
         'mt-3 rounded-xl border border-zinc-200/60 bg-zinc-50/80 px-3 py-2.5 text-center text-[12px] font-medium text-zinc-600',
       emptyFilterBox:
         'mt-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 py-8 text-center',
-      emptyFilterTitle: 'text-[13px] font-medium text-zinc-900',
+      emptyFilterTitle: 'text-body font-medium text-zinc-900',
       emptyFilterSubtitle: 'mt-0.5 text-[12px] text-zinc-500',
     };
   }
 
   return {
     gridSearchInput:
-      'w-full rounded-xl border border-zinc-200/60 bg-white py-2.5 pl-10 pr-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 hover:border-zinc-300 wizard-input-glow',
+      'w-full rounded-xl border border-zinc-200/60 bg-background-primary py-2.5 pl-10 pr-3 text-body text-zinc-900 placeholder:text-zinc-400 transition-all focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/5 hover:border-zinc-300 wizard-input-glow',
     dropdownCard: 'rounded-xl border border-zinc-200/40 wizard-glass-elevated p-5',
     skipLink:
       'inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 transition-all hover:text-zinc-900 hover:gap-2.5',
     midSearchBtn:
-      'inline-flex items-center gap-2 rounded-xl border border-zinc-200/60 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:bg-zinc-50 hover:shadow-sm',
+      'inline-flex items-center gap-2 rounded-xl border border-zinc-200/60 bg-background-primary px-4 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:bg-zinc-50 hover:shadow-sm',
     dependentSelectorHint:
       'mt-3 rounded-xl border border-zinc-200/60 bg-zinc-50/80 px-3 py-2.5 text-center text-[12px] font-medium text-zinc-600',
     emptyFilterBox:
       'mt-4 rounded-xl border border-dashed border-zinc-300/60 bg-zinc-50/50 py-8 text-center',
-    emptyFilterTitle: 'text-[13px] font-medium text-zinc-900',
+    emptyFilterTitle: 'text-body font-medium text-zinc-900',
     emptyFilterSubtitle: 'mt-0.5 text-[12px] text-zinc-500',
   };
 }

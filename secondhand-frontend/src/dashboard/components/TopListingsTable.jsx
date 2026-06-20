@@ -10,7 +10,7 @@ const TopListingsTable = ({
     t
   } = useTranslation();
   if (!listings || listings.length === 0) {
-    return <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
+    return <div className="bg-background-primary rounded-2xl border border-slate-100 p-8 text-center shadow-sm">
         <div className="w-12 h-12 bg-slate-50 rounded-xl mx-auto flex items-center justify-center mb-3">
           <Package className="w-6 h-6 text-slate-300" />
         </div>
@@ -18,7 +18,7 @@ const TopListingsTable = ({
         <p className="text-slate-400 text-xs font-medium">{t("no_listings_data_for_this_period")}</p>
       </div>;
   }
-  return <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+  return <div className="bg-background-primary rounded-2xl border border-slate-100 p-5 shadow-sm">
       <h3 className="text-sm font-medium text-text-primary mb-4">{title}</h3>
       <div className="space-y-2">
         {listings.map((listing, index) => <motion.div initial={{
@@ -39,7 +39,7 @@ const TopListingsTable = ({
               </div>}
             
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-900 truncate">{listing.title}</p>
+              <p className="text-xs font-semibold text-text-primary truncate">{listing.title}</p>
               <p className="text-caption text-slate-400 font-medium">{listing.listingNo}</p>
             </div>
 
@@ -59,7 +59,7 @@ const TopListingsTable = ({
                 </span>
               </div>
               <div className="text-right min-w-[80px]">
-                <p className="text-xs font-bold text-emerald-600">
+                <p className="text-xs font-bold text-status-success">
                   {formatCurrency(listing.revenue, 'TRY')}
                 </p>
               </div>

@@ -42,7 +42,7 @@ const GenericListingDetails = ({ listing }) => {
   const title = schema.title || config?.label || 'Details';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="bg-background-primary rounded-lg shadow-sm border p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-sm font-medium text-text-primary">{title}</h3>
         {sections.length > 1 ? (
@@ -55,7 +55,7 @@ const GenericListingDetails = ({ listing }) => {
                 className={`px-3 py-1.5 text-sm rounded border ${
                   activeSection === tab.id
                     ? 'bg-gray-900 text-white border-gray-900'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                    : 'bg-background-primary text-text-secondary border-border-DEFAULT hover:border-border-DEFAULT'
                 }`}
               >
                 {tab.label}

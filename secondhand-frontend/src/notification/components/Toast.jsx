@@ -21,12 +21,12 @@ const Toast = ({
     return () => clearTimeout(t);
   }, [autoClose, autoCloseDelay, onClose]);
   if (!visible) return null;
-  return <div className="flex items-start gap-3 min-w-[280px] max-w-sm p-4 bg-white rounded-lg shadow-lg border border-slate-200" role="alert">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                <CheckCircleIcon className="w-5 h-5 text-emerald-600" />
+  return <div className="flex items-start gap-3 min-w-[280px] max-w-sm p-4 bg-background-primary rounded-lg shadow-lg border border-border-light" role="alert">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-status-success-bg flex items-center justify-center">
+                <CheckCircleIcon className="w-5 h-5 text-status-success" />
             </div>
             <div className="flex-1 min-w-0">
-                {title && <p className="text-sm font-semibold text-slate-900">{title}</p>}
+                {title && <p className="text-sm font-semibold text-text-primary">{title}</p>}
                 <p className="text-sm text-slate-600">{message}</p>
             </div>
             <button type="button" onClick={() => {

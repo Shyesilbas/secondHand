@@ -12,13 +12,13 @@ const StatusBadge = ({
     t
   } = useTranslation();
   if (status === PAYMENT_STATUSES.ESCROW) {
-    return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+    return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-status-warning-bg text-status-warning border border-amber-100">
         <Clock className="w-2.5 h-2.5" />
         <span className="text-caption font-bold uppercase tracking-tight">{t("escrow")}</span>
       </div>;
   }
   if (isSuccess) {
-    return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+    return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-status-success-bg text-status-success border border-emerald-100">
         <CheckCircle2 className="w-2.5 h-2.5" />
         <span className="text-caption font-bold uppercase tracking-tight">{t("success")}</span>
       </div>;
@@ -40,11 +40,11 @@ const PaymentRow = ({
   return <div onClick={() => onShowReceipt(payment)} className="group grid grid-cols-12 items-center gap-4 px-6 py-4 hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-50 last:border-0">
       {/* Transaction & Type */}
       <div className="col-span-5 flex items-center gap-3 min-w-0">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isEscrow ? 'bg-amber-50 text-amber-600' : isIncoming ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isEscrow ? 'bg-status-warning-bg text-status-warning' : isIncoming ? 'bg-status-success-bg text-status-success' : 'bg-slate-100 text-slate-500'}`}>
           {isEscrow ? <ShieldCheck className="w-4 h-4" /> : isIncoming ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold text-slate-900 truncate">
+          <p className="text-sm font-bold text-text-primary truncate">
             {TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType}
           </p>
           <p className="text-caption text-slate-400 font-medium truncate">
@@ -77,11 +77,11 @@ const PaymentRow = ({
 
       {/* Amount */}
       <div className="col-span-2 flex flex-col items-end shrink-0">
-        <p className={`text-sm font-bold tracking-tight ${isIncoming ? 'text-emerald-600' : 'text-slate-900'}`}>
+        <p className={`text-sm font-bold tracking-tight ${isIncoming ? 'text-status-success' : 'text-text-primary'}`}>
           {isIncoming ? '+' : '-'}{formatCurrency(payment.amount)}
         </p>
         <div className="flex items-center gap-1">
-          <span className="text-[9px] font-bold text-indigo-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity">{t("receipt")}</span>
+          <span className="text-[9px] font-bold text-primary uppercase opacity-0 group-hover:opacity-100 transition-opacity">{t("receipt")}</span>
           <MoreVertical className="w-3 h-3 text-slate-300" />
         </div>
       </div>
@@ -113,7 +113,7 @@ const PaymentHistory = ({
         } : undefined}
       />;
   }
-  return <div className="bg-white">
+  return <div className="bg-background-primary">
       {/* Table Header */}
       <div className="grid grid-cols-12 items-center gap-4 px-6 py-3 bg-slate-50/50 border-b border-slate-100">
         <div className="col-span-5">

@@ -120,7 +120,7 @@ const CheckoutStep = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#e5e3df] bg-white shadow-sm shadow-black/[0.04]">
+    <div className="overflow-hidden rounded-xl border border-[#e5e3df] bg-background-primary shadow-sm shadow-black/[0.04]">
       {renderStepContent()}
     </div>
   );

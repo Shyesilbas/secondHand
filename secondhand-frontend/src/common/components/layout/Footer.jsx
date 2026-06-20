@@ -53,7 +53,7 @@ const Footer = () => {
                                     <ChevronUp className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />{t("hide_pricing")}</> : <>
                                     <ChevronDown className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />{t("show_pricing")}</>}
                         </button>
-                        {showPricing && <div className="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-3 backdrop-blur-xl transition-all duration-300">
+                        {showPricing && <div className="mt-3 space-y-3 rounded-xl border border-white/10 bg-background-primary/5 p-3 backdrop-blur-xl transition-all duration-300">
                                 {isLoadingPricing ? <div className="space-y-3">
                                         {[...Array(4)].map((_, i) => <div key={i} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>)}
                                     </div> : <>

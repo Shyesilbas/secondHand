@@ -84,38 +84,38 @@ const CheckoutAddressStep = ({
         <h3 className="text-sm font-medium text-text-primary mb-3.5">{t("teslimat_y_ntemi")}</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Cargo Option */}
-          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
+          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-background-primary hover:border-slate-300'}`}>
             <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="mt-1 h-4 w-4 rounded-full border-slate-300 text-zinc-900 focus:ring-zinc-900/10" />
             <div>
-              <span className="block text-sm font-semibold text-slate-900">{t("kargo_ile_g_nderim")}</span>
+              <span className="block text-sm font-semibold text-text-primary">{t("kargo_ile_g_nderim")}</span>
               <span className="mt-0.5 block text-xs text-slate-500">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
             </div>
           </label>
 
           {/* Safe Meetup Option */}
-          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-slate-100 bg-slate-50' : deliveryMethod === 'SAFE_MEETUP' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
+          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-slate-100 bg-slate-50' : deliveryMethod === 'SAFE_MEETUP' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-background-primary hover:border-slate-300'}`}>
             <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="mt-1 h-4 w-4 rounded-full border-slate-300 text-zinc-900 focus:ring-zinc-900/10 disabled:opacity-50" />
             <div>
-              <span className="block text-sm font-semibold text-slate-900 flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
+              <span className="block text-sm font-semibold text-text-primary flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-safe-meetup-onboarding'));
-              }} className="inline-flex items-center justify-center p-0.5 rounded-full text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-all focus:outline-none animate-pulse cursor-pointer" title={t("elden_g_venli_teslimat_nedir_detayl_bilg")}>
+              }} className="inline-flex items-center justify-center p-0.5 rounded-full text-primary hover:text-primary hover:bg-indigo-50 transition-all focus:outline-none animate-pulse cursor-pointer" title={t("elden_g_venli_teslimat_nedir_detayl_bilg")}>
                   <Info className="h-3.5 w-3.5" />
                 </button>
-                {canMeetup && <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-caption font-bold text-emerald-700 uppercase tracking-wider">{t("aktif")}</span>}
+                {canMeetup && <span className="rounded bg-status-success-bg px-1.5 py-0.5 text-caption font-bold text-emerald-700 uppercase tracking-wider">{t("aktif")}</span>}
               </span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {!canMeetup ? 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.' : 'Ortak bir güvenli buluşma noktasında yüz yüze teslimat.'}
               </span>
-              {canMeetup && sellerLocations.length > 0 && <span className="mt-2 block text-xs text-indigo-600 font-bold bg-indigo-50/50 px-2 py-1 rounded-md border border-indigo-100/30 w-fit">{t("sat_c_n_n_konumu")}<span className="text-slate-800 font-semibold">{sellerLocations.join(', ')}</span>
+              {canMeetup && sellerLocations.length > 0 && <span className="mt-2 block text-xs text-primary font-bold bg-indigo-50/50 px-2 py-1 rounded-md border border-primary/30 w-fit">{t("sat_c_n_n_konumu")}<span className="text-slate-800 font-semibold">{sellerLocations.join(', ')}</span>
                 </span>}
             </div>
           </label>
         </div>
 
         {/* Meetup Location Selector */}
-        {deliveryMethod === 'SAFE_MEETUP' && <div className="mt-6 rounded-xl border border-zinc-200/60 bg-white p-4 animate-fadeIn">
+        {deliveryMethod === 'SAFE_MEETUP' && <div className="mt-6 rounded-xl border border-zinc-200/60 bg-background-primary p-4 animate-fadeIn">
             <h4 className="mb-3 text-body font-bold uppercase tracking-wider text-slate-500">{t("bulu_ma_noktas_se_in")}</h4>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 mb-4">
               {predefinedHubs.map(hub => {
@@ -137,7 +137,7 @@ const CheckoutAddressStep = ({
 
             {(customLocationActive || !predefinedHubs.includes(meetupLocation) && meetupLocation) && <div className="animate-slideDown">
                 <label className="mb-1.5 block text-xs font-semibold text-slate-700">{t("zel_bulu_ma_noktas_girin")}</label>
-                <input type="text" value={meetupLocation || ''} onChange={e => setMeetupLocation(e.target.value)} className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5" placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k")} />
+                <input type="text" value={meetupLocation || ''} onChange={e => setMeetupLocation(e.target.value)} className="w-full rounded-lg border border-zinc-200 bg-background-primary px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5" placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k")} />
               </div>}
 
             {meetupLocation && <p className="mt-3 text-xs text-slate-500 font-medium">{t("se_ilen_konum")}<span className="font-semibold text-slate-800">{meetupLocation}</span>
@@ -161,16 +161,16 @@ const CheckoutAddressStep = ({
           </div> : <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {addresses.map(address => {
           const isSelected = String(selectedShippingAddressId) === String(address.id);
-          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-[0_8px_30px_rgb(79,70,229,0.05)] scale-[1.01]' : 'border-slate-100 bg-white hover:border-slate-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)]'}`}>
+          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-[0_8px_30px_rgb(79,70,229,0.05)] scale-[1.01]' : 'border-slate-100 bg-background-primary hover:border-slate-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)]'}`}>
                   <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
                   <div className="flex items-start gap-3">
                     {/* Radio indicator */}
-                    <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${isSelected ? 'border-indigo-600' : 'border-slate-300'}`}>
-                      {isSelected && <span className="h-2 w-2 rounded-full bg-indigo-600 animate-scaleUp" />}
+                    <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${isSelected ? 'border-primary' : 'border-slate-300'}`}>
+                      {isSelected && <span className="h-2 w-2 rounded-full bg-primary animate-scaleUp" />}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold tracking-tight text-slate-900">{address.addressLine}</div>
+                      <div className="text-sm font-semibold tracking-tight text-text-primary">{address.addressLine}</div>
                       <div className="mt-1 text-xs text-slate-500 font-medium">
                         {address.city}, {address.state}
                         {address.neighborhoodKey ? `, ${address.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}
@@ -178,7 +178,7 @@ const CheckoutAddressStep = ({
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{address.country}</span>
-                        {address.mainAddress && <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">{t("default")}</span>}
+                        {address.mainAddress && <span className="rounded-md border border-border-light bg-slate-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">{t("default")}</span>}
                       </div>
                     </div>
                   </div>
@@ -188,15 +188,15 @@ const CheckoutAddressStep = ({
       </div>
 
       {/* Section: Billing */}
-      {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && <div className="mb-6 rounded-xl border border-slate-100 bg-white shadow-sm p-5">
+      {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && <div className="mb-6 rounded-xl border border-slate-100 bg-background-primary shadow-sm p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <label className="flex cursor-pointer select-none items-center gap-3">
-              <input type="checkbox" checked={billingSameAsShipping} onChange={handleBillingToggle} className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20" />
+              <input type="checkbox" checked={billingSameAsShipping} onChange={handleBillingToggle} className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-indigo-600/20" />
               <span className="text-sm font-semibold text-slate-800">{t("billing_same_as_shipping")}</span>
             </label>
 
             {!billingSameAsShipping && <div className="relative w-full sm:w-64">
-                <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(Number(e.target.value))} className="w-full appearance-none rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-2.5 pr-10 text-sm text-slate-900 outline-none transition focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-100 shadow-inner">
+                <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(Number(e.target.value))} className="w-full appearance-none rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-2.5 pr-10 text-sm text-text-primary outline-none transition focus:border-primary focus:bg-background-primary focus:ring-4 focus:ring-indigo-100 shadow-inner">
                   <option value="">{t("choose_billing_address")}</option>
                   {addresses.map(a => <option key={a.id} value={a.id}>
                       {a.addressLine} — {a.city}, {a.state}
@@ -217,31 +217,31 @@ const CheckoutAddressStep = ({
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{t("order_name")}<span className="font-normal text-slate-400 capitalize">{t("optional")}</span>
           </label>
-          <input type="text" className="w-full rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition shadow-sm placeholder:text-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100" placeholder={t("e_g_birthday_gift")} value={orderName || ''} onChange={e => setOrderName(e.target.value)} maxLength={100} />
+          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-indigo-100" placeholder={t("e_g_birthday_gift")} value={orderName || ''} onChange={e => setOrderName(e.target.value)} maxLength={100} />
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{t("notes")}<span className="font-normal text-slate-400 capitalize">{t("optional")}</span>
           </label>
-          <input type="text" className="w-full rounded-xl border border-slate-100 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition shadow-sm placeholder:text-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100" placeholder={t("delivery_notes")} value={notes} onChange={e => setNotes(e.target.value)} />
+          <input type="text" className="w-full rounded-xl border border-slate-100 bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-slate-300 focus:border-primary focus:ring-4 focus:ring-indigo-100" placeholder={t("delivery_notes")} value={notes} onChange={e => setNotes(e.target.value)} />
         </div>
       </div>
 
       {/* Navigation — desktop */}
       <div className="hidden items-center justify-between border-t border-slate-100 pt-6 sm:flex">
-        <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900">
+        <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-text-primary">
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
         <div className="flex items-center gap-4">
-          {warning && <span className="text-xs text-amber-600 font-semibold tracking-wide">{warning}</span>}
+          {warning && <span className="text-xs text-status-warning font-semibold tracking-wide">{warning}</span>}
           <button type="button" onClick={onNext} disabled={!isStepValid} className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 shadow-sm active:scale-[0.98]">{t("continue")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
       </div>
 
       {/* Navigation — mobile */}
-      <div className="sticky bottom-0 -mx-5 mt-6 flex flex-col gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:hidden">
-        {warning && <p className="text-center text-xs text-amber-600 font-semibold tracking-wide mb-1">{warning}</p>}
+      <div className="sticky bottom-0 -mx-5 mt-6 flex flex-col gap-2 border-t border-slate-100 bg-background-primary px-5 py-4 sm:hidden">
+        {warning && <p className="text-center text-xs text-status-warning font-semibold tracking-wide mb-1">{warning}</p>}
         <div className="grid grid-cols-2 gap-2">
-          <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
+          <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
             <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
           <button type="button" onClick={onNext} disabled={!isStepValid} className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-black disabled:bg-slate-100 disabled:text-slate-400">{t("continue")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
           </button>

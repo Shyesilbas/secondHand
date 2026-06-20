@@ -18,27 +18,27 @@ const ViewStatisticsCard = ({
     icon: Eye,
     label: 'Total Views',
     value: totalViews || 0,
-    color: 'text-indigo-600',
+    color: 'text-primary',
     bg: 'bg-indigo-50'
   }, {
     icon: Users,
     label: 'Unique Visitors',
     value: uniqueViews || 0,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50'
+    color: 'text-status-success',
+    bg: 'bg-status-success-bg'
   }, {
     icon: TrendingUp,
     label: 'Avg. Views/User',
     value: engagementRate,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50'
+    color: 'text-status-warning',
+    bg: 'bg-status-warning-bg'
   }];
-  return <div className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm mb-5">
+  return <div className="rounded-2xl border border-slate-100 bg-background-primary overflow-hidden shadow-sm mb-5">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/60">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-xl bg-indigo-100 flex items-center justify-center">
-            <Eye className="w-3.5 h-3.5 text-indigo-600" />
+            <Eye className="w-3.5 h-3.5 text-primary" />
           </div>
           <span className="text-sm font-semibold text-slate-700">{t("view_statistics")}</span>
         </div>

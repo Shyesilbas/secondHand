@@ -93,12 +93,12 @@ const FavoriteListDetailPage = () => {
         <PageContainer className="p-4 sm:p-6">
           <div className="animate-pulse space-y-6">
             <div className="h-8 w-40 rounded-lg bg-slate-200" />
-            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="space-y-4 rounded-2xl border border-border-light bg-background-primary p-6">
               <div className="h-6 w-1/2 rounded bg-slate-200" />
               <div className="h-4 w-3/4 rounded bg-slate-200" />
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {[...Array(4)].map((_, i) => <div key={i} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+              {[...Array(4)].map((_, i) => <div key={i} className="overflow-hidden rounded-xl border border-border-light bg-background-primary">
                   <div className="aspect-square bg-slate-200" />
                   <div className="space-y-2 p-4">
                     <div className="h-4 rounded bg-slate-200" />
@@ -126,16 +126,16 @@ const FavoriteListDetailPage = () => {
   }
   return <div className="min-h-screen bg-slate-50/90">
       <PageContainer className="space-y-6 p-4 sm:p-6">
-        <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900">
+        <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-text-primary">
           <ArrowLeft className="h-4 w-4" />{t("back")}</button>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
+        <div className="overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-sm ring-1 ring-slate-950/5">
           <div className="border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-5 sm:px-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{list.name}</h1>
-                  <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${list.isPublic ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80' : 'bg-slate-100 text-slate-700'}`}>
+                  <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${list.isPublic ? 'bg-status-success-bg text-emerald-800 ring-1 ring-emerald-200/80' : 'bg-slate-100 text-slate-700'}`}>
                     {list.isPublic ? <>
                         <Globe className="h-3 w-3" />{t("public")}</> : <>
                         <Lock className="h-3 w-3" />{t("private")}</>}
@@ -160,7 +160,7 @@ const FavoriteListDetailPage = () => {
               <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                 <div className="text-right">
                   <p className="text-caption font-semibold uppercase tracking-wide text-slate-500">{t("total_value")}</p>
-                  <p className="font-mono text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
+                  <p className="font-mono text-xl font-bold tabular-nums text-text-primary sm:text-2xl">
                     {formatCurrency(list.totalPrice, list.currency)}
                   </p>
                 </div>
@@ -178,13 +178,13 @@ const FavoriteListDetailPage = () => {
                       <MoreVertical className="h-5 w-5" />
                     </button>
 
-                    {showMenu ? <div className="absolute right-0 top-full z-10 mt-2 min-w-[168px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+                    {showMenu ? <div className="absolute right-0 top-full z-10 mt-2 min-w-[168px] rounded-xl border border-border-light bg-background-primary py-1 shadow-lg">
                         <button type="button" onClick={() => {
                     setShowEditModal(true);
                     setShowMenu(false);
                   }} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
                           <Pencil className="h-4 w-4" />{t("edit")}</button>
-                        <button type="button" onClick={handleDelete} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
+                        <button type="button" onClick={handleDelete} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-status-error hover:bg-status-error-bg">
                           <Trash2 className="h-4 w-4" />{t("delete")}</button>
                       </div> : null}
                   </div> : null}
@@ -194,24 +194,24 @@ const FavoriteListDetailPage = () => {
         </div>
 
         {list.items && list.items.length > 0 ? <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-4">
-            {list.items.map(item => <div key={item.id} className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+            {list.items.map(item => <div key={item.id} className="group overflow-hidden rounded-xl border border-border-light bg-background-primary shadow-sm transition hover:shadow-md">
                 <div className="relative aspect-square bg-slate-100">
                   {item.listingImageUrl ? <img src={item.listingImageUrl} alt={item.listingTitle} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center">
                       <Package className="h-12 w-12 text-slate-300" />
                     </div>}
 
                   {item.listingStatus !== FAVORITE_LIST_LISTING_STATUS.ACTIVE ? <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                      <span className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">
+                      <span className="rounded-full bg-status-error-bg px-3 py-1 text-xs font-semibold text-white">
                         {item.listingStatus === FAVORITE_LIST_LISTING_STATUS.SOLD ? FAVORITE_LIST_MESSAGES.SOLD_LABEL : FAVORITE_LIST_MESSAGES.INACTIVE_LABEL}
                       </span>
                     </div> : null}
 
                   <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                    <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition hover:bg-slate-50" aria-label={t("open_listing")}>
+                    <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded-full bg-background-primary shadow-md transition hover:bg-slate-50" aria-label={t("open_listing")}>
                       <ExternalLink className="h-4 w-4 text-slate-600" />
                     </Link>
-                    {isOwner ? <button type="button" onClick={() => handleRemoveItem(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md transition hover:bg-red-50" aria-label={t("remove_from_list")}>
-                        <X className="h-4 w-4 text-red-500" />
+                    {isOwner ? <button type="button" onClick={() => handleRemoveItem(item.listingId)} className="flex h-8 w-8 items-center justify-center rounded-full bg-background-primary shadow-md transition hover:bg-status-error-bg" aria-label={t("remove_from_list")}>
+                        <X className="h-4 w-4 text-status-error" />
                       </button> : null}
                   </div>
                 </div>
@@ -220,7 +220,7 @@ const FavoriteListDetailPage = () => {
                   <h3 className="text-sm font-medium text-text-primary truncate transition">
                     {item.listingTitle}
                   </h3>
-                  <p className="mt-1 font-semibold tabular-nums text-slate-900">
+                  <p className="mt-1 font-semibold tabular-nums text-text-primary">
                     {formatCurrency(item.listingPrice, item.listingCurrency)}
                   </p>
                   {item.note ? <p className="mt-1 flex items-start gap-1 truncate text-xs text-slate-500">
@@ -229,7 +229,7 @@ const FavoriteListDetailPage = () => {
                     </p> : null}
                 </Link>
               </div>)}
-          </div> : <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-14 text-center shadow-sm">
+          </div> : <div className="rounded-2xl border border-dashed border-border-light bg-background-primary px-6 py-14 text-center shadow-sm">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
               <Package className="h-7 w-7 text-slate-400" />
             </div>

@@ -9,10 +9,10 @@ const OAuthErrorPage = () => {
   const navigate = useNavigate();
   const message = params.get('message') || 'Authentication failed. Please try again.';
   return <div className="flex items-center justify-center min-h-screen">
-            <div className="max-w-md w-full bg-white shadow rounded p-6 text-center">
+            <div className="max-w-md w-full bg-background-primary shadow rounded p-6 text-center">
                 <h1 className="text-2xl font-semibold text-text-primary mb-2">{t("authentication_error")}</h1>
                 <p className="text-text-secondary mb-6">{message}</p>
-                <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" onClick={() => navigate(ROUTES.LOGIN)}>{t("back_to_login")}</button>
+                <button className="px-4 py-2 bg-primary text-white rounded hover:bg-indigo-700" onClick={() => navigate(ROUTES.LOGIN)}>{t("back_to_login")}</button>
             </div>
         </div>;
 };

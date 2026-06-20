@@ -70,11 +70,11 @@ const ReviewButton = ({
   }
   if (review) {
     return <div className="text-sm">
-                <div className="flex items-center space-x-1 text-green-600">
+                <div className="flex items-center space-x-1 text-status-success">
                     <span className="text-lg">⭐</span>
                     <span>{t("reviewed")}{review.rating}/5)</span>
                 </div>
-                {review.comment && <div className="mt-1 text-xs text-gray-600 bg-gray-50 p-2 rounded-lg max-w-xs">
+                {review.comment && <div className="mt-1 text-xs text-text-secondary bg-secondary p-2 rounded-lg max-w-xs">
                         <p className="overflow-hidden" style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -101,7 +101,7 @@ const ReviewButton = ({
             <button onClick={e => {
       e.stopPropagation();
       setShowModal(true);
-    }} disabled={loading} className="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">
+    }} disabled={loading} className="text-sm bg-primary text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors">
                 {loading ? REVIEW_MESSAGES.CHECKING : REVIEW_MESSAGES.REVIEW}
             </button>
             

@@ -21,7 +21,7 @@ const PaymentPanel = ({
   } = useTranslation();
     return (
         <div className="lg:col-span-5 xl:col-span-4">
-            <div className="sticky top-4 rounded-[2rem] border border-white/60 bg-white/80 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+            <div className="sticky top-4 rounded-[2rem] border border-white/60 bg-background-primary/80 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
                 <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("payment_panel")}</h3>
                 <p className="mb-6 text-xs text-slate-500">{t("review_the_fee_details_and_choose_a_secu")}</p>
 
@@ -29,7 +29,7 @@ const PaymentPanel = ({
                     <>
                         <div className="mb-6 rounded-2xl bg-slate-50 px-4 py-3">
                             <h4 className="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">{t("chosen_listing")}</h4>
-                            <p className="text-sm font-medium tracking-tight text-slate-900">
+                            <p className="text-sm font-medium tracking-tight text-text-primary">
                                 {selectedListing.title}
                             </p>
                         </div>
@@ -42,7 +42,7 @@ const PaymentPanel = ({
                                     <div className="h-4 rounded-full bg-slate-200 animate-pulse w-full"></div>
                                 </div>
                             ) : (
-                                <div className="relative rounded-2xl bg-white border border-slate-200/80 p-5 shadow-sm overflow-hidden">
+                                <div className="relative rounded-2xl bg-background-primary border border-border-light/80 p-5 shadow-sm overflow-hidden">
                                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500" />
                                     
                                     <div className="mb-4 flex items-center justify-between">
@@ -53,13 +53,13 @@ const PaymentPanel = ({
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-sm text-slate-600">
                                             <span>{t("listing_fee")}</span>
-                                            <span className="font-mono tracking-tight font-medium text-slate-900">
+                                            <span className="font-mono tracking-tight font-medium text-text-primary">
                                                 {formatPaymentAmount(feeConfig.creationFee)}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between text-sm text-slate-600">
                                             <span>{t("tax")}{` (${feeConfig.taxPercentage}%)`}</span>
-                                            <span className="font-mono tracking-tight font-medium text-slate-900">
+                                            <span className="font-mono tracking-tight font-medium text-text-primary">
                                                 {formatPaymentAmount(feeConfig.creationFee * feeConfig.taxPercentage / 100)}
                                             </span>
                                         </div>
@@ -68,7 +68,7 @@ const PaymentPanel = ({
                                     <div className="mt-4 border-t border-dashed border-slate-300 pt-4">
                                         <div className="flex items-baseline justify-between">
                                             <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-800">{t("total_due")}</span>
-                                            <span className="font-mono text-2xl font-bold tracking-tighter text-indigo-600">
+                                            <span className="font-mono text-2xl font-bold tracking-tighter text-primary">
                                                 {formatPaymentAmount(feeConfig.totalCreationFee)}
                                             </span>
                                         </div>
@@ -80,8 +80,8 @@ const PaymentPanel = ({
                         <div className="mb-6">
                             <label className="mb-3 block text-sm font-medium text-slate-600">{t("payment_type")}</label>
                             <div className="space-y-2">
-                                <label className={`flex items-center rounded-2xl border p-4 cursor-pointer transition-all duration-300 ${paymentType === PAYMENT_TYPES.EWALLET ? 'border-indigo-500 bg-indigo-50/50 shadow-sm shadow-indigo-100/50' : 'border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/50'}`}>
-                                    <input type="radio" name="paymentType" value={PAYMENT_TYPES.EWALLET} checked={paymentType === PAYMENT_TYPES.EWALLET} onChange={e => onPaymentTypeChange(e.target.value)} className="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 focus:ring-offset-2" />
+                                <label className={`flex items-center rounded-2xl border p-4 cursor-pointer transition-all duration-300 ${paymentType === PAYMENT_TYPES.EWALLET ? 'border-primary bg-indigo-50/50 shadow-sm shadow-indigo-100/50' : 'border-border-light/80 hover:border-slate-300 hover:bg-slate-50/50'}`}>
+                                    <input type="radio" name="paymentType" value={PAYMENT_TYPES.EWALLET} checked={paymentType === PAYMENT_TYPES.EWALLET} onChange={e => onPaymentTypeChange(e.target.value)} className="w-4 h-4 text-primary border-slate-300 focus:ring-indigo-500 focus:ring-offset-2" />
                                     <div className="ml-4 flex items-center flex-1">
                                         <div className="h-10 w-10 flex items-center justify-center rounded-full bg-purple-100 text-purple-600 mr-3">
                                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ const PaymentPanel = ({
                                             </svg>
                                         </div>
                                         <div className="flex flex-col flex-1">
-                                            <span className={`text-sm font-semibold ${paymentType === PAYMENT_TYPES.EWALLET ? 'text-indigo-950' : 'text-slate-900'}`}>{t("ewallet")}</span>
+                                            <span className={`text-sm font-semibold ${paymentType === PAYMENT_TYPES.EWALLET ? 'text-primary' : 'text-text-primary'}`}>{t("ewallet")}</span>
                                             {eWallet && <span className="text-caption font-medium text-slate-500">{t("balance")} <span className="font-mono text-slate-700">{formatPaymentAmount(eWallet.balance)}</span></span>}
                                         </div>
                                     </div>
@@ -99,16 +99,16 @@ const PaymentPanel = ({
 
                         {/* eWallet Balance Warning */}
                         {paymentType === PAYMENT_TYPES.EWALLET && feeConfig && eWallet && <div className="mb-4">
-                                {eWallet.balance >= feeConfig.totalCreationFee ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                                {eWallet.balance >= feeConfig.totalCreationFee ? <div className="rounded-2xl border border-emerald-200 bg-status-success-bg px-3 py-2.5">
                                         <div className="flex items-center">
-                                            <svg className="mr-2 h-5 w-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="mr-2 h-5 w-5 text-status-success" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                             <span className="text-xs text-emerald-800">{t("sufficient_balance_available_for_payment")}</span>
                                         </div>
-                                    </div> : <div className="rounded-2xl border border-red-200 bg-red-50 px-3 py-2.5">
+                                    </div> : <div className="rounded-2xl border border-red-200 bg-status-error-bg px-3 py-2.5">
                                         <div className="flex items-center">
-                                            <svg className="mr-2 h-5 w-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="mr-2 h-5 w-5 text-status-error" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                             </svg>
                                             <span className="text-xs text-red-800">{t("insufficient_balance_you_need")}{formatPaymentAmount(feeConfig.totalCreationFee - eWallet.balance)}{t("more")}</span>
@@ -145,11 +145,11 @@ const PaymentPanel = ({
                         <div className="mt-3 flex flex-col items-center gap-1">
                             <p className="text-caption text-slate-500">{t("after_successful_payment_your_listing_wi")}</p>
                             <div className="flex items-center gap-2 text-caption font-medium text-slate-500">
-                                <div className="flex items-center gap-1 rounded-full border border-slate-200 px-2 py-0.5 bg-slate-50">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                <div className="flex items-center gap-1 rounded-full border border-border-light px-2 py-0.5 bg-slate-50">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-status-success-bg" />
                                     <span>{t("ssl_secured")}</span>
                                 </div>
-                                <div className="flex items-center gap-1 rounded-full border border-slate-200 px-2 py-0.5 bg-slate-50">
+                                <div className="flex items-center gap-1 rounded-full border border-border-light px-2 py-0.5 bg-slate-50">
                                     <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
                                     <span>{t("pci_dss_compliant")}</span>
                                 </div>

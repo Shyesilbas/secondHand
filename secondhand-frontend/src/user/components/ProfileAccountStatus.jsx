@@ -6,27 +6,27 @@ const statusConfig = {
     label: 'Active',
     icon: CheckCircle2,
     color: 'text-emerald-700',
-    bg: 'bg-emerald-50',
+    bg: 'bg-status-success-bg',
     border: 'border-emerald-200',
-    dot: 'bg-emerald-500',
+    dot: 'bg-status-success-bg',
     description: 'Your account is active and in good standing.',
   },
   [USER_ACCOUNT_STATUSES.SUSPENDED]: {
     label: 'Suspended',
     icon: XCircle,
     color: 'text-red-700',
-    bg: 'bg-red-50',
+    bg: 'bg-status-error-bg',
     border: 'border-red-200',
-    dot: 'bg-red-500',
+    dot: 'bg-status-error-bg',
     description: 'Your account has been suspended. Contact support for assistance.',
   },
   [USER_ACCOUNT_STATUSES.PENDING]: {
     label: 'Pending',
     icon: Clock,
     color: 'text-amber-700',
-    bg: 'bg-amber-50',
+    bg: 'bg-status-warning-bg',
     border: 'border-amber-200',
-    dot: 'bg-amber-500',
+    dot: 'bg-status-warning-bg',
     description: 'Your account is pending review.',
   },
 };
@@ -34,9 +34,9 @@ const statusConfig = {
 const fallbackStatus = {
   label: 'Unknown',
   icon: Clock,
-  color: 'text-gray-700',
-  bg: 'bg-gray-50',
-  border: 'border-gray-200',
+  color: 'text-text-secondary',
+  bg: 'bg-secondary',
+  border: 'border-border-light',
   dot: 'bg-gray-400',
   description: 'Account status is unknown.',
 };
@@ -65,14 +65,14 @@ const ProfileAccountStatus = ({user}) => {
 
       {/* Email Verification Card */}
       <div className={`flex items-start gap-4 p-5 rounded-xl border ${
-        isVerified ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'
+        isVerified ? 'border-emerald-200 bg-status-success-bg' : 'border-red-200 bg-status-error-bg'
       }`}>
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-          isVerified ? 'bg-emerald-100' : 'bg-red-100'
+          isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'
         }`}>
           {isVerified
-            ? <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            : <XCircle className="w-5 h-5 text-red-600" />
+            ? <CheckCircle2 className="w-5 h-5 text-status-success" />
+            : <XCircle className="w-5 h-5 text-status-error" />
           }
         </div>
         <div className="flex-1 min-w-0">
@@ -80,9 +80,9 @@ const ProfileAccountStatus = ({user}) => {
             <span className={`text-sm font-bold ${isVerified ? 'text-emerald-700' : 'text-red-700'}`}>
               {isVerified ? 'Email Verified' : 'Email Not Verified'}
             </span>
-            <span className={`w-2 h-2 rounded-full ${isVerified ? 'bg-emerald-500' : 'bg-red-500'}`} />
+            <span className={`w-2 h-2 rounded-full ${isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'}`} />
           </div>
-          <p className={`text-sm ${isVerified ? 'text-emerald-600' : 'text-red-600'} opacity-80`}>
+          <p className={`text-sm ${isVerified ? 'text-status-success' : 'text-status-error'} opacity-80`}>
             {isVerified
               ? 'Your email address has been verified successfully.'
               : 'Please verify your email address to access all features.'}

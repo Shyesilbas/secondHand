@@ -14,8 +14,8 @@ import logger from '../../common/utils/logger.js';
 const PageLoader = () => {
     const { t } = useTranslation();
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+      <div className="min-h-screen bg-secondary flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
         <h3 className="text-sm font-medium text-text-primary">{t("loading_listing_details")}</h3>
       </div>
     );
@@ -23,13 +23,13 @@ const PageLoader = () => {
 const PageError = ({ error, onBack }) => {
     const { t } = useTranslation();
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
+        <div className="bg-background-primary max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
+            <div className="w-16 h-16 bg-status-error-bg text-status-error rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="w-8 h-8" />
             </div>
             <h3 className="text-sm font-medium text-text-primary mb-2">{t("something_went_wrong")}</h3>
-            <p className="text-gray-600 mb-8">{error}</p>
+            <p className="text-text-secondary mb-8">{error}</p>
             <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-black transition-colors font-medium w-full justify-center">
                 <ArrowLeft className="w-4 h-4" />{t("go_back_to_listings")}</button>
         </div>

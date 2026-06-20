@@ -111,12 +111,12 @@ const MyCouponsPage = () => {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-slate-500">
-              <Link to={ROUTES.DASHBOARD} className="p-1.5 hover:bg-white rounded-lg transition-colors">
+              <Link to={ROUTES.DASHBOARD} className="p-1.5 hover:bg-background-primary rounded-lg transition-colors">
                 <ArrowLeft className="w-4 h-4" />
               </Link>
               <span className="text-caption font-bold tracking-wider uppercase opacity-70">{t("selling_tools")}</span>
             </div>
-            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("campaigns")}<span className="text-indigo-600">{t("promotions")}</span>
+            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("campaigns")}<span className="text-primary">{t("promotions")}</span>
             </h1>
           </div>
 
@@ -144,35 +144,35 @@ const MyCouponsPage = () => {
           value: stats.total,
           icon: Layers,
           color: 'blue'
-        }].map((stat, i) => <div key={i} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+        }].map((stat, i) => <div key={i} className="bg-background-primary rounded-2xl p-4 border border-slate-100 shadow-sm">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-8 h-8 rounded-lg bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
                   <stat.icon className="w-4 h-4" />
                 </div>
                 <span className="text-caption font-bold text-slate-400 uppercase tracking-widest">{stat.label}</span>
               </div>
-              <div className="text-xl font-bold text-slate-900">{stat.value}</div>
+              <div className="text-xl font-bold text-text-primary">{stat.value}</div>
             </div>)}
         </div>
 
         {/* Filters & Actions */}
         <div className="mb-6 flex flex-col md:flex-row gap-3 items-center justify-between">
-          <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200">
-            {['ALL', 'ACTIVE', 'INACTIVE'].map(status => <button key={status} onClick={() => setStatusFilter(status)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === status ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900'}`}>
+          <div className="flex items-center gap-1.5 bg-background-primary p-1 rounded-xl border border-border-light">
+            {['ALL', 'ACTIVE', 'INACTIVE'].map(status => <button key={status} onClick={() => setStatusFilter(status)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === status ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-text-primary'}`}>
                 {status === 'ALL' ? 'All' : status.charAt(0) + status.slice(1).toLowerCase()}
               </button>)}
           </div>
 
           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={t("search")} className="w-full bg-white border border-slate-200 rounded-xl py-2 pl-9 pr-3 text-xs font-medium focus:outline-none focus:border-indigo-400 transition-all" />
+            <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={t("search")} className="w-full bg-background-primary border border-border-light rounded-xl py-2 pl-9 pr-3 text-xs font-medium focus:outline-none focus:border-primary transition-all" />
           </div>
         </div>
 
         {/* Content List */}
         {isLoading ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map(n => <div key={n} className="h-48 rounded-2xl bg-white border border-slate-100 animate-pulse" />)}
-          </div> : filteredCampaigns.length === 0 ? <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-slate-100">
+            {[1, 2, 3, 4].map(n => <div key={n} className="h-48 rounded-2xl bg-background-primary border border-slate-100 animate-pulse" />)}
+          </div> : filteredCampaigns.length === 0 ? <div className="bg-background-primary rounded-3xl p-12 text-center border-2 border-dashed border-slate-100">
             <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Tag className="w-6 h-6 text-slate-300" />
             </div>
@@ -181,19 +181,19 @@ const MyCouponsPage = () => {
             <button onClick={() => {
           setSearchTerm('');
           setStatusFilter('ALL');
-        }} className="text-xs text-indigo-600 font-bold hover:underline">{t("clear_all_filters")}</button>
+        }} className="text-xs text-primary font-bold hover:underline">{t("clear_all_filters")}</button>
           </div> : <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredCampaigns.map(c => {
           const isBundle = c.minQuantity > 1;
           const hasListings = c.eligibleListingIds?.length > 0;
-          return <div key={c.id} className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+          return <div key={c.id} className="group bg-background-primary rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
                   <div className={`absolute top-0 left-0 w-full h-1 ${c.active ? 'bg-indigo-500' : 'bg-slate-200'}`} />
                   
                   <div className="flex justify-between items-start mb-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        {isBundle ? <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-bold uppercase tracking-wider border border-indigo-100">{t("bundle")}</span> : <span className="px-2 py-0.5 rounded-lg bg-slate-50 text-slate-600 text-[9px] font-bold uppercase tracking-wider border border-slate-100">{t("standard")}</span>}
-                        {!c.active && <span className="px-1.5 py-0.5 rounded-lg bg-red-50 text-red-600 text-[9px] font-bold">{t("paused")}</span>}
+                        {isBundle ? <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-primary text-[9px] font-bold uppercase tracking-wider border border-primary">{t("bundle")}</span> : <span className="px-2 py-0.5 rounded-lg bg-slate-50 text-slate-600 text-[9px] font-bold uppercase tracking-wider border border-slate-100">{t("standard")}</span>}
+                        {!c.active && <span className="px-1.5 py-0.5 rounded-lg bg-status-error-bg text-status-error text-[9px] font-bold">{t("paused")}</span>}
                       </div>
                       <h3 className="text-sm font-medium text-text-primary truncate">
                         {c.name}
@@ -204,10 +204,10 @@ const MyCouponsPage = () => {
                       <button onClick={() => {
                   setEditingCampaign(c);
                   setIsModalOpen(true);
-                }} className="p-1.5 rounded-lg border border-slate-100 hover:bg-slate-50 text-slate-400 hover:text-slate-900 transition-all">
+                }} className="p-1.5 rounded-lg border border-slate-100 hover:bg-slate-50 text-slate-400 hover:text-text-primary transition-all">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => deleteCampaign(c.id)} className="p-1.5 rounded-lg border border-red-50 hover:bg-red-50 text-red-300 hover:text-red-600 transition-all">
+                      <button onClick={() => deleteCampaign(c.id)} className="p-1.5 rounded-lg border border-red-50 hover:bg-status-error-bg text-red-300 hover:text-status-error transition-all">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -217,7 +217,7 @@ const MyCouponsPage = () => {
                     <div className="bg-slate-50 rounded-xl p-3">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t("benefit")}</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-bold text-indigo-600">
+                        <span className="text-xl font-bold text-primary">
                           {c.discountKind === 'PERCENT' ? `${c.value}%` : formatCurrency(c.value, 'TRY')}
                         </span>
                         <span className="text-[9px] font-bold text-slate-500 uppercase">{t("off")}</span>
@@ -225,7 +225,7 @@ const MyCouponsPage = () => {
                     </div>
                     <div className="bg-slate-50 rounded-xl p-3">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t("requirement")}</span>
-                      <div className="text-xs font-bold text-slate-900">
+                      <div className="text-xs font-bold text-text-primary">
                         {isBundle ? `${c.minQuantity}+ Items` : 'None'}
                       </div>
                     </div>
@@ -246,7 +246,7 @@ const MyCouponsPage = () => {
           </div>}
 
         {totalPages > 1 && <div className="mt-8 flex justify-center">
-            <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm scale-90">
+            <div className="bg-background-primary px-4 py-2 rounded-2xl border border-slate-100 shadow-sm scale-90">
               <Pagination page={page} totalPages={totalPages} onPageChange={p => {
             const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
             setPage(next);

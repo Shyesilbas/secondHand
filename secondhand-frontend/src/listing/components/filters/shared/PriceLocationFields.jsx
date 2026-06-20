@@ -6,7 +6,7 @@ import { get } from '../../../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../../../common/constants/apiEndpoints.js';
 import { useAuthState } from '../../../../auth/AuthContext.jsx';
 import { userService } from '../../../../user/services/userService.js';
-const inp = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm tabular-nums text-slate-900 placeholder:text-slate-400 shadow-sm transition-all focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
+const inp = 'w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm tabular-nums text-text-primary placeholder:text-slate-400 shadow-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed appearance-none pr-8';
 const selectWrapper = 'relative flex items-center';
 const dropdownIcon = <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 flex items-center justify-center">
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,11 +245,11 @@ const PriceLocationFields = ({
 
         <div className="space-y-3 border-t border-slate-100 pt-4">
           <div className="flex items-center gap-2 text-slate-700">
-            <MapPin className="h-4 w-4 shrink-0 text-indigo-500" aria-hidden />
+            <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
             <span className="text-xs font-semibold">{t("location")}</span>
           </div>
 
-          <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50/50 px-4 py-2.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 transition-all duration-200 active:scale-[0.98] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
+          <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary bg-indigo-50/50 px-4 py-2.5 text-xs font-semibold text-primary hover:bg-indigo-50 hover:text-primary transition-all duration-200 active:scale-[0.98] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
             {loadingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Navigation className="h-3.5 w-3.5 fill-indigo-100" />}{t("bana_yak_n_i_lanlar_g_ster")}</button>
           {nearMeError && <p className="mt-1 text-center text-caption font-medium text-rose-500 animate-pulse">
               {nearMeError}
@@ -260,9 +260,9 @@ const PriceLocationFields = ({
       </div>;
   }
   return <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-border-light bg-background-primary p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-2 text-slate-800">
-          <Landmark className="h-4 w-4 text-indigo-500" />
+          <Landmark className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("price_range")}</h3>
         </div>
         <div className="space-y-4">
@@ -275,13 +275,13 @@ const PriceLocationFields = ({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-border-light bg-background-primary p-5 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-2 text-slate-800">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-indigo-500" />
+            <MapPin className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("location")}</h3>
           </div>
-          <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 transition-all duration-200 active:scale-[0.98]">
+          <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex items-center gap-1.5 rounded-lg border border-primary bg-indigo-50/50 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-indigo-50 hover:text-primary transition-all duration-200 active:scale-[0.98]">
             {loadingLocation ? <Loader2 className="h-3 w-3 animate-spin" /> : <Navigation className="h-3 w-3 fill-indigo-100" />}{t("bana_yak_n_i_lanlar")}</button>
         </div>
         {nearMeError && <p className="mb-2 text-right text-caption font-medium text-rose-500 animate-pulse">

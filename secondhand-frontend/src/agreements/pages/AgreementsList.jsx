@@ -12,11 +12,11 @@ const FILTER_TABS = [{
 }, {
   key: 'pending',
   label: 'Pending',
-  dotColor: 'bg-amber-500'
+  dotColor: 'bg-status-warning-bg'
 }, {
   key: 'accepted',
   label: 'Accepted',
-  dotColor: 'bg-emerald-500'
+  dotColor: 'bg-status-success-bg'
 }];
 const AgreementsList = ({
   agreements,
@@ -54,16 +54,16 @@ const AgreementsList = ({
       status: 'pending',
       text: 'Pending',
       icon: ClockIcon,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
+      color: 'text-status-warning',
+      bgColor: 'bg-status-warning-bg',
       borderColor: 'border-amber-200'
     };
     if (ua.isAcceptedTheLastVersion) return {
       status: 'accepted',
       text: 'Accepted',
       icon: CheckIcon,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
+      color: 'text-status-success',
+      bgColor: 'bg-status-success-bg',
       borderColor: 'border-emerald-200',
       acceptedDate: ua.acceptedDate
     };
@@ -71,8 +71,8 @@ const AgreementsList = ({
       status: 'pending',
       text: 'Pending',
       icon: ClockIcon,
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
+      color: 'text-status-warning',
+      bgColor: 'bg-status-warning-bg',
       borderColor: 'border-amber-200'
     };
   };
@@ -114,14 +114,14 @@ const AgreementsList = ({
   }
   return <div>
             {/* Filter tabs */}
-            <div className="flex items-center gap-1 mb-6 p-1 bg-gray-100 rounded-xl w-fit">
+            <div className="flex items-center gap-1 mb-6 p-1 bg-tertiary rounded-xl w-fit">
                 {FILTER_TABS.map(tab => {
         const isActive = filter === tab.key;
         const count = counts[tab.key] ?? 0;
-        return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${isActive ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+        return <button key={tab.key} type="button" onClick={() => setFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${isActive ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-text-secondary'}`}>
                             {tab.dotColor && <span className={`w-1.5 h-1.5 rounded-full ${tab.dotColor}`} />}
                             {tab.label}
-                            <span className={`tabular-nums ${isActive ? 'text-gray-500' : 'text-gray-400'}`}>
+                            <span className={`tabular-nums ${isActive ? 'text-text-muted' : 'text-text-muted'}`}>
                                 {count}
                             </span>
                         </button>;
@@ -130,7 +130,7 @@ const AgreementsList = ({
 
             {/* Agreements list */}
             {filteredAgreements.length === 0 ? <div className="py-12 text-center">
-                    <p className="text-sm font-medium text-gray-500">{t("no_agreements_match_this_filter")}</p>
+                    <p className="text-sm font-medium text-text-muted">{t("no_agreements_match_this_filter")}</p>
                 </div> : <div className="space-y-3">
                     {filteredAgreements.map(agreement => {
         const status = getUserAgreementStatus(agreement.agreementId);

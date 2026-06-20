@@ -11,8 +11,8 @@ const ListingReviewStats = ({ listing, listingId, size = 'sm', showIcon = true, 
   if (isLoading) {
     return (
       <div className="flex items-center space-x-1">
-        <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
-        {showText && <div className="w-8 h-3 bg-gray-200 rounded animate-pulse"></div>}
+        <div className="w-4 h-4 bg-tertiary rounded animate-pulse"></div>
+        {showText && <div className="w-8 h-3 bg-tertiary rounded animate-pulse"></div>}
       </div>
     );
   }
@@ -90,7 +90,7 @@ const ListingReviewStats = ({ listing, listingId, size = 'sm', showIcon = true, 
         </div>
       )}
       {showText && (
-        <span className={`${config.text} text-gray-600 font-medium`}>
+        <span className={`${config.text} text-text-secondary font-medium`}>
           {safeAvg.toFixed(1)} ({stats.totalReviews})
         </span>
       )}

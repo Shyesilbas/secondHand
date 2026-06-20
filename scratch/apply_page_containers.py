@@ -119,14 +119,14 @@ targets = [
     ("secondhand-frontend/src/inbox/pages/InboxPage.jsx", r'<div className="flex flex-col flex-1 min-h-0 mx-auto w-full max-w-\[min\(100%,1420px\)\] p-4 sm:p-6 lg:p-8">', '<PageContainer className="flex flex-col flex-1 min-h-0 w-full max-w-[min(100%,1420px)] py-4 sm:py-6 lg:py-8">'),
     
     # 10. ChatPage (standard/custom width)
-    ("secondhand-frontend/src/chat/pages/ChatPage.jsx", r'return <div className="container mx-auto px-4 py-8">', 'return <PageContainer className="py-8">'),
+    ("secondhand-frontend/src/chat/pages/ChatPage.jsx", r'return <div className="container mx-auto px-4 py-8">', '<PageContainer className="py-8">'),
     ("secondhand-frontend/src/chat/pages/ChatPage.jsx", r'<div className={`max-w-\[1600px\] mx-auto \$\{embedded \? \'px-0 py-0\' : \'px-6 lg:px-8 py-8\'\}`\}>', '<PageContainer className={`max-w-[1600px] ${embedded ? \'px-0 sm:px-0 lg:px-0 py-0\' : \'py-8\'}`}>'),
     
     # 11. FavoritesPage (standard)
     ("secondhand-frontend/src/favorites/pages/FavoritesPage.jsx", r'<div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">', '<PageContainer className="py-6 sm:py-8">'),
     
     # 12. UserProfilePage (standard)
-    ("secondhand-frontend/src/user/pages/UserProfilePage.jsx", r'return <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">', 'return <PageContainer className="pb-5">'),
+    ("secondhand-frontend/src/user/pages/UserProfilePage.jsx", r'return <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">', '<PageContainer className="pb-5">'),
     ("secondhand-frontend/src/user/pages/UserProfilePage.jsx", r'<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">', '<PageContainer>'),
     ("secondhand-frontend/src/user/pages/UserProfilePage.jsx", r'<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7">', '<PageContainer className="py-7">'),
     

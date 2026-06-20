@@ -15,7 +15,7 @@ export const OrderPaymentSummary = React.memo(({
   const { t } = useTranslation();
   return <CardComponent critical className={`${isSellerView ? 'p-6' : 'p-5'} border border-white/5`}>
       <div className="flex items-center gap-2.5 mb-6">
-        <div className="p-2 bg-white/10 rounded-xl border border-white/10">
+        <div className="p-2 bg-background-primary/10 rounded-xl border border-white/10">
           <Wallet className="w-4 h-4 text-slate-200" />
         </div>
         <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest">{t("payment_summary")}</h3>
@@ -51,7 +51,7 @@ export const OrderPaymentSummary = React.memo(({
 
         <div className="flex justify-between items-center">
           <span className="text-sm text-slate-400">{t("payment_method")}</span>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-300">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background-primary/5 border border-white/10 text-slate-300">
             <CreditCard className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-xs font-bold tracking-wide">
               {selectedOrder.paymentMethod}
@@ -69,7 +69,7 @@ export const OrderPaymentSummary = React.memo(({
         </div>
       </div>
 
-      {selectedOrder.paymentReference && onOpenReceipt ? <button onClick={() => onOpenReceipt(selectedOrder.paymentReference)} className="w-full mt-5 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold tracking-wide transition-all flex items-center justify-center gap-2 border border-white/10 hover:border-white/25 text-slate-300 hover:text-white group">
+      {selectedOrder.paymentReference && onOpenReceipt ? <button onClick={() => onOpenReceipt(selectedOrder.paymentReference)} className="w-full mt-5 py-3 bg-background-primary/5 hover:bg-background-primary/10 rounded-xl text-xs font-bold tracking-wide transition-all flex items-center justify-center gap-2 border border-white/10 hover:border-white/25 text-slate-300 hover:text-white group">
           <FileText className="w-4 h-4 text-slate-400 group-hover:text-slate-200 transition-colors" />
           <span>{t("view_digital_receipt")}</span>
         </button> : null}

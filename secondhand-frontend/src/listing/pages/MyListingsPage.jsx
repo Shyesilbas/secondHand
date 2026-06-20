@@ -145,14 +145,14 @@ const MyListingsPage = () => {
                 <BulkShowcaseBanner onBoostClick={() => setIsSelectionModalOpen(true)} />
 
                 {/* Portfolio Header */}
-                <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 p-6 shadow-sm group">
+                <div className="relative overflow-hidden bg-background-primary rounded-3xl border border-slate-100 p-6 shadow-sm group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-2xl transition-colors" />
                     
                     <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                         <div className="space-y-0.5">
                             <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("portfolio_performance")}</h2>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-bold text-slate-900 tracking-tight">
+                                <span className="text-3xl font-bold text-text-primary tracking-tight">
                                     {formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[0]}
                                 </span>
                                 <span className="text-sm font-bold text-slate-400">
@@ -163,10 +163,10 @@ const MyListingsPage = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">
+                            <div className="flex items-center gap-1.5 bg-status-success-bg px-3 py-1.5 rounded-xl border border-emerald-100">
                                 <span className="relative flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success-bg opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-success-bg"></span>
                                 </span>
                                 <span className="text-caption font-bold text-emerald-700">
                                     {totalValueStats.activeCount}{t("active")}</span>
@@ -180,12 +180,12 @@ const MyListingsPage = () => {
                 </div>
 
                 {/* Inventory Management Section */}
-                {hasLowStock && <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+                {hasLowStock && <div className="bg-background-primary rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
                         <div className="p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-slate-50" onClick={lowStock.toggle}>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center">
-                                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                                    <div className="w-10 h-10 bg-status-warning-bg rounded-xl flex items-center justify-center">
+                                        <AlertTriangle className="w-5 h-5 text-status-warning" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-medium text-text-primary">{t("inventory_alert")}</h3>
@@ -196,28 +196,28 @@ const MyListingsPage = () => {
                             </div>
                         </div>
 
-                        {lowStock.isOpen && <div className="p-4 bg-white">
+                        {lowStock.isOpen && <div className="p-4 bg-background-primary">
                                 {!bulkMode ? <>
                                         <div className="flex gap-2 mb-4">
                                             <button onClick={() => setBulkMode('quantity')} className="px-4 py-1.5 bg-slate-900 text-white text-caption font-bold rounded-lg hover:bg-black transition-all">{t("batch_stock")}</button>
-                                            <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-white text-slate-900 border border-slate-200 text-caption font-bold rounded-lg hover:bg-slate-50 transition-all">{t("batch_prices")}</button>
+                                            <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-background-primary text-text-primary border border-border-light text-caption font-bold rounded-lg hover:bg-slate-50 transition-all">{t("batch_prices")}</button>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {lowStock.listings.slice(0, 4).map(listing => <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />)}
                                         </div>
                                     </> : <div className="space-y-3">
-                                        <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                                        <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-primary">
                                             <div className="flex items-center gap-2">
-                                                {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-white border border-indigo-200 rounded-lg outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-white text-xs" />}
-                                                <button onClick={applyBulk} disabled={saving} className="px-4 py-1.5 bg-indigo-600 text-white text-caption font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50">{t("apply")}</button>
+                                                {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-background-primary border border-primary rounded-lg outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-background-primary text-xs" />}
+                                                <button onClick={applyBulk} disabled={saving} className="px-4 py-1.5 bg-primary text-white text-caption font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50">{t("apply")}</button>
                                             </div>
-                                            <X onClick={clearBulk} className="w-4 h-4 text-indigo-400 cursor-pointer" />
+                                            <X onClick={clearBulk} className="w-4 h-4 text-primary cursor-pointer" />
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1">
-                                            {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-100'}`}>
-                                                    <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="w-4 h-4 rounded border-slate-200 text-indigo-600" />
+                                            {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-indigo-50 border-primary' : 'bg-background-primary border-slate-100'}`}>
+                                                    <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="w-4 h-4 rounded border-border-light text-primary" />
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="text-caption font-bold text-slate-900 truncate">{listing.title}</p>
+                                                        <p className="text-caption font-bold text-text-primary truncate">{listing.title}</p>
                                                         <p className="text-[9px] font-medium text-slate-500">{t("current")}{bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
                                                         </p>
                                                     </div>

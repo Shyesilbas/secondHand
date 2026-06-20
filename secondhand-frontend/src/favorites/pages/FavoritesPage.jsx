@@ -65,7 +65,7 @@ const FavoritesPage = () => {
   }, [fetchFavorites]);
   return <div className="min-h-screen bg-slate-50/90">
       <PageContainer className="py-6 sm:py-8">
-        <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
+        <div className="overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-sm ring-1 ring-slate-950/5">
           <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
               <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("favorites")}</h1>
@@ -75,12 +75,12 @@ const FavoritesPage = () => {
 
           <div className="flex flex-col gap-3 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="inline-flex rounded-2xl bg-slate-100 p-1">
-              <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.FAVORITES)} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.FAVORITES ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+              <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.FAVORITES)} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.FAVORITES ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-600 hover:text-text-primary'}`}>
                 <Heart className="h-4 w-4 opacity-70" />{t("saved")}<span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
                   {pagination.totalElements}
                 </span>
               </button>
-              <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.LISTS)} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.LISTS ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+              <button type="button" onClick={() => setActiveTab(FAVORITES_PAGE_TABS.LISTS)} className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4 ${activeTab === FAVORITES_PAGE_TABS.LISTS ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-600 hover:text-text-primary'}`}>
                 <List className="h-4 w-4 opacity-70" />{t("lists")}<span className="rounded-full bg-slate-200/80 px-2 py-0.5 text-xs font-bold text-slate-600">
                   {myLists.length}
                 </span>
@@ -90,7 +90,7 @@ const FavoritesPage = () => {
             <div className="flex flex-wrap items-center gap-2">
               {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-teal-700 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-teal-800 sm:text-sm">
                   <Plus className="h-4 w-4" />{t("new_list")}</button>}
-              {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 sm:text-sm">
+              {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 sm:text-sm">
                   <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />{t("refresh")}</button>}
             </div>
           </div>
@@ -108,7 +108,7 @@ const FavoritesPage = () => {
                   <div className="mb-6">
                     <ListingGrid listings={favoritedListings} isLoading={false} error={null} />
                   </div>
-                  {pagination.totalPages > 1 ? <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  {pagination.totalPages > 1 ? <div className="overflow-hidden rounded-2xl border border-border-light bg-background-primary shadow-sm">
                       <Pagination page={pagination.number} totalPages={pagination.totalPages} onPageChange={handlePageChange} />
                     </div> : null}
                 </>}

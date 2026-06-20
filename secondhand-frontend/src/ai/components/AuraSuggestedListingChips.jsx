@@ -20,15 +20,15 @@ export default function AuraSuggestedListingChips({
         const href = id ? ROUTES.LISTING_DETAIL(id) : null;
         const price = l?.price != null && l?.currency ? `${l.price} ${l.currency}` : l?.price != null ? String(l.price) : null;
         const loc = [l?.district, l?.city].filter(Boolean).join(' · ');
-        return <div key={id || `${l?.listingNo || 'row'}-${idx}`} className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition-all duration-200 hover:border-slate-400">
+        return <div key={id || `${l?.listingNo || 'row'}-${idx}`} className="flex gap-3 rounded-xl border border-border-light bg-background-primary p-3 text-left shadow-sm transition-all duration-200 hover:border-slate-400">
               {l?.imageUrl ? <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-100 bg-slate-50 shadow-inner group">
                   <img src={l.imageUrl} alt="" className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" />
-                </div> : <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center">
+                </div> : <div className="h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-dashed border-border-light flex items-center justify-center">
                   <Tag className="w-5 h-5 text-slate-300" />
                 </div>}
               <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
                 <div>
-                  <p className="text-sm font-bold text-slate-900 line-clamp-1 leading-snug">{l?.title || 'İlan'}</p>
+                  <p className="text-sm font-bold text-text-primary line-clamp-1 leading-snug">{l?.title || 'İlan'}</p>
                   
                   <div className="flex items-center gap-2 mt-1">
                     {price ? <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-800">

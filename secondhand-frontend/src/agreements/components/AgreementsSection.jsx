@@ -19,14 +19,14 @@ const AgreementsSection = ({
             </div>
 
             <div className="space-y-3">
-                {agreements.map(agreement => <div key={agreement.agreementId} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 transition-colors hover:border-indigo-200">
+                {agreements.map(agreement => <div key={agreement.agreementId} className="flex items-start gap-3 rounded-xl border border-border-light bg-background-primary px-3 py-3 transition-colors hover:border-primary">
                         <div className="pt-0.5">
-                            <input type="checkbox" id={`agreement-${agreement.agreementId}`} checked={acceptedAgreements.has(agreement.agreementId)} onChange={() => onToggle(agreement.agreementId)} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded" />
+                            <input type="checkbox" id={`agreement-${agreement.agreementId}`} checked={acceptedAgreements.has(agreement.agreementId)} onChange={() => onToggle(agreement.agreementId)} className="h-4 w-4 text-primary focus:ring-indigo-500 border-slate-300 rounded" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                                 <DocumentTextIcon className="h-4 w-4 text-slate-400 shrink-0" />
-                                <button type="button" onClick={() => onRead(agreement)} className="text-sm font-semibold text-slate-700 hover:text-indigo-600 hover:underline cursor-pointer text-left tracking-tight transition-colors">
+                                <button type="button" onClick={() => onRead(agreement)} className="text-sm font-semibold text-slate-700 hover:text-primary hover:underline cursor-pointer text-left tracking-tight transition-colors">
                                     {AGREEMENT_TYPE_LABELS[agreement.agreementType]}
                                 </button>
                             </div>
@@ -34,8 +34,8 @@ const AgreementsSection = ({
                     </div>)}
             </div>
 
-            {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                    <p className="text-red-600 text-xs tracking-tight">{error}</p>
+            {error && <div className="p-3 bg-status-error-bg border border-red-200 rounded-xl">
+                    <p className="text-status-error text-xs tracking-tight">{error}</p>
                 </div>}
         </div>;
 };

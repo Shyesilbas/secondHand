@@ -123,7 +123,7 @@ const MakeOfferModal = ({
   const modal = <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/45 px-4 backdrop-blur-[2px]" onMouseDown={e => {
     if (e.target === e.currentTarget) onClose?.();
   }}>
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/15 ring-1 ring-slate-950/5" role="dialog" aria-modal="true" aria-labelledby="make-offer-title">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-2xl shadow-slate-900/15 ring-1 ring-slate-950/5" role="dialog" aria-modal="true" aria-labelledby="make-offer-title">
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
           <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
             <h2 id="make-offer-title" className="text-lg font-semibold text-text-primary tracking-tight">{t("make_offer")}</h2>
@@ -138,15 +138,15 @@ const MakeOfferModal = ({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="offer-qty" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t("quantity")}</label>
-              <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20" />
+              <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20" />
             </div>
             <div>
               <label htmlFor="offer-total" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t("total_offer_price")}</label>
-              <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20" />
+              <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20" />
             </div>
           </div>
 
-          {recommendedOffers.length > 0 ? <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+          {recommendedOffers.length > 0 ? <div className="rounded-xl border border-border-light bg-slate-50/80 p-4">
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("recommended_offer")}</span>
                 {listTotal != null ? <span className="text-xs text-slate-500">{t("list_total")}{qtyNum}{t("unit")}{' '}
@@ -157,9 +157,9 @@ const MakeOfferModal = ({
                 {recommendedOffers.map(rec => {
               const active = selectedPreset === rec.key;
               const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
-              return <button key={rec.key} type="button" onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-xl border px-4 py-3 text-left transition ${active ? 'border-teal-600 bg-teal-50/90 ring-1 ring-teal-600/25' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}`}>
+              return <button key={rec.key} type="button" onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-xl border px-4 py-3 text-left transition ${active ? 'border-teal-600 bg-teal-50/90 ring-1 ring-teal-600/25' : 'border-border-light bg-background-primary hover:border-slate-300 hover:bg-slate-50'}`}>
                       <span className="text-caption font-semibold uppercase tracking-wide text-slate-500">{rec.title}</span>
-                      <span className="mt-1 font-mono text-lg font-bold tabular-nums text-slate-900">
+                      <span className="mt-1 font-mono text-lg font-bold tabular-nums text-text-primary">
                         {formatCurrency(rec.amount, currency)}
                       </span>
                       <span className="mt-1 text-xs text-slate-500">
@@ -170,15 +170,15 @@ const MakeOfferModal = ({
             })}
               </div>
               <p className="mt-3 text-caption leading-relaxed text-slate-500">{t("each_option_fills_your_offer_with_a_tota")}</p>
-            </div> : listingUnitPrice == null ? <p className="rounded-xl border border-amber-200/80 bg-amber-50/60 px-3 py-2 text-xs text-amber-900">{t("list_price_unavailable_enter_your_total_")}</p> : null}
+            </div> : listingUnitPrice == null ? <p className="rounded-xl border border-amber-200/80 bg-status-warning-bg/60 px-3 py-2 text-xs text-amber-900">{t("list_price_unavailable_enter_your_total_")}</p> : null}
 
-          <div className="rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm ring-1 ring-slate-950/5">
-            <p className="text-xs leading-relaxed text-slate-600">{t("offering_for")}<span className="font-semibold text-slate-900">{qtyNum}</span>{t("item_s")}{previewTotal != null && <>
-                  {' '}{t("your_total")}<span className="font-semibold text-slate-900">{formatCurrency(previewTotal, currency)}</span>
+          <div className="rounded-xl border border-slate-100 bg-background-primary px-4 py-3 shadow-sm ring-1 ring-slate-950/5">
+            <p className="text-xs leading-relaxed text-slate-600">{t("offering_for")}<span className="font-semibold text-text-primary">{qtyNum}</span>{t("item_s")}{previewTotal != null && <>
+                  {' '}{t("your_total")}<span className="font-semibold text-text-primary">{formatCurrency(previewTotal, currency)}</span>
                 </>}
               {listingUnitPrice != null && <>
                   {' '}{t("unit_on_listing")}{' '}
-                  <span className="font-semibold text-slate-900">{formatCurrency(listingUnitPrice, currency)}</span>
+                  <span className="font-semibold text-text-primary">{formatCurrency(listingUnitPrice, currency)}</span>
                 </>}
             </p>
           </div>
@@ -186,7 +186,7 @@ const MakeOfferModal = ({
           {error ? <div className="text-sm font-medium text-red-700">{error}</div> : null}
 
           <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
-            <button type="button" onClick={onClose} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" disabled={isSubmitting}>{t("cancel")}</button>
+            <button type="button" onClick={onClose} className="rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" disabled={isSubmitting}>{t("cancel")}</button>
             <button type="submit" className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800 disabled:opacity-60" disabled={isSubmitting}>
               {isSubmitting ? 'Sending…' : 'Send offer'}
             </button>

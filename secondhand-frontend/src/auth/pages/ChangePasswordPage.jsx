@@ -112,12 +112,12 @@ const ChangePasswordPage = () => {
     if (score <= 2) return {
       level: score,
       label: 'Weak',
-      color: 'bg-red-500'
+      color: 'bg-status-error-bg'
     };
     if (score <= 3) return {
       level: score,
       label: 'Fair',
-      color: 'bg-yellow-500'
+      color: 'bg-status-warning-bg'
     };
     if (score <= 4) return {
       level: score,
@@ -127,21 +127,21 @@ const ChangePasswordPage = () => {
     return {
       level: score,
       label: 'Strong',
-      color: 'bg-green-500'
+      color: 'bg-status-success-bg'
     };
   };
   const passwordStrength = getPasswordStrength(formData.newPassword);
-  return <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+  return <div className="min-h-screen bg-secondary flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-background-primary rounded-lg shadow-sm border border-border-light p-6">
                     <div className="text-center mb-6">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 bg-tertiary rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                             </svg>
                         </div>
                         <h2 className="text-lg font-semibold text-text-primary mb-1">{t("change_password")}</h2>
-                        <p className="text-xs text-gray-600">{t("update_your_account_password")}</p>
+                        <p className="text-xs text-text-secondary">{t("update_your_account_password")}</p>
                     </div>
 
                     <Alert type="error" message={errors.general} />
@@ -157,12 +157,12 @@ const ChangePasswordPage = () => {
                                     
                                     {passwordStrength.level > 0 && <div className="space-y-1">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-xs font-medium text-gray-700">{t("strength")}</span>
-                                                <span className={`text-xs font-medium ${passwordStrength.label === 'Weak' ? 'text-red-600' : passwordStrength.label === 'Fair' ? 'text-yellow-600' : passwordStrength.label === 'Good' ? 'text-blue-600' : 'text-green-600'}`}>
+                                                <span className="text-xs font-medium text-text-secondary">{t("strength")}</span>
+                                                <span className={`text-xs font-medium ${passwordStrength.label === 'Weak' ? 'text-status-error' : passwordStrength.label === 'Fair' ? 'text-status-warning' : passwordStrength.label === 'Good' ? 'text-primary' : 'text-status-success'}`}>
                                                     {passwordStrength.label}
                                                 </span>
                                             </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div className="w-full bg-tertiary rounded-full h-1.5">
                                                 <div className={`h-1.5 rounded-full transition-all duration-300 ${passwordStrength.color}`} style={{
                     width: `${passwordStrength.level / 5 * 100}%`
                   }}></div>
@@ -178,13 +178,13 @@ const ChangePasswordPage = () => {
                                 {isLoading ? 'Updating...' : 'Update Password'}
                             </AuthButton>
                             
-                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">{t("cancel")}</button>
+                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="w-full py-2 px-4 border border-border-DEFAULT rounded-lg text-sm font-medium text-text-secondary bg-background-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">{t("cancel")}</button>
                         </div>
                     </form>
 
-                    <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="mt-4 pt-4 border-t border-border-light">
                         <div className="text-center">
-                            <button onClick={() => navigate(ROUTES.FORGOT_PASSWORD)} className="text-xs text-gray-500 hover:text-gray-700 underline">{t("forgot_your_password")}</button>
+                            <button onClick={() => navigate(ROUTES.FORGOT_PASSWORD)} className="text-xs text-text-muted hover:text-text-secondary underline">{t("forgot_your_password")}</button>
                         </div>
                     </div>
                 </div>

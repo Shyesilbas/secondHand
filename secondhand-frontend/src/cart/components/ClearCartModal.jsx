@@ -17,8 +17,8 @@ const ClearCartModal = ({
     }}>
         <div className="p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="rounded-xl bg-red-50 p-2.5">
-              <TrashIcon className="h-6 w-6 text-red-600" />
+            <div className="rounded-xl bg-status-error-bg p-2.5">
+              <TrashIcon className="h-6 w-6 text-status-error" />
             </div>
             <h3 className="text-sm font-medium text-text-primary" style={{
             color: CART_UI.text
@@ -31,7 +31,7 @@ const ClearCartModal = ({
 
           <div className="flex gap-3">
             <button type="button" onClick={onClose} disabled={isClearing} className={`flex items-center justify-center ${cartBtnSecondary} flex-1 py-2.5 disabled:opacity-50`}>{t("cancel")}</button>
-            <button type="button" onClick={onConfirm} disabled={isClearing} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50 active:scale-[0.99]">
+            <button type="button" onClick={onConfirm} disabled={isClearing} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-status-error-bg px-4 py-2.5 text-sm font-medium text-white transition hover:bg-status-error-bg disabled:opacity-50 active:scale-[0.99]">
               {isClearing ? <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden />
                   <span>{t("clearing")}</span>

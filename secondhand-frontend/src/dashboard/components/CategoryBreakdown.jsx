@@ -5,18 +5,18 @@ const CATEGORY_COLORS = {
   VEHICLE: {
     bg: 'bg-indigo-500',
     light: 'bg-indigo-50',
-    text: 'text-indigo-700',
-    border: 'border-indigo-200'
+    text: 'text-primary',
+    border: 'border-primary'
   },
   ELECTRONICS: {
-    bg: 'bg-emerald-500',
-    light: 'bg-emerald-50',
+    bg: 'bg-status-success-bg',
+    light: 'bg-status-success-bg',
     text: 'text-emerald-700',
     border: 'border-emerald-200'
   },
   REAL_ESTATE: {
-    bg: 'bg-amber-500',
-    light: 'bg-amber-50',
+    bg: 'bg-status-warning-bg',
+    light: 'bg-status-warning-bg',
     text: 'text-amber-700',
     border: 'border-amber-200'
   },
@@ -40,10 +40,10 @@ const CATEGORY_COLORS = {
   }
 };
 const DEFAULT_COLOR = {
-  bg: 'bg-slate-500',
+  bg: 'bg-text-muted',
   light: 'bg-slate-50',
   text: 'text-slate-700',
-  border: 'border-slate-200'
+  border: 'border-border-light'
 };
 const formatCategoryName = key => key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 const CategoryBreakdown = ({
@@ -85,7 +85,7 @@ const CategoryBreakdown = ({
                 <span className="text-xs font-semibold text-slate-700">{formatCategoryName(entry.key)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-900">{formatCurrency(entry.value, currency)}</span>
+                <span className="text-xs font-bold text-text-primary">{formatCurrency(entry.value, currency)}</span>
                 <span className={`text-caption font-bold px-1.5 py-0.5 rounded ${colors.light} ${colors.text}`}>{pct}%</span>
               </div>
             </div>
@@ -106,7 +106,7 @@ const CategoryBreakdown = ({
       {/* Total */}
       <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between">
         <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{label}</span>
-        <span className="text-sm font-bold text-slate-900">{formatCurrency(total, currency)}</span>
+        <span className="text-sm font-bold text-text-primary">{formatCurrency(total, currency)}</span>
       </div>
     </div>;
 };

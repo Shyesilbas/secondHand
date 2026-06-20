@@ -176,27 +176,27 @@ const UnifiedSearchBar = ({
   };
   return <div ref={searchRef} className={`relative ${className}`}>
             <div className="relative">
-                <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={`Search ${activeTab}...`} className="w-full h-11 px-10 pr-20 text-sm bg-gray-50 border-0 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 focus:bg-white transition-all placeholder:text-gray-400 text-gray-900" />
+                <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={`Search ${activeTab}...`} className="w-full h-11 px-10 pr-20 text-sm bg-secondary border-0 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-300 focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
                 
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    {isLoading ? <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    {isLoading ? <svg className="animate-spin h-4 w-4 text-text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg> : <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        </svg> : <svg className="h-4 w-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>}
                 </div>
 
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
                     <div className="flex items-center bg-transparent">
-                        <button onClick={() => handleTabChange('listings')} className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${activeTab === 'listings' ? 'text-gray-900 bg-gray-200' : 'text-gray-500 hover:text-gray-700'}`} type="button">{t("listings")}</button>
+                        <button onClick={() => handleTabChange('listings')} className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${activeTab === 'listings' ? 'text-text-primary bg-tertiary' : 'text-text-muted hover:text-text-secondary'}`} type="button">{t("listings")}</button>
                         <span className="text-gray-300">/</span>
-                        <button onClick={() => handleTabChange('users')} className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${activeTab === 'users' ? 'text-gray-900 bg-gray-200' : 'text-gray-500 hover:text-gray-700'}`} type="button">{t("users")}</button>
+                        <button onClick={() => handleTabChange('users')} className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${activeTab === 'users' ? 'text-text-primary bg-tertiary' : 'text-text-muted hover:text-text-secondary'}`} type="button">{t("users")}</button>
                     </div>
                 </div>
             </div>
 
-            {isVisible && <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+            {isVisible && <div className="absolute top-full left-0 right-0 mt-1.5 bg-background-primary border border-border-light rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                     <SearchResults results={results} activeTab={activeTab} selectedIndex={selectedIndex} isLoading={isLoading} query={query} onResultSelect={handleResultSelect} />
                 </div>}
         </div>;

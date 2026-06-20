@@ -94,7 +94,7 @@ const PaymentsPage = () => {
   if (isLoading) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-primary border-t-indigo-600 rounded-full animate-spin" />
                     <p className="text-sm font-medium text-slate-500">{t("loading_your_transactions")}</p>
                 </div>
             </div>;
@@ -104,7 +104,7 @@ const PaymentsPage = () => {
 
             <div className={`flex flex-col transition-all duration-500 ${showFilters ? 'lg:ml-80' : ''}`}>
                 {/* Modern Header */}
-                <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
+                <header className="sticky top-0 z-40 bg-background-primary/80 backdrop-blur-md border-b border-slate-100">
                     <PageContainer className="py-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <button onClick={toggleFilterSidebar} className="p-2.5 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">
@@ -113,7 +113,7 @@ const PaymentsPage = () => {
                             <div>
                                 <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("finances")}</h1>
                                 <div className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-status-success-bg" />
                                     <p className="text-caption font-bold text-slate-400 uppercase tracking-widest">{t("real_time_tracking")}</p>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@ const PaymentsPage = () => {
             y: 0
           }} transition={{
             delay: idx * 0.1
-          }} className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+          }} className="bg-background-primary border border-slate-100 rounded-2xl p-5 shadow-sm">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className={`p-2 rounded-lg bg-${card.color}-50 text-${card.color}-600`}>
                                         <card.icon className="w-5 h-5" />
@@ -147,19 +147,19 @@ const PaymentsPage = () => {
                                     <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{card.title}</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-bold text-slate-900 tracking-tight">{card.value}</span>
+                                    <span className="text-2xl font-bold text-text-primary tracking-tight">{card.value}</span>
                                 </div>
                             </motion.div>)}
                     </div>
 
                     {/* Content Section */}
-                    <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
+                    <div className="bg-background-primary border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
                         {/* Search & Tabs */}
                         <div className="p-6 border-b border-slate-50 bg-slate-50/30">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                 <div className="relative flex-1 max-w-md">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input type="text" placeholder={t("search_by_transaction_or_listing")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all" />
+                                    <input type="text" placeholder={t("search_by_transaction_or_listing")} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-11 pr-4 py-2.5 bg-background-primary border border-border-light rounded-2xl text-sm outline-none focus:border-primary focus:ring-4 focus:ring-indigo-50 transition-all" />
                                 </div>
                                 
                                 <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
@@ -172,7 +172,7 @@ const PaymentsPage = () => {
                 }, {
                   id: PAYMENT_DIRECTIONS.OUTGOING,
                   label: 'Outgoing'
-                }].map(tab => <button key={tab.id} onClick={() => setDirectionFilter(tab.id)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${directionFilter === tab.id ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                }].map(tab => <button key={tab.id} onClick={() => setDirectionFilter(tab.id)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${directionFilter === tab.id ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                                             {tab.label}
                                         </button>)}
                                 </div>

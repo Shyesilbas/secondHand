@@ -47,7 +47,7 @@ const SimilarListings = ({
   if (isLoading) {
     return <div className="border-t border-slate-100/80 pt-10 mt-10">
         <h3 className="text-sm font-medium text-text-primary mb-6 flex items-center gap-2">
-          <Compass className="w-4 h-4 text-indigo-500 animate-spin" />{t("finding_similar_listings")}</h3>
+          <Compass className="w-4 h-4 text-primary animate-spin" />{t("finding_similar_listings")}</h3>
         <SkeletonGrid count={4} columns="grid-cols-2 md:grid-cols-4 gap-4" />
       </div>;
   }
@@ -55,7 +55,7 @@ const SimilarListings = ({
   return <div className="border-t border-slate-100/80 pt-10 mt-10">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <span className="text-caption font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">{t("more_to_explore")}</span>
+          <span className="text-caption font-bold uppercase tracking-wider text-primary bg-indigo-50 px-2.5 py-1 rounded-full border border-primary/50">{t("more_to_explore")}</span>
           <h3 className="text-sm font-medium text-text-primary mt-2 flex items-center gap-2">{t("similar_listings")}</h3>
         </div>
       </div>

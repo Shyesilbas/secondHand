@@ -33,7 +33,7 @@ const AddressCard = ({
         return 'Other';
     }
   };
-  return <div className={`p-4 rounded-lg border shadow-sm bg-white transition-all hover:shadow-md ${address.mainAddress ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+  return <div className={`p-4 rounded-lg border shadow-sm bg-background-primary transition-all hover:shadow-md ${address.mainAddress ? 'border-primary bg-blue-50' : 'border-border-light'}`}>
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -55,19 +55,19 @@ const AddressCard = ({
         </div>
         
         <div className="flex items-center space-x-2 ml-4">
-          <button onClick={() => onEdit(address)} className="text-gray-500 hover:text-btn-primary transition-colors p-1" title={t("update_address")}>
+          <button onClick={() => onEdit(address)} className="text-text-muted hover:text-btn-primary transition-colors p-1" title={t("update_address")}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
           
-          <button onClick={() => onDelete(address.id, address.addressType)} className="text-gray-500 hover:text-red-500 transition-colors p-1" title={t("delete_address")}>
+          <button onClick={() => onDelete(address.id, address.addressType)} className="text-text-muted hover:text-status-error transition-colors p-1" title={t("delete_address")}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H8a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
           
-          {!address.mainAddress && <button onClick={() => onSelectAsMain(address.id)} className="text-xs px-2 py-1 border border-blue-500 text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors" title={t("set_as_main_address")}>{t("set_main")}</button>}
+          {!address.mainAddress && <button onClick={() => onSelectAsMain(address.id)} className="text-xs px-2 py-1 border border-primary text-blue-500 rounded hover:bg-blue-500 hover:text-white transition-colors" title={t("set_as_main_address")}>{t("set_main")}</button>}
         </div>
       </div>
     </div>;

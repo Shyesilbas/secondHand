@@ -35,9 +35,9 @@ const FilterRenderer = ({
           return <div key={field.key} className="space-y-2 min-w-0">
             <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{field.label}</label>
             <div className="flex items-center gap-2 min-w-0">
-              <input type="number" min={field.min} max={field.max} step={field.step} value={filters[minKey] ?? ''} onChange={e => handleNumericChange(minKey, e.target.value)} placeholder={t("min")} className="min-w-0 flex-1 w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all" />
+              <input type="number" min={field.min} max={field.max} step={field.step} value={filters[minKey] ?? ''} onChange={e => handleNumericChange(minKey, e.target.value)} placeholder={t("min")} className="min-w-0 flex-1 w-0 px-3 py-2 text-sm bg-slate-50 border border-border-light rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all" />
               <span className="flex-shrink-0 text-slate-300 text-sm font-medium">–</span>
-              <input type="number" min={field.min} max={field.max} step={field.step} value={filters[maxKey] ?? ''} onChange={e => handleNumericChange(maxKey, e.target.value)} placeholder={t("max")} className="min-w-0 flex-1 w-0 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all" />
+              <input type="number" min={field.min} max={field.max} step={field.step} value={filters[maxKey] ?? ''} onChange={e => handleNumericChange(maxKey, e.target.value)} placeholder={t("max")} className="min-w-0 flex-1 w-0 px-3 py-2 text-sm bg-slate-50 border border-border-light rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all" />
             </div>
           </div>;
         }
@@ -49,11 +49,11 @@ const FilterRenderer = ({
             <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{field.label}</label>
             <div className="grid grid-cols-2 gap-2">
               <div className="relative">
-                <input type="date" value={filters[minDateKey] ?? ''} onChange={e => onChange(minDateKey, e.target.value)} className="w-full pl-8 pr-2 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
+                <input type="date" value={filters[minDateKey] ?? ''} onChange={e => onChange(minDateKey, e.target.value)} className="w-full pl-8 pr-2 py-2 text-sm bg-slate-50 border border-border-light rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
                 <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
               </div>
               <div className="relative">
-                <input type="date" value={filters[maxDateKey] ?? ''} onChange={e => onChange(maxDateKey, e.target.value)} className="w-full pl-8 pr-2 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
+                <input type="date" value={filters[maxDateKey] ?? ''} onChange={e => onChange(maxDateKey, e.target.value)} className="w-full pl-8 pr-2 py-2 text-sm bg-slate-50 border border-border-light rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
                 <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
               </div>
             </div>
@@ -63,7 +63,7 @@ const FilterRenderer = ({
         return <div key={field.key} className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{field.label}</label>
             <div className="relative">
-              <input type="text" value={filters[field.key] ?? ''} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
+              <input type="text" value={filters[field.key] ?? ''} onChange={e => onChange(field.key, e.target.value)} placeholder={field.placeholder} className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-border-light rounded-lg focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400" />
               <Type className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
             </div>
           </div>;
@@ -86,7 +86,7 @@ const FilterRenderer = ({
                 value: false
               }].map(opt => {
                 const isActive = val === opt.value;
-                return <button key={opt.label} type="button" onClick={() => onChange(field.key, opt.value)} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}`}>
+                return <button key={opt.label} type="button" onClick={() => onChange(field.key, opt.value)} className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all duration-150 ${isActive ? 'bg-background-primary text-text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-background-primary/50'}`}>
                     {opt.label}
                   </button>;
               })}

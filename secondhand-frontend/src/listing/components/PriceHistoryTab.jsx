@@ -13,14 +13,14 @@ const StatItem = ({
   value,
   subtext,
   icon: Icon
-}) => <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm hover:border-slate-300 transition-colors duration-300">
+}) => <div className="rounded-lg border border-border-light bg-background-primary px-4 py-3 shadow-sm hover:border-slate-300 transition-colors duration-300">
     <div className="flex items-center justify-between gap-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <Icon className="w-4 h-4 text-slate-500 shrink-0" />
           <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider truncate">{title}</p>
         </div>
-        <p className="text-lg font-semibold text-slate-900 mt-1 tracking-tight truncate">{value}</p>
+        <p className="text-lg font-semibold text-text-primary mt-1 tracking-tight truncate">{value}</p>
         {subtext && <p className="text-xs text-slate-500 mt-1 truncate">{subtext}</p>}
       </div>
     </div>
@@ -163,37 +163,37 @@ const PriceHistoryTab = ({
     }];
   }, [currencyCode, stats]);
   if (error) {
-    return <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
-        <div className="mx-auto w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center mb-3">
+    return <div className="rounded-xl border border-border-light bg-background-primary p-6 text-center">
+        <div className="mx-auto w-10 h-10 rounded-lg bg-status-error-bg text-status-error flex items-center justify-center mb-3">
           <TrendingUp className="w-5 h-5" />
         </div>
-        <p className="text-sm font-semibold text-slate-900">{t("unable_to_load_price_history")}</p>
+        <p className="text-sm font-semibold text-text-primary">{t("unable_to_load_price_history")}</p>
         <p className="text-sm text-slate-500 mt-1">{t("please_try_again_later")}</p>
       </div>;
   }
   if (loading) {
-    return <div className="rounded-xl border border-slate-200 bg-white p-10 flex flex-col items-center justify-center">
-        <div className="w-10 h-10 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+    return <div className="rounded-xl border border-border-light bg-background-primary p-10 flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-2 border-primary border-t-indigo-600 rounded-full animate-spin" />
         <p className="text-sm text-slate-600 mt-4">{t("analyzing_price_trends")}</p>
       </div>;
   }
   if (!priceHistory || priceHistory.length === 0) {
-    return <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-        <div className="mx-auto w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3">
+    return <div className="rounded-xl border border-border-light bg-background-primary p-10 text-center">
+        <div className="mx-auto w-10 h-10 rounded-lg bg-indigo-50 text-primary flex items-center justify-center mb-3">
           <Clock className="w-5 h-5" />
         </div>
-        <p className="text-sm font-semibold text-slate-900">{t("no_price_history_yet")}</p>
+        <p className="text-sm font-semibold text-text-primary">{t("no_price_history_yet")}</p>
         <p className="text-sm text-slate-500 mt-1">{t("this_listing_hasn_t_had_any_price_change")}</p>
       </div>;
   }
   return <div className="space-y-5">
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-border-light bg-background-primary p-5 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {statItems.map(s => <StatItem key={s.title} {...s} />)}
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-background-primary rounded-xl border border-border-light shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
           <h3 className="text-sm font-medium text-text-primary">{t("price_evolution")}</h3>
         </div>
@@ -204,7 +204,7 @@ const PriceHistoryTab = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-background-primary rounded-xl border border-border-light shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
           <h3 className="text-sm font-medium text-text-primary">{t("price_history")}</h3>
         </div>
@@ -216,26 +216,26 @@ const PriceHistoryTab = ({
           const isUp = hasPct ? pctValue > 0 : false;
           const isDown = hasPct ? pctValue < 0 : false;
           const entryCurrency = getHistoryCurrency(entry, currencyCode) || currencyCode;
-          const badgeClass = isUp ? 'bg-red-50 text-red-700 border-red-100' : isDown ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-slate-200';
-          const dotClass = isUp ? 'bg-red-500' : isDown ? 'bg-emerald-500' : 'bg-indigo-500';
+          const badgeClass = isUp ? 'bg-status-error-bg text-red-700 border-red-100' : isDown ? 'bg-status-success-bg text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-700 border-border-light';
+          const dotClass = isUp ? 'bg-status-error-bg' : isDown ? 'bg-status-success-bg' : 'bg-indigo-500';
           return <div key={entry.id ?? idx} className="px-5 py-4 hover:bg-slate-50/40 transition-colors duration-300">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${dotClass} shrink-0`} />
-                      <p className="text-sm font-medium text-slate-900 truncate">{formatHistoryDateLabel(entry?.changeDate)}</p>
+                      <p className="text-sm font-medium text-text-primary truncate">{formatHistoryDateLabel(entry?.changeDate)}</p>
                     </div>
                     {entry?.oldPrice != null && <p className="text-xs text-slate-500 mt-1 truncate">{t("previous")}{formatCurrency(entry?.oldPrice, entryCurrency)}
                       </p>}
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-slate-900">{formatCurrency(entry?.newPrice, entryCurrency)}</p>
+                    <p className="text-sm font-semibold text-text-primary">{formatCurrency(entry?.newPrice, entryCurrency)}</p>
                     <div className="mt-2 flex justify-end">
                       {hasPct ? <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border ${badgeClass}`}>
                           {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : isDown ? <TrendingDown className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
                           {Math.abs(pctValue).toFixed(1)}%
-                        </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border bg-slate-50 text-slate-600 border-slate-200">
+                        </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border bg-slate-50 text-slate-600 border-border-light">
                           <Minus className="w-3.5 h-3.5" />
                           —
                         </span>}

@@ -60,7 +60,7 @@ const ChatRoomListItem = ({
                     </div>
 
                     <div className="flex items-center space-x-2 flex-shrink-0">
-                      {unreadCount > 0 && <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-indigo-600 rounded-full shadow-sm">
+                      {unreadCount > 0 && <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-primary rounded-full shadow-sm">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>}
                       {room.lastMessageTime && <span className="text-xs text-slate-500 whitespace-nowrap tracking-tight">
@@ -73,7 +73,7 @@ const ChatRoomListItem = ({
                         <button onClick={e => {
                   e.stopPropagation();
                   onListingClick(room.listingId, e);
-                }} className="text-xs text-slate-600 hover:text-slate-900 hover:underline transition-all duration-300 ease-in-out break-words tracking-tight">
+                }} className="text-xs text-slate-600 hover:text-text-primary hover:underline transition-all duration-300 ease-in-out break-words tracking-tight">
                           📦 {room.listingTitle}
                         </button>
                       </div>}
@@ -99,8 +99,8 @@ const ChatRoomListItem = ({
               <EllipsisVerticalIcon className="w-4 h-4" />
             </button>
 
-            {showOptions && <div className="absolute right-0 top-full mt-1 bg-white/95 backdrop-blur-md border border-slate-200/60 rounded-xl shadow-2xl z-10 min-w-[140px]">
-                  <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight">
+            {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary/95 backdrop-blur-md border border-border-light/60 rounded-xl shadow-2xl z-10 min-w-[140px]">
+                  <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error hover:bg-status-error-bg/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight">
                     <TrashIcon className="w-4 h-4" />
                     <span>{t("delete_chat")}</span>
                   </button>

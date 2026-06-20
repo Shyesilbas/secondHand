@@ -23,7 +23,7 @@ const GreatSellerRulesCallout = ({
   className = ''
 }) => {
   const { t } = useTranslation();
-  return <div className={`bg-white border border-slate-100 rounded-2xl p-6 sm:p-8 ${className}`}>
+  return <div className={`bg-background-primary border border-slate-100 rounded-2xl p-6 sm:p-8 ${className}`}>
     <div className="flex items-center gap-3 mb-8">
       <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center">
         <Info className="w-5 h-5 text-slate-400" />
@@ -41,10 +41,10 @@ const GreatSellerRulesCallout = ({
       body
     }, idx) => <div key={title} className="group relative">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-slate-50 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+            <div className="p-2 rounded-lg bg-slate-50 text-slate-500 group-hover:bg-indigo-50 group-hover:text-primary transition-colors">
               <Icon className="w-4 h-4" aria-hidden />
             </div>
-            <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">{title}</p>
+            <p className="text-xs font-bold text-text-primary uppercase tracking-wider">{title}</p>
           </div>
           <p className="text-body text-slate-500 leading-relaxed font-medium">{body}</p>
         </div>)}

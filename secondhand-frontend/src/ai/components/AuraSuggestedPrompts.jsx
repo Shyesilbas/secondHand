@@ -41,13 +41,13 @@ export default function AuraSuggestedPrompts({onPick, disabled = false, dense = 
             type="button"
             disabled={disabled}
             onClick={() => onPick(p.message)}
-            className={`group text-left rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:border-slate-400 hover:bg-slate-50/50 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none ${
+            className={`group text-left rounded-xl border border-border-light bg-background-primary transition-all duration-200 hover:border-slate-400 hover:bg-slate-50/50 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none ${
               dense ? 'p-3' : 'p-4'
             }`}
           >
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-slate-300 group-hover:bg-white flex items-center justify-center shrink-0 transition-all duration-200 shadow-sm">
-                <Icon className="w-4 h-4 text-slate-500 group-hover:text-slate-900 transition-colors duration-200" />
+              <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-slate-300 group-hover:bg-background-primary flex items-center justify-center shrink-0 transition-all duration-200 shadow-sm">
+                <Icon className="w-4 h-4 text-slate-500 group-hover:text-text-primary transition-colors duration-200" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className={`font-semibold text-slate-800 group-hover:text-slate-950 transition-colors ${

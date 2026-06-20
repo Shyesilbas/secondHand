@@ -102,7 +102,7 @@ const UserSearchBar = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onKeyDown={handleKeyDown} onFocus={() => query.length >= 2 && setIsVisible(true)} placeholder={t("search_user")} className="block w-full pl-10 pr-3 py-2 border border-sidebar-border rounded-md leading-5 bg-white text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-btn-primary sm:text-sm" />
+                <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onKeyDown={handleKeyDown} onFocus={() => query.length >= 2 && setIsVisible(true)} placeholder={t("search_user")} className="block w-full pl-10 pr-3 py-2 border border-sidebar-border rounded-md leading-5 bg-background-primary text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-btn-primary sm:text-sm" />
                 {query && <button onClick={() => {
         setQuery('');
         setResults([]);

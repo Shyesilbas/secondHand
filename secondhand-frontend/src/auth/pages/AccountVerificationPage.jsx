@@ -136,7 +136,7 @@ const AccountVerificationPage = () => {
     }
   };
   return <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center py-16 px-6">
-            <div className="max-w-md w-full bg-white rounded-3xl border border-stone-200/50 shadow-[0_8px_32px_rgba(28,25,23,0.02)] p-8 md:p-10 space-y-8 animate-fade-in">
+            <div className="max-w-md w-full bg-background-primary rounded-3xl border border-stone-200/50 shadow-[0_8px_32px_rgba(28,25,23,0.02)] p-8 md:p-10 space-y-8 animate-fade-in">
                 {/* Logo Monogram */}
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">
@@ -156,8 +156,8 @@ const AccountVerificationPage = () => {
                 </div>
 
                 {/* Soft Custom Alert */}
-                {!codeSent && <div className="p-4 rounded-xl border border-amber-100 bg-amber-50/20 text-xs text-amber-800 leading-normal flex items-start gap-3">
-                        <WarningIcon className="w-4.5 h-4.5 shrink-0 text-amber-600 mt-0.5" />
+                {!codeSent && <div className="p-4 rounded-xl border border-amber-100 bg-status-warning-bg/20 text-xs text-amber-800 leading-normal flex items-start gap-3">
+                        <WarningIcon className="w-4.5 h-4.5 shrink-0 text-status-warning mt-0.5" />
                         <div>
                             <span className="font-semibold block mb-0.5">{t("account_unverified")}</span>
                             <span>{t("verify_your_account_to_enjoy_safe_buying")}</span>
@@ -176,7 +176,7 @@ const AccountVerificationPage = () => {
                             
                             {/* Segmented OTP code boxes */}
                             <div className="flex gap-2.5 justify-center" onPaste={handlePaste}>
-                                {otp.map((digit, idx) => <input key={idx} ref={inputRefs[idx]} type="text" maxLength={1} value={digit} onChange={e => handleOtpChange(idx, e.target.value)} onKeyDown={e => handleKeyDown(idx, e)} className="w-12 h-14 text-center text-xl font-mono font-semibold rounded-xl bg-stone-100/40 border border-stone-200/60 focus:bg-white focus:border-stone-900 focus:ring-4 focus:ring-stone-900/5 transition-all outline-none" />)}
+                                {otp.map((digit, idx) => <input key={idx} ref={inputRefs[idx]} type="text" maxLength={1} value={digit} onChange={e => handleOtpChange(idx, e.target.value)} onKeyDown={e => handleKeyDown(idx, e)} className="w-12 h-14 text-center text-xl font-mono font-semibold rounded-xl bg-stone-100/40 border border-stone-200/60 focus:bg-background-primary focus:border-stone-900 focus:ring-4 focus:ring-stone-900/5 transition-all outline-none" />)}
                             </div>
 
                             {errors.code && <div className="p-3 rounded-xl bg-rose-50/50 border border-rose-100 text-xs text-rose-600 leading-normal flex items-start gap-2">
@@ -193,7 +193,7 @@ const AccountVerificationPage = () => {
 
                         <div className="flex gap-3">
                             <AuthButton type="submit" isLoading={isLoading} disabled={isLoading || otp.join('').length !== 6} className="flex-[2]">{t("verify_account")}</AuthButton>
-                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="flex-1 py-3 px-4 border border-stone-200 hover:border-stone-300 rounded-xl text-xs font-semibold text-stone-500 hover:text-stone-850 active:scale-95 bg-white transition-all">{t("cancel")}</button>
+                            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="flex-1 py-3 px-4 border border-stone-200 hover:border-stone-300 rounded-xl text-xs font-semibold text-stone-500 hover:text-stone-850 active:scale-95 bg-background-primary transition-all">{t("cancel")}</button>
                         </div>
                     </form>}
 

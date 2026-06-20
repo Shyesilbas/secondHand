@@ -57,7 +57,7 @@ const ProtectedRoute = ({
   }, [isAuthenticated, isLoading, location, navigate, notification]);
   if (isLoading) {
     return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 <p className="text-sm text-slate-500">{t("verifying_authentication")}</p>
             </div>;
   }

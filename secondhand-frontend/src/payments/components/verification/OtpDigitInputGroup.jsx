@@ -90,8 +90,8 @@ const OtpDigitInputGroup = ({
               className={`w-11 h-12 text-center text-base font-mono rounded-xl transition-all duration-150 focus:outline-none ${
                 disabled ? 'opacity-50 cursor-not-allowed border border-slate-100 bg-slate-50 text-slate-400' :
                 hasValue
-                  ? 'border-indigo-600 bg-indigo-600 text-white border'
-                  : 'border border-slate-200 bg-white text-slate-900 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100'
+                  ? 'border-primary bg-primary text-white border'
+                  : 'border border-border-light bg-background-primary text-text-primary focus:border-primary focus:ring-4 focus:ring-indigo-100'
               }`}
               maxLength={1}
               data-otp-slot={`${dataSlotPrefix}-${index}`}
@@ -104,7 +104,7 @@ const OtpDigitInputGroup = ({
         {Array.from({length: OTP_CODE_LENGTH}, (_, i) => (
           <div
             key={i}
-            className={`w-1 h-1 rounded-full transition-colors ${i < filledCount ? 'bg-gray-900' : 'bg-gray-200'}`}
+            className={`w-1 h-1 rounded-full transition-colors ${i < filledCount ? 'bg-gray-900' : 'bg-tertiary'}`}
           />
         ))}
       </div>

@@ -72,11 +72,11 @@ const AddToListModal = ({
             <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose} />
                 
-                <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scaleIn">
+                <div className="relative bg-background-primary rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scaleIn">
                     <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex items-start gap-3 flex-1 min-w-0">
-                                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                                <div className="w-12 h-12 bg-background-primary/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
                                     <List className="w-6 h-6 text-white" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -86,7 +86,7 @@ const AddToListModal = ({
                                     </p>
                                 </div>
                             </div>
-                            <button type="button" onClick={onClose} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0" aria-label={t("close")}>
+                            <button type="button" onClick={onClose} className="w-8 h-8 rounded-lg bg-background-primary/10 hover:bg-background-primary/20 flex items-center justify-center transition-colors flex-shrink-0" aria-label={t("close")}>
                                 <X className="w-5 h-5 text-white" />
                             </button>
                         </div>
@@ -94,34 +94,34 @@ const AddToListModal = ({
 
                     <div className="p-6 max-h-[60vh] overflow-y-auto">
                         {listsLoading ? <div className="flex flex-col items-center justify-center py-12">
-                                <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-                                <p className="text-sm text-gray-500">{t("loading_lists")}</p>
+                                <Loader2 className="w-8 h-8 animate-spin text-primary mb-3" />
+                                <p className="text-sm text-text-muted">{t("loading_lists")}</p>
                             </div> : myLists.length === 0 ? <div className="text-center py-12">
                                 <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <List className="w-10 h-10 text-indigo-500" />
+                                    <List className="w-10 h-10 text-primary" />
                                 </div>
                                 <h3 className="text-sm font-medium text-text-primary mb-2">{t("no_lists_yet")}</h3>
-                                <p className="text-sm text-gray-500 mb-6">{t("create_your_first_list_to_organize_saved")}</p>
+                                <p className="text-sm text-text-muted mb-6">{t("create_your_first_list_to_organize_saved")}</p>
                                 <button type="button" onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl">
                                     <Plus className="w-5 h-5" />{t("create_your_first_list")}</button>
                             </div> : <div className="space-y-3">
-                                <p className="text-sm font-medium text-gray-700 mb-4">{t("your_lists")} ({myLists.length})
+                                <p className="text-sm font-medium text-text-secondary mb-4">{t("your_lists")} ({myLists.length})
                                 </p>
                                 {myLists.map(list => {
               const isInList = containingListIds.includes(list.id);
               const isProcessing = (addMutation.isPending || removeMutation.isPending) && (addMutation.variables?.listId === list.id || removeMutation.variables?.listId === list.id);
-              return <button type="button" key={list.id} onClick={() => handleToggleList(list.id)} disabled={isProcessing} className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all group ${isInList ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'} ${isProcessing ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}>
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isInList ? 'bg-indigo-500 shadow-md' : 'bg-gray-100 group-hover:bg-indigo-100'}`}>
-                                                {isProcessing ? <Loader2 className={`w-6 h-6 animate-spin ${isInList ? 'text-white' : 'text-indigo-500'}`} /> : isInList ? <Check className="w-6 h-6 text-white" strokeWidth={3} /> : <Plus className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />}
+              return <button type="button" key={list.id} onClick={() => handleToggleList(list.id)} disabled={isProcessing} className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all group ${isInList ? 'border-primary bg-indigo-50 shadow-sm' : 'border-border-light hover:border-primary hover:bg-secondary'} ${isProcessing ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}>
+                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isInList ? 'bg-indigo-500 shadow-md' : 'bg-tertiary group-hover:bg-indigo-100'}`}>
+                                                {isProcessing ? <Loader2 className={`w-6 h-6 animate-spin ${isInList ? 'text-white' : 'text-primary'}`} /> : isInList ? <Check className="w-6 h-6 text-white" strokeWidth={3} /> : <Plus className="w-6 h-6 text-text-muted group-hover:text-primary transition-colors" />}
                                             </div>
                                             <div className="flex-1 text-left min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <p className={`font-semibold truncate ${isInList ? 'text-indigo-900' : 'text-gray-900'}`}>
+                                                    <p className={`font-semibold truncate ${isInList ? 'text-primary' : 'text-text-primary'}`}>
                                                         {list.name}
                                                     </p>
-                                                    {list.isPublic ? <Globe className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" /> : <Lock className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />}
+                                                    {list.isPublic ? <Globe className="w-3.5 h-3.5 text-text-muted flex-shrink-0" /> : <Lock className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />}
                                                 </div>
-                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex items-center gap-3 text-xs text-text-muted">
                                                     <span className="flex items-center gap-1">
                                                         <Package className="w-3.5 h-3.5" />
                                                         {list.itemCount || 0}{' '}

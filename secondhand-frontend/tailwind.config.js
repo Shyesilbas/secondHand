@@ -32,8 +32,8 @@ export default {
           DEFAULT: theme.colors.secondary.DEFAULT,
         },
         accent: {
-          indigo: theme.colors.accent.indigo,
-          emerald: theme.colors.accent.emerald,
+          teal: theme.colors.accent.teal,
+          slate: theme.colors.accent.slate,
           amber: theme.colors.accent.amber,
         },
         background: theme.colors.background,
@@ -52,7 +52,7 @@ export default {
         'auth-bg': theme.colors.background.tertiary,
 
         'text-primary': theme.colors.text.primary,
-        'text-price': theme.colors.accent.emerald.DEFAULT,
+        'text-price': theme.colors.accent.teal.DEFAULT,
         'text-secondary': theme.colors.text.secondary,
         'text-muted': theme.colors.text.muted,
 
@@ -72,7 +72,7 @@ export default {
         'card-text-primary': theme.colors.text.primary,
         'card-text-secondary': theme.colors.text.secondary,
         'card-text-muted': theme.colors.text.muted,
-        'highlight': theme.colors.accent.emerald.DEFAULT,
+        'highlight': theme.colors.accent.teal.DEFAULT,
         'warning-bg': theme.colors.status.warning.bg,
         'warning-border': theme.colors.status.warning.border,
         'warning-text': theme.colors.status.warning.text,

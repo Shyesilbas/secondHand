@@ -66,9 +66,9 @@ const AgreementsPage = () => {
     return agreements.filter(a => requiredIds.has(a.agreementId));
   }, [agreements, requiredIds]);
   const activeCat = CATEGORIES.find(c => c.key === category);
-  return <div className="min-h-screen bg-gray-50/80">
+  return <div className="min-h-screen bg-secondary/80">
             {/* ── Page Header ─────────────────────────────────── */}
-            <div className="bg-white border-b border-gray-200/80">
+            <div className="bg-background-primary border-b border-border-light/80">
                 <PageContainer narrow className="py-8">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center shadow-lg shadow-gray-900/10">
@@ -76,7 +76,7 @@ const AgreementsPage = () => {
                         </div>
                         <div>
                             <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("legal_agreements")}</h1>
-                            <p className="text-sm text-gray-500 mt-0.5">{t("review_and_accept_required_legal_documen")}</p>
+                            <p className="text-sm text-text-muted mt-0.5">{t("review_and_accept_required_legal_documen")}</p>
                         </div>
                     </div>
                 </PageContainer>
@@ -87,23 +87,23 @@ const AgreementsPage = () => {
 
                     {/* ── Left: Category Sidebar ──────────────── */}
                     <div className="lg:w-64 shrink-0">
-                        <nav className="bg-white rounded-2xl border border-gray-200 overflow-hidden lg:sticky lg:top-6">
+                        <nav className="bg-background-primary rounded-2xl border border-border-light overflow-hidden lg:sticky lg:top-6">
                             <div className="px-4 py-3 border-b border-gray-100">
-                                <span className="text-caption font-semibold text-gray-400 uppercase tracking-wider">{t("category")}</span>
+                                <span className="text-caption font-semibold text-text-muted uppercase tracking-wider">{t("category")}</span>
                             </div>
                             <div className="p-2">
                                 {CATEGORIES.map(cat => {
                 const Icon = cat.icon;
                 const isActive = category === cat.key;
-                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-white/15' : 'bg-gray-100'}`}>
+                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary hover:text-text-primary'}`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-background-primary/15' : 'bg-tertiary'}`}>
                                                 <Icon className="w-4 h-4" />
                                             </div>
                                             <div className="min-w-0">
-                                                <div className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-900'}`}>
+                                                <div className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-text-primary'}`}>
                                                     {cat.label}
                                                 </div>
-                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
+                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-text-muted'}`}>
                                                     {cat.description}
                                                 </div>
                                             </div>
@@ -115,26 +115,26 @@ const AgreementsPage = () => {
 
                     {/* ── Right: Content Panel ────────────────── */}
                     <div className="flex-1 min-w-0">
-                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                        <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden">
                             <div className="px-6 py-5 border-b border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
-                                            <activeCat.icon className="w-4.5 h-4.5 text-gray-600" />
+                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-tertiary flex items-center justify-center">
+                                            <activeCat.icon className="w-4.5 h-4.5 text-text-secondary" />
                                         </div>}
                                     <div>
                                         <h2 className="text-lg font-semibold text-text-primary">{activeCat?.label}{t("agreements")}</h2>
-                                        <p className="text-xs text-gray-500 mt-0.5">{activeCat?.description}</p>
+                                        <p className="text-xs text-text-muted mt-0.5">{activeCat?.description}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="p-6">
                                 {!loading && requiredIds.size === 0 ? <div className="py-12 text-center">
-                                        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                                            <FileText className="w-6 h-6 text-gray-400" />
+                                        <div className="w-14 h-14 rounded-2xl bg-tertiary flex items-center justify-center mx-auto mb-4">
+                                            <FileText className="w-6 h-6 text-text-muted" />
                                         </div>
-                                        <p className="text-sm font-semibold text-gray-900">{t("no_required_agreements")}</p>
-                                        <p className="text-sm text-gray-500 mt-1">{t("this_section_has_no_required_agreements_")}</p>
+                                        <p className="text-sm font-semibold text-text-primary">{t("no_required_agreements")}</p>
+                                        <p className="text-sm text-text-muted mt-1">{t("this_section_has_no_required_agreements_")}</p>
                                     </div> : <AgreementsList agreements={filteredAgreements} userAgreements={userAgreements} loading={loading} filter={filter} setFilter={setFilter} onAccepted={() => {
                 if (refetchUserAgreements) refetchUserAgreements();
               }} />}

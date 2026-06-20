@@ -31,10 +31,10 @@ const TrustExperienceSection = () => {
   const {
     t
   } = useTranslation();
-  return <section className="py-16 bg-white border-t border-slate-100">
+  return <section className="py-16 bg-background-primary border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="max-w-2xl mb-12">
-          <p className="text-caption font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">{t("built_in_protection")}</p>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-status-success mb-2">{t("built_in_protection")}</p>
           <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("real_product_capabilities_ensuring_safe_")}</h2>
           <p className="text-slate-500 text-sm mt-3 leading-relaxed font-medium">{t("we_prioritize_real_working_technology_ov")}</p>
         </div>
@@ -42,10 +42,10 @@ const TrustExperienceSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TRUST_FEATURES.map(feat => {
           const Icon = feat.icon;
-          return <div key={feat.title} className="group border border-slate-100 rounded-2xl p-6 bg-slate-50/30 transition-all duration-200 hover:bg-white hover:border-slate-200/80 hover:shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between">
+          return <div key={feat.title} className="group border border-slate-100 rounded-2xl p-6 bg-slate-50/30 transition-all duration-200 hover:bg-background-primary hover:border-border-light/80 hover:shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center transition-colors group-hover:bg-status-success-bg group-hover:text-status-success">
                       <Icon className="w-5 h-5 shrink-0" />
                     </div>
                     <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100/50 px-2 py-0.5 rounded border border-slate-100">

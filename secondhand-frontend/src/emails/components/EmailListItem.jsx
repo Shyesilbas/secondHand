@@ -45,7 +45,7 @@ const EmailListItem = ({
       e.preventDefault();
       onSelect(email);
     }
-  }} className={`group relative cursor-pointer border-b border-[#edebe9] transition-colors ${isSelected ? 'bg-[#e3f2fd] pl-0' : 'bg-white hover:bg-[#faf9f8]'}`} style={isSelected ? {
+  }} className={`group relative cursor-pointer border-b border-[#edebe9] transition-colors ${isSelected ? 'bg-[#e3f2fd] pl-0' : 'bg-background-primary hover:bg-[#faf9f8]'}`} style={isSelected ? {
     borderLeft: '3px solid #0078d4'
   } : {
     borderLeft: '3px solid transparent'

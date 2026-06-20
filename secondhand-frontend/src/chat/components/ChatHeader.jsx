@@ -46,9 +46,9 @@ const ChatHeader = ({
   const getHeaderName = () => selectedChatRoom?.otherParticipantName || selectedChatRoom?.title || 'Chat';
   const listingLabel = selectedChatRoom?.listingTitle || '';
   const profileId = selectedChatRoom?.otherParticipantId;
-  return <div className="flex items-center justify-between p-4 border-b border-slate-200/60 bg-white/80 backdrop-blur-md text-slate-900 flex-shrink-0">
+  return <div className="flex items-center justify-between p-4 border-b border-border-light/60 bg-background-primary/80 backdrop-blur-md text-text-primary flex-shrink-0">
       <div className="flex items-center space-x-4">
-        <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-slate-400'}`}></div>
+        <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-text-muted'}`}></div>
         <div>
           {profileId ? <button type="button" onClick={handleUserClick} className="font-bold text-base hover:text-slate-700 transition-all duration-300 ease-in-out tracking-tight" title={t("view_user_profile")}>
             {getHeaderName()}
@@ -63,17 +63,17 @@ const ChatHeader = ({
       </div>
       <div className="flex items-center space-x-2">
         {onDeleteConversation && <div className="relative">
-          <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl" title={t("options")}>
+          <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-slate-600 hover:text-text-primary hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl" title={t("options")}>
             <EllipsisVerticalIcon className="w-5 h-5" />
           </button>
-          {showOptions && <div className="absolute right-0 top-full mt-1 bg-white/95 backdrop-blur-md border border-slate-200/60 rounded-xl shadow-2xl z-10 min-w-[150px]">
-              <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight">
+          {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary/95 backdrop-blur-md border border-border-light/60 rounded-xl shadow-2xl z-10 min-w-[150px]">
+              <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error hover:bg-status-error-bg/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight">
                 <TrashIcon className="w-4 h-4" />
                 <span>{t("delete_chat")}</span>
               </button>
             </div>}
         </div>}
-        <button type="button" onClick={onClose} className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl">
+        <button type="button" onClick={onClose} className="text-slate-600 hover:text-text-primary hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl">
           <XMarkIcon className="w-5 h-5" />
         </button>
       </div>

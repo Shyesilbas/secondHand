@@ -50,18 +50,18 @@ const NotificationModal = ({
       case 'success':
         return {
           icon: CheckCircle2,
-          iconWrap: 'bg-emerald-100 text-emerald-600',
-          heading: 'text-slate-900',
+          iconWrap: 'bg-status-success-bg text-status-success',
+          heading: 'text-text-primary',
           text: 'text-slate-500',
-          primaryButton: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+          primaryButton: 'bg-status-success-bg hover:bg-status-success-bg text-white',
           secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
-          progress: 'bg-emerald-500'
+          progress: 'bg-status-success-bg'
         };
       case 'error':
         return {
           icon: XCircle,
           iconWrap: 'bg-rose-100 text-rose-600',
-          heading: 'text-slate-900',
+          heading: 'text-text-primary',
           text: 'text-slate-500',
           primaryButton: 'bg-rose-600 hover:bg-rose-700 text-white',
           secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
@@ -70,21 +70,21 @@ const NotificationModal = ({
       case 'warning':
         return {
           icon: AlertTriangle,
-          iconWrap: 'bg-amber-100 text-amber-600',
-          heading: 'text-slate-900',
+          iconWrap: 'bg-status-warning-bg text-status-warning',
+          heading: 'text-text-primary',
           text: 'text-slate-500',
-          primaryButton: 'bg-amber-600 hover:bg-amber-700 text-white',
+          primaryButton: 'bg-status-warning-bg hover:bg-status-warning-bg text-white',
           secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
-          progress: 'bg-amber-500'
+          progress: 'bg-status-warning-bg'
         };
       case 'info':
       default:
         return {
           icon: Info,
-          iconWrap: 'bg-indigo-100 text-indigo-600',
-          heading: 'text-slate-900',
+          iconWrap: 'bg-indigo-100 text-primary',
+          heading: 'text-text-primary',
           text: 'text-slate-500',
-          primaryButton: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+          primaryButton: 'bg-primary hover:bg-indigo-700 text-white',
           secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
           progress: 'bg-indigo-500'
         };
@@ -106,7 +106,7 @@ const NotificationModal = ({
   };
   if (!isOpen && !isVisible) return null;
   return <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center z-[80] p-4" onClick={handleBackdropClick}>
-            <div className={`relative bg-white rounded-3xl border border-slate-200 shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${isLeaving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+            <div className={`relative bg-background-primary rounded-3xl border border-border-light shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${isLeaving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 {/* Close button */}
                 {showCloseButton && <div className="absolute right-4 top-4 z-10">
                         <button type="button" className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center" onClick={handleClose}>
@@ -133,7 +133,7 @@ const NotificationModal = ({
                                 </div>}
                             {details && <details className="mt-3">
                                     <summary className={`cursor-pointer text-sm font-semibold ${config.heading} hover:underline`}>{t("show_details")}</summary>
-                                    <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-border-light">
                                         <pre className="text-xs text-slate-600 whitespace-pre-wrap font-mono">
                                             {typeof details === 'object' ? JSON.stringify(details, null, 2) : details}
                                         </pre>

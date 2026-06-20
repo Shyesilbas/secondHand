@@ -26,7 +26,7 @@ const EmailContent = ({
   const formatDate = dateString => formatDateTime(dateString);
   if (!email) return null;
   const initials = senderInitials(email.senderEmail);
-  return <div className="flex h-full min-h-0 flex-col bg-white">
+  return <div className="flex h-full min-h-0 flex-col bg-background-primary">
             {/* Üst: konu + araç (Outlook’ta sağda sil vb.) */}
             <header className="shrink-0 border-b px-4 py-4 sm:px-6 lg:px-8 lg:py-5" style={{
       borderColor: MS_BORDER,
@@ -74,7 +74,7 @@ const EmailContent = ({
             </header>
 
             {/* Gövde: render full HTML inside an iframe to prevent CSS bleeding */}
-            <div className="min-h-0 flex-1 bg-white relative">
+            <div className="min-h-0 flex-1 bg-background-primary relative">
                 <iframe srcDoc={email.content} title={t("email_content")} className="absolute inset-0 w-full h-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
             </div>
         </div>;

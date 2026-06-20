@@ -73,7 +73,7 @@ const CheckoutVerificationStep = ({
           <p className="mt-1.5 text-sm text-slate-500 font-medium">
             {`Enter the ${OTP_CODE_LENGTH}-digit code sent to your email.`}
           </p>
-          {ttlActive && <p className={`mt-2.5 text-xs font-semibold tracking-wide uppercase tabular-nums ${ttlExpired ? 'text-red-600' : 'text-slate-400'}`}>
+          {ttlActive && <p className={`mt-2.5 text-xs font-semibold tracking-wide uppercase tabular-nums ${ttlExpired ? 'text-status-error' : 'text-slate-400'}`}>
               {ttlExpired ? 'Code expired — request a new one.' : `Expires in ${ttlFormatted}`}
             </p>}
         </div>
@@ -88,7 +88,7 @@ const CheckoutVerificationStep = ({
           <OtpDigitInputGroup value={paymentVerificationCode} onChange={setPaymentVerificationCode} dataSlotPrefix="checkout-otp" disabled={!!isCheckingOut || ttlExpired} />
 
           <div className="mt-4 text-center">
-            <button type="button" onClick={handleResendCode} disabled={!canResend || isResending} className={`text-xs font-bold uppercase tracking-wider transition-colors ${canResend && !isResending ? 'text-slate-500 underline underline-offset-4 hover:text-slate-900' : 'cursor-not-allowed text-slate-300'}`}>
+            <button type="button" onClick={handleResendCode} disabled={!canResend || isResending} className={`text-xs font-bold uppercase tracking-wider transition-colors ${canResend && !isResending ? 'text-slate-500 underline underline-offset-4 hover:text-text-primary' : 'cursor-not-allowed text-slate-300'}`}>
               {isResending ? 'Sending…' : canResend ? 'Resend code' : `Resend in ${resendTimer}s`}
             </button>
           </div>
@@ -112,13 +112,13 @@ const CheckoutVerificationStep = ({
 
       {/* Back link — desktop */}
       <div className="mt-6 hidden border-t border-slate-100 pt-6 sm:block">
-        <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900">
+        <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-text-primary">
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
       </div>
 
       {/* Back — mobile */}
       <div className="mt-6 border-t border-slate-100 pt-5 sm:hidden">
-        <button type="button" onClick={onBack} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
+        <button type="button" onClick={onBack} className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition-all hover:bg-slate-50">
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
       </div>
     </div>;

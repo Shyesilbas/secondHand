@@ -84,19 +84,19 @@ const OrderSuccessPage = () => {
         <div className="absolute -top-32 -right-24 h-[420px] w-[420px] rounded-full bg-indigo-200/40 blur-3xl" style={{
         animation: 'successOrb1 14s ease-in-out infinite'
       }} />
-        <div className="absolute -bottom-40 -left-28 h-[380px] w-[380px] rounded-full bg-emerald-200/35 blur-3xl" style={{
+        <div className="absolute -bottom-40 -left-28 h-[380px] w-[380px] rounded-full bg-status-success-bg/35 blur-3xl" style={{
         animation: 'successOrb2 18s ease-in-out infinite'
       }} />
       </div>
 
       <PageContainer narrow className="py-10 relative z-10">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_20px_70px_-26px_rgba(15,23,42,0.45)] overflow-hidden">
+        <div className="bg-background-primary rounded-3xl border border-border-light shadow-[0_20px_70px_-26px_rgba(15,23,42,0.45)] overflow-hidden">
           <div className="px-6 py-7 border-b border-slate-100 text-center bg-gradient-to-b from-emerald-50/90 to-white relative">
             <div className="relative inline-flex items-center justify-center mx-auto mb-4">
               <span className="absolute inline-flex h-20 w-20 rounded-full border-2 border-emerald-400/50" style={{
               animation: 'successRing 2s ease-out infinite'
             }} />
-              <div className="relative w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm" style={{
+              <div className="relative w-16 h-16 rounded-2xl bg-status-success-bg text-status-success flex items-center justify-center shadow-sm" style={{
               animation: 'successIconIn 0.55s ease-out both'
             }}>
                 <CheckCircle2 className="w-8 h-8" strokeWidth={2} />
@@ -128,7 +128,7 @@ const OrderSuccessPage = () => {
 
             <div className="rounded-2xl border border-slate-100 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Package className="w-4 h-4 text-indigo-600" />
+                <Package className="w-4 h-4 text-primary" />
                 <p className="text-sm font-semibold text-slate-800">{t("order_details")}</p>
               </div>
               {loading && itemCount > 0 && itemTitles.length === 0 ? <p className="text-sm text-slate-500">{t("loading_details")}</p> : <div className="space-y-2 text-sm text-slate-600">
@@ -138,7 +138,7 @@ const OrderSuccessPage = () => {
                       {itemCount}
                       {itemTitles.length === 1 && <span className="text-slate-600"> — {itemTitles[0]}</span>}
                     </p>
-                    {itemTitles.length > 1 && <ul className="mt-1.5 ml-0.5 space-y-0.5 border-l-2 border-indigo-100 pl-3 text-slate-600">
+                    {itemTitles.length > 1 && <ul className="mt-1.5 ml-0.5 space-y-0.5 border-l-2 border-primary pl-3 text-slate-600">
                         {itemTitles.map((title, i) => <li key={i}>{title}</li>)}
                       </ul>}
                     {itemCount > 0 && itemTitles.length === 0 && !loading && <p className="text-xs text-slate-400 mt-1">{t("line_items_are_unavailable_for_this_orde")}</p>}
@@ -150,9 +150,9 @@ const OrderSuccessPage = () => {
                   {deliveryMethod === 'SAFE_MEETUP' && <div className="space-y-2 mt-3 pt-3 border-t border-slate-100">
                       <p className="flex items-center gap-1.5 text-slate-800">
                         <span className="font-semibold text-slate-700">{t("bulu_ma_konumu")}</span>{' '}
-                        <span className="font-medium bg-slate-100 px-2 py-0.5 rounded text-indigo-700">{order?.meetupLocation || state?.meetupLocation || 'Belirtilmemiş'}</span>
+                        <span className="font-medium bg-slate-100 px-2 py-0.5 rounded text-primary">{order?.meetupLocation || state?.meetupLocation || 'Belirtilmemiş'}</span>
                       </p>
-                      <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-800 leading-relaxed font-medium">
+                      <div className="p-3 bg-indigo-50 border border-primary rounded-xl text-xs text-primary leading-relaxed font-medium">
                         🔒 <strong>{t("g_venli_teslimat_hat_rlatmas")}</strong>{t("bulu_ma_noktas_na_vard_n_zda_sat_c_ya")}<strong>{t("sipari_lerim")}</strong>{t("sayfas_ndan_eri_ebilece_iniz_6_haneli_do")}<strong>{t("4_i_g_n")}</strong>{t("s_reniz_bulunmaktad_r")}</div>
                     </div>}
                 </div>}
@@ -163,14 +163,14 @@ const OrderSuccessPage = () => {
               state: {
                 focusOrderId: orderId
               }
-            })} className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
-                  <Receipt className="w-4 h-4" />{t("view_order")}</button> : <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+            })} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+                  <Receipt className="w-4 h-4" />{t("view_order")}</button> : <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
                   <Receipt className="w-4 h-4" />{t("my_orders")}</Link>}
 
-              <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+              <Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
                 <ShoppingBag className="w-4 h-4" />{t("all_orders")}</Link>
 
-              <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">{t("continue_shopping")}</Link>
+              <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">{t("continue_shopping")}</Link>
             </div>
           </div>
         </div>

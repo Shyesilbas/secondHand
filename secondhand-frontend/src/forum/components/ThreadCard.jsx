@@ -7,14 +7,14 @@ import {
 import {formatForumDate} from '../utils/forumDateFormat.js';
 
 const categoryMeta = {
-  [FORUM_CATEGORIES.SUGGESTIONS]: {label: 'Suggestion', icon: Lightbulb, color: 'text-amber-600 bg-amber-50 border-amber-200'},
-  [FORUM_CATEGORIES.COMPLAINTS]: {label: 'Complaint', icon: AlertTriangle, color: 'text-red-600 bg-red-50 border-red-200'},
+  [FORUM_CATEGORIES.SUGGESTIONS]: {label: 'Suggestion', icon: Lightbulb, color: 'text-status-warning bg-status-warning-bg border-amber-200'},
+  [FORUM_CATEGORIES.COMPLAINTS]: {label: 'Complaint', icon: AlertTriangle, color: 'text-status-error bg-status-error-bg border-red-200'},
 };
 
 const statusMeta = {
   [FORUM_THREAD_STATUSES.OPEN]: {
     label: 'Open',
-    dot: 'bg-emerald-500',
+    dot: 'bg-status-success-bg',
   },
   [FORUM_THREAD_STATUSES.IN_PROGRESS]: {
     label: 'In Progress',
@@ -27,18 +27,18 @@ const statusMeta = {
 };
 
 export const ThreadCardSkeleton = () => (
-  <div className="rounded-xl border border-gray-200 bg-white p-4 animate-pulse">
+  <div className="rounded-xl border border-border-light bg-background-primary p-4 animate-pulse">
     <div className="flex items-center gap-2 mb-3">
-      <div className="h-5 w-16 bg-gray-200 rounded-full" />
-      <div className="h-4 w-12 bg-gray-200 rounded" />
+      <div className="h-5 w-16 bg-tertiary rounded-full" />
+      <div className="h-4 w-12 bg-tertiary rounded" />
     </div>
-    <div className="h-5 bg-gray-200 rounded w-5/6 mb-2" />
-    <div className="h-4 bg-gray-100 rounded w-full mb-1" />
-    <div className="h-4 bg-gray-100 rounded w-3/4" />
+    <div className="h-5 bg-tertiary rounded w-5/6 mb-2" />
+    <div className="h-4 bg-tertiary rounded w-full mb-1" />
+    <div className="h-4 bg-tertiary rounded w-3/4" />
     <div className="mt-4 flex items-center gap-4">
-      <div className="h-4 w-10 bg-gray-200 rounded" />
-      <div className="h-4 w-10 bg-gray-200 rounded" />
-      <div className="h-4 w-16 bg-gray-200 rounded ml-auto" />
+      <div className="h-4 w-10 bg-tertiary rounded" />
+      <div className="h-4 w-10 bg-tertiary rounded" />
+      <div className="h-4 w-16 bg-tertiary rounded ml-auto" />
     </div>
   </div>
 );
@@ -58,10 +58,10 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
     <button
       type="button"
       onClick={() => onSelect?.(thread?.id)}
-      className={`group w-full text-left rounded-xl border bg-white transition-all duration-200 ${
+      className={`group w-full text-left rounded-xl border bg-background-primary transition-all duration-200 ${
         isSelected
           ? 'border-violet-300 ring-2 ring-violet-500/10 shadow-md shadow-violet-500/5'
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+          : 'border-border-light hover:border-border-DEFAULT hover:shadow-sm'
       }`}
     >
       <div className="p-4">
@@ -72,7 +72,7 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
               <CatIcon className="w-3 h-3" />
               {catMeta.label}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-caption text-gray-400 font-medium">
+            <span className="inline-flex items-center gap-1.5 text-caption text-text-muted font-medium">
               <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
               {statusInfo.label}
             </span>
@@ -85,7 +85,7 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
         </h3>
 
         {/* Description preview */}
-        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+        <p className="text-sm text-text-muted line-clamp-2 leading-relaxed">
           {thread?.description || ''}
         </p>
 
@@ -94,26 +94,26 @@ export const ThreadCard = ({thread, isSelected, onSelect, reaction}) => {
           <div className="flex items-center gap-3">
             {/* Vote display */}
             <div className="inline-flex items-center gap-0.5 text-xs">
-              <ChevronUp className={`w-3.5 h-3.5 ${isLiked ? 'text-violet-600' : 'text-gray-400'}`} />
+              <ChevronUp className={`w-3.5 h-3.5 ${isLiked ? 'text-violet-600' : 'text-text-muted'}`} />
               <span className={`font-bold tabular-nums min-w-[16px] text-center ${
-                netVotes > 0 ? 'text-violet-600' : netVotes < 0 ? 'text-red-500' : 'text-gray-500'
+                netVotes > 0 ? 'text-violet-600' : netVotes < 0 ? 'text-status-error' : 'text-text-muted'
               }`}>
                 {netVotes}
               </span>
-              <ChevronDown className={`w-3.5 h-3.5 ${isDisliked ? 'text-red-500' : 'text-gray-400'}`} />
+              <ChevronDown className={`w-3.5 h-3.5 ${isDisliked ? 'text-status-error' : 'text-text-muted'}`} />
             </div>
 
             {/* Comment count placeholder */}
-            <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+            <span className="inline-flex items-center gap-1 text-xs text-text-muted">
               <MessageCircle className="w-3 h-3" />
               <span className="tabular-nums font-medium">{Number(thread?.commentCount) || 0}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-caption text-gray-400">
+          <div className="flex items-center gap-2 text-caption text-text-muted">
             {author && (
               <>
-                <span className="font-medium text-gray-500 truncate max-w-[100px]">{author}</span>
+                <span className="font-medium text-text-muted truncate max-w-[100px]">{author}</span>
                 <span className="text-gray-300">·</span>
               </>
             )}
