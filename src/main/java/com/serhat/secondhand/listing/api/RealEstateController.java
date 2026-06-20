@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
@@ -45,10 +48,10 @@ public class RealEstateController {
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter Real Estate listings")
-    public ResponseEntity<Page<ListingDto>> filterRealEstates(@RequestBody RealEstateFilterDto filters) {
+    public ResponseEntity<?> filterRealEstates(@RequestBody RealEstateFilterDto filters) {
         log.info("Filtering real estate with criteria: {}", filters);
         Page<ListingDto> result = realEstateListingService.filterRealEstate(filters);
-        return ResponseEntity.ok(result);
+        return ResultResponses.ok(Result.success(result));
     }
 
     @PutMapping("/{id}")
@@ -66,8 +69,8 @@ public class RealEstateController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get real estate listing details")
-    public ResponseEntity<RealEstateListingDto> getRealEstateDetails(@PathVariable UUID id) {
+    public ResponseEntity<?> getRealEstateDetails(@PathVariable UUID id) {
         RealEstateListingDto realEstateListingDto = realEstateListingService.getRealEstateDetails(id);
-        return ResponseEntity.ok(realEstateListingDto);
+        return ResultResponses.ok(Result.success(realEstateListingDto));
     }
 }

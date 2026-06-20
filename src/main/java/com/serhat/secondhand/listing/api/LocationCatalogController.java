@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.listing.application.common.LocationCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,19 +19,19 @@ public class LocationCatalogController {
     private final LocationCatalogService locationCatalogService;
 
     @GetMapping("/cities")
-    public ResponseEntity<List<LocationCatalogService.CityDto>> getCities() {
-        return ResponseEntity.ok(locationCatalogService.getCities());
+    public ResponseEntity<?> getCities() {
+        return ResultResponses.ok(Result.success(locationCatalogService.getCities()));
     }
 
     @GetMapping("/districts")
-    public ResponseEntity<List<LocationCatalogService.DistrictDto>> getDistricts(
+    public ResponseEntity<?> getDistricts(
             @RequestParam String cityKey) {
-        return ResponseEntity.ok(locationCatalogService.getDistricts(cityKey));
+        return ResultResponses.ok(Result.success(locationCatalogService.getDistricts(cityKey)));
     }
 
     @GetMapping("/neighborhoods")
-    public ResponseEntity<List<LocationCatalogService.NeighborhoodDto>> getNeighborhoods(
+    public ResponseEntity<?> getNeighborhoods(
             @RequestParam String districtKey) {
-        return ResponseEntity.ok(locationCatalogService.getNeighborhoods(districtKey));
+        return ResultResponses.ok(Result.success(locationCatalogService.getNeighborhoods(districtKey)));
     }
 }

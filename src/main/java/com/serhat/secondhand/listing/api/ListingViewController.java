@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
@@ -33,7 +36,7 @@ public class ListingViewController {
     @PublicEndpoint
     @PostMapping("/{id}/view")
     @Operation(summary = "Track a listing view", description = "Public endpoint to track when a listing is viewed. Supports both authenticated and anonymous users.")
-    public ResponseEntity<Void> trackView(
+    public ResponseEntity<?> trackView(
             @PathVariable UUID id,
             @RequestBody(required = false) TrackViewRequest request,
             @AuthenticationPrincipal User currentUser,
@@ -47,12 +50,12 @@ public class ListingViewController {
 
         listingViewService.trackView(id, userId, sessionId, ipAddress, userAgent);
 
-        return ResponseEntity.ok().build();
+        return ResultResponses.ok(Result.success());
     }
 
     @GetMapping("/{id}/view-stats")
     @Operation(summary = "Get listing view statistics", description = "Get view statistics for a listing. Only accessible by the listing owner.")
-    public ResponseEntity<ListingViewStatsDto> getViewStatistics(
+    public ResponseEntity<?> getViewStatistics(
             @PathVariable UUID id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
@@ -62,6 +65,6 @@ public class ListingViewController {
         if (startDate == null) startDate = endDate.minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS);
 
         ListingViewStatsDto stats = listingViewService.getViewStatistics(id, startDate, endDate);
-        return ResponseEntity.ok(stats);
+        return ResultResponses.ok(Result.success(stats));
     }
 }

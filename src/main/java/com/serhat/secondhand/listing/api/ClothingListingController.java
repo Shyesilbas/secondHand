@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.security.PublicEndpoint;
 
 import com.serhat.secondhand.core.result.ResultResponses;
@@ -59,28 +62,28 @@ public class ClothingListingController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get clothing listing details")
-    public ResponseEntity<ClothingListingDto> getClothingDetails(@PathVariable UUID id) {
+    public ResponseEntity<?> getClothingDetails(@PathVariable UUID id) {
         ClothingListingDto clothing = clothingListingService.getClothingDetails(id);
-        return ResponseEntity.ok(clothing);
+        return ResultResponses.ok(Result.success(clothing));
     }
 
     @PublicEndpoint
     @GetMapping("/brand/{brand}/type/{clothingType}")
     @Operation(summary = "Find clothing by brand and type")
-    public ResponseEntity<Page<ClothingListingDto>> findByBrandAndClothingType(
+    public ResponseEntity<?> findByBrandAndClothingType(
             @PathVariable UUID brand,
             @PathVariable UUID clothingType,
             Pageable pageable) {
         Page<ClothingListingDto> clothing = clothingListingService.findByBrandAndClothingType(brand, clothingType, pageable);
-        return ResponseEntity.ok(clothing);
+        return ResultResponses.ok(Result.success(clothing));
     }
 
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter clothing listings with advanced criteria")
-    public ResponseEntity<Page<ListingDto>> filterClothing(@RequestBody ClothingListingFilterDto filters) {
+    public ResponseEntity<?> filterClothing(@RequestBody ClothingListingFilterDto filters) {
         log.info("Filtering clothing with criteria: {}", filters);
         Page<ListingDto> result = clothingListingService.filterClothing(filters);
-        return ResponseEntity.ok(result);
+        return ResultResponses.ok(Result.success(result));
     }
 }

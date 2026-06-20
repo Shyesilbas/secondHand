@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
@@ -58,27 +61,27 @@ public class ElectronicListingController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get electronic listing details")
-    public ResponseEntity<ElectronicListingDto> getElectronicDetails(@PathVariable UUID id) {
+    public ResponseEntity<?> getElectronicDetails(@PathVariable UUID id) {
         ElectronicListingDto electronic = electronicListingService.getElectronicDetails(id);
-        return ResponseEntity.ok(electronic);
+        return ResultResponses.ok(Result.success(electronic));
     }
 
     @PublicEndpoint
     @GetMapping("/electronicType/{electronicType}")
     @Operation(summary = "Find electronics by type")
-    public ResponseEntity<Page<ElectronicListingDto>> findByElectronicType(
+    public ResponseEntity<?> findByElectronicType(
             @PathVariable UUID electronicType,
             Pageable pageable) {
         Page<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType, pageable);
-        return ResponseEntity.ok(electronicDto);
+        return ResultResponses.ok(Result.success(electronicDto));
     }
 
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter electronics listings with advanced criteria")
-    public ResponseEntity<Page<ListingDto>> filterElectronics(@RequestBody ElectronicListingFilterDto filters) {
+    public ResponseEntity<?> filterElectronics(@RequestBody ElectronicListingFilterDto filters) {
         log.info("Filtering electronics with criteria: {}", filters);
         Page<ListingDto> result = electronicListingService.filterElectronics(filters);
-        return ResponseEntity.ok(result);
+        return ResultResponses.ok(Result.success(result));
     }
 }

@@ -1,4 +1,7 @@
 package com.serhat.secondhand.ai.agent.api;
+
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.ai.agent.dto.AgentDataSourceDto;
@@ -34,7 +37,7 @@ public class AgentController {
     private final AuraListingSearchOrchestrator listingSearchOrchestrator;
 
     @PostMapping("/query")
-    public ResponseEntity<AgentQueryResponse> query(
+    public ResponseEntity<?> query(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody AgentQueryRequest request
     ) {
@@ -67,6 +70,6 @@ public class AgentController {
             ));
         }
 
-        return ResponseEntity.ok(AgentQueryResponse.error(aiResponse.error(), dataSources));
+        return ResultResponses.ok(Result.success(AgentQueryResponse.error(aiResponse.error(), dataSources)));
     }
 }

@@ -38,6 +38,6 @@ public final class CategoryListingControllerSupport {
             return ResultResponses.ok(result);
         }
         URI location = URI.create(basePath + "/" + result.getData());
-        return ResponseEntity.created(location).body(Map.of("id", result.getData()));
+        return ResultResponses.created(Result.success(Map.of("id", result.getData())));
     }
 }

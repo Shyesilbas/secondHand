@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.application.books.BooksListingService;
@@ -50,15 +53,15 @@ public class BooksListingController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get books listing details")
-    public ResponseEntity<BooksListingDto> getBooksDetails(@PathVariable UUID id) {
+    public ResponseEntity<?> getBooksDetails(@PathVariable UUID id) {
         BooksListingDto dto = booksListingService.getBooksDetails(id);
-        return ResponseEntity.ok(dto);
+        return ResultResponses.ok(Result.success(dto));
     }
 
     @PostMapping("/filter")
     @Operation(summary = "Filter books listings")
-    public ResponseEntity<Page<ListingDto>> filterBooks(@RequestBody BooksListingFilterDto filters) {
+    public ResponseEntity<?> filterBooks(@RequestBody BooksListingFilterDto filters) {
         Page<ListingDto> page = booksListingService.filterBooks(filters);
-        return ResponseEntity.ok(page);
+        return ResultResponses.ok(Result.success(page));
     }
 }

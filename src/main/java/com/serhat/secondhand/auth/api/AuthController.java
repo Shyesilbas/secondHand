@@ -1,5 +1,8 @@
 package com.serhat.secondhand.auth.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.auth.application.LoginService;
 import com.serhat.secondhand.auth.application.RegistrationService;
 import com.serhat.secondhand.auth.application.OAuthService;
@@ -48,7 +51,7 @@ public class AuthController {
 
     @PublicEndpoint
     @PostMapping("/login")
-    public ResponseEntity<AuthClientResponse> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse httpResponse) {
         log.info("Login request for email: {}", request.email());
@@ -57,7 +60,7 @@ public class AuthController {
         setAuthCookies(httpResponse, response);
 
         log.info("Login successful for user: {}, tokens set in secure cookies", request.email());
-        return ResponseEntity.ok(AuthClientResponse.from(response));
+        return ResultResponses.ok(Result.success(AuthClientResponse.from(response)));
     }
 
     private void setAuthCookies(HttpServletResponse httpResponse, LoginResponse response) {
@@ -67,14 +70,14 @@ public class AuthController {
 
     @PublicEndpoint
     @GetMapping("/oauth2/google")
-    public ResponseEntity<Void> redirectToGoogle() {
+    public ResponseEntity<?> redirectToGoogle() {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/oauth2/authorization/google"))
                 .build();
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthMessageResponse> logout(
+    public ResponseEntity<?> logout(
             Authentication authentication,
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
@@ -85,12 +88,12 @@ public class AuthController {
         cookieUtils.clearAuthCookies(httpResponse);
 
         log.info("Logout successful for user: {}, cookies cleared", authentication.getName());
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(response));
     }
 
     @PublicEndpoint
     @PostMapping("/refresh")
-    public ResponseEntity<AuthClientResponse> refreshToken(
+    public ResponseEntity<?> refreshToken(
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
         log.info("Token refresh request");
@@ -103,13 +106,13 @@ public class AuthController {
         setAuthCookies(httpResponse, response);
 
         log.info("Token refresh successful, new tokens set in cookies");
-        return ResponseEntity.ok(AuthClientResponse.from(response));
+        return ResultResponses.ok(Result.success(AuthClientResponse.from(response)));
     }
 
 
     @PublicEndpoint
     @PostMapping("/oauth2/complete")
-    public ResponseEntity<AuthClientResponse> completeOAuth(
+    public ResponseEntity<?> completeOAuth(
             @Valid @RequestBody OAuthCompleteRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
@@ -119,12 +122,12 @@ public class AuthController {
         setAuthCookies(httpResponse, response);
 
         log.info("OAuth completion successful for user: {}, tokens set in secure cookies", request.getEmail());
-        return ResponseEntity.ok(AuthClientResponse.from(response));
+        return ResultResponses.ok(Result.success(AuthClientResponse.from(response)));
     }
 
     @PostMapping("/revoke-all-sessions")
     @Operation(summary = "Revoke all user sessions", description = "Invalidates all active sessions for the authenticated user")
-    public ResponseEntity<AuthMessageResponse> revokeAllSessions(
+    public ResponseEntity<?> revokeAllSessions(
             Authentication authentication,
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
@@ -135,6 +138,6 @@ public class AuthController {
         cookieUtils.clearAuthCookies(httpResponse);
 
         log.info("All sessions revoked for user: {}, cookies cleared", authentication.getName());
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(response));
     }
 }

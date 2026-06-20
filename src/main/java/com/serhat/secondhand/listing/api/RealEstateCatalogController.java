@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.listing.application.realestate.RealEstateSpecCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +29,12 @@ public class RealEstateCatalogController {
     private final RealEstateSpecCatalogService realEstateSpecCatalogService;
 
     @GetMapping("/room-configs")
-    public ResponseEntity<List<RealEstateSpecCatalogService.SpecDto>> getRoomConfigs() {
-        return ResponseEntity.ok(realEstateSpecCatalogService.getRoomConfigs());
+    public ResponseEntity<?> getRoomConfigs() {
+        return ResultResponses.ok(Result.success(realEstateSpecCatalogService.getRoomConfigs()));
     }
 
     @GetMapping("/zoning-statuses")
-    public ResponseEntity<List<RealEstateSpecCatalogService.SpecDto>> getZoningStatuses() {
-        return ResponseEntity.ok(realEstateSpecCatalogService.getZoningStatuses());
+    public ResponseEntity<?> getZoningStatuses() {
+        return ResultResponses.ok(Result.success(realEstateSpecCatalogService.getZoningStatuses()));
     }
 }

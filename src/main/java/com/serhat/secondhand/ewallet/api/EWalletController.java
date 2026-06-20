@@ -1,5 +1,8 @@
 package com.serhat.secondhand.ewallet.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
 import com.serhat.secondhand.payment.application.PaymentStatsService;
@@ -31,73 +34,75 @@ public class EWalletController {
     private final PaymentStatsService paymentStatsService;
 
     @PostMapping
-    public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {
+    public ResponseEntity<?> createEWallet(@RequestBody EwalletRequest request) {
         log.info("Creating eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.createEWallet(request);
-        return ResponseEntity.ok(eWallet);
+        return ResultResponses.ok(Result.success(eWallet));
     }
 
     @GetMapping
-    public ResponseEntity<EWalletDto> getEWallet() {
+    public ResponseEntity<?> getEWallet() {
         log.debug("Getting eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.getEWalletByUserId();
-        return ResponseEntity.ok(eWallet);
+        return ResultResponses.ok(Result.success(eWallet));
     }
 
     @PutMapping("/update/spendingWarning")
-    public void updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
+    public ResponseEntity<?> updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
         eWalletService.updateSpendingWarningLimit(newSpendingWarning);
+        return ResultResponses.ok(Result.success());
     }
 
     @DeleteMapping("/update/spendingWarning")
-    public void removeSpendingWarning(){
+    public ResponseEntity<?> removeSpendingWarning(){
         eWalletService.removeSpendingWarningLimit();
+        return ResultResponses.ok(Result.success());
     }
 
     @PutMapping("/limits")
-    public ResponseEntity<EWalletDto> updateLimits(
+    public ResponseEntity<?> updateLimits(
             @RequestBody UpdateLimitRequest request) {
         log.info("Updating limits for authenticated user");
         EWalletDto eWallet = eWalletService.updateLimits(request);
-        return ResponseEntity.ok(eWallet);
+        return ResultResponses.ok(Result.success(eWallet));
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<String> deposit(
+    public ResponseEntity<?> deposit(
             @RequestBody DepositRequest request) {
 
         eWalletService.deposit(request);
 
-        return ResponseEntity.ok("Deposit successful");
+        return ResultResponses.ok(Result.success("Deposit successful"));
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<String> withdraw(
+    public ResponseEntity<?> withdraw(
             @RequestBody WithdrawRequest request) {
         log.info("Processing withdrawal for authenticated user");
         eWalletService.withdraw( request);
-        return ResponseEntity.ok("Withdrawal successful");
+        return ResultResponses.ok(Result.success("Withdrawal successful"));
     }
 
 
     @GetMapping("/balance/check")
-    public ResponseEntity<Boolean> checkBalance(
+    public ResponseEntity<?> checkBalance(
             @RequestParam BigDecimal amount) {
         log.debug("Checking balance for authenticated user");
         boolean hasBalance = eWalletService.hasSufficientBalance(amount);
-        return ResponseEntity.ok(hasBalance);
+        return ResultResponses.ok(Result.success(hasBalance));
     }
 
     @GetMapping("/spending-warning/check")
-    public ResponseEntity<SpendingWarningCheckResponse> checkSpendingWarning(
+    public ResponseEntity<?> checkSpendingWarning(
             @RequestParam BigDecimal amount) {
         log.debug("Checking spending warning threshold for authenticated user");
         SpendingWarningCheckResponse response = eWalletService.checkSpendingWarning(amount);
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(response));
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<Page<PaymentDto>> getTransactions(
+    public ResponseEntity<?> getTransactions(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 10, sort = "processedAt", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Fetching eWallet transactions for user: {}", currentUser.getEmail());
@@ -115,6 +120,6 @@ public class EWalletController {
                 currentUser.getId(),
                 pageable,
                 filter);
-        return ResponseEntity.ok(payments);
+        return ResultResponses.ok(Result.success(payments));
     }
 }

@@ -1,5 +1,8 @@
 package com.serhat.secondhand.ai.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
 import com.serhat.secondhand.ai.application.GeminiAiService;
@@ -26,15 +29,15 @@ public class GeminiController {
 
     // With context
     @PostMapping("/ask")
-    public ResponseEntity<AiResponse> askQuestion(@Valid @RequestBody UserQuestionRequest request) {
+    public ResponseEntity<?> askQuestion(@Valid @RequestBody UserQuestionRequest request) {
         log.info("New question received: {}", request.question().substring(0, Math.min(50, request.question().length())));
         AiResponse response = aiService.askQuestion(request);
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(response));
     }
 
     // No context
     @GetMapping("/quick")
-    public ResponseEntity<AiResponse> quickQuestion(@RequestParam("q") String question) {
+    public ResponseEntity<?> quickQuestion(@RequestParam("q") String question) {
         if (question == null || question.isBlank()) {
             throw new IllegalArgumentException("Question cannot be empty");
         }
@@ -42,7 +45,7 @@ public class GeminiController {
         log.info("Quick question: {}", question.substring(0, Math.min(50, question.length())));
         UserQuestionRequest request = new UserQuestionRequest(question, null);
         AiResponse response = aiService.askQuestion(request);
-        return ResponseEntity.ok(response);
+        return ResultResponses.ok(Result.success(response));
     }
 
 }

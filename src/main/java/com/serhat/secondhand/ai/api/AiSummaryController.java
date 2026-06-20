@@ -1,5 +1,8 @@
 package com.serhat.secondhand.ai.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.ai.application.AiSummaryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +23,12 @@ public class AiSummaryController {
     private final AiSummaryService aiSummaryService;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<String> getUserSummary(@PathVariable Long userId) {
-        return ResponseEntity.ok(aiSummaryService.getUserReviewsSummary(userId));
+    public ResponseEntity<?> getUserSummary(@PathVariable Long userId) {
+        return ResultResponses.ok(Result.success(aiSummaryService.getUserReviewsSummary(userId)));
     }
 
     @GetMapping("/listing/{listingId}")
-    public ResponseEntity<String> getListingSummary(@PathVariable UUID listingId) {
-        return ResponseEntity.ok(aiSummaryService.getListingReviewsSummary(listingId));
+    public ResponseEntity<?> getListingSummary(@PathVariable UUID listingId) {
+        return ResultResponses.ok(Result.success(aiSummaryService.getListingReviewsSummary(listingId)));
     }
 }

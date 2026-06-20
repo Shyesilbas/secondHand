@@ -1,4 +1,7 @@
 package com.serhat.secondhand.ai.api;
+
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.ai.dto.AiResponse;
@@ -27,30 +30,30 @@ public class AiChatController {
     private final MemoryService memoryService;
 
     @PostMapping("/chat")
-    public ResponseEntity<AiResponse> chat(@AuthenticationPrincipal User user, @Valid @RequestBody ChatRequest request) {
+    public ResponseEntity<?> chat(@AuthenticationPrincipal User user, @Valid @RequestBody ChatRequest request) {
         Long userId = user.getId();
         UserQuestionRequest question = new UserQuestionRequest(request.message(), request.context());
-        return ResponseEntity.ok(geminiAiService.askQuestion(userId, question));
+        return ResultResponses.ok(Result.success(geminiAiService.askQuestion(userId, question)));
     }
 
     @PostMapping("/chat/new")
-    public ResponseEntity<Void> newChat(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> newChat(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.clearConversationHistory(userId);
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(Result.success());
     }
 
     @DeleteMapping("/chat/history")
-    public ResponseEntity<Void> deleteHistory(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> deleteHistory(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.clearConversationHistory(userId);
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(Result.success());
     }
 
     @DeleteMapping("/memory")
-    public ResponseEntity<Void> deleteMemory(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> deleteMemory(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.deleteMemory(userId);
-        return ResponseEntity.noContent().build();
+        return ResultResponses.noContent(Result.success());
     }
 }

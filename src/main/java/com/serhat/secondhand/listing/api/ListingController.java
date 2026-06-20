@@ -1,5 +1,8 @@
 package com.serhat.secondhand.listing.api;
 
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.application.common.ListingCommandService;
@@ -56,7 +59,7 @@ public class ListingController {
 
     @PublicEndpoint
     @GetMapping("/{id}")
-    public ResponseEntity<ListingDto> getListingById(
+    public ResponseEntity<?> getListingById(
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
@@ -82,16 +85,16 @@ public class ListingController {
     @PublicEndpoint
     @PostMapping("/bulk")
     @Operation(summary = "Get listings by IDs")
-    public ResponseEntity<List<ListingDto>> getListingsByIds(
+    public ResponseEntity<?> getListingsByIds(
             @Valid @RequestBody List<UUID> ids,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingQueryService.findByIds(ids, userId));
+        return ResultResponses.ok(Result.success(listingQueryService.findByIds(ids, userId)));
     }
 
     @PublicEndpoint
     @PostMapping("/filter")
-    public ResponseEntity<Page<ListingDto>> getListingsWithFilters(
+    public ResponseEntity<?> getListingsWithFilters(
             @Valid @RequestBody ListingFilterDto filters,
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size,
@@ -99,23 +102,23 @@ public class ListingController {
         filters.setPage(page != null ? page : (filters.getPage() != null ? filters.getPage() : 0));
         filters.setSize(size != null ? size : (filters.getSize() != null ? filters.getSize() : 10));
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingSearchService.filterByCategory(filters, userId));
+        return ResultResponses.ok(Result.success(listingSearchService.filterByCategory(filters, userId)));
     }
 
     @PublicEndpoint
     @GetMapping("/search")
-    public ResponseEntity<Page<ListingDto>> globalSearch(
+    public ResponseEntity<?> globalSearch(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
-        return ResponseEntity.ok(listingSearchService.globalSearch(query, page, size, userId));
+        return ResultResponses.ok(Result.success(listingSearchService.globalSearch(query, page, size, userId)));
     }
 
     @PublicEndpoint
     @GetMapping("/search/listing-no/{no}")
-    public ResponseEntity<ListingDto> getListingByNo(
+    public ResponseEntity<?> getListingByNo(
             @PathVariable String no,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
@@ -125,7 +128,7 @@ public class ListingController {
     }
 
     @GetMapping("/my-listings")
-    public ResponseEntity<Page<ListingDto>> getMyListings(
+    public ResponseEntity<?> getMyListings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) ListingType listingType,
@@ -133,16 +136,16 @@ public class ListingController {
         Page<ListingDto> myListings = listingType != null
                 ? listingQueryService.getMyListings(currentUser.getId(), page, size, listingType)
                 : listingQueryService.getMyListings(currentUser.getId(), page, size);
-        return ResponseEntity.ok(myListings);
+        return ResultResponses.ok(Result.success(myListings));
     }
 
     @GetMapping("/my-listings/status/{status}")
-    public ResponseEntity<Page<ListingDto>> getMyListingsByStatus(
+    public ResponseEntity<?> getMyListingsByStatus(
             @PathVariable ListingStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(listingQueryService.getMyListingsByStatus(currentUser.getId(), status, page, size));
+        return ResultResponses.ok(Result.success(listingQueryService.getMyListingsByStatus(currentUser.getId(), status, page, size)));
     }
 
     @PutMapping("/{id}/publish")
@@ -181,19 +184,19 @@ public class ListingController {
     }
 
     @GetMapping("/my-listings/view-stats")
-    public ResponseEntity<ListingViewStatsDto> getMyListingsViewStats(
+    public ResponseEntity<?> getMyListingsViewStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
             @AuthenticationPrincipal User currentUser) {
         if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = endDate.minusDays(7);
-        return ResponseEntity.ok(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate));
+        return ResultResponses.ok(Result.success(listingViewService.getAggregatedViewStatisticsForSeller(currentUser.getId(), startDate, endDate)));
     }
 
     @PublicEndpoint
     @GetMapping("/statistics")
-    public ResponseEntity<ListingStatisticsDto> getListingStatistics() {
-        return ResponseEntity.ok(listingStatisticsService.getGlobalListingStatistics());
+    public ResponseEntity<?> getListingStatistics() {
+        return ResultResponses.ok(Result.success(listingStatisticsService.getGlobalListingStatistics()));
     }
 
     @PutMapping("/{id}/mark-sold")
@@ -235,10 +238,10 @@ public class ListingController {
 
     @PublicEndpoint
     @GetMapping("/status/{status}")
-    public ResponseEntity<Page<ListingDto>> getListingsByStatus(
+    public ResponseEntity<?> getListingsByStatus(
             @PathVariable ListingStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(listingQueryService.findByStatusAsDto(status, pageable));
+        return ResultResponses.ok(Result.success(listingQueryService.findByStatusAsDto(status, pageable)));
     }
 
     @PostMapping("/pay-fee")
@@ -253,7 +256,7 @@ public class ListingController {
     @PublicEndpoint
     @GetMapping("/fee-config")
     @Operation(summary = "Get listing fee configuration")
-    public ResponseEntity<ListingFeeConfigDto> getListingFeeConfig() {
-        return ResponseEntity.ok(listingFeePaymentService.getListingFeeConfig());
+    public ResponseEntity<?> getListingFeeConfig() {
+        return ResultResponses.ok(Result.success(listingFeePaymentService.getListingFeeConfig()));
     }
 }
