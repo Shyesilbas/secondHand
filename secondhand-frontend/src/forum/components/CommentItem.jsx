@@ -87,7 +87,7 @@ export const CommentItem = ({
               </div>
 
               {/* Reply composer (inline) */}
-              {isReplyTarget && <div className="mt-3 rounded-xl border border-border-light bg-secondary/60 overflow-hidden focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-500/10 transition-all duration-200">
+              {isReplyTarget && <div className="mt-3 rounded-xl border border-border-light bg-secondary-light/60 overflow-hidden focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-500/10 transition-all duration-200">
                   <textarea value={replyDraft?.content || ''} onChange={e => onReplyDraftChange?.(e.target.value)} placeholder={t("write_a_reply")} autoFocus className="w-full min-h-[80px] bg-transparent p-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none resize-none" />
                   <div className="px-3 py-2.5 border-t border-border-light/60 bg-background-primary flex items-center justify-end gap-2">
                     <button type="button" onClick={onCancelReply} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:bg-tertiary transition-colors duration-200">{t("cancel")}</button>

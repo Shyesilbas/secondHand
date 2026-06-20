@@ -48,7 +48,7 @@ const GreatSellerProgressCard = ({
   const Bar = ({
     pct,
     done
-  }) => <div className="h-1.5 bg-tertiary rounded-full overflow-hidden mt-1.5">
+  }) => <div className="h-1.5 bg-secondary-light rounded-full overflow-hidden mt-1.5">
             <div className={`h-full rounded-full transition-all ${done ? 'bg-status-success-bg' : 'bg-gray-900'}`} style={{
       width: `${Math.min(100, pct)}%`
     }} />
@@ -70,7 +70,7 @@ const GreatSellerProgressCard = ({
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary-light p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("paid_order_lines")}{days}{t("days")}</p>
                             <span className="text-caption font-bold tabular-nums text-text-muted">
@@ -83,7 +83,7 @@ const GreatSellerProgressCard = ({
                         <Bar pct={salesPct} done={gs.salesMet} />
                     </div>
 
-                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary-light p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("unique_buyer_reviews")}</p>
                             <span className="text-caption font-bold tabular-nums text-text-muted">
@@ -94,7 +94,7 @@ const GreatSellerProgressCard = ({
                         <Bar pct={revPct} done={gs.reviewersMet} />
                     </div>
 
-                    <div className="rounded-xl border border-gray-100 bg-secondary/80 p-4">
+                    <div className="rounded-xl border border-gray-100 bg-secondary-light p-4">
                         <div className="flex justify-between items-baseline gap-2">
                             <p className="text-body font-semibold text-gray-800">{t("average_rating")}</p>
                             <span className="text-caption font-bold tabular-nums text-text-muted">
@@ -201,7 +201,7 @@ const UserProfilePage = () => {
 
   // Loading state
   if (userLoading) {
-    return <div className="min-h-screen bg-secondary/80 flex items-center justify-center">
+    return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-10 h-10 border-2 border-border-DEFAULT border-t-gray-800 rounded-full animate-spin mx-auto mb-4" />
                     <p className="text-sm text-text-muted font-medium">{t("loading_profile")}</p>
@@ -211,7 +211,7 @@ const UserProfilePage = () => {
 
   // Error state
   if (userError || !user) {
-    return <div className="min-h-screen bg-secondary/80 flex items-center justify-center">
+    return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
                 <div className="text-center max-w-sm">
                     <div className="w-14 h-14 rounded-2xl bg-status-error-bg flex items-center justify-center mx-auto mb-4">
                         <AlertCircle className="w-6 h-6 text-status-error" />
@@ -239,7 +239,7 @@ const UserProfilePage = () => {
             if (tab.key === 'listings' && pagination.totalElements > 0) count = pagination.totalElements;
             if (tab.key === 'lists' && favoriteLists.length > 0) count = favoriteLists.length;
             if (tab.key === 'reviews' && reviewStats?.totalReviews > 0) count = reviewStats.totalReviews;
-            return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${isActive ? 'bg-gray-950 text-white shadow-sm' : 'bg-tertiary text-text-secondary hover:bg-tertiary hover:text-text-primary'}`}>
+            return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${isActive ? 'bg-gray-950 text-white shadow-sm' : 'bg-secondary-light text-text-secondary hover:bg-secondary-light hover:text-text-primary'}`}>
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
                                     {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-caption font-bold tabular-nums ${isActive ? 'bg-background-primary/15 text-white' : 'bg-background-primary text-text-muted'}`}>
@@ -278,13 +278,13 @@ const UserProfilePage = () => {
                             </div>
 
                             {listingsLoading ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                                    {[...Array(8)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
-                                            <div className="aspect-square bg-tertiary" />
-                                            <div className="p-3.5 space-y-2">
-                                                <div className="h-4 bg-tertiary rounded w-3/4" />
-                                                <div className="h-3 bg-tertiary rounded w-1/2" />
-                                            </div>
-                                        </div>)}
+                                     {[...Array(8)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
+                                             <div className="aspect-square bg-secondary-light" />
+                                             <div className="p-3.5 space-y-2">
+                                                 <div className="h-4 bg-secondary-light rounded w-3/4" />
+                                                 <div className="h-3 bg-secondary-light rounded w-1/2" />
+                                             </div>
+                                         </div>)}
                                 </div> : listingsError ? <EmptyState icon={AlertCircle} iconColor="text-status-error" iconBg="bg-status-error-bg" title={t("failed_to_load_listings")} description="Please try again later" /> : listings.length === 0 ? <EmptyState icon={Package} title={t("no_listings_yet")} description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"} action={isOwnProfile ? {
             label: 'Create Listing',
             onClick: () => navigate(ROUTES.CREATE_LISTING)
@@ -313,25 +313,25 @@ const UserProfilePage = () => {
                                         <Plus className="w-4 h-4" />{t("new_list")}</button>}
                             </div>
 
-                            {listsLoading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {[...Array(3)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
-                                            <div className="aspect-[4/3] bg-tertiary" />
-                                            <div className="p-4 space-y-2">
-                                                <div className="h-4 bg-tertiary rounded w-3/4" />
-                                                <div className="h-3 bg-tertiary rounded w-1/2" />
-                                            </div>
-                                        </div>)}
+                             {listsLoading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                     {[...Array(3)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-2xl overflow-hidden animate-pulse">
+                                             <div className="aspect-[4/3] bg-secondary-light" />
+                                             <div className="p-4 space-y-2">
+                                                 <div className="h-4 bg-secondary-light rounded w-3/4" />
+                                                 <div className="h-3 bg-secondary-light rounded w-1/2" />
+                                             </div>
+                                         </div>)}
                                 </div> : favoriteLists.length === 0 ? <EmptyState icon={Heart} title={t("no_lists_yet")} description={isOwnProfile ? "You haven't created any lists yet" : "This user hasn't shared any public lists yet"} action={isOwnProfile ? {
             label: 'Create List',
             onClick: () => setShowCreateListModal(true)
           } : null} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {favoriteLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
-                                    {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="aspect-[4/3] bg-background-primary border-2 border-dashed border-border-light rounded-2xl flex flex-col items-center justify-center hover:border-border-DEFAULT hover:bg-secondary transition-all duration-200 group">
-                                            <div className="w-12 h-12 rounded-xl bg-tertiary flex items-center justify-center mb-3 group-hover:bg-tertiary transition-colors">
-                                                <Plus className="w-5 h-5 text-text-muted" />
-                                            </div>
-                                            <span className="text-sm font-semibold text-text-muted group-hover:text-text-secondary">{t("new_list")}</span>
-                                        </button>}
+                                     {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="aspect-[4/3] bg-background-primary border-2 border-dashed border-border-light rounded-2xl flex flex-col items-center justify-center hover:border-border-DEFAULT hover:bg-secondary-light transition-all duration-200 group">
+                                             <div className="w-12 h-12 rounded-xl bg-secondary-light flex items-center justify-center mb-3 group-hover:bg-secondary-light transition-colors">
+                                                 <Plus className="w-5 h-5 text-text-muted" />
+                                             </div>
+                                             <span className="text-sm font-semibold text-text-muted group-hover:text-text-secondary">{t("new_list")}</span>
+                                         </button>}
                                 </div>}
                         </div>}
 
@@ -359,7 +359,7 @@ const UserProfilePage = () => {
 const EmptyState = ({
   icon: Icon,
   iconColor = 'text-text-muted',
-  iconBg = 'bg-tertiary',
+  iconBg = 'bg-secondary-light',
   title,
   description,
   action

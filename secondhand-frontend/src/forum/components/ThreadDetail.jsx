@@ -136,14 +136,14 @@ export const ThreadDetail = ({
             {draftComment?.parentCommentId ? <span className="text-xs text-violet-600 font-medium ml-2">{t("replying")}<button type="button" className="ml-1.5 text-xs text-text-muted hover:text-text-secondary" onClick={() => onReplyTarget?.(null)}>{t("cancel")}</button>
               </span> : null}
           </div>
-          <button type="button" onClick={() => setComposerOpen(v => !v)} className={`h-9 w-9 rounded-lg border inline-flex items-center justify-center transition-all duration-200 ${composerOpen ? 'border-violet-300 bg-primary text-violet-600' : 'border-border-light bg-background-primary hover:bg-secondary text-text-muted hover:text-text-secondary'}`} title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}>
+          <button type="button" onClick={() => setComposerOpen(v => !v)} className={`h-9 w-9 rounded-lg border inline-flex items-center justify-center transition-all duration-200 ${composerOpen ? 'border-violet-300 bg-primary text-violet-600' : 'border-border-light bg-background-primary hover:bg-secondary-light text-text-muted hover:text-text-secondary'}`} title={composerOpen ? FORUM_MESSAGES.CLOSE : FORUM_MESSAGES.WRITE_COMMENT}>
             {composerOpen ? <X className="w-4 h-4" /> : <MessageSquarePlus className="w-4 h-4" />}
           </button>
         </div>
 
         {/* Comment composer */}
         {composerOpen && !draftComment?.parentCommentId && <div className="px-6 pb-5">
-            <div className="rounded-xl border border-border-light bg-secondary/60 overflow-hidden focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-500/10 transition-all duration-200">
+            <div className="rounded-xl border border-border-light bg-secondary-light/60 overflow-hidden focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-500/10 transition-all duration-200">
               <textarea value={draftComment?.content || ''} onChange={e => onDraftChange?.(e.target.value)} placeholder={t("share_your_thoughts")} className="w-full min-h-[100px] bg-transparent p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none resize-none" />
               <div className="px-4 py-3 border-t border-border-light/60 bg-background-primary flex items-center justify-end">
                 <button type="button" onClick={onSubmitComment} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors duration-200">
@@ -175,7 +175,7 @@ export const ThreadDetail = ({
           </div>}
 
         {commentsHasMore && <div className="px-6 py-4 border-t border-gray-100 flex justify-center">
-            <button type="button" onClick={onLoadMoreComments} disabled={commentsLoading} className="px-5 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-secondary hover:bg-secondary hover:border-border-DEFAULT transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="button" onClick={onLoadMoreComments} disabled={commentsLoading} className="px-5 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-secondary hover:bg-secondary-light hover:border-border-DEFAULT transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
               {commentsLoading ? 'Loading...' : FORUM_MESSAGES.LOAD_MORE}
             </button>
           </div>}

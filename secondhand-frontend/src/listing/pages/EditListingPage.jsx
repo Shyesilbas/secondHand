@@ -14,7 +14,7 @@ import logger from '../../common/utils/logger.js';
 const PageLoader = () => {
     const { t } = useTranslation();
     return (
-      <div className="min-h-screen bg-secondary flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-background-secondary flex flex-col items-center justify-center">
         <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
         <h3 className="text-sm font-medium text-text-primary">{t("loading_listing_details")}</h3>
       </div>
@@ -23,7 +23,7 @@ const PageLoader = () => {
 const PageError = ({ error, onBack }) => {
     const { t } = useTranslation();
     return (
-      <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
         <div className="bg-background-primary max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
             <div className="w-16 h-16 bg-status-error-bg text-status-error rounded-full flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="w-8 h-8" />

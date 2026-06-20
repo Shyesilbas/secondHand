@@ -58,7 +58,7 @@ const CartItemCard = ({
           e.target.style.display = 'none';
           e.target.nextSibling.style.display = 'flex';
         }} /> : null}
-          <div className={`flex h-20 w-20 items-center justify-center border bg-secondary sm:h-24 sm:w-24 ${CART_SHAPE.radiusThumb} ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
+          <div className={`flex h-20 w-20 items-center justify-center border bg-secondary-light sm:h-24 sm:w-24 ${CART_SHAPE.radiusThumb} ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
           borderColor: CART_UI.border
         }}>
             <span className="text-sm font-medium text-text-muted">
@@ -122,7 +122,7 @@ const CartItemCard = ({
             <div className={`inline-flex items-stretch overflow-hidden border bg-background-primary ${CART_SHAPE.radiusBox}`} style={{
             borderColor: CART_UI.border
           }}>
-              <button type="button" onClick={() => handleQuantityChange(item.quantity - 1)} disabled={isUpdating || item.quantity <= 1} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-secondary disabled:opacity-35">
+              <button type="button" onClick={() => handleQuantityChange(item.quantity - 1)} disabled={isUpdating || item.quantity <= 1} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-secondary-light disabled:opacity-35">
                 <Minus className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
               <span className="flex min-w-[2rem] items-center justify-center border-x px-2 text-sm font-medium tabular-nums text-[#1a1918]" style={{
@@ -130,13 +130,13 @@ const CartItemCard = ({
             }}>
                 {item.quantity}
               </span>
-              <button type="button" onClick={() => handleQuantityChange(item.quantity + 1)} disabled={isUpdating || maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock)} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-secondary disabled:opacity-35">
+              <button type="button" onClick={() => handleQuantityChange(item.quantity + 1)} disabled={isUpdating || maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock)} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-secondary-light disabled:opacity-35">
                 <Plus className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
             </div>
           </div>
 
-          {item.notes && <div className="mt-3 border-l-2 border-[#5f5b57] bg-secondary px-3 py-2 text-xs text-text-secondary">
+          {item.notes && <div className="mt-3 border-l-2 border-[#5f5b57] bg-secondary-light px-3 py-2 text-xs text-text-secondary">
               <span className="font-medium text-[#1a1918]">{t("note")}</span>
               {item.notes}
             </div>}

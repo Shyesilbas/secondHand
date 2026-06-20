@@ -66,7 +66,7 @@ const AgreementsPage = () => {
     return agreements.filter(a => requiredIds.has(a.agreementId));
   }, [agreements, requiredIds]);
   const activeCat = CATEGORIES.find(c => c.key === category);
-  return <div className="min-h-screen bg-secondary/80">
+  return <div className="min-h-screen bg-background-secondary">
             {/* ── Page Header ─────────────────────────────────── */}
             <div className="bg-background-primary border-b border-border-light/80">
                 <PageContainer narrow className="py-8">
@@ -95,8 +95,8 @@ const AgreementsPage = () => {
                                 {CATEGORIES.map(cat => {
                 const Icon = cat.icon;
                 const isActive = category === cat.key;
-                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary hover:text-text-primary'}`}>
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-background-primary/15' : 'bg-tertiary'}`}>
+                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary-light hover:text-text-primary'}`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-background-primary/15' : 'bg-secondary-light'}`}>
                                                 <Icon className="w-4 h-4" />
                                             </div>
                                             <div className="min-w-0">
@@ -118,7 +118,7 @@ const AgreementsPage = () => {
                         <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden">
                             <div className="px-6 py-5 border-b border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-tertiary flex items-center justify-center">
+                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-secondary-light flex items-center justify-center">
                                             <activeCat.icon className="w-4.5 h-4.5 text-text-secondary" />
                                         </div>}
                                     <div>
@@ -130,7 +130,7 @@ const AgreementsPage = () => {
 
                             <div className="p-6">
                                 {!loading && requiredIds.size === 0 ? <div className="py-12 text-center">
-                                        <div className="w-14 h-14 rounded-2xl bg-tertiary flex items-center justify-center mx-auto mb-4">
+                                        <div className="w-14 h-14 rounded-2xl bg-secondary-light flex items-center justify-center mx-auto mb-4">
                                             <FileText className="w-6 h-6 text-text-muted" />
                                         </div>
                                         <p className="text-sm font-semibold text-text-primary">{t("no_required_agreements")}</p>

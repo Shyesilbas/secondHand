@@ -210,7 +210,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                 <span>{t("ewallet")}</span>
               </div>
             </div>
-            {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-border-light p-4 space-y-2' : 'p-3 bg-secondary rounded-lg space-y-2'}`}>
+            {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-border-light p-4 space-y-2' : 'p-3 bg-secondary-light rounded-lg space-y-2'}`}>
                 <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
                   <span>{t("subtotal")}{days}{t("days")}</span>
                   <span className="font-mono tabular-nums">{calculateSubtotal().toFixed(2)}₺</span>
@@ -223,7 +223,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                   <span>{t("total")}</span>
                   <span className={`tabular-nums ${embedded ? 'text-primary' : 'text-status-success'}`}>{totalCost.toFixed(2)}₺</span>
                 </div>
-              </div> : <div className={`flex justify-between ${embedded ? 'rounded-2xl border border-border-light p-4' : 'p-3 bg-secondary rounded'}`}>
+              </div> : <div className={`flex justify-between ${embedded ? 'rounded-2xl border border-border-light p-4' : 'p-3 bg-secondary-light rounded'}`}>
                 <span className="font-bold text-lg">{t("total")}</span>
                 <span className={`text-xl font-bold ${embedded ? 'text-primary' : 'text-status-success'} tabular-nums`}>{totalCost}₺</span>
               </div>}
@@ -278,7 +278,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   }
   return <div>
       <div className="flex items-center gap-2 mb-6">
-        {[1, 2, 3].map(s => <div key={s} className={`h-1.5 flex-1 rounded-full ${step >= s ? 'bg-status-success-bg' : 'bg-tertiary'}`} />)}
+        {[1, 2, 3].map(s => <div key={s} className={`h-1.5 flex-1 rounded-full ${step >= s ? 'bg-status-success-bg' : 'bg-secondary-light'}`} />)}
       </div>
       {renderStepBody()}
       {step !== 3 ? <div className="flex items-center justify-between mt-6">

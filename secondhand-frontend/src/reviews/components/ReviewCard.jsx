@@ -8,7 +8,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {listingService} from '../../listing/services/listingService.js';
 import {Loader2} from 'lucide-react';
 
-const listingFooterClass = 'group/footer w-full rounded-xl border border-gray-100 bg-secondary px-3 py-2.5 text-left transition-colors hover:border-amber-200/80 hover:bg-status-warning-bg/60';
+const listingFooterClass = 'group/footer w-full rounded-xl border border-gray-100 bg-secondary-light px-3 py-2.5 text-left transition-colors hover:border-amber-200/80 hover:bg-status-warning-bg/60';
 const labelBlock = (review, t) => <>
     <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-text-muted">{t("listed_item")}</span>
     <span className="min-w-0 truncate font-medium text-gray-800">{review.listingTitle || '—'}</span>
@@ -37,7 +37,7 @@ function ProfileReviewedListingLink({
       </Link>;
   }
   if (!rawNo) {
-    return <div className="rounded-xl border border-gray-100 bg-secondary px-3 py-2.5">
+    return <div className="rounded-xl border border-gray-100 bg-secondary-light px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">{labelBlock(review, t)}</div>
       </div>;
   }
@@ -69,7 +69,7 @@ const ReviewCard = ({
     </span>;
   const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 text-white shadow-sm ring-2 ring-gray-100">
       {initials}
-    </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-tertiary">{initials}</div>;
+    </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-light">{initials}</div>;
   const nameLine = `${review.reviewerName || ''} ${review.reviewerSurname || ''}`.trim() || 'Buyer';
   const listingId = review?.listingId != null && String(review.listingId).trim() !== '' ? String(review.listingId).trim() : '';
   return <article className={shell}>

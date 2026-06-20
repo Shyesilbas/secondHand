@@ -21,7 +21,7 @@ const features = [
 
 const TrustBand = () => {
   return (
-    <section className="border-t border-gray-100 bg-secondary/50">
+    <section className="border-t border-gray-100 bg-secondary-light/50">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {features.map((feature) => {

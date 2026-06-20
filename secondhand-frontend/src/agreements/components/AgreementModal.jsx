@@ -30,13 +30,13 @@ const AgreementModal = ({
               <p className="text-xs text-text-muted mt-0.5">{t("legal_agreement_document")}</p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="w-9 h-9 rounded-lg border border-border-light bg-background-primary hover:bg-secondary text-text-muted hover:text-text-secondary inline-flex items-center justify-center transition-all duration-200">
+          <button type="button" onClick={onClose} className="w-9 h-9 rounded-lg border border-border-light bg-background-primary hover:bg-secondary-light text-text-muted hover:text-text-secondary inline-flex items-center justify-center transition-all duration-200">
             <XMarkIcon className="w-4 h-4" />
           </button>
         </div>
 
         {/* Meta bar */}
-        <div className="px-6 py-3 bg-secondary/80 border-b border-gray-100 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-muted shrink-0">
+        <div className="px-6 py-3 bg-secondary-light/80 border-b border-gray-100 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-text-muted shrink-0">
           <span className="inline-flex items-center gap-1.5">
             <ClockIcon className="w-3.5 h-3.5 text-text-muted" />{t("updated")}{formatDate(agreement.updatedDate || agreement.createdDate)}
           </span>
@@ -56,7 +56,7 @@ const AgreementModal = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-secondary/40 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-t border-gray-100 bg-secondary-light/40 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-1.5 text-xs text-text-muted">
             <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
             <span>{t("please_read_carefully_before_accepting")}</span>

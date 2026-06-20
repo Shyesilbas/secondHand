@@ -135,7 +135,7 @@ const HeaderSpotlight = ({
             setQuery(e.target.value);
             setSelectedIndex(0);
           }} onKeyDown={handleKeyDown} placeholder={t("search_pages_and_features")} className="flex-1 text-sm text-text-primary placeholder-gray-400 bg-transparent focus:outline-none" />
-            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-secondary hover:bg-tertiary transition-colors shrink-0">
+            <button type="button" onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-text-muted hover:text-text-secondary hover:bg-secondary-light transition-colors shrink-0">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -158,8 +158,8 @@ const HeaderSpotlight = ({
             } = entry;
             const Icon = item.icon;
             const isSelected = idx === selectedIndex;
-            return <button key={item.route} data-spotlight-item type="button" onClick={() => handleSelect(item)} onMouseEnter={() => setSelectedIndex(idx)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 ${isSelected ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary'}`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-background-primary/15' : 'bg-tertiary'}`}>
+            return <button key={item.route} data-spotlight-item type="button" onClick={() => handleSelect(item)} onMouseEnter={() => setSelectedIndex(idx)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 ${isSelected ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary-light'}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-background-primary/15' : 'bg-secondary-light'}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -178,7 +178,7 @@ const HeaderSpotlight = ({
           </div>
 
           {/* Footer hints */}
-          <div className="px-4 py-2.5 border-t border-gray-100 bg-secondary/60 flex items-center gap-4 text-caption text-text-muted">
+          <div className="px-4 py-2.5 border-t border-gray-100 bg-secondary-light/60 flex items-center gap-4 text-caption text-text-muted">
             <span className="inline-flex items-center gap-1">
               <kbd className="px-1 py-0.5 rounded border border-border-light bg-background-primary text-[9px] font-medium">↑↓</kbd>{t("navigate")}</span>
             <span className="inline-flex items-center gap-1">

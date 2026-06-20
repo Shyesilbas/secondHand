@@ -17,7 +17,7 @@ const SidebarLayout = ({
   const toggleSidebarCollapse = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
-  return <div className="flex min-h-screen bg-secondary">
+  return <div className="flex min-h-screen bg-background-secondary">
             {/* Desktop Sidebar */}
             <aside className={`hidden lg:flex lg:flex-col bg-background-primary border-r border-border-light sticky top-0 h-screen transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-16' : sidebarWidth}`}>
                 {/* Sidebar Header */}
@@ -27,7 +27,7 @@ const SidebarLayout = ({
                                 <h2 className="text-lg font-semibold text-text-primary">{sidebarTitle}</h2>
                                 <p className="text-sm text-text-secondary mt-0.5">{t("refine_your_search")}</p>
                             </div>}
-                        <button onClick={toggleSidebarCollapse} className={`p-2 text-text-muted hover:text-text-secondary hover:bg-tertiary rounded-lg transition-all duration-200 ${isSidebarCollapsed ? 'mx-auto' : ''}`} title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+                        <button onClick={toggleSidebarCollapse} className={`p-2 text-text-muted hover:text-text-secondary hover:bg-secondary-light rounded-lg transition-all duration-200 ${isSidebarCollapsed ? 'mx-auto' : ''}`} title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
                             <svg className={`w-5 h-5 transition-transform duration-300 ${isSidebarCollapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19l-7-7 7-7" />
                             </svg>
@@ -40,7 +40,7 @@ const SidebarLayout = ({
                     {isSidebarCollapsed ? <div className="space-y-4">
                             {/* Collapsed Icons */}
                             <div className="group relative">
-                                <div className="w-10 h-10 bg-tertiary hover:bg-tertiary rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                                <div className="w-10 h-10 bg-secondary-light hover:bg-secondary-light rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                                     <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                     </svg>
@@ -49,7 +49,7 @@ const SidebarLayout = ({
                             </div>
 
                             <div className="group relative">
-                                <div className="w-10 h-10 bg-tertiary hover:bg-tertiary rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                                <div className="w-10 h-10 bg-secondary-light hover:bg-secondary-light rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                                     <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h2v2H7v2z" />
                                     </svg>
@@ -58,7 +58,7 @@ const SidebarLayout = ({
                             </div>
 
                             <div className="group relative">
-                                <div className="w-10 h-10 bg-tertiary hover:bg-tertiary rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                                <div className="w-10 h-10 bg-secondary-light hover:bg-secondary-light rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                                     <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                     </svg>
@@ -82,7 +82,7 @@ const SidebarLayout = ({
                                 <h2 className="text-lg font-semibold text-text-primary">{sidebarTitle}</h2>
                                 <p className="text-sm text-text-secondary mt-0.5">{t("refine_your_search")}</p>
                             </div>
-                            <button onClick={toggleSidebar} className="p-2 text-text-muted hover:text-text-secondary hover:bg-tertiary rounded-lg transition-colors">
+                            <button onClick={toggleSidebar} className="p-2 text-text-muted hover:text-text-secondary hover:bg-secondary-light rounded-lg transition-colors">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -97,10 +97,10 @@ const SidebarLayout = ({
                         </div>
 
                         {/* Mobile Footer Actions */}
-                        <div className="flex-shrink-0 p-4 border-t border-border-light bg-secondary">
+                        <div className="flex-shrink-0 p-4 border-t border-border-light bg-secondary-light">
                             <div className="flex space-x-3">
                                 <button onClick={toggleSidebar} className="flex-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">{t("apply_filters")}</button>
-                                <button className="px-4 py-2 text-text-secondary text-sm font-medium border border-border-DEFAULT rounded-lg hover:bg-secondary transition-colors">{t("clear_all")}</button>
+                                <button className="px-4 py-2 text-text-secondary text-sm font-medium border border-border-DEFAULT rounded-lg hover:bg-secondary-light transition-colors">{t("clear_all")}</button>
                             </div>
                         </div>
                     </aside>
@@ -110,7 +110,7 @@ const SidebarLayout = ({
             <main className="flex-1 transition-all duration-300 bg-background-primary">
                 {/* Mobile Filter Button */}
                 <div className="lg:hidden bg-background-primary border-b border-border-light p-4">
-                    <button onClick={toggleSidebar} className="flex items-center justify-center w-full px-4 py-3 bg-secondary hover:bg-tertiary border border-border-DEFAULT rounded-lg transition-colors group">
+                    <button onClick={toggleSidebar} className="flex items-center justify-center w-full px-4 py-3 bg-secondary-light hover:bg-secondary-light border border-border-DEFAULT rounded-lg transition-colors group">
                         <svg className="w-5 h-5 text-text-secondary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
@@ -123,7 +123,7 @@ const SidebarLayout = ({
 
                 {/* Floating Expand Button (when collapsed) */}
                 {isSidebarCollapsed && <div className="hidden lg:block fixed top-6 left-6 z-20">
-                        <button onClick={toggleSidebarCollapse} className="p-3 bg-background-primary hover:bg-secondary text-text-secondary hover:text-text-primary rounded-xl shadow-lg hover:shadow-xl border border-border-light transition-all duration-200 group" title={t("expand_filters")}>
+                        <button onClick={toggleSidebarCollapse} className="p-3 bg-background-primary hover:bg-secondary-light text-text-secondary hover:text-text-primary rounded-xl shadow-lg hover:shadow-xl border border-border-light transition-all duration-200 group" title={t("expand_filters")}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                             </svg>
@@ -149,7 +149,7 @@ export const FilterSection = ({
   return <div className="space-y-3">
             <div className="flex items-center justify-between">
                 <h3 className="text-sm font-medium text-text-primary">{title}</h3>
-                {collapsible && <button onClick={() => setIsExpanded(!isExpanded)} className="p-1 hover:bg-tertiary rounded transition-colors">
+                {collapsible && <button onClick={() => setIsExpanded(!isExpanded)} className="p-1 hover:bg-secondary-light rounded transition-colors">
                         <svg className={`w-4 h-4 text-text-muted transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
                         </svg>
@@ -165,12 +165,12 @@ export const FilterCheckbox = ({
   count,
   checked,
   onChange
-}) => <label className="flex items-center justify-between p-2 hover:bg-secondary rounded-lg cursor-pointer transition-colors group">
+}) => <label className="flex items-center justify-between p-2 hover:bg-secondary-light rounded-lg cursor-pointer transition-colors group">
         <div className="flex items-center space-x-3">
-            <input type="checkbox" checked={checked} onChange={onChange} className="w-4 h-4 text-text-primary bg-tertiary border-border-DEFAULT rounded focus:ring-gray-500 focus:ring-1" />
+            <input type="checkbox" checked={checked} onChange={onChange} className="w-4 h-4 text-text-primary bg-secondary-light border-border-DEFAULT rounded focus:ring-gray-500 focus:ring-1" />
             <span className="text-sm text-text-secondary group-hover:text-text-primary">{label}</span>
         </div>
-        {count !== undefined && <span className="text-xs text-text-muted bg-tertiary px-2 py-1 rounded-full">
+        {count !== undefined && <span className="text-xs text-text-muted bg-secondary-light px-2 py-1 rounded-full">
                 {count}
             </span>}
     </label>;
@@ -183,7 +183,7 @@ export const FilterRange = ({
 }) => <div className="space-y-3">
         <label className="text-sm font-medium text-text-secondary">{label}</label>
         <div className="px-2">
-            <input type="range" min={min} max={max} value={value} onChange={onChange} className="w-full h-2 bg-tertiary rounded-lg appearance-none cursor-pointer slider" />
+            <input type="range" min={min} max={max} value={value} onChange={onChange} className="w-full h-2 bg-secondary-light rounded-lg appearance-none cursor-pointer slider" />
             <div className="flex justify-between text-xs text-text-muted mt-1">
                 <span>${min}</span>
                 <span className="font-medium text-text-secondary">${value}</span>
@@ -195,7 +195,7 @@ export const FilterButton = ({
   children,
   active = false,
   onClick
-}) => <button onClick={onClick} className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-background-primary text-text-secondary border-border-DEFAULT hover:bg-secondary hover:border-border-DEFAULT'}`}>
+}) => <button onClick={onClick} className={`px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${active ? 'bg-gray-900 text-white border-gray-900' : 'bg-background-primary text-text-secondary border-border-DEFAULT hover:bg-secondary-light hover:border-border-DEFAULT'}`}>
         {children}
     </button>;
 export default SidebarLayout;

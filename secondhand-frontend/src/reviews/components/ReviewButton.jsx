@@ -74,7 +74,7 @@ const ReviewButton = ({
                     <span className="text-lg">⭐</span>
                     <span>{t("reviewed")}{review.rating}/5)</span>
                 </div>
-                {review.comment && <div className="mt-1 text-xs text-text-secondary bg-secondary p-2 rounded-lg max-w-xs">
+                {review.comment && <div className="mt-1 text-xs text-text-secondary bg-secondary-light p-2 rounded-lg max-w-xs">
                         <p className="overflow-hidden" style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,

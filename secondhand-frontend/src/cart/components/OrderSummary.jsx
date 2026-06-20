@@ -50,7 +50,7 @@ const OrderSummary = ({
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }} /> : null}
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center border bg-secondary text-caption font-medium text-text-muted ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center border bg-secondary-light text-caption font-medium text-text-muted ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
               borderColor: CART_UI.border
             }}>
                   {item.listing.title.charAt(0).toUpperCase()}

@@ -64,7 +64,7 @@ const ProfilePage = () => {
     const ActiveIcon = activeTabData?.icon || UserIcon;
 
     return (
-        <div className="min-h-screen bg-secondary/80">
+        <div className="min-h-screen bg-background-secondary">
             {/* ── Profile Hero ────────────────────────────────── */}
             <div className="bg-background-primary border-b border-border-light/80">
                 <PageContainer className="py-8">
@@ -90,13 +90,13 @@ const ProfilePage = () => {
                                             className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left transition-all duration-200 group ${
                                                 isActive
                                                     ? 'bg-gray-900 text-white shadow-sm'
-                                                    : 'text-text-secondary hover:bg-secondary hover:text-text-primary'
+                                                    : 'text-text-secondary hover:bg-secondary-light hover:text-text-primary'
                                             }`}
                                         >
                                             <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
                                                 isActive
                                                     ? 'bg-background-primary/15'
-                                                    : 'bg-tertiary group-hover:bg-tertiary'
+                                                    : 'bg-secondary-light group-hover:bg-secondary-light'
                                             }`}>
                                                 <Icon className="w-4.5 h-4.5" />
                                             </div>
@@ -124,7 +124,7 @@ const ProfilePage = () => {
                             {/* Panel Header */}
                             <div className="px-8 py-6 border-b border-gray-100">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-tertiary flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-secondary-light flex items-center justify-center">
                                         <ActiveIcon className="w-5 h-5 text-text-secondary" />
                                     </div>
                                     <div>

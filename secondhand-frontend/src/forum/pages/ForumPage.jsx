@@ -53,7 +53,7 @@ const ForumPage = () => {
                 </div>
               </div>
               {isAuthenticated && <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => setSettingsOpen(true)} className="h-10 w-10 rounded-xl border border-border-light bg-background-primary text-text-muted hover:text-text-secondary hover:bg-secondary hover:border-border-DEFAULT inline-flex items-center justify-center transition-all duration-200" title={t("forum_settings")}>
+                  <button type="button" onClick={() => setSettingsOpen(true)} className="h-10 w-10 rounded-xl border border-border-light bg-background-primary text-text-muted hover:text-text-secondary hover:bg-secondary-light hover:border-border-DEFAULT inline-flex items-center justify-center transition-all duration-200" title={t("forum_settings")}>
                     <Settings2 className="w-4 h-4" />
                   </button>
                   <button type="button" onClick={() => setComposerOpen(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200">
@@ -68,7 +68,7 @@ const ForumPage = () => {
               {/* Search */}
               <div className={`relative w-full sm:max-w-sm transition-all duration-300 ${searchFocused ? 'sm:max-w-md' : ''}`}>
                 <Search className={`h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${searchFocused ? 'text-violet-500' : 'text-text-muted'}`} />
-                <input value={forum.search} onChange={e => forum.setSearch(e.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)} placeholder={t("search_threads")} className="w-full h-10 pl-10 pr-4 rounded-xl border border-border-light bg-secondary/80 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-background-primary transition-all duration-200" />
+                <input value={forum.search} onChange={e => forum.setSearch(e.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => setSearchFocused(false)} placeholder={t("search_threads")} className="w-full h-10 pl-10 pr-4 rounded-xl border border-border-light bg-secondary-light/80 text-sm text-text-primary placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-background-primary transition-all duration-200" />
               </div>
 
               {/* Sort */}
@@ -84,16 +84,16 @@ const ForumPage = () => {
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {FORUM_CATEGORY_OPTIONS.map(c => {
               const active = forum.category === c.id;
-              return <button key={c.id} type="button" onClick={() => forum.setCategory(c.id)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${active ? 'bg-gray-900 text-white shadow-md shadow-gray-900/10' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary'}`}>
+              return <button key={c.id} type="button" onClick={() => forum.setCategory(c.id)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${active ? 'bg-gray-900 text-white shadow-md shadow-gray-900/10' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary-light'}`}>
                     {c.id === 'SUGGESTIONS' && <Sparkles className="w-3.5 h-3.5" />}
                     {c.id === 'COMPLAINTS' && <SlidersHorizontal className="w-3.5 h-3.5" />}
                     {c.label}
                   </button>;
             })}
-
+ 
               {isAuthenticated && <>
                   <div className="w-px h-6 bg-tertiary mx-1 hidden sm:block" />
-                  <button type="button" onClick={() => setListTab(listTab === FORUM_LIST_TABS.LIKED ? FORUM_LIST_TABS.ALL : FORUM_LIST_TABS.LIKED)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${listTab === FORUM_LIST_TABS.LIKED ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary'}`}>
+                  <button type="button" onClick={() => setListTab(listTab === FORUM_LIST_TABS.LIKED ? FORUM_LIST_TABS.ALL : FORUM_LIST_TABS.LIKED)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${listTab === FORUM_LIST_TABS.LIKED ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary-light'}`}>
                     <Heart className={`w-3.5 h-3.5 ${listTab === FORUM_LIST_TABS.LIKED ? 'fill-rose-500' : ''}`} />{t("liked")}</button>
                 </>}
 
@@ -134,7 +134,7 @@ const ForumPage = () => {
                 </div> : <>
                   {visibleThreads.map(t => <ThreadCard key={t?.id} thread={t} isSelected={forum.selectedThreadId === t?.id} onSelect={forum.selectThread} reaction={forum.getEffectiveThreadReaction?.(t) || null} />)}
                   {forum.threadsHasMore && listTab !== FORUM_LIST_TABS.LIKED && <div className="flex justify-center pt-3 pb-1">
-                      <button type="button" onClick={forum.loadMoreThreads} disabled={forum.threadsLoading} className="px-5 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-secondary hover:bg-secondary hover:border-border-DEFAULT transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                      <button type="button" onClick={forum.loadMoreThreads} disabled={forum.threadsLoading} className="px-5 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-secondary hover:bg-secondary-light hover:border-border-DEFAULT transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                         {forum.threadsLoading ? 'Loading...' : FORUM_MESSAGES.LOAD_MORE}
                       </button>
                     </div>}

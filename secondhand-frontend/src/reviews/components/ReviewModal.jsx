@@ -61,7 +61,7 @@ const ReviewModal = ({
         </div>
 
         <div className="p-6">
-          <div className="mb-6 p-4 bg-secondary rounded-lg">
+          <div className="mb-6 p-4 bg-secondary-light rounded-lg">
             <h3 className="text-sm font-medium text-text-primary mb-1">
               {orderItem?.listing?.title || orderItem?.listing?.listingNo || 'Product'}
             </h3>
@@ -97,7 +97,7 @@ const ReviewModal = ({
               </div>}
 
             <div className="flex space-x-3 pt-4">
-              <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-text-secondary bg-tertiary rounded-lg hover:bg-tertiary transition-colors font-medium">{t("cancel")}</button>
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-text-secondary bg-secondary-light rounded-lg hover:bg-secondary-light/80 transition-colors font-medium">{t("cancel")}</button>
               <button type="submit" disabled={loading || rating < REVIEW_LIMITS.MIN_RATING} className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">
                 {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
               </button>
