@@ -23,7 +23,7 @@ const LowStockCard = ({
   showError
 }) => {
   const { t } = useTranslation();
-  return <div className="flex flex-wrap items-center gap-3 rounded-lg p-3 bg-background-primary/80 backdrop-blur border border-border-light/50 hover:border-slate-300/70 hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all" onClick={e => e.stopPropagation()}>
+  return <div className="flex flex-wrap items-center gap-3 rounded-lg p-3 bg-background-primary/80 backdrop-blur border border-border-light/50 hover:border-slate-300/70 hover:shadow-sm transition-all" onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm">
             {listing.title?.charAt(0)?.toUpperCase() || 'L'}
         </div>
@@ -145,7 +145,7 @@ const MyListingsPage = () => {
                 <BulkShowcaseBanner onBoostClick={() => setIsSelectionModalOpen(true)} />
 
                 {/* Portfolio Header */}
-                <div className="relative overflow-hidden bg-background-primary rounded-3xl border border-slate-100 p-6 shadow-sm group">
+                <div className="relative overflow-hidden bg-background-primary rounded-2xl border border-slate-100 p-6 shadow-sm group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/30 rounded-full -mr-16 -mt-16 blur-2xl transition-colors" />
                     
                     <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
@@ -180,7 +180,7 @@ const MyListingsPage = () => {
                 </div>
 
                 {/* Inventory Management Section */}
-                {hasLowStock && <div className="bg-background-primary rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+                {hasLowStock && <div className="bg-background-primary rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
                         <div className="p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-slate-50" onClick={lowStock.toggle}>
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">

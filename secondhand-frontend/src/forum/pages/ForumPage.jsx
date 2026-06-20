@@ -36,7 +36,7 @@ const ForumPage = () => {
   const threadCount = visibleThreads.length;
   return <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-indigo-50/40">
       {/* ── Hero Header ────────────────────────────────────────── */}
-      <div className="bg-background-primary/95 backdrop-blur-sm border-b border-border-light/80 shadow-[0_1px_0_0_rgb(238_242_255_/_0.6)]">
+      <div className="bg-background-primary/95 backdrop-blur-sm border-b border-border-light/80 shadow-sm">
         <PageContainer>
           <div className="py-6 sm:py-8">
             {/* Top row */}

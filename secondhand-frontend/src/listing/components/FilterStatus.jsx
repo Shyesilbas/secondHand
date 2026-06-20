@@ -156,12 +156,12 @@ const FilterStatus = ({
   const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
   const activeTags = GROUPED_FILTERS.map(group => mapGroupToTag(group, filters, enums)).filter(tag => tag !== null);
   const FilterBadge = () => hasActive && activeCount > 0 ? <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-semibold bg-indigo-50 text-primary border border-primary shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-semibold bg-indigo-50 text-primary border border-primary shadow-sm">
                     <SlidersHorizontal className="w-3 h-3" />
                     {activeCount}{t("filter")}{activeCount !== 1 ? 's' : ''}
                 </span>
 
-                {activeTags.map((tag, idx) => <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-medium bg-slate-50 text-slate-600 border border-border-light shadow-[0_1px_2px_rgba(0,0,0,0.01)] transition-all duration-200">
+                {activeTags.map((tag, idx) => <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-medium bg-slate-50 text-slate-600 border border-border-light shadow-sm transition-all duration-200">
                         {tag}
                     </span>)}
 

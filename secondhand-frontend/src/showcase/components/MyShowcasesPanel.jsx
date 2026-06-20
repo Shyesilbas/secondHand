@@ -99,7 +99,7 @@ const MyShowcasesPanel = ({
       expired
     };
   }, [processedShowcases]);
-  return <div className="bg-background-primary rounded-[32px] border border-slate-100 p-6 lg:p-8 mt-8 shadow-sm">
+  return <div className="bg-background-primary rounded-2xl border border-slate-100 p-6 lg:p-8 mt-8 shadow-sm">
       {/* Top Title Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-100">
         <div>
@@ -161,7 +161,7 @@ const MyShowcasesPanel = ({
           {filteredShowcases.map(showcase => {
         const progress = showcase.isExpired ? 0 : Math.min(100, Math.max(0, showcase.remaining / 30 * 100));
         const thumbUrl = showcase.listing?.imageUrl;
-        return <motion.div key={showcase.id} layout className={`group relative bg-background-primary rounded-3xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${showcase.isExpired ? 'border-slate-100 hover:border-slate-300/80 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.02)]' : 'border-slate-100 hover:border-primary/80 hover:shadow-[0_12px_30px_-4px_rgba(79,70,229,0.06)]'}`}>
+        return <motion.div key={showcase.id} layout className={`group relative bg-background-primary rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${showcase.isExpired ? 'border-slate-100 hover:border-slate-300/80 shadow-sm' : 'border-slate-100 hover:border-primary/80 hover:shadow-sm'}`}>
                 {/* Header Section with Thumbnail and Title */}
                 <div className="p-5 lg:p-6 flex gap-4">
                   {/* Thumbnail Image Container */}
@@ -266,7 +266,7 @@ const MyShowcasesPanel = ({
           opacity: 0,
           scale: 0.95,
           y: 20
-        }} className="relative bg-background-primary rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden z-10 border border-slate-100">
+        }} className="relative bg-background-primary rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden z-10 border border-slate-100">
               <div className="p-8 text-center">
                 <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 border border-rose-100/50">
                   <ShieldAlert className="w-8 h-8" />

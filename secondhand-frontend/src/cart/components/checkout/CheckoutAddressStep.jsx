@@ -161,7 +161,7 @@ const CheckoutAddressStep = ({
           </div> : <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {addresses.map(address => {
           const isSelected = String(selectedShippingAddressId) === String(address.id);
-          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-[0_8px_30px_rgb(79,70,229,0.05)] scale-[1.01]' : 'border-slate-100 bg-background-primary hover:border-slate-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.02)]'}`}>
+          return <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-indigo-600 bg-indigo-50/15 shadow-sm scale-[1.01]' : 'border-slate-100 bg-background-primary hover:border-slate-300 hover:shadow-sm'}`}>
                   <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
                   <div className="flex items-start gap-3">
                     {/* Radio indicator */}

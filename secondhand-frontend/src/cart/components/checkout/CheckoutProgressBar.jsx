@@ -22,7 +22,7 @@ const CheckoutProgressBar = ({
               <li className="flex items-center">
                 <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`group flex items-center gap-2.5 transition-all outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}>
                   {/* Step Node */}
-                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-caption font-medium transition-all duration-300 ${isCompleted ? 'bg-slate-900 text-white' : isCurrent ? 'bg-background-primary border-2 border-primary text-primary shadow-[0_0_12px_rgba(79,70,229,0.25)]' : 'bg-background-primary border border-border-light text-slate-400'}`}>
+                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-caption font-medium transition-all duration-300 ${isCompleted ? 'bg-slate-900 text-white' : isCurrent ? 'bg-background-primary border-2 border-primary text-primary shadow-sm' : 'bg-background-primary border border-border-light text-slate-400'}`}>
                     {isCompleted ? <Check className="h-3 w-3" strokeWidth={3} /> : step.id}
                   </span>
 

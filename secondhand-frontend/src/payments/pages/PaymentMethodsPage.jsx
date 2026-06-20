@@ -13,7 +13,7 @@ const PaymentMethodsPage = () => {
             <PageContainer className="py-10">
 
                 <div className="flex items-center gap-4 mb-8">
-                    <button onClick={() => navigate(-1)} className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-background-primary hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-border-light/80 group shrink-0">
+                    <button onClick={() => navigate(-1)} className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-background-primary hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all shadow-sm border border-border-light/80 group shrink-0">
                         <ArrowLeftIcon className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
                     </button>
                     <div className="flex items-center gap-4">

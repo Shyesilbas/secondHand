@@ -92,7 +92,7 @@ export const SafeMeetupOnboardingModal = () => {
   const step = ONBOARDING_STEPS[currentStep];
   const StepIcon = step.icon;
   return <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-fade-in">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-[32px] border border-white/50 bg-[#faf9f7] p-8 shadow-2xl transition-all duration-300">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/50 bg-[#faf9f7] p-8 shadow-2xl transition-all duration-300">
         
         {/* Floating Background Glows */}
         <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-indigo-500/5 blur-3xl" />
@@ -116,7 +116,7 @@ export const SafeMeetupOnboardingModal = () => {
         <div className="py-8 relative z-10">
           <div className="flex flex-col items-center text-center">
             {/* Elegant Pulsing Icon Card */}
-            <div className={`flex h-20 w-20 items-center justify-center rounded-[24px] border ${step.color} shadow-inner mb-6 animate-pulse`}>
+            <div className={`flex h-20 w-20 items-center justify-center rounded-2xl border ${step.color} shadow-inner mb-6 animate-pulse`}>
               <StepIcon className="h-10 w-10" />
             </div>
 

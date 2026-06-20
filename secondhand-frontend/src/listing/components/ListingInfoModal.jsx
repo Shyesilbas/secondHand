@@ -124,7 +124,7 @@ const ListingInfoModal = ({
   const stock = listing.quantity != null && Number.isFinite(Number(listing.quantity)) ? Number(listing.quantity) : null;
   return createPortal(<div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4" role="presentation">
       <button type="button" className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity duration-300" aria-label={t("close_dialog")} onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-labelledby="quick-view-title" className="relative flex max-h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-[28px] bg-slate-50 shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,860px)] sm:rounded-[28px] transition-all duration-300" onClick={e => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-labelledby="quick-view-title" className="relative flex max-h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-[28px] bg-slate-50 shadow-2xl ring-1 ring-slate-200/80 sm:max-h-[min(88dvh,860px)] sm:rounded-2xl transition-all duration-300" onClick={e => e.stopPropagation()}>
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border-light bg-background-primary px-5 py-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary bg-indigo-50 px-2.5 py-1 text-caption font-bold uppercase tracking-wider text-primary">
@@ -177,7 +177,7 @@ const ListingInfoModal = ({
               </div>
 
               {/* Safe Meetup Visual Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-status-success-bg border border-emerald-100 text-emerald-700 text-caption font-bold shadow-[0_2px_8px_-2px_rgba(16,185,129,0.05)]">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-status-success-bg border border-emerald-100 text-emerald-700 text-caption font-bold shadow-sm">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>{t("escrow_safe_meetup_protected")}</span>
               </div>

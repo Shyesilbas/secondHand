@@ -22,7 +22,7 @@ const CompareFloatingBar = memo(() => {
   const canCompare = itemCount >= 2;
   return <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
             <div className="max-w-4xl mx-auto px-4 pb-4 pt-2">
-                <div className="pointer-events-auto rounded-2xl border border-border-light bg-background-primary/95 backdrop-blur-md shadow-[0_-4px_24px_-4px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/5 overflow-hidden">
+                <div className="pointer-events-auto rounded-2xl border border-border-light bg-background-primary/95 backdrop-blur-md shadow-sm ring-1 ring-slate-900/5 overflow-hidden">
                     <div className="px-4 py-2.5 bg-gradient-to-r from-indigo-600/08 to-indigo-500/03 border-b border-slate-100">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2 min-w-0">

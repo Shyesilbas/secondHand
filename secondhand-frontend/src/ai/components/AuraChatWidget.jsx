@@ -126,7 +126,7 @@ const AuraChatWidget = () => {
   }, [ensureGreeting, isOpen, messages.length]);
   return <div className="fixed bottom-5 right-5 z-[120]">
       <div className={`absolute bottom-16 right-0 origin-bottom-right transition-all duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        <div className="w-[380px] max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-[1.35rem] border border-border-light/90 bg-background-primary shadow-2xl shadow-slate-900/10 overflow-hidden flex flex-col ring-1 ring-slate-900/5">
+        <div className="w-[380px] max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-2xl border border-border-light/90 bg-background-primary shadow-2xl shadow-slate-900/10 overflow-hidden flex flex-col ring-1 ring-slate-900/5">
           {/* Header */}
           <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-3.5 border-b border-slate-100 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
             <button type="button" onClick={() => {

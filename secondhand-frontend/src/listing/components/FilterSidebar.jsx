@@ -80,7 +80,7 @@ const FilterSidebar = ({
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `} aria-labelledby="listing-filters-title">
         {/* Header */}
-        <header className="flex-shrink-0 border-b border-border-light/80 bg-background-primary px-4 py-4 shadow-[0_1px_0_rgba(15,23,42,0.04)]">
+        <header className="flex-shrink-0 border-b border-border-light/80 bg-background-primary px-4 py-4 shadow-sm">
           <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-md shadow-indigo-500/25">
@@ -171,7 +171,7 @@ const FilterSection = ({
   title,
   description,
   children
-}) => <section className="overflow-hidden rounded-2xl border border-border-light/70 bg-background-primary shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]">
+}) => <section className="overflow-hidden rounded-2xl border border-border-light/70 bg-background-primary shadow-sm">
     <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-3">
       <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
       {description ? <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{description}</p> : null}

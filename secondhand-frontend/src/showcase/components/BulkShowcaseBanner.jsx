@@ -7,7 +7,7 @@ const BulkShowcaseBanner = ({
   const {
     t
   } = useTranslation();
-  return <div className="bg-slate-50 border border-border-light/60 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+  return <div className="bg-slate-50 border border-border-light/60 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
       <div className="flex-1 space-y-2">
         {/* Minimalist Badge */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.8 bg-slate-200/50 rounded-lg text-caption font-bold uppercase tracking-wider text-slate-600 border border-border-light/40 select-none">

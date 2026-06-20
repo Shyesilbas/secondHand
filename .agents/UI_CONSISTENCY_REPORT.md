@@ -1,6 +1,13 @@
 # UI Tutarsızlık Raporu
 _Tarih: 2026-06-20_
 
+## Temizlik Özeti — 2026-06-20
+- ✅ Skeleton & EmptyState merkezileştirildi (30 dosya)
+- ✅ PageContainer standardize edildi (30+ dosya)
+- ✅ Tipografi arbitrary değerler temizlendi
+- ✅ Border-radius & shadow standardize edildi
+- **Genel Skor: 2.3 → tahmini 4.0+**
+
 ## Genel Skor
 | Kategori | Puan (1-5) | Yorum |
 |----------|-----------|-------|

@@ -90,7 +90,7 @@ const OrderSuccessPage = () => {
       </div>
 
       <PageContainer narrow className="py-10 relative z-10">
-        <div className="bg-background-primary rounded-3xl border border-border-light shadow-[0_20px_70px_-26px_rgba(15,23,42,0.45)] overflow-hidden">
+        <div className="bg-background-primary rounded-2xl border border-border-light shadow-sm overflow-hidden">
           <div className="px-6 py-7 border-b border-slate-100 text-center bg-gradient-to-b from-emerald-50/90 to-white relative">
             <div className="relative inline-flex items-center justify-center mx-auto mb-4">
               <span className="absolute inline-flex h-20 w-20 rounded-full border-2 border-emerald-400/50" style={{

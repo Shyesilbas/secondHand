@@ -42,7 +42,7 @@ const TrustExperienceSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {TRUST_FEATURES.map(feat => {
           const Icon = feat.icon;
-          return <div key={feat.title} className="group border border-slate-100 rounded-2xl p-6 bg-slate-50/30 transition-all duration-200 hover:bg-background-primary hover:border-border-light/80 hover:shadow-[0_8px_30px_rgb(0,0,0,0.02)] flex flex-col justify-between">
+          return <div key={feat.title} className="group border border-slate-100 rounded-2xl p-6 bg-slate-50/30 transition-all duration-200 hover:bg-background-primary hover:border-border-light/80 hover:shadow-sm flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center transition-colors group-hover:bg-status-success-bg group-hover:text-status-success">

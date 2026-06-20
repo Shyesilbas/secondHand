@@ -100,7 +100,7 @@ function FormSection({
   const {
     t
   } = useTranslation();
-  return <section className={`rounded-2xl border border-border-light/90 bg-gradient-to-br from-white via-white to-slate-50/60 p-4 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04] ${className}`}>
+  return <section className={`rounded-2xl border border-border-light/90 bg-gradient-to-br from-white via-white to-slate-50/60 p-4 shadow-sm ring-1 ring-slate-900/[0.04] ${className}`}>
       <div className="mb-3 flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25">
           <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
@@ -464,7 +464,7 @@ const AdminCouponsPage = () => {
       </div>
 
       {modal && <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-0 backdrop-blur-[3px] sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="coupon-modal-title">
-          <div className="flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.75rem] border border-white/70 bg-background-primary shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/[0.06] sm:rounded-[1.75rem] sm:shadow-2xl">
+          <div className="flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.75rem] border border-white/70 bg-background-primary shadow-sm ring-1 ring-slate-900/[0.06] sm:rounded-2xl sm:shadow-2xl">
             <header className="relative shrink-0 overflow-hidden border-b border-white/10 bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-700 px-5 py-5 text-white">
               <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-background-primary/10 blur-2xl" />
               <div className="pointer-events-none absolute -bottom-12 -left-8 h-32 w-48 rounded-full bg-primary/30 blur-xl" />

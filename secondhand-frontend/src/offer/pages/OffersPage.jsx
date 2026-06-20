@@ -159,7 +159,7 @@ const OffersPage = () => {
   const pageTo = Math.min(totalElements, page * size + items.length);
   return <div className="min-h-screen bg-slate-50/90">
       <PageContainer className="py-6 sm:py-7">
-        <div className="rounded-3xl border border-border-light/80 bg-background-primary/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
+        <div className="rounded-2xl border border-border-light/80 bg-background-primary/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="inline-flex rounded-2xl bg-slate-100 p-1">
               <button type="button" onClick={() => {
@@ -207,14 +207,14 @@ const OffersPage = () => {
           </div>
         </div>
 
-        <div className="mt-6 rounded-[1.75rem] border border-border-light/80 bg-background-primary p-4 shadow-[0_24px_80px_rgba(15,23,42,0.06)] sm:p-6">
+        <div className="mt-6 rounded-2xl border border-border-light/80 bg-background-primary p-4 shadow-sm sm:p-6">
           {totalElements > 0 ? <p className="mb-4 text-xs text-slate-500">{t("showing")}{pageFrom}–{pageTo}{t("of")}{totalElements}{t("offers")}</p> : null}
 
           {isLoading ? <div className="space-y-4">
               {[...Array(3)].map((_, i) => <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-100" />)}
             </div> : error ? <div className="rounded-2xl border border-red-200 bg-status-error-bg/80 px-4 py-3">
               <p className="text-sm font-medium text-red-800">{error}</p>
-            </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border-light bg-slate-50/60 px-6 py-16 text-center">
+            </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-light bg-slate-50/60 px-6 py-16 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15">
                 <Handshake className="h-8 w-8 text-primary" />
               </div>

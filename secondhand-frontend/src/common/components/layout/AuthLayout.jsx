@@ -15,7 +15,7 @@ const AuthLayout = () => {
   // Serene split-screen layout with spacious proportions (Left: 56% width, Right: 44% width)
   return <div className="flex min-h-screen w-full bg-[#faf9f7]" data-page={pageName ?? undefined} data-path={pathname}>
             {/* ── Left: Form Area (56% width to give inputs generous space) ── */}
-            <div className="flex flex-col w-full lg:w-[56%] min-h-screen overflow-y-auto bg-background-primary shadow-[0_8px_32px_rgba(28,25,23,0.015)] z-15 relative">
+            <div className="flex flex-col w-full lg:w-[56%] min-h-screen overflow-y-auto bg-background-primary shadow-sm z-15 relative">
                 <PageContainer narrow className="flex-col flex-1 justify-between py-10 px-6 sm:px-12 md:px-16 lg:px-18 xl:px-20 w-full">
                     {/* Header Spacing wrapper */}
                     <div className="flex-1 flex flex-col justify-center py-6">

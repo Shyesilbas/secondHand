@@ -159,7 +159,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
       {/* Unread Indicator dot */}
       {unread && (
         <span
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(79,70,229,0.7)] animate-pulse"
+          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-sm animate-pulse"
           aria-hidden
         />
       )}

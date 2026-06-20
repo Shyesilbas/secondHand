@@ -285,7 +285,7 @@ const ShoppingCartPage = () => {
 
               {/* Applied Bundles (Success) */}
               {bundleInfo.applied.length > 0 && <div className="mb-6 space-y-3">
-                  {bundleInfo.applied.map((a, idx) => <div key={idx} className="flex items-center gap-4 p-4 bg-status-success-bg border border-green-100 rounded-3xl animate-in slide-in-from-top-4 duration-500">
+                  {bundleInfo.applied.map((a, idx) => <div key={idx} className="flex items-center gap-4 p-4 bg-status-success-bg border border-green-100 rounded-2xl animate-in slide-in-from-top-4 duration-500">
                       <div className="w-10 h-10 bg-status-success-bg text-white rounded-xl flex items-center justify-center shrink-0">
                         <Check className="w-5 h-5" />
                       </div>
@@ -301,7 +301,7 @@ const ShoppingCartPage = () => {
                   {bundleInfo.suggestions.map((s, idx) => {
               const currentQty = s.minQuantity - s.remaining;
               const progress = currentQty / s.minQuantity * 100;
-              return <div key={idx} className="group relative overflow-hidden bg-background-primary border-2 border-primary rounded-3xl p-5 shadow-sm transition-all hover:shadow-md">
+              return <div key={idx} className="group relative overflow-hidden bg-background-primary border-2 border-primary rounded-2xl p-5 shadow-sm transition-all hover:shadow-md">
                         <div className="absolute top-0 left-0 w-1 bg-primary h-full" />
                         
                         <div className="flex flex-col sm:flex-row sm:items-center gap-6">

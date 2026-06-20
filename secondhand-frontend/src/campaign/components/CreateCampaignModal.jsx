@@ -134,7 +134,7 @@ const CreateCampaignModal = ({
   const modal = <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1a1918]/60 backdrop-blur-sm px-4" onMouseDown={e => {
     if (e.target === e.currentTarget) onClose?.();
   }}>
-      <div className="w-full max-w-4xl bg-background-primary rounded-3xl shadow-2xl border border-[#e5e3df] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-4xl bg-background-primary rounded-2xl shadow-2xl border border-[#e5e3df] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-8 py-5 border-b border-[#f0efed] bg-[#fafaf9] flex items-center justify-between shrink-0">
           <div>
@@ -240,7 +240,7 @@ const CreateCampaignModal = ({
               </section>
 
               {/* Type Specific Section */}
-              {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-indigo-50 border border-primary rounded-3xl space-y-4">
+              {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-indigo-50 border border-primary rounded-2xl space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

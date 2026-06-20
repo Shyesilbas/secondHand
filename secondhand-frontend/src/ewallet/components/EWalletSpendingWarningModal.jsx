@@ -15,7 +15,7 @@ const EWalletSpendingWarningModal = ({
   } = useTranslation();
   if (!isOpen) return null;
   return <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-background-primary rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 border border-slate-100">
+            <div className="bg-background-primary rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 border border-slate-100">
                 <div className="relative p-8">
                     {/* Close button */}
                     <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors">
@@ -23,7 +23,7 @@ const EWalletSpendingWarningModal = ({
                     </button>
 
                     {/* Warning Icon */}
-                    <div className="w-16 h-16 bg-status-warning-bg rounded-3xl flex items-center justify-center mb-6 border border-amber-100">
+                    <div className="w-16 h-16 bg-status-warning-bg rounded-2xl flex items-center justify-center mb-6 border border-amber-100">
                         <AlertTriangle className="w-8 h-8 text-amber-500" />
                     </div>
 

@@ -138,7 +138,7 @@ const PayListingFeePage = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4 }}
-                    className="mt-6 rounded-[2.5rem] border border-white/60 bg-background-primary/60 backdrop-blur-xl px-8 py-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                    className="mt-6 rounded-2xl border border-white/60 bg-background-primary/60 backdrop-blur-xl px-8 py-16 shadow-sm"
                 >
                     <EmptyState 
                         title={t("no_draft_listings")} 

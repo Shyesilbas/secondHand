@@ -28,7 +28,7 @@ const CheckoutOrderSummary = ({
   const total = pricing?.total != null ? parseFloat(pricing.total) : subtotal + shipping + tax;
   const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
   return <aside className="sticky top-14 lg:top-[4.5rem]">
-      <div className="overflow-hidden rounded-2xl border border-white/50 bg-background-primary/75 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
+      <div className="overflow-hidden rounded-2xl border border-white/50 bg-background-primary/75 backdrop-blur-md shadow-sm">
         {/* Header */}
         <div className="px-6 py-5">
           <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest">{t("order_summary")}</h3>

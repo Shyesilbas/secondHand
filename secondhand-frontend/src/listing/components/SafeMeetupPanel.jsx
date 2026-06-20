@@ -4,7 +4,7 @@ const SafeMeetupPanel = () => {
   const {
     t
   } = useTranslation();
-  return <div className="bg-slate-50/60 border border-slate-100/80 rounded-3xl p-6 sm:p-8 mb-10 shadow-[0_2px_8px_-1px_rgba(15,23,42,0.01)]">
+  return <div className="bg-slate-50/60 border border-slate-100/80 rounded-2xl p-6 sm:p-8 mb-10 shadow-sm">
       <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
         <ShieldCheck className="w-5 h-5 text-status-success shrink-0" />{t("safe_meetup_protection")}</h3>
       <p className="text-sm leading-relaxed text-slate-600 font-medium mb-6">{t("this_transaction_is_secured_by_our")}<strong>{t("safe_meetup_guarantee")}</strong>{t("follow_these_micro_steps_to_secure_your_")}</p>

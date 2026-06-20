@@ -83,7 +83,7 @@ const BulkShowcaseModal = ({
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-3xl bg-background-primary rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-3xl bg-background-primary rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 shrink-0">
           <div>
@@ -161,7 +161,7 @@ const BulkShowcaseModal = ({
                 </div>
 
                 {/* Right: Summary */}
-                <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-100 flex flex-col justify-between">
+                <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm text-slate-500">
                       <span>{t("base_price")}{itemCount}{t("x")}</span>

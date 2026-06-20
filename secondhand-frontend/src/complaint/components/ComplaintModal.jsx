@@ -83,7 +83,7 @@ const ComplaintModal = ({
   };
   if (!isOpen) return null;
   return <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
-            <div className="bg-background-primary rounded-[2rem] shadow-2xl shadow-slate-900/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-background-primary rounded-2xl shadow-2xl shadow-slate-900/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex-1">

@@ -32,7 +32,7 @@ const GlassCard = React.memo(({
   children,
   className = '',
   critical = false
-}) => <div className={`rounded-3xl border transition-all duration-300 ${critical ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg' : 'bg-background-primary/60 backdrop-blur-lg border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'} ${className}`}>
+}) => <div className={`rounded-2xl border transition-all duration-300 ${critical ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 shadow-lg' : 'bg-background-primary/60 backdrop-blur-lg border-white/40 shadow-sm hover:shadow-sm'} ${className}`}>
     {children}
   </div>);
 GlassCard.displayName = 'GlassCard';
@@ -174,7 +174,7 @@ const MeetupHandoverSection = ({
     const s = secs % 60;
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
-  return <div className="rounded-3xl border border-primary bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
+  return <div className="rounded-2xl border border-primary bg-gradient-to-br from-indigo-50/20 to-violet-50/20 p-6 shadow-sm mb-6 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-2xl rounded-full" />
       <div className="flex items-center gap-3 border-b border-primary/50 pb-4 mb-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-primary shadow-sm">
@@ -403,7 +403,7 @@ const OrderDetailsModal = React.memo(({
   return <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300`} style={{
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
   }}>
-        <div className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-[2rem] border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-xl overflow-hidden flex flex-col relative`}>
+        <div className={`w-full ${isSellerView ? 'max-w-5xl' : 'max-w-6xl'} max-h-[92vh] rounded-2xl border border-white/40 shadow-2xl shadow-indigo-900/20 bg-[#f8fafc]/95 backdrop-blur-xl overflow-hidden flex flex-col relative`}>
           {/* Decorative glows inside the modal */}
           <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/5 blur-[80px] rounded-full pointer-events-none mix-blend-multiply" />
           <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-primary/5 blur-[60px] rounded-full pointer-events-none mix-blend-multiply" />

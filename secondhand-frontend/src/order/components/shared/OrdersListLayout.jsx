@@ -140,7 +140,7 @@ const ListStatusGlyph = ({
   const spin = statusKey(status) === ORDER_STATUSES.PROCESSING;
   return <Cmp className={`shrink-0 ${spin ? 'animate-spin' : ''} ${className || ''}`} aria-hidden strokeWidth={2} />;
 };
-const btnToolbarIcon = 'inline-flex items-center justify-center rounded-xl bg-background-primary text-slate-600 hover:text-text-primary border border-border-light/90 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.08)] hover:border-slate-300 hover:bg-slate-50 transition-all';
+const btnToolbarIcon = 'inline-flex items-center justify-center rounded-xl bg-background-primary text-slate-600 hover:text-text-primary border border-border-light/90 shadow-sm hover:border-slate-300 hover:bg-slate-50 transition-all';
 const orderActionBtnBase = 'w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2';
 const Header = React.memo(({
   title,
@@ -159,7 +159,7 @@ const Header = React.memo(({
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-3 min-w-0">
             <h1 className="text-2xl font-semibold text-text-primary tracking-tight truncate">{title}</h1>
-            {showIndicator ? <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.45)]" /> : null}
+            {showIndicator ? <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse shrink-0 shadow-sm" /> : null}
           </div>
           {subtitle ? <p className="text-sm text-slate-500 font-medium truncate">{subtitle}</p> : null}
         </div>
@@ -207,7 +207,7 @@ const StatusTabs = React.memo(({
   return <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-200/50 border border-border-light/60 w-full lg:w-auto" role="tablist" aria-label={t("order_status_filters")}>
       {tabs.map(tab => {
       const active = (statusFilter || '') === (tab.value || '');
-      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 focus-visible:ring-offset-1 ${active ? 'bg-background-primary text-text-primary shadow-[0_2px_12px_-4px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/70'}`}>
+      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 focus-visible:ring-offset-1 ${active ? 'bg-background-primary text-text-primary shadow-sm ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/70'}`}>
             {tab.label}
           </button>;
     })}
@@ -238,13 +238,13 @@ const SearchToolbar = React.memo(({
       <div className="flex items-center gap-2 w-full">
         <form onSubmit={onSearch} className="flex items-center relative group w-full sm:w-64 transition-all duration-300 focus-within:w-full sm:focus-within:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" strokeWidth={2.5} />
-          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-primary placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-primary transition-all duration-200 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]" />
+          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-text-primary placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-primary transition-all duration-200 shadow-sm" />
           {searchTerm ? <button type="button" onClick={isSearchMode ? onClearSearch : () => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors" aria-label={uiCopy.clear}>
               <X className="w-3.5 h-3.5" />
             </button> : null}
           <button type="submit" className="sr-only" disabled={searchLoading || !searchTerm.trim()}>{uiCopy.searchSubmit}</button>
         </form>
-        <button type="button" onClick={() => setFiltersOpen(v => !v)} aria-expanded={filtersOpen} aria-controls={filtersPopoverId} className={`p-2.5 rounded-xl border transition-all duration-200 shrink-0 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${filtersOpen ? 'border-primary bg-background-primary text-primary ring-2 ring-indigo-500/15' : 'border-border-light/90 bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`} title={uiCopy.openFilters} aria-label={uiCopy.openFilters}>
+        <button type="button" onClick={() => setFiltersOpen(v => !v)} aria-expanded={filtersOpen} aria-controls={filtersPopoverId} className={`p-2.5 rounded-xl border transition-all duration-200 shrink-0 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${filtersOpen ? 'border-primary bg-background-primary text-primary ring-2 ring-indigo-500/15' : 'border-border-light/90 bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`} title={uiCopy.openFilters} aria-label={uiCopy.openFilters}>
           <SlidersHorizontal className="w-4 h-4" />
         </button>
       </div>
@@ -261,7 +261,7 @@ const SearchToolbar = React.memo(({
         </div> : null}
     </div>;
 });
-const OrderItemSkeleton = () => <div className="rounded-2xl border border-slate-100 bg-background-primary p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)] animate-pulse overflow-hidden relative">
+const OrderItemSkeleton = () => <div className="rounded-2xl border border-slate-100 bg-background-primary p-5 sm:p-6 shadow-sm animate-pulse overflow-hidden relative">
     <div className="absolute left-0 inset-y-0 w-1 rounded-r bg-slate-200" aria-hidden />
     <div className="pl-5 flex gap-4 sm:gap-5 items-start">
       <div className="flex -space-x-3 shrink-0">
@@ -305,7 +305,7 @@ const Pagination = React.memo(({
   return <div className="flex items-center justify-between flex-wrap gap-4 mt-10 pt-6 border-t border-border-light">
       <p className="text-sm text-slate-500 tabular-nums">{uiCopy.paginationShowing(startItem, endItem, totalElements)}</p>
       <div className="flex items-center gap-2 flex-wrap">
-        <button type="button" onClick={() => onPageChange(Math.max(0, currentPage - 1))} disabled={currentPage === 0 || totalPages <= 1} className="inline-flex items-center px-4 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)] transition-all">
+        <button type="button" onClick={() => onPageChange(Math.max(0, currentPage - 1))} disabled={currentPage === 0 || totalPages <= 1} className="inline-flex items-center px-4 py-2.5 rounded-xl border border-border-light bg-background-primary text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 shadow-sm transition-all">
           {uiCopy.paginationPrev}
         </button>
         <span className="text-sm font-semibold text-slate-700 tabular-nums px-2">
@@ -315,7 +315,7 @@ const Pagination = React.memo(({
           {uiCopy.paginationNext}
         </button>
         <span className="hidden sm:inline w-px h-5 bg-slate-200 mx-1" />
-        <select className="px-3 py-2.5 text-sm font-semibold text-slate-800 border border-border-light rounded-xl bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-primary shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)] cursor-pointer transition-all" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
+        <select className="px-3 py-2.5 text-sm font-semibold text-slate-800 border border-border-light rounded-xl bg-background-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-primary shadow-sm cursor-pointer transition-all" value={pageSize} onChange={e => onPageSizeChange(Number(e.target.value))}>
           {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map(option => <option key={option} value={option}>
               {uiCopy.paginationPerPage(option)}
             </option>)}
@@ -415,7 +415,7 @@ const UnifiedOrderItem = React.memo(({
       e.preventDefault();
       onOpenOrder(order);
     }
-  }} aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`} className={`group relative rounded-2xl border border-slate-100 bg-background-primary shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)] hover:shadow-[0_8px_30px_-8px_rgba(15,23,42,0.15)] hover:border-border-light hover:-translate-y-px transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-[3.5px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2 ${accentBorder}`}>
+  }} aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`} className={`group relative rounded-2xl border border-slate-100 bg-background-primary shadow-sm hover:shadow-sm hover:border-border-light hover:-translate-y-px transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-[3.5px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2 ${accentBorder}`}>
         {/* Thumbnails */}
         <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-1">
           {displayedItems.map((item, i) => <div key={item.id || i} className="w-16 h-16 sm:w-[4.5rem] sm:h-[4.5rem] rounded-2xl border-2 border-white shadow-md overflow-hidden bg-slate-50 relative" style={{
@@ -640,14 +640,14 @@ const OrdersListLayout = ({
               CARGO: 'Kargo ile Gönderim',
               SAFE_MEETUP: 'Elden Güvenli Teslimat'
             }[method];
-            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${isActive ? 'bg-background-primary text-text-primary shadow-[0_2px_12px_-4px_rgba(0,0,0,0.12)] border border-border-light/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/40'}`}>
+            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${isActive ? 'bg-background-primary text-text-primary shadow-sm border border-border-light/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/40'}`}>
                 {label}
               </button>;
           })}
         </div>
 
         {flow.search ? <>
-          <div className="mb-6 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-background-primary p-2 sm:p-2.5 rounded-2xl border border-border-light/80 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]">
+          <div className="mb-6 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-background-primary p-2 sm:p-2.5 rounded-2xl border border-border-light/80 shadow-sm">
             <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
             <SearchToolbar search={flow.search} onSearch={flow.search.handleSearch} onClearSearch={flow.search.clearSearch} filtersOpen={filtersOpen} setFiltersOpen={setFiltersOpen} uiCopy={uiCopy} pagination={flow.pagination} onPageSizeChange={onPageSizeChange} />
           </div>
@@ -660,9 +660,9 @@ const OrdersListLayout = ({
 
         {flow.loading ? <div className="space-y-4">
             {[...Array(isSellerView ? 2 : 3)].map((_, i) => <OrderItemSkeleton key={i} />)}
-          </div> : !displayedOrders?.length && !flow.search?.isSearchMode ? <div className="py-28 text-center rounded-3xl border border-dashed border-border-light bg-background-primary shadow-[0_2px_12px_-4px_rgba(15,23,42,0.06)] relative overflow-hidden">
+          </div> : !displayedOrders?.length && !flow.search?.isSearchMode ? <div className="py-28 text-center rounded-2xl border border-dashed border-border-light bg-background-primary shadow-sm relative overflow-hidden">
             <div className="relative flex flex-col items-center">
-              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-border-light flex items-center justify-center mb-6 shadow-sm">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-border-light flex items-center justify-center mb-6 shadow-sm">
                 <Package className="w-11 h-11 text-slate-300" />
               </div>
               <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</h3>

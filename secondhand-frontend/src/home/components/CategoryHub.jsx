@@ -70,7 +70,7 @@ const CategoryHub = () => {
         <div className="flex gap-3 overflow-x-auto pb-4 pt-1 px-1 scrollbar-hide md:grid md:grid-cols-4 lg:grid-cols-8 md:overflow-x-visible md:pb-0">
           {CATEGORIES.map(cat => {
           const Icon = cat.icon;
-          return <button key={cat.value} onClick={() => handleCategoryClick(cat)} className="flex flex-col items-center justify-center shrink-0 w-28 h-24 md:w-auto md:h-24 rounded-2xl border border-slate-100 bg-background-primary p-3 transition-all duration-200 hover:border-slate-300 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.45)] group">
+          return <button key={cat.value} onClick={() => handleCategoryClick(cat)} className="flex flex-col items-center justify-center shrink-0 w-28 h-24 md:w-auto md:h-24 rounded-2xl border border-slate-100 bg-background-primary p-3 transition-all duration-200 hover:border-slate-300 hover:shadow-sm group">
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-105 ${cat.bg}`}>
                   <Icon className="w-5 h-5 shrink-0" />
                 </div>

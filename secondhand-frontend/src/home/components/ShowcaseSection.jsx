@@ -130,10 +130,10 @@ const ShowcaseSection = () => {
                         <span className="px-2 py-1 rounded-md bg-background-primary/90 backdrop-blur-sm text-[9px] font-bold text-slate-500 uppercase tracking-wider shadow-sm border border-slate-100">{t("featured")}</span>
                       </div>
                       <ListingCard listing={showcase.listing} showActions={false} isOwner={user?.id === showcase.listing.sellerId} currentUserId={user?.id} />
-                    </div>) : <div className="col-span-full py-20 text-center bg-background-primary rounded-3xl border border-slate-100">
+                    </div>) : <div className="col-span-full py-20 text-center bg-background-primary rounded-2xl border border-slate-100">
                     <p className="text-sm text-slate-400 font-medium">{t("no_items_found_in_this_category")}</p>
                   </div>}
-              </motion.div> : <div className="text-center py-24 bg-background-primary rounded-3xl border border-dashed border-border-light">
+              </motion.div> : <div className="text-center py-24 bg-background-primary rounded-2xl border border-dashed border-border-light">
                 <p className="text-sm text-slate-400 font-medium">{t("no_featured_items_available_at_the_momen")}</p>
               </div>}
           </AnimatePresence>

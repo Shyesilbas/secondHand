@@ -54,7 +54,7 @@ const FavoriteListCard = ({
   };
   return <>
             <Link to={ROUTES.FAVORITE_LIST_DETAIL(list.id)} className="block group">
-                <div className="bg-background-primary rounded-3xl border border-border-light overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div className="relative aspect-square bg-gradient-to-br from-slate-100 to-slate-200">
                         {list.previewImageUrl || list.coverImageUrl ? <img src={list.previewImageUrl || list.coverImageUrl} alt={list.name} loading="lazy" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
                                 <Package className="w-16 h-16 text-gray-300" />

@@ -162,7 +162,7 @@ const ShowcaseModal = ({
 
     if (isListingLoading) {
       return <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-background-primary rounded-3xl shadow-2xl w-full max-w-md mx-4 p-10 text-center">
+                    <div className="bg-background-primary rounded-2xl shadow-2xl w-full max-w-md mx-4 p-10 text-center">
                         <div className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto mb-4" />
                         <p className="text-sm text-slate-500 font-medium">{t("loading_listing")}</p>
                     </div>
@@ -170,7 +170,7 @@ const ShowcaseModal = ({
     }
     if (!listingId || listingError || !listing) {
       return <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-background-primary rounded-3xl shadow-2xl w-full max-w-sm mx-4 p-8 text-center">
+                    <div className="bg-background-primary rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-8 text-center">
                         <div className="w-10 h-10 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <X className="w-5 h-5 text-rose-500" />
                         </div>
@@ -182,7 +182,7 @@ const ShowcaseModal = ({
     }
     return <>
                 <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-background-primary rounded-3xl shadow-2xl w-full max-w-lg mx-auto overflow-hidden max-h-[92vh] flex flex-col">
+                    <div className="bg-background-primary rounded-2xl shadow-2xl w-full max-w-lg mx-auto overflow-hidden max-h-[92vh] flex flex-col">
 
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">

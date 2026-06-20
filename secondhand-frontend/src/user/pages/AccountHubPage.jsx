@@ -66,7 +66,7 @@ const AccountHubPage = () => {
       {/* Sidebar Navigation */}
       <aside className="w-full lg:w-[320px] bg-transparent flex-shrink-0 flex flex-col p-6 lg:py-10 lg:pl-10 lg:pr-6 select-none">
         {/* User Card */}
-        <div className="bg-background-primary rounded-2xl p-5 shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-slate-100/60 mb-6 flex items-center gap-4">
+        <div className="bg-background-primary rounded-2xl p-5 shadow-sm border border-slate-100/60 mb-6 flex items-center gap-4">
           <div className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-bold text-lg shadow-sm overflow-hidden">
             {user?.profilePicture ? <img src={user.profilePicture} alt="" className="h-full w-full object-cover" /> : getInitials(`${user?.name || ''} ${user?.surname || ''}`)}
           </div>
@@ -154,7 +154,7 @@ const AccountHubPage = () => {
           </div>
 
           {/* Recent Orders Box */}
-          <div className="bg-background-primary rounded-[28px] border border-slate-100/60 shadow-[0_8px_40px_rgba(0,0,0,0.01)] p-6 lg:p-8 mb-8">
+          <div className="bg-background-primary rounded-2xl border border-slate-100/60 shadow-sm p-6 lg:p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("recent_orders")}</h2>
               <Link to={ROUTES.MY_ORDERS} className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 hover:text-text-primary transition-colors">{t("view_all")}<ArrowRight className="w-4 h-4" strokeWidth={2} />

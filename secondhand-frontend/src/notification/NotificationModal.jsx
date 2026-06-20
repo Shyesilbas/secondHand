@@ -106,7 +106,7 @@ const NotificationModal = ({
   };
   if (!isOpen && !isVisible) return null;
   return <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center z-[80] p-4" onClick={handleBackdropClick}>
-            <div className={`relative bg-background-primary rounded-3xl border border-border-light shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${isLeaving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+            <div className={`relative bg-background-primary rounded-2xl border border-border-light shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${isLeaving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 {/* Close button */}
                 {showCloseButton && <div className="absolute right-4 top-4 z-10">
                         <button type="button" className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center" onClick={handleClose}>

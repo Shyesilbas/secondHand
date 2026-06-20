@@ -83,7 +83,7 @@ const PaymentReceiptModal = ({
         opacity: 0,
         scale: 0.95,
         y: 20
-      }} className="relative w-full max-w-[420px] max-h-[90vh] flex flex-col bg-background-primary rounded-[2.5rem] shadow-2xl overflow-hidden print:shadow-none print:max-h-none">
+      }} className="relative w-full max-w-[420px] max-h-[90vh] flex flex-col bg-background-primary rounded-2xl shadow-2xl overflow-hidden print:shadow-none print:max-h-none">
           {/* Header - Fixed */}
           <div className="p-5 pb-2 flex items-center justify-between bg-background-primary z-10">
             <div className="flex items-center gap-2">

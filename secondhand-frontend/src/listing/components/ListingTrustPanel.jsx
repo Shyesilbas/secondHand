@@ -28,7 +28,7 @@ const ListingTrustPanel = ({
       {/* Seller Card Redesign */}
       <div className="border-t border-slate-100 py-6 mb-5">
         <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest mb-4">{t("seller_information")}</h3>
-        <div className="bg-slate-50/50 border border-slate-100/80 rounded-2xl p-4 mb-4 shadow-[0_2px_8px_-1px_rgba(15,23,42,0.01)]">
+        <div className="bg-slate-50/50 border border-slate-100/80 rounded-2xl p-4 mb-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               {/* Avatar with Verified Ring */}

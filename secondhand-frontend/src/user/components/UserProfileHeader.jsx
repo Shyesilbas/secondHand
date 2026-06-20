@@ -32,12 +32,12 @@ const UserProfileHeader = ({
 
         {/* Profile Row */}
         <div className="pt-7 pb-6">
-          <div className="rounded-[1.75rem] border border-white/70 bg-background-primary shadow-xl shadow-gray-900/10">
+          <div className="rounded-2xl border border-white/70 bg-background-primary shadow-xl shadow-gray-900/10">
             <div className="flex flex-col lg:flex-row lg:items-stretch">
               <div className="flex flex-1 flex-col sm:flex-row items-start gap-5 p-5 sm:p-6 lg:p-7">
           {/* Avatar */}
                 <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-lime-900 flex items-center justify-center shadow-xl shadow-gray-900/15 ring-4 ring-white">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-lime-900 flex items-center justify-center shadow-xl shadow-gray-900/15 ring-4 ring-white">
               <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 {userInitials}
               </span>

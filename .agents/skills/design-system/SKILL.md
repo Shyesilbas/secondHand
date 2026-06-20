@@ -44,9 +44,23 @@ triggers:
 ## Component Yazarken
 1. Token'dan başla — rengi kafadan yazma
 2. Spacing: `gap-2`, `gap-3`, `gap-4` — arbitrary `gap-[14px]` yazma
-3. Border radius: `rounded-md` veya `rounded-lg` — `rounded-2xl` ve üstü yasak
-4. Shadow: `shadow-sm` maksimum — ağır shadow yasak
+3. Border radius: Standartlara göre kullan (Detaylar aşağıda)
+4. Shadow: `shadow-sm` veya `shadow-md` kullan — ağır veya arbitrary shadow yasak
 5. Yeni component bitince `DESIGN_AUDIT.md`'ye ekle
+
+## Border Radius Standardı
+| Kullanım | Class |
+|----------|-------|
+| Badge, tag, küçük element | `rounded-md` |
+| Button, input | `rounded-lg` |
+| Card | `rounded-xl` |
+| Büyük card, modal | `rounded-2xl` |
+| Avatar, tam yuvarlak | `rounded-full` |
+
+## Kesinlikle Yazma
+- `rounded-[24px]`, `rounded-[2.5rem]` gibi arbitrary değerler
+- `rounded-3xl` ve üstü — maksimum `rounded-2xl`
+- `shadow-[...]` arbitrary shadow — `shadow-sm` veya `shadow-md` kullan
 
 ## Referans Component'ler (Dokunma)
 - `src/common/services/cacheService.js` — cache pattern

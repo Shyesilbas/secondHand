@@ -136,7 +136,7 @@ const AccountVerificationPage = () => {
     }
   };
   return <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center py-16 px-6">
-            <div className="max-w-md w-full bg-background-primary rounded-3xl border border-stone-200/50 shadow-[0_8px_32px_rgba(28,25,23,0.02)] p-8 md:p-10 space-y-8 animate-fade-in">
+            <div className="max-w-md w-full bg-background-primary rounded-2xl border border-stone-200/50 shadow-sm p-8 md:p-10 space-y-8 animate-fade-in">
                 {/* Logo Monogram */}
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <div className="w-8 h-8 rounded-lg bg-stone-900 flex items-center justify-center shrink-0">

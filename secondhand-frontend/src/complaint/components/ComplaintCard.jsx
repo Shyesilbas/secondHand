@@ -25,7 +25,7 @@ const ComplaintCard = ({
     const formatted = formatDateCommon(dateString);
     return formatted || 'N/A';
   };
-  return <div className="relative flex h-full rounded-3xl border border-border-light/70 bg-background-primary/90 shadow-sm overflow-hidden">
+  return <div className="relative flex h-full rounded-2xl border border-border-light/70 bg-background-primary/90 shadow-sm overflow-hidden">
             <div className={`absolute inset-y-0 left-0 w-1 ${getStripeColor(complaint.resolvedAt)}`} />
             <div className="px-6 pt-5 pb-5 flex-1">
                 <div className="flex items-start justify-between">

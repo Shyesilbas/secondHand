@@ -55,12 +55,12 @@ const HeroSection = () => {
             <p className="mt-5 text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl font-medium">{t("browse_vetted_listings_compare_real_pric")}</p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 max-w-2xl">
-              <Link to={ROUTES.LISTINGS_PREFILTER} className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-background-primary px-4 py-3.5 text-sm font-semibold text-slate-500 border border-border-light shadow-[0_18px_45px_-28px_rgba(15,23,42,0.45)] hover:border-slate-300 transition-all">
+              <Link to={ROUTES.LISTINGS_PREFILTER} className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-background-primary px-4 py-3.5 text-sm font-semibold text-slate-500 border border-border-light shadow-sm hover:border-slate-300 transition-all">
                 <Search className="w-5 h-5 text-slate-400 shrink-0" />
                 <span className="truncate">{t("search_cars_phones_homes_fashion")}</span>
                 <ArrowRight className="ml-auto w-4 h-4 text-text-primary transition-transform group-hover:translate-x-0.5 shrink-0" />
               </Link>
-              <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors shadow-[0_16px_35px_-22px_rgba(15,23,42,0.9)]">{t("start_selling")}</Link>
+              <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors shadow-sm">{t("start_selling")}</Link>
             </div>
 
             <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">
@@ -93,7 +93,7 @@ const HeroSection = () => {
           </div>
 
           <div className="relative flex items-center justify-center min-h-[330px] lg:h-[430px]">
-            <div className="absolute inset-x-4 bottom-4 top-10 rounded-[28px] bg-slate-950 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.65)]" />
+            <div className="absolute inset-x-4 bottom-4 top-10 rounded-2xl bg-slate-950 shadow-sm" />
             <div className="absolute left-4 top-5 rounded-2xl border border-white/10 bg-background-primary/10 px-4 py-3 text-white backdrop-blur">
               <p className="text-caption font-bold uppercase tracking-[0.18em] text-emerald-200">{t("live_picks")}</p>
               <p className="mt-1 text-2xl font-bold">{featuredCards.length || 3}</p>

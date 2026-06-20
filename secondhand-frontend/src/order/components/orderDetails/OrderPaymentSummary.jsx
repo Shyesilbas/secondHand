@@ -25,7 +25,7 @@ export const OrderPaymentSummary = React.memo(({
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500">{t("payment_status")}</span>
             <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/20 border border-white/5">
-              <div className={`w-1.5 h-1.5 rounded-full ${getPaymentStatusIndicatorClass(selectedOrder.paymentStatus)} shadow-[0_0_6px_currentColor]`} />
+              <div className={`w-1.5 h-1.5 rounded-full ${getPaymentStatusIndicatorClass(selectedOrder.paymentStatus)} shadow-sm`} />
               <span className={`text-caption uppercase tracking-wider font-bold ${getPaymentStatusTextClass(selectedOrder.paymentStatus)}`}>
                 {resolveEnumLabel('paymentStatuses', selectedOrder.paymentStatus) || selectedOrder.paymentStatus}
               </span>

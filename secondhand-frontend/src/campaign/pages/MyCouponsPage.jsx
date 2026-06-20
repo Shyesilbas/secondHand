@@ -172,7 +172,7 @@ const MyCouponsPage = () => {
         {/* Content List */}
         {isLoading ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(n => <div key={n} className="h-48 rounded-2xl bg-background-primary border border-slate-100 animate-pulse" />)}
-          </div> : filteredCampaigns.length === 0 ? <div className="bg-background-primary rounded-3xl p-12 text-center border-2 border-dashed border-slate-100">
+          </div> : filteredCampaigns.length === 0 ? <div className="bg-background-primary rounded-2xl p-12 text-center border-2 border-dashed border-slate-100">
             <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Tag className="w-6 h-6 text-slate-300" />
             </div>

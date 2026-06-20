@@ -12,7 +12,7 @@ const DraftListingsList = ({
   } = useTranslation();
     return (
         <div className="lg:col-span-7 xl:col-span-8">
-            <div className="rounded-[2rem] border border-white/60 bg-background-primary/70 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <div className="rounded-2xl border border-white/60 bg-background-primary/70 backdrop-blur-xl px-6 py-8 shadow-sm">
                 <div className="mb-4 flex items-baseline justify-between">
                     <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("draft_listings")}</h2>
                     <span className="text-xs text-slate-500">
@@ -28,7 +28,7 @@ const DraftListingsList = ({
                                     onClick={() => onSelectListing(listing)}
                                     className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 ease-out border overflow-hidden
                                         ${isSelected 
-                                            ? 'border-primary bg-indigo-50/30 shadow-[0_8px_20px_rgba(99,102,241,0.12)] -translate-y-0.5' 
+                                            ? 'border-primary bg-indigo-50/30 shadow-sm -translate-y-0.5' 
                                             : 'border-border-light bg-background-primary hover:border-primary hover:shadow-md hover:-translate-y-0.5'
                                         }`}
                                 >

@@ -100,7 +100,7 @@ const SecurityPage = () => {
                 {/* Main Content Area */}
                 <div className="grid grid-cols-1 gap-8">
                     {/* Activity Section */}
-                    <div className="bg-background-primary rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="bg-background-primary rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-background-primary">
                             <h3 className="text-sm font-medium text-text-primary flex items-center gap-2">{t("login_activity")}<span className="text-xs font-normal text-text-muted bg-secondary px-2 py-0.5 rounded-full">
                                     {totalElements}{t("events")}</span>
@@ -132,9 +132,9 @@ const LoadingSkeleton = () => <div className="min-h-screen bg-background-primary
             <div className="h-4 w-24 bg-tertiary rounded" />
             <div className="h-12 w-1/3 bg-tertiary rounded" />
             <div className="grid grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => <div key={i} className="h-32 bg-secondary rounded-3xl" />)}
+                {[1, 2, 3].map(i => <div key={i} className="h-32 bg-secondary rounded-2xl" />)}
             </div>
-            <div className="h-96 bg-secondary rounded-3xl" />
+            <div className="h-96 bg-secondary rounded-2xl" />
         </PageContainer>
     </div>;
 export default SecurityPage;

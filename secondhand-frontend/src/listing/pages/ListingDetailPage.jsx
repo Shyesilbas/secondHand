@@ -87,8 +87,8 @@ const DetailError = ({
 }) => {
   const { t } = useTranslation();
   return <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
-    <div className="text-center max-w-sm rounded-[24px] border border-border-light/80 bg-background-primary p-10 shadow-lg listing-fade-in">
-      <div className="w-16 h-16 bg-gradient-to-br from-rose-50 to-rose-100 rounded-[18px] flex items-center justify-center mx-auto mb-6 shadow-sm">
+    <div className="text-center max-w-sm rounded-2xl border border-border-light/80 bg-background-primary p-10 shadow-lg listing-fade-in">
+      <div className="w-16 h-16 bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl flex items-center justify-center mx-auto mb-6 shadow-sm">
         <AlertTriangle className="w-7 h-7 text-rose-500" />
       </div>
       <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("listing_unavailable")}</h3>
@@ -280,7 +280,7 @@ const ListingDetailPage = () => {
           <div className="lg:col-span-7 xl:col-span-8 listing-stagger space-y-4">
 
             {/* Title Block */}
-            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
+            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100/80">
               <div className="flex flex-wrap items-center gap-1.5 mb-3">
                 <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-caption font-bold text-white uppercase tracking-wider">
                   {listing.type}
@@ -317,7 +317,7 @@ const ListingDetailPage = () => {
             </section>
 
             {/* Image Gallery */}
-            <section ref={galleryRef} className="bg-background-primary rounded-2xl p-2.5 sm:p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80 overflow-hidden">
+            <section ref={galleryRef} className="bg-background-primary rounded-2xl p-2.5 sm:p-3 shadow-sm border border-slate-100/80 overflow-hidden">
               <div className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[400px] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl overflow-hidden relative group cursor-pointer">
                 {selectedImage ? <img key={selectedImage} src={optimizeCloudinaryUrl(selectedImage, {
                 width: 1200
@@ -354,7 +354,7 @@ const ListingDetailPage = () => {
             </section>
 
             {/* Key Specs Strip */}
-            {categoryBadges.length > 0 && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
+            {categoryBadges.length > 0 && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100/80">
                 <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.15em] mb-3">{t("key_specs")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {categoryBadges.flatMap((badge, bIdx) => {
@@ -372,7 +372,7 @@ const ListingDetailPage = () => {
             {listing?.id && <AuraSummary type="listing" id={listing.id} />}
 
             {/* Description */}
-            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
+            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100/80">
               <h2 className="text-lg font-semibold text-text-primary mb-3 tracking-tight">{t("about_this_item")}</h2>
               <div className={`text-sm leading-6 text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[180px] overflow-hidden' : ''}`}>
                 {listing.description || 'No description has been added for this listing.'}
@@ -384,7 +384,7 @@ const ListingDetailPage = () => {
             </section>
 
             {/* Specifications */}
-            {DetailsComponent && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
+            {DetailsComponent && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100/80">
                 <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("specifications")}</h2>
                 <div className="bg-gradient-to-br from-slate-50/80 to-slate-50 rounded-xl p-4 sm:p-5 border border-slate-100/60">
                   <DetailsComponent listing={listing} />
@@ -395,7 +395,7 @@ const ListingDetailPage = () => {
             <SafeMeetupPanel />
 
             {/* Reviews */}
-            {hasReviews && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
+            {hasReviews && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100/80">
                 <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("reviews")}</h2>
                 <ListingReviewsSection listing={listing} />
               </section>}

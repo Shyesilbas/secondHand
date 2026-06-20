@@ -153,7 +153,7 @@ const PaymentsPage = () => {
                     </div>
 
                     {/* Content Section */}
-                    <div className="bg-background-primary border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
+                    <div className="bg-background-primary border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
                         {/* Search & Tabs */}
                         <div className="p-6 border-b border-slate-50 bg-slate-50/30">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

@@ -21,7 +21,7 @@ const PaymentPanel = ({
   } = useTranslation();
     return (
         <div className="lg:col-span-5 xl:col-span-4">
-            <div className="sticky top-4 rounded-[2rem] border border-white/60 bg-background-primary/80 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
+            <div className="sticky top-4 rounded-2xl border border-white/60 bg-background-primary/80 backdrop-blur-xl px-6 py-8 shadow-sm">
                 <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("payment_panel")}</h3>
                 <p className="mb-6 text-xs text-slate-500">{t("review_the_fee_details_and_choose_a_secu")}</p>
 

@@ -17,7 +17,7 @@ const ListingAnalyticsPanel = ({
   if (!listing) return null;
   const price = displayPrice != null ? displayPrice : listing?.price;
   return <div className="mt-5">
-      <button type="button" onClick={openInfo} className="group w-full rounded-2xl border border-slate-100/80 bg-gradient-to-br from-slate-50/80 to-white p-5 text-left transition-all hover:border-primary/80 hover:shadow-[0_2px_12px_rgba(79,70,229,0.06)]">
+      <button type="button" onClick={openInfo} className="group w-full rounded-2xl border border-slate-100/80 bg-gradient-to-br from-slate-50/80 to-white p-5 text-left transition-all hover:border-primary/80 hover:shadow-sm">
         {/* Header row */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">

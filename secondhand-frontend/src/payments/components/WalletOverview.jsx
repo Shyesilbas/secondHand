@@ -40,7 +40,7 @@ export const EWalletBalance = ({
   return <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Wallet Virtual Card */}
       <div className="lg:col-span-1">
-        <div className="relative h-full rounded-3xl bg-gradient-to-bl from-slate-900 via-slate-800 to-black p-6 text-white shadow-2xl overflow-hidden flex flex-col justify-between">
+        <div className="relative h-full rounded-2xl bg-gradient-to-bl from-slate-900 via-slate-800 to-black p-6 text-white shadow-2xl overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-background-primary/5 blur-2xl pointer-events-none" />
           <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 rounded-full bg-background-primary/5 blur-xl pointer-events-none" />
           
@@ -81,7 +81,7 @@ export const EWalletBalance = ({
       <div className="lg:col-span-2 flex justify-between flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
           {/* Wallet Limit Card */}
-          <div className="bg-background-primary rounded-3xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div className="bg-background-primary rounded-2xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-primary flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-5 h-5" />
@@ -100,7 +100,7 @@ export const EWalletBalance = ({
           </div>
 
           {/* Spending Warning Card */}
-          <div className="bg-background-primary rounded-3xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div className="bg-background-primary rounded-2xl border border-border-light p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
                 <ShieldAlert className="w-5 h-5" />

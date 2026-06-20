@@ -122,7 +122,7 @@ const ChatPage = ({
               </div>
             </div>}
 
-          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-3xl border border-border-light/60 bg-background-primary shadow-sm`}>
+          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-2xl border border-border-light/60 bg-background-primary shadow-sm`}>
             {/* Chat Rooms List */}
             <div className="lg:col-span-4 border-r border-border-light/60 h-full flex flex-col overflow-hidden">
               <ChatList chatRooms={chatRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
@@ -176,7 +176,7 @@ const ChatPage = ({
                     </div>
                   </div> : <div className="h-full flex items-center justify-center bg-slate-50">
                     <div className="text-center px-8">
-                      <div className="w-28 h-28 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm">
+                      <div className="w-28 h-28 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-sm">
                         <MessageCircle className="w-14 h-14 text-slate-400" />
                       </div>
                       <h3 className="text-sm font-medium text-text-primary mb-3 tracking-tight">{t("select_a_conversation")}</h3>

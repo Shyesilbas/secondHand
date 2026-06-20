@@ -19,13 +19,13 @@ const InboxNotificationsPanel = () => {
     refetch
   } = useInAppNotificationsContext();
   if (isLoading) {
-    return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-3xl border border-border-light/80 bg-background-primary shadow-lg shadow-slate-100/50">
+    return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-2xl border border-border-light/80 bg-background-primary shadow-lg shadow-slate-100/50">
         <div className="flex h-16 shrink-0 items-center border-b border-slate-100 bg-slate-50/60 px-5" />
         <div className="flex flex-1 items-center justify-center px-6 text-sm text-slate-400 font-medium">
           <Loader2 className="w-5 h-5 animate-spin text-primary mr-2" />{t("bildirimler_y_kleniyor")}</div>
       </div>;
   }
-  return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-3xl border border-border-light/80 bg-background-primary/95 backdrop-blur-xl shadow-lg shadow-slate-100/40 relative">
+  return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-2xl border border-border-light/80 bg-background-primary/95 backdrop-blur-xl shadow-lg shadow-slate-100/40 relative">
       {/* Premium Header Bar */}
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-100/90 bg-slate-50/70 px-5 sm:px-6 relative z-10">
         <div className="flex min-w-0 items-center gap-3">
@@ -54,7 +54,7 @@ const InboxNotificationsPanel = () => {
       </header>
 
       {notifications.length === 0 ? <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-20 text-center bg-gradient-to-b from-white to-slate-50/30">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-slate-50 border border-border-light/80 flex items-center justify-center mb-4 shadow-sm">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-50 to-slate-50 border border-border-light/80 flex items-center justify-center mb-4 shadow-sm">
             <Bell className="w-10 h-10 text-slate-300" />
           </div>
           <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("harika_her_ey_yolunda")}</h3>
