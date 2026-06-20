@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import AgreementsList from './AgreementsList.jsx';
@@ -68,7 +69,7 @@ const AgreementsPage = () => {
   return <div className="min-h-screen bg-gray-50/80">
             {/* ── Page Header ─────────────────────────────────── */}
             <div className="bg-white border-b border-gray-200/80">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <PageContainer narrow className="py-8">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center shadow-lg shadow-gray-900/10">
                             <FileText className="w-6 h-6 text-white" />
@@ -78,10 +79,10 @@ const AgreementsPage = () => {
                             <p className="text-sm text-gray-500 mt-0.5">{t("review_and_accept_required_legal_documen")}</p>
                         </div>
                     </div>
-                </div>
+                </PageContainer>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <PageContainer narrow className="py-8">
                 <div className="flex flex-col lg:flex-row gap-6">
 
                     {/* ── Left: Category Sidebar ──────────────── */}
@@ -141,7 +142,7 @@ const AgreementsPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </PageContainer>
         </div>;
 };
 export default AgreementsPage;

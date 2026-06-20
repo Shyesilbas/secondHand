@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -105,7 +106,7 @@ const MyCouponsPage = () => {
         <div className="absolute top-[20%] -left-[10%] w-[30%] h-[30%] rounded-full bg-blue-50/50 blur-[100px]" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-4 py-6">
+      <PageContainer className="relative py-6">
         {/* Header Section */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -253,7 +254,7 @@ const MyCouponsPage = () => {
           }} />
             </div>
           </div>}
-      </div>
+      </PageContainer>
 
       <CreateCampaignModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={load} editingCampaign={editingCampaign} />
     </div>;

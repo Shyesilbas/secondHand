@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
@@ -67,7 +68,7 @@ const UserReviewsPage = () => {
     if (isGivenReviews) return 'Given Reviews';
     return 'Reviews';
   };
-  return <div className="container mx-auto px-4 py-10">
+  return <PageContainer className="py-10">
             <h1 className="text-2xl font-semibold text-text-primary mb-8">{getPageTitle()}</h1>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -82,6 +83,6 @@ const UserReviewsPage = () => {
                     <ReviewsList reviews={reviews} loading={loading} error={error} hasMore={hasMore} onLoadMore={loadMore} onRetry={refetch} />
                 </div>
             </div>
-        </div>;
+        </PageContainer>;
 };
 export default UserReviewsPage;

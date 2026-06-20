@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect } from 'react';
 import { ShieldAlert, FileSearch } from 'lucide-react';
@@ -18,7 +19,7 @@ const ComplaintsPage = () => {
   }, [getUserComplaints]);
   return <div className="min-h-screen bg-[#F8FAFC]">
             <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+                <PageContainer className="flex items-center justify-between py-4">
                     <div className="flex items-center gap-4">
                         <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-[0_18px_55px_rgba(15,23,42,0.18)] ring-1 ring-indigo-500/40">
                             <div className="absolute inset-px rounded-2xl bg-white/60 backdrop-blur-md" />
@@ -41,10 +42,10 @@ const ComplaintsPage = () => {
                             </span>
                         </div>
                     </div>
-                </div>
+                </PageContainer>
             </div>
 
-            <div className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+            <PageContainer className="pb-10 pt-6">
                 {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {[...Array(6)].map((_, i) => <div key={i} className="rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-sm animate-pulse">
                                 <div className="space-y-4">
@@ -91,7 +92,7 @@ const ComplaintsPage = () => {
                                 </span>{t("submit_new_complaint")}</button>
                         </div>
                     </div>}
-            </div>
+            </PageContainer>
         </div>;
 };
 export default ComplaintsPage;

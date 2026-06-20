@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import {useTranslation} from "react-i18next";
 import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -176,7 +177,7 @@ const Header = React.memo(({
     return <div className="mb-4 sm:mb-6">{headerContent}</div>;
   }
   return <div className="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">{headerContent}</div>
+        <PageContainer className="py-3.5">{headerContent}</PageContainer>
       </div>;
 });
 const StatusTabs = React.memo(({
@@ -619,7 +620,7 @@ const OrdersListLayout = ({
       <div className="relative z-10">
       <Header title={title} subtitle={subtitle} showIndicator={computedShowIndicator} onAnalytics={onAnalytics} analyticsLabel={analyticsLabel} onRefresh={flow.refreshAll} loading={flow.loading} sticky={stickyHeader} />
 
-      <div className={containerClassName || 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10'}>
+      <PageContainer className={containerClassName || 'py-10'}>
         {banner ? <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100/50 text-indigo-700 text-xs font-bold shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             {uiCopy.nameBannerTitle}
@@ -679,7 +680,7 @@ const OrdersListLayout = ({
           </div>}
 
         <Pagination pagination={flow.pagination} isSearchMode={flow.search?.isSearchMode} loading={flow.loading} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange} uiCopy={uiCopy} />
-      </div>
+      </PageContainer>
 
       <PaymentReceiptModal isOpen={flow.receipt.receiptOpen} onClose={flow.receipt.closeReceipt} payment={flow.receipt.receiptPayment} />
       </div>

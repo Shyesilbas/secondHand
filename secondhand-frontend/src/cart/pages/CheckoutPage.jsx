@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -188,7 +189,7 @@ const CheckoutPage = () => {
   return <div className="min-h-screen bg-[#faf9f7]">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-[#f0efed] bg-white/80 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+        <PageContainer className="py-3">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-[#555] transition-colors hover:text-[#111]" aria-label={t("back_to_cart")}>
               <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
@@ -197,7 +198,7 @@ const CheckoutPage = () => {
               <CheckoutProgressBar currentStep={currentStep} steps={steps} onStepChange={handleStepChange} />
             </div>
           </div>
-        </div>
+        </PageContainer>
       </header>
 
       {/* Mobile Collapsible Order Summary (Shopify-style accordion) */}
@@ -218,7 +219,7 @@ const CheckoutPage = () => {
       </div>
 
       {/* Body */}
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <PageContainer className="py-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
           <div className="lg:col-span-8">
             <CheckoutStep step={currentStep} cartItems={displayCartItems} calculateTotal={calculateTotal} addresses={checkout.addresses} selectedShippingAddressId={checkout.selectedShippingAddressId} setSelectedShippingAddressId={checkout.setSelectedShippingAddressId} selectedBillingAddressId={checkout.selectedBillingAddressId} setSelectedBillingAddressId={checkout.setSelectedBillingAddressId} selectedPaymentType={checkout.selectedPaymentType} setSelectedPaymentType={checkout.setSelectedPaymentType} eWallet={checkout.eWallet} paymentVerificationCode={checkout.paymentVerificationCode} setPaymentVerificationCode={checkout.setPaymentVerificationCode} paymentVerificationExpiresAtMs={checkout.paymentVerificationExpiresAtMs} notes={checkout.notes} setNotes={checkout.setNotes} orderName={checkout.orderName} setOrderName={checkout.setOrderName} deliveryMethod={checkout.deliveryMethod} setDeliveryMethod={checkout.setDeliveryMethod} meetupLocation={checkout.meetupLocation} setMeetupLocation={checkout.setMeetupLocation} emails={checkout.emails} fetchEmails={checkout.fetchEmails} onBack={handleBack} onNext={handleNext} onCheckout={checkout.handleCheckout} proceedDisabled={checkout.proceedDisabled} isCheckingOut={checkout.isCheckingOut} sendVerificationCode={checkout.sendVerificationCode} acceptedAgreements={checkout.acceptedAgreements} onAgreementToggle={checkout.onAgreementToggle} onRequiredAgreementsChange={checkout.onRequiredAgreementsChange} areAllAgreementsAccepted={checkout.areAllAgreementsAccepted} />
@@ -229,7 +230,7 @@ const CheckoutPage = () => {
             <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} />
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       <ActiveCouponsModal isOpen={isCouponsModalOpen} onClose={() => setIsCouponsModalOpen(false)} onApply={async code => {
       const c = typeof code === 'string' ? code.trim() : '';

@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import {useTranslation} from "react-i18next";
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
@@ -58,7 +59,7 @@ const discountPercent = (original, sale) => {
 /** Premium skeleton loader */
 const DetailSkeleton = () => <div className="min-h-screen bg-[#f7f8fa]">
     <div className="h-14 bg-white/80 border-b border-slate-200/50" />
-    <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 pt-5">
+    <PageContainer className="max-w-[1220px] pt-5">
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 xl:col-span-8 space-y-4">
           <div className="bg-white rounded-2xl p-4 animate-pulse">
@@ -77,7 +78,7 @@ const DetailSkeleton = () => <div className="min-h-screen bg-[#f7f8fa]">
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   </div>;
 
 /** Error state */
@@ -232,7 +233,7 @@ const ListingDetailPage = () => {
       <header className="sticky top-0 z-40 listing-glass border-b border-slate-200/50" style={{
       fontSize: '13px'
     }}>
-        <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 h-[52px] flex items-center justify-between gap-4">
+        <PageContainer className="max-w-[1220px] h-[52px] flex items-center justify-between gap-4">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm font-semibold min-w-0">
             <Link to={ROUTES.LISTINGS} className="text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0">
@@ -262,14 +263,14 @@ const ListingDetailPage = () => {
             </button>
             {isOwner && <ListingCardActions listing={listing} onChanged={fetchListing} />}
           </div>
-        </div>
+        </PageContainer>
       </header>
 
       {/* Offer Modal */}
       <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
 
       {/* ▸ Main Content */}
-      <main className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+      <PageContainer className="max-w-[1220px] pt-4 sm:pt-6">
         <div className="grid lg:grid-cols-12 gap-5 lg:gap-7">
 
           {/* ── Left Column ─────────────────────────────── */}
@@ -469,7 +470,7 @@ const ListingDetailPage = () => {
       }}>
           <SimilarListings currentListing={listing} />
         </div>
-      </main>
+      </PageContainer>
 
       {/* ▸ Mobile Bottom Bar */}
       {(canAddToCart || canMakeOffer || !isOwner) && <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 listing-mobile-bar border-t border-slate-200/50 px-4 py-3 pb-safe">

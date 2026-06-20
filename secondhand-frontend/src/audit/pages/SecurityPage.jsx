@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -65,7 +66,7 @@ const SecurityPage = () => {
   return <div className="min-h-screen bg-[#FAFAFA] text-[#1A1A1A]">
             {/* Top Navigation Bar */}
             <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
-                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                <PageContainer narrow className="h-16 flex items-center justify-between">
                     <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-black transition-colors">
                         <ArrowLeft size={18} />
                         <span>{t("account_settings")}</span>
@@ -74,10 +75,10 @@ const SecurityPage = () => {
                         <span className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
                         <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">{t("system_secure")}</span>
                     </div>
-                </div>
+                </PageContainer>
             </nav>
 
-            <div className="max-w-6xl mx-auto px-6 py-12">
+            <PageContainer narrow className="py-12">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div className="space-y-2">
@@ -119,7 +120,7 @@ const SecurityPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </PageContainer>
 
             <LogDetailModal selectedLog={selectedLog} setSelectedLog={setSelectedLog} getEventTypeDisplay={getEventTypeDisplay} getEventStatusColor={getEventStatusColor} getBrowserInfo={getBrowserInfo} />
 
@@ -127,13 +128,13 @@ const SecurityPage = () => {
         </div>;
 };
 const LoadingSkeleton = () => <div className="min-h-screen bg-white p-12 space-y-8 animate-pulse">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <PageContainer narrow className="space-y-8">
             <div className="h-4 w-24 bg-gray-100 rounded" />
             <div className="h-12 w-1/3 bg-gray-100 rounded" />
             <div className="grid grid-cols-3 gap-6">
                 {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-50 rounded-3xl" />)}
             </div>
             <div className="h-96 bg-gray-50 rounded-3xl" />
-        </div>
+        </PageContainer>
     </div>;
 export default SecurityPage;

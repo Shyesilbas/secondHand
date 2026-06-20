@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -52,7 +53,7 @@ const GreatSellerProgressCard = ({
       width: `${Math.min(100, pct)}%`
     }} />
         </div>;
-  return <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
+  return <PageContainer className="pb-5">
             <div className="bg-white rounded-2xl border border-amber-200/80 p-5 shadow-sm shadow-amber-900/5">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-2">
@@ -107,7 +108,7 @@ const GreatSellerProgressCard = ({
                     </div>
                 </div>
             </div>
-        </div>;
+        </PageContainer>;
 };
 const useUserProfile = userId => {
   const [user, setUser] = React.useState(null);
@@ -229,7 +230,7 @@ const UserProfilePage = () => {
 
             {/* ── Tab Bar ─────────────────────────────────────── */}
             <div className="sticky top-0 z-10 border-y border-gray-200/80 bg-white/90 backdrop-blur">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <PageContainer>
                     <div className="flex items-center gap-2 overflow-x-auto py-3">
                         {TABS.map(tab => {
             const Icon = tab.icon;
@@ -247,11 +248,11 @@ const UserProfilePage = () => {
                                 </button>;
           })}
                     </div>
-                </div>
+                </PageContainer>
             </div>
 
             {/* ── Tab Content ─────────────────────────────────── */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
+            <PageContainer className="py-7">
                 <div key={activeTab} className="animate-fadeIn min-w-0">
 
                     {/* ── Listings Tab ─────────────────────────── */}
@@ -337,7 +338,7 @@ const UserProfilePage = () => {
                     {/* ── Reviews Tab ──────────────────────────── */}
                     {activeTab === 'reviews' && <UserReviews profileUserId={user.id ?? userId} receivedReviews={receivedReviews} receivedReviewsLoading={receivedReviewsLoading} receivedReviewsFetching={receivedReviewsFetching} receivedReviewsError={receivedReviewsError} pagination={reviewsPagination} loadPage={loadReviewsPage} handlePageSizeChange={handleReviewsPageSizeChange} reviewStats={reviewStats} isOwnProfile={isOwnProfile} />}
                 </div>
-            </div>
+            </PageContainer>
 
             <FavoriteListModal isOpen={showCreateListModal} onClose={() => setShowCreateListModal(false)} onSuccess={() => {
       refetchLists();

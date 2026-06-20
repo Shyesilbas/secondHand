@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +10,7 @@ const PaymentMethodsPage = () => {
   } = useTranslation();
   const navigate = useNavigate();
   return <div className="min-h-screen bg-slate-50 tracking-tight">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <PageContainer className="py-10">
 
                 <div className="flex items-center gap-4 mb-8">
                     <button onClick={() => navigate(-1)} className="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-white hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] border border-slate-200/80 group shrink-0">
@@ -28,7 +29,7 @@ const PaymentMethodsPage = () => {
 
                 <EWalletSection />
 
-            </div>
+            </PageContainer>
         </div>;
 };
 export default PaymentMethodsPage;

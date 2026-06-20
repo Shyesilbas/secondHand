@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -88,7 +89,7 @@ const OrderSuccessPage = () => {
       }} />
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-10 relative z-10">
+      <PageContainer narrow className="py-10 relative z-10">
         <div className="bg-white rounded-3xl border border-slate-200 shadow-[0_20px_70px_-26px_rgba(15,23,42,0.45)] overflow-hidden">
           <div className="px-6 py-7 border-b border-slate-100 text-center bg-gradient-to-b from-emerald-50/90 to-white relative">
             <div className="relative inline-flex items-center justify-center mx-auto mb-4">
@@ -173,7 +174,7 @@ const OrderSuccessPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </div>;
 };
 export default OrderSuccessPage;

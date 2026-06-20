@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import { Heart, MessageCircle, Plus, Search, Settings2, SlidersHorizontal, TrendingUp, Sparkles, ArrowUpDown } from 'lucide-react';
@@ -36,7 +37,7 @@ const ForumPage = () => {
   return <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-indigo-50/40">
       {/* ── Hero Header ────────────────────────────────────────── */}
       <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200/80 shadow-[0_1px_0_0_rgb(238_242_255_/_0.6)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer>
           <div className="py-6 sm:py-8">
             {/* Top row */}
             <div className="flex items-start justify-between gap-4">
@@ -103,11 +104,11 @@ const ForumPage = () => {
               </span>
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* ── Main Content ───────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <PageContainer className="py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* ── Thread List (Left) ─────────────────────────────── */}
@@ -148,7 +149,7 @@ const ForumPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
 
       <ThreadComposerModal isOpen={composerOpen} onClose={() => setComposerOpen(false)} category={forum.category} onSubmit={forum.publishThread} />
 

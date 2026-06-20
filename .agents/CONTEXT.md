@@ -1,7 +1,12 @@
 ## Son çalışılan
-Tipografi arbitrary değer temizliği
+PageContainer Standartlaştırması & Tipografi arbitrary değer temizliği
 
 ## Tamamlananlar
+- `PageContainer` bileşeni `src/common/components/layout/PageContainer.jsx` altında oluşturuldu.
+- 30+ sayfa ve layout bileşenindeki (dashboard, listing, payments, cart, auth, agreements vb.) dağınık, hardcoded container sınıfları (`max-w-* mx-auto px-* py-*`) centralize edilerek `PageContainer` bileşeniyle standartlaştırıldı.
+- `AuraChatPage.jsx` `narrow` prop (`max-w-3xl`) ile yapılandırıldı.
+- `AccountHubPage.jsx` standart `PageContainer` üzerinde `className="max-w-4xl"` override prop'u verilerek uyarlandı.
+- Tüm değiştirilen dosyalarda `import PageContainer` satırının dosyanın en üstünde (satır 1) yer alması sağlandı.
 - `text-[px]` arbitrary değerler token'a taşındı, heading hiyerarşisi standardize edildi.
 - `update_typography.py` scripti kullanılarak 170+ `.jsx` dosyasında tipografi sınıfları standardize edildi.
 - `h1`, `h2`, `h3` etiketlerinde ve sayfa başlıklarında standarda uygun olarak tipografi ve renk sınıfları eklendi.
@@ -13,9 +18,9 @@ Tipografi arbitrary değer temizliği
 
 ## Açık riskler
 - Heading boyutları görsel test gerektirir — bazı başlıklar küçülmüş olabilir.
+- Bazı sayfalarda padding'lerin (px-*) ezilmesinden kaynaklı küçük görsel kaymalar.
 
 ## Geçmiş (History)
-- PageContainer Sayfa Seviyesi Wrapper Standartlaştırması yapıldı.
 - Skeleton ve EmptyState Ortak Bileşen Refaktörü yapıldı.
 - Teal/light tema geçişi + hardcoded renk temizliği yapıldı.
 - theme.js yeniden yazıldı, 3600+ hardcoded değer token'a taşındı, design-system SKILL.md eklendi.

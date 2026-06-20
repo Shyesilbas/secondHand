@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useState, lazy, Suspense } from 'react';
 import { useBuyerDashboard } from '../hooks/useDashboard.js';
@@ -71,7 +72,7 @@ const BuyerDashboardPage = () => {
   return <div className="min-h-screen bg-[#f8f9fb]">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <PageContainer className="py-6 px-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <motion.div initial={{
             opacity: 0,
@@ -102,11 +103,11 @@ const BuyerDashboardPage = () => {
               <TimeRangeSelector startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate} onPresetSelect={handlePresetSelect} />
             </motion.div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+      <PageContainer className="py-6 px-6 space-y-6">
         {/* Primary KPIs — 4 columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" color="blue" />
@@ -142,7 +143,7 @@ const BuyerDashboardPage = () => {
 
         {/* Spacer */}
         <div className="pb-8" />
-      </div>
+      </PageContainer>
     </div>;
 };
 export default BuyerDashboardPage;

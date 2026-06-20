@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -97,7 +98,7 @@ const PayListingFeePage = () => {
             <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[60%] rounded-full bg-blue-300/10 blur-[120px]" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12 relative z-10">
+        <PageContainer className="py-8 lg:py-12 relative z-10">
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -172,7 +173,7 @@ const PayListingFeePage = () => {
                 setShowConfirmModal(false);
                 navigate('/payments');
             }} isProcessing={isProcessingPayment} verificationCode={verificationCode} onChangeVerificationCode={setVerificationCode} codeExpiryTime={codeExpiryTime} onResendCode={resendVerificationCode} isResendingCode={isResendingCode} emails={emails} onFetchEmails={fetchEmails} onClearEmails={clearEmails} />}
-        </div>
+        </PageContainer>
     </div>
   );
 };

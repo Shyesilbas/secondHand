@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useCallback, useEffect } from 'react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -87,16 +88,16 @@ const ChatPage = ({
     });
   };
   if (!user) {
-    return <div className="container mx-auto px-4 py-8">
+    return <PageContainer className="py-8">
           <div className="text-center">
             <h2 className="text-lg font-semibold text-text-primary mb-4">{t("messages")}</h2>
             <p className="text-text-secondary">{t("please_login_to_see_your_messages")}</p>
           </div>
-        </div>;
+        </PageContainer>;
   }
   const gridHeightClass = embedded ? 'h-[min(72vh,calc(100vh-260px))]' : 'h-[calc(100vh-200px)]';
   return <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-slate-50'}>
-        <div className={`max-w-[1600px] mx-auto ${embedded ? 'px-0 py-0' : 'px-6 lg:px-8 py-8'}`}>
+        <PageContainer className={`max-w-[1600px] ${embedded ? 'px-0 sm:px-0 lg:px-0 py-0' : 'py-8'}`}>
           {!embedded && <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("messages")}</h1>
@@ -184,7 +185,7 @@ const ChatPage = ({
                   </div>}
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>;
 };
 export default ChatPage;

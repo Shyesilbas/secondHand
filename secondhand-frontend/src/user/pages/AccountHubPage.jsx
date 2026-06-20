@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -118,7 +119,7 @@ const AccountHubPage = () => {
 
       {/* Main Panel Body */}
       <main className="flex-1 p-6 lg:p-10 lg:pl-4 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
+        <PageContainer className="max-w-4xl">
           {/* Header Panel */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -237,7 +238,7 @@ const AccountHubPage = () => {
           </div>
 
           <MyShowcasesPanel userId={user?.id} />
-        </div>
+        </PageContainer>
       </main>
     </div>;
 };

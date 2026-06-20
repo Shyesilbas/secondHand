@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import React, {useState} from 'react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {usePhoneUpdate} from '../hooks/usePhoneUpdate.js';
@@ -66,13 +67,13 @@ const ProfilePage = () => {
         <div className="min-h-screen bg-gray-50/80">
             {/* ── Profile Hero ────────────────────────────────── */}
             <div className="bg-white border-b border-gray-200/80">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <PageContainer className="py-8">
                     <ProfileHeader user={user} />
-                </div>
+                </PageContainer>
             </div>
 
             {/* ── Main Content: Sidebar + Panel ───────────────── */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <PageContainer className="py-8">
                 <div className="flex flex-col lg:flex-row gap-6">
 
                     {/* ── Left Sidebar Nav ─────────────────────── */}
@@ -157,7 +158,7 @@ const ProfilePage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </PageContainer>
 
             <style>{`
                 @keyframes fadeIn {

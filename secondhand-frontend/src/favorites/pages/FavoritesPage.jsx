@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useMemo, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -62,7 +63,7 @@ const FavoritesPage = () => {
     fetchFavorites();
   }, [fetchFavorites]);
   return <div className="min-h-screen bg-slate-50/90">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <PageContainer className="py-6 sm:py-8">
         <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
           <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
@@ -140,7 +141,7 @@ const FavoritesPage = () => {
         refetchLists();
         setShowCreateListModal(false);
       }} />
-      </div>
+      </PageContainer>
     </div>;
 };
 export default FavoritesPage;

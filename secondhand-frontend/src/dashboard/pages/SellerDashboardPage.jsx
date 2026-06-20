@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useState, lazy, Suspense, useMemo } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
@@ -90,7 +91,7 @@ const SellerDashboardPage = () => {
   return <div className="min-h-screen bg-[#f8f9fb]">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <PageContainer className="py-6 px-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <motion.div initial={{
             opacity: 0,
@@ -112,11 +113,11 @@ const SellerDashboardPage = () => {
               <TimeRangeSelector startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate} onPresetSelect={handlePresetSelect} />
             </motion.div>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+      <PageContainer className="py-6 px-6 space-y-6">
         {/* Primary KPIs — 4 columns */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard index={0} title={t("revenue")} value={formatCurrency(dashboard.totalRevenue || 0, 'TRY')} icon={DollarSign} trend={dashboard.revenueGrowth ? parseFloat(dashboard.revenueGrowth) : null} trendLabel="vs previous period" color="green" />
@@ -165,7 +166,7 @@ const SellerDashboardPage = () => {
       }} className="pb-8">
           <TopListingsTable listings={dashboard.topListings || []} title={t("top_10_listings_by_revenue")} />
         </motion.div>
-      </div>
+      </PageContainer>
     </div>;
 };
 export default SellerDashboardPage;

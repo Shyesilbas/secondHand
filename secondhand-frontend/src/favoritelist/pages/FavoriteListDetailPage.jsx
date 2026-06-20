@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -89,7 +90,7 @@ const FavoriteListDetailPage = () => {
   };
   if (isLoading) {
     return <div className="min-h-screen bg-slate-50/90">
-        <div className="mx-auto max-w-6xl p-4 sm:p-6">
+        <PageContainer className="p-4 sm:p-6">
           <div className="animate-pulse space-y-6">
             <div className="h-8 w-40 rounded-lg bg-slate-200" />
             <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
@@ -106,7 +107,7 @@ const FavoriteListDetailPage = () => {
                 </div>)}
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>;
   }
   if (error || !list) {
@@ -124,7 +125,7 @@ const FavoriteListDetailPage = () => {
       </div>;
   }
   return <div className="min-h-screen bg-slate-50/90">
-      <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
+      <PageContainer className="space-y-6 p-4 sm:p-6">
         <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900">
           <ArrowLeft className="h-4 w-4" />{t("back")}</button>
 
@@ -237,7 +238,7 @@ const FavoriteListDetailPage = () => {
               {isOwner ? 'Add listings from search or listing pages with “Add to list”.' : 'There are no listings in this list yet.'}
             </p>
           </div>}
-      </div>
+      </PageContainer>
 
       <FavoriteListModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} editList={list} />
     </div>;

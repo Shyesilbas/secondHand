@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -104,7 +105,7 @@ const PaymentsPage = () => {
             <div className={`flex flex-col transition-all duration-500 ${showFilters ? 'lg:ml-80' : ''}`}>
                 {/* Modern Header */}
                 <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
-                    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <PageContainer className="py-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <button onClick={toggleFilterSidebar} className="p-2.5 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">
                                 <Filter className="w-5 h-5" />
@@ -124,10 +125,10 @@ const PaymentsPage = () => {
                             <Link to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 shadow-sm transition-all active:scale-95">
                                 <Wallet className="w-4 h-4" />{t("my_wallet")}</Link>
                         </div>
-                    </div>
+                    </PageContainer>
                 </header>
 
-                <main className="max-w-7xl mx-auto px-6 py-8 w-full">
+                <PageContainer className="py-8 w-full">
                     {/* Stats Section */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                         {statCards.map((card, idx) => <motion.div key={card.title} initial={{
@@ -188,7 +189,7 @@ const PaymentsPage = () => {
                                 <PaymentPagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} totalItems={totalElements} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange} />
                             </div>}
                     </div>
-                </main>
+                </PageContainer>
 
                 <PaymentReceiptModal isOpen={isReceiptModalOpen} onClose={closeReceipt} payment={selectedPayment} />
             </div>

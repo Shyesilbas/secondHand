@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -157,7 +158,7 @@ const OffersPage = () => {
   const pageFrom = totalElements === 0 ? 0 : page * size + 1;
   const pageTo = Math.min(totalElements, page * size + items.length);
   return <div className="min-h-screen bg-slate-50/90">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:py-7">
+      <PageContainer className="py-6 sm:py-7">
         <div className="rounded-3xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-900/5 sm:p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="inline-flex rounded-2xl bg-slate-100 p-1">
@@ -250,7 +251,7 @@ const OffersPage = () => {
               </div>
             </>}
         </div>
-      </div>
+      </PageContainer>
 
       <CounterOfferModal isOpen={!!counterTarget} onClose={() => setCounterTarget(null)} offer={counterTarget} onSuccess={refresh} />
     </div>;

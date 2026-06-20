@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -58,7 +59,7 @@ const OrderShipmentPage = () => {
     return m || 'Could not load this order.';
   }, [error]);
   return <div className="min-h-[calc(100vh-8rem)] bg-gradient-to-b from-slate-50 via-white to-indigo-50/30 pb-16">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 space-y-6">
+      <PageContainer narrow className="pt-8 sm:pt-10 space-y-6">
         <div className="flex items-center gap-3">
           <button type="button" onClick={() => navigate(backPath)} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 py-2">
             <ArrowLeft className="w-4 h-4" />{t("back_to_orders")}</button>
@@ -109,7 +110,7 @@ const OrderShipmentPage = () => {
               <span className="text-xs text-slate-400">{order.updatedAt ? `Updated ${formatDateTime(order.updatedAt)}` : ''}</span>
             </div>
           </> : null}
-      </div>
+      </PageContainer>
     </div>;
 };
 export default OrderShipmentPage;

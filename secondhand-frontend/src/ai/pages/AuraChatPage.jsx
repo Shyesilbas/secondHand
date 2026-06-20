@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -246,7 +247,7 @@ const AuraChatPage = () => {
 
         {/* Conversation Stream */}
         <div ref={listRef} className="flex-1 overflow-y-auto w-full custom-scrollbar">
-          <div className="max-w-3xl mx-auto px-4 py-8 w-full space-y-6">
+          <PageContainer narrow className="py-8 w-full space-y-6">
             
             {/* Elegant Welcome Greeting Card if there is only 1 message (initial welcome) */}
             {messages.length === 1 && <div className="rounded-xl border border-slate-200 bg-slate-50/40 p-6 text-center space-y-4 mb-6 shadow-inner">
@@ -294,7 +295,7 @@ const AuraChatPage = () => {
                   </div>
                 </div>;
           })}
-          </div>
+          </PageContainer>
         </div>
 
         {/* Mobile quick prompts feed panel (only visible if prompts exist and screen is mobile) */}

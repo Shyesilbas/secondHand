@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -190,7 +191,7 @@ const ShoppingCartPage = () => {
   }
   return <div className={`min-h-screen ${cartPageCanvas}`}>
       <header className={cartPageHeader}>
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <PageContainer className="flex h-14 items-center justify-between py-0">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <button type="button" onClick={() => navigate(-1)} className="-ml-2 rounded-xl p-2 text-[#5f5b57] transition hover:bg-black/[0.04] hover:text-[#1a1918]" aria-label={t("back")}>
               <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
@@ -213,10 +214,10 @@ const ShoppingCartPage = () => {
                   </span>
                 </p>}
             </div>}
-        </div>
+        </PageContainer>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <PageContainer className="py-6 sm:py-8">
         {cartCount === 0 ? <div className="space-y-8 pb-12">
             <div className={cartSurfacePanel} style={{
           borderColor: CART_UI.border
@@ -371,7 +372,7 @@ const ShoppingCartPage = () => {
           </div>}
 
         <ClearCartModal isOpen={showClearModal} onClose={() => setShowClearModal(false)} onConfirm={handleClearCart} isClearing={isClearingCart} />
-      </main>
+      </PageContainer>
     </div>;
 };
 export default ShoppingCartPage;

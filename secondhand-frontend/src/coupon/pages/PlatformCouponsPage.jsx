@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -77,7 +78,7 @@ const PlatformCouponsPage = () => {
   const ordersHref = orderId => orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
   const tableShell = 'rounded-2xl border border-slate-200/90 bg-white shadow-sm overflow-hidden ring-1 ring-slate-900/[0.04]';
   return <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="mx-auto max-w-5xl px-4 pb-10">
+      <PageContainer className="pb-10">
         <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-[#F8FAFC]/90 px-4 py-4 backdrop-blur">
           <div className="flex min-w-0 items-center gap-3">
             <Link to={ROUTES.DASHBOARD} className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-violet-600">
@@ -204,7 +205,7 @@ const PlatformCouponsPage = () => {
               </table>
             </div>
           </div>}
-      </div>
+      </PageContainer>
     </div>;
 };
 export default PlatformCouponsPage;

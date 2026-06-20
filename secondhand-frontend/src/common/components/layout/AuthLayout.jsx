@@ -1,3 +1,4 @@
+import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation } from 'react-router-dom';
 import { getPageName } from '../../utils/getPageName.js';
@@ -15,7 +16,7 @@ const AuthLayout = () => {
   return <div className="flex min-h-screen w-full bg-[#faf9f7]" data-page={pageName ?? undefined} data-path={pathname}>
             {/* ── Left: Form Area (56% width to give inputs generous space) ── */}
             <div className="flex flex-col w-full lg:w-[56%] min-h-screen overflow-y-auto bg-white shadow-[0_8px_32px_rgba(28,25,23,0.015)] z-15 relative">
-                <div className="flex flex-col flex-1 justify-between px-6 py-10 sm:px-12 md:px-16 lg:px-18 xl:px-20 max-w-xl mx-auto w-full">
+                <PageContainer narrow className="flex-col flex-1 justify-between py-10 px-6 sm:px-12 md:px-16 lg:px-18 xl:px-20 w-full">
                     {/* Header Spacing wrapper */}
                     <div className="flex-1 flex flex-col justify-center py-6">
                         <Outlet />
@@ -24,7 +25,7 @@ const AuthLayout = () => {
                     <footer className="pt-8 text-center border-t border-stone-100 mt-auto">
                         <p className="text-caption tracking-wider text-stone-400 font-medium">{t("2026_secondhand_all_rights_reserved")}</p>
                     </footer>
-                </div>
+                </PageContainer>
             </div>
 
             {/* ── Right: Visual Carousel Area (44% width showcase) ── */}
