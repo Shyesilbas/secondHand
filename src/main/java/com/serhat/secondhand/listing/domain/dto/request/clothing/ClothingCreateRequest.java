@@ -48,5 +48,9 @@ public record ClothingCreateRequest(
     ClothingGender clothingGender,
 
     @NotNull(message = "Clothing category is required")
-    ClothingCategory clothingCategory
+    ClothingCategory clothingCategory,
+
+    com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingFit fit,
+    com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingPattern pattern,
+    com.serhat.secondhand.listing.domain.entity.enums.clothing.FabricType fabricType
 ) {}

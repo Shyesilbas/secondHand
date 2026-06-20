@@ -48,5 +48,12 @@ public record RealEstateCreateRequest(
         String infrastructureStatusKey,
         String waterSource,
         boolean electricityAvailable,
-        boolean roadAccess
+        boolean roadAccess,
+        
+        String buildingCondition,
+        boolean exchangeable,
+        boolean hasNorthFacade,
+        boolean hasSouthFacade,
+        boolean hasEastFacade,
+        boolean hasWestFacade
 ) {}

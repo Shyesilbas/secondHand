@@ -6,7 +6,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useListingActions } from '../hooks/useListingActions.js';
 import { ListingQuickEdit } from './ListingQuickEdit.jsx';
 import { LISTING_STATUS } from '../types/index.js';
-import { MoreVertical, Pencil, CreditCard, PowerOff, Power, CheckCircle, Megaphone, Trash2, Zap } from 'lucide-react';
+import { MoreVertical, Pencil, CreditCard, PowerOff, Power, CheckCircle, Megaphone, Trash2, Zap, Copy } from 'lucide-react';
 const ListingCardActions = ({
   listing,
   onChanged
@@ -92,6 +92,8 @@ const ListingCardActions = ({
             {listing.status === LISTING_STATUS.INACTIVE && <MenuItem onClick={actions.handleReactivate} icon={Power} label={t("reactivate")} variant="green" />}
 
             {listing.status !== LISTING_STATUS.SOLD && <MenuItem onClick={actions.handleMarkAsSold} icon={CheckCircle} label={t("mark_as_sold")} variant="amber" />}
+
+            {listing.status === LISTING_STATUS.SOLD && <MenuItem onClick={actions.handleRelist} icon={Copy} label={t("relist") || "Relist"} variant="indigo" />}
 
             {listing.status === LISTING_STATUS.ACTIVE && !listingInShowcase && <MenuItem onClick={actions.handleOpenShowcase} icon={Zap} label={t("add_to_showcase")} variant="indigo" />}
 

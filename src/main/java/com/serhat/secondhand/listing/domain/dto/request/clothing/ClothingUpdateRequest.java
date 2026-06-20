@@ -22,5 +22,9 @@ public record ClothingUpdateRequest(
     Optional<Integer> shoeSizeEu,
     Optional<String> material,
     Optional<ClothingGender> clothingGender,
-    Optional<ClothingCategory> clothingCategory
+    Optional<ClothingCategory> clothingCategory,
+
+    Optional<com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingFit> fit,
+    Optional<com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingPattern> pattern,
+    Optional<com.serhat.secondhand.listing.domain.entity.enums.clothing.FabricType> fabricType
 ) {}

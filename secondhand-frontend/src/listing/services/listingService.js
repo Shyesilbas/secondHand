@@ -136,6 +136,9 @@ export const listingService = {
   markListingSold: async (id) => {
     return put(API_ENDPOINTS.LISTINGS.MARK_SOLD(id));
   },
+  relistListing: async (id) => {
+    return post(API_ENDPOINTS.LISTINGS.RELIST(id));
+  },
   updateQuantity: async (id, quantity) => {
     return put(API_ENDPOINTS.LISTINGS.UPDATE_QUANTITY(id), { quantity });
   },

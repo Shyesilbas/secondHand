@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum BodyType {
+    // Car body types
     SEDAN("Sedan"),
     HATCHBACK("Hatchback"),
     SUV("SUV"),
@@ -13,7 +14,15 @@ public enum BodyType {
     PICKUP("Pickup"),
     VAN("Van"),
     MPV("MPV"),
-    OTHER("Other");
+    OTHER("Other"),
+    // Motorcycle body types
+    SPORTBIKE("Sportbike"),
+    NAKED("Naked"),
+    SCOOTER("Scooter"),
+    ADVENTURE("Adventure"),
+    ENDURO("Enduro"),
+    TOURING("Touring"),
+    CRUISER("Cruiser");
 
     private final String label;
 

@@ -17,10 +17,11 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "clothing_listings")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @SuperBuilder
- @org.hibernate.annotations.BatchSize(size = 20)
+@org.hibernate.annotations.BatchSize(size = 20)
 public class ClothingListing extends Listing {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,4 +57,16 @@ public class ClothingListing extends Listing {
     @Enumerated(EnumType.STRING)
     @Column(name = "clothing_category", nullable = false)
     private ClothingCategory clothingCategory;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clothing_fit", length = 30)
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingFit fit;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clothing_pattern", length = 30)
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingPattern pattern;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "fabric_type", length = 30)
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.FabricType fabricType;
 }

@@ -1,10 +1,16 @@
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X, Plus, Check, List, Loader2, Globe, Lock, Package } from 'lucide-react';
-import { useMyFavoriteLists, useAddItemToList, useRemoveItemFromList, useListsContainingListing } from '../hooks/useFavoriteLists.js';
+import {useTranslation} from "react-i18next";
+import {useEffect, useState} from 'react';
+import {createPortal} from 'react-dom';
+import {Check, Globe, List, Loader2, Lock, Package, Plus, X} from 'lucide-react';
+import {
+    useAddItemToList,
+    useListsContainingListing,
+    useMyFavoriteLists,
+    useRemoveItemFromList
+} from '../hooks/useFavoriteLists.js';
 import FavoriteListModal from './FavoriteListModal.jsx';
 import logger from '../../common/utils/logger.js';
+
 const AddToListModal = ({
   isOpen,
   onClose,
@@ -99,7 +105,7 @@ const AddToListModal = ({
                                 <button type="button" onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl">
                                     <Plus className="w-5 h-5" />{t("create_your_first_list")}</button>
                             </div> : <div className="space-y-3">
-                                <p className="text-sm font-medium text-gray-700 mb-4">{t("your_lists")}{myLists.length})
+                                <p className="text-sm font-medium text-gray-700 mb-4">{t("your_lists")} ({myLists.length})
                                 </p>
                                 {myLists.map(list => {
               const isInList = containingListIds.includes(list.id);

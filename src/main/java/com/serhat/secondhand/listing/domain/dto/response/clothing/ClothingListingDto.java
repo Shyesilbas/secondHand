@@ -30,4 +30,8 @@ public class ClothingListingDto extends ListingDto {
     private String material;
     private ClothingGender clothingGender;
     private ClothingCategory clothingCategory;
+    
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingFit fit;
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingPattern pattern;
+    private com.serhat.secondhand.listing.domain.entity.enums.clothing.FabricType fabricType;
 }

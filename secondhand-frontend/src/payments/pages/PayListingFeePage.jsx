@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useDraftListings, usePayListingFee } from '../hooks/useListingPaymentFlow.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
@@ -87,42 +88,92 @@ const PayListingFeePage = () => {
       refetchPaymentMethods();
     }
   }, [showConfirmModal, refetchPaymentMethods]);
-  return <div className="min-h-screen bg-[#F8FAFC]">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="mb-8 flex items-center justify-between">
-                    <div>
+  return (
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+        {/* Ambient Background Glows */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-400/10 blur-[120px]" />
+            <div className="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-400/10 blur-[120px]" />
+            <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[60%] rounded-full bg-blue-300/10 blur-[120px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12 relative z-10">
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="mb-10 flex items-center justify-between"
+            >
+                <div>
+                    <div className="mb-4">
                         <BackButton onClick={() => navigate(-1)} />
-                        <h1 className="mt-4 text-3xl font-bold tracking-tighter text-slate-900">{t("listing_fee_payment")}</h1>
-                        <p className="mt-2 text-sm text-slate-500">{t("complete_a_secure_payment_to_publish_you")}</p>
                     </div>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900">
+                        {t("listing_fee_payment")}
+                    </h1>
+                    <p className="mt-2 text-base text-slate-500 max-w-2xl">
+                        {t("complete_a_secure_payment_to_publish_you")}
+                    </p>
                 </div>
+            </motion.div>
 
-                {isLoading && <div className="mt-6">
-                        <LoadingIndicator />
-                    </div>}
+            {isLoading && (
+                <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="mt-6 flex justify-center py-12"
+                >
+                    <LoadingIndicator />
+                </motion.div>
+            )}
 
-                {!isLoading && error && <ErrorMessage message={error} />}
+            {!isLoading && error && (
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+                    <ErrorMessage message={error} />
+                </motion.div>
+            )}
 
-                {!isLoading && (draftListings.length === 0 && !selectedListing ? <div className="mt-6 rounded-[2rem] border border-slate-200/60 bg-white/80 px-6 py-10 shadow-[0_18px_45px_rgba(15,23,42,0.05)]">
-                        <EmptyState title={t("no_draft_listings")} description={<>{t("no_draft_listings_found_you_can_create_a")}{' '}
-                                    <button onClick={() => navigate(ROUTES.CREATE_LISTING)} className="font-medium text-indigo-600 underline transition-colors hover:text-indigo-700">{t("clicking_here")}</button>
-                                    .
-                                </>} />
-                    </div> : <div className="mt-6 rounded-[2rem] border border-slate-200/60 bg-white/90 px-4 py-5 shadow-[0_22px_60px_rgba(15,23,42,0.06)] sm:px-6 sm:py-6">
-                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                            <DraftListingsList listings={draftListings} selectedListing={selectedListing} onSelectListing={setSelectedListing} onListingChanged={refetchListings} />
+            {!isLoading && (draftListings.length === 0 && !selectedListing ? (
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
+                    className="mt-6 rounded-[2.5rem] border border-white/60 bg-white/60 backdrop-blur-xl px-8 py-16 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                >
+                    <EmptyState 
+                        title={t("no_draft_listings")} 
+                        description={
+                            <>
+                                {t("no_draft_listings_found_you_can_create_a")}{' '}
+                                <button onClick={() => navigate(ROUTES.CREATE_LISTING)} className="font-semibold text-indigo-600 underline decoration-indigo-200 underline-offset-4 transition-colors hover:text-indigo-800 hover:decoration-indigo-400">
+                                    {t("clicking_here")}
+                                </button>.
+                            </>
+                        } 
+                    />
+                </motion.div>
+            ) : (
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="mt-6"
+                >
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+                        <DraftListingsList listings={draftListings} selectedListing={selectedListing} onSelectListing={setSelectedListing} onListingChanged={refetchListings} />
 
-                            <PaymentPanel selectedListing={selectedListing} feeConfig={feeConfig} paymentType={paymentType} onPaymentTypeChange={setPaymentType} isProcessingPayment={isProcessingPayment} onPayment={async () => {
-            handlePayment();
-          }} eWallet={eWallet} agreementsAccepted={agreementsAccepted} acceptedAgreementIds={acceptedAgreements} onAgreementToggle={onAgreementToggle} onRequiredAgreementsChange={onRequiredAgreementsChange} />
-                        </div>
-                    </div>)}
+                        <PaymentPanel selectedListing={selectedListing} feeConfig={feeConfig} paymentType={paymentType} onPaymentTypeChange={setPaymentType} isProcessingPayment={isProcessingPayment} onPayment={async () => {
+                            handlePayment();
+                        }} eWallet={eWallet} agreementsAccepted={agreementsAccepted} acceptedAgreementIds={acceptedAgreements} onAgreementToggle={onAgreementToggle} onRequiredAgreementsChange={onRequiredAgreementsChange} />
+                    </div>
+                </motion.div>
+            ))}
 
-                {showConfirmModal && <PaymentVerificationModal isOpen={showConfirmModal} selectedListing={selectedListing} feeConfig={feeConfig} paymentType={paymentType} paymentMethods={paymentMethods} isLoadingPaymentMethods={isPaymentMethodsLoading} eWallet={eWallet} onStartVerification={startVerification} onVerifyAndPay={verifyAndPay} onCancel={() => setShowConfirmModal(false)} onNavigateToPaymentMethods={() => {
-        setShowConfirmModal(false);
-        navigate('/payments');
-      }} isProcessing={isProcessingPayment} verificationCode={verificationCode} onChangeVerificationCode={setVerificationCode} codeExpiryTime={codeExpiryTime} onResendCode={resendVerificationCode} isResendingCode={isResendingCode} emails={emails} onFetchEmails={fetchEmails} onClearEmails={clearEmails} />}
-            </div>
-        </div>;
+            {showConfirmModal && <PaymentVerificationModal isOpen={showConfirmModal} selectedListing={selectedListing} feeConfig={feeConfig} paymentType={paymentType} paymentMethods={paymentMethods} isLoadingPaymentMethods={isPaymentMethodsLoading} eWallet={eWallet} onStartVerification={startVerification} onVerifyAndPay={verifyAndPay} onCancel={() => setShowConfirmModal(false)} onNavigateToPaymentMethods={() => {
+                setShowConfirmModal(false);
+                navigate('/payments');
+            }} isProcessing={isProcessingPayment} verificationCode={verificationCode} onChangeVerificationCode={setVerificationCode} codeExpiryTime={codeExpiryTime} onResendCode={resendVerificationCode} isResendingCode={isResendingCode} emails={emails} onFetchEmails={fetchEmails} onClearEmails={clearEmails} />}
+        </div>
+    </div>
+  );
 };
 export default PayListingFeePage;

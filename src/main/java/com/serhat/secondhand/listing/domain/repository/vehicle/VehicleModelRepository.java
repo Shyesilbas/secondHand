@@ -5,10 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface VehicleModelRepository extends JpaRepository<VehicleModel, UUID> {
     List<VehicleModel> findByBrand_Id(UUID brandId);
+    Optional<VehicleModel> findFirstByBrand_IdAndType_IdAndNameIgnoreCase(UUID brandId, UUID typeId, String name);
     List<VehicleModel> findAllByBrand_IdAndType_IdAndNameIgnoreCase(UUID brandId, UUID typeId, String name);
     List<VehicleModel> findAllByBrand_IdAndNameIgnoreCase(UUID brandId, String name);
     List<VehicleModel> findAllByBrand_IdAndTypeIsNullAndNameIgnoreCase(UUID brandId, String name);

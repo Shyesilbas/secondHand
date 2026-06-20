@@ -50,4 +50,11 @@ public class RealEstateListingDto extends ListingDto {
     private String waterSource;
     private boolean electricityAvailable;
     private boolean roadAccess;
+
+    private String buildingCondition;
+    private boolean exchangeable;
+    private boolean hasNorthFacade;
+    private boolean hasSouthFacade;
+    private boolean hasEastFacade;
+    private boolean hasWestFacade;
 }

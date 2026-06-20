@@ -25,7 +25,7 @@ public class BookGenre implements Labelable {
     @Column(nullable = false, length = 200)
     private String label;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_type_id")
     private BookType bookType;
 }

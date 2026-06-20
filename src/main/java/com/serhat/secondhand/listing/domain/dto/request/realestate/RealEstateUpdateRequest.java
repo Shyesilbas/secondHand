@@ -47,5 +47,12 @@ public record RealEstateUpdateRequest(
         Optional<String> infrastructureStatusKey,
         Optional<String> waterSource,
         Optional<Boolean> electricityAvailable,
-        Optional<Boolean> roadAccess
+        Optional<Boolean> roadAccess,
+
+        Optional<String> buildingCondition,
+        Optional<Boolean> exchangeable,
+        Optional<Boolean> hasNorthFacade,
+        Optional<Boolean> hasSouthFacade,
+        Optional<Boolean> hasEastFacade,
+        Optional<Boolean> hasWestFacade
 ) {}

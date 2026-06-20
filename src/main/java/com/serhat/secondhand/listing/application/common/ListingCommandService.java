@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,6 +33,7 @@ public class ListingCommandService {
     private final ListingValidationService listingValidationService;
     private final ListingConfig listingConfig;
     private final PriceHistoryService priceHistoryService;
+    private final EntityManager entityManager;
     private static final List<ListingStatus> EDITABLE_STATUSES = List.of(
             ListingStatus.DRAFT,
             ListingStatus.ACTIVE,
@@ -99,6 +101,37 @@ public class ListingCommandService {
             listingRepository.save(listing);
             log.info("Listing {} soft deleted", listingId);
             return Result.success();
+        } catch (BusinessException e) {
+            return Result.error(e.getMessage(), e.getErrorCode());
+        }
+    }
+
+    @org.springframework.cache.annotation.CacheEvict(allEntries = true)
+    public Result<UUID> relist(UUID listingId, Long userId) {
+        try {
+            Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
+            
+            if (listing.getStatus() != ListingStatus.SOLD) {
+                return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+            }
+            
+            // Detach the entity to create a deep copy for persisting as a new record
+            entityManager.detach(listing);
+            
+            // Reset fields for the new listing
+            listing.setId(null);
+            listing.setListingNo(com.serhat.secondhand.listing.util.ListingNoGenerator.generate());
+            listing.setStatus(ListingStatus.DRAFT);
+            listing.setListingFeePaid(false);
+            listing.setVersion(null);
+            listing.setCreatedAt(null);
+            listing.setUpdatedAt(null);
+            
+            // Save as a new entity
+            listingRepository.save(listing);
+            
+            log.info("Listing {} relisted into new draft listing {}", listingId, listing.getId());
+            return Result.success(listing.getId());
         } catch (BusinessException e) {
             return Result.error(e.getMessage(), e.getErrorCode());
         }

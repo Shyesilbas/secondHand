@@ -286,6 +286,10 @@ public abstract class ListingMapper {
         if (request.material() != null) request.material().ifPresent(entity::setMaterial);
         if (request.clothingGender() != null) request.clothingGender().ifPresent(entity::setClothingGender);
         if (request.clothingCategory() != null) request.clothingCategory().ifPresent(entity::setClothingCategory);
+        
+        if (request.fit() != null) request.fit().ifPresent(entity::setFit);
+        if (request.pattern() != null) request.pattern().ifPresent(entity::setPattern);
+        if (request.fabricType() != null) request.fabricType().ifPresent(entity::setFabricType);
     }
 
     public void updateElectronic(ElectronicListing entity, ElectronicUpdateRequest request) {
@@ -365,6 +369,17 @@ public abstract class ListingMapper {
         if (request.waterSource() != null) request.waterSource().ifPresent(entity::setWaterSource);
         if (request.electricityAvailable() != null) request.electricityAvailable().ifPresent(entity::setElectricityAvailable);
         if (request.roadAccess() != null) request.roadAccess().ifPresent(entity::setRoadAccess);
+
+        if (request.buildingCondition() != null) request.buildingCondition().ifPresent(cond -> {
+            try {
+                entity.setBuildingCondition(com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition.valueOf(cond));
+            } catch (Exception ignored) {}
+        });
+        if (request.exchangeable() != null) request.exchangeable().ifPresent(entity::setExchangeable);
+        if (request.hasNorthFacade() != null) request.hasNorthFacade().ifPresent(entity::setHasNorthFacade);
+        if (request.hasSouthFacade() != null) request.hasSouthFacade().ifPresent(entity::setHasSouthFacade);
+        if (request.hasEastFacade() != null) request.hasEastFacade().ifPresent(entity::setHasEastFacade);
+        if (request.hasWestFacade() != null) request.hasWestFacade().ifPresent(entity::setHasWestFacade);
     }
 
     public void updateSports(SportsListing entity, SportsUpdateRequest request) {

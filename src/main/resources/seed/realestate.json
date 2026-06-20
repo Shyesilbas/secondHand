@@ -23,7 +23,10 @@
     { "id": "10000001-0000-0000-0000-000000000021", "key": "INDUSTRIAL",  "label": "Sanayi Tesisi" },
     { "id": "10000001-0000-0000-0000-000000000022", "key": "HOTEL",       "label": "Turistik Tesis / Otel" },
     { "id": "10000001-0000-0000-0000-000000000023", "key": "PARKING",     "label": "Otopark Alanı" },
-    { "id": "10000001-0000-0000-0000-000000000024", "key": "OTHER",       "label": "Diğer Gayrimenkuller" }
+    { "id": "10000001-0000-0000-0000-000000000024", "key": "PREFABRICATED","label": "Prefabrik Ev" },
+    { "id": "10000001-0000-0000-0000-000000000025", "key": "PLAZA_OFFICE", "label": "Plaza Katı" },
+    { "id": "10000001-0000-0000-0000-000000000026", "key": "KIOSK",        "label": "Büfe / Kiosk" },
+    { "id": "10000001-0000-0000-0000-000000000027", "key": "OTHER",        "label": "Diğer Gayrimenkuller" }
   ],
   "adTypes": [
     { "id": "20000002-0000-0000-0000-000000000001", "key": "FOR_SALE",    "label": "For Sale" },

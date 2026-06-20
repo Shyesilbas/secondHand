@@ -58,6 +58,7 @@ export const API_ENDPOINTS = {
         UPDATE_PRICE: (id) => `/v1/listings/${id}/price`,
         UPDATE_QUANTITY_BATCH: '/v1/listings/quantity/batch',
         UPDATE_PRICE_BATCH: '/v1/listings/price/batch',
+        RELIST: (id) => `/v1/listings/${id}/relist`,
         ACTIVATE: (id) => `/v1/listings/${id}/reactivate`,
         DEACTIVATE: (id) => `/v1/listings/${id}/deactivate`,
         STATISTICS: '/v1/listings/statistics',

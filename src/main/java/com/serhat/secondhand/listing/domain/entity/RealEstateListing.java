@@ -143,4 +143,25 @@ public class RealEstateListing extends Listing {
 
     @Column(name = "road_access", nullable = false)
     private boolean roadAccess;
+
+    // ── Newly Added Fields (Enhancement) ─────────────────────────────
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "building_condition", length = 30)
+    private com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition buildingCondition;
+
+    @Column(name = "is_exchangeable", nullable = false)
+    private boolean exchangeable;
+
+    @Column(name = "has_north_facade", nullable = false)
+    private boolean hasNorthFacade;
+
+    @Column(name = "has_south_facade", nullable = false)
+    private boolean hasSouthFacade;
+
+    @Column(name = "has_east_facade", nullable = false)
+    private boolean hasEastFacade;
+
+    @Column(name = "has_west_facade", nullable = false)
+    private boolean hasWestFacade;
 }

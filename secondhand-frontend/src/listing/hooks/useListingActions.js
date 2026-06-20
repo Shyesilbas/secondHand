@@ -89,6 +89,22 @@ export const useListingActions = ({
     );
   }, [dismiss, fireChanged, handleApiError, listingId, notification]);
 
+  const handleRelist = useCallback(async (e) => {
+    dismiss(e);
+    if (!listingId) return;
+    try {
+      const response = await listingService.relistListing(listingId);
+      notification.showSuccess('Successful', 'Listing duplicated successfully. You can now edit and publish it.');
+      fireChanged();
+      const newListingId = response?.data || response;
+      if (newListingId) {
+          navigate(ROUTES.EDIT_LISTING(newListingId));
+      }
+    } catch (err) {
+      handleApiError('Relist Failed', err);
+    }
+  }, [dismiss, fireChanged, handleApiError, listingId, notification, navigate]);
+
   const handleDelete = useCallback((e) => {
     dismiss(e);
     if (!listingId) return;
@@ -124,6 +140,7 @@ export const useListingActions = ({
     handleDeactivate,
     handleReactivate,
     handleMarkAsSold,
+    handleRelist,
     handleDelete,
     handleOpenShowcase,
     handleOpenCampaign,

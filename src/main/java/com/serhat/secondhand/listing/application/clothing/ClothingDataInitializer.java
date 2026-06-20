@@ -28,7 +28,8 @@ import java.util.Optional;
 @Slf4j
 public class ClothingDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/clothing.json";
+    private static final String BRANDS_PATH = "data/clothing/brands.json";
+    private static final String TYPES_PATH = "data/clothing/types.json";
 
     private final ClothingBrandRepository brandRepository;
     private final ClothingTypeRepository typeRepository;
@@ -42,9 +43,8 @@ public class ClothingDataInitializer implements SeedTask {
     @Override
     public Result<Void> run() {
         try {
-            JsonNode root = loadCatalog();
-            seedBrands(root.get("brands"));
-            seedTypes(root.get("types"));
+            seedBrands(loadJson(BRANDS_PATH));
+            seedTypes(loadJson(TYPES_PATH));
             log.info("Clothing seed completed successfully");
             return Result.success();
         } catch (Exception e) {
@@ -55,8 +55,8 @@ public class ClothingDataInitializer implements SeedTask {
 
     // ── JSON Loading ────────────────────────────────────────────────────
 
-    private JsonNode loadCatalog() throws Exception {
-        try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
+    private JsonNode loadJson(String path) throws Exception {
+        try (InputStream is = new ClassPathResource(path).getInputStream()) {
             return objectMapper.readTree(is);
         }
     }

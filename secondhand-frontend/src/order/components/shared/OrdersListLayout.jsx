@@ -1,15 +1,43 @@
-import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { formatCurrency, resolveEnumLabel } from '../../../common/formatters.js';
-import { ROUTES } from '../../../common/constants/routes.js';
+import {useTranslation} from "react-i18next";
+import React, {useEffect, useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {formatCurrency, resolveEnumLabel} from '../../../common/formatters.js';
+import {ROUTES} from '../../../common/constants/routes.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import ReviewModal from '../../../reviews/components/ReviewModal.jsx';
-import { SafeMeetupOnboardingModal } from './SafeMeetupOnboardingModal.jsx';
-import { ORDER_DEFAULTS, ORDER_LIMITS, ORDER_STATUS_TAB_FILTER, ORDER_STATUSES, ORDER_TIME, ORDER_VIEW_MODES } from '../../constants/orderUiConstants.js';
-import { getOrderStatusBadgeClass } from '../../utils/statusPresentation.js';
-import { AlertTriangle, BarChart3, CheckCircle, CircleCheck, Clock, Info, Loader2, Package, PackageCheck, Pencil, RefreshCw, RotateCcw, Search, SlidersHorizontal, Sparkles, Star, Truck, Wallet, X, XCircle } from 'lucide-react';
+import {
+  ORDER_DEFAULTS,
+  ORDER_LIMITS,
+  ORDER_STATUS_TAB_FILTER,
+  ORDER_STATUSES,
+  ORDER_TIME,
+  ORDER_VIEW_MODES
+} from '../../constants/orderUiConstants.js';
+import {getOrderStatusBadgeClass} from '../../utils/statusPresentation.js';
+import {
+  AlertTriangle,
+  BarChart3,
+  CheckCircle,
+  CircleCheck,
+  Clock,
+  Info,
+  Loader2,
+  Package,
+  PackageCheck,
+  Pencil,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Star,
+  Truck,
+  Wallet,
+  X,
+  XCircle
+} from 'lucide-react';
+
 const mergeUiCopy = partial => ({
   ...DEFAULT_UI_COPY,
   ...partial
@@ -123,6 +151,9 @@ const Header = React.memo(({
   loading,
   sticky
 }) => {
+  const {
+    t
+  } = useTranslation();
   const headerContent = <div className="flex flex-row items-center justify-between gap-4">
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -153,6 +184,9 @@ const StatusTabs = React.memo(({
   setStatusFilter,
   uiCopy
 }) => {
+  const {
+    t
+  } = useTranslation();
   const tabs = useMemo(() => [{
     value: ORDER_STATUS_TAB_FILTER.ALL,
     label: uiCopy.tabAll
@@ -188,6 +222,9 @@ const SearchToolbar = React.memo(({
   pagination,
   onPageSizeChange
 }) => {
+  const {
+    t
+  } = useTranslation();
   const {
     searchTerm,
     setSearchTerm,
@@ -301,6 +338,9 @@ const UnifiedOrderItem = React.memo(({
   uiCopy,
   isReviewed
 }) => {
+  const {
+    t
+  } = useTranslation();
   const items = order.orderItems || [];
   const isBuyer = viewMode === ORDER_VIEW_MODES.BUYER;
   const isCompleted = order.status === ORDER_STATUSES.COMPLETED;

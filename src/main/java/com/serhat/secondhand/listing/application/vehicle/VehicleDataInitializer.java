@@ -70,8 +70,7 @@ public class VehicleDataInitializer implements SeedTask {
                 }
             }
 
-            log.info("Purging existing vehicle hierarchy references...");
-            purgeVehicleHierarchy();
+
             pruneStaleBrands(catalogBrandKeys);
             pruneStaleTypes(catalogTypeKeys);
 
@@ -177,13 +176,22 @@ public class VehicleDataInitializer implements SeedTask {
         String modelNaturalKey = "vehicle-model:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName());
         UUID modelId = generateStableUuid(modelNaturalKey);
 
-        VehicleModel model = new VehicleModel();
-        model.setId(modelId);
-        model.setBrand(brand);
-        model.setType(type);
-        model.setName(modelDto.getName());
+        Optional<VehicleModel> existingModelOpt = modelRepository.findFirstByBrand_IdAndType_IdAndNameIgnoreCase(brand.getId(), type.getId(), modelDto.getName());
+        VehicleModel model;
+
+        if (existingModelOpt.isPresent()) {
+            model = existingModelOpt.get();
+            model.setNew(false);
+        } else {
+            model = new VehicleModel();
+            model.setId(modelId);
+            model.setBrand(brand);
+            model.setType(type);
+            model.setName(modelDto.getName());
+        }
 
         if (modelDto.getSupportedBodyTypes() != null) {
+            model.getSupportedBodyTypes().clear();
             for (String btStr : modelDto.getSupportedBodyTypes()) {
                 try {
                     model.getSupportedBodyTypes().add(BodyType.valueOf(btStr.toUpperCase(Locale.ROOT)));
@@ -205,11 +213,19 @@ public class VehicleDataInitializer implements SeedTask {
                 String genNaturalKey = "vehicle-generation:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName());
                 UUID genId = generateStableUuid(genNaturalKey);
 
-                VehicleGeneration generation = new VehicleGeneration();
-                generation.setId(genId);
-                generation.setName(genDto.getName());
-                generation.setModel(model);
-                generation = generationRepository.save(generation);
+                Optional<VehicleGeneration> existingGenOpt = generationRepository.findByModel_IdAndNameIgnoreCase(model.getId(), genDto.getName());
+                VehicleGeneration generation;
+
+                if (existingGenOpt.isPresent()) {
+                    generation = existingGenOpt.get();
+                    generation.setNew(false);
+                } else {
+                    generation = new VehicleGeneration();
+                    generation.setId(genId);
+                    generation.setName(genDto.getName());
+                    generation.setModel(model);
+                    generation = generationRepository.save(generation);
+                }
 
                 if (genDto.getEngines() != null) {
                     for (VehicleEngineDto engDto : genDto.getEngines()) {
@@ -220,10 +236,18 @@ public class VehicleDataInitializer implements SeedTask {
                         String engNaturalKey = "vehicle-engine:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(engDto.getName()) + ":" + normalizeKey(engDto.getFuelType());
                         UUID engId = generateStableUuid(engNaturalKey);
 
-                        VehicleEngine engine = new VehicleEngine();
-                        engine.setId(engId);
-                        engine.setName(engDto.getName());
-                        engine.setGeneration(generation);
+                        Optional<VehicleEngine> existingEngOpt = engineRepository.findByGeneration_IdAndNameIgnoreCase(generation.getId(), engDto.getName());
+                        VehicleEngine engine;
+
+                        if (existingEngOpt.isPresent()) {
+                            engine = existingEngOpt.get();
+                            engine.setNew(false);
+                        } else {
+                            engine = new VehicleEngine();
+                            engine.setId(engId);
+                            engine.setName(engDto.getName());
+                            engine.setGeneration(generation);
+                        }
                         
                         if (engDto.getFuelType() == null || engDto.getFuelType().isBlank()) {
                             throw new IllegalArgumentException("Fuel type cannot be empty under engine: " + engDto.getName());
@@ -248,27 +272,25 @@ public class VehicleDataInitializer implements SeedTask {
                         String trimNaturalKey = "vehicle-trim:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(trimName);
                         UUID trimId = generateStableUuid(trimNaturalKey);
 
-                        VehicleTrim trim = new VehicleTrim();
-                        trim.setId(trimId);
-                        trim.setName(trimName);
-                        trim.setGeneration(generation);
-                        trimRepository.save(trim);
+                        Optional<VehicleTrim> existingTrimOpt = trimRepository.findByGeneration_IdAndNameIgnoreCase(generation.getId(), trimName);
+                        if (existingTrimOpt.isPresent()) {
+                            VehicleTrim trim = existingTrimOpt.get();
+                            trim.setNew(false);
+                            trimRepository.save(trim);
+                        } else {
+                            VehicleTrim trim = new VehicleTrim();
+                            trim.setId(trimId);
+                            trim.setName(trimName);
+                            trim.setGeneration(generation);
+                            trimRepository.save(trim);
+                        }
                     }
                 }
             }
         }
     }
 
-    private void purgeVehicleHierarchy() {
-        int detached = vehicleListingRepository.detachCatalogReferences();
-        if (detached > 0) {
-            log.info("Detached vehicle catalog references from {} listing(s)", detached);
-        }
-        trimRepository.deleteAll();
-        engineRepository.deleteAll();
-        generationRepository.deleteAll();
-        modelRepository.deleteAll();
-    }
+
 
     private void pruneStaleBrands(Set<String> catalogBrandKeys) {
         brandRepository.findAll().stream()

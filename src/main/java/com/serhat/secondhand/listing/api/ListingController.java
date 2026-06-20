@@ -152,6 +152,13 @@ public class ListingController {
         return ResultResponses.noContent(listingCommandService.publish(id, currentUser.getId()));
     }
 
+    @PostMapping("/{id}/relist")
+    public ResponseEntity<?> relistListing(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.created(listingCommandService.relist(id, currentUser.getId()));
+    }
+
     @PutMapping("/{id}/reactivate")
     public ResponseEntity<?> reactivateListing(
             @PathVariable UUID id,
