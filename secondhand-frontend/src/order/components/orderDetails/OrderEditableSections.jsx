@@ -18,6 +18,7 @@ export const AddressSection = React.memo(({
   selectedOrder,
   isModifiable
 }) => {
+  const { t } = useTranslation();
   if (isEditingAddress) {
     return <CardComponent className="p-5">
         <h4 className="text-caption font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
@@ -83,6 +84,7 @@ export const NotesSection = React.memo(({
   selectedOrder,
   isModifiable
 }) => {
+  const { t } = useTranslation();
   if (isEditingNotes) {
     return <CardComponent className="p-5">
         <h4 className="text-caption font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">

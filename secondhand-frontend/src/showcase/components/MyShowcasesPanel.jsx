@@ -2,7 +2,9 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, Clock, X, Zap, ShieldAlert, Sparkles, Image as ImageIcon, Filter } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../common/formatters.js';
 import { useMyShowcases } from '../hooks/useMyShowcases.js';
+// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
+import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { useState, useMemo } from 'react';
 const MyShowcasesPanel = ({
   userId
@@ -151,17 +153,11 @@ const MyShowcasesPanel = ({
           </div>
         </motion.div>}
 
-      {isLoading ? <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {[1, 2].map(i => <div key={i} className="h-56 rounded-3xl bg-slate-50/80 animate-pulse border border-slate-100" />)}
-        </div> : filteredShowcases.length === 0 ? <div className="text-center py-16 bg-slate-50/40 rounded-[28px] border border-dashed border-slate-200/80 max-w-xl mx-auto px-6">
-          <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md shadow-indigo-500/5 border border-slate-100 text-indigo-500">
-            <Sparkles className="w-6 h-6 animate-pulse" />
-          </div>
-          <h3 className="text-sm font-medium text-text-primary tracking-tight mb-1.5">{t("no_showcases_found")}</h3>
-          <p className="text-sm text-slate-500 leading-relaxed">
-            {activeTab === 'expired' ? "You don't have any expired promotions. All your showcases are still working hard!" : activeTab === 'active' ? "You don't have any active promotions currently. Boost one of your listings to start selling faster!" : "Promote your items directly to the top rows and category frontpages. Sell up to 5x faster!"}
-          </p>
-        </div> : <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+      {isLoading ? <SkeletonGrid count={2} columns="grid-cols-1 md:grid-cols-2 gap-5" /> : filteredShowcases.length === 0 ? <EmptyState
+          icon={Sparkles}
+          title={t("no_showcases_found")}
+          description={activeTab === 'expired' ? "You don't have any expired promotions. All your showcases are still working hard!" : activeTab === 'active' ? "You don't have any active promotions currently. Boost one of your listings to start selling faster!" : "Promote your items directly to the top rows and category frontpages. Sell up to 5x faster!"}
+        /> : <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
           {filteredShowcases.map(showcase => {
         const progress = showcase.isExpired ? 0 : Math.min(100, Math.max(0, showcase.remaining / 30 * 100));
         const thumbUrl = showcase.listing?.imageUrl;

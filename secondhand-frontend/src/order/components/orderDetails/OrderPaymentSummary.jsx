@@ -12,6 +12,7 @@ export const OrderPaymentSummary = React.memo(({
   getPaymentStatusIndicatorClass,
   getPaymentStatusTextClass
 }) => {
+  const { t } = useTranslation();
   return <CardComponent critical className={`${isSellerView ? 'p-6' : 'p-5'} border border-white/5`}>
       <div className="flex items-center gap-2.5 mb-6">
         <div className="p-2 bg-white/10 rounded-xl border border-white/10">

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { memo, useMemo } from 'react';
 import ListingCard from './ListingCard.jsx';
-import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { AlertCircle as ExclamationCircleIcon, Image as PhotoIcon } from 'lucide-react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcase } from '../../showcase/hooks/useShowcase.js';
@@ -14,6 +14,7 @@ const ListingGrid = memo(({
   selectedIds = new Set(),
   onSelectToggle = null
 }) => {
+  const { t } = useTranslation();
   const {
     user
   } = useAuthState();
@@ -25,24 +26,7 @@ const ListingGrid = memo(({
     return new Set(showcases.map(s => s?.listing?.id || s?.listingId).filter(Boolean));
   }, [showcases]);
   if (isLoading) {
-    return <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {[...Array(8)].map((_, index) => <div key={'skeleton-' + index} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-pulse">
-                        <div className="aspect-video bg-slate-200"></div>
-                        <div className="p-5">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-16 h-4 bg-slate-200 rounded"></div>
-                                <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
-                            </div>
-                            <div className="w-3/4 h-5 bg-slate-200 rounded mb-3"></div>
-                            <div className="w-full h-4 bg-slate-200 rounded mb-4"></div>
-                            <div className="w-1/2 h-6 bg-slate-200 rounded mb-4"></div>
-                            <div className="flex justify-between items-center">
-                                <div className="w-20 h-4 bg-slate-200 rounded"></div>
-                                <div className="w-16 h-4 bg-slate-200 rounded"></div>
-                            </div>
-                        </div>
-                    </div>)}
-            </div>;
+    return <SkeletonGrid count={10} columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8" />;
   }
   if (error) {
     return <div className="flex items-center justify-center min-h-[320px]">

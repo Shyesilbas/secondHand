@@ -9,6 +9,7 @@ import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
+import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_MESSAGES } from '../cartConstants.js';
 import { couponService } from '../services/couponService.js';
@@ -43,7 +44,7 @@ const ShoppingCartPage = () => {
     isClearingCart
   } = useCart();
   const [pricing, setPricing] = useState(null);
-  const [isPricingLoading, setIsPricingLoading] = useState(false);
+  const [_, setIsPricingLoading] = useState(false);
   const [sellerCampaigns, setSellerCampaigns] = useState([]);
   const [showClearModal, setShowClearModal] = useState(false);
   const checkReservationStatus = reservedAt => {
@@ -222,18 +223,11 @@ const ShoppingCartPage = () => {
             <div className={cartSurfacePanel} style={{
           borderColor: CART_UI.border
         }}>
-              <div className="px-6 py-12 text-center sm:px-10 sm:py-14">
-                <div className={`mx-auto mb-5 flex h-12 w-12 items-center justify-center border bg-[#f7f6f5] text-[#5f5b57] ${CART_SHAPE.radiusBox}`} style={{
-              borderColor: CART_UI.border
-            }}>
-                  <ShoppingBag className="h-6 w-6" strokeWidth={1.5} />
-                </div>
-                <h2 className="text-lg font-semibold text-text-primary text-[#1a1918]">
-                  {CART_MESSAGES.EMPTY_CART_TITLE}
-                </h2>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#5f5b57]">
-                  {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
-                </p>
+              <EmptyState
+                icon={ShoppingBag}
+                title={CART_MESSAGES.EMPTY_CART_TITLE}
+                description={CART_MESSAGES.EMPTY_CART_DESCRIPTION}
+              >
                 <div className="mt-8 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center">
                   <button type="button" onClick={() => navigate(ROUTES.LISTINGS)} className={`${cartBtnPrimary} px-6`}>{t("browse_listings")}</button>
                   {isAuthenticated ? <Link to={ROUTES.FAVORITES} className={`${cartBtnSecondary} px-6 py-2.5 text-center`}>
@@ -243,7 +237,7 @@ const ShoppingCartPage = () => {
                       {CART_MESSAGES.EMPTY_CART_SIGN_IN}
                     </Link>}
                 </div>
-              </div>
+              </EmptyState>
             </div>
 
             {isAuthenticated ? <section className={`${cartSurfacePanel} p-5 sm:p-6`} style={{
@@ -262,15 +256,7 @@ const ShoppingCartPage = () => {
                     {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES}
                   </Link>
                 </div>
-                {favoritesLoading ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
-                    {[...Array(4)].map((_, i) => <div key={i} className={`min-w-0 animate-pulse overflow-hidden border border-[#e0deda] bg-white ${CART_SHAPE.radiusBox}`}>
-                        <div className="aspect-[4/3] bg-[#e8e6e4]" />
-                        <div className="space-y-2 p-3">
-                          <div className="h-3 w-2/3 rounded bg-[#e8e6e4]" />
-                          <div className="h-4 w-full rounded bg-[#e8e6e4]" />
-                        </div>
-                      </div>)}
-                  </div> : favoriteListings.length > 0 ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
+                {favoritesLoading ? <SkeletonGrid count={4} columns="grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4" /> : favoriteListings.length > 0 ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
                     {favoriteListings.map((listing, index) => <div key={listing.id} className="min-w-0 max-w-full">
                         <ListingCard listing={listing} isOwner={user?.id === listing.sellerId} currentUserId={user?.id} priorityImage={index < 4} />
                       </div>)}

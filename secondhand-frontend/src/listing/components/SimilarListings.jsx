@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import ListingCard from './ListingCard.jsx';
 import { Sparkles, Compass } from 'lucide-react';
+import { SkeletonGrid } from '../../common/components/ui/index.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 const SimilarListings = ({
   currentListing
@@ -47,13 +48,7 @@ const SimilarListings = ({
     return <div className="border-t border-slate-100/80 pt-10 mt-10">
         <h3 className="text-sm font-medium text-text-primary mb-6 flex items-center gap-2">
           <Compass className="w-4 h-4 text-indigo-500 animate-spin" />{t("finding_similar_listings")}</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(idx => <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3 animate-pulse">
-              <div className="aspect-[4/3] bg-slate-100 rounded-xl" />
-              <div className="h-4 bg-slate-100 rounded w-3/4" />
-              <div className="h-4 bg-slate-100 rounded w-1/2" />
-            </div>)}
-        </div>
+        <SkeletonGrid count={4} columns="grid-cols-2 md:grid-cols-4 gap-4" />
       </div>;
   }
   if (error || !data || data.length === 0) return null;

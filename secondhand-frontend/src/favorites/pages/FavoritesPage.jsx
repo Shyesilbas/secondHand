@@ -7,6 +7,7 @@ import { useFavorites } from '../hooks/useFavorites.js';
 import { useMyFavoriteLists, FavoriteListModal, FavoriteListCard } from '../../favoritelist/index.js';
 import ListingGrid from '../../listing/components/ListingGrid.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
+import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { formatDate } from '../../common/formatters.js';
 import { FAVORITE_DEFAULTS, FAVORITES_PAGE_TABS } from '../favoriteConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -97,14 +98,13 @@ const FavoritesPage = () => {
 
         <div className="mt-6">
           {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <>
-              {isLoading ? <ListingGrid listings={[]} isLoading error={null} /> : error ? <ListingGrid listings={[]} isLoading={false} error={String(error)} /> : favoritedListings.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-                    <Heart className="h-7 w-7 text-slate-400" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-text-primary">{t("no_saved_listings_yet")}</h2>
-                  <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">{t("tap_the_heart_on_a_listing_to_save_it_he")}</p>
+              {isLoading ? <ListingGrid listings={[]} isLoading error={null} /> : error ? <ListingGrid listings={[]} isLoading={false} error={String(error)} /> : favoritedListings.length === 0 ? <EmptyState
+                  icon={Heart}
+                  title={t("no_saved_listings_yet")}
+                  description={t("tap_the_heart_on_a_listing_to_save_it_he")}
+                >
                   <Link to={ROUTES.LISTINGS} className="mt-6 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">{t("browse_listings")}</Link>
-                </div> : <>
+                </EmptyState> : <>
                   <div className="mb-6">
                     <ListingGrid listings={favoritedListings} isLoading={false} error={null} />
                   </div>
@@ -115,23 +115,14 @@ const FavoritesPage = () => {
             </>}
 
           {activeTab === FAVORITES_PAGE_TABS.LISTS && <div>
-              {listsLoading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {[...Array(4)].map((_, i) => <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                      <div className="aspect-square bg-slate-200" />
-                      <div className="space-y-3 p-4">
-                        <div className="h-4 w-3/4 rounded bg-slate-200" />
-                        <div className="h-4 w-1/2 rounded bg-slate-200" />
-                      </div>
-                    </div>)}
-                </div> : myLists.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-                    <List className="h-7 w-7 text-slate-400" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-text-primary">{t("no_lists_yet")}</h2>
-                  <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">{t("create_a_list_to_group_favorites_by_them")}</p>
+              {listsLoading ? <SkeletonGrid count={4} columns="grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" /> : myLists.length === 0 ? <EmptyState
+                  icon={List}
+                  title={t("no_lists_yet")}
+                  description={t("create_a_list_to_group_favorites_by_them")}
+                >
                   <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800">
                     <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>
-                </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                </EmptyState> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {myLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
                 </div>}
             </div>}

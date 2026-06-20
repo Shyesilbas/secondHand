@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { memo } from 'react';
 import ReviewCard from './ReviewCard.jsx';
+import { SkeletonList } from '../../common/components/ui/index.js';
 import { REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
 const ReviewsList = memo(({
   reviews,
@@ -11,30 +12,12 @@ const ReviewsList = memo(({
   onRetry,
   showLoadMore = true
 }) => {
+  const { t } = useTranslation();
   if (loading && reviews.length === 0) {
     return <div className="space-y-4">
                 {Array.from({
         length: REVIEW_LIMITS.SKELETON_ROWS
-      }).map((_, index) => <div key={'skeleton-' + index} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm animate-pulse">
-                        <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                                <div>
-                                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                                    <div className="h-3 bg-gray-200 rounded w-16"></div>
-                                </div>
-                            </div>
-                            <div className="flex space-x-1">
-                                {Array.from({
-              length: REVIEW_LIMITS.MAX_RATING
-            }).map((_, i) => <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>)}
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-3 bg-gray-200 rounded w-full"></div>
-                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                        </div>
-                    </div>)}
+      }).map((_, index) => <SkeletonList key={'skeleton-' + index} />)}
             </div>;
   }
   if (error) {

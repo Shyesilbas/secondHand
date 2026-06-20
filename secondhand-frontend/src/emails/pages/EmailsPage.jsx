@@ -12,20 +12,20 @@ import EmailContent from '../components/EmailContent';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { EMAIL_TYPES } from '../emails.js';
 import { EMAIL_DEFAULTS, EMAIL_FILTERS, EMAIL_MESSAGES, EMAIL_QUERY_STALE_MS } from '../emailConstants.js';
-const EmailsPageLoader = () => <div className="h-screen flex items-center justify-center bg-white">
+const EmailsPageLoader = () => {
+  const { t } = useTranslation();
+  return <div className="h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center text-gray-400 gap-4">
             <MailOpen className="w-8 h-8 animate-pulse" />
             <span className="text-sm font-medium">{t("loading_mailbox")}</span>
         </div>
     </div>;
+};
 const EmailsPageFeedback = ({
   error,
   emails,
   filterType
 }) => {
-  const {
-    t
-  } = useTranslation();
   if (error) return <div className="m-4 bg-red-50 border border-red-100 rounded-lg p-4">
             <h3 className="text-sm font-medium text-text-primary">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
             <p className="text-sm text-red-600 mt-1">{error}</p>

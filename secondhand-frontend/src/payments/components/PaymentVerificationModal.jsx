@@ -13,10 +13,13 @@ const toNumber = value => {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
 };
-const PaymentMethodsLoading = () => <div className="flex items-center justify-center py-4">
+const PaymentMethodsLoading = () => {
+  const { t } = useTranslation();
+  return <div className="flex items-center justify-center py-4">
     <LoadingIndicator size="h-6 w-6" />
     <span className="ml-2 text-text-secondary">{t("loading")}</span>
   </div>;
+};
 const EWalletPaymentMethod = ({
   eWallet,
   feeConfig
@@ -73,9 +76,6 @@ const PaymentMethodDetails = ({
   feeConfig,
   onNavigateToPaymentMethods
 }) => {
-  const {
-    t
-  } = useTranslation();
   if (isLoadingPaymentMethods) {
     return <PaymentMethodsLoading />;
   }

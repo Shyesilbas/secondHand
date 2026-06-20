@@ -22,9 +22,6 @@ const StatusBadge = ({
   label,
   type = 'rose'
 }) => {
-  const {
-    t
-  } = useTranslation();
   const styles = {
     rose: 'bg-rose-50 border-rose-200 text-rose-700',
     amber: 'bg-amber-50 border-amber-200 text-amber-700'
@@ -313,6 +310,7 @@ const OrderDetailsModal = React.memo(({
   reviewsLoading = false,
   onReviewSuccess
 }) => {
+  const { t } = useTranslation();
   const isSellerView = viewMode === ORDER_VIEW_MODES.SELLER;
   const {
     enums

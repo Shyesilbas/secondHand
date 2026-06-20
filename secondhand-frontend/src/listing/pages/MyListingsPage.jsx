@@ -21,18 +21,21 @@ const LowStockCard = ({
   onRefresh,
   showSuccess,
   showError
-}) => <div className="flex flex-wrap items-center gap-3 rounded-lg p-3 bg-white/80 backdrop-blur border border-slate-200/50 hover:border-slate-300/70 hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all" onClick={e => e.stopPropagation()}>
+}) => {
+  const { t } = useTranslation();
+  return <div className="flex flex-wrap items-center gap-3 rounded-lg p-3 bg-background-primary/80 backdrop-blur border border-border-light/50 hover:border-slate-300/70 hover:shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all" onClick={e => e.stopPropagation()}>
         <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm shadow-sm">
             {listing.title?.charAt(0)?.toUpperCase() || 'L'}
         </div>
         <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-gray-900 truncate">{listing.title}</h4>
-            <p className="text-sm text-gray-500">{listing.listingNo}</p>
+            <h4 className="font-medium text-text-primary truncate">{listing.title}</h4>
+            <p className="text-sm text-text-muted">{listing.listingNo}</p>
         </div>
         <ListingQuickEdit listing={listing} onChanged={onRefresh} showSuccess={showSuccess} showError={showError} />
         <Link to={ROUTES.EDIT_LISTING(listing.id)} className="flex-shrink-0 inline-flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium text-slate-700 bg-slate-100/80 hover:bg-slate-200/80 rounded-lg">
             <Pencil className="w-3.5 h-3.5" />{t("edit")}</Link>
     </div>;
+};
 const MyListingsPage = () => {
   const {
     t

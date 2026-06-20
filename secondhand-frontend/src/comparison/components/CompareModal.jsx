@@ -28,6 +28,7 @@ const toDisplayString = value => {
   return String(value);
 };
 const CompareModal = memo(() => {
+  const { t } = useTranslation();
   const {
     items,
     category,

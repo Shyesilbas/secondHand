@@ -5,6 +5,7 @@ import AgreementModal from '../components/AgreementModal.jsx';
 import { Check as CheckIcon, Clock as ClockIcon } from 'lucide-react';
 import { agreementService } from '../services/agreementService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { SkeletonList } from '../../common/components/ui/index.js';
 const FILTER_TABS = [{
   key: 'all',
   label: 'All'
@@ -41,6 +42,7 @@ const AgreementsList = ({
       notification.showSuccess('Success', 'Agreement accepted.');
       if (onAccepted) onAccepted();
     } catch (err) {
+      console.error('Failed to accept agreement', err);
       notification.showError('Error', 'Failed to accept agreement.');
     } finally {
       setAcceptingAgreement(null);
@@ -107,16 +109,7 @@ const AgreementsList = ({
   }, [agreements, userAgreements, filter]);
   if (loading) {
     return <div className="space-y-4">
-                {[...Array(3)].map((_, i) => <div key={i} className="rounded-xl border border-gray-100 p-5 animate-pulse">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-lg bg-gray-100" />
-                            <div className="flex-1">
-                                <div className="h-4 bg-gray-100 rounded w-1/3 mb-2" />
-                                <div className="h-3 bg-gray-100 rounded w-1/4" />
-                            </div>
-                            <div className="h-6 w-20 bg-gray-100 rounded-full" />
-                        </div>
-                    </div>)}
+                {[...Array(3)].map((_, i) => <SkeletonList key={i} />)}
             </div>;
   }
   return <div>

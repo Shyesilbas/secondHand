@@ -32,6 +32,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   /** When true, parent modal owns outer footer; no duplicate progress/footer; indigo primary CTAs */
   embedded = false
 }, ref) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const stepRef = useRef(step);
   const [paymentType] = useState('EWALLET');

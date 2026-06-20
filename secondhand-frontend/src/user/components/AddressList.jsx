@@ -8,6 +8,7 @@ import logger from '../../common/utils/logger.js';
 const AddressList = memo(({
   isActive
 }) => {
+  const { t } = useTranslation();
   const {
     addresses,
     loading,
@@ -39,6 +40,7 @@ const AddressList = memo(({
       setShowAddAddress(false);
       showSuccess('Address Added', 'Address has been added successfully.');
     } catch (err) {
+      logger.error('Failed to add address:', err);
       setAddError('Failed to add address.');
     } finally {
       setAdding(false);
@@ -53,6 +55,7 @@ const AddressList = memo(({
       setSelectedAddress(null);
       showSuccess('Address Updated', 'Address has been updated successfully.');
     } catch (err) {
+      logger.error('Failed to update address:', err);
       setUpdateError('Failed to update address.');
     } finally {
       setUpdating(false);

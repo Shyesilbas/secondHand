@@ -26,6 +26,7 @@ export const ShippingDetailsSection = React.memo(({
   CardComponent,
   internalTracking
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const goInternalTracking = useCallback(() => {
     const id = internalTracking?.orderId;

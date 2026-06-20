@@ -9,6 +9,7 @@ const MessageBubble = memo(({
   isOwnMessage,
   onDeleteMessage
 }) => {
+  const { t } = useTranslation();
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const handleDeleteClick = () => {
     onDeleteMessage(message.id);
@@ -40,6 +41,7 @@ const MessageList = memo(({
   user,
   onDeleteMessage
 }) => {
+  const { t } = useTranslation();
   return <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar bg-slate-50/50">
       {isLoadingMessages ? <div className="flex justify-center items-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>

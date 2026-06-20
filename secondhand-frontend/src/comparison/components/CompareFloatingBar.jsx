@@ -5,6 +5,7 @@ import { useComparison } from '../hooks/useComparison.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { formatCurrencyCompact } from '../../common/formatters.js';
 const CompareFloatingBar = memo(() => {
+  const { t } = useTranslation();
   const {
     items,
     category,

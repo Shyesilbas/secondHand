@@ -84,7 +84,9 @@ const DetailSkeleton = () => <div className="min-h-screen bg-[#f7f8fa]">
 /** Error state */
 const DetailError = ({
   error
-}) => <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
+}) => {
+  const { t } = useTranslation();
+  return <div className="min-h-screen bg-[#f7f8fa] flex items-center justify-center p-4">
     <div className="text-center max-w-sm rounded-[24px] border border-slate-200/80 bg-white p-10 shadow-lg listing-fade-in">
       <div className="w-16 h-16 bg-gradient-to-br from-rose-50 to-rose-100 rounded-[18px] flex items-center justify-center mx-auto mb-6 shadow-sm">
         <AlertTriangle className="w-7 h-7 text-rose-500" />
@@ -95,6 +97,7 @@ const DetailError = ({
         <ArrowLeft className="w-4 h-4" />{t("back_to_listings")}</Link>
     </div>
   </div>;
+};
 
 /* ── Main Page ───────────────────────────────────────────── */
 
