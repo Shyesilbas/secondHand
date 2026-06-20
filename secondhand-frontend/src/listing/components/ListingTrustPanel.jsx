@@ -26,17 +26,17 @@ const ListingTrustPanel = ({
   const reviewCount = stats?.reviewCount ?? 0;
   return <>
       {/* Seller Card Redesign */}
-      <div className="border-t border-slate-100 py-6 mb-5">
+      <div className="border-t border-border-light py-6 mb-5">
         <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest mb-4">{t("seller_information")}</h3>
-        <div className="bg-slate-50/50 border border-slate-100/80 rounded-2xl p-4 mb-4 shadow-sm">
+        <div className="bg-background-secondary border border-border-light rounded-2xl p-4 mb-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               {/* Avatar with Verified Ring */}
               <div className="relative">
-                <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm border border-slate-900/5">
+                <div className="w-12 h-12 bg-text-primary rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm border border-slate-900/5">
                   {listing.sellerName?.[0]?.toUpperCase() || 'U'}
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-background-primary rounded-full p-0.5 shadow-sm border border-slate-50">
+                <div className="absolute -bottom-1 -right-1 bg-background-primary rounded-full p-0.5 shadow-sm border border-border-light">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-500 fill-white" />
                 </div>
               </div>
@@ -47,7 +47,7 @@ const ListingTrustPanel = ({
                     {listing.sellerName} {listing.sellerSurname}
                   </Link>
                 </div>
-                {listing.sellerAccountCreationDate && <p className="text-xs text-slate-400 font-medium mt-0.5">{t("member_since")}{new Date(listing.sellerAccountCreationDate).getFullYear()}
+                {listing.sellerAccountCreationDate && <p className="text-xs text-text-muted font-medium mt-0.5">{t("member_since")}{new Date(listing.sellerAccountCreationDate).getFullYear()}
                   </p>}
               </div>
             </div>
@@ -55,17 +55,17 @@ const ListingTrustPanel = ({
           </div>
 
           {/* Dynamic Trust Ratings Panel */}
-          <div className="grid grid-cols-2 gap-2.5 py-3 border-y border-slate-100/60 my-4 text-center">
-            <div className="border-r border-slate-100/60">
+          <div className="grid grid-cols-2 gap-2.5 py-3 border-y border-border-light my-4 text-center">
+            <div className="border-r border-border-light">
               <div className="flex items-center justify-center gap-1">
                 <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-bold text-slate-800">{ratingAvg.toFixed(1)}</span>
+                <span className="text-sm font-bold text-text-primary">{ratingAvg.toFixed(1)}</span>
               </div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mt-1">{t("rating")}</span>
+              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("rating")}</span>
             </div>
             <div>
-              <span className="text-sm font-bold text-slate-800">{reviewCount}</span>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mt-1">{t("reviews")}</span>
+              <span className="text-sm font-bold text-text-primary">{reviewCount}</span>
+              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("reviews")}</span>
             </div>
           </div>
 
@@ -77,7 +77,7 @@ const ListingTrustPanel = ({
               </div>
             </div>}
 
-          {!isOwner ? <ContactSellerButton listing={listing} className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95">{t("contact_seller")}</ContactSellerButton> : <ShowcaseButton listingId={listing.id} onSuccess={onShowcaseSuccess} />}
+          {!isOwner ? <ContactSellerButton listing={listing} className="w-full flex items-center justify-center gap-2 py-2.5 bg-text-primary hover:bg-text-primary/90 text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95">{t("contact_seller")}</ContactSellerButton> : <ShowcaseButton listingId={listing.id} onSuccess={onShowcaseSuccess} />}
         </div>
       </div>
     </>;
