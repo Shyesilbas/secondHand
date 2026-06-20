@@ -25,7 +25,7 @@ const ChartCard = ({
   delay,
   duration: 0.4
 }} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-    {title && <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">{title}</h3>}
+    {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
     {children}
   </motion.div>;
 const BuyerDashboardPage = () => {
@@ -80,14 +80,14 @@ const BuyerDashboardPage = () => {
             opacity: 1,
             x: 0
           }}>
-              <h1 className="text-xl font-bold text-white tracking-tight">{t("my_purchases")}</h1>
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("my_purchases")}</h1>
               <div className="flex items-center gap-3 mt-0.5">
                 <p className="text-xs text-emerald-300/70 font-medium">{t("track_your_spending_orders")}</p>
                 {dashboard.totalFavorites > 0 && <>
                     <span className="text-emerald-800">·</span>
                     <div className="flex items-center gap-1">
                       <Heart className="w-3 h-3 text-pink-400/70" />
-                      <span className="text-[11px] text-slate-400 font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
+                      <span className="text-caption text-slate-400 font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
                     </div>
                   </>}
               </div>

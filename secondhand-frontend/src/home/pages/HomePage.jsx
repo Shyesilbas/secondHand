@@ -15,7 +15,7 @@ const HomePage = () => {
   } = useTranslation();
   usePageTheme(HomePageTheme);
   return <div className="min-h-screen bg-page-canvas">
-      <Suspense fallback={<div className="py-10 text-center text-[13px] text-gray-400">{t("loading")}</div>}>
+      <Suspense fallback={<div className="py-10 text-center text-sm text-gray-400">{t("loading")}</div>}>
         <HeroSection />
         <TrustBand />
         <MarketplaceStatsSection />

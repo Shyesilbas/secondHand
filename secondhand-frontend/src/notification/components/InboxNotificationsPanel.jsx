@@ -33,7 +33,7 @@ const InboxNotificationsPanel = () => {
             <Bell className="h-5 w-5 animate-[swing_1s_ease-in-out_infinite]" strokeWidth={2} aria-hidden />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate text-base font-bold text-slate-900 tracking-tight">{t("bildirim_kutusu")}</h1>
+            <h1 className="text-2xl font-semibold text-text-primary truncate tracking-tight">{t("bildirim_kutusu")}</h1>
             <p className="truncate text-xs text-slate-400 font-medium mt-0.5">
               {notifications?.length ? `${notifications.length} bildirim mevcut` : 'Uyarilar ve güncellemeleriniz'}
             </p>
@@ -57,7 +57,7 @@ const InboxNotificationsPanel = () => {
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-slate-50 border border-slate-200/80 flex items-center justify-center mb-4 shadow-sm">
             <Bell className="w-10 h-10 text-slate-300" />
           </div>
-          <h3 className="text-xl font-bold text-slate-800 tracking-tight">{t("harika_her_ey_yolunda")}</h3>
+          <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("harika_her_ey_yolunda")}</h3>
           <p className="max-w-xs text-sm text-slate-400 leading-relaxed font-medium">{t("u_anda_yeni_bir_bildiriminiz_yok_teklifl")}</p>
         </div> : <div className="min-h-0 flex-1 overflow-y-auto bg-white divide-y divide-slate-100/50">
           {notifications.map(n => <NotificationItem key={n.id} notification={n} onMarkAsRead={markAsRead} />)}

@@ -101,7 +101,7 @@ const OrderSuccessPage = () => {
                 <CheckCircle2 className="w-8 h-8" strokeWidth={2} />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">
               {deliveryMethod === 'SAFE_MEETUP' ? 'Elden Teslimat Siparişiniz Oluşturuldu!' : 'Your order was placed successfully'}
             </h1>
             <p className="text-sm text-slate-500 mt-1">

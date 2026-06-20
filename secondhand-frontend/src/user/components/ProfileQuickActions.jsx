@@ -46,7 +46,7 @@ const ProfileQuickActions = ({
               <Star className="w-5 h-5 text-amber-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-gray-900">{t("reviews_ratings")}</h3>
+              <h3 className="text-sm font-medium text-text-primary">{t("reviews_ratings")}</h3>
               <p className="text-xs text-gray-500 mt-0.5">
                 {reviewStatsLoading ? 'Loading...' : reviewStats ? `${reviewStats.totalReviews || 0} reviews · ${(reviewStats.averageRating || 0).toFixed(1)} avg` : 'Your review activity'}
               </p>
@@ -84,7 +84,7 @@ const ActionLink = ({
       <Icon className={`w-5 h-5 ${iconColor}`} />
     </div>
     <div className="flex-1 min-w-0">
-      <h3 className="text-sm font-semibold text-gray-900">{label}</h3>
+      <h3 className="text-sm font-medium text-text-primary">{label}</h3>
       <p className="text-xs text-gray-500 mt-0.5">{description}</p>
     </div>
     <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all duration-200" />

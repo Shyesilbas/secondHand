@@ -128,7 +128,7 @@ const CompareModal = memo(() => {
                                     <Scale className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h2 className="text-lg font-bold text-slate-900 truncate">{t("compare")}{getListingTypeLabel(category)}
+                                    <h2 className="text-lg font-semibold text-text-primary truncate">{t("compare")}{getListingTypeLabel(category)}
                                     </h2>
                                     <p className="text-sm text-slate-500">
                                         {items.length}{t("items_selected")}</p>
@@ -159,7 +159,7 @@ const CompareModal = memo(() => {
                                                         <X className="w-3.5 h-3.5" />
                                                     </button>
                                                 </div>
-                                                <h3 className="text-sm font-semibold text-slate-900 text-center line-clamp-2 leading-snug w-full" title={item.title}>
+                                                <h3 className="text-sm font-medium text-text-primary line-clamp-2 w-full" title={item.title}>
                                                     {item.title}
                                                 </h3>
                                                 <Link to={ROUTES.LISTING_DETAIL(item.id)} onClick={closeModal} className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700">{t("view_details")}<ExternalLink className="w-3 h-3" />

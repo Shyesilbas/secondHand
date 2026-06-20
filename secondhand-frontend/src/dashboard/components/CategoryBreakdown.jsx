@@ -86,7 +86,7 @@ const CategoryBreakdown = ({
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-900">{formatCurrency(entry.value, currency)}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${colors.light} ${colors.text}`}>{pct}%</span>
+                <span className={`text-caption font-bold px-1.5 py-0.5 rounded ${colors.light} ${colors.text}`}>{pct}%</span>
               </div>
             </div>
             <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -105,8 +105,8 @@ const CategoryBreakdown = ({
 
       {/* Total */}
       <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</span>
-        <span className="text-sm font-extrabold text-slate-900">{formatCurrency(total, currency)}</span>
+        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{label}</span>
+        <span className="text-sm font-bold text-slate-900">{formatCurrency(total, currency)}</span>
       </div>
     </div>;
 };

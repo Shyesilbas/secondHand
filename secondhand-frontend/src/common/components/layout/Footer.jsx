@@ -37,7 +37,7 @@ const Footer = () => {
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 mb-6">
                     <div className="space-y-2">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">{t("about")}</h3>
+                        <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.2em] mb-2">{t("about")}</h3>
                         <ul className="space-y-1.5">
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">{t("no_membership_fees")}</li>
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">{t("free_to_browse_and_search")}</li>
@@ -47,7 +47,7 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">{t("pricing")}</h3>
+                        <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.2em] mb-2">{t("pricing")}</h3>
                         <button onClick={() => setShowPricing(!showPricing)} className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight group font-medium">
                             {showPricing ? <>
                                     <ChevronUp className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />{t("hide_pricing")}</> : <>
@@ -97,7 +97,7 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">{t("support")}</h3>
+                        <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.2em] mb-2">{t("support")}</h3>
                         <ul className="space-y-1.5">
                             <li>
                                 <button onClick={() => navigate(ROUTES.FORUM)} className="text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight text-left">{t("forum_community")}</button>
@@ -121,7 +121,7 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">{t("legal")}</h3>
+                        <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.2em] mb-2">{t("legal")}</h3>
                         {isAuthenticated ? <div className="space-y-3">
                                 <button onClick={() => navigate(ROUTES.AGREEMENTS_ALL)} className="flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:underline underline-offset-4 decoration-slate-500/60 transition-all duration-300 tracking-tight font-medium w-full text-left">
                                     <span>{t("my_agreements")}</span>

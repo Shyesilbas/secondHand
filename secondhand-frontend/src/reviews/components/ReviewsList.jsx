@@ -44,7 +44,7 @@ const ReviewsList = memo(({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{REVIEW_MESSAGES.ERROR_OCCURRED_TITLE}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-2">{REVIEW_MESSAGES.ERROR_OCCURRED_TITLE}</h3>
                 <p className="text-gray-600 mb-4">{error}</p>
                 <button type="button" onClick={() => (onRetry ?? onLoadMore)?.()} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                     {REVIEW_MESSAGES.TRY_AGAIN}
@@ -58,7 +58,7 @@ const ReviewsList = memo(({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                     </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{REVIEW_MESSAGES.NO_REVIEWS_YET}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-2">{REVIEW_MESSAGES.NO_REVIEWS_YET}</h3>
                 <p className="text-gray-600">{t("no_reviews_have_been_made_to_this_user")}</p>
             </div>;
   }

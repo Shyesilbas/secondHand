@@ -70,7 +70,7 @@ const CartItemCard = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold leading-snug text-[#1a1918] sm:text-[15px]">
+              <p className="text-sm font-semibold leading-snug text-[#1a1918] sm:text-base">
                 {item.listing.title}
               </p>
               {metaParts.length > 0 && <p className="mt-1 text-xs text-[#5f5b57]">
@@ -88,7 +88,7 @@ const CartItemCard = ({
             </button>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[#5f5b57]">
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-[#5f5b57]">
             {isLowStock && <span className="tabular-nums">{t("stock")}{Number(maxStock)}</span>}
             {isReserved && !isExpired && <span className={`inline-flex items-center gap-1 tabular-nums ${isReservationExpiring ? 'text-[#d13438]' : 'text-[#1466c6]'}`}>
                 <Clock className="h-3 w-3" strokeWidth={1.75} />

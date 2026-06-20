@@ -98,7 +98,7 @@ const FavoriteListCard = ({
                     </div>
 
                     <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
+                        <h3 className="text-sm font-medium text-text-primary group- transition-colors truncate">
                             {list.name}
                         </h3>
                         

@@ -56,7 +56,7 @@ export default function AuraSuggestedPrompts({onPick, disabled = false, dense = 
                   {p.label}
                 </p>
                 <p className={`text-slate-400 group-hover:text-slate-500 mt-0.5 line-clamp-1 transition-colors leading-normal ${
-                  dense ? 'text-[10px]' : 'text-xs'
+                  dense ? 'text-caption' : 'text-xs'
                 }`}>
                   {p.subtitle}
                 </p>

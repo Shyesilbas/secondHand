@@ -49,7 +49,7 @@ const BulkSelectionModal = ({
         <div className="px-8 pt-8 pb-4 bg-slate-50/50">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">{t("select_listings_to_boost")}</h2>
+              <h2 className="text-lg font-semibold text-text-primary">{t("select_listings_to_boost")}</h2>
               <p className="text-sm text-slate-500">{t("choose_the_items_you_want_to_feature_in_")}</p>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
@@ -117,7 +117,7 @@ const BulkSelectionModal = ({
                   </div>
 
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("status")}</span>
+                    <span className="text-caption font-bold text-slate-400 uppercase tracking-widest">{t("status")}</span>
                     <p className="text-xs font-bold text-emerald-600">{listing.status}</p>
                   </div>
                 </div>)}

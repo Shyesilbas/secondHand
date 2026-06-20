@@ -74,7 +74,7 @@ const AgreementsPage = () => {
                             <FileText className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t("legal_agreements")}</h1>
+                            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("legal_agreements")}</h1>
                             <p className="text-sm text-gray-500 mt-0.5">{t("review_and_accept_required_legal_documen")}</p>
                         </div>
                     </div>
@@ -88,7 +88,7 @@ const AgreementsPage = () => {
                     <div className="lg:w-64 shrink-0">
                         <nav className="bg-white rounded-2xl border border-gray-200 overflow-hidden lg:sticky lg:top-6">
                             <div className="px-4 py-3 border-b border-gray-100">
-                                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{t("category")}</span>
+                                <span className="text-caption font-semibold text-gray-400 uppercase tracking-wider">{t("category")}</span>
                             </div>
                             <div className="p-2">
                                 {CATEGORIES.map(cat => {
@@ -102,7 +102,7 @@ const AgreementsPage = () => {
                                                 <div className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                                     {cat.label}
                                                 </div>
-                                                <div className={`text-[11px] truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
+                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
                                                     {cat.description}
                                                 </div>
                                             </div>
@@ -121,7 +121,7 @@ const AgreementsPage = () => {
                                             <activeCat.icon className="w-4.5 h-4.5 text-gray-600" />
                                         </div>}
                                     <div>
-                                        <h2 className="text-base font-bold text-gray-900">{activeCat?.label}{t("agreements")}</h2>
+                                        <h2 className="text-lg font-semibold text-text-primary">{activeCat?.label}{t("agreements")}</h2>
                                         <p className="text-xs text-gray-500 mt-0.5">{activeCat?.description}</p>
                                     </div>
                                 </div>

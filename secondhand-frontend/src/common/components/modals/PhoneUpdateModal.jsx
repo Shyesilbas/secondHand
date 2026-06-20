@@ -15,7 +15,7 @@ const PhoneUpdateModal = ({
   return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-text-primary">{t("update_phone_number")}</h3>
+                    <h3 className="text-sm font-medium text-text-primary">{t("update_phone_number")}</h3>
                     <button onClick={closeModal} className="text-text-muted hover:text-text-secondary">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

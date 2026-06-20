@@ -38,7 +38,7 @@ const AddressCard = ({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">{getAddressTypeIcon(address.addressType)}</span>
-            <h3 className="font-semibold text-text-primary">
+            <h3 className="text-sm font-medium text-text-primary">
               {getAddressTypeLabel(address.addressType)}
             </h3>
             {address.mainAddress && <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full font-medium">{t("main")}</span>}

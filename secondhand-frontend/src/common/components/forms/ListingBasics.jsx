@@ -16,7 +16,7 @@ const FieldError = ({
   }} animate={{
     opacity: 1,
     y: 0
-  }} className="mt-1.5 flex items-center gap-1 text-[12px] text-red-500">
+  }} className="mt-1.5 flex items-center gap-1 text-body text-red-500">
       <AlertCircle className="h-3 w-3 shrink-0" />
       {error}
     </motion.p>;
@@ -36,14 +36,14 @@ const SectionCard = ({
             <Icon className="h-4 w-4 text-zinc-600" />
           </div>}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
+          <h3 className="text-sm font-medium text-text-primary">{title}</h3>
           {description && <p className="mt-0.5 text-xs text-zinc-500">{description}</p>}
         </div>
       </div>
       <div className="p-5 sm:p-6">{children}</div>
     </div>;
 };
-const inputBase = 'w-full px-3.5 py-2.5 text-[13px] border rounded-lg focus:outline-none transition-all duration-200';
+const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
 const inputNormal = `${inputBase} border-zinc-200/60 bg-white focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
 const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
 const ListingBasics = ({
@@ -63,11 +63,11 @@ const ListingBasics = ({
       <SectionCard title={t("general_information")} description="Basic listing details" icon={Type}>
         <div className="space-y-5">
           <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("listing_title")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("listing_title")}<span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input type="text" name="title" value={formData.title} onChange={onInputChange} className={errors.title ? inputError : inputNormal} placeholder={t("e_g_iphone_13_pro_excellent_condition")} maxLength={100} />
-              <span className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[11px] tabular-nums transition-colors duration-200 ${titleCountColor}`}>
+              <span className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-caption tabular-nums transition-colors duration-200 ${titleCountColor}`}>
                 {titleLen}/100
               </span>
             </div>
@@ -85,11 +85,11 @@ const ListingBasics = ({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("description")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("description")}<span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <textarea name="description" value={formData.description} onChange={onInputChange} rows={5} className={`${errors.description ? inputError : inputNormal} resize-none pb-7`} placeholder={t("describe_your_item_in_detail_condition_f")} />
-              <span className="absolute bottom-2.5 right-3 text-[11px] tabular-nums text-zinc-400">
+              <span className="absolute bottom-2.5 right-3 text-caption tabular-nums text-zinc-400">
                 {formData.description?.length || 0} / 5000
               </span>
             </div>
@@ -101,7 +101,7 @@ const ListingBasics = ({
       <SectionCard title={t("pricing")} description="Set the price and quantity" icon={DollarSign}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("price")}<span className="text-red-500">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("price")}<span className="text-red-500">*</span>
             </label>
             <div className="relative flex">
               <PriceInput value={parsePrice(formData.price) ?? 0} onChange={n => onInputChange({
@@ -111,7 +111,7 @@ const ListingBasics = ({
               }
             })} placeholder="0,00" className={`flex-1 min-w-0 rounded-l-lg rounded-r-none border-r-0 focus:outline-none ${errors.price ? inputError : inputNormal}`} />
               <div className="flex shrink-0 items-center">
-                <select name="currency" value={formData.currency} onChange={onInputChange} className="h-full cursor-pointer rounded-r-lg border border-l-0 border-zinc-200/60 bg-zinc-50/80 py-0 pl-2.5 pr-6 text-[13px] font-medium text-zinc-700 transition-colors focus:outline-none hover:bg-zinc-100">
+                <select name="currency" value={formData.currency} onChange={onInputChange} className="h-full cursor-pointer rounded-r-lg border border-l-0 border-zinc-200/60 bg-zinc-50/80 py-0 pl-2.5 pr-6 text-sm font-medium text-zinc-700 transition-colors focus:outline-none hover:bg-zinc-100">
                   {enums.currencies?.map(currency => <option key={currency.value} value={currency.value}>
                       {currency.symbol} {currency.value}
                     </option>)}
@@ -122,7 +122,7 @@ const ListingBasics = ({
             opacity: 0
           }} animate={{
             opacity: 1
-          }} className="mt-1.5 text-[12px] text-zinc-500">{t("preview")}{' '}
+          }} className="mt-1.5 text-body text-zinc-500">{t("preview")}{' '}
                 <span className="font-semibold tabular-nums text-zinc-800">
                   {formatCurrency(parsePrice(formData.price), formData.currency)}
                 </span>
@@ -131,7 +131,7 @@ const ListingBasics = ({
           </div>
 
           {showQuantity && <div>
-              <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("quantity")}<span className="text-red-500">*</span>
+              <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("quantity")}<span className="text-red-500">*</span>
               </label>
               <input type="number" name="quantity" value={formData.quantity ?? ''} onChange={onInputChange} className={errors.quantity ? inputError : inputNormal} placeholder={t("e_g_5")} min="1" step="1" />
               <FieldError error={errors.quantity} />
@@ -147,7 +147,7 @@ const ListingBasics = ({
               }
             })} className="mt-1 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
               <div>
-                <span className="block text-[13px] font-medium text-zinc-900">{t("sadece_kendi_ehrimde_elden_teslimat_yapm")}</span>
+                <span className="block text-sm font-medium text-zinc-900">{t("sadece_kendi_ehrimde_elden_teslimat_yapm")}</span>
                 <span className="block text-xs text-zinc-500">{t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu")}</span>
                 <span className="block text-xs text-indigo-600/95 mt-1.5 font-medium bg-indigo-50/60 rounded-xl p-2.5 border border-indigo-100/50 shadow-sm max-w-lg leading-relaxed">{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari")}</span>
               </div>

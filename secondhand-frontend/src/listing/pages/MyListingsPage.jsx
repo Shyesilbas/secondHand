@@ -147,9 +147,9 @@ const MyListingsPage = () => {
                     
                     <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                         <div className="space-y-0.5">
-                            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("portfolio_performance")}</h2>
+                            <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("portfolio_performance")}</h2>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-slate-900 tracking-tight">
+                                <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                     {formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[0]}
                                 </span>
                                 <span className="text-sm font-bold text-slate-400">
@@ -165,11 +165,11 @@ const MyListingsPage = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                                 </span>
-                                <span className="text-[11px] font-bold text-emerald-700">
+                                <span className="text-caption font-bold text-emerald-700">
                                     {totalValueStats.activeCount}{t("active")}</span>
                             </div>
                             <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
-                                <span className="text-[11px] font-bold text-slate-600">
+                                <span className="text-caption font-bold text-slate-600">
                                     {engine.listings?.length || 0}{t("total")}</span>
                             </div>
                         </div>
@@ -185,8 +185,8 @@ const MyListingsPage = () => {
                                         <AlertTriangle className="w-5 h-5 text-amber-600" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-bold text-slate-900">{t("inventory_alert")}</h3>
-                                        <p className="text-[11px] text-slate-500 font-medium">{stockText}{t("needs_attention")}</p>
+                                        <h3 className="text-sm font-medium text-text-primary">{t("inventory_alert")}</h3>
+                                        <p className="text-caption text-slate-500 font-medium">{stockText}{t("needs_attention")}</p>
                                     </div>
                                 </div>
                                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} />
@@ -196,8 +196,8 @@ const MyListingsPage = () => {
                         {lowStock.isOpen && <div className="p-4 bg-white">
                                 {!bulkMode ? <>
                                         <div className="flex gap-2 mb-4">
-                                            <button onClick={() => setBulkMode('quantity')} className="px-4 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-black transition-all">{t("batch_stock")}</button>
-                                            <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-white text-slate-900 border border-slate-200 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-all">{t("batch_prices")}</button>
+                                            <button onClick={() => setBulkMode('quantity')} className="px-4 py-1.5 bg-slate-900 text-white text-caption font-bold rounded-lg hover:bg-black transition-all">{t("batch_stock")}</button>
+                                            <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-white text-slate-900 border border-slate-200 text-caption font-bold rounded-lg hover:bg-slate-50 transition-all">{t("batch_prices")}</button>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {lowStock.listings.slice(0, 4).map(listing => <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />)}
@@ -206,7 +206,7 @@ const MyListingsPage = () => {
                                         <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-xl border border-indigo-100">
                                             <div className="flex items-center gap-2">
                                                 {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-white border border-indigo-200 rounded-lg outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-white text-xs" />}
-                                                <button onClick={applyBulk} disabled={saving} className="px-4 py-1.5 bg-indigo-600 text-white text-[11px] font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50">{t("apply")}</button>
+                                                <button onClick={applyBulk} disabled={saving} className="px-4 py-1.5 bg-indigo-600 text-white text-caption font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50">{t("apply")}</button>
                                             </div>
                                             <X onClick={clearBulk} className="w-4 h-4 text-indigo-400 cursor-pointer" />
                                         </div>
@@ -214,7 +214,7 @@ const MyListingsPage = () => {
                                             {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-100'}`}>
                                                     <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="w-4 h-4 rounded border-slate-200 text-indigo-600" />
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="text-[11px] font-bold text-slate-900 truncate">{listing.title}</p>
+                                                        <p className="text-caption font-bold text-slate-900 truncate">{listing.title}</p>
                                                         <p className="text-[9px] font-medium text-slate-500">{t("current")}{bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
                                                         </p>
                                                     </div>

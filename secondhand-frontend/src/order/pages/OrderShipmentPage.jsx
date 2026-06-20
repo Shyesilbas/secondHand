@@ -65,7 +65,7 @@ const OrderShipmentPage = () => {
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">{t("shipment_tracking")}</h1>
+          <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("shipment_tracking")}</h1>
           <p className="text-sm text-slate-500">{title}</p>
           {order?.status ? <p className="text-xs font-semibold uppercase tracking-wider text-indigo-600 mt-2">{t("order_status")}{order.status}
             </p> : null}
@@ -83,7 +83,7 @@ const OrderShipmentPage = () => {
 
         {order && !isLoading ? <>
             {order.orderItems?.length ? <Panel className="p-5">
-                <h2 className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-3">{t("items")}</h2>
+                <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest mb-3">{t("items")}</h2>
                 <ul className="space-y-2">
                   {order.orderItems.map(item => <li key={item.id ?? `${item.listing?.id}-${item.quantity}`} className="flex justify-between gap-3 text-sm">
                       <span className="font-medium text-slate-900 line-clamp-2">{item.listing?.title || '—'}</span>

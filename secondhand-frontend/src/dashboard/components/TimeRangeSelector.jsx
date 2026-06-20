@@ -41,7 +41,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
           <button
             key={preset.days}
             onClick={() => handlePresetClick(preset.days)}
-            className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-all duration-200 ${
+            className={`px-3 py-1.5 text-caption font-bold rounded-md transition-all duration-200 ${
               activePreset === preset.days
                 ? 'bg-white text-slate-900 shadow-sm'
                 : 'text-slate-500 hover:text-slate-700'
@@ -63,9 +63,9 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
             const date = e.target.value ? new Date(e.target.value) : null;
             onStartDateChange(date);
           }}
-          className="px-2 py-1.5 text-[11px] text-slate-600 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white font-medium"
+          className="px-2 py-1.5 text-caption text-slate-600 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white font-medium"
         />
-        <span className="text-[10px] text-slate-400 font-bold">→</span>
+        <span className="text-caption text-slate-400 font-bold">→</span>
         <input
           type="date"
           value={endDate ? endDate.toISOString().split('T')[0] : ''}
@@ -74,7 +74,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
             onEndDateChange(date);
           }}
           max={new Date().toISOString().split('T')[0]}
-          className="px-2 py-1.5 text-[11px] text-slate-600 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white font-medium"
+          className="px-2 py-1.5 text-caption text-slate-600 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white font-medium"
         />
       </div>
     </div>

@@ -235,7 +235,7 @@ const PriceLocationFields = ({
               </span>
               <input type="number" inputMode="decimal" value={maxVal} onChange={e => onPriceChange('maxPrice', e.target.value)} placeholder={t("max")} min="0" className={`${inp} min-w-0 flex-1 pr-3`} />
             </div>
-            <p className="mt-1 text-[11px] font-medium text-slate-400">{t("leave_blank_for_no_limit")}</p>
+            <p className="mt-1 text-caption font-medium text-slate-400">{t("leave_blank_for_no_limit")}</p>
           </div>
           <div>
             <span className={fieldLabel}>{t("currency")}</span>
@@ -251,7 +251,7 @@ const PriceLocationFields = ({
 
           <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50/50 px-4 py-2.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 transition-all duration-200 active:scale-[0.98] shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">
             {loadingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Navigation className="h-3.5 w-3.5 fill-indigo-100" />}{t("bana_yak_n_i_lanlar_g_ster")}</button>
-          {nearMeError && <p className="mt-1 text-center text-[10px] font-medium text-rose-500 animate-pulse">
+          {nearMeError && <p className="mt-1 text-center text-caption font-medium text-rose-500 animate-pulse">
               {nearMeError}
             </p>}
 
@@ -263,7 +263,7 @@ const PriceLocationFields = ({
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-2 text-slate-800">
           <Landmark className="h-4 w-4 text-indigo-500" />
-          <h3 className="text-sm font-semibold tracking-tight">{t("price_range")}</h3>
+          <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("price_range")}</h3>
         </div>
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -279,12 +279,12 @@ const PriceLocationFields = ({
         <div className="mb-4 flex items-center justify-between gap-2 text-slate-800">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-indigo-500" />
-            <h3 className="text-sm font-semibold tracking-tight">{t("location")}</h3>
+            <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("location")}</h3>
           </div>
           <button type="button" onClick={handleShowNearMe} disabled={loadingLocation} className="flex items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-50 hover:text-indigo-800 transition-all duration-200 active:scale-[0.98]">
             {loadingLocation ? <Loader2 className="h-3 w-3 animate-spin" /> : <Navigation className="h-3 w-3 fill-indigo-100" />}{t("bana_yak_n_i_lanlar")}</button>
         </div>
-        {nearMeError && <p className="mb-2 text-right text-[10px] font-medium text-rose-500 animate-pulse">
+        {nearMeError && <p className="mb-2 text-right text-caption font-medium text-rose-500 animate-pulse">
             {nearMeError}
           </p>}
         <div className="space-y-4">

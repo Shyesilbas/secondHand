@@ -81,13 +81,13 @@ const CheckoutAddressStep = ({
   return <div className="p-5 sm:p-7">
       {/* Delivery Method Selection */}
       <div className="mb-8 border-b border-slate-100 pb-6">
-        <h3 className="mb-3.5 text-sm font-semibold text-slate-800">{t("teslimat_y_ntemi")}</h3>
+        <h3 className="text-sm font-medium text-text-primary mb-3.5">{t("teslimat_y_ntemi")}</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Cargo Option */}
           <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
             <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="mt-1 h-4 w-4 rounded-full border-slate-300 text-zinc-900 focus:ring-zinc-900/10" />
             <div>
-              <span className="block text-[13px] font-semibold text-slate-900">{t("kargo_ile_g_nderim")}</span>
+              <span className="block text-sm font-semibold text-slate-900">{t("kargo_ile_g_nderim")}</span>
               <span className="mt-0.5 block text-xs text-slate-500">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
             </div>
           </label>
@@ -96,14 +96,14 @@ const CheckoutAddressStep = ({
           <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-slate-100 bg-slate-50' : deliveryMethod === 'SAFE_MEETUP' ? 'border-zinc-950 bg-zinc-50/50 shadow-sm ring-1 ring-zinc-950/10' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
             <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="mt-1 h-4 w-4 rounded-full border-slate-300 text-zinc-900 focus:ring-zinc-900/10 disabled:opacity-50" />
             <div>
-              <span className="block text-[13px] font-semibold text-slate-900 flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
+              <span className="block text-sm font-semibold text-slate-900 flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-safe-meetup-onboarding'));
               }} className="inline-flex items-center justify-center p-0.5 rounded-full text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-all focus:outline-none animate-pulse cursor-pointer" title={t("elden_g_venli_teslimat_nedir_detayl_bilg")}>
                   <Info className="h-3.5 w-3.5" />
                 </button>
-                {canMeetup && <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">{t("aktif")}</span>}
+                {canMeetup && <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-caption font-bold text-emerald-700 uppercase tracking-wider">{t("aktif")}</span>}
               </span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {!canMeetup ? 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.' : 'Ortak bir güvenli buluşma noktasında yüz yüze teslimat.'}
@@ -116,7 +116,7 @@ const CheckoutAddressStep = ({
 
         {/* Meetup Location Selector */}
         {deliveryMethod === 'SAFE_MEETUP' && <div className="mt-6 rounded-xl border border-zinc-200/60 bg-white p-4 animate-fadeIn">
-            <h4 className="mb-3 text-[12px] font-bold uppercase tracking-wider text-slate-500">{t("bulu_ma_noktas_se_in")}</h4>
+            <h4 className="mb-3 text-body font-bold uppercase tracking-wider text-slate-500">{t("bulu_ma_noktas_se_in")}</h4>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 mb-4">
               {predefinedHubs.map(hub => {
             const isSelected = meetupLocation === hub;
@@ -148,10 +148,10 @@ const CheckoutAddressStep = ({
       {/* Section: Shipping */}
       <div className="mb-6">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[#111]">
+          <h3 className="text-sm font-medium text-text-primary text-[#111]">
             {deliveryMethod === 'SAFE_MEETUP' ? 'Fatura Adresi' : 'Adres Bilgisi'}
           </h3>
-          <span className="text-[10px] font-medium uppercase tracking-widest text-[#999]">{t("gerekli")}</span>
+          <span className="text-caption font-medium uppercase tracking-widest text-[#999]">{t("gerekli")}</span>
         </div>
 
         {!hasAddresses ? <div className="rounded-lg border border-dashed border-[#ddd] bg-[#fafaf9] py-10 text-center">
@@ -177,7 +177,7 @@ const CheckoutAddressStep = ({
                         {` ${address.postalCode}`}
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{address.country}</span>
+                        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{address.country}</span>
                         {address.mainAddress && <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">{t("default")}</span>}
                       </div>
                     </div>
@@ -203,7 +203,7 @@ const CheckoutAddressStep = ({
                     </option>)}
                 </select>
                 <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                {selectedBillingAddress && !billingSameAsShipping && <p className="mt-1.5 truncate pl-0.5 text-[11px] text-slate-400">
+                {selectedBillingAddress && !billingSameAsShipping && <p className="mt-1.5 truncate pl-0.5 text-caption text-slate-400">
                     {selectedBillingAddress.city}, {selectedBillingAddress.state}
                     {selectedBillingAddress.neighborhoodKey ? `, ${selectedBillingAddress.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}{' '}
                     {selectedBillingAddress.postalCode}

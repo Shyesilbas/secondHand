@@ -60,32 +60,32 @@ const GreatSellerProgressCard = ({
                             <Award className="w-5 h-5 shrink-0" />
                         </span>
                         <div>
-                            <h2 className="text-sm font-black text-gray-950 tracking-tight">{t("great_seller_milestones")}</h2>
+                            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("great_seller_milestones")}</h2>
                             <p className="text-xs font-medium text-gray-500">{t("progress_is_calculated_from_completed_ma")}</p>
                         </div>
                     </div>
-                    {gs.eligible ? <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    {gs.eligible ? <span className="inline-flex items-center gap-1 text-caption font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                             <CheckCircle2 className="w-3.5 h-3.5" />{t("completed")}</span> : null}
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
-                            <p className="text-[12px] font-semibold text-gray-800">{t("paid_order_lines")}{days}{t("days")}</p>
-                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                            <p className="text-body font-semibold text-gray-800">{t("paid_order_lines")}{days}{t("days")}</p>
+                            <span className="text-caption font-bold tabular-nums text-gray-500">
                                 {gs.qualifyingSalesLastWindow}&nbsp;/&nbsp;{gs.qualifyingSalesTarget}
                                 {gs.salesMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" /> : null}
                             </span>
                         </div>
-                        <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{t("completed_checkout_try_lines_with_unit_p")}{minTry.toLocaleString('tr-TR')}
+                        <p className="text-caption text-gray-400 mt-0.5 leading-snug">{t("completed_checkout_try_lines_with_unit_p")}{minTry.toLocaleString('tr-TR')}
                         </p>
                         <Bar pct={salesPct} done={gs.salesMet} />
                     </div>
 
                     <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
-                            <p className="text-[12px] font-semibold text-gray-800">{t("unique_buyer_reviews")}</p>
-                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                            <p className="text-body font-semibold text-gray-800">{t("unique_buyer_reviews")}</p>
+                            <span className="text-caption font-bold tabular-nums text-gray-500">
                                 {gs.distinctReviewerCount}&nbsp;/&nbsp;{gs.distinctReviewerTarget}
                                 {gs.reviewersMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" /> : null}
                             </span>
@@ -95,8 +95,8 @@ const GreatSellerProgressCard = ({
 
                     <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-4">
                         <div className="flex justify-between items-baseline gap-2">
-                            <p className="text-[12px] font-semibold text-gray-800">{t("average_rating")}</p>
-                            <span className="text-[11px] font-bold tabular-nums text-gray-500">
+                            <p className="text-body font-semibold text-gray-800">{t("average_rating")}</p>
+                            <span className="text-caption font-bold tabular-nums text-gray-500">
                                 {(avg ?? 0).toFixed(2)}
                                 {' / '}
                                 {minRating.toFixed(1)}
@@ -241,7 +241,7 @@ const UserProfilePage = () => {
             return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-bold transition-all duration-200 ${isActive ? 'bg-gray-950 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900'}`}>
                                     <Icon className="w-4 h-4" />
                                     {tab.label}
-                                    {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-[11px] font-bold tabular-nums ${isActive ? 'bg-white/15 text-white' : 'bg-white text-gray-500'}`}>
+                                    {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full text-caption font-bold tabular-nums ${isActive ? 'bg-white/15 text-white' : 'bg-white text-gray-500'}`}>
                                             {count}
                                         </span>}
                                 </button>;
@@ -261,7 +261,7 @@ const UserProfilePage = () => {
                                 <div>
                                     <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
                                         <Grid3X3 className="h-3.5 w-3.5" />{t("marketplace")}</div>
-                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">{t("listings")}</h2>
+                                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("listings")}</h2>
                                     <p className="text-sm text-gray-500 mt-0.5">
                                         {isOwnProfile ? 'Your active listings' : 'All active listings by this user'}
                                     </p>
@@ -303,7 +303,7 @@ const UserProfilePage = () => {
                                 <div>
                                     <div className="mb-1 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
                                         <Sparkles className="h-3.5 w-3.5" />{t("curated")}</div>
-                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">{t("lists")}</h2>
+                                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("lists")}</h2>
                                     <p className="text-sm text-gray-500 mt-0.5">
                                         {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
                                     </p>
@@ -366,7 +366,7 @@ const EmptyState = ({
         <div className={`w-14 h-14 rounded-2xl ${iconBg} flex items-center justify-center mx-auto mb-4`}>
             <Icon className={`w-6 h-6 ${iconColor}`} />
         </div>
-        <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
+        <h3 className="text-sm font-medium text-text-primary mb-1">{title}</h3>
         <p className="text-sm text-gray-500 max-w-xs mx-auto">{description}</p>
         {action && <button onClick={action.onClick} className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
                 {action.label}

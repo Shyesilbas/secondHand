@@ -66,7 +66,7 @@ const FavoritesPage = () => {
         <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-950/5">
           <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
-              <h1 className="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{t("favorites")}</h1>
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("favorites")}</h1>
               <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{t("saved_listings_and_your_curated_lists_in")}</p>
             </div>
           </div>
@@ -100,7 +100,7 @@ const FavoritesPage = () => {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
                     <Heart className="h-7 w-7 text-slate-400" />
                   </div>
-                  <h2 className="text-base font-semibold text-slate-900">{t("no_saved_listings_yet")}</h2>
+                  <h2 className="text-lg font-semibold text-text-primary">{t("no_saved_listings_yet")}</h2>
                   <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">{t("tap_the_heart_on_a_listing_to_save_it_he")}</p>
                   <Link to={ROUTES.LISTINGS} className="mt-6 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">{t("browse_listings")}</Link>
                 </div> : <>
@@ -126,7 +126,7 @@ const FavoritesPage = () => {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
                     <List className="h-7 w-7 text-slate-400" />
                   </div>
-                  <h2 className="text-base font-semibold text-slate-900">{t("no_lists_yet")}</h2>
+                  <h2 className="text-lg font-semibold text-text-primary">{t("no_lists_yet")}</h2>
                   <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">{t("create_a_list_to_group_favorites_by_them")}</p>
                   <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800">
                     <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>

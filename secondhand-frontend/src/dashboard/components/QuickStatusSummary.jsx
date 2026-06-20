@@ -56,7 +56,7 @@ const QuickStatusSummary = ({
     delay: 0.25
   }} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("order_status")}</span>
+        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("order_status")}</span>
         <div className="h-4 w-px bg-slate-200" />
         <div className="flex items-center gap-2 flex-wrap">
           {counts.map(({
@@ -70,7 +70,7 @@ const QuickStatusSummary = ({
         }) => <div key={key} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${bg} border ${border} transition-all`}>
               <Icon className={`w-3.5 h-3.5 ${color}`} />
               <span className={`text-xs font-bold ${color}`}>{count}</span>
-              <span className="text-[10px] text-slate-500 font-medium">{label}</span>
+              <span className="text-caption text-slate-500 font-medium">{label}</span>
             </div>)}
         </div>
       </div>

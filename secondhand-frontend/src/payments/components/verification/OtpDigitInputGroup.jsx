@@ -87,7 +87,7 @@ const OtpDigitInputGroup = ({
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
               aria-label={`Verification digit ${index + 1} of ${OTP_CODE_LENGTH}`}
-              className={`w-11 h-12 text-center text-[16px] font-mono rounded-xl transition-all duration-150 focus:outline-none ${
+              className={`w-11 h-12 text-center text-base font-mono rounded-xl transition-all duration-150 focus:outline-none ${
                 disabled ? 'opacity-50 cursor-not-allowed border border-slate-100 bg-slate-50 text-slate-400' :
                 hasValue
                   ? 'border-indigo-600 bg-indigo-600 text-white border'

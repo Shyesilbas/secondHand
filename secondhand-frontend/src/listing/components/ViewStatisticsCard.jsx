@@ -40,9 +40,9 @@ const ViewStatisticsCard = ({
           <div className="w-7 h-7 rounded-xl bg-indigo-100 flex items-center justify-center">
             <Eye className="w-3.5 h-3.5 text-indigo-600" />
           </div>
-          <span className="text-[13px] font-semibold text-slate-700">{t("view_statistics")}</span>
+          <span className="text-sm font-semibold text-slate-700">{t("view_statistics")}</span>
         </div>
-        <div className="flex items-center gap-1 text-[11px] text-slate-400">
+        <div className="flex items-center gap-1 text-caption text-slate-400">
           <Calendar className="w-3 h-3" />
           <span>{t("last")}{periodDays || 7}{t("days")}</span>
         </div>
@@ -60,14 +60,14 @@ const ViewStatisticsCard = ({
             <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
               <Icon className={`w-4 h-4 ${color}`} />
             </div>
-            <span className={`text-xl font-black tracking-tight ${color}`}>{value}</span>
-            <span className="text-[10px] text-slate-400 font-medium text-center leading-tight">{label}</span>
+            <span className={`text-xl font-bold tracking-tight ${color}`}>{value}</span>
+            <span className="text-caption text-slate-400 font-medium text-center leading-tight">{label}</span>
           </div>)}
       </div>
 
       {/* Footer note */}
       {repeatViews > 0 && <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
-          <p className="text-[11px] text-slate-400 text-center">
+          <p className="text-caption text-slate-400 text-center">
             <span className="font-semibold text-slate-600">{repeatViews}</span>{t("repeat_visit")}{repeatViews !== 1 ? 's' : ''}{t("recorded")}</p>
         </div>}
     </div>;

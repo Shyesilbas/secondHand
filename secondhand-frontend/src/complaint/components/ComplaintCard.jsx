@@ -36,11 +36,11 @@ const ComplaintCard = ({
                             </svg>
                         </div>
                         <div>
-                            <h3 className="font-semibold tracking-tight text-slate-900">{t("complaint")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("complaint")}</h3>
                             <p className="text-xs text-slate-500 leading-relaxed">{formatDate(complaint.createdAt)}</p>
                         </div>
                     </div>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${getStatusColor(complaint.resolvedAt)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-caption font-medium border ${getStatusColor(complaint.resolvedAt)}`}>
                         {getStatusText(complaint.resolvedAt)}
                     </span>
                 </div>

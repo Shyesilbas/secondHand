@@ -30,7 +30,7 @@ const ProfileHeader = ({
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl font-semibold text-text-primary tracking-tight">
             {fullName || 'Profile Settings'}
           </h1>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">

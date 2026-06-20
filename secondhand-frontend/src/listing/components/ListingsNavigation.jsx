@@ -38,13 +38,13 @@ const ListingsNavigation = ({
                   {hasActiveFilters ? <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-900" /> : null}
                 </button>
                 <div>
-                  <h1 className="text-lg font-semibold text-gray-900 tracking-tight leading-none">{title}</h1>
+                  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>
                   <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-[13px] font-medium text-gray-600">
+                  <span className="text-sm font-medium text-gray-600">
                     {getListingTypeLabel(selectedCategory || filters?.listingType) || 'All Categories'}
                   </span>
                     <span className="text-gray-300">·</span>
-                    <span className="text-gray-400 text-[13px]">{totalElements?.toLocaleString()}{t("results")}</span>
+                    <span className="text-gray-400 text-sm">{totalElements?.toLocaleString()}{t("results")}</span>
                   </div>
                 </div>
               </div>
@@ -59,9 +59,9 @@ const ListingsNavigation = ({
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Search className="h-4 w-4 text-gray-400 group-focus-within:text-gray-600 transition-colors" />
                   </div>
-                  <input type="text" value={term} onChange={e => engineSearch?.setTerm?.(e.target.value)} placeholder={t("search_by_title_or_listing_number")} className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-200 focus:border-gray-300 focus:bg-white rounded-xl transition-all text-[13px] font-medium" />
+                  <input type="text" value={term} onChange={e => engineSearch?.setTerm?.(e.target.value)} placeholder={t("search_by_title_or_listing_number")} className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-200 focus:border-gray-300 focus:bg-white rounded-xl transition-all text-sm font-medium" />
                   {term ? <button onClick={() => clear?.()} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-gray-200 rounded-md">{t("esc")}</span>
+                        <span className="text-caption font-semibold px-1.5 py-0.5 bg-gray-200 rounded-md">{t("esc")}</span>
                       </button> : null}
                 </div>
               </div>
@@ -69,7 +69,7 @@ const ListingsNavigation = ({
               {term ? <div className="mt-3 flex items-center justify-between bg-gray-50 rounded-xl p-3.5 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <div className="flex-1">
-                        <p className="text-[13px] font-medium text-gray-700">
+                        <p className="text-sm font-medium text-gray-700">
                           {isListingNo && listingNoLoading ? <span className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_listing_number")}</span> : isListingNo && listingNoError ? listingNoError : loadingAllPages ? <span className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_everywhere")}</span> : <>{t("found")}<span className="font-bold">{filteredListings.length}</span>{t("result")}{filteredListings.length !== 1 ? 's' : ''}
@@ -79,7 +79,7 @@ const ListingsNavigation = ({
                       </div>
                     </div>
 
-                    {isTitle && !allPagesLoaded && !loadingAllPages ? <button onClick={() => loadAllPages?.()} className="text-[11px] font-semibold text-gray-700 hover:text-gray-900 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">{t("search_all_pages")}</button> : null}
+                    {isTitle && !allPagesLoaded && !loadingAllPages ? <button onClick={() => loadAllPages?.()} className="text-caption font-semibold text-gray-700 hover:text-gray-900 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">{t("search_all_pages")}</button> : null}
                   </div> : null}
             </div>
           </div>

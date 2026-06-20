@@ -148,7 +148,7 @@ const HeaderSpotlight = ({
               </div> : grouped.map((entry, i) => {
             if (entry.type === 'header') {
               return <div key={`h-${entry.label}`} className="px-4 pt-3 pb-1">
-                      <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{entry.label}</span>
+                      <span className="text-caption font-semibold text-gray-400 uppercase tracking-wider">{entry.label}</span>
                     </div>;
             }
             itemIndex++;
@@ -166,7 +166,7 @@ const HeaderSpotlight = ({
                       <div className={`text-sm font-medium truncate ${isSelected ? 'text-white' : 'text-gray-900'}`}>
                         {item.name}
                       </div>
-                      <div className={`text-[11px] truncate ${isSelected ? 'text-white/60' : 'text-gray-400'}`}>
+                      <div className={`text-caption truncate ${isSelected ? 'text-white/60' : 'text-gray-400'}`}>
                         {item.description || item.group}
                       </div>
                     </div>
@@ -178,7 +178,7 @@ const HeaderSpotlight = ({
           </div>
 
           {/* Footer hints */}
-          <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center gap-4 text-[10px] text-gray-400">
+          <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50/60 flex items-center gap-4 text-caption text-gray-400">
             <span className="inline-flex items-center gap-1">
               <kbd className="px-1 py-0.5 rounded border border-gray-200 bg-white text-[9px] font-medium">↑↓</kbd>{t("navigate")}</span>
             <span className="inline-flex items-center gap-1">

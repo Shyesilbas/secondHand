@@ -24,13 +24,13 @@ const SecurityActivityList = ({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("no_security_events_found")}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-2">{t("no_security_events_found")}</h3>
                 <p className="text-gray-600">{t("you_don_t_have_any_security_events_yet")}</p>
             </div>;
   }
   return <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-10">
             <div className="px-6 py-5 bg-gray-50 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">{t("security_activity")}{totalElements})
+                <h3 className="text-sm font-medium text-text-primary">{t("security_activity")}{totalElements})
                 </h3>
             </div>
 
@@ -44,7 +44,7 @@ const SecurityActivityList = ({
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-sm font-semibold text-gray-900">
+                                    <h3 className="text-sm font-medium text-text-primary">
                                         {getEventTypeDisplay(log.eventType)}
                                     </h3>
                                     <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${getEventStatusColor(log.eventStatus)}`}>

@@ -59,7 +59,7 @@ const UserStats = ({
   return <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-lg">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">{t("personal_information")}</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{t("personal_information")}</h2>
           <p className="text-sm text-gray-600 mt-1">{t("basic_account_details_and_contact_inform")}</p>
         </div>
         <div className="p-6">
@@ -75,7 +75,7 @@ const UserStats = ({
 
       {reviewStats && reviewStats.totalReviews > 0 && <div className="bg-white border border-gray-200 rounded-lg">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">{t("review_summary")}</h2>
+            <h2 className="text-lg font-semibold text-text-primary">{t("review_summary")}</h2>
           </div>
           <div className="p-6">
             <CompactReviewStats stats={reviewStats} loading={reviewStatsLoading} />

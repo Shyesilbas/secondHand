@@ -39,7 +39,7 @@ const EWalletSection = () => {
   return <div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
                 <div>
-                    <h2 className="text-xl font-semibold tracking-tight text-slate-900">{t("ewallet")}</h2>
+                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("ewallet")}</h2>
                     <p className="text-sm text-slate-500 mt-1">{t("manage_your_wallet_balance_limits_and_tr")}</p>
                 </div>
                 {eWallet && <EWalletActions eWallet={eWallet} loading={loading} onCreateEWallet={createEWallet} onUpdateLimits={updateLimits} onUpdateSpendingWarningLimit={updateSpendingWarningLimit} onDeposit={deposit} onWithdraw={withdraw} />}

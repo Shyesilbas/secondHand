@@ -110,10 +110,10 @@ const PaymentsPage = () => {
                                 <Filter className="w-5 h-5" />
                             </button>
                             <div>
-                                <h1 className="text-lg font-bold text-slate-900 tracking-tight">{t("finances")}</h1>
+                                <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("finances")}</h1>
                                 <div className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t("real_time_tracking")}</p>
+                                    <p className="text-caption font-bold text-slate-400 uppercase tracking-widest">{t("real_time_tracking")}</p>
                                 </div>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ const PaymentsPage = () => {
                                     <div className={`p-2 rounded-lg bg-${card.color}-50 text-${card.color}-600`}>
                                         <card.icon className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{card.title}</span>
+                                    <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{card.title}</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-2xl font-bold text-slate-900 tracking-tight">{card.value}</span>

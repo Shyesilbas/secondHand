@@ -24,7 +24,7 @@ const AgreementCard = ({
               <FileText className={`w-5 h-5 ${isPending ? 'text-amber-600' : 'text-gray-500'}`} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-gray-900">
+              <h3 className="text-sm font-medium text-text-primary">
                 {AGREEMENT_TYPE_LABELS[agreement.agreementType]}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-400">

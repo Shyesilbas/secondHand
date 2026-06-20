@@ -17,12 +17,12 @@ const FieldError = ({
   }} animate={{
     opacity: 1,
     y: 0
-  }} className="mt-1.5 flex items-center gap-1 text-[12px] text-red-500">
+  }} className="mt-1.5 flex items-center gap-1 text-body text-red-500">
       <AlertCircle className="h-3 w-3 shrink-0" />
       {error}
     </motion.p>;
 };
-const inputBase = 'w-full pl-10 pr-8 py-2.5 text-[13px] border rounded-lg focus:outline-none transition-all duration-200 appearance-none bg-white';
+const inputBase = 'w-full pl-10 pr-8 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200 appearance-none bg-white';
 const inputNormal = `${inputBase} border-zinc-200/60 text-zinc-900 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
 const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
 const LocationFields = ({
@@ -174,7 +174,7 @@ const LocationFields = ({
   return <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
       {/* City Select */}
       <div>
-        <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("city_i_l")}<span className="text-red-500">*</span>
+        <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("city_i_l")}<span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -196,7 +196,7 @@ const LocationFields = ({
 
       {/* District Select */}
       <div>
-        <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("district_i_l_e")}<span className="text-red-500">*</span>
+        <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("district_i_l_e")}<span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -218,7 +218,7 @@ const LocationFields = ({
 
       {/* Neighborhood Select */}
       <div>
-        <label className="mb-1.5 block text-[13px] font-medium text-zinc-900">{t("neighborhood_mahalle")}<span className="text-zinc-400">{t("optional")}</span>
+        <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("neighborhood_mahalle")}<span className="text-zinc-400">{t("optional")}</span>
         </label>
         <div className="relative">
           <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />

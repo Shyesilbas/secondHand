@@ -9,7 +9,7 @@ const tabUrl = tab => `${ROUTES.INBOX}?tab=${tab}`;
 const countBadge = n => {
   const v = Number(n) || 0;
   if (v <= 0) return null;
-  return <span className="min-w-[1.25rem] rounded-full bg-slate-200/90 px-2 py-0.5 text-center text-[11px] font-bold tabular-nums text-slate-700">
+  return <span className="min-w-[1.25rem] rounded-full bg-slate-200/90 px-2 py-0.5 text-center text-caption font-bold tabular-nums text-slate-700">
             {v > 99 ? '99+' : v}
         </span>;
 };
@@ -31,14 +31,14 @@ const HeaderInboxMenu = ({
   return <div className="relative">
             <button type="button" onClick={onToggle} title={t("inbox")} className="group relative rounded-xl p-2.5 text-slate-600 transition-all duration-300 ease-in-out hover:bg-slate-100/50 hover:text-slate-900">
                 <Inbox className="h-5 w-5 stroke-[1.5px]" />
-                {hubTotal > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gray-900 px-1 text-[10px] font-bold leading-none text-white">
+                {hubTotal > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gray-900 px-1 text-caption font-bold leading-none text-white">
                         {hubTotal > 99 ? '99+' : hubTotal}
                     </span>}
             </button>
 
             {isOpen && <HeaderDropdownPanel className="!right-0 !w-64">
                     <div className="border-b border-slate-100 px-3 pb-2 pt-1">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{t("inbox")}</p>
+                        <p className="text-caption font-semibold uppercase tracking-wider text-slate-400">{t("inbox")}</p>
                     </div>
                     <nav className="flex flex-col gap-0.5 p-1.5">
                         <Link to={tabUrl(INBOX_TABS.EMAILS)} onClick={onClose} className={rowClass}>

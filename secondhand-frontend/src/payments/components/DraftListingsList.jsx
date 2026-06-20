@@ -14,7 +14,7 @@ const DraftListingsList = ({
         <div className="lg:col-span-7 xl:col-span-8">
             <div className="rounded-[2rem] border border-white/60 bg-white/70 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <div className="mb-4 flex items-baseline justify-between">
-                    <h2 className="text-lg font-semibold tracking-tight text-slate-900">{t("draft_listings")}</h2>
+                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("draft_listings")}</h2>
                     <span className="text-xs text-slate-500">
                         {listings.length}{t("draft")}{listings.length === 1 ? '' : 's'}
                     </span>
@@ -37,7 +37,7 @@ const DraftListingsList = ({
                                     )}
                                     <div className="relative flex items-start justify-between">
                                         <div className="flex-1">
-                                            <h3 className={`mb-2 text-base font-semibold tracking-tight transition-colors ${isSelected ? 'text-indigo-950' : 'text-slate-900'}`}>
+                                            <h3 className={`text-sm font-medium text-text-primary mb-2 tracking-tight transition-colors ${isSelected ? '' : ''}`}>
                                                 {listing.title}
                                             </h3>
                                             <p className="mb-3 line-clamp-2 text-sm text-slate-500 leading-relaxed">

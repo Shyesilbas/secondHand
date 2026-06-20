@@ -59,7 +59,7 @@ const OtpSuggestionBanner = ({
           <p className="text-xs font-semibold text-[#111]">
             {emailSubject || 'Payment Verification'}
           </p>
-          {emailDate && <p className="text-[10px] text-[#999]">
+          {emailDate && <p className="text-caption text-[#999]">
               {new Date(emailDate).toLocaleString()}
             </p>}
         </div>

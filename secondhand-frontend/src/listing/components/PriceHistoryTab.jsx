@@ -195,7 +195,7 @@ const PriceHistoryTab = ({
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
-          <h3 className="text-sm font-semibold text-slate-900">{t("price_evolution")}</h3>
+          <h3 className="text-sm font-medium text-text-primary">{t("price_evolution")}</h3>
         </div>
         <div className="p-5">
           <div className="h-72">
@@ -206,7 +206,7 @@ const PriceHistoryTab = ({
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
-          <h3 className="text-sm font-semibold text-slate-900">{t("price_history")}</h3>
+          <h3 className="text-sm font-medium text-text-primary">{t("price_history")}</h3>
         </div>
         <div className="divide-y divide-slate-100">
           {historyDesc.map((entry, idx) => {
@@ -232,10 +232,10 @@ const PriceHistoryTab = ({
                   <div className="text-right shrink-0">
                     <p className="text-sm font-semibold text-slate-900">{formatCurrency(entry?.newPrice, entryCurrency)}</p>
                     <div className="mt-2 flex justify-end">
-                      {hasPct ? <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeClass}`}>
+                      {hasPct ? <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border ${badgeClass}`}>
                           {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : isDown ? <TrendingDown className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
                           {Math.abs(pctValue).toFixed(1)}%
-                        </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border bg-slate-50 text-slate-600 border-slate-200">
+                        </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border bg-slate-50 text-slate-600 border-slate-200">
                           <Minus className="w-3.5 h-3.5" />
                           —
                         </span>}

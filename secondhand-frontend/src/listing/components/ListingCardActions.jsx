@@ -60,7 +60,7 @@ const ListingCardActions = ({
       amber: 'text-amber-700 hover:bg-amber-50',
       red: 'text-rose-600 hover:bg-rose-50'
     };
-    return <button onClick={onClick} className={`w-full px-3.5 py-2 text-left text-[12px] font-medium flex items-center gap-2.5 rounded-lg transition-colors ${colorMap[variant]}`}>
+    return <button onClick={onClick} className={`w-full px-3.5 py-2 text-left text-body font-medium flex items-center gap-2.5 rounded-lg transition-colors ${colorMap[variant]}`}>
         <Icon className="w-3.5 h-3.5 shrink-0" />
         {label}
       </button>;
@@ -78,7 +78,7 @@ const ListingCardActions = ({
 
           {/* Quick edit section */}
           {canEdit && <div className="px-3 pb-2 mb-1 border-b border-slate-100">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-0.5">{t("quick_actions")}</p>
+              <p className="text-caption font-bold text-slate-400 uppercase tracking-widest mb-2 px-0.5">{t("quick_actions")}</p>
               <ListingQuickEdit listing={listing} onChanged={onChanged} showSuccess={showSuccess} showError={showError} compact />
             </div>}
 

@@ -20,8 +20,8 @@ const HeaderBlock = () => {
     <div className="relative z-10 mb-12">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
         <div className="max-w-2xl">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">{t("community_spotlight")}</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">{t("trust_verified_sellers")}</h2>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">{t("community_spotlight")}</p>
+          <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("trust_verified_sellers")}</h2>
           <p className="text-base text-slate-500 mt-4 font-medium leading-relaxed">{t("high_performance_sellers_recognized_for_")}</p>
         </div>
 
@@ -53,11 +53,11 @@ const SellerCard = ({
         <div className="flex items-start gap-4">
           {/* Avatar - Calm Slate */}
           <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 transition-colors group-hover:bg-slate-100">
-            <span className="text-[13px] font-bold text-slate-600">{initials}</span>
+            <span className="text-sm font-bold text-slate-600">{initials}</span>
           </div>
           
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-bold text-slate-900 truncate mb-1 group-hover:text-indigo-600 transition-colors">
+            <h3 className="text-sm font-medium text-text-primary truncate mb-1 group- transition-colors">
               {fullName}
             </h3>
             
@@ -65,8 +65,8 @@ const SellerCard = ({
               {/* Rating / Trust Score */}
               <div className="flex items-center gap-1">
                 <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span className="text-[11px] font-bold text-slate-700">{s.averageRating?.toFixed(1) || '0.0'}</span>
-                <span className="text-[10px] text-slate-400 font-medium">{t("score")}</span>
+                <span className="text-caption font-bold text-slate-700">{s.averageRating?.toFixed(1) || '0.0'}</span>
+                <span className="text-caption text-slate-400 font-medium">{t("score")}</span>
               </div>
               
               <div className="w-1 h-1 rounded-full bg-slate-200" />
@@ -74,7 +74,7 @@ const SellerCard = ({
               {/* Join Date */}
               <div className="flex items-center gap-1 text-slate-400">
                 <CalendarDays className="w-3 h-3" />
-                <span className="text-[10px] font-medium">{formatDate(s.createdAt)}</span>
+                <span className="text-caption font-medium">{formatDate(s.createdAt)}</span>
               </div>
             </div>
           </div>

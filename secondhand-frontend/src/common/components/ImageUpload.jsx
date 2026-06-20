@@ -130,7 +130,7 @@ const ImageUpload = ({
             scale: 1.05
           }} whileTap={{
             scale: 0.95
-          }} type="button" onClick={handleRemoveImage} className="bg-white/95 backdrop-blur-sm text-red-600 px-5 py-2.5 rounded-xl text-[13px] font-medium shadow-lg hover:bg-white transition-colors flex items-center gap-1.5 focus:outline-none">
+          }} type="button" onClick={handleRemoveImage} className="bg-white/95 backdrop-blur-sm text-red-600 px-5 py-2.5 rounded-xl text-sm font-medium shadow-lg hover:bg-white transition-colors flex items-center gap-1.5 focus:outline-none">
                   <X className="w-4 h-4" />{t("remove")}</motion.button>
               </div>}
             {/* Success badge */}
@@ -147,7 +147,7 @@ const ImageUpload = ({
           type: 'spring',
           stiffness: 400,
           damping: 20
-        }} className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-medium text-white shadow-sm">
+        }} className="absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-caption font-medium text-white shadow-sm">
               <CheckCircle2 className="w-3 w-3" />{t("uploaded")}</motion.div>
           </motion.div> : <motion.div key="dropzone" initial={{
         opacity: 0
@@ -178,8 +178,8 @@ const ImageUpload = ({
                 <div className="relative mb-4">
                   <div className="w-12 h-12 rounded-full border-[3px] border-zinc-200 border-t-zinc-600 animate-spin" />
                 </div>
-                <p className="text-[13px] font-medium text-zinc-600">{t("uploading")}</p>
-                <p className="mt-1 text-[11px] text-zinc-400">{t("compressing_and_uploading_your_image")}</p>
+                <p className="text-sm font-medium text-zinc-600">{t("uploading")}</p>
+                <p className="mt-1 text-caption text-zinc-400">{t("compressing_and_uploading_your_image")}</p>
               </div> : <div className="flex flex-col items-center p-6 text-center relative z-10">
                 <motion.div animate={dragActive ? {
             scale: 1.1,
@@ -194,10 +194,10 @@ const ImageUpload = ({
           }} className={`p-3.5 rounded-xl mb-3 transition-colors ${dragActive ? 'bg-zinc-200/60' : 'bg-zinc-100/60'}`}>
                   {dragActive ? <Upload className="w-6 h-6 text-zinc-600" /> : <ImageIcon className="w-6 h-6 text-zinc-400" />}
                 </motion.div>
-                <p className="text-[13px] font-medium text-zinc-700 mb-1">
+                <p className="text-sm font-medium text-zinc-700 mb-1">
                   {dragActive ? 'Drop to upload' : 'Drag & drop or click to browse'}
                 </p>
-                <p className="text-[11px] text-zinc-400">{t("png_jpg_or_gif_max_10mb")}</p>
+                <p className="text-caption text-zinc-400">{t("png_jpg_or_gif_max_10mb")}</p>
               </div>}
           </motion.div>}
       </AnimatePresence>
@@ -212,7 +212,7 @@ const ImageUpload = ({
       }} exit={{
         opacity: 0,
         y: -4
-      }} className="mt-3 px-3.5 py-2.5 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2 text-[12px] text-red-600">
+      }} className="mt-3 px-3.5 py-2.5 bg-red-50/80 border border-red-100 rounded-xl flex items-start gap-2 text-body text-red-600">
             <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />
             <span>{error}</span>
           </motion.div>}

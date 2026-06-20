@@ -46,7 +46,7 @@ const ForumPage = () => {
                     <MessageCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{t("community_forum")}</h1>
+                    <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("community_forum")}</h1>
                     <p className="text-sm text-gray-500 mt-0.5 hidden sm:block">{t("share_ideas_report_issues_and_discuss_wi")}</p>
                   </div>
                 </div>

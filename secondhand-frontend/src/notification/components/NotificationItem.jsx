@@ -174,7 +174,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
       <div className="min-w-0 flex-1 pt-0.5 pl-1.5">
         <div className="flex items-baseline justify-between gap-3">
           <p
-            className={`min-w-0 truncate text-[13px] sm:text-[14px] leading-snug tracking-tight ${unread ? 'font-bold text-slate-800' : 'font-semibold text-slate-500'}`}
+            className={`min-w-0 truncate text-sm sm:text-sm leading-snug tracking-tight ${unread ? 'font-bold text-slate-800' : 'font-semibold text-slate-500'}`}
             title={notification.title}
           >
             {notification.title}
@@ -184,7 +184,7 @@ const NotificationItem = ({ notification, onMarkAsRead }) => {
           </span>
         </div>
         {preview && (
-          <p className="mt-1 line-clamp-2 text-[12px] sm:text-[13px] leading-relaxed text-slate-400 font-medium">{preview}</p>
+          <p className="mt-1 line-clamp-2 text-body sm:text-sm leading-relaxed text-slate-400 font-medium">{preview}</p>
         )}
       </div>
 

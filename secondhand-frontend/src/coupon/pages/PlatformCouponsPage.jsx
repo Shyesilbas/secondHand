@@ -88,7 +88,7 @@ const PlatformCouponsPage = () => {
                 <Ticket className="h-5 w-5" strokeWidth={2.2} />
               </div>
               <div className="min-w-0">
-                <h1 className="truncate text-lg font-bold tracking-tight text-slate-900">{t("platform_kuponlar")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary truncate tracking-tight">{t("platform_kuponlar")}</h1>
                 <p className="truncate text-xs text-slate-500">{t("size_uygun_kodlar_ve_kullan_m_ge_mi_iniz")}</p>
               </div>
             </div>
@@ -140,7 +140,7 @@ const PlatformCouponsPage = () => {
                         {c.description?.trim() && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600" title={c.description.trim()}>
                             {c.description.trim()}
                           </p>}
-                        {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-[11px] text-slate-500">{c.eligibleTypes.join(', ')}</p>}
+                        {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-caption text-slate-500">{c.eligibleTypes.join(', ')}</p>}
                       </td>
                       <td className="align-top whitespace-nowrap px-4 py-3">
                         <span className="inline-flex flex-col gap-1">
@@ -167,7 +167,7 @@ const PlatformCouponsPage = () => {
                 </tbody>
               </table>
             </div>
-            <p className="border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 text-[11px] text-slate-500">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
+            <p className="border-t border-slate-100 bg-slate-50/80 px-4 py-2.5 text-caption text-slate-500">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
           </div>}
 
         {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length > 0 && <div className={tableShell}>

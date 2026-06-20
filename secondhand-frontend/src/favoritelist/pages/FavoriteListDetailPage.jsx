@@ -115,7 +115,7 @@ const FavoriteListDetailPage = () => {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
             <Package className="h-8 w-8 text-slate-400" />
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
+          <h2 className="text-lg font-semibold text-text-primary">{FAVORITE_LIST_MESSAGES.NOT_FOUND_TITLE}</h2>
           <p className="mt-2 text-sm text-slate-500">{FAVORITE_LIST_MESSAGES.NOT_FOUND_BODY}</p>
           <button type="button" onClick={() => navigate(-1)} className="mt-6 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">
             {FAVORITE_LIST_MESSAGES.BACK}
@@ -133,7 +133,7 @@ const FavoriteListDetailPage = () => {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{list.name}</h1>
+                  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{list.name}</h1>
                   <div className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${list.isPublic ? 'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80' : 'bg-slate-100 text-slate-700'}`}>
                     {list.isPublic ? <>
                         <Globe className="h-3 w-3" />{t("public")}</> : <>
@@ -158,7 +158,7 @@ const FavoriteListDetailPage = () => {
 
               <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                 <div className="text-right">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{t("total_value")}</p>
+                  <p className="text-caption font-semibold uppercase tracking-wide text-slate-500">{t("total_value")}</p>
                   <p className="font-mono text-xl font-bold tabular-nums text-slate-900 sm:text-2xl">
                     {formatCurrency(list.totalPrice, list.currency)}
                   </p>
@@ -216,7 +216,7 @@ const FavoriteListDetailPage = () => {
                 </div>
 
                 <Link to={ROUTES.LISTING_DETAIL(item.listingId)} className="block p-3">
-                  <h3 className="truncate text-sm font-medium text-slate-900 transition hover:text-teal-800">
+                  <h3 className="text-sm font-medium text-text-primary truncate transition">
                     {item.listingTitle}
                   </h3>
                   <p className="mt-1 font-semibold tabular-nums text-slate-900">
@@ -232,7 +232,7 @@ const FavoriteListDetailPage = () => {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
               <Package className="h-7 w-7 text-slate-400" />
             </div>
-            <h3 className="text-base font-semibold text-slate-900">{t("this_list_is_empty")}</h3>
+            <h3 className="text-sm font-medium text-text-primary">{t("this_list_is_empty")}</h3>
             <p className="mt-2 text-sm text-slate-500">
               {isOwner ? 'Add listings from search or listing pages with “Add to list”.' : 'There are no listings in this list yet.'}
             </p>

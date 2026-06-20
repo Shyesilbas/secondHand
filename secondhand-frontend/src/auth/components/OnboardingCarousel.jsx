@@ -81,7 +81,7 @@ export const OnboardingCarousel = () => {
                 </div>
 
                 <div className="space-y-3.5">
-                    <h2 className="text-2xl font-normal text-stone-900 tracking-tight transition-all duration-500">
+                    <h2 className="text-lg font-semibold text-text-primary tracking-tight transition-all duration-500">
                         {card.title}
                     </h2>
                     <p className="text-xs text-stone-500 leading-relaxed whitespace-pre-line max-w-[280px] mx-auto transition-all duration-500">
@@ -123,7 +123,7 @@ export const OnboardingCarousel = () => {
                 </div>
             </div>
 
-            <div className="absolute bottom-8 right-10 text-[10px] tracking-widest text-stone-400 font-semibold">
+            <div className="absolute bottom-8 right-10 text-caption tracking-widest text-stone-400 font-semibold">
                 {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
             </div>
         </div>

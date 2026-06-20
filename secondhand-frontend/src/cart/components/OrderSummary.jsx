@@ -32,7 +32,7 @@ const OrderSummary = ({
       borderColor: CART_UI.border,
       backgroundColor: CART_UI.surface
     }}>
-        <h3 className="text-sm font-semibold text-[#1a1918]">{t("order_summary")}</h3>
+        <h3 className="text-sm font-medium text-text-primary text-[#1a1918]">{t("order_summary")}</h3>
         <p className="mt-0.5 text-xs tabular-nums text-[#5f5b57]">
           {cartCount} {cartCount === 1 ? 'item' : 'items'}
         </p>
@@ -50,7 +50,7 @@ const OrderSummary = ({
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
             }} /> : null}
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center border bg-[#f7f6f5] text-[10px] font-medium text-[#9c9894] ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center border bg-[#f7f6f5] text-caption font-medium text-[#9c9894] ${item.listing.imageUrl ? 'hidden' : 'flex'}`} style={{
               borderColor: CART_UI.border
             }}>
                   {item.listing.title.charAt(0).toUpperCase()}
@@ -59,7 +59,7 @@ const OrderSummary = ({
                   <p className="line-clamp-2 text-xs font-medium leading-snug text-[#1a1918]">
                     {item.listing.title}
                   </p>
-                  <p className="mt-0.5 text-[11px] tabular-nums text-[#5f5b57]">
+                  <p className="mt-0.5 text-caption tabular-nums text-[#5f5b57]">
                     {item.quantity} × {formatCurrency(itemPrice, item.listing.currency)}
                   </p>
                 </div>
@@ -90,7 +90,7 @@ const OrderSummary = ({
               </span>
             </div>
             <div className="flex justify-end">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#dff6dd] px-2 py-0.5 text-[10px] font-bold text-[#107c10]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#dff6dd] px-2 py-0.5 text-caption font-bold text-[#107c10]">
                 <Check className="h-3 w-3" strokeWidth={3} />{t("bundle_savings_applied")}</span>
             </div>
           </div>}
@@ -119,7 +119,7 @@ const OrderSummary = ({
 
       <div className="border-t border-[#e0deda] px-4 pb-5 pt-2 sm:px-5">
         <button type="button" className={cartBtnPrimaryBlock} onClick={onCheckout} disabled={disabled}>{t("proceed_to_checkout")}</button>
-        <p className="mt-3 text-center text-[11px] text-[#9c9894]">{t("you_will_enter_address_and_payment_on_th")}</p>
+        <p className="mt-3 text-center text-caption text-[#9c9894]">{t("you_will_enter_address_and_payment_on_th")}</p>
       </div>
     </aside>;
 };

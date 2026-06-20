@@ -106,7 +106,7 @@ const CheckoutReviewStep = ({
   return <div className="p-5 sm:p-7">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold tracking-tight text-[#111]">{t("review_your_order")}</h2>
+        <h2 className="text-lg font-semibold text-text-primary tracking-tight text-[#111]">{t("review_your_order")}</h2>
         <p className="mt-1 text-sm text-[#999]">{t("double_check_details_before_finishing_yo")}</p>
       </div>
 
@@ -128,10 +128,10 @@ const CheckoutReviewStep = ({
               {/* Info */}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="truncate text-sm font-medium text-[#111]">
+                  <h3 className="text-sm font-medium text-text-primary truncate text-[#111]">
                     {item.listing.title}
                   </h3>
-                  {isOffer && <span className="rounded border border-[#e5e3df] bg-[#fafaf9] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#555]">{t("offer")}</span>}
+                  {isOffer && <span className="rounded border border-[#e5e3df] bg-[#fafaf9] px-1.5 py-0.5 text-caption font-medium uppercase tracking-wider text-[#555]">{t("offer")}</span>}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#999]">
                   <span>
@@ -176,7 +176,7 @@ const CheckoutReviewStep = ({
               <p className="mt-1 text-slate-500 font-medium">
                 {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
               </p>
-              <p className="mt-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{shippingAddress.country}</p>
+              <p className="mt-1.5 text-caption font-bold text-slate-400 uppercase tracking-wider">{shippingAddress.country}</p>
             </div> : <p className="text-xs text-slate-400 font-medium">{t("no_shipping_address_chosen")}</p>}
         </div>
 

@@ -108,7 +108,7 @@ const PayListingFeePage = () => {
                     <div className="mb-4">
                         <BackButton onClick={() => navigate(-1)} />
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900">
+                    <h1 className="text-2xl font-semibold text-text-primary tracking-tight bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900">
                         {t("listing_fee_payment")}
                     </h1>
                     <p className="mt-2 text-base text-slate-500 max-w-2xl">

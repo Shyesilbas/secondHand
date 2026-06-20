@@ -141,11 +141,11 @@ const AuraChatWidget = () => {
               </div>
               <div className="leading-tight min-w-0">
                 <div className="text-sm font-semibold tracking-tight truncate">{t("aura")}</div>
-                <div className="text-[11px] text-indigo-200/90 truncate">{t("your_marketplace_assistant")}</div>
+                <div className="text-caption text-indigo-200/90 truncate">{t("your_marketplace_assistant")}</div>
               </div>
             </button>
             <div className="flex items-center gap-1.5 shrink-0">
-              {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${agentMode ? 'bg-white/15 text-white ring-1 ring-white/25' : 'bg-white/5 text-indigo-200/80 hover:bg-white/10'}`}>{t("agent")}</button> : null}
+              {AI_AGENT_MODE_ENABLED ? <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`rounded-full px-2.5 py-1 text-caption font-semibold uppercase tracking-wide transition ${agentMode ? 'bg-white/15 text-white ring-1 ring-white/25' : 'bg-white/5 text-indigo-200/80 hover:bg-white/10'}`}>{t("agent")}</button> : null}
               <button type="button" onClick={() => setIsOpen(false)} className="p-2 rounded-xl hover:bg-white/10 text-white/80 hover:text-white transition-colors" aria-label={t("close")}>
                 <X className="w-4 h-4" />
               </button>
@@ -162,7 +162,7 @@ const AuraChatWidget = () => {
                       {isUser ? <UserRound className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
                     </div>
                     <div className={`min-w-0 max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                      <div className={`inline-block rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-md' : 'border border-slate-200/80 bg-white text-slate-800 shadow-sm'}`}>
+                      <div className={`inline-block rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-gradient-to-br from-slate-900 to-indigo-950 text-white shadow-md' : 'border border-slate-200/80 bg-white text-slate-800 shadow-sm'}`}>
                         {m.typing ? <div className="flex items-center gap-1.5 py-0.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" style={{
                         animationDelay: '0ms'
@@ -177,7 +177,7 @@ const AuraChatWidget = () => {
                             {m.content}
                             {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 ? <AuraSuggestedListingChips listings={m.meta.suggestedListings} dense /> : null}
                             {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-2 flex flex-wrap gap-1.5">
-                                {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] leading-4 text-slate-600">
+                                {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-caption leading-4 text-slate-600">
                                     {source.source}:{source.status}
                                   </span>)}
                               </div> : null}
@@ -189,7 +189,7 @@ const AuraChatWidget = () => {
             </div>
 
             {showQuickPrompts && isAuthenticated && userId != null ? <div className="shrink-0 px-4 pb-2 border-t border-slate-100/80 bg-white/60">
-                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-2">{t("quick_start")}</p>
+                <p className="text-caption font-medium text-slate-500 uppercase tracking-wider mb-2">{t("quick_start")}</p>
                 <AuraSuggestedPrompts dense disabled={isSending} onPick={msg => sendMessage({
               text: msg
             })} />
@@ -197,12 +197,12 @@ const AuraChatWidget = () => {
 
             <div className="shrink-0 border-t border-slate-200/90 bg-white/95 backdrop-blur-md p-3">
               <div className="flex items-end gap-2">
-                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-2xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-[13px] text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-300 focus:bg-white" rows={2} />
+                <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-2xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-300 focus:bg-white" rows={2} />
                 <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-500 hover:to-violet-500 transition-all" aria-label={t("send")}>
                   <Send className="w-4 h-4" />
                 </button>
               </div>
-              {isGreeting ? <div className="mt-2 text-[10px] text-slate-400 tracking-tight">{t("aura_is_preparing")}</div> : <p className="mt-2 text-[10px] text-slate-400 leading-snug">{t("your_last_conversation_is_stored_on_this")}</p>}
+              {isGreeting ? <div className="mt-2 text-caption text-slate-400 tracking-tight">{t("aura_is_preparing")}</div> : <p className="mt-2 text-caption text-slate-400 leading-snug">{t("your_last_conversation_is_stored_on_this")}</p>}
             </div>
           </div>
         </div>

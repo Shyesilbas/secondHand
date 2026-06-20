@@ -149,12 +149,12 @@ const ListingWizard = ({
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>{t("cancel")}</span>
               </button>
-              <span className="tabular-nums text-[11px] text-zinc-500">
+              <span className="tabular-nums text-caption text-zinc-500">
                 {currentStep}/{steps.length}
               </span>
             </div>
 
-            <nav className="flex flex-wrap items-baseline gap-x-0.5 gap-y-1 text-[11px] text-zinc-500" aria-label={t("steps")}>
+            <nav className="flex flex-wrap items-baseline gap-x-0.5 gap-y-1 text-caption text-zinc-500" aria-label={t("steps")}>
               {steps.map((step, idx) => {
               const isActive = currentStep === step.id;
               const done = currentStep > step.id;
@@ -183,7 +183,7 @@ const ListingWizard = ({
 
         <div className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 sm:px-5">
           <div className="shrink-0 pt-5 pb-1">
-            <h1 className="text-[15px] font-medium leading-snug tracking-tight text-zinc-950 sm:text-base">
+            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">
               {currentStepInfo?.title || title}
             </h1>
             {(currentStepInfo?.description || subtitle) && <p className="mt-1 text-xs leading-relaxed text-zinc-500">
@@ -256,7 +256,7 @@ const ListingWizard = ({
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
               return <div key={step.id} className="flex shrink-0 items-center gap-1 sm:gap-1.5">
-                    <div className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300 sm:h-7 sm:w-7 sm:text-[11px] ${isActive ? `${t.stepActiveMob} wizard-step-pulse` : isCompleted ? t.stepDoneMob : t.stepTodoMob}`}>
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full text-caption font-bold transition-all duration-300 sm:h-7 sm:w-7 sm:text-caption ${isActive ? `${t.stepActiveMob} wizard-step-pulse` : isCompleted ? t.stepDoneMob : t.stepTodoMob}`}>
                       {isCompleted ? <span className="wizard-check-bounce inline-flex">
                           <Check className="h-3 w-3" />
                         </span> : step.id}
@@ -327,7 +327,7 @@ const ListingWizard = ({
                   <span className={t.eyebrowBadge}>{headerEyebrow}</span>
                 </div> : null}
               <div className="mb-1.5 flex items-center gap-2">
-                <h1 className={`text-xl font-bold tracking-tight sm:text-2xl ${t.pageTitle}`}>
+                <h1 className={`text-2xl font-semibold text-text-primary tracking-tight ${t.pageTitle}`}>
                   {currentStepInfo?.title || title}
                 </h1>
               </div>

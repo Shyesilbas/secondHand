@@ -60,8 +60,8 @@ const CategoryHub = () => {
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="mb-5 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600 mb-1">{t("browse_categories")}</p>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{t("what_are_you_looking_for")}</h2>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-emerald-600 mb-1">{t("browse_categories")}</p>
+          <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("what_are_you_looking_for")}</h2>
           </div>
           <p className="text-xs font-medium text-slate-500 max-w-sm">{t("jump_into_the_most_active_marketplace_la")}</p>
         </div>
@@ -74,7 +74,7 @@ const CategoryHub = () => {
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-105 ${cat.bg}`}>
                   <Icon className="w-5 h-5 shrink-0" />
                 </div>
-                <span className="text-[12px] font-bold text-slate-700 mt-2.5 group-hover:text-slate-900 transition-colors truncate w-full text-center">
+                <span className="text-body font-bold text-slate-700 mt-2.5 group-hover:text-slate-900 transition-colors truncate w-full text-center">
                   {cat.label}
                 </span>
               </button>;

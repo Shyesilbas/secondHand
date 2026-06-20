@@ -14,7 +14,7 @@ const AgreementsSection = ({
   if (!agreements?.length) return null;
   return <div className="space-y-4">
             <div>
-                <h3 className="text-base font-bold text-slate-900 mb-1.5 tracking-tight">{t("agreements")}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-1.5 tracking-tight">{t("agreements")}</h3>
                 <p className="text-xs text-slate-600 tracking-tight">{t("you_must_accept_all_agreements_below_to_")}</p>
             </div>
 

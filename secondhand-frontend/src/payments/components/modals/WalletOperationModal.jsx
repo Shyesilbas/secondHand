@@ -77,7 +77,7 @@ const WalletOperationModal = ({
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-sm font-medium text-text-primary">{title}</h3>
             <p className="text-sm text-gray-500 mt-1">{description}</p>
             {currentValueLabel && <div className="mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs text-gray-600">
                 <span className="opacity-70">{currentValueLabel}</span>

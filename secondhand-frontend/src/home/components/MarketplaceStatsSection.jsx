@@ -85,11 +85,11 @@ const MarketplaceStatsSection = () => {
                     <Icon className="w-4.5 h-4.5 shrink-0" />
                   </div>
                   <div>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{metric.label}</span>
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">{metric.value}</h3>
+                    <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{metric.label}</span>
+                    <h3 className="text-sm font-medium text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium mt-3 border-t border-slate-50 pt-2 leading-relaxed">
+                <p className="text-caption text-slate-400 font-medium mt-3 border-t border-slate-50 pt-2 leading-relaxed">
                   {metric.desc}
                 </p>
               </div>

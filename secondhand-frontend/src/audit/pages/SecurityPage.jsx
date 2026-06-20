@@ -83,7 +83,7 @@ const SecurityPage = () => {
                     <div className="space-y-2">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold mb-2">
                             <ShieldCheck size={14} />{t("privacy_protection")}</div>
-                        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">{t("security_privacy")}</h1>
+                        <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("security_privacy")}</h1>
                         <p className="text-gray-500 max-w-lg">{t("keep_track_of_where_you_ve_signed_in_and")}</p>
                     </div>
 
@@ -101,7 +101,7 @@ const SecurityPage = () => {
                     {/* Activity Section */}
                     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-white">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">{t("login_activity")}<span className="text-xs font-normal text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                            <h3 className="text-sm font-medium text-text-primary flex items-center gap-2">{t("login_activity")}<span className="text-xs font-normal text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
                                     {totalElements}{t("events")}</span>
                             </h3>
                             <button onClick={() => setShowFilters(!showFilters)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${showFilters ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'}`}>

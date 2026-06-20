@@ -87,8 +87,8 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
     refreshWallet();
   }, []);
   const btnPrimaryClass = embedded ? 'w-full py-3 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 disabled:opacity-45 disabled:shadow-none transition-colors' : 'w-full py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-45 transition-colors';
-  const headingClass = embedded ? 'text-[15px] font-bold text-slate-900' : 'text-lg font-semibold text-gray-900';
-  const mutedClass = embedded ? 'text-[13px] text-slate-500' : 'text-sm text-gray-600';
+  const headingClass = embedded ? 'text-base font-bold text-slate-900' : 'text-lg font-semibold text-gray-900';
+  const mutedClass = embedded ? 'text-sm text-slate-500' : 'text-sm text-gray-600';
   const innerBack = useCallback(() => {
     if (loading) return;
     if (step > 1) {
@@ -171,7 +171,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       case 1:
         return <div className={embedded ? 'space-y-4' : 'space-y-3'}>
             <div>
-              <h3 className={`${headingClass} ${embedded ? 'mb-1' : 'mb-4 text-center'}`}>{t("payment_method")}</h3>
+              <h3 className={`text-sm font-medium text-text-primary ${headingClass} ${embedded ? 'mb-1' : 'mb-4 '}`}>{t("payment_method")}</h3>
               {embedded ? <p className={mutedClass}>{t("showcase_payments_currently_use_wallet_b")}</p> : null}
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -192,29 +192,29 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       case 2:
         return <div className={embedded ? 'space-y-4' : 'space-y-3'}>
             <div>
-              <h3 className={`${headingClass} ${embedded ? 'mb-1' : 'mb-4 text-center'}`}>{t("summary")}</h3>
+              <h3 className={`text-sm font-medium text-text-primary ${headingClass} ${embedded ? 'mb-1' : 'mb-4 '}`}>{t("summary")}</h3>
               {embedded ? <p className={mutedClass}>{t("confirm_the_total_then_send_the_verifica")}</p> : null}
             </div>
             <div className={`${embedded ? 'rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-2' : 'space-y-2 mb-4'}`}>
-              <div className="flex justify-between gap-3 text-[13px]">
+              <div className="flex justify-between gap-3 text-sm">
                 <span className={`${embedded ? 'text-slate-500' : 'font-medium'} shrink-0`}>{t("listing")}</span>
                 <span className={`text-right ${embedded ? 'font-semibold text-slate-900' : ''}`}>{listingTitle}</span>
               </div>
-              <div className={`flex justify-between ${embedded ? 'text-[13px] text-slate-600' : ''}`}>
+              <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : ''}`}>
                 <span className={embedded ? 'text-slate-500' : 'font-medium'}>{t("duration")}</span>
                 <span>{days}{t("days")}</span>
               </div>
-              <div className={`flex justify-between ${embedded ? 'text-[13px] text-slate-600' : ''}`}>
+              <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : ''}`}>
                 <span className={embedded ? 'text-slate-500' : 'font-medium'}>{t("payment_method")}</span>
                 <span>{t("ewallet")}</span>
               </div>
             </div>
             {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-slate-200 p-4 space-y-2' : 'p-3 bg-gray-50 rounded-lg space-y-2'}`}>
-                <div className={`flex justify-between ${embedded ? 'text-[13px] text-slate-600' : 'text-sm'}`}>
+                <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
                   <span>{t("subtotal")}{days}{t("days")}</span>
                   <span className="font-mono tabular-nums">{calculateSubtotal().toFixed(2)}₺</span>
                 </div>
-                <div className={`flex justify-between ${embedded ? 'text-[13px] text-slate-600' : 'text-sm'}`}>
+                <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
                   <span>{t("tax")}{showcasePricing.taxPercentage}%)</span>
                   <span className="font-mono tabular-nums">{calculateTax().toFixed(2)}₺</span>
                 </div>
@@ -226,7 +226,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                 <span className="font-bold text-lg">{t("total")}</span>
                 <span className={`text-xl font-bold ${embedded ? 'text-indigo-600' : 'text-emerald-600'} tabular-nums`}>{totalCost}₺</span>
               </div>}
-            {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-[13px] text-rose-800">
+            {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800">
                 {error}
               </div> : null}
             <button type="button" className={btnPrimaryClass} onClick={proceedToPayment} disabled={loading}>
@@ -246,7 +246,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
                   <span className="font-semibold text-slate-700">{t("finish_payment")}</span>
                   .
                 </p>
-                {otpTtlActive ? <p className={`text-[11px] font-semibold mt-2 tabular-nums ${otpTtlExpired ? 'text-amber-700' : embedded ? 'text-slate-600' : 'text-gray-600'}`}>
+                {otpTtlActive ? <p className={`text-caption font-semibold mt-2 tabular-nums ${otpTtlExpired ? 'text-amber-700' : embedded ? 'text-slate-600' : 'text-gray-600'}`}>
                     {otpTtlExpired ? 'Code expired — go back and send a new code.' : `Expires in: ${otpTtlFormatted}`}
                   </p> : null}
               </div>
@@ -258,7 +258,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               <OtpDigitInputGroup value={verificationCode} onChange={setVerificationCode} dataSlotPrefix="showcase-otp" disabled={loading || otpTtlExpired} />
             </div>
 
-            {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-[13px] text-rose-800">
+            {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800">
                 {error}
               </div> : null}
 

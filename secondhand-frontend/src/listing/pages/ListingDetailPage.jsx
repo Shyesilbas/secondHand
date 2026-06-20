@@ -88,7 +88,7 @@ const DetailError = ({
       <div className="w-16 h-16 bg-gradient-to-br from-rose-50 to-rose-100 rounded-[18px] flex items-center justify-center mx-auto mb-6 shadow-sm">
         <AlertTriangle className="w-7 h-7 text-rose-500" />
       </div>
-      <h3 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("listing_unavailable")}</h3>
+      <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("listing_unavailable")}</h3>
       <p className="text-slate-500 text-sm font-medium mb-8 leading-relaxed">{error || 'This listing could not be found or may have been removed.'}</p>
       <Link to={ROUTES.LISTINGS} className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-sm listing-cta-primary text-sm">
         <ArrowLeft className="w-4 h-4" />{t("back_to_listings")}</Link>
@@ -234,7 +234,7 @@ const ListingDetailPage = () => {
     }}>
         <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 h-[52px] flex items-center justify-between gap-4">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-[13px] font-semibold min-w-0">
+          <nav className="flex items-center gap-1.5 text-sm font-semibold min-w-0">
             <Link to={ROUTES.LISTINGS} className="text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0">
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">{t("explore")}</span>
@@ -253,7 +253,7 @@ const ListingDetailPage = () => {
             }
           })} className="flex items-center gap-2 px-3 py-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl font-semibold transition-all group" title={t("ask_aura_ai")}>
               <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline text-[13px]">{t("ask_aura")}</span>
+              <span className="hidden sm:inline text-sm">{t("ask_aura")}</span>
             </button>
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
             {!isOwner && <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className="p-2 border border-transparent text-slate-400 hover:text-rose-500 rounded-xl transition-all hover:bg-rose-50/80" />}
@@ -278,24 +278,24 @@ const ListingDetailPage = () => {
             {/* Title Block */}
             <section className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
               <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-caption font-bold text-white uppercase tracking-wider">
                   {listing.type}
                 </span>
-                {hasCampaign && <span className="listing-discount-badge inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
+                {hasCampaign && <span className="listing-discount-badge inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-caption font-bold text-white uppercase tracking-wider">
                     <Tag className="w-3 h-3" />
                     {listing.campaignName || 'Sale'}
                     {discount && <span className="ml-0.5">−{discount}%</span>}
                   </span>}
-                {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-caption font-bold text-slate-500 uppercase tracking-wider">
                     {listing.status}
                   </span>}
               </div>
 
-              <h1 className="text-[20px] sm:text-[22px] lg:text-[26px] font-extrabold text-slate-950 tracking-tight leading-[1.15] mb-3">
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight leading-[1.15] mb-3">
                 {listing.title}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-slate-500 font-medium">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body text-slate-500 font-medium">
                 <div className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-slate-400" />
                   {locationLabel}
@@ -333,7 +333,7 @@ const ListingDetailPage = () => {
                       <ChevronRight className="w-5 h-5" />
                     </button>
                     {/* Image counter badge */}
-                    <div className="absolute bottom-2.5 right-2.5 listing-glass rounded-full px-2.5 py-1 text-[11px] font-bold text-slate-700 shadow-md">
+                    <div className="absolute bottom-2.5 right-2.5 listing-glass rounded-full px-2.5 py-1 text-caption font-bold text-slate-700 shadow-md">
                       {selectedImageIndex + 1} / {images.length}
                     </div>
                   </>}
@@ -351,12 +351,12 @@ const ListingDetailPage = () => {
 
             {/* Key Specs Strip */}
             {categoryBadges.length > 0 && <section className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">{t("key_specs")}</h3>
+                <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.15em] mb-3">{t("key_specs")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {categoryBadges.flatMap((badge, bIdx) => {
                 const labelStr = String(badge.label || '');
                 const parts = labelStr.includes(' • ') ? labelStr.split(' • ').map(p => p.trim()).filter(Boolean) : [labelStr];
-                return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-700 text-[12px] font-semibold border border-slate-100/80 transition-all hover:bg-slate-100/80 hover:border-slate-200">
+                return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-700 text-body font-semibold border border-slate-100/80 transition-all hover:bg-slate-100/80 hover:border-slate-200">
                         {pIdx === 0 && badge.icon && <span className="text-sm">{badge.icon}</span>}
                         {part}
                       </span>);
@@ -369,8 +369,8 @@ const ListingDetailPage = () => {
 
             {/* Description */}
             <section className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-950 mb-3 tracking-tight">{t("about_this_item")}</h2>
-              <div className={`text-[13px] leading-6 text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[180px] overflow-hidden' : ''}`}>
+              <h2 className="text-lg font-semibold text-text-primary mb-3 tracking-tight">{t("about_this_item")}</h2>
+              <div className={`text-sm leading-6 text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[180px] overflow-hidden' : ''}`}>
                 {listing.description || 'No description has been added for this listing.'}
                 {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none" />}
               </div>
@@ -381,7 +381,7 @@ const ListingDetailPage = () => {
 
             {/* Specifications */}
             {DetailsComponent && <section className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-950 mb-4 tracking-tight">{t("specifications")}</h2>
+                <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("specifications")}</h2>
                 <div className="bg-gradient-to-br from-slate-50/80 to-slate-50 rounded-xl p-4 sm:p-5 border border-slate-100/60">
                   <DetailsComponent listing={listing} />
                 </div>
@@ -392,7 +392,7 @@ const ListingDetailPage = () => {
 
             {/* Reviews */}
             {hasReviews && <section className="bg-white rounded-2xl p-4 sm:p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_2px_12px_rgba(0,0,0,0.03)] border border-slate-100/80">
-                <h2 className="text-base sm:text-lg font-extrabold text-slate-950 mb-4 tracking-tight">{t("reviews")}</h2>
+                <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("reviews")}</h2>
                 <ListingReviewsSection listing={listing} />
               </section>}
           </div>
@@ -406,16 +406,16 @@ const ListingDetailPage = () => {
 
                 {/* Price */}
                 <div className="mb-5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">{t("price")}</p>
+                  <p className="text-caption font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">{t("price")}</p>
                   <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className={`text-[26px] sm:text-[30px] font-extrabold tabular-nums tracking-tight leading-none ${hasCampaign ? 'listing-price-gradient' : 'text-slate-950'}`}>
+                    <span className={`text-3xl sm:text-[30px] font-bold tabular-nums tracking-tight leading-none ${hasCampaign ? 'listing-price-gradient' : 'text-slate-950'}`}>
                       {formatCurrency(displayPrice, listing.currency)}
                     </span>
                     {hasCampaign && <div className="flex items-center gap-2">
                         <span className="text-sm text-slate-400 line-through font-semibold tabular-nums">
                           {formatCurrency(listing.price, listing.currency)}
                         </span>
-                        {discount && <span className="listing-discount-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-extrabold border border-emerald-100">
+                        {discount && <span className="listing-discount-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
                             −{discount}%
                           </span>}
                       </div>}
@@ -436,20 +436,20 @@ const ListingDetailPage = () => {
 
                 {/* CTA Buttons */}
                 {(canAddToCart || canMakeOffer) && <div className="space-y-2.5 mb-5">
-                    {canAddToCart && <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl text-[13px] font-bold disabled:opacity-50 disabled:pointer-events-none">
+                    {canAddToCart && <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold disabled:opacity-50 disabled:pointer-events-none">
                         <ShoppingBag className="w-4 h-4" />
                         {isAddingToCart ? 'Adding to Cart…' : 'Add to Cart'}
                       </button>}
-                    {canMakeOffer && <button onClick={() => setIsOfferModalOpen(true)} className="listing-cta-secondary w-full flex items-center justify-center gap-2 py-3 border-2 border-slate-200 text-slate-800 rounded-xl text-[13px] font-bold">
+                    {canMakeOffer && <button onClick={() => setIsOfferModalOpen(true)} className="listing-cta-secondary w-full flex items-center justify-center gap-2 py-3 border-2 border-slate-200 text-slate-800 rounded-xl text-sm font-bold">
                         <HandCoins className="w-4 h-4" />{t("make_an_offer")}</button>}
                   </div>}
 
                 {/* Trust Guarantees */}
                 <div className="flex items-center gap-3 py-3 border-t border-slate-100/60">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-caption font-bold text-slate-400 uppercase tracking-wider">
                     <Shield className="w-3.5 h-3.5 text-emerald-500" />{t("buyer_protection")}</div>
                   <span className="w-1 h-1 rounded-full bg-slate-200" />
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-caption font-bold text-slate-400 uppercase tracking-wider">
                     <Clock className="w-3.5 h-3.5 text-indigo-400" />{t("secure_escrow")}</div>
                 </div>
 
@@ -476,12 +476,12 @@ const ListingDetailPage = () => {
           <div className="flex items-center justify-between gap-3">
             {/* Price */}
             <div className="flex-1 min-w-0">
-              <p className={`text-lg font-extrabold tabular-nums tracking-tight leading-none mb-0.5 ${hasCampaign ? 'listing-price-gradient' : 'text-slate-900'}`}>
+              <p className={`text-lg font-bold tabular-nums tracking-tight leading-none mb-0.5 ${hasCampaign ? 'listing-price-gradient' : 'text-slate-900'}`}>
                 {formatCurrency(displayPrice, listing.currency)}
               </p>
               {hasCampaign ? <div className="flex items-center gap-2">
                   <p className="text-xs text-slate-400 line-through font-medium tabular-nums">{formatCurrency(listing.price, listing.currency)}</p>
-                  {discount && <span className="text-[10px] font-extrabold text-emerald-600">−{discount}%</span>}
+                  {discount && <span className="text-caption font-bold text-emerald-600">−{discount}%</span>}
                 </div> : <p className="text-xs text-slate-500 font-semibold truncate">{locationLabel}</p>}
             </div>
 

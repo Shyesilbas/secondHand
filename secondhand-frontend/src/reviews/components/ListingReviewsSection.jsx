@@ -26,7 +26,7 @@ const ListingReviewsSection = ({
     });
   }, [stats]);
   return <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6">
-      <h3 className="text-lg font-bold text-slate-900 mb-6 tracking-tight">{t("product_reviews")}</h3>
+      <h3 className="text-sm font-medium text-text-primary mb-6 tracking-tight">{t("product_reviews")}</h3>
 
       {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-slate-200/40">
           <div className="flex flex-wrap items-center gap-4 mb-4">

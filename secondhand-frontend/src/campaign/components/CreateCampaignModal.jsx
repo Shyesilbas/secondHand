@@ -138,7 +138,7 @@ const CreateCampaignModal = ({
         {/* Header */}
         <div className="px-8 py-5 border-b border-[#f0efed] bg-[#fafaf9] flex items-center justify-between shrink-0">
           <div>
-            <h2 className="text-2xl font-bold text-[#1a1918] tracking-tight">
+            <h2 className="text-lg font-semibold text-text-primary text-[#1a1918] tracking-tight">
               {editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}
             </h2>
             <p className="text-sm text-[#5f5b57] mt-1">{t("boost_your_sales_with_attractive_discoun")}</p>
@@ -193,7 +193,7 @@ const CreateCampaignModal = ({
                 <div className="text-sm font-bold text-[#1a1918]">{t("basic_information")}</div>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="relative">
-                    <label className="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-[#9c9894] uppercase">{t("campaign_name")}</label>
+                    <label className="absolute -top-2 left-3 px-1 bg-white text-caption font-bold text-[#9c9894] uppercase">{t("campaign_name")}</label>
                     <input value={form.name} onChange={e => setForm(p => ({
                     ...p,
                     name: e.target.value
@@ -203,7 +203,7 @@ const CreateCampaignModal = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
-                    <label className="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-[#9c9894] uppercase">{t("discount_type")}</label>
+                    <label className="absolute -top-2 left-3 px-1 bg-white text-caption font-bold text-[#9c9894] uppercase">{t("discount_type")}</label>
                     <select value={form.discountKind} onChange={e => setForm(p => ({
                     ...p,
                     discountKind: e.target.value
@@ -213,7 +213,7 @@ const CreateCampaignModal = ({
                     </select>
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-[#9c9894] uppercase">{t("value")}</label>
+                    <label className="absolute -top-2 left-3 px-1 bg-white text-caption font-bold text-[#9c9894] uppercase">{t("value")}</label>
                     <input value={form.value} onChange={e => setForm(p => ({
                     ...p,
                     value: e.target.value
@@ -223,14 +223,14 @@ const CreateCampaignModal = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
-                    <label className="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-[#9c9894] uppercase">{t("starts_at")}</label>
+                    <label className="absolute -top-2 left-3 px-1 bg-white text-caption font-bold text-[#9c9894] uppercase">{t("starts_at")}</label>
                     <input type="datetime-local" value={form.startsAt} onChange={e => setForm(p => ({
                     ...p,
                     startsAt: e.target.value
                   }))} className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600" />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-[#9c9894] uppercase">{t("ends_at")}</label>
+                    <label className="absolute -top-2 left-3 px-1 bg-white text-caption font-bold text-[#9c9894] uppercase">{t("ends_at")}</label>
                     <input type="datetime-local" value={form.endsAt} onChange={e => setForm(p => ({
                     ...p,
                     endsAt: e.target.value
@@ -252,7 +252,7 @@ const CreateCampaignModal = ({
                   
                   <div className="space-y-4">
                     <div className="relative">
-                      <label className="absolute -top-2 left-3 px-1 bg-indigo-50 text-[10px] font-bold text-indigo-600 uppercase">{t("minimum_item_quantity")}</label>
+                      <label className="absolute -top-2 left-3 px-1 bg-indigo-50 text-caption font-bold text-indigo-600 uppercase">{t("minimum_item_quantity")}</label>
                       <input type="number" min="2" value={form.minQuantity} onChange={e => setForm(p => ({
                     ...p,
                     minQuantity: e.target.value
@@ -288,7 +288,7 @@ const CreateCampaignModal = ({
                     }} className="w-5 h-5 rounded-md border-[#e5e3df] text-indigo-600 focus:ring-indigo-600" />
                             <div className="flex-1 min-w-0">
                               <div className="text-sm font-medium text-[#1a1918] truncate">{l.title}</div>
-                              <div className="text-[10px] text-[#9c9894]">{formatCurrency(l.price, l.currency)}</div>
+                              <div className="text-caption text-[#9c9894]">{formatCurrency(l.price, l.currency)}</div>
                             </div>
                           </label>)}
                       </div>

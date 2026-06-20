@@ -113,9 +113,9 @@ const MyCouponsPage = () => {
               <Link to={ROUTES.DASHBOARD} className="p-1.5 hover:bg-white rounded-lg transition-colors">
                 <ArrowLeft className="w-4 h-4" />
               </Link>
-              <span className="text-[10px] font-bold tracking-wider uppercase opacity-70">{t("selling_tools")}</span>
+              <span className="text-caption font-bold tracking-wider uppercase opacity-70">{t("selling_tools")}</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">{t("campaigns")}<span className="text-indigo-600">{t("promotions")}</span>
+            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("campaigns")}<span className="text-indigo-600">{t("promotions")}</span>
             </h1>
           </div>
 
@@ -148,9 +148,9 @@ const MyCouponsPage = () => {
                 <div className={`w-8 h-8 rounded-lg bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
                   <stat.icon className="w-4 h-4" />
                 </div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</span>
+                <span className="text-caption font-bold text-slate-400 uppercase tracking-widest">{stat.label}</span>
               </div>
-              <div className="text-xl font-black text-slate-900">{stat.value}</div>
+              <div className="text-xl font-bold text-slate-900">{stat.value}</div>
             </div>)}
         </div>
 
@@ -175,7 +175,7 @@ const MyCouponsPage = () => {
             <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Tag className="w-6 h-6 text-slate-300" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-1">{t("no_campaigns")}</h3>
+            <h3 className="text-sm font-medium text-text-primary mb-1">{t("no_campaigns")}</h3>
             <p className="text-slate-500 text-sm mb-6">{t("adjust_your_filters_to_see_more_results")}</p>
             <button onClick={() => {
           setSearchTerm('');
@@ -191,10 +191,10 @@ const MyCouponsPage = () => {
                   <div className="flex justify-between items-start mb-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        {isBundle ? <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-wider border border-indigo-100">{t("bundle")}</span> : <span className="px-2 py-0.5 rounded-lg bg-slate-50 text-slate-600 text-[9px] font-black uppercase tracking-wider border border-slate-100">{t("standard")}</span>}
+                        {isBundle ? <span className="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-bold uppercase tracking-wider border border-indigo-100">{t("bundle")}</span> : <span className="px-2 py-0.5 rounded-lg bg-slate-50 text-slate-600 text-[9px] font-bold uppercase tracking-wider border border-slate-100">{t("standard")}</span>}
                         {!c.active && <span className="px-1.5 py-0.5 rounded-lg bg-red-50 text-red-600 text-[9px] font-bold">{t("paused")}</span>}
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 truncate">
+                      <h3 className="text-sm font-medium text-text-primary truncate">
                         {c.name}
                       </h3>
                     </div>
@@ -214,16 +214,16 @@ const MyCouponsPage = () => {
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-slate-50 rounded-xl p-3">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">{t("benefit")}</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t("benefit")}</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-indigo-600">
+                        <span className="text-xl font-bold text-indigo-600">
                           {c.discountKind === 'PERCENT' ? `${c.value}%` : formatCurrency(c.value, 'TRY')}
                         </span>
                         <span className="text-[9px] font-bold text-slate-500 uppercase">{t("off")}</span>
                       </div>
                     </div>
                     <div className="bg-slate-50 rounded-xl p-3">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">{t("requirement")}</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">{t("requirement")}</span>
                       <div className="text-xs font-bold text-slate-900">
                         {isBundle ? `${c.minQuantity}+ Items` : 'None'}
                       </div>
@@ -231,11 +231,11 @@ const MyCouponsPage = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-x-4 gap-y-2">
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 text-caption text-slate-500 font-medium">
                       <CalendarDays className="w-3.5 h-3.5" />
                       <span>{c.endsAt ? formatDateTime(c.endsAt) : 'No expiry'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 text-caption text-slate-500 font-medium">
                       <Target className="w-3.5 h-3.5" />
                       <span>{hasListings ? `${c.eligibleListingIds.length} items` : 'Global'}</span>
                     </div>

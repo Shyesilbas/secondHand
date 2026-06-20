@@ -23,7 +23,7 @@ const UserSearchResults = ({
                         <span className="text-text-secondary">{t("searching")}</span>
                     </div>
                 </div> : results.length > 0 ? <div className="py-2">
-                    <h3 className="text-sm font-semibold text-text-primary px-4 mb-1">{t("users")}</h3>
+                    <h3 className="text-sm font-medium text-text-primary px-4 mb-1">{t("users")}</h3>
                     {results.map((user, index) => <Link key={user.id} to={ROUTES.USER_PROFILE(user.id)} onClick={() => onUserSelect && onUserSelect(user)} className={`flex items-center px-4 py-3 transition-colors border-b border-sidebar-border last:border-b-0 ${index === selectedIndex ? 'bg-btn-primary text-white' : 'hover:bg-app-bg'}`}>
                             {/* Avatar */}
                             <div className="w-10 h-10 bg-gradient-to-br from-btn-primary to-btn-primary-hover rounded-full flex items-center justify-center flex-shrink-0 mr-3">

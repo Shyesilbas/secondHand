@@ -89,7 +89,7 @@ const ChatPage = ({
   if (!user) {
     return <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-text-primary mb-4">{t("messages")}</h2>
+            <h2 className="text-lg font-semibold text-text-primary mb-4">{t("messages")}</h2>
             <p className="text-text-secondary">{t("please_login_to_see_your_messages")}</p>
           </div>
         </div>;
@@ -99,7 +99,7 @@ const ChatPage = ({
         <div className={`max-w-[1600px] mx-auto ${embedded ? 'px-0 py-0' : 'px-6 lg:px-8 py-8'}`}>
           {!embedded && <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-4xl font-bold text-slate-900 tracking-tight">{t("messages")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("messages")}</h1>
                 <p className="text-slate-500 mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
               </div>
               <div className="flex items-center space-x-3">
@@ -148,7 +148,7 @@ const ChatPage = ({
                           </span>
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                          <h3 className="text-sm font-medium text-text-primary tracking-tight">
                             {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
                           </h3>
                           <div className="flex items-center space-x-2 mt-1">
@@ -178,7 +178,7 @@ const ChatPage = ({
                       <div className="w-28 h-28 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm">
                         <MessageCircle className="w-14 h-14 text-slate-400" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">{t("select_a_conversation")}</h3>
+                      <h3 className="text-sm font-medium text-text-primary mb-3 tracking-tight">{t("select_a_conversation")}</h3>
                       <p className="text-slate-500 max-w-sm mx-auto tracking-tight leading-relaxed">{t("choose_a_chat_from_the_sidebar_to_start_")}</p>
                     </div>
                   </div>}

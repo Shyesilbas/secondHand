@@ -108,11 +108,11 @@ const OrderStatusBreakdown = ({
         }} className={`flex items-center justify-between px-3 py-2 rounded-lg ${entry.light} border border-transparent hover:border-slate-200 transition-colors`}>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${entry.dot}`} />
-                <span className={`text-[11px] font-semibold ${entry.text}`}>{entry.label}</span>
+                <span className={`text-caption font-semibold ${entry.text}`}>{entry.label}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-extrabold text-slate-900">{entry.count}</span>
-                <span className="text-[10px] font-medium text-slate-400">{pct}%</span>
+                <span className="text-xs font-bold text-slate-900">{entry.count}</span>
+                <span className="text-caption font-medium text-slate-400">{pct}%</span>
               </div>
             </motion.div>;
       })}
@@ -120,8 +120,8 @@ const OrderStatusBreakdown = ({
 
       {/* Total */}
       <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t("total_orders")}</span>
-        <span className="text-sm font-extrabold text-slate-900">{total}</span>
+        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("total_orders")}</span>
+        <span className="text-sm font-bold text-slate-900">{total}</span>
       </div>
     </div>;
 };

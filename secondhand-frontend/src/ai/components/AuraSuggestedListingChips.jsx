@@ -13,7 +13,7 @@ export default function AuraSuggestedListingChips({
   } = useTranslation();
   if (!Array.isArray(listings) || listings.length === 0) return null;
   return <div className={`flex flex-col gap-2.5 ${dense ? 'mt-2.5' : 'mt-4'}`}>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("related_listings_found")}</p>
+      <p className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("related_listings_found")}</p>
       <div className="grid grid-cols-1 gap-3">
         {listings.map((l, idx) => {
         const id = l?.id;
@@ -34,7 +34,7 @@ export default function AuraSuggestedListingChips({
                     {price ? <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-800">
                         {price}
                       </span> : null}
-                    {loc ? <span className="inline-flex items-center gap-0.5 text-[11px] text-slate-500">
+                    {loc ? <span className="inline-flex items-center gap-0.5 text-caption text-slate-500">
                         <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                         {loc}
                       </span> : null}
@@ -42,7 +42,7 @@ export default function AuraSuggestedListingChips({
                 </div>
 
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-                  {l?.listingNo ? <span className="text-[10px] text-slate-400 font-mono">{t("no")}{l.listingNo}</span> : <span />}
+                  {l?.listingNo ? <span className="text-caption text-slate-400 font-mono">{t("no")}{l.listingNo}</span> : <span />}
                   {href ? <Link to={href} className="inline-flex items-center gap-1 text-xs font-bold text-slate-800 hover:text-slate-950 transition-colors group/link">{t("view_details")}<ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-0.5" />
                     </Link> : null}
                 </div>

@@ -44,16 +44,16 @@ const ListingsContent = React.memo(({
                         </div>
 
                         {/* Text */}
-                        <h3 className="text-[16px] font-bold text-slate-800 mb-2">
+                        <h3 className="text-sm font-medium text-text-primary mb-2">
                             {hasSearch ? 'No results found' : 'Nothing here yet'}
                         </h3>
-                        <p className="text-[13px] text-slate-400 leading-relaxed mb-6 max-w-[260px] mx-auto">
+                        <p className="text-sm text-slate-400 leading-relaxed mb-6 max-w-[260px] mx-auto">
                             {hasSearch ? 'Try different keywords or remove some filters to see more results.' : `No listings in ${categoryLabel} right now. Try a different category or check back soon.`}
                         </p>
 
                         {/* Actions */}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-                            {onResetFilters && <button onClick={onResetFilters} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-[12px] font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
+                            {onResetFilters && <button onClick={onResetFilters} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white text-body font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
                                     <RefreshCw className="w-3.5 h-3.5" />{t("reset_filters")}</button>}
                         </div>
                     </div>

@@ -10,7 +10,7 @@ import {Loader2} from 'lucide-react';
 
 const listingFooterClass = 'group/footer w-full rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 text-left transition-colors hover:border-amber-200/80 hover:bg-amber-50/60';
 const labelBlock = (review, t) => <>
-    <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-gray-400">{t("listed_item")}</span>
+    <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-gray-400">{t("listed_item")}</span>
     <span className="min-w-0 truncate font-medium text-gray-800">{review.listingTitle || '—'}</span>
     {review.listingNo ? <span className="shrink-0 font-normal tabular-nums text-gray-500">#{review.listingNo}</span> : null}
   </>;
@@ -29,7 +29,7 @@ function ProfileReviewedListingLink({
   const row = <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
       {labelBlock(review, t)}
       <span className="sr-only">{t("open_listing")}</span>
-      {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-amber-700" aria-hidden /> : <span className="pointer-events-none ml-auto text-[10px] font-semibold uppercase tracking-wide text-amber-700 opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
+      {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-amber-700" aria-hidden /> : <span className="pointer-events-none ml-auto text-caption font-semibold uppercase tracking-wide text-amber-700 opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
     </div>;
   if (listingId) {
     return <Link to={ROUTES.LISTING_DETAIL(listingId)} className={`${listingFooterClass} block focus-visible:outline focus-visible:ring-2 focus-visible:ring-amber-500/40`}>
@@ -64,7 +64,7 @@ const ReviewCard = ({
   } = useTranslation();
   const isProfile = variant === 'profile';
   const shell = isProfile ? 'rounded-2xl border border-gray-200/90 bg-white p-5 shadow-sm transition-[box-shadow,border-color] duration-200 hover:border-gray-300/90 hover:shadow-md' : 'rounded-lg border border-gray-200 bg-white p-4 shadow-sm';
-  const initials = <span className={isProfile ? 'text-[14px] font-bold text-white' : 'text-sm font-medium text-gray-600'}>
+  const initials = <span className={isProfile ? 'text-sm font-bold text-white' : 'text-sm font-medium text-gray-600'}>
       {review.reviewerName?.[0]?.toUpperCase() || '?'}
     </span>;
   const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gray-700 to-gray-900 text-white shadow-sm ring-2 ring-gray-100">
@@ -79,9 +79,9 @@ const ReviewCard = ({
               {avatar}
             </Link> : avatar}
           <div className="min-w-0">
-            {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="block truncate text-[15px] font-semibold leading-tight text-gray-900 hover:text-amber-800 hover:underline underline-offset-2">
+            {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="block truncate text-base font-semibold leading-tight text-gray-900 hover:text-amber-800 hover:underline underline-offset-2">
                 {nameLine}
-              </Link> : <p className={`font-medium text-gray-900 ${isProfile ? 'truncate text-[15px] leading-tight' : ''}`}>{nameLine}</p>}
+              </Link> : <p className={`font-medium text-gray-900 ${isProfile ? 'truncate text-base leading-tight' : ''}`}>{nameLine}</p>}
             <time className={`${isProfile ? 'text-xs' : 'text-sm'} mt-1 block text-gray-500`} dateTime={review.createdAt}>
               {formatReviewDate(review.createdAt)}
             </time>

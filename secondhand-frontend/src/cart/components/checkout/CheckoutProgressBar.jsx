@@ -22,7 +22,7 @@ const CheckoutProgressBar = ({
               <li className="flex items-center">
                 <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`group flex items-center gap-2.5 transition-all outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}>
                   {/* Step Node */}
-                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-medium transition-all duration-300 ${isCompleted ? 'bg-slate-900 text-white' : isCurrent ? 'bg-white border-2 border-indigo-600 text-indigo-600 shadow-[0_0_12px_rgba(79,70,229,0.25)]' : 'bg-white border border-slate-200 text-slate-400'}`}>
+                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-caption font-medium transition-all duration-300 ${isCompleted ? 'bg-slate-900 text-white' : isCurrent ? 'bg-white border-2 border-indigo-600 text-indigo-600 shadow-[0_0_12px_rgba(79,70,229,0.25)]' : 'bg-white border border-slate-200 text-slate-400'}`}>
                     {isCompleted ? <Check className="h-3 w-3" strokeWidth={3} /> : step.id}
                   </span>
 
@@ -46,7 +46,7 @@ const CheckoutProgressBar = ({
       {/* Mobile-first compact Stepper indicator */}
       <div className="flex items-center justify-between sm:hidden w-full px-2">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("step")}{currentStep}{t("of")}{steps.length}
+          <span className="text-caption font-bold uppercase tracking-widest text-slate-400">{t("step")}{currentStep}{t("of")}{steps.length}
           </span>
           <span className="text-sm font-semibold text-slate-900 mt-0.5">
             {activeStepObj.title}

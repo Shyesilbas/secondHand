@@ -27,7 +27,7 @@ const ComplaintsPage = () => {
                             </div>
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tighter text-slate-900">{t("my_complaints")}</h1>
+                            <h1 className="text-2xl font-semibold text-text-primary tracking-tighter">{t("my_complaints")}</h1>
                             <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
                                 <span className="leading-relaxed">{t("track_and_manage_your_submissions_to_our")}</span>
                             </div>
@@ -68,7 +68,7 @@ const ComplaintsPage = () => {
                             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-3xl bg-rose-50">
                                 <ShieldAlert className="h-7 w-7 text-rose-500" />
                             </div>
-                            <h3 className="text-base font-semibold tracking-tight text-slate-900">{t("unable_to_load_complaints")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("unable_to_load_complaints")}</h3>
                             <p className="mt-2 text-sm leading-relaxed text-slate-500">
                                 {error}
                             </p>
@@ -83,7 +83,7 @@ const ComplaintsPage = () => {
                             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/10 via-slate-100 to-slate-50">
                                 <FileSearch className="h-10 w-10 text-indigo-500" />
                             </div>
-                            <h3 className="text-xl font-semibold tracking-tighter text-slate-900">{t("no_complaints_submitted")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary tracking-tighter">{t("no_complaints_submitted")}</h3>
                             <p className="mt-2 text-sm leading-relaxed text-slate-500">{t("if_you_encounter_inappropriate_behavior_")}</p>
                             <button className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">
                                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800">

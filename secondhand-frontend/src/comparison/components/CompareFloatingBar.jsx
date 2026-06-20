@@ -52,10 +52,10 @@ const CompareFloatingBar = memo(() => {
                                             </button>
                                         </div>
                                         <div className="px-1.5 py-1.5 border-t border-slate-100 bg-white">
-                                            <p className="text-[10px] font-medium text-slate-800 truncate leading-tight" title={item.title}>
+                                            <p className="text-caption font-medium text-slate-800 truncate leading-tight" title={item.title}>
                                                 {item.title}
                                             </p>
-                                            <p className="text-[10px] font-bold text-indigo-600 tabular-nums mt-0.5">
+                                            <p className="text-caption font-bold text-indigo-600 tabular-nums mt-0.5">
                                                 {formatCurrencyCompact(item.campaignPrice || item.price, item.currency)}
                                             </p>
                                         </div>
@@ -74,7 +74,7 @@ const CompareFloatingBar = memo(() => {
                                         ${canCompare ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/25' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}
                                     `}>
                                     <Scale className="w-4 h-4 shrink-0" />{t("compare")}</button>
-                                {!canCompare && <p className="text-center text-[10px] text-slate-400 sm:text-left">{t("add_at_least_2_items")}</p>}
+                                {!canCompare && <p className="text-center text-caption text-slate-400 sm:text-left">{t("add_at_least_2_items")}</p>}
                             </div>
                         </div>
                     </div>

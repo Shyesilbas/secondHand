@@ -42,7 +42,7 @@ const SearchResults = ({
     }];
     return <div className="py-1">
         <div className="px-4 py-2 border-b border-gray-100/60 bg-gray-50/50">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t("quick_navigation")}</span>
+          <span className="text-caption font-bold text-gray-400 uppercase tracking-widest">{t("quick_navigation")}</span>
         </div>
         {quickLinks.map((link, index) => {
         const Icon = link.icon;
@@ -58,7 +58,7 @@ const SearchResults = ({
                 <div className={`text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-slate-900'}`}>
                   {link.label}
                 </div>
-                <div className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-slate-400 font-medium'}`}>
+                <div className={`text-caption truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-slate-400 font-medium'}`}>
                   {link.desc}
                 </div>
               </div>
@@ -68,7 +68,7 @@ const SearchResults = ({
             </div>;
       })}
         {/* Footer */}
-        <div className="px-4 py-2.5 text-[10px] text-gray-400 font-medium bg-gray-50/55 border-t border-gray-100/60 flex items-center justify-between">
+        <div className="px-4 py-2.5 text-caption text-gray-400 font-medium bg-gray-50/55 border-t border-gray-100/60 flex items-center justify-between">
           <div>{t("navigate_enter_open_esc_close")}</div>
           <div className="hidden sm:block">{t("ctrl_tab_switch_mode")}</div>
         </div>

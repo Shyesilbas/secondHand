@@ -56,7 +56,7 @@ const PaymentAgreementsSection = ({
       </div>;
   }
   return <div className="space-y-4">
-      <h3 className="text-lg font-medium text-gray-900">{t("payment_agreements")}</h3>
+      <h3 className="text-sm font-medium text-text-primary">{t("payment_agreements")}</h3>
       <p className="text-sm text-gray-600">{t("please_review_and_accept_the_following_a")}</p>
       
       {agreements.map(agreement => <div key={agreement.agreementId} className="flex items-start space-x-3">

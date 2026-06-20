@@ -35,7 +35,7 @@ const LogDetailModal = ({
                             <Shield className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-bold text-gray-900">{t("event_details")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary">{t("event_details")}</h3>
                             <p className="text-xs text-gray-500">{t("security_activity_information")}</p>
                         </div>
                     </div>

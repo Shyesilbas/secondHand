@@ -181,7 +181,7 @@ const PaymentVerificationModal = ({
       <div className="w-full max-w-3xl mx-4 overflow-hidden rounded-[2.5rem] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.38)] animate-in fade-in zoom-in-95">
         <div className="px-6 py-5 border-b border-slate-100 bg-white/70">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold tracking-tight text-slate-900">
+            <h3 className="text-sm font-medium text-text-primary tracking-tight">
               {step === VERIFICATION_STEPS.REVIEW ? 'Payment Confirmation' : 'Verification'}
             </h3>
             <button onClick={handleClose} className="text-slate-400 hover:text-slate-600">
@@ -196,11 +196,11 @@ const PaymentVerificationModal = ({
           <div className="mb-5 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-slate-50 to-slate-50 px-4 py-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] text-indigo-700/70">{t("listing")}</p>
+                <p className="text-caption text-indigo-700/70">{t("listing")}</p>
                 <p className="text-sm font-medium tracking-tight text-slate-900">{selectedListing?.title}</p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] text-indigo-700/70">{t("amount")}</p>
+                <p className="text-caption text-indigo-700/70">{t("amount")}</p>
                 <p className="font-mono text-sm font-semibold tracking-tight text-slate-900">
                   {feeConfig ? formatPaymentAmount(feeConfig.totalCreationFee) : ''}
                 </p>

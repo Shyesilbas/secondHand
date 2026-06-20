@@ -187,7 +187,7 @@ const AuraChatPage = () => {
 
           {/* Settings Section */}
           <div className="space-y-2 pt-4 border-t border-slate-200">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t("controls")}</p>
+            <p className="text-caption font-bold text-slate-400 uppercase tracking-wider mb-2">{t("controls")}</p>
             
             <button type="button" onClick={handleDeleteHistory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-600 transition-all">
               <Trash2 className="w-3.5 h-3.5 text-slate-400" />{t("clear_history")}</button>
@@ -200,7 +200,7 @@ const AuraChatPage = () => {
         {/* Footer info in sidebar */}
         <div className="pt-4 border-t border-slate-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-[11px] font-bold text-slate-600 uppercase">
+            <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-caption font-bold text-slate-600 uppercase">
               {user?.name?.slice(0, 2) || 'US'}
             </div>
             <div className="min-w-0 flex-1">
@@ -224,7 +224,7 @@ const AuraChatPage = () => {
             </button>
 
             <span className="lg:hidden w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <h2 className="text-sm font-bold text-slate-800 tracking-tight">{t("aura_assistant")}</h2>
+            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("aura_assistant")}</h2>
             <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200 rounded">{t("pro")}</span>
           </div>
 
@@ -254,7 +254,7 @@ const AuraChatPage = () => {
                   <Bot className="w-6 h-6 text-white" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-slate-800">{t("secure_agentic_trade_companion")}</h3>
+                  <h3 className="text-sm font-medium text-text-primary">{t("secure_agentic_trade_companion")}</h3>
                   <p className="text-xs text-slate-500 leading-normal max-w-md mx-auto">{t("aura_provides_automated_database_queries")}</p>
                 </div>
               </div>}
@@ -299,7 +299,7 @@ const AuraChatPage = () => {
 
         {/* Mobile quick prompts feed panel (only visible if prompts exist and screen is mobile) */}
         {showQuickPrompts && <div className="lg:hidden shrink-0 border-t border-slate-100 px-4 py-4 bg-slate-50">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">{t("suggested_questions")}</p>
+            <p className="text-caption font-bold text-slate-500 uppercase tracking-wider mb-2">{t("suggested_questions")}</p>
             <AuraSuggestedPrompts disabled={isSending} onPick={msg => sendMessage({
           text: msg
         })} dense />
@@ -327,17 +327,17 @@ const AuraChatPage = () => {
         
         {/* Active Product Analysis section */}
         {listing ? <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t("workspace_context")}</p>
+            <p className="text-caption font-bold text-slate-400 uppercase tracking-wider mb-2">{t("workspace_context")}</p>
             <AuraListingContextCard listing={listing} />
           </div> : <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
               <Layers className="w-4 h-4 text-slate-400" />{t("general_workspace")}</div>
-            <p className="text-[10px] text-slate-500 leading-normal">{t("no_product_is_currently_active_in_your_c")}</p>
+            <p className="text-caption text-slate-500 leading-normal">{t("no_product_is_currently_active_in_your_c")}</p>
           </div>}
 
         {/* Quick Suggestions Cards */}
         {showQuickPrompts && <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">{t("suggested_queries")}</p>
+            <p className="text-caption font-bold text-slate-400 uppercase tracking-wider mb-2">{t("suggested_queries")}</p>
             <AuraSuggestedPrompts disabled={isSending} onPick={msg => sendMessage({
           text: msg
         })} dense />
@@ -348,7 +348,7 @@ const AuraChatPage = () => {
           <div className="flex-1 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-slate-800 font-bold text-xs">
               <Info className="w-4 h-4 text-slate-400" />{t("security_shield")}</div>
-            <p className="text-[10px] text-slate-500 leading-normal">{t("for_secure_payments_always_checkout_usin")}</p>
+            <p className="text-caption text-slate-500 leading-normal">{t("for_secure_payments_always_checkout_usin")}</p>
           </div>
         </div>
 

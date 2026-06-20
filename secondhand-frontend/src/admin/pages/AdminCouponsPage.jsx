@@ -106,7 +106,7 @@ function FormSection({
           <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
         </div>
         <div className="min-w-0 flex-1 pt-0.5">
-          <h3 className="text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
+          <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
           {subtitle ? <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{subtitle}</p> : null}
         </div>
       </div>
@@ -364,7 +364,7 @@ const AdminCouponsPage = () => {
                 <Shield className="w-5 h-5" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg font-semibold text-slate-900 truncate">{t("coupon_management")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary truncate">{t("coupon_management")}</h1>
                 <p className="text-xs text-slate-500">{t("admin_only_platform_coupons")}</p>
               </div>
             </div>
@@ -474,7 +474,7 @@ const AdminCouponsPage = () => {
                     <Ticket className="h-6 w-6 opacity-95" strokeWidth={2} />
                   </div>
                   <div className="min-w-0 pt-0.5">
-                    <h2 id="coupon-modal-title" className="text-lg font-bold tracking-tight">
+                    <h2 id="coupon-modal-title" className="text-lg font-semibold text-text-primary tracking-tight">
                       {modal === 'create' ? 'Yeni kupon' : 'Kuponu düzenle'}
                     </h2>
                     <p className="mt-1 text-sm font-medium leading-snug text-indigo-100/95">
@@ -551,14 +551,14 @@ const AdminCouponsPage = () => {
                         <span className="block text-2xl font-bold tabular-nums tracking-tight text-indigo-700">
                           {audienceStatsLoading ? '…' : audienceStats?.eligibleUserCount ?? '—'}
                         </span>
-                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">{t("ki_i")}</span>
+                        <span className="text-caption font-medium uppercase tracking-wide text-slate-500">{t("ki_i")}</span>
                       </div>
                     </div>}
 
                   {form.audience === 'USER_ID_LIST' && <label className="block">
                       <span className="text-xs font-semibold text-slate-700">{t("kullan_c_id_leri")}</span>
-                      <span className="mt-0.5 block text-[11px] font-normal text-slate-500">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
-                      <input className={`${inputCn} font-mono text-[13px]`} value={form.eligibleUserIdsText} onChange={e => setForm(p => ({
+                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
+                      <input className={`${inputCn} font-mono text-sm`} value={form.eligibleUserIdsText} onChange={e => setForm(p => ({
                   ...p,
                   eligibleUserIdsText: e.target.value
                 }))} placeholder={t("rn_12_48_102")} />
@@ -644,7 +644,7 @@ const AdminCouponsPage = () => {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
                       <span className="text-xs font-semibold text-slate-700">{t("global_limit")}</span>
-                      <span className="mt-0.5 block text-[11px] font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
+                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
                       <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitGlobal} onChange={e => setForm(p => ({
                     ...p,
                     usageLimitGlobal: e.target.value
@@ -652,7 +652,7 @@ const AdminCouponsPage = () => {
                     </label>
                     <label className="block">
                       <span className="text-xs font-semibold text-slate-700">{t("ki_i_ba_limit")}</span>
-                      <span className="mt-0.5 block text-[11px] font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
+                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
                       <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitPerUser} onChange={e => setForm(p => ({
                     ...p,
                     usageLimitPerUser: e.target.value

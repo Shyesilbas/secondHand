@@ -98,7 +98,7 @@ const AddressList = memo(({
   }, []);
   return <div className="mt-10">
       <div className="flex items-center mb-6">
-        <h2 className="text-xl font-semibold text-text-primary">{t("addresses")}</h2>
+        <h2 className="text-lg font-semibold text-text-primary">{t("addresses")}</h2>
         <button className="ml-3 text-btn-primary hover:text-btn-primary-hover transition-colors" onClick={handleAddClick} title={t("add_address")}>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

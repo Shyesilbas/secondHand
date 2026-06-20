@@ -65,7 +65,7 @@ const FavoriteListModal = ({
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm">
                                 <List className="h-6 w-6 text-white" />
                             </div>
-                            <h2 className="text-xl font-bold text-white">
+                            <h2 className="text-lg font-semibold text-text-primary">
                                 {editList ? 'Edit List' : 'Create New List'}
                             </h2>
                         </div>

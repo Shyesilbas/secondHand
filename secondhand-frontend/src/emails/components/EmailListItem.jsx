@@ -51,7 +51,7 @@ const EmailListItem = ({
     borderLeft: '3px solid transparent'
   }} onClick={() => onSelect(email)} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             <div className="flex gap-3 px-3 py-3 pr-2 sm:px-4">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white" style={{
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-caption font-semibold text-white" style={{
         backgroundColor: isSelected ? '#0078d4' : '#8a8886'
       }}>
                     {initials}
@@ -59,15 +59,15 @@ const EmailListItem = ({
 
                 <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                        <h4 className={`truncate text-[13px] leading-snug sm:text-sm ${isUnread ? 'font-semibold text-[#323130]' : 'font-normal text-[#605e5c]'}`}>
+                        <h4 className={`truncate text-sm leading-snug sm:text-sm ${isUnread ? 'font-semibold text-[#323130]' : 'font-normal text-[#605e5c]'}`}>
                             {email.subject || '(No subject)'}
                         </h4>
-                        <span className="shrink-0 text-[11px] tabular-nums text-[#605e5c]">
+                        <span className="shrink-0 text-caption tabular-nums text-[#605e5c]">
                             {formatShort(email.sentAt)}
                         </span>
                     </div>
                     <p className="mt-0.5 truncate text-xs text-[#605e5c]">{email.senderEmail}</p>
-                    {previewText && <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#8a8886] sm:text-xs">
+                    {previewText && <p className="mt-1 line-clamp-2 text-caption leading-4 text-[#8a8886] sm:text-xs">
                             {previewText}
                         </p>}
                 </div>

@@ -23,7 +23,7 @@ const SecurityFilters = ({
                             </svg>
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900">{t("filters")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary">{t("filters")}</h3>
                             <p className="text-sm text-gray-600">{t("filter_your_security_events")}</p>
                         </div>
                     </div>

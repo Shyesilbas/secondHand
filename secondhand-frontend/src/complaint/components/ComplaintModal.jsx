@@ -87,7 +87,7 @@ const ComplaintModal = ({
                 <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
                         <div className="flex-1">
-                            <h3 className="text-xl font-bold tracking-tight text-slate-900 mb-3">
+                            <h3 className="text-sm font-medium text-text-primary tracking-tight mb-3">
                                 {listingId ? 'Report Listing' : 'Report User'}
                             </h3>
                             <div className="bg-slate-50 rounded-xl px-4 py-3 border border-slate-200/60">

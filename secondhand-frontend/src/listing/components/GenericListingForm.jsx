@@ -55,7 +55,7 @@ const SectionCard = ({
             <Icon className="h-4 w-4 text-zinc-600" />
           </div>}
         <div>
-          <h3 className="text-sm font-semibold text-zinc-900">{title}</h3>
+          <h3 className="text-sm font-medium text-text-primary">{title}</h3>
           {description && <p className="mt-0.5 text-xs text-zinc-500">{description}</p>}
         </div>
       </div>
@@ -89,10 +89,10 @@ const ToggleCardField = ({
     </div>
     <input id={name} type="checkbox" name={name} checked={Boolean(value)} onChange={() => onToggle()} className="sr-only" />
     <div>
-      <label htmlFor={name} className="block cursor-pointer text-[13px] font-medium text-zinc-900">
+      <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-zinc-900">
         {label}
       </label>
-      {description && <p className="mt-0.5 text-[12px] text-zinc-500">
+      {description && <p className="mt-0.5 text-body text-zinc-500">
           {description}
         </p>}
     </div>
@@ -100,7 +100,7 @@ const ToggleCardField = ({
 
 /* ── Input Classes ─────────────────────────────────────────── */
 
-const inputBase = 'w-full px-3.5 py-2.5 text-[13px] border rounded-lg focus:outline-none transition-all duration-200';
+const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
 const inputNormal = `${inputBase} border-zinc-200/60 bg-white focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
 const inputError = `${inputBase} border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-2 focus:ring-red-500/10`;
 
@@ -133,8 +133,8 @@ const GenericListingForm = ({
   const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
   const labelClass = uiChrome === 'composer' ? 'text-zinc-950' : 'text-zinc-900';
   const descFieldClass = uiChrome === 'composer' ? 'text-zinc-500' : 'text-zinc-400';
-  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-zinc-200/60 bg-white px-3.5 py-2.5 text-[13px] text-zinc-950 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5 hover:border-zinc-300 wizard-input-glow' : inputNormal, [uiChrome]);
-  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-red-200 bg-red-50/40 px-3.5 py-2.5 text-[13px] text-zinc-950 outline-none transition-all duration-200 focus:border-red-400 focus:ring-2 focus:ring-red-400/25' : inputError, [uiChrome]);
+  const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-zinc-200/60 bg-white px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-950/5 hover:border-zinc-300 wizard-input-glow' : inputNormal, [uiChrome]);
+  const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-red-200 bg-red-50/40 px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-all duration-200 focus:border-red-400 focus:ring-2 focus:ring-red-400/25' : inputError, [uiChrome]);
   const wizardSteps = useMemo(() => {
     const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
     if (!steps.length) return steps;
@@ -449,10 +449,10 @@ const GenericListingForm = ({
           <div className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
-                <span className="inline-flex items-center rounded-lg bg-zinc-100/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+                <span className="inline-flex items-center rounded-lg bg-zinc-100/80 px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-zinc-600">
                   {typeLabel}
                 </span>
-                <h3 className={`mt-2.5 text-lg font-semibold tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
+                <h3 className={`text-sm font-medium text-text-primary mt-2.5 tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
                 {formData?.description && <p className={`mt-2 whitespace-pre-wrap line-clamp-3 text-sm leading-relaxed ${descFieldClass}`}>{formData.description}</p>}
               </div>
               {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200/50 bg-zinc-50 shadow-sm">
@@ -477,7 +477,7 @@ const GenericListingForm = ({
         delay: 0.3
       }} className="flex items-center gap-2.5 rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-3">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <p className="text-[13px] text-emerald-700 font-medium">{t("your_listing_is_ready_to_publish")}</p>
+          <p className="text-sm text-emerald-700 font-medium">{t("your_listing_is_ready_to_publish")}</p>
         </motion.div>
       </div>;
   };
@@ -547,7 +547,7 @@ const SummarySection = ({
   return <div className="wizard-glass-elevated rounded-xl overflow-hidden">
       <div className="border-b border-zinc-100/60 bg-zinc-50/50 px-4 py-2.5 flex items-center gap-2">
         {Icon && <Icon className="h-3.5 w-3.5 text-zinc-500" />}
-        <h4 className="text-[11px] font-semibold uppercase tracking-wider text-zinc-600">{title}</h4>
+        <h4 className="text-caption font-semibold uppercase tracking-wider text-zinc-600">{title}</h4>
       </div>
       <div className="divide-y divide-zinc-100/60">
         {rows.map((row, i) => <motion.div key={`${row.label}-${row.value}`} initial={{
@@ -559,8 +559,8 @@ const SummarySection = ({
       }} transition={{
         delay: i * 0.05
       }} className="flex items-start justify-between gap-3 px-4 py-3">
-            <span className="text-[12px] text-zinc-500">{row.label}</span>
-            <span className="text-right text-[13px] font-medium tabular-nums text-zinc-900">{row.value}</span>
+            <span className="text-body text-zinc-500">{row.label}</span>
+            <span className="text-right text-sm font-medium tabular-nums text-zinc-900">{row.value}</span>
           </motion.div>)}
       </div>
     </div>;

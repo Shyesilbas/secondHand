@@ -22,7 +22,7 @@ const PaymentPanel = ({
     return (
         <div className="lg:col-span-5 xl:col-span-4">
             <div className="sticky top-4 rounded-[2rem] border border-white/60 bg-white/80 backdrop-blur-xl px-6 py-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
-                <h3 className="mb-2 text-lg font-semibold tracking-tight text-slate-900">{t("payment_panel")}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("payment_panel")}</h3>
                 <p className="mb-6 text-xs text-slate-500">{t("review_the_fee_details_and_choose_a_secu")}</p>
 
                 {selectedListing ? (
@@ -46,8 +46,8 @@ const PaymentPanel = ({
                                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500" />
                                     
                                     <div className="mb-4 flex items-center justify-between">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{t("invoice_summary")}</span>
-                                        <span className="text-[10px] text-slate-400 font-medium">#FEE-{selectedListing.id.substring(0,6).toUpperCase()}</span>
+                                        <span className="text-caption font-bold uppercase tracking-[0.2em] text-slate-400">{t("invoice_summary")}</span>
+                                        <span className="text-caption text-slate-400 font-medium">#FEE-{selectedListing.id.substring(0,6).toUpperCase()}</span>
                                     </div>
                                     
                                     <div className="space-y-3">
@@ -68,7 +68,7 @@ const PaymentPanel = ({
                                     <div className="mt-4 border-t border-dashed border-slate-300 pt-4">
                                         <div className="flex items-baseline justify-between">
                                             <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-800">{t("total_due")}</span>
-                                            <span className="font-mono text-2xl font-extrabold tracking-tighter text-indigo-600">
+                                            <span className="font-mono text-2xl font-bold tracking-tighter text-indigo-600">
                                                 {formatPaymentAmount(feeConfig.totalCreationFee)}
                                             </span>
                                         </div>
@@ -90,7 +90,7 @@ const PaymentPanel = ({
                                         </div>
                                         <div className="flex flex-col flex-1">
                                             <span className={`text-sm font-semibold ${paymentType === PAYMENT_TYPES.EWALLET ? 'text-indigo-950' : 'text-slate-900'}`}>{t("ewallet")}</span>
-                                            {eWallet && <span className="text-[11px] font-medium text-slate-500">{t("balance")} <span className="font-mono text-slate-700">{formatPaymentAmount(eWallet.balance)}</span></span>}
+                                            {eWallet && <span className="text-caption font-medium text-slate-500">{t("balance")} <span className="font-mono text-slate-700">{formatPaymentAmount(eWallet.balance)}</span></span>}
                                         </div>
                                     </div>
                                 </label>
@@ -143,8 +143,8 @@ const PaymentPanel = ({
                         </button>
 
                         <div className="mt-3 flex flex-col items-center gap-1">
-                            <p className="text-[11px] text-slate-500">{t("after_successful_payment_your_listing_wi")}</p>
-                            <div className="flex items-center gap-2 text-[10px] font-medium text-slate-500">
+                            <p className="text-caption text-slate-500">{t("after_successful_payment_your_listing_wi")}</p>
+                            <div className="flex items-center gap-2 text-caption font-medium text-slate-500">
                                 <div className="flex items-center gap-1 rounded-full border border-slate-200 px-2 py-0.5 bg-slate-50">
                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                     <span>{t("ssl_secured")}</span>

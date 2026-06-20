@@ -26,7 +26,7 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => (
                         label={item.label}
                         rightContent={
                             item.key === 'orders' && orderCount > 0
-                                ? <span className="ml-auto text-[10px] font-semibold bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>
+                                ? <span className="ml-auto text-caption font-semibold bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>
                                 : null
                         }
                     />

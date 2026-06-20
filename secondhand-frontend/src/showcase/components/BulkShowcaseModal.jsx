@@ -87,7 +87,7 @@ const BulkShowcaseModal = ({
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-lg font-semibold text-text-primary">
               {step === 1 ? 'Boost Multiple Listings' : step === 2 ? 'Review Agreements' : 'Complete Payment'}
             </h2>
             <p className="text-sm text-slate-500">
@@ -129,7 +129,7 @@ const BulkShowcaseModal = ({
                     <div className="p-2 bg-white/20 rounded-lg">
                       <Star className="w-5 h-5 fill-white" />
                     </div>
-                    <h3 className="text-lg font-bold">{t("bulk_showcase_benefit")}</h3>
+                    <h3 className="text-sm font-medium text-text-primary">{t("bulk_showcase_benefit")}</h3>
                   </div>
                   <p className="text-indigo-50 text-sm leading-relaxed">{t("add")}{pricing.bulkDiscountThreshold}{t("or_more_listings_to_get_an_instant")}<span className="font-bold text-white mx-1">{pricing.bulkDiscountPercentage}{t("discount")}</span>{t("on_your_total_showcase_fee")}</p>
                 </div>}
@@ -174,11 +174,11 @@ const BulkShowcaseModal = ({
                         </div>
                         <span>-{formatCurrency(discountAmount, 'TRY')}</span>
                       </div>}
-                    {!hasDiscount && pricing && <div className="text-[11px] text-indigo-600 font-semibold bg-indigo-50 p-2 rounded-lg flex items-center gap-1.5">
+                    {!hasDiscount && pricing && <div className="text-caption text-indigo-600 font-semibold bg-indigo-50 p-2 rounded-lg flex items-center gap-1.5">
                         <Star className="w-3 h-3 fill-indigo-600" />{t("add")}{pricing.bulkDiscountThreshold - itemCount}{t("more_to_unlock_discount")}</div>}
                     <div className="pt-3 border-t border-slate-200 flex justify-between items-end">
                       <span className="text-sm font-bold text-slate-900">{t("total_payable")}</span>
-                      <span className="text-2xl font-black text-slate-900">{formatCurrency(finalTotal, 'TRY')}</span>
+                      <span className="text-2xl font-bold text-slate-900">{formatCurrency(finalTotal, 'TRY')}</span>
                     </div>
                   </div>
 

@@ -20,7 +20,7 @@ const PaymentMethodsPage = () => {
                             <WalletIcon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t("wallet")}</h1>
+                            <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("wallet")}</h1>
                             <p className="text-sm text-slate-500 mt-0.5">{t("manage_your_wallet_balance_and_limits")}</p>
                         </div>
                     </div>

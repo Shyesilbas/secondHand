@@ -14,18 +14,18 @@ const StatusBadge = ({
   if (status === PAYMENT_STATUSES.ESCROW) {
     return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
         <Clock className="w-2.5 h-2.5" />
-        <span className="text-[10px] font-bold uppercase tracking-tight">{t("escrow")}</span>
+        <span className="text-caption font-bold uppercase tracking-tight">{t("escrow")}</span>
       </div>;
   }
   if (isSuccess) {
     return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
         <CheckCircle2 className="w-2.5 h-2.5" />
-        <span className="text-[10px] font-bold uppercase tracking-tight">{t("success")}</span>
+        <span className="text-caption font-bold uppercase tracking-tight">{t("success")}</span>
       </div>;
   }
   return <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
       <XCircle className="w-2.5 h-2.5" />
-      <span className="text-[10px] font-bold uppercase tracking-tight">{t("failed")}</span>
+      <span className="text-caption font-bold uppercase tracking-tight">{t("failed")}</span>
     </div>;
 };
 const PaymentRow = ({
@@ -56,7 +56,7 @@ const PaymentRow = ({
           <p className="text-sm font-bold text-slate-900 truncate">
             {TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType}
           </p>
-          <p className="text-[11px] text-slate-400 font-medium truncate">
+          <p className="text-caption text-slate-400 font-medium truncate">
             {payment.listingTitle || 'Platform Transaction'}
           </p>
         </div>
@@ -67,7 +67,7 @@ const PaymentRow = ({
         <p className="text-xs font-bold text-slate-500">
           {formatDateTime(payment.processedAt || payment.createdAt).split(' ')[0]}
         </p>
-        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-tight">
+        <p className="text-caption text-slate-400 font-medium uppercase tracking-tight">
           {formatDateTime(payment.processedAt || payment.createdAt).split(' ')[1]}
         </p>
       </div>
@@ -79,7 +79,7 @@ const PaymentRow = ({
 
       {/* Payment Method */}
       <div className="col-span-1 hidden lg:block text-center">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-1.5 py-0.5 rounded">
+        <span className="text-caption font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-1.5 py-0.5 rounded">
           {payment.paymentType || 'Wallet'}
         </span>
       </div>
@@ -124,30 +124,30 @@ const PaymentHistory = ({
         <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
           <Receipt className="w-7 h-7 text-slate-300" />
         </div>
-        <h3 className="text-sm font-bold text-slate-900 mb-1">{t("no_activity_found")}</h3>
-        <p className="text-[11px] text-slate-400 font-medium max-w-[220px] mx-auto leading-relaxed">
+        <h3 className="text-sm font-medium text-text-primary mb-1">{t("no_activity_found")}</h3>
+        <p className="text-caption text-slate-400 font-medium max-w-[220px] mx-auto leading-relaxed">
           {hasActiveFilters ? 'We couldn\'t find any transactions matching your current filters.' : 'Your transaction history is empty. Start exploring the marketplace to see activity here.'}
         </p>
-        {hasActiveFilters && <button onClick={onClearFilters} className="mt-6 px-4 py-2 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-sm">{t("reset_filters")}</button>}
+        {hasActiveFilters && <button onClick={onClearFilters} className="mt-6 px-4 py-2 bg-slate-900 text-white text-caption font-bold uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all active:scale-95 shadow-sm">{t("reset_filters")}</button>}
       </div>;
   }
   return <div className="bg-white">
       {/* Table Header */}
       <div className="grid grid-cols-12 items-center gap-4 px-6 py-3 bg-slate-50/50 border-b border-slate-100">
         <div className="col-span-5">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t("transaction_details")}</span>
+          <span className="text-caption font-bold text-slate-400 uppercase tracking-[0.1em]">{t("transaction_details")}</span>
         </div>
         <div className="col-span-2 hidden md:block">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t("date_time")}</span>
+          <span className="text-caption font-bold text-slate-400 uppercase tracking-[0.1em]">{t("date_time")}</span>
         </div>
         <div className="col-span-2 hidden sm:block">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t("status")}</span>
+          <span className="text-caption font-bold text-slate-400 uppercase tracking-[0.1em]">{t("status")}</span>
         </div>
         <div className="col-span-1 hidden lg:block text-center">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t("method")}</span>
+          <span className="text-caption font-bold text-slate-400 uppercase tracking-[0.1em]">{t("method")}</span>
         </div>
         <div className="col-span-2 text-right">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t("amount")}</span>
+          <span className="text-caption font-bold text-slate-400 uppercase tracking-[0.1em]">{t("amount")}</span>
         </div>
       </div>
 

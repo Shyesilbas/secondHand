@@ -28,7 +28,7 @@ const EWalletSpendingWarningModal = ({
                     </div>
 
                     {/* Content */}
-                    <h2 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">{t("spending_warning")}</h2>
+                    <h2 className="text-lg font-semibold text-text-primary mb-3 tracking-tight">{t("spending_warning")}</h2>
                     <p className="text-slate-500 leading-relaxed mb-8">{t("this_purchase_will_bring_your_total_mont")}<span className="font-bold text-slate-900">{formatCurrency(projectedSpent, currency)}</span>{t("which_exceeds_your_security_threshold_li")}<span className="font-bold text-slate-900">{formatCurrency(warningLimit, currency)}</span>.
                         <br /><br />{t("do_you_want_to_proceed_anyway")}</p>
 

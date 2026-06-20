@@ -36,12 +36,12 @@ export const ShipOrderForm = ({
   return <CardComponent className="p-5 border-indigo-100 bg-indigo-50/30">
       <div className="flex items-center gap-2 mb-4">
         <Truck className="w-5 h-5 text-indigo-600" />
-        <h3 className="text-sm font-bold text-slate-900">{t("ship_this_order")}</h3>
+        <h3 className="text-sm font-medium text-text-primary">{t("ship_this_order")}</h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("select_carrier")}</label>
+          <label className="block text-caption font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("select_carrier")}</label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {carriers.map(c => <button key={c.value} type="button" onClick={() => setCarrier(c.value)} className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${carrier === c.value ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200' : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600'}`}>
                 {c.label}
@@ -50,7 +50,7 @@ export const ShipOrderForm = ({
         </div>
 
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("tracking_number")}</label>
+          <label className="block text-caption font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("tracking_number")}</label>
           <div className="relative">
             <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input type="text" value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-sm font-semibold bg-white" placeholder={t("e_g_ar123456789")} />

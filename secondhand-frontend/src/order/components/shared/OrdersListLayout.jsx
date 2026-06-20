@@ -157,7 +157,7 @@ const Header = React.memo(({
   const headerContent = <div className="flex flex-row items-center justify-between gap-4">
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-3 min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight truncate">{title}</h1>
+            <h1 className="text-2xl font-semibold text-text-primary tracking-tight truncate">{title}</h1>
             {showIndicator ? <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.45)]" /> : null}
           </div>
           {subtitle ? <p className="text-sm text-slate-500 font-medium truncate">{subtitle}</p> : null}
@@ -206,7 +206,7 @@ const StatusTabs = React.memo(({
   return <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-200/50 border border-slate-200/60 w-full lg:w-auto" role="tablist" aria-label={t("order_status_filters")}>
       {tabs.map(tab => {
       const active = (statusFilter || '') === (tab.value || '');
-      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 focus-visible:ring-offset-1 ${active ? 'bg-white text-slate-900 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-white/70'}`}>
+      return <button key={tab.value || 'all'} type="button" role="tab" aria-selected={active} id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`} onClick={() => setStatusFilter?.(tab.value)} className={`flex-1 min-w-[5.25rem] sm:flex-none px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 focus-visible:ring-offset-1 ${active ? 'bg-white text-slate-900 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-white/70'}`}>
             {tab.label}
           </button>;
     })}
@@ -237,7 +237,7 @@ const SearchToolbar = React.memo(({
       <div className="flex items-center gap-2 w-full">
         <form onSubmit={onSearch} className="flex items-center relative group w-full sm:w-64 transition-all duration-300 focus-within:w-full sm:focus-within:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none group-focus-within:text-indigo-500 transition-colors" strokeWidth={2.5} />
-          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-slate-200 bg-white text-[13px] font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-400 transition-all duration-200 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]" />
+          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder={uiCopy.searchPlaceholder} disabled={searchLoading} aria-invalid={Boolean(searchError)} aria-describedby={searchError ? 'orders-search-error' : undefined} className="w-full pl-9 pr-9 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-400 transition-all duration-200 shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]" />
           {searchTerm ? <button type="button" onClick={isSearchMode ? onClearSearch : () => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors" aria-label={uiCopy.clear}>
               <X className="w-3.5 h-3.5" />
             </button> : null}
@@ -452,7 +452,7 @@ const UnifiedOrderItem = React.memo(({
               </span>
 
               {/* Status pill */}
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border ${getOrderStatusBadgeClass(order.status)}`}>
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-caption font-semibold border ${getOrderStatusBadgeClass(order.status)}`}>
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDotColor} ${order.status === ORDER_STATUSES.PROCESSING ? 'animate-pulse' : ''}`} aria-hidden />
                 {statusLabel}
               </span>
@@ -467,14 +467,14 @@ const UnifiedOrderItem = React.memo(({
             </div>}
 
           {/* Meta: date · items */}
-          <div className="flex items-center gap-2 text-[13px] text-slate-400 tabular-nums">
+          <div className="flex items-center gap-2 text-sm text-slate-400 tabular-nums">
             <time dateTime={order.createdAt || undefined}>{formatLongDate(order.createdAt, uiCopy.locale)}</time>
             <span className="w-1 h-1 rounded-full bg-slate-200 shrink-0" aria-hidden />
             <span>{uiCopy.itemsSummary ? uiCopy.itemsSummary(items.length) : `${items.length} items`}</span>
           </div>
 
           {/* Order number subtle */}
-          <p className="text-[12px] text-slate-300 font-medium tabular-nums">
+          <p className="text-body text-slate-300 font-medium tabular-nums">
             #{order.orderNumber}
           </p>
         </div>
@@ -483,7 +483,7 @@ const UnifiedOrderItem = React.memo(({
         <div className={`shrink-0 flex z-10 mt-1 sm:mt-0 w-full sm:w-auto flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-4`}>
           {/* Price */}
           <div className="flex flex-col items-start sm:items-end">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{uiCopy.totalLabel}</span>
+            <span className="text-caption font-semibold text-slate-400 uppercase tracking-wider">{uiCopy.totalLabel}</span>
             <span className={`text-xl sm:text-2xl font-bold tabular-nums tracking-tight leading-tight mt-0.5 ${isCompleted ? 'text-emerald-600' : 'text-slate-900'}`}>
               {formatCurrency(displayTotal, currency)}
             </span>
@@ -491,7 +491,7 @@ const UnifiedOrderItem = React.memo(({
 
           {/* Primary CTA or chevron affordance */}
           <div className="shrink-0" onClick={e => e.stopPropagation()}>
-            {primaryAction ? primaryAction : <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-slate-400 group-hover:text-indigo-600 transition-colors" aria-hidden>
+            {primaryAction ? primaryAction : <span className="inline-flex items-center gap-1 text-body font-semibold text-slate-400 group-hover:text-indigo-600 transition-colors" aria-hidden>
                 {uiCopy.detail}
                 <svg className="w-3.5 h-3.5 -rotate-90 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -566,16 +566,16 @@ const OrdersListLayout = ({
           <Wallet className={`w-4 h-4 mt-0.5 shrink-0 ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-600' : 'text-slate-300'}`} />
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">{uiCopy.escrowLabel}</span>
+              <span className="text-caption font-medium text-slate-500 uppercase tracking-wide">{uiCopy.escrowLabel}</span>
               <span className={`text-lg font-semibold tabular-nums tracking-tight ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-900' : 'text-slate-400'}`}>
                 {formatCurrency(flow.escrow.pendingEscrowAmount)}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 mb-0">
+            <p className="text-caption text-slate-500 mb-0">
               {flow.escrow.pendingEscrowAmount > 0 ? uiCopy.escrowHintPending : uiCopy.escrowHintEmpty}
             </p>
             {flow.escrow.pendingEscrowAmount > 0 && flow.orders.length > 0 ? <div className="mt-3 pt-3 border-t border-slate-200">
-                <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-2">{uiCopy.escrowByOrder}</div>
+                <div className="text-caption font-medium text-slate-500 uppercase tracking-wide mb-2">{uiCopy.escrowByOrder}</div>
                 <div className="space-y-2">
                   {flow.orders.filter(order => (parseFloat(order.escrowAmount) || 0) > 0).map(order => {
               const escrowAmt = parseFloat(order.escrowAmount) || 0;
@@ -589,14 +589,14 @@ const OrdersListLayout = ({
                 const h = Math.ceil(diffMs / (60 * 60 * 1000));
                 tooltipText = `Auto-releases in ~${h}h.`;
               }
-              return <div key={order.id} className="flex items-center justify-between text-[11px]">
+              return <div key={order.id} className="flex items-center justify-between text-caption">
                           <div className="flex items-center gap-1.5">
                             <button type="button" onClick={() => flow.modal.openOrderModal(order)} className="text-slate-700 hover:underline font-medium truncate max-w-[12rem] text-left">
                               {order.name || uiCopy.orderCardTitleFallback}
                             </button>
                             <div className="relative group">
                               <Info className="w-2.5 h-2.5 text-slate-400 cursor-help" />
-                              <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-50 w-52 p-2 bg-slate-900 text-white text-[10px] rounded-lg shadow-lg">
+                              <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-50 w-52 p-2 bg-slate-900 text-white text-caption rounded-lg shadow-lg">
                                 {tooltipText}
                               </div>
                             </div>
@@ -639,7 +639,7 @@ const OrdersListLayout = ({
               CARGO: 'Kargo ile Gönderim',
               SAFE_MEETUP: 'Elden Güvenli Teslimat'
             }[method];
-            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-[13px] font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${isActive ? 'bg-white text-slate-900 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.12)] border border-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>
+            return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/35 ${isActive ? 'bg-white text-slate-900 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.12)] border border-slate-200/60' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>
                 {label}
               </button>;
           })}
@@ -664,7 +664,7 @@ const OrdersListLayout = ({
               <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center mb-6 shadow-sm">
                 <Package className="w-11 h-11 text-slate-300" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2 tracking-tight">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</h3>
+              <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{emptyText || (isSellerView ? 'No sales yet' : 'No orders yet')}</h3>
               <p className="text-sm text-slate-400 mb-8 max-w-xs leading-relaxed">
                 {isSellerView ? 'Your sold items will appear here once buyers place orders.' : 'Discover amazing products and place your first order.'}
               </p>

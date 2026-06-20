@@ -103,7 +103,7 @@ const ProfilePage = () => {
                                                 <div className={`text-sm font-semibold truncate ${isActive ? 'text-white' : 'text-gray-900'}`}>
                                                     {tab.label}
                                                 </div>
-                                                <div className={`text-[11px] truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
+                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-gray-400'}`}>
                                                     {tab.description}
                                                 </div>
                                             </div>
@@ -127,7 +127,7 @@ const ProfilePage = () => {
                                         <ActiveIcon className="w-5 h-5 text-gray-700" />
                                     </div>
                                     <div>
-                                        <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                                        <h2 className="text-lg font-semibold text-text-primary tracking-tight">
                                             {activeTabData?.label}
                                         </h2>
                                         <p className="text-sm text-gray-500 mt-0.5">

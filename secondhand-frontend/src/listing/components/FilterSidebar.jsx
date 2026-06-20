@@ -87,7 +87,7 @@ const FilterSidebar = ({
                 <SlidersHorizontal className="w-5 h-5" strokeWidth={2} />
               </div>
               <div className="min-w-0">
-                <h2 id="listing-filters-title" className="truncate text-base font-semibold tracking-tight text-slate-900">{t("filters")}</h2>
+                <h2 id="listing-filters-title" className="text-lg font-semibold text-text-primary truncate tracking-tight">{t("filters")}</h2>
                 <p className="text-xs font-medium text-slate-500">{t("refine_listings_then_apply")}</p>
               </div>
             </div>
@@ -173,7 +173,7 @@ const FilterSection = ({
   children
 }) => <section className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-[0_1px_4px_-1px_rgba(15,23,42,0.06)]">
     <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-3">
-      <h3 className="text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
+      <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
       {description ? <p className="mt-0.5 text-xs font-medium leading-relaxed text-slate-500">{description}</p> : null}
     </div>
     <div className="p-4">{children}</div>
@@ -191,7 +191,7 @@ const CategoryChip = ({
   active,
   onClick
 }) => <button type="button" onClick={onClick} className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${active ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'border-transparent bg-white text-slate-600 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/80 hover:bg-slate-50'}`}>
-    {icon && <span className="text-[11px]">{icon}</span>}
+    {icon && <span className="text-caption">{icon}</span>}
     <span>{label}</span>
   </button>;
 export default FilterSidebar;

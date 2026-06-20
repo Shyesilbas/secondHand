@@ -27,7 +27,7 @@ const CategorySelector = ({
   };
   if (compact) {
     return <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-900">{t("category")}</h3>
+                <h3 className="text-sm font-medium text-text-primary">{t("category")}</h3>
                 <div className="space-y-2">
                     {enums.listingTypes.map(type => <button key={type.value} onClick={() => handleCategoryChange(type.value)} className={`w-full p-2.5 rounded-lg border transition-all duration-200 text-left hover:shadow-sm ${selectedCategory === type.value ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}`}>
                             <div className="flex items-center space-x-2">
@@ -50,7 +50,7 @@ const CategorySelector = ({
             </div>;
   }
   return <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t("category")}</h3>
+            <h3 className="text-sm font-medium text-text-primary">{t("category")}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {enums.listingTypes.map(type => <button key={type.value} onClick={() => handleCategoryChange(type.value)} className={`p-4 rounded-lg border-2 transition-all duration-200 text-left hover:shadow-md ${selectedCategory === type.value ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}`}>
                         <div className="flex items-center space-x-3">

@@ -31,7 +31,7 @@ const CheckoutOrderSummary = ({
       <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/75 backdrop-blur-md shadow-[0_20px_50px_rgba(0,0,0,0.03)]">
         {/* Header */}
         <div className="px-6 py-5">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{t("order_summary")}</h3>
+          <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest">{t("order_summary")}</h3>
           <p className="mt-1 text-sm font-semibold text-slate-800 tabular-nums">
             {cartCount} {cartCount === 1 ? 'item' : 'items'}
           </p>
@@ -59,7 +59,7 @@ const CheckoutOrderSummary = ({
                   <p className="line-clamp-2 text-xs font-semibold leading-snug text-slate-800">
                     {item.listing.title}
                   </p>
-                  {isOffer && <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600">{t("offer")}</p>}
+                  {isOffer && <p className="mt-1 text-caption font-bold uppercase tracking-wider text-emerald-600">{t("offer")}</p>}
                   <p className="mt-1 text-xs font-medium text-slate-400 tabular-nums">
                     {item.quantity} × {formatCurrency(unitPrice, item.listing.currency)}
                   </p>
@@ -78,7 +78,7 @@ const CheckoutOrderSummary = ({
           {/* Coupon */}
           <div className="space-y-2 border-b border-slate-100/60 pb-4">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("coupon")}</span>
+              <span className="text-caption font-bold uppercase tracking-widest text-slate-400">{t("coupon")}</span>
               {isPreviewLoading && <span className="text-xs text-slate-400 font-medium">{t("applying")}</span>}
             </div>
 
@@ -144,7 +144,7 @@ const CheckoutOrderSummary = ({
 
         {/* Security note */}
         <div className="border-t border-slate-100/40 px-6 py-3.5 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("secure_256_bit_ssl_checkout")}</p>
+          <p className="text-caption font-bold uppercase tracking-widest text-slate-400">{t("secure_256_bit_ssl_checkout")}</p>
         </div>
       </div>
     </aside>;

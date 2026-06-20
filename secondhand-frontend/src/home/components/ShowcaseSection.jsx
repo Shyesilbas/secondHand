@@ -82,8 +82,8 @@ const ShowcaseSection = () => {
         {/* Header - Simpler & More Direct */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-7">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-indigo-600 mb-2">{t("fresh_from_the_market")}</p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">{t("featured_listings")}</h2>
+            <p className="text-caption font-bold uppercase tracking-[0.2em] text-indigo-600 mb-2">{t("fresh_from_the_market")}</p>
+            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("featured_listings")}</h2>
             <p className="text-slate-500 mt-2 max-w-xl text-sm font-medium">{t("discover_popular_items_and_top_picks_fro")}</p>
           </div>
           <Link to={ROUTES.LISTINGS} className="inline-flex w-fit items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all active:scale-95 shadow-sm">

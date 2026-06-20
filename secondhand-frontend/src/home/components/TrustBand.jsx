@@ -32,8 +32,8 @@ const TrustBand = () => {
                   <Icon className="w-4 h-4 text-gray-500" />
                 </div>
                 <div>
-                  <h3 className="text-[13px] font-semibold text-gray-900">{feature.title}</h3>
-                  <p className="text-[12px] text-gray-400 mt-0.5 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-sm font-medium text-text-primary">{feature.title}</h3>
+                  <p className="text-body text-gray-400 mt-0.5 leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             );

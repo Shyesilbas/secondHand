@@ -33,7 +33,7 @@ const EmailContent = ({
       backgroundColor: MS_HEADER
     }}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                    <h1 className="min-w-0 flex-1 text-xl font-semibold leading-tight tracking-tight text-[#323130] sm:text-2xl lg:text-[1.65rem]">
+                    <h1 className="text-2xl font-semibold text-text-primary min-w-0 flex-1 tracking-tight text-[#323130] lg:text-[1.65rem]">
                         {email.subject}
                     </h1>
                     {onDelete && <div className="flex shrink-0 items-center gap-1 sm:pt-0.5">
@@ -59,7 +59,7 @@ const EmailContent = ({
                             <span className="break-all">{email.recipientEmail}</span>
                         </div>
                         <div className="mt-2">
-                            <span className="inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#605e5c]" style={{
+                            <span className="inline-flex items-center rounded border px-2 py-0.5 text-caption font-semibold uppercase tracking-wide text-[#605e5c]" style={{
               borderColor: MS_BORDER,
               backgroundColor: '#fff'
             }}>

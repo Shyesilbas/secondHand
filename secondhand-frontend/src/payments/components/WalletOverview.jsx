@@ -17,8 +17,8 @@ export const PaymentInfo = () => {
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-xs font-semibold text-blue-900 mb-1">{t("sales_earnings_information")}</h3>
-          <p className="text-[11px] text-blue-700 leading-relaxed">{t("your_sales_earnings_are_automatically_tr")}{' '}
+          <h3 className="text-sm font-medium text-text-primary mb-1">{t("sales_earnings_information")}</h3>
+          <p className="text-caption text-blue-700 leading-relaxed">{t("your_sales_earnings_are_automatically_tr")}{' '}
             <Link to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`} className="font-medium text-blue-800 hover:text-blue-900 underline transition-colors">{t("ewallet")}</Link>{' '}{t("account_manual_top_up_and_withdrawal_act")}{' '}
             <Link to={`${ROUTES.PAYMENT_METHODS}?tab=ewallet`} className="font-medium text-blue-800 hover:text-blue-900 underline transition-colors">{t("ewallet")}</Link>{' '}{t("while_external_bank_transfers_are_disabl")}</p>
         </div>
@@ -65,12 +65,12 @@ export const EWalletBalance = ({
 
           <div className="relative z-10 flex items-center justify-between text-sm">
             <div className="flex flex-col">
-              <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("status")}</span>
+              <span className="text-caption text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("status")}</span>
               <span className="font-medium text-emerald-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />{t("active")}</span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("currency")}</span>
+              <span className="text-caption text-slate-400 uppercase tracking-widest font-semibold mb-0.5">{t("currency")}</span>
               <span className="font-medium tracking-wider text-slate-200">{t("try")}</span>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const EWalletBalance = ({
                 }} />
                     </div>}
 
-                  {statisticsLoaded && statsData && <p className="mt-3 text-[11px] text-slate-500">{t("incoming_outgoing_transactions")}<span className="font-semibold text-slate-700">{statsData.totalPayments ?? 0}</span>
+                  {statisticsLoaded && statsData && <p className="mt-3 text-caption text-slate-500">{t("incoming_outgoing_transactions")}<span className="font-semibold text-slate-700">{statsData.totalPayments ?? 0}</span>
                     </p>}
                 </div>}
             </div>

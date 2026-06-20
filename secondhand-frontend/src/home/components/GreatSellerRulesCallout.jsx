@@ -29,7 +29,7 @@ const GreatSellerRulesCallout = ({
         <Info className="w-5 h-5 text-slate-400" />
       </div>
       <div>
-        <h3 className="text-base font-bold text-slate-900">{t("platform_recognition_standards")}</h3>
+        <h3 className="text-sm font-medium text-text-primary">{t("platform_recognition_standards")}</h3>
         <p className="text-xs text-slate-400 font-medium">{t("automatic_eligibility_based_on_60_day_pe")}</p>
       </div>
     </div>
@@ -46,12 +46,12 @@ const GreatSellerRulesCallout = ({
             </div>
             <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">{title}</p>
           </div>
-          <p className="text-[12px] text-slate-500 leading-relaxed font-medium">{body}</p>
+          <p className="text-body text-slate-500 leading-relaxed font-medium">{body}</p>
         </div>)}
     </div>
 
     <div className="mt-8 pt-6 border-t border-slate-50 text-center">
-      <p className="text-[10px] text-slate-400 font-medium tracking-wide italic">{t("sellers_who_meet_all_four_criteria_simul")}</p>
+      <p className="text-caption text-slate-400 font-medium tracking-wide italic">{t("sellers_who_meet_all_four_criteria_simul")}</p>
     </div>
   </div>;
 };

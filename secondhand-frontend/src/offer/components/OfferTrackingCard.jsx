@@ -99,42 +99,42 @@ const OfferTrackingCard = ({
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-slate-500">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] text-white">
+            <div className="flex flex-wrap items-center gap-1.5 text-caption font-medium text-slate-500">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-caption text-white">
                 1
               </span>
               <span>{t("created")}</span>
               <span className="text-slate-300">→</span>
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${isPending ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white'}`}>
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-caption ${isPending ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white'}`}>
                 2
               </span>
               <span>{t("in_review")}</span>
               <span className="text-slate-300">→</span>
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${hasOutcome ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}`}>
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-caption ${hasOutcome ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'}`}>
                 3
               </span>
               <span>{t("outcome")}</span>
             </div>
-            {timeLeft ? <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+            {timeLeft ? <span className="rounded-full bg-amber-50 px-2 py-0.5 text-caption font-semibold text-amber-800">
                 {timeLeft}
               </span> : null}
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{t("total")}</div>
+              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("total")}</div>
               <div className="mt-0.5 font-mono text-xl font-bold tracking-tight text-indigo-600">
                 {formatCurrency(o.totalPrice, currency)}
               </div>
             </div>
             <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{t("qty_unit")}</div>
+              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("qty_unit")}</div>
               <div className="mt-0.5 text-sm text-slate-700">
                 {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
               </div>
             </div>
             <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">{t("timeline")}</div>
+              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("timeline")}</div>
               <div className="mt-0.5 text-xs leading-relaxed text-slate-600">
                 <div>{o.createdAt ? formatDateTime(o.createdAt) : '—'}</div>
                 <div className="text-slate-400">{t("expires")}</div>
@@ -154,7 +154,7 @@ const OfferTrackingCard = ({
               <button type="button" onClick={() => onCounter(o)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50">{t("counter")}</button>
               <button type="button" onClick={() => onReject(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700">
                 <XCircle className="mr-1.5 h-4 w-4" />{t("reject")}</button>
-            </> : <p className="text-center text-[11px] leading-relaxed text-slate-500">
+            </> : <p className="text-center text-caption leading-relaxed text-slate-500">
               {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING ? 'Waiting for the seller to respond.' : 'No action required.'}
             </p>}
         </div>

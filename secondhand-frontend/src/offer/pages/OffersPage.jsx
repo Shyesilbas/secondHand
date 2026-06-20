@@ -217,7 +217,7 @@ const OffersPage = () => {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15">
                 <Handshake className="h-8 w-8 text-indigo-600" />
               </div>
-              <h2 className="text-lg font-semibold text-slate-900">{t("no")}{activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'}{t("yet")}</h2>
+              <h2 className="text-lg font-semibold text-text-primary">{t("no")}{activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'}{t("yet")}</h2>
               <p className="mt-2 max-w-md text-sm text-slate-500">{t("when_you_send_or_receive_offers_they_wil")}</p>
             </div> : processedItems.length === 0 ? <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 px-4 py-8 text-center">
               <p className="text-sm font-medium text-amber-900">{t("no_offers_match_your_filters")}</p>

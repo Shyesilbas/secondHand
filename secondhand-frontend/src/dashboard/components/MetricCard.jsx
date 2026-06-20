@@ -59,7 +59,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
               <Icon className="w-4 h-4" />
             </div>
           )}
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
+          <span className="text-caption font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
         </div>
         {badge && (
           <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-200/50">
@@ -70,11 +70,11 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
       
       <div>
         <div className="flex items-end gap-2.5 mb-1">
-          <span className="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">{formatValue(value)}</span>
+          <span className="text-2xl font-bold text-slate-900 tracking-tight leading-none">{formatValue(value)}</span>
           {trend !== undefined && trend !== null && (
             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${getTrendColor()} font-bold`}>
               {getTrendIcon()}
-              <span className="text-[10px]">
+              <span className="text-caption">
                 {Math.abs(trend).toFixed(1)}%
               </span>
             </div>
@@ -84,7 +84,7 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
         {(subtitle || trendLabel) && (
           <div className="flex flex-col">
             {subtitle && (
-              <p className="text-[11px] text-slate-500 font-medium">{subtitle}</p>
+              <p className="text-caption text-slate-500 font-medium">{subtitle}</p>
             )}
             {trendLabel && (
               <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{trendLabel}</p>

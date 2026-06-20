@@ -69,7 +69,7 @@ export const ThreadDetail = ({
       <div className="px-6 py-5 border-b border-gray-100">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold text-gray-900 tracking-tight leading-snug">
+            <h2 className="text-lg font-semibold text-text-primary tracking-tight">
               {thread?.title || FORUM_MESSAGES.SELECT_THREAD_TITLE}
             </h2>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
@@ -129,8 +129,8 @@ export const ThreadDetail = ({
         {/* Comments header */}
         <div className="px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-900">{t("comments")}</h3>
-            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-gray-100 text-[11px] font-bold text-gray-600 tabular-nums">
+            <h3 className="text-sm font-medium text-text-primary">{t("comments")}</h3>
+            <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-gray-100 text-caption font-bold text-gray-600 tabular-nums">
               {commentCount}
             </span>
             {draftComment?.parentCommentId ? <span className="text-xs text-violet-600 font-medium ml-2">{t("replying")}<button type="button" className="ml-1.5 text-xs text-gray-400 hover:text-gray-600" onClick={() => onReplyTarget?.(null)}>{t("cancel")}</button>

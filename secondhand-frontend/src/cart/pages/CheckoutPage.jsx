@@ -176,7 +176,7 @@ const CheckoutPage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
-          <h1 className="text-lg font-semibold text-[#111]">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
+          <h1 className="text-2xl font-semibold text-text-primary text-[#111]">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
           <p className="mt-2 text-sm text-[#999]">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
           <button type="button" onClick={() => navigate(ROUTES.LISTINGS)} className="mt-8 rounded-lg border border-[#1466c6] bg-[#1466c6] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#0f529e]">{t("browse_listings")}</button>
         </div>

@@ -27,14 +27,14 @@ const EmailsPageFeedback = ({
     t
   } = useTranslation();
   if (error) return <div className="m-4 bg-red-50 border border-red-100 rounded-lg p-4">
-            <h3 className="text-sm font-bold text-red-800">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
+            <h3 className="text-sm font-medium text-text-primary">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
             <p className="text-sm text-red-600 mt-1">{error}</p>
         </div>;
   if (!emails.length) return <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                 <Inbox className="w-6 h-6 text-gray-300" />
             </div>
-            <h3 className="text-base font-bold text-gray-900 mb-1">
+            <h3 className="text-sm font-medium text-text-primary mb-1">
                 {EMAIL_MESSAGES.NO_EMAILS_TITLE}
             </h3>
             <p className="text-sm text-gray-500">
@@ -241,7 +241,7 @@ const EmailsPage = ({
                             <ArrowLeftIcon className="h-5 w-5" />
                         </button>}
                     <div className="hidden min-w-0 sm:block">
-                        <h1 className="truncate text-sm font-semibold text-[#323130]">{t("mailbox")}</h1>
+                        <h1 className="text-2xl font-semibold text-text-primary truncate text-[#323130]">{t("mailbox")}</h1>
                     </div>
                 </div>
 
@@ -279,7 +279,7 @@ const EmailsPage = ({
                                         <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-[#0078d4]' : 'text-[#605e5c]'}`} />
                                         <span className="truncate">{item.label}</span>
                                     </span>
-                                    {counts[item.id] > 0 && <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${active ? 'bg-[#deecf9] text-[#0078d4]' : 'bg-[#edebe9] text-[#605e5c]'}`}>
+                                    {counts[item.id] > 0 && <span className={`shrink-0 rounded-full px-2 py-0.5 text-caption font-bold tabular-nums ${active ? 'bg-[#deecf9] text-[#0078d4]' : 'bg-[#edebe9] text-[#605e5c]'}`}>
                                             {counts[item.id]}
                                         </span>}
                                 </button>;
@@ -291,7 +291,7 @@ const EmailsPage = ({
                 <section className={`flex min-h-0 w-full min-w-0 flex-col border-[#edebe9] bg-white lg:border-r ${selectedEmail ? 'hidden lg:flex' : 'flex'}`}>
                     <div className="flex shrink-0 items-center justify-between border-b border-[#edebe9] bg-[#faf9f8] px-4 py-2.5">
                         <div className="flex min-w-0 items-center gap-2">
-                            <h2 className="truncate text-xs font-bold uppercase tracking-wide text-[#605e5c]">
+                            <h2 className="text-lg font-semibold text-text-primary truncate uppercase tracking-wide text-[#605e5c]">
                                 {selectedFolderLabel}
                             </h2>
                             {unreadCount > 0 && <span className="h-2 w-2 shrink-0 rounded-full bg-[#0078d4]" title={t("unread")} />}
@@ -300,7 +300,7 @@ const EmailsPage = ({
                             <button type="button" onClick={() => setPage(p => p - 1)} disabled={pageInfo.page === 0} className="rounded p-1 text-[#605e5c] hover:bg-[#f3f2f1] disabled:opacity-30" aria-label={t("previous_page")}>
                                 <ArrowLeftIcon className="h-3.5 w-3.5" />
                             </button>
-                            <span className="px-1.5 text-[10px] font-semibold tabular-nums text-[#605e5c]">
+                            <span className="px-1.5 text-caption font-semibold tabular-nums text-[#605e5c]">
                                 {pageInfo.page + 1}/{Math.max(pageInfo.totalPages, 1)}
                             </span>
                             <button type="button" onClick={() => setPage(p => p + 1)} disabled={pageInfo.page + 1 >= pageInfo.totalPages} className="rounded p-1 text-[#605e5c] hover:bg-[#f3f2f1] disabled:opacity-30" aria-label={t("next_page")}>

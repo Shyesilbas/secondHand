@@ -95,7 +95,7 @@ export const ThreadComposerModal = ({
                 <CatIcon className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-gray-900 tracking-tight">{FORUM_MESSAGES.NEW_THREAD}</h3>
+                <h3 className="text-sm font-medium text-text-primary tracking-tight">{FORUM_MESSAGES.NEW_THREAD}</h3>
                 <p className="text-xs text-gray-500 mt-0.5">{catConfig.label}</p>
               </div>
             </div>
@@ -115,7 +115,7 @@ export const ThreadComposerModal = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">{t("title")}</label>
-              <span className={`text-[11px] tabular-nums font-medium ${titleLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{titleLen}{t("3_min")}</span>
+              <span className={`text-caption tabular-nums font-medium ${titleLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{titleLen}{t("3_min")}</span>
             </div>
             <input value={title} onChange={e => setTitle(e.target.value)} className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50/60 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white transition-all duration-200" placeholder={t("write_a_clear_descriptive_title")} disabled={submitting} />
           </div>
@@ -124,7 +124,7 @@ export const ThreadComposerModal = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">{t("description")}</label>
-              <span className={`text-[11px] tabular-nums font-medium ${descLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{descLen}{t("3_min")}</span>
+              <span className={`text-caption tabular-nums font-medium ${descLen >= 3 ? 'text-gray-400' : 'text-amber-500'}`}>{descLen}{t("3_min")}</span>
             </div>
             <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full min-h-[140px] rounded-xl border border-gray-200 bg-gray-50/60 p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 focus:bg-white transition-all duration-200 resize-none" placeholder={t("add_details_about_your_thread")} disabled={submitting} />
           </div>

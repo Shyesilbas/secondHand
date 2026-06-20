@@ -297,8 +297,8 @@ const ListingPrefilterSelectionFlow = ({
           duration: 0.3
         }} className="rounded-2xl border border-indigo-100/80 bg-gradient-to-r from-indigo-50/60 to-violet-50/30 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm backdrop-blur-sm">
                 <div>
-                  <h4 className="text-[14px] font-bold text-indigo-950">{t("just_want_to_look_around")}</h4>
-                  <p className="text-[12px] text-zinc-500 mt-0.5">{t("skip_selecting_a_category_and_filters_to")}</p>
+                  <h4 className="text-sm font-bold text-indigo-950">{t("just_want_to_look_around")}</h4>
+                  <p className="text-body text-zinc-500 mt-0.5">{t("skip_selecting_a_category_and_filters_to")}</p>
                 </div>
                 <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-indigo-600/10 transition-all hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-900/20 active:scale-95 shrink-0">
                   <span>{t("browse_all_listings")}</span>
@@ -317,7 +317,7 @@ const ListingPrefilterSelectionFlow = ({
             }} type="button" onClick={() => handleTypeSelect(type.value)} className={card.wrapper}>
                     <div className={card.iconBg}>{type.icon}</div>
                     <div className="min-w-0 flex-1">
-                      <h3 className={`text-sm font-semibold transition-colors ${card.title}`}>{type.label}</h3>
+                      <h3 className={`text-sm font-medium text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
                       <p className={`mt-0.5 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
                     </div>
                     {isSelected ? <motion.div initial={{
@@ -465,8 +465,8 @@ const ListingPrefilterSelectionFlow = ({
         scale: 1
       }} className="w-full max-w-sm wizard-glass-elevated rounded-2xl p-8 text-center">
           <div className="mx-auto mb-4 h-10 w-10 rounded-full border-[3px] border-zinc-200 border-t-zinc-700 animate-spin" />
-          <h2 className="text-[15px] font-medium text-zinc-900">{flowCopy.loading}</h2>
-          {flowCopy.loadingSub ? <p className="mt-1.5 text-[13px] text-zinc-500">{flowCopy.loadingSub}</p> : null}
+          <h2 className="text-lg font-semibold text-text-primary">{flowCopy.loading}</h2>
+          {flowCopy.loadingSub ? <p className="mt-1.5 text-sm text-zinc-500">{flowCopy.loadingSub}</p> : null}
         </motion.div>
       </div>;
   }

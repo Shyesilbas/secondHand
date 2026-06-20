@@ -101,8 +101,8 @@ export const SafeMeetupOnboardingModal = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between pb-6 border-b border-indigo-100/40 relative z-10">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">{t("yeni_zellik_tan_t_m")}</span>
-            <h3 className="text-xl font-extrabold text-slate-900 mt-2">{t("elden_g_venli_teslimat")}</h3>
+            <span className="text-caption font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">{t("yeni_zellik_tan_t_m")}</span>
+            <h3 className="text-sm font-medium text-text-primary mt-2">{t("elden_g_venli_teslimat")}</h3>
           </div>
           
           {/* Close Button - Hidden/Disabled for the first 5 seconds */}

@@ -136,14 +136,14 @@ const ListingCard = ({
 
                 {/* Top-left badges */}
                 <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
-                    {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${statusConfig.cls}`}>
+                    {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
                             {statusConfig.label}
                         </span>}
-                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-white shadow-sm">
+                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-amber-400 text-white shadow-sm">
                             <Zap className="w-2.5 h-2.5 fill-current" />{t("featured")}</span>}
-                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-sm">
+                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-amber-50 text-amber-900 border border-amber-200 shadow-sm">
                             <Award className="w-2.5 h-2.5 shrink-0" />{t("great_seller")}</span>}
-                    {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white shadow-sm">
+                    {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-caption font-bold bg-rose-500 text-white shadow-sm">
                             <TrendingDown className="w-2.5 h-2.5" />
                             -{discountPct}%
                         </span>}
@@ -154,7 +154,7 @@ const ListingCard = ({
         e.preventDefault();
         e.stopPropagation();
         setShowInfo(true);
-      }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur text-[11px] font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+      }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
                     <Eye className="w-3 h-3" />{t("quick_view")}</button>
             </div>
 
@@ -162,7 +162,7 @@ const ListingCard = ({
             <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-3.5">
 
                 {/* Title */}
-                <h3 className={`text-[13px] font-semibold text-slate-800 line-clamp-2 leading-snug mb-1.5 group-hover:text-indigo-600 transition-colors ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
+                <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 group- transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
                     {listing.title}
                 </h3>
 
@@ -171,7 +171,7 @@ const ListingCard = ({
                         <div className="flex shrink-0" aria-hidden>
                             {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}
                         </div>
-                        <span className="text-[11px] text-slate-500 tabular-nums leading-none">
+                        <span className="text-caption text-slate-500 tabular-nums leading-none">
                             <span className="font-medium text-slate-600">{averageRating.toFixed(1)}</span>
                             <span className="text-slate-400"> ({reviewCount})</span>
                         </span>
@@ -182,23 +182,23 @@ const ListingCard = ({
                     <span className={`text-base font-bold text-slate-900 tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
                         {formatCurrency(displayPrice, listing.currency)}
                     </span>
-                    {hasCampaign && <span className="text-[11px] text-slate-400 line-through font-medium">
+                    {hasCampaign && <span className="text-caption text-slate-400 line-through font-medium">
                             {formatCurrency(listing.price, listing.currency)}
                         </span>}
                 </div>
 
                 {/* Campaign tag */}
-                {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-[10px] font-semibold border border-rose-100 mb-1.5">
+                {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-caption font-semibold border border-rose-100 mb-1.5">
                         {listing.campaignName || 'Campaign'}
                     </span>}
 
                 {/* Stock badge */}
-                {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold mb-1.5 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
+                {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold mb-1.5 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
                         {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
                     </span>}
 
                 {/* Description */}
-                {listing.description && <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed mb-2">
+                {listing.description && <p className="text-caption text-slate-400 line-clamp-2 leading-relaxed mb-2">
                         {listing.description}
                     </p>}
 
@@ -208,17 +208,17 @@ const ListingCard = ({
                             <div className="w-5 h-5 shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-[9px] font-bold text-indigo-600">
                                 {listing.sellerName[0]?.toUpperCase()}
                             </div>
-                            <span className="text-[11px] font-medium text-slate-500 truncate max-w-[88px]" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
+                            <span className="text-caption font-medium text-slate-500 truncate max-w-[88px]" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
                                 {listing.sellerName}
                             </span>
                             {isGreatSeller && <Award className="w-3 h-3 text-amber-600 shrink-0" aria-label={t("great_seller")} />}
                         </div> : <div />}
                     <div className="flex items-center gap-2.5 ml-auto">
-                        {listing.city && <div className="flex items-center gap-0.5 text-[11px] text-slate-400">
+                        {listing.city && <div className="flex items-center gap-0.5 text-caption text-slate-400">
                                 <MapPin className="w-2.5 h-2.5 shrink-0" />
                                 <span className="truncate max-w-[56px]">{listing.city}</span>
                             </div>}
-                        <div className="flex items-center gap-0.5 text-[11px] text-slate-400">
+                        <div className="flex items-center gap-0.5 text-caption text-slate-400">
                             <Heart className="w-2.5 h-2.5 shrink-0 fill-current" />
                             <span>{favoriteCount}</span>
                         </div>

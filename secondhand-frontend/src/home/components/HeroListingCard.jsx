@@ -33,7 +33,7 @@ const HeroListingCard = ({
       </div>
 
       <div className="mt-3 flex flex-col">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+        <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">
           {listing.type || 'Listing'}
         </span>
         <h4 className="text-sm font-bold text-slate-900 mt-1 truncate group-hover:text-indigo-600 transition-colors">

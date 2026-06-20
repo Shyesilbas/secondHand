@@ -22,7 +22,7 @@ const AuthLayout = () => {
                     </div>
 
                     <footer className="pt-8 text-center border-t border-stone-100 mt-auto">
-                        <p className="text-[10px] tracking-wider text-stone-400 font-medium">{t("2026_secondhand_all_rights_reserved")}</p>
+                        <p className="text-caption tracking-wider text-stone-400 font-medium">{t("2026_secondhand_all_rights_reserved")}</p>
                     </footer>
                 </div>
             </div>

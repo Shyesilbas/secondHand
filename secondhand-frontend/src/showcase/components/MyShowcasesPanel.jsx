@@ -102,8 +102,8 @@ const MyShowcasesPanel = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("my_showcases")}</h2>
-            <span className="inline-flex items-center justify-center bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-0.5 rounded-full border border-indigo-100/60 shadow-sm shadow-indigo-100/20">
+            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("my_showcases")}</h2>
+            <span className="inline-flex items-center justify-center bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-indigo-100/60 shadow-sm shadow-indigo-100/20">
               {counts.active} / {counts.all}{t("active")}</span>
           </div>
           <p className="text-sm text-slate-500 mt-1">{t("manage_and_track_your_active_listing_pro")}</p>
@@ -123,7 +123,7 @@ const MyShowcasesPanel = ({
           id: 'expired',
           label: 'Expired',
           count: counts.expired
-        }].map(tab => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`relative px-4 py-2 rounded-xl text-xs font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 ${activeTab === tab.id ? 'text-slate-950 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-600'}`}>
+        }].map(tab => <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`relative px-4 py-2 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 ${activeTab === tab.id ? 'text-slate-950 shadow-sm border border-slate-200/40' : 'text-slate-400 hover:text-slate-600'}`}>
               {activeTab === tab.id && <motion.div layoutId="activeTabIndicator" className="absolute inset-0 bg-white rounded-xl" transition={{
             type: 'spring',
             stiffness: 380,
@@ -157,7 +157,7 @@ const MyShowcasesPanel = ({
           <div className="bg-white w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md shadow-indigo-500/5 border border-slate-100 text-indigo-500">
             <Sparkles className="w-6 h-6 animate-pulse" />
           </div>
-          <h3 className="text-slate-950 font-extrabold text-base tracking-tight mb-1.5">{t("no_showcases_found")}</h3>
+          <h3 className="text-sm font-medium text-text-primary tracking-tight mb-1.5">{t("no_showcases_found")}</h3>
           <p className="text-sm text-slate-500 leading-relaxed">
             {activeTab === 'expired' ? "You don't have any expired promotions. All your showcases are still working hard!" : activeTab === 'active' ? "You don't have any active promotions currently. Boost one of your listings to start selling faster!" : "Promote your items directly to the top rows and category frontpages. Sell up to 5x faster!"}
           </p>
@@ -173,26 +173,26 @@ const MyShowcasesPanel = ({
                     {thumbUrl ? <img src={thumbUrl} alt="" className={`w-full h-full object-cover ${showcase.isExpired ? 'grayscale' : ''}`} /> : <div className={`w-full h-full flex items-center justify-center ${showcase.isExpired ? 'text-slate-400' : 'text-indigo-400 bg-gradient-to-br from-indigo-50 to-violet-50'}`}>
                         <ImageIcon className="w-7 h-7 opacity-60" />
                       </div>}
-                    <div className={`absolute top-1 left-1 p-1 rounded-lg text-[9px] font-black flex items-center justify-center shadow ${showcase.isExpired ? 'bg-slate-400 text-white' : 'bg-[#0f111a] text-white'}`}>
+                    <div className={`absolute top-1 left-1 p-1 rounded-lg text-[9px] font-bold flex items-center justify-center shadow ${showcase.isExpired ? 'bg-slate-400 text-white' : 'bg-[#0f111a] text-white'}`}>
                       <Zap className={`w-2.5 h-2.5 fill-current ${showcase.isExpired ? 'text-slate-100' : 'text-amber-400'}`} />
                     </div>
                   </div>
 
                   <div className="min-w-0 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className={`text-base font-extrabold leading-snug truncate transition-colors ${showcase.isExpired ? 'text-slate-500 group-hover:text-slate-700' : 'text-slate-900 group-hover:text-indigo-600'}`} title={showcase.listing?.title}>
+                      <h3 className={`text-sm font-medium text-text-primary truncate transition-colors ${showcase.isExpired ? ' group-' : ' group-'}`} title={showcase.listing?.title}>
                         {showcase.listing?.title || 'Premium Promoted Listing'}
                       </h3>
                       
                       <div className="flex items-center gap-2 mt-1">
-                        {showcase.isExpired ? <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider border border-slate-200/50">{t("expired")}</span> : <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider border border-emerald-100">
+                        {showcase.isExpired ? <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-caption font-bold uppercase tracking-wider border border-slate-200/50">{t("expired")}</span> : <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-caption font-bold uppercase tracking-wider border border-emerald-100">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />{t("live_boosting")}</span>}
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-1 text-slate-400 text-xs">
                       <Clock className="w-3.5 h-3.5 shrink-0" />
-                      {showcase.isExpired ? <span className="font-semibold text-slate-400">{t("ended")}</span> : <span>{t("ends_in")}<strong className="text-slate-950 font-black">{showcase.remaining}{t("days")}</strong></span>}
+                      {showcase.isExpired ? <span className="font-semibold text-slate-400">{t("ended")}</span> : <span>{t("ends_in")}<strong className="text-slate-950 font-bold">{showcase.remaining}{t("days")}</strong></span>}
                     </div>
                   </div>
                 </div>
@@ -214,13 +214,13 @@ const MyShowcasesPanel = ({
                   {/* Financial Metrics */}
                   <div className={`grid grid-cols-2 gap-4 p-3 rounded-2xl border ${showcase.isExpired ? 'bg-slate-50/20 border-slate-100 text-slate-400' : 'bg-slate-50/50 border-slate-100/40'}`}>
                     <div className="flex flex-col">
-                      <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">{t("spent_cost")}</span>
-                      <span className={`text-sm font-black mt-0.5 ${showcase.isExpired ? 'text-slate-500' : 'text-slate-900'}`}>
+                      <span className="text-caption uppercase font-bold text-slate-400 tracking-wider">{t("spent_cost")}</span>
+                      <span className={`text-sm font-bold mt-0.5 ${showcase.isExpired ? 'text-slate-500' : 'text-slate-900'}`}>
                         {formatCurrency(showcase.totalCost, 'TRY')}
                       </span>
                     </div>
                     <div className="flex flex-col border-l border-slate-200/60 pl-4">
-                      <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider">{t("ended_on")}</span>
+                      <span className="text-caption uppercase font-bold text-slate-400 tracking-wider">{t("ended_on")}</span>
                       <span className={`text-xs font-bold mt-1 ${showcase.isExpired ? 'text-slate-400' : 'text-slate-600'}`}>
                         {formatDate(showcase.endDate)}
                       </span>
@@ -233,10 +233,10 @@ const MyShowcasesPanel = ({
                       <input type="number" min={1} max={30} value={extendDays[showcase.id] ?? 7} onChange={e => setExtendDays(prev => ({
                   ...prev,
                   [showcase.id]: e.target.value
-                }))} className={`w-full h-11 border rounded-xl pl-3 pr-12 text-sm font-extrabold focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none ${showcase.isExpired ? 'bg-slate-50/40 border-slate-200 text-slate-600' : 'bg-slate-50 border-slate-200/60 text-slate-950'}`} />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400 uppercase tracking-wider select-none">{t("days")}</span>
+                }))} className={`w-full h-11 border rounded-xl pl-3 pr-12 text-sm font-bold focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none ${showcase.isExpired ? 'bg-slate-50/40 border-slate-200 text-slate-600' : 'bg-slate-50 border-slate-200/60 text-slate-950'}`} />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400 uppercase tracking-wider select-none">{t("days")}</span>
                     </div>
-                    <button type="button" onClick={() => handleExtend(showcase.id)} disabled={isMutating} className={`h-11 px-5 rounded-xl text-xs font-extrabold transition-all duration-200 active:scale-95 disabled:opacity-50 tracking-wide uppercase ${showcase.isExpired ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/10' : 'bg-slate-950 text-white hover:bg-indigo-600'}`}>
+                    <button type="button" onClick={() => handleExtend(showcase.id)} disabled={isMutating} className={`h-11 px-5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 tracking-wide uppercase ${showcase.isExpired ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/10' : 'bg-slate-950 text-white hover:bg-indigo-600'}`}>
                       {showcase.isExpired ? 'Re-Boost' : 'Extend'}
                     </button>
                     {!showcase.isExpired && <button type="button" onClick={() => setConfirmCancelId(showcase.id)} disabled={isMutating} className="h-11 w-11 flex items-center justify-center rounded-xl border border-slate-200/60 text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all active:scale-90" title={t("cancel_showcase")}>
@@ -275,11 +275,11 @@ const MyShowcasesPanel = ({
                 <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 border border-rose-100/50">
                   <ShieldAlert className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-black text-slate-900 mb-1.5 tracking-tight">{t("cancel_boosting")}</h3>
+                <h3 className="text-sm font-medium text-text-primary mb-1.5 tracking-tight">{t("cancel_boosting")}</h3>
                 <p className="text-slate-500 text-xs leading-relaxed mb-6">{t("are_you_sure_you_want_to_stop_boosting_t")}</p>
                 <div className="flex gap-3">
-                  <button onClick={() => setConfirmCancelId(null)} className="flex-1 h-12 rounded-xl bg-slate-50 text-slate-800 text-xs font-extrabold hover:bg-slate-100 transition-all uppercase tracking-wide border border-slate-100">{t("no_stay")}</button>
-                  <button onClick={handleCancel} className="flex-1 h-12 rounded-xl bg-rose-600 text-white text-xs font-extrabold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 uppercase tracking-wide">{t("yes_cancel")}</button>
+                  <button onClick={() => setConfirmCancelId(null)} className="flex-1 h-12 rounded-xl bg-slate-50 text-slate-800 text-xs font-bold hover:bg-slate-100 transition-all uppercase tracking-wide border border-slate-100">{t("no_stay")}</button>
+                  <button onClick={handleCancel} className="flex-1 h-12 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 uppercase tracking-wide">{t("yes_cancel")}</button>
                 </div>
               </div>
             </motion.div>
@@ -291,7 +291,7 @@ const MyShowcasesPanel = ({
           <Zap className="w-4 h-4 fill-current" />
         </div>
         <div>
-          <strong className="text-indigo-950 block font-black uppercase tracking-wider text-[10px]">{t("showcase_operations_guidelines")}</strong>
+          <strong className="text-indigo-950 block font-bold uppercase tracking-wider text-caption">{t("showcase_operations_guidelines")}</strong>
           <p className="text-xs text-indigo-900/70 leading-relaxed font-medium mt-0.5">{t("cancelling_active_promotions_stops_visib")}</p>
         </div>
       </div>

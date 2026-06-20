@@ -50,12 +50,12 @@ const UserProfileHeader = ({
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-2">
-              <h1 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">
                 {fullName}
               </h1>
-              {greatSellerEligible && <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-bold rounded-full uppercase tracking-wide">
+              {greatSellerEligible && <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200 text-caption font-bold rounded-full uppercase tracking-wide">
                   <Award className="w-3.5 h-3.5" />{t("great_seller")}</span>}
-              {isOwnProfile && <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-semibold rounded-full uppercase tracking-wider">{t("you")}</span>}
+              {isOwnProfile && <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-caption font-semibold rounded-full uppercase tracking-wider">{t("you")}</span>}
             </div>
 
             {/* Stats row */}
@@ -103,7 +103,7 @@ const UserProfileHeader = ({
                 <div className="bg-gray-50 p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
                     <Star className="h-3.5 w-3.5 text-amber-500" />{t("rating")}</div>
-                  <p className="mt-2 text-2xl font-black text-gray-950">
+                  <p className="mt-2 text-2xl font-bold text-gray-950">
                     {hasReviews ? (reviewStats.averageRating || 0).toFixed(1) : '-'}
                   </p>
                   <p className="mt-0.5 text-xs font-medium text-gray-500">
@@ -113,7 +113,7 @@ const UserProfileHeader = ({
                 <div className="bg-gray-50 p-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-gray-500">
                     <MessageCircle className="h-3.5 w-3.5 text-gray-700" />{t("response")}</div>
-                  <p className="mt-2 text-2xl font-black text-gray-950">{t("open")}</p>
+                  <p className="mt-2 text-2xl font-bold text-gray-950">{t("open")}</p>
                   <p className="mt-0.5 text-xs font-medium text-gray-500">
                     {isOwnProfile ? 'This is your public page' : 'Message seller directly'}
                   </p>

@@ -30,7 +30,7 @@ export default function AuraListingContextCard({
           </div>
           <span className="text-xs font-bold text-slate-800 tracking-tight">{t("active_context")}</span>
         </div>
-        <span className="text-[10px] sm:text-xs font-medium text-slate-500 hidden sm:inline-block">{t("personalized_recommendations_active")}</span>
+        <span className="text-caption sm:text-xs font-medium text-slate-500 hidden sm:inline-block">{t("personalized_recommendations_active")}</span>
       </div>
 
       {/* Content */}
@@ -41,18 +41,18 @@ export default function AuraListingContextCard({
             <Tag className="w-4 h-4 text-slate-300" />
           </div>}
         <div className="min-w-0 flex-1 flex flex-col justify-center">
-          <h2 className="text-sm font-bold text-slate-900 leading-snug tracking-tight truncate">
+          <h2 className="text-lg font-semibold text-text-primary tracking-tight truncate">
             {title}
           </h2>
           
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            {priceLabel && <span className="inline-flex items-center rounded bg-slate-900 text-white text-[11px] font-bold px-2 py-0.5 shadow-sm">
+            {priceLabel && <span className="inline-flex items-center rounded bg-slate-900 text-white text-caption font-bold px-2 py-0.5 shadow-sm">
                 {priceLabel}
               </span>}
-            {typeLabel && <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white text-[11px] font-medium text-slate-600 px-2 py-0.5 shadow-sm">
+            {typeLabel && <span className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white text-caption font-medium text-slate-600 px-2 py-0.5 shadow-sm">
                 {typeLabel}
               </span>}
-            {statusLabel && <span className="inline-flex items-center rounded border border-emerald-100 bg-emerald-50 text-[11px] font-semibold text-emerald-700 px-2 py-0.5">
+            {statusLabel && <span className="inline-flex items-center rounded border border-emerald-100 bg-emerald-50 text-caption font-semibold text-emerald-700 px-2 py-0.5">
                 {statusLabel}
               </span>}
           </div>

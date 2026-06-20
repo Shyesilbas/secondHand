@@ -100,7 +100,7 @@ const FilterRenderer = ({
   return <div className="space-y-1">
       {title ? <div className="flex items-center gap-2 py-2">
           <Hash className="w-4 h-4 text-slate-500" />
-          <h3 className="text-sm font-bold text-slate-900 tracking-tight">{title}</h3>
+          <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
         </div> : null}
       <div className="space-y-2">
         {fields.map(field => {

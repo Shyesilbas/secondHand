@@ -27,7 +27,7 @@ const ChatList = ({
       <div className="px-6 py-5 border-b border-slate-200/60 flex-shrink-0">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight">{t("conversations")}</h2>
+            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("conversations")}</h2>
             <p className="text-xs text-slate-500 mt-1 tracking-tight">{filteredChatRooms.length}{t("active_chats")}</p>
           </div>
           <div className="flex items-center space-x-2">
@@ -61,7 +61,7 @@ const ChatList = ({
             <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
               <MessageCircle className="w-10 h-10 text-slate-400" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2 tracking-tight">{t("no_messages_yet")}</h3>
+            <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("no_messages_yet")}</h3>
             <p className="text-sm text-slate-500 mb-5 tracking-tight">{t("start_a_conversation_with_a_seller_to_se")}</p>
             <button onClick={() => onBrowseListings?.()} className="px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 ease-in-out text-sm font-semibold shadow-sm tracking-tight">
               {CHAT_MESSAGES.BROWSE_LISTINGS}
@@ -70,7 +70,7 @@ const ChatList = ({
             <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mb-5 shadow-sm">
               <Search className="w-10 h-10 text-slate-400" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2 tracking-tight">{t("no_conversations_found")}</h3>
+            <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("no_conversations_found")}</h3>
             <p className="text-sm text-slate-500 tracking-tight">{t("try_adjusting_your_search_terms")}</p>
           </div> : filteredChatRooms.map(room => <ChatRoomListItem key={room.id} room={room} userId={userId} isSelected={selectedChatRoom?.id === room.id} onClick={() => onChatRoomSelect(room)} onListingClick={onListingClick} onDeleteConversation={onDeleteConversation} />)}
       </div>

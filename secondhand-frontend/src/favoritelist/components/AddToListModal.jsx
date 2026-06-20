@@ -80,7 +80,7 @@ const AddToListModal = ({
                                     <List className="w-6 h-6 text-white" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h2 className="text-xl font-bold text-white mb-1">{t("add_to_list")}</h2>
+                                    <h2 className="text-lg font-semibold text-text-primary mb-1">{t("add_to_list")}</h2>
                                     <p className="text-white/90 text-sm line-clamp-2 leading-snug">
                                         {listingTitle}
                                     </p>
@@ -100,7 +100,7 @@ const AddToListModal = ({
                                 <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <List className="w-10 h-10 text-indigo-500" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("no_lists_yet")}</h3>
+                                <h3 className="text-sm font-medium text-text-primary mb-2">{t("no_lists_yet")}</h3>
                                 <p className="text-sm text-gray-500 mb-6">{t("create_your_first_list_to_organize_saved")}</p>
                                 <button type="button" onClick={() => setShowCreateModal(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl">
                                     <Plus className="w-5 h-5" />{t("create_your_first_list")}</button>

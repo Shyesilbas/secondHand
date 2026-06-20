@@ -28,7 +28,7 @@ const ChartCard = ({
   delay,
   duration: 0.4
 }} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-    {title && <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">{title}</h3>}
+    {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
     {children}
   </motion.div>;
 const SellerDashboardPage = () => {
@@ -99,7 +99,7 @@ const SellerDashboardPage = () => {
             opacity: 1,
             x: 0
           }}>
-              <h1 className="text-xl font-bold text-white tracking-tight">{t("seller_dashboard")}</h1>
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("seller_dashboard")}</h1>
               <p className="text-xs text-indigo-300/70 font-medium mt-0.5">{t("analytics_insights_for_your_sales")}</p>
             </motion.div>
             <motion.div initial={{

@@ -68,13 +68,13 @@ export const RegisterForm = ({
             {/* Header / Stepper Progress */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-3">
-                    <span className="text-[10px] font-semibold tracking-[0.2em] text-stone-400 uppercase">{t("step")}{step}{t("of_2")}</span>
+                    <span className="text-caption font-semibold tracking-[0.2em] text-stone-400 uppercase">{t("step")}{step}{t("of_2")}</span>
                     <div className="flex gap-1.5 items-center flex-1 max-w-[100px]">
                         <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-stone-900' : 'bg-stone-200'}`} />
                         <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-stone-900' : 'bg-stone-200'}`} />
                     </div>
                 </div>
-                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">{t("create_account")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("create_account")}</h1>
                 <p className="mt-2.5 text-sm text-stone-500 font-normal leading-relaxed">
                     {step === 1 ? 'Set up your credentials and secure your digital space.' : 'Tell us a bit about yourself to complete registration.'}
                 </p>
@@ -110,7 +110,7 @@ export const RegisterForm = ({
 
                         {/* Gender selection full width */}
                         <div className="flex flex-col gap-2.5">
-                            <label className="block text-[10px] font-semibold tracking-[0.12em] uppercase text-stone-500">{t("gender")}<span className="text-red-400 font-normal">*</span>
+                            <label className="block text-caption font-semibold tracking-[0.12em] uppercase text-stone-500">{t("gender")}<span className="text-red-400 font-normal">*</span>
                             </label>
                             {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-stone-200/50 rounded-xl bg-stone-50/30">
                                     <LoadingIndicator size="h-4 w-4" />
@@ -120,7 +120,7 @@ export const RegisterForm = ({
                 name: 'gender',
                 value: g.value
               }
-            })} className={`flex-1 py-3 px-5 rounded-xl border text-[10px] font-semibold tracking-wider uppercase transition-all duration-300 ${formData.gender === g.value ? 'border-stone-900 bg-stone-900 text-white shadow-sm' : 'border-stone-200 bg-stone-100/40 text-stone-500 hover:bg-stone-200/50 hover:text-stone-700'}`}>
+            })} className={`flex-1 py-3 px-5 rounded-xl border text-caption font-semibold tracking-wider uppercase transition-all duration-300 ${formData.gender === g.value ? 'border-stone-900 bg-stone-900 text-white shadow-sm' : 'border-stone-200 bg-stone-100/40 text-stone-500 hover:bg-stone-200/50 hover:text-stone-700'}`}>
                                             {g.label}
                                         </button>)}
                                 </div>}
@@ -150,7 +150,7 @@ export const RegisterForm = ({
                 {/* Silent Divider */}
                 <div className="relative flex items-center my-3">
                     <div className="flex-1 border-t border-stone-200/50"></div>
-                    <span className="px-3 text-[10px] tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
+                    <span className="px-3 text-caption tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
                     <div className="flex-1 border-t border-stone-200/50"></div>
                 </div>
 

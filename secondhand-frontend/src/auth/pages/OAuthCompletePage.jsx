@@ -105,7 +105,7 @@ const OAuthCompletePage = () => {
                         <span className="text-amber-700 font-bold text-sm">{initials || '?'}</span>
                     </div>}
                 <div>
-                    <h1 className="text-2xl font-bold text-secondary-900 tracking-tight">{t("almost_there")}{baseInfo.name}!
+                    <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("almost_there")}{baseInfo.name}!
                     </h1>
                     <p className="mt-0.5 text-sm text-secondary-500">{t("just_a_few_more_details_to_complete_your")}</p>
                 </div>
@@ -117,7 +117,7 @@ const OAuthCompletePage = () => {
                 </div>}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <p className="text-[11px] font-semibold text-secondary-400 uppercase tracking-widest">{t("missing_information")}</p>
+                <p className="text-caption font-semibold text-secondary-400 uppercase tracking-widest">{t("missing_information")}</p>
 
                 {/* Read-only prefilled fields */}
                 <div className="grid grid-cols-2 gap-3">

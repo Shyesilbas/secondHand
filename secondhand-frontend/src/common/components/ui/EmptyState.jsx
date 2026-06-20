@@ -27,7 +27,7 @@ const EmptyState = ({
           <DefaultIcon className={iconInnerSize} />
         </div>
       )}
-      <h3 className={`${isCompact ? 'text-base' : 'text-lg'} font-semibold text-text-primary mb-2`}>{title}</h3>
+      <h3 className={`text-sm font-medium text-text-primary ${isCompact ? '' : ''} mb-2`}>{title}</h3>
       {description && (
         <p className={`text-text-secondary ${isCompact ? 'text-sm mb-4' : 'mb-6'}`}>{description}</p>
       )}

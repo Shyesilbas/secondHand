@@ -126,7 +126,7 @@ const MakeOfferModal = ({
       <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/15 ring-1 ring-slate-950/5" role="dialog" aria-modal="true" aria-labelledby="make-offer-title">
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
           <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
-            <h2 id="make-offer-title" className="text-lg font-semibold tracking-tight text-slate-900">{t("make_offer")}</h2>
+            <h2 id="make-offer-title" className="text-lg font-semibold text-text-primary tracking-tight">{t("make_offer")}</h2>
             <p className="mt-0.5 line-clamp-2 text-sm text-slate-600">{listingTitle}</p>
           </div>
           <button type="button" onClick={onClose} className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800" aria-label={t("close")}>
@@ -158,7 +158,7 @@ const MakeOfferModal = ({
               const active = selectedPreset === rec.key;
               const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
               return <button key={rec.key} type="button" onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-xl border px-4 py-3 text-left transition ${active ? 'border-teal-600 bg-teal-50/90 ring-1 ring-teal-600/25' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}`}>
-                      <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{rec.title}</span>
+                      <span className="text-caption font-semibold uppercase tracking-wide text-slate-500">{rec.title}</span>
                       <span className="mt-1 font-mono text-lg font-bold tabular-nums text-slate-900">
                         {formatCurrency(rec.amount, currency)}
                       </span>
@@ -169,7 +169,7 @@ const MakeOfferModal = ({
                     </button>;
             })}
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-slate-500">{t("each_option_fills_your_offer_with_a_tota")}</p>
+              <p className="mt-3 text-caption leading-relaxed text-slate-500">{t("each_option_fills_your_offer_with_a_tota")}</p>
             </div> : listingUnitPrice == null ? <p className="rounded-xl border border-amber-200/80 bg-amber-50/60 px-3 py-2 text-xs text-amber-900">{t("list_price_unavailable_enter_your_total_")}</p> : null}
 
           <div className="rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm ring-1 ring-slate-950/5">

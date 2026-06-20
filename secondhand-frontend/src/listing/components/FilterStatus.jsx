@@ -156,16 +156,16 @@ const FilterStatus = ({
   const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
   const activeTags = GROUPED_FILTERS.map(group => mapGroupToTag(group, filters, enums)).filter(tag => tag !== null);
   const FilterBadge = () => hasActive && activeCount > 0 ? <div className="flex flex-wrap items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
                     <SlidersHorizontal className="w-3 h-3" />
                     {activeCount}{t("filter")}{activeCount !== 1 ? 's' : ''}
                 </span>
 
-                {activeTags.map((tag, idx) => <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-50 text-slate-600 border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.01)] transition-all duration-200">
+                {activeTags.map((tag, idx) => <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-medium bg-slate-50 text-slate-600 border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.01)] transition-all duration-200">
                         {tag}
                     </span>)}
 
-                <button onClick={onResetFilters} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1">
+                <button onClick={onResetFilters} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-caption font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1">
                     <X className="w-3 h-3" />{t("clear_all")}</button>
             </div> : null;
   if (!hasResults) {
@@ -173,29 +173,29 @@ const FilterStatus = ({
                 <div className="flex flex-wrap items-center gap-2.5">
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block" />
-                        <span className="text-[13px] font-semibold text-slate-700">{t("no_listings_found")}</span>
-                        {categoryLabel && <span className="text-[13px] text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
+                        <span className="text-sm font-semibold text-slate-700">{t("no_listings_found")}</span>
+                        {categoryLabel && <span className="text-sm text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
                     </div>
                     <FilterBadge />
                 </div>
-                <p className="text-[12px] text-slate-400">{t("try_changing_filters_or_category_to_see_")}</p>
+                <p className="text-body text-slate-400">{t("try_changing_filters_or_category_to_see_")}</p>
             </div>;
   }
   return <div className="flex items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2.5">
                 <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                    <span className="text-[13px] font-semibold text-slate-700">
+                    <span className="text-sm font-semibold text-slate-700">
                         {totalElements}{t("listing")}{totalElements !== 1 ? 's' : ''}
                     </span>
-                    {categoryLabel && <span className="text-[13px] text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
+                    {categoryLabel && <span className="text-sm text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
                 </div>
                 <FilterBadge />
             </div>
 
             {/* Sort toggle */}
             <div className="flex items-center gap-2 shrink-0">
-                <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                <div className="flex items-center gap-1 text-caption text-slate-400">
                     <ArrowUpDown className="w-3 h-3" />
                     <span>{t("sort")}</span>
                 </div>
@@ -212,7 +212,7 @@ const FilterStatus = ({
         }) => <button key={key} onClick={() => updateFilters({
           sortBy: key,
           sortDirection: LISTING_DEFAULTS.SORT_DIRECTION
-        })} className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all duration-200 ${filters.sortBy === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+        })} className={`px-3 py-1 rounded-lg text-caption font-semibold transition-all duration-200 ${filters.sortBy === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                             {label}
                         </button>)}
                 </div>

@@ -19,7 +19,7 @@ const RevokeSessionsModal = ({
                             <div className="p-2 bg-red-100 rounded-lg">
                                 <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900">{t("revoke_all_sessions")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary">{t("revoke_all_sessions")}</h3>
                         </div>
                         <button onClick={onClose} disabled={isLoading} className="p-1 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50">
                             <XMarkIcon className="w-5 h-5" />

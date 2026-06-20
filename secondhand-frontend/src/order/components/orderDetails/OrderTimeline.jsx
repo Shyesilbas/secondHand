@@ -42,16 +42,16 @@ const DeliveryCountdown = ({
           </div>
           <div>
             <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-slate-900'}`}>{t("confirmation_window")}</p>
-            <p className={`text-[11px] font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-caption font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
               {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
             </p>
           </div>
         </div>
         {critical ? <div className="flex gap-1.5 items-baseline">
             <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.h).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase">{t("h")}</span>
+            <span className="text-caption font-semibold text-slate-400 uppercase">{t("h")}</span>
             <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.m).padStart(2, '0')}</span>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase">{t("m")}</span>
+            <span className="text-caption font-semibold text-slate-400 uppercase">{t("m")}</span>
           </div> : null}
       </div>
     </div>;
@@ -127,7 +127,7 @@ const OrderProgressStepper = ({
                     <Icon className="w-5 h-5 stroke-[2.5px]" />
                   </div>
                 </div>
-                <span className={`mt-3 text-[11px] font-bold uppercase tracking-tight ${isDone ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`mt-3 text-caption font-bold uppercase tracking-tight ${isDone ? 'text-slate-900' : 'text-slate-400'}`}>
                   {step.label}
                 </span>
               </div>;
@@ -155,7 +155,7 @@ const OrderProgressStepper = ({
                     <Icon className="w-4 h-4 stroke-[2.5]" />
                   </div>
                 </div>
-                <span className={`mt-2.5 text-[10px] uppercase tracking-wide ${isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'}`}>
+                <span className={`mt-2.5 text-caption uppercase tracking-wide ${isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'}`}>
                   {step.label}
                 </span>
               </div>
@@ -169,7 +169,7 @@ const OrderProgressStepper = ({
       })}
       </div>
       {isFailed ? <div className="mt-4 flex justify-center">
-          <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-[10px] font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
+          <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-caption font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
             <AlertCircle className="w-3 h-3" /> {currentStatus}
           </span>
         </div> : null}

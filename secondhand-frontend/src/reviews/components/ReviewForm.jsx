@@ -29,7 +29,7 @@ const ReviewForm = ({
     });
   };
   return <div className="bg-white rounded-lg shadow-md border p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("make_a_review")}</h3>
+      <h3 className="text-sm font-medium text-text-primary mb-4">{t("make_a_review")}</h3>
 
       <p className="text-sm text-gray-600 mb-4">{t("product")}<span className="font-medium">{listingTitle}</span>
       </p>

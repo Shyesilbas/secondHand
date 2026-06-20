@@ -69,7 +69,7 @@ const CheckoutVerificationStep = ({
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-slate-100 bg-slate-50 shadow-sm">
             <Lock className="h-4 w-4 text-slate-700" strokeWidth={2} />
           </div>
-          <h2 className="text-lg font-bold tracking-tight text-slate-900">{t("verify_your_purchase")}</h2>
+          <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("verify_your_purchase")}</h2>
           <p className="mt-1.5 text-sm text-slate-500 font-medium">
             {`Enter the ${OTP_CODE_LENGTH}-digit code sent to your email.`}
           </p>
@@ -102,7 +102,7 @@ const CheckoutVerificationStep = ({
         </button>
 
         {/* Trust indicators */}
-        <div className="mt-5 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        <div className="mt-5 flex items-center justify-center gap-3 text-caption font-bold uppercase tracking-widest text-slate-400">
           <Lock className="h-3.5 w-3.5 text-emerald-500" strokeWidth={2} />
           <span>{t("256_bit_encrypted")}</span>
           <span className="text-slate-200">·</span>

@@ -83,7 +83,7 @@ const AddressForm = ({
                 <MapPin className="h-5 w-5 text-white" aria-hidden />
               </div>
               <div className="min-w-0">
-                <h3 id="address-form-title" className="text-lg font-bold tracking-tight text-white sm:text-xl">
+                <h3 id="address-form-title" className="text-sm font-medium text-text-primary tracking-tight">
                   {isEditing ? 'Update address' : 'Add new address'}
                 </h3>
                 <p className="mt-0.5 text-sm text-indigo-100/90">{t("delivery_and_billing_details")}</p>

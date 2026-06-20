@@ -149,7 +149,7 @@ const AccountVerificationPage = () => {
                     <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-stone-100 text-stone-900 mb-4">
                         <ShieldCheckIcon className="w-5 h-5 stroke-[1.5]" />
                     </div>
-                    <h2 className="text-2xl font-normal text-stone-900 tracking-tight">{t("verify_your_account")}</h2>
+                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("verify_your_account")}</h2>
                     <p className="mt-2.5 text-xs text-stone-500 font-normal leading-relaxed max-w-xs mx-auto">
                         {!codeSent ? 'Verify your credentials to unlock full marketplace functionalities and trade securely.' : `We have dispatched a 6-digit confirmation code to ${user?.email}`}
                     </p>
@@ -166,13 +166,13 @@ const AccountVerificationPage = () => {
 
                 {!codeSent ? <div className="space-y-6 text-center">
                         <div className="p-4 rounded-2xl bg-stone-50/50 border border-stone-100/65 flex flex-col gap-1">
-                            <span className="text-[10px] tracking-wider uppercase font-semibold text-stone-400">{t("registered_email")}</span>
+                            <span className="text-caption tracking-wider uppercase font-semibold text-stone-400">{t("registered_email")}</span>
                             <span className="text-sm font-semibold text-stone-900">{user?.email}</span>
                         </div>
                         <AuthButton onClick={handleSendCode} isLoading={isSendingCode} disabled={isSendingCode} size="lg">{t("send_verification_code")}</AuthButton>
                     </div> : <form className="space-y-6" onSubmit={handleVerifyCode}>
                         <div className="space-y-4">
-                            <label className="block text-[10px] font-semibold tracking-[0.12em] uppercase text-stone-500 text-center">{t("verification_code")}</label>
+                            <label className="block text-caption font-semibold tracking-[0.12em] uppercase text-stone-500 text-center">{t("verification_code")}</label>
                             
                             {/* Segmented OTP code boxes */}
                             <div className="flex gap-2.5 justify-center" onPaste={handlePaste}>
@@ -198,7 +198,7 @@ const AccountVerificationPage = () => {
                     </form>}
 
                 <div className="text-center">
-                    <p className="text-[10px] text-stone-400 font-medium leading-relaxed">{t("code_expires_in_10_minutes_need_assistan")}{' '}
+                    <p className="text-caption text-stone-400 font-medium leading-relaxed">{t("code_expires_in_10_minutes_need_assistan")}{' '}
                         <button onClick={() => navigate(ROUTES.PROFILE)} className="font-semibold text-stone-500 hover:text-stone-900 underline underline-offset-2">{t("return_to_profile")}</button>
                     </p>
                 </div>

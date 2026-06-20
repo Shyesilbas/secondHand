@@ -20,7 +20,7 @@ const ClearCartModal = ({
             <div className="rounded-xl bg-red-50 p-2.5">
               <TrashIcon className="h-6 w-6 text-red-600" />
             </div>
-            <h3 className="text-lg font-semibold" style={{
+            <h3 className="text-sm font-medium text-text-primary" style={{
             color: CART_UI.text
           }}>{t("clear_cart")}</h3>
           </div>

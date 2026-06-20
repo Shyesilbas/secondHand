@@ -195,7 +195,7 @@ const ShoppingCartPage = () => {
             <button type="button" onClick={() => navigate(-1)} className="-ml-2 rounded-xl p-2 text-[#5f5b57] transition hover:bg-black/[0.04] hover:text-[#1a1918]" aria-label={t("back")}>
               <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
             </button>
-            <h1 className="truncate text-base font-semibold text-[#1a1918] sm:text-lg">{t("shopping_cart")}</h1>
+            <h1 className="text-2xl font-semibold text-text-primary truncate text-[#1a1918]">{t("shopping_cart")}</h1>
             {cartCount > 0 ? <span className="shrink-0 rounded-full border bg-white px-2.5 py-0.5 text-xs font-medium tabular-nums text-[#5f5b57]" style={{
             borderColor: CART_UI.border
           }}>
@@ -227,7 +227,7 @@ const ShoppingCartPage = () => {
             }}>
                   <ShoppingBag className="h-6 w-6" strokeWidth={1.5} />
                 </div>
-                <h2 className="text-lg font-semibold text-[#1a1918] sm:text-xl">
+                <h2 className="text-lg font-semibold text-text-primary text-[#1a1918]">
                   {CART_MESSAGES.EMPTY_CART_TITLE}
                 </h2>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-[#5f5b57]">
@@ -250,7 +250,7 @@ const ShoppingCartPage = () => {
         }}>
                 <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <h3 className="text-base font-semibold text-[#1a1918]">
+                    <h3 className="text-sm font-medium text-text-primary text-[#1a1918]">
                       {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
                     </h3>
                     <p className="mt-1 text-sm text-[#5f5b57]">
@@ -336,7 +336,7 @@ const ShoppingCartPage = () => {
                         width: `${progress}%`
                       }} />
                             </div>
-                            <div className="flex justify-between mt-2 text-[10px] font-bold uppercase tracking-wider text-[#9c9894]">
+                            <div className="flex justify-between mt-2 text-caption font-bold uppercase tracking-wider text-[#9c9894]">
                               <span>{currentQty}{t("items_in_cart")}</span>
                               <span>{t("target")}{s.minQuantity}{t("items")}</span>
                             </div>
@@ -356,7 +356,7 @@ const ShoppingCartPage = () => {
               borderColor: CART_UI.border,
               backgroundColor: CART_UI.surface
             }}>
-                  <h2 className="text-sm font-semibold text-[#1a1918]">{t("your_items")}</h2>
+                  <h2 className="text-lg font-semibold text-text-primary text-[#1a1918]">{t("your_items")}</h2>
                   <button type="button" onClick={() => setShowClearModal(true)} className="text-xs font-medium text-[#5f5b57] underline-offset-2 hover:text-[#1466c6] hover:underline">{t("clear_all")}</button>
                 </div>
                 <div className="divide-y divide-[#e0deda]">

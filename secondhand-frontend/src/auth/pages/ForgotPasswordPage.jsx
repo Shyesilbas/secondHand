@@ -68,12 +68,12 @@ const ForgotPasswordPage = () => {
                     <div className="w-12 h-12 mx-auto mb-4 bg-stone-100 rounded-full flex items-center justify-center text-stone-900">
                         <EnvelopeIcon className="w-5 h-5 stroke-[1.5]" />
                     </div>
-                    <h2 className="text-2xl font-normal text-stone-900 tracking-tight">{t("check_verification_code")}</h2>
+                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("check_verification_code")}</h2>
                     <p className="mt-2 text-xs text-stone-500 font-normal max-w-xs mx-auto leading-relaxed">{t("a_verification_code_has_been_generated_u")}</p>
                 </div>
 
                 {verificationCode && <div className="mb-6 p-4 rounded-xl border border-stone-200 bg-[#faf9f7] text-center">
-                        <div className="text-[10px] tracking-wider font-semibold text-stone-400 uppercase mb-1">{t("developer_environment_code")}</div>
+                        <div className="text-caption tracking-wider font-semibold text-stone-400 uppercase mb-1">{t("developer_environment_code")}</div>
                         <div className="text-2xl font-mono tracking-[0.2em] font-semibold text-stone-900">{verificationCode}</div>
                     </div>}
 
@@ -145,7 +145,7 @@ const ForgotPasswordPage = () => {
             </div>
 
             <div className="mb-8">
-                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">{t("recover_password")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("recover_password")}</h1>
                 <p className="mt-2 text-sm text-stone-500 font-normal">{t("enter_your_email_and_we_ll_start_your_re")}</p>
             </div>
 

@@ -125,7 +125,7 @@ const NotificationModal = ({
                         
                         {/* Text content */}
                         <div className="flex-1">
-                            {title && <h3 className={`text-lg font-bold ${config.heading} mb-1.5 pr-10`}>
+                            {title && <h3 className={`text-sm font-medium text-text-primary ${config.heading} mb-1.5 pr-10`}>
                                     {title}
                                 </h3>}
                             {message && <div className={`text-sm leading-relaxed ${config.text} mb-4`}>

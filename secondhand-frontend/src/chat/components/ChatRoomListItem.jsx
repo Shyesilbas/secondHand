@@ -54,7 +54,7 @@ const ChatRoomListItem = ({
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="flex items-start justify-between mb-1.5">
                     <div className="flex-1 min-w-0 mr-2">
-                      <h3 className={`text-sm truncate tracking-tight ${isSelected ? 'font-bold text-slate-900' : 'font-semibold text-slate-900'}`}>
+                      <h3 className={`text-sm font-medium text-text-primary truncate tracking-tight ${isSelected ? ' ' : ' '}`}>
                         {title}
                       </h3>
                     </div>

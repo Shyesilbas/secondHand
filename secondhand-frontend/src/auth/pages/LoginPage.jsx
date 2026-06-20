@@ -86,7 +86,7 @@ const LoginPage = () => {
 
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-normal text-stone-900 tracking-tight leading-tight">{t("welcome_back")}</h1>
+                <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("welcome_back")}</h1>
                 <p className="mt-2 text-sm text-stone-500 font-normal">{t("sign_in_to_continue_to_your_curated_spac")}</p>
             </div>
 
@@ -120,7 +120,7 @@ const LoginPage = () => {
                 {/* Silent Divider */}
                 <div className="relative flex items-center my-2">
                     <div className="flex-1 border-t border-stone-200/50"></div>
-                    <span className="px-3 text-[10px] tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
+                    <span className="px-3 text-caption tracking-[0.2em] text-stone-400 uppercase font-medium">{t("or_continue_with")}</span>
                     <div className="flex-1 border-t border-stone-200/50"></div>
                 </div>
 

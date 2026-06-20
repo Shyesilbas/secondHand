@@ -45,7 +45,7 @@ const SimilarListings = ({
   });
   if (isLoading) {
     return <div className="border-t border-slate-100/80 pt-10 mt-10">
-        <h3 className="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-text-primary mb-6 flex items-center gap-2">
           <Compass className="w-4 h-4 text-indigo-500 animate-spin" />{t("finding_similar_listings")}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(idx => <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-3.5 space-y-3 animate-pulse">
@@ -60,8 +60,8 @@ const SimilarListings = ({
   return <div className="border-t border-slate-100/80 pt-10 mt-10">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">{t("more_to_explore")}</span>
-          <h3 className="text-[15px] font-extrabold text-slate-900 mt-2 flex items-center gap-2">{t("similar_listings")}</h3>
+          <span className="text-caption font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100/50">{t("more_to_explore")}</span>
+          <h3 className="text-sm font-medium text-text-primary mt-2 flex items-center gap-2">{t("similar_listings")}</h3>
         </div>
       </div>
 

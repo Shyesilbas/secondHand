@@ -48,7 +48,7 @@ class ErrorBoundary extends React.Component {
             </div>
 
             {/* Error Title */}
-            <h3 className="mt-4 text-lg font-medium text-gray-900 text-center">{t("something_went_wrong")}</h3>
+            <h3 className="text-sm font-medium text-text-primary mt-4">{t("something_went_wrong")}</h3>
 
             {/* Error Message */}
             <p className="mt-2 text-sm text-gray-500 text-center">{t("we_re_sorry_for_the_inconvenience_please")}</p>

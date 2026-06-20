@@ -50,7 +50,7 @@ const ReviewStats = ({
     count: stats.zeroStarReviews || 0
   }];
   return <div className="bg-white rounded-lg shadow-md border p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("review_stats")}</h3>
+      <h3 className="text-sm font-medium text-text-primary mb-4">{t("review_stats")}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="text-center">

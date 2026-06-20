@@ -70,7 +70,7 @@ const AccountHubPage = () => {
             {user?.profilePicture ? <img src={user.profilePicture} alt="" className="h-full w-full object-cover" /> : getInitials(`${user?.name || ''} ${user?.surname || ''}`)}
           </div>
           <div className="overflow-hidden min-w-0">
-            <h2 className="text-sm font-bold text-slate-800 truncate">
+            <h2 className="text-lg font-semibold text-text-primary truncate">
               {user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User'}
             </h2>
             <p className="text-xs text-slate-400 truncate mt-0.5">{user?.email || ''}</p>
@@ -91,7 +91,7 @@ const AccountHubPage = () => {
 
         {/* Desktop Navigation Groups */}
         <nav className="hidden lg:flex flex-col gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 mb-2">{t("private_space")}</span>
+          <span className="text-caption font-bold uppercase tracking-widest text-slate-400 px-3 mb-2">{t("private_space")}</span>
           {navGroups.map(group => {
           const GroupIcon = group.icon;
           const isOpen = openGroups.has(group.id);
@@ -122,7 +122,7 @@ const AccountHubPage = () => {
           {/* Header Panel */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl lg:text-[28px] font-bold text-slate-900 tracking-tight">{t("welcome")}{user?.name?.split(' ')[0] || 'User'}
+              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("welcome")}{user?.name?.split(' ')[0] || 'User'}
               </h1>
               <p className="mt-1 text-sm text-slate-500 font-medium">{t("your_personal_secondhand_space")}</p>
             </div>
@@ -137,17 +137,17 @@ const AccountHubPage = () => {
           <div className="grid grid-cols-3 gap-3 mb-8">
             <Link to={ROUTES.MY_LISTINGS} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
               <Sparkles className="w-5 h-5 text-indigo-500 mb-1.5" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("listings")}</span>
+              <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("listings")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("manage_items")}</span>
             </Link>
             <Link to={ROUTES.FAVORITES} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
               <Heart className="w-5 h-5 text-rose-500 mb-1.5" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("saved")}</span>
+              <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("saved")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("my_favorites")}</span>
             </Link>
             <Link to={ROUTES.CHAT} className="bg-white rounded-2xl p-4 border border-slate-100/60 shadow-sm flex flex-col items-center justify-center text-center transition hover:shadow-md hover:scale-[1.01]">
               <MessageSquare className="w-5 h-5 text-teal-500 mb-1.5" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t("inbox")}</span>
+              <span className="text-caption font-bold uppercase tracking-wider text-slate-400">{t("inbox")}</span>
               <span className="text-sm font-bold text-slate-800 mt-0.5">{t("chat_history")}</span>
             </Link>
           </div>
@@ -155,7 +155,7 @@ const AccountHubPage = () => {
           {/* Recent Orders Box */}
           <div className="bg-white rounded-[28px] border border-slate-100/60 shadow-[0_8px_40px_rgba(0,0,0,0.01)] p-6 lg:p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base font-bold uppercase tracking-widest text-slate-400">{t("recent_orders")}</h2>
+              <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("recent_orders")}</h2>
               <Link to={ROUTES.MY_ORDERS} className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 hover:text-slate-900 transition-colors">{t("view_all")}<ArrowRight className="w-4 h-4" strokeWidth={2} />
               </Link>
             </div>
@@ -166,7 +166,7 @@ const AccountHubPage = () => {
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 border border-slate-100">
                   <ShoppingBag className="w-5 h-5 text-slate-400" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-800">{t("your_shopping_bag_is_waiting")}</h3>
+                <h3 className="text-sm font-medium text-text-primary">{t("your_shopping_bag_is_waiting")}</h3>
                 <p className="text-xs text-slate-400 mt-1">{t("explore_our_second_hand_listings_to_find")}</p>
                 <Link to={ROUTES.LISTINGS} className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-black transition-all">{t("explore_listings")}</Link>
               </div> : <div className="space-y-4">
@@ -183,14 +183,14 @@ const AccountHubPage = () => {
                           {thumbUrl ? <img src={thumbUrl} alt="" className="w-full h-full object-cover" /> : <ShoppingBag className="w-5 h-5 text-slate-400" />}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-slate-800 text-sm leading-tight truncate">
+                          <h3 className="text-sm font-medium text-text-primary truncate">
                             {order.name || lineTitle || `Order #${order.orderNumber}`}
                           </h3>
                           <p className="text-xs text-slate-400 mt-1 font-medium">
                             {order.orderNumber} •{' '}
                             {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB') : ''}
                           </p>
-                          <span className={`mt-2 inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${statusColor}`}>
+                          <span className={`mt-2 inline-flex items-center px-2 py-0.5 rounded-md text-caption font-bold uppercase tracking-wider border ${statusColor}`}>
                             {order.status?.replace(/_/g, ' ')}
                           </span>
                         </div>
@@ -212,8 +212,8 @@ const AccountHubPage = () => {
                 <Plus className="w-5 h-5" strokeWidth={2} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{t("sell_item")}</h3>
-                <p className="text-[10px] text-slate-400 font-medium mt-0.5">{t("create_a_listing")}</p>
+                <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider">{t("sell_item")}</h3>
+                <p className="text-caption text-slate-400 font-medium mt-0.5">{t("create_a_listing")}</p>
               </div>
             </Link>
             <Link to={ROUTES.EWALLET} className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
@@ -221,8 +221,8 @@ const AccountHubPage = () => {
                 <Wallet className="w-4 h-4" strokeWidth={2} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{t("my_wallet")}</h3>
-                <p className="text-[10px] text-slate-400 font-medium mt-0.5">{t("top_up_balance")}</p>
+                <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider">{t("my_wallet")}</h3>
+                <p className="text-caption text-slate-400 font-medium mt-0.5">{t("top_up_balance")}</p>
               </div>
             </Link>
             <Link to={ROUTES.PROFILE} className="bg-white rounded-2xl p-5 border border-slate-100/60 shadow-sm flex items-center gap-4 transition hover:shadow-md hover:scale-[1.01]">
@@ -230,8 +230,8 @@ const AccountHubPage = () => {
                 <MapPin className="w-4 h-4" strokeWidth={2} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{t("addresses")}</h3>
-                <p className="text-[10px] text-slate-400 font-medium mt-0.5">{t("manage_profiles")}</p>
+                <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider">{t("addresses")}</h3>
+                <p className="text-caption text-slate-400 font-medium mt-0.5">{t("manage_profiles")}</p>
               </div>
             </Link>
           </div>

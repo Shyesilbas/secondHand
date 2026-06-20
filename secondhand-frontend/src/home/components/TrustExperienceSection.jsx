@@ -34,8 +34,8 @@ const TrustExperienceSection = () => {
   return <section className="py-16 bg-white border-t border-slate-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="max-w-2xl mb-12">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">{t("built_in_protection")}</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-snug">{t("real_product_capabilities_ensuring_safe_")}</h2>
+          <p className="text-caption font-bold uppercase tracking-[0.2em] text-emerald-600 mb-2">{t("built_in_protection")}</p>
+          <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("real_product_capabilities_ensuring_safe_")}</h2>
           <p className="text-slate-500 text-sm mt-3 leading-relaxed font-medium">{t("we_prioritize_real_working_technology_ov")}</p>
         </div>
 
@@ -53,10 +53,10 @@ const TrustExperienceSection = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-900 tracking-tight mt-4 group-hover:text-emerald-600 transition-colors">
+                  <h3 className="text-sm font-medium text-text-primary tracking-tight mt-4 group- transition-colors">
                     {feat.title}
                   </h3>
-                  <p className="text-[12px] text-slate-500 leading-relaxed mt-2.5 font-medium">
+                  <p className="text-body text-slate-500 leading-relaxed mt-2.5 font-medium">
                     {feat.desc}
                   </p>
                 </div>

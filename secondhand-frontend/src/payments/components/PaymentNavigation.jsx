@@ -40,7 +40,7 @@ const PaymentFilterSidebar = ({
                 <div className="border-b border-slate-200 bg-white px-4 py-4 flex-shrink-0">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-base font-semibold tracking-tight text-slate-900">{t("filters")}</h2>
+                            <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("filters")}</h2>
                             <p className="text-xs text-slate-500 mt-0.5">{t("refine_payment_history_with_precision")}</p>
                         </div>
                         <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
@@ -52,7 +52,7 @@ const PaymentFilterSidebar = ({
                 <div className="flex-1 overflow-y-auto bg-slate-50 overscroll-contain">
                     <div className="p-4 space-y-4">
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("quick_filters")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("quick_filters")}</h3>
                             <div className="space-y-2">
                                 <button onClick={() => handleInputChange('paymentDirection', localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? '' : PAYMENT_DIRECTIONS.INCOMING)} className={`w-full p-2.5 rounded-xl border transition-all duration-200 text-left ${localFilters.paymentDirection === PAYMENT_DIRECTIONS.INCOMING ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}`}>
                                     <span className="text-sm font-medium inline-flex items-center gap-2">
@@ -74,7 +74,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("seller")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("seller")}</h3>
                             <div className="relative">
                                 <input type="text" placeholder={t("search_seller")} value={localFilters.seller || ''} onChange={e => handleInputChange('seller', e.target.value)} className="w-full pl-8 pr-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all" />
                                 <svg className="absolute left-2 top-3 w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("transaction_type")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("transaction_type")}</h3>
                             <select value={localFilters.transactionType || ''} onChange={e => handleInputChange('transactionType', e.target.value)} className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all">
                                 <option value="">{t("all_transaction_types")}</option>
                                 <option value={PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE}>{t("item_purchase")}</option>
@@ -95,7 +95,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("payment_method")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("payment_method")}</h3>
                             <select value={localFilters.paymentType || ''} onChange={e => handleInputChange('paymentType', e.target.value)} className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all">
                                 <option value="">{t("all_payment_methods")}</option>
                                 <option value={PAYMENT_TYPES.EWALLET}>{t("ewallet")}</option>
@@ -103,7 +103,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("payment_direction")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("payment_direction")}</h3>
                             <select value={localFilters.paymentDirection || ''} onChange={e => handleInputChange('paymentDirection', e.target.value)} className="w-full px-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all">
                                 <option value="">{t("all_directions")}</option>
                                 <option value={PAYMENT_DIRECTIONS.INCOMING}>{t("incoming")}</option>
@@ -112,7 +112,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("date_range")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("date_range")}</h3>
                             <div className="space-y-2">
                                 <div>
                                     <label className="text-xs text-slate-600 mb-1 block">{t("from_date")}</label>
@@ -126,7 +126,7 @@ const PaymentFilterSidebar = ({
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                            <h3 className="text-sm font-semibold text-slate-900 mb-3">{t("amount_range")}</h3>
+                            <h3 className="text-sm font-medium text-text-primary mb-3">{t("amount_range")}</h3>
                             <div className="space-y-2">
                                 <div className="relative">
                                     <input type="number" placeholder={t("min")} min="0" step="0.01" value={localFilters.amountMin || ''} onChange={e => handleInputChange('amountMin', e.target.value)} className="w-full pl-6 pr-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 focus:bg-white transition-all" />

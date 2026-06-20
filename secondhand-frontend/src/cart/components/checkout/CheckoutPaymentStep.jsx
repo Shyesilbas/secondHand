@@ -48,7 +48,7 @@ const CheckoutPaymentStep = ({
   };
   return <div className="p-5 sm:p-7">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold tracking-tight text-[#111]">{t("payment")}</h2>
+        <h2 className="text-lg font-semibold text-text-primary tracking-tight text-[#111]">{t("payment")}</h2>
         <div className="text-sm font-semibold tabular-nums text-[#1466c6]">
           {formatCurrency(totalAmount, cur)}
         </div>
@@ -90,7 +90,7 @@ const CheckoutPaymentStep = ({
           <div className="flex items-start gap-3">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-slate-900">{t("spending_limit_warning")}</h3>
+              <h3 className="text-sm font-medium text-text-primary">{t("spending_limit_warning")}</h3>
               <p className="mt-1 text-xs font-medium leading-relaxed text-slate-600">{t("with_this_order_monthly_spending_reaches")}{' '}
                 <strong>{formatCurrency(warningData.projectedSpending, cur)}</strong>.
               </p>

@@ -41,7 +41,7 @@ const StarBreakdown = ({
   const total = Number(stats?.totalReviews) || 0;
   if (total <= 0) return null;
   return <div className="space-y-2.5 mt-6">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{t("rating_mix")}</p>
+      <p className="text-caption font-semibold uppercase tracking-wider text-gray-400">{t("rating_mix")}</p>
       <ul className="space-y-2">
         {BREAKDOWN.map(({
         key,
@@ -50,7 +50,7 @@ const StarBreakdown = ({
       }) => {
         const count = Number(stats[key]) || 0;
         const pct = total > 0 ? Math.round(count / total * 1000) / 10 : 0;
-        return <li key={key} className="flex items-center gap-3 text-[12px]">
+        return <li key={key} className="flex items-center gap-3 text-body">
               <span className="w-8 shrink-0 font-medium tabular-nums text-gray-600">{label}</span>
               <div className="flex-1 min-w-0 h-2 rounded-full bg-gray-100 overflow-hidden">
                 <div className={`h-full rounded-full ${bar} transition-[width] duration-500 ease-out`} style={{
@@ -172,9 +172,9 @@ const UserReviews = ({
         <div className="shrink-0 min-w-0 p-5 sm:p-7 bg-gradient-to-br from-gray-50 via-white to-amber-50/30 border-b border-gray-100">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-10 min-w-0 w-full">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-amber-700/90 mb-2">
+              <div className="flex items-center gap-2 text-caption font-semibold uppercase tracking-widest text-amber-700/90 mb-2">
                 <Sparkles className="w-4 h-4" aria-hidden />{t("buyer_feedback")}</div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{t("reputation")}</h2>
+              <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("reputation")}</h2>
               <p className="text-sm text-gray-500 mt-2 max-w-md leading-relaxed">
                 {isOwnProfile ? 'Ratings left by buyers after completed orders. Build trust with clear communication and accurate listings.' : 'Aggregated from reviews this member received as a seller.'}
               </p>
@@ -207,7 +207,7 @@ const UserReviews = ({
         <div className="shrink-0 min-w-0 w-full px-5 sm:px-7 py-4 border-b border-gray-100 bg-white/60 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 min-w-0">
             <div className="min-w-0 flex-1">
-              <h3 className="text-base font-bold text-gray-900 tracking-tight">{t("reviews_received")}{!filterActive && pagination?.totalElements > 0 ? <span className="font-normal text-gray-400 ml-2 tabular-nums">({pagination.totalElements})</span> : null}
+              <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("reviews_received")}{!filterActive && pagination?.totalElements > 0 ? <span className="font-normal text-gray-400 ml-2 tabular-nums">({pagination.totalElements})</span> : null}
                 {filterActive ? <span className="font-normal text-gray-400 ml-2 tabular-nums">
                     ({filteredAll.length}{t("for_selected_listing")}</span> : null}
               </h3>
@@ -226,22 +226,22 @@ const UserReviews = ({
           </div>
 
           {totalReviewsStat > 0 ? <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2 flex items-center gap-1.5">
+              <p className="text-caption font-semibold uppercase tracking-wide text-gray-400 mb-2 flex items-center gap-1.5">
                 <LayoutGrid className="w-3.5 h-3.5" aria-hidden />{t("filter_by_listing")}{indexFetching ? <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-700" aria-hidden /> : null}
               </p>
               <div className="min-w-0 w-full overflow-x-auto overflow-y-hidden overscroll-x-contain [-webkit-overflow-scrolling:touch] touch-pan-x pb-2 -mx-1 px-1 [scrollbar-width:thin]" role="group" aria-label={t("listing_filter_chips")}>
                 <div className="flex flex-row flex-nowrap gap-2 w-max max-w-none pr-1">
-                  <button type="button" onClick={() => setListingFilter(ALL_LISTINGS)} className={`flex-none inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors max-w-[min(240px,calc(100vw-120px))] ${!filterActive ? 'border-gray-900 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}`}>{t("all_listings")}{totalReviewsStat > 0 ? <span className={`tabular-nums px-2 py-0.5 rounded-md text-[10px] ${!filterActive ? 'bg-white/15' : 'bg-gray-100'}`}>
+                  <button type="button" onClick={() => setListingFilter(ALL_LISTINGS)} className={`flex-none inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors max-w-[min(240px,calc(100vw-120px))] ${!filterActive ? 'border-gray-900 bg-gray-900 text-white shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}`}>{t("all_listings")}{totalReviewsStat > 0 ? <span className={`tabular-nums px-2 py-0.5 rounded-md text-caption ${!filterActive ? 'bg-white/15' : 'bg-gray-100'}`}>
                         {totalReviewsStat}
                       </span> : null}
                   </button>
                   {listingOptions.map(opt => {
                 const active = listingFilter === opt.key;
-                return <button key={opt.key} type="button" onClick={() => setListingFilter(opt.key)} title={opt.title} className={`flex-none max-w-none text-left inline-flex flex-col rounded-xl border px-3 py-2 text-[11px] font-semibold transition-colors min-w-[10.5rem] max-w-[min(288px,calc(100vw-6rem))] ${active ? 'border-amber-500 bg-amber-50 text-amber-950 ring-2 ring-amber-200' : 'border-gray-200 bg-white text-gray-800 hover:border-amber-200'}`}>
+                return <button key={opt.key} type="button" onClick={() => setListingFilter(opt.key)} title={opt.title} className={`flex-none max-w-none text-left inline-flex flex-col rounded-xl border px-3 py-2 text-caption font-semibold transition-colors min-w-[10.5rem] max-w-[min(288px,calc(100vw-6rem))] ${active ? 'border-amber-500 bg-amber-50 text-amber-950 ring-2 ring-amber-200' : 'border-gray-200 bg-white text-gray-800 hover:border-amber-200'}`}>
                         <span className="block w-full min-w-0 overflow-x-auto overscroll-x-contain whitespace-nowrap [scrollbar-width:thin] [-webkit-overflow-scrolling:touch] touch-pan-x leading-snug py-px">
                           {opt.title}
                         </span>
-                        <span className="mt-1 flex flex-wrap items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                        <span className="mt-1 flex flex-wrap items-center gap-1 text-caption font-semibold uppercase tracking-wide text-gray-400">
                           {opt.listingNo ? <span className="tabular-nums">#{opt.listingNo}</span> : null}
                           <span className={`tabular-nums px-2 py-0.5 rounded-md ${active ? 'bg-white/70 text-amber-900' : 'bg-gray-100 text-gray-500'}`}>
                             {opt.count}{t("reviews")}</span>
@@ -250,7 +250,7 @@ const UserReviews = ({
               })}
                 </div>
               </div>
-              {indexLoadError ? <p className="mt-2 text-[11px] text-amber-800">{t("listing_filter_incomplete")}{indexLoadError}</p> : null}
+              {indexLoadError ? <p className="mt-2 text-caption text-amber-800">{t("listing_filter_incomplete")}{indexLoadError}</p> : null}
             </div> : null}
         </div>
 

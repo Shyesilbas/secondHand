@@ -45,13 +45,13 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-[minmax(0,1fr)_520px] lg:items-center gap-8 lg:gap-10">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2 mb-5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-[10px] font-bold text-emerald-700 uppercase tracking-[0.18em]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-caption font-bold text-emerald-700 uppercase tracking-[0.18em]">
                 <Sparkles className="w-3 h-3" />{t("curated_marketplace")}</span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-[0.18em]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-slate-200 text-caption font-bold text-slate-500 uppercase tracking-[0.18em]">
                 <BadgeCheck className="w-3 h-3 text-indigo-600" />{t("verified_trade")}</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[58px] font-extrabold tracking-tight text-slate-950 leading-[0.98]">{t("find_better_deals_from_sellers_you_can_t")}</h1>
+            <h1 className="text-2xl font-semibold text-text-primary lg:text-[58px] tracking-tight leading-[0.98]">{t("find_better_deals_from_sellers_you_can_t")}</h1>
             <p className="mt-5 text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl font-medium">{t("browse_vetted_listings_compare_real_pric")}</p>
 
             <div className="mt-7 flex flex-col sm:flex-row gap-3 max-w-2xl">
@@ -85,8 +85,8 @@ const HeroSection = () => {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[12px] font-bold text-slate-900 truncate">{title}</p>
-                    <p className="text-[11px] font-medium text-slate-500 truncate">{text}</p>
+                    <p className="text-body font-bold text-slate-900 truncate">{title}</p>
+                    <p className="text-caption font-medium text-slate-500 truncate">{text}</p>
                   </div>
                 </div>)}
             </div>
@@ -95,11 +95,11 @@ const HeroSection = () => {
           <div className="relative flex items-center justify-center min-h-[330px] lg:h-[430px]">
             <div className="absolute inset-x-4 bottom-4 top-10 rounded-[28px] bg-slate-950 shadow-[0_30px_90px_-45px_rgba(15,23,42,0.65)]" />
             <div className="absolute left-4 top-5 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white backdrop-blur">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200">{t("live_picks")}</p>
-              <p className="mt-1 text-2xl font-extrabold">{featuredCards.length || 3}</p>
+              <p className="text-caption font-bold uppercase tracking-[0.18em] text-emerald-200">{t("live_picks")}</p>
+              <p className="mt-1 text-2xl font-bold">{featuredCards.length || 3}</p>
             </div>
             <div className="absolute right-4 bottom-8 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-white backdrop-blur z-30">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-200">{t("safer_deals")}</p>
+              <p className="text-caption font-bold uppercase tracking-[0.18em] text-indigo-200">{t("safer_deals")}</p>
               <p className="mt-1 text-sm font-bold">{t("chat_checkout")}</p>
             </div>
             <div className="relative flex items-center justify-center w-full h-[330px] lg:h-[390px]">
