@@ -54,9 +54,23 @@ public class PaymentStatsService {
     }
 
     public Page<PaymentDto> getMyPayments(Long userId, Pageable pageable, PaymentFilter filter) {
-        Page<Payment> paymentsPage = isFilterPresent(filter)
-                ? paymentRepository.findByFilters(userId, filter.transactionType(), filter.paymentType(), filter.paymentDirection(), filter.dateFrom(), filter.dateTo(), filter.amountMin(), filter.amountMax(), (filter.searchTerm() != null && !filter.searchTerm().isBlank()) ? filter.searchTerm().trim() : null, pageable)
-                : paymentRepository.findByUserId(userId, pageable);
+        Page<Payment> paymentsPage;
+        if (isFilterPresent(filter)) {
+            var spec = com.serhat.secondhand.payment.repository.spec.PaymentSpecification.withFilters(
+                    userId,
+                    filter.transactionType(),
+                    filter.paymentType(),
+                    filter.paymentDirection(),
+                    filter.dateFrom(),
+                    filter.dateTo(),
+                    filter.amountMin(),
+                    filter.amountMax(),
+                    filter.searchTerm()
+            );
+            paymentsPage = paymentRepository.findAll(spec, pageable);
+        } else {
+            paymentsPage = paymentRepository.findByUserId(userId, pageable);
+        }
 
         return paymentsPage.map(payment -> mapPaymentToDtoOptimized(payment, userId));
     }

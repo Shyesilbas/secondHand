@@ -14,6 +14,19 @@ Her görev veya session tamamlandığında `.agents/CONTEXT.md` dosyasını gün
 
 Bu adımı atlamak yasaktır.
 
+## 0.2 GEMINI.md Güncelleme Kuralı
+Aşağıdaki durumlarda `GEMINI.md` otomatik güncellenir, onay beklenmez:
+
+- Yeni skill eklenince → Section 2'ye ekle
+- Yeni backend paketi eklenince → Section 3 Backend listesine ekle  
+- Yeni frontend modülü eklenince → Section 3 Frontend listesine ekle
+- Yeni teknoloji/kütüphane eklenince → Section 5'e ekle
+- Yeni convention belirlendiyse → Section 5'e ekle
+- Görev tamamlanınca → Section 6.4 Todo güncelle
+- Önemli mimari karar alındıysa → Section 6.5 Timeline'a ekle
+
+Bu adımı atlamak yasaktır. CONTEXT.md ile aynı anda güncellenir.
+
 ## 1. Rules
 
 ### Genel
@@ -51,6 +64,10 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 
 ### Frontend
 - `src/listing`, `src/order`, `src/payments`, `src/reviews`
+- `src/ai`, `src/auth`, `src/cart`, `src/chat`, `src/offer`
+- `src/ewallet`, `src/campaign`, `src/showcase`, `src/forum`
+- `src/complaint`, `src/notification`, `src/user`, `src/home`
+- `src/common` (shared components, hooks, services, theme)
 
 ### Calisma Notu
 - Her proje alani icin sadece bir ana README veya artifact referansi kullan.
@@ -91,6 +108,13 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 - **Structure:** Follow a modular folder structure (`components/`, `hooks/`, `services/`, vb.).
 - **Side Effects:** Ensure `useEffect` dependencies are accurate and perform cleanups to prevent memory leaks.
 
+### API Contract & Response Convention
+- **Response format:** Backend `ResultResponses` wrapper kullanır. Frontend'e başarıda direkt DTO, hata durumunda `{ error: "KOD", message: "..." }` gelir.
+- **Frontend fetch:** Asla `useEffect` ile fetch yapma — her zaman React Query kullan.
+- **Hata yakalama:** `error.response?.data?.error` ve `error.response?.data?.message` kullan.
+- **Double unwrap yasak:** `response.data.data` değil, `response.data` kullan.
+- **Mutation sonrası:** `queryClient.invalidateQueries` ile ilgili cache'i temizle.
+
 ## 6. Artifacts & Context
 
 ### 6.1. Behaviour & Architecture
@@ -101,7 +125,7 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 - **Değişiklik Prensipleri:** Modüller arası soyutlamayı bozma. Hardcoded mesajları azalt. Boundary'leri koru. Domain rule'u service/validator tarafında tut. Repository'yi saf data access olarak kullan. DTO ile entity'yi karıştırma. Cache, event ve async yan etkileri ayrık düşün. Token azaltma kurallarına uy, özetleri davranış dosyasında tut, detayı koda bırak.
 
 ### 6.2. Agent Map & Read Order
-- **Read Order:** 1. Root README → 2. `GEMINI.md` → 3. `.agents/CONTEXT.md` → 4. `.agents/PROJECT_REPORT.md` → 5. Backend module README / Frontend feature README → 6. Source files
+- **Read Order:** 1. Root README → 2. `GEMINI.md` → 3. `.agents/CONTEXT.md` → 4. `.agents/PROJECT_REPORT.md` → 5. `.agents/skills/` → 6. Backend module README / Frontend feature README → 7. Source files
 - **Fast Mental Model:** Root README explains product scope. `GEMINI.md` explains how to work. Module README explains local business rules. Source code is the final authority.
 - **Best Practice Checklist:** Prefer the smallest file set that answers the question. Update docs when behavior changes. Treat cache, payment, escrow, and auth as high-risk areas. Favor existing patterns over new abstractions.
 
@@ -109,16 +133,26 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 - Bu doküman (`GEMINI.md`), AI aracılarının hızlı bağlam edinmesi için tek kaynaklı, kısa ve karlı dokümanları tutar. Yeni bilgi sadece buraya eklenir; README'ler özeti tutar.
 
 ### 6.4. Todo & Active Tasks
-**Aktif:**
+**Tamamlanan:**
 - [x] `.agents` kurallarını netleştir
-- [ ] Modül bazlı kısa AI rehberlerini standart hale getir
-- [ ] Tekrarlayan README bölümlerini azalt
-- [ ] Değişimlerde doküman güncelleme akışını sabitle
+- [x] Skeleton & EmptyState merkezileştirildi
+- [x] PageContainer standardize edildi
+- [x] Tipografi ve border-radius temizliği
+- [x] Frontend kalite skill'leri yazıldı (frontend-quality, design-system, frontend-audit)
+- [x] Backend audit yapıldı — auth refactor, listing analizi
+- [x] API response format standardize edildi (ResultResponses)
+- [x] api-contract skill yazıldı
+- [x] Auth cookie flow görsel test
+
+**Aktif:**
+- [ ] AI streaming endpoint testi
+- [ ] Eksik modül README'leri (core, user, checkout, shipping, pricing, email)
 
 **Sonraki:**
-- [ ] Her ana backend modülüne kısa `agent note` ekle
-- [ ] Frontend feature klasörleri için özet rehber ekle
-- [ ] Token tasarrufu için arama rehberi yaz
+- [ ] listing N+1 sorunu JPA log analizi
+- [ ] Yeni özellik geliştirmesi — api-contract skill ile test et
+- [ ] CI/CD pipeline kurulumu
 
 ### 6.5. Timeline
 - **2026-06-19:** İlk AI destek doküman yapısı tasarlandı. Token azaltma odaklı çalışma ilkeleri belirlendi.
+- **2026-06-20:** Frontend UI sprint tamamlandı (Skeleton, PageContainer, tipografi, border-radius). Backend audit yapıldı. Auth God Object refactor edildi. API response convention standardize edildi. 10 skill dosyası oluşturuldu.

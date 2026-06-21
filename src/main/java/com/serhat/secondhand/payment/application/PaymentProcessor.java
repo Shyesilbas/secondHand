@@ -34,6 +34,7 @@ public class PaymentProcessor {
     private final PaymentPreCheckService paymentPreCheckService;
     private final PaymentOutboxService paymentOutboxService;
     private final PaymentRedisIdempotencyService paymentRedisIdempotencyService;
+    private final org.springframework.cache.CacheManager cacheManager;
 
     @Lazy
     @Autowired
@@ -105,7 +106,6 @@ public class PaymentProcessor {
     }
 
     @Transactional
-    @CacheEvict(value = "paymentStats", allEntries = true)
     public Result<PaymentDto> executePaymentWithTransaction(Long userId, PaymentRequest paymentRequest) {
         String idempotencyKey = paymentRequest.idempotencyKey();
 
@@ -141,6 +141,8 @@ public class PaymentProcessor {
             paymentOutboxService.enqueuePaymentCompleted(payment);
         }
 
+        evictUserPaymentStatsCache(userId);
+
         return Result.success(paymentMapper.toDto(payment));
     }
 
@@ -169,5 +171,15 @@ public class PaymentProcessor {
                 paymentRequest.amount() + "|" +
                 paymentRequest.listingId() + "|" +
                 paymentRequest.orderItemId();
+    }
+
+    private void evictUserPaymentStatsCache(Long userId) {
+        org.springframework.cache.Cache cache = cacheManager.getCache("paymentStats");
+        if (cache != null) {
+            cache.evict(userId + "_null");
+            for (com.serhat.secondhand.payment.entity.PaymentType type : com.serhat.secondhand.payment.entity.PaymentType.values()) {
+                cache.evict(userId + "_" + type.name());
+            }
+        }
     }
 }

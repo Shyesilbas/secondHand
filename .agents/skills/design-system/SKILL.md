@@ -20,6 +20,16 @@ triggers:
 - **Accent:** Teal (#0d9488)
 - **His:** Sade, bol beyaz alan, ince border'lar, küçük shadow
 
+## Tipografi Standardı
+| Kullanım | Class |
+|----------|-------|
+| Sayfa başlığı | `text-2xl font-semibold` |
+| Section başlığı | `text-lg font-semibold` |
+| Card başlığı | `text-sm font-medium` |
+| Gövde metni | `text-sm` veya `text-base` |
+| Yardımcı metin | `text-body text-text-muted` |
+| Çok küçük etiket | `text-caption` |
+
 ## Kesinlikle Yapma
 - Hardcoded renk yazma: `text-gray-900`, `bg-blue-600`, `#f7f6f5` — her zaman token kullan
 - `text-[14px]` gibi arbitrary tipografi değeri yazma — `text-body`, `text-sm` kullan
