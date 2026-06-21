@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Stomp} from '@stomp/stompjs';
 import {WS_BASE_URL} from '../constants/apiEndpoints.js';
-import {getToken} from '../services/storage/tokenStorage.js';
+
 import logger from '../utils/logger.js';
 
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -33,8 +33,7 @@ const useWebSocket = (userId) => {
             return;
         }
 
-        const token = getToken();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = {};
 
         const socket = new WebSocket(WS_BASE_URL);
         stompClient.current = Stomp.over(socket);
@@ -93,7 +92,8 @@ const useWebSocket = (userId) => {
             subscriptions.current.forEach((subscription) => {
                 try {
                     subscription.unsubscribe();
-                } catch (e) {
+                } catch {
+                    // Ignore
                 }
             });
             subscriptions.current.clear();
@@ -101,7 +101,7 @@ const useWebSocket = (userId) => {
             // Use deactivate() to ensure cleanup even if still in 'connecting' state
             try {
                 stompClient.current.deactivate();
-            } catch (e) {
+            } catch {
                 if (stompClient.current.connected) {
                     stompClient.current.disconnect();
                 }
@@ -112,20 +112,7 @@ const useWebSocket = (userId) => {
 
     // ==================== SUBSCRIPTION MANAGEMENT ====================
     
-    const subscribeToUserMessages = useCallback((userId) => {
-        if (!stompClient.current?.connected || !userId) return;
 
-        const subscription = stompClient.current.subscribe(
-            `/user/${userId}/queue/messages`,
-            (message) => {
-                const messageData = JSON.parse(message.body);
-                setMessages(prev => appendLimited(prev, messageData));
-                setUnreadCount(prev => prev + 1);
-            }
-        );
-        
-        subscriptions.current.set(`user-${userId}`, subscription);
-    }, []);
 
     const subscribeToChatRoom = useCallback((chatRoomId) => {
         if (!stompClient.current?.connected || !chatRoomId) {

@@ -38,12 +38,14 @@ public class LoginService {
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final AgreementUpdateNotificationService agreementUpdateNotificationService;
+    private final LoginAttemptService loginAttemptService;
 
     public record TokenRotationResult(String accessToken, String refreshToken) {}
 
-    public TokenRotationResult issueTokens(User user, boolean rememberMe) {
-        Token oldRefreshToken = tokenService.findActiveRefreshTokenByUser(user).orElse(null);
-        tokenService.revokeUserRefreshTokens(user);
+    public TokenRotationResult issueTokens(User user, boolean rememberMe, Token oldRefreshToken) {
+        if (oldRefreshToken != null) {
+            tokenService.revokeToken(oldRefreshToken.getToken());
+        }
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
@@ -63,9 +65,18 @@ public class LoginService {
     public LoginResponse login(LoginRequest request) {
         log.info("Login attempt: {}", request.email());
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        if (loginAttemptService.isBlocked(request.email())) {
+            throw new BusinessException("Too many login attempts. Please try again later.", HttpStatus.TOO_MANY_REQUESTS, "ACCOUNT_LOCKED");
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+        } catch (BadCredentialsException e) {
+            loginAttemptService.loginFailed(request.email());
+            throw new BadCredentialsException("Invalid username or password.");
+        }
 
         User user = userService.findByEmail(request.email())
                 .orElseThrow(() -> new BadCredentialsException("Invalid username or password."));
@@ -74,10 +85,12 @@ public class LoginService {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
         }
 
+        loginAttemptService.loginSucceeded(request.email());
+
         user.setLastLoginDate(LocalDateTime.now());
         userService.update(user);
 
-        TokenRotationResult tokens = issueTokens(user, request.rememberMe());
+        TokenRotationResult tokens = issueTokens(user, request.rememberMe(), null);
 
         agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(user.getId());
 
@@ -85,17 +98,15 @@ public class LoginService {
         return new LoginResponse("Login success", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), request.rememberMe());
     }
 
-    public String logout(String username, String accessToken) {
+    public String logoutToken(String username, String refreshToken) {
         log.info("Logout request: {}", username);
 
         User user = userService.findByEmail(username)
                 .orElseThrow(UserAlreadyLoggedOutException::defaultMessage);
 
-        if (tokenService.findActiveRefreshTokenByUser(user).isEmpty()) {
-            throw UserAlreadyLoggedOutException.defaultMessage();
+        if (refreshToken != null) {
+            tokenService.revokeToken(refreshToken);
         }
-
-        tokenService.revokeUserRefreshTokens(user);
 
         log.info("User logged out successfully: {}", user.getEmail());
         return "Logout successful";
@@ -117,13 +128,19 @@ public class LoginService {
         }
 
         if (!tokenService.isTokenValid(refreshTokenValue)) {
+            tokenService.findByToken(refreshTokenValue).ifPresent(token -> {
+                if (token.getFamilyId() != null) {
+                    log.warn("Security Alert: Token reuse detected for user {}. Revoking token family.", username);
+                    tokenService.revokeTokenFamily(token.getFamilyId());
+                }
+            });
             throw InvalidRefreshTokenException.revoked();
         }
 
         Token oldRefreshToken = tokenService.findByToken(refreshTokenValue)
                 .orElseThrow(InvalidRefreshTokenException::invalid);
 
-        TokenRotationResult tokens = issueTokens(user, oldRefreshToken.isRememberMe());
+        TokenRotationResult tokens = issueTokens(user, oldRefreshToken.isRememberMe(), oldRefreshToken);
 
         log.info("Tokens rotated successfully for user: {}", username);
         return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe());
@@ -146,7 +163,7 @@ public class LoginService {
         return null;
     }
 
-    public AuthMessageResponse logout(Authentication authentication, HttpServletRequest request) {
+    public AuthMessageResponse logout(Authentication authentication, String refreshToken) {
         String username = null;
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             username = ((UserDetails) authentication.getPrincipal()).getUsername();
@@ -157,9 +174,7 @@ public class LoginService {
         if (username != null) {
             log.info("Processing logout for user: {}", username);
 
-            String accessToken = extractTokenFromHeader(request);
-
-            logout(username, accessToken);
+            logoutToken(username, refreshToken);
             log.info("Logout successful for user: {}", username);
             return AuthMessageResponse.of("Successfully logged out");
         }

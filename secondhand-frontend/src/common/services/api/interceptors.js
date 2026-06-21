@@ -1,5 +1,5 @@
 import apiClient from './config.js';
-import {clearTokens, getToken, isCookieBasedAuth, setTokens} from '../storage/tokenStorage.js';
+import {clearUser} from '../storage/tokenStorage.js';
 import axios from "axios";
 import {API_BASE_URL, API_ENDPOINTS} from '../../constants/apiEndpoints.js';
 import logger from '../../utils/logger.js';
@@ -34,13 +34,7 @@ apiClient.interceptors.request.use(
         if (i18n.language) {
             config.headers['Accept-Language'] = i18n.language;
         }
-                        if (!isCookieBasedAuth()) {
-            const token = getToken();
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-        }
-                config.withCredentials = true;
+        config.withCredentials = true;
 
         // Manually add CSRF token from cookie if not already present
         if (!config.headers['X-XSRF-TOKEN']) {
@@ -125,7 +119,7 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+                await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
                     {},                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -135,21 +129,8 @@ apiClient.interceptors.response.use(
                     }
                 );
 
-                                                const newAccessToken = response.data.accessToken;
-                const newRefreshToken = response.data.refreshToken;
-
-                if (newAccessToken && newRefreshToken) {
-                                        setTokens(newAccessToken, newRefreshToken);
-                    processQueue(null, newAccessToken);
-                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                } else {
-                                        processQueue(null, 'cookie-based');
-                                        delete originalRequest.headers.Authorization;
-                }
-
-                if (authContextRef?.handleTokenRefresh) {
-                    authContextRef.handleTokenRefresh(newAccessToken, newRefreshToken);
-                }
+                processQueue(null, 'cookie-based');
+                delete originalRequest.headers.Authorization;
 
                 return apiClient(originalRequest);
 
@@ -160,7 +141,7 @@ apiClient.interceptors.response.use(
                     authContextRef.handleTokenRefreshFailure();
                 } else {
                     showTokenExpiredMessage();
-                    clearTokens();
+                    clearUser();
                 }
 
                 return Promise.reject(refreshError);

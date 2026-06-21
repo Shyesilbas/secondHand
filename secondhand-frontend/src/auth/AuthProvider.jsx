@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    clearTokens,
     getUser,
-    hasValidTokens,
-    isCookieBasedAuth,
-    setTokens,
-    setUser
+    setUser,
+    clearUser
 } from '../common/services/storage/tokenStorage.js';
 import { authService } from './services/authService.js';
 import { UserDTO } from '../user/users.js';
 import logger from '../common/utils/logger.js';
 import { AuthContext } from './AuthContext.jsx';
+import { setAuthContextRef } from '../common/services/api/interceptors.js';
 
 export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState({
@@ -28,29 +26,20 @@ export const AuthProvider = ({ children }) => {
             isAuthInitializing.current = true;
             try {
                 const userData = getUser();
-                const isCookieAuth = isCookieBasedAuth();
-
 
                 if (userData) {
                     setAuthState({ user: userData, isAuthenticated: true, isLoading: true });
-                }
-
-                if (isCookieAuth || hasValidTokens()) {
-                    if (!userData) {
-                        try {
-                            const userProfile = await authService.getCurrentUser();
-                            const newUserData = {
-                                ...UserDTO,
-                                ...userProfile
-                            };
-                            setUser(newUserData);
-                            setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
-                        } catch (error) {
-                            clearTokens();
-                            setAuthState({ user: null, isAuthenticated: false, isLoading: false });
-                        }
-                    } else {
-                        setAuthState(prev => ({ ...prev, isLoading: false }));
+                    try {
+                        const userProfile = await authService.getCurrentUser();
+                        const newUserData = {
+                            ...UserDTO,
+                            ...userProfile
+                        };
+                        setUser(newUserData);
+                        setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
+                    } catch {
+                        clearUser();
+                        setAuthState({ user: null, isAuthenticated: false, isLoading: false });
                     }
                 } else {
                     setAuthState({ user: null, isAuthenticated: false, isLoading: false });
@@ -70,8 +59,6 @@ export const AuthProvider = ({ children }) => {
     const login = useCallback(async (loginResponse) => {
         const { userId, email } = loginResponse;
 
-        setTokens(null, null);
-
         try {
             const userProfile = await authService.getCurrentUser();
 
@@ -84,7 +71,7 @@ export const AuthProvider = ({ children }) => {
 
             setUser(userData);
             setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
-        } catch (error) {
+        } catch {
             const userData = {
                 ...UserDTO,
                 id: userId,
@@ -95,30 +82,14 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const loginWithTokens = useCallback(async (accessToken, refreshToken) => {
-        setTokens(accessToken, refreshToken);
-
-        try {
-            const userProfile = await authService.getCurrentUser();
-            const userData = {
-                ...UserDTO,
-                ...userProfile
-            };
-            setUser(userData);
-            setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
-        } catch (error) {
-            setAuthState(prev => ({ ...prev, isAuthenticated: true, isLoading: false }));
-        }
-    }, []);
-
     const logout = useCallback(async () => {
         try {
             await authService.logout();
-        } catch (error) {
+        } catch {
+            // Ignore error since backend logout might fail if token is already expired
         } finally {
-            clearTokens();
+            clearUser();
             setAuthState({ user: null, isAuthenticated: false, isLoading: false });
-            // Reset flags so auth can be re-initialized if needed
             isAuthInitialized.current = false;
             isAuthInitializing.current = false;
         }
@@ -132,23 +103,24 @@ export const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    const handleTokenRefresh = useCallback((newAccessToken, newRefreshToken) => {
-        setTokens(newAccessToken, newRefreshToken);
-    }, []);
-
     const handleTokenRefreshFailure = useCallback(() => {
-        logout();
-    }, [logout]);
+        clearUser();
+        setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+        isAuthInitialized.current = false;
+        isAuthInitializing.current = false;
+    }, []);
 
     const value = useMemo(() => ({
         authState,
         login,
-        loginWithTokens,
         logout,
         updateUser,
-        handleTokenRefresh,
         handleTokenRefreshFailure,
-    }), [authState, login, loginWithTokens, logout, updateUser, handleTokenRefresh, handleTokenRefreshFailure]);
+    }), [authState, login, logout, updateUser, handleTokenRefreshFailure]);
+
+    useEffect(() => {
+        setAuthContextRef({ handleTokenRefreshFailure });
+    }, [handleTokenRefreshFailure]);
 
     return (
         <AuthContext.Provider value={value}>

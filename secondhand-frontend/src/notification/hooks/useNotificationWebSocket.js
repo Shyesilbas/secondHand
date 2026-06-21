@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef} from 'react';
 import {Stomp} from '@stomp/stompjs';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {WS_BASE_URL} from '../../common/constants/apiEndpoints.js';
-import {getToken} from '../../common/services/storage/tokenStorage.js';
+
 import logger from '../../common/utils/logger.js';
 
 const MAX_RECONNECT_ATTEMPTS = 10;
@@ -26,8 +26,7 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
             return;
         }
 
-        const token = getToken();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const headers = {};
 
         const socket = new WebSocket(WS_BASE_URL);
         stompClient.current = Stomp.over(socket);
@@ -95,7 +94,7 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
         if (stompClient.current) {
             try {
                 stompClient.current.deactivate();
-            } catch(e) {
+            } catch {
                 if (stompClient.current.connected) {
                     stompClient.current.disconnect();
                 }

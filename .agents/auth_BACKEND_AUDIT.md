@@ -1,67 +1,53 @@
 # auth Backend Audit
-_Tarih: 2026-06-20_
+_Tarih: 2026-06-21_
 
 ## Genel Değerlendirme
-`auth` paketi genel hatlarıyla çalışır durumda ancak `AuthService` sınıfı bir God Object'e (Her Şeyi Bilen Nesne) dönüşmüş durumda. Bu sınıf 11 farklı servisi (`IUserService`, `AuthenticationManager`, `TokenService`, `UserAgreementService` vb.) enjekte ediyor ve Kayıt, Giriş, OAuth tamamlama, Token Rotasyonu ve Çıkış gibi birbirinden ayrılması gereken çok farklı flow'ları tek başına yönetiyor. Validasyon katmanının eksikliği nedeniyle iş kuralları (sözleşme kontrolü vb.) servis içine sızmış.
+Önceki raporda tespit edilen `AuthService` God Object antipattern'i başarıyla çözülmüş; sorumluluklar `LoginService`, `RegistrationService`, `OAuthService`, `PasswordService` ve `TokenService` olarak Single Responsibility prensibine uygun şekilde dağıtılmış. Katmanlı mimari genel hatlarıyla çok daha sağlıklı. Access token'ların kısa süreli tutulması ve state-less bırakılması performansa olumlu etki ediyor. Bu raporda ağırlıklı olarak güvenlik zafiyetlerine (Security Vulnerabilities) odaklanılmıştır.
 
 ## Sınıf Haritası
 | Katman | Sınıflar | Adet | Yorum |
 |--------|----------|------|-------|
-| Controller | AuthController, PasswordController | 2 | İnce yapıda, HTTP ve Cookie yönetimini düzgün yapıyor. |
-| Service | AuthService, PasswordService, TokenService, vb. | 6 | `AuthService` aşırı yüklenmiş (God Object). |
+| Controller | AuthController, PasswordController | 2 | Sadece HTTP response/cookie yönetiminden sorumlu, business logic içermiyor. |
+| Service | LoginService, RegistrationService, PasswordService, TokenService, vb. | 7 | Sorumluluklar mükemmel ayrılmış. |
 | Repository | TokenRepository | 1 | |
-| Validator/Policy | - | 0 | Eksik. Validasyonlar servis içine yazılmış. |
-| Mapper | - | 0 | `userMapper` dışarıdan (user paketinden) kullanılıyor. |
-| Event/Listener | - | 0 | `UserRegisteredEvent` fırlatılıyor ancak listener yok (diğer modüllerde). |
+| Validator/Policy | RegistrationValidator | 1 | Request validasyonları doğru katmana çekilmiş. |
+| Mapper | - | 0 | `UserMapper` dışarıdan kullanılıyor. |
 
-## Tespit Edilen Sorunlar
+## Tespit Edilen Güvenlik Zafiyetleri ve Riskler
+
 | Sorun | Sınıf/Katman | Risk | Çözüm Önerisi |
 |-------|-------------|------|---------------|
-| God Object Antipattern | `AuthService` (Service) | Kritik | `RegistrationService`, `LoginService` ve `OAuthService` olarak parçalanmalı. 11 bağımlılık çok fazla. |
-| Katman İhlali (Eksik Validator) | `AuthService` (Service) | Orta | Sözleşme (Agreement) kabulleri veya kullanıcı kontrolleri servis metotlarının başında yapılıyor. Bunlar `RegistrationValidator` gibi Policy sınıflarına alınmalı. |
-| Gereksiz Transaction | `AuthService` (Service) | Düşük | Sınıf seviyesinde `@Transactional` var. Login işlemi gibi ağır read-only süreçlerin gereksiz yere transaction altında ezilmemesi için metot bazlı transaction kullanılmalı. |
+| **Refresh Token Rotation (RTR) Reuse Açığı** | `LoginService` | **Kritik** | Çalınan ve önceden kullanılmış (Revoked) bir refresh token tekrar kullanıldığında, sadece `InvalidRefreshTokenException` fırlatılıyor. Gerçek bir RTR implementasyonunda, token reuse tespit edildiğinde o `familyId`'ye ait **tüm aktif tokenlar iptal edilmelidir**. Aksi takdirde saldırgan çalınan aktif token'ı kullanmaya devam edebilir. |
+| **Concurrent Login / Çoklu Cihaz Politikası** | `LoginService` / `TokenService` | Orta | Kullanıcı her giriş yaptığında `tokenService.revokeUserRefreshTokens(user)` çağrılıyor. Bu, kullanıcının aynı anda sadece tek bir cihazda oturum açabilmesine neden oluyor (yeni giriş, diğer tüm cihazlardan çıkış yaptırır). Bu kasıtlı değilse, ciddi bir UX/DoS sorunudur. Sadece eski token ailesi veya süresi dolanlar iptal edilmelidir. |
+| **Brute Force / Rate Limiting Eksikliği** | `AuthController` | Orta | `/login` ve `/forgot-password` endpoint'lerinde açık bir rate-limiting (ör. hesabı 15 dk kilitleme veya IP bazlı limit) görünmüyor. `AuthenticationManager` desteklemiyorsa, özel bir mekanizma eklenmeli. |
+| **Logout CSRF veya Session Kapatma Çelişkisi** | `LoginService` | Düşük | `logout` işlemi yalnızca `user`'ın tüm refresh token'larını siliyor (multi-device logout'a dönüşüyor). Kullanıcının sadece mevcut oturumdan çıkış yapması (`revokeToken(refreshToken)`) beklenirken tüm cihazlardan atılmasına sebep oluyor. `revokeAllSessions` ile `logout` metodunun işlevleri birbirine karışmış. |
 
-## Katman Analizi
+## Güvenlik Analizi Detayı
 
-### Controller
-`AuthController` cookie ayarlarını (`cookieUtils` ile) düzgün yapıyor. İstekleri direkt servise iletiyor. İş mantığı sızması yok.
+### Refresh Token Ailesi (Family) Takibi
+`TokenService.saveToken` içinde token ailesi (`familyId`) oluşturuluyor. Ancak `LoginService.refreshToken` içinde bir token'ın REVOKED olduğu tespit edildiğinde (`!tokenService.isTokenValid(refreshTokenValue)`), o `familyId` altındaki aktif token'lar aranıp silinmiyor. Kötü niyetli kişi eski bir token'ı denerse, asıl kurbanın oturumu sonlandırılmalı.
 
-### Service
-`AuthService` modülerlikten uzaklaşmış. Single Responsibility Principle (Tek Sorumluluk Prensibi) ciddi şekilde ihlal ediliyor. 
-`PasswordService` ve `TokenService` ise kendi alanlarında iyi çalışıyor.
+### Rate Limiting & Brute Force
+Parola sıfırlama işlemlerinde `verificationAttemptLeft` doğru bir şekilde azaltılıyor ve enumeration engellenmiş (`emailFingerprint` kullanımı ve aynı yanıtın dönülmesi çok iyi). Ancak `/login` endpoint'inde benzer bir parola deneme limiti kontrolü (Account Lockout) görülmedi.
 
-### Validasyon
-Bu pakete ait bir Validator/Policy sınıfı yok. Controller `@Valid` kullanıyor ancak business rule'lar (örn: zorunlu sözleşmelerin kabul edilip edilmediği) direkt `AuthService.register` içinde `if (!request.getAgreementsAccepted())` şeklinde inline kontrol ediliyor.
+### Access Token Revocation
+Kullanıcının access token'ı kısa süreli olduğu için iptal edilmemesi bilinen bir durum ve kabul edilebilir bir trade-off'tur. Çıkış yapıldığında client tarafındaki cookie siliniyor.
 
-### Repository
-`TokenRepository` basit ve işlevsel. N+1 veya transaction riski yaratacak kompleks sorgular yok.
-
-### Mapper
-DTO-Entity dönüşümü için `UserMapper` kullanılıyor (user domain'ine ait). Bu normal karşılanabilir ancak Auth paketi kendi request DTO'larını kendisi User objesine dönüştürecek bir mapping barındırabilir.
-
-### Event/Async
-Kayıt işlemi bitince `UserRegisteredEvent` senkron olarak fırlatılıyor. Bu asenkron yapılabilirse kayıt işlemi daha da hızlanır.
-
-## Transaction & Güvenlik Riski
-`AuthService` sınıf seviyesinde `@Transactional` işaretlendiği için login işleminde bile (sadece son giriş tarihi güncelleniyor) veritabanı kilitleri veya bağlantı havuzu uzun süre tutulabilir. Yalnızca veri değişikliği yapan metotlar (Register, OAuthComplete, Logout) transactional olmalıdır.
-
-## Cache Kullanımı
-Paket dahilinde belirgin bir cache kullanımı görülmedi (Token'lar Redis yerine DB'de tutuluyor gibi duruyor, ancak `TokenCleanupScheduler` ile temizleniyor).
-
-## README Durumu
-Paket içerisinde `README.md` dosyası mevcut.
+### Cookie Güvenliği
+`CookieUtils` içinde `HttpOnly`, `Secure` ve `SameSite` flag'leri kullanılarak XSS ve CSRF ataklarına karşı önlem alınmış. Çerez domain'i üretim ortamına göre dinamik atanıyor, bu iyi bir pratik.
 
 ## Öncelik Sırası
-1. **Kritik:** `AuthService`'in `RegistrationService`, `LoginService` ve `OAuthHandlerService` olarak parçalanması (God Object riskini azaltmak).
-2. **Orta:** İş kurallarının (`Agreement` onayları vb.) bir Validator veya Policy sınıfına çıkarılması.
-3. **Düşük:** Sınıf seviyesindeki `@Transactional` anatasyonunun metot seviyesine düşürülmesi.
+1. **Kritik:** `LoginService.refreshToken` içinde token reuse tespiti yapıldığında tüm token ailesinin (`familyId`) iptal edilmesi.
+2. **Kritik:** `LoginService.login` içinde tüm aktif oturumların sonlandırılması davranışının (eğer bilerek yapılmadıysa) düzeltilmesi. Sadece mevcut cihazın token'ları yenilenmeli.
+3. **Orta:** `LoginService.logout` işleminin sadece gönderilen refresh token'ı iptal edecek şekilde güncellenmesi.
+4. **Orta:** Login endpoint'i için Rate Limiting / Account Lockout eklenmesi.
 
 ## Genel Skor
 | Kategori | Puan (1-5) |
 |----------|-----------|
-| Katman Ayrımı | 2 |
-| Transaction Yönetimi | 3 |
-| Validasyon | 2 |
-| Kod Tekrarı | 3 |
-| Dokümantasyon | 4 |
-| **Ortalama** | 2.8 |
+| Katman Ayrımı | 5 |
+| Transaction Yönetimi | 4 |
+| Validasyon | 4 |
+| Güvenlik / Token Yönetimi | 3 |
+| Kod Tekrarı | 4 |
+| **Ortalama** | 4.0 |

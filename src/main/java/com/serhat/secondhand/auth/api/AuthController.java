@@ -13,7 +13,6 @@ import com.serhat.secondhand.auth.domain.dto.response.AuthClientResponse;
 import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
-import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +82,9 @@ public class AuthController {
             HttpServletResponse httpResponse) {
         
         log.info("Logout request for user: {}", authentication.getName());
-        AuthMessageResponse response = loginService.logout(authentication, request);
+        
+        String refreshToken = cookieUtils.getRefreshTokenFromCookies(request).orElse(null);
+        AuthMessageResponse response = loginService.logout(authentication, refreshToken);
 
         cookieUtils.clearAuthCookies(httpResponse);
 

@@ -1,36 +1,5 @@
 const USER_KEY = 'user';
 
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-        const cookieValue = parts.pop().split(';').shift();
-        return cookieValue;
-    }
-    return null;
-};
-
-const deleteCookie = (name, path = '/') => {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; SameSite=Strict; Secure`;
-};
-
-export const setTokens = (accessToken, refreshToken) => {
-};
-
-export const getToken = () => {
-                return getCookie('sh_at');
-};
-
-export const getRefreshToken = () => {
-                return getCookie('sh_rt');
-};
-
-export const clearTokens = () => {
-            deleteCookie('sh_at', '/');
-    deleteCookie('sh_rt', '/');
-    localStorage.removeItem(USER_KEY);
-};
-
 export const setUser = (userData) => {
     if (userData) {
         // Remove sensitive data before storing
@@ -67,7 +36,7 @@ export const getUser = () => {
         if (userData) {
             return JSON.parse(userData);
         }
-    } catch (error) {
+    } catch {
         localStorage.removeItem(USER_KEY);
     }
     return null;
@@ -75,35 +44,4 @@ export const getUser = () => {
 
 export const clearUser = () => {
     localStorage.removeItem(USER_KEY);
-};
-
-export const isTokenExpired = (token) => {
-    if (!token) return true;
-
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.exp * 1000 < Date.now();
-    } catch (error) {
-        return true;
-    }
-};
-
-export const hasValidTokens = () => {
-                
-        const accessToken = getToken();
-    const refreshToken = getRefreshToken();
-    
-        if (accessToken && refreshToken) {
-        return !isTokenExpired(refreshToken);
-    }
-    
-                return true;
-};
-
-export const isCookieBasedAuth = () => {
-    const accessToken = getToken();
-    const refreshToken = getRefreshToken();
-    
-    // Cookie-based auth if both cookies exist
-    return !!(accessToken && refreshToken);
 };

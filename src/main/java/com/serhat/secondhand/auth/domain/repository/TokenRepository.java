@@ -60,4 +60,13 @@ import java.util.UUID;
     int bulkExpireTokens(@Param("now") LocalDateTime now,
                          @Param("currentStatus") TokenStatus currentStatus,
                          @Param("newStatus") TokenStatus newStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Token t
+            SET t.tokenStatus = :newStatus
+            WHERE t.familyId = :familyId
+            """)
+    int bulkUpdateTokenFamilyStatus(@Param("familyId") UUID familyId,
+                                    @Param("newStatus") TokenStatus newStatus);
 }

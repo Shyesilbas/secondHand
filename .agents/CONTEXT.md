@@ -1,16 +1,16 @@
 ## Son çalışılan
-- Auth cookie flow görsel testi yapıldı ve başarılı geçti.
-- Auth paketi için güvenlik zafiyetlerine odaklanan derin backend audit yapılıyor.
+- Frontend Auth iş mantığı ve güvenlik refactor işlemi (HttpOnly cookie uyumsuzluğu, misafir API yükü, yanlış durum yönetimi) başarıyla tamamlandı.
+- Backend Auth paketinde concurrent login (brute-force) rate limit, RTR family token revocation ve güvenlik sıkılaştırmaları tamamlandı.
 
 ## Tamamlananlar
 - GEMINI.md otomatik güncelleme kuralları eklendi
 - `design-system` skill'ine tipografi standartları eklendi
 - Payment paketi backend audit raporu `.agents/payment_BACKEND_AUDIT.md` olarak kaydedildi.
 - Auth cookie flow görsel testi başarıyla tamamlandı.
+- Backend Auth rate limiting (LoginAttemptService) ve Token Family Revocation tamamlandı.
+- Frontend Auth HttpOnly cookie refactor'ü (gereksiz istek engelleme ve tokenStorage temizliği) tamamlandı.
 
 ## Bir sonraki adım
-- Backend audit raporundaki (ör. Cache invalidation, karmaşık sorgular) düzeltmelerin onaya göre uygulanması.
-- Auth paketi güvenlik denetimi bulgularının raporlanması ve onaya göre giderilmesi.
 - AI streaming endpoint testi, eksik README'ler.
 
 ## Açık riskler

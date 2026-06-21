@@ -97,7 +97,7 @@ public class OAuthService {
         }
         eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
-        LoginService.TokenRotationResult tokens = loginService.issueTokens(user, false);
+        LoginService.TokenRotationResult tokens = loginService.issueTokens(user, false, null);
 
         auditOAuthGoogleLogin(user, httpRequest);
 

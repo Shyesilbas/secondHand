@@ -94,6 +94,18 @@ public class TokenService {
     }
 
     @Transactional
+    public void revokeTokenFamily(UUID familyId) {
+        if (familyId == null) return;
+        int revokedCount = tokenRepository.bulkUpdateTokenFamilyStatus(
+                familyId,
+                TokenStatus.REVOKED
+        );
+        if (revokedCount > 0) {
+            log.warn("Revoked {} tokens for family: {}", revokedCount, familyId);
+        }
+    }
+
+    @Transactional
     public void cleanupExpiredTokens() {
         LocalDateTime now = LocalDateTime.now();
         int expiredCount = tokenRepository.bulkExpireTokens(
