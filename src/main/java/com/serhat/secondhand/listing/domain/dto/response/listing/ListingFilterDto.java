@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 public abstract class ListingFilterDto {
     private ListingType listingType;
     private ListingStatus status;
+    private String title;
     private Long sellerId;
     private String city;
     private String district;

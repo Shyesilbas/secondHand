@@ -1,6 +1,7 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ShoppingCart } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
@@ -28,24 +29,21 @@ const CheckoutPage = () => {
     resetCartState
   } = useCart();
   const offerId = useMemo(() => new URLSearchParams(location.search).get('offerId'), [location.search]);
-  const [offerContext, setOfferContext] = useState(null);
   const [couponInput, setCouponInput] = useState('');
   const [appliedCouponCode, setAppliedCouponCode] = useState(null);
   const [couponError, setCouponError] = useState(null);
-  const [pricing, setPricing] = useState(null);
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
   const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
   const cartKey = useMemo(() => {
     const base = cartItems.map(i => `${i.id}:${i.quantity}`).join('|');
     return `${base}|offer:${offerId || ''}`;
   }, [cartItems, offerId]);
-  useEffect(() => {
-    if (!offerId) {
-      setOfferContext(null);
-      return;
-    }
-    offerService.getById(offerId).then(async offer => {
+
+  // Fetch offer context using useQuery
+  const { data: offerContextQuery, error: offerError } = useQuery({
+    queryKey: ['offerContext', offerId],
+    queryFn: async () => {
+      const offer = await offerService.getById(offerId);
       const listing = offer?.listingId ? await listingService.getListingById(offer.listingId) : null;
       const safeListing = listing ? {
         ...listing,
@@ -53,15 +51,19 @@ const CheckoutPage = () => {
         campaignPrice: null,
         campaignName: null
       } : null;
-      setOfferContext({
-        offer,
-        listing: safeListing
-      });
-    }).catch(e => {
-      setOfferContext(null);
-      setCouponError(e?.response?.data?.message || CART_MESSAGES.OFFER_LOAD_FAILED);
-    });
-  }, [offerId]);
+      return { offer, listing: safeListing };
+    },
+    enabled: !!offerId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const offerContext = offerContextQuery || null;
+
+  useEffect(() => {
+    if (offerError) {
+      setCouponError(offerError?.response?.data?.message || CART_MESSAGES.OFFER_LOAD_FAILED);
+    }
+  }, [offerError]);
   const displayCartItems = useMemo(() => {
     if (!offerContext?.offer || !offerContext?.listing) {
       return cartItems;
@@ -76,6 +78,28 @@ const CheckoutPage = () => {
       offerTotalPrice: offerContext.offer.totalPrice
     }];
   }, [cartItems, offerContext]);
+  // Fetch pricing preview using useQuery
+  const { data: pricingQueryData, isLoading: isPreviewLoading } = useQuery({
+    queryKey: ['checkoutPreview', cartKey, appliedCouponCode, offerId],
+    queryFn: async () => {
+      const requested = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
+      try {
+        const data = await couponService.preview(requested, offerId);
+        return { data, success: true };
+      } catch (e) {
+        if (requested) {
+          const fallbackData = await couponService.preview(null, offerId);
+          return { data: fallbackData, success: false, error: e };
+        }
+        throw e;
+      }
+    },
+    retry: false,
+    staleTime: 10 * 1000,
+  });
+
+  const pricing = pricingQueryData?.data || null;
+
   const calculateTotal = useCallback(() => {
     if (pricing?.total != null) {
       return parseFloat(pricing.total) || 0;
@@ -91,64 +115,44 @@ const CheckoutPage = () => {
   const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
   const checkout = useCheckout(effectiveCartCount, calculateTotal, resetCartState, appliedCouponCode, offerId);
   const [currentStep, setCurrentStep] = useState(CART_CHECKOUT_DEFAULTS.INITIAL_STEP);
-  const refreshPreviewRef = useRef(null);
-  const isRefreshingRef = useRef(false);
-  const refreshPreview = useCallback(async code => {
-    if (isRefreshingRef.current) {
-      return;
-    }
-    isRefreshingRef.current = true;
-    setIsPreviewLoading(true);
-    const requested = code != null && String(code).trim() !== '' ? String(code).trim().toUpperCase() : null;
-    try {
-      const data = await couponService.preview(requested, offerId);
-      setPricing(data);
-      const echoed = data?.couponCode != null && String(data.couponCode).trim() !== '' ? String(data.couponCode).trim().toUpperCase() : null;
-      if (!requested) {
-        setAppliedCouponCode(null);
-        setCouponError(null);
-      } else if (echoed && echoed === requested) {
-        setAppliedCouponCode(echoed);
-        setCouponError(null);
-      } else {
-        setAppliedCouponCode(null);
-        setCouponError(CART_MESSAGES.COUPON_APPLY_FAILED);
-      }
-    } catch (e) {
-      const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
-      setCouponError(message);
-      setAppliedCouponCode(null);
-      try {
-        const data = await couponService.preview(null, offerId);
-        setPricing(data);
-      } catch {
-        /* ignore nested preview failures */
-      }
-    } finally {
-      setIsPreviewLoading(false);
-      isRefreshingRef.current = false;
-    }
-  }, [offerId]);
-  refreshPreviewRef.current = refreshPreview;
+
+
+
   useEffect(() => {
-    if (refreshPreviewRef.current) {
-      refreshPreviewRef.current(appliedCouponCode);
+    if (pricingQueryData) {
+      if (pricingQueryData.success) {
+        const echoed = pricingQueryData.data?.couponCode != null && String(pricingQueryData.data.couponCode).trim() !== '' ? String(pricingQueryData.data.couponCode).trim().toUpperCase() : null;
+        if (!appliedCouponCode) {
+          setCouponError(null);
+        } else if (echoed && echoed === appliedCouponCode) {
+          setCouponError(null);
+        } else {
+          setAppliedCouponCode(null);
+          setCouponError(CART_MESSAGES.COUPON_APPLY_FAILED);
+        }
+      } else {
+        const e = pricingQueryData.error;
+        const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
+        setCouponError(message);
+        setAppliedCouponCode(null);
+      }
     }
-  }, [cartKey, appliedCouponCode]);
-  const onApplyCoupon = async () => {
+  }, [pricingQueryData, appliedCouponCode]);
+
+  const onApplyCoupon = () => {
     const next = couponInput?.trim() || '';
     if (!next) {
       setCouponError(null);
-      await refreshPreview(null);
+      setAppliedCouponCode(null);
       return;
     }
-    await refreshPreview(next.toUpperCase());
+    setAppliedCouponCode(next.toUpperCase());
   };
-  const onRemoveCoupon = async () => {
+
+  const onRemoveCoupon = () => {
     setAppliedCouponCode(null);
     setCouponInput('');
     setCouponError(null);
-    await refreshPreview(null);
   };
   const steps = CART_CHECKOUT_STEPS;
   const handleStepChange = step => {
@@ -232,11 +236,11 @@ const CheckoutPage = () => {
         </div>
       </PageContainer>
 
-      <ActiveCouponsModal isOpen={isCouponsModalOpen} onClose={() => setIsCouponsModalOpen(false)} onApply={async code => {
+      <ActiveCouponsModal isOpen={isCouponsModalOpen} onClose={() => setIsCouponsModalOpen(false)} onApply={code => {
       const c = typeof code === 'string' ? code.trim() : '';
       setCouponInput(c);
       setIsCouponsModalOpen(false);
-      await refreshPreview(c ? c.toUpperCase() : null);
+      setAppliedCouponCode(c ? c.toUpperCase() : null);
     }} />
 
       <EWalletSpendingWarningModal isOpen={checkout.showEWalletWarning} onClose={() => checkout.setShowEWalletWarning(false)} onConfirm={checkout.confirmEWalletWarningAndCheckout} projectedSpent={calculateTotal()} warningLimit={checkout.eWallet?.spendingWarningLimit || 0} currency={displayCartItems[0]?.listing?.currency || 'TRY'} />

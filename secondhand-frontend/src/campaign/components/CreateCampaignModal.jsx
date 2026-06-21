@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import ReactDOM from 'react-dom';
 import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
@@ -64,8 +65,15 @@ const CreateCampaignModal = ({
   } = useNotification();
   const [form, setForm] = useState(defaultForm);
   const [isSaving, setIsSaving] = useState(false);
-  const [myListings, setMyListings] = useState([]);
-  const [isLoadingListings, setIsLoadingListings] = useState(false);
+  const { data: myListings = [] } = useQuery({
+    queryKey: ['myListingsForCampaign'],
+    queryFn: async () => {
+      const res = await listingService.getMyListings(0, 50);
+      return Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
+    },
+    enabled: isOpen,
+    staleTime: 2 * 60 * 1000,
+  });
   const availableListings = useMemo(() => {
     return (myListings || []).filter(l => l?.type !== 'VEHICLE' && l?.type !== 'REAL_ESTATE');
   }, [myListings]);
@@ -76,14 +84,7 @@ const CreateCampaignModal = ({
     });
     return Array.from(types).sort();
   }, [availableListings]);
-  useEffect(() => {
-    if (!isOpen) return;
-    setIsLoadingListings(true);
-    listingService.getMyListings(0, 50).then(res => {
-      const data = Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
-      setMyListings(data);
-    }).catch(() => setMyListings([])).finally(() => setIsLoadingListings(false));
-  }, [isOpen]);
+  // My listings are now fetched and cached using useQuery above
   useEffect(() => {
     if (!isOpen) return;
     if (editingCampaign) {

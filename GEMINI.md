@@ -143,10 +143,17 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 - [x] API response format standardize edildi (ResultResponses)
 - [x] api-contract skill yazıldı
 - [x] Auth cookie flow görsel test
+- [x] Backend Legacy & Hardcoded Kod Taraması (BACKEND_LEGACY_AUDIT)
+- [x] 3 sınıfta @Autowired -> constructor injection refaktörü yapıldı (OrderQueryService, UserService, ListingQueryService)
+- [x] CloudinaryConfig System.out.println ifadeleri Logger ile değiştirildi
+- [x] ListingMapper:376 boş catch bloğuna loglama eklendi
+- [x] Eksik modül README'leri tamamlandı (core, user, checkout, shipping, pricing, email)
+- [x] Frontend performans analizi yapıldı ve raporu hazırlandı (frontend_performance_audit.md)
+- [x] Frontend performans optimizasyonları (React Query, WebSocket lazy load, storage debounce, ReviewButton loop fix) başarıyla tamamlandı ve build alındı
+- [x] useListingSearch.js ve backend title filtresi entegrasyonu (V24__add_listing_title_search_index.sql ile) tamamlandı, build alındı
 
 **Aktif:**
 - [ ] AI streaming endpoint testi
-- [ ] Eksik modül README'leri (core, user, checkout, shipping, pricing, email)
 
 **Sonraki:**
 - [ ] listing N+1 sorunu JPA log analizi
@@ -156,3 +163,8 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 ### 6.5. Timeline
 - **2026-06-19:** İlk AI destek doküman yapısı tasarlandı. Token azaltma odaklı çalışma ilkeleri belirlendi.
 - **2026-06-20:** Frontend UI sprint tamamlandı (Skeleton, PageContainer, tipografi, border-radius). Backend audit yapıldı. Auth God Object refactor edildi. API response convention standardize edildi. 10 skill dosyası oluşturuldu.
+- **2026-06-21:** Backend Legacy & Hardcoded Kod Taraması tamamlandı, `.agents/BACKEND_LEGACY_AUDIT.md` raporu oluşturuldu. Performans optimizasyonları (React Query, lazy-loading WebSockets, storage writes debouncing, ReviewButton loop fixes) uygulandı. Son olarak, backend arama API'sine `title` filtresi entegre edildi, `LOWER(title)` için `V24__add_listing_title_search_index.sql` Flyway migration'ı yazıldı ve frontend client-side search loops kaldırılarak debounced server-side paginated title aramaya geçildi. Hem frontend hem backend build'leri başarıyla doğrulandı.
+
+
+
+

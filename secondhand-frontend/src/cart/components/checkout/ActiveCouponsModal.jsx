@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import ReactDOM from 'react-dom';
 import { couponService } from '../../services/couponService.js';
 import { formatCurrency } from '../../../common/formatters.js';
@@ -13,18 +14,15 @@ const ActiveCouponsModal = ({
   const {
     t
   } = useTranslation();
-  const [coupons, setCoupons] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  useEffect(() => {
-    if (!isOpen) return;
-    setIsLoading(true);
-    setError(null);
-    couponService.active().then(data => setCoupons(Array.isArray(data) ? data : [])).catch(e => {
-      setCoupons([]);
-      setError(e?.response?.data?.message || 'Failed to load coupons');
-    }).finally(() => setIsLoading(false));
-  }, [isOpen]);
+  const { data: coupons = [], isLoading, error: queryError } = useQuery({
+    queryKey: ['activeCoupons'],
+    queryFn: () => couponService.active(),
+    select: (data) => Array.isArray(data) ? data : [],
+    enabled: isOpen,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const error = queryError?.response?.data?.message || queryError?.message || null;
   const sorted = useMemo(() => {
     return [...(coupons || [])].sort((a, b) => String(a.code).localeCompare(String(b.code)));
   }, [coupons]);

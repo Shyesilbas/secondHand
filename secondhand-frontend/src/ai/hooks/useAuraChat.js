@@ -63,14 +63,17 @@ export const useAuraChat = ({
     persistFlushRef.current += 1;
     if (persistFlushRef.current === 1) return;
     const toSave = messages.filter((m) => !m.typing).slice(-MAX_PERSISTED_MESSAGES);
-    try {
-      cacheService.set(
-        getAuraChatMessagesStorageKey(userId, persistMessagesSurface),
-        toSave
-      );
-    } catch {
-      /* quota */
-    }
+    const handler = setTimeout(() => {
+      try {
+        cacheService.set(
+          getAuraChatMessagesStorageKey(userId, persistMessagesSurface),
+          toSave
+        );
+      } catch {
+        /* quota */
+      }
+    }, 1000);
+    return () => clearTimeout(handler);
   }, [messages, persistMessagesSurface, userId]);
 
   const scrollToBottom = useCallback(() => {

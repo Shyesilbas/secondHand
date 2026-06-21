@@ -31,7 +31,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
 public class OrderQueryService {
@@ -43,10 +42,25 @@ public class OrderQueryService {
     private final OrderValidationService orderValidationService;
     private final OrderItemCancelRepository orderItemCancelRepository;
     private final OrderItemRefundRepository orderItemRefundRepository;
+    private final OrderQueryService self;
 
-    @Lazy
-    @Autowired
-    private OrderQueryService self;
+    public OrderQueryService(OrderRepository orderRepository,
+                             OrderMapper orderMapper,
+                             EscrowService escrowService,
+                             IUserService userService,
+                             OrderValidationService orderValidationService,
+                             OrderItemCancelRepository orderItemCancelRepository,
+                             OrderItemRefundRepository orderItemRefundRepository,
+                             @Lazy OrderQueryService self) {
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
+        this.escrowService = escrowService;
+        this.userService = userService;
+        this.orderValidationService = orderValidationService;
+        this.orderItemCancelRepository = orderItemCancelRepository;
+        this.orderItemRefundRepository = orderItemRefundRepository;
+        this.self = self;
+    }
 
     public Result<Page<OrderDto>> getUserOrders(Long userId, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);

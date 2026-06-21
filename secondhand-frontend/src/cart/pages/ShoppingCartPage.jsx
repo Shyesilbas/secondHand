@@ -1,6 +1,7 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, Check, Heart, ShoppingBag } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
@@ -43,9 +44,33 @@ const ShoppingCartPage = () => {
     isRemovingFromCart,
     isClearingCart
   } = useCart();
-  const [pricing, setPricing] = useState(null);
-  const [_, setIsPricingLoading] = useState(false);
-  const [sellerCampaigns, setSellerCampaigns] = useState([]);
+  const sellerIds = useMemo(() => {
+    return [...new Set(cartItems.map(item => item.listing.sellerId))];
+  }, [cartItems]);
+
+  const cartKey = useMemo(() => {
+    return cartItems.map(i => `${i?.listing?.id || i?.id}:${i.quantity}`).join('|');
+  }, [cartItems]);
+
+  const { data: pricingData } = useQuery({
+    queryKey: ['cartPricingAndCampaigns', cartKey, sellerIds],
+    queryFn: async () => {
+      const [pricingRes, campaignsRes] = await Promise.all([
+        couponService.preview(null),
+        campaignService.listBySellers(sellerIds)
+      ]);
+      return {
+        pricing: pricingRes?.data || pricingRes,
+        sellerCampaigns: Array.isArray(campaignsRes?.data) ? campaignsRes.data : Array.isArray(campaignsRes) ? campaignsRes : []
+      };
+    },
+    enabled: cartItems.length > 0,
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+  const pricing = pricingData?.pricing || null;
+  const sellerCampaigns = useMemo(() => pricingData?.sellerCampaigns || [], [pricingData?.sellerCampaigns]);
   const [showClearModal, setShowClearModal] = useState(false);
   const checkReservationStatus = reservedAt => {
     if (!reservedAt) return {
@@ -79,22 +104,7 @@ const ShoppingCartPage = () => {
     } = checkReservationStatus(item.reservedAt);
     return !isExpired && timeRemaining && timeRemaining.minutes < 5;
   }), [cartItems]);
-  useEffect(() => {
-    if (cartItems.length > 0) {
-      setIsPricingLoading(true);
-      const sellerIds = [...new Set(cartItems.map(item => item.listing.sellerId))];
-      Promise.all([couponService.preview(null), campaignService.listBySellers(sellerIds)]).then(([pricingRes, campaignsRes]) => {
-        setPricing(pricingRes?.data || pricingRes);
-        setSellerCampaigns(Array.isArray(campaignsRes?.data) ? campaignsRes.data : Array.isArray(campaignsRes) ? campaignsRes : []);
-      }).catch(() => {
-        setPricing(null);
-        setSellerCampaigns([]);
-      }).finally(() => setIsPricingLoading(false));
-    } else {
-      setPricing(null);
-      setSellerCampaigns([]);
-    }
-  }, [cartItems]);
+  // Pricing and campaigns are now fetched and managed by TanStack useQuery above
   const bundleInfo = useMemo(() => {
     if (!sellerCampaigns.length || !cartItems.length) return {
       suggestions: [],

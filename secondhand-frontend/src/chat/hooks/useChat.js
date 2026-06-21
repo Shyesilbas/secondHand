@@ -13,6 +13,7 @@ export const useChat = (userId, options = {}) => {
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
     const [messages, setMessages] = useState([]);
     const enableChatRoomsFetch = options.enableChatRoomsFetch ?? false;
+    const connectWebSocket = options.connectWebSocket ?? true;
 
     const {
         isConnected,
@@ -24,7 +25,7 @@ export const useChat = (userId, options = {}) => {
         unsubscribeFromChatRoom,
         addMessageCallback,
         removeMessageCallback
-    } = useWebSocket(user?.id);
+    } = useWebSocket(user?.id, { enabled: connectWebSocket });
 
     const {
         data: chatRooms = [],

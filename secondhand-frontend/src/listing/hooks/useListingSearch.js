@@ -5,16 +5,12 @@ import { LISTING_DEFAULTS } from '../types/index.js';
 /**
  * Handles title-based search (client-side) and listingNo search (API call)
  */
-export const useListingSearch = ({ listings, mode, filters, selectedCategory, urlSearchQuery = '' }) => {
+export const useListingSearch = ({ listings, mode, urlSearchQuery = '', updateFilters }) => {
   const [searchTerm, setSearchTerm] = useState(() => String(urlSearchQuery || '').trim());
-  const [allPagesLoaded, setAllPagesLoaded] = useState(false);
-  const [allListings, setAllListings] = useState([]);
-  const [loadingAllPages, setLoadingAllPages] = useState(false);
   const [listingNoLoading, setListingNoLoading] = useState(false);
   const [listingNoError, setListingNoError] = useState('');
   const [listingNoResult, setListingNoResult] = useState(null);
   const listingNoRequestRef = useRef(0);
-  const titleSearchRequestRef = useRef(0);
 
   useEffect(() => {
     const q = String(urlSearchQuery || '').trim();
@@ -34,6 +30,20 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory, ur
     if (mode === 'mine') return 'title';
     return isListingNoSearch ? 'listingNo' : 'title';
   }, [isListingNoSearch, mode, searchTrimmed]);
+
+  // Sync title search term to parent filters state with debounce
+  useEffect(() => {
+    if (searchMode !== 'title') {
+      updateFilters?.({ title: null });
+      return;
+    }
+
+    const handler = setTimeout(() => {
+      updateFilters?.({ title: searchTrimmed || null });
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchTrimmed, searchMode, updateFilters]);
 
   // ListingNo API call effect
   useEffect(() => {
@@ -74,78 +84,16 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory, ur
     if (searchMode === 'listingNo') {
       return listingNoResult ? [listingNoResult] : [];
     }
-    if (searchMode === 'none') return listings || [];
-
-    const searchLower = searchTrimmed.toLowerCase();
-    const listingsToSearch = allPagesLoaded ? allListings : listings || [];
-
-    return listingsToSearch.filter((listing) => {
-      const titleMatch = listing.title?.toLowerCase().includes(searchLower);
-      const listingNoMatch = listing.listingNo?.toLowerCase().includes(searchLower);
-      return titleMatch || listingNoMatch;
-    });
-  }, [allListings, allPagesLoaded, listingNoResult, listings, searchMode, searchTrimmed]);
+    return listings || [];
+  }, [listingNoResult, listings, searchMode]);
 
   const clearSearch = useCallback(() => {
-    titleSearchRequestRef.current += 1;
     setSearchTerm('');
-    setAllPagesLoaded(false);
-    setAllListings([]);
-    setLoadingAllPages(false);
     setListingNoLoading(false);
     setListingNoError('');
     setListingNoResult(null);
-  }, []);
-
-  const loadAllPages = useCallback(async () => {
-    if (searchMode !== 'title' || !searchTrimmed) return;
-    const requestId = titleSearchRequestRef.current + 1;
-    titleSearchRequestRef.current = requestId;
-    setLoadingAllPages(true);
-    try {
-      const allListingsData = [];
-      let page = 0;
-      let total = 1;
-      let loadedPageCount = 0;
-
-      while (page < total && loadedPageCount < LISTING_DEFAULTS.TITLE_SEARCH_MAX_PAGES) {
-        if (titleSearchRequestRef.current !== requestId) return;
-        const response =
-          mode === 'mine'
-            ? await listingService.getMyListings(
-                page,
-                LISTING_DEFAULTS.SEARCH_MY_PAGE_SIZE,
-                selectedCategory || filters.listingType || null
-              )
-            : await listingService.filterListings({
-                ...filters,
-                listingType: selectedCategory || filters.listingType,
-                type: selectedCategory || filters.type,
-                page,
-                size: LISTING_DEFAULTS.SEARCH_FILTER_PAGE_SIZE,
-              });
-
-        if (titleSearchRequestRef.current !== requestId) return;
-        const content = response.content || [];
-        total = response.totalPages || 0;
-        if (content.length) {
-          allListingsData.push(...content);
-        }
-        page += 1;
-        loadedPageCount += 1;
-
-        if (!content.length) break;
-      }
-
-      if (titleSearchRequestRef.current !== requestId) return;
-      setAllListings(allListingsData);
-      setAllPagesLoaded(true);
-    } finally {
-      if (titleSearchRequestRef.current === requestId) {
-        setLoadingAllPages(false);
-      }
-    }
-  }, [filters, mode, searchMode, searchTrimmed, selectedCategory]);
+    updateFilters?.({ title: null });
+  }, [updateFilters]);
 
   return {
     searchTerm,
@@ -158,9 +106,9 @@ export const useListingSearch = ({ listings, mode, filters, selectedCategory, ur
       error: listingNoError,
     },
     title: {
-      allPagesLoaded,
-      loadingAllPages,
-      loadAllPages,
+      allPagesLoaded: true,
+      loadingAllPages: false,
+      loadAllPages: () => {},
     },
   };
 };

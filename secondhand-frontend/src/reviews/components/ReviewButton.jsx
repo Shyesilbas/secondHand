@@ -24,38 +24,21 @@ const ReviewButton = ({
     setReview(existingReview);
   }, [existingReview]);
 
-  // Modal + batch map arası senkron sorunlarında (veya esnek API şekli) tek satır GET ile doldur.
+  // Hydrate review by order item if skipIndividualFetch is false and no existingReview is provided.
   React.useEffect(() => {
-    if (!skipIndividualFetch || reviewsLoading) return;
+    if (skipIndividualFetch || reviewsLoading) return;
     const oid = orderItem?.id ?? orderItem?.orderItemId;
     if (oid === undefined || oid === null || oid === '') return;
-    if (existingReview) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const reviewData = await reviewService.getReviewByOrderItem(oid);
-        if (cancelled || !reviewData) return;
-        setReview(reviewData);
-      } catch (error) {
-        if (error?.response?.status !== 404) {
-          logger.error('Error hydrating review by order item:', error);
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [skipIndividualFetch, reviewsLoading, orderItem?.id, orderItem?.orderItemId, existingReview]);
+    if (existingReview !== null && existingReview !== undefined) return;
 
-  // Parent provides batch reviews via orderReviews - never fetch individually.
-  React.useEffect(() => {
-    if (skipIndividualFetch || reviewsLoading || !orderItem?.id) return;
-    if (existingReview !== null && existingReview !== undefined) return; // Parent already provided
+    let cancelled = false;
     const checkExistingReview = async () => {
       try {
-        const reviewData = await reviewService.getReviewByOrderItem(orderItem.id);
+        const reviewData = await reviewService.getReviewByOrderItem(oid);
+        if (cancelled) return;
         setReview(reviewData);
       } catch (error) {
+        if (cancelled) return;
         if (error?.response?.status !== 404) {
           logger.error('Error checking review:', error);
         }
@@ -63,7 +46,10 @@ const ReviewButton = ({
       }
     };
     checkExistingReview();
-  }, [orderItem?.id, existingReview, reviewsLoading, skipIndividualFetch]);
+    return () => {
+      cancelled = true;
+    };
+  }, [skipIndividualFetch, reviewsLoading, orderItem?.id, orderItem?.orderItemId, existingReview]);
   const canReview = orderStatus === ORDER_STATUSES.COMPLETED || orderStatus === ORDER_STATUSES.DELIVERED || shippingStatus === ORDER_STATUSES.DELIVERED || orderItem?.shippingStatus === ORDER_STATUSES.DELIVERED;
   if (!canReview) {
     return null;

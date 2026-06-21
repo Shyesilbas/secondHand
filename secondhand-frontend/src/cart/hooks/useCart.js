@@ -44,7 +44,10 @@ export const useCart = (options = {}) => {
 
     useEffect(() => {
         if (loadCartItems && !isLoadingItems) {
-            syncCartCount(cartCount);
+            const handler = setTimeout(() => {
+                syncCartCount(cartCount);
+            }, 200);
+            return () => clearTimeout(handler);
         }
     }, [cartCount, cartItems, isLoadingItems, loadCartItems]);
 

@@ -29,7 +29,6 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
 public class ListingQueryService {
@@ -39,12 +38,24 @@ public class ListingQueryService {
     private final ListingEnrichmentService enrichmentService;
     private final ListingViewService listingViewService;
     private final IReviewService reviewService;
-    @Qualifier("taskExecutor")
     private final Executor taskExecutor;
+    private final ListingQueryService self;
 
-    @Lazy
-    @Autowired
-    private ListingQueryService self;
+    public ListingQueryService(ListingRepository listingRepository,
+                               ListingMapper listingMapper,
+                               ListingEnrichmentService enrichmentService,
+                               ListingViewService listingViewService,
+                               IReviewService reviewService,
+                               @Qualifier("taskExecutor") Executor taskExecutor,
+                               @Lazy ListingQueryService self) {
+        this.listingRepository = listingRepository;
+        this.listingMapper = listingMapper;
+        this.enrichmentService = enrichmentService;
+        this.listingViewService = listingViewService;
+        this.reviewService = reviewService;
+        this.taskExecutor = taskExecutor;
+        this.self = self;
+    }
 
     public Optional<Listing> findById(UUID id) {
         return listingRepository.findById(id);
@@ -121,6 +132,16 @@ public class ListingQueryService {
         return self.getCachedUserListings(userId, page, size).toPage();
     }
 
+    public Page<ListingDto> getMyListings(Long userId, int page, int size, String title) {
+        if (title == null || title.isBlank()) {
+            return getMyListings(userId, page, size);
+        }
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
+        Page<Listing> listingsPage = listingRepository.findBySellerIdAndTitle(userId, title.trim(), pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+    }
+
     @Cacheable(value = "userProfile", key = "'listings:' + #userId + ':' + #page + ':' + #size")
     public CachedPage<ListingDto> getCachedUserListings(Long userId, int page, int size) {
         log.info("[CACHE MISS] userListings::{} page={}", userId, page);
@@ -142,6 +163,16 @@ public class ListingQueryService {
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingType(userId, listingType, pageable);
+        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+    }
+
+    public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType, String title) {
+        if (title == null || title.isBlank()) {
+            return getMyListings(userId, page, size, listingType);
+        }
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
+        Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingTypeAndTitle(userId, listingType, title.trim(), pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
     }
 

@@ -105,6 +105,7 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
     filters: filterHook.filters,
     selectedCategory: filterHook.selectedCategory,
     urlSearchQuery,
+    updateFilters: filterHook.updateFilters,
   });
 
   // Wire up filter changes to clear search

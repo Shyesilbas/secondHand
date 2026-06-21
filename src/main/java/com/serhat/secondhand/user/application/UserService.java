@@ -29,16 +29,22 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final UserNotificationService userNotificationService;
     private final UserMapper userMapper;
+    private final UserService self;
 
-    @Lazy
-    @Autowired
-    private UserService self;
+    public UserService(UserRepository userRepository,
+                       UserNotificationService userNotificationService,
+                       UserMapper userMapper,
+                       @Lazy UserService self) {
+        this.userRepository = userRepository;
+        this.userNotificationService = userNotificationService;
+        this.userMapper = userMapper;
+        this.self = self;
+    }
 
     public User getAuthenticatedUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

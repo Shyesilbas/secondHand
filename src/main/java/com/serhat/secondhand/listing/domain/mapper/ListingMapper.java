@@ -373,7 +373,9 @@ public abstract class ListingMapper {
         if (request.buildingCondition() != null) request.buildingCondition().ifPresent(cond -> {
             try {
                 entity.setBuildingCondition(com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition.valueOf(cond));
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                log.warn("Failed to parse building condition: {}", cond, e);
+            }
         });
         if (request.exchangeable() != null) request.exchangeable().ifPresent(entity::setExchangeable);
         if (request.hasNorthFacade() != null) request.hasNorthFacade().ifPresent(entity::setHasNorthFacade);

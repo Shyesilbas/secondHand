@@ -39,7 +39,8 @@ const ContactSellerButton = ({
     isConnected,
     selectedChatRoom
   } = useChat(user?.id, {
-    enableChatRoomsFetch: false
+    enableChatRoomsFetch: false,
+    connectWebSocket: isChatOpen
   });
   const targetUserId = listing.userId || listing.sellerId;
   if (sameChatId(targetUserId, user?.id)) {

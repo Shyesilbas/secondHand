@@ -15,7 +15,8 @@ const appendLimited = (prev, item) => {
     return next.length > MAX_MESSAGES_BUFFER ? next.slice(-MAX_MESSAGES_BUFFER) : next;
 };
 
-const useWebSocket = (userId) => {
+const useWebSocket = (userId, options = {}) => {
+    const enabled = options.enabled ?? true;
     const [isConnected, setIsConnected] = useState(false);
     const [messages, setMessages] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -193,12 +194,14 @@ const useWebSocket = (userId) => {
     // ==================== EFFECTS ====================
     
     useEffect(() => {
-        connect();
+        if (enabled) {
+            connect();
+        }
         
         return () => {
             disconnect();
         };
-    }, [connect, disconnect]);
+    }, [connect, disconnect, enabled]);
 
     // ==================== RETURN ====================
     

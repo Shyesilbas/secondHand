@@ -26,6 +26,9 @@ public class FilterHelper {
         if (filters.getStatus() != null) {
             predicates.add(cb.equal(root.get("status"), filters.getStatus()));
         }
+        if (filters.getTitle() != null && !filters.getTitle().trim().isEmpty()) {
+            predicates.add(cb.like(cb.lower(root.get("title")), "%" + filters.getTitle().toLowerCase() + "%"));
+        }
         if (filters.getCity() != null && !filters.getCity().trim().isEmpty()) {
             predicates.add(cb.like(cb.lower(root.get("city")), "%" + filters.getCity().toLowerCase() + "%"));
         }
