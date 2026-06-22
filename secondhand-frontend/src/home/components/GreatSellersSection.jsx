@@ -55,7 +55,7 @@ const SellerCard = ({
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {/* Rating / Trust Score */}
               <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                <Star className="w-3 h-3 text-status-warning fill-status-warning" />
                 <span className="text-caption font-bold text-text-secondary">{s.averageRating?.toFixed(1) || '0.0'}</span>
                 <span className="text-caption text-text-muted font-medium">{t("score")}</span>
               </div>

@@ -11,7 +11,7 @@ import { LISTING_DEFAULTS, LISTING_TYPES, NON_PURCHASABLE_TYPES } from '../types
 const LISTING_ENGINE_QUERY_KEYS = {
   listings: ['listings'],
   filtered: (filters) => ['listings', 'filtered', filters],
-  mine: (userId, page, size, listingType) => ['listings', 'mine', userId, page, size, listingType || null],
+  mine: (userId, page, size, listingType, title, status) => ['listings', 'mine', userId, page, size, listingType || null, title || null, status || null],
 };
 
 /**
@@ -45,11 +45,13 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
         user?.id,
         filterHook.cleanedFilters?.page ?? 0,
         filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-        filterHook.cleanedFilters?.listingType || null
+        filterHook.cleanedFilters?.listingType || null,
+        filterHook.cleanedFilters?.title || null,
+        filterHook.mineStatus || null
       );
     }
     return LISTING_ENGINE_QUERY_KEYS.filtered({ ...filterHook.cleanedFilters, userId: user?.id || null });
-  }, [filterHook.cleanedFilters, mode, user?.id]);
+  }, [filterHook.cleanedFilters, filterHook.mineStatus, mode, user?.id]);
 
   const canFetch = mode === 'mine'
     ? Boolean(isAuthenticated && user?.id)
@@ -62,7 +64,9 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
         return listingService.getMyListings(
           filterHook.cleanedFilters?.page ?? 0,
           filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-          filterHook.cleanedFilters?.listingType || null
+          filterHook.cleanedFilters?.listingType || null,
+          filterHook.cleanedFilters?.title || null,
+          filterHook.mineStatus || null
         );
       }
       return listingService.filterListings(filterHook.cleanedFilters);
@@ -76,12 +80,8 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const rawListings = data?.content || [];
-  const listings = useMemo(() => {
-    if (mode !== 'mine') return rawListings;
-    if (!filterHook.mineStatus) return rawListings;
-    return rawListings.filter((l) => l?.status === filterHook.mineStatus);
-  }, [filterHook.mineStatus, mode, rawListings]);
+  const rawListings = useMemo(() => data?.content || [], [data?.content]);
+  const listings = rawListings;
   const error = queryError?.message || null;
 
   const paginationHook = useListingPagination({

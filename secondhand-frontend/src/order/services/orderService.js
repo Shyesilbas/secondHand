@@ -2,10 +2,13 @@ import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {get, post, put} from '../../common/services/api/request.js';
 import { ORDER_DEFAULTS } from '../constants/orderUiConstants.js';
 
-const buildPagedOrdersUrl = (endpoint, page, size, sort, direction) => {
+const buildPagedOrdersUrl = (endpoint, page, size, sort, direction, deliveryMethod) => {
   let url = `${endpoint}?page=${page}&size=${size}`;
   if (sort) {
     url += `&sort=${sort},${direction}`;
+  }
+  if (deliveryMethod && deliveryMethod !== 'ALL') {
+    url += `&deliveryMethod=${encodeURIComponent(deliveryMethod)}`;
   }
   return url;
 };
@@ -21,9 +24,10 @@ export const orderService = {
     page = ORDER_DEFAULTS.INITIAL_PAGE,
     size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
     sort = null,
-    direction = ORDER_DEFAULTS.SORT_DIRECTION
+    direction = ORDER_DEFAULTS.SORT_DIRECTION,
+    deliveryMethod = 'ALL'
   ) => {
-    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, page, size, sort, direction));
+    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, page, size, sort, direction, deliveryMethod));
   },
   getByOrderNumber: async (orderNumber) => {
     return get(API_ENDPOINTS.ORDERS.GET_BY_ORDER_NUMBER(orderNumber));
@@ -56,9 +60,10 @@ export const orderService = {
     page = ORDER_DEFAULTS.INITIAL_PAGE,
     size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
     sort = null,
-    direction = ORDER_DEFAULTS.SORT_DIRECTION
+    direction = ORDER_DEFAULTS.SORT_DIRECTION,
+    deliveryMethod = 'ALL'
   ) => {
-    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS, page, size, sort, direction));
+    return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS, page, size, sort, direction, deliveryMethod));
   },
   getPendingEscrowAmount: async () => {
     return get(API_ENDPOINTS.ORDERS.GET_PENDING_ESCROW_AMOUNT);

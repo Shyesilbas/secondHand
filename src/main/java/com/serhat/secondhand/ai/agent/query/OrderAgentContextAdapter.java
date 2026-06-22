@@ -26,7 +26,7 @@ public class OrderAgentContextAdapter implements AgentContextAdapter {
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {
         try {
-            var orderResult = orderQueryService.getUserOrders(userId, PageRequest.of(0, MAX_ITEMS));
+            var orderResult = orderQueryService.getUserOrders(userId, null, PageRequest.of(0, MAX_ITEMS));
             if (orderResult.isError() || orderResult.getData() == null) {
                 return new AgentContextSection(SOURCE, "No orders found for this user.", "ok");
             }

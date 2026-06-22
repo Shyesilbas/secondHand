@@ -39,7 +39,7 @@ const HeroSection = () => {
     }
     return cards;
   }, [showcases]);
-  return <section className="relative overflow-hidden bg-page-hero border-b border-border-light/70">
+  return <section className="relative overflow-hidden bg-page-hero border-b border-border-light">
       <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-12">
         <div className="grid lg:grid-cols-[minmax(0,1fr)_520px] lg:items-center gap-8 lg:gap-10">
           <div className="max-w-2xl">
@@ -92,11 +92,11 @@ const HeroSection = () => {
 
           <div className="relative flex items-center justify-center min-h-[330px] lg:h-[430px]">
             <div className="absolute inset-x-4 bottom-4 top-10 rounded-xl bg-background-dark shadow-sm" />
-            <div className="absolute left-4 top-5 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white">
+            <div className="absolute left-4 top-5 rounded-xl border border-border-dark bg-secondary-dark px-4 py-3 text-text-inverse">
               <p className="text-caption font-bold uppercase tracking-[0.18em] text-primary-300">{t("live_picks")}</p>
               <p className="mt-1 text-2xl font-bold">{featuredCards.length || 3}</p>
             </div>
-            <div className="absolute right-4 bottom-8 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white z-30">
+            <div className="absolute right-4 bottom-8 rounded-xl border border-border-dark bg-secondary-dark px-4 py-3 text-text-inverse z-30">
               <p className="text-caption font-bold uppercase tracking-[0.18em] text-primary-300">{t("safer_deals")}</p>
               <p className="mt-1 text-sm font-bold">{t("chat_checkout")}</p>
             </div>

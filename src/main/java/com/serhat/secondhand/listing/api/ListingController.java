@@ -133,10 +133,10 @@ public class ListingController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) ListingType listingType,
             @RequestParam(required = false) String title,
+            @RequestParam(required = false) ListingStatus status,
             @AuthenticationPrincipal User currentUser) {
-        Page<ListingDto> myListings = listingType != null
-                ? listingQueryService.getMyListings(currentUser.getId(), page, size, listingType, title)
-                : listingQueryService.getMyListings(currentUser.getId(), page, size, title);
+        Page<ListingDto> myListings = listingQueryService.getMyListings(
+                currentUser.getId(), page, size, status, listingType, title);
         return ResultResponses.ok(Result.success(myListings));
     }
 

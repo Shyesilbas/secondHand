@@ -4,18 +4,18 @@ export { getOrderStatusTextClass as getStatusColor } from './utils/statusPresent
 
 export const ORDER_QUERY_KEYS = Object.freeze({
   orders: ['orders'],
-  myOrders: (userId, page, size, sort, direction) => [
+  myOrders: (userId, page, size, sort, direction, deliveryMethod) => [
     'orders',
     'my',
     userId,
-    { page, size, sort, direction },
+    { page, size, sort, direction, deliveryMethod },
   ],
 
   sellerOrders: ['sellerOrders'],
-  sellerOrdersList: (userId, page, size, sort, direction) => [
+  sellerOrdersList: (userId, page, size, sort, direction, deliveryMethod) => [
     'sellerOrders',
     userId,
-    { page, size, sort, direction },
+    { page, size, sort, direction, deliveryMethod },
   ],
 
   escrow: ['escrow'],

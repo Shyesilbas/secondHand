@@ -25,7 +25,7 @@ const ChartCard = ({
 }} transition={{
   delay,
   duration: 0.4
-}} className="bg-background-primary rounded-2xl border border-slate-100 p-5 shadow-sm">
+}} className="bg-background-primary rounded-2xl border border-border-light p-5 shadow-sm">
     {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
     {children}
   </motion.div>;
@@ -49,7 +49,7 @@ const BuyerDashboardPage = () => {
     setEndDate(end);
   };
   if (isLoading) {
-    return <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
+    return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
         <LoadingIndicator />
       </div>;
   }
@@ -58,9 +58,9 @@ const BuyerDashboardPage = () => {
       opacity: 0
     }} animate={{
       opacity: 1
-    }} className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
-        <div className="text-center p-8 bg-background-primary rounded-2xl border border-slate-100 shadow-sm max-w-sm">
-          <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+    }} className="min-h-screen bg-background-secondary flex items-center justify-center">
+        <div className="text-center p-8 bg-background-primary rounded-2xl border border-border-light shadow-sm max-w-sm">
+          <div className="w-14 h-14 bg-status-error-bg text-status-error rounded-xl flex items-center justify-center mx-auto mb-4">
             <ShoppingBag className="w-7 h-7" />
           </div>
           <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
@@ -69,9 +69,9 @@ const BuyerDashboardPage = () => {
       </motion.div>;
   }
   if (!dashboard) return null;
-  return <div className="min-h-screen bg-[#f8f9fb]">
+  return <div className="min-h-screen bg-background-secondary">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 border-b border-slate-800">
+      <div className="bg-background-dark border-b border-border-dark">
         <PageContainer className="py-6 px-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <motion.div initial={{
@@ -81,14 +81,14 @@ const BuyerDashboardPage = () => {
             opacity: 1,
             x: 0
           }}>
-              <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("my_purchases")}</h1>
+              <h1 className="text-2xl font-semibold text-white tracking-tight">{t("my_purchases")}</h1>
               <div className="flex items-center gap-3 mt-0.5">
-                <p className="text-xs text-emerald-300/70 font-medium">{t("track_your_spending_orders")}</p>
+                <p className="text-xs text-text-muted font-medium">{t("track_your_spending_orders")}</p>
                 {dashboard.totalFavorites > 0 && <>
-                    <span className="text-emerald-800">·</span>
+                    <span className="text-text-muted">·</span>
                     <div className="flex items-center gap-1">
-                      <Heart className="w-3 h-3 text-primary-50/70" />
-                      <span className="text-caption text-slate-400 font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
+                      <Heart className="w-3 h-3 text-text-muted" />
+                      <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
                     </div>
                   </>}
               </div>
@@ -121,7 +121,7 @@ const BuyerDashboardPage = () => {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-slate-100" />}>
+          <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-border-light" />}>
             <ChartCard title={t("spending_trend")} delay={0.2}>
               <RevenueChart data={dashboard.spendingTrend || []} title={t("spending_trend")} label={t("spending")} />
             </ChartCard>

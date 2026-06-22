@@ -12,11 +12,11 @@ const FILTER_TABS = [{
 }, {
   key: 'pending',
   label: 'Pending',
-  dotColor: 'bg-status-warning-bg'
+  dotColor: 'bg-status-warning'
 }, {
   key: 'accepted',
   label: 'Accepted',
-  dotColor: 'bg-status-success-bg'
+  dotColor: 'bg-status-success'
 }];
 const AgreementsList = ({
   agreements,
@@ -56,7 +56,7 @@ const AgreementsList = ({
       icon: ClockIcon,
       color: 'text-status-warning',
       bgColor: 'bg-status-warning-bg',
-      borderColor: 'border-amber-200'
+      borderColor: 'border-status-warning-border'
     };
     if (ua.isAcceptedTheLastVersion) return {
       status: 'accepted',
@@ -64,7 +64,7 @@ const AgreementsList = ({
       icon: CheckIcon,
       color: 'text-status-success',
       bgColor: 'bg-status-success-bg',
-      borderColor: 'border-emerald-200',
+      borderColor: 'border-status-success-border',
       acceptedDate: ua.acceptedDate
     };
     return {
@@ -73,7 +73,7 @@ const AgreementsList = ({
       icon: ClockIcon,
       color: 'text-status-warning',
       bgColor: 'bg-status-warning-bg',
-      borderColor: 'border-amber-200'
+      borderColor: 'border-status-warning-border'
     };
   };
   const counts = useMemo(() => {
@@ -114,7 +114,7 @@ const AgreementsList = ({
   }
   return <div>
             {/* Filter tabs */}
-            <div className="flex items-center gap-1 mb-6 p-1 bg-tertiary rounded-xl w-fit">
+            <div className="flex items-center gap-1 mb-6 p-1 bg-background-secondary rounded-xl w-fit">
                 {FILTER_TABS.map(tab => {
         const isActive = filter === tab.key;
         const count = counts[tab.key] ?? 0;

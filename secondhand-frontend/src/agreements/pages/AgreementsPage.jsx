@@ -68,10 +68,10 @@ const AgreementsPage = () => {
   const activeCat = CATEGORIES.find(c => c.key === category);
   return <div className="min-h-screen bg-background-secondary">
             {/* ── Page Header ─────────────────────────────────── */}
-            <div className="bg-background-primary border-b border-border-light/80">
-                <PageContainer narrow className="py-8">
+            <div className="bg-background-primary border-b border-border-light">
+                <PageContainer className="py-8">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center shadow-lg shadow-gray-900/10">
+                        <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-sm">
                             <FileText className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -82,28 +82,28 @@ const AgreementsPage = () => {
                 </PageContainer>
             </div>
 
-            <PageContainer narrow className="py-8">
+            <PageContainer className="py-8">
                 <div className="flex flex-col lg:flex-row gap-6">
 
                     {/* ── Left: Category Sidebar ──────────────── */}
                     <div className="lg:w-64 shrink-0">
                         <nav className="bg-background-primary rounded-2xl border border-border-light overflow-hidden lg:sticky lg:top-6">
-                            <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="px-4 py-3 border-b border-border-light">
                                 <span className="text-caption font-semibold text-text-muted uppercase tracking-wider">{t("category")}</span>
                             </div>
                             <div className="p-2">
                                 {CATEGORIES.map(cat => {
                 const Icon = cat.icon;
                 const isActive = category === cat.key;
-                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-gray-900 text-white' : 'text-text-secondary hover:bg-secondary-light hover:text-text-primary'}`}>
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-background-primary/15' : 'bg-secondary-light'}`}>
+                return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-primary/20 text-primary' : 'bg-background-secondary text-text-muted'}`}>
                                                 <Icon className="w-4 h-4" />
                                             </div>
                                             <div className="min-w-0">
-                                                <div className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-text-primary'}`}>
+                                                <div className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-text-primary'}`}>
                                                     {cat.label}
                                                 </div>
-                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-text-muted'}`}>
+                                                <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-primary/80' : 'text-text-muted'}`}>
                                                     {cat.description}
                                                 </div>
                                             </div>
@@ -116,13 +116,13 @@ const AgreementsPage = () => {
                     {/* ── Right: Content Panel ────────────────── */}
                     <div className="flex-1 min-w-0">
                         <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden">
-                            <div className="px-6 py-5 border-b border-gray-100">
+                            <div className="px-6 py-5 border-b border-border-light">
                                 <div className="flex items-center gap-3">
-                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-secondary-light flex items-center justify-center">
-                                            <activeCat.icon className="w-4.5 h-4.5 text-text-secondary" />
-                                        </div>}
+                                    {activeCat && <div className="w-9 h-9 rounded-lg bg-background-secondary flex items-center justify-center">
+                                             <activeCat.icon className="w-4.5 h-4.5 text-text-secondary" />
+                                         </div>}
                                     <div>
-                                        <h2 className="text-lg font-semibold text-text-primary">{activeCat?.label}{t("agreements")}</h2>
+                                        <h2 className="text-lg font-semibold text-text-primary">{activeCat?.label} {t("agreements")}</h2>
                                         <p className="text-xs text-text-muted mt-0.5">{activeCat?.description}</p>
                                     </div>
                                 </div>
@@ -130,7 +130,7 @@ const AgreementsPage = () => {
 
                             <div className="p-6">
                                 {!loading && requiredIds.size === 0 ? <div className="py-12 text-center">
-                                        <div className="w-14 h-14 rounded-2xl bg-secondary-light flex items-center justify-center mx-auto mb-4">
+                                        <div className="w-14 h-14 rounded-2xl bg-background-secondary flex items-center justify-center mx-auto mb-4">
                                             <FileText className="w-6 h-6 text-text-muted" />
                                         </div>
                                         <p className="text-sm font-semibold text-text-primary">{t("no_required_agreements")}</p>
@@ -145,4 +145,5 @@ const AgreementsPage = () => {
             </PageContainer>
         </div>;
 };
+
 export default AgreementsPage;

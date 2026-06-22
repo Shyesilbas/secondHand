@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
@@ -58,7 +58,7 @@ const Header = () => {
     });
   };
   return <>
-            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-background-primary/90 backdrop-blur-xl border-b border-border-light/60 shadow-sm' : 'bg-background-primary border-b border-border-light/40'}`}>
+            <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-background-primary border-b border-border-light shadow-sm' : 'bg-background-primary border-b border-border-light'}`}>
                 <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
                     <div className={`flex items-center justify-between gap-4 transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}>
 

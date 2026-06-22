@@ -1,8 +1,20 @@
 ## Son çalışılan
-- `CheckoutPage.jsx` içerisinde meydana gelen `ReferenceError: Cannot access 'pricing' before initialization` hatası çözüldü (TDZ nedeniyle aşağıda tanımlı değişkenin useCallback dependency dizisinde kullanılması problemi, tanımlamaların yukarı taşınmasıyla giderildi).
-- Backend tarafına `title` arama/filtreleme parametresi eklendi ve veritabanı Title LOWER index migration'ı oluşturuldu. Frontend `useListingSearch` ve `useListingEngine` entegrasyonu tamamlanarak client-side loop'lu arama yapısı kaldırıldı, server-side paginated title aramaya geçildi.
+- Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) bileşenlerinin projenin standart light teması ve Teal renk şemasına (design-system) göre refaktör edilmesi.
 
 ## Tamamlananlar
+- Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) tasarım sistemi uyumluluğu kapsamında refaktör edildi; cam efekti (glassmorphism), tüm mavi butonlar (#1466c6) ve hardcoded slate/indigo renkleri temizlendi.
+- ShoppingCartPage, CartItemCard, OrderSummary ve uiPalette modülleri detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; ayrıksı mavi accent renkleri (#1466c6) ve warm-stone arka planları (#f4f3f1) temizlenerek projenin birincil Teal (#0d9488) renk standardına ve semantic token'larına geçildi. inline stil kodları temizlendi.
+- AgreementsPage ve ilişkili bileşenler (AgreementCard, AgreementModal, AgreementsSection) detaylı tasarım/UX denetiminden geçirilerek refaktör edildi. Sol kategori sidebar butonlarının tasarımı yumuşatıldı (bg-primary/10), onay bekleyen sözleşmelerin agresif sarı kart renkleri temizlenerek minimal card yapısına geçildi, modal perdesi backdrop-blur ile premiumlaştırıldı, AgreementsSection içindeki tüm hardcoded slate renkleri semantic theme token'ları ile değiştirildi ve frontend-audit skill dosyası daha derinlemesine tasarım/yerleşim denetimleri yapacak şekilde güncellendi.
+- CouponsPage (MyCouponsPage, PlatformCouponsPage, AdminCouponsPage) üzerindeki hardcoded renkler, gradyanlar ve slates/violets temizlendi; tasarım sistemiyle entegre edildi ve skeletons `SkeletonList` bileşenine dönüştürüldü.
+- 1→2→3 adım göstergesi kaldırıldı, 3'lü kutu grid kaldırıldı, kart sadeleştirildi, skeleton standardize edildi.
+- `UserReviewsPage` (Reviews Received/Given) modülü yepyeni, elit bir tasarıma kavuşturuldu.
+- `AuraChatPage` sayfası analiz edildi (`AURA_CHAT_PAGE_AUDIT.md`) ve premium UI kurallRules'una göre yenilendi.
+- `BuyerDashboardPage` ve `SellerDashboardPage` (Analytics) sayfalarındaki CSS ihlalleri temizlenip `design-system`'e entegre edildi.
+- `AccountHubPage` bileşeni audit edildi (`ACCOUNT_HUB_PAGE_AUDIT.md`) ve tasarım sistemine entegre edilerek hardcoded token'lardan arındırıldı.
+- HomePage bileşenleri audit edildi (`HOME_PAGE_AUDIT.md`) ve tasarım standartlarına uyumlu hale getirildi (HeroSection, ShowcaseSection, GreatSellersSection).
+- Frontend Header bileşeni audit edildi ve glassmorphism, hardcoded renk kural ihlalleri semantic token'lara geçirildi.
+- İlan yönetiminde (Kendi İlanlarım) durum (status) filtresinin sunucu tarafına taşınması (ListingRepository, ListingQueryService, ListingController, ve frontend react query entegrasyonu).
+- Sipariş listesinde teslimat yöntemi filtresinin sunucu tarafına taşınması (OrderRepository, OrderQueryService, OrderController ve frontend react query entegrasyonu).
 - GEMINI.md otomatik güncelleme kuralları eklendi
 - `design-system` skill'ine tipografi standartları eklendi
 - Payment paketi backend audit raporu `.agents/payment_BACKEND_AUDIT.md` olarak kaydedildi.
@@ -26,11 +38,13 @@
 - Frontend ve backend build doğrulamaları başarıyla tamamlandı.
 
 ## Bir sonraki adım
+- Chat infinite scroll implementasyonu
 - AI streaming endpoint testi.
 - `@PreAuthorize` eksikliği bulunan rol bazlı controller endpoint'lerinin kapatılması.
 - Listing N+1 sorunu JPA log analizi.
 
 ## Açık riskler
+- Teklif kartı mobil görünümünü test et
 - AI streaming endpoint henüz test edilmedi.
 - Payment repository `findByFilters` sorgusu karmaşık ve performans riski taşıyor.
 - PaymentProcessor'da global cache invalidation performansı olumsuz etkileyebilir.

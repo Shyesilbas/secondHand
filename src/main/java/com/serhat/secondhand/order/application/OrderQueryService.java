@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.dto.OrderItemDto;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
@@ -62,9 +63,9 @@ public class OrderQueryService {
         this.self = self;
     }
 
-    public Result<Page<OrderDto>> getUserOrders(Long userId, Pageable pageable) {
+    public Result<Page<OrderDto>> getUserOrders(Long userId, DeliveryMethod deliveryMethod, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
-        Page<Order> orders = orderRepository.findByUserId(userId, finalPageable);
+        Page<Order> orders = orderRepository.findByUserIdAndDeliveryMethod(userId, deliveryMethod, finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {
@@ -127,12 +128,12 @@ public class OrderQueryService {
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
 
-    public Result<Page<OrderDto>> getSellerOrders(Long sellerId, Pageable pageable) {
+    public Result<Page<OrderDto>> getSellerOrders(Long sellerId, DeliveryMethod deliveryMethod, Pageable pageable) {
         var userResult = userService.findById(sellerId);
         if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
 
         Pageable finalPageable = ensureSort(pageable);
-        Page<Order> orders = orderRepository.findOrdersBySellerId(sellerId, finalPageable);
+        Page<Order> orders = orderRepository.findOrdersBySellerIdAndDeliveryMethod(sellerId, deliveryMethod, finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {

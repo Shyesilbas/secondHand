@@ -11,7 +11,7 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => (
         >
             <Package className="w-[20px] h-[20px] stroke-[1.5px]" />
             {orderCount > 0 && (
-                <span className="absolute top-1 right-1 flex h-2.5 w-2.5 bg-status-error-bg rounded-full border border-white shadow-sm shadow-red-500/30"></span>
+                <span className="absolute top-1 right-1 flex h-2.5 w-2.5 bg-status-error rounded-full border border-white shadow-sm shadow-red-500/30"></span>
             )}
         </button>
 
@@ -26,7 +26,7 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => (
                         label={item.label}
                         rightContent={
                             item.key === 'orders' && orderCount > 0
-                                ? <span className="ml-auto text-caption font-semibold bg-status-error-bg text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>
+                                ? <span className="ml-auto text-caption font-semibold bg-status-error text-white w-5 h-5 flex items-center justify-center rounded-full shadow-sm shadow-red-500/30">!</span>
                                 : null
                         }
                     />

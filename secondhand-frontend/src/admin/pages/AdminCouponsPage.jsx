@@ -91,23 +91,21 @@ const audienceSummary = row => {
 /** Tutarlı form kontrolleri */
 const inputCn = 'mt-1.5 w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm placeholder:text-slate-400 transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-100/90 disabled:text-slate-500';
 function FormSection({
+  // eslint-disable-next-line no-unused-vars
   Icon,
   title,
   subtitle,
   children,
   className = ''
 }) {
-  const {
-    t
-  } = useTranslation();
-  return <section className={`rounded-2xl border border-border-light/90 bg-gradient-to-br from-white via-white to-slate-50/60 p-4 shadow-sm ring-1 ring-slate-900/[0.04] ${className}`}>
+  return <section className={`rounded-2xl border border-border-light bg-background-primary p-4 shadow-sm ${className}`}>
       <div className="mb-3 flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
           <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
         </div>
         <div className="min-w-0 flex-1 pt-0.5">
           <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
-          {subtitle ? <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{subtitle}</p> : null}
+          {subtitle ? <p className="mt-0.5 text-xs leading-relaxed text-text-muted">{subtitle}</p> : null}
         </div>
       </div>
       <div className="space-y-3.5">{children}</div>
@@ -352,27 +350,28 @@ const AdminCouponsPage = () => {
     if (!normalizedCodeQuery) return sorted;
     return sorted.filter(c => String(c.code || '').toLowerCase().includes(normalizedCodeQuery));
   }, [sorted, normalizedCodeQuery]);
-  return <div className="min-h-screen bg-[#F8FAFC]">
+
+  return <div className="min-h-screen bg-background-secondary">
       <div className="max-w-7xl mx-auto px-4 pb-10">
-        <div className="sticky top-0 z-10 -mx-4 mb-4 px-4 py-4 bg-[#F8FAFC]/90 backdrop-blur border-b border-border-light flex flex-wrap items-center justify-between gap-3">
+        <div className="sticky top-0 z-10 -mx-4 mb-4 px-4 py-4 bg-background-secondary/90 backdrop-blur border-b border-border-light flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Link to={ROUTES.DASHBOARD} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-primary shrink-0">
+            <Link to={ROUTES.DASHBOARD} className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-primary shrink-0">
               <ArrowLeft className="w-4 h-4" />{t("account")}</Link>
-            <div className="h-8 w-px bg-slate-200 hidden sm:block" />
+            <div className="h-8 w-px bg-border-light hidden sm:block" />
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-2 rounded-xl bg-primary-50 text-primary">
+              <div className="p-2 rounded-xl bg-primary-light text-primary">
                 <Shield className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl font-semibold text-text-primary truncate">{t("coupon_management")}</h1>
-                <p className="text-xs text-slate-500">{t("admin_only_platform_coupons")}</p>
+                <p className="text-xs text-text-muted">{t("admin_only_platform_coupons")}</p>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border-light bg-background-primary text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60">
+            <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border-light bg-background-primary text-sm text-text-primary hover:bg-background-secondary disabled:opacity-60">
               <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />{t("refresh")}</button>
-            <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary shadow-sm">
+            <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover shadow-sm">
               <Plus className="w-4 h-4" />{t("new_coupon")}</button>
           </div>
         </div>
@@ -380,25 +379,25 @@ const AdminCouponsPage = () => {
         <div className="rounded-2xl border border-border-light bg-background-primary shadow-sm overflow-hidden">
           {isLoading ? <div className="p-16 flex justify-center">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-            </div> : sorted.length === 0 ? <div className="p-16 text-center text-slate-500 text-sm">{t("no_coupons_yet_create_one_with_new_coupo")}</div> : <>
-              <div className="flex flex-col gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            </div> : sorted.length === 0 ? <div className="p-16 text-center text-text-muted text-sm">{t("no_coupons_yet_create_one_with_new_coupo")}</div> : <>
+              <div className="flex flex-col gap-2 border-b border-border-light bg-background-secondary px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="relative block min-w-0 flex-1 sm:max-w-sm">
                   <span className="sr-only">{t("filter_by_coupon_code")}</span>
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
-                  <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded-xl border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary shadow-sm placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden />
+                  <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded-xl border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary shadow-sm placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15" />
                 </label>
-                {normalizedCodeQuery ? <span className="shrink-0 text-xs font-medium tabular-nums text-slate-500">
+                {normalizedCodeQuery ? <span className="shrink-0 text-xs font-medium tabular-nums text-text-muted">
                     {filteredSorted.length}{t("of")}{sorted.length}
                   </span> : null}
               </div>
-              {filteredSorted.length === 0 ? <div className="px-4 py-10 text-center text-sm text-slate-600">
+              {filteredSorted.length === 0 ? <div className="px-4 py-10 text-center text-sm text-text-secondary">
                   <p>{t("no_coupon_code_matches")}<span className="font-mono font-medium text-text-primary">{codeFilter.trim()}</span>
                     &quot;.
                   </p>
-                  <button type="button" className="mt-3 text-sm font-semibold text-primary hover:text-primary" onClick={() => setCodeFilter('')}>{t("clear_search")}</button>
+                  <button type="button" className="mt-3 text-sm font-semibold text-primary hover:text-primary-hover" onClick={() => setCodeFilter('')}>{t("clear_search")}</button>
                 </div> : <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 border-b border-border-light text-slate-600">
+                <thead className="bg-background-secondary border-b border-border-light text-text-secondary">
                   <tr>
                     <th className="px-4 py-3 font-semibold">{t("code")}</th>
                     <th className="px-4 py-3 font-semibold">{t("title")}</th>
@@ -410,24 +409,24 @@ const AdminCouponsPage = () => {
                     <th className="px-4 py-3 font-semibold w-[100px]" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredSorted.map(row => <tr key={row.id} className="hover:bg-slate-50/80">
+                <tbody className="divide-y divide-border-light">
+                  {filteredSorted.map(row => <tr key={row.id} className="hover:bg-background-secondary">
                       <td className="px-4 py-3 font-mono font-medium text-text-primary">{row.code}</td>
                       <td className="px-4 py-3 max-w-[200px]">
-                        <div className="truncate text-slate-800">{row.title}</div>
-                        {row.description && <div className="truncate text-xs text-slate-500">{row.description}</div>}
+                        <div className="truncate text-text-primary">{row.title}</div>
+                        {row.description && <div className="truncate text-xs text-text-muted">{row.description}</div>}
                       </td>
-                      <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
-                        <span className="text-xs text-slate-500 uppercase">{String(row.discountKind || '').replace(/_/g, ' ')}</span>
+                      <td className="px-4 py-3 text-text-primary whitespace-nowrap">
+                        <span className="text-xs text-text-muted uppercase">{String(row.discountKind || '').replace(/_/g, ' ')}</span>
                         <div>{row.value != null ? row.value : '—'}</div>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap tabular-nums text-xs text-slate-700">
+                      <td className="px-4 py-3 whitespace-nowrap tabular-nums text-xs text-text-primary">
                         {row.usageLimitGlobal != null ? <>
                             <span className="font-semibold text-text-primary">{row.usageRemainingGlobal ?? '—'}</span>
-                            <span className="text-slate-400"> / {row.usageLimitGlobal}</span>
-                          </> : <span className="text-slate-400">—</span>}
+                            <span className="text-text-muted"> / {row.usageLimitGlobal}</span>
+                          </> : <span className="text-text-muted">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-slate-700">
+                      <td className="px-4 py-3 text-text-primary">
                         {(() => {
                       const {
                         label,
@@ -435,24 +434,24 @@ const AdminCouponsPage = () => {
                       } = audienceSummary(row);
                       const a = row.audience || (row.forAllUsers !== false ? 'ALL_USERS' : 'USER_ID_LIST');
                       return <div className="text-xs">
-                              <span className={a === 'NEVER_ORDERED_FIRST_ORDER' ? 'text-primary font-medium' : a === 'ALL_USERS' ? 'text-emerald-700 font-medium' : 'text-slate-800'}>
+                              <span className={a === 'NEVER_ORDERED_FIRST_ORDER' ? 'text-primary font-medium' : a === 'ALL_USERS' ? 'text-status-success font-medium' : 'text-text-primary'}>
                                 {label}
                               </span>
-                              {hint ? <div className="text-slate-500 mt-0.5">{hint}</div> : null}
+                              {hint ? <div className="text-text-muted mt-0.5">{hint}</div> : null}
                             </div>;
                     })()}
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">
+                      <td className="px-4 py-3 text-xs text-text-secondary whitespace-nowrap">
                         <div>{formatDateTime(row.startsAt)}</div>
                         <div>{formatDateTime(row.endsAt)}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${row.active ? 'bg-status-success-bg text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${row.active ? 'bg-status-success-bg text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
                           {row.active ? 'On' : 'Off'}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <button type="button" onClick={() => openEdit(row)} className="inline-flex items-center gap-1 text-primary hover:text-primary font-medium text-xs">
+                        <button type="button" onClick={() => openEdit(row)} className="inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-xs">
                           <Pencil className="w-3.5 h-3.5" />{t("edit")}</button>
                       </td>
                     </tr>)}
@@ -463,26 +462,24 @@ const AdminCouponsPage = () => {
         </div>
       </div>
 
-      {modal && <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-0 backdrop-blur-[3px] sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="coupon-modal-title">
-          <div className="flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.75rem] border border-white/70 bg-background-primary shadow-sm ring-1 ring-slate-900/[0.06] sm:rounded-2xl sm:shadow-2xl">
-            <header className="relative shrink-0 overflow-hidden border-b border-white/10 bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-700 px-5 py-5 text-white">
-              <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-background-primary/10 blur-2xl" />
-              <div className="pointer-events-none absolute -bottom-12 -left-8 h-32 w-48 rounded-full bg-primary/30 blur-xl" />
+      {modal && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="coupon-modal-title">
+          <div className="flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.75rem] border border-border-light bg-background-primary shadow-md sm:rounded-xl sm:shadow-lg">
+            <header className="relative shrink-0 overflow-hidden border-b border-border-light bg-background-secondary px-5 py-5 text-text-primary">
               <div className="relative flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-start gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-background-primary/15 ring-1 ring-white/25">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-light text-primary">
                     <Ticket className="h-6 w-6 opacity-95" strokeWidth={2} />
                   </div>
                   <div className="min-w-0 pt-0.5">
                     <h2 id="coupon-modal-title" className="text-lg font-semibold text-text-primary tracking-tight">
                       {modal === 'create' ? 'Yeni kupon' : 'Kuponu düzenle'}
                     </h2>
-                    <p className="mt-1 text-sm font-medium leading-snug text-primary/95">
+                    <p className="mt-1 text-sm font-medium leading-snug text-text-muted">
                       {modal === 'create' ? 'Kod, hedef kitle ve indirim kurallarını tanımlayın.' : 'Metin, indirim ve limitleri güncelleyin. Hedef kitle sabittir.'}
                     </p>
                   </div>
                 </div>
-                <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background-primary/10 text-white ring-1 ring-white/20 transition hover:bg-background-primary/20" onClick={() => {
+                <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl hover:bg-background-tertiary text-text-secondary transition-colors" onClick={() => {
               setModal(null);
               setForm(emptyForm());
             }} aria-label={t("kapat")}>
@@ -491,19 +488,19 @@ const AdminCouponsPage = () => {
               </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-slate-50/40">
+            <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-background-primary">
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
                 <FormSection Icon={Tag} title={t("temel_bilgiler")} subtitle="Kullanıcıya görünen başlık ve kupon kodu.">
                   {modal === 'create' && <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("kod")}<span className="text-rose-500">*</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("kod")}<span className="text-rose-500">*</span>
                       </span>
                       <input className={`${inputCn} font-mono uppercase tracking-wide`} value={form.code} onChange={e => setForm(p => ({
                   ...p,
                   code: e.target.value
                 }))} placeholder={t("ilk300")} required />
-                    </label>}
+                  </label>}
                   <label className="block">
-                    <span className="text-xs font-semibold text-slate-700">{t("ba_l_k")}<span className="text-rose-500">*</span>
+                    <span className="text-xs font-semibold text-text-secondary">{t("ba_l_k")}<span className="text-rose-500">*</span>
                     </span>
                     <input className={inputCn} value={form.title} onChange={e => setForm(p => ({
                   ...p,
@@ -511,7 +508,7 @@ const AdminCouponsPage = () => {
                 }))} placeholder={t("liste_ve_deme_ad_mlar_nda_g_r_n_r")} required />
                   </label>
                   <label className="block">
-                    <span className="text-xs font-semibold text-slate-700">{t("a_klama")}</span>
+                    <span className="text-xs font-semibold text-text-secondary">{t("a_klama")}</span>
                     <textarea className={`${inputCn} min-h-[88px] resize-y leading-relaxed`} value={form.description} onChange={e => setForm(p => ({
                   ...p,
                   description: e.target.value
@@ -525,39 +522,39 @@ const AdminCouponsPage = () => {
                     <div className="grid gap-2 sm:grid-cols-1">
                       {AUDIENCES.map(opt => {
                     const selected = form.audience === opt.value;
-                    return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-indigo-50/90 shadow-md shadow-indigo-500/10 ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-slate-300 hover:bg-slate-50/80'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
-                            <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-slate-300 text-primary focus:ring-primary" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
+                    return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-primary-light shadow-sm ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-border-dark hover:bg-background-secondary'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
+                            <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-border-light text-primary focus:ring-primary" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-semibold text-text-primary">{opt.label}</span>
-                              <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">{opt.hint}</span>
+                              <span className="mt-0.5 block text-xs leading-relaxed text-text-secondary">{opt.hint}</span>
                             </span>
                           </label>;
                   })}
                     </div>
                   </fieldset>
-                  {modal?.mode === 'edit' && <p className="rounded-xl border border-amber-200/80 bg-status-warning-bg px-3 py-2 text-xs text-amber-900">{t("hedef_kitle_olu_turulduktan_sonra_de_i_t")}</p>}
+                  {modal?.mode === 'edit' && <p className="rounded-xl border border-status-warning-border bg-status-warning-bg px-3 py-2 text-xs text-status-warning-text">{t("hedef_kitle_olu_turulduktan_sonra_de_i_t")}</p>}
 
-                  {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/80 bg-gradient-to-r from-indigo-50 to-violet-50 px-4 py-3.5">
-                      <div className="flex items-center gap-2.5 text-sm text-primary">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background-primary shadow-sm ring-1 ring-primary-200">
+                  {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-light bg-background-secondary px-4 py-3.5">
+                      <div className="flex items-center gap-2.5 text-sm text-text-primary">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background-primary shadow-sm border border-border-light">
                           <Users className="h-5 w-5 text-primary" />
                         </div>
                         <div>
                           <p className="font-semibold">{t("anl_k_uygun_kullan_c")}</p>
-                          <p className="text-xs text-primary/80">{t("tamamlanm_demeli_sipari_i_olmayan_kay_tl")}</p>
+                          <p className="text-xs text-text-muted">{t("tamamlanm_demeli_sipari_i_olmayan_kay_tl")}</p>
                         </div>
                       </div>
-                      <div className="rounded-xl bg-background-primary px-4 py-2 text-center shadow-sm ring-1 ring-primary-200">
+                      <div className="rounded-xl bg-background-primary px-4 py-2 text-center shadow-sm border border-border-light">
                         <span className="block text-2xl font-bold tabular-nums tracking-tight text-primary">
                           {audienceStatsLoading ? '…' : audienceStats?.eligibleUserCount ?? '—'}
                         </span>
-                        <span className="text-caption font-medium uppercase tracking-wide text-slate-500">{t("ki_i")}</span>
+                        <span className="text-caption font-medium uppercase tracking-wide text-text-muted">{t("ki_i")}</span>
                       </div>
                     </div>}
 
                   {form.audience === 'USER_ID_LIST' && <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("kullan_c_id_leri")}</span>
-                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("kullan_c_id_leri")}</span>
+                      <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
                       <input className={`${inputCn} font-mono text-sm`} value={form.eligibleUserIdsText} onChange={e => setForm(p => ({
                   ...p,
                   eligibleUserIdsText: e.target.value
@@ -566,35 +563,35 @@ const AdminCouponsPage = () => {
                 </FormSection>
 
                 <FormSection Icon={Clock} title={t("yay_n_ve_s_re")} subtitle="Ne zaman geçerli olsun? İlk sipariş kuralında tarih kapalıdır.">
-                  <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border-light bg-background-primary px-4 py-3.5 shadow-sm transition hover:border-slate-300">
-                    <span className="text-sm font-semibold text-slate-800">{t("kupon_yay_nda")}</span>
+                  <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border-light bg-background-primary px-4 py-3.5 shadow-sm transition hover:border-border-dark">
+                    <span className="text-sm font-semibold text-text-primary">{t("kupon_yay_nda")}</span>
                     <input type="checkbox" checked={form.active} onChange={e => setForm(p => ({
                   ...p,
                   active: e.target.checked
-                }))} className="h-5 w-5 shrink-0 rounded-md border-slate-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0" />
+                }))} className="h-5 w-5 shrink-0 rounded-md border-border-light text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0" />
                   </label>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("ba_lang")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("ba_lang")}</span>
                       <input type="datetime-local" className={inputCn} value={form.startsAt} onChange={e => setForm(p => ({
-                    ...p,
-                    startsAt: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     startsAt: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("biti")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("biti")}</span>
                       <input type="datetime-local" className={inputCn} value={form.endsAt} onChange={e => setForm(p => ({
-                    ...p,
-                    endsAt: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     endsAt: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                   </div>
-                  {firstOrderAudience && <p className="text-xs text-slate-500">{t("bu_kuralda_s_re_s_n_r_yok_alanlar_kilitl")}</p>}
+                  {firstOrderAudience && <p className="text-xs text-text-muted">{t("bu_kuralda_s_re_s_n_r_yok_alanlar_kilitl")}</p>}
                 </FormSection>
 
                 <FormSection Icon={Percent} title={t("i_ndirim")} subtitle="Tür ve tutar. İlk sipariş kuralı sabit ₺300 sipariş indirimidir.">
                   <label className="block">
-                    <span className="text-xs font-semibold text-slate-700">{t("i_ndirim_t_r")}</span>
+                    <span className="text-xs font-semibold text-text-secondary">{t("i_ndirim_t_r")}</span>
                     <select className={inputCn} value={form.discountKind} onChange={e => setForm(p => ({
                   ...p,
                   discountKind: e.target.value
@@ -606,22 +603,22 @@ const AdminCouponsPage = () => {
                   </label>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("de_er")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("de_er")}</span>
                       <input type="number" step="any" className={inputCn} value={form.value} onChange={e => setForm(p => ({
-                    ...p,
-                    value: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     value: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("min_sepet")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("min_sepet")}</span>
                       <input type="number" step="any" className={inputCn} value={form.minSubtotal} onChange={e => setForm(p => ({
-                    ...p,
-                    minSubtotal: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     minSubtotal: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                   </div>
                   <label className="block">
-                    <span className="text-xs font-semibold text-slate-700">{t("maks_indirim")}</span>
+                    <span className="text-xs font-semibold text-text-secondary">{t("maks_indirim")}</span>
                     <input type="number" step="any" className={inputCn} value={form.maxDiscount} onChange={e => setForm(p => ({
                   ...p,
                   maxDiscount: e.target.value
@@ -632,42 +629,42 @@ const AdminCouponsPage = () => {
                 <FormSection Icon={Layers} title={t("r_n_kapsam")} subtitle="Boş bırakılırsa uygun tüm ilan türleri (gayrimenkul ve araç hariç) geçerlidir.">
                   <div className="flex flex-wrap gap-2">
                     {LISTING_TYPES.map(t => {
-                  const on = form.eligibleTypes.includes(t);
-                  return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-indigo-50 text-primary shadow-sm ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-slate-600 hover:border-slate-300 hover:bg-slate-50'}`}>
-                          {t.replace(/_/g, ' ')}
-                        </button>;
-                })}
+                   const on = form.eligibleTypes.includes(t);
+                   return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-primary-light text-primary shadow-sm ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-text-secondary hover:border-border-dark hover:bg-background-secondary'}`}>
+                           {t.replace(/_/g, ' ')}
+                         </button>;
+                 })}
                   </div>
                 </FormSection>
 
                 <FormSection Icon={Gauge} title={t("kullan_m_limitleri")} subtitle="Global tavan ve kişi başı. İlk sipariş kuralında yalnızca 1 kullanım / kişi.">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("global_limit")}</span>
-                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("global_limit")}</span>
+                      <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
                       <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitGlobal} onChange={e => setForm(p => ({
-                    ...p,
-                    usageLimitGlobal: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     usageLimitGlobal: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-semibold text-slate-700">{t("ki_i_ba_limit")}</span>
-                      <span className="mt-0.5 block text-caption font-normal text-slate-500">{t("bo_s_n_rs_z")}</span>
+                      <span className="text-xs font-semibold text-text-secondary">{t("ki_i_ba_limit")}</span>
+                      <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
                       <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitPerUser} onChange={e => setForm(p => ({
-                    ...p,
-                    usageLimitPerUser: e.target.value
-                  }))} disabled={firstOrderAudience} />
+                     ...p,
+                     usageLimitPerUser: e.target.value
+                   }))} disabled={firstOrderAudience} />
                     </label>
                   </div>
                 </FormSection>
               </div>
 
-              <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border-light/80 bg-background-primary/90 px-4 py-4 backdrop-blur-md sm:px-5">
-                <button type="button" className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-border-light bg-background-primary px-5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50" onClick={() => {
+              <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border-light bg-background-secondary/90 px-4 py-4 backdrop-blur-md sm:px-5">
+                <button type="button" className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-border-light bg-background-primary px-5 text-sm font-semibold text-text-secondary shadow-sm transition hover:bg-background-secondary" onClick={() => {
               setModal(null);
               setForm(emptyForm());
             }}>{t("vazge")}</button>
-                <button type="submit" disabled={submitting} className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:from-indigo-500 hover:to-violet-500 disabled:pointer-events-none disabled:opacity-50">
+                <button type="submit" disabled={submitting} className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-hover disabled:pointer-events-none disabled:opacity-50">
                   {submitting ? 'Kaydediliyor…' : 'Kaydet'}
                 </button>
               </footer>
@@ -676,4 +673,5 @@ const AdminCouponsPage = () => {
         </div>}
     </div>;
 };
+
 export default AdminCouponsPage;

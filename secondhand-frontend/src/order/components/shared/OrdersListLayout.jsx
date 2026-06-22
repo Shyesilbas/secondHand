@@ -523,18 +523,10 @@ const OrdersListLayout = ({
   } = useTranslation();
   const uiCopy = useMemo(() => mergeUiCopy(uiCopyProp || {}), [uiCopyProp]);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [deliveryMethodFilter, setDeliveryMethodFilter] = useState('ALL');
+  const deliveryMethodFilter = flow.deliveryMethodFilter;
+  const setDeliveryMethodFilter = flow.setDeliveryMethodFilter;
   const navigate = useNavigate();
-  const displayedOrders = useMemo(() => {
-    let list = flow.orders || [];
-    if (deliveryMethodFilter === 'CARGO') {
-      return list.filter(o => o.deliveryMethod === 'CARGO');
-    }
-    if (deliveryMethodFilter === 'SAFE_MEETUP') {
-      return list.filter(o => o.deliveryMethod === 'SAFE_MEETUP');
-    }
-    return list;
-  }, [flow.orders, deliveryMethodFilter]);
+  const displayedOrders = flow.orders || [];
   const onPageChange = page => {
     if (!flow.search?.isSearchMode) flow.loadPage(page);
   };

@@ -134,6 +134,17 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 
 ### 6.4. Todo & Active Tasks
 **Tamamlanan:**
+- [x] Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) tasarım sistemi uyumluluğu kapsamında refaktör edildi; cam efekti (glassmorphism), tüm mavi butonlar (#1466c6) ve hardcoded slate/indigo renkleri temizlendi.
+- [x] ShoppingCartPage ve alt bileşenleri (CartItemCard, OrderSummary, uiPalette) projenin standart light teması ve Teal renk şemasına (design-system) göre tamamen refaktör edildi; mavi CTA'ler, warm-stone arka planları ve tüm hardcoded renkler temizlendi
+- [x] AgreementsPage ve alt bileşenleri (AgreementCard, AgreementModal, AgreementsSection) detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; sol menü aktif stili, sert sarı kart arka planları, modal overlay/derinlik hissi iyileştirildi, tüm hardcoded slate renkler temizlendi
+- [x] CouponsPage (MyCouponsPage, PlatformCouponsPage, AdminCouponsPage) üzerindeki hardcoded renkler, gradyanlar, ve slates/violets temizlendi; tasarım sistemiyle entegre edildi ve skeletons SkeletonList bileşenine dönüştürüldü
+- [x] OffersPage ve OfferTrackingCard tasarım revizyonu (1→2→3 adım göstergesi, 3'lü kutu grid kaldırıldı, kart sadeleştirildi, modal/skeleton standardize edildi)
+- [x] UserReviewsPage (Alınan/Verilen Yorumlar) baştan aşağı elit bir tasarımla yenilendi, hardcoded stiller temizlendi.
+- [x] AuraChatPage sayfası audit edildi (`AURA_CHAT_PAGE_AUDIT.md`) ve premium asistan görünümü ile baştan tasarlandı.
+- [x] BuyerDashboardPage ve SellerDashboardPage analiz edilip (`BUYER_ANALYTICS_PAGE_AUDIT.md`) UI standartlarına çekildi.
+- [x] AccountHubPage (Dashboard) analiz edildi (`ACCOUNT_HUB_PAGE_AUDIT.md`) ve hardcoded token kural ihlalleri semantic token'larla düzeltildi.
+- [x] HomePage bileşenleri audit edildi (`HOME_PAGE_AUDIT.md`) ve tasarım standardı kural ihlalleri giderildi.
+- [x] Frontend Header bileşeni analiz edildi (HEADER_AUDIT.md) ve glassmorphism/hardcoded token kural ihlalleri düzeltildi
 - [x] `.agents` kurallarını netleştir
 - [x] Skeleton & EmptyState merkezileştirildi
 - [x] PageContainer standardize edildi
@@ -151,11 +162,14 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 - [x] Frontend performans analizi yapıldı ve raporu hazırlandı (frontend_performance_audit.md)
 - [x] Frontend performans optimizasyonları (React Query, WebSocket lazy load, storage debounce, ReviewButton loop fix) başarıyla tamamlandı ve build alındı
 - [x] useListingSearch.js ve backend title filtresi entegrasyonu (V24__add_listing_title_search_index.sql ile) tamamlandı, build alındı
+- [x] Sipariş listesinde istemci tarafı teslimat yöntemi filtresi, veritabanı sayfalama uyumsuzluğunu gidermek için sunucu tarafına (server-side JPQL) taşındı
+- [x] İlan yönetiminde (Kendi İlanlarım) istemci tarafı durum (status) filtresi, veritabanı sayfalama uyumsuzluğunu gidermek için sunucu tarafına (server-side status query) taşındı
 
 **Aktif:**
-- [ ] AI streaming endpoint testi
+- [ ] Chat infinite scroll implementasyonu
 
 **Sonraki:**
+- [ ] AI streaming endpoint testi
 - [ ] listing N+1 sorunu JPA log analizi
 - [ ] Yeni özellik geliştirmesi — api-contract skill ile test et
 - [ ] CI/CD pipeline kurulumu
@@ -163,8 +177,6 @@ Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver
 ### 6.5. Timeline
 - **2026-06-19:** İlk AI destek doküman yapısı tasarlandı. Token azaltma odaklı çalışma ilkeleri belirlendi.
 - **2026-06-20:** Frontend UI sprint tamamlandı (Skeleton, PageContainer, tipografi, border-radius). Backend audit yapıldı. Auth God Object refactor edildi. API response convention standardize edildi. 10 skill dosyası oluşturuldu.
-- **2026-06-21:** Backend Legacy & Hardcoded Kod Taraması tamamlandı, `.agents/BACKEND_LEGACY_AUDIT.md` raporu oluşturuldu. Performans optimizasyonları (React Query, lazy-loading WebSockets, storage writes debouncing, ReviewButton loop fixes) uygulandı. Son olarak, backend arama API'sine `title` filtresi entegre edildi, `LOWER(title)` için `V24__add_listing_title_search_index.sql` Flyway migration'ı yazıldı ve frontend client-side search loops kaldırılarak debounced server-side paginated title aramaya geçildi. Hem frontend hem backend build'leri başarıyla doğrulandı.
-
-
+- **2026-06-21:** Backend Legacy & Hardcoded Kod Taraması tamamlandı, `.agents/BACKEND_LEGACY_AUDIT.md` raporu oluşturuldu. Performans optimizasyonları (React Query, lazy-loading WebSockets, storage writes debouncing, ReviewButton loop fixes) uygulandı. Son olarak, backend arama API'sine `title` filtresi entegre edildi, `LOWER(title)` için `V24__add_listing_title_search_index.sql` Flyway migration'ı yazıldı ve frontend client-side search loops kaldırılarak debounced server-side paginated title aramaya geçildi. Hem frontend hem backend build'leri başarıyla doğrulandı. Sipariş listesinde teslimat yöntemi (kargo / elden teslimat) filtresi sunucu tarafında (server-side paginated JPQL) çalışacak şekilde entegre edildi, istemci tarafı süzme mantığı ve yerel state'ler temizlendi. Kendi ilanlarım sayfasındaki durum (status) bazlı local/client-side filtreleme kaldırıldı; backend `/my-listings` endpoint'ine opsiyonel `status` parametresi eklenerek `ListingRepository` dynamic JPQL sorgusu ile server-side paginated entegre edildi, hem backend hem frontend build'leri başarıyla doğrulandı. Frontend Header bileşeni incelendi, glassmorphism ihlali temizlenerek semantic theme token'lara geçirildi ve HEADER_AUDIT.md raporu oluşturuldu. HomePage bileşenleri (Hero, Showcase, GreatSellers vs.) incelenerek HOME_PAGE_AUDIT.md hazırlandı ve keyfi/hardcoded opacity, amber yıldız renkleri, cam efekti gibi tüm ui/tasarım borçları temizlendi. OffersPage ve OfferTrackingCard tasarım revizyonu tamamlandı; 1→2→3 adım göstergesi ve 3'lü kutu grid kaldırıldı, kart sadeleştirildi, skeleton/modal container standartları uygulandı. MyCouponsPage, PlatformCouponsPage and AdminCouponsPage bileşenleri temizlenerek tüm hardcoded renkler, gradyanlar ve slates/violets temizlendi; tasarım sistemine entegre edilerek skeletons SkeletonList bileşenine dönüştürüldü. AgreementsPage ve alt bileşenleri (AgreementCard, AgreementModal, AgreementsSection) detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; sol menü aktif stili, sert sarı kart arka planları, modal overlay/derinlik hissi iyileştirildi, tüm hardcoded slate renkler temizlendi ve frontend-audit skill dosyası daha derinlemesine tasarım/yerleşim denetimleri yapacak şekilde güncellendi. ShoppingCartPage, CartItemCard, OrderSummary ve uiPalette modülleri detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; ayrıksı mavi accent renkleri (#1466c6) ve warm-stone arka planları (#f4f3f1) temizlenerek projenin birincil Teal (#0d9488) renk standardına ve semantic token'larına geçildi. Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) tasarım sistemi uyumluluğu kapsamında refaktör edildi; cam efekti (glassmorphism), tüm mavi butonlar (#1466c6) ve hardcoded slate/indigo renkleri temizlendi.
 
 

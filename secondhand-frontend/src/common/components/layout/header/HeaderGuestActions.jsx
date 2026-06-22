@@ -15,7 +15,7 @@ const HeaderGuestActions = () => {
             </Link>
             <Link
                 to={ROUTES.REGISTER}
-                className="text-sm font-semibold bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all duration-200 shadow-sm"
+                className="text-sm font-semibold bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-hover transition-all duration-200 shadow-sm"
             >
                 {t('common.register')}
             </Link>

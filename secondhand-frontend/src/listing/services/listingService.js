@@ -101,13 +101,16 @@ const serializeFilters = (filters, config, listingType) => {
 
 export const listingService = {
 
-  getMyListings: async (page = 0, size = LISTING_DEFAULTS.FILTER_PAGE_SIZE, listingType = null, title = null) => {
+  getMyListings: async (page = 0, size = LISTING_DEFAULTS.FILTER_PAGE_SIZE, listingType = null, title = null, status = null) => {
     let url = `${API_ENDPOINTS.LISTINGS.MY_LISTINGS}?page=${page}&size=${size}`;
     if (listingType) {
       url += `&listingType=${encodeURIComponent(listingType)}`;
     }
     if (title && String(title).trim()) {
       url += `&title=${encodeURIComponent(String(title).trim())}`;
+    }
+    if (status) {
+      url += `&status=${encodeURIComponent(status)}`;
     }
     return get(url);
   },

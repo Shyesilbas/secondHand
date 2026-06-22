@@ -30,23 +30,23 @@ const normalizeReviewsBulkResponse = (res) => {
   return [];
 };
 
-const useOrdersListQuery = ({ mode, page, size, sort, direction }) => {
+const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod }) => {
   const { user } = useAuthState();
   const queryClient = useQueryClient();
 
   const queryKey = useMemo(() => {
     if (mode === ORDER_VIEW_MODES.SELLER) {
-      return ORDER_QUERY_KEYS.sellerOrdersList(user?.id, page, size, sort, direction);
+      return ORDER_QUERY_KEYS.sellerOrdersList(user?.id, page, size, sort, direction, deliveryMethod);
     }
-    return ORDER_QUERY_KEYS.myOrders(user?.id, page, size, sort, direction);
-  }, [mode, user?.id, page, size, sort, direction]);
+    return ORDER_QUERY_KEYS.myOrders(user?.id, page, size, sort, direction, deliveryMethod);
+  }, [mode, user?.id, page, size, sort, direction, deliveryMethod]);
 
   const queryFn = useCallback(async () => {
     if (mode === ORDER_VIEW_MODES.SELLER) {
-      return await orderService.sellerOrders(page, size, sort, direction);
+      return await orderService.sellerOrders(page, size, sort, direction, deliveryMethod);
     }
-    return await orderService.myOrders(page, size, sort, direction);
-  }, [mode, page, size, sort, direction]);
+    return await orderService.myOrders(page, size, sort, direction, deliveryMethod);
+  }, [mode, page, size, sort, direction, deliveryMethod]);
 
   const { data, isLoading, error } = useQuery({
     queryKey,
@@ -145,6 +145,11 @@ export const useOrderFlow = ({
   const [size, setSize] = useState(initialSize);
   const [sortField, setSortField] = useState(initialSortField);
   const [sortDirection, setSortDirection] = useState(initialSortDirection);
+  const [deliveryMethodFilter, setDeliveryMethodFilter] = useState('ALL');
+
+  useEffect(() => {
+    setPage(0);
+  }, [deliveryMethodFilter]);
 
   const [searchResult, setSearchResult] = useState(null);
 
@@ -215,6 +220,7 @@ export const useOrderFlow = ({
     size,
     sort: sortField,
     direction: sortDirection,
+    deliveryMethod: deliveryMethodFilter,
   });
 
   const escrow = usePendingEscrowAmount({ enabled: viewMode === ORDER_VIEW_MODES.SELLER });
@@ -226,6 +232,7 @@ export const useOrderFlow = ({
     setSearchTerm('');
     setSearchError(null);
     setIsSearchMode(false);
+    setDeliveryMethodFilter('ALL');
   }, [initialPage, initialSize, viewMode]);
 
   const ordersRaw = useMemo(() => data?.content || [], [data]);
@@ -672,6 +679,8 @@ export const useOrderFlow = ({
     pagination,
     page,
     size,
+    deliveryMethodFilter,
+    setDeliveryMethodFilter,
     sortField,
     sortDirection,
     setSortField,

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -65,9 +66,17 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserOrders(
             @AuthenticationPrincipal User currentUser,
+            @RequestParam(required = false) String deliveryMethod,
             @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
-        return ResultResponses.ok(orderQueryService.getUserOrders(currentUser.getId(), pageable));
+        DeliveryMethod method = null;
+        if (deliveryMethod != null && !deliveryMethod.isBlank() && !"ALL".equalsIgnoreCase(deliveryMethod)) {
+            try {
+                method = DeliveryMethod.valueOf(deliveryMethod.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid values
+            }
+        }
+        return ResultResponses.ok(orderQueryService.getUserOrders(currentUser.getId(), method, pageable));
     }
 
     @GetMapping("/seller")
@@ -79,8 +88,17 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSellerOrders(
             @AuthenticationPrincipal User currentUser,
+            @RequestParam(required = false) String deliveryMethod,
             @PageableDefault(size = 5) Pageable pageable) {
-        return ResultResponses.ok(orderQueryService.getSellerOrders(currentUser.getId(), pageable));
+        DeliveryMethod method = null;
+        if (deliveryMethod != null && !deliveryMethod.isBlank() && !"ALL".equalsIgnoreCase(deliveryMethod)) {
+            try {
+                method = DeliveryMethod.valueOf(deliveryMethod.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid values
+            }
+        }
+        return ResultResponses.ok(orderQueryService.getSellerOrders(currentUser.getId(), method, pageable));
     }
 
     @GetMapping("/seller/{orderId}")

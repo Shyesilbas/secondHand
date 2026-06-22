@@ -78,6 +78,21 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
                                                        Pageable pageable);
 
     @EntityGraph(attributePaths = {"seller"})
+    @Query(value = "SELECT l FROM Listing l WHERE l.seller.id = :sellerId " +
+            "AND (:status IS NULL AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED OR :status IS NOT NULL AND l.status = :status) " +
+            "AND (:listingType IS NULL OR l.listingType = :listingType) " +
+            "AND (:title IS NULL OR :title = '' OR LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')))",
+           countQuery = "SELECT COUNT(l) FROM Listing l WHERE l.seller.id = :sellerId " +
+            "AND (:status IS NULL AND l.status <> com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.DELETED OR :status IS NOT NULL AND l.status = :status) " +
+            "AND (:listingType IS NULL OR l.listingType = :listingType) " +
+            "AND (:title IS NULL OR :title = '' OR LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')))")
+    Page<Listing> findBySellerIdAndFilters(@Param("sellerId") Long sellerId,
+                                           @Param("status") ListingStatus status,
+                                           @Param("listingType") ListingType listingType,
+                                           @Param("title") String title,
+                                           Pageable pageable);
+
+    @EntityGraph(attributePaths = {"seller"})
     @Query("SELECT l FROM Listing l " +
             "WHERE (LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
             "OR LOWER(l.listingNo) LIKE LOWER(CONCAT('%', :listingNo, '%'))) " +

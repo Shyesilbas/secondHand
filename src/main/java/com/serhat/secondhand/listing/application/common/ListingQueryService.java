@@ -132,14 +132,18 @@ public class ListingQueryService {
         return self.getCachedUserListings(userId, page, size).toPage();
     }
 
-    public Page<ListingDto> getMyListings(Long userId, int page, int size, String title) {
-        if (title == null || title.isBlank()) {
+    public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingStatus status, ListingType listingType, String title) {
+        if (status == null && listingType == null && (title == null || title.isBlank())) {
             return getMyListings(userId, page, size);
         }
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        Page<Listing> listingsPage = listingRepository.findBySellerIdAndTitle(userId, title.trim(), pageable);
+        Page<Listing> listingsPage = listingRepository.findBySellerIdAndFilters(userId, status, listingType, title != null ? title.trim() : null, pageable);
         return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+    }
+
+    public Page<ListingDto> getMyListings(Long userId, int page, int size, String title) {
+        return getMyListings(userId, page, size, null, null, title);
     }
 
     @Cacheable(value = "userProfile", key = "'listings:' + #userId + ':' + #page + ':' + #size")
@@ -160,27 +164,15 @@ public class ListingQueryService {
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType) {
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingType(userId, listingType, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+        return getMyListings(userId, page, size, null, listingType, null);
     }
 
     public Page<ListingDto> getMyListings(Long userId, int page, int size, ListingType listingType, String title) {
-        if (title == null || title.isBlank()) {
-            return getMyListings(userId, page, size, listingType);
-        }
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        Page<Listing> listingsPage = listingRepository.findBySellerIdAndListingTypeAndTitle(userId, listingType, title.trim(), pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+        return getMyListings(userId, page, size, null, listingType, title);
     }
 
     public Page<ListingDto> getMyListingsByStatus(Long userId, ListingStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        Page<Listing> listingsPage = listingRepository.findBySellerIdAndStatus(userId, status, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), userId);
+        return getMyListings(userId, page, size, status, null, null);
     }
 
     public Page<ListingDto> findByStatusAsDto(ListingStatus status, Pageable pageable) {

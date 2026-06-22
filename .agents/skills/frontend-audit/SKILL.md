@@ -32,13 +32,14 @@ Hedef sayfa ve bağlı component'leri tespit et:
 - Varsa modal ve panel component'leri
 
 Her dosyada şunlara bak:
-- Genel layout yapısı (grid/flex, kaç kolon, sticky var mı)
-- Renk ve token kullanımı (hardcoded mi, semantic mi)
-- Spacing ve padding değerleri
-- Buton ve CTA yapısı
-- Loading/empty state kullanımı
-- Mobil uyum durumu
-- Yasaklı pattern'ler (gradient, glassmorphism, arbitrary değerler)
+- **Layout & Sayfa Yerleşimi**: Flex/Grid kullanımı, bilgi yoğunluğu (cramped or too sparse), elemanların hizalanması, boşlukların dengeli dağılımı, sticky/sabit alanların kullanımı.
+- **Görsel Hiyerarşi & Tipografi**: Başlıkların öne çıkma derecesi, alt detayların okunabilirliği, meta bilgilerin görsel olarak ikincil düzeyde düzgün gruplanıp gruplanmadığı.
+- **Kullanıcı Akışı & UX/UI**: Form elemanları, butonlar ve aksiyonların konumu (ulaşılabilirlik), tıklanabilir alanların belirginliği (hover/focus animasyonları), modal/drawer geçişleri.
+- **Sunum & Kart Tasarımları**: Bilginin sadece düz çizgilerle değil, derinlik hissi veren premium kart tasarımları, gölgeler (`shadow-sm`/`shadow-md`), ve temiz gruplamalarla sunulması.
+- **Renkli Durumlar & Badge'ler**: Statü badge'lerinin, hata/uyarı kutularının çok parlak/çiğ renkler yerine pastel ve premium tonlarda olmasının sağlanması.
+- **Loading & Empty States**: İskelet yükleme (skeleton) ekranlarının tasarımsal bütünlüğü, veri olmadığında gösterilen boş durum (empty state) görselleri ve açıklayıcı metinlerin kalitesi.
+- **Mobil & Responsive**: Mobilde elemanların kayması, taşması veya aşırı sıkışması, kritik aksiyonların parmak hizasına yakınlığı.
+- **Yasaklı Pattern'ler**: Renk token ihlalleri, gradient, kontrolsüz glassmorphism, arbitrary (`-[px]`) Tailwind değerleri.
 
 ### 2. Raporu Oluştur
 

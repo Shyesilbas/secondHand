@@ -62,7 +62,7 @@ const ShowcaseSection = () => {
     if (activeTab === 'ALL') return showcases;
     return showcases.filter(s => normalizeListingType(s.listing) === activeTab);
   }, [showcases, activeTab]);
-  return <section className="py-12 sm:py-14 bg-background-secondary border-y border-border-light/70">
+  return <section className="py-12 sm:py-14 bg-background-secondary border-y border-border-light">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         
         {/* Header - Simpler & More Direct */}
@@ -72,7 +72,7 @@ const ShowcaseSection = () => {
             <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("featured_listings")}</h2>
             <p className="text-text-secondary mt-2 max-w-xl text-sm font-medium">{t("discover_popular_items_and_top_picks_fro")}</p>
           </div>
-          <Link to={ROUTES.LISTINGS} className="inline-flex w-fit items-center gap-2 px-4 py-2.5 bg-secondary-light hover:bg-secondary-200 text-primary rounded-lg font-bold text-sm transition-all active:scale-95 shadow-sm">
+          <Link to={ROUTES.LISTINGS} className="inline-flex w-fit items-center gap-2 px-4 py-2.5 bg-secondary-light hover:bg-secondary text-primary rounded-lg font-bold text-sm transition-all active:scale-95 shadow-sm">
             <span>{t("view_all_marketplace")}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>

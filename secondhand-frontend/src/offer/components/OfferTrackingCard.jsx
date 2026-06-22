@@ -3,33 +3,35 @@ import React from 'react';
 import { ArrowUpRight, CheckCircle2, Clock, ImageOff, ShoppingCart, XCircle } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { OFFER_DEFAULTS, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
+
 const statusPresentation = {
   [OFFER_STATUSES.PENDING]: {
     label: 'Pending',
-    badge: 'bg-status-warning-bg text-amber-800 border-amber-200/80',
+    badge: 'bg-status-warning-bg text-status-warning-text border-status-warning-border',
     icon: Clock
   },
   [OFFER_STATUSES.ACCEPTED]: {
     label: 'Accepted',
-    badge: 'bg-status-success-bg text-emerald-800 border-emerald-200/80',
+    badge: 'bg-status-success-bg text-status-success border-status-success-border',
     icon: CheckCircle2
   },
   [OFFER_STATUSES.REJECTED]: {
     label: 'Rejected',
-    badge: 'bg-status-error-bg text-status-error-text border-status-error-border/80',
+    badge: 'bg-status-error-bg text-status-error-text border-status-error-border',
     icon: XCircle
   },
   [OFFER_STATUSES.EXPIRED]: {
     label: 'Expired',
-    badge: 'bg-slate-100 text-slate-600 border-border-light/80',
+    badge: 'bg-background-tertiary text-text-secondary border-border-light',
     icon: Clock
   },
   [OFFER_STATUSES.COMPLETED]: {
     label: 'Completed',
-    badge: 'bg-indigo-50 text-primary border-primary/80',
+    badge: 'bg-primary-light text-primary border-primary/20',
     icon: CheckCircle2
   }
 };
+
 const formatTimeLeft = iso => {
   if (!iso) return null;
   const end = new Date(iso).getTime();
@@ -64,101 +66,112 @@ const OfferTrackingCard = ({
   const pres = statusPresentation[o.status] || statusPresentation[OFFER_STATUSES.PENDING];
   const StatusIcon = pres.icon;
   const timeLeft = !isExpired && o.expiresAt ? formatTimeLeft(o.expiresAt) : null;
-  const isPending = o.status === OFFER_STATUSES.PENDING;
-  const hasOutcome = [OFFER_STATUSES.ACCEPTED, OFFER_STATUSES.REJECTED, OFFER_STATUSES.COMPLETED, OFFER_STATUSES.EXPIRED].includes(o.status);
-  return <article className={`group relative overflow-hidden rounded-2xl border bg-background-primary shadow-sm transition-all hover:shadow-md ${needsAttention ? 'border-amber-300/90 ring-1 ring-amber-200/50' : 'border-border-light/80'} ${isExpired ? 'opacity-75 grayscale-[0.35]' : ''}`}>
-      {needsAttention ? <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-amber-400 to-orange-500" /> : null}
 
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:gap-5 sm:p-5">
-        <button type="button" onClick={() => o.listingId && onOpenListing?.(o.listingId)} disabled={!o.listingId} className="relative h-28 w-full shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-32 sm:w-32 disabled:cursor-default disabled:opacity-90" title={o.listingId ? 'View listing' : undefined}>
-          {o.listingImageUrl ? <img src={o.listingImageUrl} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" /> : <div className="flex h-full w-full items-center justify-center text-slate-400">
-              <ImageOff className="h-10 w-10" />
-            </div>}
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              {o.listingId ? <button type="button" onClick={() => onOpenListing(o.listingId)} className="text-left text-base font-semibold leading-snug text-text-primary transition hover:text-primary">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="line-clamp-2">{o.listingTitle || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE}</span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 opacity-0 transition group-hover:opacity-100" />
-                  </span>
-                </button> : <p className="text-base font-semibold text-text-primary line-clamp-2">
-                  {o.listingTitle || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE}
-                </p>}
-              <p className="mt-1 text-xs text-slate-500">
-                <span className="font-medium text-slate-600">{roleLabel}:</span> {personName}
-              </p>
-            </div>
-
-            <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${pres.badge}`}>
-              <StatusIcon className="h-3.5 w-3.5" />
-              {pres.label}
-            </span>
+  return <article className={`group flex items-center gap-4 rounded-xl border bg-card-bg p-4 shadow-sm hover:shadow-md transition-all ${isExpired ? 'opacity-60' : ''} ${needsAttention ? 'border-status-warning-border' : 'border-border-light'}`}>
+      <button
+        type="button"
+        onClick={() => o.listingId && onOpenListing?.(o.listingId)}
+        disabled={!o.listingId}
+        className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-background-secondary disabled:cursor-default"
+        title={o.listingId ? 'View listing' : undefined}
+      >
+        {o.listingImageUrl ? (
+          <img src={o.listingImageUrl} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-text-muted">
+            <ImageOff className="h-6 w-6" />
           </div>
+        )}
+      </button>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <div className="flex flex-wrap items-center gap-1.5 text-caption font-medium text-slate-500">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-caption text-white">
-                1
-              </span>
-              <span>{t("created")}</span>
-              <span className="text-slate-300">→</span>
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-caption ${isPending ? 'bg-status-warning-bg text-white' : 'bg-slate-900 text-white'}`}>
-                2
-              </span>
-              <span>{t("in_review")}</span>
-              <span className="text-slate-300">→</span>
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-caption ${hasOutcome ? 'bg-status-success-bg text-white' : 'bg-slate-200 text-slate-600'}`}>
-                3
-              </span>
-              <span>{t("outcome")}</span>
-            </div>
-            {timeLeft ? <span className="rounded-full bg-status-warning-bg px-2 py-0.5 text-caption font-semibold text-amber-800">
-                {timeLeft}
-              </span> : null}
-          </div>
+      <div className="flex-1 min-w-0">
+        {o.listingId ? (
+          <button
+            type="button"
+            onClick={() => onOpenListing(o.listingId)}
+            className="text-left text-sm font-semibold text-text-primary line-clamp-1 hover:text-primary transition"
+          >
+            {o.listingTitle || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE}
+          </button>
+        ) : (
+          <p className="text-sm font-semibold text-text-primary line-clamp-1">
+            {o.listingTitle || OFFER_DEFAULTS.FALLBACK_LISTING_TITLE}
+          </p>
+        )}
 
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("total")}</div>
-              <div className="mt-0.5 font-mono text-xl font-bold tracking-tight text-primary">
-                {formatCurrency(o.totalPrice, currency)}
-              </div>
-            </div>
-            <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("qty_unit")}</div>
-              <div className="mt-0.5 text-sm text-slate-700">
-                {o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}
-              </div>
-            </div>
-            <div className="rounded-xl bg-slate-50/90 px-3 py-2.5 ring-1 ring-slate-100">
-              <div className="text-caption font-semibold uppercase tracking-wider text-slate-500">{t("timeline")}</div>
-              <div className="mt-0.5 text-xs leading-relaxed text-slate-600">
-                <div>{o.createdAt ? formatDateTime(o.createdAt) : '—'}</div>
-                <div className="text-slate-400">{t("expires")}</div>
-                <div className={isExpired ? 'font-medium text-status-error' : ''}>
-                  {o.expiresAt ? formatDateTime(o.expiresAt) : '—'}
-                </div>
-              </div>
-            </div>
-          </div>
+        <p className="text-xs text-text-muted mt-0.5">
+          <span className="font-medium text-text-secondary">{roleLabel}:</span> {personName}
+        </p>
+
+        <div className="mt-2 text-xl font-bold text-primary">
+          {formatCurrency(o.totalPrice, currency)}
         </div>
 
-        <div className="flex shrink-0 flex-row flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4 sm:w-44 sm:flex-col sm:border-t-0 sm:pt-0">
-          {isExpired ? <span className="text-xs font-medium text-slate-500">{t("offer_expired")}</span> : canCheckout ? <button type="button" onClick={() => onCheckout(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary">
-              <ShoppingCart className="mr-1.5 h-4 w-4" />{t("checkout")}</button> : canActAsSeller ? <>
-              <button type="button" onClick={() => onAccept(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-emerald-200 bg-status-success-bg px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-status-success-bg">
-                <CheckCircle2 className="mr-1.5 h-4 w-4" />{t("accept")}</button>
-              <button type="button" onClick={() => onCounter(o)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-semibold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50">{t("counter")}</button>
-              <button type="button" onClick={() => onReject(o.id)} className="inline-flex w-full min-w-[8.5rem] items-center justify-center rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-status-error-border hover:bg-status-error-bg hover:text-status-error-text">
-                <XCircle className="mr-1.5 h-4 w-4" />{t("reject")}</button>
-            </> : <p className="text-center text-caption leading-relaxed text-slate-500">
-              {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING ? 'Waiting for the seller to respond.' : 'No action required.'}
-            </p>}
+        <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
+          <span>{o.quantity} × {formatCurrency(o.listingUnitPrice, currency)}</span>
+          <span>·</span>
+          <span>{o.createdAt ? formatDateTime(o.createdAt) : '—'}</span>
+          {timeLeft && (
+            <>
+              <span>·</span>
+              <span className="font-medium text-status-warning-text">{timeLeft}</span>
+            </>
+          )}
         </div>
+      </div>
+
+      <div className="flex flex-col items-end gap-2 shrink-0">
+        <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${pres.badge}`}>
+          <StatusIcon className="h-3.5 w-3.5" />
+          {pres.label}
+        </span>
+
+        {isExpired ? (
+          <span className="text-xs font-medium text-text-muted">{t("offer_expired")}</span>
+        ) : canCheckout ? (
+          <button
+            type="button"
+            onClick={() => onCheckout(o.id)}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-hover transition"
+          >
+            <ShoppingCart className="h-3.5 w-3.5" />
+            {t("checkout")}
+          </button>
+        ) : canActAsSeller ? (
+          <>
+            <button
+              type="button"
+              onClick={() => onAccept(o.id)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-hover transition"
+            >
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              {t("accept")}
+            </button>
+            <button
+              type="button"
+              onClick={() => onCounter(o)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition"
+            >
+              {t("counter")}
+            </button>
+            <button
+              type="button"
+              onClick={() => onReject(o.id)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border-light px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-status-error-border hover:text-status-error-text transition"
+            >
+              <XCircle className="h-3.5 w-3.5" />
+              {t("reject")}
+            </button>
+          </>
+        ) : (
+          <p className="text-right text-caption leading-relaxed text-text-muted">
+            {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING
+              ? 'Waiting for the seller to respond.'
+              : 'No action required.'}
+          </p>
+        )}
       </div>
     </article>;
 };
+
 export default OfferTrackingCard;

@@ -89,7 +89,6 @@ const CheckoutStep = ({
             calculateTotal={calculateTotal}
             addresses={addresses}
             selectedShippingAddressId={selectedShippingAddressId}
-            selectedBillingAddressId={selectedBillingAddressId}
             selectedPaymentType={selectedPaymentType}
             eWallet={eWallet}
             onNext={onNext}
@@ -120,7 +119,7 @@ const CheckoutStep = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#e5e3df] bg-background-primary shadow-sm shadow-black/[0.04]">
+    <div className="overflow-hidden rounded-xl border border-border-light bg-background-primary shadow-sm">
       {renderStepContent()}
     </div>
   );

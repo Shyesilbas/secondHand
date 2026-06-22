@@ -1,6 +1,7 @@
 package com.serhat.secondhand.order.repository;
 
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import org.springframework.data.domain.Page;
@@ -26,8 +27,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
     @Query("SELECT DISTINCT o FROM Order o " +
-           "WHERE o.user.id = :userId")
-    Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
+           "WHERE o.user.id = :userId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)")
+    Page<Order> findByUserIdAndDeliveryMethod(
+            @Param("userId") Long userId,
+            @Param("deliveryMethod") DeliveryMethod deliveryMethod,
+            Pageable pageable);
 
 
     long countByUserIdAndStatus(Long userId, OrderStatus status);
@@ -60,8 +65,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "JOIN o.orderItems oi " +
            "JOIN FETCH o.user u " +
            "WHERE oi.listing.seller.id = :sellerId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
            "ORDER BY o.createdAt DESC")
-    Page<Order> findOrdersBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+    Page<Order> findOrdersBySellerIdAndDeliveryMethod(
+            @Param("sellerId") Long sellerId,
+            @Param("deliveryMethod") DeliveryMethod deliveryMethod,
+            Pageable pageable);
 
     boolean existsByUserIdAndStatus(Long userId, OrderStatus status);
 }
