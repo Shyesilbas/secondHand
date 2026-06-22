@@ -8,6 +8,9 @@ import com.serhat.secondhand.ai.dto.UserMemory;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
 import com.serhat.secondhand.ai.memory.ChatRole;
 import com.serhat.secondhand.ai.memory.service.MemoryService;
+import com.serhat.secondhand.user.application.PlanValidator;
+import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +21,15 @@ public class GeminiAiService {
     private final MemoryService memoryService;
     private final GeminiClient geminiClient;
     private final AgentPromptBuilder agentPromptBuilder;
+    private final PlanValidator planValidator;
+    private final UserRepository userRepository;
 
-    public GeminiAiService(MemoryService memoryService, GeminiClient geminiClient, AgentPromptBuilder agentPromptBuilder) {
+    public GeminiAiService(MemoryService memoryService, GeminiClient geminiClient, AgentPromptBuilder agentPromptBuilder, PlanValidator planValidator, UserRepository userRepository) {
         this.memoryService = memoryService;
         this.geminiClient = geminiClient;
         this.agentPromptBuilder = agentPromptBuilder;
+        this.planValidator = planValidator;
+        this.userRepository = userRepository;
     }
 
     public String testConnection(String message) {
@@ -52,6 +59,9 @@ public class GeminiAiService {
         }
 
         try {
+            User user = userRepository.findById(userId).orElseThrow();
+            planValidator.checkAuraLimit(user);
+
             UserMemory memory = memoryService.getOrCreate(userId);
             String recent = memoryService.buildRecentConversationBlock(userId);
             String prompt = buildMemoryAwarePrompt(memory, request, recent);
@@ -62,6 +72,9 @@ public class GeminiAiService {
             if (memoryService.shouldUpdateMemory(userId, request.question())) {
                 memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
             }
+
+            user.setDailyAuraUsage(user.getDailyAuraUsage() + 1);
+            userRepository.save(user);
 
             return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {
@@ -86,6 +99,9 @@ public class GeminiAiService {
         }
 
         try {
+            User user = userRepository.findById(userId).orElseThrow();
+            planValidator.checkAuraLimit(user);
+
             String recent = memoryService.buildRecentConversationBlock(userId);
             String live = liveSearchResults == null ? "" : liveSearchResults;
             String prompt = agentPromptBuilder.buildPrompt(memoryData, domainContext, request, uiContext, recent, live);
@@ -96,6 +112,9 @@ public class GeminiAiService {
             if (memoryService.shouldUpdateMemory(userId, request.question())) {
                 memoryService.updateMemoryFromInteraction(userId, request.question(), answer);
             }
+
+            user.setDailyAuraUsage(user.getDailyAuraUsage() + 1);
+            userRepository.save(user);
 
             return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {

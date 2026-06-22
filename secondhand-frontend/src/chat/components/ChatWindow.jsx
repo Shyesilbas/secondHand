@@ -18,7 +18,10 @@ const ChatWindow = ({
                         isLoadingMessages,
                         isConnected,
                         onConversationDeleted,
-                        isEmbedded = false
+                        isEmbedded = false,
+                        fetchNextPage,
+                        hasNextPage,
+                        isFetchingNextPage
                     }) => {
     const { user } = useAuthState();
     const notification = useNotification();
@@ -76,6 +79,9 @@ const ChatWindow = ({
                     messagesContainerRef={messagesContainerRef}
                     user={user}
                     onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    isFetchingNextPage={isFetchingNextPage}
                 />
                 <ChatInput
                     messageText={messageText}
@@ -105,6 +111,9 @@ const ChatWindow = ({
                 messagesContainerRef={messagesContainerRef}
                 user={user}
                 onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
+                fetchNextPage={fetchNextPage}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
             />
             <ChatInput
                 messageText={messageText}

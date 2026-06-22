@@ -109,6 +109,26 @@ public class PaymentRequestFactory {
                 .build();
     }
 
+    public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, PaymentType paymentType, String idempotencyKey) {
+        return PaymentRequest.builder()
+                .fromUserId(user.getId())
+                .toUserId(null)
+                .receiverName("SYSTEM")
+                .receiverSurname("MEMBERSHIP")
+                .listingId(null)
+                .orderItemId(null)
+                .listingTitle(null)
+                .listingNo(null)
+                .amount(amount)
+                .currency("TRY")
+                .paymentType(paymentType != null ? paymentType : PaymentType.EWALLET)
+                .transactionType(PaymentTransactionType.MEMBERSHIP_PAYMENT)
+                .paymentDirection(PaymentDirection.OUTGOING)
+                .agreementsAccepted(true)
+                .idempotencyKey(idempotencyKey)
+                .build();
+    }
+
     private List<OrderItemAmount> buildPayableAmountsByOrderItem(Order order) {
         if (order == null || order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
             return List.of();

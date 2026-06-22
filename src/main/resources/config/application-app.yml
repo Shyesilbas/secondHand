@@ -40,7 +40,7 @@ app:
       cleanup-fixed-rate-ms: ${CART_SCHEDULER_CLEANUP_FIXED_RATE_MS:60000}
   listing:
     creation:
-      fee: 50.00
+      fee: 249.00
     fee:
       tax: 18.00
   favorite:

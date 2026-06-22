@@ -25,8 +25,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.serhat.secondhand.user.domain.entity.enums.MembershipPlan;
 
 @Component
 @RequiredArgsConstructor
@@ -105,6 +107,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = jwtUtils.extractRoles(jwt).stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
+                String planStr = jwtUtils.extractClaim(jwt, claims -> claims.get("plan", String.class));
+                String planExpiryStr = jwtUtils.extractClaim(jwt, claims -> claims.get("planExpiry", String.class));
+                MembershipPlan plan = planStr != null ? MembershipPlan.valueOf(planStr) : MembershipPlan.FREE;
+                LocalDateTime planExpiry = planExpiryStr != null ? LocalDateTime.parse(planExpiryStr) : null;
+
                 User principal = User.builder()
                         .id(userId)
                         .email(userEmail)
@@ -114,6 +121,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                         .gender(Gender.PREFER_NOT_TO_SAY)
                         .accountStatus(AccountStatus.ACTIVE)
                         .accountVerified(true)
+                        .plan(plan)
+                        .planExpiry(planExpiry)
                         .build();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         principal,

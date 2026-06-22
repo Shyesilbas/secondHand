@@ -52,11 +52,11 @@ public class CartController {
         return ResultResponses.ok(cartService.addToCart(currentUser.getId(), request));
     }
 
-    @PutMapping("/items/{listingId}")
+    @PutMapping("/items/{listing-id}")
     @Operation(summary = "Update cart item", description = "Update quantity or notes of a cart item")
 
     public ResponseEntity<?> updateCartItem(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @Valid @RequestBody UpdateCartItemRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -65,11 +65,11 @@ public class CartController {
         return ResultResponses.ok(cartService.updateCartItem(currentUser.getId(), listingId, request));
     }
 
-    @DeleteMapping("/items/{listingId}")
+    @DeleteMapping("/items/{listing-id}")
     @Operation(summary = "Remove item from cart", description = "Remove a specific item from the user's cart")
 
     public ResponseEntity<?> removeFromCart(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
 
         log.debug("Remove from cart request - user: {}, listingId: {}",
@@ -100,11 +100,11 @@ public class CartController {
         return ResultResponses.okWithBody(result, Map.of("count", result.getData()));
     }
 
-    @GetMapping("/check/{listingId}")
+    @GetMapping("/check/{listing-id}")
     @Operation(summary = "Check if item is in cart", description = "Check if a specific listing is in the user's cart")
 
     public ResponseEntity<?> isInCart(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
 
         log.debug("Check in cart request - user: {}, listingId: {}",
@@ -113,10 +113,10 @@ public class CartController {
         return ResultResponses.okWithBody(result, Map.of("inCart", result.getData()));
     }
 
-    @GetMapping("/reservations/count/{listingId}")
+    @GetMapping("/reservations/count/{listing-id}")
     @Operation(summary = "Get active reservation count", description = "Get the total number of active reservations for a listing")
 
-    public ResponseEntity<?> getActiveReservationCount(@PathVariable UUID listingId) {
+    public ResponseEntity<?> getActiveReservationCount(@PathVariable("listing-id") UUID listingId) {
         log.debug("Get active reservation count request - listingId: {}", listingId);
         var result = cartService.getActiveReservationCount(listingId);
         return ResultResponses.okWithBody(result, Map.of("count", result.getData()));

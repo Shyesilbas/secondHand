@@ -257,7 +257,7 @@ public class ChatService {
             throw new SecurityException("You do not have permission to view messages in this chat room.");
         }
         return messageRepository
-                .findByChatRoomIdOrderByCreatedAtAsc(roomId, pageable)
+                .findByChatRoomIdOrderByCreatedAtDesc(roomId, pageable)
                 .map(chatMessageMapper::toDto);
     }
 

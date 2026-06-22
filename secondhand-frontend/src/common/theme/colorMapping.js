@@ -29,8 +29,12 @@ export const colorMapping = {
     600: 'accent-indigo-600',
   },
   emerald: {
-    500: 'accent-emerald-DEFAULT',
-    600: 'accent-emerald-600',
+    500: 'primary-500',
+    600: 'primary-600',
+  },
+  teal: {
+    500: 'primary-500',
+    600: 'primary-600',
   },
 };
 

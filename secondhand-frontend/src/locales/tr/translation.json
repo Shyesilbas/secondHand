@@ -1256,5 +1256,25 @@
   "marketplace": "Pazar Yeri",
   "failed_to_load_listings": "İlanlar yüklenemedi",
   "no_listings_yet": "Henüz ilan yok",
-  "curated": "Özel Seçim"
+  "curated": "Özel Seçim",
+  "about_secondhand": "SecondHand Hakkında",
+  "about_secondhand_title": "SecondHand Hakkında",
+  "about_secondhand_subtitle": "Pazarlama vaatleri yerine gerçek, çalışan teknolojiye ve topluluk güvenine öncelik veriyoruz. Pazaryerimizin güvenli ve şeffaf işlemleri nasıl desteklediğini keşfedin.",
+  "premium": {
+    "banner": {
+      "opportunity": "Premium Fırsatı",
+      "title_start": "Alışveriş Deneyiminizi ",
+      "title_highlight": "İkiye Katlayın",
+      "description": "Premium'a geçerek siparişlerinizi 2 kat daha hızlı onaylatın, 1 günde teslimat ayrıcalığından faydalanın ve yapay zeka ile showcase avantajlarını yakalayın.",
+      "feature_fast_title": "2x Hızlı",
+      "feature_fast_desc": "Sipariş Onayı",
+      "feature_shipping_title": "1 İş Günü",
+      "feature_shipping_desc": "Teslimat Süresi",
+      "feature_ai_title": "AI Gücü",
+      "feature_ai_desc": "2.5x Sohbet, 4x İlan",
+      "feature_showcase_title": "Showcase",
+      "feature_showcase_desc": "Daha Fazla Görünürlük",
+      "cta": "Premium'u Keşfet"
+    }
+  }
 }

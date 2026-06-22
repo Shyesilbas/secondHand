@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chatService.js';
 import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -46,13 +46,20 @@ export const useChat = (userId, options = {}) => {
     });
 
     const {
-        data: chatMessages,
+        data: chatMessagesData,
         isLoading: isLoadingMessages,
         error: messagesError,
-        refetch: refetchMessages
-    } = useQuery({
+        refetch: refetchMessages,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
         queryKey: ['chatMessages', user?.id, selectedChatRoom?.id],
-        queryFn: () => chatService.getChatMessages(selectedChatRoom.id),
+        queryFn: ({ pageParam = 0 }) => chatService.getChatMessages(selectedChatRoom.id, pageParam),
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.last) return undefined;
+            return allPages.length;
+        },
         enabled: !!(user?.id && selectedChatRoom?.id),
         staleTime: CHAT_DEFAULTS.MESSAGE_STALE_TIME_MS,
         cacheTime: CHAT_DEFAULTS.MESSAGE_CACHE_TIME_MS,
@@ -71,10 +78,14 @@ export const useChat = (userId, options = {}) => {
             });
             // Only update specific queries, don't invalidate everything
             queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
-                if (!oldData) return oldData;
+                if (!oldData || !oldData.pages || oldData.pages.length === 0) return oldData;
+                const newPages = [...oldData.pages];
+                const firstPage = { ...newPages[0] };
+                firstPage.content = [data, ...(firstPage.content || [])];
+                newPages[0] = firstPage;
                 return {
                     ...oldData,
-                    content: [...(oldData.content || []), data]
+                    pages: newPages
                 };
             });
         }
@@ -98,10 +109,13 @@ export const useChat = (userId, options = {}) => {
             setMessages((prev) => prev.filter((msg) => !sameChatId(msg.id, messageId)));
             // Only update the specific message cache, don't refetch everything
             queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
-                if (!oldData) return oldData;
+                if (!oldData || !oldData.pages) return oldData;
                 return {
                     ...oldData,
-                    content: oldData.content.filter(msg => !sameChatId(msg.id, messageId))
+                    pages: oldData.pages.map(page => ({
+                        ...page,
+                        content: (page.content || []).filter(msg => !sameChatId(msg.id, messageId))
+                    }))
                 };
             });
         }
@@ -154,7 +168,7 @@ export const useChat = (userId, options = {}) => {
         };
 
         sendMessageMutation.mutate(messageData);
-    }, [selectedChatRoom?.id, user?.id, sendMessageMutation]);
+    }, [selectedChatRoom?.id, selectedChatRoom?.participantIds, user?.id, sendMessageMutation]);
 
     const createDirectChat = useCallback(async (otherUserId) => {
         const chatRoom = await chatService.createOrGetDirectChat(otherUserId);
@@ -196,10 +210,13 @@ export const useChat = (userId, options = {}) => {
     }, [selectedChatRoom?.id]);
 
     useEffect(() => {
-        if (chatMessages?.content) {
-            setMessages(chatMessages.content);
+        if (chatMessagesData?.pages) {
+            const allMessages = chatMessagesData.pages
+                .flatMap(page => page.content || [])
+                .reverse();
+            setMessages(allMessages);
         }
-    }, [chatMessages]);
+    }, [chatMessagesData]);
 
     return {
         chatRooms: chatRooms || [],
@@ -213,6 +230,9 @@ export const useChat = (userId, options = {}) => {
         isDeletingConversation: deleteConversationMutation.isPending,
         roomsError,
         messagesError,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
         selectChatRoom,
         sendMessage,
         deleteMessage,

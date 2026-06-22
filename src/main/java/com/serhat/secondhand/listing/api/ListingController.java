@@ -69,21 +69,21 @@ public class ListingController {
     }
 
     @PublicEndpoint
-    @GetMapping("/{listingId}/reviews")
+    @GetMapping("/{listing-id}/reviews")
     public ResponseEntity<?> getReviewsForListing(
-            @PathVariable String listingId,
+            @PathVariable("listing-id") String listingId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResultResponses.ok(reviewService.getReviewsForListing(listingId, pageable));
     }
 
     @PublicEndpoint
-    @GetMapping("/{listingId}/review-stats")
-    public ResponseEntity<?> getListingReviewStats(@PathVariable String listingId) {
+    @GetMapping("/{listing-id}/review-stats")
+    public ResponseEntity<?> getListingReviewStats(@PathVariable("listing-id") String listingId) {
         return ResultResponses.ok(reviewService.getListingReviewStats(listingId));
     }
 
     @PublicEndpoint
-    @PostMapping("/bulk")
+    @PostMapping("/bulks")
     @Operation(summary = "Get listings by IDs")
     public ResponseEntity<?> getListingsByIds(
             @Valid @RequestBody List<UUID> ids,
@@ -127,7 +127,7 @@ public class ListingController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/my-listings")
+    @GetMapping("/my")
     public ResponseEntity<?> getMyListings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -140,7 +140,7 @@ public class ListingController {
         return ResultResponses.ok(Result.success(myListings));
     }
 
-    @GetMapping("/my-listings/status/{status}")
+    @GetMapping("/my/status/{status}")
     public ResponseEntity<?> getMyListingsByStatus(
             @PathVariable ListingStatus status,
             @RequestParam(defaultValue = "0") int page,
@@ -184,7 +184,7 @@ public class ListingController {
         return ResultResponses.noContent(listingCommandService.deleteListing(id, currentUser.getId()));
     }
 
-    @GetMapping("/my-listings/view-stats")
+    @GetMapping("/my/view-stats")
     public ResponseEntity<?> getMyListingsViewStats(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,

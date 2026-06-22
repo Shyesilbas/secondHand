@@ -2,29 +2,28 @@ package com.serhat.secondhand.ewallet.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
-import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
+import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.payment.application.PaymentStatsService;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.math.BigDecimal;
 
 @RestController
-@RequestMapping("/api/ewallet")
+@RequestMapping("/api/v1/e-wallets")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "E Wallet", description = "E Wallet operations")
@@ -47,13 +46,13 @@ public class EWalletController {
         return ResultResponses.ok(Result.success(eWallet));
     }
 
-    @PutMapping("/update/spendingWarning")
+    @PutMapping("/update/spending-warning")
     public ResponseEntity<?> updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
         eWalletService.updateSpendingWarningLimit(newSpendingWarning);
         return ResultResponses.ok(Result.success());
     }
 
-    @DeleteMapping("/update/spendingWarning")
+    @DeleteMapping("/update/spending-warning")
     public ResponseEntity<?> removeSpendingWarning(){
         eWalletService.removeSpendingWarningLimit();
         return ResultResponses.ok(Result.success());

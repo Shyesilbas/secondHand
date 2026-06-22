@@ -8,6 +8,7 @@ import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.j
 import NotificationModal from '../../notification/NotificationModal.jsx';
 import ShowcasePayment from './ShowcasePayment.jsx';
 import { Zap, ShieldCheck, X, Check } from 'lucide-react';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
 const STEPS = [{
   id: 1,
   label: 'Duration',
@@ -39,6 +40,8 @@ const ShowcaseModal = ({
   const [requiredAgreements, setRequiredAgreements] = useState([]);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successSummary, setSuccessSummary] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeHint, setUpgradeHint] = useState('');
   const showcasePaymentRef = useRef(null);
   const {
     enums,
@@ -152,6 +155,13 @@ const ShowcaseModal = ({
       });
       setShowSuccessNotification(true);
       onSuccess?.();
+    }} onError={(error) => {
+      if (error.response?.data?.error === 'SHOWCASE_SLOT_LIMIT_EXCEEDED') {
+        setShowUpgradeModal(true);
+        setUpgradeHint('Showcase slot limitinize ulaştınız.');
+        return true;
+      }
+      return false;
     }} onClose={onClose} acceptedAgreements={acceptedAgreements} getAcceptedAgreementIds={getAcceptedAgreementIds} isExtension={isExtension} showcaseId={showcaseId} />;
   }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, getAcceptedAgreementIds, handleDaysChange, onRequiredAgreementsChange]);
   if (!isOpen && !showSuccessNotification) return null;
@@ -257,6 +267,11 @@ const ShowcaseModal = ({
       setSuccessSummary(null);
       onClose?.();
     }} type="success" title={isExtension ? "Showcase extended!" : "Showcase activated!"} message={isExtension ? `"${successTitle}" has been extended by ${successDays} day${successDays !== 1 ? 's' : ''}.` : `"${successTitle}" will be featured for ${successDays} day${successDays !== 1 ? 's' : ''}.`} autoClose={true} autoCloseDelay={5000} size="md" />}
+            <PremiumUpgradeModal
+              isOpen={showUpgradeModal}
+              onClose={() => setShowUpgradeModal(false)}
+              featureHint={upgradeHint}
+            />
         </>;
   return ReactDOM.createPortal(modalContent, document.body);
 };

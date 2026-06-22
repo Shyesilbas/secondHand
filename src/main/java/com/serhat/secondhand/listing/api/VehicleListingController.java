@@ -2,15 +2,13 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
-import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
+import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleUpdateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.VehicleListingFilterDto;
 import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleListingDto;
-import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,11 +62,11 @@ public class VehicleListingController {
         return ResultResponses.ok(Result.success(vehicle));
     }
 
-    @GetMapping("/brand/{brandId}/model/{modelId}")
+    @GetMapping("/brand/{brand-id}/model/{model-id}")
     @Operation(summary = "Find vehicles by brand and model")
     public ResponseEntity<?> findByBrandAndModel(
-            @PathVariable UUID brandId,
-            @PathVariable UUID modelId,
+            @PathVariable("brand-id") UUID brandId,
+            @PathVariable("model-id") UUID modelId,
             Pageable pageable) {
         Page<VehicleListingDto> vehicles = vehicleListingService.findByBrandAndModel(brandId, modelId, pageable);
         return ResultResponses.ok(Result.success(vehicles));

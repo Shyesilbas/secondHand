@@ -18,6 +18,7 @@ import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
 import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
 import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.application.PlanValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class ShowcaseService implements IShowcaseService {
     private final IUserService userService;
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestFactory paymentRequestFactory;
+    private final PlanValidator planValidator;
 
     private <T> Result<T> validateShowcaseDays(int days) {
         Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
@@ -76,6 +78,9 @@ public class ShowcaseService implements IShowcaseService {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         User user = userResult.getData();
+
+        int currentSlotCount = showcaseRepository.countActiveByUserId(userId);
+        planValidator.checkShowcaseSlot(user, currentSlotCount);
 
         return listingService.findById(request.listingId())
                 .map(listing -> createShowcaseInternal(request, user, listing, userId))

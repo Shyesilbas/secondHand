@@ -1,30 +1,29 @@
 package com.serhat.secondhand.agreements.api;
 
-import com.serhat.secondhand.agreements.entity.enums.AgreementType;
+import com.serhat.secondhand.agreements.application.AgreementRequirementService;
+import com.serhat.secondhand.agreements.application.AgreementService;
+import com.serhat.secondhand.agreements.application.UserAgreementService;
 import com.serhat.secondhand.agreements.dto.AgreementDto;
 import com.serhat.secondhand.agreements.dto.UserAgreementDto;
 import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
+import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.mapper.AgreementMapper;
-import com.serhat.secondhand.agreements.application.AgreementService;
-import com.serhat.secondhand.agreements.application.AgreementRequirementService;
-import com.serhat.secondhand.agreements.application.UserAgreementService;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
-import com.serhat.secondhand.core.security.PublicEndpoint;
-
 @RestController
-@RequestMapping("/api/agreements")
+@RequestMapping("/api/v1/agreements")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Agreements", description = "Agreement management endpoints")
@@ -67,9 +66,9 @@ public class AgreementController {
     }
 
     @PublicEndpoint
-    @GetMapping("/{agreementType}")
+    @GetMapping("/{agreement-type}")
     @Operation(summary = "Get agreement by type", description = "Retrieves agreement by its type")
-    public ResponseEntity<AgreementDto> getAgreementByType(@PathVariable AgreementType agreementType) {
+    public ResponseEntity<AgreementDto> getAgreementByType(@PathVariable("agreement-type") AgreementType agreementType) {
         var agreement = agreementService.getAgreementByType(agreementType);
         var agreementDto = agreementMapper.toDto(agreement);
         return ResponseEntity.ok(agreementDto);
@@ -91,19 +90,19 @@ public class AgreementController {
         return ResponseEntity.ok(userAgreements);
     }
 
-    @GetMapping("/user/status/{agreementType}")
+    @GetMapping("/user/status/{agreement-type}")
     @Operation(summary = "Check specific agreement status", description = "Checks if user has accepted specific agreement type")
     public ResponseEntity<Boolean> hasUserAcceptedAgreement(
             @AuthenticationPrincipal User user,
-            @PathVariable AgreementType agreementType) {
+            @PathVariable("agreement-type") AgreementType agreementType) {
         var hasAccepted = userAgreementService.hasUserAcceptedAgreement(user.getId(), agreementType);
         return ResponseEntity.ok(hasAccepted);
     }
 
-    @GetMapping("/user/acceptance-history/{agreementId}")
+    @GetMapping("/user/acceptance-history/{agreement-id}")
     @Operation(summary = "Get user acceptance history for an agreement", description = "Retrieves all acceptance records for a specific agreement by the current user")
     public ResponseEntity<List<UserAgreementDto>> getUserAcceptanceHistory(
-            @PathVariable UUID agreementId,
+            @PathVariable("agreement-id") UUID agreementId,
             @AuthenticationPrincipal User user) {
         var history = userAgreementService.getUserAcceptanceHistory(user.getId(), agreementId);
         return ResponseEntity.ok(history);

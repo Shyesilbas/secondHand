@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/favorites")
+@RequestMapping("/api/v1/favorites")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Favorites", description = "Favorite listings management")
@@ -43,12 +43,12 @@ public class FavoriteController {
         return ResultResponses.ok(favoriteService.addToFavorites(currentUser.getId(), request.getListingId()));
     }
     
-    @DeleteMapping("/{listingId}")
+    @DeleteMapping("/{listing-id}")
     @Operation(summary = "Remove listing from favorites", description = "Remove a listing from the current user's favorites")
     @ApiResponse(responseCode = "204", description = "Listing removed from favorites successfully")
     @ApiResponse(responseCode = "400", description = "Listing not in favorites")
     public ResponseEntity<?> removeFromFavorites(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteService.removeFromFavorites(currentUser.getId(), listingId));
     }
@@ -75,11 +75,11 @@ public class FavoriteController {
         return ResultResponses.ok(favoriteService.getUserFavorites(currentUser.getId(), pageable));
     }
     
-    @GetMapping("/stats/{listingId}")
+    @GetMapping("/stats/{listing-id}")
     @Operation(summary = "Get favorite stats for listing", description = "Get favorite count and user's favorite status for a listing")
     @ApiResponse(responseCode = "200", description = "Stats retrieved successfully")
     public ResponseEntity<?> getFavoriteStats(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
         return ResultResponses.ok(favoriteService.getFavoriteStats(listingId, userId));
@@ -95,19 +95,19 @@ public class FavoriteController {
         return ResultResponses.ok(favoriteService.getFavoriteStatsForListings(listingIds, userId));
     }
     
-    @GetMapping("/check/{listingId}")
+    @GetMapping("/check/{listing-id}")
     @Operation(summary = "Check if listing is favorited", description = "Check if current user has favorited a specific listing")
     @ApiResponse(responseCode = "200", description = "Check completed successfully")
     public ResponseEntity<?> isFavorited(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(favoriteService.isFavorited(currentUser.getId(), listingId));
     }
     
-    @GetMapping("/count/{listingId}")
+    @GetMapping("/count/{listing-id}")
     @Operation(summary = "Get favorite count", description = "Get total number of users who favorited a listing")
     @ApiResponse(responseCode = "200", description = "Count retrieved successfully")
-    public ResponseEntity<?> getFavoriteCount(@PathVariable UUID listingId) {
+    public ResponseEntity<?> getFavoriteCount(@PathVariable("listing-id") UUID listingId) {
         return ResultResponses.ok(favoriteService.getFavoriteCount(listingId));
     }
     

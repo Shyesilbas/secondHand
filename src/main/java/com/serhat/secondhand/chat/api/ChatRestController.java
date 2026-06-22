@@ -1,9 +1,10 @@
 package com.serhat.secondhand.chat.api;
 
+import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
-import com.serhat.secondhand.chat.application.ChatService;
 import com.serhat.secondhand.user.domain.entity.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chats")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Chat Rest", description = "Chat Rest operations")
@@ -45,9 +45,9 @@ public class ChatRestController {
         return ResponseEntity.ok(chatRoom);
     }
 
-    @PostMapping("/rooms/listing/{listingId}")
+    @PostMapping("/rooms/listing/{listing-id}")
     public ResponseEntity<ChatRoomDto> createOrGetListingChat(
-            @PathVariable String listingId,
+            @PathVariable("listing-id") String listingId,
             @RequestParam String listingTitle,
             @AuthenticationPrincipal User currentUser) {
         log.info("Creating or getting listing chat - listingId: {}, userId: {}, title: {}", listingId, currentUser.getId(), listingTitle);
@@ -73,9 +73,9 @@ public class ChatRestController {
         return ResponseEntity.ok(sentMessage);
     }
 
-    @GetMapping("/rooms/{chatRoomId}/messages")
+    @GetMapping("/rooms/{chat-room-id}/messages")
     public ResponseEntity<Page<ChatMessageDto>> getChatMessages(
-            @PathVariable Long chatRoomId,
+            @PathVariable("chat-room-id") Long chatRoomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal User currentUser) {
@@ -89,9 +89,9 @@ public class ChatRestController {
         return ResponseEntity.ok(messages);
     }
 
-    @PutMapping("/rooms/{chatRoomId}/messages/read")
+    @PutMapping("/rooms/{chat-room-id}/messages/read")
     public ResponseEntity<Void> markMessagesAsRead(
-            @PathVariable Long chatRoomId, 
+            @PathVariable("chat-room-id") Long chatRoomId, 
             @AuthenticationPrincipal User currentUser) {
         log.info("Marking messages as read - room: {}, user: {}", chatRoomId, currentUser.getEmail());
         chatService.markMessagesAsRead(chatRoomId, currentUser.getId());
@@ -121,18 +121,18 @@ public class ChatRestController {
         return ResponseEntity.ok(count);
     }
 
-    @DeleteMapping("/rooms/{chatRoomId}")
+    @DeleteMapping("/rooms/{chat-room-id}")
     public ResponseEntity<Void> deleteConversation(
-            @PathVariable Long chatRoomId,
+            @PathVariable("chat-room-id") Long chatRoomId,
             @AuthenticationPrincipal User currentUser) {
         log.info("Deleting conversation - roomId: {}, userId: {}", chatRoomId, currentUser.getId());
         chatService.deleteConversation(chatRoomId, currentUser.getId());
         return ResponseEntity.ok().build();
     }
     
-    @DeleteMapping("/messages/{messageId}")
+    @DeleteMapping("/messages/{message-id}")
     public ResponseEntity<Void> deleteMessage(
-            @PathVariable Long messageId,
+            @PathVariable("message-id") Long messageId,
             @AuthenticationPrincipal User currentUser) {
         log.info("Deleting message - messageId: {}, userId: {}", messageId, currentUser.getId());
         chatService.deleteMessage(messageId, currentUser.getId());

@@ -1,28 +1,32 @@
 import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ShoppingCart } from 'lucide-react';
-import { useCart } from '../hooks/useCart.js';
-import { useCheckout } from '../hooks/useCheckout.js';
+import {useTranslation} from "react-i18next";
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {ArrowLeft, ChevronDown, Crown, ShoppingCart} from 'lucide-react';
+import {useCart} from '../hooks/useCart.js';
+import {useCheckout} from '../hooks/useCheckout.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
 import CheckoutStep from '../components/checkout/CheckoutStep.jsx';
 import CheckoutOrderSummary from '../components/checkout/CheckoutOrderSummary.jsx';
-import { couponService } from '../services/couponService.js';
+import {couponService} from '../services/couponService.js';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
-import { offerService } from '../../offer/services/offerService.js';
-import { listingService } from '../../listing/services/listingService.js';
-import { ROUTES } from '../../common/constants/routes.js';
-import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
+import {offerService} from '../../offer/services/offerService.js';
+import {listingService} from '../../listing/services/listingService.js';
+import {ROUTES} from '../../common/constants/routes.js';
+import {CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES} from '../cartConstants.js';
 import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendingWarningModal.jsx';
-import { formatCurrency } from '../../common/formatters.js';
+import {formatCurrency} from '../../common/formatters.js';
+import {usePlan} from '@/common/hooks/usePlan';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
+
 const CheckoutPage = () => {
   const {
     t
   } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isPremium, estimatedShippingDays, orderProcessingSpeed } = usePlan();
   const {
     cartItems,
     cartCount,
@@ -33,6 +37,7 @@ const CheckoutPage = () => {
   const [appliedCouponCode, setAppliedCouponCode] = useState(null);
   const [couponError, setCouponError] = useState(null);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
   const cartKey = useMemo(() => {
     const base = cartItems.map(i => `${i.id}:${i.quantity}`).join('|');
@@ -222,6 +227,35 @@ const CheckoutPage = () => {
           </div>}
       </div>
 
+      {/* Premium Shipping Perk Banner */}
+      <PageContainer className="mt-4">
+        <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-center justify-between gap-4 ${isPremium ? 'bg-accent-amber-50 border-accent-amber-100' : 'bg-background-primary border-border-light'}`}>
+          <div className="flex items-center gap-3">
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isPremium ? 'bg-accent-amber-100 text-accent-amber-600' : 'bg-background-secondary text-text-muted'}`}>
+              <Crown className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-text-primary">
+                {isPremium ? 'Premium Kargo Avantajı' : 'Kargoda Beklemeyin!'}
+              </p>
+              <p className="text-xs text-text-secondary">
+                {isPremium 
+                  ? `Siparişiniz öncelikli olarak işlenecek. Tahmini teslimat: ${estimatedShippingDays} iş günü.` 
+                  : `Premium'a geçerek kargonuzu en kısa sürede alın!`}
+              </p>
+            </div>
+          </div>
+          {!isPremium && (
+            <button 
+              onClick={() => setIsPremiumModalOpen(true)}
+              className="text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+            >
+              Premium'u Keşfet
+            </button>
+          )}
+        </div>
+      </PageContainer>
+
       {/* Body */}
       <PageContainer className="py-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
@@ -244,6 +278,7 @@ const CheckoutPage = () => {
     }} />
 
       <EWalletSpendingWarningModal isOpen={checkout.showEWalletWarning} onClose={() => checkout.setShowEWalletWarning(false)} onConfirm={checkout.confirmEWalletWarningAndCheckout} projectedSpent={calculateTotal()} warningLimit={checkout.eWallet?.spendingWarningLimit || 0} currency={displayCartItems[0]?.listing?.currency || 'TRY'} />
+      <PremiumUpgradeModal isOpen={isPremiumModalOpen} onClose={() => setIsPremiumModalOpen(false)} featureHint="Hızlı Kargo" />
     </div>;
 };
 export default CheckoutPage;

@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.order.application.*;
 import com.serhat.secondhand.order.dto.*;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -101,11 +101,11 @@ public class OrderController {
         return ResultResponses.ok(orderQueryService.getSellerOrders(currentUser.getId(), method, pageable));
     }
 
-    @GetMapping("/seller/{orderId}")
+    @GetMapping("/seller/{order-id}")
     @Operation(summary = "Get seller order by ID", description = "Retrieve specific order details for seller (only if order contains seller items)")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getSellerOrderById(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderQueryService.getSellerOrderById(orderId, currentUser.getId()));
     }
@@ -123,7 +123,7 @@ public class OrderController {
         return ResultResponses.ok(Result.success(Map.of("amount", amount)));
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/{order-id}")
     @Operation(summary = "Get order by ID", description = "Retrieve specific order details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order retrieved successfully"),
@@ -132,7 +132,7 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getOrderById(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderQueryService.getOrderById(orderId, currentUser.getId()));
     }
@@ -149,15 +149,15 @@ public class OrderController {
         return ResultResponses.ok(Result.success(orderQueryService.getPendingCompletionStatus(currentUser.getId())));
     }
 
-    @GetMapping("/items/{orderItemId}/review")
+    @GetMapping("/items/{order-item-id}/review")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getReviewByOrderItem(
-            @PathVariable Long orderItemId,
+            @PathVariable("order-item-id") Long orderItemId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(reviewService.getReviewByOrderItem(orderItemId, currentUser.getId()));
     }
 
-    @PutMapping("/{orderId}/cancel")
+    @PutMapping("/{order-id}/cancel")
     @Operation(summary = "Cancel order", description = "Cancel a confirmed order (partial or full)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
@@ -167,13 +167,13 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> cancelOrder(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody OrderCancelRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderCancellationService.cancelOrder(orderId, request, currentUser));
     }
 
-    @PostMapping("/{orderId}/refund")
+    @PostMapping("/{order-id}/refund")
     @Operation(summary = "Refund order", description = "Refund a delivered order within 48 hours (partial or full)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order refunded successfully"),
@@ -183,13 +183,13 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> refundOrder(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody OrderRefundRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderRefundService.refundOrder(orderId, request, currentUser));
     }
 
-    @PutMapping("/{orderId}/complete")
+    @PutMapping("/{order-id}/complete")
     @Operation(summary = "Complete order", description = "Manually complete a delivered order")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order completed successfully"),
@@ -199,12 +199,12 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> completeOrder(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderCompletionService.completeOrder(orderId, currentUser));
     }
 
-    @PutMapping("/{orderId}/name")
+    @PutMapping("/{order-id}/name")
     @Operation(summary = "Update order name", description = "Update the name of an order")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order name updated successfully"),
@@ -214,13 +214,13 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderName(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody UpdateOrderNameRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderModificationService.updateOrderName(orderId, request.getName(), currentUser));
     }
 
-    @PutMapping("/{orderId}/address")
+    @PutMapping("/{order-id}/address")
     @Operation(summary = "Update order address", description = "Update shipping/billing address of a modifiable order (pending or confirmed)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order address updated successfully"),
@@ -230,14 +230,14 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderAddress(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody UpdateOrderAddressRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderModificationService.updateOrderAddress(
                 orderId, request.getShippingAddressId(), request.getBillingAddressId(), currentUser));
     }
 
-    @PutMapping("/{orderId}/notes")
+    @PutMapping("/{order-id}/notes")
     @Operation(summary = "Update order notes", description = "Update notes of a modifiable order (pending or confirmed)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order notes updated successfully"),
@@ -247,13 +247,13 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateOrderNotes(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody UpdateOrderNotesRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderModificationService.updateOrderNotes(orderId, request.getNotes(), currentUser));
     }
 
-    @PutMapping("/{orderId}/ship")
+    @PutMapping("/{order-id}/ship")
     @Operation(summary = "Ship order", description = "Mark order as shipped (Seller only)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order marked as shipped successfully"),
@@ -263,38 +263,38 @@ public class OrderController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> shipOrder(
-            @PathVariable Long orderId,
+            @PathVariable("order-id") Long orderId,
             @Valid @RequestBody OrderShipRequest request,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderShippingService.shipOrder(orderId, request, currentUser));
     }
 
-    @PostMapping("/{orderNumber}/verify-meetup")
+    @PostMapping("/{order-number}/verify-meetup")
     @Operation(summary = "Verify meetup code", description = "Verify 6-digit meetup OTP code (Seller only)")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> verifyMeetup(
-            @PathVariable String orderNumber,
+            @PathVariable("order-number") String orderNumber,
             @RequestParam String code,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderCompletionService.verifyMeetupCode(orderNumber, code, currentUser));
     }
 
-    @PostMapping("/{orderNumber}/confirm-handover-completion")
+    @PostMapping("/{order-number}/confirm-handover-completion")
     @Operation(summary = "Confirm handover completion", description = "Manually finalize order handover to complete order (Buyer/Seller)")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> confirmHandoverCompletion(
-            @PathVariable String orderNumber,
+            @PathVariable("order-number") String orderNumber,
             @RequestBody Map<String, Boolean> payload,
             @AuthenticationPrincipal User currentUser) {
         boolean confirmed = payload != null && payload.getOrDefault("confirmed", false);
         return ResultResponses.ok(orderCompletionService.confirmHandoverCompletion(orderNumber, confirmed, currentUser));
     }
 
-    @GetMapping(value = "/{orderNumber}/qr-code", produces = org.springframework.http.MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "/{order-number}/qr-code", produces = org.springframework.http.MediaType.IMAGE_PNG_VALUE)
     @Operation(summary = "Get order meetup QR code", description = "Generates and returns order's meetup verification QR code as an image (PNG) locally using ZXing")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> getOrderQrCode(
-            @PathVariable String orderNumber,
+            @PathVariable("order-number") String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         byte[] qrBytes = orderCompletionService.generateMeetupQrCode(orderNumber, currentUser);
         return ResponseEntity.ok()
@@ -302,11 +302,11 @@ public class OrderController {
                 .body(qrBytes);
     }
 
-    @PostMapping("/{orderNumber}/regenerate-meetup-code")
+    @PostMapping("/{order-number}/regenerate-meetup-code")
     @Operation(summary = "Regenerate meetup code", description = "Regenerates and returns new meetup code and hash (Buyer only)")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> regenerateMeetupCode(
-            @PathVariable String orderNumber,
+            @PathVariable("order-number") String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderCompletionService.regenerateMeetupCode(orderNumber, currentUser));
     }

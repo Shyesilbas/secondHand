@@ -1,8 +1,8 @@
 package com.serhat.secondhand.dashboard.api;
 
+import com.serhat.secondhand.dashboard.application.IDashboardService;
 import com.serhat.secondhand.dashboard.dto.BuyerDashboardDto;
 import com.serhat.secondhand.dashboard.dto.SellerDashboardDto;
-import com.serhat.secondhand.dashboard.application.IDashboardService;
 import com.serhat.secondhand.dashboard.util.DateRangeHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/v1/dashboard")
+@RequestMapping("/api/v1/dashboards")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Dashboard", description = "Analytics dashboard operations")

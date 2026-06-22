@@ -1,9 +1,5 @@
 package com.serhat.secondhand.ai.agent.api;
 
-import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.core.result.ResultResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import com.serhat.secondhand.ai.agent.dto.AgentDataSourceDto;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryRequest;
 import com.serhat.secondhand.ai.agent.dto.AgentQueryResponse;
@@ -13,7 +9,10 @@ import com.serhat.secondhand.ai.agent.search.AuraListingSearchOrchestrator;
 import com.serhat.secondhand.ai.application.GeminiAiService;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.domain.entity.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ai/agent")
+@RequestMapping("/api/v1/ai/agents")
 @RequiredArgsConstructor
 @Tag(name = "Agent", description = "Agent operations")
 public class AgentController {

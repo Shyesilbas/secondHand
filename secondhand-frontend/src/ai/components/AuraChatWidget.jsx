@@ -12,6 +12,7 @@ import { buildAuraWidgetUiContext } from '../utils/auraWidgetContext.js';
 import AuraSuggestedPrompts from './AuraSuggestedPrompts.jsx';
 import AuraSuggestedListingChips from './AuraSuggestedListingChips.jsx';
 import { cacheService } from '../../common/services/cacheService.js';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
 const AuraChatWidget = () => {
   const {
     t
@@ -25,6 +26,8 @@ const AuraChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isGreeting, setIsGreeting] = useState(false);
   const [agentMode, setAgentMode] = useState(AI_AGENT_MODE_ENABLED);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeHint, setUpgradeHint] = useState('');
   const buildPayload = text => ({
     message: text,
     context: undefined,
@@ -35,18 +38,27 @@ const AuraChatWidget = () => {
     const message = typeof payload === 'object' && payload != null ? payload.message : payload;
     const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
     const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
-    if (AI_AGENT_MODE_ENABLED && agentMode) {
-      return aiChatService.agentQuery({
+    try {
+      if (AI_AGENT_MODE_ENABLED && agentMode) {
+        return await aiChatService.agentQuery({
+          message,
+          context,
+          uiContext,
+          agentMode: true
+        });
+      }
+      return await aiChatService.chat({
         message,
-        context,
-        uiContext,
-        agentMode: true
+        context
       });
+    } catch (error) {
+      if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED') {
+        setShowUpgradeModal(true);
+        setUpgradeHint('Günlük Aura AI limitinize ulaştınız.');
+        throw error;
+      }
+      throw error;
     }
-    return aiChatService.chat({
-      message,
-      context
-    });
   };
   const {
     storageKey,
@@ -108,6 +120,11 @@ const AuraChatWidget = () => {
       }
       cacheService.set(storageKey, '1');
     } catch (e) {
+      if (e.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED') {
+        setShowUpgradeModal(true);
+        setUpgradeHint('Günlük Aura AI limitinize ulaştınız.');
+        return;
+      }
       const errorMessage = getApiErrorMessage(e, 'Could not start chat. Please try again in a moment.');
       setMessages(prev => [...prev, {
         id: `aura-error-${Date.now()}`,
@@ -212,6 +229,12 @@ const AuraChatWidget = () => {
         {!isOpen ? <span className="absolute inset-0 rounded-full bg-primary/25 blur-md scale-110 pointer-events-none" aria-hidden /> : null}
         {isOpen ? <X className="w-6 h-6 relative z-10" /> : <MessageCircle className="w-6 h-6 relative z-10" />}
       </button>
+
+      <PremiumUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureHint={upgradeHint}
+      />
     </div>;
 };
 export default AuraChatWidget;

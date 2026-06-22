@@ -25,6 +25,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   onClose,
   acceptedAgreements,
   getAcceptedAgreementIds,
+  onError,
   isExtension = false,
   showcaseId = null,
   isBulk = false,
@@ -139,6 +140,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       } catch {}
       onSuccess?.();
     } catch (err) {
+      if (onError && onError(err)) return;
       setError(err?.response?.data?.message || err.message || 'Payment failed');
     } finally {
       setLoading(false);

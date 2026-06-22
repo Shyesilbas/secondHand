@@ -2,9 +2,7 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
 import com.serhat.secondhand.core.security.PublicEndpoint;
-import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
@@ -67,10 +65,10 @@ public class ElectronicListingController {
     }
 
     @PublicEndpoint
-    @GetMapping("/electronicType/{electronicType}")
+    @GetMapping("/electronic-types/{electronic-type-id}")
     @Operation(summary = "Find electronics by type")
     public ResponseEntity<?> findByElectronicType(
-            @PathVariable UUID electronicType,
+            @PathVariable("electronic-type-id") UUID electronicType,
             Pageable pageable) {
         Page<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType, pageable);
         return ResultResponses.ok(Result.success(electronicDto));

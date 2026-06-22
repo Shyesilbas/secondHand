@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/admin/audit-logs")
+@RequestMapping("/api/v1/admin/audit-logs")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Audit Logs", description = "Audit log management operations")
@@ -29,30 +29,30 @@ public class AuditLogController {
 
     private final AuditLogService auditLogService;
 
-    @GetMapping("/user/{userEmail}")
+    @GetMapping("/user/{user-email}")
     @Operation(summary = "Get audit logs by user email", description = "Retrieve paginated audit logs for a specific user")
     public ResponseEntity<Page<AuditLogDto>> getAuditLogsByUserEmail(
-            @PathVariable String userEmail,
+            @PathVariable("user-email") String userEmail,
             @PageableDefault(size = 10) Pageable pageable) {
         log.info("Fetching audit logs for user: {} with pagination", userEmail);
         Page<AuditLogDto> auditLogs = auditLogService.getUserAuditLogs(userEmail, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
-    @GetMapping("/user/id/{userId}")
+    @GetMapping("/user/id/{user-id}")
     @Operation(summary = "Get audit logs by user ID", description = "Retrieve paginated audit logs for a specific user ID")
     public ResponseEntity<Page<AuditLogDto>> getAuditLogsByUserId(
-            @PathVariable Long userId,
+            @PathVariable("user-id") Long userId,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("Fetching audit logs for user ID: {} with pagination", userId);
         Page<AuditLogDto> auditLogs = auditLogService.getUserAuditLogs(userId, pageable);
         return ResponseEntity.ok(auditLogs);
     }
 
-    @GetMapping("/event-type/{eventType}")
+    @GetMapping("/event-type/{event-type}")
     @Operation(summary = "Get audit logs by event type", description = "Retrieve audit logs filtered by event type")
     public ResponseEntity<Page<AuditLogDto>> getAuditLogsByEventType(
-            @PathVariable AuditLog.AuditEventType eventType,
+            @PathVariable("event-type") AuditLog.AuditEventType eventType,
             @PageableDefault(size = 20) Pageable pageable) {
         log.info("Fetching audit logs for event type: {}", eventType);
         Page<AuditLogDto> auditLogs = auditLogService.getAuditLogsByEventType(eventType, pageable);
@@ -70,20 +70,20 @@ public class AuditLogController {
         return ResponseEntity.ok(auditLogs);
     }
 
-    @GetMapping("/failed-attempts/user/{userEmail}")
+    @GetMapping("/failed-attempts/user/{user-email}")
     @Operation(summary = "Count failed login attempts by user", description = "Count failed login attempts for a user since a specific time")
     public ResponseEntity<Long> countFailedLoginAttemptsByUser(
-            @PathVariable String userEmail,
+            @PathVariable("user-email") String userEmail,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime since) {
         log.info("Counting failed login attempts for user: {} since {}", userEmail, since);
         Long count = auditLogService.countFailedLoginAttemptsByUser(userEmail, since);
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/failed-attempts/ip/{ipAddress}")
+    @GetMapping("/failed-attempts/ip/{ip-address}")
     @Operation(summary = "Count failed login attempts by IP", description = "Count failed login attempts from an IP since a specific time")
     public ResponseEntity<Long> countFailedLoginAttemptsByIp(
-            @PathVariable String ipAddress,
+            @PathVariable("ip-address") String ipAddress,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime since) {
         log.info("Counting failed login attempts from IP: {} since {}", ipAddress, since);
         Long count = auditLogService.countFailedLoginAttemptsByIp(ipAddress, since);

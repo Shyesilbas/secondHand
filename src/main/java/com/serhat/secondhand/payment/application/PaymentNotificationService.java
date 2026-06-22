@@ -28,6 +28,12 @@ public class PaymentNotificationService {
     @Async("notificationExecutor")
     public void sendPaymentSuccessNotification(User user, PaymentDto paymentDto) {
         try {
+            if (paymentDto.transactionType() == com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT) {
+                sendMembershipUpgradeEmail(user, paymentDto);
+                sendMembershipUpgradeNotification(user, paymentDto);
+                return;
+            }
+
             String subject = emailConfig.getPaymentSuccessSubject();
             String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Ödeme";
             String content = String.format("'%s' başlıklı ilan için %s tutarındaki %s işleminiz başarıyla tamamlandı.",
@@ -51,6 +57,32 @@ public class PaymentNotificationService {
         } catch (Exception e) {
             log.warn("Failed to send payment success notification to user {}: {}", user.getEmail(), e.getMessage());
         }
+    }
+
+    private void sendMembershipUpgradeEmail(User user, PaymentDto paymentDto) {
+        String subject = "Premium Üyeliğiniz Aktif Edildi!";
+        org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+        ctx.setVariable("userName", user.getName());
+        ctx.setVariable("amount", paymentDto.amount().toPlainString() + " " + paymentDto.currency());
+        ctx.setVariable("paymentId", paymentDto.paymentId().toString());
+        ctx.setVariable("date", java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(java.time.LocalDateTime.now()));
+        ctx.setVariable("expiryDate", java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(java.time.LocalDateTime.now().plusDays(30)));
+        
+        emailService.sendTemplateEmail(user, subject, "membership-confirmation", ctx, EmailType.NOTIFICATION);
+        log.info("Premium confirmation email sent to user: {}", user.getEmail());
+    }
+
+    private void sendMembershipUpgradeNotification(User user, PaymentDto paymentDto) {
+        com.serhat.secondhand.notification.dto.NotificationRequest req = com.serhat.secondhand.notification.dto.NotificationRequest.of(
+                user.getId(),
+                com.serhat.secondhand.notification.entity.enums.NotificationType.PAYMENT_SUCCESS,
+                "Premium Üyelik Aktif",
+                "Tebrikler! Premium üyeliğiniz başarıyla aktif edildi. Premium avantajlarınızın tadını çıkarın.",
+                "/profile",
+                "{}"
+        );
+        notificationEventPublisher.publishDispatch(req, "payment", "membership-success:" + user.getId() + ":" + paymentDto.paymentId());
+        log.info("Premium in-app notification sent to user: {}", user.getId());
     }
 
     public void sendPaymentVerificationNotification(User user, String code, String extraDetails) {

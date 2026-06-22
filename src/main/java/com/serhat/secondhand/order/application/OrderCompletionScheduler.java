@@ -1,16 +1,15 @@
 package com.serhat.secondhand.order.application;
 
+import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.application.event.OrderStatusChangedEvent;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
+import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.shipping.entity.Shipping;
 import com.serhat.secondhand.shipping.entity.enums.Carrier;
-import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
-import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.shipping.repository.ShippingRepository;
-import com.serhat.secondhand.order.util.OrderBusinessConstants;
-import com.serhat.secondhand.escrow.application.EscrowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -156,16 +155,17 @@ public class OrderCompletionScheduler {
     }
 
     private boolean shouldUpdateToProcessing(Order order, LocalDateTime now) {
+        int interval = getEffectiveInterval(order);
         if (order.getUpdatedAt() == null) {
             if (order.getCreatedAt() == null) {
                 orderLog.logDataWarning("Order {} has null createdAt and updatedAt", order.getOrderNumber());
                 return false;
             }
             Duration duration = Duration.between(order.getCreatedAt(), now);
-            return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+            return duration.toMinutes() >= interval;
         }
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= interval;
     }
 
     private boolean shouldUpdateToShipped(Order order, LocalDateTime now) {
@@ -173,21 +173,31 @@ public class OrderCompletionScheduler {
             orderLog.logDataWarning("Order {} has null updatedAt, cannot update to SHIPPED", order.getOrderNumber());
             return false;
         }
+        int interval = getEffectiveInterval(order);
         Duration duration = Duration.between(order.getUpdatedAt(), now);
-        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= interval;
     }
 
     private boolean shouldUpdateToDelivered(Order order, LocalDateTime now) {
         Shipping shipping = order.getShipping();
+        int interval = getEffectiveInterval(order);
         if (shipping == null || shipping.getInTransitAt() == null) {
             if (order.getUpdatedAt() == null) {
                 return false;
             }
             Duration duration = Duration.between(order.getUpdatedAt(), now);
-            return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+            return duration.toMinutes() >= interval;
         }
         Duration duration = Duration.between(shipping.getInTransitAt(), now);
-        return duration.toMinutes() >= OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+        return duration.toMinutes() >= interval;
+    }
+
+    private int getEffectiveInterval(Order order) {
+        int baseInterval = OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES;
+        if (order.getUser() != null && order.getUser().isPremium()) {
+            return baseInterval / 2;
+        }
+        return baseInterval;
     }
 
     private boolean shouldAutoCompleteOrder(Shipping shipping, LocalDateTime now) {

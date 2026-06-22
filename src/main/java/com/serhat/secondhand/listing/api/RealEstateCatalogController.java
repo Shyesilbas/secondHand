@@ -2,7 +2,6 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
 import com.serhat.secondhand.listing.application.realestate.RealEstateSpecCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +9,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * Serves non-entity real estate spec catalogs (room configs, zoning statuses).
@@ -21,7 +18,7 @@ import java.util.List;
  * not from this in-memory catalog.
  */
 @RestController
-@RequestMapping("/api/catalog/real-estate/specs")
+@RequestMapping("/api/v1/catalog/real-estate/specs")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class RealEstateCatalogController {

@@ -39,9 +39,9 @@ public class EmailController {
         return ResponseEntity.ok(emails);
     }
 
-    @GetMapping("/my-emails/{emailType}")
+    @GetMapping("/my-emails/{email-type}")
     public ResponseEntity<Page<EmailDto>> getMyEmailsByType(
-            @PathVariable EmailType emailType,
+            @PathVariable("email-type") EmailType emailType,
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable)
     {
@@ -64,8 +64,8 @@ public class EmailController {
         return ResponseEntity.ok(Map.of("unreadCount", count));
     }
 
-    @DeleteMapping("/{emailId}")
-    public ResponseEntity<?> delete(@PathVariable UUID emailId) {
+    @DeleteMapping("/{email-id}")
+    public ResponseEntity<?> delete(@PathVariable("email-id") UUID emailId) {
         return ResultResponses.ok(emailService.deleteEmail(emailId));
     }
 

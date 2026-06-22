@@ -8,17 +8,9 @@ import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.notification.entity.Notification;
 import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.domain.entity.enums.Gender;
-import com.serhat.secondhand.user.domain.entity.enums.Provider;
-import com.serhat.secondhand.user.domain.entity.enums.UserRole;
+import com.serhat.secondhand.user.domain.entity.enums.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -140,6 +132,37 @@ public class User implements UserDetails {
     /** Great Seller uygunluk geçişi; null = migrasyon/ilk değerlendirme (bildirim gönderilmez). */
     @Column(name = "great_seller_eligible_snapshot")
     private Boolean greatSellerEligibleSnapshot;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private MembershipPlan plan = MembershipPlan.FREE;
+
+    @Column(name = "plan_expiry")
+    private LocalDateTime planExpiry;
+
+    @Column(name = "ai_listing_quota", nullable = false)
+    @Builder.Default
+    private Integer aiListingQuota = 1;
+
+    @Column(name = "daily_aura_usage", nullable = false)
+    @Builder.Default
+    private Integer dailyAuraUsage = 0;
+
+    @Column(name = "daily_aura_reset_date")
+    private LocalDate dailyAuraResetDate;
+
+    @Column(name = "auto_renew", nullable = false)
+    @Builder.Default
+    private boolean autoRenew = true;
+
+    public boolean isPremium() {
+        return plan == MembershipPlan.PREMIUM;
+    }
+
+    public MembershipPlan getEffectivePlan() {
+        return isPremium() ? MembershipPlan.PREMIUM : MembershipPlan.FREE;
+    }
 
 
     @Override

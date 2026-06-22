@@ -72,7 +72,7 @@ public class PaymentController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/my-payments")
+    @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get user payments", description = "Retrieve paginated and filtered history of payments.")
     public ResponseEntity<Page<PaymentDto>> getMyPayments(

@@ -1,17 +1,32 @@
 import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
-import React, { useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ShoppingBag, ShieldCheck, Wallet, Plus, MessageSquare, Heart, Sparkles, MapPin } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { useAuthState } from '../../auth/AuthContext.jsx';
-import { ROUTES } from '../../common/constants/routes.js';
-import { USER_DEFAULTS } from '../userConstants.js';
-import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
-import { isAdminUser } from '../../common/utils/admin.js';
-import { orderService } from '../../order/services/orderService.js';
-import { formatCurrency } from '../../common/formatters.js';
+import {useTranslation} from "react-i18next";
+import React, {useMemo, useState} from 'react';
+import {Link, useLocation} from 'react-router-dom';
+import {
+  ArrowRight,
+  ChevronDown,
+  Crown,
+  Heart,
+  MapPin,
+  MessageSquare,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Wallet
+} from 'lucide-react';
+import {useQuery} from '@tanstack/react-query';
+import {usePlan} from '@/common/hooks/usePlan';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+import {useAuthState} from '../../auth/AuthContext.jsx';
+import {ROUTES} from '../../common/constants/routes.js';
+import {USER_DEFAULTS} from '../userConstants.js';
+import {getAccountHubNavGroups} from '../utils/accountHubSections.js';
+import {isAdminUser} from '../../common/utils/admin.js';
+import {orderService} from '../../order/services/orderService.js';
+import {formatCurrency} from '../../common/formatters.js';
 import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
+
 const getInitials = name => {
   const value = (name || '').trim();
   if (!value) return USER_DEFAULTS.FALLBACK_NAME_INITIAL;
@@ -57,6 +72,16 @@ const AccountHubPage = () => {
     refetchOnWindowFocus: false
   });
   const recentOrders = useMemo(() => ordersData?.content || [], [ordersData]);
+
+  const { plan, isPremium, planExpiry, dailyAuraUsage, dailyAuraLimit, aiListingQuota, autoRenew, cancelSubscription, isCancelling, orderProcessingSpeed } = usePlan();
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  const handleCancelSubscription = () => {
+    if (window.confirm('Aboneliğinizi iptal etmek istediğinize emin misiniz? Gelecek dönem için otomatik yenileme kapatılacaktır.')) {
+      cancelSubscription();
+    }
+  };
+
   if (!user) {
     return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -131,6 +156,199 @@ const AccountHubPage = () => {
             <div className="inline-flex items-center self-start gap-1.5 rounded-full bg-status-success-bg border border-status-success-border px-3.5 py-1.5 text-xs font-bold text-status-success select-none shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-status-success" strokeWidth={2.5} />
               <span>{t("escrow_secured_member")}</span>
+            </div>
+          </div>
+
+          {/* Premium Plan Card */}
+          <div className="mb-8">
+            {isPremium ? (
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-card-bg rounded-2xl border border-border-light shadow-sm relative overflow-hidden gap-6">
+                <div className="space-y-4 flex-1 w-full">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-accent-amber-50 text-accent-amber-600 flex items-center justify-center border border-accent-amber-100 shrink-0">
+                      <Crown className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm font-semibold text-text-primary">Premium Üyelik Aktif</h3>
+                        <span className="text-[10px] font-bold text-accent-amber-600 bg-accent-amber-50 border border-accent-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          {plan}
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-muted mt-0.5 font-medium">
+                        {planExpiry && `${new Date(planExpiry).toLocaleDateString('tr-TR')} tarihine kadar geçerli`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quota Progress for Premium */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
+                        <span>Aura AI Mesajı</span>
+                        <span className="font-semibold">{dailyAuraUsage}/{dailyAuraLimit}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all duration-500" 
+                          style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 10)) * 100)}%` }} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
+                        <span>AI İlan Sihirbazı</span>
+                        <span className="font-semibold">{aiListingQuota} / 4 Hak</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all duration-500" 
+                          style={{ width: `${Math.min(100, (aiListingQuota / 4) * 100)}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Managed Plan Info */}
+                <div className="w-full md:w-auto shrink-0 bg-background-secondary border border-border-light p-4 rounded-xl md:min-w-[200px] flex flex-col justify-center items-center text-center">
+                  <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Abonelik Durumu</span>
+                  <span className="text-sm font-semibold text-primary mt-1">{autoRenew ? 'Otomatik Yenileniyor' : 'Sona Erecek'}</span>
+                  {autoRenew ? (
+                    <button 
+                      onClick={handleCancelSubscription}
+                      disabled={isCancelling}
+                      className="text-[10px] text-status-error hover:underline mt-2 font-bold uppercase tracking-tight disabled:opacity-50"
+                    >
+                      {isCancelling ? 'İşleniyor...' : 'Aboneliği İptal Et'}
+                    </button>
+                  ) : (
+                    <span className="text-[9px] text-text-muted mt-1 font-medium">Otomatik yenileme kapalı</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-card-bg rounded-2xl border border-border-light shadow-sm hover:shadow-md transition-all duration-200 gap-6">
+                <div className="space-y-4 flex-1 w-full">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-background-tertiary text-text-secondary flex items-center justify-center border border-border-light shrink-0">
+                      <Crown className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-text-primary">Mevcut Plan: Ücretsiz</h3>
+                        <span className="text-[10px] font-bold text-text-muted bg-background-secondary border border-border-light px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          STANDART
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-secondary mt-0.5 font-medium">Sınırlı özelliklerle temel kullanım</p>
+                    </div>
+                  </div>
+
+                  {/* Quota Progress for Standard */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
+                        <span>Aura AI Mesajı</span>
+                        <span className="font-semibold">{dailyAuraUsage}/{dailyAuraLimit}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all duration-500" 
+                          style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 4)) * 100)}%` }} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
+                        <span>AI İlan Sihirbazı</span>
+                        <span className="font-semibold">{aiListingQuota} / 1 Hak</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all duration-500" 
+                          style={{ width: `${Math.min(100, (aiListingQuota / 1) * 100)}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upgrade CTA Block */}
+                <div className="w-full md:w-auto shrink-0 flex flex-col items-center md:items-end gap-3 bg-background-secondary border border-border-light p-4 rounded-xl md:min-w-[220px] text-center md:text-right">
+                  <div>
+                    <span className="text-[10px] font-semibold text-accent-amber-600 uppercase tracking-wider">Premium Avantajları</span>
+                    <p className="text-xs font-medium text-text-primary mt-1">Sınırları 3 katına çıkarın</p>
+                  </div>
+                  <button
+                    onClick={() => setShowUpgrade(true)}
+                    className="flex w-full md:w-auto items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white hover:bg-primary-hover shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer"
+                  >
+                    <Crown className="h-3.5 w-3.5" />
+                    Premium'a Yükselt
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <PremiumUpgradeModal
+            isOpen={showUpgrade}
+            onClose={() => setShowUpgrade(false)}
+          />
+
+          {/* Plan Benefits Report Section */}
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-background-primary rounded-2xl p-6 border border-border-light shadow-sm">
+              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                Premium Advantages
+              </h3>
+              <ul className="space-y-3">
+                <li className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-medium">Fast Delivery</span>
+                  <span className={`font-bold ${isPremium ? 'text-status-success' : 'text-text-muted'}`}>
+                    {isPremium ? 'Aktif (1 Gün)' : 'Pasif (3 Gün)'}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-medium">Cargo</span>
+                  <span className={`font-bold ${isPremium ? 'text-status-success' : 'text-text-muted'}`}>
+                    {orderProcessingSpeed}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-medium">Daily AI Chat Message Limit</span>
+                  <span className="text-text-primary font-bold">{dailyAuraLimit} Message</span>
+                </li>
+                <li className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-medium">Aylık AI İlan Sihirbazı</span>
+                  <span className="text-text-primary font-bold">{isPremium ? '4' : '1'} İlan</span>
+                </li>
+                <li className="flex items-center justify-between text-xs">
+                  <span className="text-text-secondary font-medium">Showcase Slot</span>
+                  <span className="text-text-primary font-bold">{isPremium ? '3' : '1'} Slot</span>
+                </li>
+              </ul>
+            </div>
+            <div className="bg-background-primary rounded-2xl p-6 border border-border-light shadow-sm flex flex-col justify-center">
+              <div className="text-center">
+                <p className="text-xs text-text-secondary font-medium mb-3">
+                  {isPremium 
+                    ? "Premium özellikler sayesinde ilanlarınız %40 daha hızlı alıcı buluyor." 
+                    : "Premium'a geçerek kargo sürelerinde öncelik kazanın ve daha fazla ilan öne çıkarın."}
+                </p>
+                {!isPremium && (
+                  <button 
+                    onClick={() => setShowUpgrade(true)}
+                    className="text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+                  >
+                    Tüm Avantajları İncele
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 

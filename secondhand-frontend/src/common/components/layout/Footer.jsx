@@ -1,12 +1,13 @@
-import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthState } from '../../../auth/AuthContext.jsx';
-import { useEnums } from '../../hooks/useEnums.js';
-import { useAgreements } from '../../../agreements/hooks/useAgreements.js';
-import { formatCurrency } from '../../formatters.js';
-import { ROUTES } from '../../constants/routes.js';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import {useTranslation} from "react-i18next";
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAuthState} from '../../../auth/AuthContext.jsx';
+import {useEnums} from '../../hooks/useEnums.js';
+import {useAgreements} from '../../../agreements/hooks/useAgreements.js';
+import {formatCurrency} from '../../formatters.js';
+import {ROUTES} from '../../constants/routes.js';
+import {ChevronDown, ChevronUp} from 'lucide-react';
+
 const Footer = () => {
   const {
     t
@@ -39,6 +40,11 @@ const Footer = () => {
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.2em] mb-2">{t("about")}</h3>
                         <ul className="space-y-1.5">
+                            <li>
+                                <button onClick={() => navigate(ROUTES.ABOUT)} className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight font-medium">
+                                    {t("about_secondhand", "About SecondHand")}
+                                </button>
+                            </li>
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">{t("no_membership_fees")}</li>
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">{t("free_to_browse_and_search")}</li>
                             <li className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight">{t("secure_transactions")}</li>

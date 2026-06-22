@@ -1261,5 +1261,25 @@
   "marketplace": "Marketplace",
   "failed_to_load_listings": "Failed to load listings",
   "no_listings_yet": "No listings yet",
-  "curated": "Curated"
+  "curated": "Curated",
+  "about_secondhand": "About SecondHand",
+  "about_secondhand_title": "About SecondHand",
+  "about_secondhand_subtitle": "We prioritize real, working technology and community trust over marketing promises. Explore how our marketplace empowers safe and transparent trades.",
+  "premium": {
+    "banner": {
+      "opportunity": "Premium Opportunity",
+      "title_start": "Double Your ",
+      "title_highlight": "Shopping Experience",
+      "description": "Upgrade to Premium to get your orders approved 2x faster, enjoy 1-day delivery, and reach more buyers with AI and showcase features.",
+      "feature_fast_title": "2x Faster",
+      "feature_fast_desc": "Order Approval",
+      "feature_shipping_title": "1 Business Day",
+      "feature_shipping_desc": "Delivery Time",
+      "feature_ai_title": "AI Power",
+      "feature_ai_desc": "2.5x Chat, 4x Listings",
+      "feature_showcase_title": "Showcase",
+      "feature_showcase_desc": "More Visibility",
+      "cta": "Explore Premium"
+    }
+  }
 }

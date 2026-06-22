@@ -1,11 +1,8 @@
 package com.serhat.secondhand.auth.api;
 
-import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.core.result.ResultResponses;
-
 import com.serhat.secondhand.auth.application.LoginService;
-import com.serhat.secondhand.auth.application.RegistrationService;
 import com.serhat.secondhand.auth.application.OAuthService;
+import com.serhat.secondhand.auth.application.RegistrationService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
@@ -13,6 +10,8 @@ import com.serhat.secondhand.auth.domain.dto.response.AuthClientResponse;
 import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Authentication", description = "User authentication and authorization operations")

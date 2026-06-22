@@ -14,7 +14,6 @@ import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.application.GreatSellerService;
 import com.serhat.secondhand.user.application.IUserService;
-import com.serhat.secondhand.user.domain.dto.GreatSellerPublicProfileDto;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
@@ -115,34 +114,34 @@ public class UserController {
     }
 
     @PublicEndpoint
-    @GetMapping("/{userId}/great-seller-status")
+    @GetMapping("/{user-id}/great-seller-status")
     @Operation(summary = "Great Seller badge eligibility and progress")
-    public ResponseEntity<?> getGreatSellerStatus(@PathVariable Long userId) {
+    public ResponseEntity<?> getGreatSellerStatus(@PathVariable("user-id") Long userId) {
         return ResultResponses.ok(Result.success(greatSellerService.getStatus(userId)));
     }
 
-    @GetMapping("/{userId}/reviews/received")
+    @GetMapping("/{user-id}/reviews/received")
     public ResponseEntity<?> getReviewsReceivedByUser(
-            @PathVariable Long userId,
+            @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResultResponses.ok(reviewService.getReviewsForUser(userId, pageable));
     }
 
-    @GetMapping("/{userId}/reviews/written")
+    @GetMapping("/{user-id}/reviews/written")
     public ResponseEntity<?> getReviewsWrittenByUser(
-            @PathVariable Long userId,
+            @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResultResponses.ok(reviewService.getReviewsByUser(userId, pageable));
     }
 
-    @GetMapping("/{userId}/review-stats")
-    public ResponseEntity<?> getUserReviewStats(@PathVariable Long userId) {
+    @GetMapping("/{user-id}/review-stats")
+    public ResponseEntity<?> getUserReviewStats(@PathVariable("user-id") Long userId) {
         return ResultResponses.ok(reviewService.getUserReviewStats(userId));
     }
 
-    @GetMapping("/{userId}/listings")
+    @GetMapping("/{user-id}/listings")
     public ResponseEntity<Page<ListingDto>> getListingsByUser(
-            @PathVariable Long userId,
+            @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(listingService.getMyListings(userId, pageable.getPageNumber(), pageable.getPageSize()));
     }

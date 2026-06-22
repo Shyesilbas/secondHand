@@ -341,5 +341,10 @@ export const API_ENDPOINTS = {
     },
     AI: {
         SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`
+    },
+    MEMBERSHIP: {
+        STATUS: '/v1/membership/status',
+        UPGRADE: '/v1/membership/upgrade',
+        CANCEL: '/v1/membership/cancel',
     }
 };

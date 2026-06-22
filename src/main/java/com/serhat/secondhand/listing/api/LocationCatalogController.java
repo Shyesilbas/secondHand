@@ -2,16 +2,13 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
 import com.serhat.secondhand.listing.application.common.LocationCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/catalog/locations")
+@RequestMapping("/api/v1/catalog/locations")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LocationCatalogController {

@@ -42,4 +42,7 @@ public interface ShowcaseRepository extends JpaRepository<Showcase, UUID> {
 
     @Query("SELECT s FROM Showcase s LEFT JOIN FETCH s.listing l LEFT JOIN FETCH l.seller WHERE s.user.id = :userId AND s.status = :status ORDER BY s.createdAt DESC")
     List<Showcase> findByUserIdAndStatusWithListing(@Param("userId") Long userId, @Param("status") ShowcaseStatus status);
+
+    @Query("SELECT COUNT(s) FROM Showcase s WHERE s.user.id = :userId AND s.status = 'ACTIVE'")
+    int countActiveByUserId(@Param("userId") Long userId);
 }

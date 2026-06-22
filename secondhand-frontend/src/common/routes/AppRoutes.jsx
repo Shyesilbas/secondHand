@@ -1,8 +1,8 @@
-import { useTranslation } from "react-i18next";
-import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { ROUTES } from '../constants/routes.js';
+import {useTranslation} from "react-i18next";
+import {lazy, Suspense} from 'react';
+import {Navigate, Route, Routes, useSearchParams} from 'react-router-dom';
+import {useAuth} from '../../auth/AuthContext.jsx';
+import {ROUTES} from '../constants/routes.js';
 import LoadingIndicator from '../components/ui/LoadingIndicator.jsx';
 
 // Layouts - Always loaded
@@ -14,6 +14,7 @@ import AdminRoute from './AdminRoute.jsx';
 
 // Critical Routes - Eager loaded (always needed on initial load)
 import HomePage from '../../home/pages/HomePage.jsx';
+import AboutPage from '../../home/pages/AboutPage.jsx';
 
 // High Priority - Lazy loaded (frequently accessed)
 const ListingsPage = lazy(() => import('../../listing/pages/ListingsPage.jsx'));
@@ -153,6 +154,7 @@ const AppRoutes = () => {
                 {/* Public Routes with Main Layout */}
                 <Route element={<MainLayout />}>
                     <Route path={ROUTES.HOME} element={<HomePage />} />
+                    <Route path={ROUTES.ABOUT} element={<AboutPage />} />
                     <Route path={ROUTES.LISTINGS_PREFILTER} element={<Suspense fallback={<PageLoader />}>
                                 <ListingsPrefilterPage />
                             </Suspense>} />

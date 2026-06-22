@@ -1,12 +1,12 @@
 package com.serhat.secondhand.favoritelist.api;
 
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.favoritelist.application.FavoriteListService;
 import com.serhat.secondhand.favoritelist.config.FavoriteListConfig;
 import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
 import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
 import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
 import com.serhat.secondhand.favoritelist.dto.UpdateFavoriteListRequest;
-import com.serhat.secondhand.favoritelist.application.FavoriteListService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/favorite-lists")
+@RequestMapping("/api/v1/favorite-lists")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Favorite Lists", description = "Operations for managing favorite listing collections")
@@ -55,10 +55,10 @@ public class FavoriteListController {
         return ResponseEntity.ok(lists);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{user-id}")
     @Operation(summary = "Get a user's public favorite lists")
     public ResponseEntity<Page<FavoriteListSummaryDto>> getUserPublicLists(
-            @PathVariable Long userId,
+            @PathVariable("user-id") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) Integer size) {
         int resolvedSize = resolveSize(size, favoriteListConfig.getUserPublicListsDefaultSize());
@@ -78,69 +78,69 @@ public class FavoriteListController {
         return ResponseEntity.ok(lists);
     }
 
-    @GetMapping("/{listId}")
+    @GetMapping("/{list-id}")
     @Operation(summary = "Get a favorite list by ID")
     public ResponseEntity<?> getListById(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(favoriteListService.getListById(listId, currentUser));
     }
 
-    @PutMapping("/{listId}")
+    @PutMapping("/{list-id}")
     @Operation(summary = "Update a favorite list")
     public ResponseEntity<?> updateList(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateFavoriteListRequest request) {
         return ResultResponses.ok(favoriteListService.updateList(currentUser.getId(), listId, request));
     }
 
-    @DeleteMapping("/{listId}")
+    @DeleteMapping("/{list-id}")
     @Operation(summary = "Delete a favorite list")
     public ResponseEntity<?> deleteList(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteListService.deleteList(currentUser.getId(), listId));
     }
 
-    @PostMapping("/{listId}/items")
+    @PostMapping("/{list-id}/items")
     @Operation(summary = "Add an item to a favorite list")
     public ResponseEntity<?> addItemToList(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody AddToListRequest request) {
         return ResultResponses.created(favoriteListService.addItemToList(currentUser.getId(), listId, request));
     }
 
-    @DeleteMapping("/{listId}/items/{listingId}")
+    @DeleteMapping("/{list-id}/items/{listing-id}")
     @Operation(summary = "Remove an item from a favorite list")
     public ResponseEntity<?> removeItemFromList(
-            @PathVariable Long listId,
-            @PathVariable UUID listingId,
+            @PathVariable("list-id") Long listId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteListService.removeItemFromList(currentUser.getId(), listId, listingId));
     }
 
-    @PostMapping("/{listId}/like")
+    @PostMapping("/{list-id}/like")
     @Operation(summary = "Like a favorite list")
     public ResponseEntity<?> likeList(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(favoriteListService.likeList(currentUser.getId(), listId));
     }
 
-    @DeleteMapping("/{listId}/like")
+    @DeleteMapping("/{list-id}/like")
     @Operation(summary = "Unlike a favorite list")
     public ResponseEntity<?> unlikeList(
-            @PathVariable Long listId,
+            @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteListService.unlikeList(currentUser.getId(), listId));
     }
 
-    @GetMapping("/listing/{listingId}/lists")
+    @GetMapping("/listing/{listing-id}/lists")
     @Operation(summary = "Get list IDs containing a specific listing for current user")
     public ResponseEntity<Map<String, List<Long>>> getListsContainingListing(
-            @PathVariable UUID listingId,
+            @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         List<Long> listIds = favoriteListService.getListIdsContainingListing(currentUser.getId(), listingId);
         return ResponseEntity.ok(Map.of("listIds", listIds));

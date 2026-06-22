@@ -32,6 +32,7 @@ public class PaymentValidationHelper {
         }
         if (paymentRequest.transactionType() != PaymentTransactionType.LISTING_CREATION
                 && paymentRequest.transactionType() != PaymentTransactionType.SHOWCASE_PAYMENT
+                && paymentRequest.transactionType() != PaymentTransactionType.MEMBERSHIP_PAYMENT
                 && toUser != null
                 && fromUser.getId().equals(toUser.getId())) {
             return Result.error(PaymentErrorCodes.SELF_PAYMENT);

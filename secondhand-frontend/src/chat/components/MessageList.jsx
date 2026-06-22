@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useRef, useLayoutEffect } from 'react';
 import { Trash2 as TrashIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
@@ -39,10 +39,50 @@ const MessageList = memo(({
   messagesEndRef,
   messagesContainerRef,
   user,
-  onDeleteMessage
+  onDeleteMessage,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage
 }) => {
   const { t } = useTranslation();
-  return <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar bg-slate-50/50">
+  const prevScrollHeightRef = useRef(0);
+  const prevScrollTopRef = useRef(0);
+
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop } = messagesContainerRef.current;
+    prevScrollTopRef.current = scrollTop;
+
+    if (scrollTop === 0 && hasNextPage && !isFetchingNextPage) {
+      if (fetchNextPage) fetchNextPage();
+    }
+  };
+
+  useLayoutEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const currentScrollHeight = container.scrollHeight;
+    
+    if (prevScrollHeightRef.current > 0 && prevScrollHeightRef.current < currentScrollHeight) {
+      if (prevScrollTopRef.current === 0) {
+        container.scrollTop = currentScrollHeight - prevScrollHeightRef.current;
+      }
+    }
+    
+    prevScrollHeightRef.current = currentScrollHeight;
+  }, [messages, isFetchingNextPage, messagesContainerRef]);
+
+  return <div 
+      ref={messagesContainerRef} 
+      onScroll={handleScroll}
+      className="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar bg-slate-50/50"
+    >
+      {isFetchingNextPage && (
+        <div className="flex justify-center items-center py-2">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-900"></div>
+        </div>
+      )}
       {isLoadingMessages ? <div className="flex justify-center items-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
         </div> : messages.length === 0 ? <div className="flex flex-col items-center justify-center h-full text-center">

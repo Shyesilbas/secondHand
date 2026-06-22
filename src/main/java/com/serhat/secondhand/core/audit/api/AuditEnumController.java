@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/audit/enums")
+@RequestMapping("/api/v1/audit/enums")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Audit Enums", description = "Audit log enumeration values")

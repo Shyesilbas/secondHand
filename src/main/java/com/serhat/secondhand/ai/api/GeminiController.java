@@ -1,20 +1,19 @@
 package com.serhat.secondhand.ai.api;
 
-import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.core.result.ResultResponses;
-
+import com.serhat.secondhand.ai.application.GeminiAiService;
 import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
-import com.serhat.secondhand.ai.application.GeminiAiService;
+import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.result.ResultResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/api/ai-test")
+@RequestMapping("/api/v1/ai/tests")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Gemini", description = "Gemini operations")

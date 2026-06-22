@@ -41,30 +41,30 @@ public class OfferController {
         return ResultResponses.ok(offerService.create(currentUser.getId(), request));
     }
 
-    @GetMapping("/{offerId}")
+    @GetMapping("/{offer-id}")
     @Operation(summary = "Get offer", description = "Get a single offer by id (buyer or seller only)")
-    public ResponseEntity<?> getById(@PathVariable UUID offerId,
+    public ResponseEntity<?> getById(@PathVariable("offer-id") UUID offerId,
                                            @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.getByIdForUser(currentUser.getId(), offerId));
     }
 
-    @PostMapping("/{offerId}/accept")
+    @PostMapping("/{offer-id}/accept")
     @Operation(summary = "Accept offer", description = "Receiver accepts a pending offer")
-    public ResponseEntity<?> accept(@PathVariable UUID offerId,
+    public ResponseEntity<?> accept(@PathVariable("offer-id") UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.accept(currentUser.getId(), offerId));
     }
 
-    @PostMapping("/{offerId}/reject")
+    @PostMapping("/{offer-id}/reject")
     @Operation(summary = "Reject offer", description = "Receiver rejects a pending offer")
-    public ResponseEntity<?> reject(@PathVariable UUID offerId,
+    public ResponseEntity<?> reject(@PathVariable("offer-id") UUID offerId,
                                           @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.reject(currentUser.getId(), offerId));
     }
 
-    @PostMapping("/{offerId}/counter")
+    @PostMapping("/{offer-id}/counter")
     @Operation(summary = "Counter offer", description = "Receiver counters a pending offer (creates a new offer record)")
-    public ResponseEntity<?> counter(@PathVariable UUID offerId,
+    public ResponseEntity<?> counter(@PathVariable("offer-id") UUID offerId,
                                            @Valid @RequestBody CounterOfferRequest request,
                                            @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(offerService.counter(currentUser.getId(), offerId, request));
