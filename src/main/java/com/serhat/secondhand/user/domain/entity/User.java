@@ -29,6 +29,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@org.hibernate.annotations.BatchSize(size = 20)
 @Table(name = "users", indexes = {
     @Index(name = "idx_user_email", columnList = "email"),
     @Index(name = "idx_user_phone", columnList = "phone"),

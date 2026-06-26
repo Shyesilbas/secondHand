@@ -109,7 +109,7 @@ public class PaymentRequestFactory {
                 .build();
     }
 
-    public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, PaymentType paymentType, String idempotencyKey) {
+    public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, PaymentType paymentType, String idempotencyKey, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
                 .toUserId(null)
@@ -124,7 +124,9 @@ public class PaymentRequestFactory {
                 .paymentType(paymentType != null ? paymentType : PaymentType.EWALLET)
                 .transactionType(PaymentTransactionType.MEMBERSHIP_PAYMENT)
                 .paymentDirection(PaymentDirection.OUTGOING)
-                .agreementsAccepted(true)
+                .agreementsAccepted(request != null ? request.agreementsAccepted() : false)
+                .acceptedAgreementIds(request != null ? request.acceptedAgreementIds() : null)
+                .verificationCode(request != null ? request.verificationCode() : null)
                 .idempotencyKey(idempotencyKey)
                 .build();
     }

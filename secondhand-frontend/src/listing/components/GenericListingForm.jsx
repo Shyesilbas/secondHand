@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
@@ -116,6 +116,7 @@ const GenericListingForm = ({
     t
   } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const notification = useNotification();
   const {
     enums
@@ -154,8 +155,11 @@ const GenericListingForm = ({
   }, [formSchema?.initialData, normalizedInitialData]);
   const totalSteps = wizardSteps?.length || 3;
   const draftKey = `listing_draft_${listingType}`;
+  const restoreDraft = location.state?.restoreDraft === true;
   const initialDataWithDraft = useMemo(() => {
     if (isEdit) return mergedInitialData;
+    if (!restoreDraft) return mergedInitialData;
+    
     try {
       const draft = cacheService.get(draftKey);
       if (draft && typeof draft === 'object') {
@@ -168,7 +172,7 @@ const GenericListingForm = ({
       console.error('Failed to parse draft from cache', e);
     }
     return mergedInitialData;
-  }, [mergedInitialData, isEdit, draftKey]);
+  }, [mergedInitialData, isEdit, draftKey, restoreDraft]);
   const formState = useFormState({
     initialData: initialDataWithDraft,
     totalSteps,
@@ -228,7 +232,7 @@ const GenericListingForm = ({
 
   // Restore step on mount
   useEffect(() => {
-    if (isEdit) return;
+    if (isEdit || !restoreDraft) return;
     try {
       const savedStep = cacheService.get(`${draftKey}_step`);
       if (savedStep) {
@@ -240,7 +244,7 @@ const GenericListingForm = ({
     } catch (e) {
       console.error('Failed to parse saved step from cache', e);
     }
-  }, [goToStep, isEdit, totalSteps, draftKey]);
+  }, [goToStep, isEdit, totalSteps, draftKey, restoreDraft]);
   const ctx = useMemo(() => {
     const setValue = (field, value) => handleDropdownChange(field, value);
     const setChecked = (field, checked) => handleInputChange({

@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     
-        Page<Message> findByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable);
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"sender", "recipient"})
+    Page<Message> findByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable);
         @Modifying
     @Query("UPDATE Message m SET m.isRead = true WHERE m.chatRoomId = :chatRoomId AND m.recipient.id = :userId AND m.isRead = false")
     void markMessagesAsRead(@Param("chatRoomId") Long chatRoomId, @Param("userId") Long userId);
@@ -54,6 +55,7 @@ group by m.chatRoomId
                 ));
     }
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"sender", "recipient"})
     Page<Message> findByChatRoomIdInOrderByCreatedAtDesc(
             List<Long> chatRoomIds,
             Pageable pageable

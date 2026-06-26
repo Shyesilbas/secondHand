@@ -7,8 +7,8 @@ export const membershipService = {
     return response.data;
   },
 
-  upgradeToPremium: async () => {
-    const response = await apiClient.post(API_ENDPOINTS.MEMBERSHIP.UPGRADE);
+  upgradeToPremium: async (payload) => {
+    const response = await apiClient.post(API_ENDPOINTS.MEMBERSHIP.UPGRADE, payload);
     return response.data;
   },
 

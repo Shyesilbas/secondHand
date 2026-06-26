@@ -11,6 +11,8 @@ import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
+import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.listing.domain.entity.Listing;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,7 @@ public class PaymentModuleAdapter implements ListingFeePaymentPort {
 
     private final PaymentProcessor paymentProcessor;
     private final PaymentRepository paymentRepository;
+    private final ListingRepository listingRepository;
 
     @Override
     public Result<UUID> processListingFee(ListingFeePaymentRequest request) {
@@ -50,12 +53,25 @@ public class PaymentModuleAdapter implements ListingFeePaymentPort {
     }
 
     private PaymentRequest mapToPaymentRequest(ListingFeePaymentRequest request) {
+        String listingTitle = null;
+        String listingNo = null;
+
+        if (request.listingId() != null) {
+            Listing listing = listingRepository.findById(request.listingId()).orElse(null);
+            if (listing != null) {
+                listingTitle = listing.getTitle();
+                listingNo = listing.getListingNo();
+            }
+        }
+
         return PaymentRequest.builder()
                 .fromUserId(request.userId())
                 .toUserId(null)
                 .receiverName(PaymentProcessingConstants.SYSTEM_RECEIVER_NAME)
                 .receiverSurname(PaymentProcessingConstants.PAYMENT_RECEIVER_SURNAME)
                 .listingId(request.listingId())
+                .listingTitle(listingTitle)
+                .listingNo(listingNo)
                 .amount(request.amount())
                 .paymentType(request.paymentType())
                 .transactionType(PaymentTransactionType.LISTING_CREATION)

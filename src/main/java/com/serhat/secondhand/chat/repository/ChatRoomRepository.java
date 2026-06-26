@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     
-        @Query("SELECT cr FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC")
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"participantIds"})
+    @Query("SELECT cr FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC")
     List<ChatRoom> findByParticipantIdOrderByLastMessageTimeDesc(@Param("userId") Long userId);
     
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.roomType = 'DIRECT' AND :userId1 MEMBER OF cr.participantIds AND :userId2 MEMBER OF cr.participantIds ORDER BY cr.createdAt ASC")

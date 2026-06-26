@@ -109,7 +109,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private void handleSuccessResponse(HttpServletRequest request, HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
         cookieUtils.setAccessTokenCookie(response, accessToken);
         cookieUtils.setRefreshTokenCookie(response, refreshToken);
-        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/");
+        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/?oauth_success=true");
     }
 
     private void handleErrorResponse(HttpServletResponse response, String message) throws IOException {

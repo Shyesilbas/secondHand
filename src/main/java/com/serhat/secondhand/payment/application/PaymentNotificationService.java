@@ -34,10 +34,11 @@ public class PaymentNotificationService {
                 return;
             }
 
+            String typeLabel = getLocalizedTransactionType(paymentDto.transactionType());
             String subject = emailConfig.getPaymentSuccessSubject();
             String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Ödeme";
             String content = String.format("'%s' başlıklı ilan için %s tutarındaki %s işleminiz başarıyla tamamlandı.",
-                    listingTitle, paymentDto.amount(), paymentDto.transactionType());
+                    listingTitle, paymentDto.amount(), typeLabel);
             
             org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
             ctx.setVariable("userName", user.getName());
@@ -49,7 +50,6 @@ public class PaymentNotificationService {
 
             String amountText = paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "";
             String cur = paymentDto.currency() != null ? paymentDto.currency() : "";
-            String typeLabel = paymentDto.transactionType() != null ? paymentDto.transactionType().name() : "";
             notificationEventPublisher.publishDispatch(
                     notificationTemplateCatalog.paymentSucceeded(
                             user.getId(), amountText, cur, paymentDto.listingTitle(), typeLabel),
@@ -57,6 +57,21 @@ public class PaymentNotificationService {
         } catch (Exception e) {
             log.warn("Failed to send payment success notification to user {}: {}", user.getEmail(), e.getMessage());
         }
+    }
+
+    private String getLocalizedTransactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType type) {
+        if (type == null) return "Ödeme";
+        return switch (type) {
+            case LISTING_CREATION -> "İlan Oluşturma";
+            case ITEM_PURCHASE -> "Ürün Satın Alma";
+            case ITEM_SALE -> "Ürün Satışı";
+            case REFUND -> "İade";
+            case EWALLET_DEPOSIT -> "Cüzdana Para Yükleme";
+            case EWALLET_WITHDRAWAL -> "Cüzdandan Para Çekme";
+            case EWALLET_PAYMENT_RECEIVED -> "Ödeme Alma";
+            case SHOWCASE_PAYMENT -> "İlan Öne Çıkarma";
+            case MEMBERSHIP_PAYMENT -> "Premium Üyelik";
+        };
     }
 
     private void sendMembershipUpgradeEmail(User user, PaymentDto paymentDto) {

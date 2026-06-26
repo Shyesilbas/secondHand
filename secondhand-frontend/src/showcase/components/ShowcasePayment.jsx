@@ -41,6 +41,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   const [error, setError] = useState(null);
   const [verificationCode, setVerificationCode] = useState('');
   const [otpExpiresAtMs, setOtpExpiresAtMs] = useState(null);
+  const [localEmails, setLocalEmails] = useState(null);
   useEffect(() => {
     if (step !== 3) {
       setVerificationCode('');
@@ -71,10 +72,10 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
     eWallet,
     refreshWallet
   } = useEWallet();
-  const suggestedFromInbox = useMemo(() => findLatestOtpFromEmails(emails, {
+  const suggestedFromInbox = useMemo(() => findLatestOtpFromEmails(localEmails || emails, {
     emailType: EMAIL_TYPES.PAYMENT_VERIFICATION,
     maxScan: 16
-  }), [emails]);
+  }), [emails, localEmails]);
   useOtpSuggestedToast({
     suggestedCode: suggestedFromInbox,
     enabled: step === 3
@@ -158,7 +159,8 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
         days,
         amount: totalCost
       });
-      await fetchEmails();
+      const fetchedEmails = await fetchEmails();
+      setLocalEmails(fetchedEmails);
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setStep(3);
     } catch (err) {
@@ -238,30 +240,18 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
           </div>;
       case 3:
         return <div className="space-y-4">
-            <div className="flex gap-3 items-start">
-              {embedded ? <div className="w-10 h-10 shrink-0 rounded-xl bg-primary flex items-center justify-center shadow-md shadow-indigo-500/25">
-                  <Lock className="w-5 h-5 text-white" aria-hidden />
-                </div> : null}
-              <div className={`min-w-0 flex-1 ${embedded ? '' : 'text-center'}`}>
-                <h3 className={headingClass}>{t("verification")}</h3>
-                <p className={`${mutedClass} mt-1 leading-relaxed`}>{t("enter_the")}{' '}
-                  <span className="font-semibold text-slate-700">{OTP_CODE_LENGTH}</span>{t("digit_code_we_emailed_you_to")}{' '}
-                  <span className="font-semibold text-slate-700">{t("finish_payment")}</span>
-                  .
-                </p>
-                {otpTtlActive ? <p className={`text-caption font-semibold mt-2 tabular-nums ${otpTtlExpired ? 'text-amber-700' : embedded ? 'text-slate-600' : 'text-text-secondary'}`}>
-                    {otpTtlExpired ? 'Code expired — go back and send a new code.' : `Expires in: ${otpTtlFormatted}`}
-                  </p> : null}
+            <OtpDigitInputGroup length={OTP_CODE_LENGTH} value={verificationCode} onChange={setVerificationCode} disabled={loading} error={error} label={t("verification_code")} onComplete={() => {}} />
+
+            {suggestedFromInbox && (
+              <div className="mt-4">
+                <OtpSuggestionBanner 
+                  suggestedCode={suggestedFromInbox} 
+                  onApply={setVerificationCode} 
+                />
               </div>
-            </div>
-
-            {suggestedFromInbox ? <OtpSuggestionBanner suggestedCode={suggestedFromInbox} onApply={setVerificationCode} /> : null}
-
-            <div className={`${embedded ? 'rounded-2xl border border-border-light bg-background-primary p-4' : ''}`}>
-              <OtpDigitInputGroup value={verificationCode} onChange={setVerificationCode} dataSlotPrefix="showcase-otp" disabled={loading || otpTtlExpired} />
-            </div>
-
-            {error ? <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800">
+            )}
+            
+            <div className={`rounded-xl border border-border-light p-4 ${embedded ? 'bg-background-secondary' : 'bg-background-primary'}`}>
                 {error}
               </div> : null}
 

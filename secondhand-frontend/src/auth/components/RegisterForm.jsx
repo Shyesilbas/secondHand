@@ -155,7 +155,7 @@ export const RegisterForm = ({
                 </div>
 
                 {/* Google SSO */}
-                <a href={`${API_BASE_URL}/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-border-light hover:border-border-DEFAULT rounded-xl bg-background-primary text-sm font-medium text-text-secondary hover:bg-background-secondary active:scale-[0.985] transition-all duration-300">
+                <a href={`${API_BASE_URL}/v1/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-border-light hover:border-border-DEFAULT rounded-xl bg-background-primary text-sm font-medium text-text-secondary hover:bg-background-secondary active:scale-[0.985] transition-all duration-300">
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
                         <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4" />
                         <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853" />

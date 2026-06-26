@@ -25,9 +25,13 @@ export const AuthProvider = ({ children }) => {
         const initializeAuth = async () => {
             isAuthInitializing.current = true;
             try {
+                const isOauthSuccess = window.location.search.includes('oauth_success=true');
                 const userData = getUser();
 
-                if (userData) {
+                if (userData || isOauthSuccess) {
+                    if (isOauthSuccess) {
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
                     setAuthState({ user: userData, isAuthenticated: true, isLoading: true });
                     try {
                         const userProfile = await authService.getCurrentUser();

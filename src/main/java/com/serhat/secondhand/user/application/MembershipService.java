@@ -35,7 +35,7 @@ public class MembershipService {
         return MembershipStatusDto.from(user);
     }
 
-    public MembershipStatusDto upgradeToPremium(Long userId) {
+    public MembershipStatusDto upgradeToPremium(Long userId, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException("Kullanıcı bulunamadı", HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
 
@@ -44,7 +44,7 @@ public class MembershipService {
         }
 
         String idempotencyKey = "membership-upgrade-" + userId + "-" + System.currentTimeMillis();
-        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, PREMIUM_PRICE, PaymentType.EWALLET, idempotencyKey);
+        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, PREMIUM_PRICE, PaymentType.EWALLET, idempotencyKey, request);
 
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
         if (paymentResult.isError()) {

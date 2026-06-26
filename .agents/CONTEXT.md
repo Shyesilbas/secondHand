@@ -1,10 +1,11 @@
 ## Son çalışılan
-- Endpoint audit ve Postman collection.
-- Premium üyeliğinin entegrasyonu tamamlandı. Ödemeler `PaymentProcessor` üzerinden `MEMBERSHIP_PAYMENT` işlemi olarak geçirilip veritabanındaki `payment` tablosuna kaydedilmesi sağlandı.
-- Ödeme sonrasında `PaymentNotificationService` üzerinden custom `membership-confirmation` Thymeleaf şablonlu e-posta gönderimi ve in-app `PAYMENT_SUCCESS` bildirimi tetiklendi.
-- Frontend tarafında `PremiumUpgradeModal.jsx` bileşenine `useNotification` toast entegrasyonu yapıldı; işlem başarılı olduğunda toast gösterilip modalın kontrollü kapatılması sağlandı.
+- Backend N+1 performans sorunu giderildi: ChatRoomRepository, MessageRepository, Order.java, OrderItem.java, User.java, Address.java değiştirildi. Build başarıyla doğrulandı.
 
 ## Tamamlananlar
+- 11. skill dosyası eklendi
+- Premium Membership ödeme akışında `INVALID_AGREEMENT_COUNT` hatası giderildi. Backend'e `MembershipUpgradeRequest` DTO'suna `agreementsAccepted`, `acceptedAgreementIds` ve `verificationCode` alanları eklendi. `PaymentRequestFactory.buildMembershipPaymentRequest()` imzası güncellenerek bu alanlar `PaymentRequest`'e aktarıldı. Frontend `PremiumUpgradeModal` 3 adımlı (Plan/Features, Sözleşmeler, OTP) showcase ile birebir aynı ödeme akışına sahip premium bir UI'a dönüştürüldü. Frontend build başarıyla doğrulandı.
+- Backend Thymeleaf email template'leri Teal tasarım sistemine uyumlu hale getirildi, transactionType'ların Türkçeleştirilmesi yapıldı.
+- İlan oluşturma formlarında (GenericListingForm) local storage cache'inin kullanıcı seçimlerini (pre-filter) ezmesi sorunu `restoreDraft` bayrağı ile çözüldü.
 - Tüm endpoint'ler tarandı, path tutarsızlıkları düzeltildi, Postman collection oluşturuldu (`SecondHand_API.postman_collection.json`).
 - Premium/Membership ödeme altyapısı `PaymentProcessor` altyapısına geçirildi (Showcase ve Listing fee ile aynı sisteme bağlandı).
 - Veritabanına `MEMBERSHIP_PAYMENT` tipinde ödeme kaydı eklenmesi sağlandı.
@@ -51,10 +52,12 @@
 - Frontend ve backend build doğrulamaları başarıyla tamamlandı.
 
 ## Bir sonraki adım
+- Chat infinite scroll, eksik README'ler
 - Postman'a import et ve manuel test yap.
 - AI streaming endpoint testi.
 - `@PreAuthorize` eksikliği bulunan rol bazlı controller endpoint'lerinin kapatılması.
 - Listing N+1 sorunu JPA log analizi.
+- Backend N+1 performans düzeltmeleri uygulandı (Chat, Order, User, Address, OrderItem).
 
 ## Açık riskler
 - @PreAuthorize eksik endpoint'ler raporlandı, gözden geçir.

@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@org.hibernate.annotations.BatchSize(size = 20)
 @Table(name = "addresses")
 public class Address {
     @Id

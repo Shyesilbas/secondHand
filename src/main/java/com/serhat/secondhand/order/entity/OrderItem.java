@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@org.hibernate.annotations.BatchSize(size = 20)
 @Table(name = "order_items", indexes = {
         @Index(name = "idx_order_item_order", columnList = "order_id"),
         @Index(name = "idx_order_item_listing", columnList = "listing_id"),
