@@ -1,43 +1,30 @@
 ---
 name: Frontend Quality Control
-description: Frontend kod yazımı veya mimari incelemesi sırasında React standartlarına uyumu denetler.
+description: Inspects compliance with React standards during frontend code writing or architectural review.
 triggers:
-  - "frontend refactor"
-  - "react inceleme"
-  - "ui kodu yaz"
-  - "hook düzenle"
+  - "frontend audit"
 ---
-
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Frontend Quality Control
 
-## Tetiklenme
-Frontend (.jsx, .js) kodlarında geliştirme yapıldığında, refactor istendiğinde veya API entegrasyonu yazılırken devreye girer.
+## Trigger
+Triggered by "frontend audit".
 
-## Kurallar
+## Zero-I/O Architectural Rules
+- **Data Fetching:** Use `react-query` (`useQuery`, `useMutation`). Direct `fetch`/`axios` inside `useEffect` is strictly prohibited.
+- **State Management:** Use `useMemo` for derived state. Do not set up cascading `useEffect` chains (A triggers B triggers C).
+- **Cache Management:** Use `react-query` `staleTime: Infinity` for static data instead of manual `localStorage.setItem`.
+- **Event Cleanup:** WebSocket connections (STOMP) or global event listeners must provide proper cleanup functions in their `useEffect` hooks (`client.deactivate()`).
+- **Component Design:** Keep components modular. Split large components.
+- **List Keys:** Arrays mapped in JSX must use unique, stable keys. Prohibit array index as key where possible.
 
-### 1. Veri Çekme (Data Fetching)
-- **YASAK:** Komponent içinde `useEffect` kullanarak `fetch` veya `axios` ile doğrudan veri çekmeyin.
-- **ZORUNLU:** Tüm data fetching ve caching işlemleri için `react-query` (`useQuery`, `useMutation`) hook'larını kullanın.
-- **NEDEN:** React Query loading state, caching ve staleTime yönetimini otomatik yapar, useEffect spagettisini önler.
+## Workflow Steps
 
-### 2. Manuel Cache Yönetimi (localStorage)
-- **YASAK:** Global veri (örn. enumlar) için `localStorage.setItem` ve `JSON.parse` ile manuel cache yönetimi (enumCache.js gibi) yapmayın.
-- **ZORUNLU:** Kalıcı cache gerektiren statik veriler için `react-query` `staleTime: 24 * 60 * 60 * 1000` (veya Infinity) özelliğini kullanın. 
+### 1. Evaluate Data Fetching and State
+Check compliance with React Query rules and derived state rules above.
 
-### 3. State ve Lifecycle (useEffect Zincirleri)
-- **YASAK:** Birbirini tetikleyen (cascading) `useEffect` zincirleri kurmayın (A tetiklenir B'yi değiştirir, B tetiklenir C'yi değiştirir).
-- **ZORUNLU:** Derived state (türetilmiş durum) için `useMemo` kullanın. Çoklu state değişimlerini `useReducer` veya tek bir olay işleyicisinde (event handler) toplayın.
+### 2. Evaluate Event Cleanup & UI Standards
+Verify cleanup logic and component modularity.
 
-### 4. WebSocket ve Event Cleanup
-- **YASAK:** WebSocket (STOMP) veya global event listener başlatıp `cleanup` işlemini (return) unutmak.
-- **ZORUNLU:** `useEffect` içinde `client.activate()` / `connect()` yapılıyorsa mutlaka `return () => client.deactivate()` (veya disconnect) yapılmalıdır. Sadece `.connected` kontrolü yetmez, askıda (connecting) kalan bağlantılar da temizlenmelidir.
-
-### 5. UI Standartları
-- Bileşenleri modüler (tek sorumluluk) tutun. 500+ satırlık devasa formlar yerine alt bileşenlere (sub-components) bölün.
-- Stil için Tailwind kullanılıyorsa class karmaşasını azaltmak için anlamlı isimlendirmelere veya config sabitlerine başvurun.
-
-### 6. Liste ve Key Kullanımı
-- **YASAK:** `map()` içinde döngü oluştururken `key` olarak array index (`index`) kullanmak.
-- **ZORUNLU:** Her zaman verinin benzersiz ve stabil bir alanını (örn. `id`, `uuid` vb.) veya uygun yoksa statik + index kombinasyonunu `key` olarak kullanın.
+### 3. Output Format
+Provide a quality control report highlighting violations of the standards defined above, along with proposed fixes. Do not apply fixes without approval.

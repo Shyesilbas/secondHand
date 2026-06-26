@@ -1,23 +1,23 @@
 ---
 name: Documentation Sync
-description: Kod değiştiğinde artifact, README veya GEMINI.md güncellenmesi gerekiyorsa tetiklenir.
+description: Triggered when an artifact, README, or GEMINI.md needs to be updated due to code changes.
+triggers:
+  - "documentation sync"
 ---
-
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Documentation Sync
 
-## Tetiklenme
-Mimari (yeni paket/migration/cache), kod akışı veya iş mantığı değiştiğinde, ayrıca "dokümanı güncelle", "artifact değişti" dendiğinde tetiklenir.
+## Trigger
+Triggered by "documentation sync".
 
-## Çalışma Adımları
-1. Hangi kod değişti? → Hangi doküman etkilenir?
-2. **[KRİTİK ADIM]** Eğer yeni paket, yeni Flyway migration, cache davranışı veya yeni AOP aspect eklendiyse `PROJECT_REPORT.md` dosyasını MUTLAKA güncelle!
-3. Sadece etkilenen bölümü güncelle, diğerine dokunma.
-4. Yeni bilgiyi sadece bir yere yaz (GEMINI.md, PROJECT_REPORT.md veya ilgili README).
-5. Güncelleme sonrası çelişen eski metni (stale data) sil.
+## Workflow Steps
+1. Identify what code changed.
+2. Update local domain `README.md` for business logic changes.
+3. Update `.agents/decisions/` files if architecture changed.
+4. Update `.agents/TASKS.md` if the active state changed.
+5. Only update the affected section, do not touch the rest.
+6. Delete any conflicting old text (stale data) after the update.
 
-## Kurallar
-- Kısa tut: bir bölüm maksimum 5–8 satır.
-- Tekrar etme: aynı bilgi birden fazla dokümanda kopyalanmasın.
-- Asla "stale data" bırakma: Kod değiştiği an ilgili rapor da değişmelidir.
+## Rules
+- Keep it short: a section should be maximum 5-8 lines.
+- Do not repeat: the same information should not be copied across multiple documents.

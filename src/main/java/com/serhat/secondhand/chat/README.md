@@ -1,25 +1,24 @@
-# Chat Paketi Teknik Rehber
+# Chat Domain
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Purpose
+The `chat` domain provides real-time user-to-user messaging capabilities using the WebSocket (STOMP) protocol, backed by Redis Pub/Sub for distributed message routing.
 
-## 1) Paket Amacı ve Sınırları
-`chat` paketi, platform üzerindeki kullanıcılar arası gerçek zamanlı (real-time) mesajlaşma sisteminden sorumludur. WebSocket (STOMP) protokolü üzerinden çalışır.
+## Architecture Overview
+- **ChatMessageService:** Persists messages to PostgreSQL and retrieves chat history.
+- **WebSocketAuthInterceptor:** Validates JWT tokens during the initial WS connection (CONNECT frame).
+- **RedisMessagePublisher / Subscriber:** Routes messages across multiple application instances.
 
-Kapsam:
-- Özel sohbet odaları oluşturma
-- Anlık mesaj iletimi ve okundu/okunmadı durumları (Read/Unread)
-- Çevrimiçi/çevrimdışı (Online/Offline) kullanıcı durumu takibi
-- Redis tabanlı Pub/Sub mekaniği ile dağıtık (distributed) mesaj iletimi
+## Business Invariants & Constraints
+- **WebSocket Authentication:** HTTP filters are bypassed for WS connections. All auth validation must occur inside the `WebSocketAuthInterceptor`.
+- **Durability:** While Redis routes messages, PostgreSQL is the source of truth for message persistence.
+- **Session State:** User online/offline status relies on detecting WS CONNECT/DISCONNECT frames.
 
-## 2) Kritik Sınıflar
-- `ChatController`: STOMP mesajlaşma endpoint'leri (`@MessageMapping`).
-- `ChatMessageService`: Mesajların veritabanına (Postgres) kaydedilmesi ve geçmişin getirilmesi.
-- `WebSocketAuthInterceptor`: Bağlantı anında (CONNECT frame) gönderilen JWT token'ı parse edip kullanıcı kimliğini doğrulayan güvenlik katmanı.
-- `RedisMessagePublisher / Subscriber`: Mesajların farklı sunucu instanceları arasında dağıtılması için kullanılan mekanizma.
+## Integration Points
+- **Incoming:** WS connections from the client.
+- **Outgoing:** Push notifications to connected clients.
 
-## 3) Dikkat Edilmesi Gereken Riskler
-- **WebSocket Güvenliği:** HTTP tarafındaki `AuthenticationFilter` WS tarafında çalışmaz. JWT doğrulaması mutlaka `WebSocketAuthInterceptor` üzerinden `ChannelInterceptor` ile yapılmalıdır.
-- **Cache ve Pub/Sub:** Redis çökmesi durumunda mesajların kaybolmaması için kalıcı veritabanı (Postgres) kaydının asenkron değil sekron yapılması veya güçlü bir dead-letter-queue mekanizması kurulması gerekir.
-- **Session Leak:** Bağlantısı kopan kullanıcıların (DISCONNECT frame) Redis üzerindeki "online" statülerinin anında temizlendiğinden emin olunmalıdır.
+## Public APIs
+- WebSocket STOMP Endpoints mapped via `@MessageMapping`.
+
+## Related Knowledge
+- *(No specific runbooks extracted; modifications usually require Redis and WS security knowledge)*

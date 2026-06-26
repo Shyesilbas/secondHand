@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import { ERROR_MESSAGES } from '../types/index.js';
 
-const LISTING_KEYS = {
+export const LISTING_KEYS = {
   detail: (id) => ['listings', 'detail', id],
 };
 

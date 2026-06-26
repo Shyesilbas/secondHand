@@ -1,15 +1,19 @@
-# Payments Frontend
+# Payments UI Module
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `../../../.agents/PROJECT_REPORT.md` ve `../../../GEMINI.md` dosyalarını oku.
+## Purpose
+The `payments` UI module manages eWallet interactions including displaying balance limits, transaction history, and mock top-up/withdrawal screens.
 
+## Architecture Overview
+- **PaymentMethodsPage:** Main container for eWallet features.
+- **paymentService.js:** Interface to the backend payment APIs.
+- **Queries:** React query hooks for fetching wallet statistics and transaction lists.
 
-The payments UI is currently eWallet-only.
+## Business Invariants & Constraints
+- **eWallet Only:** Currently, the UI only supports eWallet flows. Credit card and bank integrations have been removed. Any future payment methods must strictly align with the backend `PaymentStrategy` contract before UI enablement.
 
-- `pages/PaymentMethodsPage.jsx`: wallet balance, limits, top-up and withdrawal.
-- `paymentSchema.js`: payment constants and DTO normalizers.
-- `services/paymentService.js`: payment history, listing-fee payment, statistics and verification calls.
-- `hooks/queries.js`: payment list and statistics queries.
+## Integration Points
+- **Incoming:** User navigation to the payment methods view.
+- **Outgoing:** Interacts with the backend `ewallet` and `payment` domains.
 
-Credit card and bank account screens/endpoints were removed. Future payment methods should be added through the backend `PaymentStrategy` contract first, then exposed in this frontend module deliberately.
+## Related Knowledge
+- *(No runbooks extracted; UI consists of standard data fetching and form submissions)*

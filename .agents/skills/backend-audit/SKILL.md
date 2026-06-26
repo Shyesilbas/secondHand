@@ -1,149 +1,42 @@
 ---
 name: Backend Audit
-description: Herhangi bir backend paketi, servis veya domain için mimari kalite raporu oluşturur. "Analiz et", "audit et", "incele", "mimari sorunları bul", "rapor çıkar", "ne durumda" gibi ifadelerle tetiklenir.
+description: Generates an architectural quality report for any backend package, service, or domain.
 triggers:
-  - "analiz et"
-  - "audit et"
-  - "incele"
-  - "rapor çıkar"
-  - "mimari sorunları bul"
-  - "ne durumda"
-  - "teknik borç"
+  - "backend audit"
 ---
 
 # Backend Audit
 
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
-> Mimari kurallar: `GEMINI.md`
-> Kod kalite kuralları: `.agents/skills/code-quality-control/SKILL.md`
+## Trigger
+Triggered by "backend audit".
+If the package name is not given, ask: "Which package or domain should I analyze?"
 
-## Tetiklenme
-Bir paket, servis veya domain için mimari ve kod kalitesi analizi istendiğinde.
-Paket ismi verilmezse sor: "Hangi paketi veya domain'i analiz edeyim?"
+## Zero-I/O Architectural Rules
+- **Layered Architecture:** Workflow must follow: `controller -> service -> validator -> repository -> mapper`.
+- **Controllers:** Must be thin. All business logic must reside in `@Service` classes.
+- **Data Transfer:** Controllers must NEVER return Entity models. Always use DTOs.
+- **Transactions:** Escrow and EWallet operations must be under `@Transactional` with clear rollback mechanisms.
+- **Caching:** L1 (Caffeine) for static lists. L2 (Redis) for distributed cache. Always trigger invalidation on updates.
 
-## Çalışma Adımları
+## Workflow Steps
 
-### 1. Dosyaları Tara
-Hedef paket ve bağlı sınıfları tespit et — içerik okuma, sadece sınıf isimlerini listele:
-- `*Controller.java` → endpoint sayısı, HTTP method'ları
-- `*Service.java` / `*ServiceImpl.java` → servis bölünmesi, God Object riski
-- `*Repository.java` → JPA mı, custom query var mı, N+1 riski
-- `*Validator.java` / `*Policy.java` → validasyon katmanı
-- `*Mapper.java` → MapStruct mı, manuel mi
-- `*Event.java` / `*Listener.java` → event-driven yapı
-- `*Aspect.java` → AOP kullanımı
-- Varsa paket README'sini oku
+### 1. Scan Files
+Identify the target package and its classes (Controller, Service, Repository, Validator, Mapper, Event, Aspect). 
 
-### 2. Raporu Oluştur
+### 2. Generate the Report
+Save the report as `.agents/[PACKAGE_NAME]_BACKEND_AUDIT.md`:
+- General Assessment & Class Map
+- Detected Issues (Issue, Class/Layer, Risk, Proposed Solution)
+- Layer Analysis & Transaction/Security Risk
+- Priority Order
 
-Raporu `.agents/[PAKET_ADI]_BACKEND_AUDIT.md` olarak kaydet:
+### 3. Checklist Evaluation
+Evaluate against the architectural rules above:
+- **Layer Violations:** Business logic in Controller? Entity returned directly?
+- **Transaction Risk:** Rollback scenarios? `@Transactional` used correctly in Escrow/Payment?
+- **Validation:** Rules in Service/Validator? Custom exceptions used?
+- **Repository:** N+1 risks? Pagination used?
+- **Events:** Main transaction broken? Error states handled?
 
-```markdown
-# [Paket Adı] Backend Audit
-_Tarih: [tarih]_
-
-## Genel Değerlendirme
-[Katmanlı mimari ne kadar tutarlı, sorumluluk ayrımı nasıl]
-
-## Sınıf Haritası
-| Katman | Sınıflar | Adet | Yorum |
-|--------|----------|------|-------|
-| Controller | | | |
-| Service | | | |
-| Repository | | | |
-| Validator/Policy | | | |
-| Mapper | | | |
-| Event/Listener | | | |
-
-## Tespit Edilen Sorunlar
-| Sorun | Sınıf/Katman | Risk | Çözüm Önerisi |
-|-------|-------------|------|---------------|
-
-## Katman Analizi
-
-### Controller
-[Thin mı? İş mantığı sızmış mı?]
-
-### Service
-[God Object var mı? Transaction yönetimi doğru mu?]
-
-### Validasyon
-[Validator/Policy tutarlı mı? Eksik alan var mı?]
-
-### Repository
-[N+1 riski, custom query kullanımı]
-
-### Mapper
-[MapStruct mı, manuel mi? Tutarlılık]
-
-### Event/Async
-[Loose coupling sağlanmış mı? Listener yan etkileri]
-
-## Transaction & Güvenlik Riski
-[Para, escrow, kritik domain varsa rollback senaryoları]
-
-## Cache Kullanımı
-[Bu paket cache kullanıyor mu? Invalidation doğru mu?]
-
-## README Durumu
-[README var mı, güncel mi, eksik alan var mı]
-
-## Öncelik Sırası
-1. [En kritik — production riski]
-2. ...
-
-## Genel Skor
-| Kategori | Puan (1-5) |
-|----------|-----------|
-| Katman Ayrımı | |
-| Transaction Yönetimi | |
-| Validasyon | |
-| Kod Tekrarı | |
-| Dokümantasyon | |
-| **Ortalama** | |
-```
-
-### 3. Düzeltme Onayı İste
-Raporu oluşturduktan sonra sor:
-"Rapor hazır. Düzeltmeleri uygulamamı ister misin?"
-Onay gelirse `.agents/skills/domain-editor/SKILL.md` kurallarıyla minimum diff uygula.
-
-## Kontrol Listesi (Her Audit'te Bak)
-
-### Katman İhlalleri
-- [ ] Controller'da iş mantığı var mı?
-- [ ] Service'te direkt HTTP response nesnesi var mı?
-- [ ] Repository'de iş kuralı var mı?
-- [ ] Entity API'ye direkt dönülmüş mü? (DTO eksikliği)
-
-### Transaction Riski
-- [ ] Para/escrow işlemleri `@Transactional` altında mı?
-- [ ] Rollback senaryosu tanımlı mı?
-- [ ] Nested transaction varsa `REQUIRES_NEW` bilinçli mi?
-- [ ] Outbox pattern gereken yer uygulanmış mı?
-
-### Validasyon
-- [ ] Domain kuralı service/validator'da mı, controller'da değil mi?
-- [ ] Custom exception kullanılıyor mu?
-- [ ] Hata mesajı client'a bilgi sızdırıyor mu?
-
-### Repository
-- [ ] N+1 riski var mı? (`@OneToMany` lazy load sorunu)
-- [ ] `findAll()` büyük tabloda çağrılıyor mu?
-- [ ] Pagination uygulanmış mı?
-
-### Cache
-- [ ] Cache invalidation tetikleniyor mu güncelleme sonrası?
-- [ ] Cache key çakışması riski var mı?
-- [ ] TTL tanımlı mı?
-
-### Event/Async
-- [ ] Listener ana transaction'ı bozuyor mu?
-- [ ] Event yayını domain kararı tamamlandıktan sonra mı?
-- [ ] Async listener hata durumunu handle ediyor mu?
-
-## Çıktı Formatı
-- Sorunları tabloya yaz — genel tavsiye değil, somut sınıf ve katman
-- Her sorun için tek satır çözüm önerisi
-- Öncelik: kritik (production riski) → orta (teknik borç) → düşük (kozmetik)
-- Rapor bittikten sonra "Düzelteyim mi?" sor, onaysız değişiklik yapma
+### 4. Request Approval for Fixes
+After generating the report, ask: "The report is ready. Would you like me to apply the fixes?" Do not apply unapproved changes.

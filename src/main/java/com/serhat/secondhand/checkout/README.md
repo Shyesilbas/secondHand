@@ -1,43 +1,26 @@
-# Checkout (Satın Alma / Ödeme Kontrolü) Modülü
+# Checkout Domain
 
-Bu modül, sepet veya teklif üzerinden başlayan satın alma işlemlerini yöneten koordinasyon (Orchestration) katmanıdır. Sepet doğrulamasından ödeme alınması, kargo kaydının oluşturulması ve emanet hesaba (Escrow) paranın aktarılmasına kadar olan tüm süreci yönetir.
+## Purpose
+The `checkout` domain acts as the orchestration layer that ties together the cart, offers, stock reservations, order creation, and payment execution to finalize a purchase.
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **CheckoutOrchestrator:** The central nervous system of the purchase flow.
+- **CheckoutPricingContextFactory:** Calculates the final payable amount considering active cart items, accepted offers, and applied coupons.
+- **CheckoutStockReservationService:** Handles reserving stock during the checkout window and rolling it back if the payment fails.
 
-## İş Akışı ve Koordinasyon (`CheckoutOrchestrator`)
+## Business Invariants & Constraints
+- **Atomic Execution:** The entire checkout sequence must be robust against partial failures. If payment fails, stock reservations must be strictly released.
+- **Escrow Default:** Upon successful payment, funds must be deposited into the Escrow wallet; they are never directly credited to the seller during checkout.
 
-`executeCheckout` metodunun başlattığı satın alma akışı sırasıyla aşağıdaki adımlardan oluşur:
+## State Machines
+- **Checkout Execution Flow:** Pricing -> Reservation -> Order Creation -> Payment Execution -> Escrow Transfer / Rollback -> Event Emission.
 
-```mermaid
-graph TD
-    A[Checkout Başlangıcı] --> B[Fiyat Hesaplama & Kontrol]
-    B --> C[Stok Rezervasyonu]
-    C --> D[Taslak Sipariş Oluşturma]
-    D --> E[Ödeme Alma - EWALLET / CC]
-    E -->|Ödeme Başarılı| F[Escrow Cüzdanına Aktarım]
-    F --> G[Kupon Kullanımı & Teklif Kapatma]
-    G --> H[Sepet Temizleme & Event Yayınlama]
-    E -->|Ödeme Başarısız| I[Siparişi İptal Et & Stoğu Geri Sal]
-```
+## Integration Points
+- **Incoming:** HTTP requests for checkout initiation.
+- **Outgoing:** Queries `cart` or `offer` for items. Executes payments via `payment`. Creates orders via `order`.
 
-### 1. Fiyatlandırma Bağlamı (`CheckoutPricingContextFactory`)
-- Kullanıcının aktif sepet öğelerini, varsa kabul edilen teklifleri (`acceptedOffer`) ve kupon kodlarını çekerek son fiyatlandırmayı hesaplar.
+## Public APIs
+- `/api/checkout/execute`
 
-### 2. Stok Rezervasyonu (`CheckoutStockReservationService`)
-- Satın alınmak istenen ürünlerin stoklarını kontrol eder ve rezerve eder.
-- İşlem başarısız olursa veya ödeme alınamazsa, rezerve edilen stoklar otomatik olarak geri bırakılır (`releaseReservedStock`).
-
-### 3. Sipariş Oluşturma (`OrderCreationService`)
-- Alıcı bilgileri, teslimat yöntemi (Safe Meetup veya Kargo) ve hesaplanan fiyat detaylarıyla sipariş kaydı oluşturur.
-
-### 4. Ödeme Yönetimi (`OrderPaymentService`)
-- Siparişin türüne göre entegre cüzdandan (E-Wallet) veya kredi kartından ödeme tahsil eder.
-- Ödeme başarısız olursa, sipariş iptal durumuna getirilir ve stok iade edilir.
-
-### 5. Emanet Hesap Altyapısı (`EscrowService`)
-- Ödemesi başarılı olan siparişlerin tutarı doğrudan satıcıya aktarılmaz; alıcı teslimatı onaylayana kadar sistemin emanet (Escrow) hesabında bekletilir.
-
-### 6. Event Yayınlama (`ApplicationEventPublisher`)
-- Süreç tamamlandığında asenkron işlenmek üzere `OrderCreatedEvent` yayınlanır.
+## Related Knowledge
+- *(No specific runbooks extracted; modifications usually require coordinating changes across `order`, `payment`, and `cart`)*

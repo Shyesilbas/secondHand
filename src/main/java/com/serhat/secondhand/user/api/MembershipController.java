@@ -3,6 +3,7 @@ package com.serhat.secondhand.user.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.application.MembershipService;
+import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.dto.MembershipUpgradeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +20,19 @@ public class MembershipController {
 
     @GetMapping("/status")
     public ResponseEntity<?> getStatus(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((com.serhat.secondhand.user.domain.entity.User) userDetails).getId();
+        Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.getStatus(userId)));
     }
 
     @PostMapping("/upgrade")
     public ResponseEntity<?> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MembershipUpgradeRequest request) {
-        Long userId = ((com.serhat.secondhand.user.domain.entity.User) userDetails).getId();
+        Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.upgradeToPremium(userId, request)));
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelSubscription(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((com.serhat.secondhand.user.domain.entity.User) userDetails).getId();
+        Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.cancelSubscription(userId)));
     }
 }

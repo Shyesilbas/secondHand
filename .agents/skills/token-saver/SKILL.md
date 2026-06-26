@@ -1,24 +1,21 @@
 ---
 name: Token Saver
-description: Bağlam penceresi büyüyorsa veya geniş arama yapılıyorsa tetiklenir.
+description: Triggered when the context window grows or a broad search is performed.
+triggers:
+  - "token save"
 ---
-
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Token Saver
 
-## Tetiklenme
-Geniş dosya taraması, tekrarlayan okuma veya uzun bağlam birikmesi fark edildiğinde.
+## Trigger
+Triggered by "token save" or when extensive file scanning is noticed.
 
-## Çalışma Adımları
-1. Önce index veya README oku — kaynak koda geçme.
-2. Sadece ilgili klasörü tara, tüm repoyu gezme.
-3. Uzun dosya yerine özet veya ilgili bölümünü oku.
-4. Aynı komutu tekrar çalıştırma — sonucu hafızada tut.
-5. Bağlam yeterliyse yeni dosya açma.
-6. Asla ve asla gereksiz yorum satırı ve emoji kullanma, sadece kompleks durumlarda ufak ve anlaşılır yorum satırı oluştur.
+## Workflow Steps
+1. Read the local `README.md` first — do not jump to source code.
+2. Only scan the relevant folder, do not browse the whole repo.
+3. Stop searching immediately when the answer is found.
+4. Do not open new files if the context is sufficient.
 
-## Kurallar
-- Aynı bilgiyi iki kaynaktan okuma.
-- Gerekmedikçe test veya config dosyalarını bağlama çekme.
-- Cevap bulunduğunda aramayı durdur.
+## Rules
+- Do not read the same information from two sources.
+- Do not pull test or config files into context unless necessary.

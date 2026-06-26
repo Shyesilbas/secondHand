@@ -1,192 +1,100 @@
-# secondHand Project Rules & Agents Guidelines
+# secondHand Project Rules
 
-## 0. Principles
-- Kısa oku, kısa karar ver, kısa değiştir.
-- Önce kurallar, sonra iş listesi, sonra kod.
-- En az bağlamla en güvenli değişikliği yap.
+## 0. Repository Invariants
+- **Backend:** Java 17, Spring Boot 3, Spring Data JPA (PostgreSQL), MapStruct.
+- **Frontend:** React 19 (Vite), TailwindCSS, React Router.
+- **Client State/Data Fetching:** React Query (`@tanstack/react-query`).
+- **Architecture/API:** RESTful APIs, Hexagonal Architecture, CQRS pattern, DTO-based responses.
 
-## 0.1 Context Güncelleme Kuralı
-Her görev veya session tamamlandığında `.agents/CONTEXT.md` dosyasını güncelle:
-- **Son çalışılan:** Ne yapıldı
-- **Tamamlananlar:** Kapatılan maddeler
-- **Bir sonraki adım:** Bekleyen iş
-- **Açık riskler:** Test edilmemiş veya dikkat gerektiren alan
+## 1. Global AI Behavior
+- **Context Loading Strategy:** Stop reading immediately once enough context is acquired. Never continue reading out of habit. 
+- **Confidence-Based Escalation Rule:** Start with the minimum required context. If, after inspecting the source code, confidence is below approximately 80%, load the next most relevant documentation source. Escalation order: Source Code → Knowledge Item (if applicable) → Domain README → Architecture Decision Record (ADR) → Cross-domain documentation.
+- **Intent-Based Routing:** Adapt your execution order based on the specific workflow:
+  - *New Features:* 1. `GEMINI.md` → 2. `.agents/TASKS.md` → 3. Relevant Skill → 4. Target Layer Domain README → 5. Source Code.
+  - *Implementation Bug (e.g., NullPointer, wrong mapper):* 1. `GEMINI.md` → 2. Source Code.
+  - *Business Rule Bug (e.g., Cancellation rules, Escrow release):* 1. `GEMINI.md` → 2. Domain README → 3. Source Code.
+  - *Investigations:* 1. `GEMINI.md` → 2. Knowledge Items (KIs) / Runbooks → 3. Domain README (ONLY if intended business behavior is required, skip by default) → 4. Source Code.
+  - *Mechanical Refactoring (e.g., Rename, Extract Method):* 1. `GEMINI.md` → 2. Unit Tests → 3. Source Code.
+  - *Behavioral Refactoring (e.g., Service decomposition, redesign):* 1. `GEMINI.md` → 2. Code Quality Skill → 3. Domain README → 4. Source Code.
+- **Minimum Total Context Cost (MTCC):** Optimize every action for the minimum number of tokens loaded and minimum tool calls executed.
+- **Safety Over Assumptions:** Make the safest change with the least context. Never silently assume intent, architecture, or business rules in high-risk domains (Payment, Escrow, Order).
+- **Periodic Documentation Drift Validation:** Periodically audit READMEs and KIs for references to deleted packages, renamed classes, obsolete workflows, duplicate KIs, or overlapping documentation to prevent stale guidance from accumulating.
 
-Bu adımı atlamak yasaktır.
+## 2. Global Constraints
+- **Do not break abstraction:** Keep boundaries tight between modules.
+- **High-Risk Domains:** `auth` (session stability), `payment` (financial transactions), `escrow` (state machines), `ewallet` (balances). Treat these with extreme caution.
+- **No Stale Data:** Update `.agents/TASKS.md` immediately when the active working state changes.
 
-## 0.2 GEMINI.md Güncelleme Kuralı
-Aşağıdaki durumlarda `GEMINI.md` otomatik güncellenir, onay beklenmez:
+## 3. Repository Navigation Philosophy
+- **Domain & Layer Locality:** Load domain documentation only for the specific layer you are modifying (e.g., load frontend READMEs for frontend bugs). Never load unrelated domain or cross-layer documentation.
+- **Behavior Priority:** When modifying existing behavior or refactoring, prefer **Unit Tests** over documentation. Tests represent actual validated behavior, whereas documentation only represents intended behavior.
+- **Skills are Executable:** Skills (located in `.agents/skills/`) are self-contained executable units. Rely on their embedded rules.
+- **No Monoliths:** Do not load large architectural decision files (ADRs) or historical changelogs into your context window unless explicitly necessary.
+- **KI Metadata:** Every Knowledge Item MUST begin with a YAML metadata block defining: Purpose, Trigger, Load When, Do Not Load When, Required Context, Related KIs, and Estimated Tokens.
 
-- Yeni skill eklenince → Section 2'ye ekle
-- Yeni backend paketi eklenince → Section 3 Backend listesine ekle  
-- Yeni frontend modülü eklenince → Section 3 Frontend listesine ekle
-- Yeni teknoloji/kütüphane eklenince → Section 5'e ekle
-- Yeni convention belirlendiyse → Section 5'e ekle
-- Görev tamamlanınca → Section 6.4 Todo güncelle
-- Önemli mimari karar alındıysa → Section 6.5 Timeline'a ekle
+## 4. Final Reasoning Rules
 
-Bu adımı atlamak yasaktır. CONTEXT.md ile aynı anda güncellenir.
+### 4.1 Evidence-Based Investigation
+- Start from the observable symptom.
+- Follow only evidence that exists in the source code.
+- Do not infer hidden architecture without supporting evidence.
+- Do not assume asynchronous processing, event-driven architecture, caching layers, message queues, schedulers, or distributed systems unless the source code or documentation explicitly demonstrates their existence.
+- Reasoning should always progress from facts to hypotheses, never the reverse.
 
-## 1. Rules
+### 4.2 Follow the Execution Path
+- During investigations, always inspect the execution path before consulting additional documentation.
+- Preferred investigation order: Observable symptom → Entry point → Call chain → Dependencies → Infrastructure → Architecture documentation (only if still ambiguous).
+- Avoid jumping directly to downstream implementations before confirming they are involved.
 
-### Genel
-- Var olan mimariyi bozma.
-- Gereksiz refactor yapma.
-- Bir degisiklik tek sorunu cozsun.
-- Kod degisirse ilgili artefact da degissin.
+### 4.3 Evidence Before Architecture
+- Source code is the primary source of truth. Architectural documentation describes intended behavior. Implementation describes actual behavior.
+- Whenever the implementation and documentation appear inconsistent, investigate the implementation first and use documentation only to clarify intended behavior.
 
-### Proje Kurallari
-- Backend is akisi genelde `controller -> service -> validator -> repository -> mapper` seklinde ilerler.
-- DTO, entity, mapper ve repository birbiriyle tutarli kalmali.
-- Cache davranisi degisiyorsa etkiledigi tum katmanlar kontrol edilmeli.
-- Payment, escrow, order, cart, listing gibi kritik domainlerde kural ihlali yaratacak varsayim yapma.
+### 4.4 Progressive Confidence Escalation
+- Maintain an internal confidence estimate while gathering context.
+- When confidence is sufficiently high (approximately 80% or greater), continue using the current context.
+- Only load additional documentation when confidence falls below this threshold.
+- Escalation order: Source Code → Knowledge Item → Domain README → Architecture Decision Record (ADR) → Cross-domain documentation.
+- Never skip escalation levels without justification.
 
-### Token / Baglam Kurallari
-- Ilgili modul disinda arama yapma.
-- Uzun dosya yerine kisa ozet dosyasini kullan.
-- Bir sorunu cozerken once hedef dosyayi bul, sonra minimum diff uygula.
-- Ayni bilginin kopyasini README, artifact ve prompt icinde tekrar etme.
+### 4.5 Minimize Architectural Assumptions
+- Do not assume that a repository contains: Event-driven architecture, CQRS, Message queues, Redis, Kafka, RabbitMQ, Transactional Outbox, Saga, Event Sourcing unless explicitly documented, directly referenced by source code, or discovered during investigation.
+- Repository invariants may establish technology choices, but should never be expanded into unsupported architectural assumptions.
 
-### Best Practice
-- Yorum yerine isimlendirme ve yapisal ayrim kullan.
-- Degisiklik oncesi ilgili test/validation etkisini zihinde haritala.
-- Riskli alanlarda fallback yerine net hata uret.
-- Kural eklerken once mevcut desenle eslestir, yeni desen sadece zorunluysa ekle.
+### 4.6 Locality Before Breadth
+- Investigations should begin with the smallest possible scope.
+- Prefer: Single component → Single service → Single module → Single domain → Cross-domain reasoning.
+- Avoid loading multiple domains before evidence indicates interaction between them.
 
-## 2. Skills
-Skill detayları `.agents/skills/` klasöründe tanımlıdır.
-Mevcut skill'ler: repo-navigator, domain-editor, documentation-sync, token-saver, code-quality-control, frontend-quality, design-system, frontend-audit, backend-audit, api-contract, feature-planner
+### 4.7 Cross-Domain Escalation
+- Do not load multiple domain READMEs simply because multiple domains appear in the user story.
+- Only load another domain when the execution path demonstrably crosses that boundary.
+- Example: Listing → publishes PaymentCompletedEvent → Payment → creates Order → Order → sends Notification. Only after discovering this chain should additional domains be loaded.
 
-## 3. Projects Structure
+### 4.8 Behavior Before Documentation
+- Whenever unit tests clearly define the expected behavior, prefer them over architectural documentation.
+- Priority: Tests → Implementation → Knowledge Items → README → ADR.
+- Documentation should explain behavior—not replace executable specifications.
 
-### Backend
-- `auth`, `listing`, `cart`, `offer`, `order`, `payment`, `escrow`, `ewallet`, `shipping`, `review`, `campaign`, `showcase`, `favorite`, `agreements`
+### 4.9 Repository Documentation Philosophy
+- Documentation exists to reduce uncertainty. It should never be loaded merely because it exists.
+- Every documentation load must answer one question: "What uncertainty does this document remove?" If no concrete uncertainty is removed, the document should not be loaded.
 
-### Frontend
-- `src/listing`, `src/order`, `src/payments`, `src/reviews`
-- `src/ai`, `src/auth`, `src/cart`, `src/chat`, `src/offer`
-- `src/ewallet`, `src/campaign`, `src/showcase`, `src/forum`
-- `src/complaint`, `src/notification`, `src/user`, `src/home`
-- `src/common` (shared components, hooks, services, theme)
+### 4.10 Documentation Budget Rule
+- Every task starts with a documentation budget.
+- Estimate the minimum documentation required.
+- Before opening each additional document ask: "Will this document likely increase confidence by at least 15%?"
+- If not, skip it.
+- Always maximize: Confidence gained per token consumed.
 
-### Calisma Notu
-- Her proje alani icin sadece bir ana README veya artifact referansi kullan.
-- Modul icindeki detaylar gerekiyorsa oradan okunur, buraya tasinmaz.
+### 4.11 Hypothesis Generation and Grouping
+- **Hypothesis Budget Rule:** Produce at most 3 primary hypotheses ordered by posterior probability. Additional hypotheses should only be generated if evidence collected from source code rejects all primary hypotheses.
+- **Priority Classes:** Group hypotheses into logical priority classes (e.g., Priority 1: React Query synchronization, Priority 2: Component State, Priority 3: Backend consistency) rather than presenting a flat list.
 
-## 4. Runbook
+### 4.12 Evidence-First Identifiers
+- Intentionally avoid assuming or guessing exact identifiers, such as React Query `queryKeys`, API endpoints, or specific component names.
+- Explicitly state your strategy to locate them first (e.g., "My first task is locating every `useQuery()` serving this page via grep") before proceeding with the investigation.
 
-### Decision Flow
-1. Task hangi domaini etkiliyor?
-2. O domainin README'si ne diyor?
-3. Degisim controller/service/validator/repository/mapper zincirinin neresinde?
-4. Cache, event, auth veya money flow var mi?
-5. En kucuk dogru diff nedir?
-
-### Change Pattern
-- Contract degisiyorsa DTO + mapper + controller birlikte.
-- Business rule degisiyorsa validator + service birlikte.
-- Query degisiyorsa repository + mapper birlikte.
-- Side effect degisiyorsa event/listener veya async handler birlikte.
-
-### Do Not
-- Tum depoyu tarama.
-- Kurali birden fazla katmana kopyalama.
-- Eski endpoint veya alan adini dokumanda tutma.
-- Buyuk refactor'u is acil degilken tek turda yapma.
-
-## 5. Technology Guidelines
-
-### Spring Boot & Java Best Practices
-- **Injection:** Prefer constructor injection (kullanımı) over field injection (`@Autowired`).
-- **Separation of Concerns:** Keep controllers thin. All business logic must reside in `@Service` classes.
-- **Data Transfer:** Always use DTOs for request and response payloads, never expose Domain/Entity models directly to the API layer.
-- **Validation:** Use `jakarta.validation` constraints thoroughly on DTOs.
-
-### React & Frontend Best Practices
-- **Components:** Use functional components and React Hooks exclusively.
-- **State Management:** Keep state as local as possible. Use Context API or global state managers only when prop-drilling becomes an issue.
-- **Structure:** Follow a modular folder structure (`components/`, `hooks/`, `services/`, vb.).
-- **Side Effects:** Ensure `useEffect` dependencies are accurate and perform cleanups to prevent memory leaks.
-
-### API Contract & Response Convention
-- **Response format:** Backend `ResultResponses` wrapper kullanır. Frontend'e başarıda direkt DTO, hata durumunda `{ error: "KOD", message: "..." }` gelir.
-- **Frontend fetch:** Asla `useEffect` ile fetch yapma — her zaman React Query kullan.
-- **Hata yakalama:** `error.response?.data?.error` ve `error.response?.data?.message` kullan.
-- **Double unwrap yasak:** `response.data.data` değil, `response.data` kullan.
-- **Mutation sonrası:** `queryClient.invalidateQueries` ile ilgili cache'i temizle.
-
-## 6. Artifacts & Context
-
-### 6.1. Behaviour & Architecture
-- **Backend:** Spring Boot 3.5, Java 17, PostgreSQL, Redis, Flyway, Security, JPA, WebSocket
-- **Frontend:** React 19, Vite, feature-based module yapisi
-- **Domain:** listing, order, payment, escrow, ewallet, cart, offer, review, shipping, auth, campaign, showcase, favorite
-- **AI Çalışma Kuralı:** Önce ilgili modül README'sini oku. Read order: root README -> `GEMINI.md` -> `.agents/CONTEXT.md` -> ilgili modul README -> kaynak kod. Büyük değişiklikleri küçük, doğrulanabilir adımlara böl.
-- **Değişiklik Prensipleri:** Modüller arası soyutlamayı bozma. Hardcoded mesajları azalt. Boundary'leri koru. Domain rule'u service/validator tarafında tut. Repository'yi saf data access olarak kullan. DTO ile entity'yi karıştırma. Cache, event ve async yan etkileri ayrık düşün. Token azaltma kurallarına uy, özetleri davranış dosyasında tut, detayı koda bırak.
-
-### 6.2. Agent Map & Read Order
-- **Read Order:** 1. Root README → 2. `GEMINI.md` → 3. `.agents/CONTEXT.md` → 4. `.agents/PROJECT_REPORT.md` → 5. `.agents/skills/` → 6. Backend module README / Frontend feature README → 7. Source files
-- **Fast Mental Model:** Root README explains product scope. `GEMINI.md` explains how to work. Module README explains local business rules. Source code is the final authority.
-- **Best Practice Checklist:** Prefer the smallest file set that answers the question. Update docs when behavior changes. Treat cache, payment, escrow, and auth as high-risk areas. Favor existing patterns over new abstractions.
-
-### 6.3. Artifacts Purpose
-- Bu doküman (`GEMINI.md`), AI aracılarının hızlı bağlam edinmesi için tek kaynaklı, kısa ve karlı dokümanları tutar. Yeni bilgi sadece buraya eklenir; README'ler özeti tutar.
-
-### 6.4. Todo & Active Tasks
-**Tamamlanan:**
-- [x] Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) tasarım sistemi uyumluluğu kapsamında refaktör edildi; cam efekti (glassmorphism), tüm mavi butonlar (#1466c6) ve hardcoded slate/indigo renkleri temizlendi.
-- [x] ShoppingCartPage ve alt bileşenleri (CartItemCard, OrderSummary, uiPalette) projenin standart light teması ve Teal renk şemasına (design-system) göre tamamen refaktör edildi; mavi CTA'ler, warm-stone arka planları ve tüm hardcoded renkler temizlendi
-- [x] AgreementsPage ve alt bileşenleri (AgreementCard, AgreementModal, AgreementsSection) detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; sol menü aktif stili, sert sarı kart arka planları, modal overlay/derinlik hissi iyileştirildi, tüm hardcoded slate renkler temizlendi
-- [x] CouponsPage (MyCouponsPage, PlatformCouponsPage, AdminCouponsPage) üzerindeki hardcoded renkler, gradyanlar, ve slates/violets temizlendi; tasarım sistemiyle entegre edildi ve skeletons SkeletonList bileşenine dönüştürüldü
-- [x] OffersPage ve OfferTrackingCard tasarım revizyonu (1→2→3 adım göstergesi, 3'lü kutu grid kaldırıldı, kart sadeleştirildi, modal/skeleton standardize edildi)
-- [x] UserReviewsPage (Alınan/Verilen Yorumlar) baştan aşağı elit bir tasarımla yenilendi, hardcoded stiller temizlendi.
-- [x] AuraChatPage sayfası audit edildi (`AURA_CHAT_PAGE_AUDIT.md`) ve premium asistan görünümü ile baştan tasarlandı.
-- [x] BuyerDashboardPage ve SellerDashboardPage analiz edilip (`BUYER_ANALYTICS_PAGE_AUDIT.md`) UI standartlarına çekildi.
-- [x] AccountHubPage (Dashboard) analiz edildi (`ACCOUNT_HUB_PAGE_AUDIT.md`) ve hardcoded token kural ihlalleri semantic token'larla düzeltildi.
-- [x] HomePage bileşenleri audit edildi (`HOME_PAGE_AUDIT.md`) ve tasarım standardı kural ihlalleri giderildi.
-- [x] Frontend Header bileşeni analiz edildi (HEADER_AUDIT.md) ve glassmorphism/hardcoded token kural ihlalleri düzeltildi
-- [x] `.agents` kurallarını netleştir
-- [x] Skeleton & EmptyState merkezileştirildi
-- [x] PageContainer standardize edildi
-- [x] Tipografi ve border-radius temizliği
-- [x] Frontend kalite skill'leri yazıldı (frontend-quality, design-system, frontend-audit)
-- [x] Backend audit yapıldı — auth refactor, listing analizi
-- [x] API response format standardize edildi (ResultResponses)
-- [x] api-contract skill yazıldı
-- [x] Auth cookie flow görsel test
-- [x] Backend Legacy & Hardcoded Kod Taraması (BACKEND_LEGACY_AUDIT)
-- [x] 3 sınıfta @Autowired -> constructor injection refaktörü yapıldı (OrderQueryService, UserService, ListingQueryService)
-- [x] CloudinaryConfig System.out.println ifadeleri Logger ile değiştirildi
-- [x] ListingMapper:376 boş catch bloğuna loglama eklendi
-- [x] Eksik modül README'leri tamamlandı (core, user, checkout, shipping, pricing, email)
-- [x] Frontend performans analizi yapıldı ve raporu hazırlandı (frontend_performance_audit.md)
-- [x] Frontend performans optimizasyonları (React Query, WebSocket lazy load, storage debounce, ReviewButton loop fix) başarıyla tamamlandı ve build alındı
-- [x] useListingSearch.js ve backend title filtresi entegrasyonu (V24__add_listing_title_search_index.sql ile) tamamlandı, build alındı
-- [x] Sipariş listesinde istemci tarafı teslimat yöntemi filtresi, veritabanı sayfalama uyumsuzluğunu gidermek için sunucu tarafına (server-side JPQL) taşındı
-- [x] İlan yönetiminde (Kendi İlanlarım) istemci tarafı durum (status) filtresi, veritabanı sayfalama uyumsuzluğunu gidermek için sunucu tarafına (server-side status query) taşındı
-- [x] Membership (Premium) sistemi entegrasyonu (PlanValidator, JWT claim, Showcase/Aura quota limitleri, MembershipScheduler). Frontend için usePlan hook'u, API servisi ve PremiumUpgradeModal bileşeni geliştirildi.
-- [x] Chat infinite scroll implementasyonu backend (OrderByCreatedAtDesc) ve frontend (useInfiniteQuery, scroll restoration) olarak başarıyla tamamlandı.
-- [x] Premium/Membership UI tasarımı (PremiumUpgradeModal, AccountHub plan kartı ve Header badge/buton) premium/elit görsel standartlara (animasyonlu gold/amber CTA'ler, progress barlar ve görsel olarak zenginleştirilmiş kıyaslama satırları) göre tamamen yenilendi.
-- [x] Premium üyelik ödemesi, `PaymentProcessor` üzerinden `MEMBERSHIP_PAYMENT` işlemi olarak entegre edildi; veritabanına payment kaydı oluşturulması, in-app bildirim ve custom Thymeleaf fatura e-postası (membership-confirmation.html) gönderimi ile frontend success toast geri bildirimi tamamlandı.
-- [x] Tüm Controller endpoint'leri tarandı, raporlandı, path format tutarsızlıkları düzeltildi, public endpoint yetki kontrolü yapıldı ve test edilebilir bir Postman collection (`SecondHand_API.postman_collection.json`) oluşturuldu.
-
-- [x] ListingCreation ödeme (Payment) işlemlerinde `listingTitle` ve `listingNo` alanlarının `null` kaydedilmesi sorunu `PaymentModuleAdapter` güncellenerek çözüldü.
-- [x] İlan oluşturma formlarında (GenericListingForm) local storage cache'inin kullanıcı seçimlerini (pre-filter) ezmesi sorunu `restoreDraft` bayrağı eklenerek çözüldü. Artık sadece açıkça `restoreDraft: true` gönderildiğinde cache verisi yükleniyor, aksi takdirde kullanıcının girdiği güncel veriler gösteriliyor.
-- [x] Backend Thymeleaf email şablonlarındaki tasarım tutarsızlıkları düzeltildi. Hardcoded indigo/blue vb. renkler ile Helvetica font ailesi temizlenerek projenin ana Teal (#0d9488) rengi ve Inter tipografisine çekildi. `PaymentNotificationService` içindeki raw enum (örn: LISTING_CREATION) metinleri yerelleştirildi.
-- [x] Backend N+1 performans sorunları giderildi: `ChatRoomRepository`'ye `@EntityGraph(attributePaths={"participantIds"})`, `MessageRepository`'ye `@EntityGraph(attributePaths={"sender","recipient"})` eklendi. `Order.orderItems`, `User`, `Address`, `OrderItem` entity'lerine `@BatchSize(size=20)` eklenerek in-memory paging riski olmadan `1+N/20` seviyesine indirgendi. Build başarıyla doğrulandı.
-
-**Aktif:**
-- [ ] AI streaming endpoint testi
-
-**Sonraki:**
-- [ ] listing N+1 sorunu JPA log analizi
-- [ ] Yeni özellik geliştirmesi — api-contract skill ile test et
-- [ ] CI/CD pipeline kurulumu
-
-### 6.5. Timeline
-- **2026-06-19:** İlk AI destek doküman yapısı tasarlandı. Token azaltma odaklı çalışma ilkeleri belirlendi.
-- **2026-06-20:** Frontend UI sprint tamamlandı (Skeleton, PageContainer, tipografi, border-radius). Backend audit yapıldı. Auth God Object refactor edildi. API response convention standardize edildi. 10 skill dosyası oluşturuldu.
-- **2026-06-21:** Backend Legacy & Hardcoded Kod Taraması tamamlandı, `.agents/BACKEND_LEGACY_AUDIT.md` raporu oluşturuldu. Performans optimizasyonları (React Query, lazy-loading WebSockets, storage writes debouncing, ReviewButton loop fixes) uygulandı. Son olarak, backend arama API'sine `title` filtresi entegre edildi, `LOWER(title)` için `V24__add_listing_title_search_index.sql` Flyway migration'ı yazıldı ve frontend client-side search loops kaldırılarak debounced server-side paginated title aramaya geçildi. Hem frontend hem backend build'leri başarıyla doğrulandı. Sipariş listesinde teslimat yöntemi (kargo / elden teslimat) filtresi sunucu tarafında (server-side paginated JPQL) çalışacak şekilde entegre edildi, istemci tarafı süzme mantığı ve yerel state'ler temizlendi. Kendi ilanlarım sayfasındaki durum (status) bazlı local/client-side filtreleme kaldırıldı; backend `/my-listings` endpoint'ine opsiyonel `status` parametresi eklenerek `ListingRepository` dynamic JPQL sorgusu ile server-side paginated entegre edildi, hem backend hem frontend build'leri başarıyla doğrulandı. Frontend Header bileşeni incelendi, glassmorphism ihlali temizlenerek semantic theme token'lara geçirildi ve HEADER_AUDIT.md raporu oluşturuldu. HomePage bileşenleri (Hero, Showcase, GreatSellers vs.) incelenerek HOME_PAGE_AUDIT.md hazırlandı ve keyfi/hardcoded opacity, amber yıldız renkleri, cam efekti gibi tüm ui/tasarım borçları temizlendi. OffersPage ve OfferTrackingCard tasarım revizyonu tamamlandı; 1→2→3 adım göstergesi ve 3'lü kutu grid kaldırıldı, kart sadeleştirildi, skeleton/modal container standartları uygulandı. MyCouponsPage, PlatformCouponsPage and AdminCouponsPage bileşenleri temizlenerek tüm hardcoded renkler, gradyanlar ve slates/violets temizlendi; tasarım sistemine entegre edilerek skeletons SkeletonList bileşenine dönüştürüldü. AgreementsPage ve alt bileşenleri (AgreementCard, AgreementModal, AgreementsSection) detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; sol menü aktif stili, sert sarı kart arka planları, modal overlay/derinlik hissi iyileştirildi, tüm hardcoded slate renkler temizlendi ve frontend-audit skill dosyası daha derinlemesine tasarım/yerleşim denetimleri yapacak şekilde güncellendi. ShoppingCartPage, CartItemCard, OrderSummary ve uiPalette modülleri detaylı tasarım/UX denetiminden geçirilerek refaktör edildi; ayrıksı mavi accent renkleri (#1466c6) ve warm-stone arka planları (#f4f3f1) temizlenerek projenin birincil Teal (#0d9488) renk standardına ve semantic token'larına geçildi. Checkout adımları (CheckoutStep, CheckoutProgressBar, CheckoutAddressStep, CheckoutPaymentStep, CheckoutReviewStep, CheckoutVerificationStep, CheckoutOrderSummary ve ActiveCouponsModal) tasarım sistemi uyumluluğu kapsamında refaktör edildi; cam efekti (glassmorphism), tüm mavi butonlar (#1466c6) ve hardcoded slate/indigo renkleri temizlendi.
-- **2026-06-22:** Kullanıcı üyelik (Premium) modeli backend ve frontend sistemlerine eklendi. `User` entity'sine `MembershipPlan`, quota limitleri, günlük Aura kullanımları gibi field'lar eklendi. JWT tabanlı auth akışına `plan` bilgisi dahil edildi. Backend Showcase ve Gemini AI servislerine `PlanValidator` ile yetkilendirme (quota) limitleri koyuldu ve plan süresi dolan kullanıcılar için `MembershipScheduler` arka plan cron işlemleri eklendi. Frontend katmanında ise kullanıcıların hesap durumunu canlı olarak yansıtmak amacıyla `usePlan` custom hook'u ve `PremiumUpgradeModal` eklendi. Ayrıca Chat "Infinite Scroll" altyapısı başarıyla eklendi; veritabanı seviyesinde `OrderByCreatedAtDesc` kullanılarak sondan başa sayfalama yapıldı, frontend'de ise `useInfiniteQuery` ve `useLayoutEffect` entegrasyonu ile scroll pozisyonu zıplamaları önlendi. Premium/Membership UI bileşenleri (PremiumUpgradeModal, AccountHub plan kartı, HeaderProfileMenu) baştan aşağı elit ve modern bir tasarımla yenilendi; cam efekti veya keyfi renkler yerine marka Teal tonu ile Premium Gold/Amber tonları birleştirildi, görsel kota ilerleme çubukları eklendi ve tüm frontend test build'leri doğrulandı. Premium ödemeleri, Showcase ve Listing Fee ile aynı veritabanı ve payment/e-wallet altyapısına (`PaymentProcessor`) taşındı. Ödeme başarısında in-app `PAYMENT_SUCCESS` bildirimi ile özel detaylar içeren `membership-confirmation` HTML e-posta faturası tetiklendi. Frontend upgrade modalına aniden kapanma sorununu çözmek üzere success toast (`showSuccess`) entegre edildi. Tüm backend ve frontend build doğrulamaları sağlandı.- **2026-06-26:** Backend N+1 performans sorunu tespiti ve düzeltmesi tamamlandı. `ChatRoomRepository` ve `MessageRepository` için `@EntityGraph` ile eager-fetch sağlandı. `Order`, `OrderItem`, `User`, `Address` entity'lerine `@BatchSize(size=20)` eklenerek Hibernate'in koleksiyon yüklemelerini `IN` sorgusuyla toplu (batched) yapması sağlandı. Bu yaklaşım, in-memory pagination riskini tamamen ortadan kaldırarak güvenli bir `1+N/20` paternine geçişi mümkün kıldı.
-
-
+### 4.13 Executable Debugging Path
+- Every investigation must conclude with an "Expected Debugging Path".
+- Provide an explicit, step-by-step, actionable sequence of steps that guides the exact debugging process (e.g., Step 1: Locate useQuery → Step 2: Locate mutation → Step 3: Compare queryKeys → Step 4: Verify invalidateQueries → Step 5: Open DevTools).

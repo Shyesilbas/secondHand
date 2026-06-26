@@ -1,13 +1,16 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {membershipService} from '../services/membershipService';
+import {useAuthState} from '../../auth/AuthContext.jsx';
 
 export const usePlan = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuthState();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['membership', 'status'],
     queryFn: membershipService.getStatus,
-    staleTime: 5 * 60 * 1000,
+    initialData: user?.plan ? { plan: user.plan, planExpiry: user.planExpiry } : undefined,
+    staleTime: Infinity,
   });
 
   const cancelMutation = useMutation({

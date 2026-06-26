@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationService } from '../services/notificationService.js';
 import { useNotificationWebSocket } from './useNotificationWebSocket.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
+import { useBadgeCounts } from '../../common/hooks/useBadgeCounts.js';
 
 export const useInAppNotifications = (onNewNotification) => {
     const { user } = useAuthState();
     const queryClient = useQueryClient();
-    const [unreadCount, setUnreadCount] = useState(0);
+    const { notificationCount: unreadCount } = useBadgeCounts({ userId: user?.id });
 
     const { data: notificationsData, isLoading, refetch } = useQuery({
         queryKey: ['notifications', user?.id],
@@ -17,34 +18,19 @@ export const useInAppNotifications = (onNewNotification) => {
         gcTime: 30 * 60 * 1000,
         refetchInterval: false,
         refetchOnWindowFocus: false,
-        refetchOnMount: true,
+        refetchOnMount: false,
     });
-
-    const { data: unreadCountData, refetch: refetchUnreadCount } = useQuery({
-        queryKey: ['notifications', 'unread-count', user?.id],
-        queryFn: () => notificationService.getUnreadCount(),
-        enabled: !!user?.id,
-        staleTime: 5 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchInterval: false,
-        refetchOnWindowFocus: false,
-        refetchOnMount: true,
-    });
-
-    useEffect(() => {
-        if (unreadCountData !== undefined) {
-            setUnreadCount(unreadCountData);
-        }
-    }, [unreadCountData]);
 
     const markAsReadMutation = useMutation({
         mutationFn: (notificationId) => notificationService.markAsRead(notificationId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            setUnreadCount((prev) => {
-                const newCount = Math.max(0, prev - 1);
-                queryClient.setQueryData(['notifications', 'unread-count', user?.id], newCount);
-                return newCount;
+            queryClient.setQueryData(['badgeCounts', user?.id], (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    notificationCount: Math.max(0, (old.notificationCount || 0) - 1)
+                };
             });
         },
     });
@@ -53,8 +39,13 @@ export const useInAppNotifications = (onNewNotification) => {
         mutationFn: () => notificationService.markAllAsRead(),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['notifications'] });
-            setUnreadCount(0);
-            queryClient.setQueryData(['notifications', 'unread-count', user?.id], 0);
+            queryClient.setQueryData(['badgeCounts', user?.id], (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    notificationCount: 0
+                };
+            });
         },
     });
 
@@ -75,11 +66,15 @@ export const useInAppNotifications = (onNewNotification) => {
                 totalElements: (oldData.totalElements || 0) + 1,
             };
         });
-        setUnreadCount((prev) => {
-            const newCount = prev + 1;
-            queryClient.setQueryData(['notifications', 'unread-count', user?.id], newCount);
-            return newCount;
+        
+        queryClient.setQueryData(['badgeCounts', user?.id], (old) => {
+            if (!old) return old;
+            return {
+                ...old,
+                notificationCount: (old.notificationCount || 0) + 1
+            };
         });
+
         onNewNotification?.(notification);
     }, [user?.id, queryClient, onNewNotification]);
 

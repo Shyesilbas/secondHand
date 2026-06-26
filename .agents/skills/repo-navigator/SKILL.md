@@ -1,22 +1,22 @@
 ---
 name: Repo Navigator
-description: Hangi dosyanın veya modülün değişeceğini bulmak için tetiklenir.
+description: Triggered to find which file or module will change.
+triggers:
+  - "repository navigation"
 ---
-
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Repo Navigator
 
-## Tetiklenme
-"nerede yazıyor", "hangi dosya", "modülü bul", "ilgili sınıf hangisi" gibi ifadeler.
+## Trigger
+Triggered by "repository navigation".
 
-## Çalışma Adımları
-1. Root README → GEMINI.md → ilgili modül README sırasıyla oku.
-2. Tüm repoyu tarama — sadece ilgili modül klasörüne gir.
-3. Hedef dosya listesini çıkar.
-4. Değişiklik kapsamını belirt: hangi katman, hangi dosya.
+## Workflow Steps
+1. Navigate directly to the relevant module's local folder.
+2. Read the local `README.md` for domain-specific context.
+3. Extract the list of target files.
+4. Specify the scope of change: which layer, which file.
 
-## Çıktı Formatı
-- Hedef dosyalar: `[modül]/[katman]/[DosyaAdı].java`
-- Değişiklik kapsamı: controller / service / validator / repository / mapper
-- Yan etki riski: cache / event / auth / payment varsa belirt.
+## Output Format
+- Target files: `[module]/[layer]/[FileName].java`
+- Scope of change: controller / service / validator / repository / mapper
+- Side effect risk: specify if there is cache / event / auth / payment.

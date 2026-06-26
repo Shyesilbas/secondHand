@@ -92,8 +92,8 @@ public class CacheConfig {
         // ── Tier 3b: Kısa süreli — 5 dakika ───────────────────────────
         RedisCacheConfiguration shortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
-        // ── Tier 4: Ultra Kısa — 30 saniye ────────────────────────────
-        RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofSeconds(30));
+        // ── Tier 4: Ultra Kısa — 5 dakika ────────────────────────────
+        RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
         log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}::", CACHE_VERSION);
 
@@ -131,7 +131,7 @@ public class CacheConfig {
                 .withCacheConfiguration("listingViewStats", shortConfig)
                 .withCacheConfiguration("activeShowcases", shortConfig)
 
-                // Tier 4 — Ultra Kısa (30 saniye)
+                // Tier 4 — Ultra Kısa (5 dakika)
                 .withCacheConfiguration("userBadges", ultraShortConfig)
 
                 .build();

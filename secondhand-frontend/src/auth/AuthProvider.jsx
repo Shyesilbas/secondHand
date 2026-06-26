@@ -9,6 +9,7 @@ import { UserDTO } from '../user/users.js';
 import logger from '../common/utils/logger.js';
 import { AuthContext } from './AuthContext.jsx';
 import { setAuthContextRef } from '../common/services/api/interceptors.js';
+import { decodeJwtPayload } from '../common/utils/jwtDecode.js';
 
 export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState({
@@ -37,7 +38,9 @@ export const AuthProvider = ({ children }) => {
                         const userProfile = await authService.getCurrentUser();
                         const newUserData = {
                             ...UserDTO,
-                            ...userProfile
+                            ...userProfile,
+                            plan: userData?.plan || 'FREE',
+                            planExpiry: userData?.planExpiry || null
                         };
                         setUser(newUserData);
                         setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
@@ -61,7 +64,17 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = useCallback(async (loginResponse) => {
-        const { userId, email } = loginResponse;
+        const { userId, email, accessToken } = loginResponse;
+
+        let plan = 'FREE';
+        let planExpiry = null;
+        if (accessToken) {
+            const decoded = decodeJwtPayload(accessToken);
+            if (decoded) {
+                plan = decoded.plan || 'FREE';
+                planExpiry = decoded.planExpiry || null;
+            }
+        }
 
         try {
             const userProfile = await authService.getCurrentUser();
@@ -70,7 +83,9 @@ export const AuthProvider = ({ children }) => {
                 ...UserDTO,
                 id: userId,
                 email,
-                ...userProfile
+                ...userProfile,
+                plan,
+                planExpiry
             };
 
             setUser(userData);
@@ -79,7 +94,9 @@ export const AuthProvider = ({ children }) => {
             const userData = {
                 ...UserDTO,
                 id: userId,
-                email
+                email,
+                plan,
+                planExpiry
             };
             setUser(userData);
             setAuthState({ user: userData, isAuthenticated: true, isLoading: false });

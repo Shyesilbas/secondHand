@@ -35,26 +35,28 @@ export const useBadgeCounts = ({ enabled = true, userId } = {}) => {
       const emailCount = Number(badges.emailUnreadCount) || 0;
       const chatCount = Number(badges.chatUnreadCount) || 0;
       const orderCount = Number(badges.pendingOrderCount) || 0;
+      const notificationCount = Number(badges.notificationCount) || 0;
 
-      return { emailCount, chatCount, orderCount };
+      return { emailCount, chatCount, orderCount, notificationCount };
     },
     staleTime: 2 * 60 * 1000, // 2 min - reduce refetches
     gcTime: 10 * 60 * 1000,
     refetchInterval: false, // No polling - rely on focus/mount
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true, // Re-enabled for better UX
-    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
     retry: 1,
     retryDelay: 1000,
   });
 
-  const data = query.data || { emailCount: 0, chatCount: 0, orderCount: 0 };
+  const data = query.data || { emailCount: 0, chatCount: 0, orderCount: 0, notificationCount: 0 };
 
   return {
     emailCount: data.emailCount ?? 0,
     chatCount: data.chatCount ?? 0,
     cartCount,
     orderCount: data.orderCount ?? 0,
+    notificationCount: data.notificationCount ?? 0,
     isLoading: query.isLoading,
     error: query.error || null,
   };

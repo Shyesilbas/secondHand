@@ -1,26 +1,24 @@
-# AI (Aura) Paketi Teknik Rehber
+# AI (Aura) Domain
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Purpose
+The `ai` domain orchestrates interactions with the "Aura" AI assistant, translating natural language user input into semantic listing searches, dynamic price advice, and automated listing generation.
 
-## 1) Paket Amacı ve Sınırları
-`ai` paketi, "Aura" yapay zeka asistanının yönetiminden, Gemini API ile haberleşmekten ve kullanıcı komutlarını (semantic search) sistem komutlarına (SQL/Search Plans) dönüştürmekten sorumludur.
+## Architecture Overview
+- **AuraListingSearchOrchestrator:** Parses user intents and prepares prompts.
+- **ContextAdapters:** Systematically injects the active user's context (e.g., cart state, recent orders) into the LLM prompt.
+- **GeminiClient:** Manages the HTTP communication layer with the Google Gemini API.
 
-Kapsam:
-- Kullanıcı girdisini analiz etme (Semantic Listing Search)
-- Zengin arama filtreleri ve planları üretme
-- Dinamik fiyat önerileri sunma (Dynamic Price Advisor)
-- Otomatik ilan açıklaması üretme (Automated Listing Generator)
-- Kullanıcıya ait sepet, favori veya sipariş bağlamını prompt'a enjekte etme (Context Adapters)
+## Business Invariants & Constraints
+- **Context Security:** Context adapters MUST ensure that a user's prompt is never injected with data belonging to another user.
+- **Token Limits:** Large data dumps (like complete order histories) must be aggressively summarized before injection to prevent HTTP 429 or Token Limit errors.
+- **Latency Handling:** AI endpoints are inherently slow; front-end consumers must be prepared for delayed, asynchronous responses.
 
-## 2) Kritik Sınıflar
-- `AuraController`: Arayüz ile haberleşen ana endpoint.
-- `AuraListingSearchOrchestrator`: Gelen isteği alıp Gemini modeline gönderilmek üzere hazırlayan ana orkestratör.
-- `ContextAdapters`: Kullanıcının sistemdeki aktif durumlarını (Sepet vb.) okuyup prompt'a bağlam (context) olarak ekleyen bileşenler.
-- `GeminiClient`: Google Gemini API ile asıl HTTP iletişimini kuran servis.
+## Integration Points
+- **Incoming:** HTTP search and advisor requests from the client UI.
+- **Outgoing:** External calls to the Gemini API.
 
-## 3) Dikkat Edilmesi Gereken Riskler
-- **Token Limitleri:** Context Adapter'lar çok büyük verileri (örneğin binlerce ilan geçmişini) prompt'a eklememelidir. Sınır aşımı `429 Too Many Requests` veya Token Limit Exception hatalarına yol açar.
-- **Güvenlik:** Kullanıcı bağlamı enjekte edilirken kullanıcının yetkisi olmayan veriler (`other_user_cart`) kesinlikle prompt'a sızmamalıdır.
-- **Gecikme (Latency):** LLM çağrıları yavaştır. Arayüz tarafında asenkron (WebSocket veya loading state) tasarımlar tercih edilmelidir.
+## Public APIs
+- Aura Semantic Search, Price Advisor, and Listing Generator endpoints.
+
+## Related Knowledge
+- *(No specific runbooks extracted; modifications involve prompt engineering and context adapter implementation)*

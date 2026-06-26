@@ -1,25 +1,22 @@
-# Pricing (Fiyatlandırma) Modülü
+# Pricing Domain
 
-Bu modül, sepet ve ödeme adımlarındaki fiyat hesaplama, kampanya indirimleri ve kupon kullanımı kurallarını yöneten fiyatlandırma motorunu (Pricing Engine) barındırır.
+## Purpose
+The `pricing` domain acts as the central Pricing Engine, dynamically calculating final prices by applying active campaigns and valid coupons to a user's cart or checkout context.
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **PriceCalculationEngine:** The orchestrator that applies the pricing rules sequentially (Base Price -> Campaigns -> Coupons).
+- **Calculators:** Specialized strategy classes (`CampaignDiscountCalculator`, `CouponDiscountCalculator`) handle specific reduction logic.
 
-## Temel Yapı
+## Business Invariants & Constraints
+- **Calculation Priority:** Campaign discounts are strictly applied BEFORE global coupon discounts.
+- **Category Exclusions:** High-value categories like Real Estate (`REAL_ESTATE`) and Vehicles (`VEHICLE`) are systemically excluded from standard percentage campaigns.
 
-### 1. Fiyat Hesaplama Motoru (`PriceCalculationEngine`)
-- Sepetteki tüm ürünler için temel fiyatları, aktif kampanyaları ve uygulanan kuponları bir araya getirerek nihai fiyat kırılımını hesaplar.
-- **İşlem Sırası:**
-  1. Sepet alt toplamı hesaplanır.
-  2. Geçerli kampanyalar (`CampaignDiscountCalculator`) filtrelenir ve sepet öğelerine indirim uygulanır.
-  3. Kullanıcının girdiği kupon kodu (`CouponDiscountCalculator`) indirimli alt toplam üzerinden uygulanır.
-  4. Nihai ödenecek tutar, toplam yapılan indirimler ve kupon payları belirlenir.
+## Integration Points
+- **Incoming:** Called primarily by the `checkout` domain during the final cart review.
+- **Outgoing:** Queries the `campaign` domain to fetch active seller campaigns.
 
-### 2. İndirim Hesaplayıcılar (`pricing.calculator`)
-- **Kampanya Hesaplayıcı (`CampaignDiscountCalculator`):** Yüzdelik veya sabit tutarlı satıcı/ilan kampanyalarını ilan bazında uygular.
-- **Kupon Hesaplayıcı (`CouponDiscountCalculator`):** Platform genelindeki aktif kuponların sepet toplamı sınırları ve geçerlilik kontrollerini yaparak indirimi uygular.
+## Public APIs
+- None exposed directly; utilized as an internal service.
 
-## İş Kuralları ve Sınırlamalar
-- **İlan Tipi Sınırlamaları:** Gayrimenkul (`REAL_ESTATE`) ve Vasıta (`VEHICLE`) gibi yüksek bütçeli kategoriler platform genelindeki standart sepet kampanyalarından hariç tutulabilir.
-- **Kupon Önceliği:** Kupon indirimleri, kampanya indirimleri uygulandıktan sonra kalan net tutar üzerinden hesaplanır.
+## Related Knowledge
+- *(No runbooks extracted; modifications involve adjusting the PriceCalculationEngine sequence)*

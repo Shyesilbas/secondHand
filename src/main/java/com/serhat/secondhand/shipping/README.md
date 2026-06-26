@@ -1,29 +1,22 @@
-# Shipping (Kargo) Modülü
+# Shipping Domain
 
-Bu modül, siparişlerin lojistik süreçlerini yönetmekten sorumludur. `order` paketinden ayrıştırılarak bağımsız bir yapı haline getirilmiştir.
+## Purpose
+The `shipping` domain isolates the logistical tracking and carrier management from the main order processing flow.
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **Modular Separation:** Shipping state transitions are handled independently of payment and checkout.
+- **Carrier Management:** Managed via enum structures (`Carrier`) allowing Open/Closed extension.
 
-## Kullanım
+## Business Invariants & Constraints
+- **State Progression:** PENDING -> IN_TRANSIT -> DELIVERED (or CANCELLED).
+- **Update Authorization:** Only sellers can update carrier and tracking information for an order they fulfill.
 
-### Siparişi Kargoya Verme (Satıcı)
-Satıcılar `PUT /api/v1/orders/{orderId}/ship` endpoint'ini kullanarak kargo bilgilerini girebilir:
+## Integration Points
+- **Incoming:** Triggered post-payment by the `order` domain.
+- **Outgoing:** Provides delivery status back to `order` and `escrow` to trigger fund releases.
 
-```json
-{
-  "carrier": "ARAS",
-  "trackingNumber": "123456789"
-}
-```
+## Public APIs
+- `PUT /api/v1/orders/{orderId}/ship`
 
-### Kargo Durumları
-- `PENDING`: Kargo bilgileri henüz girilmedi (Ödeme sonrası varsayılan).
-- `IN_TRANSIT`: Kargo verildi, yolda.
-- `DELIVERED`: Kargo başarıyla teslim edildi.
-- `CANCELLED`: Kargo iptal edildi.
-
-## Mimari Kararlar
-- **Modülerlik:** Kargo mantığı siparişten ayrılarak SOLID prensiplerine (Single Responsibility) uygun hale getirilmiştir.
-- **Genişletilebilirlik:** `Carrier` enum'ı içindeki `trackingUrlBase` alanı sayesinde OCP (Open/Closed Principle) korunmuştur.
+## Related Knowledge
+- *(No specific runbooks extracted; modifications usually require updating Carrier enums and state transitions)*

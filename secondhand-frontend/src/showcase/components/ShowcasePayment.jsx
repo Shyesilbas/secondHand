@@ -251,7 +251,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               </div>
             )}
             
-            <div className={`rounded-xl border border-border-light p-4 ${embedded ? 'bg-background-secondary' : 'bg-background-primary'}`}>
+            {error ? <div className={`rounded-xl border border-border-light p-4 ${embedded ? 'bg-background-secondary' : 'bg-background-primary'}`}>
                 {error}
               </div> : null}
 

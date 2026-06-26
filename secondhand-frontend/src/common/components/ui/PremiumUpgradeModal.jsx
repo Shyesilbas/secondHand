@@ -45,7 +45,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   const [localEmails, setLocalEmails] = useState(null);
 
   const { emails, fetchEmails } = useEmails();
-  const { eWallet, refreshWallet } = useEWallet();
+  const { eWallet, refreshWallet } = useEWallet({ enabled: isOpen });
 
   const {
     acceptedAgreements,

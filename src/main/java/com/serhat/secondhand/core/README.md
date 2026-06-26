@@ -1,31 +1,26 @@
-# Core Modülü
+# Core Domain
 
-Bu modül, uygulamanın geneline hizmet eden çapraz kesen (cross-cutting) altyapı, konfigürasyon ve ortak yardımcı araçları barındırır.
+## Purpose
+The `core` domain provides cross-cutting infrastructural services, including global security (JWT, CSRF, Rate Limiting), global error handling, standard API response wrappers, and verification utilities (OTP).
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **Security & JWT:** Uses `JwtUtils` and `AuthenticationFilter` for secure token management. Enforces CSRF via strict cookies and manages Rate Limits.
+- **Dynamic Endpoints:** Routes are dynamically classified as public vs. protected using `@PublicEndpoint` via `PublicEndpointRegistry`.
+- **Global Error Handling:** `GlobalExceptionHandler` ensures all exceptions are translated into a standardized JSON error shape.
+- **Audit Logging:** An AOP `AuditAspect` asynchronously records sensitive actions.
+- **Seeders:** Includes `CatalogSeedStartupRunner` for database initialization.
 
-## Altyapı Bileşenleri
+## Business Invariants & Constraints
+- **Response Format:** All API responses must be wrapped in `Result<T>` and handled via `ResultResponses`.
+- **Public Routing:** New unprotected endpoints must be explicitly annotated with `@PublicEndpoint`.
+- **Statelessness:** JWT token validation is stateless but relies on refresh token rotation (RTR) managed in `auth`.
 
-### 1. Güvenlik & Yetkilendirme (`core.jwt` & `core.security`)
-- **JWT Altyapısı:** `JwtUtils` ve `AuthenticationFilter` üzerinden token doğrulama, token rotasyonu (RTR - Refresh Token Rotation) ve HttpOnly güvenli çerez yönetimi.
-- **Dynamic Public Endpoints:** `@PublicEndpoint` anotasyonunu tarayarak dinamik bir şekilde kimlik doğrulama gerektirmeyen adresleri belirleyen `PublicEndpointRegistry` yapısı.
-- **CSRF Koruması:** `CsrfCookieFilter` ile `SameSite=Strict` uyumlu çerez bazlı CSRF koruması.
-- **Rate Limiting:** `RateLimitingFilter` ile API istek sayılarını (Auth ve Payment işlemleri için özel) IP ve User bazlı sınırlandırma.
-- **HTTP Headers:** `SecurityHeadersFilter` ile standard HTTP güvenlik başlıklarını (HSTS, CSP, X-Frame-Options vb.) ekleme.
+## Integration Points
+- **Incoming:** Every HTTP request passes through `core` filters.
+- **Outgoing:** Provides infrastructural utilities to every other domain.
 
-### 2. Hata Yönetimi (`core.exception`)
-- **Global Hata Yakalayıcı:** `GlobalExceptionHandler` ile uygulamanın fırlattığı tüm `BusinessException` ve Java/Spring hata türlerini frontend'e standard `{ error: "KOD", message: "..." }` biçiminde dönüştürme.
+## Public APIs
+- Provides standard infrastructure; no direct business endpoints.
 
-### 3. API Response Standardı (`core.result`)
-- **Result Wrapper:** Tüm servis ve API katmanlarında kullanılan generic `Result<T>` sınıfı ve bu sonucu ResponseEntity'ye çeviren `ResultResponses` sınıfı.
-
-### 4. Doğrulama Kodları (`core.verification`)
-- **OTP Kod Yönetimi:** Şifre sıfırlama, e-posta/telefon doğrulama ve ödeme güvenlik kontrolleri için kullanılan, deneme limitli ve süreli OTP (One Time Password) sistemi (`VerificationService`).
-
-### 5. Denetim Günlükleri (`core.audit`)
-- **Audit Aspect:** Spring AOP ile uygulanan, hassas işlemleri (şifre değiştirme, ödemeler vb.) arka planda asenkron event'ler yardımıyla veritabanına loglayan denetim altyapısı (`AuditAspect`).
-
-### 6. Veritabanı Besleme (`core.seed`)
-- **Seeding:** Uygulama açılışında katalog verilerini (şehirler, kargo, ilan modelleri vb.) veritabanına besleyen `CatalogSeedStartupRunner`.
+## Related Knowledge
+- *(No runbooks extracted; modifications affect the entire application architecture)*

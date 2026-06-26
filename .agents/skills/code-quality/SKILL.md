@@ -1,28 +1,24 @@
 ---
 name: Code Quality Control
-description: Kod yazımı bittikten sonra mimari standartların (DTO, Exception, Transaction) ihlal edilip edilmediğini kontrol eder.
+description: Checks whether architectural standards (DTO, Exception, Transaction) are violated after code is written.
 triggers:
-  - "kodu incele"
-  - "refactor et"
-  - "kalite kontrol"
-  - "PR hazır mı"
-  - "merge öncesi"
+  - "code quality"
 ---
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Code Quality Control
 
-## Tetiklenme
-"kodu incele", "refactor et", "kalite kontrol yap" dendiğinde veya büyük bir özellik kodu yazıldıktan hemen sonra.
+## Trigger
+Triggered by "code quality".
 
-## Çalışma Adımları
-1. Eklenen veya değiştirilen kodları tara.
-2. DTO kuralları: Controller hiçbir zaman Entity dönmemeli, her giriş/çıkış DTO olmalıdır.
-3. Transaction kuralları: `payment` veya `escrow` gibi alanlarda `@Transactional` olup olmadığına bak. Rollback stratejileri eksik mi kontrol et.
-4. Exception Handling: Hard-coded hata mesajları varsa, enum (`AuthErrorCodes` vs) kullanımına yönlendir.
-5. Sızıntı kontrolü: Service katmanındaki iş mantığı asla Controller katmanına sızmamalıdır. Controller'lar ince (thin) kalmalıdır.
+## Zero-I/O Architectural Rules
+- **Layered Architecture:** Controller -> Service -> Validator -> Repository -> Mapper.
+- **DTOs:** Controller must never return Entity. All inputs/outputs must be DTOs.
+- **Transactions:** Escrow and EWallet operations must be under `@Transactional`.
+- **Exceptions:** Use appropriate enums (e.g., AuthErrorCodes) instead of hard-coded error messages.
+- **Leak Control:** Business logic in the Service layer must never leak to the Controller layer. Controllers must remain thin.
 
-## Kurallar
-- Olası ihlalleri doğrudan düzeltme, önce raporla ve onay al.
-- Hataları gösterirken satır numarası ve dosya yoluyla net belirt.
-- Genel Java öğütleri değil, tamamen bu projeye (SecondHand) özel mimari riskler üzerinden inceleme yap.
+## Workflow Steps
+1. Scan the added or modified codes.
+2. Verify against the architectural rules above.
+3. Report violations clearly with line number and file path.
+4. Do not directly fix violations; report them first and request approval.

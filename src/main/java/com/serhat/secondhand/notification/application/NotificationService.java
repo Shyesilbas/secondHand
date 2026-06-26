@@ -25,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service
 @RequiredArgsConstructor
@@ -113,6 +115,7 @@ public class NotificationService implements INotificationService {
     }
 
 
+    @CacheEvict(value = "userBadges", key = "#userId")
     public Result<Void> markAsRead(UUID notificationId, Long userId) {
         log.info("Marking notification {} as read for user: {}", notificationId, userId);
 
@@ -150,6 +153,7 @@ public class NotificationService implements INotificationService {
     }
 
 
+    @CacheEvict(value = "userBadges", key = "#userId")
     public void markAllAsRead(Long userId) {
         log.info("Marking all notifications as read for user: {}", userId);
 
@@ -160,6 +164,19 @@ public class NotificationService implements INotificationService {
                 });
 
         notificationRepository.flush();
+
+        List<UUID> unreadEventIds = notificationEventRepository.findUnreadEventIdsForUser(userId);
+        if (!unreadEventIds.isEmpty()) {
+            List<NotificationEventRead> eventReads = unreadEventIds.stream()
+                    .map(eventId -> NotificationEventRead.builder()
+                            .eventId(eventId)
+                            .userId(userId)
+                            .readAt(LocalDateTime.now())
+                            .build())
+                    .toList();
+            notificationEventReadRepository.saveAll(eventReads);
+        }
+
         log.info("All notifications marked as read for user: {}", userId);
     }
 

@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { useQueryClient } from '@tanstack/react-query';
+import { LISTING_KEYS } from '../hooks/useListingData.js';
 import { listingTypeRegistry, getListingConfig } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
@@ -49,6 +51,7 @@ const EditListingPage = ({
     isAuthenticated
   } = useAuthState();
   const notification = useNotification();
+  const queryClient = useQueryClient();
 
   // 1. Fetch Logic
   const [data, setData] = useState(null);
@@ -123,6 +126,8 @@ const EditListingPage = ({
         throw new Error('Update service not found for this listing type');
       }
       await activeService.update(id, updatedFields);
+      queryClient.invalidateQueries({ queryKey: LISTING_KEYS.detail(id) });
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
       notification.showSuccess('Success', 'Listing updated successfully');
       navigate(ROUTES.MY_LISTINGS);
     } catch (err) {

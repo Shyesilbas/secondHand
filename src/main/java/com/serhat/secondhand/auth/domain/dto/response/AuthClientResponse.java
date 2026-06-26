@@ -7,7 +7,8 @@ public record AuthClientResponse(
         String message,
         Long userId,
         String email,
-        boolean success
+        boolean success,
+        String accessToken
 ) {
     public static AuthClientResponse from(LoginResponse response) {
         return AuthClientResponse.builder()
@@ -15,6 +16,7 @@ public record AuthClientResponse(
                 .userId(response.getUserId())
                 .email(response.getEmail())
                 .success(response.isSuccess())
+                .accessToken(response.getAccessToken())
                 .build();
     }
 }

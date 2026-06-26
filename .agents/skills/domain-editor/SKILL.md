@@ -1,23 +1,24 @@
 ---
 name: Domain Editor
-description: Business rule, validasyon veya servis mantığı değişiyorsa tetiklenir.
+description: Triggered when business rules, validations, or service logic change.
+triggers:
+  - "domain rule"
 ---
-
-> Detaylı proje haritası için: `.agents/PROJECT_REPORT.md`
 
 # Domain Editor
 
-## Tetiklenme
-"bu kuralı değiştir", "validasyon ekle", "fiyat hesapla", "servis mantığı" gibi ifadeler.
+## Trigger
+Triggered by "domain rule".
 
-## Çalışma Adımları
-1. Hangi domain? (payment / order / listing / escrow / cart / offer ...)
-2. O modülün README'sini oku.
-3. Etkilenen zinciri belirle: validator → service → repository
-4. Sadece o zincire dokun, dışına çıkma.
-5. DTO ve mapper tutarlılığını kontrol et.
+## Zero-I/O Architectural Rules
+- **Layered Flow:** Business rules stay in service/validator. Controllers must remain thin.
+- **DTO Usage:** Always use DTOs for request and response payloads. Never expose Domain/Entity models directly.
+- **High-Risk Domains (Payment, Escrow, Order):** Do not make assumptions. Generate clear errors, do not write fallbacks. Escrow and EWallet operations must be under `@Transactional` with clear rollback mechanisms.
 
-## Kurallar
-- Payment, escrow, order'da varsayım yapma — net hata üret, fallback yazma.
-- Business rule service/validator'da kalır, controller'a taşıma.
-- Bir değişiklik tek sorunu çözsün.
+## Workflow Steps
+1. Determine the domain (payment, order, listing, escrow, cart, offer).
+2. Read the local README of that domain.
+3. Determine the affected chain: validator → service → repository.
+4. Only touch that chain, do not go outside of it.
+5. Check DTO and mapper consistency.
+6. One change should solve one problem.

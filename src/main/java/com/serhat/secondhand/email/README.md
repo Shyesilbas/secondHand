@@ -1,27 +1,25 @@
-# Email (E-posta) Modülü
+# Email Domain
 
-Bu modül, sistem tarafından kullanıcılara gönderilen tüm e-posta bildirimlerinin oluşturulması, gönderilmesi, veritabanına kaydedilmesi ve kullanıcıların bu e-postaları arayüz üzerinden okundu/silindi olarak yönetmesini sağlar.
+## Purpose
+The `email` domain manages the creation, rendering, transmission, and persistent tracking of all system-generated email notifications.
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **EmailService:** Renders HTML templates via Thymeleaf and logs all emails into the `Email` database table.
+- **EmailController:** Provides a REST API for users to list, read, or soft-delete their received system emails from their inbox view.
 
-## Temel Bileşenler
+## Business Invariants & Constraints
+- **Auditability:** Every sent email MUST be recorded in the database with its `EmailType` and recipient.
+- **Soft Deletion:** Emails deleted by users via the interface are marked with `deletedAt`, not permanently dropped.
 
-### 1. E-posta Servisi (`EmailService`)
-- **Şablon Motoru (Thymeleaf):** `TemplateEngine` kullanarak `resources/templates/email/` altındaki dinamik HTML şablonlarını işler.
-- **Kayıt ve Takip:** Gönderilen her e-posta, alıcı bilgisi, konu, içerik türü (`EmailType`) ve gönderim zamanıyla veritabanına (`Email` tablosuna) kaydedilir.
-- **Durum Yönetimi:** E-postaların okundu (`readAt`) veya silindi (`deletedAt` - soft delete) durumlarını takip eder.
+## State Machines
+- **Email State:** Unread -> Read (`readAt`) -> Deleted (`deletedAt`).
 
-### 2. Yapılandırma (`EmailConfig`)
-- `app.email` prefix'i altındaki özellikleri okur.
-- Şifre sıfırlama, e-posta doğrulama, yeni teklif, sipariş durumu değişikliği gibi farklı senaryolar için kullanılacak varsayılan konu başlıklarını (`subject`) yapılandırır.
+## Integration Points
+- **Incoming:** Triggered by various domains (auth, order, offer, agreements) via internal service calls or events.
+- **Outgoing:** Interacts with the external SMTP/Email gateway provider.
 
-### 3. REST API (`EmailController`)
-- Kullanıcıların kendilerine gönderilen e-postaları sayfalamalı listelemesine, okundu olarak işaretlemesine veya silmesine imkan verir.
+## Public APIs
+- Inbox retrieval, Mark as read, Delete email.
 
-## E-posta Türleri (`EmailType`)
-- **Şifre / Güvenlik:** Şifre sıfırlama kodu, yeni telefon numarası doğrulaması.
-- **Sipariş / Satış:** Sipariş oluşturuldu, sipariş tamamlandı, sipariş iptali veya iadesi.
-- **Teklifler:** Yeni teklif alındı, karşı teklif alındı, teklif kabulü veya reddi.
-- **Sosyal / İlan:** Takip edilen satıcının yeni ilan yayınlaması, ilan fiyat düşüşü bildirimi.
+## Related Knowledge
+- *(No runbooks extracted; modifications usually involve adding new templates or EmailType enum values)*

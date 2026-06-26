@@ -1,74 +1,30 @@
-# Cart Modulu
+# Cart Domain
 
-Bu modul, kullanicinin sepete urun ekleme/guncelleme/silme akisini ve dusuk stokta gecici rezervasyon davranisini yonetir.
+## Purpose
+The `cart` domain manages the user's shopping cart, handling addition, modification, and deletion of items, as well as executing temporary reservations for low-stock scenarios.
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **CartService:** Core business logic handling stock availability, reservation calculations, and cart mutations.
+- **CartValidator:** Extracts listing and reservation eligibility checks out of the service layer.
+- **CartReservationScheduler:** A periodic cleanup task that purges expired low-stock reservations from the database.
 
-## Mimari Akis
+## Business Invariants & Constraints
+- **Ownership Limitation:** Users cannot add their own listings to their cart.
+- **Listing Status:** Items added to the cart must be in an `ACTIVE` state.
+- **Reservation Stock:** When checking available stock, active cart reservations belonging to other users must be subtracted from the total available quantity.
+- **Parallel Mutations:** Concurrent additions or updates that trigger DB unique constraint conflicts are intercepted and converted into standard business errors, not technical 500s.
 
-- `api/CartController`: HTTP endpoint girisi, kimlik dogrulama principal'dan user alir.
-- `application/CartService`: Is kurallari, stok/rezervasyon kontrolu, sepet yazma islemleri.
-- `validator/CartValidator`: Listeleme ve rezervasyon uygunluk kurallari.
-- `repository/CartRepository`: Sepet sorgulari, aktif rezervasyon toplamlari, batch temizlik sorgulari.
-- `application/CartReservationScheduler`: Suresi dolan rezervasyonlari periyodik temizler.
-- `mapper/CartMapper`: `Cart` -> `CartDto` donusumu.
-- `config/CartConfig`: Modul bazli konfigurasyonlar.
+## State Machines
+- **Reservation Status:** `null` -> `reservedAt/reservationEndTime` assigned -> Cleared when expired by the Scheduler or processed in Checkout.
 
-## Kritik Is Kurallari
+## Integration Points
+- **Incoming:** User actions via `CartController`.
+- **Outgoing:** Validates listing state via the `listing` domain query APIs. Provides items to the `checkout` domain.
 
-- Listeleme aktif olmali ve kullanicinin kendi ilani olmamali.
-- Listeleme tipi kurala uygun olmali (izin verilmeyen tipler engellenir).
-- Dusuk stok senaryosunda aktif rezervasyonlar da stok hesabina dahil edilir.
-- Rezervasyon acik oldugunda, dusuk stok urunleri sepete eklerken `reservedAt` ve `reservationEndTime` atanir.
-- Paralel add/update yazimlarinda olusan DB unique conflict, teknik hata yerine business error olarak doner.
+## Public APIs
+- `GET /api/cart`
+- `POST /api/cart/add`, `PUT /api/cart/update`, `DELETE /api/cart/remove`
 
-## Konfigurasyon
-
-`application.yml` altinda:
-
-- `app.cart.reservation.enabled`
-- `app.cart.reservation.timeout-minutes`
-- `app.cart.defaults.quantity`
-- `app.cart.scheduler.cleanup-fixed-rate-ms`
-- `app.cart.zone-id`
-
-Not: zone tek noktadan yonetilir; service/scheduler bu degeri kullanir.
-
-## Degisiklik Yaparken Nereden Baslanir
-
-- Endpoint davranisi degisecekse: `CartController` + `CartService`.
-- Is kurali degisecekse: once `CartValidator`, sonra `CartService` entegrasyonu.
-- Yeni sorgu gerekiyorsa: `CartRepository`e projection veya query ekle.
-- DTO cevabi degisecekse: `CartDto` ve `CartMapper` birlikte guncellenmeli.
-- Rezervasyon zamani/temizlik davranisi degisecekse: `CartConfig` + `CartReservationScheduler`.
-
-## Yeni Ozellik Ekleme Runbook
-
-1. **Kurali tanimla**
-   - Is kurali ve hata kodunu netlestir.
-   - Gerekirse `CartErrorCodes`a yeni kod ekle.
-
-2. **Servis akisina entegre et**
-   - `CartService` icinde tek sorumlulugu koru.
-   - Validasyonlari `CartValidator`a tasiyip serviste orkestre et.
-
-3. **Repository ihtiyacini belirle**
-   - Yeni filtre/sayim gerekiyorsa repository query ekle.
-   - N+1 riskini join fetch/projection ile kontrol et.
-
-4. **Konfigurasyonlastir**
-   - Magic number/string kullanma.
-   - Ayarlanabilir degerleri `app.cart.*` altina tasi.
-
-5. **Test et**
-   - Paralel add/update cakisimi.
-   - Dusuk stok + aktif rezervasyon kombinasyonu.
-   - Rezervasyon timeout temizleme davranisi.
-   - Notes alaninin null ile temizlenmesi.
-
-## Bilinen Dikkat Noktalari
-
-- `CartMapper` icindeki zaman donusumu zone bilgisini sabit kullaniyor; zone davranisi degisecekse mapper da guncellenmeli.
-- `ReservationException` modulde sinirli kullanimda; yeni akista gereksizse kaldirma/deprecate degerlendir.
+## Related Knowledge
+- **Cart Feature Development**
+  -> `.docs/runbooks/cart-feature-runbook.md`

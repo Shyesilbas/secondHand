@@ -1,27 +1,27 @@
-# User (Kullanıcı) Modülü
+# User Domain
 
-Bu modül, kullanıcı hesap yönetimi, adres yönetimi, kullanıcı rozetleri (badges) ve "Harika Satıcı" (Great Seller) hak ediş sistemini yönetir.
+## Purpose
+The `user` domain manages user profiles, delivery/billing addresses, user badges, and automated eligibility systems like "Great Seller".
 
-## Agent Note
-> [!IMPORTANT]
-> Detaylı AI ajan kuralları ve proje mimari haritası için: `.agents/PROJECT_REPORT.md` ve `GEMINI.md` dosyalarını oku.
+## Architecture Overview
+- **UserService:** Profile management, incorporating caching strategies.
+- **AddressService:** Address management and main-address resolution.
+- **UserBadgeService & GreatSellerService:** Evaluate user metrics (ratings, order volume) to assign prestige badges.
 
-## Temel Bileşenler
+## Business Invariants & Constraints
+- **Unique Identifiers:** Email and phone numbers must be strictly unique across the system.
+- **Main Address:** Only one address per user can be marked as the main address at any given time.
+- **Badge Eligibility:** Great Seller status is resolved via `GreatSellerPolicy` using historical aggregate data, triggered asynchronously.
 
-### 1. Kullanıcı Profili (`user.application.UserService`)
-- Kullanıcı oluşturma, arama, e-posta ve telefon numarası güncelleme işlemlerini yönetir.
-- **Cache Stratejisi:** Kullanıcı profilleri performansı artırmak amacıyla `@Cacheable(value = "userProfile", key = "#id")` ile önbelleğe alınır. Profil güncellendiğinde (`update`), `@CacheEvict` ile cache temizlenir.
+## State Machines
+- **Address Status:** Standard -> Main (demotes previously main address).
 
-### 2. Adres Yönetimi (`user.application.AddressService`)
-- Kullanıcıların teslimat ve fatura adreslerini yönetir.
-- Bir adresin ana adres (main address) olarak seçilmesi durumunda, kullanıcının diğer tüm adreslerindeki ana adres bayrağı (`isMain`) kaldırılır.
+## Integration Points
+- **Incoming:** Triggered by user profile updates or periodic schedulers for badge synchronization.
+- **Outgoing:** Queries historical order and review data for badge eligibility.
 
-### 3. Rozet Sistemi (`user.application.UserBadgeService` & `GreatSellerService`)
-- Kullanıcılara belirli başarımlara göre rozet atar.
-- **Harika Satıcı (Great Seller) Rozeti:**
-  - `GreatSellerPolicy` politikasına göre kullanıcının son sipariş sayısı, ortalama değerlendirme puanı (ortalama rating >= 4.5 vb.) ve olumlu yorum sayısına göre belirlenir.
-  - `GreatSellerEligibilitySyncService` asenkron bir scheduler veya event tetiklemesiyle çalışarak kullanıcıların bu politikaya uygunluğunu periyodik olarak tarar ve veritabanını günceller.
+## Public APIs
+- Standard Profile CRUD and Address Management.
 
-## İş Kuralları (Business Rules)
-- **Email ve Telefon Eşsizliği:** Bir e-posta veya telefon numarası sistemde yalnızca bir kez kullanılabilir.
-- **Ana Adres Zorunluluğu:** Kullanıcının aktif olan adreslerinden yalnızca biri ana adres olarak işaretlenebilir.
+## Related Knowledge
+- *(Modifications to profile rules are contained within the entity and validation services)*
