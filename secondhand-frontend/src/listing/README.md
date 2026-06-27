@@ -17,6 +17,13 @@ The `listing` UI module handles the presentation of the main item catalog, inclu
 - **Incoming:** Main catalog routes.
 - **Outgoing:** Queries the backend `listing` APIs heavily.
 
-## Related Knowledge
-- **Modify Listing UI**
-  -> `.docs/runbooks/modify-listing-ui.md`
+## Knowledge Routing
+- For procedural changes or troubleshooting, refer to KIs in `src/.docs/listing/`.
+
+## Source of Truth
+- **Business Rules:** Domain READMEs
+- **UI Rules:** Frontend UX KIs (`src/.docs/`)
+- **React Query:** `react-query-ownership.md`
+- **API:** Backend OpenAPI & Tests
+- **Validated Behaviour:** Unit Tests
+- **Architecture:** `GEMINI.md`

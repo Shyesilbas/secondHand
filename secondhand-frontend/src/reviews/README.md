@@ -17,6 +17,13 @@ The `reviews` UI module provides components and hooks to display star ratings, a
 - **Incoming:** Rendered inside listing details and user profile pages.
 - **Outgoing:** Queries the backend `review` domain APIs.
 
-## Related Knowledge
-- **Modify Reviews UI**
-  -> `.docs/runbooks/modify-reviews-ui.md`
+## Knowledge Routing
+- For procedural changes or troubleshooting, refer to KIs in `src/.docs/reviews/`.
+
+## Source of Truth
+- **Business Rules:** Domain READMEs
+- **UI Rules:** Frontend UX KIs (`src/.docs/`)
+- **React Query:** `react-query-ownership.md`
+- **API:** Backend OpenAPI & Tests
+- **Validated Behaviour:** Unit Tests
+- **Architecture:** `GEMINI.md`

@@ -20,7 +20,7 @@ const DetailItem = ({ label, value }) => (
   </div>
 );
 
-const GenericListingDetails = ({ listing }) => {
+const GenericListingDetails = ({ listing, flat = false }) => {
   const { enums } = useEnums();
 
   const config = useMemo(() => getListingConfig(listing?.type), [listing?.type]);
@@ -41,10 +41,10 @@ const GenericListingDetails = ({ listing }) => {
 
   const title = schema.title || config?.label || 'Details';
 
-  return (
-    <div className="bg-background-primary rounded-lg shadow-sm border p-6">
+  const content = (
+    <>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-medium text-text-primary">{title}</h3>
+        <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
         {sections.length > 1 ? (
           <div className="flex flex-wrap gap-2">
             {sections.map((tab) => (
@@ -52,10 +52,10 @@ const GenericListingDetails = ({ listing }) => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1.5 text-sm rounded border ${
+                className={`px-3 py-1.5 text-sm rounded-lg border font-semibold transition-all ${
                   activeSection === tab.id
-                    ? 'bg-gray-900 text-white border-gray-900'
-                    : 'bg-background-primary text-text-secondary border-border-DEFAULT hover:border-border-DEFAULT'
+                    ? 'bg-text-primary text-text-inverse border-text-primary'
+                    : 'bg-background-primary text-text-secondary border-border-light hover:border-border-DEFAULT'
                 }`}
               >
                 {tab.label}
@@ -66,7 +66,7 @@ const GenericListingDetails = ({ listing }) => {
       </div>
 
       {active?.title ? <h4 className="text-sm font-semibold text-text-muted mb-3">{active.title}</h4> : null}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {(active?.fields || [])
           .filter((field) => {
             if (typeof field.visibleWhen === 'function') {
@@ -80,6 +80,16 @@ const GenericListingDetails = ({ listing }) => {
             return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
           })}
       </div>
+    </>
+  );
+
+  if (flat) {
+    return <div className="mt-2">{content}</div>;
+  }
+
+  return (
+    <div className="bg-background-primary rounded-xl shadow-sm border border-border-light p-6">
+      {content}
     </div>
   );
 };

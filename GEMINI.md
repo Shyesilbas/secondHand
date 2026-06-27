@@ -98,3 +98,13 @@
 ### 4.13 Executable Debugging Path
 - Every investigation must conclude with an "Expected Debugging Path".
 - Provide an explicit, step-by-step, actionable sequence of steps that guides the exact debugging process (e.g., Step 1: Locate useQuery → Step 2: Locate mutation → Step 3: Compare queryKeys → Step 4: Verify invalidateQueries → Step 5: Open DevTools).
+
+### 4.14 Evidence Gate
+- Never present an implementation or root cause as fact until it has been verified in the source code.
+
+### 4.15 Confidence Reporting
+- For every investigation, explicitly distinguish:
+  - Observed facts
+  - Hypotheses
+  - Required verification
+  - Recommended fix (conditional on verification)

@@ -7,38 +7,38 @@ const CATEGORIES = [{
   value: 'VEHICLE',
   label: 'Vehicles',
   icon: Car,
-  bg: 'bg-primary-light hover:bg-primary-200 text-primary border-primary-300'
+  bg: 'bg-primary-light hover:bg-primary-100 text-primary border-primary-200'
 }, {
   value: 'REAL_ESTATE',
   label: 'Real Estate',
   icon: Building2,
-  bg: 'bg-status-warning-bg hover:bg-status-warning-border/20 text-status-warning border-status-warning-border'
+  bg: 'bg-status-warning-bg hover:bg-status-warning-bg text-status-warning border-status-warning-border'
 }, {
   value: 'ELECTRONICS',
   label: 'Electronics',
   icon: Laptop,
-  bg: 'bg-primary-light hover:bg-primary-200 text-primary border-primary-300'
+  bg: 'bg-primary-light hover:bg-primary-100 text-primary border-primary-200'
 }, {
   value: 'CLOTHING',
   label: 'Fashion',
   icon: Shirt,
-  bg: 'bg-secondary-light hover:bg-secondary-200 text-text-secondary border-border-light'
+  bg: 'bg-secondary-light hover:bg-secondary-100 text-text-secondary border-border-light'
 }, {
   value: 'HOME_LIVING',
   label: 'Home & Living',
   icon: Home,
-  bg: 'bg-status-success-bg hover:bg-status-success-border/20 text-status-success border-status-success-border',
+  bg: 'bg-status-success-bg hover:bg-status-success-bg text-status-success border-status-success-border',
   routeValue: 'OTHER'
 }, {
   value: 'SPORTS',
   label: 'Sports',
   icon: Dumbbell,
-  bg: 'bg-secondary-light hover:bg-secondary-200 text-text-secondary border-border-light'
+  bg: 'bg-secondary-light hover:bg-secondary-100 text-text-secondary border-border-light'
 }, {
   value: 'BOOKS',
   label: 'Books',
   icon: BookOpen,
-  bg: 'bg-secondary-light hover:bg-secondary-200 text-text-secondary border-border-light'
+  bg: 'bg-secondary-light hover:bg-secondary-100 text-text-secondary border-border-light'
 }];
 const CategoryHub = () => {
   const {

@@ -5,3 +5,5 @@ export { default as MarketplaceStatsSection } from './MarketplaceStatsSection.js
 export { default as TrustBand } from './TrustBand.jsx';
 export { default as GreatSellersSection } from './GreatSellersSection.jsx';
 export { default as TrustExperienceSection } from './TrustExperienceSection.jsx';
+export { default as CategoryHub } from './CategoryHub.jsx';
+

@@ -128,6 +128,7 @@ const ListingDetailPage = () => {
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
   const viewTrackedRef = useRef(false);
   const galleryRef = useRef(null);
   const {
@@ -142,7 +143,12 @@ const ListingDetailPage = () => {
   /* Reset image on listing change */
   useEffect(() => {
     setSelectedImageIndex(0);
+    setImageError(false);
   }, [listing?.id]);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [selectedImageIndex]);
 
   /* Track view */
   useEffect(() => {
@@ -241,9 +247,9 @@ const ListingDetailPage = () => {
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">{t("explore")}</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 hidden sm:block" />
+            <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0 hidden sm:block" />
             <span className="text-text-muted hidden sm:inline shrink-0">{listing.type}</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 hidden md:block" />
+            <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0 hidden md:block" />
             <span className="text-text-primary truncate hidden md:inline max-w-[200px]">{listing.title}</span>
           </nav>
 
@@ -253,12 +259,12 @@ const ListingDetailPage = () => {
             state: {
               listing
             }
-          })} className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-primary hover:bg-indigo-50/80 rounded-lg font-semibold transition-all group" title={t("ask_aura_ai")}>
+          })} className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-primary hover:bg-primary-light rounded-lg font-semibold transition-all group" title={t("ask_aura_ai")}>
               <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span className="hidden sm:inline text-sm">{t("ask_aura")}</span>
             </button>
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
-            {!isOwner && <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className="p-2 border border-transparent text-text-muted hover:text-rose-500 rounded-lg transition-all hover:bg-rose-50/80" />}
+            {!isOwner && <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className="p-2 border border-transparent text-text-muted hover:text-status-error-text rounded-lg transition-all hover:bg-status-error-bg" />}
             <button onClick={handleShare} className="p-2 text-text-muted hover:text-text-primary rounded-lg transition-all hover:bg-secondary-light" aria-label={t("share_listing")} title={t("share")}>
               <Share2 className="w-4 h-4" />
             </button>
@@ -275,192 +281,213 @@ const ListingDetailPage = () => {
         <div className="grid lg:grid-cols-12 gap-5 lg:gap-7">
 
           {/* ── Left Column ─────────────────────────────── */}
-          <div className="lg:col-span-7 xl:col-span-8 listing-stagger space-y-4">
+          <div className="lg:col-span-7 listing-stagger space-y-4">
 
-            {/* Title Block */}
-            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light">
-              <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                <span className="inline-flex items-center gap-1 rounded-full bg-text-primary px-2.5 py-1 text-caption font-bold text-white uppercase tracking-wider">
-                  {listing.type}
-                </span>
-                {hasCampaign && <span className="listing-discount-badge inline-flex items-center gap-1 rounded-full bg-status-success-bg px-2.5 py-1 text-caption font-bold text-white uppercase tracking-wider">
-                    <Tag className="w-3 h-3" />
-                    {listing.campaignName || 'Sale'}
-                    {discount && <span className="ml-0.5">−{discount}%</span>}
-                  </span>}
-                {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-full bg-secondary-light px-2.5 py-1 text-caption font-bold text-text-muted uppercase tracking-wider">
-                    {listing.status}
-                  </span>}
+            {/* Showcase Block (Title + Gallery + Key Specs) */}
+            <section className="bg-background-primary rounded-xl p-4 sm:p-5 shadow-sm border border-border-light space-y-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-text-primary px-2.5 py-1 text-caption font-bold text-text-inverse uppercase tracking-wider">
+                    {listing.type}
+                  </span>
+                  {hasCampaign && <span className="listing-discount-badge inline-flex items-center gap-1 rounded-full bg-status-success-bg px-2.5 py-1 text-caption font-bold text-status-success-text uppercase tracking-wider border border-status-success-border">
+                      <Tag className="w-3 h-3 text-status-success-icon" />
+                      {listing.campaignName || 'Sale'}
+                      {discount && <span className="ml-0.5">−{discount}%</span>}
+                    </span>}
+                  {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-full bg-secondary-light px-2.5 py-1 text-caption font-bold text-text-muted uppercase tracking-wider border border-border-light">
+                      {listing.status}
+                    </span>}
+                </div>
+
+                <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight leading-[1.2] mb-2.5">
+                  {listing.title}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body text-text-muted font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {locationLabel}
+                  </div>
+                  <span className="hidden sm:block w-1 h-1 rounded-full bg-border-light" />
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {formatDateTime(listing.createdAt)}
+                  </div>
+                  <span className="hidden sm:block w-1 h-1 rounded-full bg-border-light" />
+                  <div className="flex items-center gap-1.5">
+                    <Eye className="w-3.5 h-3.5" />
+                    {listing.viewCount || 0} {t("views")}</div>
+                </div>
               </div>
 
-              <h1 className="text-2xl font-semibold text-text-primary tracking-tight leading-[1.15] mb-3">
-                {listing.title}
-              </h1>
-
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body text-text-muted font-medium">
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-text-muted" />
-                  {locationLabel}
-                </div>
-                <span className="hidden sm:block w-1 h-1 rounded-full bg-slate-300" />
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-text-muted" />
-                  {formatDateTime(listing.createdAt)}
-                </div>
-                <span className="hidden sm:block w-1 h-1 rounded-full bg-slate-300" />
-                <div className="flex items-center gap-1.5">
-                  <Eye className="w-3.5 h-3.5 text-text-muted" />
-                  {listing.viewCount || 0}{t("views")}</div>
-              </div>
-            </section>
-
-            {/* Image Gallery */}
-            <section ref={galleryRef} className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light overflow-hidden">
-              <div className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[400px] bg-background-secondary rounded-xl overflow-hidden relative group cursor-pointer">
-                {selectedImage ? <img key={selectedImage} src={optimizeCloudinaryUrl(selectedImage, {
+              {/* Gallery Frame */}
+              <div ref={galleryRef} className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[360px] bg-background-secondary rounded-xl overflow-hidden relative group cursor-pointer border border-border-light">
+                {selectedImage && !imageError ? <img key={selectedImage} src={optimizeCloudinaryUrl(selectedImage, {
                 width: 1200
-              })} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-cover listing-image-enter listing-img-zoom" /> : <div className="flex flex-col items-center justify-center h-full text-text-muted">
-                    <div className="w-14 h-14 bg-background-primary rounded-xl flex items-center justify-center mb-3 shadow-sm border border-border-light">
-                      <Package className="w-6 h-6 text-slate-300" />
+              })} onError={() => setImageError(true)} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-cover listing-image-enter listing-img-zoom" fetchpriority="high" decoding="async" loading="eager" /> : <div className="flex flex-col items-center justify-center h-full text-text-muted">
+                    <div className="w-12 h-12 bg-background-primary rounded-lg flex items-center justify-center mb-3 border border-border-light">
+                      <Package className="w-5 h-5" />
                     </div>
-                    <p className="text-xs font-semibold text-text-muted">{t("no_image_available")}</p>
+                    <p className="text-xs font-semibold">{t("no_image_available")}</p>
                   </div>}
 
                 {/* Gallery nav arrows */}
                 {images.length > 1 && <>
-                    <button onClick={showPreviousImage} className="absolute left-2.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95" aria-label={t("previous_image")}>
-                      <ChevronLeft className="w-5 h-5" />
+                    <button onClick={showPreviousImage} className="absolute left-2.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-border-light" aria-label={t("previous_image")}>
+                      <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <button onClick={showNextImage} className="absolute right-2.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95" aria-label={t("next_image")}>
-                      <ChevronRight className="w-5 h-5" />
+                    <button onClick={showNextImage} className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-border-light" aria-label={t("next_image")}>
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                     {/* Image counter badge */}
-                    <div className="absolute bottom-2.5 right-2.5 bg-background-primary border-b border-border-light rounded-full px-2.5 py-1 text-caption font-bold text-text-primary shadow-md">
+                    <div className="absolute bottom-2.5 right-2.5 bg-background-primary border border-border-light rounded-full px-2 py-0.5 text-caption font-bold text-text-primary shadow-sm">
                       {selectedImageIndex + 1} / {images.length}
                     </div>
                   </>}
               </div>
 
               {/* Thumbnail strip */}
-              {images.length > 1 && <div className="mt-2 flex gap-2 overflow-x-auto pb-1 px-0.5 scrollbar-thin">
-                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-[48px] w-[60px] shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-primary ring-2 ring-primary/20 listing-thumb-active shadow-sm' : 'border-border-light/80 opacity-60 hover:opacity-100 hover:border-border-DEFAULT'}`}>
+              {images.length > 1 && <div className="flex gap-2 overflow-x-auto pb-1 px-0.5 scrollbar-thin">
+                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-11 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-primary ring-2 ring-primary/20 shadow-sm' : 'border-border-light/85 opacity-65 hover:opacity-100 hover:border-border-DEFAULT'}`}>
                       <img src={optimizeCloudinaryUrl(imgUrl, {
-                  width: 180
-                })} alt="" className="h-full w-full object-cover" />
+                  width: 120
+                })} alt="" className="h-full w-full object-cover" width="56" height="44" decoding="async" loading="lazy" />
                     </button>)}
                 </div>}
-            </section>
 
-            {/* Key Specs Strip */}
-            {categoryBadges.length > 0 && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light">
-                <h3 className="text-sm font-medium text-text-primary uppercase tracking-[0.15em] mb-3">{t("key_specs")}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {categoryBadges.flatMap((badge, bIdx) => {
-                const labelStr = String(badge.label || '');
-                const parts = labelStr.includes(' • ') ? labelStr.split(' • ').map(p => p.trim()).filter(Boolean) : [labelStr];
-                return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background-secondary text-text-primary text-body font-semibold border border-border-light transition-all hover:bg-secondary-light hover:border-border-light">
-                        {pIdx === 0 && badge.icon && <span className="text-sm">{badge.icon}</span>}
-                        {part}
-                      </span>);
-              })}
-                </div>
-              </section>}
+              {/* Key Specs Row */}
+              {categoryBadges.length > 0 && <div className="pt-3 border-t border-border-light">
+                  <div className="flex flex-wrap gap-1.5">
+                    {categoryBadges.flatMap((badge, bIdx) => {
+                  const labelStr = String(badge.label || '');
+                  const parts = labelStr.includes(' • ') ? labelStr.split(' • ').map(p => p.trim()).filter(Boolean) : [labelStr];
+                  return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-background-secondary text-text-primary text-body font-semibold border border-border-light">
+                          {pIdx === 0 && badge.icon && <span className="text-xs">{badge.icon}</span>}
+                          {part}
+                        </span>);
+                })}
+                  </div>
+                </div>}
+            </section>
 
             {/* Aura AI Summary */}
             {listing?.id && <AuraSummary type="listing" id={listing.id} />}
 
-            {/* Description */}
-            <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light">
-              <h2 className="text-lg font-semibold text-text-primary mb-3 tracking-tight">{t("about_this_item")}</h2>
-              <div className={`text-sm leading-6 text-text-secondary whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[180px] overflow-hidden' : ''}`}>
-                {listing.description || 'No description has been added for this listing.'}
-                {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-28 bg-background-secondary pointer-events-none opacity-90" />}
-              </div>
-              {shouldClampDescription && <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-3 inline-flex items-center gap-1.5 text-primary font-bold text-xs hover:text-primary transition-colors group">
-                  {isDescriptionExpanded ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
-                </button>}
-            </section>
-
-            {/* Specifications */}
-            {DetailsComponent && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light">
-                <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("specifications")}</h2>
-                <div className="bg-background-secondary rounded-xl p-4 sm:p-5 border border-border-light">
-                  <DetailsComponent listing={listing} />
+            {/* Unified Product Info & Specifications */}
+            <section className="bg-background-primary rounded-xl p-4 sm:p-5 shadow-sm border border-border-light space-y-5">
+              {/* Description */}
+              <div>
+                <h2 className="text-base font-bold text-text-primary mb-2.5 tracking-tight">{t("about_this_item")}</h2>
+                <div className={`text-sm leading-relaxed text-text-secondary whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[140px] overflow-hidden' : ''}`}>
+                  {listing.description || 'No description has been added for this listing.'}
+                  {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-background-primary to-transparent pointer-events-none opacity-95" />}
                 </div>
-              </section>}
+                {shouldClampDescription && <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-2 inline-flex items-center gap-1.5 text-primary font-bold text-xs hover:text-primary transition-colors group">
+                    {isDescriptionExpanded ? <><ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
+                  </button>}
+              </div>
+
+              {/* Specifications */}
+              {DetailsComponent && <div className="pt-4 border-t border-border-light">
+                  <DetailsComponent listing={listing} flat={true} />
+                </div>}
+            </section>
 
             {/* Safe Meetup */}
             <SafeMeetupPanel />
 
             {/* Reviews */}
-            {hasReviews && <section className="bg-background-primary rounded-2xl p-4 sm:p-5 shadow-sm border border-border-light">
-                <h2 className="text-lg font-semibold text-text-primary mb-4 tracking-tight">{t("reviews")}</h2>
-                <ListingReviewsSection listing={listing} />
-              </section>}
+            {hasReviews && <ListingReviewsSection listing={listing} />}
           </div>
 
           {/* ── Right Column (Sticky Sidebar) ───────────── */}
-          <div className="lg:col-span-5 xl:col-span-4">
+          <div className="lg:col-span-5">
             <div className="sticky top-[66px] space-y-4 listing-float-in">
 
-              {/* Pricing Card */}
-              <div className="bg-background-primary border border-border-light rounded-2xl p-5 sm:p-5 shadow-sm">
-
-                {/* Price */}
-                <div className="mb-5">
-                  <p className="text-caption font-bold uppercase tracking-[0.15em] text-text-muted mb-2">{t("price")}</p>
-                  <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className={`text-3xl sm:text-[30px] font-bold tabular-nums tracking-tight leading-none ${hasCampaign ? 'text-primary' : 'text-text-primary'}`}>
+              {/* Card 1: Pricing & CTAs + Trust Guarantees */}
+              <div className="bg-background-primary border border-border-light rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
+                {/* Price block */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">{t("price")}</p>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className={`text-3xl font-extrabold tabular-nums tracking-tight leading-none ${hasCampaign ? 'text-primary' : 'text-text-primary'}`}>
                       {formatCurrency(displayPrice, listing.currency)}
                     </span>
-                    {hasCampaign && <div className="flex items-center gap-2">
+                    {hasCampaign && (
+                      <div className="flex items-center gap-2">
                         <span className="text-sm text-text-muted line-through font-semibold tabular-nums">
                           {formatCurrency(listing.price, listing.currency)}
                         </span>
-                        {discount && <span className="listing-discount-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-status-success-bg text-emerald-700 text-xs font-bold border border-emerald-100">
+                        {discount && (
+                          <span className="listing-discount-badge inline-flex items-center gap-1 px-2 py-0.5 rounded bg-status-success-bg text-status-success-text text-[11px] font-extrabold border border-status-success-border">
                             −{discount}%
-                          </span>}
-                      </div>}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Stock & Reservation Info */}
-                  {(hasStockInfo || activeReservations > 0) && <div className="flex flex-wrap items-center gap-2 mt-4">
-                      {hasStockInfo && <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${isLowStock ? 'bg-status-error-bg text-status-error-text border border-status-error-border' : 'bg-background-secondary text-text-secondary border border-border-light'}`}>
-                          {isLowStock && <span className="w-2 h-2 rounded-full bg-status-error listing-stock-pulse" />}
-                          <Package className="w-3 h-3" />
+                  {(hasStockInfo || activeReservations > 0) && (
+                    <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                      {hasStockInfo && (
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${isLowStock ? 'bg-status-error-bg text-status-error-text border border-status-error-border' : 'bg-background-secondary text-text-secondary border border-border-light'}`}>
+                          {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-status-error listing-stock-pulse" />}
+                          <Package className="w-3.5 h-3.5" />
                           {isLowStock ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
-                        </span>}
-                      {activeReservations > 0 && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-error-bg text-status-error-text text-xs font-bold border border-status-error-border">
-                          <Flame className="w-3 h-3" />
-                          {activeReservations} {activeReservations === 1 ? 'person' : 'people'}{t("looking")}</span>}
-                    </div>}
+                        </span>
+                      )}
+                      {activeReservations > 0 && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-status-error-bg text-status-error-text text-xs font-bold border border-status-error-border">
+                          <Flame className="w-3.5 h-3.5 text-status-error-icon" />
+                          {activeReservations} {activeReservations === 1 ? 'person' : 'people'} {t("looking")}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* CTA Buttons */}
-                {(canAddToCart || canMakeOffer) && <div className="space-y-2.5 mb-5">
-                    {canAddToCart && <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white hover:bg-primary-hover rounded-lg text-sm font-bold disabled:opacity-50 disabled:pointer-events-none">
+                {(canAddToCart || canMakeOffer) && (
+                  <div className="space-y-2 pt-2 border-t border-border-light/60">
+                    {canAddToCart && (
+                      <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary w-full flex items-center justify-center gap-2.5 py-2.5 bg-primary text-white hover:bg-primary-hover rounded-lg text-sm font-bold shadow-sm transition-all active:scale-[0.98]">
                         <ShoppingBag className="w-4 h-4" />
                         {isAddingToCart ? 'Adding to Cart…' : 'Add to Cart'}
-                      </button>}
-                    {canMakeOffer && <button onClick={() => setIsOfferModalOpen(true)} className="listing-cta-secondary w-full flex items-center justify-center gap-2 py-2.5 bg-secondary-light text-primary hover:bg-secondary-200 border border-border-light rounded-lg text-sm font-bold">
-                        <HandCoins className="w-4 h-4" />{t("make_an_offer")}</button>}
-                  </div>}
+                      </button>
+                    )}
+                    {canMakeOffer && (
+                      <button onClick={() => setIsOfferModalOpen(true)} className="listing-cta-secondary w-full flex items-center justify-center gap-2.5 py-2.5 bg-secondary-light text-primary hover:bg-button-secondary-hover border border-border-light rounded-lg text-sm font-bold transition-all active:scale-[0.98]">
+                        <HandCoins className="w-4 h-4" />
+                        {t("make_an_offer")}
+                      </button>
+                    )}
+                  </div>
+                )}
 
                 {/* Trust Guarantees */}
-                <div className="flex items-center gap-3 py-3 border-t border-border-light">
-                  <div className="flex items-center gap-1.5 text-caption font-bold text-text-muted uppercase tracking-wider">
-                    <Shield className="w-3.5 h-3.5 text-emerald-500" />{t("buyer_protection")}</div>
-                  <span className="w-1 h-1 rounded-full bg-secondary-light" />
-                  <div className="flex items-center gap-1.5 text-caption font-bold text-text-muted uppercase tracking-wider">
-                    <Clock className="w-3.5 h-3.5 text-primary" />{t("secure_escrow")}</div>
+                <div className="bg-background-secondary rounded-lg p-3 flex items-center justify-around gap-2 text-[11px] font-bold text-text-muted border border-border-light/50">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-status-success" />
+                    {t("buyer_protection")}
+                  </div>
+                  <span className="w-1.5 h-1.5 rounded-full bg-border-light" />
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    {t("secure_escrow")}
+                  </div>
                 </div>
-
-                {/* Seller Trust Panel */}
-                <ListingTrustPanel listing={listing} isOwner={isOwner} onShowcaseSuccess={fetchListing} />
-
-                {/* Analytics Panel */}
-                <ListingAnalyticsPanel listing={listing} isOwner={isOwner} displayPrice={displayPrice} />
               </div>
+
+              {/* Card 2: Seller Information */}
+              <div className="bg-background-primary border border-border-light rounded-xl p-4 sm:p-5 shadow-sm">
+                <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-3.5">{t("seller_information")}</h3>
+                <ListingTrustPanel listing={listing} isOwner={isOwner} onShowcaseSuccess={fetchListing} flat={true} />
+              </div>
+
+              {/* Card 3: Market Insights */}
+              <ListingAnalyticsPanel listing={listing} isOwner={isOwner} displayPrice={displayPrice} />
             </div>
           </div>
         </div>
@@ -493,7 +520,7 @@ const ListingDetailPage = () => {
               {canMakeOffer && (
                 <button
                   onClick={() => setIsOfferModalOpen(true)}
-                  className="flex-1 py-2.5 rounded-lg border border-border-light bg-secondary-light text-primary text-sm font-medium hover:bg-secondary-200 transition-colors"
+                  className="flex-1 py-2.5 rounded-lg border border-border-light bg-secondary-light text-primary text-sm font-medium hover:bg-button-secondary-hover transition-colors"
                 >
                   {t('make_offer')}
                 </button>

@@ -52,6 +52,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
         this.sportsListingResolver = sportsListingResolver;
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<UUID> createSportsListing(SportsCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -100,6 +101,7 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<Void> updateSportsListing(UUID id, SportsUpdateRequest request, Long currentUserId) {
         return standardUpdate(
                 id, request, currentUserId,

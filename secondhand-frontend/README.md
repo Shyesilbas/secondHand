@@ -1,54 +1,34 @@
 # SecondHand Frontend
 
+## Purpose
+The `secondhand-frontend` module is the React-based Single Page Application (SPA) providing the user interface for the SecondHand platform.
+
 ## Architecture Overview
+- **Routing**: Client-side routing managed by React Router.
+- **Data Fetching & State**: Managed entirely by `@tanstack/react-query`.
+- **API Communication**: Centralized through `services/api/request.js` using Axios.
 
-- src/
-  - components/
-    - forms/
-      - ListingBasics.jsx
-      - LocationFields.jsx
-    - notifications/
-      - NotificationModal.jsx
-    - ui/
-      - EnumDropdown.jsx
-      - SearchableDropdown.jsx
-  - features/
-    - auth/ | emails/ | favorites/ | listings/ | payments/ | vehicles/ | users/
-      - services/ → API calls (via services/api/request.js)
-      - components/ → Feature-specific UI
-      - hooks/ → Feature hooks
-  - pages/ → Route pages
-  - services/
-    - api/
-      - config.js → Axios base
-      - interceptors.js → Token, retry
-      - request.js → Shared request wrapper (get/post/put/del)
-    - storage/
-      - tokenStorage.js | enumCache.js
-  - utils/
-    - formatters.js → formatCurrency, formatDateTime
-    - errorHandler.js → parse/notify helpers
-    - validators/
-      - vehicleValidators.js
-  - context/
-    - AuthContext.jsx
-    - NotificationContext.jsx
+## Responsibilities
+- Rendering responsive, accessible user interfaces.
+- Orchestrating client-side interactions and transitions.
+- Handling local authentication state synchronization via token interceptors.
 
-## Conventions
+## Invariants & Constraints
+- **State Ownership**: Server state is strictly owned by React Query. Local state must not duplicate server data.
+- **API Uniformity**: All API calls MUST use the centralized `services/api/request.js`.
+- **Notification Consistency**: Global alerts must utilize the `NotificationContext`. Use of native `alert()` or `confirm()` is prohibited.
 
-- API calls MUST use `services/api/request.js` for consistency and logging.
-- Use `EnumDropdown` for enum-based selections (carBrands, colors, fuelTypes, ...).
-- Use shared form blocks: `ListingBasics` and `LocationFields` in create/edit flows.
-- Display currency/dates via `formatters.js`.
-- Use `NotificationContext` for all toasts, confirmations, and errors. Avoid alert/confirm.
+## Integration Points
+- **Backend API**: Connects to the backend REST services.
+- **Authentication**: Token refresh via `services/api/interceptors.js`.
 
-## Token Refresh
+## Knowledge Routing
+- For UI components, forms, and general architectural guidelines, refer to the intent-routed KIs in `src/.docs/`.
 
-- Interceptors are initialized in `src/main.jsx` by importing `services/api/interceptors.js`.
-- 401/403 → refresh token automatically; retried with new access token.
-
-## Development
-
-- Start: `npm run dev`
-- Build: `npm run build`
-
+## Source of Truth
+- **Business Rules:** Domain READMEs
+- **UI Rules:** Frontend UX KIs (`src/.docs/`)
+- **React Query:** `react-query-ownership.md`
+- **API:** Backend OpenAPI & Tests
+- **Validated Behaviour:** Unit Tests
+- **Architecture:** `GEMINI.md`

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
@@ -115,6 +115,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
   const [codeExpiryTime, setCodeExpiryTime] = useState(null);
   const [isResendingCode, setIsResendingCode] = useState(false);
   const { showSuccess, showError, showInfo } = useNotification();
+  const queryClient = useQueryClient();
 
   const {
     acceptedAgreements,
@@ -199,6 +200,8 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
       setCodeExpiryTime(null);
       setShowConfirmModal(false);
 
+      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings });
+
       if (onSuccess) {
         onSuccess();
       }
@@ -209,7 +212,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
     } finally {
       setIsProcessingPayment(false);
     }
-  }, [selectedListing, feeConfig, paymentType, verificationCode, getAcceptedAgreementIds, onSuccess, showError, showSuccess]);
+  }, [selectedListing, feeConfig, paymentType, verificationCode, getAcceptedAgreementIds, onSuccess, showError, showSuccess, queryClient]);
 
   const resendVerificationCode = async () => {
     if (!selectedListing) {

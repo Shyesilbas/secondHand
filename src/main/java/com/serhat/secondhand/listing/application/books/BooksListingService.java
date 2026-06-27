@@ -53,6 +53,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         this.booksListingResolver = booksListingResolver;
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<UUID> createBooksListing(BooksCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -105,6 +106,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<Void> updateBooksListing(UUID id, BooksUpdateRequest request, Long currentUserId) {
         Result<Void> ownershipResult = validateOwnership(id, currentUserId);
         if (ownershipResult.isError()) {

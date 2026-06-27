@@ -44,9 +44,15 @@ export const AuthProvider = ({ children }) => {
                         };
                         setUser(newUserData);
                         setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });
-                    } catch {
-                        clearUser();
-                        setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+                    } catch (error) {
+                        const isNetworkError = error?.errorCode === 'NETWORK_ERROR' || !error?.response;
+                        if (isNetworkError) {
+                            logger.warn('Backend offline or network error during auth initialization. Preserving session.');
+                            setAuthState({ user: userData, isAuthenticated: true, isLoading: false });
+                        } else {
+                            clearUser();
+                            setAuthState({ user: null, isAuthenticated: false, isLoading: false });
+                        }
                     }
                 } else {
                     setAuthState({ user: null, isAuthenticated: false, isLoading: false });

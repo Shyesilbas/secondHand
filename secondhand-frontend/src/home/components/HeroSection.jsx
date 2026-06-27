@@ -14,7 +14,7 @@ const HeroSection = () => {
   } = useShowcaseQueries({
     enabled: true,
     page: 0,
-    size: 72
+    size: 24
   });
 
   // Extract actual listings: 1 Vehicle, 1 Electronic, 1 Real Estate

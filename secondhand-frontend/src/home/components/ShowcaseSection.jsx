@@ -55,7 +55,7 @@ const ShowcaseSection = () => {
   } = useShowcaseQueries({
     enabled: true,
     page: 0,
-    size: 72
+    size: 24
   });
   const filteredShowcases = useMemo(() => {
     if (!Array.isArray(showcases)) return [];

@@ -17,6 +17,13 @@ The `order` UI module manages the display of seller and buyer orders, handling c
 - **Incoming:** Renders within the `MyOrdersPage` and `ISoldPage` components.
 - **Outgoing:** Calls the backend `order` domain APIs via `orderService.js`.
 
-## Related Knowledge
-- **Modify Order UI**
-  -> `.docs/runbooks/modify-order-ui.md`
+## Knowledge Routing
+- For procedural changes or troubleshooting, refer to KIs in `src/.docs/order/`.
+
+## Source of Truth
+- **Business Rules:** Domain READMEs
+- **UI Rules:** Frontend UX KIs (`src/.docs/`)
+- **React Query:** `react-query-ownership.md`
+- **API:** Backend OpenAPI & Tests
+- **Validated Behaviour:** Unit Tests
+- **Architecture:** `GEMINI.md`

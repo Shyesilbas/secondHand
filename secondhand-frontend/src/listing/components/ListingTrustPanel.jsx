@@ -9,7 +9,8 @@ import { Award, ShieldCheck, Star, CheckCircle, ShieldAlert, QrCode, MapPin, Wal
 const ListingTrustPanel = ({
   listing,
   isOwner,
-  onShowcaseSuccess
+  onShowcaseSuccess,
+  flat = false
 }) => {
   const {
     t
@@ -24,62 +25,72 @@ const ListingTrustPanel = ({
   const showGreatSeller = Boolean(listing.sellerGreatSellerEligible);
   const ratingAvg = stats?.averageRating ?? 5.0;
   const reviewCount = stats?.reviewCount ?? 0;
-  return <>
-      {/* Seller Card Redesign */}
-      <div className="border-t border-border-light py-6 mb-5">
-        <h3 className="text-sm font-medium text-text-primary uppercase tracking-widest mb-4">{t("seller_information")}</h3>
-        <div className="bg-background-secondary border border-border-light rounded-2xl p-4 mb-4 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              {/* Avatar with Verified Ring */}
-              <div className="relative">
-                <div className="w-12 h-12 bg-text-primary rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm border border-slate-900/5">
-                  {listing.sellerName?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div className="absolute -bottom-1 -right-1 bg-background-primary rounded-full p-0.5 shadow-sm border border-border-light">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500 fill-white" />
-                </div>
-              </div>
-              
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <Link to={ROUTES.USER_PROFILE(listing.sellerId)} className="text-sm font-bold text-text-primary hover:text-primary transition-colors truncate">
-                    {listing.sellerName} {listing.sellerSurname}
-                  </Link>
-                </div>
-                {listing.sellerAccountCreationDate && <p className="text-xs text-text-muted font-medium mt-0.5">{t("member_since")}{new Date(listing.sellerAccountCreationDate).getFullYear()}
-                  </p>}
-              </div>
-            </div>
-            {!isOwner && <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />}
-          </div>
 
-          {/* Dynamic Trust Ratings Panel */}
-          <div className="grid grid-cols-2 gap-2.5 py-3 border-y border-border-light my-4 text-center">
-            <div className="border-r border-border-light">
-              <div className="flex items-center justify-center gap-1">
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-bold text-text-primary">{ratingAvg.toFixed(1)}</span>
-              </div>
-              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("rating")}</span>
+  const content = (
+    <>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          {/* Avatar with Verified Ring */}
+          <div className="relative">
+            <div className="w-12 h-12 bg-text-primary rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm border border-slate-900/5">
+              {listing.sellerName?.[0]?.toUpperCase() || 'U'}
             </div>
-            <div>
-              <span className="text-sm font-bold text-text-primary">{reviewCount}</span>
-              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("reviews")}</span>
+            <div className="absolute -bottom-1 -right-1 bg-background-primary rounded-full p-0.5 shadow-sm border border-border-light">
+              <CheckCircle className="w-3.5 h-3.5 text-emerald-500 fill-white" />
             </div>
           </div>
+          
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Link to={ROUTES.USER_PROFILE(listing.sellerId)} className="text-sm font-bold text-text-primary hover:text-primary transition-colors truncate">
+                {listing.sellerName} {listing.sellerSurname}
+              </Link>
+            </div>
+            {listing.sellerAccountCreationDate && <p className="text-xs text-text-muted font-medium mt-0.5">{t("member_since")} {new Date(listing.sellerAccountCreationDate).getFullYear()}
+              </p>}
+          </div>
+        </div>
+        {!isOwner && <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />}
+      </div>
 
-          {showGreatSeller && <div className="flex items-center gap-2 py-2 px-3 bg-status-warning-bg/50 border border-amber-100/60 rounded-xl mb-4">
-              <Award className="w-4 h-4 text-status-warning shrink-0" />
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("great_seller_status")}</span>
-                <p className="text-xs text-amber-700/80 font-medium mt-0.5 leading-tight">{t("highly_rated_for_excellent_customer_resp")}</p>
-              </div>
-            </div>}
-
-          {!isOwner ? <ContactSellerButton listing={listing} className="w-full flex items-center justify-center gap-2 py-2.5 bg-text-primary hover:bg-text-primary/90 text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95">{t("contact_seller")}</ContactSellerButton> : <ShowcaseButton listingId={listing.id} onSuccess={onShowcaseSuccess} />}
+      {/* Dynamic Trust Ratings Panel */}
+      <div className="grid grid-cols-2 gap-2.5 py-3 border-y border-border-light my-4 text-center">
+        <div className="border-r border-border-light">
+          <div className="flex items-center justify-center gap-1">
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <span className="text-sm font-bold text-text-primary">{ratingAvg.toFixed(1)}</span>
+          </div>
+          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("rating")}</span>
+        </div>
+        <div>
+          <span className="text-sm font-bold text-text-primary">{reviewCount}</span>
+          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block mt-1">{t("reviews")}</span>
         </div>
       </div>
-    </>;
+
+      {showGreatSeller && <div className="flex items-center gap-2 py-2 px-3 bg-status-warning-bg/50 border border-amber-105 rounded-xl mb-4">
+          <Award className="w-4 h-4 text-status-warning shrink-0" />
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("great_seller_status")}</span>
+            <p className="text-xs text-amber-700/80 font-medium mt-0.5 leading-tight">{t("highly_rated_for_excellent_customer_resp")}</p>
+          </div>
+        </div>}
+
+      {!isOwner ? <ContactSellerButton listing={listing} className="w-full flex items-center justify-center gap-2 py-2.5 bg-text-primary hover:bg-text-primary/90 text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95">{t("contact_seller")}</ContactSellerButton> : <ShowcaseButton listingId={listing.id} onSuccess={onShowcaseSuccess} />}
+    </>
+  );
+
+  if (flat) {
+    return content;
+  }
+
+  return (
+    <div className="border-t border-border-light pt-6 mt-6">
+      <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wider mb-4">{t("seller_information")}</h3>
+      <div className="bg-background-secondary border border-border-light rounded-xl p-4 mb-4 shadow-sm">
+        {content}
+      </div>
+    </div>
+  );
 };
 export default ListingTrustPanel;

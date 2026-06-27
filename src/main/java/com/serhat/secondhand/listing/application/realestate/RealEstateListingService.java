@@ -53,6 +53,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         this.realEstateListingResolver = realEstateListingResolver;
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<UUID> createRealEstateListing(RealEstateCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -98,6 +99,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
+    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
     public Result<Void> updateRealEstateListing(UUID id, RealEstateUpdateRequest request, Long currentUserId) {
         log.info("Updating real estate listing: {} by user: {}", id, currentUserId);
         Result<Void> ownershipResult = validateOwnership(id, currentUserId);
