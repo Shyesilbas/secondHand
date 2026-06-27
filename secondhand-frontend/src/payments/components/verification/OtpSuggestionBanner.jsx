@@ -10,7 +10,10 @@ import { OTP_CODE_LENGTH } from '../../../common/constants/otp.js';
  */
 const sanitizeEmailContent = raw => {
   if (!raw || typeof raw !== 'string') return '';
-  let t = raw.replace(/<[^>]+>/g, ' ');
+  let t = raw
+    .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '')
+    .replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+  t = t.replace(/<[^>]+>/g, ' ');
   t = t.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
   t = t.replace(/\s+/g, ' ').trim();
   return t;

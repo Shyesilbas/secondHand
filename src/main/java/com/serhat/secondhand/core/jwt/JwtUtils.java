@@ -59,7 +59,7 @@ public class JwtUtils {
         if (userDetails instanceof User user) {
             extraClaims.put("userId", user.getId());
             extraClaims.put("plan", user.getEffectivePlan().name());
-            extraClaims.put("planExpiry", user.getPlanExpiry() != null ? user.getPlanExpiry().toString() : null);
+            extraClaims.put("planExpiry", user.getExpirationDate() != null ? user.getExpirationDate().toString() : null);
         }
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -73,7 +73,7 @@ public class JwtUtils {
             extraClaims = new HashMap<>(extraClaims);
             extraClaims.put("userId", user.getId());
             extraClaims.put("plan", user.getEffectivePlan().name());
-            extraClaims.put("planExpiry", user.getPlanExpiry() != null ? user.getPlanExpiry().toString() : null);
+            extraClaims.put("planExpiry", user.getExpirationDate() != null ? user.getExpirationDate().toString() : null);
         }
         if (!extraClaims.containsKey("roles")) {
             extraClaims = new HashMap<>(extraClaims);

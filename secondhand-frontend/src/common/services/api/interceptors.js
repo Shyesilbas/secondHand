@@ -119,7 +119,7 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
                     {},                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -128,6 +128,11 @@ apiClient.interceptors.response.use(
                         withCredentials: true,                         timeout: 10000
                     }
                 );
+
+                const newAccessToken = response.data?.data?.accessToken;
+                if (newAccessToken && authContextRef?.handleTokenRefreshSuccess) {
+                    authContextRef.handleTokenRefreshSuccess(newAccessToken);
+                }
 
                 processQueue(null, 'cookie-based');
                 delete originalRequest.headers.Authorization;

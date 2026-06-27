@@ -35,4 +35,10 @@ public class MembershipController {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.cancelSubscription(userId)));
     }
+
+    @PostMapping("/toggle-auto-renew")
+    public ResponseEntity<?> toggleAutoRenew(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean autoRenew) {
+        Long userId = ((User) userDetails).getId();
+        return ResultResponses.ok(Result.success(membershipService.toggleAutoRenew(userId, autoRenew)));
+    }
 }

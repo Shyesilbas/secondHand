@@ -145,7 +145,7 @@ const FavoriteListDetailPage = () => {
                 {list.description ? <p className="max-w-2xl text-sm leading-relaxed text-slate-600">{list.description}</p> : null}
 
                 <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
-                  <Link to={ROUTES.USER_PROFILE(list.ownerId)} className="font-medium text-teal-800 transition hover:text-teal-950">{t("by")}{list.ownerName}
+                  <Link to={ROUTES.USER_PROFILE(list.ownerId)} className="font-medium text-highlight transition hover:text-primary-700">{t("by")}{list.ownerName}
                   </Link>
                   <span>
                     {list.itemCount} {list.itemCount === 1 ? 'item' : 'items'}

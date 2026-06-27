@@ -7,16 +7,20 @@ import { EMAIL_DEFAULTS } from '../emailConstants.js';
 export const emailService = {
     getUnreadCount: async () => {
         const data = await get(API_ENDPOINTS.EMAILS.UNREAD_COUNT);
-        return data?.count ?? 0;
+        return data?.unreadCount ?? 0;
     },
-    getMyEmails: async (page = EMAIL_DEFAULTS.PAGE, size = EMAIL_DEFAULTS.PAGE_SIZE) => {
+    getMyEmails: async (page = EMAIL_DEFAULTS.PAGE, size = EMAIL_DEFAULTS.PAGE_SIZE, types = []) => {
         try {
             const timestamp = new Date().getTime();
-            const query = new URLSearchParams({
+            const params = {
                 page: String(page),
                 size: String(size),
                 _t: String(timestamp)
-            }).toString();
+            };
+            if (Array.isArray(types) && types.length > 0) {
+                params.types = types.join(',');
+            }
+            const query = new URLSearchParams(params).toString();
             const url = `${API_ENDPOINTS.EMAILS.MY_EMAILS}?${query}`;
             const data = await get(url);
             if (data && Array.isArray(data.content)) {

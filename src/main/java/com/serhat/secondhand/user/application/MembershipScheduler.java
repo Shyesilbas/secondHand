@@ -18,18 +18,28 @@ import java.util.List;
 public class MembershipScheduler {
 
     private final UserRepository userRepository;
+    private final MembershipService membershipService;
 
-    // Her gece 00:01'de çalışır — süresi dolan Premium'ları FREE'ye düşür
+    // Her gece 00:01'de çalışır — süresi dolan Premium'ları yenile veya FREE'ye düşür
     @Scheduled(cron = "0 1 0 * * *")
     @Transactional
     public void downgradeExpiredPremiumUsers() {
         List<User> expired = userRepository.findExpiredPremiumUsers(LocalDateTime.now());
         expired.forEach(user -> {
-            user.setPlan(MembershipPlan.FREE);
-            user.setAiListingQuota(MembershipPlan.FREE.getMonthlyAiListingQuota());
-            log.info("Kullanıcı {} Premium süresi doldu, FREE'ye düşürüldü.", user.getId());
+            if (user.isAutoRenew()) {
+                boolean renewed = membershipService.renewPremiumMembership(user);
+                if (renewed) {
+                    log.info("Kullanıcı {} Premium üyeliği otomatik yenilendi.", user.getId());
+                } else {
+                    log.info("Kullanıcı {} Premium üyeliği yenilenemedi (bakiye yetersiz vb.), FREE'ye düşürüldü.", user.getId());
+                }
+            } else {
+                user.setPlan(MembershipPlan.FREE);
+                user.setAiListingQuota(MembershipPlan.FREE.getMonthlyAiListingQuota());
+                userRepository.save(user);
+                log.info("Kullanıcı {} Premium süresi doldu, autoRenew kapalı olduğundan FREE'ye düşürüldü.", user.getId());
+            }
         });
-        userRepository.saveAll(expired);
     }
 
     // Her ayın 1'inde AI ilan kotasını resetle

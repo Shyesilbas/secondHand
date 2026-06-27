@@ -41,7 +41,7 @@ const SearchResults = ({
       icon: Inbox
     }];
     return <div className="py-1">
-        <div className="px-4 py-2 border-b border-gray-100/60 bg-secondary/50">
+        <div className="px-4 py-2 border-b border-border-light bg-secondary-50">
           <span className="text-caption font-bold text-text-muted uppercase tracking-widest">{t("quick_navigation")}</span>
         </div>
         {quickLinks.map((link, index) => {
@@ -50,15 +50,15 @@ const SearchResults = ({
         return <div key={link.id} onClick={() => onResultSelect({
           id: link.id,
           type: 'link'
-        })} className={`w-full flex items-center gap-3.5 px-4 py-3 text-left cursor-pointer transition-all duration-150 ${isSelected ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'}`}>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-background-primary/15 text-white' : 'bg-slate-100 text-slate-500'}`}>
+        })} className={`w-full flex items-center gap-3.5 px-4 py-3 text-left cursor-pointer transition-all duration-150 ${isSelected ? 'bg-primary text-white' : 'text-text-secondary hover:bg-secondary-50'}`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-background-primary/15 text-white' : 'bg-secondary-100 text-text-muted'}`}>
                 <Icon className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className={`text-sm font-semibold truncate ${isSelected ? 'text-white' : 'text-text-primary'}`}>
                   {link.label}
                 </div>
-                <div className={`text-caption truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-slate-400 font-medium'}`}>
+                <div className={`text-caption truncate mt-0.5 ${isSelected ? 'text-white/60' : 'text-text-muted font-medium'}`}>
                   {link.desc}
                 </div>
               </div>
@@ -68,13 +68,13 @@ const SearchResults = ({
             </div>;
       })}
         {/* Footer */}
-        <div className="px-4 py-2.5 text-caption text-text-muted font-medium bg-secondary/55 border-t border-gray-100/60 flex items-center justify-between">
+        <div className="px-4 py-2.5 text-caption text-text-muted font-medium bg-secondary-50 border-t border-border-light flex items-center justify-between">
           <div>{t("navigate_enter_open_esc_close")}</div>
           <div className="hidden sm:block">{t("ctrl_tab_switch_mode")}</div>
         </div>
       </div>;
   };
-  const renderUserResult = (user, index) => <div key={user.id} onClick={() => onResultSelect(user)} className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-secondary ${index === selectedIndex ? 'bg-blue-50' : ''}`}>
+  const renderUserResult = (user, index) => <div key={user.id} onClick={() => onResultSelect(user)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
           {user.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -89,7 +89,7 @@ const SearchResults = ({
         </div>
       </div>
     </div>;
-  const renderListingResult = (listing, index) => <div key={listing.id} onClick={() => onResultSelect(listing)} className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-secondary ${index === selectedIndex ? 'bg-blue-50' : ''}`}>
+  const renderListingResult = (listing, index) => <div key={listing.id} onClick={() => onResultSelect(listing)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-tertiary rounded-lg overflow-hidden flex-shrink-0">
           {listing.imageUrl ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center">
@@ -119,7 +119,7 @@ const SearchResults = ({
   if (results.length > 0) {
     return <>
         {/* Tab Header */}
-        <div className="px-4 py-2 bg-secondary border-b border-border-light flex items-center justify-between">
+        <div className="px-4 py-2 bg-secondary-50 border-b border-border-light flex items-center justify-between">
           <div className="text-sm font-medium text-text-secondary capitalize">
             {activeTab}{t("results")}</div>
           <div className="text-xs text-text-muted">
@@ -130,7 +130,7 @@ const SearchResults = ({
         {results.map((result, index) => activeTab === 'users' ? renderUserResult(result, index) : renderListingResult(result, index))}
 
         {/* Footer */}
-        <div className="px-4 py-2 text-xs text-text-muted bg-secondary border-t flex items-center justify-between">
+        <div className="px-4 py-2 text-xs text-text-muted bg-secondary-50 border-t border-border-light flex items-center justify-between">
           <div>{t("navigate_enter_select_esc_close")}</div>
           <div>{t("ctrl_tab_switch")}</div>
         </div>

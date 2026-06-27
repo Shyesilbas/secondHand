@@ -25,6 +25,7 @@ export const ORDER_QUERY_KEYS = Object.freeze({
   pendingCompletion: (userId) => ['pendingCompletionOrders', userId],
 
   orderShipment: (scope, orderId) => ['orderShipment', scope, orderId],
+  detail: (orderId, isSellerView) => ['orders', 'detail', { orderId, isSellerView }],
 });
 
 export const getLastUpdateInfo = (order) => {

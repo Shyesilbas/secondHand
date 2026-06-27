@@ -346,5 +346,6 @@ export const API_ENDPOINTS = {
         STATUS: '/v1/memberships/status',
         UPGRADE: '/v1/memberships/upgrade',
         CANCEL: '/v1/memberships/cancel',
+        TOGGLE_AUTO_RENEW: '/v1/memberships/toggle-auto-renew',
     }
 };

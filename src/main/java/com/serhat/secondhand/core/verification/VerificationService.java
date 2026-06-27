@@ -42,9 +42,13 @@ public class VerificationService implements IVerificationService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public Verification generateVerification(User user, String code ,CodeType codeType) {
-        verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user, codeType, LocalDateTime.now())
-                .forEach(v -> { v.setCodeExpiresAt(LocalDateTime.now()); v.setVerified(true); });
+        var oldVerifications = verificationRepository.findByUserAndCodeTypeAndIsVerifiedFalseAndCodeExpiresAtAfter(user, codeType, LocalDateTime.now());
+        oldVerifications.forEach(v -> { v.setCodeExpiresAt(LocalDateTime.now()); v.setVerified(true); });
+        if (!oldVerifications.isEmpty()) {
+            verificationRepository.saveAll(oldVerifications);
+        }
         
         Verification verification = new Verification();
         verification.setUser(user);

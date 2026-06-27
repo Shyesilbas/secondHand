@@ -45,6 +45,12 @@ public class AuraListingSearchOrchestrator {
         if (!searchEnabled || userId == null || userMessage == null || userMessage.isBlank()) {
             return AgentSearchAugmentation.empty();
         }
+        // Heuristic check first to bypass slow LLM planning for non-search queries
+        SearchPlan heuristicPlan = heuristicListingIntent(userMessage);
+        if (heuristicPlan.mode() == SearchPlanMode.NONE) {
+            return AgentSearchAugmentation.empty();
+        }
+
         if (!rateLimiter.tryAcquire(userId)) {
             log.info("Aura listing search rate limited userId={}", userId);
             return AgentSearchAugmentation.rateLimited();
@@ -52,10 +58,7 @@ public class AuraListingSearchOrchestrator {
 
         SearchPlan plan = extractPlanWithLlm(userMessage, memoryData);
         if (plan.mode() == SearchPlanMode.NONE) {
-            plan = heuristicListingIntent(userMessage);
-        }
-        if (plan.mode() == SearchPlanMode.NONE) {
-            return AgentSearchAugmentation.empty();
+            plan = heuristicPlan;
         }
 
         try {

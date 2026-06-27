@@ -150,6 +150,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
   const proceedToPayment = async () => {
     setLoading(true);
     setError(null);
+    const startTime = Date.now() - 3000; // 3 seconds buffer for clock skew
     try {
       await orderService.initiatePaymentVerification({
         transactionType: 'SHOWCASE_PAYMENT',
@@ -159,7 +160,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
         days,
         amount: totalCost
       });
-      const fetchedEmails = await fetchEmails();
+      const fetchedEmails = await fetchEmails(startTime);
       setLocalEmails(fetchedEmails);
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setStep(3);

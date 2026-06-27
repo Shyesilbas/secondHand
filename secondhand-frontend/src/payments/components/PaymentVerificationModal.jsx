@@ -158,11 +158,12 @@ const PaymentVerificationModal = ({
     onCancel?.();
   };
   const handleStart = async () => {
+    const startTime = Date.now() - 3000;
     const ok = await onStartVerification?.();
     if (!ok) return;
     setStep(VERIFICATION_STEPS.VERIFY);
     try {
-      await onFetchEmails?.();
+      await onFetchEmails?.(startTime);
     } catch {}
   };
   const handleVerify = async () => {
@@ -171,9 +172,10 @@ const PaymentVerificationModal = ({
     onClearEmails?.();
   };
   const handleResend = async () => {
+    const startTime = Date.now() - 3000;
     await onResendCode?.();
     try {
-      await onFetchEmails?.();
+      await onFetchEmails?.(startTime);
     } catch {}
   };
   if (!isOpen) return null;

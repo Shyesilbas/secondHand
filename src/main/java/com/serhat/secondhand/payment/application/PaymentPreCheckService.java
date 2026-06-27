@@ -28,19 +28,24 @@ public class PaymentPreCheckService {
         User fromUser = userResult.getData();
         User toUser = paymentValidationHelper.resolveToUser(paymentRequest, userService);
 
-        Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
-        if (agreementsResult.isError()) {
-            return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
-        }
+        boolean isAutoRenewal = paymentRequest.transactionType() == com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT
+                && "AUTO_RENEWAL".equals(paymentRequest.verificationCode());
 
-        if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
-            paymentVerificationService.generateAndSendVerification(fromUser);
-            return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
-        }
+        if (!isAutoRenewal) {
+            Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
+            if (agreementsResult.isError()) {
+                return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
+            }
 
-        Result<Void> verificationResult = paymentVerificationService.validateCode(fromUser, paymentRequest.verificationCode());
-        if (verificationResult.isError()) {
-            return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
+            if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
+                paymentVerificationService.generateAndSendVerification(fromUser);
+                return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
+            }
+
+            Result<Void> verificationResult = paymentVerificationService.validateCode(fromUser, paymentRequest.verificationCode());
+            if (verificationResult.isError()) {
+                return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
+            }
         }
 
         Result<Void> requestValidationResult = paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);

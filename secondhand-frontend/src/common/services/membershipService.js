@@ -1,19 +1,12 @@
-import apiClient from './api/interceptors.js';
-import {API_ENDPOINTS} from '../constants/apiEndpoints.js';
+import { get, post } from './api/request.js';
+import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
 
 export const membershipService = {
-  getStatus: async () => {
-    const response = await apiClient.get(API_ENDPOINTS.MEMBERSHIP.STATUS);
-    return response.data;
-  },
+  getStatus: () => get(API_ENDPOINTS.MEMBERSHIP.STATUS),
 
-  upgradeToPremium: async (payload) => {
-    const response = await apiClient.post(API_ENDPOINTS.MEMBERSHIP.UPGRADE, payload);
-    return response.data;
-  },
+  upgradeToPremium: (payload) => post(API_ENDPOINTS.MEMBERSHIP.UPGRADE, payload),
 
-  cancelSubscription: async () => {
-    const response = await apiClient.post(API_ENDPOINTS.MEMBERSHIP.CANCEL);
-    return response.data;
-  },
+  cancelSubscription: () => post(API_ENDPOINTS.MEMBERSHIP.CANCEL),
+
+  toggleAutoRenew: (autoRenew) => post(`${API_ENDPOINTS.MEMBERSHIP.TOGGLE_AUTO_RENEW}?autoRenew=${autoRenew}`),
 };

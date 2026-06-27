@@ -51,11 +51,10 @@ public class AgentPromptBuilder {
                 %s
 
                 YANIT STİLİ:
-                - Kısa, uygulanabilir ve kullanıcı bağlamına özel yaz.
+                - Doğal, samimi, kaliteli ve kullanıcı bağlamına özel yaz.
                 - Yanıtı düz metin olarak üret; markdown sembolleri (`*`, `**`, `#`, backtick) kullanma.
-                - Bu sıra ile ilerle: Durum, Öneri, Sonraki adım.
-                - Adım gerekiyorsa `1)`, `2)`, `3)` numaralı kısa satırlar kullan.
-                - Yararlıysa hangi kaynağın yanıtı beslediğini tek satırda belirt (siparişler, ilanlarım, bildirimler, aktif ilan, canlı arama, bellek, son konuşma).
+                - Robotik şablonlardan (Durum, Öneri, Sonraki adım başlıkları) veya 'Kaynak:' gibi teknik etiketlerden kaçın.
+                - Cevaba doğrudan konuya girerek başla; gereksiz giriş/selamlama ifadeleriyle uzatma.
                 """.formatted(
                 AuraSystemInstructions.agentSystemPreambleWithPlatformKnowledge(),
                 safe(recentBlock),

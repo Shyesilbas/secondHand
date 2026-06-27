@@ -122,7 +122,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                         .accountStatus(AccountStatus.ACTIVE)
                         .accountVerified(true)
                         .plan(plan)
-                        .planExpiry(planExpiry)
+                        .expirationDate(planExpiry)
                         .build();
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         principal,

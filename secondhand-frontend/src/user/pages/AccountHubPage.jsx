@@ -13,7 +13,8 @@ import {
   ShieldCheck,
   ShoppingBag,
   Sparkles,
-  Wallet
+  Wallet,
+  AlertTriangle
 } from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
 import {usePlan} from '@/common/hooks/usePlan';
@@ -26,6 +27,7 @@ import {isAdminUser} from '../../common/utils/admin.js';
 import {orderService} from '../../order/services/orderService.js';
 import {formatCurrency} from '../../common/formatters.js';
 import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
+import {useMyShowcases} from '../../showcase/hooks/useMyShowcases.js';
 
 const getInitials = name => {
   const value = (name || '').trim();
@@ -73,8 +75,40 @@ const AccountHubPage = () => {
   });
   const recentOrders = useMemo(() => ordersData?.content || [], [ordersData]);
 
-  const { plan, isPremium, planExpiry, dailyAuraUsage, dailyAuraLimit, aiListingQuota, autoRenew, cancelSubscription, isCancelling, orderProcessingSpeed } = usePlan();
+  const {
+    plan,
+    isPremium,
+    purchaseDate,
+    expirationDate,
+    dailyAuraUsage,
+    dailyAuraLimit,
+    maxShowcaseSlots,
+    estimatedShippingDays,
+    autoRenew,
+    cancelSubscription,
+    isCancelling,
+    toggleAutoRenew,
+    isTogglingAutoRenew,
+    orderProcessingSpeed,
+    freeMaxShowcaseSlots,
+    premiumMaxShowcaseSlots,
+    freeDailyAuraLimit,
+    premiumDailyAuraLimit,
+    freeEstimatedShippingDays,
+    premiumEstimatedShippingDays,
+    freeOrderProcessingSpeed,
+    premiumOrderProcessingSpeed
+  } = usePlan();
+  const { showcases } = useMyShowcases(user?.id);
+  const activeShowcasesCount = useMemo(() => showcases ? showcases.filter(s => new Date(s.endDate) > new Date()).length : 0, [showcases]);
   const [showUpgrade, setShowUpgrade] = useState(false);
+
+  const isExpiringSoon = useMemo(() => {
+    if (!isPremium || !expirationDate) return false;
+    const diff = new Date(expirationDate) - new Date();
+    const days = diff / (1000 * 60 * 60 * 24);
+    return days > 0 && days <= 3;
+  }, [isPremium, expirationDate]);
 
   const handleCancelSubscription = () => {
     if (window.confirm('Aboneliğinizi iptal etmek istediğinize emin misiniz? Gelecek dönem için otomatik yenileme kapatılacaktır.')) {
@@ -137,14 +171,26 @@ const AccountHubPage = () => {
                         </Link>;
               })}
                   </div>}
-              </div>;
+                </div>;
         })}
         </nav>
       </aside>
 
-      {/* Main Panel Body */}
       <main className="flex-1 p-6 lg:p-10 lg:pl-4 overflow-y-auto">
         <PageContainer className="max-w-4xl">
+          {isExpiringSoon && (
+            <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-start gap-3 shadow-sm">
+              <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700">Üyeliğiniz Yakında Sona Erecek</h4>
+                <p className="text-xs mt-1 font-medium">
+                  Premium üyeliğiniz {new Date(expirationDate).toLocaleDateString('tr-TR')} tarihinde sona erecektir.
+                  {!autoRenew && " Otomatik yenileme kapalıdır. Avantajlarınızı kaybetmemek için otomatik yenilemeyi açabilirsiniz."}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Header Panel */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -159,134 +205,197 @@ const AccountHubPage = () => {
             </div>
           </div>
 
-          {/* Premium Plan Card */}
-          <div className="mb-8">
+          {/* Unified Premium Space */}
+          <div className="mb-8 bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
+              <Crown className="w-4 h-4 text-amber-500" />
+              Üyelik ve Ayrıcalıklar
+            </h2>
+            
             {isPremium ? (
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-card-bg rounded-2xl border border-border-light shadow-sm relative overflow-hidden gap-6">
-                <div className="space-y-4 flex-1 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-accent-amber-50 text-accent-amber-600 flex items-center justify-center border border-accent-amber-100 shrink-0">
-                      <Crown className="h-5 w-5" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Side: Plan Quotas & Benefits (col-span-2) */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Status header */}
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 shrink-0">
+                      <Crown className="h-6 w-6" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-sm font-semibold text-text-primary">Premium Üyelik Aktif</h3>
-                        <span className="text-[10px] font-bold text-accent-amber-600 bg-accent-amber-50 border border-accent-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                      <div className="flex items-center gap-2.5">
+                        <h3 className="text-base font-bold text-slate-900 tracking-tight">Premium Üyelik Aktif</h3>
+                        <span className="text-[10px] font-extrabold text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {plan}
                         </span>
                       </div>
-                      <p className="text-xs text-text-muted mt-0.5 font-medium">
-                        {planExpiry && `${new Date(planExpiry).toLocaleDateString('tr-TR')} tarihine kadar geçerli`}
-                      </p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Premium avantajlarınızın tadını çıkarın.</p>
                     </div>
                   </div>
 
-                  {/* Quota Progress for Premium */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
-                        <span>Aura AI Mesajı</span>
-                        <span className="font-semibold">{dailyAuraUsage}/{dailyAuraLimit}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-500" 
-                          style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 10)) * 100)}%` }} 
-                        />
-                      </div>
+                  {/* Quota Progress */}
+                  <div className="space-y-2 bg-slate-50 border border-slate-100 p-4 rounded-2xl">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700">
+                      <span className="flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
+                        Aura AI Mesajı
+                      </span>
+                      <span className="font-bold text-slate-900">{dailyAuraUsage} / {dailyAuraLimit}</span>
                     </div>
-                    
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
-                        <span>AI İlan Sihirbazı</span>
-                        <span className="font-semibold">{aiListingQuota} / 4 Hak</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-500" 
-                          style={{ width: `${Math.min(100, (aiListingQuota / 4) * 100)}%` }} 
-                        />
-                      </div>
+                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-amber-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 8)) * 100)}%` }} 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Benefits Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hızlı Teslimat</div>
+                      <span className="text-xs font-bold text-emerald-600">{estimatedShippingDays} Gün (Kargo Önceliği)</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kargo Süreci</div>
+                      <span className="text-xs font-bold text-emerald-600">{orderProcessingSpeed} (Hazırlık Hızı)</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Aura AI Mesaj Limiti</div>
+                      <span className="text-xs font-bold text-slate-900">Günlük {dailyAuraLimit} Mesaj</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Showcase Slotu</div>
+                      <span className="text-xs font-bold text-slate-900">{activeShowcasesCount} / {maxShowcaseSlots} Slot Aktif</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Managed Plan Info */}
-                <div className="w-full md:w-auto shrink-0 bg-background-secondary border border-border-light p-4 rounded-xl md:min-w-[200px] flex flex-col justify-center items-center text-center">
-                  <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Abonelik Durumu</span>
-                  <span className="text-sm font-semibold text-primary mt-1">{autoRenew ? 'Otomatik Yenileniyor' : 'Sona Erecek'}</span>
-                  {autoRenew ? (
-                    <button 
-                      onClick={handleCancelSubscription}
-                      disabled={isCancelling}
-                      className="text-[10px] text-status-error hover:underline mt-2 font-bold uppercase tracking-tight disabled:opacity-50"
-                    >
-                      {isCancelling ? 'İşleniyor...' : 'Aboneliği İptal Et'}
-                    </button>
-                  ) : (
-                    <span className="text-[9px] text-text-muted mt-1 font-medium">Otomatik yenileme kapalı</span>
-                  )}
+                {/* Right Side: Subscription Admin Control */}
+                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-3xl md:min-w-[240px] flex flex-col justify-between items-stretch z-10 shadow-sm">
+                  {/* Top: Başlangıç Tarihi */}
+                  <div className="space-y-3">
+                    {purchaseDate && (
+                      <div className="flex flex-col items-start text-left">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Başlangıç Tarihi</span>
+                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(purchaseDate).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                    )}
+                    
+                    {/* Under it: Bitiş Tarihi */}
+                    {expirationDate && (
+                      <div className="flex flex-col items-start text-left border-t border-slate-100 pt-2.5">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bitiş Tarihi</span>
+                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(expirationDate).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                    )}
+
+                    {/* Status: Otomatik Yenileme */}
+                    <div className="border-t border-slate-100 pt-2.5 flex flex-col items-start text-left">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Otomatik Yenileme</span>
+                      <span className={`text-xs font-bold mt-0.5 ${autoRenew ? 'text-emerald-600' : 'text-slate-500'}`}>
+                        {autoRenew ? 'Açık (Varsayılan)' : 'Kapalı'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Bottom: Cancel or Resume Button */}
+                  <div className="mt-5 pt-3 border-t border-slate-250">
+                    {autoRenew ? (
+                      <button 
+                        onClick={handleCancelSubscription}
+                        disabled={isCancelling}
+                        className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-rose-500/10"
+                      >
+                        {isCancelling ? 'İşleniyor...' : 'Aboneliği İptal Et'}
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        <span className="text-[10px] text-slate-500 font-semibold bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 inline-block w-full text-center">
+                          Otomatik Yenileme Kapalı
+                        </span>
+                        <button 
+                          onClick={() => toggleAutoRenew(true)}
+                          disabled={isTogglingAutoRenew}
+                          className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-500/10"
+                        >
+                          {isTogglingAutoRenew ? 'Etkinleştiriliyor...' : 'Yeniden Etkinleştir'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-5 bg-card-bg rounded-2xl border border-border-light shadow-sm hover:shadow-md transition-all duration-200 gap-6">
-                <div className="space-y-4 flex-1 w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-background-tertiary text-text-secondary flex items-center justify-center border border-border-light shrink-0">
-                      <Crown className="h-5 w-5" />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Side: Current standard features & visual hints (col-span-2) */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 shrink-0">
+                      <Crown className="h-6 w-6" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-text-primary">Mevcut Plan: Ücretsiz</h3>
-                        <span className="text-[10px] font-bold text-text-muted bg-background-secondary border border-border-light px-2 py-0.5 rounded-md uppercase tracking-wider">
+                      <div className="flex items-center gap-2.5">
+                        <h3 className="text-base font-bold text-slate-900 tracking-tight">Mevcut Plan: Ücretsiz</h3>
+                        <span className="text-[10px] font-extrabold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           STANDART
                         </span>
                       </div>
-                      <p className="text-xs text-text-secondary mt-0.5 font-medium">Sınırlı özelliklerle temel kullanım</p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">Sınırlı özelliklerle temel kullanım</p>
                     </div>
                   </div>
 
-                  {/* Quota Progress for Standard */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
-                        <span>Aura AI Mesajı</span>
-                        <span className="font-semibold">{dailyAuraUsage}/{dailyAuraLimit}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-500" 
-                          style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 4)) * 100)}%` }} 
-                        />
-                      </div>
+                  {/* Standard Quota Progress */}
+                  <div className="space-y-1.5 bg-slate-50/50 border border-slate-100 p-4 rounded-2xl max-w-md">
+                    <div className="flex justify-between text-[11px] font-semibold text-slate-600">
+                      <span>Aura AI Mesajı</span>
+                      <span className="font-bold text-slate-900">{dailyAuraUsage}/{dailyAuraLimit}</span>
                     </div>
-                    
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-medium text-text-secondary">
-                        <span>AI İlan Sihirbazı</span>
-                        <span className="font-semibold">{aiListingQuota} / 1 Hak</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-background-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-500" 
-                          style={{ width: `${Math.min(100, (aiListingQuota / 1) * 100)}%` }} 
-                        />
-                      </div>
+                    <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-slate-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 2)) * 100)}%` }} 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Features Comparison Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Teslimat Süresi</div>
+                      <span className="text-xs font-bold text-slate-650">{estimatedShippingDays} Gün (Premium ile {premiumEstimatedShippingDays} Gün)</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kargo Süreci</div>
+                      <span className="text-xs font-bold text-slate-650">{orderProcessingSpeed} (Premium ile {premiumOrderProcessingSpeed})</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Aura AI Mesaj Limiti</div>
+                      <span className="text-xs font-bold text-slate-900">Günlük {dailyAuraLimit} Mesaj (Premium ile {premiumDailyAuraLimit})</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Showcase Slotu</div>
+                      <span className="text-xs font-bold text-slate-900">{activeShowcasesCount} / {maxShowcaseSlots} Slot ({premiumMaxShowcaseSlots} Premium)</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Upgrade CTA Block */}
-                <div className="w-full md:w-auto shrink-0 flex flex-col items-center md:items-end gap-3 bg-background-secondary border border-border-light p-4 rounded-xl md:min-w-[220px] text-center md:text-right">
-                  <div>
-                    <span className="text-[10px] font-semibold text-accent-amber-600 uppercase tracking-wider">Premium Avantajları</span>
-                    <p className="text-xs font-medium text-text-primary mt-1">Sınırları 3 katına çıkarın</p>
+                {/* Right Side: Premium Upgrade Callout Box */}
+                <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col justify-between items-center text-center shadow-sm">
+                  <div className="my-auto space-y-4 w-full">
+                    <div className="inline-flex p-3 bg-amber-500/10 text-amber-600 rounded-2xl border border-amber-500/20">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest block">Premium Avantajları</span>
+                      <p className="text-xs text-slate-600 font-semibold leading-relaxed">
+                        Premium'a geçerek kargo sürelerinde öncelik kazanın ve daha fazla ilan öne çıkarın. İlanlarınız %40 daha hızlı alıcı bulsun.
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowUpgrade(true)}
-                    className="flex w-full md:w-auto items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white hover:bg-primary-hover shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer"
+                    className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold uppercase tracking-wider text-xs shadow-sm hover:shadow-md transition-colors cursor-pointer mt-5"
                   >
-                    <Crown className="h-3.5 w-3.5" />
                     Premium'a Yükselt
                   </button>
                 </div>
@@ -298,59 +407,6 @@ const AccountHubPage = () => {
             isOpen={showUpgrade}
             onClose={() => setShowUpgrade(false)}
           />
-
-          {/* Plan Benefits Report Section */}
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-background-primary rounded-2xl p-6 border border-border-light shadow-sm">
-              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                Premium Advantages
-              </h3>
-              <ul className="space-y-3">
-                <li className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary font-medium">Fast Delivery</span>
-                  <span className={`font-bold ${isPremium ? 'text-status-success' : 'text-text-muted'}`}>
-                    {isPremium ? 'Aktif (1 Gün)' : 'Pasif (3 Gün)'}
-                  </span>
-                </li>
-                <li className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary font-medium">Cargo</span>
-                  <span className={`font-bold ${isPremium ? 'text-status-success' : 'text-text-muted'}`}>
-                    {orderProcessingSpeed}
-                  </span>
-                </li>
-                <li className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary font-medium">Daily AI Chat Message Limit</span>
-                  <span className="text-text-primary font-bold">{dailyAuraLimit} Message</span>
-                </li>
-                <li className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary font-medium">Aylık AI İlan Sihirbazı</span>
-                  <span className="text-text-primary font-bold">{isPremium ? '4' : '1'} İlan</span>
-                </li>
-                <li className="flex items-center justify-between text-xs">
-                  <span className="text-text-secondary font-medium">Showcase Slot</span>
-                  <span className="text-text-primary font-bold">{isPremium ? '3' : '1'} Slot</span>
-                </li>
-              </ul>
-            </div>
-            <div className="bg-background-primary rounded-2xl p-6 border border-border-light shadow-sm flex flex-col justify-center">
-              <div className="text-center">
-                <p className="text-xs text-text-secondary font-medium mb-3">
-                  {isPremium 
-                    ? "Premium özellikler sayesinde ilanlarınız %40 daha hızlı alıcı buluyor." 
-                    : "Premium'a geçerek kargo sürelerinde öncelik kazanın ve daha fazla ilan öne çıkarın."}
-                </p>
-                {!isPremium && (
-                  <button 
-                    onClick={() => setShowUpgrade(true)}
-                    className="text-xs font-bold text-primary hover:underline uppercase tracking-wider"
-                  >
-                    Tüm Avantajları İncele
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
 
           {/* Mini Summary Row */}
           <div className="grid grid-cols-3 gap-3 mb-8">

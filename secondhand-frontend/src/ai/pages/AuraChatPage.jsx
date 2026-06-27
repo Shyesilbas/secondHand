@@ -7,11 +7,14 @@ import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
 import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Info, Layers } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
-import { clearAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
+import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
 import AuraListingContextCard from '../components/AuraListingContextCard.jsx';
 import AuraSuggestedListingChips from '../components/AuraSuggestedListingChips.jsx';
 import { buildAuraListingSessionContext } from '../utils/auraListingContext.js';
+import { useListingData } from '../../listing/hooks/useListingData.js';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+
 const AuraChatPage = () => {
   const {
     t
@@ -20,10 +23,17 @@ const AuraChatPage = () => {
     user
   } = useAuthState();
   const location = useLocation();
-  const listing = location?.state?.listing || null;
+  
+  const listingFromState = location?.state?.listing || null;
+  const listingIdFromState = location?.state?.listingId || null;
+  const { listing: fetchedListing } = useListingData(listingIdFromState, !listingFromState && !!listingIdFromState);
+  const listing = listingFromState || fetchedListing;
+
   const [agentMode, setAgentMode] = React.useState(AI_AGENT_MODE_ENABLED);
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
   const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
+  const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
+  const [upgradeHint, setUpgradeHint] = React.useState('');
   const userId = user?.id ?? null;
   const listingContext = useMemo(() => buildAuraListingSessionContext(listing), [listing]);
   const buildPayload = useMemo(() => {
@@ -46,20 +56,29 @@ const AuraChatPage = () => {
       const message = typeof payload === 'object' && payload != null ? payload.message : payload;
       const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
       const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
-      if (AI_AGENT_MODE_ENABLED && agentMode) {
-        return aiChatService.agentQuery({
+      try {
+        if (AI_AGENT_MODE_ENABLED && agentMode) {
+          return await aiChatService.agentQuery({
+            message,
+            context,
+            uiContext,
+            agentMode: true
+          });
+        }
+        return await aiChatService.chat({
           message,
-          context,
-          uiContext,
-          agentMode: true
+          context
         });
+      } catch (error) {
+        if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED') {
+          setShowUpgradeModal(true);
+          setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
+          throw error;
+        }
+        throw error;
       }
-      return aiChatService.chat({
-        message,
-        context
-      });
     };
-  }, [agentMode]);
+  }, [agentMode, t]);
   const {
     storageKey,
     messages,
@@ -100,7 +119,7 @@ const AuraChatPage = () => {
     setIsSending(true);
     try {
       await aiChatService.newChat();
-      clearAuraPersistedMessages(userId, 'page');
+      clearAllAuraPersistedMessages(userId);
       localStorage.removeItem(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
@@ -119,11 +138,11 @@ const AuraChatPage = () => {
   };
   const handleDeleteHistory = async () => {
     if (userId == null) return;
-    if (!window.confirm('Do you want to delete all chat history?')) return;
+    if (!window.confirm(t("confirm_delete_all_chat_history") || 'Do you want to delete all chat history?')) return;
     setIsSending(true);
     try {
       await aiChatService.deleteHistory();
-      clearAuraPersistedMessages(userId, 'page');
+      clearAllAuraPersistedMessages(userId);
       localStorage.removeItem(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
@@ -142,11 +161,11 @@ const AuraChatPage = () => {
   };
   const handleDeleteMemory = async () => {
     if (userId == null) return;
-    if (!window.confirm('Memory and chat history will be deleted. Continue?')) return;
+    if (!window.confirm(t("confirm_reset_memory_cache") || 'Memory and chat history will be deleted. Continue?')) return;
     setIsSending(true);
     try {
       await aiChatService.deleteMemory();
-      clearAuraPersistedMessages(userId, 'page');
+      clearAllAuraPersistedMessages(userId);
       localStorage.removeItem(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
@@ -205,8 +224,8 @@ const AuraChatPage = () => {
               {user?.name?.slice(0, 2) || 'US'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-text-primary truncate">{user?.name || 'Guest User'}</p>
-              <p className="text-[9px] text-text-muted font-medium truncate">{user?.email || 'Sync enabled'}</p>
+              <p className="text-xs font-semibold text-text-primary truncate">{user?.name || t("guest_user") || 'Guest User'}</p>
+              <p className="text-[9px] text-text-muted font-medium truncate">{user?.email || t("sync_enabled") || 'Sync enabled'}</p>
             </div>
           </div>
         </div>
@@ -220,7 +239,7 @@ const AuraChatPage = () => {
           
           {/* Left tools: sidebar toggle + Brand */}
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setSidebarOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={sidebarOpen ? 'Collapse Navigation' : 'Expand Navigation'}>
+            <button type="button" onClick={() => setSidebarOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={sidebarOpen ? t("collapse_navigation") || 'Collapse Navigation' : t("expand_navigation") || 'Expand Navigation'}>
               {sidebarOpen ? <PanelLeftClose className="w-4.5 h-4.5" /> : <PanelLeft className="w-4.5 h-4.5" />}
             </button>
 
@@ -235,7 +254,7 @@ const AuraChatPage = () => {
             </button>}
 
           {/* Right tools: context toggle */}
-          <button type="button" onClick={() => setRightPanelOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={rightPanelOpen ? 'Collapse Information' : 'Expand Information'}>
+          <button type="button" onClick={() => setRightPanelOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={rightPanelOpen ? t("collapse_information") || 'Collapse Information' : t("expand_information") || 'Expand Information'}>
             {rightPanelOpen ? <PanelRightClose className="w-4.5 h-4.5" /> : <PanelRight className="w-4.5 h-4.5" />}
           </button>
         </div>
@@ -310,7 +329,7 @@ const AuraChatPage = () => {
         <div className="shrink-0 bg-transparent p-4 sm:p-6 pb-6 mt-auto">
           <div className="max-w-3xl mx-auto flex items-end gap-3 bg-surface-elevated shadow-lg rounded-2xl border border-border-light p-2 transition-all">
             <div className="flex-1 relative">
-              <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("type_a_message_or_ask_a_shopping_questio")} className="w-full resize-none rounded-xl bg-transparent px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-0 min-h-[44px] max-h-[120px]" rows={1} />
+              <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("type_a_message_or_ask_a_shopping_questio")} className="w-full resize-none rounded-xl bg-transparent px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-0 min-h-[44px] max-h-[120px]" rows={2} />
             </div>
             <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm hover:bg-primary-hover active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:active:scale-100 mb-0.5">
               <Send className="w-4.5 h-4.5" />
@@ -355,6 +374,11 @@ const AuraChatPage = () => {
 
       </div>
 
+      <PremiumUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureHint={upgradeHint}
+      />
     </div>;
 };
 export default AuraChatPage;

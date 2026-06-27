@@ -5,6 +5,7 @@ import { emailService } from '../../emails/services/emailService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 import { EMAIL_QUERY_STALE_MS } from '../../emails/emailConstants.js';
+import { parseCustomDate } from '../utils/otp.js';
 
 export const useEmails = () => {
     const { user } = useAuthState();
@@ -34,14 +35,42 @@ export const useEmails = () => {
 
     const emails = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
-    const fetchEmails = useCallback(async () => {
-        const res = await refetch();
-        if (res.isError) {
-            const msg = res.error?.message || res.error?.response?.data?.message || 'Emails could not be loaded.';
-            notification.showError('Error', msg);
-            return [];
+    const fetchEmails = useCallback(async (minTimestamp = 0) => {
+        let attempts = 0;
+        const maxAttempts = 3;
+        
+        while (attempts < maxAttempts) {
+            const res = await refetch();
+            if (res.isError) {
+                const msg = res.error?.message || res.error?.response?.data?.message || 'Emails could not be loaded.';
+                notification.showError('Error', msg);
+                return [];
+            }
+            
+            const list = Array.isArray(res.data) ? res.data : [];
+            if (minTimestamp > 0 && list.length > 0) {
+                // Find the newest email's timestamp
+                const newestEmail = [...list].sort((a, b) => {
+                    return parseCustomDate(b.sentAt || b.createdAt) - parseCustomDate(a.sentAt || a.createdAt);
+                })[0];
+                
+                const newestTime = parseCustomDate(newestEmail?.sentAt || newestEmail?.createdAt);
+                if (newestTime >= minTimestamp) {
+                    return list; // Found the new email!
+                }
+                
+                // If the newest email is older than minTimestamp, wait 500ms and try again
+                attempts++;
+                if (attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            } else {
+                return list;
+            }
         }
-        return Array.isArray(res.data) ? res.data : [];
+        
+        const finalRes = await refetch();
+        return Array.isArray(finalRes.data) ? finalRes.data : [];
     }, [notification, refetch]);
 
     const markAsRead = useCallback(async (emailId) => {

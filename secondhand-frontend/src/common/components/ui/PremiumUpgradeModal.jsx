@@ -90,12 +90,13 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   const sendVerificationCode = async () => {
     setLoading(true);
     setError(null);
+    const startTime = Date.now() - 3000; // 3 seconds buffer for clock skew
     try {
       await orderService.initiatePaymentVerification({
         transactionType: 'MEMBERSHIP_PAYMENT',
         amount: PREMIUM_PRICE,
       });
-      const res = await fetchEmails();
+      const res = await fetchEmails(startTime);
       setLocalEmails(res);
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setStep(3);

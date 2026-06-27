@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
     getUser,
     setUser,
@@ -12,6 +13,7 @@ import { setAuthContextRef } from '../common/services/api/interceptors.js';
 import { decodeJwtPayload } from '../common/utils/jwtDecode.js';
 
 export const AuthProvider = ({ children }) => {
+    const queryClient = useQueryClient();
     const [authState, setAuthState] = useState({
         user: null,
         isAuthenticated: false,
@@ -137,17 +139,38 @@ export const AuthProvider = ({ children }) => {
         isAuthInitializing.current = false;
     }, []);
 
+    const handleTokenRefreshSuccess = useCallback((newAccessToken) => {
+        if (!newAccessToken) return;
+        try {
+            const decoded = decodeJwtPayload(newAccessToken);
+            if (decoded) {
+                const plan = decoded.plan || 'FREE';
+                const planExpiry = decoded.planExpiry || null;
+                setAuthState(prev => {
+                    if (!prev.user) return prev;
+                    const newUserData = { ...prev.user, plan, planExpiry };
+                    setUser(newUserData);
+                    return { ...prev, user: newUserData };
+                });
+                queryClient.invalidateQueries({ queryKey: ['membership'] });
+            }
+        } catch (error) {
+            logger.error('Failed to decode refreshed token:', error);
+        }
+    }, [queryClient]);
+
     const value = useMemo(() => ({
         authState,
         login,
         logout,
         updateUser,
         handleTokenRefreshFailure,
-    }), [authState, login, logout, updateUser, handleTokenRefreshFailure]);
+        handleTokenRefreshSuccess,
+    }), [authState, login, logout, updateUser, handleTokenRefreshFailure, handleTokenRefreshSuccess]);
 
     useEffect(() => {
-        setAuthContextRef({ handleTokenRefreshFailure });
-    }, [handleTokenRefreshFailure]);
+        setAuthContextRef({ handleTokenRefreshFailure, handleTokenRefreshSuccess });
+    }, [handleTokenRefreshFailure, handleTokenRefreshSuccess]);
 
     return (
         <AuthContext.Provider value={value}>

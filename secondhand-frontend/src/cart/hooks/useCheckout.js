@@ -136,6 +136,7 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
     const sendVerificationCode = async () => {
         setIsCheckingOut(true);
+        const startTime = Date.now() - 3000; // 3 seconds buffer for clock skew
         try {
             await orderService.initiatePaymentVerification?.({
                 transactionType: CART_CHECKOUT_DEFAULTS.VERIFICATION_TRANSACTION_TYPE,
@@ -145,7 +146,7 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
             showSuccess(CART_MESSAGES.VERIFICATION_SENT_TITLE, CART_MESSAGES.VERIFICATION_SENT_DESCRIPTION);
             setPaymentVerificationExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
             try {
-                await fetchEmails();
+                await fetchEmails(startTime);
             } catch (err) {
                 logger.warn('Failed to fetch emails:', err);
             }

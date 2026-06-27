@@ -2,6 +2,9 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import {useTranslation} from "react-i18next";
 import React, {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { ORDER_QUERY_KEYS } from '../../orderConstants.js';
+import { orderService } from '../../services/orderService.js';
 import {formatCurrency, resolveEnumLabel} from '../../../common/formatters.js';
 import {ROUTES} from '../../../common/constants/routes.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
@@ -133,9 +136,6 @@ const ListStatusGlyph = ({
   status,
   className
 }) => {
-  const {
-    t
-  } = useTranslation();
   const Cmp = ORDER_STATUS_LIST_ICON[statusKey(status)] || Package;
   const spin = statusKey(status) === ORDER_STATUSES.PROCESSING;
   return <Cmp className={`shrink-0 ${spin ? 'animate-spin' : ''} ${className || ''}`} aria-hidden strokeWidth={2} />;
@@ -339,6 +339,18 @@ const UnifiedOrderItem = React.memo(({
   uiCopy,
   isReviewed
 }) => {
+  const queryClient = useQueryClient();
+  const handleMouseEnter = () => {
+    const isSeller = viewMode === ORDER_VIEW_MODES.SELLER;
+    queryClient.prefetchQuery({
+      queryKey: ORDER_QUERY_KEYS.detail(order.id, isSeller),
+      queryFn: () => isSeller
+        ? orderService.getSellerOrderById(order.id)
+        : orderService.getById(order.id),
+      staleTime: 30000,
+    });
+  };
+
   const {
     t
   } = useTranslation();
@@ -409,7 +421,7 @@ const UnifiedOrderItem = React.memo(({
     [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'border-l-violet-600',
     [ORDER_STATUSES.VERIFICATION_LOCKED]: 'border-l-purple-700'
   }[statusKey(order.status)] || 'border-l-slate-200';
-  return <article tabIndex={isBuyer && editingOrderId === order.id ? -1 : 0} onClick={() => onOpenOrder(order)} onKeyDown={e => {
+  return <article tabIndex={isBuyer && editingOrderId === order.id ? -1 : 0} onClick={() => onOpenOrder(order)} onMouseEnter={handleMouseEnter} onKeyDown={e => {
     if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -518,9 +530,6 @@ const OrdersListLayout = ({
   uiCopy: uiCopyProp,
   highlightOrderId
 }) => {
-  const {
-    t
-  } = useTranslation();
   const uiCopy = useMemo(() => mergeUiCopy(uiCopyProp || {}), [uiCopyProp]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const deliveryMethodFilter = flow.deliveryMethodFilter;
@@ -553,7 +562,7 @@ const OrdersListLayout = ({
   const topListSummarySlice = useMemo(() => {
     if (!flow.search || flow.loading || flow.search?.isSearchMode || !flow.orders?.length) return null;
     return getListPaginationSlice(flow.pagination);
-  }, [flow.search, flow.loading, flow.search?.isSearchMode, flow.orders?.length, flow.pagination]);
+  }, [flow.search, flow.loading, flow.orders?.length, flow.pagination]);
   const topSlot = isSellerView && !flow.escrow.isLoading ? <div className={`px-4 py-3.5 rounded-2xl border ${flow.escrow.pendingEscrowAmount > 0 ? 'bg-slate-50 border-border-light' : 'bg-slate-50/60 border-border-light'}`}>
         <div className="flex items-start gap-3">
           <Wallet className={`w-4 h-4 mt-0.5 shrink-0 ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-600' : 'text-slate-300'}`} />
@@ -678,7 +687,7 @@ const OrdersListLayout = ({
       </div>
 
       {/* Render Modal outside the z-10 wrapper so it has full z-index context over the whole viewport */}
-      <OrderDetailsModal isOpen={flow.modal.orderModalOpen} selectedOrder={flow.modal.selectedOrder} orderReviews={flow.reviews.orderReviews} reviewsLoading={flow.reviews.reviewsLoading} onClose={flow.modal.closeOrderModal} onOpenReceipt={flow.receipt.openReceipt} onReviewSuccess={flow.actions.handleReviewSuccess} viewMode={viewMode || flow.viewMode} />
+      <OrderDetailsModal isOpen={flow.modal.orderModalOpen} selectedOrderId={flow.modal.selectedOrder?.id} selectedOrder={flow.modal.selectedOrder} orderReviews={flow.reviews.orderReviews} reviewsLoading={flow.reviews.reviewsLoading} onClose={flow.modal.closeOrderModal} onOpenReceipt={flow.receipt.openReceipt} onReviewSuccess={flow.actions.handleReviewSuccess} viewMode={viewMode || flow.viewMode} />
 
       <ReviewModal isOpen={Boolean(flow?.reviewQuick?.isOpen && flow?.reviewQuick?.target?.orderItem)} onClose={() => flow?.reviewQuick?.close?.()} orderItem={flow?.reviewQuick?.target?.orderItem} fallbackOrderId={flow?.reviewQuick?.target?.orderId} onReviewCreated={payload => flow?.reviewQuick?.onReviewCreated?.(payload)} />
     </div>;

@@ -36,7 +36,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             + "(SELECT 1 FROM Order o WHERE o.user = u AND o.paymentStatus = :completed)")
     long countUsersNeverCompletedPaidOrder(@Param("completed") PaymentStatus completed);
 
-    @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.planExpiry < :now")
+    @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate < :now")
     List<User> findExpiredPremiumUsers(@Param("now") java.time.LocalDateTime now);
+
+    @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate >= :now")
+    List<User> findActivePremiumUsers(@Param("now") java.time.LocalDateTime now);
+
+    @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate BETWEEN :now AND :soon")
+    List<User> findExpiringSoonUsers(@Param("now") java.time.LocalDateTime now, @Param("soon") java.time.LocalDateTime soon);
 
 }

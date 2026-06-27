@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,10 +33,11 @@ public class EmailController {
     @GetMapping("/my-emails")
     public ResponseEntity<Page<EmailDto>> getMyEmails(
             @AuthenticationPrincipal User currentUser,
+            @RequestParam(value = "types", required = false) List<EmailType> types,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("Getting email history for userId: {}", currentUser.getId());
-        Page<EmailDto> emails = emailService.getUserEmails(currentUser.getId(), pageable);
+        log.info("Getting email history for userId: {} with types: {}", currentUser.getId(), types);
+        Page<EmailDto> emails = emailService.getUserEmails(currentUser.getId(), types, pageable);
         return ResponseEntity.ok(emails);
     }
 
@@ -54,7 +56,7 @@ public class EmailController {
             @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Marking email {} as read for user: {}", id, currentUser.getEmail());
-        EmailDto updatedEmail = emailService.markAsRead(id, currentUser.getEmail());
+        EmailDto updatedEmail = emailService.markAsRead(id, currentUser.getId(), currentUser.getEmail());
         return ResponseEntity.ok(updatedEmail);
     }
 
@@ -65,8 +67,10 @@ public class EmailController {
     }
 
     @DeleteMapping("/{email-id}")
-    public ResponseEntity<?> delete(@PathVariable("email-id") UUID emailId) {
-        return ResultResponses.ok(emailService.deleteEmail(emailId));
+    public ResponseEntity<?> delete(
+            @PathVariable("email-id") UUID emailId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(emailService.deleteEmail(emailId, currentUser.getId()));
     }
 
     @DeleteMapping

@@ -10,12 +10,14 @@ import com.serhat.secondhand.email.mapper.EmailMapper;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 @Service
@@ -35,6 +37,7 @@ public class EmailService {
     }
 
 
+    @CacheEvict(value = "userBadges", key = "#user.id")
     public EmailDto sendEmail(User user, String subject, String content, EmailType emailType) {
         log.info("Sending email to user: {}, emailType: {}", user.getEmail(), emailType);
         LocalDateTime now = LocalDateTime.now();
@@ -54,11 +57,14 @@ public class EmailService {
         return emailMapper.toDto(email);
     }
 
-    public Page<EmailDto> getUserEmails(Long userId, Pageable pageable) {
-        log.info("Fetching paginated emails for userId: {}", userId);
-
-        Page<Email> emailsPage = emailRepository.findByUserId(userId, pageable);
-
+    public Page<EmailDto> getUserEmails(Long userId, Collection<EmailType> emailTypes, Pageable pageable) {
+        log.info("Fetching paginated emails for userId: {}, types: {}", userId, emailTypes);
+        Page<Email> emailsPage;
+        if (emailTypes == null || emailTypes.isEmpty()) {
+            emailsPage = emailRepository.findByUserId(userId, pageable);
+        } else {
+            emailsPage = emailRepository.findByUserIdAndEmailTypeIn(userId, emailTypes, pageable);
+        }
         return emailsPage.map(emailMapper::toDto);
     }
 
@@ -74,20 +80,23 @@ public class EmailService {
         return emailRepository.countByUserIdAndReadAtIsNull(userId);
     }
 
-    public Result<String> deleteEmail(UUID emailId) {
-        int affected = emailRepository.softDeleteById(emailId, LocalDateTime.now());
+    @CacheEvict(value = "userBadges", key = "#userId")
+    public Result<String> deleteEmail(UUID emailId, Long userId) {
+        int affected = emailRepository.softDeleteByIdAndUserId(emailId, userId, LocalDateTime.now());
         if (affected > 0) {
             return Result.success("Email deleted " + emailId);
         }
-        return Result.error("Email not found", "EMAIL_NOT_FOUND");
+        return Result.error("Email not found or unauthorized", "EMAIL_NOT_FOUND");
     }
 
+    @CacheEvict(value = "userBadges", key = "#userId")
     public String deleteAllEmails(Long userId) {
         emailRepository.softDeleteAllByUserId(userId, LocalDateTime.now());
         return "Emails deleted for userId: " + userId;
     }
 
-    public EmailDto markAsRead(UUID emailId, String userEmail) {
+    @CacheEvict(value = "userBadges", key = "#userId")
+    public EmailDto markAsRead(UUID emailId, Long userId, String userEmail) {
         Email email = emailRepository.findByIdAndRecipientEmail(emailId, userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found or unauthorized"));
                 

@@ -67,7 +67,7 @@ const FavoritesPage = () => {
       <PageContainer className="py-6 sm:py-8">
         <div className="overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-sm ring-1 ring-slate-950/5">
           <div className="flex flex-col gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/90 to-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-            <div className="min-w-0 border-l-[3px] border-teal-700 pl-3">
+            <div className="min-w-0 border-l-[3px] border-primary pl-3">
               <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("favorites")}</h1>
               <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">{t("saved_listings_and_your_curated_lists_in")}</p>
             </div>
@@ -88,7 +88,7 @@ const FavoritesPage = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-teal-700 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-teal-800 sm:text-sm">
+              {activeTab === FAVORITES_PAGE_TABS.LISTS && <button type="button" onClick={() => setShowCreateListModal(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-btn-primary px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-btn-primary-hover sm:text-sm">
                   <Plus className="h-4 w-4" />{t("new_list")}</button>}
               {activeTab === FAVORITES_PAGE_TABS.FAVORITES && <button type="button" onClick={handleRefresh} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-background-primary px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 sm:text-sm">
                   <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />{t("refresh")}</button>}
@@ -120,7 +120,7 @@ const FavoritesPage = () => {
                   title={t("no_lists_yet")}
                   description={t("create_a_list_to_group_favorites_by_them")}
                 >
-                  <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-800">
+                  <button type="button" onClick={() => setShowCreateListModal(true)} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-btn-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-btn-primary-hover">
                     <Plus className="h-5 w-5" />{t("create_your_first_list")}</button>
                 </EmptyState> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {myLists.map(list => <FavoriteListCard key={list.id} list={list} />)}

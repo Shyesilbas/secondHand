@@ -13,6 +13,11 @@ export const clearAuraPersistedMessages = (userId, surface) => {
   }
 };
 
+export const clearAllAuraPersistedMessages = (userId) => {
+  clearAuraPersistedMessages(userId, 'page');
+  clearAuraPersistedMessages(userId, 'widget');
+};
+
 export const createAuraChatId = (prefix) =>
   `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 

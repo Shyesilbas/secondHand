@@ -59,13 +59,13 @@ const FavoriteListModal = ({
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose} />
             
             <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-2xl ring-1 ring-slate-950/5 animate-scaleIn">
-                <div className="bg-gradient-to-r from-teal-700 via-teal-800 to-slate-800 px-6 py-5">
+                <div className="bg-primary px-6 py-5">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background-primary/15 backdrop-blur-sm">
                                 <List className="h-6 w-6 text-white" />
                             </div>
-                            <h2 className="text-lg font-semibold text-text-primary">
+                            <h2 className="text-lg font-semibold text-white">
                                 {editList ? 'Edit List' : 'Create New List'}
                             </h2>
                         </div>
@@ -81,7 +81,7 @@ const FavoriteListModal = ({
                         <input type="text" value={formData.name} onChange={e => setFormData({
             ...formData,
             name: e.target.value
-          })} placeholder={t("e_g_home_decoration")} className="w-full rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20" maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX} required autoFocus />
+          })} placeholder={t("e_g_home_decoration")} className="w-full rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20" maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX} required autoFocus />
                     </div>
 
                     <div>
@@ -89,7 +89,7 @@ const FavoriteListModal = ({
                         <textarea value={formData.description} onChange={e => setFormData({
             ...formData,
             description: e.target.value
-          })} placeholder={t("a_short_description_about_the_list")} className="w-full resize-none rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20" rows={3} maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX} />
+          })} placeholder={t("a_short_description_about_the_list")} className="w-full resize-none rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20" rows={3} maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX} />
                     </div>
 
                     <div>
@@ -98,14 +98,14 @@ const FavoriteListModal = ({
                             <button type="button" onClick={() => setFormData({
               ...formData,
               isPublic: false
-            })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${!formData.isPublic ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
+            })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${!formData.isPublic ? 'border-primary bg-primary/5 text-primary' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
                                 <Lock className="w-4 h-4" />
                                 <span className="font-medium">{t("private")}</span>
                             </button>
                             <button type="button" onClick={() => setFormData({
               ...formData,
               isPublic: true
-            })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${formData.isPublic ? 'border-teal-600 bg-teal-50 text-teal-900' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
+            })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${formData.isPublic ? 'border-primary bg-primary/5 text-primary' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
                                 <Globe className="w-4 h-4" />
                                 <span className="font-medium">{t("public")}</span>
                             </button>
@@ -117,7 +117,7 @@ const FavoriteListModal = ({
 
                     <div className="flex gap-3 pt-4">
                         <button type="button" onClick={onClose} className="flex-1 rounded-xl border border-border-light px-4 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-50">{t("cancel")}</button>
-                        <button type="submit" disabled={isLoading || !formData.name.trim()} className="flex-1 rounded-xl bg-teal-700 px-4 py-3 font-medium text-white shadow-sm transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50">
+                        <button type="submit" disabled={isLoading || !formData.name.trim()} className="flex-1 rounded-xl bg-btn-primary px-4 py-3 font-medium text-white shadow-sm transition-all hover:bg-btn-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
                             {isLoading ? 'Saving...' : editList ? 'Update' : 'Create'}
                         </button>
                     </div>

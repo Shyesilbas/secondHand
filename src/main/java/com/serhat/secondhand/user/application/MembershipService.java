@@ -10,6 +10,7 @@ import com.serhat.secondhand.user.domain.entity.enums.MembershipPlan;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import com.serhat.secondhand.user.dto.MembershipStatusDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class MembershipService {
 
     private static final BigDecimal PREMIUM_PRICE = new BigDecimal("100.00");
@@ -52,7 +54,9 @@ public class MembershipService {
         }
 
         user.setPlan(MembershipPlan.PREMIUM);
-        user.setPlanExpiry(LocalDateTime.now().plusDays(PREMIUM_DURATION_DAYS));
+        user.setExpirationDate(LocalDateTime.now().plusDays(PREMIUM_DURATION_DAYS));
+        user.setPurchaseDate(LocalDateTime.now());
+        user.setPrice(PREMIUM_PRICE);
         user.setAutoRenew(true);
         user.setAiListingQuota(MembershipPlan.PREMIUM.getMonthlyAiListingQuota());
         userRepository.save(user);
@@ -72,5 +76,62 @@ public class MembershipService {
         userRepository.save(user);
 
         return MembershipStatusDto.from(user);
+    }
+
+    public MembershipStatusDto toggleAutoRenew(Long userId, boolean autoRenew) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new BusinessException("Kullanıcı bulunamadı", HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
+
+        if (!user.isPremium()) {
+            throw new BusinessException("Aktif bir aboneliğiniz bulunmamaktadır.", HttpStatus.BAD_REQUEST, "NO_ACTIVE_SUBSCRIPTION");
+        }
+
+        user.setAutoRenew(autoRenew);
+        userRepository.save(user);
+
+        return MembershipStatusDto.from(user);
+    }
+
+    @Transactional
+    public boolean renewPremiumMembership(User user) {
+        if (!user.isAutoRenew()) {
+            return false;
+        }
+
+        String idempotencyKey = "membership-autorenew-" + user.getId() + "-" + System.currentTimeMillis();
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .fromUserId(user.getId())
+                .toUserId(null)
+                .receiverName("SYSTEM")
+                .receiverSurname("MEMBERSHIP")
+                .amount(PREMIUM_PRICE)
+                .currency("TRY")
+                .paymentType(PaymentType.EWALLET)
+                .transactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT)
+                .paymentDirection(com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING)
+                .agreementsAccepted(true)
+                .verificationCode("AUTO_RENEWAL")
+                .idempotencyKey(idempotencyKey)
+                .build();
+
+        var paymentResult = paymentProcessor.executeSinglePayment(user.getId(), paymentRequest);
+        if (paymentResult.isSuccess()) {
+            user.setPlan(MembershipPlan.PREMIUM);
+            user.setExpirationDate(user.getExpirationDate() != null ? user.getExpirationDate().plusDays(PREMIUM_DURATION_DAYS) : LocalDateTime.now().plusDays(PREMIUM_DURATION_DAYS));
+            user.setPurchaseDate(LocalDateTime.now());
+            user.setPrice(PREMIUM_PRICE);
+            user.setAutoRenew(true);
+            user.setAiListingQuota(MembershipPlan.PREMIUM.getMonthlyAiListingQuota());
+            userRepository.save(user);
+            log.info("Kullanıcı {} Premium üyeliği otomatik yenilendi.", user.getId());
+            return true;
+        } else {
+            user.setPlan(MembershipPlan.FREE);
+            user.setAutoRenew(false);
+            user.setAiListingQuota(MembershipPlan.FREE.getMonthlyAiListingQuota());
+            userRepository.save(user);
+            log.warn("Kullanıcı {} Premium üyeliği otomatik yenileme ödemesi başarısız oldu, FREE'ye düşürüldü. Hata: {}", user.getId(), paymentResult.getMessage());
+            return false;
+        }
     }
 }

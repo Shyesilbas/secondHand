@@ -6,6 +6,21 @@ import {
 
 export { sanitizeOtpInput };
 
+export const parseCustomDate = (dateStr) => {
+  if (!dateStr) return 0;
+  if (typeof dateStr === 'number') return dateStr;
+  if (typeof dateStr === 'string') {
+    const match = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/);
+    if (match) {
+      const [_, day, month, year, hour, minute, second = '0'] = match;
+      return new Date(year, month - 1, day, hour, minute, second).getTime();
+    }
+    const t = Date.parse(dateStr);
+    if (!isNaN(t)) return t;
+  }
+  return 0;
+};
+
 /** TR/EN labels often precede the 6-digit payment code in HTML emails. */
 const CODE_AFTER_LABEL_RE =
   /(?:code|verification|dogrulama|doğrulama|kod|şifre|pin|otp)[^\d]{0,18}(\d{6})\b/i;
@@ -15,7 +30,10 @@ const CODE_AFTER_LABEL_RE =
  */
 export const normalizeOtpScanText = (raw) => {
   if (raw == null || typeof raw !== 'string') return '';
-  let t = raw.replace(/<[^>]+>/g, ' ');
+  let t = raw
+    .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '')
+    .replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+  t = t.replace(/<[^>]+>/g, ' ');
   t = t
     .replace(/&nbsp;|&#160;/gi, ' ')
     .replace(/&amp;/g, '&')
@@ -28,10 +46,10 @@ export const normalizeOtpScanText = (raw) => {
 
 export const extractSixDigitFromNormalizedText = (normalizedText) => {
   if (!normalizedText) return null;
-  const m = normalizedText.match(OTP_EXTRACTION_REGEX);
-  if (m) return m[0];
   const m2 = normalizedText.match(CODE_AFTER_LABEL_RE);
   if (m2?.[1] && m2[1].length === OTP_CODE_LENGTH) return m2[1];
+  const m = normalizedText.match(OTP_EXTRACTION_REGEX);
+  if (m) return m[0];
   return null;
 };
 
@@ -57,8 +75,8 @@ export const extractVerificationCodeFromEmail = (email, expectedEmailType) =>
 export const findLatestOtpFromEmails = (emails, { emailType, maxScan = 12 } = {}) => {
   const list = Array.isArray(emails) ? emails : [];
   const sorted = [...list].sort((a, b) => {
-    const tb = Date.parse(b?.createdAt || b?.sentAt || '') || 0;
-    const ta = Date.parse(a?.createdAt || a?.sentAt || '') || 0;
+    const tb = parseCustomDate(b?.createdAt || b?.sentAt || 0);
+    const ta = parseCustomDate(a?.createdAt || a?.sentAt || 0);
     return tb - ta;
   });
 
@@ -80,8 +98,8 @@ export const findLatestOtpFromEmails = (emails, { emailType, maxScan = 12 } = {}
 export const findLatestOtpWithEmail = (emails, { emailType, maxScan = 12 } = {}) => {
   const list = Array.isArray(emails) ? emails : [];
   const sorted = [...list].sort((a, b) => {
-    const tb = Date.parse(b?.createdAt || b?.sentAt || '') || 0;
-    const ta = Date.parse(a?.createdAt || a?.sentAt || '') || 0;
+    const tb = parseCustomDate(b?.createdAt || b?.sentAt || 0);
+    const ta = parseCustomDate(a?.createdAt || a?.sentAt || 0);
     return tb - ta;
   });
 

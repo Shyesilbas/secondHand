@@ -33,55 +33,47 @@ const EmailContent = ({
         return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; line-height: 1.6; color: #323130; white-space: pre-wrap; word-wrap: break-word; margin: 0; }</style></head><body>${content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</body></html>`;
     };
 
-    return <div className="flex h-full min-h-0 flex-col bg-background-primary">
+    return <div className="flex h-full min-h-0 flex-col bg-main-bg">
             {/* Üst: konu + araç (Outlook’ta sağda sil vb.) */}
-            <header className="shrink-0 border-b px-4 py-4 sm:px-6 lg:px-8 lg:py-5" style={{
-      borderColor: MS_BORDER,
-      backgroundColor: MS_HEADER
-    }}>
+            <header className="shrink-0 border-b border-border-light bg-background-secondary px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                    <h1 className="text-2xl font-semibold text-text-primary min-w-0 flex-1 tracking-tight text-[#323130] lg:text-[1.65rem]">
+                    <h1 className="text-xl font-semibold text-text-primary min-w-0 flex-1 tracking-tight lg:text-2xl">
                         {email.subject}
                     </h1>
                     {onDelete && <div className="flex shrink-0 items-center gap-1 sm:pt-0.5">
-                            <button type="button" onClick={() => onDelete(email.id)} disabled={isDeleting} className="rounded-md p-2 text-[#605e5c] transition-colors hover:bg-black/[0.05] hover:text-[#d13438] disabled:opacity-40" title={t("delete")}>
+                            <button type="button" onClick={() => onDelete(email.id)} disabled={isDeleting} className="rounded-md p-2 text-text-secondary transition-colors hover:bg-background-tertiary hover:text-status-error-text disabled:opacity-40" title={t("delete")}>
                                 <Trash2 className="h-5 w-5" aria-hidden />
                             </button>
                         </div>}
                 </div>
 
                 {/* Gönderen satırı: avatar + kimlik + zaman */}
-                <div className="mt-5 flex flex-wrap items-start gap-3 border-t border-black/[0.06] pt-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style={{
-          backgroundColor: '#0078d4'
-        }} aria-hidden>
+                <div className="mt-5 flex flex-wrap items-start gap-3 border-t border-border-light pt-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white bg-primary-600" aria-hidden>
                         {initials}
                     </div>
                     <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold text-[#323130]">
+                        <div className="text-sm font-semibold text-text-primary">
                             {email.senderEmail}
                         </div>
-                        <div className="mt-0.5 text-xs text-[#605e5c]">
-                            <span className="font-medium text-[#605e5c]">{t("to")}</span>
+                        <div className="mt-0.5 text-xs text-text-secondary">
+                            <span className="font-medium text-text-secondary">{t("to")} </span>
                             <span className="break-all">{email.recipientEmail}</span>
                         </div>
                         <div className="mt-2">
-                            <span className="inline-flex items-center rounded border px-2 py-0.5 text-caption font-semibold uppercase tracking-wide text-[#605e5c]" style={{
-              borderColor: MS_BORDER,
-              backgroundColor: '#fff'
-            }}>
+                            <span className="inline-flex items-center rounded border border-border-light bg-main-bg px-2 py-0.5 text-caption font-semibold uppercase tracking-wide text-text-secondary">
                                 {email.emailType || 'Email'}
                             </span>
                         </div>
                     </div>
-                    <time className="ml-auto shrink-0 text-xs tabular-nums text-[#605e5c] sm:text-sm" dateTime={email.sentAt}>
+                    <time className="ml-auto shrink-0 text-xs tabular-nums text-text-secondary sm:text-sm" dateTime={email.sentAt}>
                         {formatDate(email.sentAt)}
                     </time>
                 </div>
             </header>
 
             {/* Gövde: render full HTML inside an iframe to prevent CSS bleeding */}
-            <div className="min-h-0 flex-1 bg-background-primary relative">
+            <div className="min-h-0 flex-1 bg-main-bg relative">
                 <iframe srcDoc={getProcessedContent(email.content)} title={t("email_content")} className="absolute inset-0 w-full h-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
             </div>
         </div>;

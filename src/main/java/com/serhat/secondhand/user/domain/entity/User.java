@@ -140,7 +140,13 @@ public class User implements UserDetails {
     private MembershipPlan plan = MembershipPlan.FREE;
 
     @Column(name = "plan_expiry")
-    private LocalDateTime planExpiry;
+    private LocalDateTime expirationDate;
+
+    @Column(name = "purchase_date")
+    private LocalDateTime purchaseDate;
+
+    @Column(name = "price")
+    private java.math.BigDecimal price;
 
     @Column(name = "ai_listing_quota", nullable = false)
     @Builder.Default
@@ -158,7 +164,7 @@ public class User implements UserDetails {
     private boolean autoRenew = true;
 
     public boolean isPremium() {
-        return plan == MembershipPlan.PREMIUM;
+        return plan == MembershipPlan.PREMIUM && expirationDate != null && !LocalDateTime.now().isAfter(expirationDate);
     }
 
     public MembershipPlan getEffectivePlan() {

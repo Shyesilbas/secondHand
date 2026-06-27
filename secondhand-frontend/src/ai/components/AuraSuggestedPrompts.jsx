@@ -3,7 +3,7 @@ import {Sparkles, MessageCircle, HelpCircle, ShoppingCart} from 'lucide-react';
 /**
  * ChatGPT / Claude style quick start suggestions (English).
  */
-export const AURA_QUICK_PROMPTS = [
+const AURA_QUICK_PROMPTS = [
   {
     label: 'How to list items',
     message: 'How do I create my second-hand listing? Which page should I start from?',
@@ -32,7 +32,7 @@ export const AURA_QUICK_PROMPTS = [
 
 export default function AuraSuggestedPrompts({onPick, disabled = false, dense = false, className = ''}) {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${className}`}>
+    <div className={`grid grid-cols-1 ${dense ? '' : 'md:grid-cols-2'} gap-3 ${className}`}>
       {AURA_QUICK_PROMPTS.map((p) => {
         const Icon = p.icon;
         return (
