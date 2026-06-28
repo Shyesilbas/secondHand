@@ -18,7 +18,7 @@ const ReviewsList = memo(({
     return <div className="space-y-4">
                 {Array.from({
         length: REVIEW_LIMITS.SKELETON_ROWS
-      }).map((_, index) => <SkeletonList key={'skeleton-' + index} />)}
+      }).map((_, index) => <SkeletonList key={'review-skeleton-' + index} />)}
             </div>;
   }
   if (error) {

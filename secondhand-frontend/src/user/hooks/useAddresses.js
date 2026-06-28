@@ -1,62 +1,65 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../services/userService.js';
 
+export const ADDRESSES_QUERY_KEYS = {
+  all: ['addresses'],
+};
+
 const useAddresses = (options = {}) => {
-  const [addresses, setAddresses] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
   const enabled = options.enabled ?? true;
 
-  const fetchAddresses = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await userService.getAddresses();
-      setAddresses(data);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+  const {
+    data: addresses = [],
+    isLoading: loading,
+    error,
+    refetch: fetchAddresses,
+  } = useQuery({
+    queryKey: ADDRESSES_QUERY_KEYS.all,
+    queryFn: userService.getAddresses,
+    enabled,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const addAddressMutation = useMutation({
+    mutationFn: (address) => userService.addAddress(address),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADDRESSES_QUERY_KEYS.all });
     }
-  }, []);
+  });
 
-  useEffect(() => {
-    if (enabled) {
-      fetchAddresses();
+  const updateAddressMutation = useMutation({
+    mutationFn: ({ id, address }) => userService.updateAddress(id, address),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADDRESSES_QUERY_KEYS.all });
     }
-  }, [enabled]);
+  });
 
-  const addAddress = async (address) => {
-    const newAddress = await userService.addAddress(address);
-    setAddresses((prev) => [...prev, newAddress]);
-    return newAddress;
-  };
+  const deleteAddressMutation = useMutation({
+    mutationFn: (id) => userService.deleteAddress(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADDRESSES_QUERY_KEYS.all });
+    }
+  });
 
-  const updateAddress = async (id, address) => {
-    const updated = await userService.updateAddress(id, address);
-    setAddresses((prev) => prev.map((a) => (a.id === id ? updated : a)));
-    return updated;
-  };
-
-  const deleteAddress = async (id) => {
-    await userService.deleteAddress(id);
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-  };
-
-  const selectMainAddress = async (id) => {
-    await userService.selectMainAddress(id);
-    await fetchAddresses();
-  };
+  const selectMainAddressMutation = useMutation({
+    mutationFn: (id) => userService.selectMainAddress(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADDRESSES_QUERY_KEYS.all });
+    }
+  });
 
   return {
     addresses,
-    loading,
-    error,
+    loading: loading || addAddressMutation.isPending || updateAddressMutation.isPending || deleteAddressMutation.isPending || selectMainAddressMutation.isPending,
+    error: error?.message || null,
     fetchAddresses,
-    addAddress,
-    updateAddress,
-    deleteAddress,
-    selectMainAddress,
+    addAddress: (address) => addAddressMutation.mutateAsync(address),
+    updateAddress: (id, address) => updateAddressMutation.mutateAsync({ id, address }),
+    deleteAddress: (id) => deleteAddressMutation.mutateAsync(id),
+    selectMainAddress: (id) => selectMainAddressMutation.mutateAsync(id),
   };
 };
 

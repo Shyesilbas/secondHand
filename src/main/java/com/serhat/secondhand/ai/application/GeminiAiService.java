@@ -13,6 +13,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -50,6 +51,7 @@ public class GeminiAiService {
         }
     }
 
+    @Transactional
     public AiResponse askQuestion(Long userId, UserQuestionRequest request) {
         if (userId == null) {
             return AiResponse.error("userId is required");
@@ -83,6 +85,7 @@ public class GeminiAiService {
         }
     }
 
+    @Transactional
     public AiResponse askAgentQuestion(
             Long userId,
             UserQuestionRequest request,

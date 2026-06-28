@@ -1,4 +1,5 @@
 export const FORUM_CATEGORIES = Object.freeze({
+  ALL: '',
   SUGGESTIONS: 'SUGGESTIONS',
   COMPLAINTS: 'COMPLAINTS',
 });
@@ -33,12 +34,13 @@ export const FORUM_AUTHOR_VISIBILITY = Object.freeze({
 export const FORUM_DEFAULTS = Object.freeze({
   PAGE: 0,
   PAGE_SIZE: 20,
-  CATEGORY: FORUM_CATEGORIES.SUGGESTIONS,
+  CATEGORY: FORUM_CATEGORIES.ALL,
   SORT: FORUM_SORTS.NEW,
   LIST_TAB: FORUM_LIST_TABS.ALL,
 });
 
 export const FORUM_CATEGORY_OPTIONS = Object.freeze([
+  { id: FORUM_CATEGORIES.ALL, label: 'All Categories' },
   { id: FORUM_CATEGORIES.SUGGESTIONS, label: 'Suggestions' },
   { id: FORUM_CATEGORIES.COMPLAINTS, label: 'Complaints' },
 ]);

@@ -68,6 +68,13 @@ public class OrderCompletionService {
             return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
         }
 
+        // Check if code has expired (5 minutes)
+        if (order.getMeetupVerificationCodeGeneratedAt() != null) {
+            if (order.getMeetupVerificationCodeGeneratedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+                return Result.error(OrderErrorCodes.MEETUP_CODE_EXPIRED);
+            }
+        }
+
         // Check lock state
         if (order.getVerificationLockedUntil() != null) {
             if (order.getVerificationLockedUntil().isAfter(LocalDateTime.now())) {
@@ -173,6 +180,13 @@ public class OrderCompletionService {
         boolean isBuyer = order.getUser().getId().equals(user.getId());
         if (!isBuyer) {
             return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
+        }
+
+        // Enforce rate limit (30 seconds) on code regeneration
+        if (order.getMeetupVerificationCodeGeneratedAt() != null) {
+            if (order.getMeetupVerificationCodeGeneratedAt().isAfter(LocalDateTime.now().minusSeconds(30))) {
+                return Result.error("Please wait at least 30 seconds between code regenerations", "RATE_LIMIT_EXCEEDED");
+            }
         }
 
         order.generateVerificationCode();

@@ -1,125 +1,108 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 import logger from '../utils/logger.js';
 
 export const useEntity = (config) => {
   const { entityId = null, service, defaultData = null, entityName = 'Entity' } = config;
-  
-  const [entity, setEntity] = useState(defaultData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
+
+  const queryKey = useMemo(() => [entityName, entityId], [entityName, entityId]);
+
+  const { data: entity, isLoading, error, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!entityId || !service.getEntityById) return defaultData;
+      try {
+        return await service.getEntityById(entityId);
+      } catch (err) {
+        logger.error(`Error fetching ${entityName.toLowerCase()}:`, err);
+        throw err;
+      }
+    },
+    enabled: !!entityId && !!service.getEntityById,
+    initialData: defaultData || undefined,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (entityData) => {
+      if (!service.createEntity) {
+        throw new Error(`Create method not implemented for ${entityName}`);
+      }
+      try {
+        return await service.createEntity(entityData);
+      } catch (err) {
+        logger.error(`Error creating ${entityName.toLowerCase()}:`, err);
+        throw err;
+      }
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (entityData) => {
+      if (!service.updateEntity) {
+        throw new Error(`Update method not implemented for ${entityName}`);
+      }
+      try {
+        return await service.updateEntity(entityId, entityData);
+      } catch (err) {
+        logger.error(`Error updating ${entityName.toLowerCase()}:`, err);
+        throw err;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      if (!service.deleteEntity) {
+        throw new Error(`Delete method not implemented for ${entityName}`);
+      }
+      try {
+        return await service.deleteEntity(id);
+      } catch (err) {
+        logger.error(`Error deleting ${entityName.toLowerCase()}:`, err);
+        throw err;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+    },
+  });
 
   const fetchEntity = useCallback(async (id = entityId) => {
     if (!id || !service.getEntityById) return;
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await service.getEntityById(id);
-      setEntity(data);
-      return data;
-    } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while fetching ${entityName.toLowerCase()}. Please try again later.`;
-      setError(errorMessage);
-      logger.error(`Error fetching ${entityName.toLowerCase()}:`, err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, entityName, entityId]);
+    return refetch();
+  }, [entityId, service.getEntityById, refetch]);
 
   const createEntity = useCallback(async (entityData) => {
-    if (!service.createEntity) {
-      throw new Error(`Create method not implemented for ${entityName}`);
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await service.createEntity(entityData);
-      return response;
-    } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while creating ${entityName.toLowerCase()}. Please try again later.`;
-      setError(errorMessage);
-      logger.error(`Error creating ${entityName.toLowerCase()}:`, err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, entityName]);
+    return createMutation.mutateAsync(entityData);
+  }, [createMutation]);
 
   const updateEntity = useCallback(async (id, entityData) => {
-    if (!service.updateEntity) {
-      throw new Error(`Update method not implemented for ${entityName}`);
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await service.updateEntity(id, entityData);
-      
-            setEntity(prev => ({ ...prev, ...(entityData || {}) }));
-      
-            fetchEntity(id);
-      
-      return response;
-    } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while updating ${entityName.toLowerCase()}. Please try again later.`;
-      setError(errorMessage);
-      logger.error(`Error updating ${entityName.toLowerCase()}:`, err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, entityName, fetchEntity]);
+    return updateMutation.mutateAsync(entityData);
+  }, [updateMutation]);
 
   const deleteEntity = useCallback(async (id) => {
-    if (!service.deleteEntity) {
-      throw new Error(`Delete method not implemented for ${entityName}`);
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await service.deleteEntity(id);
-      setEntity(null);
-      return response;
-    } catch (err) {
-      const errorMessage = err.response?.data?.detail || err.response?.data?.message || `Error occurred while deleting ${entityName.toLowerCase()}. Please try again later.`;
-      setError(errorMessage);
-      logger.error(`Error deleting ${entityName.toLowerCase()}:`, err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [service, entityName]);
-
-  const refetch = useCallback(() => {
-    return fetchEntity(entityId);
-  }, [fetchEntity, entityId]);
+    return deleteMutation.mutateAsync(id);
+  }, [deleteMutation]);
 
   const reset = useCallback(() => {
-    setEntity(defaultData);
-    setError(null);
-    setIsLoading(false);
-  }, [defaultData]);
-
-  useEffect(() => {
-    if (entityId) {
-      fetchEntity();
-    }
-  }, [entityId, fetchEntity]);
+    queryClient.resetQueries({ queryKey });
+  }, [queryClient, queryKey]);
 
   return {
-    entity,
-    isLoading,
-    error,
+    entity: entity ?? defaultData,
+    isLoading: isLoading || createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+    error: error ? (error.response?.data?.detail || error.response?.data?.message || error.message) : null,
     fetchEntity,
     createEntity,
     updateEntity,
     deleteEntity,
     refetch,
     reset,
-    setEntity,
-    setError
+    setEntity: (data) => queryClient.setQueryData(queryKey, data),
+    setError: () => {}
   };
 };

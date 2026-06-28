@@ -54,6 +54,7 @@ public class OrderDto {
     private int verificationAttempts;
     private LocalDateTime verificationLockedUntil;
     private LocalDateTime meetupVerifiedAt;
+    private LocalDateTime meetupVerificationCodeGeneratedAt;
 
     /** Populated only in seller view (getSellerOrders / getSellerOrderById). Null in buyer view. */
     private BigDecimal escrowAmount;

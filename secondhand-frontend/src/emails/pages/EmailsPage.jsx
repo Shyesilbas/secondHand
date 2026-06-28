@@ -109,7 +109,7 @@ const EmailsPage = ({
     isLoading,
     error
   } = useQuery({
-    queryKey: ['myEmails', user?.id, page, filterType],
+    queryKey: ['emails', 'my', user?.id, page, filterType],
     queryFn: async () => {
       return await emailService.getMyEmails(page, pageSize, activeTypes);
     },
@@ -157,7 +157,7 @@ const EmailsPage = ({
           setSelectedEmail(null);
         }
         queryClient.invalidateQueries({
-          queryKey: ['myEmails', user?.id]
+          queryKey: ['emails', 'my', user?.id]
         });
         queryClient.invalidateQueries({
           queryKey: ['badgeCounts', user?.id]
@@ -171,7 +171,7 @@ const EmailsPage = ({
     onSuccess: () => {
       setSelectedEmail(null);
       queryClient.invalidateQueries({
-        queryKey: ['myEmails', user?.id]
+        queryKey: ['emails', 'my', user?.id]
       });
       queryClient.invalidateQueries({
         queryKey: ['badgeCounts', user?.id]
@@ -239,7 +239,7 @@ const EmailsPage = ({
           queryClient.invalidateQueries({
             queryKey: ['badgeCounts', user?.id]
           });
-          queryClient.setQueryData(['myEmails', user?.id, page, filterType], oldData => {
+          queryClient.setQueryData(['emails', 'my', user?.id, page, filterType], oldData => {
             if (!oldData || !oldData.content) return oldData;
             return {
               ...oldData,
@@ -284,7 +284,7 @@ const EmailsPage = ({
 
       <div className="flex shrink-0 items-center gap-0.5">
         <button type="button" onClick={() => queryClient.invalidateQueries({
-          queryKey: ['myEmails', user?.id]
+          queryKey: ['emails', 'my', user?.id]
         })} className="rounded-md p-2 text-text-secondary transition-colors hover:bg-background-tertiary hover:text-text-primary" title={t("refresh")}>
           <RefreshCw className="h-4 w-4" />
         </button>

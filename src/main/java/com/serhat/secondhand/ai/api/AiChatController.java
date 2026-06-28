@@ -50,4 +50,22 @@ public class AiChatController {
         memoryService.deleteMemory(userId);
         return ResultResponses.noContent(Result.success());
     }
+
+    @GetMapping("/memories")
+    public ResponseEntity<?> getMemory(@AuthenticationPrincipal User user) {
+        return ResultResponses.ok(Result.success(memoryService.getMemoryDto(user.getId())));
+    }
+
+    @PutMapping("/memories")
+    public ResponseEntity<?> updateMemory(@AuthenticationPrincipal User user, @RequestBody com.serhat.secondhand.ai.dto.UserMemoryDto dto) {
+        memoryService.updateMemory(user.getId(), dto);
+        return ResultResponses.ok(Result.success());
+    }
+
+    @DeleteMapping("/memories/interests")
+    public ResponseEntity<?> deleteInterest(@AuthenticationPrincipal User user, @RequestParam String interest) {
+        memoryService.removeInterest(user.getId(), interest);
+        return ResultResponses.noContent(Result.success());
+    }
 }
+

@@ -3,7 +3,7 @@ const ListingsSkeleton = () => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, index) => (
-                <div key={'skeleton-' + index} className="bg-background-primary rounded-lg border border-border-light shadow-sm overflow-hidden animate-pulse">
+                <div key={'listings-skeleton-' + index} className="bg-background-primary rounded-lg border border-border-light shadow-sm overflow-hidden animate-pulse">
                     <div className="h-48 bg-tertiary"></div>
                     <div className="p-4 space-y-3">
                         <div className="h-4 bg-tertiary rounded w-3/4"></div>

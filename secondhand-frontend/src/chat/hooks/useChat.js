@@ -17,10 +17,8 @@ export const useChat = (userId, options = {}) => {
 
     const {
         isConnected,
-        sendMessage: sendWebSocketMessage,
         joinRoom,
         leaveRoom,
-        markAsRead: markAsReadWebSocket,
         subscribeToChatRoom,
         unsubscribeFromChatRoom,
         addMessageCallback,
@@ -127,7 +125,7 @@ export const useChat = (userId, options = {}) => {
             setSelectedChatRoom(null);
             setMessages([]);
             // Only invalidate chat rooms when absolutely necessary
-            queryClient.invalidateQueries(['chatRooms', user?.id]);
+            queryClient.invalidateQueries({ queryKey: ['chatRooms', user?.id] });
         }
     });
 

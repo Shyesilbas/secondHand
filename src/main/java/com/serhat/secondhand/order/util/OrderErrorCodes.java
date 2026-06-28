@@ -31,6 +31,7 @@ public enum OrderErrorCodes implements ErrorCode {
     ORDER_NOT_SHIPPABLE("ORDER_NOT_SHIPPABLE", "Order cannot be shipped", HttpStatus.BAD_REQUEST),
     MEETUP_VERIFICATION_FAILED("MEETUP_VERIFICATION_FAILED", "Meetup verification code is incorrect", HttpStatus.BAD_REQUEST),
     VERIFICATION_LOCKED("VERIFICATION_LOCKED", "Too many failed attempts. Verification is locked temporarily.", HttpStatus.FORBIDDEN),
+    MEETUP_CODE_EXPIRED("MEETUP_CODE_EXPIRED", "Meetup verification code has expired", HttpStatus.BAD_REQUEST),
     NOT_AUTHORIZED_FOR_ORDER("NOT_AUTHORIZED_FOR_ORDER", "You are not authorized to perform this action on this order", HttpStatus.FORBIDDEN);
 
     private final String code;

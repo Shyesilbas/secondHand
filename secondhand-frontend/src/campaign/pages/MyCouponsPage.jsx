@@ -1,10 +1,10 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '../../common/constants/routes.js';
 import { campaignService } from '../../listing/services/campaignService.js';
-import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import CreateCampaignModal from '../components/CreateCampaignModal.jsx';
 import { formatDateTime, formatCurrency } from '../../common/formatters.js';
@@ -20,65 +20,46 @@ const MyCouponsPage = () => {
     showError,
     showSuccess
   } = useNotification();
-  const [campaigns, setCampaigns] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [listingTitleById, setListingTitleById] = useState({});
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const size = 5;
-  const load = async (nextPage = page) => {
-    setIsLoading(true);
-    try {
-      const res = await campaignService.listMine(nextPage, size);
-      const items = Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
-      setCampaigns(items);
-      setPage(Number.isFinite(res?.number) ? res.number : nextPage);
-      setTotalPages(Number.isFinite(res?.totalPages) ? res.totalPages : 0);
-      setTotalElements(Number.isFinite(res?.totalElements) ? res.totalElements : items.length);
-    } catch (e) {
-      setCampaigns([]);
-      showError('Campaigns', e?.response?.data?.message || 'Failed to load campaigns');
-      setTotalPages(0);
-      setTotalElements(0);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const loadListingTitles = async () => {
-    try {
-      const res = await listingService.getMyListings(0, 50);
-      const items = Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
-      const map = {};
-      items.forEach(l => {
-        if (l?.id) {
-          map[l.id] = l.title || l.listingNo || l.id;
-        }
-      });
-      setListingTitleById(map);
-    } catch {
-      setListingTitleById({});
-    }
-  };
-  useEffect(() => {
-    load();
-    loadListingTitles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const deleteCampaign = async id => {
-    try {
-      await campaignService.remove(id);
+
+  // 1. Fetch campaigns using React Query
+  const {
+    data: campaignsPage,
+    isLoading,
+  } = useQuery({
+    queryKey: ['campaigns', 'my', page, size],
+    queryFn: () => campaignService.listMine(page, size),
+  });
+
+  const campaigns = useMemo(() => campaignsPage?.content || [], [campaignsPage]);
+  const totalPages = campaignsPage?.totalPages || 0;
+  const totalElements = campaignsPage?.totalElements || 0;
+
+
+
+  // 3. Delete mutation using React Query
+  const deleteCampaignMutation = useMutation({
+    mutationFn: (id) => campaignService.remove(id),
+    onSuccess: () => {
       showSuccess('Deleted', 'Campaign deleted.');
-      await load(page);
-    } catch (e) {
+      queryClient.invalidateQueries({ queryKey: ['campaigns'] });
+    },
+    onError: (e) => {
       showError('Delete failed', e?.response?.data?.message || 'Failed to delete campaign');
     }
+  });
+
+  const deleteCampaign = (id) => {
+    deleteCampaignMutation.mutate(id);
   };
+
   const stats = useMemo(() => {
     const active = campaigns.filter(c => c.active).length;
     const inactive = campaigns.filter(c => !c.active).length;
@@ -88,6 +69,7 @@ const MyCouponsPage = () => {
       inactive
     };
   }, [campaigns, totalElements]);
+
   const filteredCampaigns = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     return campaigns.filter(campaign => {
@@ -148,7 +130,7 @@ const MyCouponsPage = () => {
           value: stats.total,
           icon: Layers,
           color: 'blue'
-        }].map((stat, i) => <div key={i} className="bg-background-primary rounded-2xl p-4 border border-border-light shadow-sm">
+        }].map((stat) => <div key={`stat-${stat.label}`} className="bg-background-primary rounded-2xl p-4 border border-border-light shadow-sm">
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${statStyles[stat.color] || 'bg-background-secondary text-text-secondary'}`}>
                   <stat.icon className="w-4 h-4" />
@@ -254,13 +236,13 @@ const MyCouponsPage = () => {
               <Pagination page={page} totalPages={totalPages} onPageChange={p => {
             const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
             setPage(next);
-            load(next);
           }} />
             </div>
           </div>}
       </PageContainer>
 
-      <CreateCampaignModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={load} editingCampaign={editingCampaign} />
+      <CreateCampaignModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => queryClient.invalidateQueries({ queryKey: ['campaigns'] })} editingCampaign={editingCampaign} />
     </div>;
 };
+
 export default MyCouponsPage;

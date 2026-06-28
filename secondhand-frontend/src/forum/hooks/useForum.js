@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { forumService } from '../services/forumService.js';
 import { getForumVisibilitySettings } from '../utils/forumVisibilitySettings.js';
 import {
   FORUM_AUTHOR_VISIBILITY,
-  FORUM_CATEGORIES,
   FORUM_DEFAULTS,
   FORUM_MESSAGES,
   FORUM_REACTIONS,
@@ -20,17 +20,6 @@ const reactionToRequest = (reaction) => {
   return FORUM_REACTIONS.CLEAR;
 };
 
-const applyDelta = ({ likes, dislikes, prev, next }) => {
-  let l = Number(likes) || 0;
-  let d = Number(dislikes) || 0;
-
-  if (prev === FORUM_REACTIONS.LIKE) l -= 1;
-  if (prev === FORUM_REACTIONS.DISLIKE) d -= 1;
-  if (next === FORUM_REACTIONS.LIKE) l += 1;
-  if (next === FORUM_REACTIONS.DISLIKE) d += 1;
-
-  return { likes: Math.max(0, l), dislikes: Math.max(0, d) };
-};
 
 const normalizePage = (pageData, fallbackPage, fallbackSize) => {
   const content = Array.isArray(pageData?.content) ? pageData.content : Array.isArray(pageData) ? pageData : [];
@@ -42,36 +31,114 @@ const normalizePage = (pageData, fallbackPage, fallbackSize) => {
 };
 
 export const useForum = () => {
+  const queryClient = useQueryClient();
+
   const [category, setCategory] = useState(FORUM_DEFAULTS.CATEGORY);
   const [sort, setSort] = useState(FORUM_DEFAULTS.SORT);
   const [search, setSearch] = useState('');
 
-  const [threads, setThreads] = useState([]);
-  const [threadsPage, setThreadsPage] = useState(0);
-  const [threadsHasMore, setThreadsHasMore] = useState(true);
-  const [threadsLoading, setThreadsLoading] = useState(false);
-  const [threadsError, setThreadsError] = useState(null);
-
   const [selectedThreadId, setSelectedThreadId] = useState(null);
-  const [selectedThread, setSelectedThread] = useState(null);
-  const [threadLoading, setThreadLoading] = useState(false);
-  const [threadError, setThreadError] = useState(null);
-
-  const [comments, setComments] = useState([]);
-  const [commentsPage, setCommentsPage] = useState(0);
-  const [commentsHasMore, setCommentsHasMore] = useState(true);
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [commentsError, setCommentsError] = useState(null);
-
   const [draftComment, setDraftComment] = useState({ content: '', parentCommentId: null });
+
+  const [tempThreads, setTempThreads] = useState([]);
+  const [tempComments, setTempComments] = useState([]);
 
   const threadReactionsRef = useRef(new Map());
   const commentReactionsRef = useRef(new Map());
-
   const [threadReactions, setThreadReactions] = useState({});
 
   const pendingKeysRef = useRef(new Set());
 
+  const listParams = useMemo(() => ({
+    category,
+    q: search,
+    sort,
+  }), [category, search, sort]);
+
+  // 1. Threads Infinite Query
+  const {
+    data: threadsData,
+    isLoading: isLoadingThreads,
+    isFetchingNextPage: isFetchingNextPageThreads,
+    error: errorThreads,
+    fetchNextPage: fetchNextPageThreads,
+    hasNextPage: hasNextPageThreads,
+  } = useInfiniteQuery({
+    queryKey: ['forum', 'threads', category, sort, search],
+    queryFn: ({ pageParam = 0 }) => forumService.listThreads({ ...listParams, page: pageParam, size: FORUM_DEFAULTS.PAGE_SIZE }),
+    getNextPageParam: (lastPage) => {
+      const normalized = normalizePage(lastPage, 0, FORUM_DEFAULTS.PAGE_SIZE);
+      return normalized.number + 1 < normalized.totalPages ? normalized.number + 1 : undefined;
+    },
+    staleTime: 30 * 1000,
+  });
+
+  const threads = useMemo(() => {
+    const list = threadsData?.pages.flatMap(page => {
+      const normalized = normalizePage(page, 0, FORUM_DEFAULTS.PAGE_SIZE);
+      return normalized.content;
+    }) || [];
+    return [...tempThreads, ...list];
+  }, [threadsData, tempThreads]);
+
+  const threadsLoading = isLoadingThreads || isFetchingNextPageThreads;
+  const threadsError = errorThreads?.message || null;
+  const threadsHasMore = hasNextPageThreads;
+
+  // 2. Thread Detail Query
+  const {
+    data: selectedThreadData,
+    isLoading: threadLoading,
+    error: threadQueryError,
+  } = useQuery({
+    queryKey: ['forum', 'thread', selectedThreadId],
+    queryFn: () => forumService.getThreadById(selectedThreadId),
+    enabled: !!selectedThreadId && !String(selectedThreadId).startsWith('temp-'),
+  });
+
+  const selectedThread = useMemo(() => {
+    if (selectedThreadData) return selectedThreadData;
+    return threads.find(t => t?.id === selectedThreadId) || null;
+  }, [selectedThreadData, threads, selectedThreadId]);
+
+  const threadError = threadQueryError?.message || null;
+
+  // 3. Comments Infinite Query
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    isFetchingNextPage: isFetchingNextPageComments,
+    error: errorComments,
+    fetchNextPage: fetchNextPageComments,
+    hasNextPage: hasNextPageComments,
+  } = useInfiniteQuery({
+    queryKey: ['forum', 'comments', selectedThreadId],
+    queryFn: ({ pageParam = 0 }) => forumService.listComments(selectedThreadId, { page: pageParam, size: FORUM_DEFAULTS.PAGE_SIZE }),
+    getNextPageParam: (lastPage) => {
+      const normalized = normalizePage(lastPage, 0, FORUM_DEFAULTS.PAGE_SIZE);
+      return normalized.number + 1 < normalized.totalPages ? normalized.number + 1 : undefined;
+    },
+    enabled: !!selectedThreadId && !String(selectedThreadId).startsWith('temp-'),
+    staleTime: 30 * 1000,
+  });
+
+  const comments = useMemo(() => {
+    const list = commentsData?.pages.flatMap(page => {
+      const normalized = normalizePage(page, 0, FORUM_DEFAULTS.PAGE_SIZE);
+      return normalized.content;
+    }) || [];
+    return [...tempComments, ...list];
+  }, [commentsData, tempComments]);
+
+  const commentsLoading = isLoadingComments || isFetchingNextPageComments;
+  const commentsError = errorComments?.message || null;
+  const commentsHasMore = hasNextPageComments;
+
+  useEffect(() => {
+    setTempComments([]);
+  }, [selectedThreadId]);
+
+  // Reactions syncing
   const hydrateViewerReactionsFromThreads = useCallback((list) => {
     if (!Array.isArray(list) || !list.length) return;
     const m = new Map(threadReactionsRef.current);
@@ -100,6 +167,18 @@ export const useForum = () => {
     commentReactionsRef.current = m;
   }, []);
 
+  useEffect(() => {
+    if (threads.length > 0) {
+      hydrateViewerReactionsFromThreads(threads);
+    }
+  }, [threads, hydrateViewerReactionsFromThreads]);
+
+  useEffect(() => {
+    if (comments.length > 0) {
+      hydrateViewerReactionsFromComments(comments);
+    }
+  }, [comments, hydrateViewerReactionsFromComments]);
+
   const getEffectiveThreadReaction = useCallback((thread) => {
     if (!thread?.id || String(thread.id).startsWith('temp-')) return null;
     if (Object.prototype.hasOwnProperty.call(threadReactions, thread.id)) {
@@ -108,120 +187,27 @@ export const useForum = () => {
     return clampReaction(thread.viewerReaction);
   }, [threadReactions]);
 
-  const listParams = useMemo(() => ({
-    category,
-    q: search,
-    sort,
-  }), [category, search, sort]);
+  // Compatibility helpers
+  const resetThreads = useCallback(() => {}, []);
+  const loadThreads = useCallback(() => {}, []);
 
-  const resetThreads = useCallback(() => {
-    setThreads([]);
-    setThreadsPage(0);
-    setThreadsHasMore(true);
-    setThreadsError(null);
-  }, []);
-
-  const loadThreads = useCallback(async ({ reset = false } = {}) => {
-    if (threadsLoading) return;
-    setThreadsLoading(true);
-    setThreadsError(null);
-    try {
-      const page = reset ? 0 : threadsPage;
-      const data = await forumService.listThreads({ ...listParams, page, size: FORUM_DEFAULTS.PAGE_SIZE });
-      const normalized = normalizePage(data, page, FORUM_DEFAULTS.PAGE_SIZE);
-      setThreads((prev) => reset ? normalized.content : [...prev, ...normalized.content]);
-      hydrateViewerReactionsFromThreads(normalized.content);
-      setThreadsPage(normalized.number);
-      setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
-    } catch (e) {
-      setThreadsError(e?.message || FORUM_MESSAGES.LOAD_THREADS_FAILED);
-    } finally {
-      setThreadsLoading(false);
+  const loadMoreThreads = useCallback(() => {
+    if (hasNextPageThreads) {
+      fetchNextPageThreads();
     }
-  }, [hydrateViewerReactionsFromThreads, listParams, threadsLoading, threadsPage]);
+  }, [fetchNextPageThreads, hasNextPageThreads]);
 
-  const loadMoreThreads = useCallback(async () => {
-    if (threadsLoading || !threadsHasMore) return;
-    const next = threadsPage + 1;
-    setThreadsLoading(true);
-    setThreadsError(null);
-    try {
-      const data = await forumService.listThreads({ ...listParams, page: next, size: FORUM_DEFAULTS.PAGE_SIZE });
-      const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
-      setThreads((prev) => [...prev, ...normalized.content]);
-      hydrateViewerReactionsFromThreads(normalized.content);
-      setThreadsPage(normalized.number);
-      setThreadsHasMore(normalized.number + 1 < normalized.totalPages);
-    } catch (e) {
-      setThreadsError(e?.message || FORUM_MESSAGES.LOAD_THREADS_FAILED);
-    } finally {
-      setThreadsLoading(false);
+  const loadMoreComments = useCallback(() => {
+    if (hasNextPageComments) {
+      fetchNextPageComments();
     }
-  }, [hydrateViewerReactionsFromThreads, listParams, threadsHasMore, threadsLoading, threadsPage]);
+  }, [fetchNextPageComments, hasNextPageComments]);
 
-  const selectThread = useCallback(async (threadId) => {
+  const selectThread = useCallback((threadId) => {
     if (String(threadId || '').startsWith('temp-')) return;
     setSelectedThreadId(threadId);
-    setSelectedThread(null);
-    setThreadError(null);
-    setComments([]);
-    setCommentsPage(0);
-    setCommentsHasMore(true);
-    setCommentsError(null);
     setDraftComment({ content: '', parentCommentId: null });
-
-    if (!threadId) return;
-
-    setThreadLoading(true);
-    try {
-      const data = await forumService.getThreadById(threadId);
-      setSelectedThread(data || null);
-      if (data) hydrateViewerReactionsFromThreads([data]);
-    } catch (e) {
-      setThreadError(e?.message || FORUM_MESSAGES.LOAD_THREAD_FAILED);
-    } finally {
-      setThreadLoading(false);
-    }
-
-    setCommentsLoading(true);
-    try {
-      const data = await forumService.listComments(threadId, {
-        page: FORUM_DEFAULTS.PAGE,
-        size: FORUM_DEFAULTS.PAGE_SIZE,
-      });
-      const normalized = normalizePage(data, FORUM_DEFAULTS.PAGE, FORUM_DEFAULTS.PAGE_SIZE);
-      setComments(normalized.content);
-      hydrateViewerReactionsFromComments(normalized.content);
-      setCommentsPage(normalized.number);
-      setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
-    } catch (e) {
-      setCommentsError(e?.message || FORUM_MESSAGES.LOAD_COMMENTS_FAILED);
-    } finally {
-      setCommentsLoading(false);
-    }
-  }, [hydrateViewerReactionsFromComments, hydrateViewerReactionsFromThreads]);
-
-  const loadMoreComments = useCallback(async () => {
-    if (!selectedThreadId || commentsLoading || !commentsHasMore) return;
-    const next = commentsPage + 1;
-    setCommentsLoading(true);
-    setCommentsError(null);
-    try {
-      const data = await forumService.listComments(selectedThreadId, {
-        page: next,
-        size: FORUM_DEFAULTS.PAGE_SIZE,
-      });
-      const normalized = normalizePage(data, next, FORUM_DEFAULTS.PAGE_SIZE);
-      setComments((prev) => [...prev, ...normalized.content]);
-      hydrateViewerReactionsFromComments(normalized.content);
-      setCommentsPage(normalized.number);
-      setCommentsHasMore(normalized.number + 1 < normalized.totalPages);
-    } catch (e) {
-      setCommentsError(e?.message || FORUM_MESSAGES.LOAD_COMMENTS_FAILED);
-    } finally {
-      setCommentsLoading(false);
-    }
-  }, [commentsHasMore, commentsLoading, commentsPage, hydrateViewerReactionsFromComments, selectedThreadId]);
+  }, []);
 
   const setReplyTarget = useCallback((parentCommentId) => {
     setDraftComment((prev) => ({ ...prev, parentCommentId: parentCommentId || null }));
@@ -230,6 +216,14 @@ export const useForum = () => {
   const updateDraftContent = useCallback((content) => {
     setDraftComment((prev) => ({ ...prev, content }));
   }, []);
+
+  // Mutations
+  const submitCommentMutation = useMutation({
+    mutationFn: ({ threadId, payload }) => forumService.addComment(threadId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forum', 'comments', selectedThreadId] });
+    }
+  });
 
   const submitComment = useCallback(async () => {
     if (!selectedThreadId) return;
@@ -240,20 +234,26 @@ export const useForum = () => {
     if (draftComment.parentCommentId) payload.parentCommentId = draftComment.parentCommentId;
     payload.authorVisibility = getForumVisibilitySettings().commentAuthorVisibility;
 
-    setCommentsError(null);
+    setDraftComment({ content: '', parentCommentId: null });
+
     try {
-      const created = await forumService.addComment(selectedThreadId, payload);
-      setDraftComment({ content: '', parentCommentId: null });
+      const created = await submitCommentMutation.mutateAsync({ threadId: selectedThreadId, payload });
       if (created) {
-        setComments((prev) => [created, ...prev]);
+        setTempComments(prev => [created, ...prev]);
         hydrateViewerReactionsFromComments([created]);
-      } else {
-        await selectThread(selectedThreadId);
       }
-    } catch (e) {
-      setCommentsError(e?.message || FORUM_MESSAGES.ADD_COMMENT_FAILED);
+      queryClient.invalidateQueries({ queryKey: ['forum', 'comments', selectedThreadId] });
+    } catch {
+      // Suppressed
     }
-  }, [draftComment.content, draftComment.parentCommentId, hydrateViewerReactionsFromComments, selectThread, selectedThreadId]);
+  }, [draftComment, selectedThreadId, submitCommentMutation, hydrateViewerReactionsFromComments, queryClient]);
+
+  const publishThreadMutation = useMutation({
+    mutationFn: (payload) => forumService.publishThread(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['forum', 'threads'] });
+    }
+  });
 
   const publishThread = useCallback(async ({ category, title, description, authorVisibility }) => {
     const safeTitle = String(title || '').trim();
@@ -280,19 +280,12 @@ export const useForum = () => {
       updatedAt: nowIso,
     };
 
-    setThreadsError(null);
-    setThreadError(null);
-    setThreads((prev) => [optimistic, ...prev]);
+    setTempThreads((prev) => [optimistic, ...prev]);
     setSelectedThreadId(tempId);
-    setSelectedThread(optimistic);
-    setComments([]);
-    setCommentsPage(0);
-    setCommentsHasMore(true);
-    setCommentsError(null);
     setDraftComment({ content: '', parentCommentId: null });
 
     try {
-      const created = await forumService.publishThread({
+      const created = await publishThreadMutation.mutateAsync({
         category: safeCategory,
         title: safeTitle,
         description: safeDescription,
@@ -300,24 +293,24 @@ export const useForum = () => {
       });
 
       if (!created?.id) {
-        setThreads((prev) => prev.filter((t) => t?.id !== tempId));
+        setTempThreads((prev) => prev.filter((t) => t?.id !== tempId));
         setSelectedThreadId(null);
-        setSelectedThread(null);
         return { ok: false, error: FORUM_MESSAGES.PUBLISH_THREAD_FAILED };
       }
 
-      setThreads((prev) => prev.map((t) => (t?.id === tempId ? created : t)));
+      setTempThreads((prev) => prev.map((t) => (t?.id === tempId ? created : t)));
       setSelectedThreadId(created.id);
-      setSelectedThread(created);
-      await selectThread(created.id);
       return { ok: true, data: created };
     } catch (e) {
-      setThreads((prev) => prev.filter((t) => t?.id !== tempId));
+      setTempThreads((prev) => prev.filter((t) => t?.id !== tempId));
       setSelectedThreadId(null);
-      setSelectedThread(null);
       return { ok: false, error: e?.message || FORUM_MESSAGES.PUBLISH_THREAD_FAILED };
     }
-  }, [selectThread]);
+  }, [publishThreadMutation]);
+
+  const changeThreadStatusMutation = useMutation({
+    mutationFn: ({ threadId, nextStatus }) => forumService.changeThreadStatus(threadId, { status: nextStatus }),
+  });
 
   const changeThreadStatus = useCallback(async (threadId, nextStatus) => {
     if (!threadId || String(threadId || '').startsWith('temp-')) return { ok: false };
@@ -325,33 +318,20 @@ export const useForum = () => {
     if (pendingKeysRef.current.has(key)) return { ok: false };
     pendingKeysRef.current.add(key);
 
-    let rollbackThreads = null;
-    let rollbackSelected = null;
-
-    setThreads((prev) => {
-      rollbackThreads = prev;
-      return prev.map((t) => (t?.id === threadId ? { ...t, status: nextStatus } : t));
-    });
-    setSelectedThread((prev) => {
-      rollbackSelected = prev;
-      if (!prev || prev?.id !== threadId) return prev;
-      return { ...prev, status: nextStatus };
-    });
-
     try {
-      const updated = await forumService.changeThreadStatus(threadId, { status: nextStatus });
-      const status = updated?.status || nextStatus;
-      setThreads((prev) => prev.map((t) => (t?.id === threadId ? { ...t, status } : t)));
-      setSelectedThread((prev) => (prev && prev?.id === threadId ? { ...prev, status } : prev));
+      const updated = await changeThreadStatusMutation.mutateAsync({ threadId, nextStatus });
+      queryClient.invalidateQueries({ queryKey: ['forum'] });
       return { ok: true, data: updated };
     } catch (e) {
-      if (rollbackThreads) setThreads(rollbackThreads);
-      if (rollbackSelected !== null) setSelectedThread(rollbackSelected);
       return { ok: false, error: e?.message || FORUM_MESSAGES.CHANGE_STATUS_FAILED };
     } finally {
       pendingKeysRef.current.delete(key);
     }
-  }, []);
+  }, [changeThreadStatusMutation, queryClient]);
+
+  const deleteThreadMutation = useMutation({
+    mutationFn: (threadId) => forumService.deleteThread(threadId),
+  });
 
   const deleteThread = useCallback(async (threadId) => {
     if (!threadId || String(threadId || '').startsWith('temp-')) return { ok: false };
@@ -359,33 +339,26 @@ export const useForum = () => {
     if (pendingKeysRef.current.has(key)) return { ok: false };
     pendingKeysRef.current.add(key);
 
-    let rollbackThreads = null;
     const wasSelected = selectedThreadId === threadId;
-
-    setThreads((prev) => {
-      rollbackThreads = prev;
-      return prev.filter((t) => t?.id !== threadId);
-    });
     if (wasSelected) {
       setSelectedThreadId(null);
-      setSelectedThread(null);
-      setComments([]);
-      setCommentsPage(0);
-      setCommentsHasMore(true);
-      setCommentsError(null);
       setDraftComment({ content: '', parentCommentId: null });
     }
 
     try {
-      await forumService.deleteThread(threadId);
+      await deleteThreadMutation.mutateAsync(threadId);
+      queryClient.invalidateQueries({ queryKey: ['forum', 'threads'] });
       return { ok: true };
     } catch (e) {
-      if (rollbackThreads) setThreads(rollbackThreads);
       return { ok: false, error: e?.message || FORUM_MESSAGES.DELETE_THREAD_FAILED };
     } finally {
       pendingKeysRef.current.delete(key);
     }
-  }, [selectedThreadId]);
+  }, [selectedThreadId, deleteThreadMutation, queryClient]);
+
+  const reactToThreadMutation = useMutation({
+    mutationFn: ({ threadId, reactionReq }) => forumService.reactToThread(threadId, { reaction: reactionReq }),
+  });
 
   const reactToThread = useCallback(async (threadId, nextReactionRaw) => {
     const key = `thread:${threadId}`;
@@ -396,38 +369,23 @@ export const useForum = () => {
     const wanted = clampReaction(nextReactionRaw);
     const nextReaction = wanted && wanted === prevReaction ? null : wanted;
 
-    const rollback = { threads: null, selectedThread: null, prevReaction };
-
-    setThreads((prev) => {
-      rollback.threads = prev;
-      return prev.map((t) => {
-        if (t?.id !== threadId) return t;
-        const delta = applyDelta({ likes: t?.totalLikes, dislikes: t?.totalDislikes, prev: prevReaction, next: nextReaction });
-        return { ...t, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
-      });
-    });
-
-    setSelectedThread((prev) => {
-      rollback.selectedThread = prev;
-      if (!prev || prev?.id !== threadId) return prev;
-      const delta = applyDelta({ likes: prev?.totalLikes, dislikes: prev?.totalDislikes, prev: prevReaction, next: nextReaction });
-      return { ...prev, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
-    });
-
     threadReactionsRef.current.set(threadId, nextReaction);
     setThreadReactions((prev) => ({ ...prev, [threadId]: nextReaction }));
 
     try {
-      await forumService.reactToThread(threadId, { reaction: reactionToRequest(nextReaction) });
-    } catch (e) {
-      threadReactionsRef.current.set(threadId, rollback.prevReaction);
-      setThreadReactions((prev) => ({ ...prev, [threadId]: rollback.prevReaction }));
-      if (rollback.threads) setThreads(rollback.threads);
-      if (rollback.selectedThread !== null) setSelectedThread(rollback.selectedThread);
+      await reactToThreadMutation.mutateAsync({ threadId, reactionReq: reactionToRequest(nextReaction) });
+      queryClient.invalidateQueries({ queryKey: ['forum'] });
+    } catch {
+      threadReactionsRef.current.set(threadId, prevReaction);
+      setThreadReactions((prev) => ({ ...prev, [threadId]: prevReaction }));
     } finally {
       pendingKeysRef.current.delete(key);
     }
-  }, []);
+  }, [reactToThreadMutation, queryClient]);
+
+  const reactToCommentMutation = useMutation({
+    mutationFn: ({ threadId, commentId, reactionReq }) => forumService.reactToComment(threadId, commentId, { reaction: reactionReq }),
+  });
 
   const reactToComment = useCallback(async (threadId, commentId, nextReactionRaw) => {
     const key = `comment:${commentId}`;
@@ -438,27 +396,17 @@ export const useForum = () => {
     const wanted = clampReaction(nextReactionRaw);
     const nextReaction = wanted && wanted === prevReaction ? null : wanted;
 
-    let rollbackComments = null;
-    setComments((prev) => {
-      rollbackComments = prev;
-      return prev.map((c) => {
-        if (c?.id !== commentId) return c;
-        const delta = applyDelta({ likes: c?.totalLikes, dislikes: c?.totalDislikes, prev: prevReaction, next: nextReaction });
-        return { ...c, totalLikes: delta.likes, totalDislikes: delta.dislikes, viewerReaction: nextReaction };
-      });
-    });
-
     commentReactionsRef.current.set(commentId, nextReaction);
 
     try {
-      await forumService.reactToComment(threadId, commentId, { reaction: reactionToRequest(nextReaction) });
-    } catch (e) {
+      await reactToCommentMutation.mutateAsync({ threadId, commentId, reactionReq: reactionToRequest(nextReaction) });
+      queryClient.invalidateQueries({ queryKey: ['forum', 'comments', threadId] });
+    } catch {
       commentReactionsRef.current.set(commentId, prevReaction);
-      if (rollbackComments) setComments(rollbackComments);
     } finally {
       pendingKeysRef.current.delete(key);
     }
-  }, []);
+  }, [reactToCommentMutation, queryClient]);
 
   const commentTree = useMemo(() => {
     const byId = new Map();
@@ -542,4 +490,3 @@ export const useForum = () => {
     reactToComment,
   };
 };
-

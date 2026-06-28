@@ -29,8 +29,8 @@ public class AuraListingSearchOrchestrator {
     private static final int MAX_SIZE = 10;
     private static final int MAX_QUERY_LEN = 200;
 
-    private static final Pattern LISTING_INTENT = Pattern.compile(
-            "(?i).*(öner|listele|bul\\s|arama|search|ilan|göster|hangi\\s+ilan|laptop|bilgisayar|telefon|macbook|iphone|araç|araba|otomobil|kitap|giyim|ev|daire).*"
+    private static final Pattern BYPASS_SEARCH_INTENT = Pattern.compile(
+            "(?i)^\\s*(merhaba|selam|hi|hello|nasılsın|kimsin|ne yapabilirsin|help|yardım|günaydın|iyi akşamlar|iyi günler|teşekkürler|thanks|ok|tamam)\\s*[.!?]?\\s*$"
     );
 
     private final GeminiClient geminiClient;
@@ -42,37 +42,51 @@ public class AuraListingSearchOrchestrator {
     private boolean searchEnabled;
 
     public AgentSearchAugmentation augment(Long userId, String userMessage, String memoryData) {
+        log.info("Aura augment invoked for userId={}, userMessage='{}'", userId, userMessage);
         if (!searchEnabled || userId == null || userMessage == null || userMessage.isBlank()) {
+            log.info("Aura search not enabled or input invalid");
             return AgentSearchAugmentation.empty();
         }
-        // Heuristic check first to bypass slow LLM planning for non-search queries
-        SearchPlan heuristicPlan = heuristicListingIntent(userMessage);
-        if (heuristicPlan.mode() == SearchPlanMode.NONE) {
+
+        // Bypass search planning immediately for simple greetings/generic chat
+        if (BYPASS_SEARCH_INTENT.matcher(userMessage).matches()) {
+            log.info("Aura search bypassed: generic greeting or chat matched BYPASS_SEARCH_INTENT");
             return AgentSearchAugmentation.empty();
         }
 
         if (!rateLimiter.tryAcquire(userId)) {
-            log.info("Aura listing search rate limited userId={}", userId);
+            log.warn("Aura listing search rate limited userId={}", userId);
             return AgentSearchAugmentation.rateLimited();
         }
 
         SearchPlan plan = extractPlanWithLlm(userMessage, memoryData);
+        log.info("Aura LLM search plan extracted: {}", plan);
         if (plan.mode() == SearchPlanMode.NONE) {
-            plan = heuristicPlan;
+            // Fall back to a global search using the raw message instead of giving up
+            String fallbackQuery = truncate(userMessage.trim(), MAX_QUERY_LEN);
+            log.info("Aura fallback query generated: '{}'", fallbackQuery);
+            if (fallbackQuery != null && fallbackQuery.length() >= 3) {
+                plan = SearchPlan.global(fallbackQuery, DEFAULT_SIZE);
+            } else {
+                log.info("Aura fallback query too short, skipping search");
+                return AgentSearchAugmentation.empty();
+            }
         }
 
         try {
             Page<ListingDto> page = executeSearch(plan, userId);
             if (page == null || page.isEmpty()) {
+                log.info("Aura executeSearch returned no matches or page is empty");
                 return new AgentSearchAugmentation(
                         "CANLI_ARAMA_SONUCU: Uygun ilan bulunamadı veya sonuç boş.",
                         List.of(),
                         "ok"
-                );
+                    );
             }
+            log.info("Aura executeSearch found {} listings", page.getNumberOfElements());
             return buildAugmentation(page);
         } catch (Exception e) {
-            log.warn("Aura listing search failed: {}", e.getMessage());
+            log.error("Aura listing search failed: {}", e.getMessage(), e);
             return AgentSearchAugmentation.empty();
         }
     }
@@ -152,17 +166,12 @@ public class AuraListingSearchOrchestrator {
         return SearchPlan.none();
     }
 
-    private SearchPlan heuristicListingIntent(String message) {
-        if (!LISTING_INTENT.matcher(message).matches()) {
-            return SearchPlan.none();
-        }
-        String q = truncate(message.trim(), MAX_QUERY_LEN);
-        return SearchPlan.global(q, DEFAULT_SIZE);
-    }
+
 
     private Page<ListingDto> executeSearch(SearchPlan plan, Long userId) {
         int size = clampSize(plan.resultSize() > 0 ? plan.resultSize() : DEFAULT_SIZE);
-        return switch (plan.mode()) {
+        log.info("Aura executing DB search. Mode={}, Query='{}', Size={}", plan.mode(), plan.searchQuery(), size);
+        Page<ListingDto> result = switch (plan.mode()) {
             case GLOBAL_TEXT -> listingSearchService.globalSearch(plan.searchQuery(), 0, size, userId);
             case CATEGORY_FILTER -> {
                 ListingFilterDto filters = buildCategoryFilter(plan.category(), plan.minPrice(), plan.maxPrice(), size);
@@ -170,6 +179,8 @@ public class AuraListingSearchOrchestrator {
             }
             case NONE -> Page.empty();
         };
+        log.info("Aura DB search result totalElements={}, contentSize={}", result.getTotalElements(), result.getContent().size());
+        return result;
     }
 
     private ListingFilterDto buildCategoryFilter(ListingType type, BigDecimal min, BigDecimal max, int size) {

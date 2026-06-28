@@ -20,22 +20,22 @@ const CheckoutProgressBar = ({
         const isLast = index === steps.length - 1;
         return <React.Fragment key={step.id}>
               <li className="flex items-center">
-                <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`group flex items-center gap-2.5 transition-all outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}>
+                <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`group flex items-center gap-3 transition-all outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}>
                   {/* Step Node */}
-                  <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-caption font-medium transition-all duration-300 ${isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-background-primary border-2 border-primary text-primary shadow-sm' : 'bg-background-primary border border-border-light text-text-muted'}`}>
-                    {isCompleted ? <Check className="h-3 w-3" strokeWidth={3} /> : step.id}
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${isCompleted ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.05]' : isCurrent ? 'bg-white border-2 border-blue-600 text-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.15)] ring-4 ring-blue-600/5 scale-[1.05]' : 'bg-white border border-border-light text-text-muted'}`}>
+                    {isCompleted ? <Check className="h-4 w-4" strokeWidth={3} /> : step.id}
                   </span>
 
                   {/* Step Title */}
-                  <span className={`text-xs font-semibold tracking-wide uppercase transition-colors duration-200 ${isCurrent ? 'text-text-primary font-bold' : isCompleted ? 'text-text-secondary group-hover:text-text-primary' : 'text-text-muted'}`}>
+                  <span className={`text-xs font-bold tracking-wider uppercase transition-colors duration-200 ${isCurrent ? 'text-text-primary font-extrabold' : isCompleted ? 'text-text-secondary group-hover:text-text-primary' : 'text-text-muted'}`}>
                     {step.title}
                   </span>
                 </button>
               </li>
 
               {/* Connector line */}
-              {!isLast && <div className="flex-1 mx-4 h-[2px] relative bg-border-light rounded overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-primary transition-all duration-500 ease-out" style={{
+              {!isLast && <div className="flex-1 mx-4 h-[3px] relative bg-border-light rounded overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500 ease-out" style={{
               width: isCompleted ? '100%' : '0%'
             }} />
                 </div>}

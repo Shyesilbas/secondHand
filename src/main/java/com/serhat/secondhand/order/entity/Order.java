@@ -149,6 +149,9 @@ public class Order {
     @Column(name = "meetup_verified_at")
     private LocalDateTime meetupVerifiedAt;
 
+    @Column(name = "meetup_verification_code_generated_at")
+    private LocalDateTime meetupVerificationCodeGeneratedAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "completed_by_user_id")
     private User completedByUser;
@@ -308,6 +311,7 @@ public class Order {
         this.meetupVerificationCodeHash = hashSha256(raw);
         this.verificationAttempts = 0;
         this.verificationLockedUntil = null;
+        this.meetupVerificationCodeGeneratedAt = LocalDateTime.now();
     }
 
     public static String hashSha256(String raw) {

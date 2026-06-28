@@ -1,33 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
-import {agreementService} from '../services/agreementService.js';
-import {useNotification} from '../../notification/NotificationContext.jsx';
-import logger from '../../common/utils/logger.js';
+import {useState} from 'react';
+import {useRequiredAgreements} from './useAgreements.js';
 
 export const useRegisterAgreements = () => {
-  const [agreements, setAgreements] = useState([]);
-  const [agreementsLoading, setAgreementsLoading] = useState(true);
+  const { requiredAgreements: agreements, isLoading: agreementsLoading } = useRequiredAgreements('REGISTER');
   const [acceptedAgreements, setAcceptedAgreements] = useState(new Set());
   const [selectedAgreement, setSelectedAgreement] = useState(null);
   const [showAgreementModal, setShowAgreementModal] = useState(false);
-
-  const notification = useNotification();
-
-  const loadRequiredAgreements = useCallback(async () => {
-    try {
-      setAgreementsLoading(true);
-      const requiredAgreements = await agreementService.getRequiredAgreementsForRegister();
-      setAgreements(requiredAgreements);
-    } catch (error) {
-            logger.error('Error loading agreements:', error);
-      notification.showError('Error', 'Error occurred while listing agreements..');
-    } finally {
-      setAgreementsLoading(false);
-    }
-  }, [notification]);
-
-  useEffect(() => {
-    loadRequiredAgreements();
-  }, [loadRequiredAgreements]);
 
   const handleAgreementToggle = (agreementId) => {
     setAcceptedAgreements(prev => {
@@ -65,5 +43,3 @@ export const useRegisterAgreements = () => {
 };
 
 export default useRegisterAgreements;
-
-

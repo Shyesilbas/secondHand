@@ -36,7 +36,7 @@ const StatusBadge = ({ label, type = 'rose' }) => {
 };
 
 const OrderCard = React.memo(({ children, className = '' }) => (
-  <div className={`bg-card-bg border border-border-light rounded-lg shadow-sm p-6 ${className}`}>
+  <div className={`bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] ${className}`}>
     {children}
   </div>
 ));
@@ -72,6 +72,15 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
   const [qrCountdown, setQrCountdown] = useState(300);
   useEffect(() => {
     if (!isSeller && order.status === 'MEETUP_PENDING') {
+      const calculateRemaining = () => {
+        if (!order.meetupVerificationCodeGeneratedAt) return 300;
+        const generatedTime = new Date(order.meetupVerificationCodeGeneratedAt).getTime();
+        const elapsedSeconds = Math.floor((Date.now() - generatedTime) / 1000);
+        return Math.max(0, 300 - elapsedSeconds);
+      };
+      
+      setQrCountdown(calculateRemaining());
+
       const timer = setInterval(() => {
         setQrCountdown(prev => {
           if (prev <= 1) {
@@ -83,7 +92,7 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [order.status, isSeller]);
+  }, [order.status, order.meetupVerificationCodeGeneratedAt, isSeller]);
 
   // Authenticated dynamic QR Code fetching
   const [qrImageUrl, setQrImageUrl] = useState('');
@@ -91,6 +100,7 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
   const [qrFetchTrigger, setQrFetchTrigger] = useState(0);
   useEffect(() => {
     let url = '';
+    let active = true;
     if (order.status === 'MEETUP_PENDING' && !isSeller) {
       const fetchQrCode = async () => {
         setIsQrLoading(true);
@@ -98,17 +108,22 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
           const response = await apiClient.get(API_ENDPOINTS.ORDERS.GET_MEETUP_QR(order.orderNumber), {
             responseType: 'blob'
           });
-          url = URL.createObjectURL(response.data);
-          setQrImageUrl(url);
+          if (active) {
+            url = URL.createObjectURL(response.data);
+            setQrImageUrl(url);
+          }
         } catch (err) {
           console.error('Failed to load QR code image', err);
         } finally {
-          setIsQrLoading(false);
+          if (active) {
+            setIsQrLoading(false);
+          }
         }
       };
       fetchQrCode();
     }
     return () => {
+      active = false;
       if (url) {
         URL.revokeObjectURL(url);
       }
@@ -358,11 +373,11 @@ const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
 
   return (
     <div className="py-4">
-      <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+      <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 z-0">
         {/* Connection Line (desktop only) */}
-        <div className="absolute top-5 left-0 w-full h-[3px] bg-slate-100 -z-10 hidden md:block" />
+        <div className="absolute top-4 left-0 w-full h-[3px] bg-slate-100 z-0 hidden md:block" />
         <div 
-          className="absolute top-5 left-0 h-[3px] bg-primary -z-10 hidden md:block transition-all duration-500" 
+          className="absolute top-4 left-0 h-[3px] bg-gradient-to-r from-blue-600 to-indigo-600 z-0 hidden md:block transition-all duration-500 ease-out" 
           style={{ width: `${Math.max(0, (currentIndex / (steps.length - 1)) * 100)}%` }}
         />
 
@@ -371,32 +386,32 @@ const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
           const isCurrent = idx === currentIndex;
 
           return (
-            <div key={step.key} className="flex md:flex-col items-center gap-3 md:gap-0 w-full md:w-auto relative group">
-              <div className="relative">
+            <div key={step.key} className="flex md:flex-col items-center gap-3 md:gap-0 w-full md:w-auto relative group z-10">
+              <div className="relative bg-white sm:bg-transparent rounded-full">
                 {isCurrent && (
-                  <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-70" aria-hidden />
+                  <span className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-70" aria-hidden />
                 )}
                 <div 
-                  className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                  className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isDone 
-                      ? 'bg-status-success-bg border-status-success text-status-success shadow-sm' 
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-none text-white shadow-md shadow-emerald-500/20 scale-[1.05]' 
                       : isCurrent 
-                        ? 'bg-primary border-primary text-white ring-4 ring-primary/10' 
-                        : 'bg-card-bg border-border-light text-text-muted'
+                        ? 'bg-white border-2 border-blue-600 text-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.15)] ring-4 ring-blue-600/5 scale-[1.05]' 
+                        : 'bg-white border border-border-light text-text-muted'
                   }`}
                 >
                   {isDone ? (
-                    <Check className="w-5 h-5 stroke-[3px]" />
+                    <Check className="w-4 h-4 stroke-[3px]" />
                   ) : (
-                    <span className="text-sm font-bold">{idx + 1}</span>
+                    <span className="text-xs font-bold">{idx + 1}</span>
                   )}
                 </div>
               </div>
-              <span className={`md:mt-3 text-xs font-bold uppercase tracking-wider ${
+              <span className={`md:mt-3 text-[10px] font-bold uppercase tracking-wider ${
                 isDone 
-                  ? 'text-status-success' 
+                  ? 'text-emerald-600' 
                   : isCurrent 
-                    ? 'text-primary' 
+                    ? 'text-blue-600 font-extrabold' 
                     : 'text-text-muted'
               }`}>
                 {step.label}
@@ -591,10 +606,10 @@ const OrderDetailsModal = React.memo(({
       tabIndex={-1}
     >
       <div 
-        className="w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-xl border border-border-light shadow-xl bg-card-bg overflow-hidden flex flex-col relative"
+        className="w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-3xl border border-white/60 shadow-2xl bg-gradient-to-tr from-[#fbfaf8] via-[#f8f6f0] to-[#f3efe5] overflow-hidden flex flex-col relative"
       >
         {/* Header (sticky at top) */}
-        <div className="px-6 py-5 border-b border-border-light flex items-center justify-between gap-4 bg-card-bg z-10 shrink-0">
+        <div className="px-6 py-5 border-b border-border-light flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-4 min-w-0">
             <div className="w-10 h-10 rounded-lg border border-border-light bg-slate-50 flex items-center justify-center shrink-0">
               <Package className="w-5 h-5 text-text-secondary" />
@@ -643,7 +658,7 @@ const OrderDetailsModal = React.memo(({
         </div>
 
         {/* Scrollable Modal Content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-slate-50/30">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-gradient-to-b from-white/20 to-[#f5f3eb]/40">
           {isLoading ? (
             <OrderDetailsSkeleton />
           ) : error ? (

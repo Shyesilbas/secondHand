@@ -81,34 +81,34 @@ const CheckoutAddressStep = ({
   return <div className="p-5 sm:p-7">
       {/* Delivery Method Selection */}
       <div className="mb-8 border-b border-border-light pb-6">
-        <h3 className="text-sm font-medium text-text-primary mb-3.5">{t("teslimat_y_ntemi")}</h3>
+        <h3 className="text-sm font-bold text-text-primary mb-4 tracking-wide uppercase">{t("teslimat_y_ntemi")}</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Cargo Option */}
-          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border'}`}>
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
             <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="mt-1 h-4 w-4 rounded-full border-border text-primary focus:ring-primary/10" />
             <div>
-              <span className="block text-sm font-semibold text-text-primary">{t("kargo_ile_g_nderim")}</span>
-              <span className="mt-0.5 block text-xs text-text-muted">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
+              <span className="block text-sm font-bold text-text-primary">{t("kargo_ile_g_nderim")}</span>
+              <span className="mt-1 block text-xs text-text-muted leading-relaxed">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
             </div>
           </label>
 
           {/* Safe Meetup Option */}
-          <label className={`relative flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-border-light bg-background-secondary' : deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-primary/5 shadow-sm ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border'}`}>
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-border-light bg-background-secondary' : deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
             <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="mt-1 h-4 w-4 rounded-full border-border text-primary focus:ring-primary/10 disabled:opacity-50" />
             <div>
-              <span className="block text-sm font-semibold text-text-primary flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
+              <span className="block text-sm font-bold text-text-primary flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-safe-meetup-onboarding'));
               }} className="inline-flex items-center justify-center p-0.5 rounded-full text-primary hover:text-primary hover:bg-primary/15 transition-all focus:outline-none animate-pulse cursor-pointer" title={t("elden_g_venli_teslimat_nedir_detayl_bilg")}>
                   <Info className="h-3.5 w-3.5" />
                 </button>
-                {canMeetup && <span className="rounded bg-status-success-bg px-1.5 py-0.5 text-caption font-bold text-emerald-700 uppercase tracking-wider">{t("aktif")}</span>}
+                {canMeetup && <span className="rounded-lg bg-status-success-bg px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase tracking-widest border border-emerald-500/20">{t("aktif")}</span>}
               </span>
-              <span className="mt-0.5 block text-xs text-text-muted">
+              <span className="mt-1 block text-xs text-text-muted leading-relaxed">
                 {!canMeetup ? 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.' : 'Ortak bir güvenli buluşma noktasında yüz yüze teslimat.'}
               </span>
-              {canMeetup && sellerLocations.length > 0 && <span className="mt-2 block text-xs text-primary font-bold bg-primary/5 px-2 py-1 rounded-md border border-primary/20 w-fit">{t("sat_c_n_n_konumu")}<span className="text-text-primary font-semibold">{sellerLocations.join(', ')}</span>
+              {canMeetup && sellerLocations.length > 0 && <span className="mt-3 inline-flex items-center gap-1 text-[10px] text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/25">{t("sat_c_n_n_konumu")}<span className="text-text-primary font-bold">{sellerLocations.join(', ')}</span>
                 </span>}
             </div>
           </label>
@@ -166,24 +166,24 @@ const CheckoutAddressStep = ({
             {addresses.map(address => {
               const isSelected = String(selectedShippingAddressId) === String(address.id);
               return (
-                <label key={address.id} className={`relative cursor-pointer rounded-xl border p-5 transition-all duration-300 ${isSelected ? 'border-transparent ring-2 ring-primary bg-primary/5 shadow-sm scale-[1.01]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
+                <label key={address.id} className={`relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${isSelected ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
                   <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
                   <div className="flex items-start gap-3">
                     {/* Radio indicator */}
                     <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${isSelected ? 'border-primary' : 'border-border'}`}>
-                      {isSelected && <span className="h-2 w-2 rounded-full bg-primary animate-scaleUp" />}
+                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary animate-scaleUp" />}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold tracking-tight text-text-primary">{address.addressLine}</div>
-                      <div className="mt-1 text-xs text-text-muted font-medium">
+                      <div className="text-sm font-bold tracking-tight text-text-primary">{address.addressLine}</div>
+                      <div className="mt-1.5 text-xs text-text-secondary leading-relaxed font-medium">
                         {address.city}, {address.state}
                         {address.neighborhoodKey ? `, ${address.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}
                         {` ${address.postalCode}`}
                       </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <span className="text-caption font-bold text-text-muted uppercase tracking-wider">{address.country}</span>
-                        {address.mainAddress && <span className="rounded-md border border-border-light bg-background-secondary px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-text-muted">{t("default")}</span>}
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{address.country}</span>
+                        {address.mainAddress && <span className="rounded-lg border border-border-light bg-background-secondary px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-text-muted">{t("default")}</span>}
                       </div>
                     </div>
                   </div>

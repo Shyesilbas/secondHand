@@ -90,7 +90,6 @@ const AccountHubPage = () => {
     toggleAutoRenew,
     isTogglingAutoRenew,
     orderProcessingSpeed,
-    freeMaxShowcaseSlots,
     premiumMaxShowcaseSlots,
     freeDailyAuraLimit,
     premiumDailyAuraLimit,

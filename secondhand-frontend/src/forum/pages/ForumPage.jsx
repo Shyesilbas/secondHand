@@ -85,6 +85,7 @@ const ForumPage = () => {
               {FORUM_CATEGORY_OPTIONS.map(c => {
               const active = forum.category === c.id;
               return <button key={c.id} type="button" onClick={() => forum.setCategory(c.id)} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${active ? 'bg-gray-900 text-white shadow-md shadow-gray-900/10' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary-light'}`}>
+                    {c.id === '' && <MessageCircle className="w-3.5 h-3.5" />}
                     {c.id === 'SUGGESTIONS' && <Sparkles className="w-3.5 h-3.5" />}
                     {c.id === 'COMPLAINTS' && <SlidersHorizontal className="w-3.5 h-3.5" />}
                     {c.label}

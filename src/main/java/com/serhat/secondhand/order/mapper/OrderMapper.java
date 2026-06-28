@@ -80,6 +80,7 @@ public class OrderMapper {
                 .verificationLockedUntil(order.getVerificationLockedUntil())
                 .meetupVerifiedAt(order.getMeetupVerifiedAt())
                 .meetupVerificationCode(order.getMeetupVerificationCode())
+                .meetupVerificationCodeGeneratedAt(order.getMeetupVerificationCodeGeneratedAt())
                 .completedAt(order.getCompletedAt())
                 .completedByUserId(order.getCompletedByUser() != null ? order.getCompletedByUser().getId() : null)
                 .completedByUserName(order.getCompletedByUser() != null ? (order.getCompletedByUser().getName() != null ? order.getCompletedByUser().getName() + " " + (order.getCompletedByUser().getSurname() != null ? order.getCompletedByUser().getSurname() : "") : order.getCompletedByUser().getEmail()) : null)

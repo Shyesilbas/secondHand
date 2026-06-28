@@ -26,7 +26,7 @@ const CheckoutPage = () => {
   } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isPremium, estimatedShippingDays, orderProcessingSpeed } = usePlan();
+  const { isPremium, estimatedShippingDays } = usePlan();
   const {
     cartItems,
     cartCount,
@@ -179,26 +179,26 @@ const CheckoutPage = () => {
   /* ── Empty cart ──────────────────────────────────────────── */
 
   if (!offerId && cartCount === 0) {
-    return <div className="flex min-h-screen items-center justify-center bg-[#faf9f7] px-4">
-        <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-lg border border-[#f0efed] bg-background-primary">
-            <svg className="h-6 w-6 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+    return <div className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-[#fbfaf8] via-[#f8f6f0] to-[#f3efe5] px-4">
+        <div className="w-full max-w-md text-center bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-white/60 shadow-lg">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-border-light bg-background-primary shadow-inner">
+            <svg className="h-6 w-6 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-semibold text-text-primary text-[#111]">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
-          <p className="mt-2 text-sm text-[#999]">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
-          <button type="button" onClick={() => navigate(ROUTES.LISTINGS)} className="mt-8 rounded-lg border border-[#1466c6] bg-[#1466c6] px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#0f529e]">{t("browse_listings")}</button>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">{CART_MESSAGES.EMPTY_CART_TITLE}</h1>
+          <p className="mt-2 text-sm text-text-muted font-medium">{CART_MESSAGES.EMPTY_CART_DESCRIPTION}</p>
+          <button type="button" onClick={() => navigate(ROUTES.LISTINGS)} className="mt-8 w-full rounded-xl bg-primary py-3 text-sm font-bold uppercase tracking-wider text-white shadow-md hover:bg-primary-hover active:scale-95 transition-all">{t("browse_listings")}</button>
         </div>
       </div>;
   }
 
   /* ── Main checkout ──────────────────────────────────────── */
 
-  return <div className="min-h-screen bg-[#faf9f7]">
+  return <div className="min-h-screen bg-gradient-to-tr from-[#fbfaf8] via-[#f8f6f0] to-[#f3efe5] text-text-primary antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-[#f0efed] bg-background-primary/80 backdrop-blur-md">
-        <PageContainer className="py-3">
+      <header className="sticky top-0 z-30 border-b border-border-light bg-background-primary/80 backdrop-blur-md shadow-sm">
+        <PageContainer className="py-4">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-[#555] transition-colors hover:text-[#111]" aria-label={t("back_to_cart")}>
               <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />

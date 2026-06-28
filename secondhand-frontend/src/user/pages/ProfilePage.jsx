@@ -56,7 +56,7 @@ const ProfilePage = () => {
     const handleTabChange = (key) => {
         setActiveTab(key);
         if (key === 'addresses') {
-            queryClient.invalidateQueries(['addresses']);
+            queryClient.invalidateQueries({ queryKey: ['addresses'] });
         }
     };
 

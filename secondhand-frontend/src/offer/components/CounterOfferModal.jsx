@@ -128,4 +128,4 @@ const CounterOfferModal = ({
   return ReactDOM.createPortal(modal, document.body);
 };
 
-export default CounterOfferModal;l;
+export default CounterOfferModal;

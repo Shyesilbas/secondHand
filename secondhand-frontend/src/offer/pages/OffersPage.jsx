@@ -1,8 +1,9 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { SkeletonList } from '@/common/components/ui/Skeleton';
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { offerService } from '../services/offerService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -12,74 +13,76 @@ import { Handshake, LayoutGrid, Search, SlidersHorizontal } from 'lucide-react';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import { OFFER_DEFAULTS, OFFER_MESSAGES, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
 import { getOfferErrorMessage } from '../utils/offerError.js';
+
 const STATUS_FILTER = Object.freeze({
   ALL: 'ALL'
 });
+
 const SORT = Object.freeze({
   NEWEST: 'newest',
   EXPIRING: 'expiring'
 });
+
 const personLabel = (o, activeTab) => activeTab === OFFER_TABS.MADE ? `${o.sellerName || ''} ${o.sellerSurname || ''}`.trim() : `${o.buyerName || ''} ${o.buyerSurname || ''}`.trim();
+
 const OffersPage = () => {
   const {
     t
   } = useTranslation();
   const notification = useNotification();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab] = useState(OFFER_TABS.MADE);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [made, setMade] = useState([]);
-  const [received, setReceived] = useState([]);
   const [madePage, setMadePage] = useState(OFFER_DEFAULTS.PAGE);
-  const [madeTotalPages, setMadeTotalPages] = useState(0);
-  const [madeTotalElements, setMadeTotalElements] = useState(0);
   const [receivedPage, setReceivedPage] = useState(OFFER_DEFAULTS.PAGE);
-  const [receivedTotalPages, setReceivedTotalPages] = useState(0);
-  const [receivedTotalElements, setReceivedTotalElements] = useState(0);
   const size = OFFER_DEFAULTS.PAGE_SIZE;
+
   const [counterTarget, setCounterTarget] = useState(null);
   const [statusFilter, setStatusFilter] = useState(STATUS_FILTER.ALL);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState(SORT.NEWEST);
-  const refresh = async (opts = {}) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const nextMadePage = Number.isFinite(opts?.madePage) ? opts.madePage : madePage;
-      const nextReceivedPage = Number.isFinite(opts?.receivedPage) ? opts.receivedPage : receivedPage;
-      const [mRes, rRes] = await Promise.all([offerService.listMade(nextMadePage, size), offerService.listReceived(nextReceivedPage, size)]);
-      const mItems = Array.isArray(mRes) ? mRes : Array.isArray(mRes?.content) ? mRes.content : [];
-      const rItems = Array.isArray(rRes) ? rRes : Array.isArray(rRes?.content) ? rRes.content : [];
-      setMade(mItems);
-      setReceived(rItems);
-      setMadePage(Number.isFinite(mRes?.number) ? mRes.number : nextMadePage);
-      setMadeTotalPages(Number.isFinite(mRes?.totalPages) ? mRes.totalPages : 0);
-      setMadeTotalElements(Number.isFinite(mRes?.totalElements) ? mRes.totalElements : mItems.length);
-      setReceivedPage(Number.isFinite(rRes?.number) ? rRes.number : nextReceivedPage);
-      setReceivedTotalPages(Number.isFinite(rRes?.totalPages) ? rRes.totalPages : 0);
-      setReceivedTotalElements(Number.isFinite(rRes?.totalElements) ? rRes.totalElements : rItems.length);
-    } catch (e) {
-      setMade([]);
-      setReceived([]);
-      setMadeTotalPages(0);
-      setMadeTotalElements(0);
-      setReceivedTotalPages(0);
-      setReceivedTotalElements(0);
-      setError(getOfferErrorMessage(e, OFFER_MESSAGES.LOAD_FAILED));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    refresh();
-  }, []);
+
+  // 1. Fetch made offers
+  const {
+    data: madeResponse,
+    isLoading: isLoadingMade,
+    error: errorMade,
+  } = useQuery({
+    queryKey: ['offers', 'made', madePage, size],
+    queryFn: () => offerService.listMade(madePage, size),
+  });
+
+  // 2. Fetch received offers
+  const {
+    data: receivedResponse,
+    isLoading: isLoadingReceived,
+    error: errorReceived,
+  } = useQuery({
+    queryKey: ['offers', 'received', receivedPage, size],
+    queryFn: () => offerService.listReceived(receivedPage, size),
+  });
+
+  const made = useMemo(() => madeResponse?.content || [], [madeResponse]);
+  const received = useMemo(() => receivedResponse?.content || [], [receivedResponse]);
+
+  const madeTotalPages = madeResponse?.totalPages || 0;
+  const madeTotalElements = madeResponse?.totalElements || 0;
+  const receivedTotalPages = receivedResponse?.totalPages || 0;
+  const receivedTotalElements = receivedResponse?.totalElements || 0;
+
+  const isLoading = isLoadingMade || isLoadingReceived;
+  const errorObj = errorMade || errorReceived;
+  const error = errorObj ? getOfferErrorMessage(errorObj, OFFER_MESSAGES.LOAD_FAILED) : null;
+
   const items = useMemo(() => {
     return activeTab === OFFER_TABS.RECEIVED ? received : made;
   }, [activeTab, made, received]);
+
   const totalPages = activeTab === OFFER_TABS.RECEIVED ? receivedTotalPages : madeTotalPages;
   const page = activeTab === OFFER_TABS.RECEIVED ? receivedPage : madePage;
   const totalElements = activeTab === OFFER_TABS.RECEIVED ? receivedTotalElements : madeTotalElements;
+
   const statusCounts = useMemo(() => {
     const c = {
       [STATUS_FILTER.ALL]: items.length
@@ -92,6 +95,7 @@ const OffersPage = () => {
     });
     return c;
   }, [items]);
+
   const processedItems = useMemo(() => {
     let list = [...items];
     if (statusFilter !== STATUS_FILTER.ALL) {
@@ -113,30 +117,46 @@ const OffersPage = () => {
     });
     return list;
   }, [items, statusFilter, searchQuery, sortBy, activeTab]);
-  const handleAccept = async offerId => {
-    try {
-      await offerService.accept(offerId);
+
+  // Mutations
+  const acceptMutation = useMutation({
+    mutationFn: (offerId) => offerService.accept(offerId),
+    onSuccess: () => {
       notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.OFFER_ACCEPTED);
-      await refresh();
-    } catch (e) {
+      queryClient.invalidateQueries({ queryKey: ['offers'] });
+    },
+    onError: (e) => {
       notification?.showError(OFFER_MESSAGES.ERROR_TITLE, getOfferErrorMessage(e, OFFER_MESSAGES.ACCEPT_FAILED));
     }
-  };
-  const handleReject = async offerId => {
-    try {
-      await offerService.reject(offerId);
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (offerId) => offerService.reject(offerId),
+    onSuccess: () => {
       notification?.showSuccess(OFFER_MESSAGES.SUCCESS_TITLE, OFFER_MESSAGES.OFFER_REJECTED);
-      await refresh();
-    } catch (e) {
+      queryClient.invalidateQueries({ queryKey: ['offers'] });
+    },
+    onError: (e) => {
       notification?.showError(OFFER_MESSAGES.ERROR_TITLE, getOfferErrorMessage(e, OFFER_MESSAGES.REJECT_FAILED));
     }
+  });
+
+  const handleAccept = (offerId) => {
+    acceptMutation.mutate(offerId);
   };
+
+  const handleReject = (offerId) => {
+    rejectMutation.mutate(offerId);
+  };
+
   const handleCheckout = offerId => {
     navigate(`${ROUTES.CHECKOUT}?offerId=${offerId}`);
   };
+
   const openListing = useCallback(listingId => {
     navigate(ROUTES.LISTING_DETAIL(listingId));
   }, [navigate]);
+
   const statusChips = useMemo(() => [{
     key: STATUS_FILTER.ALL,
     label: 'All'
@@ -156,8 +176,10 @@ const OffersPage = () => {
     key: OFFER_STATUSES.COMPLETED,
     label: 'Completed'
   }], []);
+
   const pageFrom = totalElements === 0 ? 0 : page * size + 1;
   const pageTo = Math.min(totalElements, page * size + items.length);
+
   return <div className="min-h-screen bg-background-secondary">
       <PageContainer className="py-6 sm:py-7">
         <div className="rounded-2xl border border-border-light bg-card-bg p-4 shadow-sm sm:p-5">
@@ -184,12 +206,12 @@ const OffersPage = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative min-w-[200px] flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-lg border border-border-light bg-background-secondary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-lg border border-border-light bg-background-secondary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-1 focus:ring-primary" />
               </div>
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="hidden h-4 w-4 text-text-muted sm:block" aria-hidden />
                 <label className="sr-only" htmlFor="offer-sort">{t("sort")}</label>
-                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-lg border border-border-light bg-background-primary px-3 py-2 text-sm font-medium text-text-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-auto">
+                <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-lg border border-border-light bg-background-primary px-3 py-2 text-sm font-medium text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:w-auto">
                   <option value={SORT.NEWEST}>{t("newest_first")}</option>
                   <option value={SORT.EXPIRING}>{t("expiring_soon")}</option>
                 </select>
@@ -243,22 +265,17 @@ const OffersPage = () => {
               const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
               if (activeTab === OFFER_TABS.MADE) {
                 setMadePage(next);
-                refresh({
-                  madePage: next
-                });
                 return;
               }
               setReceivedPage(next);
-              refresh({
-                receivedPage: next
-              });
             }} />
               </div>
             </>}
         </div>
       </PageContainer>
 
-      <CounterOfferModal isOpen={!!counterTarget} onClose={() => setCounterTarget(null)} offer={counterTarget} onSuccess={refresh} />
+      <CounterOfferModal isOpen={!!counterTarget} onClose={() => setCounterTarget(null)} offer={counterTarget} onSuccess={() => queryClient.invalidateQueries({ queryKey: ['offers'] })} />
     </div>;
 };
+
 export default OffersPage;

@@ -100,7 +100,7 @@ const Footer = () => {
                         </button>
                         {showPricing && <div className="mt-3 space-y-4 rounded-xl border border-white/10 bg-slate-900/50 p-4 backdrop-blur-xl transition-all duration-300">
                                 {isLoadingPricing ? <div className="space-y-3">
-                                        {[...Array(4)].map((_, i) => <div key={i} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>)}
+                                        {[...Array(4)].map((_, i) => <div key={`fee-skeleton-${i}`} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>)}
                                     </div> : <>
                                         <div className="space-y-2">
                                             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-indigo-400">{t("listing_fee")}</div>
@@ -180,7 +180,7 @@ const Footer = () => {
                                     {!loadAgreements ? <button onClick={() => setLoadAgreements(true)} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-medium tracking-tight text-slate-200 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.04]">
                                             <span>{t("load_legal_documents")}</span>
                                         </button> : agreementsLoading ? <div className="space-y-2">
-                                            {[...Array(3)].map((_, i) => <div key={i} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>)}
+                                            {[...Array(3)].map((_, i) => <div key={`agreement-skeleton-${i}`} className="h-4 rounded-2xl bg-slate-800/60 animate-pulse"></div>)}
                                         </div> : agreements && agreements.length > 0 ? <ul className="space-y-2">
                                             {agreements.map(agreement => <li key={agreement.agreementId}>
                                                     <button onClick={() => {

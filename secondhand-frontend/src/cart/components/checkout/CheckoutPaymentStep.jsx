@@ -55,15 +55,15 @@ const CheckoutPaymentStep = ({
       </div>
 
       <div className="mb-5">
-        <label className="flex items-center gap-4 rounded-xl border border-transparent bg-primary/5 p-5 ring-2 ring-primary shadow-sm">
+        <label className="flex items-center gap-4 rounded-2xl border border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 p-5 scale-[1.005] transition-all duration-300">
           <input type="radio" name="payment" value={CART_PAYMENT_TYPES.EWALLET} checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET} onChange={event => setSelectedPaymentType(event.target.value)} className="sr-only" />
           <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary">
-            <span className="h-2 w-2 rounded-full bg-primary" />
+            <span className="h-2.5 w-2.5 rounded-full bg-primary" />
           </span>
           <Wallet className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-semibold tracking-tight text-text-primary">{t("wallet")}</div>
-            <div className="mt-0.5 text-xs font-medium text-text-muted">
+            <div className="text-sm font-bold tracking-tight text-text-primary">{t("wallet")}</div>
+            <div className="mt-1 text-xs font-medium text-text-muted">
               {eWallet ? `Balance: ${formatCurrency(walletBalance, cur)}` : 'No wallet available'}
             </div>
           </div>

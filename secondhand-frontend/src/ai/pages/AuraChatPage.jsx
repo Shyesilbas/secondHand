@@ -5,15 +5,62 @@ import { useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
-import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Info, Layers } from 'lucide-react';
+import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Info, Layers, BrainCircuit } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
 import AuraListingContextCard from '../components/AuraListingContextCard.jsx';
 import AuraSuggestedListingChips from '../components/AuraSuggestedListingChips.jsx';
+import AuraPriceAdvisorGauge from '../components/AuraPriceAdvisorGauge.jsx';
+import AuraMemoryProfileHub from '../components/AuraMemoryProfileHub.jsx';
 import { buildAuraListingSessionContext } from '../utils/auraListingContext.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+import { cacheService } from '../../common/services/cacheService.js';
+
+const renderMessageContent = (content) => {
+  if (typeof content !== 'string') return content;
+  
+  const gaugeRegex = /<PriceAdvisorGauge\s+([^>]+)\s*\/?>/i;
+  const match = content.match(gaugeRegex);
+  
+  if (match) {
+    const rawAttrs = match[1];
+    const getAttr = (name) => {
+      const regex = new RegExp(`${name}="([^"]+)"`, 'i');
+      const attrMatch = rawAttrs.match(regex);
+      return attrMatch ? attrMatch[1] : null;
+    };
+    
+    const min = getAttr('min');
+    const max = getAttr('max');
+    const avg = getAttr('avg');
+    const current = getAttr('current');
+    const currency = getAttr('currency') || 'TRY';
+    const status = getAttr('status') || 'Good Deal';
+    
+    const index = content.indexOf(match[0]);
+    const before = content.substring(0, index);
+    const after = content.substring(index + match[0].length);
+    
+    return (
+      <>
+        {before && <span className="block mb-2">{before}</span>}
+        <AuraPriceAdvisorGauge 
+          min={min} 
+          max={max} 
+          avg={avg} 
+          current={current} 
+          currency={currency} 
+          status={status} 
+        />
+        {after && <span className="block mt-2">{after}</span>}
+      </>
+    );
+  }
+  
+  return content;
+};
 
 const AuraChatPage = () => {
   const {
@@ -34,6 +81,7 @@ const AuraChatPage = () => {
   const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const [upgradeHint, setUpgradeHint] = React.useState('');
+  const [showMemoryHub, setShowMemoryHub] = React.useState(false);
   const userId = user?.id ?? null;
   const listingContext = useMemo(() => buildAuraListingSessionContext(listing), [listing]);
   const buildPayload = useMemo(() => {
@@ -120,7 +168,7 @@ const AuraChatPage = () => {
     try {
       await aiChatService.newChat();
       clearAllAuraPersistedMessages(userId);
-      localStorage.removeItem(storageKey);
+      cacheService.remove(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
         content: 'New chat started. What are we looking at today?'
@@ -143,7 +191,7 @@ const AuraChatPage = () => {
     try {
       await aiChatService.deleteHistory();
       clearAllAuraPersistedMessages(userId);
-      localStorage.removeItem(storageKey);
+      cacheService.remove(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
         content: 'History cleared. You can start a new conversation below.'
@@ -166,7 +214,7 @@ const AuraChatPage = () => {
     try {
       await aiChatService.deleteMemory();
       clearAllAuraPersistedMessages(userId);
-      localStorage.removeItem(storageKey);
+      cacheService.remove(storageKey);
       setMessages([createChatMessage({
         role: 'assistant',
         content: "Memory reset. Start a new chat below if you'd like."
@@ -214,7 +262,16 @@ const AuraChatPage = () => {
 
             <button type="button" onClick={handleDeleteMemory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-background-primary hover:bg-secondary-light text-xs font-semibold text-text-secondary transition-all active:scale-95">
               <Shield className="w-3.5 h-3.5 text-text-muted" />{t("reset_memory_cache")}</button>
+
+            <button type="button" onClick={() => setShowMemoryHub(prev => !prev)} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light text-xs font-semibold transition-all active:scale-95 ${showMemoryHub ? 'bg-primary text-white hover:bg-primary-hover border-transparent shadow-sm' : 'bg-background-primary hover:bg-secondary-light text-text-secondary'}`}>
+              <BrainCircuit className={`w-3.5 h-3.5 ${showMemoryHub ? 'text-white' : 'text-text-muted'}`} />{showMemoryHub ? 'Aura Hafızasını Kapat' : 'Aura Bellek Profili'}</button>
           </div>
+
+          {showMemoryHub && (
+            <div className="pt-4 border-t border-border-light">
+              <AuraMemoryProfileHub />
+            </div>
+          )}
         </div>
 
         {/* Footer info in sidebar */}
@@ -302,7 +359,7 @@ const AuraChatPage = () => {
                       animationDelay: '300ms'
                     }} />
                         </div> : <>
-                          {m.content}
+                          {renderMessageContent(m.content)}
                           {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 ? <AuraSuggestedListingChips listings={m.meta.suggestedListings} /> : null}
                           {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-3 flex flex-wrap gap-1 pt-2 border-t border-border-light">
                               {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded bg-background-secondary px-2 py-0.5 text-[9px] font-bold font-mono text-text-muted border border-border-light">

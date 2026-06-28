@@ -71,21 +71,64 @@ public class ListingSearchService {
     }
 
     public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
+        log.info("ListingSearchService.globalSearch query='{}', page={}, size={}", query, page, size);
         if (query == null || query.trim().isEmpty()) return Page.empty();
 
-        String searchTerm = query.trim();
-        Pageable pageable = PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-
-        Page<Listing> results = listingRepository.findBySearch(
-                searchTerm, searchTerm, ListingStatus.ACTIVE, pageable
+        String searchTerm = query.trim().toLowerCase(java.util.Locale.ROOT);
+        
+        // Clean and tokenize the search term
+        String cleaned = searchTerm.replaceAll("[.,;:!?\"'()\\-]", " ");
+        String[] queryTokens = cleaned.split("\\s+");
+        List<String> stopWords = List.of(
+            "var", "mi", "mı", "mu", "mü", "arıyorum", "istiyorum", "bul", "göster", 
+            "öner", "lütfen", "bir", "ve", "veya", "en", "en son", "son", "yeni"
         );
+        List<String> activeTokens = java.util.Arrays.stream(queryTokens)
+                .map(String::trim)
+                .filter(t -> t.length() >= 2 && !stopWords.contains(t))
+                .map(t -> {
+                    if (t.endsWith("sı") || t.endsWith("si") || t.endsWith("su") || t.endsWith("sü")) return t.substring(0, t.length() - 2);
+                    if (t.endsWith("lar") || t.endsWith("ler")) return t.substring(0, t.length() - 3);
+                    if (t.endsWith("ı") || t.endsWith("i") || t.endsWith("u") || t.endsWith("ü")) return t.substring(0, t.length() - 1);
+                    return t;
+                })
+                .filter(t -> !t.isEmpty())
+                .toList();
 
-        List<ListingDto> dtos = results.getContent().stream()
+        log.info("ListingSearchService active search tokens: {}", activeTokens);
+        if (activeTokens.isEmpty()) {
+            return Page.empty();
+        }
+
+        // Fetch all active listings to perform token-based matching in Java
+        List<Listing> allActive = listingRepository.findByStatus(ListingStatus.ACTIVE);
+        
+        List<Listing> matchedListings = allActive.stream()
+                .filter(listing -> {
+                    String title = (listing.getTitle() == null ? "" : listing.getTitle()).toLowerCase(java.util.Locale.ROOT);
+                    String desc = (listing.getDescription() == null ? "" : listing.getDescription()).toLowerCase(java.util.Locale.ROOT);
+                    String listingNo = (listing.getListingNo() == null ? "" : listing.getListingNo()).toLowerCase(java.util.Locale.ROOT);
+                    
+                    // The listing must contain ALL active search tokens in any order
+                    return activeTokens.stream().allMatch(token -> 
+                        title.contains(token) || desc.contains(token) || listingNo.contains(token)
+                    );
+                })
+                .collect(Collectors.toList());
+
+        log.info("ListingSearchService token-based search found {} matches out of {} active listings", matchedListings.size(), allActive.size());
+
+        // Paginate results
+        int start = Math.min(page * size, matchedListings.size());
+        int end = Math.min(start + size, matchedListings.size());
+        List<Listing> paginated = matchedListings.subList(start, end);
+
+        List<ListingDto> dtos = paginated.stream()
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, results.getTotalElements());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
+        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, matchedListings.size());
     }
 
     private Page<ListingDto> enrichPage(Page<ListingDto> page, Long userId) {

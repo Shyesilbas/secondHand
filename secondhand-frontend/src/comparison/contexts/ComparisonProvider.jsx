@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import logger from '../../common/utils/logger.js';
 import { ComparisonContext } from './ComparisonContext.jsx';
+import { cacheService } from '../../common/services/cacheService.js';
 
 const STORAGE_KEY = 'comparison_items';
 const MAX_ITEMS = 4;
 
 const loadFromStorage = () => {
     try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                return {
-                    items: parsed,
-                    category: parsed[0]?.type || null
-                };
-            }
+        const stored = cacheService.get(STORAGE_KEY);
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+            return {
+                items: stored,
+                category: stored[0]?.type || null
+            };
         }
     } catch (error) {
         logger.error('Failed to load comparison items from storage:', error);
@@ -25,7 +23,7 @@ const loadFromStorage = () => {
 
 const saveToStorage = (items) => {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        cacheService.set(STORAGE_KEY, items);
     } catch (error) {
         logger.error('Failed to save comparison items to storage:', error);
     }

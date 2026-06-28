@@ -1,3 +1,5 @@
+import { cacheService } from '../../common/services/cacheService.js';
+
 export const getAuraChatStorageKey = (userId) =>
   userId != null ? `aura.chat.started.${userId}` : 'aura.chat.started.anonymous';
 
@@ -7,7 +9,7 @@ export const getAuraChatMessagesStorageKey = (userId, surface) =>
 
 export const clearAuraPersistedMessages = (userId, surface) => {
   try {
-    localStorage.removeItem(getAuraChatMessagesStorageKey(userId, surface));
+    cacheService.remove(getAuraChatMessagesStorageKey(userId, surface));
   } catch {
     /* ignore */
   }

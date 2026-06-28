@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { auditLogService } from '../services/auditLogService.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import logger from '../../common/utils/logger.js';
@@ -7,13 +8,8 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
     const { enums } = useEnums();
     
     // State management
-    const [auditLogs, setAuditLogs] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [pageSize, setPageSize] = useState(initialPageSize);
-    const [totalPages, setTotalPages] = useState(0);
-    const [totalElements, setTotalElements] = useState(0);
     
     // Filter states
     const [filters, setFilters] = useState({
@@ -25,37 +21,26 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
         userAgent: ''
     });
 
-    // Fetch audit logs from API
-    const fetchAuditLogs = async (page, size) => {
-        if (!userEmail) return;
-        
-        try {
-            setIsLoading(true);
-            setError(null);
-            
-            const data = await auditLogService.getUserAuditLogsByEmail(userEmail, page, size);
-            
-            setAuditLogs(data.content || []);
-            setTotalElements(data.totalElements || 0);
-            setTotalPages(data.totalPages || 0);
-            
-        } catch (err) {
-            logger.error('API ERROR:', err);
-            setError(err.response?.data?.message || 'An error occurred while loading security logs');
-            setAuditLogs([]);
-            setTotalElements(0);
-            setTotalPages(0);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const queryKey = useMemo(() => ['auditLogs', userEmail, currentPage, pageSize], [userEmail, currentPage, pageSize]);
 
-    // Fetch data when dependencies change
-    useEffect(() => {
-        if (userEmail) {
-            fetchAuditLogs(currentPage, pageSize);
-        }
-    }, [userEmail, currentPage, pageSize]);
+    const { data, isLoading, error } = useQuery({
+        queryKey,
+        queryFn: async () => {
+            if (!userEmail) return { content: [], totalElements: 0, totalPages: 0 };
+            try {
+                return await auditLogService.getUserAuditLogsByEmail(userEmail, currentPage, pageSize);
+            } catch (err) {
+                logger.error('API ERROR:', err);
+                throw err;
+            }
+        },
+        enabled: !!userEmail,
+        staleTime: 2 * 60 * 1000,
+    });
+
+    const auditLogs = useMemo(() => data?.content || [], [data?.content]);
+    const totalElements = data?.totalElements || 0;
+    const totalPages = data?.totalPages || 0;
 
     // Client-side filtering
     const filteredAuditLogs = useMemo(() => {
@@ -231,42 +216,29 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
     };
 
     return {
-        // Data
         auditLogs: filteredAuditLogs,
         totalElements,
         totalPages,
         currentPage,
         pageSize,
-        
-        // Loading & Error
         isLoading,
-        error,
-        
-        // Filters
+        error: error ? (error.response?.data?.message || error.message) : null,
         filters,
         hasActiveFilters,
-        
-        // Controls
         goToPage,
         goToNextPage,
         goToPreviousPage,
         changePageSize,
         updateFilter,
         clearFilters,
-        
-        // Pagination Info
         shouldShowPagination,
         startIndex,
         endIndex,
-        
-        // Helper Functions
         getEventTypeDisplay,
         getEventStatusColor,
         getEventTypeIcon,
         getBrowserInfo,
         getLocationFromIP,
-        
-        // Enums
         auditEnums: {
             eventTypes: enums?.auditEventTypes || [],
             eventStatuses: enums?.auditEventStatuses || []

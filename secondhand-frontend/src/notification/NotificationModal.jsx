@@ -145,7 +145,7 @@ const NotificationModal = ({
 
                 {/* Actions */}
                 {(actions.length > 0 || !autoClose) && <div className="px-6 sm:px-7 py-4 bg-slate-50 border-t border-slate-100 flex flex-row-reverse gap-2.5">
-                        {actions.map((action, index) => <button key={action.label || index} type="button" className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${action.primary ? config.primaryButton : config.secondaryButton}`} onClick={() => {
+                        {actions.map((action, index) => <button key={`action-${action.label || ''}-${index}`} type="button" className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${action.primary ? config.primaryButton : config.secondaryButton}`} onClick={() => {
           action.onClick?.();
           if (action.closeOnClick !== false) {
             handleClose();

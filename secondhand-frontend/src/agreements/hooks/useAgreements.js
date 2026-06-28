@@ -26,8 +26,6 @@ export const useAgreements = (options = {}) => {
         refetchInterval: false,
         retry: 1,
         retryDelay: 1000,
-        onError: (error) => {
-        }
     });
 
     return {
@@ -52,8 +50,6 @@ export const useAgreementByType = (agreementType) => {
         cacheTime: 60 * 60 * 1000,
         refetchOnWindowFocus: false,
         retry: 1,
-        onError: (error) => {
-        }
     });
 
     return {
@@ -80,12 +76,39 @@ export const useUserAgreements = () => {
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         retry: 1,
-        onError: (error) => {
-        }
     });
 
     return {
         userAgreements,
+        isLoading,
+        error,
+        refetch
+    };
+};
+
+export const useRequiredAgreements = (group) => {
+    const {
+        data: requiredAgreements = [],
+        isLoading,
+        error,
+        refetch
+    } = useQuery({
+        queryKey: AGREEMENT_KEYS.required(group),
+        queryFn: () => {
+            if (group === 'REGISTER') return agreementService.getRequiredAgreementsForRegister();
+            if (group === 'ONLINE_PAYMENT') return agreementService.getRequiredAgreementsForPayment();
+            return [];
+        },
+        enabled: !!group,
+        staleTime: 60 * 60 * 1000, // 1 hour
+        gcTime: 2 * 60 * 60 * 1000, // 2 hours
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        retry: 1,
+    });
+
+    return {
+        requiredAgreements,
         isLoading,
         error,
         refetch

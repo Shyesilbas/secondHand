@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.serhat.secondhand.ai.dto.UserMemory;
+import com.serhat.secondhand.ai.dto.UserMemoryDto;
+import com.serhat.secondhand.ai.dto.SecondHandProfileDto;
 import com.serhat.secondhand.ai.memory.ChatMessage;
 import com.serhat.secondhand.ai.memory.ChatRole;
 import com.serhat.secondhand.ai.memory.dto.MemoryExtraction;
@@ -581,4 +583,58 @@ public class MemoryService {
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
     }
+
+    public UserMemoryDto getMemoryDto(Long userId) {
+        UserMemory memory = getOrCreate(userId);
+        SecondHandProfileDto profileDto = null;
+        String json = memory.getSecondHandProfileJson();
+        if (json != null && !json.isBlank()) {
+            try {
+                profileDto = objectMapper.readValue(json, SecondHandProfileDto.class);
+            } catch (Exception e) {
+                log.warn("Failed to parse secondHandProfileJson for user {}: {}", userId, e.getMessage());
+            }
+        }
+        if (profileDto == null) {
+            profileDto = new SecondHandProfileDto(new ArrayList<>(), new ArrayList<>(), null);
+        }
+        return new UserMemoryDto(
+            memory.getUserName(),
+            memory.getPreferredTone(),
+            new ArrayList<>(memory.getPermanentInterests()),
+            memory.getUserNotes(),
+            profileDto
+        );
+    }
+
+    @Transactional
+    public void updateMemory(Long userId, UserMemoryDto dto) {
+        UserMemory memory = getOrCreate(userId);
+        memory.setUserName(dto.userName());
+        memory.setPreferredTone(normalizeTone(dto.preferredTone()));
+        memory.setPermanentInterests(dto.permanentInterests());
+        memory.setUserNotes(dto.userNotes());
+        
+        if (dto.secondHandProfile() != null) {
+            try {
+                String json = objectMapper.writeValueAsString(dto.secondHandProfile());
+                memory.setSecondHandProfileJson(json);
+            } catch (Exception e) {
+                log.error("Failed to serialize SecondHandProfileDto for user {}: {}", userId, e.getMessage());
+            }
+        }
+        userMemoryRepository.save(memory);
+        refreshSummary(userId);
+    }
+
+    @Transactional
+    public void removeInterest(Long userId, String interest) {
+        UserMemory memory = getOrCreate(userId);
+        if (interest != null) {
+            memory.getPermanentInterests().removeIf(i -> i.equalsIgnoreCase(interest.trim()));
+            userMemoryRepository.save(memory);
+            refreshSummary(userId);
+        }
+    }
 }
+

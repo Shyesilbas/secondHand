@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
 import React, { useState, useEffect } from 'react';
-import { agreementService } from '../../agreements/services/agreementService.js';
+import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
-import logger from '../../common/utils/logger.js';
 const PaymentAgreementsSection = ({
   acceptedAgreements,
   onToggle,
@@ -14,8 +13,7 @@ const PaymentAgreementsSection = ({
   const {
     t
   } = useTranslation();
-  const [agreements, setAgreements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { requiredAgreements: agreements, isLoading: loading } = useRequiredAgreements('ONLINE_PAYMENT');
   const [selectedAgreement, setSelectedAgreement] = useState(null);
   const [showAgreementModal, setShowAgreementModal] = useState(false);
   const areAllAgreementsAccepted = () => {
@@ -23,21 +21,10 @@ const PaymentAgreementsSection = ({
     return agreements.every(agreement => acceptedAgreements.has(agreement.agreementId));
   };
   useEffect(() => {
-    const fetchAgreements = async () => {
-      try {
-        const data = await agreementService.getRequiredAgreementsForPayment();
-        setAgreements(data);
-        if (onRequiredAgreementsChange) {
-          onRequiredAgreementsChange(data);
-        }
-      } catch (error) {
-        logger.error('Error fetching payment agreements:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAgreements();
-  }, [onRequiredAgreementsChange]);
+    if (onRequiredAgreementsChange && agreements && agreements.length > 0) {
+      onRequiredAgreementsChange(agreements);
+    }
+  }, [agreements, onRequiredAgreementsChange]);
   const handleAgreementToggle = agreementId => {
     onToggle(agreementId);
   };
