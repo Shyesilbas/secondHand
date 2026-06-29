@@ -1,12 +1,11 @@
-# 🔄 SecondHand - Enterprise C2C Marketplace & AI Negotiation Platform
+# SecondHand - Enterprise C2C Marketplace & AI Negotiation Platform
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-5.4-purple?style=for-the-badge&logo=vite)](https://vitejs.dev)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org)
-[![Redis](https://img.shields.io/badge/Redis-7-red?style=for-the-badge&logo=redis)](https://redis.io)
-[![Gemini](https://img.shields.io/badge/Gemini_AI-2.5_Flash-orange?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
-[![Docker](https://img.shields.io/badge/Docker-Enabled-cyan?style=for-the-badge&logo=docker)](https://www.docker.com)
+### Technology Stack
+
+**Frontend & UI:** React 19, Vite 5.4, TailwindCSS 3
+**Backend & Architecture:** Spring Boot 3.5.4, PostgreSQL 15, Redis 7, Flyway, MapStruct
+**AI & External Services:** Google Gemini LLM API, Cloudinary, OAuth2 (Google/GitHub), JWT
+**DevOps & Observability:** Docker, Prometheus, Grafana, Spring Boot Actuator, Swagger/OpenAPI
 
 **SecondHand** is a production-grade, highly scalable, and secure C2C (Customer-to-Customer) marketplace platform. It combines enterprise-level Java backend engineering (Spring Boot 3.5) with a highly interactive, modern React 19 web application. 
 
@@ -28,7 +27,7 @@ Rules of thumb:
 
 ---
 
-## 🗺️ System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -39,49 +38,49 @@ graph TD
     classDef thirdparty fill:#4C1D95,stroke:#8B5CF6,stroke-width:2px,color:#fff;
 
     %% Clients
-    ReactApp["💻 React 19 Frontend<br>(Tailwind, Framer Motion, Query)"]:::client
-    WebSocketClient["⚡ STOMP WebSocket Client"]:::client
+    ReactApp["React 19 Frontend<br>(Tailwind, Framer Motion, Query)"]:::client
+    WebSocketClient["STOMP WebSocket Client"]:::client
 
     %% Security Gate
-    subgraph SecurityGateway ["🔒 Secure API Gatekeeper & Filters"]
-        RateLimit["🛡️ RateLimitingFilter (Custom Tokens)"]
-        CorsCsrf["🍪 CsrfCookieFilter & CorsConfig"]
-        JwtFilter["🔐 AuthenticationFilter & JWT Rotation"]
-        SecurityHeaders["🛡️ SecurityHeadersFilter"]
+    subgraph SecurityGateway ["Secure API Gatekeeper & Filters"]
+        RateLimit["RateLimitingFilter (Custom Tokens)"]
+        CorsCsrf["CsrfCookieFilter & CorsConfig"]
+        JwtFilter["AuthenticationFilter & JWT Rotation"]
+        SecurityHeaders["SecurityHeadersFilter"]
     end
     class SecurityGateway security;
 
     %% Backend Controllers & Modules
-    subgraph SpringBootBackend ["☕ Spring Boot 3.5 Backend Services"]
+    subgraph SpringBootBackend ["Spring Boot 3.5 Backend Services"]
         direction TB
-        UserController["👤 User & Address Service"]
-        ListingController["📦 Multi-Category Listings<br>(Cars, Real Estate, Books, etc.)"]
-        ChatController["💬 Chat & WebSocket STOMP Engine"]
-        EscrowService["🛡️ Escrow Transaction Engine"]
-        EWalletService["💰 E-Wallet Ledger System"]
-        PricingEngine["🏷️ Campaign, Coupon & Pricing Engine"]
-        ShowcaseService["🔥 Showcase Slot Auction & Scheduler"]
-        AuraAgent["🧠 Aura AI Gemini Engine<br>(Context Injection & Semantic Search)"]
-        AuditAspect["📝 AuditLogAspect (Declarative AOP)"]
-        PriceHistory["📈 PriceHistoryAspect (AOP Track)"]
+        UserController["User & Address Service"]
+        ListingController["Multi-Category Listings<br>(Cars, Real Estate, Books, etc.)"]
+        ChatController["Chat & WebSocket STOMP Engine"]
+        EscrowService["Escrow Transaction Engine"]
+        EWalletService["E-Wallet Ledger System"]
+        PricingEngine["Campaign, Coupon & Pricing Engine"]
+        ShowcaseService["Showcase Slot Auction & Scheduler"]
+        AuraAgent["Aura AI Gemini Engine<br>(Context Injection & Semantic Search)"]
+        AuditAspect["AuditLogAspect (Declarative AOP)"]
+        PriceHistory["PriceHistoryAspect (AOP Track)"]
     end
     class SpringBootBackend core;
 
     %% Databases & Cache
-    subgraph DataStorage ["💾 Enterprise Persistence & Cache Layers"]
-        PostgresDB[("🐘 PostgreSQL DB (Flyway Schema)")]
-        CaffeineCache["⚡ L1 Caffeine In-Memory Cache"]
-        RedisDB[("🔴 L2 Redis Cache & Pub/Sub Brokers")]
+    subgraph DataStorage ["Enterprise Persistence & Cache Layers"]
+        PostgresDB[("PostgreSQL DB (Flyway Schema)")]
+        CaffeineCache["L1 Caffeine In-Memory Cache"]
+        RedisDB[("L2 Redis Cache & Pub/Sub Brokers")]
     end
     class DataStorage database;
 
     %% External Services
-    subgraph ThirdPartyIntegrations ["🌐 Third-Party Cloud Integrations"]
-        GeminiAPI["🤖 Google Gemini LLM API"]
-        CloudinaryAPI["🖼️ Cloudinary Image CDN"]
-        OAuthProviders["🔑 Google/GitHub OAuth2"]
-        ExchangeAPI["💱 Exchange Rate API"]
-        MailServer["📧 SMTP Mail Server (Templates)"]
+    subgraph ThirdPartyIntegrations ["Third-Party Cloud Integrations"]
+        GeminiAPI["Google Gemini LLM API"]
+        CloudinaryAPI["Cloudinary Image CDN"]
+        OAuthProviders["Google/GitHub OAuth2"]
+        ExchangeAPI["Exchange Rate API"]
+        MailServer["SMTP Mail Server (Templates)"]
     end
     class ThirdPartyIntegrations thirdparty;
 
@@ -111,9 +110,9 @@ graph TD
 
 ---
 
-## ✨ Core Feature Highlights
+## Core Feature Highlights
 
-### 🔄 Symmetric Modular Design
+### Symmetric Modular Design
 The project stands out for its high-grade architectural symmetry. For every backend package (representing a domain model), there is a corresponding frontend workspace folder under `src/`. This enforces solid clean code separation and eases cross-stack features implementation.
 
 | Domain Module | Backend Package (Java 17) | Frontend Directory (React 19) | Business Logic & Features |
@@ -129,7 +128,7 @@ The project stands out for its high-grade architectural symmetry. For every back
 
 ---
 
-## 🧠 Aura - The Gemini AI Core Engine
+## Aura - The Gemini AI Core Engine
 
 At the heart of **SecondHand** lies **Aura**, an advanced AI platform agent powered by **Google Gemini** API. Aura is not just a chatbot; it is a context-aware transactional agent deeply integrated into the platform's workspace.
 
@@ -177,34 +176,34 @@ At the heart of **SecondHand** lies **Aura**, an advanced AI platform agent powe
 
 ---
 
-## ☕ Deep-Dive into Backend Architectural Patterns
+## Deep-Dive into Backend Architectural Patterns
 
-### 1. 🛡️ Advanced Rate Limiting Filter (`RateLimitingFilter`)
+### 1. Advanced Rate Limiting Filter (`RateLimitingFilter`)
 Rather than relying on basic API gates, SecondHand secures its application layer using a highly configurable Token Bucket rate limiter built on core Spring configurations.
 *   **Route-Specific Limits**: Auth, AI Agent, Payment, and General endpoints possess individual limit scopes (defined in `.env`).
 *   **Client Identification**: Identifies consumers using unified JWT signatures or IP-fallback mechanisms.
 *   **Graceful Handling**: Returns specialized standard error codes (`429 Too Many Requests`) with clear time-to-reset metadata.
 
-### 2. 📝 Declarative AOP-Driven Auditing (`AuditAspect`)
+### 2. Declarative AOP-Driven Auditing (`AuditAspect`)
 Uses Spring Aspect-Oriented Programming (AOP) to implement system auditing across multiple service layers.
 *   Annotating a method automatically records the executor, raw inputs, operation results, and time metrics to the `audit_logs` database table.
 *   Zero performance footprint using async logging executors.
 
-### 3. 📈 Price Tracking Aspect (`PriceHistoryAspect`)
+### 3. Price Tracking Aspect (`PriceHistoryAspect`)
 A specialized aspect that listens to listing updates. If the price of an item shifts, the system automatically records a snapshot in the price database table.
 *   Powers visual charts on the frontend, allowing buyers to see pricing fluctuations over time.
 *   Protects data integrity by catching only successful database commits.
 
-### 4. 🗃️ Two-Tier Cache Architecture (`Caffeine` + `Redis`)
+### 4. Two-Tier Cache Architecture (`Caffeine` + `Redis`)
 To minimize database query costs, the platform utilizes a robust two-tier caching mechanism:
 *   **L1 (In-Memory)**: Caffeine cache for immediate local storage (enums, configurations, listing categories) with low latency.
 *   **L2 (Distributed)**: Redis cluster caches listing searches, homepage contents, and session tokens. Includes dynamic cache invalidation on listing updates.
 
 ---
 
-## 🛠️ Installation & Setup Guide
+## Installation & Setup Guide
 
-### 📋 Prerequisites
+### Prerequisites
 Make sure you have the following installed on your system:
 *   **Java 17 SE Development Kit (JDK)**
 *   **Node.js (v18+)** & **npm**
@@ -212,7 +211,7 @@ Make sure you have the following installed on your system:
 
 ---
 
-### 🐳 Step 1: Fire up Database & Infrastructure Services
+### Step 1: Fire up Database & Infrastructure Services
 The project includes a ready-to-go `docker-compose.yml` defining development databases, Redis, and monitoring setups.
 
 Run the following command in the root folder:
@@ -227,7 +226,7 @@ This boots:
 
 ---
 
-### ☕ Step 2: Configure & Start the Backend
+### Step 2: Configure & Start the Backend
 
 1.  Copy the environment template in the root directory:
     ```bash
@@ -256,7 +255,7 @@ This boots:
 
 ---
 
-### 💻 Step 3: Configure & Start the Frontend
+### Step 3: Configure & Start the Frontend
 
 1.  Navigate to the frontend folder:
     ```bash
@@ -279,7 +278,7 @@ This boots:
 
 ---
 
-## 🔒 Security Best Practices Implemented
+## Security Best Practices Implemented
 
 *   **Secure HttpOnly Session Cookies**: JWT access and refresh tokens are stored in secure, HttpOnly, SameSite cookies to protect the system against XSS (Cross-Site Scripting) and CSRF (Cross-Site Request Forgery) attacks.
 *   **OAuth2 Client Security**: Handles Google authentication server-side, verifying identity tokens securely and preventing token manipulation.
@@ -288,7 +287,7 @@ This boots:
 
 ---
 
-## 📊 Observability & Metrics
+## Observability & Metrics
 
 With Spring Actuator and Micrometer integration, developers can monitor the health, JVM stats, CPU usage, and custom business metrics (e.g. active listings, successful payments).
 
