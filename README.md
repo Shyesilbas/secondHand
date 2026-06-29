@@ -176,6 +176,33 @@ At the heart of **SecondHand** lies **Aura**, an advanced AI platform agent powe
 
 ---
 
+## Cart Reservation, Secure Escrow & Order Engine
+
+A primary pillar of the SecondHand marketplace is trust and inventory consistency. The platform integrates a robust transactional flow extending from item reservation to secure escrow payments and refund compensations.
+
+### 1. Temporary Cart Reservations
+To prevent race conditions on low-stock items and double-purchasing:
+*   **Time-Limited Lock**: Adding an item to the cart places a temporary reservation (`reservedAt` and `reservationEndTime`).
+*   **Dynamic Inventory Valuation**: The `CartValidator` calculates available stock by subtracting active reservations held by other users from the total inventory.
+*   **Automated Clean-Up**: A Spring scheduled task (`CartReservationScheduler`) periodically runs in the background to purge expired reservations, instantly freeing up stock for other buyers.
+
+### 2. Escrow-Backed E-Wallet System
+*   **Virtual Ledger (`EWalletService`)**: Users load funds into a central wallet balance via an external payment mock API, keeping core transaction flows clean.
+*   **Double-Entry Principles**: All monetary movements are atomic, recorded precisely, and strictly audited.
+
+### 3. The Order State Machine & Refunds
+Orders transition through a strict, immutable state machine ensuring safety for both parties:
+*   `PENDING_PAYMENT` -> `PAYMENT_LOCKED_IN_ESCROW` -> `SHIPPED` -> `DELIVERED` -> `COMPLETED`.
+*   **Safe Handover Validation**: Escrow funds are only released to the seller once the buyer explicitly confirms delivery satisfaction via the interface or QR code scanning.
+*   **Compensation & Refund Engine**: The `OrderItemCompensationPlanner` handles full or partial cancellations. The actual fund returns are safely rolled back and routed through the `payment` orchestrator to ensure data consistency between order states and the ledger.
+*   **Dispute Arbitration**: If an item is reported defective or undelivered, funds are frozen in the escrow holding account pending admin resolution.
+
+### 4. Payment Processing
+*   Transactions employ resilient database locking (`@Lock(LockModeType.PESSIMISTIC_WRITE)`) in the Postgres database to prevent race conditions during high-concurrency checkouts.
+*   The `PaymentService` communicates heavily with the `EscrowService` to reserve funds immediately upon checkout, meaning sellers are guaranteed payment upon successful handover.
+
+---
+
 ## Deep-Dive into Backend Architectural Patterns
 
 ### 1. Advanced Rate Limiting Filter (`RateLimitingFilter`)
