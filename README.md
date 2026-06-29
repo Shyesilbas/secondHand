@@ -115,16 +115,22 @@ graph TD
 ### Symmetric Modular Design
 The project stands out for its high-grade architectural symmetry. For every backend package (representing a domain model), there is a corresponding frontend workspace folder under `src/`. This enforces solid clean code separation and eases cross-stack features implementation.
 
-| Domain Module | Backend Package (Java 17) | Frontend Directory (React 19) | Business Logic & Features |
-| :--- | :--- | :--- | :--- |
-| **Aura AI Agent** | `com.serhat.secondHand.ai` | `src/ai` | Gemini-powered semantic search, interactive price advisors, automated descriptions, context adapters |
-| **Escrow & Wallet** | `com.serhat.secondHand.escrow` / `ewallet` | `src/ewallet` | Multi-party secure trade mechanism, balance ledger, deposit/withdrawal, transaction logs |
-| **Real-time Chat** | `com.serhat.secondHand.chat` | `src/chat` / `src/inbox` | STOMP WS private rooms, instant messaging, online indicators, read/unread states |
-| **Categorized Products**| `com.serhat.secondHand.listing` | `src/listing` + `vehicle` / `electronics`... | Advanced listing engine with subclass properties (Real Estate, Cars, Books, Clothes, Sports) |
-| **Offers & Bids** | `com.serhat.secondHand.offer` | `src/offer` | Counter-offer negotiation system, accepting/rejecting bids, instant dynamic price calculation |
-| **Marketing Systems** | `com.serhat.secondHand.campaign` / `coupon` | `src/campaign` / `coupon` | System-scheduled campaigns, discount coupons, user-targeted audience mapping |
-| **Promoted Slots** | `com.serhat.secondHand.showcase` | `src/showcase` | Paid listing upgrades to home showcase, managed by cron task schedulers |
-| **Social & Reviews** | `com.serhat.secondHand.forum` / `review` | `src/forum` / `reviews` | Structured QA forum, seller rating/review statistics, community moderation |
+### System Capabilities & Subsystems
+
+| Subsystem | Backend Package (Java 17) | Frontend Directory (React 19) | Architectural & Technical Implementation Details | Key Business Rules & Solved Challenges |
+| :--- | :--- | :--- | :--- | :--- |
+| **Auth & Social Identity** | `com.serhat.secondhand.auth` | `src/auth` | Multi-provider OAuth2 (Google/GitHub) and local credentials auth integrated with custom Spring Security filters. Implements secure HTTP-only cookies, JWT access/refresh token rotation, and invalidation tracking on logout. | Secures session lifecycle against CSRF/XSS. Blocks hijacked sessions dynamically without database overhead on every request. |
+| **System Security** | `com.serhat.secondhand.core.security` | N/A | Custom Token Bucket-based `RateLimitingFilter`, `CsrfCookieFilter`, and strict HTTP headers security. Fine-grained CORS configurations and JWT signature validation at filter level. | Prevents API abuse and DoS attacks. Handles rate resets gracefully returning 429 status codes with Retry-After metadata. |
+| **Payment & Ledgers** | `com.serhat.secondhand.payment`, `ewallet` | `src/ewallet` | Double-entry transaction ledger keeping precise records of balance movements. Uses pessimistic database locking (`PESSIMISTIC_WRITE`) on high-concurrency wallet updates. | Resolves race conditions during concurrent checkouts. Decouples core transaction logic from bank payment simulation. |
+| **Escrow & Validation** | `com.serhat.secondhand.escrow` | `src/ewallet` | Holds buyer's funds securely in virtual escrow holding accounts. Interfaces with shipping/handover verification modules to release or freeze funds. | Builds consumer trust. Seller payments are guaranteed but only released after buyer confirmation or via secure QR code handshakes. |
+| **Order Lifecycle** | `com.serhat.secondhand.order`, `checkout` | `src/order` | Finite State Machine managing order stages (`PENDING_PAYMENT`, `PAYMENT_LOCKED_IN_ESCROW`, `SHIPPED`, `DELIVERED`, `COMPLETED`). Uses `OrderItemCompensationPlanner` for partial refunds and cancellations. | Prevents state inconsistency. Atomic database rollbacks occur if payment processing fails while updating order states. |
+| **Cart & Stock Control** | `com.serhat.secondhand.cart` | `src/cart` | Temporary time-limited locking on cart items (`reservedAt` and `reservationEndTime`). Scheduled background task (`CartReservationScheduler`) cleans up expired locks. | Solves the "double purchase" problem for low-stock items. Integrates custom `CartValidator` to subtract active reservations from inventory limits. |
+| **Aura AI Engine** | `com.serhat.secondhand.ai` | `src/ai` | Gemini-powered semantic orchestrator (`AuraListingSearchOrchestrator`) that plans database queries based on free-form human text. Injectable workspace context adapters. | Translates fuzzy queries (e.g. "sporty red diesel car under 800k") into strict database parameters. Provides dynamic price suggestions to listings. |
+| **Real-Time Chat** | `com.serhat.secondhand.chat` | `src/chat`, `src/inbox` | WebSocket engine based on STOMP messaging protocol. Leverages Spring's channel interceptors to validate JWT tokens on connection shake hands. | Low-latency private rooms between buyers and sellers. Keeps track of instant online indicators and unread message tallies. |
+| **Offers & Bids** | `com.serhat.secondhand.offer` | `src/offer` | Advanced bidding system supporting counter-offers and status transitions. Implements instant dynamic calculations of price splits. | Negotiates final transactions automatically between users. Updates listing prices dynamically upon transaction close. |
+| **Campaign & Coupons** | `com.serhat.secondhand.campaign`, `coupon` | `src/campaign`, `coupon` | Flexible marketing campaign framework mapping targeted user categories to discount structures. Scheduled cron tasks govern active/inactive states. | Incentivizes user conversions via dynamic coupon codes and user eligibility rules checking. |
+| **Showcase Slots** | `com.serhat.secondhand.showcase` | `src/showcase` | Showcase slot bidding and placement management. An automated scheduler coordinates the rotation of top-tier listings on the homepage. | Monetizes user listings via premium slot bookings, integrating directly with the wallet/escrow modules for purchases. |
+| **Forums & Reviews** | `com.serhat.secondhand.forum`, `review` | `src/forum`, `reviews` | Structured QA threads, community comment boards, and double-blind user rating mechanisms. | Creates a community marketplace. Prevents fake reviews by validating that reviewers have a completed purchase history with the seller. |
 
 ---
 
