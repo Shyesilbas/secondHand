@@ -55,3 +55,8 @@ secondhand_dump.sql
 # Katalog seed verileri — repoya gitmez, lokal tutulur.
 # Yol: src/main/resources/data/
 src/main/resources/data/
+
+# Root scripts and scratch files
+/*.py
+/scratch/
+/plan*.md
