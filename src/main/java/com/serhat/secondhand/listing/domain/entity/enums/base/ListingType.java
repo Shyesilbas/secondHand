@@ -1,8 +1,10 @@
 package com.serhat.secondhand.listing.domain.entity.enums.base;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 
 @Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public enum ListingType {
     VEHICLE("Vehicle"),
     ELECTRONICS("Electronics"), 

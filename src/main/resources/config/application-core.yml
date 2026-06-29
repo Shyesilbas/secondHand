@@ -91,3 +91,6 @@ app:
   e-wallet:
     default-balance: 10000.00
     spending-warning-threshold: 0.90
+  membership:
+    premium-price: ${PREMIUM_PRICE:100.00}
+    premium-duration-days: ${PREMIUM_DURATION_DAYS:30}

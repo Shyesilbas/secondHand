@@ -1,6 +1,7 @@
 package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.core.config.AppConfigProperties;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.dto.PaymentDto;
@@ -31,6 +32,7 @@ public class MembershipServiceTest {
     private UserRepository userRepository;
     private PaymentProcessor paymentProcessor;
     private PaymentRequestFactory paymentRequestFactory;
+    private AppConfigProperties appConfigProperties;
     private MembershipService membershipService;
     private MembershipScheduler membershipScheduler;
 
@@ -39,7 +41,8 @@ public class MembershipServiceTest {
         userRepository = mock(UserRepository.class);
         paymentProcessor = mock(PaymentProcessor.class);
         paymentRequestFactory = mock(PaymentRequestFactory.class);
-        membershipService = new MembershipService(userRepository, paymentProcessor, paymentRequestFactory);
+        appConfigProperties = new AppConfigProperties();
+        membershipService = new MembershipService(userRepository, paymentProcessor, paymentRequestFactory, appConfigProperties);
         membershipScheduler = new MembershipScheduler(userRepository, membershipService);
     }
 
@@ -50,7 +53,7 @@ public class MembershipServiceTest {
         user.setId(userId);
         user.setPlan(MembershipPlan.FREE);
 
-        MembershipUpgradeRequest upgradeRequest = new MembershipUpgradeRequest(true, List.of(), "123456");
+        MembershipUpgradeRequest upgradeRequest = new MembershipUpgradeRequest(true, List.of(), "123456", "test-idempotency-key");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         
@@ -84,7 +87,7 @@ public class MembershipServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        MembershipUpgradeRequest upgradeRequest = new MembershipUpgradeRequest(true, List.of(), "123456");
+        MembershipUpgradeRequest upgradeRequest = new MembershipUpgradeRequest(true, List.of(), "123456", "test-idempotency-key");
 
         assertThrows(BusinessException.class, () -> membershipService.upgradeToPremium(userId, upgradeRequest));
     }

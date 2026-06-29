@@ -24,12 +24,10 @@ import java.time.LocalDateTime;
 @Slf4j
 public class MembershipService {
 
-    private static final BigDecimal PREMIUM_PRICE = new BigDecimal("100.00");
-    private static final int PREMIUM_DURATION_DAYS = 30;
-
     private final UserRepository userRepository;
     private final PaymentProcessor paymentProcessor;
     private final PaymentRequestFactory paymentRequestFactory;
+    private final com.serhat.secondhand.core.config.AppConfigProperties appConfigProperties;
 
     public MembershipStatusDto getStatus(Long userId) {
         User user = userRepository.findById(userId)
@@ -45,8 +43,13 @@ public class MembershipService {
             throw new BusinessException("Zaten Premium üyesiniz.", HttpStatus.BAD_REQUEST, "ALREADY_PREMIUM");
         }
 
-        String idempotencyKey = "membership-upgrade-" + userId + "-" + System.currentTimeMillis();
-        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, PREMIUM_PRICE, PaymentType.EWALLET, idempotencyKey, request);
+        BigDecimal premiumPrice = appConfigProperties.getMembership().getPremiumPrice();
+        int premiumDurationDays = appConfigProperties.getMembership().getPremiumDurationDays();
+
+        String idempotencyKey = (request.idempotencyKey() != null && !request.idempotencyKey().isBlank())
+                ? request.idempotencyKey()
+                : "membership-upgrade-" + userId + "-" + java.util.Objects.hash(request.verificationCode(), request.acceptedAgreementIds());
+        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, premiumPrice, PaymentType.EWALLET, idempotencyKey, request);
 
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
         if (paymentResult.isError()) {
@@ -54,9 +57,9 @@ public class MembershipService {
         }
 
         user.setPlan(MembershipPlan.PREMIUM);
-        user.setExpirationDate(LocalDateTime.now().plusDays(PREMIUM_DURATION_DAYS));
+        user.setExpirationDate(LocalDateTime.now().plusDays(premiumDurationDays));
         user.setPurchaseDate(LocalDateTime.now());
-        user.setPrice(PREMIUM_PRICE);
+        user.setPrice(premiumPrice);
         user.setAutoRenew(true);
         user.setAiListingQuota(MembershipPlan.PREMIUM.getMonthlyAiListingQuota());
         userRepository.save(user);
@@ -98,13 +101,16 @@ public class MembershipService {
             return false;
         }
 
-        String idempotencyKey = "membership-autorenew-" + user.getId() + "-" + System.currentTimeMillis();
+        BigDecimal premiumPrice = appConfigProperties.getMembership().getPremiumPrice();
+        int premiumDurationDays = appConfigProperties.getMembership().getPremiumDurationDays();
+
+        String idempotencyKey = "membership-autorenew-" + user.getId() + "-" + java.time.LocalDate.now();
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .fromUserId(user.getId())
                 .toUserId(null)
                 .receiverName("SYSTEM")
                 .receiverSurname("MEMBERSHIP")
-                .amount(PREMIUM_PRICE)
+                .amount(premiumPrice)
                 .currency("TRY")
                 .paymentType(PaymentType.EWALLET)
                 .transactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT)
@@ -117,9 +123,9 @@ public class MembershipService {
         var paymentResult = paymentProcessor.executeSinglePayment(user.getId(), paymentRequest);
         if (paymentResult.isSuccess()) {
             user.setPlan(MembershipPlan.PREMIUM);
-            user.setExpirationDate(user.getExpirationDate() != null ? user.getExpirationDate().plusDays(PREMIUM_DURATION_DAYS) : LocalDateTime.now().plusDays(PREMIUM_DURATION_DAYS));
+            user.setExpirationDate(user.getExpirationDate() != null ? user.getExpirationDate().plusDays(premiumDurationDays) : LocalDateTime.now().plusDays(premiumDurationDays));
             user.setPurchaseDate(LocalDateTime.now());
-            user.setPrice(PREMIUM_PRICE);
+            user.setPrice(premiumPrice);
             user.setAutoRenew(true);
             user.setAiListingQuota(MembershipPlan.PREMIUM.getMonthlyAiListingQuota());
             userRepository.save(user);

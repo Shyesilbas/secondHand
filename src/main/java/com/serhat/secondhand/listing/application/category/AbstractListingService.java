@@ -37,7 +37,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     }
 
     @Transactional
-    @CacheEvict(value = "userProfile", allEntries = true)
+    @CacheEvict(value = "userListings", allEntries = true)
     public Result<UUID> createListing(C request, Long sellerId) {
         log.info("Creating {} listing for sellerId: {}", getListingType(), sellerId);
 
@@ -128,7 +128,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     }
     
     @Transactional
-    @CacheEvict(value = "userProfile", allEntries = true)
+    @CacheEvict(value = "userListings", allEntries = true)
     protected <U, R> Result<Void> performUpdate(
             UUID id,
             U request,
@@ -192,7 +192,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
      * @param validator     runs spec validators and returns a Result
      */
     @Transactional
-    @CacheEvict(value = "userProfile", allEntries = true)
+    @CacheEvict(value = "userListings", allEntries = true)
     protected <U> Result<Void> standardUpdate(
             UUID id,
             U request,

@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_agreements")
+@Table(name = "user_agreements", indexes = {
+    @jakarta.persistence.Index(name = "idx_user_agreements_user", columnList = "user_id")
+})
 @Data
 @Builder
 @NoArgsConstructor

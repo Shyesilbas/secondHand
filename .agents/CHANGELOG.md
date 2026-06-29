@@ -48,3 +48,5 @@ This document contains historical completed work and timeline events for the Sec
 - `listingTitle` ve `listingNo` alanlarının ListingCreation ödeme işlemlerinde `null` kaydedilmesi sorunu `PaymentModuleAdapter` ile çözüldü.
 - Backend Thymeleaf email template'leri Teal tasarım sistemine uyumlu hale getirildi.
 - `CloudinaryConfig` `System.out.println` yerine Logger kullanımı. `ListingMapper` boş catch bloğuna loglama.
+- Safe Meetup siparişleri için review desteği backend (`ReviewValidator.java`) ve frontend (`useOrderFlow.js`, `OrdersListLayout.jsx`) entegre edilerek tamamlandı. Unit test'leri (`ReviewValidatorTest.java`) yazıldı ve doğrulandı.
+- `OrderDetailsModal` içerisindeki sipariş ürünlerinin görseli ve başlığı tıklanabilir yapılarak `ListingDetailPage` sayfasına yönlendirme ve modal kapatma işlevleri entegre edildi.

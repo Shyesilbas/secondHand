@@ -18,5 +18,6 @@ public record BulkShowcasePaymentRequest(
     String verificationCode,
     com.serhat.secondhand.payment.entity.PaymentType paymentType,
     boolean agreementsAccepted,
-    List<UUID> acceptedAgreementIds
+    List<UUID> acceptedAgreementIds,
+    String idempotencyKey
 ) {}

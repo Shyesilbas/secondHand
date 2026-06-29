@@ -246,7 +246,7 @@ export const useOrderFlow = ({
     }
     if (statusFilter === ORDER_STATUS_TAB_FILTER.DELIVERED_GROUP) {
       return ordersUnfiltered.filter((o) =>
-        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(o.status)
+        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED].includes(o.status)
       );
     }
     return ordersUnfiltered.filter((o) => o.status === statusFilter);
@@ -264,7 +264,7 @@ export const useOrderFlow = ({
       }
 
       const reviewEligibleOrders = orders.filter((order) =>
-        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(order?.status)
+        [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED].includes(order?.status)
       );
       const orderItemIds = reviewEligibleOrders.flatMap((order) =>
         (order?.orderItems || [])

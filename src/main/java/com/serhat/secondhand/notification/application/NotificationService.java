@@ -198,5 +198,52 @@ public class NotificationService implements INotificationService {
                 .createdAt(row.getCreatedAt())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public java.util.List<NotificationDto> createAndSendBulk(java.util.List<NotificationRequest> requests) {
+        log.info("Creating bulk notifications, size: {}", requests.size());
+        if (requests.isEmpty()) {
+            return java.util.List.of();
+        }
+
+        java.util.List<Long> userIds = requests.stream()
+                .map(NotificationRequest::getUserId)
+                .distinct()
+                .toList();
+
+        java.util.Map<Long, User> userMap = userRepository.findAllById(userIds).stream()
+                .collect(java.util.stream.Collectors.toMap(User::getId, java.util.function.Function.identity()));
+
+        java.util.List<Notification> notificationsToSave = new java.util.ArrayList<>();
+        for (NotificationRequest req : requests) {
+            User user = userMap.get(req.getUserId());
+            if (user == null) {
+                log.warn("User {} not found for bulk notification, skipping", req.getUserId());
+                continue;
+            }
+            Notification notification = Notification.builder()
+                    .user(user)
+                    .type(req.getType())
+                    .title(req.getTitle())
+                    .message(req.getMessage())
+                    .actionUrl(req.getActionUrl())
+                    .metadata(req.getMetadata())
+                    .isRead(false)
+                    .build();
+            notificationsToSave.add(notification);
+        }
+
+        java.util.List<Notification> savedList = notificationRepository.saveAll(notificationsToSave);
+        log.info("Bulk notifications saved successfully, count: {}", savedList.size());
+
+        return savedList.stream()
+                .map(n -> {
+                    NotificationDto dto = notificationMapper.toDto(n);
+                    webSocketService.sendNotificationToUser(n.getUser().getId(), dto);
+                    return dto;
+                })
+                .toList();
+    }
 }
 

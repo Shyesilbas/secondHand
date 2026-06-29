@@ -23,7 +23,7 @@ public class PriceDropNotificationListener {
     private final INotificationService notificationService;
 
     @EventListener
-    @Async
+    @Async("notificationExecutor")
     public void handlePriceDroppedEvent(PriceDroppedEvent event) {
         log.info("Handling PriceDroppedEvent for listing: {}", event.getListingId());
 
@@ -42,23 +42,22 @@ public class PriceDropNotificationListener {
                 event.getNewPrice().toString(),
                 event.getCurrency());
 
+        List<NotificationRequest> requests = new java.util.ArrayList<>();
         for (User user : favoritedUsers) {
-            try {
-                // Fixed: Using constructor as builder was missing, and fixed method name
-                NotificationRequest request = new NotificationRequest();
-                request.setUserId(user.getId());
-                request.setType(NotificationType.LISTING_PRICE_DROPPED);
-                request.setTitle(title);
-                request.setMessage(message);
-                request.setMetadata(String.format("{\"listingId\": \"%s\"}", event.getListingId()));
-                
-                notificationService.createAndSend(request);
-                log.debug("Price drop notification sent to user: {}", user.getEmail());
-            } catch (Exception e) {
-                log.error("Failed to send price drop notification to user {}: {}", user.getEmail(), e.getMessage());
-            }
+            NotificationRequest request = new NotificationRequest();
+            request.setUserId(user.getId());
+            request.setType(NotificationType.LISTING_PRICE_DROPPED);
+            request.setTitle(title);
+            request.setMessage(message);
+            request.setMetadata(String.format("{\"listingId\": \"%s\"}", event.getListingId()));
+            requests.add(request);
         }
-        
-        log.info("Sent price drop notifications to {} users for listing {}", favoritedUsers.size(), event.getListingId());
+
+        try {
+            notificationService.createAndSendBulk(requests);
+            log.info("Successfully sent {} price drop notifications in bulk", requests.size());
+        } catch (Exception e) {
+            log.error("Failed to send bulk price drop notifications: {}", e.getMessage(), e);
+        }
     }
 }

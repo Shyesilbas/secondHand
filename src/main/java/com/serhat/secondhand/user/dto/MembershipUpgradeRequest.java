@@ -6,6 +6,7 @@ import java.util.UUID;
 public record MembershipUpgradeRequest(
         boolean agreementsAccepted,
         List<UUID> acceptedAgreementIds,
-        String verificationCode
+        String verificationCode,
+        String idempotencyKey
 ) {
 }

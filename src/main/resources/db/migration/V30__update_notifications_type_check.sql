@@ -1,0 +1,27 @@
+ALTER TABLE notifications DROP CONSTRAINT IF EXISTS notifications_type_check;
+
+ALTER TABLE notifications ADD CONSTRAINT notifications_type_check CHECK (
+    type IN (
+        'OFFER_RECEIVED',
+        'OFFER_ACCEPTED',
+        'OFFER_REJECTED',
+        'OFFER_COUNTERED',
+        'OFFER_EXPIRED',
+        'ORDER_CREATED',
+        'ORDER_STATUS_CHANGED',
+        'ORDER_CANCELLED',
+        'ORDER_RECEIVED',
+        'CHAT_MESSAGE_RECEIVED',
+        'LISTING_PRICE_DROPPED',
+        'LISTING_NEW_FROM_FOLLOWED',
+        'LISTING_SOLD',
+        'LISTING_FAVORITED',
+        'REVIEW_RECEIVED',
+        'PAYMENT_SUCCESS',
+        'PAYMENT_FAILED',
+        'AGREEMENT_UPDATED',
+        'ORDER_COMPLETED',
+        'ORDER_REFUNDED',
+        'GREAT_SELLER_ACHIEVED'
+    )
+);

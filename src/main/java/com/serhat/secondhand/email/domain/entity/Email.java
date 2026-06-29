@@ -20,7 +20,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "emails")
+@Table(name = "emails", indexes = {
+    @jakarta.persistence.Index(name = "idx_emails_user_deleted", columnList = "user_id, deleted_at")
+})
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE emails SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")

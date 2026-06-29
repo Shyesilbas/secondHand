@@ -272,13 +272,17 @@ public class ShowcaseService implements IShowcaseService {
                 .collect(java.util.stream.Collectors.joining(", "));
         String paymentDescription = "Bulk Showcase Payment for " + listings.size() + " listings: " + listingTitles;
 
+        String idempotencyKey = (request.idempotencyKey() != null && !request.idempotencyKey().isBlank())
+                ? request.idempotencyKey()
+                : "bulk-showcase-" + userId + "-" + java.util.Objects.hash(request.listingIds(), request.days());
+
         Listing firstListing = listings.get(0);
         ShowcasePaymentRequest tempRequest = new ShowcasePaymentRequest(
                 firstListing.getId(), request.days(),
                 request.paymentType() != null ? request.paymentType()
                         : com.serhat.secondhand.payment.entity.PaymentType.EWALLET,
                 request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(),
-                "bulk-showcase-" + userId + "-" + System.currentTimeMillis());
+                idempotencyKey);
 
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, firstListing,
                 tempRequest, finalTotalAmount);

@@ -357,7 +357,7 @@ const UnifiedOrderItem = React.memo(({
   const items = order.orderItems || [];
   const isBuyer = viewMode === ORDER_VIEW_MODES.BUYER;
   const isCompleted = order.status === ORDER_STATUSES.COMPLETED;
-  const isDelivered = order.status === ORDER_STATUSES.DELIVERED;
+  const isDelivered = order.status === ORDER_STATUSES.DELIVERED || order.status === ORDER_STATUSES.HANDOVER_CONFIRMED;
   const isShipped = order.status === ORDER_STATUSES.SHIPPED;
   const sellerTotalAmount = viewMode === ORDER_VIEW_MODES.SELLER ? items.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0) : null;
   const displayTotal = viewMode === ORDER_VIEW_MODES.SELLER ? sellerTotalAmount : parseFloat(order.totalAmount);

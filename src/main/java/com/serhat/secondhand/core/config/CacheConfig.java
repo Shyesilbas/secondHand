@@ -117,6 +117,7 @@ public class CacheConfig {
                 .withCacheConfiguration("completedOrder", completedConfig)
                 .withCacheConfiguration("paymentHistory", completedConfig)
                 .withCacheConfiguration("paymentStats", completedConfig)
+                .withCacheConfiguration("exchangeRates", completedConfig)
 
                 // Tier 2b — Kullanıcı profili (15 dakika)
                 .withCacheConfiguration("userProfile", profileConfig)
@@ -125,6 +126,7 @@ public class CacheConfig {
                 .withCacheConfiguration("reviewStatsBatch", aggregationConfig)
                 .withCacheConfiguration("favoriteStatsBatch", aggregationConfig)
                 .withCacheConfiguration("sellerViewStats", aggregationConfig)
+                .withCacheConfiguration("userListings", aggregationConfig)
 
                 // Tier 3b — Kısa süreli (5 dakika)
                 .withCacheConfiguration("pendingOrders", shortConfig)

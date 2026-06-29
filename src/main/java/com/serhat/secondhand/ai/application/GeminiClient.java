@@ -28,7 +28,14 @@ public class GeminiClient {
     @Value("${gemini.api.fallback-memory-model:gemini-3.1-flash-lite}")
     private String fallbackMemoryModel;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public GeminiClient() {
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(30000);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     public String model() {
         return model;

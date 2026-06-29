@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "chat_rooms")
+@Table(name = "chat_rooms", indexes = {
+    @jakarta.persistence.Index(name = "idx_chat_rooms_last_msg_time", columnList = "last_message_time")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,7 +35,14 @@ public class ChatRoom {
     private String listingId;
 
     @ElementCollection
-    @CollectionTable(name = "chat_room_participants", joinColumns = @JoinColumn(name = "chat_room_id"))
+    @CollectionTable(
+        name = "chat_room_participants", 
+        joinColumns = @JoinColumn(name = "chat_room_id"),
+        indexes = {
+            @Index(name = "idx_chat_room_participants_user", columnList = "user_id"),
+            @Index(name = "idx_chat_room_participants_room", columnList = "chat_room_id")
+        }
+    )
     @Column(name = "user_id")
     private Set<Long> participantIds = new HashSet<>();
 

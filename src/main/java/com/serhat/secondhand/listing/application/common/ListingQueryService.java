@@ -146,7 +146,7 @@ public class ListingQueryService {
         return getMyListings(userId, page, size, null, null, title);
     }
 
-    @Cacheable(value = "userProfile", key = "'listings:' + #userId + ':' + #page + ':' + #size")
+    @Cacheable(value = "userListings", key = "'listings:' + #userId + ':' + #page + ':' + #size")
     public CachedPage<ListingDto> getCachedUserListings(Long userId, int page, int size) {
         log.info("[CACHE MISS] userListings::{} page={}", userId, page);
         Pageable pageable = PageRequest.of(page, size,

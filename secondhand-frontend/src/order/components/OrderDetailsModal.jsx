@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime, resolveEnumLabel } from '../../common/formatters.js';
 import { ReviewButton } from '../../reviews/index.js';
 import { getLastUpdateInfo, getStatusColor, isCancellableStatus, isModifiableStatus, isRefundableStatus } from '../orderConstants.js';
@@ -444,6 +446,7 @@ const OrderDetailsModal = React.memo(({
   onReviewSuccess
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const isSellerView = viewMode === ORDER_VIEW_MODES.SELLER;
   const { enums } = useEnums();
   const notification = useNotification();
@@ -715,7 +718,15 @@ const OrderDetailsModal = React.memo(({
 
                         return (
                           <div key={reviewKey || `row-${idx}`} className={`py-4 first:pt-0 last:pb-0 flex gap-4 ${isFullyCancelled || isFullyRefunded ? 'opacity-50' : ''}`}>
-                            <div className="w-16 h-16 rounded-lg border border-border-light bg-slate-50 overflow-hidden flex-shrink-0 relative">
+                            <div 
+                              onClick={() => {
+                                if (item.listing?.id) {
+                                  navigate(ROUTES.LISTING_DETAIL(item.listing.id));
+                                  onClose();
+                                }
+                              }}
+                              className="w-16 h-16 rounded-lg border border-border-light bg-slate-50 overflow-hidden flex-shrink-0 relative cursor-pointer hover:opacity-80 transition-opacity"
+                            >
                               <img src={item.listing?.imageUrl} className="w-full h-full object-cover" alt={item.listing?.title || 'Listing'} />
                               {(isFullyCancelled || isFullyRefunded) && (
                                 <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
@@ -726,7 +737,15 @@ const OrderDetailsModal = React.memo(({
 
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="text-xs font-bold text-text-primary line-clamp-1">
+                                <h4 
+                                  onClick={() => {
+                                    if (item.listing?.id) {
+                                      navigate(ROUTES.LISTING_DETAIL(item.listing.id));
+                                      onClose();
+                                    }
+                                  }}
+                                  className="text-xs font-bold text-text-primary line-clamp-1 cursor-pointer hover:text-primary hover:underline transition-colors"
+                                >
                                   {item.listing?.title}
                                 </h4>
                                 {isFullyCancelled ? <StatusBadge label={t("cancelled")} type="rose" /> : null}

@@ -4,7 +4,6 @@ import com.serhat.secondhand.core.config.ExchangeConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.exchange.ExchangeRateDto;
 import com.serhat.secondhand.exchange.ExchangeRateResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,14 +13,22 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class ExchangeRateService {
 
     private final ExchangeConfig exchangeConfig;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public ExchangeRateService(ExchangeConfig exchangeConfig) {
+        this.exchangeConfig = exchangeConfig;
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(10000);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     private static final String API_URL = "https://v6.exchangerate-api.com/v6/{apiKey}/pair/{base}/{target}";
 
+    @org.springframework.cache.annotation.Cacheable(value = "exchangeRates", key = "#from.toUpperCase() + '_' + #to.toUpperCase()")
     public ExchangeRateDto getRate(String from, String to) {
         validateCurrencies(from, to);
         

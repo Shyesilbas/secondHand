@@ -112,6 +112,7 @@ public class LoginService {
         return "Logout successful";
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public LoginResponse refreshToken(String refreshTokenValue) {
         log.info("Token refresh request");
 

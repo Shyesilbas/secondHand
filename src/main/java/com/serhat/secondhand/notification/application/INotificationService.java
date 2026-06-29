@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface INotificationService {
     
     Result<NotificationDto> createAndSend(NotificationRequest request);
+
+    java.util.List<NotificationDto> createAndSendBulk(java.util.List<NotificationRequest> requests);
     
     Result<NotificationDto> createBroadcast(NotificationRequest request);
     
