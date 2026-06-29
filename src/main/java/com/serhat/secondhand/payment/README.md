@@ -43,3 +43,6 @@ stateDiagram-v2
 
 - **Payment Feature Development**
   -> `.docs/runbooks/payment-feature-runbook.md`
+
+- **Payment Testing Guidelines**
+  -> `.docs/runbooks/payment-testing-guidelines.md`

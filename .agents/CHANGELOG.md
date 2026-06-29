@@ -50,3 +50,5 @@ This document contains historical completed work and timeline events for the Sec
 - `CloudinaryConfig` `System.out.println` yerine Logger kullanımı. `ListingMapper` boş catch bloğuna loglama.
 - Safe Meetup siparişleri için review desteği backend (`ReviewValidator.java`) ve frontend (`useOrderFlow.js`, `OrdersListLayout.jsx`) entegre edilerek tamamlandı. Unit test'leri (`ReviewValidatorTest.java`) yazıldı ve doğrulandı.
 - `OrderDetailsModal` içerisindeki sipariş ürünlerinin görseli ve başlığı tıklanabilir yapılarak `ListingDetailPage` sayfasına yönlendirme ve modal kapatma işlevleri entegre edildi.
+- Backend `order` paketi için 6 farklı test sınıfı altında toplam 49 adet unit test yazıldı: `OrderTest`, `OrderPolicyTest`, `OrderCreationServiceTest`, `OrderCompletionServiceTest`, `OrderItemCompensationPlannerTest`, `OrderCancellationAndRefundServiceTest`.
+- Backend `payment` paketi için 6 farklı test sınıfı altında toplam 28 adet unit test yazıldı: `PaymentRequestFactoryTest`, `PaymentPreCheckServiceTest`, `PaymentVerificationServiceTest`, `PaymentProcessorTest`, `OrderPaymentServiceTest`, `PaymentCompletedHandlersTest`.

@@ -52,3 +52,6 @@ stateDiagram-v2
 
 - **Order Feature Development**
   -> `.docs/runbooks/order-feature-runbook.md`
+
+- **Order Testing Guidelines**
+  -> `.docs/runbooks/order-testing-guidelines.md`
