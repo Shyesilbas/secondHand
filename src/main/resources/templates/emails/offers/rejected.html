@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 24px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+        .content { padding: 32px; line-height: 1.6; color: #334155; }
+        .offer-box { border: 2px solid #e0e7ff; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0; background-color: #f5f3ff; }
+        .offer-box h2 { color: #4338ca; margin: 0 0 8px 0; font-size: 28px; }
+        .listing-title { font-weight: 600; font-size: 16px; margin-bottom: 16px; color: #1e293b; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        .detail-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${headerTitle}">Yeni Bir Teklif Aldınız!</h1>
+        </div>
+        <div class="content">
+            <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
+            <p th:text="${headline}">İlanınız için yeni bir teklif geldi.</p>
+            
+            <div class="listing-title" th:text="${listingTitle}">Ürün Adı</div>
+            
+            <div class="offer-box">
+                <h2 th:text="${totalPrice}">0.00 TL</h2>
+                <span th:if="${quantity > 1}" style="color: #64748b; font-size: 14px;">Birim Fiyat: <span th:text="${unitPrice}">0.00 TL</span></span>
+            </div>
+
+            <div class="detail-row">
+                <span style="color: #64748b;">Miktar:</span>
+                <strong th:text="${quantity}">1</strong>
+            </div>
+            <div class="detail-row" th:if="${expiresAt != null}">
+                <span style="color: #64748b;">Geçerlilik Süresi:</span>
+                <strong th:text="${expiresAt}">...</strong>
+            </div>
+            
+            <p th:if="${nextStep != null}" style="margin-top: 24px; font-weight: 600; color: #4338ca;" th:text="${nextStep}">Sıradaki adım...</p>
+
+            <p style="margin-top: 32px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
+        </div>
+        <div class="footer">
+            &copy; 2026 SecondHand. Tüm hakları saklıdır.
+        </div>
+    </div>
+</body>
+</html>

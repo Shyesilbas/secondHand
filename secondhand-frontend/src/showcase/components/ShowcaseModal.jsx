@@ -29,13 +29,14 @@ const ShowcaseModal = ({
   listingTitle = '',
   onSuccess,
   isExtension = false,
-  showcaseId = null
+  showcaseId = null,
+  initialDays = 7
 }) => {
   const {
     t
   } = useTranslation();
   const [step, setStep] = useState(1);
-  const [days, setDays] = useState(7);
+  const [days, setDays] = useState(initialDays);
   const [allAgreementsAccepted, setAllAgreementsAccepted] = useState(false);
   const [requiredAgreements, setRequiredAgreements] = useState([]);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
@@ -121,11 +122,11 @@ const ShowcaseModal = ({
                             </div>
                             <div className="px-4 py-4 space-y-2.5">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">{t("subtotal")}{days}{t("day")}{days !== 1 ? 's' : ''})</span>
+                                    <span className="text-slate-500">{t("subtotal")} ({days} {t("day")}{days !== 1 ? 's' : ''})</span>
                                     <span className="font-semibold text-slate-800 font-mono">{calculateSubtotal().toFixed(2)}₺</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">{t("tax")}{showcasePricing.taxPercentage}%)</span>
+                                    <span className="text-slate-500">{t("tax")} ({showcasePricing.taxPercentage}%)</span>
                                     <span className="font-semibold text-slate-800 font-mono">{calculateTax().toFixed(2)}₺</span>
                                 </div>
                                 <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">

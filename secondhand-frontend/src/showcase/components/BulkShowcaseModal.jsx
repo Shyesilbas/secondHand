@@ -138,7 +138,7 @@ const BulkShowcaseModal = ({
                 {/* Left: Selection Info */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{t("selected_listings")}{itemCount})</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{t("selected_listings")} ({itemCount})</label>
                     <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                       {uniqueListings.map(l => <div key={l.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-100">
                           <div className="w-10 h-10 rounded-lg bg-background-primary overflow-hidden shrink-0 border border-border-light/50">
@@ -164,7 +164,7 @@ const BulkShowcaseModal = ({
                 <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm text-slate-500">
-                      <span>{t("base_price")}{itemCount}{t("x")}</span>
+                      <span>{t("base_price")} ({itemCount} {t("x")})</span>
                       <span>{formatCurrency(totalBeforeDiscount, 'TRY')}</span>
                     </div>
                     {hasDiscount && <div className="flex justify-between text-sm text-status-success font-bold bg-status-success-bg p-3 rounded-xl border border-emerald-100 animate-in zoom-in-95">

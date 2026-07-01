@@ -1,7 +1,9 @@
 package com.serhat.secondhand.agreements.application;
 
 import com.serhat.secondhand.agreements.entity.enums.AgreementType;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.AgreementUpdateEmailEvent;
+import com.serhat.secondhand.email.application.event.model.GenericEmailData;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
@@ -29,7 +31,7 @@ public class AgreementEmailNotificationService {
 
     private static final int BROADCAST_BATCH_SIZE = 150;
 
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
     private final EmailConfig emailConfig;
     private final EmailRepository emailRepository;
     private final UserRepository userRepository;
@@ -46,15 +48,17 @@ public class AgreementEmailNotificationService {
         if (emailRepository.existsByUser_IdAndEmailTypeAndSubject(user.getId(), EmailType.AGREEMENT_UPDATED, subject)) {
             return;
         }
-        org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
-        ctx.setVariable("userName", user.getName());
-        ctx.setVariable("headerTitle", template.getTitle());
-        ctx.setVariable("message", template.getMessage());
-        ctx.setVariable("actionText", "Sözleşmeleri Görüntüle");
-        ctx.setVariable("actionUrl", "/profile/agreements");
 
-        emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.AGREEMENT_UPDATED);
-        log.debug("Agreement outdated email queued for userId={} type={}", userId, agreementType);
+        var data = GenericEmailData.builder()
+                .userName(user.getName())
+                .headerTitle(template.getTitle())
+                .message(template.getMessage())
+                .actionText("Sözleşmeleri Görüntüle")
+                .actionUrl("/profile/agreements")
+                .build();
+
+        emailEventPublisher.publish(new AgreementUpdateEmailEvent(user, subject, data));
+        log.debug("Agreement outdated email event published for userId={} type={}", userId, agreementType);
     }
 
     public void notifyAllUsersAgreementPublished(AgreementType agreementType, String version) {
@@ -78,19 +82,20 @@ public class AgreementEmailNotificationService {
                 if (alreadySentUserIds.contains(u.getId())) {
                     continue;
                 }
-                org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
-                ctx.setVariable("userName", u.getName());
-                ctx.setVariable("headerTitle", template.getTitle());
-                ctx.setVariable("message", template.getMessage());
-                ctx.setVariable("actionText", "Sözleşmeleri Görüntüle");
-                ctx.setVariable("actionUrl", "/profile/agreements");
+                var data = GenericEmailData.builder()
+                        .userName(u.getName())
+                        .headerTitle(template.getTitle())
+                        .message(template.getMessage())
+                        .actionText("Sözleşmeleri Görüntüle")
+                        .actionUrl("/profile/agreements")
+                        .build();
 
-                emailService.sendTemplateEmail(u, subject, "generic-notification", ctx, EmailType.AGREEMENT_UPDATED);
+                emailEventPublisher.publish(new AgreementUpdateEmailEvent(u, subject, data));
             }
             pageable = batch.nextPageable();
         } while (batch.hasNext());
 
-        log.info("Agreement publish emails sent for type={} version={}", agreementType, version);
+        log.info("Agreement publish emails event published for type={} version={}", agreementType, version);
     }
 
     private String buildSubject(NotificationRequest template) {

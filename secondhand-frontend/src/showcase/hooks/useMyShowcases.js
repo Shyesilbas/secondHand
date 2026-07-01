@@ -41,6 +41,7 @@ export const useMyShowcases = (userId) => {
     isMutating: extendMutation.isPending || cancelMutation.isPending,
     extendError: extendMutation.error?.response?.data?.message || extendMutation.error?.message || null,
     cancelError: cancelMutation.error?.response?.data?.message || cancelMutation.error?.message || null,
+    refresh,
   };
 };
 

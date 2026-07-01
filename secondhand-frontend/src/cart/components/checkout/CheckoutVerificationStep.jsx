@@ -36,6 +36,26 @@ const CheckoutVerificationStep = ({
     suggestedCode: suggestedFromInbox,
     enabled: true
   });
+  useEffect(() => {
+    if (!suggestedFromInbox) {
+      fetchEmails().catch(() => {});
+      let count = 0;
+      const interval = setInterval(async () => {
+        if (count >= 6 || suggestedFromInbox) {
+          clearInterval(interval);
+          return;
+        }
+        count++;
+        try {
+          await fetchEmails();
+        } catch (err) {
+          console.debug('Polling emails failed:', err);
+        }
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [suggestedFromInbox, fetchEmails]);
+
   const {
     formatted: ttlFormatted,
     isExpired: ttlExpired,

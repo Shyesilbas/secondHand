@@ -20,7 +20,15 @@ public enum EmailType {
     /** Yasal metin / sözleşme güncellemeleri — yalnızca gelen kutusu; in-app bildirim değil */
     AGREEMENT_UPDATED("Agreement Updated"),
     GREAT_SELLER_ACHIEVEMENT("Great Seller Achievement"),
-    SYSTEM("System");
+    SYSTEM("System"),
+    ORDER_CONFIRMATION("Order Confirmation"),
+    PAYMENT_RECEIPT("Payment Receipt"),
+    SHIPPING_NOTIFICATION("Shipping Notification"),
+    MEMBERSHIP_ACTIVATED("Membership Activated"),
+    MEMBERSHIP_EXPIRING("Membership Expiring"),
+    ESCROW_RELEASED("Escrow Released"),
+    LISTING_APPROVED("Listing Approved"),
+    REVIEW_SUBMITTED("Review Submitted");
 
     private final String label;
 

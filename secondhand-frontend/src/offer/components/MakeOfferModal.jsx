@@ -149,7 +149,7 @@ const MakeOfferModal = ({
           {recommendedOffers.length > 0 ? <div className="rounded-xl border border-border-light bg-slate-50/80 p-4">
               <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("recommended_offer")}</span>
-                {listTotal != null ? <span className="text-xs text-slate-500">{t("list_total")}{qtyNum}{t("unit")}{' '}
+                {listTotal != null ? <span className="text-xs text-slate-500">{t("list_total")} ({qtyNum}{t("unit")}){' '}
                     <span className="font-semibold text-slate-800">{formatCurrency(listTotal, currency)}</span>
                   </span> : null}
               </div>

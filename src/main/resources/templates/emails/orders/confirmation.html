@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .header { background-color: #0d9488; padding: 30px 24px; text-align: center; color: #ffffff; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px 24px; text-align: center; color: #ffffff; }
         .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
         .content { padding: 32px; color: #334155; }
@@ -24,11 +24,11 @@
         .item-meta { font-size: 14px; color: #64748b; }
         .item-price { font-weight: 700; font-size: 16px; color: #0f172a; }
         
-        .address-box { background-color: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 8px; padding: 16px; margin-top: 24px; }
-        .address-box h3 { margin: 0 0 12px 0; color: #0f766e; font-size: 16px; }
+        .address-box { background-color: #f5f3ff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 16px; margin-top: 24px; }
+        .address-box h3 { margin: 0 0 12px 0; color: #4338ca; font-size: 16px; }
         
         .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
-        .highlight { color: #0d9488; font-weight: 600; }
+        .highlight { color: #4f46e5; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -42,8 +42,24 @@
             <p>Siparişiniz başarıyla alındı ve onaylandı. İşte siparişinizin detayları:</p>
             
             <div class="order-details">
+                <div class="detail-row" th:if="${orderDate != null && !#strings.isEmpty(orderDate)}">
+                    <span class="detail-label">Sipariş Tarihi:</span>
+                    <span class="detail-value" th:text="${orderDate}">30.06.2026 12:00</span>
+                </div>
+                <div class="detail-row" th:if="${paymentMethod != null && !#strings.isEmpty(paymentMethod)}">
+                    <span class="detail-label">Ödeme Yöntemi:</span>
+                    <span class="detail-value" th:text="${paymentMethod}">E-Cüzdan</span>
+                </div>
                 <div class="detail-row">
-                    <span class="detail-label">Durum:</span>
+                    <span class="detail-label">Teslimat Yöntemi:</span>
+                    <span class="detail-value" th:text="${deliveryMethod == 'SAFE_MEETUP' ? 'Elden Güvenli Buluşma (Safe Meetup)' : 'Kargo'}">Kargo</span>
+                </div>
+                <div class="detail-row" th:if="${notes != null && !#strings.isEmpty(notes)}">
+                    <span class="detail-label">Sipariş Notu:</span>
+                    <span class="detail-value" th:text="${notes}">Not</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Sipariş Durumu:</span>
                     <span class="detail-value" th:text="${status}">ONAYLANDI</span>
                 </div>
                 <div class="detail-row">
@@ -61,10 +77,10 @@
                 <!-- Iterate over items here -->
                 <div class="item-row" th:each="item : ${items}">
                     <div class="item-info">
-                        <div class="item-title" th:text="${item.title}">Ürün Adı</div>
+                        <div class="item-title" th:text="${item.listing.title}">Ürün Adı</div>
                         <div class="item-meta">Adet: <span th:text="${item.quantity}">1</span></div>
                     </div>
-                    <div class="item-price" th:text="${item.price}">0.00 TL</div>
+                    <div class="item-price" th:text="${item.totalPrice + ' ' + item.currency}">0.00 TL</div>
                 </div>
             </div>
 

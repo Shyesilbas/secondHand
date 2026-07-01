@@ -55,6 +55,23 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
+    @Bean(name = "emailExecutor")
+    public ThreadPoolTaskExecutor emailExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("email-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setRejectedExecutionHandler((r, e) -> 
+            log.warn("Email task rejected. Queue full. Task: {}", r.toString()));
+        executor.initialize();
+        
+        log.info("Email executor initialized - Core: 5, Max: 10, Queue: 100");
+        return executor;
+    }
+
     @Bean(name = "viewTrackingExecutor")
     public ThreadPoolTaskExecutor viewTrackingExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

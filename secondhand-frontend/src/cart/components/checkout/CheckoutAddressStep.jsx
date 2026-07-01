@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useState, useMemo, useEffect, memo } from 'react';
 import { ChevronDown, Plus, ArrowLeft, ArrowRight, Info } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../common/constants/routes.js';
+import AddressForm from '../../../user/components/address/AddressForm.jsx';
+import useAddresses from '../../../user/hooks/useAddresses.js';
+
 const CheckoutAddressStep = ({
   addresses,
   selectedShippingAddressId,
@@ -24,10 +25,24 @@ const CheckoutAddressStep = ({
   const {
     t
   } = useTranslation();
-  const navigate = useNavigate();
+  const { addAddress, loading: addressMutating, error: addressError } = useAddresses();
+  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
   const hasAddresses = Array.isArray(addresses) && addresses.length > 0;
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(() => !selectedBillingAddressId || selectedBillingAddressId === selectedShippingAddressId);
   const [customLocationActive, setCustomLocationActive] = useState(false);
+
+  const handleAddAddressSubmit = async (newAddress) => {
+    try {
+      const result = await addAddress(newAddress);
+      if (result?.id) {
+        setSelectedShippingAddressId(Number(result.id));
+        setSelectedBillingAddressId(Number(result.id));
+      }
+      setIsAddAddressModalOpen(false);
+    } catch (e) {
+      console.error('Failed to add address:', e);
+    }
+  };
   const handleShippingChange = id => {
     setSelectedShippingAddressId(Number(id));
     if (billingSameAsShipping || deliveryMethod === 'SAFE_MEETUP') {
@@ -84,8 +99,11 @@ const CheckoutAddressStep = ({
         <h3 className="text-sm font-bold text-text-primary mb-4 tracking-wide uppercase">{t("teslimat_y_ntemi")}</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Cargo Option */}
-          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
-            <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="mt-1 h-4 w-4 rounded-full border-border text-primary focus:ring-primary/10" />
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${deliveryMethod === 'CARGO' ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
+            <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="sr-only" />
+            <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
+              {deliveryMethod === 'CARGO' && <span className="h-2 w-2 rounded-full bg-primary" />}
+            </span>
             <div>
               <span className="block text-sm font-bold text-text-primary">{t("kargo_ile_g_nderim")}</span>
               <span className="mt-1 block text-xs text-text-muted leading-relaxed">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
@@ -93,8 +111,11 @@ const CheckoutAddressStep = ({
           </label>
 
           {/* Safe Meetup Option */}
-          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 ${!canMeetup ? 'opacity-50 cursor-not-allowed border-border-light bg-background-secondary' : deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
-            <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="mt-1 h-4 w-4 rounded-full border-border text-primary focus:ring-primary/10 disabled:opacity-50" />
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${!canMeetup ? 'opacity-50 cursor-not-allowed border-border-light bg-background-secondary' : deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
+            <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="sr-only" />
+            <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
+              {deliveryMethod === 'SAFE_MEETUP' && <span className="h-2 w-2 rounded-full bg-primary" />}
+            </span>
             <div>
               <span className="block text-sm font-bold text-text-primary flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
                 e.preventDefault();
@@ -151,13 +172,19 @@ const CheckoutAddressStep = ({
           <h3 className="text-sm font-medium text-text-primary">
             {deliveryMethod === 'SAFE_MEETUP' ? 'Fatura Adresi' : 'Adres Bilgisi'}
           </h3>
-          <span className="text-caption font-medium uppercase tracking-widest text-text-muted">{t("gerekli")}</span>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setIsAddAddressModalOpen(true)} className="inline-flex items-center gap-1 text-xs font-bold text-primary uppercase tracking-wider hover:text-primary-hover">
+              <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+              {t("add_address")}
+            </button>
+            <span className="text-caption font-medium uppercase tracking-widest text-text-muted">{t("gerekli")}</span>
+          </div>
         </div>
 
         {!hasAddresses ? (
           <div className="rounded-lg border border-dashed border-border-light bg-background-secondary py-10 text-center">
             <p className="mb-4 text-sm text-text-muted">{t("no_saved_addresses")}</p>
-            <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="inline-flex items-center gap-1.5 rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary-hover">
+            <button type="button" onClick={() => setIsAddAddressModalOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary-hover">
               <Plus className="h-3.5 w-3.5" strokeWidth={2} />{t("add_address")}
             </button>
           </div>
@@ -166,12 +193,12 @@ const CheckoutAddressStep = ({
             {addresses.map(address => {
               const isSelected = String(selectedShippingAddressId) === String(address.id);
               return (
-                <label key={address.id} className={`relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 ${isSelected ? 'border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 scale-[1.005]' : 'border-border-light bg-background-primary hover:border-border hover:shadow-sm'}`}>
+                <label key={address.id} className={`relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${isSelected ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
                   <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
                   <div className="flex items-start gap-3">
                     {/* Radio indicator */}
-                    <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${isSelected ? 'border-primary' : 'border-border'}`}>
-                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary animate-scaleUp" />}
+                    <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${isSelected ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
+                      {isSelected && <span className="h-2 w-2 rounded-full bg-primary" />}
                     </span>
 
                     <div className="min-w-0 flex-1">
@@ -254,6 +281,15 @@ const CheckoutAddressStep = ({
           </button>
         </div>
       </div>
+
+      <AddressForm
+        isOpen={isAddAddressModalOpen}
+        onClose={() => setIsAddAddressModalOpen(false)}
+        onSubmit={handleAddAddressSubmit}
+        loading={addressMutating}
+        error={addressError}
+      />
     </div>;
 };
+
 export default memo(CheckoutAddressStep);

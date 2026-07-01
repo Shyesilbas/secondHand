@@ -34,8 +34,8 @@ export const useShowcase = () => {
     });
 
         const extendShowcaseMutation = useMutation({
-        mutationFn: ({ showcaseId, days }) => 
-            showcaseService.extendShowcase(showcaseId, days),
+        mutationFn: ({ showcaseId, request }) => 
+            showcaseService.extendShowcase(showcaseId, request),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
             queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
@@ -55,8 +55,8 @@ export const useShowcase = () => {
         const createShowcase = (listingId, days, paymentType) => 
         createShowcaseMutation.mutateAsync({ listingId, days, paymentType });
 
-    const extendShowcase = (showcaseId, days) => 
-        extendShowcaseMutation.mutateAsync({ showcaseId, days });
+    const extendShowcase = (showcaseId, request) => 
+        extendShowcaseMutation.mutateAsync({ showcaseId, request });
 
     const cancelShowcase = (showcaseId) => 
         cancelShowcaseMutation.mutateAsync(showcaseId);

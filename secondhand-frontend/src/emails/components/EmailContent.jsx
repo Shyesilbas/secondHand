@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from '../../common/formatters.js';
 import { Trash2 } from 'lucide-react';
+import { EMAIL_TYPE_LABELS, EMAIL_TYPE_BADGE_COLORS } from '../emails.js';
 const MS_HEADER = '#f3f2f1';
 const MS_BORDER = '#edebe9';
 
@@ -34,41 +35,46 @@ const EmailContent = ({
     };
 
     return <div className="flex h-full min-h-0 flex-col bg-main-bg">
-            {/* Üst: konu + araç (Outlook’ta sağda sil vb.) */}
-            <header className="shrink-0 border-b border-border-light bg-background-secondary px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                    <h1 className="text-xl font-semibold text-text-primary min-w-0 flex-1 tracking-tight lg:text-2xl">
-                        {email.subject}
-                    </h1>
-                    {onDelete && <div className="flex shrink-0 items-center gap-1 sm:pt-0.5">
-                            <button type="button" onClick={() => onDelete(email.id)} disabled={isDeleting} className="rounded-md p-2 text-text-secondary transition-colors hover:bg-background-tertiary hover:text-status-error-text disabled:opacity-40" title={t("delete")}>
-                                <Trash2 className="h-5 w-5" aria-hidden />
-                            </button>
-                        </div>}
-                </div>
-
-                {/* Gönderen satırı: avatar + kimlik + zaman */}
-                <div className="mt-5 flex flex-wrap items-start gap-3 border-t border-border-light pt-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white bg-primary-600" aria-hidden>
+            {/* Compact Header: Merged subject, sender, recipient, date, tag and actions */}
+            <header className="shrink-0 border-b border-border-light bg-background-secondary px-4 py-3 sm:px-6">
+                <div className="flex items-center gap-3">
+                    {/* Avatar */}
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white bg-primary-600" aria-hidden>
                         {initials}
                     </div>
+                    
+                    {/* Mid section: Subject & Metadata */}
                     <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold text-text-primary">
-                            {email.senderEmail}
+                        <div className="flex items-baseline gap-2">
+                            <h2 className="text-sm sm:text-base font-semibold text-text-primary truncate" title={email.subject}>
+                                {email.subject}
+                            </h2>
+                            <span className={`shrink-0 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide border ${EMAIL_TYPE_BADGE_COLORS[email.emailType] || 'border-border-light bg-main-bg text-text-secondary'}`}>
+                                {EMAIL_TYPE_LABELS[email.emailType] || email.emailType || 'Email'}
+                            </span>
                         </div>
-                        <div className="mt-0.5 text-xs text-text-secondary">
-                            <span className="font-medium text-text-secondary">{t("to")} </span>
-                            <span className="break-all">{email.recipientEmail}</span>
-                        </div>
-                        <div className="mt-2">
-                            <span className="inline-flex items-center rounded border border-border-light bg-main-bg px-2 py-0.5 text-caption font-semibold uppercase tracking-wide text-text-secondary">
-                                {email.emailType || 'Email'}
+                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-secondary">
+                            <span className="font-semibold text-text-primary truncate max-w-[200px]" title={email.senderEmail}>
+                                {email.senderEmail}
+                            </span>
+                            <span className="text-text-muted text-[10px]">&rarr;</span>
+                            <span className="truncate max-w-[200px]" title={email.recipientEmail}>
+                                {email.recipientEmail}
                             </span>
                         </div>
                     </div>
-                    <time className="ml-auto shrink-0 text-xs tabular-nums text-text-secondary sm:text-sm" dateTime={email.sentAt}>
-                        {formatDate(email.sentAt)}
-                    </time>
+                    
+                    {/* Right side: Date & Actions */}
+                    <div className="flex items-center gap-2">
+                        <time className="text-[11px] sm:text-xs tabular-nums text-text-secondary" dateTime={email.sentAt}>
+                            {formatDate(email.sentAt)}
+                        </time>
+                        {onDelete && (
+                            <button type="button" onClick={() => onDelete(email.id)} disabled={isDeleting} className="rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-background-tertiary hover:text-status-error-text disabled:opacity-40" title={t("delete")}>
+                                <Trash2 className="h-4.5 w-4.5" aria-hidden />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </header>
 

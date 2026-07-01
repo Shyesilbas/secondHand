@@ -146,6 +146,25 @@ const PaymentVerificationModal = ({
     suggestedCode: suggestedFromInbox,
     enabled: Boolean(isOpen && step === VERIFICATION_STEPS.VERIFY)
   });
+  useEffect(() => {
+    if (isOpen && step === VERIFICATION_STEPS.VERIFY && !suggestedFromInbox) {
+      onFetchEmails?.().catch(() => {});
+      let count = 0;
+      const interval = setInterval(async () => {
+        if (count >= 6 || suggestedFromInbox) {
+          clearInterval(interval);
+          return;
+        }
+        count++;
+        try {
+          await onFetchEmails?.();
+        } catch (err) {
+          console.debug('Polling verification emails failed:', err);
+        }
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [isOpen, step, suggestedFromInbox, onFetchEmails]);
   const canStartPayment = canProceedWithPaymentMethod({
     paymentType,
     paymentMethods,

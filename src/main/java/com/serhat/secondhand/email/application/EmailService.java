@@ -1,13 +1,11 @@
 package com.serhat.secondhand.email.application;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.email.dto.EmailDto;
 import com.serhat.secondhand.email.mapper.EmailMapper;
-import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,34 +26,6 @@ public class EmailService {
 
     private final EmailRepository emailRepository;
     private final EmailMapper emailMapper;
-    private final EmailConfig emailConfig;
-    private final org.thymeleaf.TemplateEngine templateEngine;
-
-    public EmailDto sendTemplateEmail(User user, String subject, String templateName, org.thymeleaf.context.Context context, EmailType emailType) {
-        String content = templateEngine.process("email/" + templateName, context);
-        return sendEmail(user, subject, content, emailType);
-    }
-
-
-    @CacheEvict(value = "userBadges", key = "#user.id")
-    public EmailDto sendEmail(User user, String subject, String content, EmailType emailType) {
-        log.info("Sending email to user: {}, emailType: {}", user.getEmail(), emailType);
-        LocalDateTime now = LocalDateTime.now();
-        Email email = Email.builder()
-                .user(user)
-                .recipientEmail(user.getEmail())
-                .senderEmail(emailConfig.getSender())
-                .subject(subject)
-                .content(content)
-                .emailType(emailType)
-                .createdAt(now)
-                .build();
-
-        email = emailRepository.save(email);
-        log.info("{} email saved with ID: {}", emailType, email.getId());
-
-        return emailMapper.toDto(email);
-    }
 
     public Page<EmailDto> getUserEmails(Long userId, Collection<EmailType> emailTypes, Pageable pageable) {
         log.info("Fetching paginated emails for userId: {}, types: {}", userId, emailTypes);

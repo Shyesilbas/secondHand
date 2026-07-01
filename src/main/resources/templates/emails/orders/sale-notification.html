@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .header { background-color: #0d9488; padding: 30px 24px; text-align: center; color: #ffffff; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px 24px; text-align: center; color: #ffffff; }
         .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
         .content { padding: 32px; color: #334155; }
         .content p { margin: 0 0 16px 0; line-height: 1.6; }
-        .summary-box { background-color: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px; }
-        .summary-box h2 { margin: 0 0 8px 0; color: #0f766e; font-size: 24px; font-weight: 700; }
-        .summary-box p { margin: 0; color: #0d9488; font-weight: 600; }
+        .summary-box { background-color: #f5f3ff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px; }
+        .summary-box h2 { margin: 0 0 8px 0; color: #4338ca; font-size: 24px; font-weight: 700; }
+        .summary-box p { margin: 0; color: #4f46e5; font-weight: 600; }
         
         .items-section { margin-top: 24px; }
         .item-row { display: flex; align-items: center; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
@@ -21,9 +21,14 @@
         .item-title { font-weight: 600; font-size: 16px; color: #1e293b; margin-bottom: 4px; }
         .item-meta { font-size: 14px; color: #64748b; }
         
-        .action-box { background-color: #f0fdfa; border-left: 4px solid #0d9488; padding: 16px; margin-top: 24px; }
-        .action-box h3 { margin: 0 0 8px 0; color: #0f766e; font-size: 16px; }
+        .action-box { background-color: #f5f3ff; border-left: 4px solid #4f46e5; padding: 16px; margin-top: 24px; }
+        .action-box h3 { margin: 0 0 8px 0; color: #4338ca; font-size: 16px; }
         .action-box p { margin: 0; color: #115e59; font-size: 14px; }
+        .order-details { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px; }
+        .detail-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .detail-label { font-weight: 600; color: #475569; }
+        .detail-value { font-weight: 700; color: #0f172a; text-align: right; }
 
         .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
     </style>
@@ -43,11 +48,30 @@
                 <p>Toplam Kazanç</p>
             </div>
 
+            <div class="order-details">
+                <div class="detail-row" th:if="${orderDate != null && !#strings.isEmpty(orderDate)}">
+                    <span class="detail-label">Sipariş Tarihi:</span>
+                    <span class="detail-value" th:text="${orderDate}">30.06.2026 12:00</span>
+                </div>
+                <div class="detail-row" th:if="${paymentMethod != null && !#strings.isEmpty(paymentMethod)}">
+                    <span class="detail-label">Ödeme Yöntemi:</span>
+                    <span class="detail-value" th:text="${paymentMethod}">E-Cüzdan</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Teslimat Yöntemi:</span>
+                    <span class="detail-value" th:text="${deliveryMethod == 'SAFE_MEETUP' ? 'Elden Güvenli Buluşma (Safe Meetup)' : 'Kargo'}">Kargo</span>
+                </div>
+                <div class="detail-row" th:if="${notes != null && !#strings.isEmpty(notes)}">
+                    <span class="detail-label">Alıcı Notu:</span>
+                    <span class="detail-value" th:text="${notes}">Not</span>
+                </div>
+            </div>
+
             <div class="items-section">
                 <h3 style="color: #334155; margin-bottom: 16px;">Satılan Ürünler</h3>
                 <div class="item-row" th:each="item : ${items}">
                     <div class="item-info">
-                        <div class="item-title" th:text="${item.title}">Ürün Adı</div>
+                        <div class="item-title" th:text="${item.listing.title}">Ürün Adı</div>
                         <div class="item-meta">Adet: <span th:text="${item.quantity}">1</span></div>
                     </div>
                 </div>
@@ -56,7 +80,7 @@
             <div class="action-box" th:if="${deliveryMethod == 'SHIPPING'}">
                 <h3>Sıradaki Adım: Kargolama</h3>
                 <p>Lütfen ürünü güvenli bir şekilde paketleyin ve alıcının aşağıdaki adresine kargolayın. Uygulama üzerinden kargo takip numarasını girmeyi unutmayın.</p>
-                <div style="margin-top: 12px; padding: 12px; background: #fff; border-radius: 6px; font-size: 14px;" th:utext="${shippingAddress}">
+                <div style="margin-top: 12px; padding: 12px; background: #fff; border-radius: 10px; font-size: 14px;" th:utext="${shippingAddress}">
                     Adres detayları...
                 </div>
             </div>

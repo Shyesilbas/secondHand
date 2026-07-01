@@ -1,9 +1,10 @@
 package com.serhat.secondhand.follow.application;
 
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.NewListingEmailEvent;
+import com.serhat.secondhand.email.application.event.model.NewListingEmailData;
 import com.serhat.secondhand.email.config.EmailConfig;
-import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.follow.dto.FollowStatsDto;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.thymeleaf.context.Context;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class SellerFollowService {
     private final SellerFollowRepository sellerFollowRepository;
     private final UserRepository userRepository;
     private final SellerFollowMapper sellerFollowMapper;
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
     private final EmailConfig emailConfig;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
@@ -204,21 +204,19 @@ public class SellerFollowService {
         
         for (SellerFollow follow : followers) {
             try {
-                Context ctx = new Context();
-                ctx.setVariable("userName", follow.getFollower().getName());
-                ctx.setVariable("headerTitle", "Yeni Bir İlan Eklendi!");
-                ctx.setVariable("introText", "Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname() + " yeni bir ilan ekledi:");
-                ctx.setVariable("listingTitle", listing.getTitle());
-                ctx.setVariable("listingPrice", listing.getPrice() + " " + listing.getCurrency());
-                ctx.setVariable("listingCity", listing.getCity());
-                ctx.setVariable("listingUrl", "/listings/" + listing.getId());
-                ctx.setVariable("manageNotificationText", "Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.");
-                
-                if (listing.getImageUrl() != null && !listing.getImageUrl().isEmpty()) {
-                    ctx.setVariable("listingImage", listing.getImageUrl());
-                }
+                var data = NewListingEmailData.builder()
+                        .userName(follow.getFollower().getName())
+                        .headerTitle("Yeni Bir İlan Eklendi!")
+                        .introText("Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname() + " yeni bir ilan ekledi:")
+                        .listingTitle(listing.getTitle())
+                        .listingPrice(listing.getPrice() + " " + listing.getCurrency())
+                        .listingCity(listing.getCity())
+                        .listingUrl("/listings/" + listing.getId())
+                        .manageNotificationText("Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.")
+                        .listingImage(listing.getImageUrl())
+                        .build();
 
-                emailService.sendTemplateEmail(follow.getFollower(), subject, "new-listing", ctx, EmailType.NEW_LISTING_NOTIFICATION);
+                emailEventPublisher.publish(new NewListingEmailEvent(follow.getFollower(), subject, data));
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
                 
                 var request = notificationTemplateCatalog.listingNewFromFollowed(

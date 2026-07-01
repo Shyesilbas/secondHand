@@ -1,8 +1,10 @@
 package com.serhat.secondhand.order.application.listener;
 
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.*;
+import com.serhat.secondhand.email.application.event.model.GenericEmailData;
+import com.serhat.secondhand.email.application.event.model.OrderConfirmationEmailData;
 import com.serhat.secondhand.email.config.EmailConfig;
-import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.order.application.OrderLogService;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
@@ -30,14 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.thymeleaf.context.Context;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OrderEmailListener {
 
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
     private final EmailConfig emailConfig;
     private final OrderMapper orderMapper;
     private final IUserService userService;
@@ -66,12 +67,13 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iptal edilmiştir.";
-            
-            Context ctx1 = new Context();
-            ctx1.setVariable("userName", event.requester().getName());
-            ctx1.setVariable("message", content);
-            ctx1.setVariable("headerTitle", "Sipariş İptali");
-            emailService.sendTemplateEmail(event.requester(), emailConfig.getOrder().getCancelledSubject(), "generic-notification", ctx1, EmailType.NOTIFICATION);
+
+            var data1 = GenericEmailData.builder()
+                    .userName(event.requester().getName())
+                    .headerTitle("Sipariş İptali")
+                    .message(content)
+                    .build();
+            emailEventPublisher.publish(new OrderCancelledEmailEvent(event.requester(), emailConfig.getOrder().getCancelledSubject(), data1));
 
             Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
             Set<Long> recipientIds = new LinkedHashSet<>();
@@ -92,11 +94,12 @@ public class OrderEmailListener {
                     continue;
                 }
                 User counterparty = userResult.getData();
-                Context ctx = new Context();
-                ctx.setVariable("userName", counterparty.getName());
-                ctx.setVariable("message", "Sipariş " + getOrderDisplayName(order.getName(), order.getOrderNumber()) + " karşı taraf tarafından iptal edildi.");
-                ctx.setVariable("headerTitle", "Sipariş İptali");
-                emailService.sendTemplateEmail(counterparty, emailConfig.getOrder().getCancelledSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
+                var data = GenericEmailData.builder()
+                        .userName(counterparty.getName())
+                        .headerTitle("Sipariş İptali")
+                        .message("Sipariş " + getOrderDisplayName(order.getName(), order.getOrderNumber()) + " karşı taraf tarafından iptal edildi.")
+                        .build();
+                emailEventPublisher.publish(new OrderCancelledEmailEvent(counterparty, emailConfig.getOrder().getCancelledSubject(), data));
             }
 
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
@@ -112,12 +115,13 @@ public class OrderEmailListener {
             Order order = event.order();
             String completionWord = event.isAutomatic() ? "otomatik olarak tamamlandı" : "tamamlandı";
             String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") " + completionWord + ".";
-            
-            Context ctx = new Context();
-            ctx.setVariable("userName", event.buyer().getName());
-            ctx.setVariable("message", content);
-            ctx.setVariable("headerTitle", "Sipariş Tamamlandı");
-            emailService.sendTemplateEmail(event.buyer(), emailConfig.getOrder().getCompletedSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
+
+            var data = GenericEmailData.builder()
+                    .userName(event.buyer().getName())
+                    .headerTitle("Sipariş Tamamlandı")
+                    .message(content)
+                    .build();
+            emailEventPublisher.publish(new OrderCompletedEmailEvent(event.buyer(), emailConfig.getOrder().getCompletedSubject(), data));
             orderLog.logNotificationSent("orderCompletedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCompletedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -130,12 +134,13 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iade edilmiştir. İade tutarı e-cüzdanınıza aktarıldı.";
-            
-            Context ctx = new Context();
-            ctx.setVariable("userName", event.buyer().getName());
-            ctx.setVariable("message", content);
-            ctx.setVariable("headerTitle", "Sipariş İade");
-            emailService.sendTemplateEmail(event.buyer(), emailConfig.getOrder().getRefundedSubject(), "generic-notification", ctx, EmailType.NOTIFICATION);
+
+            var data = GenericEmailData.builder()
+                    .userName(event.buyer().getName())
+                    .headerTitle("Sipariş İade")
+                    .message(content)
+                    .build();
+            emailEventPublisher.publish(new OrderRefundedEmailEvent(event.buyer(), emailConfig.getOrder().getRefundedSubject(), data));
             orderLog.logNotificationSent("orderRefundedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderRefundedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -147,28 +152,36 @@ public class OrderEmailListener {
     private void sendCustomerConfirmationEmail(User customer, OrderDto orderDto) {
         try {
             String subject = emailConfig.getOrderConfirmationSubject();
-            Context ctx = new Context();
-            ctx.setVariable("userName", customer.getName());
-            ctx.setVariable("orderNumber", getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()));
-            ctx.setVariable("status", orderDto.getStatus());
-            ctx.setVariable("paymentStatus", orderDto.getPaymentStatus());
-            ctx.setVariable("totalAmount", orderDto.getTotalAmount() + " " + orderDto.getCurrency());
-            ctx.setVariable("items", orderDto.getOrderItems());
-            ctx.setVariable("deliveryMethod", orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "");
-            
-            if (orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
-                ctx.setVariable("meetupLocation", orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş");
-                ctx.setVariable("meetupVerificationCode", orderDto.getMeetupVerificationCode());
-            } else if (orderDto.getShippingAddress() != null) {
-                String address = orderDto.getShippingAddress().getAddressLine() + "<br>" +
+            String shippingAddress = null;
+
+            if (orderDto.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP && orderDto.getShippingAddress() != null) {
+                shippingAddress = orderDto.getShippingAddress().getAddressLine() + "<br>" +
                                  orderDto.getShippingAddress().getCity() + " " +
                                  orderDto.getShippingAddress().getState() + " " +
                                  orderDto.getShippingAddress().getPostalCode() + "<br>" +
                                  orderDto.getShippingAddress().getCountry();
-                ctx.setVariable("shippingAddress", address);
             }
 
-            emailService.sendTemplateEmail(customer, subject, "order-confirmation", ctx, EmailType.NOTIFICATION);
+            String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
+            String paymentMethodLabel = orderDto.getPaymentMethod() != null ? (orderDto.getPaymentMethod().name().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentMethod().name()) : "E-Cüzdan (E-Wallet)";
+
+            var data = OrderConfirmationEmailData.builder()
+                    .userName(customer.getName())
+                    .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
+                    .status(orderDto.getStatus() != null ? orderDto.getStatus().name() : "")
+                    .paymentStatus(orderDto.getPaymentStatus() != null ? orderDto.getPaymentStatus().name() : "")
+                    .totalAmount(orderDto.getTotalAmount() + " " + orderDto.getCurrency())
+                    .items(orderDto.getOrderItems())
+                    .deliveryMethod(orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "")
+                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
+                    .meetupVerificationCode(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP ? orderDto.getMeetupVerificationCode() : "")
+                    .shippingAddress(shippingAddress)
+                    .orderDate(formattedDate)
+                    .paymentMethod(paymentMethodLabel)
+                    .notes(orderDto.getNotes())
+                    .build();
+
+            emailEventPublisher.publish(new OrderConfirmationEmailEvent(customer, subject, data));
             orderLog.logNotificationSent("customerConfirmationEmail", orderDto.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("customerConfirmationEmail", orderDto.getOrderNumber(), e.getMessage());
@@ -199,38 +212,42 @@ public class OrderEmailListener {
             }
             User seller = sellerResult.getData();
             String subject = emailConfig.getSaleNotificationSubject();
-            
-            Context ctx = new Context();
-            ctx.setVariable("userName", seller.getName());
-            ctx.setVariable("orderNumber", getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()));
-            BigDecimal total = sellerItems.stream()
-                .map(OrderItemDto::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-            ctx.setVariable("totalAmount", total + " " + orderDto.getCurrency());
-            ctx.setVariable("items", sellerItems);
-            ctx.setVariable("deliveryMethod", orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "");
-            
-            if (orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP) {
-                ctx.setVariable("meetupLocation", orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş");
-            } else if (orderDto.getShippingAddress() != null) {
-                String address = orderDto.getShippingAddress().getAddressLine() + "<br>" +
+            String shippingAddress = null;
+
+            if (orderDto.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP && orderDto.getShippingAddress() != null) {
+                shippingAddress = orderDto.getShippingAddress().getAddressLine() + "<br>" +
                                  orderDto.getShippingAddress().getCity() + " " +
                                  orderDto.getShippingAddress().getState() + " " +
                                  orderDto.getShippingAddress().getPostalCode() + "<br>" +
                                  orderDto.getShippingAddress().getCountry();
-                ctx.setVariable("shippingAddress", address);
             }
 
-            emailService.sendTemplateEmail(seller, subject, "sale-notification", ctx, EmailType.NOTIFICATION);
+            BigDecimal total = sellerItems.stream()
+                .map(OrderItemDto::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
+            String paymentMethodLabel = orderDto.getPaymentMethod() != null ? (orderDto.getPaymentMethod().name().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentMethod().name()) : "E-Cüzdan (E-Wallet)";
+
+            var data = OrderConfirmationEmailData.builder()
+                    .userName(seller.getName())
+                    .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
+                    .totalAmount(total + " " + orderDto.getCurrency())
+                    .items(sellerItems)
+                    .deliveryMethod(orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "")
+                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
+                    .shippingAddress(shippingAddress)
+                    .orderDate(formattedDate)
+                    .paymentMethod(paymentMethodLabel)
+                    .notes(orderDto.getNotes())
+                    .build();
+
+            emailEventPublisher.publish(new SaleNotificationEmailEvent(seller, subject, data));
             orderLog.logNotificationSent("sellerSaleEmail", orderDto.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("sellerSaleEmail", orderDto.getOrderNumber(), e.getMessage());
         }
     }
-
-    // StringBuilder methods removed in favor of Thymeleaf templates
-
-    // StringBuilder methods removed in favor of Thymeleaf templates
 
     private String getOrderDisplayName(String orderName, String orderNumber) {
         if (orderName != null && !orderName.trim().isEmpty()) {

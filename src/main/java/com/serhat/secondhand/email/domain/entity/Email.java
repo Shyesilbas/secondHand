@@ -1,6 +1,8 @@
 package com.serhat.secondhand.email.domain.entity;
 
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.email.domain.entity.enums.EmailStatus;
+import com.serhat.secondhand.email.domain.entity.enums.EmailPriority;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,6 +53,20 @@ public class Email {
     @Enumerated(EnumType.STRING)
     @Column(name = "email_type", nullable = false)
     private EmailType emailType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private EmailStatus status;
+
+    @Column(name = "retry_count", nullable = false)
+    private int retryCount;
+
+    @Column(name = "sent_at")
+    private LocalDateTime sentAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", nullable = false)
+    private EmailPriority priority;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

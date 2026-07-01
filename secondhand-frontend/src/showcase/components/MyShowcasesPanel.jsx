@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, Clock, X, Zap, ShieldAlert, Sparkles, Image as ImageIcon, Filter } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../common/formatters.js';
 import { useMyShowcases } from '../hooks/useMyShowcases.js';
+import ShowcaseModal from './ShowcaseModal.jsx';
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
 import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
@@ -16,26 +17,29 @@ const MyShowcasesPanel = ({
   const [extendDays, setExtendDays] = useState({});
   const [localError, setLocalError] = useState(null);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
+  const [activeExtendShowcase, setActiveExtendShowcase] = useState(null); // { id, listingId, listingTitle, days }
   const {
     showcases,
     isLoading,
     error,
-    extendShowcase,
     cancelShowcase,
     isMutating,
-    extendError,
-    cancelError
+    cancelError,
+    refresh
   } = useMyShowcases(userId);
-  const actionError = localError || extendError || cancelError || error;
-  const handleExtend = async showcaseId => {
+  const actionError = localError || cancelError || error;
+  const handleExtend = showcaseId => {
     const raw = extendDays[showcaseId];
     const parsed = Number.parseInt(raw, 10);
     const days = Number.isFinite(parsed) ? Math.min(30, Math.max(1, parsed)) : 7;
-    try {
-      setLocalError(null);
-      await extendShowcase(showcaseId, days);
-    } catch (err) {
-      setLocalError(err?.response?.data?.message || err?.message || 'Extend failed');
+    const showcase = showcases.find(s => s.id === showcaseId);
+    if (showcase) {
+      setActiveExtendShowcase({
+        id: showcaseId,
+        listingId: showcase.listing?.id,
+        listingTitle: showcase.listing?.title || '',
+        days
+      });
     }
   };
   const handleCancel = async () => {
@@ -281,6 +285,22 @@ const MyShowcasesPanel = ({
             </motion.div>
           </div>}
       </AnimatePresence>
+
+      {activeExtendShowcase && (
+        <ShowcaseModal
+          isOpen={!!activeExtendShowcase}
+          onClose={() => setActiveExtendShowcase(null)}
+          listingId={activeExtendShowcase.listingId}
+          listingTitle={activeExtendShowcase.listingTitle}
+          isExtension={true}
+          showcaseId={activeExtendShowcase.id}
+          initialDays={activeExtendShowcase.days}
+          onSuccess={() => {
+            setActiveExtendShowcase(null);
+            refresh();
+          }}
+        />
+      )}
 
       <div className="mt-8 p-4 rounded-2xl bg-indigo-50/50 border border-primary/50 flex items-start gap-3">
         <div className="bg-primary-50/80 p-2 rounded-xl text-primary mt-0.5">

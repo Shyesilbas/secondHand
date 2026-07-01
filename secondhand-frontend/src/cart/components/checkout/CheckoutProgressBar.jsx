@@ -12,36 +12,32 @@ const CheckoutProgressBar = ({
   const activeStepObj = steps.find(s => s.id === currentStep) || steps[0];
   return <nav className="w-full" aria-label={t("checkout_progress")}>
       {/* Desktop Stepper */}
-      <ol className="hidden items-center justify-between sm:flex w-full select-none">
+      <div className="hidden sm:flex items-center bg-background-secondary/40 backdrop-blur-sm rounded-2xl border border-border-light/60 p-1.5 w-full select-none">
         {steps.map((step, index) => {
         const isCompleted = currentStep > step.id;
         const isCurrent = currentStep === step.id;
         const isClickable = currentStep > step.id;
         const isLast = index === steps.length - 1;
         return <React.Fragment key={step.id}>
-              <li className="flex items-center">
-                <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`group flex items-center gap-3 transition-all outline-none ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}>
-                  {/* Step Node */}
-                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${isCompleted ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.05]' : isCurrent ? 'bg-white border-2 border-blue-600 text-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.15)] ring-4 ring-blue-600/5 scale-[1.05]' : 'bg-white border border-border-light text-text-muted'}`}>
-                    {isCompleted ? <Check className="h-4 w-4" strokeWidth={3} /> : step.id}
-                  </span>
+              <button type="button" onClick={() => isClickable && onStepChange(step.id)} disabled={!isClickable} aria-current={isCurrent ? 'step' : undefined} className={`flex-1 flex items-center justify-center gap-2.5 py-2 px-3 rounded-xl transition-all duration-300 outline-none ${isCurrent ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.03)] border border-[#f1f5f9] text-primary scale-[1.01]' : isCompleted ? 'text-text-secondary hover:bg-white/40 cursor-pointer' : 'text-text-muted cursor-default'}`}>
+                {/* Step Node */}
+                <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold transition-all duration-300 ${isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary' : 'bg-background-tertiary text-text-muted border border-border-light'}`}>
+                  {isCompleted ? <Check className="h-3 w-3" strokeWidth={3.5} /> : step.id}
+                </span>
 
-                  {/* Step Title */}
-                  <span className={`text-xs font-bold tracking-wider uppercase transition-colors duration-200 ${isCurrent ? 'text-text-primary font-extrabold' : isCompleted ? 'text-text-secondary group-hover:text-text-primary' : 'text-text-muted'}`}>
-                    {step.title}
-                  </span>
-                </button>
-              </li>
+                {/* Step Title */}
+                <span className={`text-[11px] font-bold uppercase tracking-wider transition-colors duration-200 ${isCurrent ? 'text-text-primary' : 'text-inherit'}`}>
+                  {step.title}
+                </span>
+              </button>
 
-              {/* Connector line */}
-              {!isLast && <div className="flex-1 mx-4 h-[3px] relative bg-border-light rounded overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500 ease-out" style={{
-              width: isCompleted ? '100%' : '0%'
-            }} />
+              {/* Connector dot */}
+              {!isLast && <div className="flex shrink-0 items-center justify-center px-1 text-text-muted/20">
+                  <span className="h-1 w-1 rounded-full bg-current" />
                 </div>}
             </React.Fragment>;
       })}
-      </ol>
+      </div>
 
       {/* Mobile-first compact Stepper indicator */}
       <div className="flex items-center justify-between sm:hidden w-full px-2">

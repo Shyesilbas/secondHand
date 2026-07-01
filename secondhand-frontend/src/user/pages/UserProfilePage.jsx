@@ -72,7 +72,7 @@ const GreatSellerProgressCard = ({
                 <div className="grid gap-4 md:grid-cols-3">
                     <div className="rounded-xl border border-gray-100 bg-secondary-light p-4">
                         <div className="flex justify-between items-baseline gap-2">
-                            <p className="text-body font-semibold text-gray-800">{t("paid_order_lines")}{days}{t("days")}</p>
+                            <p className="text-body font-semibold text-gray-800">{t("paid_order_lines")} ({days} {t("days")})</p>
                             <span className="text-caption font-bold tabular-nums text-text-muted">
                                 {gs.qualifyingSalesLastWindow}&nbsp;/&nbsp;{gs.qualifyingSalesTarget}
                                 {gs.salesMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-emerald-500 ml-1 align-text-bottom" /> : null}

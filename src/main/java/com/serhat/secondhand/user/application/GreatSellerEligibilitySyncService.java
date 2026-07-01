@@ -1,8 +1,9 @@
 package com.serhat.secondhand.user.application;
 
-import com.serhat.secondhand.email.application.EmailService;
 import com.serhat.secondhand.email.config.EmailConfig;
-import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.GreatSellerAchievementEmailEvent;
+import com.serhat.secondhand.email.application.event.model.GenericEmailData;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -20,7 +21,7 @@ public class GreatSellerEligibilitySyncService {
 
     private final UserRepository userRepository;
     private final GreatSellerService greatSellerService;
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
     private final EmailConfig emailConfig;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
@@ -69,11 +70,12 @@ public class GreatSellerEligibilitySyncService {
         }
         try {
             String subject = emailConfig.getGreatSellerSubject();
-            org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
-            ctx.setVariable("userName", user.getName());
-            ctx.setVariable("headerTitle", "Harika Satıcı Rozeti!");
-            ctx.setVariable("message", "Tebrikler — SecondHand'de Harika Satıcı rozeti kazandınız. Güvenilir satışlarınız ve harika yorumlarınız için teşekkür ederiz.");
-            emailService.sendTemplateEmail(user, subject, "generic-notification", ctx, EmailType.GREAT_SELLER_ACHIEVEMENT);
+            var data = GenericEmailData.builder()
+                    .userName(user.getName())
+                    .headerTitle("Harika Satıcı Rozeti!")
+                    .message("Tebrikler — SecondHand'de Harika Satıcı rozeti kazandınız. Güvenilir satışlarınız ve harika yorumlarınız için teşekkür ederiz.")
+                    .build();
+            emailEventPublisher.publish(new GreatSellerAchievementEmailEvent(user, subject, data));
         } catch (Exception e) {
             log.warn("Great Seller email failed for {}: {}", user.getId(), e.getMessage());
         }

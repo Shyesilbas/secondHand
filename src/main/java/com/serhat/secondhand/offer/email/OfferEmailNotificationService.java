@@ -1,6 +1,9 @@
 package com.serhat.secondhand.offer.email;
 
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.application.event.EmailEvent;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.*;
+import com.serhat.secondhand.email.application.event.model.OfferEmailData;
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.notification.application.NotificationEventPublisher;
@@ -12,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,7 +24,7 @@ import java.math.RoundingMode;
 @Slf4j
 public class OfferEmailNotificationService {
 
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
     private final EmailConfig emailConfig;
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
@@ -34,7 +36,7 @@ public class OfferEmailNotificationService {
             return;
         }
         sendOfferTemplate(recipient, emailConfig.getOffer().getReceivedSubject(), "Yeni Bir Teklif Aldınız", offer, EmailType.OFFER_RECEIVED, null);
-        
+
         var request = notificationTemplateCatalog.offerReceived(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
                 offer.getListing() != null ? offer.getListing().getTitle() : null
@@ -47,7 +49,7 @@ public class OfferEmailNotificationService {
         User recipient = getCounterRecipient(offer);
         if (recipient == null) return;
         sendOfferTemplate(recipient, emailConfig.getOffer().getCounterReceivedSubject(), "Karşı Teklif Aldınız", offer, EmailType.OFFER_COUNTER_RECEIVED, null);
-        
+
         var request = notificationTemplateCatalog.offerCountered(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
                 offer.getListing() != null ? offer.getListing().getTitle() : null
@@ -60,7 +62,7 @@ public class OfferEmailNotificationService {
         User recipient = getCreator(offer);
         if (recipient == null) return;
         sendOfferTemplate(recipient, emailConfig.getOffer().getAcceptedSubject(), "Teklifiniz Kabul Edildi", offer, EmailType.OFFER_ACCEPTED, "Sıradaki Adım: Uygulama üzerinden ödemeyi tamamlayın.");
-        
+
         var request = notificationTemplateCatalog.offerAccepted(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
                 offer.getListing() != null ? offer.getListing().getTitle() : null
@@ -73,7 +75,7 @@ public class OfferEmailNotificationService {
         User recipient = getCreator(offer);
         if (recipient == null) return;
         sendOfferTemplate(recipient, emailConfig.getOffer().getRejectedSubject(), "Teklifiniz Reddedildi", offer, EmailType.OFFER_REJECTED, null);
-        
+
         var request = notificationTemplateCatalog.offerRejected(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
                 offer.getListing() != null ? offer.getListing().getTitle() : null
@@ -114,22 +116,34 @@ public class OfferEmailNotificationService {
     }
 
     private void sendOfferTemplate(User recipient, String subject, String headline, Offer offer, EmailType type, String nextStep) {
-        Context ctx = new Context();
-        ctx.setVariable("userName", recipient.getName());
-        ctx.setVariable("headerTitle", headline);
-        ctx.setVariable("headline", headline);
-        ctx.setVariable("listingTitle", offer.getListing() != null ? offer.getListing().getTitle() : "Bilinmeyen İlan");
-        ctx.setVariable("quantity", offer.getQuantity());
-        ctx.setVariable("totalPrice", offer.getTotalPrice() + " TL");
+        String unitPrice = "";
         if (offer.getTotalPrice() != null && offer.getQuantity() != null && offer.getQuantity() > 0) {
-            ctx.setVariable("unitPrice", offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2, RoundingMode.HALF_UP) + " TL");
+            unitPrice = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2, RoundingMode.HALF_UP) + " TL";
         }
-        if (offer.getExpiresAt() != null) {
-            ctx.setVariable("expiresAt", offer.getExpiresAt().toString());
-        }
-        ctx.setVariable("nextStep", nextStep);
-        
-        emailService.sendTemplateEmail(recipient, subject, "offer-notification", ctx, type);
+
+        var data = OfferEmailData.builder()
+                .userName(recipient.getName())
+                .headerTitle(headline)
+                .headline(headline)
+                .listingTitle(offer.getListing() != null ? offer.getListing().getTitle() : "Bilinmeyen İlan")
+                .quantity(offer.getQuantity() != null ? offer.getQuantity() : 0)
+                .totalPrice(offer.getTotalPrice() != null ? (offer.getTotalPrice() + " TL") : "")
+                .unitPrice(unitPrice)
+                .expiresAt(offer.getExpiresAt() != null ? offer.getExpiresAt().toString() : "")
+                .nextStep(nextStep)
+                .build();
+
+        EmailEvent<OfferEmailData> event = switch (type) {
+            case OFFER_RECEIVED -> new OfferReceivedEmailEvent(recipient, subject, data);
+            case OFFER_COUNTER_RECEIVED -> new OfferCounterReceivedEmailEvent(recipient, subject, data);
+            case OFFER_ACCEPTED -> new OfferAcceptedEmailEvent(recipient, subject, data);
+            case OFFER_REJECTED -> new OfferRejectedEmailEvent(recipient, subject, data);
+            case OFFER_EXPIRED -> new OfferExpiredEmailEvent(recipient, subject, data);
+            case OFFER_COMPLETED -> new OfferCompletedEmailEvent(recipient, subject, data);
+            default -> throw new IllegalArgumentException("Unsupported offer email type: " + type);
+        };
+
+        emailEventPublisher.publish(event);
     }
 
     private User getCreator(Offer offer) {
@@ -142,4 +156,3 @@ public class OfferEmailNotificationService {
         return actor == OfferActor.BUYER ? offer.getSeller() : actor == OfferActor.SELLER ? offer.getBuyer() : null;
     }
 }
-

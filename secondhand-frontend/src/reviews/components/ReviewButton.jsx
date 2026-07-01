@@ -58,7 +58,7 @@ const ReviewButton = ({
     return <div className="text-sm">
                 <div className="flex items-center space-x-1 text-status-success">
                     <span className="text-lg">⭐</span>
-                    <span>{t("reviewed")}{review.rating}/5)</span>
+                    <span>{t("reviewed")} ({review.rating}/5)</span>
                 </div>
                 {review.comment && <div className="mt-1 text-xs text-text-secondary bg-secondary-light p-2 rounded-lg max-w-xs">
                         <p className="overflow-hidden" style={{

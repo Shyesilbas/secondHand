@@ -2,6 +2,7 @@ package com.serhat.secondhand.email.domain.repository;
 
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
+import com.serhat.secondhand.email.domain.entity.enums.EmailStatus;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,4 +54,11 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
     java.util.Optional<Email> findByIdAndRecipientEmail(UUID id, String recipientEmail);
 
     Page<Email> findByRecipientEmail(String email, Pageable pageable);
+
+    @Query(value = "SELECT e FROM Email e WHERE e.status = :status AND e.retryCount < :maxRetries ORDER BY CASE e.priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'NORMAL' THEN 3 ELSE 4 END ASC, e.createdAt ASC")
+    java.util.List<Email> findTop50FailedEmails(@Param("status") EmailStatus status, @Param("maxRetries") int maxRetries);
+
+    @Modifying
+    @Query("DELETE FROM Email e WHERE e.createdAt < :cutoffDate")
+    int deleteOldEmails(@Param("cutoffDate") LocalDateTime cutoffDate);
 }

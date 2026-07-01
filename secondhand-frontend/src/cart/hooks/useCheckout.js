@@ -35,6 +35,18 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
     const [deliveryMethod, setDeliveryMethod] = useState('CARGO');
     const [meetupLocation, setMeetupLocation] = useState('');
 
+    useEffect(() => {
+        if (Array.isArray(addresses) && addresses.length > 0) {
+            if (!selectedShippingAddressId) {
+                const mainAddress = addresses.find(a => a.mainAddress) || addresses[0];
+                if (mainAddress) {
+                    setSelectedShippingAddressId(mainAddress.id);
+                    setSelectedBillingAddressId(mainAddress.id);
+                }
+            }
+        }
+    }, [addresses, selectedShippingAddressId]);
+
     const findAddressById = (id) => {
         if (!id || !Array.isArray(addresses)) return null;
         return addresses.find((address) => String(address.id) === String(id)) || null;

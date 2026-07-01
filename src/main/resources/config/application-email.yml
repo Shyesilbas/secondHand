@@ -1,29 +1,21 @@
 # E-posta şablonları (içerik). Sırlar burada tutulmaz; yalnızca app.email.* metinleri.
+spring:
+  mail:
+    host: "${SMTP_HOST:localhost}"
+    port: "${SMTP_PORT:2525}"
+    username: "${SMTP_USERNAME:}"
+    password: "${SMTP_PASSWORD:}"
+    properties:
+      mail:
+        smtp:
+          auth: "${SMTP_AUTH:false}"
+          starttls:
+            enable: "${SMTP_STARTTLS:false}"
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 app:
   email:
+    mock: "${EMAIL_MOCK:true}"
     sender: "${EMAIL_SENDER:secondhand@noreply.com}"
-    verification-subject: "${EMAIL_VERIFICATION_SUBJECT:SecondHand - Account Verification Code}"
-    password-reset-subject: "${EMAIL_PASSWORD_RESET_SUBJECT:SecondHand - Password Reset Code}"
-    welcome-subject: "${EMAIL_WELCOME_SUBJECT:Welcome to SecondHand!}"
-    phone-update-subject: "${EMAIL_PHONE_UPDATE_SUBJECT:SecondHand - Phone Number Updated}"
-    payment-success-subject: "${EMAIL_PAYMENT_SUCCESS_SUBJECT:SecondHand - Payment Successful}"
-    price-change-subject: "${EMAIL_PRICE_CHANGE_SUBJECT:SecondHand - Price Changed on a Favorite Listing}"
-    order-confirmation-subject: "${EMAIL_ORDER_CONFIRMATION_SUBJECT:SecondHand - Order Confirmation}"
-    sale-notification-subject: "${EMAIL_SALE_NOTIFICATION_SUBJECT:SecondHand - Your Item Has Been Sold!}"
-    payment-verification-subject: "${EMAIL_PAYMENT_VERIFICATION_SUBJECT:SecondHand - Payment Verification}"
-    great-seller-subject: "${EMAIL_GREAT_SELLER_SUBJECT:SecondHand - Great Seller badge}"
-    agreement:
-      subject-prefix: "${EMAIL_AGREEMENT_SUBJECT_PREFIX:SecondHand: }"
-    order:
-      cancelled-subject: "${EMAIL_ORDER_CANCELLED_SUBJECT:SecondHand - Order Cancelled}"
-      completed-subject: "${EMAIL_ORDER_COMPLETED_SUBJECT:SecondHand - Order Completed}"
-      refunded-subject: "${EMAIL_ORDER_REFUNDED_SUBJECT:SecondHand - Order Refunded}"
-    offer:
-      received-subject: "${EMAIL_OFFER_RECEIVED_SUBJECT:SecondHand - New Offer Received}"
-      counter-received-subject: "${EMAIL_OFFER_COUNTER_RECEIVED_SUBJECT:SecondHand - Counter Offer Received}"
-      accepted-subject: "${EMAIL_OFFER_ACCEPTED_SUBJECT:SecondHand - Offer Accepted}"
-      rejected-subject: "${EMAIL_OFFER_REJECTED_SUBJECT:SecondHand - Offer Rejected}"
-      expired-subject: "${EMAIL_OFFER_EXPIRED_SUBJECT:SecondHand - Offer Expired}"
-      completed-subject: "${EMAIL_OFFER_COMPLETED_SUBJECT:SecondHand - Offer Completed}"
-    follow:
-      new-listing-subject-format: "${EMAIL_FOLLOW_NEW_LISTING_SUBJECT_FORMAT:%s %s yeni bir ilan ekledi!}"

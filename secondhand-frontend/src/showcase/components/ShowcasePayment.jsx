@@ -217,11 +217,11 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
             </div>
             {showcasePricing ? <div className={`${embedded ? 'rounded-2xl border border-border-light p-4 space-y-2' : 'p-3 bg-secondary-light rounded-lg space-y-2'}`}>
                 <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
-                  <span>{t("subtotal")}{days}{t("days")}</span>
+                  <span>{t("subtotal")} ({days} {t("days")})</span>
                   <span className="font-mono tabular-nums">{calculateSubtotal().toFixed(2)}₺</span>
                 </div>
                 <div className={`flex justify-between ${embedded ? 'text-sm text-slate-600' : 'text-sm'}`}>
-                  <span>{t("tax")}{showcasePricing.taxPercentage}%)</span>
+                  <span>{t("tax")} ({showcasePricing.taxPercentage}%)</span>
                   <span className="font-mono tabular-nums">{calculateTax().toFixed(2)}₺</span>
                 </div>
                 <div className={`flex justify-between font-bold border-t pt-2 ${embedded ? 'text-sm text-text-primary' : 'text-lg'}`}>

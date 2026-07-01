@@ -13,7 +13,11 @@ export const EMAIL_TYPES = {
     PROMOTIONAL: 'PROMOTIONAL',
     PAYMENT_VERIFICATION: 'PAYMENT_VERIFICATION',
     AGREEMENT_UPDATED: 'AGREEMENT_UPDATED',
-    SYSTEM: 'SYSTEM'
+    SYSTEM: 'SYSTEM',
+    ORDER_CONFIRMATION: 'ORDER_CONFIRMATION',
+    MEMBERSHIP_ACTIVATED: 'MEMBERSHIP_ACTIVATED',
+    PAYMENT_RECEIPT: 'PAYMENT_RECEIPT',
+    NEW_LISTING_NOTIFICATION: 'NEW_LISTING_NOTIFICATION'
 };
 
 export const EmailDto = (data) => ({
@@ -43,7 +47,11 @@ export const EMAIL_TYPE_LABELS = {
     [EMAIL_TYPES.PROMOTIONAL]: 'Promotional',
     [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'Payment Verification',
     [EMAIL_TYPES.AGREEMENT_UPDATED]: 'Agreement Update',
-    [EMAIL_TYPES.SYSTEM]: 'System Email'
+    [EMAIL_TYPES.SYSTEM]: 'System Email',
+    [EMAIL_TYPES.ORDER_CONFIRMATION]: 'Order Confirmation',
+    [EMAIL_TYPES.MEMBERSHIP_ACTIVATED]: 'Premium Membership',
+    [EMAIL_TYPES.PAYMENT_RECEIPT]: 'Payment Receipt',
+    [EMAIL_TYPES.NEW_LISTING_NOTIFICATION]: 'New Listing Alert'
 };
 
 export const EMAIL_TYPE_BADGE_COLORS = {
@@ -60,5 +68,9 @@ export const EMAIL_TYPE_BADGE_COLORS = {
     [EMAIL_TYPES.PROMOTIONAL]: 'bg-primary-50 text-primary',
     [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-status-error-bg text-status-error-text',
     [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-status-warning-bg text-amber-900',
-    [EMAIL_TYPES.SYSTEM]: 'bg-tertiary text-gray-800'
+    [EMAIL_TYPES.SYSTEM]: 'bg-tertiary text-gray-800',
+    [EMAIL_TYPES.ORDER_CONFIRMATION]: 'bg-sky-100 text-sky-800',
+    [EMAIL_TYPES.MEMBERSHIP_ACTIVATED]: 'bg-purple-100 text-purple-800',
+    [EMAIL_TYPES.PAYMENT_RECEIPT]: 'bg-emerald-100 text-emerald-800',
+    [EMAIL_TYPES.NEW_LISTING_NOTIFICATION]: 'bg-blue-100 text-blue-800'
 };

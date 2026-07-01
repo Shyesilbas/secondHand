@@ -55,10 +55,10 @@ const CheckoutPaymentStep = ({
       </div>
 
       <div className="mb-5">
-        <label className="flex items-center gap-4 rounded-2xl border border-primary bg-primary/[0.02] shadow-[0_0_20px_rgba(20,102,198,0.08)] ring-1 ring-primary/20 p-5 scale-[1.005] transition-all duration-300">
+        <label className="flex items-center gap-4 rounded-2xl border border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10 p-5 transition-all duration-300 active:scale-[0.99] cursor-pointer">
           <input type="radio" name="payment" value={CART_PAYMENT_TYPES.EWALLET} checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET} onChange={event => setSelectedPaymentType(event.target.value)} className="sr-only" />
-          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary">
-            <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+          <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border border-primary bg-white ring-4 ring-primary/10">
+            <span className="h-2 w-2 rounded-full bg-primary" />
           </span>
           <Wallet className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
           <div className="min-w-0 flex-1">

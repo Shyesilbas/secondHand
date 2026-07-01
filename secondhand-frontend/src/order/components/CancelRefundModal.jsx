@@ -86,7 +86,7 @@ const CancelRefundModal = ({
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
           {order.orderItems && order.orderItems.length > 0 && <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-700">{t("select_items")}{selectedItems.length}{t("of")}{order.orderItems.length}{t("selected")}</label>
+                <label className="text-sm font-semibold text-slate-700">{t("select_items")} ({selectedItems.length} {t("of")} {order.orderItems.length} {t("selected")})</label>
                 {order.orderItems.length > 1 && <button type="button" onClick={handleSelectAll} className="text-xs font-medium text-primary hover:text-primary">
                     {allItemsSelected ? 'Deselect All' : 'Select All'}
                   </button>}

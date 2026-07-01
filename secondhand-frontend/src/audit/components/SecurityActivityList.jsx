@@ -30,8 +30,7 @@ const SecurityActivityList = ({
   }
   return <div className="bg-background-primary rounded-2xl border border-border-light shadow-sm overflow-hidden mb-10">
             <div className="px-6 py-5 bg-secondary border-b border-border-light">
-                <h3 className="text-sm font-medium text-text-primary">{t("security_activity")}{totalElements})
-                </h3>
+                <h3 className="text-sm font-medium text-text-primary">{t("security_activity")} ({totalElements})</h3>
             </div>
 
             <div className="divide-y divide-gray-200">

@@ -6,7 +6,6 @@ import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
-import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.pricing.application.IPricingService;
@@ -29,8 +28,20 @@ public class PaymentVerificationMessageBuilder {
     private final CartRepository cartRepository;
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
-        StringBuilder details = new StringBuilder("\n\nPayment Details:\n");
-        details.append("Service: ").append(type.name().replace("_", " ")).append("\n");
+        StringBuilder details = new StringBuilder();
+        details.append("<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse; margin-top: 24px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;\">");
+        details.append("  <tr>");
+        details.append("    <td style=\"padding: 18px 20px;\">");
+        details.append("      <h3 style=\"margin-top: 0; margin-bottom: 16px; font-size: 14px; color: #0f172a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;\">Ödeme Detayları</h3>");
+        
+        details.append("      <table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">");
+        
+        // Service Row
+        details.append("        <tr>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Hizmet</td>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+               .append(type.name().replace("_", " ")).append("</td>");
+        details.append("        </tr>");
 
         switch (type) {
             case ITEM_PURCHASE -> appendCartDetails(details, user, req);
@@ -38,26 +49,43 @@ public class PaymentVerificationMessageBuilder {
             case SHOWCASE_PAYMENT -> {
                 appendListingDetails(details, req, req != null ? req.getAmount() : null);
                 if (req != null && req.getDays() != null) {
-                    details.append("Days: ").append(req.getDays()).append("\n");
+                    details.append("        <tr>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Süre (Gün)</td>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                           .append(req.getDays()).append(" Gün</td>");
+                    details.append("        </tr>");
                 }
             }
             default -> {
                 if (req != null && req.getAmount() != null) {
-                    details.append("Amount: ").append(req.getAmount()).append(" TRY\n");
+                    details.append("        <tr>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Tutar</td>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                           .append(req.getAmount()).append(" TRY</td>");
+                    details.append("        </tr>");
                 }
             }
         }
 
-        details.append("Date: ").append(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy : HH:mm"))).append("\n");
+        // Date Row
+        details.append("        <tr>");
+        details.append("          <td style=\"padding: 8px 0 0 0; color: #64748b; font-size: 13px;\">Tarih</td>");
+        details.append("          <td style=\"padding: 8px 0 0 0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+               .append(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))).append("</td>");
+        details.append("        </tr>");
+
+        details.append("      </table>");
+        details.append("    </td>");
+        details.append("  </tr>");
+        details.append("</table>");
         return details.toString();
     }
 
     private void appendCartDetails(StringBuilder details, User user, InitiateVerificationRequest req) {
         String couponCode = req != null ? req.getCouponCode() : null;
-        Offer acceptedOffer = null;
 
+        PricingResultDto pricing;
         if (req != null && req.getOfferId() != null) {
-            // Reuse CheckoutPricingContextFactory offer resolution to avoid duplication
             com.serhat.secondhand.order.dto.CheckoutRequest syntheticRequest =
                     com.serhat.secondhand.order.dto.CheckoutRequest.builder()
                             .offerId(req.getOfferId())
@@ -72,41 +100,67 @@ public class PaymentVerificationMessageBuilder {
                         org.springframework.http.HttpStatus.BAD_REQUEST, contextResult.getErrorCode());
             }
 
-            CheckoutPricingContextFactory.CheckoutPricingContext ctx = contextResult.getData();
-            appendPricingSummary(details, ctx.pricing());
-            return;
+            pricing = contextResult.getData().pricing();
+        } else {
+            List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
+            List<Cart> effectiveCartItems = checkoutPricingContextFactory.buildEffectiveCartItems(cartItems, null, user);
+            pricing = pricingService.priceCart(user, effectiveCartItems, couponCode);
         }
 
-        List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
-        List<Cart> effectiveCartItems = checkoutPricingContextFactory.buildEffectiveCartItems(cartItems, null, user);
-        PricingResultDto pricing = pricingService.priceCart(user, effectiveCartItems, couponCode);
         appendPricingSummary(details, pricing);
     }
 
     private void appendPricingSummary(StringBuilder details, PricingResultDto pricing) {
-        details.append("Order Summary:\n");
+        details.append("        <tr>");
+        details.append("          <td colspan=\"2\" style=\"padding: 12px 0 6px 0; color: #64748b; font-size: 13px; font-weight: 600;\">Sipariş Özeti</td>");
+        details.append("        </tr>");
+        
         if (pricing.getItems() != null) {
             for (var item : pricing.getItems()) {
-                details.append("- Item x").append(item.getQuantity())
-                        .append(" — ").append(item.getCampaignUnitPrice()).append(" TRY\n");
+                details.append("        <tr>");
+                details.append("          <td style=\"padding: 4px 0 4px 10px; color: #475569; font-size: 12px;\">Ürün x").append(item.getQuantity()).append("</td>");
+                details.append("          <td style=\"padding: 4px 0 4px 0; color: #475569; font-size: 12px; text-align: right;\">")
+                       .append(item.getCampaignUnitPrice()).append(" TRY</td>");
+                details.append("        </tr>");
             }
         }
-        details.append("Total: ").append(pricing.getTotal()).append(" TRY\n");
+        
+        details.append("        <tr>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700;\">Toplam</td>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #4f46e5; font-size: 14px; font-weight: 700; text-align: right;\">")
+               .append(pricing.getTotal()).append(" TRY</td>");
+        details.append("        </tr>");
     }
 
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {
         if (req != null) {
+            String title = null;
             if (req.getCustomTitle() != null && !req.getCustomTitle().isBlank()) {
-                details.append("Listing: ").append(req.getCustomTitle()).append("\n");
+                title = req.getCustomTitle();
             } else if (req.isBulk()) {
-                details.append("Listing: Bulk Showcase Payment (Multiple Listings)\n");
+                title = "Bulk Showcase Payment (Multiple Listings)";
             } else if (req.getListingId() != null) {
-                listingService.findById(req.getListingId()).ifPresent(listing ->
-                        details.append("Listing: ").append(listing.getTitle()).append("\n"));
+                var listingOpt = listingService.findById(req.getListingId());
+                if (listingOpt.isPresent()) {
+                    title = listingOpt.get().getTitle();
+                }
+            }
+            
+            if (title != null) {
+                details.append("        <tr>");
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">İlan</td>");
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                       .append(title).append("</td>");
+                details.append("        </tr>");
             }
         }
+        
         if (amount != null) {
-            details.append("Amount: ").append(amount).append(" TRY\n");
+            details.append("        <tr>");
+            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Tutar</td>");
+            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                   .append(amount).append(" TRY</td>");
+            details.append("        </tr>");
         }
     }
 

@@ -26,7 +26,7 @@ const CheckoutPage = () => {
   } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isPremium, estimatedShippingDays } = usePlan();
+  const { isPremium } = usePlan();
   const {
     cartItems,
     cartCount,
@@ -240,7 +240,7 @@ const CheckoutPage = () => {
               </p>
               <p className="text-xs text-text-secondary">
                 {isPremium 
-                  ? `Siparişiniz öncelikli olarak işlenecek. Tahmini teslimat: ${estimatedShippingDays} iş günü.` 
+                  ? `Siparişiniz öncelikli olarak işlenecek.` 
                   : `Premium'a geçerek kargonuzu en kısa sürede alın!`}
               </p>
             </div>

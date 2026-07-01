@@ -4,7 +4,9 @@ import com.serhat.secondhand.core.audit.dto.AuditLogDto;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.audit.mapper.AuditLogMapper;
 import com.serhat.secondhand.core.audit.repository.AuditLogRepository;
-import com.serhat.secondhand.email.application.EmailService;
+import com.serhat.secondhand.email.application.event.EmailEventPublisher;
+import com.serhat.secondhand.email.application.event.impl.SystemAuditEmailEvent;
+import com.serhat.secondhand.email.application.event.model.GenericEmailData;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,16 +28,21 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepository;
     private final AuditLogMapper auditLogMapper;
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final EmailEventPublisher emailEventPublisher;
 
     private void sendAuditEmail(String userEmail, String subject, String content, EmailType emailType) {
         if (userEmail == null || userEmail.isBlank()) return;
         userRepository.findByEmail(userEmail).ifPresent(user -> {
             try {
-                emailService.sendEmail(user, subject, content, emailType);
-                log.info("Security audit email sent successfully to {} for subject: {}", userEmail, subject);
+                var data = GenericEmailData.builder()
+                        .userName(user.getName())
+                        .headerTitle(subject)
+                        .message(content)
+                        .build();
+                emailEventPublisher.publish(new SystemAuditEmailEvent(user, subject, data));
+                log.info("Security audit email event published successfully to {} for subject: {}", userEmail, subject);
             } catch (Exception e) {
-                log.error("Failed to send security audit email to {}: {}", userEmail, e.getMessage());
+                log.error("Failed to publish security audit email to {}: {}", userEmail, e.getMessage());
             }
         });
     }
