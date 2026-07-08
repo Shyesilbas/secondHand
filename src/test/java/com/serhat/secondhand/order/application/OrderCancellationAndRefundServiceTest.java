@@ -15,7 +15,6 @@ import com.serhat.secondhand.order.entity.enums.CancelRefundReason;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.policy.OrderRefundPolicy;
-import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +45,6 @@ class OrderCancellationAndRefundServiceTest {
     private OrderStatusConsistencyLogger orderStatusConsistencyLogger;
     private OrderValidationService orderValidationService;
     private OrderRefundPolicy orderRefundPolicy;
-
     private User user;
     private Order order;
     private OrderItem orderItem;

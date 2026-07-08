@@ -60,6 +60,8 @@ public class ComplaintService implements IComplaintService {
         Complaint complaint = complaintMapper.fromCreateRequest(complaintRequest, complainer, complainedUser, listing);
         Complaint savedComplaint = complaintRepository.save(complaint);
 
+
+
         log.info("Complaint created with ID: {}", savedComplaint.getId());
         return Result.success(complaintMapper.mapComplaintToDto(savedComplaint));
     }

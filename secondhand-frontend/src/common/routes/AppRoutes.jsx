@@ -49,9 +49,6 @@ const BuyerDashboardPage = lazy(() => import('../../dashboard/pages/BuyerDashboa
 const AuraChatPage = lazy(() => import('../../ai/pages/AuraChatPage.jsx'));
 const InboxPage = lazy(() => import('../../inbox/pages/InboxPage.jsx'));
 const LegacyChatInboxRedirect = () => {
-  const {
-    t
-  } = useTranslation();
   const [sp] = useSearchParams();
   const room = sp.get('room');
   const q = new URLSearchParams();
@@ -107,9 +104,6 @@ const PageLoader = () => {
   );
 };
 const AppRoutes = () => {
-  const {
-    t
-  } = useTranslation();
   const authContext = useAuth();
   const {
     isLoading
@@ -285,6 +279,8 @@ const AppRoutes = () => {
                                 <OffersPage />
                             </Suspense>} />
                 </Route>
+
+
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
