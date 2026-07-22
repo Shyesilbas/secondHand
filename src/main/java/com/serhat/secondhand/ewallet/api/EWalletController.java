@@ -7,7 +7,6 @@ import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.payment.application.PaymentStatsService;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -107,7 +106,7 @@ public class EWalletController {
         log.info("Fetching eWallet transactions for user: {}", currentUser.getEmail());
         PaymentFilter filter = new PaymentFilter(
                 null,
-                PaymentType.EWALLET,
+                "EWALLET",
                 null,
                 null,
                 null,

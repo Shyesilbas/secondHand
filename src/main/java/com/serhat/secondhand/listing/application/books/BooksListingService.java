@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.books.BooksListingReposit
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.validation.books.BooksSpecValidator;
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import com.serhat.secondhand.user.application.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,8 +45,9 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<BooksSpecValidator> booksSpecValidators,
-            BooksListingResolver booksListingResolver) {
-        super(userService, listingValidationService, listingMapper, listingValidationEngine);
+            BooksListingResolver booksListingResolver,
+            InventoryService inventoryService) {
+        super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.booksRepository = booksRepository;
         this.genericFilterService = genericFilterService;
         this.predicateBuilder = predicateBuilder;
@@ -71,6 +73,11 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
     @Override
     protected boolean requiresQuantityValidation() {
         return true;
+    }
+
+    @Override
+    protected Integer extractQuantity(BooksCreateRequest request) {
+        return request.quantity();
     }
 
     @Override

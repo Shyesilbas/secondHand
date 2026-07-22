@@ -11,7 +11,7 @@ public class PaymentIdempotencyHelper {
                 userId,
                 paymentRequest.amount(),
                 paymentRequest.listingId() != null ? paymentRequest.listingId() : "null",
-                paymentRequest.paymentType());
+                paymentRequest.providerName());
     }
 
     public PaymentRequest withIdempotencyKey(PaymentRequest original, String idempotencyKey) {
@@ -26,7 +26,7 @@ public class PaymentIdempotencyHelper {
                 .listingNo(original.listingNo())
                 .amount(original.amount())
                 .currency(original.currency())
-                .paymentType(original.paymentType())
+                .providerName(original.providerName())
                 .transactionType(original.transactionType())
                 .paymentDirection(original.paymentDirection())
                 .verificationCode(original.verificationCode())

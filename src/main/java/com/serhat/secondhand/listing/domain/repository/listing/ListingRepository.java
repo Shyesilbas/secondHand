@@ -122,17 +122,6 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l.listingType, COUNT(l) FROM Listing l WHERE l.status = :status GROUP BY l.listingType")
     List<Object[]> getActiveCountsByType(ListingStatus status);
 
-    @Modifying
-    @Query("update Listing l set l.quantity = l.quantity + :qty where l.id = :id and l.quantity is not null")
-    int incrementQuantity(@Param("id") UUID id, @Param("qty") int qty);
-
-    @Modifying
-    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id = :id AND l.seller.id = :sellerId AND l.quantity IS NOT NULL")
-    int updateQuantity(@Param("id") UUID id, @Param("qty") int qty, @Param("sellerId") Long sellerId);
-
-    @Modifying
-    @Query("UPDATE Listing l SET l.quantity = :qty, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id IN :ids AND l.seller.id = :sellerId AND l.quantity IS NOT NULL AND l.status IN :statuses")
-    int updateQuantityBatch(@Param("ids") List<UUID> ids, @Param("qty") int qty, @Param("sellerId") Long sellerId, @Param("statuses") Collection<ListingStatus> statuses);
 
     @Modifying
     @Query("UPDATE Listing l SET l.price = :price, l.updatedAt = CURRENT_TIMESTAMP WHERE l.id = :id AND l.seller.id = :sellerId")

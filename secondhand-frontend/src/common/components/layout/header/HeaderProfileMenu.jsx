@@ -42,7 +42,7 @@ const HeaderProfileMenu = ({
                     <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">{t("account")}</p>
                     <Link to={ROUTES.PROFILE} onClick={onClose} className="text-sm font-semibold text-text-primary truncate tracking-tight block hover:text-slate-600 transition-colors cursor-pointer flex items-center gap-1.5">
                         {user?.name || 'User'}
-                        {isPremium && <Crown className="h-3.5 w-3.5 text-accent-amber-500 shrink-0" aria-label="Premium üye" />}
+                        {isPremium && <Crown className="h-3.5 w-3.5 text-accent-amber-500 shrink-0" aria-label={t('premium_member', 'Premium üye')} />}
                     </Link>
                 </div>
                 {getProfileMenuItems(user?.id).map(item => <HeaderMenuItem key={item.key} to={item.to} onClick={onClose} icon={item.icon} label={item.label} compact />)}
@@ -54,9 +54,9 @@ const HeaderProfileMenu = ({
                       className="flex w-full items-center justify-between px-3 py-2 text-xs font-bold bg-primary text-white hover:bg-primary-hover transition-all duration-200 rounded-lg cursor-pointer shadow-sm active:scale-97">
                       <span className="flex items-center gap-1.5">
                         <Crown className="h-3.5 w-3.5" />
-                        Premium'a Geç
+                        {t('upgrade_to_premium', "Premium'a Geç")}
                       </span>
-                      <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">YÜKSELT</span>
+                      <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">{t('upgrade_badge', 'YÜKSELT')}</span>
                     </button>
                   </div>
                 )}

@@ -9,6 +9,8 @@ import { useGenderEnum } from '../../common/hooks/useGenderEnum.js';
 import AuthInput from '../../common/components/ui/AuthInput.jsx';
 import AuthButton from '../../common/components/ui/AuthButton.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+import { formatBirthdateInput } from '../../common/utils/dateFormat.js';
+import { formatPhoneNumber } from '../../common/utils/phoneFormatter.js';
 const OAuthCompletePage = () => {
   const {
     t
@@ -29,21 +31,48 @@ const OAuthCompletePage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const registrationToken = params.get('registrationToken') || '';
+
+  const tokenClaims = useMemo(() => {
+    if (!registrationToken) return {};
+    try {
+      const base64Url = registrationToken.split('.')[1];
+      if (!base64Url) return {};
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return {};
+    }
+  }, [registrationToken]);
+
   const baseInfo = useMemo(() => ({
-    email: params.get('email') || '',
-    name: params.get('name') || '',
-    surname: params.get('surname') || '',
-    picture: params.get('picture') || ''
-  }), [params]);
+    registrationToken,
+    email: tokenClaims.email || params.get('email') || '',
+    name: tokenClaims.name || params.get('name') || '',
+    surname: tokenClaims.surname || params.get('surname') || '',
+    picture: tokenClaims.picture || params.get('picture') || ''
+  }), [registrationToken, tokenClaims, params]);
   const initials = [baseInfo.name?.[0], baseInfo.surname?.[0]].filter(Boolean).join('').toUpperCase();
   const handleChange = e => {
     const {
       name,
       value
     } = e.target;
+    let formattedValue = value;
+    if (name === 'birthdate') {
+      formattedValue = formatBirthdateInput(value, form.birthdate);
+    } else if (name === 'phone') {
+      formattedValue = formatPhoneNumber(value, true);
+    }
     setForm(prev => ({
       ...prev,
-      [name]: value
+      [name]: formattedValue
     }));
     if (errors[name]) setErrors(prev => ({
       ...prev,
@@ -61,6 +90,12 @@ const OAuthCompletePage = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     if (!validate()) return;
+    if (!baseInfo.registrationToken) {
+      setErrors({
+        submit: 'Missing OAuth registration token. Please try logging in again.'
+      });
+      return;
+    }
     if (!baseInfo.email) {
       setErrors({
         submit: 'Missing email from OAuth provider.'
@@ -70,6 +105,7 @@ const OAuthCompletePage = () => {
     setSubmitting(true);
     try {
       const payload = {
+        registrationToken: baseInfo.registrationToken,
         name: baseInfo.name,
         surname: baseInfo.surname,
         email: baseInfo.email,

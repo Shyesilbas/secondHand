@@ -66,7 +66,7 @@ public class OrderMapper {
                 .notes(order.getNotes())
                 .paymentReference(order.getPaymentReference())
                 .paymentStatus(order.getPaymentStatus())
-                .paymentMethod(order.getPaymentMethod())
+                .paymentProviderName(order.getPaymentProviderName())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .orderItems(orderItemsToDtoList(order.getOrderItems(), 

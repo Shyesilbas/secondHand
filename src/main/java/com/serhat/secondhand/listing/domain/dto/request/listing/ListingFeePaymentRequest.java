@@ -1,6 +1,5 @@
 package com.serhat.secondhand.listing.domain.dto.request.listing;
 
-import com.serhat.secondhand.payment.entity.PaymentType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,7 +10,7 @@ public record ListingFeePaymentRequest(
     Long userId,
     BigDecimal amount,
     String currency,
-    PaymentType paymentType,
+    String providerName,
     String verificationCode,
     boolean agreementsAccepted,
     List<UUID> acceptedAgreementIds,

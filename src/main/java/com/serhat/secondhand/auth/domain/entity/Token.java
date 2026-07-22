@@ -22,7 +22,7 @@ public class Token {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 1000)
+    @Column(name = "token_value", nullable = false, unique = true, length = 1000)
     private String token;
 
     @Enumerated(EnumType.STRING)

@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository
 import com.serhat.secondhand.listing.application.common.ListingEnrichmentService;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class CartService {
     private final ListingRepository listingRepository;
     private final CartConfig cartConfig;
     private final CartReservationScheduler cartReservationScheduler;
+    private final InventoryService inventoryService;
 
     @Transactional
     public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
@@ -74,7 +76,7 @@ public class CartService {
     }
 
     private void applyReservationIfLowStock(Listing listing, Cart cartItem) {
-        Integer qty = listing.getQuantity();
+        Integer qty = inventoryService.getAvailableQuantity(listing.getId());
         int threshold = Optional.ofNullable(cartConfig.getReservation().getThreshold()).orElse(3);
         if (qty != null && qty <= threshold) {
             LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());

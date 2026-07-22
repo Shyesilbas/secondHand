@@ -8,6 +8,7 @@ import {useRegisterAgreements} from '../../agreements/hooks/useRegisterAgreement
 import {validateRegisterForm} from '../utils/registerValidator.js';
 import {useGenderEnum} from '../../common/hooks/useGenderEnum.js';
 import {formatPhoneNumber} from '../../common/utils/phoneFormatter.js';
+import {formatBirthdateInput} from '../../common/utils/dateFormat.js';
 
 export const useRegisterForm = () => {
   const [formData, setFormData] = useState({ ...RegisterRequestDTO, confirmPassword: '' });
@@ -25,31 +26,7 @@ export const useRegisterForm = () => {
     
     // Special handling for birthdate to format DD/MM/YYYY
     if (name === 'birthdate') {
-      const prevValue = formData.birthdate || '';
-      const isDeleting = value.length < prevValue.length;
-      let formattedValue = value;
-
-      if (!isDeleting) {
-        // Strip all non-digits
-        const clean = value.replace(/\D/g, '').substring(0, 8);
-        const day = clean.substring(0, 2);
-        const month = clean.substring(2, 4);
-        const year = clean.substring(4, 8);
-
-        if (clean.length > 4) {
-          formattedValue = `${day}/${month}/${year}`;
-        } else if (clean.length > 2) {
-          formattedValue = `${day}/${month}`;
-        } else {
-          formattedValue = clean;
-        }
-      } else {
-        // If deleting a slash, delete the character before it as well to prevent loops
-        if (prevValue.endsWith('/') && value.length === prevValue.length - 1) {
-          formattedValue = value.slice(0, -1);
-        }
-      }
-      
+      const formattedValue = formatBirthdateInput(value, formData.birthdate || '');
       setFormData(prev => ({ ...prev, [name]: formattedValue }));
     } 
     // Special handling for phone number formatting

@@ -2,7 +2,6 @@ package com.serhat.secondhand.payment.dto;
 
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import lombok.Builder;
 
@@ -22,7 +21,7 @@ public record PaymentRequest(
         String listingNo,
         BigDecimal amount,
         String currency,
-        PaymentType paymentType,
+        String providerName,
         PaymentTransactionType transactionType,
         PaymentDirection paymentDirection,
         String verificationCode,

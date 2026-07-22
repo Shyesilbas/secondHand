@@ -181,10 +181,10 @@ const AccountHubPage = () => {
             <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-start gap-3 shadow-sm">
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700">Üyeliğiniz Yakında Sona Erecek</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700">{t('your_membership_expires_soon', 'Üyeliğiniz Yakında Sona Erecek')}</h4>
                 <p className="text-xs mt-1 font-medium">
-                  Premium üyeliğiniz {new Date(expirationDate).toLocaleDateString('tr-TR')} tarihinde sona erecektir.
-                  {!autoRenew && " Otomatik yenileme kapalıdır. Avantajlarınızı kaybetmemek için otomatik yenilemeyi açabilirsiniz."}
+                  {t('expires_on', 'Üyeliğiniz {{date}} tarihinde sona erecektir.', { date: new Date(expirationDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US') })}
+                  {!autoRenew && ` ${t('auto_renew_off_warning', 'Otomatik yenileme kapalıdır. Avantajlarınızı kaybetmemek için otomatik yenilemeyi açabilirsiniz.')}`}
                 </p>
               </div>
             </div>
@@ -208,7 +208,7 @@ const AccountHubPage = () => {
           <div className="mb-8 bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
               <Crown className="w-4 h-4 text-amber-500" />
-              Üyelik ve Ayrıcalıklar
+              {t('membership_and_privileges', 'Üyelik ve Ayrıcalıklar')}
             </h2>
             
             {isPremium ? (
@@ -222,12 +222,12 @@ const AccountHubPage = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5">
-                        <h3 className="text-base font-bold text-slate-900 tracking-tight">Premium Üyelik Aktif</h3>
+                        <h3 className="text-base font-bold text-slate-900 tracking-tight">{t('premium_membership_active', 'Premium Üyelik Aktif')}</h3>
                         <span className="text-[10px] font-extrabold text-amber-600 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           {plan}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1 font-medium">Premium avantajlarınızın tadını çıkarın.</p>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">{t('enjoy_premium_perks', 'Premium avantajlarınızın tadını çıkarın.')}</p>
                     </div>
                   </div>
 
@@ -236,7 +236,7 @@ const AccountHubPage = () => {
                     <div className="flex justify-between text-xs font-semibold text-slate-700">
                       <span className="flex items-center gap-1.5">
                         <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
-                        Aura AI Mesajı
+                        {t('aura_ai_message', 'Aura AI Mesajı')}
                       </span>
                       <span className="font-bold text-slate-900">{dailyAuraUsage} / {dailyAuraLimit}</span>
                     </div>
@@ -251,20 +251,20 @@ const AccountHubPage = () => {
                   {/* Benefits Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
-                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Hızlı Teslimat</div>
-                      <span className="text-xs font-bold text-emerald-600">{estimatedShippingDays} Gün (Kargo Önceliği)</span>
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('fast_shipping', 'Hızlı Teslimat')}</div>
+                      <span className="text-xs font-bold text-emerald-600">{estimatedShippingDays} {t('days_priority', 'Gün (Kargo Önceliği)')}</span>
                     </div>
                     <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
-                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kargo Süreci</div>
-                      <span className="text-xs font-bold text-emerald-600">{orderProcessingSpeed} (Hazırlık Hızı)</span>
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('shipping_process', 'Kargo Süreci')}</div>
+                      <span className="text-xs font-bold text-emerald-600">{orderProcessingSpeed}</span>
                     </div>
                     <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
-                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Aura AI Mesaj Limiti</div>
-                      <span className="text-xs font-bold text-slate-900">Günlük {dailyAuraLimit} Mesaj</span>
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('aura_ai_message_limit', 'Aura AI Mesaj Limiti')}</div>
+                      <span className="text-xs font-bold text-slate-900">{t('daily_x_messages', 'Günlük {{count}} Mesaj', { count: dailyAuraLimit })}</span>
                     </div>
                     <div className="p-3.5 rounded-xl bg-slate-50/50 border border-slate-100">
-                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Showcase Slotu</div>
-                      <span className="text-xs font-bold text-slate-900">{activeShowcasesCount} / {maxShowcaseSlots} Slot Aktif</span>
+                      <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('showcase_slot', 'Showcase Slotu')}</div>
+                      <span className="text-xs font-bold text-slate-900">{activeShowcasesCount} / {maxShowcaseSlots} {t('slots_active', 'Slot Aktif')}</span>
                     </div>
                   </div>
                 </div>
@@ -275,24 +275,24 @@ const AccountHubPage = () => {
                   <div className="space-y-3">
                     {purchaseDate && (
                       <div className="flex flex-col items-start text-left">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Başlangıç Tarihi</span>
-                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(purchaseDate).toLocaleDateString('tr-TR')}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('start_date', 'Başlangıç Tarihi')}</span>
+                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(purchaseDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US')}</span>
                       </div>
                     )}
                     
                     {/* Under it: Bitiş Tarihi */}
                     {expirationDate && (
                       <div className="flex flex-col items-start text-left border-t border-slate-100 pt-2.5">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bitiş Tarihi</span>
-                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(expirationDate).toLocaleDateString('tr-TR')}</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('end_date', 'Bitiş Tarihi')}</span>
+                        <span className="text-xs font-bold text-slate-900 mt-0.5">{new Date(expirationDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US')}</span>
                       </div>
                     )}
 
                     {/* Status: Otomatik Yenileme */}
                     <div className="border-t border-slate-100 pt-2.5 flex flex-col items-start text-left">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Otomatik Yenileme</span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('auto_renew', 'Otomatik Yenileme')}</span>
                       <span className={`text-xs font-bold mt-0.5 ${autoRenew ? 'text-emerald-600' : 'text-slate-500'}`}>
-                        {autoRenew ? 'Açık (Varsayılan)' : 'Kapalı'}
+                        {autoRenew ? t('enabled_default', 'Açık (Varsayılan)') : t('disabled', 'Kapalı')}
                       </span>
                     </div>
                   </div>
@@ -305,19 +305,19 @@ const AccountHubPage = () => {
                         disabled={isCancelling}
                         className="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-rose-500/10"
                       >
-                        {isCancelling ? 'İşleniyor...' : 'Aboneliği İptal Et'}
+                        {isCancelling ? t('processing_progress', 'İşleniyor...') : t('cancel_subscription', 'Aboneliği İptal Et')}
                       </button>
                     ) : (
                       <div className="space-y-2">
                         <span className="text-[10px] text-slate-500 font-semibold bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 inline-block w-full text-center">
-                          Otomatik Yenileme Kapalı
+                          {t('auto_renew_disabled', 'Otomatik Yenileme Kapalı')}
                         </span>
                         <button 
                           onClick={() => toggleAutoRenew(true)}
                           disabled={isTogglingAutoRenew}
                           className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-emerald-500/10"
                         >
-                          {isTogglingAutoRenew ? 'Etkinleştiriliyor...' : 'Yeniden Etkinleştir'}
+                          {isTogglingAutoRenew ? t('enabling', 'Etkinleştiriliyor...') : t('reactivate', 'Yeniden Etkinleştir')}
                         </button>
                       </div>
                     )}

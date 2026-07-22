@@ -1,5 +1,6 @@
 import React from 'react';
 import { Tag, TrendingDown, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AuraPriceAdvisorGauge({
   min,
@@ -9,6 +10,7 @@ export default function AuraPriceAdvisorGauge({
   currency = 'TRY',
   status = 'Good Deal'
 }) {
+  const { t, i18n } = useTranslation();
   const currentNum = Number(current);
   const minNum = Number(min);
   const maxNum = Number(max);
@@ -25,7 +27,7 @@ export default function AuraPriceAdvisorGauge({
 
   // Format currencies
   const formatPrice = (val) => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(val);
+    return new Intl.NumberFormat(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US', { style: 'currency', currency }).format(val);
   };
 
   // Determine colors based on status
@@ -33,7 +35,7 @@ export default function AuraPriceAdvisorGauge({
     const s = status.toLowerCase();
     if (s.includes('good') || s.includes('bargain') || s.includes('ucuz') || s.includes('iyi')) {
       return {
-        label: 'İyi Fiyat',
+        label: t('good_price', 'İyi Fiyat'),
         badgeClass: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
         barColor: 'from-emerald-500 to-teal-500',
         glowColor: 'shadow-emerald-500/20',
@@ -41,7 +43,7 @@ export default function AuraPriceAdvisorGauge({
       };
     } else if (s.includes('high') || s.includes('pahalı') || s.includes('yüksek')) {
       return {
-        label: 'Piyasa Üstü',
+        label: t('above_market_price', 'Piyasa Üstü'),
         badgeClass: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
         barColor: 'from-orange-500 to-rose-500',
         glowColor: 'shadow-rose-500/20',
@@ -49,7 +51,7 @@ export default function AuraPriceAdvisorGauge({
       };
     } else {
       return {
-        label: 'Ortalama Fiyat',
+        label: t('average_price', 'Ortalama Fiyat'),
         badgeClass: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
         barColor: 'from-teal-500 to-amber-500',
         glowColor: 'shadow-amber-500/20',
@@ -67,8 +69,8 @@ export default function AuraPriceAdvisorGauge({
       
       <div className="flex items-center justify-between gap-4 mb-4">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">AURA FİYAT DANIŞMANI</span>
-          <h4 className="text-sm font-extrabold text-text-primary mt-0.5">Piyasa Fiyat Değerlendirmesi</h4>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">{t('aura_price_advisor', 'AURA FİYAT DANIŞMANI')}</span>
+          <h4 className="text-sm font-extrabold text-text-primary mt-0.5">{t('market_price_evaluation', 'Piyasa Fiyat Değerlendirmesi')}</h4>
         </div>
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide ${config.badgeClass}`}>
           {config.icon}
@@ -80,11 +82,11 @@ export default function AuraPriceAdvisorGauge({
         {/* Comparison Values */}
         <div className="grid grid-cols-2 gap-4">
           <div className="p-3 rounded-xl bg-background-secondary border border-border-light/50">
-            <span className="text-[10px] font-semibold text-text-muted block">Mevcut Ürün Fiyatı</span>
+            <span className="text-[10px] font-semibold text-text-muted block">{t('current_item_price', 'Mevcut Ürün Fiyatı')}</span>
             <span className="text-base font-black text-text-primary mt-1 block">{formatPrice(currentNum)}</span>
           </div>
           <div className="p-3 rounded-xl bg-background-secondary border border-border-light/50">
-            <span className="text-[10px] font-semibold text-text-muted block">Ortalama Piyasa Fiyatı</span>
+            <span className="text-[10px] font-semibold text-text-muted block">{t('average_market_price', 'Ortalama Piyasa Fiyatı')}</span>
             <span className="text-base font-black text-text-primary mt-1 block">{formatPrice(avgNum)}</span>
           </div>
         </div>
@@ -99,7 +101,7 @@ export default function AuraPriceAdvisorGauge({
             <div 
               className="absolute top-1/2 -translate-y-1/2 w-1.5 h-4 bg-slate-400 dark:bg-slate-500 rounded-full z-10 cursor-help"
               style={{ left: `${avgPct}%` }}
-              title={`Piyasa Ortalaması: ${formatPrice(avgNum)}`}
+              title={`${t('average_market_price', 'Piyasa Ortalaması')}: ${formatPrice(avgNum)}`}
             />
 
             {/* Current Price Selector Pin */}
@@ -114,7 +116,7 @@ export default function AuraPriceAdvisorGauge({
           {/* Label Ranges */}
           <div className="flex justify-between items-center text-[10px] font-extrabold text-text-muted mt-2 px-0.5">
             <span>Min: {formatPrice(minNum)}</span>
-            <span className="text-slate-400 dark:text-slate-500">Ortalama: {formatPrice(avgNum)}</span>
+            <span className="text-slate-400 dark:text-slate-500">{t('average', 'Ortalama')}: {formatPrice(avgNum)}</span>
             <span>Max: {formatPrice(maxNum)}</span>
           </div>
         </div>

@@ -11,12 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import com.serhat.secondhand.inventory.application.InventoryService;
 
 @Service
 @RequiredArgsConstructor
 public class CartValidator {
 
     private final CartConfig cartConfig;
+    private final InventoryService inventoryService;
 
     public Result<Void> validateListingExists(Listing listing) {
         if (listing == null) {
@@ -53,7 +55,8 @@ public class CartValidator {
             int currentInCartQty,
             int activeReservationQty
     ) {
-        int actualStock = Optional.ofNullable(listing.getQuantity()).orElse(0);
+        Integer invQty = inventoryService.getAvailableQuantity(listing.getId());
+        int actualStock = Optional.ofNullable(invQty).orElse(0);
         int effectiveReservedQty = Math.max(activeReservationQty - currentInCartQty, 0);
         int availableStock = Math.max(actualStock - effectiveReservedQty, 0);
 

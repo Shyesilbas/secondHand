@@ -3,7 +3,6 @@ package com.serhat.secondhand.payment.application;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.entity.Payment;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +28,10 @@ public class PaymentStatsService {
     private final PaymentContextResolver paymentContextResolver;
 
     @Cacheable(value = "paymentStats", key = "#userId + '_' + #filterType")
-    public Map<String, Object> getPaymentStatistics(Long userId, PaymentType filterType) {
+    public Map<String, Object> getPaymentStatistics(Long userId, String providerName) {
         log.info("[CACHE MISS] paymentStats for userId: {}", userId);
 
-        List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, filterType);
+        List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, providerName);
         Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO} : statsRows.get(0);
 
         long total = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
@@ -59,7 +58,7 @@ public class PaymentStatsService {
             var spec = com.serhat.secondhand.payment.repository.spec.PaymentSpecification.withFilters(
                     userId,
                     filter.transactionType(),
-                    filter.paymentType(),
+                    filter.providerName(),
                     filter.paymentDirection(),
                     filter.dateFrom(),
                     filter.dateTo(),
@@ -78,7 +77,7 @@ public class PaymentStatsService {
     private boolean isFilterPresent(PaymentFilter filter) {
         if (filter == null) return false;
         return filter.transactionType() != null ||
-                filter.paymentType() != null ||
+                filter.providerName() != null ||
                 filter.paymentDirection() != null ||
                 filter.dateFrom() != null ||
                 filter.dateTo() != null ||
@@ -97,7 +96,8 @@ public class PaymentStatsService {
                 baseDto.receiverDisplayName(),
                 baseDto.amount(),
                 baseDto.currency(),
-                baseDto.paymentType(),
+                baseDto.providerName(),
+                baseDto.providerTransactionId(),
                 inferredData.transactionType(),
                 inferredData.direction(),
                 baseDto.listingId(),

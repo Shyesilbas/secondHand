@@ -39,7 +39,7 @@ public interface PaymentMapper {
                 .orderItemId(paymentRequest.orderItemId())
                 .listingTitle(paymentRequest.listingTitle())
                 .listingNo(paymentRequest.listingNo())
-                .paymentType(paymentRequest.paymentType())
+                .providerName(paymentRequest.providerName())
                 .transactionType(paymentRequest.transactionType())
                 .paymentDirection(paymentRequest.paymentDirection())
                 .processedAt(result.processedAt())

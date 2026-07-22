@@ -44,8 +44,6 @@ public class Listing {
 
     private BigDecimal price;
 
-    @Column(name = "quantity")
-    private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     private Currency currency;
@@ -133,44 +131,7 @@ public class Listing {
         this.price = newPrice;
     }
     
-    public void updateQuantity(Integer newQuantity) {
-        validateEditable();
-        validateQuantity(newQuantity);
-        this.quantity = newQuantity;
-    }
 
-    public void reserveQuantityForCheckout(int requestedQuantity) {
-        validateCanReserveForCheckout(requestedQuantity);
-        if (this.quantity == null) {
-            return;
-        }
-        this.quantity -= requestedQuantity;
-        if (this.quantity == 0) {
-            this.status = ListingStatus.SOLD;
-        }
-    }
-
-    public void restoreReservedQuantity(int restoredQuantity) {
-        if (restoredQuantity <= 0) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
-        }
-        if (this.quantity == null) {
-            return;
-        }
-        this.quantity += restoredQuantity;
-        if (this.status == ListingStatus.SOLD && this.quantity > 0) {
-            this.status = ListingStatus.ACTIVE;
-        }
-    }
-
-    public void incrementQuantity(int delta) {
-        if (this.quantity != null) {
-            this.quantity += delta;
-            if (this.status == ListingStatus.SOLD && this.quantity > 0) {
-                this.status = ListingStatus.ACTIVE;
-            }
-        }
-    }
     
     public void markFeeAsPaid() {
         this.isListingFeePaid = true;
@@ -227,17 +188,7 @@ public class Listing {
         }
     }
 
-    private void validateCanReserveForCheckout(int requestedQuantity) {
-        if (this.status != ListingStatus.ACTIVE) {
-            throw new BusinessException(ListingErrorCodes.INVALID_LISTING_STATUS);
-        }
-        if (requestedQuantity < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
-        }
-        if (this.quantity != null && this.quantity < requestedQuantity) {
-            throw new BusinessException(ListingErrorCodes.STOCK_INSUFFICIENT);
-        }
-    }
+
     
     private void validatePrice(BigDecimal newPrice) {
         if (newPrice == null || newPrice.compareTo(BigDecimal.ZERO) < 0) {
@@ -245,9 +196,5 @@ public class Listing {
         }
     }
     
-    private void validateQuantity(Integer newQuantity) {
-        if (newQuantity != null && newQuantity < 1) {
-            throw new BusinessException(ListingErrorCodes.INVALID_QUANTITY);
-        }
-    }
+
 }

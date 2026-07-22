@@ -20,7 +20,7 @@ public final class ResultResponses {
         return of(result, HttpStatus.OK);
     }
 
-    /**
+        /**
      * Returns 201 CREATED with data on success, or 400 BAD_REQUEST with error details on failure.
      */
     public static <T> ResponseEntity<?> created(Result<T> result) {

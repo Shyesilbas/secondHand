@@ -8,7 +8,6 @@ import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.shipping.entity.Shipping;
-import com.serhat.secondhand.shipping.entity.enums.Carrier;
 import com.serhat.secondhand.shipping.repository.ShippingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,7 +55,7 @@ public class OrderCompletionScheduler {
                 OrderStatus oldStatus = order.getStatus();
                 // Simulation: Use ARAS carrier and a random tracking number
                 String trackingNumber = "TRK" + System.currentTimeMillis();
-                order.markAsShipped(Carrier.ARAS, trackingNumber);
+                order.markAsShipped("ARAS", trackingNumber, null, "SIM-" + trackingNumber, null, java.math.BigDecimal.ZERO);
                 orderRepository.save(order);
                 eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), OrderStatus.SHIPPED.name()));
                 updatedCount++;

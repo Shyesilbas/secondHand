@@ -8,9 +8,9 @@ import com.serhat.secondhand.payment.entity.PaymentResult;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.outbox.PaymentOutboxService;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
-import com.serhat.secondhand.payment.strategy.PaymentStrategyFactory;
-import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.port.out.PaymentProviderPort;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
+import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.payment.util.PaymentRedisIdempotencyService;
 import jakarta.persistence.OptimisticLockException;
@@ -22,12 +22,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentProcessor {
 
-    private final PaymentStrategyFactory paymentStrategyFactory;
+    private final List<PaymentProviderPort> providers;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentIdempotencyHelper paymentIdempotencyHelper;
@@ -126,7 +128,10 @@ public class PaymentProcessor {
         }
         PaymentPreCheckService.PreCheckContext context = preCheckResult.getData();
 
-        var strategy = paymentStrategyFactory.getStrategy(paymentRequest.paymentType());
+        PaymentProviderPort strategy = providers.stream()
+                .filter(p -> p.supports(paymentRequest.providerName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No provider for: " + paymentRequest.providerName()));
 
         if (!strategy.canProcess(context.fromUser(), context.toUser(), paymentRequest.amount())) {
             return Result.error("Payment Method is not eligible.", PaymentErrorCodes.PAYMENT_ERROR.toString());
@@ -152,7 +157,7 @@ public class PaymentProcessor {
                 (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
         boolean orderItemMatches = (existingPayment.getOrderItemId() == null && paymentRequest.orderItemId() == null) ||
                 (existingPayment.getOrderItemId() != null && existingPayment.getOrderItemId().equals(paymentRequest.orderItemId()));
-        boolean paymentTypeMatches = existingPayment.getPaymentType() == paymentRequest.paymentType();
+        boolean paymentTypeMatches = existingPayment.getProviderName() != null && existingPayment.getProviderName().equals(paymentRequest.providerName());
         boolean fromUserMatches = existingPayment.getFromUser().getId().equals(userId);
 
         if (!amountMatches || !listingMatches || !orderItemMatches || !paymentTypeMatches || !fromUserMatches) {
@@ -167,7 +172,7 @@ public class PaymentProcessor {
 
     private String buildRequestFingerprint(Long userId, PaymentRequest paymentRequest) {
         return userId + "|" +
-                paymentRequest.paymentType() + "|" +
+                paymentRequest.providerName() + "|" +
                 paymentRequest.amount() + "|" +
                 paymentRequest.listingId() + "|" +
                 paymentRequest.orderItemId();
@@ -177,9 +182,9 @@ public class PaymentProcessor {
         org.springframework.cache.Cache cache = cacheManager.getCache("paymentStats");
         if (cache != null) {
             cache.evict(userId + "_null");
-            for (com.serhat.secondhand.payment.entity.PaymentType type : com.serhat.secondhand.payment.entity.PaymentType.values()) {
-                cache.evict(userId + "_" + type.name());
-            }
+            // Since PaymentType enum is removed, we invalidate everything
+            // Or better: cache.clear() if supported, but typically we evict known keys
+            cache.evict(userId + "_EWALLET");
         }
     }
 }

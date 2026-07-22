@@ -3,7 +3,6 @@ package com.serhat.secondhand.payment.repository.spec;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -17,7 +16,7 @@ public class PaymentSpecification {
     public static Specification<Payment> withFilters(
             Long userId,
             PaymentTransactionType transactionType,
-            PaymentType paymentType,
+            String providerName,
             PaymentDirection paymentDirection,
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -53,8 +52,8 @@ public class PaymentSpecification {
                 }
             }
 
-            if (paymentType != null) {
-                predicates.add(cb.equal(root.get("paymentType"), paymentType));
+            if (providerName != null && !providerName.isBlank()) {
+                predicates.add(cb.equal(root.get("providerName"), providerName));
             }
 
             if (paymentDirection != null) {

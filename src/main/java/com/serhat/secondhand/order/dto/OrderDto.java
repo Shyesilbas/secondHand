@@ -4,7 +4,6 @@ import com.serhat.secondhand.payment.entity.PaymentStatus;
 
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.shipping.dto.ShippingDto;
 import com.serhat.secondhand.user.domain.dto.AddressDto;
 import lombok.AllArgsConstructor;
@@ -42,7 +41,7 @@ public class OrderDto {
     private String notes;
     private String paymentReference;
     private PaymentStatus paymentStatus;
-    private PaymentType paymentMethod;
+    private String paymentProviderName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<OrderItemDto> orderItems;

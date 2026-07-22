@@ -9,7 +9,6 @@ import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -94,9 +93,9 @@ public class PaymentController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> getPaymentStatistics(
             @AuthenticationPrincipal User currentUser,
-            @RequestParam(name = "paymentType", required = false) PaymentType paymentType) {
+            @RequestParam(name = "providerName", required = false) String providerName) {
 
-        return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId(), paymentType));
+        return ResponseEntity.ok(paymentStatsService.getPaymentStatistics(currentUser.getId(), providerName));
     }
 
 }

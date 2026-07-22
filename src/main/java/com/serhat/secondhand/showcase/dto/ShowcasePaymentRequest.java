@@ -1,6 +1,5 @@
 package com.serhat.secondhand.showcase.dto;
 
-import com.serhat.secondhand.payment.entity.PaymentType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -15,7 +14,7 @@ public record ShowcasePaymentRequest(
         @Positive
         int days,
         @NotNull
-        PaymentType paymentType,
+        String providerName,
         @NotBlank
         String verificationCode,
         boolean agreementsAccepted,

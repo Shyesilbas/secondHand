@@ -10,6 +10,7 @@ import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,16 +25,19 @@ public abstract class AbstractListingService<T extends Listing, C> {
     protected final ListingValidationService listingValidationService;
     protected final ListingMapper listingMapper;
     protected final ListingValidationEngine listingValidationEngine;
+    protected final InventoryService inventoryService;
 
     protected AbstractListingService(
             IUserService userService,
             ListingValidationService listingValidationService,
             ListingMapper listingMapper,
-            ListingValidationEngine listingValidationEngine) {
+            ListingValidationEngine listingValidationEngine,
+            InventoryService inventoryService) {
         this.userService = userService;
         this.listingValidationService = listingValidationService;
         this.listingMapper = listingMapper;
         this.listingValidationEngine = listingValidationEngine;
+        this.inventoryService = inventoryService;
     }
 
     @Transactional
@@ -50,7 +54,8 @@ public abstract class AbstractListingService<T extends Listing, C> {
         T entity = mapRequestToEntity(request);
 
         if (requiresQuantityValidation()) {
-            Result<Void> quantityResult = validateQuantity(entity);
+            Integer q = extractQuantity(request);
+            Result<Void> quantityResult = validateQuantity(q);
             if (quantityResult.isError()) {
                 return Result.error(quantityResult.getMessage(), quantityResult.getErrorCode());
             }
@@ -75,6 +80,12 @@ public abstract class AbstractListingService<T extends Listing, C> {
         }
 
         T saved = save(entity);
+        if (requiresQuantityValidation()) {
+            Integer initialQty = extractQuantity(request);
+            if (initialQty != null) {
+                inventoryService.createInventory(saved.getId(), initialQty);
+            }
+        }
         log.info("{} listing created: {}", getListingType(), saved.getId());
         return Result.success(saved.getId());
     }
@@ -88,7 +99,7 @@ public abstract class AbstractListingService<T extends Listing, C> {
     public Result<Void> applyQuantityUpdate(Listing listing, Optional<Integer> quantity) {
         if (quantity.isPresent()) {
             try {
-                listing.updateQuantity(quantity.get());
+                inventoryService.updateQuantity(listing.getId(), quantity.get());
                 return Result.success();
             } catch (BusinessException e) {
                 return Result.error(e.getMessage(), e.getErrorCode());
@@ -111,12 +122,14 @@ public abstract class AbstractListingService<T extends Listing, C> {
 
     protected abstract T save(T entity);
 
+    protected abstract Integer extractQuantity(C request);
+
     protected boolean requiresQuantityValidation() {
         return false;
     }
 
-    protected Result<Void> validateQuantity(T entity) {
-        if (entity.getQuantity() == null || entity.getQuantity() < 1) {
+    protected Result<Void> validateQuantity(Integer quantity) {
+        if (quantity == null || quantity < 1) {
             return Result.error("Invalid quantity for " + getListingType().toLowerCase() + " listing",
                     ListingErrorCodes.INVALID_QUANTITY.toString());
         }

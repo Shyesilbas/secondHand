@@ -31,6 +31,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.serhat.secondhand.inventory.application.InventoryService;
 
 @Mapper(
     componentModel = "spring",
@@ -39,6 +41,9 @@ import org.mapstruct.*;
 )
 @Slf4j
 public abstract class ListingMapper {
+
+    @Autowired
+    protected InventoryService inventoryService;
 
     // ──────────────────────────────────────────────
     //  Shared nested mapping methods
@@ -63,6 +68,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "model", source = "model", qualifiedByName = "vehicleModel")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(vehicleListing.getId()))")
     public abstract VehicleListingDto toVehicleDto(VehicleListing vehicleListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -71,6 +77,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "model", source = "model", qualifiedByName = "electronicModel")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(electronicListing.getId()))")
     public abstract ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -78,6 +85,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(realEstateListing.getId()))")
     public abstract RealEstateListingDto toRealEstateDto(RealEstateListing realEstateListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -85,6 +93,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(clothingListing.getId()))")
     public abstract ClothingListingDto toClothingDto(ClothingListing clothingListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -92,6 +101,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(booksListing.getId()))")
     public abstract BooksListingDto toBooksDto(BooksListing booksListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -99,6 +109,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerId", source = "seller.id")
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
+    @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(sportsListing.getId()))")
     public abstract SportsListingDto toSportsDto(SportsListing sportsListing);
 
     // ──────────────────────────────────────────────

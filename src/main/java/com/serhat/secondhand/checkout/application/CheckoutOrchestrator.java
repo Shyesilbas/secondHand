@@ -19,7 +19,6 @@ import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.payment.application.OrderPaymentService;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -94,7 +93,7 @@ public class CheckoutOrchestrator {
             List<PaymentDto> paymentResults = paymentResult.getData();
             boolean allSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
 
-            applyPaymentResultToOrder(order, paymentResults, allSuccessful, request.getPaymentType());
+            applyPaymentResultToOrder(order, paymentResults, allSuccessful, request.getProviderName());
 
             if (allSuccessful) {
                 Result<Void> escrowResult = escrowService.hold(order);
@@ -127,7 +126,7 @@ public class CheckoutOrchestrator {
     }
 
     private void applyPaymentResultToOrder(Order order, List<PaymentDto> paymentResults,
-                                           boolean allSuccessful, PaymentType paymentType) {
+                                           boolean allSuccessful, String providerName) {
         if (paymentResults != null && !paymentResults.isEmpty()) {
             order.setPaymentReference(paymentResults.get(0).paymentId().toString());
         }
@@ -137,13 +136,13 @@ public class CheckoutOrchestrator {
         } else {
             order.setStatus(OrderStatus.CANCELLED);
         }
-        order.setPaymentMethod(paymentType != null ? paymentType : PaymentType.EWALLET);
+        order.setPaymentProviderName(providerName != null ? providerName : "EWALLET");
         if (allSuccessful && order.getShipping() != null) {
             order.getShipping().setStatus(ShippingStatus.PENDING);
         }
         orderRepository.save(order);
         log.info("Updated order {} payment status to: {} with payment method: {}",
-                order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentMethod());
+                order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentProviderName());
     }
 
     private void markOrderAsFailed(Order order) {

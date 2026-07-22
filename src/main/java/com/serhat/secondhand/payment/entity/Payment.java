@@ -43,8 +43,11 @@ public class Payment {
     
     private String listingNo;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentType paymentType;
+    @Column(name = "provider_name", length = 50)
+    private String providerName;
+
+    @Column(name = "provider_transaction_id", length = 100)
+    private String providerTransactionId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)

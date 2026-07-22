@@ -1,6 +1,5 @@
 package com.serhat.secondhand.order.dto;
 
-import com.serhat.secondhand.payment.entity.PaymentType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ public class CheckoutRequest {
     private String notes;
     private String name;
 
-    private PaymentType paymentType;
+    private String providerName;
     private String paymentVerificationCode;
     
     private boolean agreementsAccepted;

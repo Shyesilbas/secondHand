@@ -37,7 +37,7 @@ public class PaymentValidationHelper {
                 && fromUser.getId().equals(toUser.getId())) {
             return Result.error(PaymentErrorCodes.SELF_PAYMENT);
         }
-        if (paymentRequest.paymentType() == null) {
+        if (paymentRequest.providerName() == null) {
             return Result.error(PaymentErrorCodes.PAYMENT_TYPE_REQUIRED);
         }
         return Result.success();

@@ -12,6 +12,7 @@ import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class OrderCompensationPersistenceService {
     private final ListingRepository listingRepository;
     private final OrderRepository orderRepository;
     private final OrderLogService orderLog;
+    private final InventoryService inventoryService;
 
     public void persistCancellationRecordsAndRestoreStock(List<OrderItemCancel> cancelRecords) {
         orderItemCancelRepository.saveAll(cancelRecords);
@@ -60,10 +62,12 @@ public class OrderCompensationPersistenceService {
         if (listing == null) return;
         ListingType type = item.getListingType();
         if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) return;
-        if (listing.getQuantity() == null) return;
         
-        listing.restoreReservedQuantity(delta);
-        listingRepository.save(listing);
-        orderLog.logStockRestored(listing.getId(), delta);
+        try {
+            inventoryService.restoreQuantity(listing.getId(), delta);
+            orderLog.logStockRestored(listing.getId(), delta);
+        } catch (Exception ignored) {
+            // Ignored, fallback
+        }
     }
 }

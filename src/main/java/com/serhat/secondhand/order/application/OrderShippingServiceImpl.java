@@ -6,10 +6,11 @@ import com.serhat.secondhand.order.dto.OrderShipRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
-import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
+import com.serhat.secondhand.shipping.application.ShippingService;
+import com.serhat.secondhand.shipping.dto.ShippingDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class OrderShippingServiceImpl implements OrderShippingService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderLogService orderLog;
+    private final ShippingService shippingService;
 
     @Override
     @Transactional
@@ -39,10 +41,26 @@ public class OrderShippingServiceImpl implements OrderShippingService {
                     }
 
                     try {
-                        if (order.getStatus() == OrderStatus.CONFIRMED) {
+                        if (order.getStatus() == com.serhat.secondhand.order.entity.enums.OrderStatus.CONFIRMED) {
                             order.markAsProcessing();
                         }
-                        order.markAsShipped(request.getCarrier(), request.getTrackingNumber());
+                        
+                        // Delegate shipment creation to ShippingService
+                        Result<ShippingDto> shipmentResult = shippingService.createShipmentForOrder(order.getShipping().getId(), request.getProviderName());
+                        if (shipmentResult.isError()) {
+                            return Result.<OrderDto>error(shipmentResult.getErrorCode(), shipmentResult.getMessage());
+                        }
+
+                        ShippingDto shipment = shipmentResult.getData();
+                        order.markAsShipped(
+                                shipment.getProviderName(),
+                                shipment.getTrackingNumber(),
+                                shipment.getTrackingUrl(),
+                                shipment.getProviderShipmentId(),
+                                shipment.getLabelUrl(),
+                                shipment.getShippingCost()
+                        );
+
                         Order savedOrder = orderRepository.save(order);
                         
                         orderLog.logStatusChanged(order.getOrderNumber(), "PROCESSING", "SHIPPED");

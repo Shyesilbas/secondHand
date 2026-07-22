@@ -194,7 +194,7 @@ public class EWalletService implements IEWalletService {
     @Transactional
     public PaymentResult processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId) {
         if (fromUser == null) {
-            return PaymentResult.failure("User not found", amount, PaymentType.EWALLET, listingId, null,
+            return PaymentResult.failure("User not found", amount, "EWALLET", listingId, null,
                     toUser != null ? toUser.getId() : null);
         }
 
@@ -215,7 +215,7 @@ public class EWalletService implements IEWalletService {
             return PaymentResult.success(
                     UUID.randomUUID().toString(),
                     amount,
-                    PaymentType.EWALLET,
+                    "EWALLET",
                     listingId,
                     fromUser.getId(),
                     toUser != null ? toUser.getId() : null);
@@ -224,7 +224,7 @@ public class EWalletService implements IEWalletService {
             return PaymentResult.failure(
                     e.getMessage(),
                     amount,
-                    PaymentType.EWALLET,
+                    "EWALLET",
                     listingId,
                     fromUser.getId(),
                     toUser != null ? toUser.getId() : null);

@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateRepo
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.realestate.RealEstateSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,9 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<RealEstateSpecValidator> realEstateSpecValidators,
-            RealEstateListingResolver realEstateListingResolver) {
-        super(userService, listingValidationService, listingMapper, listingValidationEngine);
+            RealEstateListingResolver realEstateListingResolver,
+            InventoryService inventoryService) {
+        super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.realEstateRepository = realEstateRepository;
         this.genericFilterService = genericFilterService;
         this.predicateBuilder = predicateBuilder;
@@ -95,6 +97,11 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
     @Override
     protected RealEstateListing save(RealEstateListing entity) {
         return realEstateRepository.save(entity);
+    }
+
+    @Override
+    protected Integer extractQuantity(RealEstateCreateRequest request) {
+        return null;
     }
 
     @Transactional

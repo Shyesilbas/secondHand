@@ -73,7 +73,7 @@ public class PaymentModuleAdapter implements ListingFeePaymentPort {
                 .listingTitle(listingTitle)
                 .listingNo(listingNo)
                 .amount(request.amount())
-                .paymentType(request.paymentType())
+                .providerName(request.providerName())
                 .transactionType(PaymentTransactionType.LISTING_CREATION)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.verificationCode())

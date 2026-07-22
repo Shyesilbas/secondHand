@@ -1,7 +1,7 @@
 package com.serhat.secondhand.shipping.entity;
 
 import com.serhat.secondhand.order.entity.Order;
-import com.serhat.secondhand.shipping.entity.enums.Carrier;
+
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter @Setter
@@ -41,12 +42,23 @@ public class Shipping {
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "carrier")
-    private Carrier carrier;
+    @Column(name = "provider_name", length = 50)
+    private String providerName;
+
+    @Column(name = "provider_shipment_id", length = 100)
+    private String providerShipmentId;
+
+    @Column(name = "label_url", length = 500)
+    private String labelUrl;
 
     @Column(name = "tracking_number", length = 50)
     private String trackingNumber;
+
+    @Column(name = "tracking_url", length = 500)
+    private String trackingUrl;
+
+    @Column(name = "shipping_cost")
+    private BigDecimal shippingCost;
 
     @Column(name = "estimated_delivery_date")
     private LocalDateTime estimatedDeliveryDate;
@@ -59,12 +71,16 @@ public class Shipping {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public void ship(Carrier carrier, String trackingNumber) {
+    public void ship(String providerName, String trackingNumber, String trackingUrl, String providerShipmentId, String labelUrl, BigDecimal shippingCost) {
         this.status = ShippingStatus.IN_TRANSIT;
-        this.carrier = carrier;
+        this.providerName = providerName;
         this.trackingNumber = trackingNumber;
+        this.trackingUrl = trackingUrl;
+        this.providerShipmentId = providerShipmentId;
+        this.labelUrl = labelUrl;
+        this.shippingCost = shippingCost;
         this.inTransitAt = LocalDateTime.now();
-        // Default estimation: 3 days from now
+        // Default estimation: 3 days from now, provider can update later via webhook
         this.estimatedDeliveryDate = this.inTransitAt.plusDays(3);
     }
 
@@ -76,14 +92,5 @@ public class Shipping {
 
     public void cancel() {
         this.status = ShippingStatus.CANCELLED;
-        this.trackingNumber = null;
-        this.carrier = null;
-    }
-
-    public String getTrackingUrl() {
-        if (carrier == null || carrier == Carrier.OTHER || trackingNumber == null || trackingNumber.isBlank()) {
-            return null;
-        }
-        return carrier.getTrackingUrlBase() + trackingNumber;
     }
 }

@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleListingRep
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.vehicle.VehicleSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,8 +46,9 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<VehicleSpecValidator> vehicleSpecValidators,
-            VehicleListingResolver vehicleListingResolver) {
-        super(userService, listingValidationService, listingMapper, listingValidationEngine);
+            VehicleListingResolver vehicleListingResolver,
+            InventoryService inventoryService) {
+        super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.vehicleRepository = vehicleRepository;
         this.genericFilterService = genericFilterService;
         this.predicateBuilder = predicateBuilder;
@@ -100,6 +102,11 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
     @Override
     protected VehicleListing save(VehicleListing entity) {
         return vehicleRepository.save(entity);
+    }
+
+    @Override
+    protected Integer extractQuantity(VehicleCreateRequest request) {
+        return null;
     }
 
     @Transactional

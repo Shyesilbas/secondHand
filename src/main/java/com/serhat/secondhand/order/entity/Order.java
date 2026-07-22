@@ -4,9 +4,8 @@ import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.shipping.entity.Shipping;
-import com.serhat.secondhand.shipping.entity.enums.Carrier;
+
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -116,9 +115,8 @@ public class Order {
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
-    @Column(name = "payment_method")
-    @Enumerated(EnumType.STRING)
-    private PaymentType paymentMethod;
+    @Column(name = "payment_provider_name")
+    private String paymentProviderName;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -254,14 +252,14 @@ public class Order {
         this.setUpdatedAt(LocalDateTime.now());
     }
 
-    public void markAsShipped(Carrier carrier, String trackingNumber) {
+    public void markAsShipped(String providerName, String trackingNumber, String trackingUrl, String providerShipmentId, String labelUrl, BigDecimal shippingCost) {
         if (this.status != OrderStatus.PROCESSING) {
             throw new IllegalStateException("Only processing orders can be moved to shipped");
         }
         this.status = OrderStatus.SHIPPED;
         this.setUpdatedAt(LocalDateTime.now());
         if (this.shipping != null) {
-            this.shipping.ship(carrier, trackingNumber);
+            this.shipping.ship(providerName, trackingNumber, trackingUrl, providerShipmentId, labelUrl, shippingCost);
         }
     }
 

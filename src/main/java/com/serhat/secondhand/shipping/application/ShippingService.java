@@ -2,16 +2,14 @@ package com.serhat.secondhand.shipping.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.shipping.dto.ShippingDto;
-import com.serhat.secondhand.shipping.entity.enums.Carrier;
-
 import java.util.Optional;
 
 public interface ShippingService {
     
     /**
-     * Updates shipping status to IN_TRANSIT and sets tracking details.
+     * Creates a shipment via CargoProviderPort and updates shipping status.
      */
-    Result<ShippingDto> startShipping(Long shippingId, Carrier carrier, String trackingNumber);
+    Result<ShippingDto> createShipmentForOrder(Long shippingId, String providerName);
     
     /**
      * Updates shipping status to DELIVERED.

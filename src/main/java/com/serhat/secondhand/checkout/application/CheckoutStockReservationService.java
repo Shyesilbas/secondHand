@@ -13,12 +13,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.serhat.secondhand.inventory.application.InventoryService;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class CheckoutStockReservationService {
 
     private final ListingRepository listingRepository;
+    private final InventoryService inventoryService;
 
     public Result<Map<UUID, Integer>> reserveStock(List<Cart> cartItems) {
         Map<UUID, Integer> reserved = new HashMap<>();
@@ -32,11 +35,9 @@ public class CheckoutStockReservationService {
 
             int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;
             try {
-                listing.reserveQuantityForCheckout(requestedQty);
-                listingRepository.save(listing);
-                if (listing.getQuantity() != null) {
-                    reserved.merge(listing.getId(), requestedQty, Integer::sum);
-                }
+                inventoryService.reserveQuantity(listing.getId(), requestedQty);
+                // We assume there's always an inventory if a listing is active
+                reserved.merge(listing.getId(), requestedQty, Integer::sum);
             } catch (BusinessException e) {
                 releaseReservedStock(reserved);
                 return Result.error(e.getMessage(), e.getErrorCode());
@@ -49,10 +50,11 @@ public class CheckoutStockReservationService {
         if (reserved == null) {
             return;
         }
-        reserved.forEach((listingId, quantity) ->
-                listingRepository.findByIdWithLock(listingId).ifPresent(listing -> {
-                    listing.restoreReservedQuantity(quantity);
-                    listingRepository.save(listing);
-                }));
+        reserved.forEach((listingId, quantity) -> {
+            try {
+                inventoryService.restoreQuantity(listingId, quantity);
+            } catch (Exception ignored) {
+            }
+        });
     }
 }

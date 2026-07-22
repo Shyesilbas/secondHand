@@ -10,12 +10,17 @@ import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.offer.entity.OfferActor;
 import com.serhat.secondhand.offer.util.OfferErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.inventory.application.InventoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
+@RequiredArgsConstructor
 public class OfferValidator {
+
+    private final InventoryService inventoryService;
 
     public Result<Void> validateCreateRequest(CreateOfferRequest request) {
         return validateQuantityAndPrice(request.getQuantity(), request.getTotalPrice());
@@ -66,7 +71,8 @@ public class OfferValidator {
         if (quantity == null || quantity < 1) {
             return Result.error(OfferErrorCodes.INVALID_QUANTITY);
         }
-        if (listing.getQuantity() != null && listing.getQuantity() < quantity) {
+        Integer availableQty = inventoryService.getAvailableQuantity(listing.getId());
+        if (availableQty != null && availableQty < quantity) {
             return Result.error(OfferErrorCodes.OFFER_QUANTITY_EXCEEDS_STOCK);
         }
         return Result.success();

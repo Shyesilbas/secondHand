@@ -19,8 +19,6 @@ import com.serhat.secondhand.listing.domain.entity.enums.electronic.Processor;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
-import com.serhat.secondhand.payment.entity.PaymentType;
-import com.serhat.secondhand.shipping.entity.enums.Carrier;
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
 import com.serhat.secondhand.showcase.application.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
@@ -255,17 +253,6 @@ public class EnumController {
         return ResponseEntity.ok(enumReadService.getOwnerTypes());
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getPaymentTypes() {
-        List<Map<String, Object>> types = Arrays.stream(PaymentType.values())
-                .map(type -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", type.name());
-                    map.put("label", type.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(types);
-    }
 
     private ResponseEntity<List<Map<String, Object>>> getShippingStatuses() {
         List<Map<String, Object>> list = Arrays.stream(ShippingStatus.values())
@@ -291,18 +278,6 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getCarriers() {
-        List<Map<String, Object>> list = Arrays.stream(Carrier.values())
-                .map(carrier -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", carrier.name());
-                    map.put("label", carrier.getName());
-                    map.put("trackingUrlBase", carrier.getTrackingUrlBase());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(list);
-    }
 
     private List<String> getCancellableOrderStatuses() {
         return OrderStatus.CANCELLABLE_STATUSES.stream()
@@ -587,9 +562,7 @@ public class EnumController {
         allEnums.put("sportEquipmentTypes", getSportEquipmentTypes().getBody());
         allEnums.put("sportConditions", getSportConditions().getBody());
         allEnums.put("genders", getGenders().getBody());
-        allEnums.put("paymentTypes", getPaymentTypes().getBody());
         allEnums.put("shippingStatuses", getShippingStatuses().getBody());
-        allEnums.put("carriers", getCarriers().getBody());
         allEnums.put("orderStatuses", getOrderStatuses().getBody());
         allEnums.put("cancellableOrderStatuses", getCancellableOrderStatuses());
         allEnums.put("refundableOrderStatuses", getRefundableOrderStatuses());

@@ -163,7 +163,7 @@ public class OrderEmailListener {
             }
 
             String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
-            String paymentMethodLabel = orderDto.getPaymentMethod() != null ? (orderDto.getPaymentMethod().name().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentMethod().name()) : "E-Cüzdan (E-Wallet)";
+            String paymentMethodLabel = orderDto.getPaymentProviderName() != null ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentProviderName()) : "E-Cüzdan (E-Wallet)";
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(customer.getName())
@@ -227,7 +227,7 @@ public class OrderEmailListener {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
-            String paymentMethodLabel = orderDto.getPaymentMethod() != null ? (orderDto.getPaymentMethod().name().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentMethod().name()) : "E-Cüzdan (E-Wallet)";
+            String paymentMethodLabel = orderDto.getPaymentProviderName() != null ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentProviderName()) : "E-Cüzdan (E-Wallet)";
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(seller.getName())

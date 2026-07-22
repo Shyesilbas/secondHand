@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.sports.SportsListingRepos
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.sports.SportsSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -43,8 +44,9 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<SportsSpecValidator> sportsSpecValidators,
-            SportsListingResolver sportsListingResolver) {
-        super(userService, listingValidationService, listingMapper, listingValidationEngine);
+            SportsListingResolver sportsListingResolver,
+            InventoryService inventoryService) {
+        super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.sportsRepository = sportsRepository;
         this.genericFilterService = genericFilterService;
         this.predicateBuilder = predicateBuilder;
@@ -97,6 +99,11 @@ public class SportsListingService extends AbstractListingService<SportsListing, 
     @Override
     protected SportsListing save(SportsListing entity) {
         return sportsRepository.save(entity);
+    }
+
+    @Override
+    protected Integer extractQuantity(SportsCreateRequest request) {
+        return request.quantity();
     }
 
     @Transactional

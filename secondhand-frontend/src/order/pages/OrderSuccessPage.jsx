@@ -103,10 +103,10 @@ const OrderSuccessPage = () => {
               </div>
             </div>
             <h1 className="text-2xl font-semibold text-text-primary tracking-tight">
-              {deliveryMethod === 'SAFE_MEETUP' ? 'Elden Teslimat Siparişiniz Oluşturuldu!' : 'Your order was placed successfully'}
+              {deliveryMethod === 'SAFE_MEETUP' ? t('safe_meetup_order_created', 'Elden Teslimat Siparişiniz Oluşturuldu!') : t('order_placed_successfully', 'Siparişiniz başarıyla oluşturuldu')}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              {deliveryMethod === 'SAFE_MEETUP' ? 'Ödemeniz alındı. Buluşma noktasında satıcıyla görüşerek teslim alabilirsiniz.' : "Payment is complete. We're getting your order ready."}
+              {deliveryMethod === 'SAFE_MEETUP' ? t('safe_meetup_order_desc', 'Ödemeniz alındı. Buluşma noktasında satıcıyla görüşerek teslim alabilirsiniz.') : t('payment_complete_getting_ready', 'Ödemeniz alındı. Siparişiniz hazırlanıyor.')}
             </p>
           </div>
 

@@ -236,12 +236,12 @@ const CheckoutPage = () => {
             </div>
             <div>
               <p className="text-sm font-bold text-text-primary">
-                {isPremium ? 'Premium Kargo Avantajı' : 'Kargoda Beklemeyin!'}
+                {isPremium ? t('premium_shipping_advantage', 'Premium Kargo Avantajı') : t('dont_wait_for_shipping', 'Kargoda Beklemeyin!')}
               </p>
               <p className="text-xs text-text-secondary">
                 {isPremium 
-                  ? `Siparişiniz öncelikli olarak işlenecek.` 
-                  : `Premium'a geçerek kargonuzu en kısa sürede alın!`}
+                  ? t('order_processed_with_priority', 'Siparişiniz öncelikli olarak işlenecek.') 
+                  : t('upgrade_to_premium_get_shipping_fast', "Premium'a geçerek kargonuzu en kısa sürede alın!")}
               </p>
             </div>
           </div>
@@ -250,7 +250,7 @@ const CheckoutPage = () => {
               onClick={() => setIsPremiumModalOpen(true)}
               className="text-xs font-bold text-primary hover:underline uppercase tracking-wider"
             >
-              Premium'u Keşfet
+              {t('explore_premium', "Premium'u Keşfet")}
             </button>
           )}
         </div>

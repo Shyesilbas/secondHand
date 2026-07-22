@@ -47,7 +47,7 @@ export default function AuraMemoryProfileHub() {
     return (
       <div className="flex flex-col items-center justify-center py-8 space-y-3">
         <BrainCircuit className="w-8 h-8 text-primary animate-pulse" />
-        <span className="text-xs text-text-muted font-medium">{t("loading_ai_memory") || 'Aura hafızası yükleniyor...'}</span>
+        <span className="text-xs text-text-muted font-medium">{t("loading_ai_memory", "Aura hafızası yükleniyor...")}</span>
       </div>
     );
   }
@@ -143,26 +143,26 @@ export default function AuraMemoryProfileHub() {
       <div className="flex items-center gap-2 pb-3 border-b border-border-light">
         <BrainCircuit className="w-5 h-5 text-primary shrink-0" />
         <div>
-          <h3 className="text-xs font-bold text-text-primary">{t("aura_brain_hub") || 'Aura Hafıza Paneli'}</h3>
-          <p className="text-[10px] text-text-muted leading-tight mt-0.5">{t("aura_remembers_your_chats") || 'Aura sizin hakkınızda bunları hatırlıyor.'}</p>
+          <h3 className="text-xs font-bold text-text-primary">{t("aura_brain_hub", "Aura Hafıza Paneli")}</h3>
+          <p className="text-[10px] text-text-muted leading-tight mt-0.5">{t("aura_remembers_your_chats", "Aura sizin hakkınızda bunları hatırlıyor.")}</p>
         </div>
       </div>
 
       {/* Name & Tone */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold text-text-muted block mb-1">Nasıl Hitap Etsin?</label>
+          <label className="text-[10px] font-bold text-text-muted block mb-1">{t("how_to_address_you", "Nasıl Hitap Etsin?")}</label>
           <input 
             type="text" 
             value={userName} 
             onChange={(e) => setUserName(e.target.value)}
             onBlur={handleSaveField}
-            placeholder="İsim"
+            placeholder={t("name_placeholder", "İsim")}
             className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
           />
         </div>
         <div>
-          <label className="text-[10px] font-bold text-text-muted block mb-1">Konuşma Tonu</label>
+          <label className="text-[10px] font-bold text-text-muted block mb-1">{t("conversation_tone", "Konuşma Tonu")}</label>
           <select 
             value={preferredTone} 
             onChange={(e) => {
@@ -187,17 +187,17 @@ export default function AuraMemoryProfileHub() {
             }}
             className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
           >
-            <option value="Friendly">Samimi / Dostça</option>
-            <option value="Formal">Resmi</option>
-            <option value="Casual">Günlük / Rahat</option>
-            <option value="Serious">Ciddi</option>
+            <option value="Friendly">{t("tone_friendly", "Samimi / Dostça")}</option>
+            <option value="Formal">{t("tone_formal", "Resmi")}</option>
+            <option value="Casual">{t("tone_casual", "Günlük / Rahat")}</option>
+            <option value="Serious">{t("tone_serious", "Ciddi")}</option>
           </select>
         </div>
       </div>
 
       {/* Interests Section */}
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-text-muted block">İlgi Alanları (Kelime/Kategori)</label>
+        <label className="text-[10px] font-bold text-text-muted block">{t("interests_label", "İlgi Alanları (Kelime/Kategori)")}</label>
         <div className="flex flex-wrap gap-1.5">
           {memory?.permanentInterests?.map(interest => (
             <span key={interest} className="inline-flex items-center gap-1 text-[10px] font-bold bg-secondary-light border border-border-light px-2 py-0.5 rounded-full text-text-secondary">
@@ -208,7 +208,7 @@ export default function AuraMemoryProfileHub() {
             </span>
           ))}
           {(!memory?.permanentInterests || memory.permanentInterests.length === 0) && (
-            <span className="text-[10px] text-text-muted font-medium italic">Kayıtlı ilgi alanı yok.</span>
+            <span className="text-[10px] text-text-muted font-medium italic">{t("no_saved_interests", "Kayıtlı ilgi alanı yok.")}</span>
           )}
         </div>
         <form onSubmit={handleAddInterest} className="flex gap-2">
@@ -216,7 +216,7 @@ export default function AuraMemoryProfileHub() {
             type="text" 
             value={newInterest} 
             onChange={(e) => setNewInterest(e.target.value)} 
-            placeholder="İlgi alanı ekle... (örn: Bisiklet)"
+            placeholder={t("add_interest_placeholder", "İlgi alanı ekle... (örn: Bisiklet)")}
             className="flex-1 text-[11px] bg-background-secondary border border-border-light rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
           />
           <button type="submit" className="px-2.5 py-1 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all">
@@ -227,7 +227,7 @@ export default function AuraMemoryProfileHub() {
 
       {/* Brands Section */}
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-text-muted block">Tercih Ettiği Markalar</label>
+        <label className="text-[10px] font-bold text-text-muted block">{t("preferred_brands", "Tercih Ettiği Markalar")}</label>
         <div className="flex flex-wrap gap-1.5">
           {memory?.secondHandProfile?.brands?.map(brand => (
             <span key={brand} className="inline-flex items-center gap-1 text-[10px] font-bold bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full text-primary">
@@ -238,7 +238,7 @@ export default function AuraMemoryProfileHub() {
             </span>
           ))}
           {(!memory?.secondHandProfile?.brands || memory.secondHandProfile.brands.length === 0) && (
-            <span className="text-[10px] text-text-muted font-medium italic">Kayıtlı marka yok.</span>
+            <span className="text-[10px] text-text-muted font-medium italic">{t("no_saved_brands", "Kayıtlı marka yok.")}</span>
           )}
         </div>
         <form onSubmit={handleAddBrand} className="flex gap-2">
@@ -246,7 +246,7 @@ export default function AuraMemoryProfileHub() {
             type="text" 
             value={newBrand} 
             onChange={(e) => setNewBrand(e.target.value)} 
-            placeholder="Marka ekle... (örn: Apple)"
+            placeholder={t("add_brand_placeholder", "Marka ekle... (örn: Apple)")}
             className="flex-1 text-[11px] bg-background-secondary border border-border-light rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
           />
           <button type="submit" className="px-2.5 py-1 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all">
@@ -257,11 +257,11 @@ export default function AuraMemoryProfileHub() {
 
       {/* Budget Preferences */}
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-text-muted block">Bütçe Tercihi</label>
+        <label className="text-[10px] font-bold text-text-muted block">{t("budget_preference", "Bütçe Tercihi")}</label>
         <div className="flex gap-2 items-center">
           <input 
             type="number" 
-            placeholder="Min" 
+            placeholder={t("min", "Min")} 
             value={budgetMin}
             onChange={(e) => setBudgetMin(e.target.value)}
             onBlur={handleSaveField}
@@ -270,7 +270,7 @@ export default function AuraMemoryProfileHub() {
           <span className="text-text-muted text-xs">-</span>
           <input 
             type="number" 
-            placeholder="Max" 
+            placeholder={t("max", "Max")} 
             value={budgetMax}
             onChange={(e) => setBudgetMax(e.target.value)}
             onBlur={handleSaveField}
@@ -309,12 +309,12 @@ export default function AuraMemoryProfileHub() {
 
       {/* User Notes */}
       <div>
-        <label className="text-[10px] font-bold text-text-muted block mb-1">Aura'nın Özel Notları (Hedefler, Tercihler)</label>
+        <label className="text-[10px] font-bold text-text-muted block mb-1">{t("auras_special_notes", "Aura'nın Özel Notları (Hedefler, Tercihler)")}</label>
         <textarea 
           value={userNotes} 
           onChange={(e) => setUserNotes(e.target.value)}
           onBlur={handleSaveField}
-          placeholder="İlan arayışları, kargo kısıtlamaları veya özel notlar..."
+          placeholder={t("special_notes_placeholder", "İlan arayışları, kargo kısıtlamaları veya özel notlar...")}
           rows={3}
           className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary resize-none"
         />
@@ -323,7 +323,7 @@ export default function AuraMemoryProfileHub() {
       {updateMutation.isPending && (
         <div className="flex items-center gap-1.5 text-[9px] text-primary font-bold">
           <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
-          Kaydediliyor...
+          {t("saving", "Kaydediliyor...")}
         </div>
       )}
     </div>

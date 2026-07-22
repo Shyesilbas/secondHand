@@ -55,7 +55,7 @@ public class ListingFeePaymentService {
                 userId,
                 totalFee,
                 request.currency(),
-                request.paymentType(),
+                request.providerName(),
                 request.verificationCode(),
                 request.agreementsAccepted(),
                 request.acceptedAgreementIds(),

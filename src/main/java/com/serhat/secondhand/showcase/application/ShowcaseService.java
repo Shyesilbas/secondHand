@@ -279,8 +279,8 @@ public class ShowcaseService implements IShowcaseService {
         Listing firstListing = listings.get(0);
         ShowcasePaymentRequest tempRequest = new ShowcasePaymentRequest(
                 firstListing.getId(), request.days(),
-                request.paymentType() != null ? request.paymentType()
-                        : com.serhat.secondhand.payment.entity.PaymentType.EWALLET,
+                request.providerName() != null ? request.providerName()
+                        : "EWALLET",
                 request.verificationCode(), request.agreementsAccepted(), request.acceptedAgreementIds(),
                 idempotencyKey);
 

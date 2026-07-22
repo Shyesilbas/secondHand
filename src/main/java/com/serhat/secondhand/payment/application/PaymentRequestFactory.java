@@ -7,7 +7,7 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
+
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
@@ -37,7 +37,7 @@ public class PaymentRequestFactory {
 
     public PaymentRequest buildOrderPaymentRequestForItem(User user, OrderItem item,
                                                            BigDecimal itemPayableAmount, CheckoutRequest request, String idempotencyKey, java.util.UUID orderExternalId) {
-        PaymentType paymentType = request.getPaymentType() != null ? request.getPaymentType() : PaymentType.EWALLET;
+        String providerName = request.getProviderName() != null ? request.getProviderName() : "EWALLET";
 
         Listing listing = item.getListing();
         return PaymentRequest.builder()
@@ -51,7 +51,7 @@ public class PaymentRequestFactory {
                 .listingNo(listing.getListingNo())
                 .amount(itemPayableAmount)
                 .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
-                .paymentType(paymentType)
+                .providerName(providerName)
                 .transactionType(PaymentTransactionType.ITEM_PURCHASE)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.getPaymentVerificationCode())
@@ -76,7 +76,7 @@ public class PaymentRequestFactory {
                 .listingNo(listing.getListingNo())
                 .amount(totalCost)
                 .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
-                .paymentType(request.paymentType())
+                .providerName(request.providerName())
                 .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.verificationCode())
@@ -99,7 +99,7 @@ public class PaymentRequestFactory {
                 .listingNo(listing.getListingNo())
                 .amount(additionalCost)
                 .currency(listing.getCurrency() != null ? listing.getCurrency().name() : "TRY")
-                .paymentType(request.paymentType())
+                .providerName(request.providerName())
                 .transactionType(PaymentTransactionType.SHOWCASE_PAYMENT)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .verificationCode(request.verificationCode())
@@ -109,7 +109,7 @@ public class PaymentRequestFactory {
                 .build();
     }
 
-    public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, PaymentType paymentType, String idempotencyKey, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {
+    public PaymentRequest buildMembershipPaymentRequest(User user, BigDecimal amount, String providerName, String idempotencyKey, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {
         return PaymentRequest.builder()
                 .fromUserId(user.getId())
                 .toUserId(null)
@@ -121,7 +121,7 @@ public class PaymentRequestFactory {
                 .listingNo(null)
                 .amount(amount)
                 .currency("TRY")
-                .paymentType(paymentType != null ? paymentType : PaymentType.EWALLET)
+                .providerName(providerName != null ? providerName : "EWALLET")
                 .transactionType(PaymentTransactionType.MEMBERSHIP_PAYMENT)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .agreementsAccepted(request != null ? request.agreementsAccepted() : false)

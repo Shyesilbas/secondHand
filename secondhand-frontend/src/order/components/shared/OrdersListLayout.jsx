@@ -637,9 +637,9 @@ const OrdersListLayout = ({
           {['ALL', 'CARGO', 'SAFE_MEETUP'].map(method => {
             const isActive = deliveryMethodFilter === method;
             const label = {
-              ALL: 'Tüm Siparişler',
-              CARGO: 'Kargo ile Gönderim',
-              SAFE_MEETUP: 'Elden Güvenli Teslimat'
+              ALL: t('all_orders_tab', 'Tüm Siparişler'),
+              CARGO: t('shipping_orders_tab', 'Kargo ile Gönderim'),
+              SAFE_MEETUP: t('safe_meetup_orders_tab', 'Elden Güvenli Teslimat')
             }[method];
             return <button key={method} type="button" onClick={() => setDeliveryMethodFilter(method)} className={`flex-1 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-tight transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 ${isActive ? 'bg-background-primary text-text-primary shadow-sm border border-border-light/60' : 'text-slate-500 hover:text-slate-800 hover:bg-background-primary/40'}`}>
                 {label}

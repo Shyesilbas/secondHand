@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicLis
 import com.serhat.secondhand.listing.validation.common.ListingValidationEngine;
 import com.serhat.secondhand.listing.validation.electronics.ElectronicSpecValidator;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,8 +45,9 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
             IUserService userService,
             ListingValidationEngine listingValidationEngine,
             List<ElectronicSpecValidator> electronicSpecValidators,
-            ElectronicListingResolver electronicListingResolver) {
-        super(userService, listingValidationService, listingMapper, listingValidationEngine);
+            ElectronicListingResolver electronicListingResolver,
+            InventoryService inventoryService) {
+        super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.repository = repository;
         this.genericFilterService = genericFilterService;
         this.predicateBuilder = predicateBuilder;
@@ -93,6 +95,11 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     @Override
     protected ElectronicListing save(ElectronicListing entity) {
         return repository.save(entity);
+    }
+
+    @Override
+    protected Integer extractQuantity(ElectronicCreateRequest request) {
+        return request.quantity();
     }
 
     @Transactional

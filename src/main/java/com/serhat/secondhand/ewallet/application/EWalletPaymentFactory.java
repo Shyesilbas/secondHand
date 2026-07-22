@@ -3,7 +3,7 @@ package com.serhat.secondhand.ewallet.application;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
+
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class EWalletPaymentFactory {
                 .fromUser(user)
                 .toUser(user)
                 .amount(amount)
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.EWALLET_DEPOSIT)
                 .paymentDirection(PaymentDirection.INCOMING)
                 .listingId(null)
@@ -33,7 +33,7 @@ public class EWalletPaymentFactory {
                 .fromUser(user)
                 .toUser(user)
                 .amount(amount)
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.EWALLET_WITHDRAWAL)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .listingId(null)
@@ -47,7 +47,7 @@ public class EWalletPaymentFactory {
                 .fromUser(seller)
                 .toUser(buyer)
                 .amount(amount)
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.INCOMING)
                 .listingId(listingId)
@@ -64,7 +64,7 @@ public class EWalletPaymentFactory {
                 .fromUser(seller)
                 .toUser(buyer)
                 .amount(amount)
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.OUTGOING)
                 .listingId(listingId)
@@ -81,7 +81,7 @@ public class EWalletPaymentFactory {
                 .fromUser(buyer)
                 .toUser(seller)
                 .amount(amount)
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.ITEM_SALE)
                 .paymentDirection(PaymentDirection.INCOMING)
                 .listingId(listingId)

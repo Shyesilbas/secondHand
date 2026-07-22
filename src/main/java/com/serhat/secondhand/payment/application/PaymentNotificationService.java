@@ -43,7 +43,7 @@ public class PaymentNotificationService {
             String typeLabel = getLocalizedTransactionType(paymentDto.transactionType());
             String subject = emailConfig.getPaymentSuccessSubject();
             String listingTitle = paymentDto.listingTitle() != null ? paymentDto.listingTitle() : "Ödeme";
-            String methodLabel = paymentDto.paymentType() != null ? (paymentDto.paymentType().name().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : paymentDto.paymentType().name()) : "E-Cüzdan (E-Wallet)";
+            String methodLabel = paymentDto.providerName() != null ? (paymentDto.providerName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : paymentDto.providerName()) : "E-Cüzdan (E-Wallet)";
             String formattedDate = paymentDto.processedAt() != null ? DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(paymentDto.processedAt()) : DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(java.time.LocalDateTime.now());
 
             StringBuilder sb = new StringBuilder();

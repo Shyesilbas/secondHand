@@ -10,7 +10,9 @@ import com.serhat.secondhand.listing.domain.entity.events.NewListingCreatedEvent
 import com.serhat.secondhand.listing.domain.entity.events.PriceDroppedEvent;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
+import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
+import com.serhat.secondhand.inventory.application.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,6 +36,7 @@ public class ListingCommandService {
     private final ListingConfig listingConfig;
     private final PriceHistoryService priceHistoryService;
     private final EntityManager entityManager;
+    private final InventoryService inventoryService;
     private static final List<ListingStatus> EDITABLE_STATUSES = List.of(
             ListingStatus.DRAFT,
             ListingStatus.ACTIVE,
@@ -141,8 +144,7 @@ public class ListingCommandService {
     public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         try {
-            listing.updateQuantity(quantity);
-            listingRepository.save(listing);
+            inventoryService.updateQuantity(listing.getId(), quantity);
             log.info("Listing {} quantity updated to {}", listingId, quantity);
             return Result.success();
         } catch (BusinessException e) {
@@ -162,10 +164,10 @@ public class ListingCommandService {
         if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds.size()) {
             return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
-        int updated = listingRepository.updateQuantityBatch(listingIds, quantity, userId, EDITABLE_STATUSES);
-        if (updated != listingIds.size()) {
-            return Result.error(ListingErrorCodes.INVALID_QUANTITY);
+        for (UUID lId : listingIds) {
+            inventoryService.updateQuantity(lId, quantity);
         }
+        int updated = listingIds.size();
         log.info("Batch quantity updated to {} for {} listings", quantity, updated);
         return Result.success();
     }

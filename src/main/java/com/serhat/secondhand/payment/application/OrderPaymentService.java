@@ -8,7 +8,7 @@ import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
-import com.serhat.secondhand.payment.entity.PaymentType;
+
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -92,7 +92,7 @@ public class OrderPaymentService {
 
     private Result<Void> validateAggregateEWalletBalance(Long userId, List<PaymentRequest> paymentRequests) {
         BigDecimal totalEWalletAmount = paymentRequests.stream()
-                .filter(request -> request.paymentType() == null || request.paymentType() == PaymentType.EWALLET)
+                .filter(request -> request.providerName() == null || "EWALLET".equals(request.providerName()))
                 .map(PaymentRequest::amount)
                 .filter(amount -> amount != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

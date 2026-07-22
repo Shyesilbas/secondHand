@@ -4,7 +4,6 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.entity.PaymentType;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.MembershipPlan;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
@@ -49,7 +48,7 @@ public class MembershipService {
         String idempotencyKey = (request.idempotencyKey() != null && !request.idempotencyKey().isBlank())
                 ? request.idempotencyKey()
                 : "membership-upgrade-" + userId + "-" + java.util.Objects.hash(request.verificationCode(), request.acceptedAgreementIds());
-        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, premiumPrice, PaymentType.EWALLET, idempotencyKey, request);
+        PaymentRequest paymentRequest = paymentRequestFactory.buildMembershipPaymentRequest(user, premiumPrice, "EWALLET", idempotencyKey, request);
 
         var paymentResult = paymentProcessor.executeSinglePayment(userId, paymentRequest);
         if (paymentResult.isError()) {
@@ -112,7 +111,7 @@ public class MembershipService {
                 .receiverSurname("MEMBERSHIP")
                 .amount(premiumPrice)
                 .currency("TRY")
-                .paymentType(PaymentType.EWALLET)
+                .providerName("EWALLET")
                 .transactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT)
                 .paymentDirection(com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING)
                 .agreementsAccepted(true)
