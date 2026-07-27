@@ -52,22 +52,22 @@ const ListingCard = ({
     switch (status) {
       case LISTING_STATUS.ACTIVE:
         return {
-          cls: 'bg-status-success-bg text-white',
+          cls: 'bg-emerald-600 text-white font-bold shadow-xs',
           label: 'Active'
         };
       case LISTING_STATUS.SOLD:
         return {
-          cls: 'bg-rose-500 text-white',
+          cls: 'bg-rose-600 text-white font-bold shadow-xs',
           label: 'Sold'
         };
       case LISTING_STATUS.INACTIVE:
         return {
-          cls: 'bg-text-muted text-white',
+          cls: 'bg-slate-600 text-white font-bold shadow-xs',
           label: 'Inactive'
         };
       default:
         return {
-          cls: 'bg-text-muted text-white',
+          cls: 'bg-slate-600 text-white font-bold shadow-xs',
           label: status
         };
     }
@@ -153,12 +153,12 @@ const ListingCard = ({
                     {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
                             {statusConfig.label}
                         </span>}
-                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-status-warning-bg text-white shadow-sm">
-                            <Zap className="w-2.5 h-2.5 fill-current" />{t("featured")}</span>}
-                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-caption font-bold bg-status-warning-bg text-amber-900 border border-amber-200 shadow-sm">
-                            <Award className="w-2.5 h-2.5 shrink-0" />{t("great_seller")}</span>}
-                    {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-caption font-bold bg-rose-500 text-white shadow-sm">
-                            <TrendingDown className="w-2.5 h-2.5" />
+                    {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">
+                            <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
+                    {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
+                            <Award className="w-3 h-3 shrink-0 text-amber-600" />{t("great_seller")}</span>}
+                    {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white shadow-sm font-mono">
+                            <TrendingDown className="w-3 h-3" />
                             -{discountPct}%
                         </span>}
                 </div>

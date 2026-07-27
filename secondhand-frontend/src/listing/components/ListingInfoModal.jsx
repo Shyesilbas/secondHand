@@ -170,8 +170,8 @@ const ListingInfoModal = ({
                   </div>
                 )}
                 {isInShowcase && (
-                  <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-status-warning-bg px-2.5 py-0.5 text-[10px] font-bold uppercase text-white shadow-sm border border-amber-300/40">
-                    <Zap className="h-3 w-3 fill-current" />{t("featured")}
+                  <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-md">
+                    <Zap className="h-3 w-3 fill-current text-white" />{t("featured")}
                   </span>
                 )}
               </div>

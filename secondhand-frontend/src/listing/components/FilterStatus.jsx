@@ -158,7 +158,7 @@ const FilterStatus = ({
   const FilterBadge = () => hasActive && activeCount > 0 ? <div className="flex flex-wrap items-center gap-1.5">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-semibold bg-indigo-50 text-primary border border-primary shadow-sm">
                     <SlidersHorizontal className="w-3 h-3" />
-                    {activeCount}{t("filter")}{activeCount !== 1 ? 's' : ''}
+                    {activeCount} {t("filter", "filtre")}
                 </span>
 
                 {activeTags.map((tag, idx) => <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-caption font-medium bg-slate-50 text-slate-600 border border-border-light shadow-sm transition-all duration-200">
@@ -174,7 +174,7 @@ const FilterStatus = ({
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-slate-300 inline-block" />
                         <span className="text-sm font-semibold text-slate-700">{t("no_listings_found")}</span>
-                        {categoryLabel && <span className="text-sm text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
+                        {categoryLabel && <span className="text-sm text-slate-400"> ({categoryLabel})</span>}
                     </div>
                     <FilterBadge />
                 </div>
@@ -184,11 +184,11 @@ const FilterStatus = ({
   return <div className="flex items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2.5">
                 <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-status-success-bg inline-block" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
                     <span className="text-sm font-semibold text-slate-700">
-                        {totalElements}{t("listing")}{totalElements !== 1 ? 's' : ''}
+                        {totalElements} {t("listing", "ilan")}
                     </span>
-                    {categoryLabel && <span className="text-sm text-slate-400">{t("in")}<span className="font-medium text-slate-600">{categoryLabel}</span></span>}
+                    {categoryLabel && <span className="text-sm text-slate-400"> ({categoryLabel})</span>}
                 </div>
                 <FilterBadge />
             </div>

@@ -239,36 +239,36 @@ const ListingDetailPage = () => {
   if (isLoading) return <DetailSkeleton />;
   if (error) return <DetailError error={error} />;
   if (!listing) return null;
-  return <div className="min-h-screen bg-background-secondary pb-28 lg:pb-16 text-text-primary selection:bg-primary-50 selection:text-primary">
+  return <div className="min-h-screen bg-slate-50/60 pb-28 lg:pb-16 text-slate-900 selection:bg-emerald-50 selection:text-emerald-700">
 
       {/* ▸ Sticky Navigation Header */}
-      <header className="sticky top-0 z-40 bg-background-primary border-b border-border-light text-sm">
-        <PageContainer className="max-w-[1220px] h-[52px] flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm text-sm">
+        <PageContainer className="max-w-[1280px] h-[54px] flex items-center justify-between gap-4">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-sm font-semibold min-w-0">
-            <Link to={ROUTES.LISTINGS} className="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1.5 shrink-0">
-              <ArrowLeft className="w-4 h-4" />
+          <nav className="flex items-center gap-2 text-sm font-semibold min-w-0">
+            <Link to={ROUTES.LISTINGS} className="text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0">
+              <ArrowLeft className="w-4 h-4 text-slate-600" />
               <span className="hidden sm:inline">{t("explore")}</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0 hidden sm:block" />
-            <span className="text-text-muted hidden sm:inline shrink-0">{listing.type}</span>
-            <ChevronRight className="w-3.5 h-3.5 text-text-muted shrink-0 hidden md:block" />
-            <span className="text-text-primary truncate hidden md:inline max-w-[200px]">{listing.title}</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 hidden sm:block" />
+            <span className="text-slate-500 font-bold uppercase tracking-wider text-xs hidden sm:inline shrink-0">{listing.type}</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 hidden md:block" />
+            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[240px]">{listing.title}</span>
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Top Header Quick Actions */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button onClick={() => navigate(ROUTES.AURA_CHAT, {
             state: {
               listing
             }
-          })} className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-primary hover:bg-primary-light rounded-lg font-semibold transition-all group" title={t("ask_aura_ai")}>
-              <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline text-sm">{t("ask_aura")}</span>
+          })} className="flex items-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20 rounded-xl font-bold transition-all shadow-sm group" title={t("ask_aura_ai")}>
+              <Sparkles className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline text-xs">{t("ask_aura")}</span>
             </button>
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
-            {!isOwner && <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className="p-2 border border-transparent text-text-muted hover:text-status-error-text rounded-lg transition-all hover:bg-status-error-bg" />}
-            <button onClick={handleShare} className="p-2 text-text-muted hover:text-text-primary rounded-lg transition-all hover:bg-secondary-light" aria-label={t("share_listing")} title={t("share")}>
+            {!isOwner && <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className="p-2 border border-slate-200 text-slate-500 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-200" />}
+            <button onClick={handleShare} className="p-2 text-slate-600 hover:text-slate-900 rounded-xl transition-all hover:bg-slate-100 border border-slate-200" aria-label={t("share_listing")} title={t("share")}>
               <Share2 className="w-4 h-4" />
             </button>
             {isOwner && <ListingCardActions listing={listing} onChanged={fetchListing} />}
@@ -280,93 +280,91 @@ const ListingDetailPage = () => {
       <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
 
       {/* ▸ Main Content */}
-      <PageContainer className="max-w-[1220px] pt-4 sm:pt-6">
-        <div className="grid lg:grid-cols-12 gap-5 lg:gap-7">
+      <PageContainer className="max-w-[1280px] pt-6 sm:pt-8">
+        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8">
 
-          {/* ── Left Column ─────────────────────────────── */}
-          <div className="lg:col-span-7 listing-stagger space-y-4">
+          {/* ── Left Column (Main Gallery & Specs) ─────────────────────────────── */}
+          <div className="lg:col-span-7 xl:col-span-8 space-y-6">
 
             {/* Showcase Block (Title + Gallery + Key Specs) */}
-            <section className="bg-background-primary rounded-xl p-4 sm:p-5 shadow-sm border border-border-light space-y-4">
+            <section className="bg-white rounded-3xl p-5 sm:p-7 shadow-md shadow-slate-200/50 border border-slate-200/90 space-y-5">
               <div>
-                <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-text-primary px-2.5 py-1 text-caption font-bold text-text-inverse uppercase tracking-wider">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="inline-flex items-center gap-1 rounded-xl bg-slate-900 px-3 py-1 text-xs font-extrabold text-white uppercase tracking-wider">
                     {listing.type}
                   </span>
-                  {hasCampaign && <span className="listing-discount-badge inline-flex items-center gap-1 rounded-full bg-status-success-bg px-2.5 py-1 text-caption font-bold text-status-success-text uppercase tracking-wider border border-status-success-border">
-                      <Tag className="w-3 h-3 text-status-success-icon" />
+                  {hasCampaign && <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1 text-xs font-extrabold text-emerald-700 uppercase tracking-wider border border-emerald-200 shadow-sm">
+                      <Tag className="w-3.5 h-3.5 text-emerald-600" />
                       {listing.campaignName || 'Sale'}
-                      {discount && <span className="ml-0.5">−{discount}%</span>}
+                      {discount && <span className="ml-0.5 font-mono">−{discount}%</span>}
                     </span>}
-                  {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-full bg-secondary-light px-2.5 py-1 text-caption font-bold text-text-muted uppercase tracking-wider border border-border-light">
+                  {listing.status !== LISTING_STATUS.ACTIVE && <span className="inline-flex items-center rounded-xl bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500 uppercase tracking-wider border border-slate-200">
                       {listing.status}
                     </span>}
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight leading-[1.2] mb-2.5">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-[1.18] mb-3">
                   {listing.title}
                 </h1>
 
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-body text-text-muted font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" />
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 font-semibold">
+                  <div className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                     {locationLabel}
                   </div>
-                  <span className="hidden sm:block w-1 h-1 rounded-full bg-border-light" />
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60">
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
                     {formatDateTime(listing.createdAt)}
                   </div>
-                  <span className="hidden sm:block w-1 h-1 rounded-full bg-border-light" />
-                  <div className="flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-1.5 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60">
+                    <Eye className="w-3.5 h-3.5 text-slate-500" />
                     {listing.viewCount || 0} {t("views")}</div>
                 </div>
               </div>
 
               {/* Gallery Frame */}
-              <div ref={galleryRef} className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[360px] bg-background-secondary rounded-xl overflow-hidden relative group cursor-pointer border border-border-light">
+              <div ref={galleryRef} className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[420px] bg-slate-900 rounded-2xl overflow-hidden relative group cursor-pointer border border-slate-200 shadow-inner">
                 {selectedImage && !imageError ? <img key={selectedImage} src={optimizeCloudinaryUrl(selectedImage, {
                 width: 1200
-              })} onError={() => setImageError(true)} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-cover listing-image-enter listing-img-zoom" fetchpriority="high" decoding="async" loading="eager" /> : <div className="flex flex-col items-center justify-center h-full text-text-muted">
-                    <div className="w-12 h-12 bg-background-primary rounded-lg flex items-center justify-center mb-3 border border-border-light">
-                      <Package className="w-5 h-5" />
+              })} onError={() => setImageError(true)} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" fetchpriority="high" decoding="async" loading="eager" /> : <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                    <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mb-3 border border-slate-700">
+                      <Package className="w-6 h-6 text-slate-300" />
                     </div>
-                    <p className="text-xs font-semibold">{t("no_image_available")}</p>
+                    <p className="text-xs font-bold">{t("no_image_available")}</p>
                   </div>}
 
                 {/* Gallery nav arrows */}
                 {images.length > 1 && <>
-                    <button onClick={showPreviousImage} className="absolute left-2.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-border-light" aria-label={t("previous_image")}>
-                      <ChevronLeft className="w-4 h-4" />
+                    <button onClick={showPreviousImage} className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-2xl bg-white/90 text-slate-900 shadow-xl flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-slate-200 backdrop-blur-md" aria-label={t("previous_image")}>
+                      <ChevronLeft className="w-5 h-5" />
                     </button>
-                    <button onClick={showNextImage} className="absolute right-2.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background-primary text-text-primary shadow-md flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-border-light" aria-label={t("next_image")}>
-                      <ChevronRight className="w-4 h-4" />
+                    <button onClick={showNextImage} className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-2xl bg-white/90 text-slate-900 shadow-xl flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-105 active:scale-95 border border-slate-200 backdrop-blur-md" aria-label={t("next_image")}>
+                      <ChevronRight className="w-5 h-5" />
                     </button>
                     {/* Image counter badge */}
-                    <div className="absolute bottom-2.5 right-2.5 bg-background-primary border border-border-light rounded-full px-2 py-0.5 text-caption font-bold text-text-primary shadow-sm">
+                    <div className="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md border border-slate-700/80 rounded-xl px-3 py-1 text-xs font-mono font-bold text-white shadow-md">
                       {selectedImageIndex + 1} / {images.length}
                     </div>
                   </>}
               </div>
 
               {/* Thumbnail strip */}
-              {images.length > 1 && <div className="flex gap-2 overflow-x-auto pb-1 px-0.5 scrollbar-thin">
-                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-11 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-primary ring-2 ring-primary/20 shadow-sm' : 'border-border-light/85 opacity-65 hover:opacity-100 hover:border-border-DEFAULT'}`}>
+              {images.length > 1 && <div className="flex gap-2.5 overflow-x-auto pb-1 px-0.5 custom-scrollbar">
+                  {images.slice(0, 10).map((imgUrl, idx) => <button key={`${imgUrl}-${idx}`} onClick={() => setSelectedImageIndex(idx)} className={`h-14 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-200 ${selectedImageIndex === idx ? 'border-emerald-600 ring-4 ring-emerald-500/20 shadow-md scale-105' : 'border-slate-200 opacity-70 hover:opacity-100 hover:border-slate-400'}`}>
                       <img src={optimizeCloudinaryUrl(imgUrl, {
-                  width: 120
-                })} alt="" className="h-full w-full object-cover" width="56" height="44" decoding="async" loading="lazy" />
+                  width: 150
+                })} alt="" className="h-full w-full object-cover" width="80" height="56" decoding="async" loading="lazy" />
                     </button>)}
                 </div>}
 
               {/* Key Specs Row */}
-              {categoryBadges.length > 0 && <div className="pt-3 border-t border-border-light">
-                  <div className="flex flex-wrap gap-1.5">
+              {categoryBadges.length > 0 && <div className="pt-4 border-t border-slate-100">
+                  <div className="flex flex-wrap gap-2">
                     {categoryBadges.flatMap((badge, bIdx) => {
                   const labelStr = String(badge.label || '');
                   const parts = labelStr.includes(' • ') ? labelStr.split(' • ').map(p => p.trim()).filter(Boolean) : [labelStr];
-                  return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-background-secondary text-text-primary text-body font-semibold border border-border-light">
-                          {pIdx === 0 && badge.icon && <span className="text-xs">{badge.icon}</span>}
+                  return parts.map((part, pIdx) => <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100/90 text-slate-800 text-xs font-bold border border-slate-200/80 shadow-xs">
+                          {pIdx === 0 && badge.icon && <span className="text-sm">{badge.icon}</span>}
                           {part}
                         </span>);
                 })}
@@ -377,53 +375,53 @@ const ListingDetailPage = () => {
             {/* Aura AI Summary */}
             {listing?.id && <AuraSummary type="listing" id={listing.id} />}
 
-            {/* Unified Product Info & Specifications */}
-            <section className="bg-background-primary rounded-xl p-4 sm:p-5 shadow-sm border border-border-light space-y-5">
+            {/* Product Info & Specifications */}
+            <section className="bg-white rounded-3xl p-5 sm:p-7 shadow-md shadow-slate-200/50 border border-slate-200/90 space-y-6">
               {/* Description */}
               <div>
-                <h2 className="text-base font-bold text-text-primary mb-2.5 tracking-tight">{t("about_this_item")}</h2>
-                <div className={`text-sm leading-relaxed text-text-secondary whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[140px] overflow-hidden' : ''}`}>
+                <h2 className="text-lg font-extrabold text-slate-900 mb-3 tracking-tight">{t("about_this_item")}</h2>
+                <div className={`text-sm leading-relaxed text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden' : ''}`}>
                   {listing.description || 'No description has been added for this listing.'}
-                  {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-background-primary to-transparent pointer-events-none opacity-95" />}
+                  {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none opacity-95" />}
                 </div>
-                {shouldClampDescription && <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-2 inline-flex items-center gap-1.5 text-primary font-bold text-xs hover:text-primary transition-colors group">
-                    {isDescriptionExpanded ? <><ChevronUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
+                {shouldClampDescription && <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-3 inline-flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs hover:text-emerald-700 transition-colors group">
+                    {isDescriptionExpanded ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
                   </button>}
               </div>
 
               {/* Specifications */}
-              {DetailsComponent && <div className="pt-4 border-t border-border-light">
+              {DetailsComponent && <div className="pt-5 border-t border-slate-100">
                   <DetailsComponent listing={listing} flat={true} />
                 </div>}
             </section>
 
             {/* Safe Meetup */}
-            <SafeMeetupPanel />
+            <SafeMeetupPanel listing={listing} />
 
             {/* Reviews */}
             {hasReviews && <ListingReviewsSection listing={listing} />}
           </div>
 
-          {/* ── Right Column (Sticky Sidebar) ───────────── */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-[66px] space-y-4 listing-float-in">
+          {/* ── Right Column (Sticky Sidebar & Buy Box) ───────────── */}
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="sticky top-[72px] space-y-5">
 
-              {/* Card 1: Pricing & CTAs + Trust Guarantees */}
-              <div className="bg-background-primary border border-border-light rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
+              {/* Buy Box Card */}
+              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xl shadow-slate-200/60 space-y-5">
                 {/* Price block */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1.5">{t("price")}</p>
-                  <div className="flex items-baseline gap-2 flex-wrap">
-                    <span className={`text-3xl font-extrabold tabular-nums tracking-tight leading-none ${hasCampaign ? 'text-primary' : 'text-text-primary'}`}>
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">{t("price")}</p>
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className={`text-3xl sm:text-4xl font-black tabular-nums tracking-tight leading-none font-mono ${hasCampaign ? 'text-emerald-600' : 'text-slate-900'}`}>
                       {formatCurrency(displayPrice, listing.currency)}
                     </span>
                     {hasCampaign && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-text-muted line-through font-semibold tabular-nums">
+                        <span className="text-base text-slate-400 line-through font-bold tabular-nums font-mono">
                           {formatCurrency(listing.price, listing.currency)}
                         </span>
                         {discount && (
-                          <span className="listing-discount-badge inline-flex items-center gap-1 px-2 py-0.5 rounded bg-status-success-bg text-status-success-text text-[11px] font-extrabold border border-status-success-border">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">
                             −{discount}%
                           </span>
                         )}
@@ -431,19 +429,19 @@ const ListingDetailPage = () => {
                     )}
                   </div>
 
-                  {/* Stock & Reservation Info */}
+                  {/* Stock & Reservation Alerts */}
                   {(hasStockInfo || activeReservations > 0) && (
-                    <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                    <div className="flex flex-wrap items-center gap-2 mt-3.5">
                       {hasStockInfo && (
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${isLowStock ? 'bg-status-error-bg text-status-error-text border border-status-error-border' : 'bg-background-secondary text-text-secondary border border-border-light'}`}>
-                          {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-status-error listing-stock-pulse" />}
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${isLowStock ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+                          {isLowStock && <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
                           <Package className="w-3.5 h-3.5" />
                           {isLowStock ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
                         </span>
                       )}
                       {activeReservations > 0 && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-status-error-bg text-status-error-text text-xs font-bold border border-status-error-border">
-                          <Flame className="w-3.5 h-3.5 text-status-error-icon" />
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
+                          <Flame className="w-3.5 h-3.5 text-amber-600" />
                           {activeReservations} {activeReservations === 1 ? 'person' : 'people'} {t("looking")}
                         </span>
                       )}
@@ -451,17 +449,17 @@ const ListingDetailPage = () => {
                   )}
                 </div>
 
-                {/* CTA Buttons */}
+                {/* Primary & Secondary Action CTAs */}
                 {(canAddToCart || canMakeOffer) && (
-                  <div className="space-y-2 pt-2 border-t border-border-light/60">
+                  <div className="space-y-3 pt-3 border-t border-slate-100">
                     {canAddToCart && (
                       <button
                         onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
                         disabled={isAddingToCart}
-                        className={`listing-cta-primary w-full flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all active:scale-[0.98] ${
+                        className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-sm font-bold shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 ${
                           itemIsInCart
-                            ? 'bg-status-success-bg text-status-success hover:bg-status-success-bg/80 border border-status-success/30'
-                            : 'bg-primary text-white hover:bg-primary-hover'
+                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 shadow-emerald-500/10'
+                            : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-600/25'
                         }`}
                       >
                         {isAddingToCart ? (
@@ -471,7 +469,7 @@ const ListingDetailPage = () => {
                           </>
                         ) : itemIsInCart ? (
                           <>
-                            <Check className="w-4 h-4" />
+                            <Check className="w-4 h-4 text-emerald-600" />
                             {t("in_cart", "In Cart")}
                           </>
                         ) : (
@@ -483,8 +481,8 @@ const ListingDetailPage = () => {
                       </button>
                     )}
                     {canMakeOffer && (
-                      <button onClick={() => setIsOfferModalOpen(true)} className="listing-cta-secondary w-full flex items-center justify-center gap-2.5 py-2.5 bg-secondary-light text-primary hover:bg-button-secondary-hover border border-border-light rounded-lg text-sm font-bold transition-all active:scale-[0.98]">
-                        <HandCoins className="w-4 h-4" />
+                      <button onClick={() => setIsOfferModalOpen(true)} className="w-full flex items-center justify-center gap-2.5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-2xl text-sm font-bold transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                        <HandCoins className="w-4 h-4 text-slate-600" />
                         {t("make_an_offer")}
                       </button>
                     )}
@@ -492,60 +490,58 @@ const ListingDetailPage = () => {
                 )}
 
                 {/* Trust Guarantees */}
-                <div className="bg-background-secondary rounded-lg p-3 flex items-center justify-around gap-2 text-[11px] font-bold text-text-muted border border-border-light/50">
+                <div className="bg-slate-50/80 rounded-2xl p-3.5 flex items-center justify-around gap-2 text-xs font-bold text-slate-600 border border-slate-200/80">
                   <div className="flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-status-success" />
+                    <Shield className="w-4 h-4 text-emerald-600" />
                     {t("buyer_protection")}
                   </div>
-                  <span className="w-1.5 h-1.5 rounded-full bg-border-light" />
+                  <span className="w-1 h-1 rounded-full bg-slate-300" />
                   <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    <Clock className="w-4 h-4 text-teal-600" />
                     {t("secure_escrow")}
                   </div>
                 </div>
               </div>
 
-              {/* Card 2: Seller Information */}
-              <div className="bg-background-primary border border-border-light rounded-xl p-4 sm:p-5 shadow-sm">
-                <h3 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-3.5">{t("seller_information")}</h3>
+              {/* Seller Information */}
+              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-md shadow-slate-200/50">
+                <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">{t("seller_information")}</h3>
                 <ListingTrustPanel listing={listing} isOwner={isOwner} onShowcaseSuccess={fetchListing} flat={true} />
               </div>
 
-              {/* Card 3: Market Insights */}
+              {/* Market Insights */}
               <ListingAnalyticsPanel listing={listing} isOwner={isOwner} displayPrice={displayPrice} />
             </div>
           </div>
         </div>
 
         {/* Similar Listings */}
-        <div className="mt-6 listing-fade-in" style={{
-        animationDelay: '0.3s'
-      }}>
+        <div className="mt-10">
           <SimilarListings currentListing={listing} />
         </div>
       </PageContainer>
 
       {/* ▸ Mobile Bottom Bar */}
-      {(canAddToCart || canMakeOffer || !isOwner) && <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background-primary border-t border-border-light px-4 py-3 pb-safe">
+      {(canAddToCart || canMakeOffer || !isOwner) && <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 pb-safe shadow-2xl">
           <div className="flex items-center justify-between gap-3">
             {/* Price */}
             <div className="flex-1 min-w-0">
-              <p className={`text-lg font-bold tabular-nums tracking-tight leading-none mb-0.5 ${hasCampaign ? 'text-primary' : 'text-text-primary'}`}>
+              <p className={`text-lg font-bold tabular-nums tracking-tight leading-none mb-0.5 font-mono ${hasCampaign ? 'text-emerald-600' : 'text-slate-900'}`}>
                 {formatCurrency(displayPrice, listing.currency)}
               </p>
               {hasCampaign ? <div className="flex items-center gap-2">
-                  <p className="text-xs text-text-muted line-through font-medium tabular-nums">{formatCurrency(listing.price, listing.currency)}</p>
-                  {discount && <span className="text-caption font-bold text-status-success">−{discount}%</span>}
-                </div> : <p className="text-xs text-text-muted font-semibold truncate">{locationLabel}</p>}
+                  <p className="text-xs text-slate-400 line-through font-medium tabular-nums font-mono">{formatCurrency(listing.price, listing.currency)}</p>
+                  {discount && <span className="text-xs font-bold text-emerald-600 font-mono">−{discount}%</span>}
+                </div> : <p className="text-xs text-slate-500 font-semibold truncate">{locationLabel}</p>}
             </div>
 
             {/* CTA buttons */}
             <div className="flex items-center gap-2 flex-1 justify-end">
-              {!isOwner && <ContactSellerButton listing={listing} className="py-2.5 px-3 rounded-lg border border-border-light bg-background-primary text-text-primary hover:text-text-primary hover:bg-background-secondary transition-colors" />}
+              {!isOwner && <ContactSellerButton listing={listing} className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors" />}
               {canMakeOffer && (
                 <button
                   onClick={() => setIsOfferModalOpen(true)}
-                  className="flex-1 py-2.5 rounded-lg border border-border-light bg-secondary-light text-primary text-sm font-medium hover:bg-button-secondary-hover transition-colors"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-800 text-xs font-bold hover:bg-slate-200 transition-colors"
                 >
                   {t('make_offer')}
                 </button>
@@ -554,10 +550,10 @@ const ListingDetailPage = () => {
                 <button
                   onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
                   disabled={isAddingToCart}
-                  className={`listing-cta-primary flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors ${
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold disabled:opacity-50 transition-all ${
                     itemIsInCart
-                      ? 'bg-status-success-bg text-status-success hover:bg-status-success-bg/80 border border-status-success/30'
-                      : 'bg-primary text-white hover:bg-primary-hover'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/20'
                   }`}
                 >
                   {isAddingToCart ? (

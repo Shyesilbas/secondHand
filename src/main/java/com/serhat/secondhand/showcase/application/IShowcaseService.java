@@ -2,7 +2,6 @@ package com.serhat.secondhand.showcase.application;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.showcase.Showcase;
-import com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
@@ -19,5 +18,4 @@ public interface IShowcaseService {
     void expireShowcases();
     ShowcasePricingDto getShowcasePricingConfig();
     Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request);
-    Result<List<Showcase>> createBulkShowcase(Long userId, BulkShowcasePaymentRequest request);
 }

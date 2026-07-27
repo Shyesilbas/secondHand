@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingEngine } from '../hooks/useListingEngine.js';
@@ -12,11 +11,6 @@ import { ListingQuickEdit } from '../components/ListingQuickEdit.jsx';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { formatCurrency, parsePrice } from '../../common/formatters.js';
 import { AlertTriangle, ChevronDown, ChevronUp, Loader2, Pencil, Plus, X } from 'lucide-react';
-import BulkShowcaseModal from '../../showcase/components/BulkShowcaseModal.jsx';
-import BulkSelectionModal from '../../showcase/components/BulkSelectionModal.jsx';
-import BulkShowcaseBanner from '../../showcase/components/BulkShowcaseBanner.jsx';
-import { useShowcase } from '../../showcase/hooks/useShowcase.js';
-import { showcaseService } from '../../showcase/services/showcaseService.js';
 const LowStockCard = ({
   listing,
   onRefresh,
@@ -53,28 +47,10 @@ const MyListingsPage = () => {
     mode: 'mine'
   });
   const lowStock = engine.alerts?.lowStock;
-  const {
-    showcases
-  } = useShowcase();
   const [bulkMode, setBulkMode] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkValue, setBulkValue] = useState('');
   const [saving, setSaving] = useState(false);
-
-  // Showcase States
-  const [isBulkShowcaseOpen, setIsBulkShowcaseOpen] = useState(false);
-  const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false);
-  const [selectedListingsForBulk, setSelectedListingsForBulk] = useState([]);
-  const { data: pricing } = useQuery({
-    queryKey: ['showcasePricingConfig'],
-    queryFn: showcaseService.getPricingConfig,
-    staleTime: 24 * 60 * 60 * 1000,
-    gcTime: 24 * 60 * 60 * 1000,
-  });
-  const showcaseListingIds = useMemo(() => {
-    if (!Array.isArray(showcases)) return new Set();
-    return new Set(showcases.map(s => s.listingId || s.listing?.id).filter(Boolean));
-  }, [showcases]);
   const listings = useMemo(() => lowStock?.listings ?? [], [lowStock]);
   const toggleSelect = useCallback(id => setSelectedIds(prev => {
     const s = new Set(prev);
@@ -136,9 +112,6 @@ const MyListingsPage = () => {
     const hasLowStock = lowStock && lowStock.count > 0;
     const stockText = hasLowStock ? `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}` : '';
     return <div className="mb-8 space-y-4">
-                <BulkShowcaseBanner onBoostClick={() => setIsSelectionModalOpen(true)} />
-
-                {/* Portfolio Header */}
                 <div className="relative overflow-hidden bg-background-primary rounded-2xl border border-border-light p-6 shadow-sm group">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-primary-50 rounded-full -mr-16 -mt-16 blur-2xl transition-colors" />
                     
@@ -153,9 +126,8 @@ const MyListingsPage = () => {
                                     ,{formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[1] || '00'}
                                 </span>
                             </div>
-                            <p className="text-xs text-text-secondary font-medium">{t("store_value_across")}{totalValueStats.activeCount}{t("live_listings")}</p>
+                            <p className="text-xs text-text-secondary font-medium">{t("store_value_across")} {totalValueStats.activeCount} {t("live_listings")}</p>
                         </div>
-
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1.5 bg-status-success-bg px-3 py-1.5 rounded-md border border-status-success-border">
                                 <span className="relative flex h-1.5 w-1.5">
@@ -163,17 +135,16 @@ const MyListingsPage = () => {
                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-success-border"></span>
                                 </span>
                                 <span className="text-caption font-bold text-status-success-text">
-                                    {totalValueStats.activeCount}{t("active")}</span>
+                                    {totalValueStats.activeCount} {t("active")}</span>
                             </div>
                             <div className="flex items-center gap-1.5 bg-secondary-light px-3 py-1.5 rounded-md border border-border-light">
                                 <span className="text-caption font-bold text-text-secondary">
-                                    {engine.listings?.length || 0}{t("total")}</span>
+                                    {engine.listings?.length || 0} {t("total")}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Inventory Management Section */}
                 {hasLowStock && <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden shadow-sm">
                         <div className="p-4 cursor-pointer hover:bg-secondary-light transition-colors border-b border-border-light" onClick={lowStock.toggle}>
                             <div className="flex items-center justify-between">
@@ -222,18 +193,8 @@ const MyListingsPage = () => {
                     </div>}
             </div>;
   }, [lowStock, engine, bulkMode, selectedIds, bulkValue, saving, toggleSelect, clearBulk, applyBulk, listings, showSuccess, showError, totalValueStats, t]);
-  const handleSelectionProceed = selectedListings => {
-    setSelectedListingsForBulk(selectedListings);
-    setIsBulkShowcaseOpen(true);
-  };
   return <div className="min-h-screen bg-[#fafafa]">
             <ListingsModuleLayout mode="mine" title={t("my_listings")} getListingTypeLabel={getListingTypeLabel} engine={engine} extraActions={extraActions} topSlot={topSlot} disableSticky={true} isSelectable={false} />
-
-            {isSelectionModalOpen && <BulkSelectionModal isOpen={isSelectionModalOpen} onClose={() => setIsSelectionModalOpen(false)} listings={engine.listings || []} showcaseListingIds={showcaseListingIds} onProceed={handleSelectionProceed} pricing={pricing} />}
-
-            {isBulkShowcaseOpen && <BulkShowcaseModal isOpen={isBulkShowcaseOpen} onClose={() => setIsBulkShowcaseOpen(false)} selectedListings={selectedListingsForBulk} pricing={pricing} onSuccess={() => {
-      engine.refresh();
-    }} />}
         </div>;
 };
 export default MyListingsPage;

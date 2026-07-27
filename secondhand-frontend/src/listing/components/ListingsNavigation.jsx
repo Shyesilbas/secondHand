@@ -43,7 +43,7 @@ const ListingsNavigation = ({
                     {getListingTypeLabel(selectedCategory || filters?.listingType) || 'All Categories'}
                   </span>
                     <span className="text-border-DEFAULT">·</span>
-                    <span className="text-text-muted text-sm">{totalElements?.toLocaleString()}{t("results")}</span>
+                    <span className="text-text-muted text-sm">{totalElements?.toLocaleString()} {t("results")}</span>
                   </div>
                 </div>
               </div>
@@ -71,7 +71,7 @@ const ListingsNavigation = ({
                         <p className="text-sm font-medium text-text-secondary">
                           {isListingNo && listingNoLoading ? <span className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_listing_number")}</span> : isListingNo && listingNoError ? listingNoError : loadingAllPages ? <span className="flex items-center gap-2">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_everywhere")}</span> : <>{t("found")}<span className="font-bold">{filteredListings.length}</span>{t("result")}{filteredListings.length !== 1 ? 's' : ''}
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_everywhere")}</span> : <>{t("found")} <span className="font-bold">{filteredListings.length}</span> {t("results", "sonuç")}
                                 {isTitle ? allPagesLoaded ? ' in all pages' : ' on this page' : ''}
                               </>}
                         </p>

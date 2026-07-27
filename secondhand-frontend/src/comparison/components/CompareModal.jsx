@@ -129,10 +129,10 @@ const CompareModal = memo(() => {
                                     <Scale className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h2 className="text-lg font-semibold text-text-primary truncate">{t("compare")}{getListingTypeLabel(category)}
+                                    <h2 className="text-lg font-semibold text-text-primary truncate">{t("compare")} ({getListingTypeLabel(category)})
                                     </h2>
                                     <p className="text-sm text-slate-500">
-                                        {items.length}{t("items_selected")}</p>
+                                        {items.length} {t("items_selected")}</p>
                                 </div>
                             </div>
                             <button type="button" onClick={closeModal} className="p-2 text-slate-500 hover:text-text-primary hover:bg-slate-100 rounded-xl transition-colors shrink-0" aria-label={t("close")}>

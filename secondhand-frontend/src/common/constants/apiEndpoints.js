@@ -278,7 +278,6 @@ export const API_ENDPOINTS = {
     },
     SHOWCASES: {
         CREATE: '/v1/showcases',
-        BULK: '/v1/showcases/bulks',
         ACTIVE: '/v1/showcases/active',
         MY_SHOWCASES: '/v1/showcases/my',
         EXTEND: (id) => `/v1/showcases/${id}/extend`,
