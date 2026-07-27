@@ -65,6 +65,9 @@ public class Inventory {
 
     public void incrementQuantity(int delta) {
         if (this.availableQuantity != null) {
+            if (this.availableQuantity + delta < 0) {
+                throw new BusinessException(InventoryErrorCodes.INVALID_QUANTITY);
+            }
             this.availableQuantity += delta;
         }
     }

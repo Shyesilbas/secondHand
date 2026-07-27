@@ -80,12 +80,8 @@ public abstract class AbstractListingService<T extends Listing, C> {
         }
 
         T saved = save(entity);
-        if (requiresQuantityValidation()) {
-            Integer initialQty = extractQuantity(request);
-            if (initialQty != null) {
-                inventoryService.createInventory(saved.getId(), initialQty);
-            }
-        }
+        Integer initialQty = extractQuantity(request);
+        inventoryService.createInventory(saved.getId(), initialQty != null ? initialQty : 1);
         log.info("{} listing created: {}", getListingType(), saved.getId());
         return Result.success(saved.getId());
     }

@@ -7,7 +7,7 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award, Check } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
@@ -33,10 +33,12 @@ const ListingCard = ({
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const {
     addToCart,
-    isAddingToCart
+    isAddingToCart,
+    isInCart
   } = useCart({
-    loadCartItems: false
+    loadCartItems: true
   });
+  const itemIsInCart = isInCart(listing?.id);
   const {
     isInComparison
   } = useComparison();
@@ -103,9 +105,21 @@ const ListingCard = ({
                 {canAddToCart && <button onClick={e => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart(listing.id);
-      }} disabled={isAddingToCart} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-primary hover:bg-background-primary transition-colors" title={t("add_to_cart")}>
-                        <ShoppingBag className="w-3.5 h-3.5" />
+        if (!itemIsInCart) {
+          addToCart(listing.id);
+        }
+      }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded-full backdrop-blur shadow-sm flex items-center justify-center transition-colors ${
+        itemIsInCart
+          ? 'bg-status-success-bg/20 text-status-success cursor-default'
+          : 'bg-background-primary/90 text-slate-500 hover:text-primary hover:bg-background-primary'
+      }`} title={itemIsInCart ? t("in_cart", "In Cart") : t("add_to_cart")}>
+                        {isAddingToCart ? (
+                          <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : itemIsInCart ? (
+                          <Check className="w-3.5 h-3.5 text-status-success" />
+                        ) : (
+                          <ShoppingBag className="w-3.5 h-3.5" />
+                        )}
                     </button>}
                 {canMakeOffer && <button onClick={e => {
         e.preventDefault();

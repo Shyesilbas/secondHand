@@ -12,6 +12,7 @@ export const showcaseService = {
       listingId,
       days,
       paymentType,
+      providerName: paymentType || 'EWALLET',
       verificationCode,
       agreementsAccepted,
       acceptedAgreementIds,
@@ -27,7 +28,7 @@ export const showcaseService = {
     post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),
 
   createBulkShowcase: (listingIds, days, verificationCode, paymentType, agreementsAccepted = false, acceptedAgreementIds = []) =>
-    post(API_ENDPOINTS.SHOWCASES.BULK, { listingIds, days, verificationCode, paymentType, agreementsAccepted, acceptedAgreementIds }),
+    post(API_ENDPOINTS.SHOWCASES.BULK, { listingIds, days, verificationCode, paymentType, providerName: paymentType || 'EWALLET', agreementsAccepted, acceptedAgreementIds }),
 
   getPricingConfig: () => get(API_ENDPOINTS.SHOWCASES.PRICING_CONFIG),
 };

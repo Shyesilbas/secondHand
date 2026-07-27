@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * Seeds electronics reference data (brands, types, models) from
  * brand-specific and type-aware directory structure.
@@ -50,6 +52,7 @@ public class ElectronicDataInitializer implements SeedTask {
     }
 
     @Override
+    @Transactional
     public Result<Void> run() {
         try {
             log.info("Loading electronics catalog from {}", BRANDS_INDEX);

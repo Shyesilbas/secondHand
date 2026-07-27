@@ -10,10 +10,9 @@ const AddToCartButton = ({
                              className = ''
                          }) => {
     const { user } = useAuthState();
-    const { addToCart, isAddingToCart, cartItems } = useCart({ loadCartItems: true });
+    const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: true });
     
-    // Check if item is in cart from cartItems array (no API call needed!)
-    const isInCart = Array.isArray(cartItems) && cartItems.some(item => item.listing?.id === listing?.id);
+    const itemIsInCart = isInCart(listing?.id);
 
     const canAddToCart = () => {
         if (!user) return false;
@@ -26,9 +25,9 @@ const AddToCartButton = ({
     };
 
     const handleAddToCart = async () => {
-        if (!canAddToCart() || isInCart) return;
+        if (!canAddToCart() || itemIsInCart) return;
         try {
-            await addToCart(listing.id, 1, '');
+            addToCart(listing.id, 1, '');
         } catch (error) {
             logger.error('Failed to add to cart:', error);
         }
@@ -62,21 +61,21 @@ const AddToCartButton = ({
     return (
         <button
             onClick={handleAddToCart}
-            disabled={isAddingToCart || isInCart}
+            disabled={isAddingToCart || itemIsInCart}
             className={`
                 ${sizeClasses[size]}
-                ${isInCart
+                ${itemIsInCart
                 ? 'bg-status-success-bg text-status-success hover:bg-status-success-bg'
                 : 'bg-[#eef4fb] text-[#1466c6] hover:bg-[#e6f0fb]'
             }
                 rounded-xl transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                 flex items-center space-x-2 ${className}
             `}
-            title={isInCart ? 'Added to cart' : 'Add to cart'}
+            title={itemIsInCart ? 'Added to cart' : 'Add to cart'}
         >
             {isAddingToCart ? (
                 <div className={`${iconSizes[size]} animate-spin rounded-full border-2 border-current border-t-transparent`} />
-            ) : isInCart ? (
+            ) : itemIsInCart ? (
                 <CheckIcon className={iconSizes[size]} />
             ) : (
                 <ShoppingCartIcon className={iconSizes[size]} />
@@ -84,7 +83,7 @@ const AddToCartButton = ({
 
             {showText && (
                 <span className={`${textSizes[size]} font-medium`}>
-                    {isInCart ? 'Added' : 'Add to Cart'}
+                    {itemIsInCart ? 'Added' : 'Add to Cart'}
                 </span>
             )}
         </button>

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.showcase.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ public record BulkShowcasePaymentRequest(
     Integer days,
 
     String verificationCode,
+    @JsonAlias({"paymentType", "providerName"})
     String providerName,
     boolean agreementsAccepted,
     List<UUID> acceptedAgreementIds,

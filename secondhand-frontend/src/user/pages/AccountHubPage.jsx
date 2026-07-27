@@ -40,7 +40,8 @@ const getInitials = name => {
 const isRouteActive = (pathname, route) => pathname === route;
 const AccountHubPage = () => {
   const {
-    t
+    t,
+    i18n
   } = useTranslation();
   const {
     user

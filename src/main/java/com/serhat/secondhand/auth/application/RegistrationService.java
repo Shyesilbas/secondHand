@@ -50,7 +50,6 @@ public class RegistrationService {
             for (UUID agreementId : request.getAcceptedAgreementIds()) {
                 userAgreementService.acceptAgreement(user.getId(), AcceptAgreementRequest.builder()
                     .agreementId(agreementId)
-                    .isAcceptedTheLastVersion(true)
                     .build());
             }
         }

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.order.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class CheckoutRequest {
     private String notes;
     private String name;
 
+    @JsonAlias({"paymentType", "providerName"})
     private String providerName;
     private String paymentVerificationCode;
     

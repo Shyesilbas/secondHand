@@ -11,6 +11,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 import { findEngine } from '../../vehicle/utils/vehicleCatalogUtils.js';
 import ListingWizard from './ListingWizard.jsx';
+import StudioPrefilterFlow from './StudioPrefilterFlow.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
 const WIZARD_COPY = {
   create: {
@@ -306,29 +307,45 @@ const ListingPrefilterSelectionFlow = ({
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </motion.div>}
-            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {listingTypeOptions.map(type => {
             const isSelected = selectedType === type.value;
             const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
+            const badgeText = {
+              VEHICLE: '630+ Models & Kasa',
+              ELECTRONICS: '1,200+ Models',
+              REAL_ESTATE: '27 Property Types',
+              CLOTHING: 'Brands & Sizes',
+              BOOKS: 'Genres & Formats',
+              SPORTS: 'Disciplines & Gear'
+            }[type.value] || 'Catalog Data';
+
             return <motion.button key={type.value} variants={gridItemVariants} whileHover={{
-              y: -2,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)'
+              y: -3,
+              scale: 1.015,
             }} whileTap={{
               scale: 0.98
             }} type="button" onClick={() => handleTypeSelect(type.value)} className={card.wrapper}>
                     <div className={card.iconBg}>{type.icon}</div>
                     <div className="min-w-0 flex-1">
-                      <h3 className={`text-sm font-medium text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
-                      <p className={`mt-0.5 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
+                      <div className="flex items-center gap-2">
+                        <h3 className={`text-sm font-bold text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
+                        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider">
+                          {badgeText}
+                        </span>
+                      </div>
+                      <p className={`mt-1 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
                     </div>
                     {isSelected ? <motion.div initial={{
-                scale: 0
+                scale: 0,
+                rotate: -45
               }} animate={{
-                scale: 1
+                scale: 1,
+                rotate: 0
               }} transition={{
                 type: 'spring',
                 stiffness: 500,
-                damping: 25
+                damping: 22
               }} className={card.checkOuter}>
                         <Check className={card.checkInner} strokeWidth={3} />
                       </motion.div> : <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />}
@@ -480,12 +497,7 @@ const ListingPrefilterSelectionFlow = ({
     label: 'Search listings',
     onClick: triggerBrowseSearch
   } : null;
-  return <>
-      <ListingWizard title={flowCopy.title} subtitle={flowCopy.subtitle} steps={selectionSteps} currentStep={selectionStep} onBack={onCancel} onPrev={onSelectionBackOrPrev} onNext={onSelectionNext} canSubmit={canGoNextSelection} renderStep={step => renderSelectionStep(step)} footerExtra={browseFooterExtra} lastStepAction={browseLastStepAction} wizardVariant={flowUiVariant} headerEyebrow={mode === 'create' ? 'New listing' : 'Shopping'} continueLabel={mode === 'create' ? 'Next step' : 'Continue'} />
-      {mode === 'browse' && <div className="mx-auto max-w-5xl border-t border-border-light/70 px-6 pb-12 pt-8 text-center">
-          <Link to={ROUTES.LISTINGS} className={auxUi.skipLink}>{t("skip_filters_and_browse_all_listings")}<ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>}
-    </>;
+  return <StudioPrefilterFlow mode={mode} onComplete={onComplete} onCancel={onCancel} />;
 };
+
 export default ListingPrefilterSelectionFlow;

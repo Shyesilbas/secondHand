@@ -180,6 +180,7 @@ export const createListingFeePaymentRequest = (data) => {
   return {
     listingId: data.listingId || '',
     paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
+    providerName: data.providerName || data.paymentType || PAYMENT_TYPES.EWALLET,
     transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
     paymentDirection: PAYMENT_DIRECTIONS.OUTGOING,
     verificationCode: data.verificationCode || null,

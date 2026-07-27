@@ -1,9 +1,7 @@
 package com.serhat.secondhand.inventory.application;
 
-import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.inventory.domain.entity.Inventory;
 import com.serhat.secondhand.inventory.domain.repository.InventoryRepository;
-import com.serhat.secondhand.inventory.util.InventoryErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,14 +33,15 @@ public class InventoryService {
 
     @Transactional(readOnly = true)
     public Integer getAvailableQuantity(UUID listingId) {
+        if (listingId == null) return 0;
         return inventoryRepository.findByListingId(listingId)
                 .map(Inventory::getAvailableQuantity)
-                .orElse(null); // or throw exception depending on requirements, returning null to match old Listing.getQuantity() behavior for missing quantites
+                .orElse(1); // Default to 1 if no inventory record exists yet
     }
 
     @Transactional
     public void reserveQuantity(UUID listingId, int quantity) {
-        Inventory inventory = getInventoryOrThrow(listingId);
+        Inventory inventory = getOrCreateInventory(listingId, 1);
         inventory.reserveQuantity(quantity);
         inventoryRepository.save(inventory);
         log.info("Reserved {} items for listing {}. Remaining: {}", quantity, listingId, inventory.getAvailableQuantity());
@@ -50,7 +49,7 @@ public class InventoryService {
 
     @Transactional
     public void restoreQuantity(UUID listingId, int quantity) {
-        Inventory inventory = getInventoryOrThrow(listingId);
+        Inventory inventory = getOrCreateInventory(listingId, 1);
         inventory.restoreQuantity(quantity);
         inventoryRepository.save(inventory);
         log.info("Restored {} items for listing {}. New total: {}", quantity, listingId, inventory.getAvailableQuantity());
@@ -58,20 +57,27 @@ public class InventoryService {
 
     @Transactional
     public void incrementQuantity(UUID listingId, int delta) {
-        Inventory inventory = getInventoryOrThrow(listingId);
+        Inventory inventory = getOrCreateInventory(listingId, 1);
         inventory.incrementQuantity(delta);
         inventoryRepository.save(inventory);
     }
 
     @Transactional
     public void updateQuantity(UUID listingId, Integer newQuantity) {
-        Inventory inventory = getInventoryOrThrow(listingId);
+        Inventory inventory = getOrCreateInventory(listingId, newQuantity != null ? newQuantity : 1);
         inventory.updateQuantity(newQuantity);
         inventoryRepository.save(inventory);
     }
 
-    private Inventory getInventoryOrThrow(UUID listingId) {
+    private Inventory getOrCreateInventory(UUID listingId, Integer defaultQuantity) {
         return inventoryRepository.findByListingId(listingId)
-                .orElseThrow(() -> new BusinessException(InventoryErrorCodes.INVENTORY_NOT_FOUND));
+                .orElseGet(() -> {
+                    Inventory newInv = Inventory.builder()
+                            .listingId(listingId)
+                            .availableQuantity(defaultQuantity != null ? defaultQuantity : 1)
+                            .build();
+                    log.info("Auto-created missing inventory record for listing {} with default quantity {}", listingId, newInv.getAvailableQuantity());
+                    return inventoryRepository.save(newInv);
+                });
     }
 }

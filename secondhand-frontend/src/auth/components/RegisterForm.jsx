@@ -47,8 +47,10 @@ export const RegisterForm = ({
     }
     if (!formData.password) {
       step1Errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      step1Errors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      step1Errors.password = 'Password must be at least 8 characters';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]).*/.test(formData.password)) {
+      step1Errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character';
     }
     if (formData.password !== formData.confirmPassword) {
       step1Errors.confirmPassword = 'Passwords do not match';
@@ -95,7 +97,29 @@ export const RegisterForm = ({
                                     </button>} />
                         </div>
 
-                        <AuthButton type="button" onClick={handleNextStep} size="lg" className="mt-3" rightIcon={<ArrowRightIcon className="h-4 w-4" />}>{t("continue")}</AuthButton>
+                        {/* Password Requirements Helper */}
+                        <div className="bg-background-secondary border border-border-light rounded-xl p-3.5 text-xs text-text-secondary flex flex-col gap-1.5">
+                            <span className="font-semibold text-text-primary mb-0.5">Password Requirements:</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px]">
+                                <span className={`flex items-center gap-1.5 ${formData.password.length >= 8 ? 'text-status-success font-medium' : 'text-text-muted'}`}>
+                                    <span>{formData.password.length >= 8 ? '✓' : '•'}</span> At least 8 characters
+                                </span>
+                                <span className={`flex items-center gap-1.5 ${/[A-Z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
+                                    <span>{/[A-Z]/.test(formData.password) ? '✓' : '•'}</span> One uppercase letter
+                                </span>
+                                <span className={`flex items-center gap-1.5 ${/[a-z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
+                                    <span>{/[a-z]/.test(formData.password) ? '✓' : '•'}</span> One lowercase letter
+                                </span>
+                                <span className={`flex items-center gap-1.5 ${/\d/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
+                                    <span>{/\d/.test(formData.password) ? '✓' : '•'}</span> One digit
+                                </span>
+                                <span className={`flex items-center gap-1.5 ${/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
+                                    <span>{/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? '✓' : '•'}</span> One special character
+                                </span>
+                            </div>
+                        </div>
+
+                        <AuthButton type="button" onClick={handleNextStep} size="lg" className="mt-1" rightIcon={<ArrowRightIcon className="h-4 w-4" />}>{t("continue")}</AuthButton>
                     </div>}
 
                 {step === 2 && <div className="flex flex-col gap-6 animate-slide-left">

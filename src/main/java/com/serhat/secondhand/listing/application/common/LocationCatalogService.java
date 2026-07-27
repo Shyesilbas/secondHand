@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -90,24 +92,28 @@ public class LocationCatalogService {
         return loadNeighborhoodsFromJson(districtKey.toUpperCase());
     }
 
+    @Autowired
+    @Lazy
+    private LocationCatalogService self;
+
     // ── Validation Helpers (cache uzerinden) ────────────────────────────
 
     public boolean isValidCity(String cityKey) {
         if (cityKey == null) return false;
         String upper = cityKey.toUpperCase();
-        return getCities().stream().anyMatch(c -> upper.equals(c.getKey()));
+        return self.getCities().stream().anyMatch(c -> upper.equals(c.getKey()));
     }
 
     public boolean isValidDistrict(String cityKey, String districtKey) {
         if (cityKey == null || districtKey == null) return false;
         String upper = districtKey.toUpperCase();
-        return getDistricts(cityKey).stream().anyMatch(d -> upper.equals(d.getKey()));
+        return self.getDistricts(cityKey).stream().anyMatch(d -> upper.equals(d.getKey()));
     }
 
     public boolean isValidNeighborhood(String districtKey, String neighborhoodKey) {
         if (districtKey == null || neighborhoodKey == null) return false;
         String upper = neighborhoodKey.toUpperCase();
-        return getNeighborhoods(districtKey).stream().anyMatch(n -> upper.equals(n.getKey()));
+        return self.getNeighborhoods(districtKey).stream().anyMatch(n -> upper.equals(n.getKey()));
     }
 
     // ── Redis Populate (sadece ilk yuklemede) ────────────────────────────

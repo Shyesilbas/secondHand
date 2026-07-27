@@ -94,84 +94,84 @@ export function getCategoryCardClasses(variant, isSelected, typeValue) {
   // Config mapping for category-specific colors
   const colorMap = {
     REAL_ESTATE: {
-      activeBorder: 'border-primary/30 bg-primary/5',
-      activeIcon: 'bg-primary text-white',
+      activeBorder: 'border-primary/40 bg-primary/5 shadow-md shadow-primary/10 ring-2 ring-primary/20',
+      activeIcon: 'bg-gradient-to-br from-primary to-blue-600 text-white shadow-md shadow-primary/25',
       hoverIcon: 'group-hover:bg-primary/10 group-hover:text-primary',
       accentText: 'text-primary',
     },
     VEHICLE: {
-      activeBorder: 'border-status-warning-border bg-status-warning-bg',
-      activeIcon: 'bg-status-warning text-white',
-      hoverIcon: 'group-hover:bg-status-warning-bg group-hover:text-status-warning',
-      accentText: 'text-status-warning',
+      activeBorder: 'border-amber-500/40 bg-amber-500/5 shadow-md shadow-amber-500/10 ring-2 ring-amber-500/20',
+      activeIcon: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25',
+      hoverIcon: 'group-hover:bg-amber-500/10 group-hover:text-amber-600',
+      accentText: 'text-amber-600',
     },
     ELECTRONICS: {
-      activeBorder: 'border-primary/30 bg-primary/5',
-      activeIcon: 'bg-primary text-white',
-      hoverIcon: 'group-hover:bg-primary/10 group-hover:text-primary',
-      accentText: 'text-primary',
+      activeBorder: 'border-indigo-500/40 bg-indigo-500/5 shadow-md shadow-indigo-500/10 ring-2 ring-indigo-500/20',
+      activeIcon: 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25',
+      hoverIcon: 'group-hover:bg-indigo-500/10 group-hover:text-indigo-600',
+      accentText: 'text-indigo-600',
     },
     CLOTHING: {
-      activeBorder: 'border-status-error-border bg-status-error-bg',
-      activeIcon: 'bg-status-error text-white',
-      hoverIcon: 'group-hover:bg-status-error-bg group-hover:text-status-error',
-      accentText: 'text-status-error',
+      activeBorder: 'border-rose-500/40 bg-rose-500/5 shadow-md shadow-rose-500/10 ring-2 ring-rose-500/20',
+      activeIcon: 'bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/25',
+      hoverIcon: 'group-hover:bg-rose-500/10 group-hover:text-rose-600',
+      accentText: 'text-rose-600',
     },
     BOOKS: {
-      activeBorder: 'border-status-success-border bg-status-success-bg',
-      activeIcon: 'bg-status-success text-white',
-      hoverIcon: 'group-hover:bg-status-success-bg group-hover:text-status-success',
-      accentText: 'text-status-success',
+      activeBorder: 'border-emerald-500/40 bg-emerald-500/5 shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20',
+      activeIcon: 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25',
+      hoverIcon: 'group-hover:bg-emerald-500/10 group-hover:text-emerald-600',
+      accentText: 'text-emerald-600',
     },
     SPORTS: {
-      activeBorder: 'border-primary/30 bg-primary/5',
-      activeIcon: 'bg-primary text-white',
-      hoverIcon: 'group-hover:bg-primary/10 group-hover:text-primary',
-      accentText: 'text-primary',
+      activeBorder: 'border-cyan-500/40 bg-cyan-500/5 shadow-md shadow-cyan-500/10 ring-2 ring-cyan-500/20',
+      activeIcon: 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/25',
+      hoverIcon: 'group-hover:bg-cyan-500/10 group-hover:text-cyan-600',
+      accentText: 'text-cyan-600',
     },
   };
 
   const scheme = colorMap[typeValue] || {
-    activeBorder: 'border-primary/30 bg-background-secondary',
-    activeIcon: 'bg-primary text-white shadow-sm',
+    activeBorder: 'border-primary/40 bg-primary/5 shadow-md ring-2 ring-primary/20',
+    activeIcon: 'bg-gradient-to-br from-primary to-primary-hover text-white shadow-md',
     hoverIcon: 'group-hover:bg-background-secondary',
     accentText: 'text-primary',
   };
 
   if (isBrowse) {
     return {
-      wrapper: `group relative flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all duration-200 focus:outline-none ${
+      wrapper: `group relative flex w-full items-center gap-3.5 rounded-2xl border px-4 py-3.5 text-left transition-all duration-250 focus:outline-none backdrop-blur-sm ${
         isSelected
-          ? `border-2 ${scheme.activeBorder} shadow-sm`
-          : 'border-border-light bg-background-primary hover:border-border-DEFAULT hover:shadow-sm'
+          ? `${scheme.activeBorder}`
+          : 'border-border-light/80 bg-background-primary/90 hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5'
       }`,
-      iconBg: `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm transition-all duration-200 ${
-        isSelected ? `${scheme.activeIcon} shadow-sm` : `bg-background-secondary text-text-secondary ${scheme.hoverIcon}`
+      iconBg: `flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-all duration-250 ${
+        isSelected ? `${scheme.activeIcon}` : `bg-background-secondary text-text-secondary ${scheme.hoverIcon}`
       }`,
-      title: isSelected ? 'text-text-primary font-bold text-sm' : 'text-text-primary font-semibold group-hover:text-text-primary text-sm',
-      desc: 'hidden', // Hide description to save space
+      title: isSelected ? 'text-text-primary font-bold text-sm tracking-tight' : 'text-text-primary font-semibold text-sm group-hover:text-primary transition-colors',
+      desc: 'text-xs text-text-muted mt-0.5 font-normal line-clamp-1',
       trailing: isSelected ? scheme.accentText : 'text-text-muted group-hover:text-text-secondary',
-      checkOuter: 'flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary shadow-sm',
-      checkInner: 'h-2.5 w-2.5 text-white',
-      chevron: 'h-4 w-4 shrink-0',
+      checkOuter: 'flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-hover text-white shadow-md shadow-primary/30',
+      checkInner: 'h-3 w-3 text-white',
+      chevron: 'h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5',
     };
   }
 
   return {
-    wrapper: `group relative flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-200 focus:outline-none ${
+    wrapper: `group relative flex w-full items-center gap-3.5 rounded-2xl border px-4 py-3 text-left transition-all duration-250 focus:outline-none backdrop-blur-sm ${
       isSelected
-        ? 'border-primary/30 bg-background-secondary shadow-sm'
-        : 'border-border-light bg-background-primary hover:border-border-DEFAULT hover:shadow-sm'
+        ? `${scheme.activeBorder}`
+        : 'border-border-light/80 bg-background-primary/90 hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5'
     }`,
-    iconBg: `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm transition-all duration-200 ${
-      isSelected ? 'bg-primary text-white shadow-sm' : 'bg-background-secondary text-text-secondary group-hover:bg-background-secondary text-text-secondary'
+    iconBg: `flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-all duration-250 ${
+      isSelected ? `${scheme.activeIcon}` : 'bg-background-secondary text-text-secondary group-hover:bg-background-secondary'
     }`,
-    title: isSelected ? 'text-text-primary font-semibold text-sm' : 'text-text-primary text-sm',
-    desc: 'hidden',
+    title: isSelected ? 'text-text-primary font-bold text-sm tracking-tight' : 'text-text-primary font-semibold text-sm',
+    desc: 'text-xs text-text-muted mt-0.5 font-normal line-clamp-1',
     trailing: isSelected ? 'text-text-primary' : 'text-text-muted group-hover:text-text-secondary',
-    checkOuter: 'flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary shadow-sm',
-    checkInner: 'h-2.5 w-2.5 text-white',
-    chevron: 'h-4 w-4 shrink-0',
+    checkOuter: 'flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-hover text-white shadow-md shadow-primary/30',
+    checkInner: 'h-3 w-3 text-white',
+    chevron: 'h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5',
   };
 }
 
@@ -180,17 +180,17 @@ export function getGridOptionClasses(variant, isSelected) {
   const isBrowse = variant === PREFLOW_WIZARD_VARIANT.BROWSE || variant === 'browse';
 
   if (isBrowse) {
-    return `relative flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all duration-200 focus:outline-none ${
+    return `relative flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all duration-200 focus:outline-none ${
       isSelected
-        ? 'border-primary bg-primary/5 shadow-sm border-2'
-        : 'border-border-light bg-background-primary hover:border-border-DEFAULT hover:shadow-sm'
+        ? 'border-primary/50 bg-primary/10 shadow-md ring-2 ring-primary/20'
+        : 'border-border-light/80 bg-background-primary hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5'
     }`;
   }
 
-  return `relative flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all duration-200 focus:outline-none ${
+  return `relative flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition-all duration-200 focus:outline-none ${
     isSelected
-      ? 'border-primary/30 bg-background-secondary shadow-sm'
-      : 'border-border-light bg-background-primary hover:border-border-DEFAULT hover:shadow-sm'
+      ? 'border-primary/50 bg-primary/10 shadow-md ring-2 ring-primary/20'
+      : 'border-border-light/80 bg-background-primary hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5'
   }`;
 }
 
@@ -198,10 +198,10 @@ export function getGridOptionLabelClass(variant, isSelected) {
   const isBrowse = variant === PREFLOW_WIZARD_VARIANT.BROWSE || variant === 'browse';
 
   if (isBrowse) {
-    return `text-body font-semibold transition-colors ${isSelected ? 'text-primary' : 'text-text-secondary'}`;
+    return `text-body font-semibold transition-colors ${isSelected ? 'text-primary' : 'text-text-primary'}`;
   }
 
-  return `text-body font-medium ${isSelected ? 'text-text-primary' : 'text-text-secondary'}`;
+  return `text-body font-semibold transition-colors ${isSelected ? 'text-primary' : 'text-text-primary'}`;
 }
 
 export function getGridCheckDotClass() {

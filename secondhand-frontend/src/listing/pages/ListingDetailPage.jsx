@@ -15,6 +15,7 @@ import {
     AlertTriangle,
     ArrowLeft,
     Calendar,
+    Check,
     ChevronDown,
     ChevronLeft,
     ChevronRight,
@@ -121,10 +122,12 @@ const ListingDetailPage = () => {
   } = useListingData(id);
   const {
     addToCart,
-    isAddingToCart
+    isAddingToCart,
+    isInCart
   } = useCart({
-    loadCartItems: false
+    loadCartItems: true
   });
+  const itemIsInCart = isInCart(listing?.id);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -452,9 +455,31 @@ const ListingDetailPage = () => {
                 {(canAddToCart || canMakeOffer) && (
                   <div className="space-y-2 pt-2 border-t border-border-light/60">
                     {canAddToCart && (
-                      <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary w-full flex items-center justify-center gap-2.5 py-2.5 bg-primary text-white hover:bg-primary-hover rounded-lg text-sm font-bold shadow-sm transition-all active:scale-[0.98]">
-                        <ShoppingBag className="w-4 h-4" />
-                        {isAddingToCart ? 'Adding to Cart…' : 'Add to Cart'}
+                      <button
+                        onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
+                        disabled={isAddingToCart}
+                        className={`listing-cta-primary w-full flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all active:scale-[0.98] ${
+                          itemIsInCart
+                            ? 'bg-status-success-bg text-status-success hover:bg-status-success-bg/80 border border-status-success/30'
+                            : 'bg-primary text-white hover:bg-primary-hover'
+                        }`}
+                      >
+                        {isAddingToCart ? (
+                          <>
+                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            {t("adding_to_cart", "Adding to Cart...")}
+                          </>
+                        ) : itemIsInCart ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            {t("in_cart", "In Cart")}
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingBag className="w-4 h-4" />
+                            {t("add_to_cart", "Add to Cart")}
+                          </>
+                        )}
                       </button>
                     )}
                     {canMakeOffer && (
@@ -525,8 +550,31 @@ const ListingDetailPage = () => {
                   {t('make_offer')}
                 </button>
               )}
-              {canAddToCart && <button onClick={() => addToCart(listing.id)} disabled={isAddingToCart} className="listing-cta-primary flex-1 flex items-center justify-center gap-2 px-6 py-2.5 bg-primary text-white hover:bg-primary-hover rounded-lg text-sm font-bold disabled:opacity-50">
-                  <ShoppingBag className="w-4 h-4" />{t("cart")}</button>}
+              {canAddToCart && (
+                <button
+                  onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
+                  disabled={isAddingToCart}
+                  className={`listing-cta-primary flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold disabled:opacity-50 transition-colors ${
+                    itemIsInCart
+                      ? 'bg-status-success-bg text-status-success hover:bg-status-success-bg/80 border border-status-success/30'
+                      : 'bg-primary text-white hover:bg-primary-hover'
+                  }`}
+                >
+                  {isAddingToCart ? (
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : itemIsInCart ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      {t("in_cart", "In Cart")}
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4" />
+                      {t("cart", "Cart")}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>}

@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @org.springframework.transaction.annotation.Transactional
-@org.springframework.cache.annotation.CacheConfig(cacheNames = "userProfile")
+@org.springframework.cache.annotation.CacheConfig(cacheNames = {"userListings", "userProfile", "listingStats"})
 public class ListingCommandService {
 
     private final ListingRepository listingRepository;
@@ -142,6 +142,10 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
+        Result<Void> quantityValidation = listingValidationService.validateQuantity(quantity);
+        if (quantityValidation.isError()) {
+            return quantityValidation;
+        }
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         try {
             inventoryService.updateQuantity(listing.getId(), quantity);

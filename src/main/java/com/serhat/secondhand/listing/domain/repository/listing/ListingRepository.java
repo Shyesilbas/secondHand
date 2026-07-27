@@ -3,12 +3,10 @@ package com.serhat.secondhand.listing.domain.repository.listing;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
-import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,9 +21,12 @@ import java.util.UUID;
 @Repository
 public interface ListingRepository extends JpaRepository<Listing, UUID> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT l FROM Listing l WHERE l.id = :id")
-    Optional<Listing> findByIdWithLock(@Param("id") UUID id);
+    @Query(value = "SELECT id FROM listings WHERE id = :id FOR UPDATE", nativeQuery = true)
+    Optional<UUID> lockListingById(@Param("id") UUID id);
+
+    default Optional<Listing> findByIdWithLock(UUID id) {
+        return lockListingById(id).flatMap(this::findById);
+    }
 
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id = :id")
     Optional<Listing> findByIdWithSeller(@Param("id") UUID id);

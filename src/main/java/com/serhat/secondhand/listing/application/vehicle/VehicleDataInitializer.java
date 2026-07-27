@@ -296,8 +296,12 @@ public class VehicleDataInitializer implements SeedTask {
         brandRepository.findAll().stream()
                 .filter(b -> !catalogBrandKeys.contains(normalizeKey(b.getName())))
                 .forEach(b -> {
-                    brandRepository.delete(b);
-                    log.debug("Removed stale car brand: {}", b.getName());
+                    try {
+                        brandRepository.delete(b);
+                        log.debug("Removed stale car brand: {}", b.getName());
+                    } catch (Exception e) {
+                        log.warn("Could not remove stale car brand {}: {}", b.getName(), e.getMessage());
+                    }
                 });
     }
 
@@ -305,8 +309,12 @@ public class VehicleDataInitializer implements SeedTask {
         typeRepository.findAll().stream()
                 .filter(t -> !catalogTypeKeys.contains(normalizeKey(t.getName())))
                 .forEach(t -> {
-                    typeRepository.delete(t);
-                    log.debug("Removed stale vehicle type: {}", t.getName());
+                    try {
+                        typeRepository.delete(t);
+                        log.debug("Removed stale vehicle type: {}", t.getName());
+                    } catch (Exception e) {
+                        log.warn("Could not remove stale vehicle type {}: {}", t.getName(), e.getMessage());
+                    }
                 });
     }
 
@@ -342,6 +350,6 @@ public class VehicleDataInitializer implements SeedTask {
     }
 
     private static String normalizeKey(String key) {
-        return key == null ? "" : key.trim().toUpperCase(Locale.ROOT);
+        return key == null ? "" : key.trim().toUpperCase(Locale.ROOT).replace("-", "_");
     }
 }

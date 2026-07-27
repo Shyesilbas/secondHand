@@ -13,6 +13,8 @@ import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.payment.util.PaymentRedisIdempotencyService;
+import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class PaymentProcessor {
     private final PaymentOutboxService paymentOutboxService;
     private final PaymentRedisIdempotencyService paymentRedisIdempotencyService;
     private final org.springframework.cache.CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Lazy
     @Autowired
@@ -144,6 +147,7 @@ public class PaymentProcessor {
 
         if (result.success()) {
             paymentOutboxService.enqueuePaymentCompleted(payment);
+            eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
         }
 
         evictUserPaymentStatsCache(userId);

@@ -135,6 +135,7 @@ export const realEstateConfig = {
             SUMMER_HOUSE: 'KONUT',
             CHALET: 'KONUT',
             MANSION: 'KONUT',
+            PREFABRICATED: 'KONUT',
 
             LAND: 'ARSA',
             FARM: 'ARSA',
@@ -148,6 +149,8 @@ export const realEstateConfig = {
             FACTORY: 'ISYERI',
             INDUSTRIAL: 'ISYERI',
             HOTEL: 'ISYERI',
+            PLAZA_OFFICE: 'ISYERI',
+            KIOSK: 'ISYERI',
 
             PARKING: 'DIGER',
             OTHER: 'DIGER'

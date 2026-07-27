@@ -530,6 +530,9 @@ const OrdersListLayout = ({
   uiCopy: uiCopyProp,
   highlightOrderId
 }) => {
+  const {
+    t
+  } = useTranslation();
   const uiCopy = useMemo(() => mergeUiCopy(uiCopyProp || {}), [uiCopyProp]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const deliveryMethodFilter = flow.deliveryMethodFilter;

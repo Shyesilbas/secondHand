@@ -8,7 +8,7 @@ import {cacheService} from '../../common/services/cacheService.js';
 export const useCart = (options = {}) => {
     const { user } = useAuthState();
     const queryClient = useQueryClient();
-    const { showSuccess } = useNotification();
+    const { showSuccess, showError } = useNotification();
 
     const isEnabled = options.enabled ?? true;
     const loadCartItems = options.loadCartItems ?? isEnabled;
@@ -60,6 +60,13 @@ export const useCart = (options = {}) => {
         return Number.isFinite(raw) && raw >= 0 ? raw : 0;
     };
 
+    const isInCart = (listingId) => {
+        if (!listingId) return false;
+        return Array.isArray(cartItems) && cartItems.some(item =>
+            String(item?.listing?.id || item?.listingId) === String(listingId)
+        );
+    };
+
     const addToCartMutation = useMutation({
         mutationFn: ({ listingId, quantity, notes }) => cartService.addToCart(listingId, quantity, notes),
         onSuccess: (_data, variables) => {
@@ -68,6 +75,9 @@ export const useCart = (options = {}) => {
             syncCartCount(getStoredCartCount() + qty);
             showSuccess(null, 'Added to cart successfully.', { toast: true });
         },
+        onError: (err) => {
+            showError(null, err?.response?.data?.message || err?.message || 'Failed to add item to cart.', { toast: true });
+        }
     });
 
     const removeFromCartMutation = useMutation({
@@ -82,6 +92,9 @@ export const useCart = (options = {}) => {
             const removedQty = Number(removedItem?.quantity) || 1;
             syncCartCount(getStoredCartCount() - removedQty);
         },
+        onError: (err) => {
+            showError(null, err?.response?.data?.message || err?.message || 'Failed to remove item from cart.', { toast: true });
+        }
     });
 
     const updateCartItemMutation = useMutation({
@@ -97,6 +110,9 @@ export const useCart = (options = {}) => {
             const nextQty = Number(variables?.quantity) || 0;
             syncCartCount(getStoredCartCount() - previousQty + nextQty);
         },
+        onError: (err) => {
+            showError(null, err?.response?.data?.message || err?.message || 'Failed to update cart item.', { toast: true });
+        }
     });
 
     const clearCartMutation = useMutation({
@@ -105,6 +121,9 @@ export const useCart = (options = {}) => {
             invalidateCart();
             syncCartCount(0);
         },
+        onError: (err) => {
+            showError(null, err?.response?.data?.message || err?.message || 'Failed to clear cart.', { toast: true });
+        }
     });
 
     const resetCartState = () => {
@@ -124,7 +143,9 @@ export const useCart = (options = {}) => {
         clearCart: () => clearCartMutation.mutate(),
         resetCartState,
         refetchItems,
+        isInCart,
         isAdding: addToCartMutation.isPending,
+        isAddingToCart: addToCartMutation.isPending,
         isUpdating: updateCartItemMutation.isPending,
         isRemoving: removeFromCartMutation.isPending,
     };

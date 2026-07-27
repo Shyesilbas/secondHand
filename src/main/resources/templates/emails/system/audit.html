@@ -4,34 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #1e293b; -webkit-font-smoothing: antialiased; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9; }
-        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px 24px; text-align: center; color: #ffffff; }
-        .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; }
-        .content { padding: 36px; line-height: 1.6; color: #334155; }
-        .content p { margin: 0 0 16px 0; font-size: 15px; }
-        .highlight { font-weight: 700; color: #4f46e5; }
-        .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; font-weight: 500; }
-        .button { display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: 600; margin-top: 16px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.15); }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 0; color: #1e293b; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 580px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px 28px; text-align: left; color: #ffffff; position: relative; }
+        .header-logo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #818cf8; margin-bottom: 8px; display: block; }
+        .header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; color: #ffffff; }
+        .content { padding: 32px 28px; line-height: 1.6; color: #334155; }
+        .footer { background-color: #f8fafc; padding: 20px 28px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; font-weight: 500; }
+        .button { display: inline-block; background-color: #4f46e5; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 14px; margin-top: 8px; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 th:text="${headerTitle}">Bildirim</h1>
+            <span class="header-logo">SECONDHAND GÜVENLİK</span>
+            <h1 th:text="${headerTitle}">Güvenlik Uyarısı</h1>
         </div>
         <div class="content">
-            <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
-            <div th:utext="${message}" style="white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">Mesaj içeriği burada yer alacak.</div>
+            <p style="font-size: 16px; font-weight: 600; color: #0f172a; margin: 0 0 16px 0;" th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
+            <div th:utext="${message}" style="font-size: 15px; color: #334155;">Mesaj içeriği burada yer alacak.</div>
             
-            <p th:if="${actionUrl != null}">
-                <a th:href="${actionUrl}" class="button" th:text="${actionText != null ? actionText : 'Detayları Gör'}">Detayları Gör</a>
+            <p th:if="${actionUrl != null}" style="text-align: center; margin-top: 24px;">
+                <a th:href="${actionUrl}" class="button" th:text="${actionText != null ? actionText : 'Güvenlik Ayarlarını İncele'}">Güvenlik Ayarlarını İncele</a>
             </p>
             
-            <p style="margin-top: 28px; border-top: 1px solid #f1f5f9; padding-top: 20px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
+            <div style="margin-top: 28px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 14px; color: #64748b;">
+                Saygılarımızla,<br>
+                <strong style="color: #1e293b;">SecondHand Güvenlik Ekibi</strong>
+            </div>
         </div>
         <div class="footer">
-            &copy; 2026 SecondHand. Tüm hakları saklıdır.
+            &copy; 2026 SecondHand. Tüm hakları saklıdır. <br>Bu e-posta hesabınızın güvenliği ile ilgili otomatik olarak gönderilmiştir.
         </div>
     </div>
 </body>

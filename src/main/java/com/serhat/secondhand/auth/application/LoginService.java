@@ -1,6 +1,5 @@
 package com.serhat.secondhand.auth.application;
 
-import com.serhat.secondhand.agreements.application.AgreementUpdateNotificationService;
 import com.serhat.secondhand.auth.domain.dto.request.LoginRequest;
 import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
@@ -37,7 +36,6 @@ public class LoginService {
     private final IUserService userService;
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
-    private final AgreementUpdateNotificationService agreementUpdateNotificationService;
     private final LoginAttemptService loginAttemptService;
 
     public record TokenRotationResult(String accessToken, String refreshToken) {}
@@ -91,8 +89,6 @@ public class LoginService {
         userService.update(user);
 
         TokenRotationResult tokens = issueTokens(user, request.rememberMe(), null);
-
-        agreementUpdateNotificationService.notifyOutdatedRequiredAgreements(user.getId());
 
         log.info("User logged in successfully: {}", user.getEmail());
         return new LoginResponse("Login success", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), request.rememberMe());

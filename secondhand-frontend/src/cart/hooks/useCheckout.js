@@ -117,6 +117,7 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
                 notes: String(notes || '').trim() || null,
                 name: String(orderName || '').trim() || null,
                 paymentType: selectedPaymentType,
+                providerName: selectedPaymentType || 'EWALLET',
                 paymentVerificationCode: String(paymentVerificationCode || '').trim() || null,
                 agreementsAccepted: true,
                 acceptedAgreementIds: getAcceptedAgreementIds(),
