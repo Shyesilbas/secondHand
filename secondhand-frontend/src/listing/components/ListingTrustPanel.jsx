@@ -24,7 +24,7 @@ const ListingTrustPanel = ({
   if (!listing) return null;
   const showGreatSeller = Boolean(listing.sellerGreatSellerEligible);
   const ratingAvg = stats?.averageRating ?? 5.0;
-  const reviewCount = stats?.reviewCount ?? 0;
+  const reviewCount = stats?.totalReviews ?? stats?.reviewCount ?? 0;
 
   const content = (
     <>

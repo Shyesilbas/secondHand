@@ -3,43 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siparişiniz Onaylandı!</title>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 30px 24px; text-align: center; color: #ffffff; }
-        .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-        .header p { margin: 10px 0 0 0; font-size: 16px; opacity: 0.9; }
-        .content { padding: 32px; color: #334155; }
-        .content p { margin: 0 0 16px 0; line-height: 1.6; }
-        .order-details { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #1e293b; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 36px 32px; text-align: center; color: #ffffff; border-bottom: 3px solid #059669; }
+        .brand-badge { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; background-color: #059669; border-radius: 12px; color: #ffffff; font-weight: 900; font-size: 20px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
+        .brand-name { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #10b981; margin-bottom: 6px; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; }
+        .header p { margin: 8px 0 0 0; font-size: 14px; color: #94a3b8; font-weight: 600; }
+        .content { padding: 36px; line-height: 1.6; color: #334155; }
+        .content p { margin: 0 0 16px 0; font-size: 15px; }
+        
+        .order-details { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px 24px; margin-bottom: 24px; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 12px; font-size: 14px; }
         .detail-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-        .detail-label { font-weight: 600; color: #475569; }
+        .detail-label { font-weight: 600; color: #64748b; }
         .detail-value { font-weight: 700; color: #0f172a; text-align: right; }
         
         .items-section { margin-top: 24px; }
-        .item-row { display: flex; align-items: center; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; }
+        .item-row { display: flex; align-items: center; padding: 14px 18px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; background-color: #ffffff; }
         .item-info { flex-grow: 1; }
-        .item-title { font-weight: 600; font-size: 16px; color: #1e293b; margin-bottom: 4px; }
-        .item-meta { font-size: 14px; color: #64748b; }
-        .item-price { font-weight: 700; font-size: 16px; color: #0f172a; }
+        .item-title { font-weight: 700; font-size: 15px; color: #0f172a; margin-bottom: 2px; }
+        .item-meta { font-size: 13px; color: #64748b; font-weight: 500; }
+        .item-price { font-weight: 800; font-size: 15px; color: #059669; font-family: ui-monospace, monospace; }
         
-        .address-box { background-color: #f5f3ff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 16px; margin-top: 24px; }
-        .address-box h3 { margin: 0 0 12px 0; color: #4338ca; font-size: 16px; }
+        .address-box { background-color: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 14px; padding: 18px; margin-top: 24px; }
+        .address-box h3 { margin: 0 0 10px 0; color: #047857; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .footer { background-color: #f8fafc; padding: 24px; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid #e2e8f0; }
-        .highlight { color: #4f46e5; font-weight: 600; }
+        .footer { background-color: #f8fafc; padding: 28px 32px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; font-weight: 500; }
+        .highlight { color: #059669; font-weight: 800; font-size: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="brand-badge">S</div>
+            <div class="brand-name">SECONDHAND</div>
             <h1>Siparişiniz Onaylandı!</h1>
-            <p>Sipariş Numaranız: <span th:text="${orderNumber}">#ORD-1234</span></p>
+            <p>Sipariş Numarası: <span th:text="${orderNumber}" style="color: #10b981; font-weight: 800;">#ORD-1234</span></p>
         </div>
         <div class="content">
             <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
-            <p>Siparişiniz başarıyla alındı ve onaylandı. İşte siparişinizin detayları:</p>
+            <p>Siparişiniz başarıyla alındı ve onaylandı. İşleminize ait detaylar aşağıda özetlenmiştir:</p>
             
             <div class="order-details">
                 <div class="detail-row" th:if="${orderDate != null && !#strings.isEmpty(orderDate)}">
@@ -60,25 +66,24 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Sipariş Durumu:</span>
-                    <span class="detail-value" th:text="${status}">ONAYLANDI</span>
+                    <span class="detail-value" style="color: #059669;" th:text="${status}">ONAYLANDI</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Ödeme Durumu:</span>
-                    <span class="detail-value" th:text="${paymentStatus}">ÖDENDİ</span>
+                    <span class="detail-value" style="color: #059669;" th:text="${paymentStatus}">ÖDENDİ</span>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Toplam Tutar:</span>
+                <div class="detail-row" style="border-bottom: none; padding-top: 6px;">
+                    <span class="detail-label" style="font-weight: 800; color: #0f172a;">Toplam Tutar:</span>
                     <span class="detail-value highlight" th:text="${totalAmount}">0.00 TL</span>
                 </div>
             </div>
 
             <div class="items-section">
-                <h3 style="color: #334155; margin-bottom: 16px;">Sipariş Edilen Ürünler</h3>
-                <!-- Iterate over items here -->
+                <h3 style="color: #0f172a; margin-bottom: 14px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Sipariş Edilen Ürünler</h3>
                 <div class="item-row" th:each="item : ${items}">
                     <div class="item-info">
                         <div class="item-title" th:text="${item.listing.title}">Ürün Adı</div>
-                        <div class="item-meta">Adet: <span th:text="${item.quantity}">1</span></div>
+                        <div class="item-meta">Adet: <span th:text="${item.quantity}" style="font-weight: 700;">1</span></div>
                     </div>
                     <div class="item-price" th:text="${item.totalPrice + ' ' + item.currency}">0.00 TL</div>
                 </div>
@@ -86,24 +91,25 @@
 
             <div class="address-box" th:if="${deliveryMethod == 'SHIPPING'}">
                 <h3>Teslimat Adresi</h3>
-                <p style="margin: 0;" th:utext="${shippingAddress}">Adres detayları...</p>
+                <p style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 600;" th:utext="${shippingAddress}">Adres detayları...</p>
             </div>
             
             <div class="address-box" th:if="${deliveryMethod == 'SAFE_MEETUP'}" style="background-color: #fffbeb; border-color: #fde68a;">
                 <h3 style="color: #92400e;">Güvenli Elden Teslimat</h3>
-                <p><strong>Buluşma Noktası:</strong> 📍 <span th:text="${meetupLocation}">Konum</span></p>
-                <p th:if="${meetupVerificationCode != null}" style="margin-top: 10px;">
-                    <strong>Doğrulama Kodunuz:</strong> <span style="font-size: 20px; font-weight: bold; letter-spacing: 2px; color: #b45309;" th:text="${meetupVerificationCode}">123456</span>
+                <p style="margin: 0; font-size: 14px; color: #78350f;"><strong>Buluşma Noktası:</strong> 📍 <span th:text="${meetupLocation}">Konum</span></p>
+                <p th:if="${meetupVerificationCode != null}" style="margin-top: 12px; margin-bottom: 0;">
+                    <strong style="color: #92400e;">Doğrulama Kodunuz:</strong> <span style="font-size: 24px; font-weight: 900; letter-spacing: 4px; color: #b45309; font-family: monospace;" th:text="${meetupVerificationCode}">123456</span>
                 </p>
-                <p style="font-size: 13px; color: #78350f; margin-top: 8px;">
-                    * Satıcı ile buluştuğunuzda bu kodu göstermeniz gerekmektedir.
+                <p style="font-size: 12px; color: #a16207; margin-top: 8px; margin-bottom: 0; font-weight: 600;">
+                    * Satıcı ile buluştuğunuzda bu kodu teslimatı onaylamak için paylaşmanız gerekmektedir.
                 </p>
             </div>
 
-            <p style="margin-top: 32px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
+            <p style="margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 14px; color: #475569;" th:utext="#{email.body.team}">Saygılarımızla,<br><strong style="color: #0f172a;">SecondHand Ekibi</strong></p>
         </div>
         <div class="footer">
-            &copy; 2026 SecondHand. Tüm hakları saklıdır.
+            &copy; 2026 SecondHand Pazaryeri. Tüm hakları saklıdır.<br>
+            <span style="font-size: 11px; color: #94a3b8; display: inline-block; margin-top: 6px;">Güvenli Alışveriş ve İkinci El Pazaryeri Platformu</span>
         </div>
     </div>
 </body>

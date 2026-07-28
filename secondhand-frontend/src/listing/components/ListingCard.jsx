@@ -72,11 +72,32 @@ const ListingCard = ({
         };
     }
   };
-  const reviewCount = Number(listing.reviewStats?.totalReviews) || 0;
-  const avgRaw = Number(listing.reviewStats?.averageRating);
-  const averageRating = Number.isFinite(avgRaw) ? avgRaw : 0;
-  const roundedForStars = reviewCount > 0 ? Math.round(averageRating) : 0;
-  const favoriteCount = listing.favoriteStats?.favoriteCount || 0;
+  const reviewCount = Number(
+    listing.reviewStats?.totalReviews ??
+    listing.reviewStats?.reviewCount ??
+    listing.reviewStats?.totalCount ??
+    listing.reviewStats?.count ??
+    listing.totalReviews ??
+    listing.reviewCount ??
+    listing.ratingCount ??
+    listing.reviewsCount ??
+    (Array.isArray(listing.reviews) ? listing.reviews.length : 0)
+  ) || 0;
+
+  const avgRaw = Number(
+    listing.reviewStats?.averageRating ??
+    listing.reviewStats?.rating ??
+    listing.reviewStats?.avgRating ??
+    listing.averageRating ??
+    listing.rating ??
+    listing.avgRating ??
+    0
+  );
+
+  const averageRating = Number.isFinite(avgRaw) && avgRaw > 0 ? avgRaw : 0;
+  const shouldShowReviews = reviewCount > 0 || averageRating > 0;
+  const roundedForStars = shouldShowReviews ? Math.round(averageRating || 5) : 0;
+  const favoriteCount = listing.favoriteStats?.favoriteCount || listing.favoriteCount || 0;
   const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
   const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
   const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
@@ -180,14 +201,14 @@ const ListingCard = ({
                     {listing.title}
                 </h3>
 
-                {/* Reviews: yalnızca en az bir değerlendirme varsa */}
-                {reviewCount > 0 && <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
+                {/* Reviews: en az bir değerlendirme veya puan varsa göster */}
+                {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
                         <div className="flex shrink-0" aria-hidden>
                             {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}
                         </div>
                         <span className="text-caption text-slate-500 tabular-nums leading-none">
-                            <span className="font-medium text-slate-600">{averageRating.toFixed(1)}</span>
-                            <span className="text-slate-400"> ({reviewCount})</span>
+                            <span className="font-medium text-slate-600">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
+                            {reviewCount > 0 && <span className="text-slate-400"> ({reviewCount})</span>}
                         </span>
                     </div>}
 
@@ -246,4 +267,21 @@ const ListingCard = ({
         </div>;
 };
 ListingCard.displayName = 'ListingCard';
-export default memo(ListingCard, (prevProps, nextProps) => prevProps.listing?.id === nextProps.listing?.id && prevProps.listing?.sellerId === nextProps.listing?.sellerId && prevProps.listing?.sellerGreatSellerEligible === nextProps.listing?.sellerGreatSellerEligible && prevProps.isOwner === nextProps.isOwner && prevProps.currentUserId === nextProps.currentUserId && prevProps.showActions === nextProps.showActions && prevProps.isInShowcase === nextProps.isInShowcase && prevProps.priorityImage === nextProps.priorityImage && prevProps.isSelectable === nextProps.isSelectable && prevProps.isSelected === nextProps.isSelected && prevProps.onSelectToggle === nextProps.onSelectToggle);
+export default memo(ListingCard, (prevProps, nextProps) => 
+  prevProps.listing?.id === nextProps.listing?.id &&
+  prevProps.listing?.sellerId === nextProps.listing?.sellerId &&
+  prevProps.listing?.sellerGreatSellerEligible === nextProps.listing?.sellerGreatSellerEligible &&
+  prevProps.listing?.reviewStats?.totalReviews === nextProps.listing?.reviewStats?.totalReviews &&
+  prevProps.listing?.reviewStats?.averageRating === nextProps.listing?.reviewStats?.averageRating &&
+  prevProps.listing?.averageRating === nextProps.listing?.averageRating &&
+  prevProps.listing?.rating === nextProps.listing?.rating &&
+  prevProps.listing?.favoriteStats?.favoriteCount === nextProps.listing?.favoriteStats?.favoriteCount &&
+  prevProps.isOwner === nextProps.isOwner &&
+  prevProps.currentUserId === nextProps.currentUserId &&
+  prevProps.showActions === nextProps.showActions &&
+  prevProps.isInShowcase === nextProps.isInShowcase &&
+  prevProps.priorityImage === nextProps.priorityImage &&
+  prevProps.isSelectable === nextProps.isSelectable &&
+  prevProps.isSelected === nextProps.isSelected &&
+  prevProps.onSelectToggle === nextProps.onSelectToggle
+);

@@ -73,8 +73,9 @@ export const RealEstateSearchFiltersDTO = {
 };
 
 export const createRealEstateCreateRequest = (data) => {
+  const zoningVal = (data.zoningStatusKey || data.zoningStatus || '').trim() || null;
   return {
-        base: {
+    base: {
       title: (data.title || '').trim(),
       description: (data.description || '').trim(),
       price: parseFloat(data.price) || 0,
@@ -88,7 +89,7 @@ export const createRealEstateCreateRequest = (data) => {
       allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
     },
     
-        adTypeId: data.adTypeId || null,
+    adTypeId: data.adTypeId || null,
     realEstateTypeId: data.realEstateTypeId || null,
     heatingTypeId: data.heatingTypeId || null,
     ownerTypeId: data.ownerTypeId || null,
@@ -98,14 +99,15 @@ export const createRealEstateCreateRequest = (data) => {
     floor: parseInt(data.floor) || 0,
     buildingAge: parseInt(data.buildingAge) || 0,
     furnished: Boolean(data.furnished),
-    zoningStatus: (data.zoningStatus || '').trim() || null,
+    zoningStatus: zoningVal,
+    zoningStatusKey: zoningVal,
   };
 };
 
 export const createRealEstateUpdateRequest = (data) => {
   const updateData = {};
   
-    const base = {};
+  const base = {};
   if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
   if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
   if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
@@ -127,7 +129,14 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
   if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
   if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
-  if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
+  if (data.zoningStatus !== undefined && data.zoningStatus !== '') {
+    const val = data.zoningStatus.trim();
+    updateData.zoningStatus = val;
+    updateData.zoningStatusKey = val;
+  }
+  if (data.zoningStatusKey !== undefined && data.zoningStatusKey !== '') {
+    updateData.zoningStatusKey = data.zoningStatusKey.trim();
+  }
   if (Object.keys(base).length > 0) updateData.base = base;
   
   return updateData;

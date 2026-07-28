@@ -10,8 +10,8 @@ import com.serhat.secondhand.user.domain.dto.VerificationRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.util.UserErrorCodes;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class VerificationService implements IVerificationService {
 
@@ -29,6 +28,17 @@ public class VerificationService implements IVerificationService {
     private final VerificationRepository verificationRepository;
     private final UserNotificationService userNotificationService;
     private final IUserService userService;
+
+    public VerificationService(
+            VerificationConfig verificationConfig,
+            VerificationRepository verificationRepository,
+            @Lazy UserNotificationService userNotificationService,
+            IUserService userService) {
+        this.verificationConfig = verificationConfig;
+        this.verificationRepository = verificationRepository;
+        this.userNotificationService = userNotificationService;
+        this.userService = userService;
+    }
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
@@ -74,7 +84,6 @@ public class VerificationService implements IVerificationService {
     
     @Override
     public boolean validateVerificationCode(User user, String code, CodeType codeType) {
-        // Doğrulama kodları (2FA / şifre sıfırlama) hiçbir log seviyesinde yazılmamalıdır.
         log.debug("Validating verification code for user id: {}, codeType: {}", user.getId(), codeType);
 
         LocalDateTime now = LocalDateTime.now();
@@ -109,7 +118,6 @@ public class VerificationService implements IVerificationService {
 
     public Result<Void> verifyUser(VerificationRequest request, Authentication authentication) {
         User user = userService.getAuthenticatedUser(authentication);
-        // Kullanıcının girdiği kod ve depodaki kod log'a yazılmamalıdır.
         log.info("Verifying user id: {}", user.getId());
 
         var verificationOpt = findLatestActiveVerification(user, CodeType.ACCOUNT_VERIFICATION);

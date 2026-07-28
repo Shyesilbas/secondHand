@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { 
   Lock, 
   ShieldCheck, 
@@ -23,6 +22,7 @@ import OtpSuggestionBanner from '../../payments/components/verification/OtpSugge
 import { useOtpSuggestedToast } from '../../payments/hooks/useOtpSuggestedToast.js';
 import { useOtpValidityCountdown } from '../../payments/hooks/useOtpValidityCountdown.js';
 import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 const ShowcasePayment = forwardRef(function ShowcasePayment({
   listingId,
@@ -146,7 +146,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       onSuccess?.();
     } catch (err) {
       if (onError && onError(err)) return;
-      setError(err?.response?.data?.message || err.message || 'Ödeme tamamlanamadı.');
+      setError(getErrorMessage(err, 'Ödeme tamamlanamadı.'));
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setStep(3);
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Doğrulama kodu gönderilemedi.');
+      setError(getErrorMessage(err, 'Doğrulama kodu gönderilemedi.'));
     } finally {
       setLoading(false);
     }
@@ -184,10 +184,10 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-black text-slate-700 uppercase tracking-wider">
                 Ödeme Yöntemi
               </span>
-              <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Güvenli Ödeme
               </span>
             </div>
@@ -195,43 +195,43 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
             {/* E-Wallet Status Card */}
             <div className={`p-4 rounded-2xl border transition-all duration-200 ${
               canContinuePayment 
-                ? 'bg-emerald-50/40 border-emerald-200' 
+                ? 'bg-emerald-50/50 border-emerald-200' 
                 : 'bg-rose-50/50 border-rose-200'
             }`}>
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-md ${
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${
                     canContinuePayment ? 'bg-emerald-600' : 'bg-rose-600'
                   }`}>
                     <Wallet className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-extrabold text-slate-900">E-Cüzdan Bakiyeniz</h4>
-                    <p className="text-xs font-semibold text-slate-500 font-mono">
-                      {balance.toFixed(2)}₺
+                    <h4 className="text-xs font-black text-slate-900">E-Cüzdan Bakiyeniz</h4>
+                    <p className="text-xs font-bold text-slate-600 font-mono">
+                      ₺{balance.toFixed(2)}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Ödenecek</span>
-                  <span className="text-base font-extrabold font-mono text-slate-900">
-                    {cost.toFixed(2)}₺
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Ödenecek</span>
+                  <span className="text-base font-black font-mono text-slate-900">
+                    ₺{cost.toFixed(2)}
                   </span>
                 </div>
               </div>
 
               {!canContinuePayment ? (
-                <div className="mt-3.5 p-2.5 rounded-xl bg-rose-100/70 border border-rose-200 text-xs text-rose-700 font-medium flex items-center gap-2">
+                <div className="mt-3.5 p-2.5 rounded-xl bg-rose-100/70 border border-rose-200 text-xs text-rose-800 font-bold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span>E-Cüzdan bakiyeniz yetersiz. Lütfen bakiyenizi yükleyin.</span>
                 </div>
               ) : (
-                <div className="mt-3.5 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs text-emerald-700 font-medium">
+                <div className="mt-3.5 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs text-emerald-800 font-bold">
                   <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Ödeme sonrasında kalan bakiye:
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Kalan Bakiye:
                   </span>
-                  <span className="font-mono font-bold">{(balance - cost).toFixed(2)}₺</span>
+                  <span className="font-mono font-black">₺{(balance - cost).toFixed(2)}</span>
                 </div>
               )}
             </div>
@@ -239,7 +239,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
             {embedded && (
               <button
                 type="button"
-                className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-500/25 transition-all disabled:opacity-45 disabled:shadow-none flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/20 transition-all disabled:opacity-45 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer"
                 onClick={() => setStep(2)}
                 disabled={!canContinuePayment || loading}
               >
@@ -253,16 +253,16 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-black text-slate-700 uppercase tracking-wider">
                 İşlem Özeti & Onay
               </span>
-              <span className="text-xs font-medium text-slate-400">Son Adım Öncesi</span>
+              <span className="text-xs font-bold text-slate-500">Son Adım Öncesi</span>
             </div>
 
-            <div className="rounded-2xl border border-border-light bg-slate-50 p-4 space-y-2.5 text-xs">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-2 text-xs">
               <div className="flex justify-between gap-3">
                 <span className="text-slate-500 font-medium">İlan:</span>
-                <span className="font-bold text-slate-900 text-right truncate max-w-[240px]">
+                <span className="font-extrabold text-slate-900 text-right truncate max-w-[240px]">
                   {listingTitle}
                 </span>
               </div>
@@ -272,31 +272,31 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500 font-medium">Ödeme Yöntemi:</span>
-                <span className="font-bold text-emerald-600 flex items-center gap-1">
+                <span className="font-extrabold text-emerald-700 flex items-center gap-1">
                   <Wallet className="w-3.5 h-3.5" /> E-Cüzdan
                 </span>
               </div>
             </div>
 
             {showcasePricing ? (
-              <div className="rounded-2xl border border-border-light p-4 space-y-2 text-xs">
+              <div className="rounded-2xl border border-slate-200 p-4 space-y-2 text-xs">
                 <div className="flex justify-between text-slate-600">
                   <span>Ara Toplam ({days} Gün)</span>
-                  <span className="font-mono font-semibold">{calculateSubtotal().toFixed(2)}₺</span>
+                  <span className="font-mono font-bold">₺{calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>KDV (%{showcasePricing.taxPercentage})</span>
-                  <span className="font-mono font-semibold">{calculateTax().toFixed(2)}₺</span>
+                  <span className="font-mono font-bold">₺{calculateTax().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-extrabold text-sm border-t border-border-light pt-2 text-slate-900">
+                <div className="flex justify-between font-black text-sm border-t border-slate-200 pt-2 text-slate-900">
                   <span>Toplam Fiyat</span>
-                  <span className="font-mono text-primary">{cost.toFixed(2)}₺</span>
+                  <span className="font-mono text-emerald-700">₺{cost.toFixed(2)}</span>
                 </div>
               </div>
             ) : null}
 
             {error && (
-              <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-xs text-rose-700 font-semibold flex items-center gap-2">
+              <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-xs text-rose-700 font-extrabold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -304,17 +304,17 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
 
             <button
               type="button"
-              className="w-full py-3 rounded-2xl text-xs font-bold text-white bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-500/25 transition-all disabled:opacity-45 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/20 transition-all disabled:opacity-45 flex items-center justify-center gap-2 cursor-pointer"
               onClick={proceedToPayment}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Doğrulama Kodu Gönderiliyor...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Kodu Gönderiyor...
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" /> Doğrulama Kodu Gönder & Devam Et
+                  <Send className="w-4 h-4" /> Kodu Gönder & Devam Et
                 </>
               )}
             </button>
@@ -325,15 +325,15 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
         return (
           <div className="space-y-4">
             <div className="text-center py-2">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-2 text-primary">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-2 text-emerald-600">
                 <Lock className="w-5 h-5" />
               </div>
-              <h4 className="text-sm font-extrabold text-slate-900">SMS / E-Posta Doğrulama Kodu</h4>
-              <p className="text-xs text-slate-500 mt-0.5">
-                E-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.
+              <h4 className="text-xs font-black text-slate-900">SMS / E-Posta Doğrulama Kodu</h4>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                E-postanıza gönderilen 6 haneli doğrulama kodunu girin.
               </p>
               {otpTtlActive && (
-                <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-mono font-bold text-primary">
+                <span className="inline-block mt-2 px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-mono font-bold text-emerald-700">
                   Kalan Süre: {otpTtlFormatted}
                 </span>
               )}
@@ -345,7 +345,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               onChange={setVerificationCode}
               disabled={loading}
               error={error}
-              label={t("verification_code")}
+              label={t("verification_code", "Doğrulama Kodu")}
               onComplete={() => {}}
             />
 
@@ -359,7 +359,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
             )}
             
             {error && (
-              <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-xs text-rose-700 font-semibold flex items-center gap-2">
+              <div className="p-3 rounded-xl border border-rose-200 bg-rose-50 text-xs text-rose-700 font-extrabold flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -367,17 +367,17 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
 
             <button
               type="button"
-              className="w-full py-3.5 rounded-2xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/25 transition-all disabled:opacity-45 disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/20 transition-all disabled:opacity-45 disabled:shadow-none flex items-center justify-center gap-2 cursor-pointer"
               onClick={handlePayment}
               disabled={loading || !otpFilled || otpTtlExpired}
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> İşlem Gerçekleştiriliyor...
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Ödeme İşleniyor...
                 </>
               ) : (
                 <>
-                  <ShieldCheck className="w-4.5 h-4.5" /> Vitrin Ödemesini Tamamla
+                  <ShieldCheck className="w-4.5 h-4.5" /> Ödemeyi Tamamla
                 </>
               )}
             </button>
@@ -400,7 +400,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
           <div
             key={s}
             className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-              step >= s ? 'bg-primary' : 'bg-slate-200'
+              step >= s ? 'bg-emerald-600' : 'bg-slate-200'
             }`}
           />
         ))}

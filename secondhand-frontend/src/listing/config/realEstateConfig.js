@@ -31,7 +31,7 @@ export const realEstateConfig = {
     initialData: {
       ...RealEstateCreateRequestDTO,
       title: '', description: '', price: '', squareMeters: '', roomCount: '',
-      bathroomCount: '', floor: '', buildingAge: '', zoningStatus: '', _realEstateTypeName: '',
+      bathroomCount: '', floor: '', buildingAge: '', zoningStatus: '', zoningStatusKey: '', _realEstateTypeName: '',
     },
     steps: [
       { id: 1, title: 'Basic Information', description: 'Set the title, description and price of your listing', kind: 'basics', showQuantity: false },
@@ -81,6 +81,7 @@ export const realEstateConfig = {
           if (Boolean(ctx.formData?.furnished)) ctx.setValue('furnished', false);
         } else {
           if (ctx.formData?.zoningStatus) ctx.setValue('zoningStatus', '');
+          if (ctx.formData?.zoningStatusKey) ctx.setValue('zoningStatusKey', '');
         }
       },
     ],

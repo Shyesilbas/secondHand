@@ -17,6 +17,8 @@ import { EMAIL_TYPES } from '../../../emails/emails.js';
 import { sanitizeOtpInput, findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
 import { OTP_CODE_VALIDITY_SECONDS } from '../../../payments/paymentSchema.js';
 import { useEWallet } from '../../../ewallet/hooks/useEWallet.js';
+import { useAuth } from '../../../auth/AuthContext.jsx';
+import { authService } from '../../../auth/services/authService.js';
 
 const PREMIUM_PRICE = 100;
 
@@ -24,6 +26,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { showSuccess } = useNotification();
+  const { updateUser } = useAuth();
 
   const FEATURES = useMemo(() => [
     { icon: Zap, label: 'Aura AI', free: t('daily_4_messages', 'Günlük 4 mesaj'), premium: t('daily_10_messages', 'Günlük 10 mesaj') },
@@ -122,7 +125,17 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
         acceptedAgreementIds: getAcceptedAgreementIds(),
         verificationCode: code,
       });
+      try {
+        const updatedProfile = await authService.getCurrentUser();
+        if (updatedProfile) {
+          updateUser(updatedProfile);
+        }
+      } catch {
+        // Fallback local update if profile fetch fails
+        updateUser({ plan: 'PREMIUM' });
+      }
       queryClient.invalidateQueries({ queryKey: ['membership'] });
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
       showSuccess('Premium Üyelik', 'Premium planına başarıyla geçiş yaptınız!');
       onClose?.();
     } catch (err) {

@@ -195,13 +195,15 @@ const CheckoutPage = () => {
 
   /* ── Main checkout ──────────────────────────────────────── */
 
-  return <div className="min-h-screen bg-gradient-to-tr from-[#fbfaf8] via-[#f8f6f0] to-[#f3efe5] text-text-primary antialiased">
+  /* ── Main checkout ──────────────────────────────────────── */
+
+  return <div className="min-h-screen bg-slate-50/70 text-slate-900 antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border-light bg-background-primary/80 backdrop-blur-md shadow-sm">
-        <PageContainer className="py-4">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-xs">
+        <PageContainer className="py-3.5">
           <div className="flex items-center gap-4">
-            <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-[#555] transition-colors hover:text-[#111]" aria-label={t("back_to_cart")}>
-              <ArrowLeft className="h-5 w-5" strokeWidth={1.5} />
+            <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-slate-600 hover:text-slate-900 transition-colors" aria-label={t("back_to_cart", "Sepete Dön")}>
+              <ArrowLeft className="h-5 w-5" strokeWidth={2} />
             </button>
             <div className="min-w-0 flex-1">
               <CheckoutProgressBar currentStep={currentStep} steps={steps} onStepChange={handleStepChange} />
@@ -210,47 +212,47 @@ const CheckoutPage = () => {
         </PageContainer>
       </header>
 
-      {/* Mobile Collapsible Order Summary (Shopify-style accordion) */}
-      <div className="bg-background-primary/90 border-b border-[#f0efed] lg:hidden px-4 py-3 backdrop-blur-md">
-        <button type="button" onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} className="flex w-full items-center justify-between text-sm">
-          <span className="flex items-center gap-1.5 font-medium text-[#111]">
-            <ShoppingCart className="h-4 w-4 text-[#1466c6]" />
-            {isOrderSummaryExpanded ? 'Hide order summary' : 'Show order summary'}
-            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
+      {/* Mobile Collapsible Order Summary */}
+      <div className="bg-white border-b border-slate-200 lg:hidden px-4 py-3 shadow-xs">
+        <button type="button" onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} className="flex w-full items-center justify-between text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-slate-900">
+            <ShoppingCart className="h-4 w-4 text-emerald-600" />
+            {isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}
+            <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
           </span>
-          <span className="font-semibold text-[#1466c6] tabular-nums">
+          <span className="font-extrabold font-mono text-emerald-700">
             {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
           </span>
         </button>
-        {isOrderSummaryExpanded && <div className="mt-3 pt-3 border-t border-[#f0efed] overflow-hidden">
+        {isOrderSummaryExpanded && <div className="mt-3 pt-3 border-t border-slate-100 overflow-hidden">
             <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} />
           </div>}
       </div>
 
       {/* Premium Shipping Perk Banner */}
       <PageContainer className="mt-4">
-        <div className={`p-4 rounded-xl border flex flex-col md:flex-row items-center justify-between gap-4 ${isPremium ? 'bg-accent-amber-50 border-accent-amber-100' : 'bg-background-primary border-border-light'}`}>
+        <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-4 ${isPremium ? 'bg-amber-50/70 border-amber-200/80 shadow-xs' : 'bg-white border-slate-200/80 shadow-xs'}`}>
           <div className="flex items-center gap-3">
-            <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${isPremium ? 'bg-accent-amber-100 text-accent-amber-600' : 'bg-background-secondary text-text-muted'}`}>
+            <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${isPremium ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600'}`}>
               <Crown className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-bold text-text-primary">
+              <p className="text-xs font-extrabold text-slate-900">
                 {isPremium ? t('premium_shipping_advantage', 'Premium Kargo Avantajı') : t('dont_wait_for_shipping', 'Kargoda Beklemeyin!')}
               </p>
-              <p className="text-xs text-text-secondary">
+              <p className="text-xs text-slate-500 font-medium">
                 {isPremium 
-                  ? t('order_processed_with_priority', 'Siparişiniz öncelikli olarak işlenecek.') 
-                  : t('upgrade_to_premium_get_shipping_fast', "Premium'a geçerek kargonuzu en kısa sürede alın!")}
+                  ? t('order_processed_with_priority', 'Siparişiniz öncelikli kargo olarak işlenecek.') 
+                  : t('upgrade_to_premium_get_shipping_fast', "Premium'a geçerek siparişinizi en hızlı şekilde teslim alın!")}
               </p>
             </div>
           </div>
           {!isPremium && (
             <button 
               onClick={() => setIsPremiumModalOpen(true)}
-              className="text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+              className="text-xs font-extrabold text-emerald-600 hover:text-emerald-700 uppercase tracking-wider cursor-pointer"
             >
-              {t('explore_premium', "Premium'u Keşfet")}
+              {t('explore_premium', "Premium'u Keşfet →")}
             </button>
           )}
         </div>

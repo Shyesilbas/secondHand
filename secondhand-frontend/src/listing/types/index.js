@@ -41,8 +41,8 @@ export const LISTING_DEFAULTS = Object.freeze({
   FILTER_PAGE_SIZE: 10,
   // Used by service payload serialization when size is not present
   SERVICE_FILTER_PAGE_SIZE: 20,
-  MIN_PRICE: 0,
-  MAX_PRICE: 0,
+  MIN_PRICE: null,
+  MAX_PRICE: null,
   CURRENCY: '',
   // Mine-mode: "low stock" alert threshold (exclusive upper bound).
   LOW_STOCK_MAX_QUANTITY: 10,

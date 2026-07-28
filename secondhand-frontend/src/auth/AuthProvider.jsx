@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }) => {
                         const newUserData = {
                             ...UserDTO,
                             ...userProfile,
-                            plan: userData?.plan || 'FREE',
-                            planExpiry: userData?.planExpiry || null
+                            plan: userProfile?.plan || userData?.plan || 'FREE',
+                            planExpiry: userProfile?.planExpiry || userData?.planExpiry || null
                         };
                         setUser(newUserData);
                         setAuthState({ user: newUserData, isAuthenticated: true, isLoading: false });

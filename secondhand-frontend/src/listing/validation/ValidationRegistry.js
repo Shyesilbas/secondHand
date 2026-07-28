@@ -16,7 +16,14 @@ const toNumber = (v) => {
 
 const buildValidationCtx = (formData, enums = null) => ({
   formData: formData || {},
+  selection: formData || {},
   enums: enums || {},
+  getName: (enumKey, idOrValue, { upper = false } = {}) => {
+    const list = enums?.[enumKey] || [];
+    const found = list.find(x => String(x?.id ?? x?.value ?? '') === String(idOrValue ?? ''));
+    const name = found?.name || found?.label || '';
+    return upper ? name.toUpperCase() : name;
+  }
 });
 
 const validateBaseStep1 = (formData) => {

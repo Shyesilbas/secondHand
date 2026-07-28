@@ -9,8 +9,8 @@ import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.user.application.event.UserRegisteredEvent;
 import com.serhat.secondhand.user.domain.entity.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
@@ -19,7 +19,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserNotificationService {
 
@@ -28,6 +27,19 @@ public class UserNotificationService {
     private final NotificationEventPublisher notificationEventPublisher;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final IVerificationService verificationService;
+
+    public UserNotificationService(
+            EmailEventPublisher emailEventPublisher,
+            EmailConfig emailConfig,
+            NotificationEventPublisher notificationEventPublisher,
+            NotificationTemplateCatalog notificationTemplateCatalog,
+            @Lazy IVerificationService verificationService) {
+        this.emailEventPublisher = emailEventPublisher;
+        this.emailConfig = emailConfig;
+        this.notificationEventPublisher = notificationEventPublisher;
+        this.notificationTemplateCatalog = notificationTemplateCatalog;
+        this.verificationService = verificationService;
+    }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -72,9 +84,9 @@ public class UserNotificationService {
             String subject = emailConfig.getVerificationSubject();
             String content = String.format(
                 "<div style=\"text-align: center; margin: 24px 0;\">" +
-                "  <p style=\"margin-bottom: 8px; font-size: 14px; color: #64748b; font-weight: 500;\">Doğrulama Kodunuz</p>" +
-                "  <div style=\"display: inline-block; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 28px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #4f46e5; font-family: monospace;\">%s</div>" +
-                "  <p style=\"margin-top: 8px; font-size: 13px; color: #94a3b8;\">Bu kod 15 dakika boyunca geçerlidir.</p>" +
+                "  <p style=\"margin-bottom: 10px; font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;\">Doğrulama Kodunuz</p>" +
+                "  <div style=\"display: inline-block; background-color: #f0fdf4; border: 1px solid #a7f3d0; padding: 14px 32px; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #047857; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\">%s</div>" +
+                "  <p style=\"margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 600;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
                 "</div>",
                 verificationCode
             );
@@ -98,9 +110,9 @@ public class UserNotificationService {
             String subject = emailConfig.getPasswordResetSubject();
             String content = String.format(
                 "<div style=\"text-align: center; margin: 24px 0;\">" +
-                "  <p style=\"margin-bottom: 8px; font-size: 14px; color: #64748b; font-weight: 500;\">Şifre Sıfırlama Kodunuz</p>" +
-                "  <div style=\"display: inline-block; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 28px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #4f46e5; font-family: monospace;\">%s</div>" +
-                "  <p style=\"margin-top: 8px; font-size: 13px; color: #94a3b8;\">Bu kod 15 dakika boyunca geçerlidir.</p>" +
+                "  <p style=\"margin-bottom: 10px; font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;\">Şifre Sıfırlama Kodunuz</p>" +
+                "  <div style=\"display: inline-block; background-color: #f0fdf4; border: 1px solid #a7f3d0; padding: 14px 32px; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #047857; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\">%s</div>" +
+                "  <p style=\"margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 600;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
                 "</div>",
                 verificationCode
             );

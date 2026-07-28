@@ -62,7 +62,11 @@ apiClient.interceptors.response.use(
 
         // Enrich error object - extract messages from backend
         if (errorData) {
-            error.userMessage = errorData.detail || errorData.message || null;
+            const realMessage = errorData.detail || errorData.message || (typeof errorData.error === 'string' ? errorData.error : null);
+            if (realMessage) {
+                error.message = realMessage;
+            }
+            error.userMessage = realMessage || null;
             error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
             error.validationErrors = errorData.validationErrors ?? errorData.errors;
             error.errorDetails = {

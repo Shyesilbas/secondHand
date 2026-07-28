@@ -4,10 +4,13 @@ import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
+import { usePlan } from '../../common/hooks/usePlan.js';
+import { showcaseService } from '../services/showcaseService.js';
 import PaymentAgreementsSection from '../../payments/components/PaymentAgreementsSection.jsx';
 import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
 import ShowcaseSuccessModal from './ShowcaseSuccessModal.jsx';
 import ShowcasePayment from './ShowcasePayment.jsx';
+import PremiumUpgradeModal from '../../common/components/ui/PremiumUpgradeModal.jsx';
 import { 
   Zap, 
   ShieldCheck, 
@@ -19,9 +22,10 @@ import {
   CreditCard, 
   ArrowLeft, 
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  Crown,
+  Loader2
 } from 'lucide-react';
-import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
 
 const STEPS = [
   { id: 1, label: 'Süre Seçimi', icon: Zap },
@@ -47,17 +51,24 @@ const ShowcaseModal = ({
   initialDays = 7
 }) => {
   const { t } = useTranslation();
+  const { plan, isPremium, maxShowcaseSlots } = usePlan();
+
   const [step, setStep] = useState(1);
   const [days, setDays] = useState(initialDays);
   const [allAgreementsAccepted, setAllAgreementsAccepted] = useState(false);
-  const [requiredAgreements, setRequiredAgreements] = useState([]);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successSummary, setSuccessSummary] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeHint, setUpgradeHint] = useState('');
+
+  // Limit Pre-Check State
+  const [isCheckingLimit, setIsCheckingLimit] = useState(false);
+  const [limitExceeded, setLimitExceeded] = useState(false);
+  const [activeShowcaseCount, setActiveShowcaseCount] = useState(0);
+
   const showcasePaymentRef = useRef(null);
 
-  const { enums, isLoading: isPricingLoading } = useEnums();
+  const { enums } = useEnums();
   const {
     acceptedAgreements,
     onAgreementToggle,
@@ -67,8 +78,42 @@ const ShowcaseModal = ({
   } = useAgreementsState();
 
   const { listing, isLoading: isListingLoading, error: listingError } = useListingData(listingId, isOpen);
-
   const showcasePricing = enums?.showcasePricingConfig;
+
+  // Pre-check showcase limit before making user fill steps
+  useEffect(() => {
+    if (!isOpen || isExtension) {
+      setLimitExceeded(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsCheckingLimit(true);
+
+    showcaseService.getUserShowcases()
+      .then(showcases => {
+        if (!isMounted) return;
+        const activeList = Array.isArray(showcases) 
+          ? showcases.filter(s => s.status === 'ACTIVE') 
+          : [];
+        const count = activeList.length;
+        setActiveShowcaseCount(count);
+
+        if (count >= maxShowcaseSlots) {
+          setLimitExceeded(true);
+        } else {
+          setLimitExceeded(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setLimitExceeded(false);
+      })
+      .finally(() => {
+        if (isMounted) setIsCheckingLimit(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [isOpen, isExtension, maxShowcaseSlots]);
 
   const calculateTotal = useCallback(() => {
     if (!showcasePricing) return 0;
@@ -103,11 +148,6 @@ const ShowcaseModal = ({
     setDays(isNaN(val) ? 1 : Math.max(1, Math.min(30, val)));
   }, []);
 
-  const handleAgreementsChange = useCallback(agreements => {
-    setRequiredAgreements(agreements);
-    onRequiredAgreementsChange(agreements);
-  }, [onRequiredAgreementsChange]);
-
   const handleNextStep = useCallback(() => {
     if (step < 3) setStep(s => s + 1);
   }, [step]);
@@ -127,27 +167,27 @@ const ShowcaseModal = ({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 10 }}
           transition={{ duration: 0.2 }}
-          className="space-y-6"
+          className="space-y-5"
         >
           {/* Target Listing Info Box */}
           {(listing || listingTitle) && (
-            <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 border border-border-light">
+            <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
               {listing?.images?.[0] ? (
                 <img 
                   src={listing.images[0]} 
                   alt={listing.title} 
-                  className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-sm"
+                  className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-xs"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-bold shrink-0 shadow-sm">
-                  <Zap className="w-5 h-5" />
+                <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shrink-0 shadow-xs">
+                  <Zap className="w-5 h-5 fill-current" />
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase tracking-wider mb-0.5">
-                  <TrendingUp className="w-3 h-3" /> Vitrin Yapılacak İlan
+                <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md uppercase tracking-wider mb-0.5">
+                  <TrendingUp className="w-3 h-3" /> Vitrine Çıkarılacak İlan
                 </span>
-                <p className="text-sm font-bold text-text-primary truncate">
+                <p className="text-xs font-black text-slate-900 truncate">
                   {listing?.title || listingTitle}
                 </p>
               </div>
@@ -157,17 +197,17 @@ const ShowcaseModal = ({
           {/* Duration Selector */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-primary" /> Vitrin Süresi Seçin
+              <label className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-emerald-600" /> Vitrin Süresi Seçin
               </label>
               {showcasePricing && (
-                <span className="text-xs font-medium text-slate-400">
-                  Günlük {showcasePricing.totalDailyCost.toFixed(2)}₺
+                <span className="text-xs font-bold text-slate-500">
+                  Günlük ₺{showcasePricing.totalDailyCost.toFixed(2)}
                 </span>
               )}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3.5">
               {PRESET_DURATIONS.map(opt => {
                 const isSelected = days === opt.days;
                 return (
@@ -175,26 +215,26 @@ const ShowcaseModal = ({
                     key={opt.days}
                     type="button"
                     onClick={() => setDays(opt.days)}
-                    className={`relative p-3.5 rounded-2xl text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 border ${
+                    className={`relative p-3.5 rounded-2xl text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 border cursor-pointer ${
                       isSelected
-                        ? 'bg-primary text-white border-primary shadow-lg shadow-indigo-500/25 scale-[1.02]'
-                        : 'bg-background-primary text-slate-700 border-border-light hover:border-primary/50 hover:bg-slate-50'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 scale-[1.02]'
+                        : 'bg-white text-slate-800 border-slate-200 hover:border-emerald-500/60 hover:bg-slate-50'
                     }`}
                   >
                     {opt.badge && (
-                      <span className={`absolute -top-2.5 px-2 py-0.5 text-[10px] font-bold rounded-full shadow-sm ${
+                      <span className={`absolute -top-2.5 px-2 py-0.5 text-[10px] font-extrabold rounded-full shadow-xs ${
                         isSelected 
-                          ? 'bg-amber-400 text-slate-900' 
-                          : 'bg-primary text-white'
+                          ? 'bg-amber-400 text-slate-950' 
+                          : 'bg-slate-900 text-white'
                       }`}>
                         {opt.badge}
                       </span>
                     )}
-                    <span className={`text-lg font-extrabold tracking-tight ${isSelected ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`text-base font-black tracking-tight ${isSelected ? 'text-white' : 'text-slate-900'}`}>
                       {opt.days} Gün
                     </span>
-                    <span className={`text-[11px] font-medium ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
-                      {showcasePricing ? `${(showcasePricing.totalDailyCost * opt.days).toFixed(0)}₺` : ''}
+                    <span className={`text-[11px] font-bold ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
+                      {showcasePricing ? `₺${(showcasePricing.totalDailyCost * opt.days).toFixed(0)}` : ''}
                     </span>
                   </button>
                 );
@@ -202,9 +242,9 @@ const ShowcaseModal = ({
             </div>
 
             {/* Custom Days Input */}
-            <div className="flex items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3 border border-border-light">
-              <span className="text-xs font-semibold text-slate-600 shrink-0">
-                Özel Süre (Gün):
+            <div className="flex items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3 border border-slate-200">
+              <span className="text-xs font-bold text-slate-600 shrink-0">
+                Özel Süre Belirle:
               </span>
               <input
                 type="number"
@@ -214,48 +254,48 @@ const ShowcaseModal = ({
                 onChange={handleDaysChange}
                 className="flex-1 bg-transparent text-sm font-extrabold text-slate-900 focus:outline-none w-0 text-right font-mono"
               />
-              <span className="text-xs font-bold text-primary shrink-0">
+              <span className="text-xs font-black text-emerald-600 shrink-0">
                 Gün
               </span>
             </div>
           </div>
 
           {/* Pricing Summary Card */}
-          <div className="rounded-2xl border border-border-light bg-slate-50 p-4 space-y-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-border-light">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Ücret Özeti
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-200">
+              <span className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Ücret Detayı
               </span>
-              <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
+              <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
                 %{showcasePricing?.taxPercentage || 20} KDV Dahil
               </span>
             </div>
 
             {showcasePricing ? (
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-slate-600">
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-slate-600 font-medium">
                   <span>Ara Toplam ({days} Gün)</span>
-                  <span className="font-mono font-semibold">{calculateSubtotal().toFixed(2)}₺</span>
+                  <span className="font-mono font-bold text-slate-900">₺{calculateSubtotal().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="flex justify-between text-slate-600 font-medium">
                   <span>KDV (%{showcasePricing.taxPercentage})</span>
-                  <span className="font-mono font-semibold">{calculateTax().toFixed(2)}₺</span>
+                  <span className="font-mono font-bold text-slate-900">₺{calculateTax().toFixed(2)}</span>
                 </div>
-                <div className="pt-2.5 border-t border-border-light flex justify-between items-center">
+                <div className="pt-2.5 border-t border-slate-200 flex justify-between items-center">
                   <div>
-                    <span className="text-sm font-bold text-slate-900">Toplam Ödenecek</span>
-                    <p className="text-[11px] text-slate-400">E-Cüzdan bakiyenizden tahsil edilir</p>
+                    <span className="text-xs font-black text-slate-900">Toplam Ödenecek Tutarlı</span>
+                    <p className="text-[11px] text-slate-500 font-medium">Cüzdan bakiyenizden düşülür</p>
                   </div>
-                  <span className="text-2xl font-black font-mono text-primary tracking-tight">
-                    {totalCost.toFixed(2)}₺
+                  <span className="text-2xl font-black font-mono text-emerald-700 tracking-tight">
+                    ₺{totalCost.toFixed(2)}
                   </span>
                 </div>
               </div>
             ) : (
               <div className="flex justify-between items-center py-2">
-                <span className="text-sm font-bold text-slate-900">Toplam Ödenecek</span>
-                <span className="text-2xl font-black font-mono text-primary">
-                  {totalCost.toFixed(2)}₺
+                <span className="text-xs font-black text-slate-900">Toplam Tutarlı</span>
+                <span className="text-2xl font-black font-mono text-emerald-700">
+                  ₺{totalCost.toFixed(2)}
                 </span>
               </div>
             )}
@@ -274,18 +314,18 @@ const ShowcaseModal = ({
           transition={{ duration: 0.2 }}
           className="space-y-4"
         >
-          <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-primary shrink-0" />
-            <p className="text-xs text-slate-700 font-medium">
-              Vitrin ödeme işlemini gerçekleştirmeden önce lütfen aşağıdaki sözleşme ve bilgilendirmeleri onaylayın.
+          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
+            <p className="text-xs text-emerald-900 font-bold">
+              Ödemeye geçmeden önce lütfen hizmet sözleşmelerini inceleyip onaylayın.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border-light bg-background-primary p-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
             <PaymentAgreementsSection 
               acceptedAgreements={acceptedAgreements} 
               onToggle={onAgreementToggle} 
-              onRequiredAgreementsChange={handleAgreementsChange} 
+              onRequiredAgreementsChange={onRequiredAgreementsChange} 
             />
           </div>
         </motion.div>
@@ -319,7 +359,7 @@ const ShowcaseModal = ({
             onSuccess?.();
           }} 
           onError={(error) => {
-            if (error.response?.data?.error === 'SHOWCASE_SLOT_LIMIT_EXCEEDED') {
+            if (error.response?.data?.error === 'SHOWCASE_SLOT_LIMIT_EXCEEDED' || error.errorCode === 'SHOWCASE_SLOT_LIMIT_EXCEEDED') {
               setShowUpgradeModal(true);
               setUpgradeHint('Showcase slot limitinize ulaştınız.');
               return true;
@@ -334,7 +374,7 @@ const ShowcaseModal = ({
         />
       </motion.div>
     );
-  }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, getAcceptedAgreementIds, handleDaysChange, onRequiredAgreementsChange, isExtension, showcaseId]);
+  }, [step, days, showcasePricing, calculateSubtotal, calculateTax, totalCost, listingId, listing, listingTitle, onSuccess, onClose, acceptedAgreements, onAgreementToggle, onRequiredAgreementsChange, isExtension, showcaseId]);
 
   if (!isOpen && !showSuccessNotification) return null;
 
@@ -344,33 +384,77 @@ const ShowcaseModal = ({
   const renderModalContent = () => {
     if (showSuccessNotification) return null;
 
-    if (isListingLoading) {
+    // Limit Pre-Check Loading
+    if (isCheckingLimit || isListingLoading) {
       return (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-background-primary rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center border border-border-light">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-6 h-6 text-primary animate-pulse" />
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center border border-slate-200">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-4">
+              <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
             </div>
-            <p className="text-sm font-semibold text-slate-700">İlan Bilgileri Yükleniyor...</p>
+            <p className="text-xs font-black text-slate-900">Vitrin Hakları Kontrol Ediliyor...</p>
           </div>
         </div>
+      );
+    }
+
+    // Limit Pre-Check Warning View (UX+: Pre-check before 3 steps)
+    if (limitExceeded && !isExtension) {
+      return (
+        <AnimatePresence>
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 text-center"
+            >
+              <div className="w-14 h-14 bg-amber-100 border border-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-4 text-amber-700 shadow-xs">
+                <Crown className="w-7 h-7" />
+              </div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight mb-2">Vitrin Limitine Ulaştınız</h3>
+              <p className="text-xs text-slate-600 font-medium mb-6 leading-relaxed">
+                Mevcut <strong className="text-slate-900">{plan}</strong> planınız maksimum <strong className="text-emerald-700">{maxShowcaseSlots} vitrin ilanına</strong> izin vermektedir (Şu an aktif: {activeShowcaseCount}). Daha fazla ilan öne çıkarmak için planınızı yükseltebilirsiniz.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                <button
+                  onClick={onClose}
+                  className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Vazgeç
+                </button>
+                <button
+                  onClick={() => {
+                    setUpgradeHint(`Planınız (${plan}) vitrin limitine ulaştı.`);
+                    setShowUpgradeModal(true);
+                  }}
+                  className="w-full sm:w-1/2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold uppercase tracking-wider shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Crown className="w-4 h-4" />
+                  Plan Yükselt
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </AnimatePresence>
       );
     }
 
     if (!listingId || listingError || !listing) {
       return (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-background-primary rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center border border-border-light">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center border border-slate-200">
             <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-6 h-6 text-rose-500" />
             </div>
-            <h2 className="text-base font-bold text-text-primary mb-1">{t("something_went_wrong")}</h2>
+            <h2 className="text-sm font-black text-slate-900 mb-1">{t("something_went_wrong", "Bir Hata Oluştu")}</h2>
             <p className="text-xs text-slate-500 mb-6">{listingError || 'İlan bulunamadı.'}</p>
             <button 
-              className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors" 
+              className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer" 
               onClick={onClose}
             >
-              {t("close")}
+              {t("close", "Kapat")}
             </button>
           </div>
         </div>
@@ -385,39 +469,37 @@ const ShowcaseModal = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-lg bg-background-primary rounded-3xl shadow-2xl border border-border-light overflow-hidden flex flex-col max-h-[90vh] my-auto"
+            className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] my-auto"
           >
             {/* Header */}
-            <div className="relative px-6 py-5 border-b border-border-light bg-slate-50 flex items-center justify-between shrink-0">
+            <div className="relative px-6 py-4.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20">
                   <Zap className="w-5 h-5 fill-current" />
                 </div>
                 <div>
-                  <h3 className="text-base font-extrabold text-text-primary tracking-tight">
+                  <h3 className="text-sm font-black text-slate-900 tracking-tight">
                     {isExtension ? 'Vitrin Süresini Uzat' : 'İlanı Vitrine Çıkar'}
                   </h3>
                   <p className="text-xs font-medium text-slate-500">
-                    {isExtension ? 'Mevcut vitrin sürenizi uzatın' : 'İlanınızı aramalarda öne çıkarın'}
+                    {isExtension ? 'Mevcut vitrin sürenizi uzatın' : 'İlanınızı aramalarda en üste çıkarın'}
                   </p>
                 </div>
               </div>
               <button 
                 onClick={onClose} 
-                className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-600 transition-all flex items-center justify-center cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Step Progress Bar */}
-            <div className="px-6 py-3.5 bg-slate-50/60 border-b border-border-light shrink-0">
+            <div className="px-6 py-3.5 bg-slate-50/50 border-b border-slate-200 shrink-0">
               <div className="flex items-center justify-between relative">
-                {/* Background Connecting Line */}
                 <div className="absolute left-6 right-6 top-4 h-0.5 bg-slate-200 z-0" />
-                {/* Active Animated Connecting Line */}
                 <motion.div 
-                  className="absolute left-6 top-4 h-0.5 bg-primary z-0" 
+                  className="absolute left-6 top-4 h-0.5 bg-emerald-600 z-0" 
                   initial={false}
                   animate={{
                     width: `${((step - 1) / (STEPS.length - 1)) * 82}%`
@@ -433,15 +515,15 @@ const ShowcaseModal = ({
                       <div 
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                           isDone 
-                            ? 'bg-primary text-white shadow-md shadow-indigo-500/20' 
+                            ? 'bg-emerald-600 text-white shadow-xs' 
                             : isActive 
-                            ? 'bg-primary text-white ring-4 ring-indigo-500/20 shadow-lg shadow-indigo-500/30 scale-110' 
-                            : 'bg-background-primary border-2 border-border-light text-slate-400'
+                            ? 'bg-emerald-600 text-white ring-4 ring-emerald-600/20 shadow-md scale-105' 
+                            : 'bg-white border-2 border-slate-200 text-slate-400'
                         }`}
                       >
                         {isDone ? <Check className="w-4 h-4 stroke-[3]" /> : <Icon className="w-3.5 h-3.5" />}
                       </div>
-                      <span className={`text-[11px] font-bold ${isActive ? 'text-primary' : isDone ? 'text-slate-600' : 'text-slate-400'}`}>
+                      <span className={`text-[11px] font-extrabold ${isActive ? 'text-emerald-700' : isDone ? 'text-slate-700' : 'text-slate-400'}`}>
                         {label}
                       </span>
                     </div>
@@ -451,17 +533,17 @@ const ShowcaseModal = ({
             </div>
 
             {/* Step Body Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 bg-background-primary">
+            <div className="flex-1 overflow-y-auto px-6 py-5 bg-white">
               <AnimatePresence mode="wait">
                 {renderStepContent()}
               </AnimatePresence>
             </div>
 
             {/* Footer Navigation */}
-            <div className="px-6 py-4 border-t border-border-light bg-slate-50 flex items-center justify-between shrink-0">
+            <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between shrink-0">
               <button 
                 type="button"
-                className="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:bg-slate-200/70 transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:bg-slate-200/70 transition-all flex items-center gap-1.5 cursor-pointer"
                 onClick={handlePrevStep}
               >
                 {step > 1 ? <><ArrowLeft className="w-3.5 h-3.5" /> Geri</> : 'Vazgeç'}
@@ -470,7 +552,7 @@ const ShowcaseModal = ({
               {step < 3 && (
                 <button 
                   type="button"
-                  className="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none flex items-center gap-1.5"
+                  className="px-6 py-2.5 rounded-xl font-extrabold uppercase tracking-wider text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-1.5 cursor-pointer"
                   onClick={handleNextStep}
                   disabled={
                     (step === 1 && (days < 1 || days > 30)) || 

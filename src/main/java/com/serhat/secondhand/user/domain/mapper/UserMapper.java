@@ -9,11 +9,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "email", expression = "java(user.getEmail())")
+    @Mappings({
+        @Mapping(target = "email", expression = "java(user.getEmail())"),
+        @Mapping(target = "plan", expression = "java(user.getEffectivePlan() != null ? user.getEffectivePlan().name() : \"FREE\")"),
+        @Mapping(target = "planExpiry", expression = "java(user.getExpirationDate())")
+    })
     UserDto toDto(User user);
 
     @Mappings({

@@ -30,51 +30,27 @@ import SearchableDropdown from '../../common/components/ui/SearchableDropdown.js
 
 const CATEGORY_META = {
   VEHICLE: {
-    gradient: 'from-amber-500 via-orange-500 to-red-500',
-    glow: 'shadow-amber-500/20 border-amber-500/30',
-    badge: '630+ Models & Kasa',
-    accent: 'bg-amber-500 text-white',
-    lightBg: 'bg-amber-500/10 text-amber-600',
+    badge: 'Model & Kasa',
     icon: '🚗'
   },
   ELECTRONICS: {
-    gradient: 'from-indigo-500 via-purple-500 to-pink-500',
-    glow: 'shadow-indigo-500/20 border-indigo-500/30',
-    badge: '1,200+ Devices',
-    accent: 'bg-indigo-500 text-white',
-    lightBg: 'bg-indigo-500/10 text-indigo-600',
+    badge: 'Cihaz & Marka',
     icon: '📱'
   },
   REAL_ESTATE: {
-    gradient: 'from-emerald-500 via-teal-500 to-cyan-500',
-    glow: 'shadow-emerald-500/20 border-emerald-500/30',
-    badge: '27 Property Types',
-    accent: 'bg-emerald-500 text-white',
-    lightBg: 'bg-emerald-500/10 text-emerald-600',
+    badge: 'Konut & İlan',
     icon: '🏠'
   },
   CLOTHING: {
-    gradient: 'from-rose-500 via-pink-500 to-red-400',
-    glow: 'shadow-rose-500/20 border-rose-500/30',
-    badge: 'Brands & Sizes',
-    accent: 'bg-rose-500 text-white',
-    lightBg: 'bg-rose-500/10 text-rose-600',
+    badge: 'Giyim & Beden',
     icon: '👕'
   },
   BOOKS: {
-    gradient: 'from-cyan-500 via-blue-500 to-indigo-500',
-    glow: 'shadow-cyan-500/20 border-cyan-500/30',
-    badge: 'Genres & Formats',
-    accent: 'bg-cyan-500 text-white',
-    lightBg: 'bg-cyan-500/10 text-cyan-600',
+    badge: 'Kitap & Tür',
     icon: '📚'
   },
   SPORTS: {
-    gradient: 'from-sky-500 via-blue-600 to-indigo-600',
-    glow: 'shadow-sky-500/20 border-sky-500/30',
-    badge: 'Disciplines & Gear',
-    accent: 'bg-sky-500 text-white',
-    lightBg: 'bg-sky-500/10 text-sky-600',
+    badge: 'Spor & Ekipman',
     icon: '⚽'
   }
 };

@@ -7,7 +7,7 @@ import com.serhat.secondhand.user.domain.entity.enums.UserRole;
 import lombok.Builder;
 
 import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 
 @Builder
 public record UserDto(
@@ -23,5 +23,7 @@ public record UserDto(
         LocalDate accountCreationDate,
         AccountStatus accountStatus,
         boolean accountVerified,
-        UserRole role
+        UserRole role,
+        String plan,
+        LocalDateTime planExpiry
 ) {}

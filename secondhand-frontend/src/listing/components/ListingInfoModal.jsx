@@ -233,7 +233,7 @@ const ListingInfoModal = ({
                           <div className="flex items-center gap-1 mt-0.5">
                             <Star className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" />
                             <span className="text-[11px] font-bold text-text-primary">{(sellerStats.averageRating ?? 5.0).toFixed(1)}</span>
-                            <span className="text-[11px] text-text-muted font-medium">({sellerStats.reviewCount ?? 0} {t("reviews")})</span>
+                            <span className="text-[11px] text-text-muted font-medium">({sellerStats.totalReviews ?? sellerStats.reviewCount ?? 0} {t("reviews")})</span>
                           </div>
                         )}
                       </div>

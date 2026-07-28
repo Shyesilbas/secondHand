@@ -91,8 +91,8 @@ public class PaymentNotificationService {
 
             // Total Amount
             sb.append("        <tr>");
-            sb.append("          <td style=\"padding: 12px 0 0 0; color: #0f172a; font-size: 13px; font-weight: 700;\">Toplam Ödenen</td>");
-            sb.append("          <td style=\"padding: 12px 0 0 0; color: #4f46e5; font-size: 14px; font-weight: 700; text-align: right;\">")
+            sb.append("          <td style=\"padding: 12px 0 0 0; color: #0f172a; font-size: 13px; font-weight: 800;\">Toplam Ödenen</td>");
+            sb.append("          <td style=\"padding: 12px 0 0 0; color: #059669; font-size: 15px; font-weight: 800; text-align: right;\">")
               .append(paymentDto.amount()).append(" ").append(paymentDto.currency()).append("</td>");
             sb.append("        </tr>");
 
@@ -168,9 +168,9 @@ public class PaymentNotificationService {
             String subject = emailConfig.getPaymentVerificationSubject();
             String base = String.format(
                 "<div style=\"text-align: center; margin: 24px 0;\">" +
-                "  <p style=\"margin-bottom: 8px; font-size: 14px; color: #64748b; font-weight: 500;\">Ödeme Doğrulama Kodunuz</p>" +
-                "  <div style=\"display: inline-block; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 28px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #4f46e5; font-family: monospace;\">%s</div>" +
-                "  <p style=\"margin-top: 8px; font-size: 13px; color: #94a3b8;\">Bu kod %d dakika boyunca geçerlidir.</p>" +
+                "  <p style=\"margin-bottom: 10px; font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;\">Ödeme Doğrulama Kodunuz</p>" +
+                "  <div style=\"display: inline-block; background-color: #f0fdf4; border: 1px solid #a7f3d0; padding: 14px 32px; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #047857; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\">%s</div>" +
+                "  <p style=\"margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 600;\">Bu güvenlik kodu %d dakika boyunca geçerlidir.</p>" +
                 "</div>",
                 code, verificationConfig.getExpiryMinutes()
             );

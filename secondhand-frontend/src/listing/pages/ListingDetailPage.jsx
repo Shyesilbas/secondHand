@@ -23,13 +23,16 @@ import {
     Clock,
     Eye,
     Flame,
+    FileText,
     HandCoins,
     MapPin,
     Package,
     Share2,
     Shield,
+    ShieldCheck,
     ShoppingBag,
     Sparkles,
+    Star,
     Tag
 } from 'lucide-react';
 import {useCart} from '../../cart/hooks/useCart.js';
@@ -132,6 +135,7 @@ const ListingDetailPage = () => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
+  const [activeTab, setActiveTab] = useState('details');
   const viewTrackedRef = useRef(false);
   const galleryRef = useRef(null);
   const {
@@ -323,10 +327,10 @@ const ListingDetailPage = () => {
               </div>
 
               {/* Gallery Frame */}
-              <div ref={galleryRef} className="w-full aspect-[3/2] sm:aspect-[16/10] lg:max-h-[420px] bg-slate-900 rounded-2xl overflow-hidden relative group cursor-pointer border border-slate-200 shadow-inner">
+              <div ref={galleryRef} className="w-full aspect-[16/9] sm:aspect-[16/10] lg:max-h-[350px] bg-slate-950 rounded-2xl overflow-hidden relative group cursor-pointer border border-slate-200 shadow-inner flex items-center justify-center">
                 {selectedImage && !imageError ? <img key={selectedImage} src={optimizeCloudinaryUrl(selectedImage, {
                 width: 1200
-              })} onError={() => setImageError(true)} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" fetchpriority="high" decoding="async" loading="eager" /> : <div className="flex flex-col items-center justify-center h-full text-slate-400">
+              })} onError={() => setImageError(true)} alt={`${listing.title} - Image ${selectedImageIndex + 1}`} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]" fetchpriority="high" decoding="async" loading="eager" /> : <div className="flex flex-col items-center justify-center h-full text-slate-400">
                     <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mb-3 border border-slate-700">
                       <Package className="w-6 h-6 text-slate-300" />
                     </div>
@@ -372,34 +376,91 @@ const ListingDetailPage = () => {
                 </div>}
             </section>
 
-            {/* Aura AI Summary */}
-            {listing?.id && <AuraSummary type="listing" id={listing.id} />}
+            {/* ── Tabbed Content Navigation Card ─────────────────────────── */}
+            <div className="bg-white rounded-3xl border border-slate-200/90 shadow-md shadow-slate-200/50 overflow-hidden">
+              {/* Tab Navigation Header */}
+              <div className="flex border-b border-slate-200/80 bg-slate-50/80 p-2 gap-1.5 overflow-x-auto custom-scrollbar">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('details')}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === 'details'
+                      ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 text-emerald-600" />
+                  {t("details_and_specs", "Özellikler & Açıklama")}
+                </button>
 
-            {/* Product Info & Specifications */}
-            <section className="bg-white rounded-3xl p-5 sm:p-7 shadow-md shadow-slate-200/50 border border-slate-200/90 space-y-6">
-              {/* Description */}
-              <div>
-                <h2 className="text-lg font-extrabold text-slate-900 mb-3 tracking-tight">{t("about_this_item")}</h2>
-                <div className={`text-sm leading-relaxed text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden' : ''}`}>
-                  {listing.description || 'No description has been added for this listing.'}
-                  {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none opacity-95" />}
-                </div>
-                {shouldClampDescription && <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-3 inline-flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs hover:text-emerald-700 transition-colors group">
-                    {isDescriptionExpanded ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
-                  </button>}
+                {hasReviews && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('reviews')}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
+                      activeTab === 'reviews'
+                        ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 font-extrabold'
+                        : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
+                    }`}
+                  >
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+                    {t("reviews", "Değerlendirmeler")}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('safety')}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
+                    activeTab === 'safety'
+                      ? 'bg-white text-slate-900 shadow-sm border border-slate-200/90 font-extrabold'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-white/60'
+                  }`}
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  {t("safe_meetup", "Güvenli Alışveriş")}
+                </button>
               </div>
 
-              {/* Specifications */}
-              {DetailsComponent && <div className="pt-5 border-t border-slate-100">
-                  <DetailsComponent listing={listing} flat={true} />
-                </div>}
-            </section>
+              {/* Tab Body */}
+              <div className="p-5 sm:p-7 space-y-6">
+                {activeTab === 'details' && (
+                  <div className="space-y-6">
+                    {/* Aura AI Summary */}
+                    {listing?.id && <AuraSummary type="listing" id={listing.id} />}
 
-            {/* Safe Meetup */}
-            <SafeMeetupPanel listing={listing} />
+                    {/* Description */}
+                    <div>
+                      <h2 className="text-lg font-extrabold text-slate-900 mb-3 tracking-tight">{t("about_this_item")}</h2>
+                      <div className={`text-sm leading-relaxed text-slate-600 whitespace-pre-wrap relative font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden' : ''}`}>
+                        {listing.description || 'No description has been added for this listing.'}
+                        {!isDescriptionExpanded && shouldClampDescription && <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none opacity-95" />}
+                      </div>
+                      {shouldClampDescription && (
+                        <button onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)} className="mt-3 inline-flex items-center gap-1.5 text-emerald-600 font-extrabold text-xs hover:text-emerald-700 transition-colors group">
+                          {isDescriptionExpanded ? <><ChevronUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />{t("show_less")}</> : <><ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />{t("read_more")}</>}
+                        </button>
+                      )}
+                    </div>
 
-            {/* Reviews */}
-            {hasReviews && <ListingReviewsSection listing={listing} />}
+                    {/* Specifications */}
+                    {DetailsComponent && (
+                      <div className="pt-5 border-t border-slate-100">
+                        <DetailsComponent listing={listing} flat={true} />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'reviews' && hasReviews && (
+                  <ListingReviewsSection listing={listing} />
+                )}
+
+                {activeTab === 'safety' && (
+                  <SafeMeetupPanel listing={listing} />
+                )}
+              </div>
+            </div>
           </div>
 
           {/* ── Right Column (Sticky Sidebar & Buy Box) ───────────── */}
@@ -407,21 +468,21 @@ const ListingDetailPage = () => {
             <div className="sticky top-[72px] space-y-5">
 
               {/* Buy Box Card */}
-              <div className="bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xl shadow-slate-200/60 space-y-5">
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-md shadow-slate-200/40 space-y-4">
                 {/* Price block */}
                 <div>
-                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">{t("price")}</p>
-                  <div className="flex items-baseline gap-2.5 flex-wrap">
-                    <span className={`text-3xl sm:text-4xl font-black tabular-nums tracking-tight leading-none font-mono ${hasCampaign ? 'text-emerald-600' : 'text-slate-900'}`}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t("price")}</p>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className={`text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight leading-none font-mono ${hasCampaign ? 'text-emerald-600' : 'text-slate-900'}`}>
                       {formatCurrency(displayPrice, listing.currency)}
                     </span>
                     {hasCampaign && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-base text-slate-400 line-through font-bold tabular-nums font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-slate-400 line-through font-bold tabular-nums font-mono">
                           {formatCurrency(listing.price, listing.currency)}
                         </span>
                         {discount && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">
+                          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-black border border-emerald-200">
                             −{discount}%
                           </span>
                         )}
@@ -431,17 +492,17 @@ const ListingDetailPage = () => {
 
                   {/* Stock & Reservation Alerts */}
                   {(hasStockInfo || activeReservations > 0) && (
-                    <div className="flex flex-wrap items-center gap-2 mt-3.5">
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
                       {hasStockInfo && (
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold ${isLowStock ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
-                          {isLowStock && <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />}
-                          <Package className="w-3.5 h-3.5" />
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${isLowStock ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+                          {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />}
+                          <Package className="w-3 h-3" />
                           {isLowStock ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
                         </span>
                       )}
                       {activeReservations > 0 && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-                          <Flame className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+                          <Flame className="w-3 h-3 text-amber-600" />
                           {activeReservations} {activeReservations === 1 ? 'person' : 'people'} {t("looking")}
                         </span>
                       )}
@@ -451,56 +512,43 @@ const ListingDetailPage = () => {
 
                 {/* Primary & Secondary Action CTAs */}
                 {(canAddToCart || canMakeOffer) && (
-                  <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-2 pt-3 border-t border-slate-100">
                     {canAddToCart && (
                       <button
                         onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
                         disabled={isAddingToCart}
-                        className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl text-sm font-bold shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 ${
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold shadow-sm transition-all active:scale-[0.98] ${
                           itemIsInCart
-                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300 shadow-emerald-500/10'
-                            : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-600/25'
+                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-300'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                         }`}
                       >
                         {isAddingToCart ? (
-                          <>
-                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                            {t("adding_to_cart", "Adding to Cart...")}
-                          </>
+                          <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : itemIsInCart ? (
                           <>
-                            <Check className="w-4 h-4 text-emerald-600" />
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
                             {t("in_cart", "In Cart")}
                           </>
                         ) : (
                           <>
-                            <ShoppingBag className="w-4 h-4" />
+                            <ShoppingBag className="w-3.5 h-3.5" />
                             {t("add_to_cart", "Add to Cart")}
                           </>
                         )}
                       </button>
                     )}
                     {canMakeOffer && (
-                      <button onClick={() => setIsOfferModalOpen(true)} className="w-full flex items-center justify-center gap-2.5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-2xl text-sm font-bold transition-all transform hover:-translate-y-0.5 active:translate-y-0">
-                        <HandCoins className="w-4 h-4 text-slate-600" />
+                      <button
+                        onClick={() => setIsOfferModalOpen(true)}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80 rounded-xl text-xs font-bold transition-all active:scale-[0.98]"
+                      >
+                        <HandCoins className="w-3.5 h-3.5 text-slate-600" />
                         {t("make_an_offer")}
                       </button>
                     )}
                   </div>
                 )}
-
-                {/* Trust Guarantees */}
-                <div className="bg-slate-50/80 rounded-2xl p-3.5 flex items-center justify-around gap-2 text-xs font-bold text-slate-600 border border-slate-200/80">
-                  <div className="flex items-center gap-1.5">
-                    <Shield className="w-4 h-4 text-emerald-600" />
-                    {t("buyer_protection")}
-                  </div>
-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-teal-600" />
-                    {t("secure_escrow")}
-                  </div>
-                </div>
               </div>
 
               {/* Seller Information */}

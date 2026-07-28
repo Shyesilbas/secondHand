@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
-import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Info, Layers, BrainCircuit } from 'lucide-react';
+import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, BrainCircuit } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
@@ -78,7 +78,6 @@ const AuraChatPage = () => {
 
   const [agentMode, setAgentMode] = React.useState(AI_AGENT_MODE_ENABLED);
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
-  const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
   const [upgradeHint, setUpgradeHint] = React.useState('');
   const [showMemoryHub, setShowMemoryHub] = React.useState(false);
@@ -310,10 +309,7 @@ const AuraChatPage = () => {
               <Zap className="w-3.5 h-3.5" />{t("agent_mode")}{agentMode ? 'ON' : 'OFF'}
             </button>}
 
-          {/* Right tools: context toggle */}
-          <button type="button" onClick={() => setRightPanelOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={rightPanelOpen ? t("collapse_information") || 'Collapse Information' : t("expand_information") || 'Expand Information'}>
-            {rightPanelOpen ? <PanelRightClose className="w-4.5 h-4.5" /> : <PanelRight className="w-4.5 h-4.5" />}
-          </button>
+
         </div>
 
         {/* Mobile active context view banner (shown inline only on mobile) */}
@@ -397,39 +393,14 @@ const AuraChatPage = () => {
       </div>
 
       {/* ── 3. RIGHT PANEL (Listing Information Canvas) ───────── */}
-      <div className={`
-        ${rightPanelOpen ? 'w-80 border-l opacity-100 p-5' : 'w-0 border-l-0 opacity-0 p-0 pointer-events-none'}
-        hidden lg:flex flex-col h-full bg-background-secondary border-border-light overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25
-      `}>
-        
-        {/* Active Product Analysis section */}
-        {listing ? <div>
+      {listing && (
+        <div className="w-80 border-l opacity-100 p-5 hidden lg:flex flex-col h-full bg-background-secondary border-border-light overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25">
+          <div>
             <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("workspace_context")}</p>
             <AuraListingContextCard listing={listing} />
-          </div> : <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
-            <div className="flex items-center gap-2 text-text-primary font-bold text-xs">
-              <Layers className="w-4 h-4 text-text-muted" />{t("general_workspace")}</div>
-            <p className="text-caption text-text-secondary leading-normal">{t("no_product_is_currently_active_in_your_c")}</p>
-          </div>}
-
-        {/* Quick Suggestions Cards */}
-        {showQuickPrompts && <div>
-            <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("suggested_queries")}</p>
-            <AuraSuggestedPrompts disabled={isSending} onPick={msg => sendMessage({
-          text: msg
-        })} dense />
-          </div>}
-
-        {/* Secure shopping widget info */}
-        <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-text-primary font-bold text-xs">
-              <Info className="w-4 h-4 text-text-muted" />{t("security_shield")}</div>
-            <p className="text-caption text-text-secondary leading-normal">{t("for_secure_payments_always_checkout_usin")}</p>
           </div>
         </div>
-
-      </div>
+      )}
 
       <PremiumUpgradeModal
         isOpen={showUpgradeModal}
