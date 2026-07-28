@@ -1,7 +1,7 @@
 
 export const LISTING_TYPES = {
   VEHICLE: 'VEHICLE',
-  ELECTRONICS: 'ELECTRONICS', 
+  ELECTRONICS: 'ELECTRONICS',
   REAL_ESTATE: 'REAL_ESTATE',
   CLOTHING: 'CLOTHING',
   BOOKS: 'BOOKS',
@@ -14,7 +14,7 @@ export const NON_PURCHASABLE_TYPES = [LISTING_TYPES.REAL_ESTATE, LISTING_TYPES.V
 
 export const LISTING_STATUS = {
   ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE', 
+  INACTIVE: 'INACTIVE',
   SOLD: 'SOLD',
   PENDING: 'PENDING',
   DRAFT: 'DRAFT',
@@ -41,8 +41,8 @@ export const LISTING_DEFAULTS = Object.freeze({
   FILTER_PAGE_SIZE: 10,
   // Used by service payload serialization when size is not present
   SERVICE_FILTER_PAGE_SIZE: 20,
-  MIN_PRICE: null,
-  MAX_PRICE: null,
+  MIN_PRICE: 0,
+  MAX_PRICE: 0,
   CURRENCY: '',
   // Mine-mode: "low stock" alert threshold (exclusive upper bound).
   LOW_STOCK_MAX_QUANTITY: 10,

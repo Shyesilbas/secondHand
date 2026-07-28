@@ -13,8 +13,6 @@ import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
 import com.serhat.secondhand.payment.util.PaymentProcessingConstants;
 import com.serhat.secondhand.payment.util.PaymentRedisIdempotencyService;
-import com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +37,6 @@ public class PaymentProcessor {
     private final PaymentOutboxService paymentOutboxService;
     private final PaymentRedisIdempotencyService paymentRedisIdempotencyService;
     private final org.springframework.cache.CacheManager cacheManager;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Lazy
     @Autowired
@@ -52,11 +49,12 @@ public class PaymentProcessor {
                 ? paymentRequest.idempotencyKey()
                 : paymentIdempotencyHelper.buildIdempotencyKey(paymentRequest, userId);
 
-        PaymentRequest requestWithIdempotency = paymentIdempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
+        PaymentRequest requestWithIdempotency = paymentIdempotencyHelper.withIdempotencyKey(paymentRequest,
+                idempotencyKey);
         String fingerprint = buildRequestFingerprint(userId, requestWithIdempotency);
 
-        PaymentRedisIdempotencyService.ClaimResult claimResult =
-                paymentRedisIdempotencyService.claim(idempotencyKey, fingerprint);
+        PaymentRedisIdempotencyService.ClaimResult claimResult = paymentRedisIdempotencyService.claim(idempotencyKey,
+                fingerprint);
 
         if (claimResult == PaymentRedisIdempotencyService.ClaimResult.CONFLICT) {
             return Result.error("Processed already.", PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString());
@@ -70,7 +68,8 @@ public class PaymentProcessor {
         if (claimResult == PaymentRedisIdempotencyService.ClaimResult.ALREADY_COMPLETED) {
             return paymentRepository.findByIdempotencyKeyAndFromUserId(idempotencyKey, userId)
                     .map(payment -> Result.success(paymentMapper.toDto(payment)))
-                    .orElseGet(() -> Result.error("Processed already.", PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString()));
+                    .orElseGet(() -> Result.error("Processed already.",
+                            PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString()));
         }
 
         int maxRetries = PaymentProcessingConstants.MAX_OPTIMISTIC_LOCK_RETRIES;
@@ -107,7 +106,8 @@ public class PaymentProcessor {
         if (!completed) {
             paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
         }
-        return Result.error("Unexpected error occurred during payment processing.", PaymentErrorCodes.PAYMENT_ERROR.toString());
+        return Result.error("Unexpected error occurred during payment processing.",
+                PaymentErrorCodes.PAYMENT_ERROR.toString());
     }
 
     @Transactional
@@ -125,7 +125,8 @@ public class PaymentProcessor {
             return Result.success(paymentMapper.toDto(existingPayment));
         }
 
-        Result<PaymentPreCheckService.PreCheckContext> preCheckResult = paymentPreCheckService.preCheck(userId, paymentRequest);
+        Result<PaymentPreCheckService.PreCheckContext> preCheckResult = paymentPreCheckService.preCheck(userId,
+                paymentRequest);
         if (preCheckResult.isError()) {
             return Result.error(preCheckResult.getMessage(), preCheckResult.getErrorCode());
         }
@@ -140,14 +141,15 @@ public class PaymentProcessor {
             return Result.error("Payment Method is not eligible.", PaymentErrorCodes.PAYMENT_ERROR.toString());
         }
 
-        PaymentResult result = strategy.process(context.fromUser(), context.toUser(), paymentRequest.amount(), paymentRequest.listingId(), paymentRequest);
+        PaymentResult result = strategy.process(context.fromUser(), context.toUser(), paymentRequest.amount(),
+                paymentRequest.listingId(), paymentRequest);
 
-        Payment payment = paymentMapper.fromPaymentRequest(paymentRequest, context.fromUser(), context.toUser(), result);
+        Payment payment = paymentMapper.fromPaymentRequest(paymentRequest, context.fromUser(), context.toUser(),
+                result);
         payment = paymentRepository.save(payment);
 
         if (result.success()) {
             paymentOutboxService.enqueuePaymentCompleted(payment);
-            eventPublisher.publishEvent(new PaymentCompletedEvent(this, payment));
         }
 
         evictUserPaymentStatsCache(userId);
@@ -155,13 +157,17 @@ public class PaymentProcessor {
         return Result.success(paymentMapper.toDto(payment));
     }
 
-    private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest, Long userId) {
+    private Result<Void> validateIdempotencyKeyMatch(Payment existingPayment, PaymentRequest paymentRequest,
+            Long userId) {
         boolean amountMatches = existingPayment.getAmount().compareTo(paymentRequest.amount()) == 0;
         boolean listingMatches = (existingPayment.getListingId() == null && paymentRequest.listingId() == null) ||
-                (existingPayment.getListingId() != null && existingPayment.getListingId().equals(paymentRequest.listingId()));
+                (existingPayment.getListingId() != null
+                        && existingPayment.getListingId().equals(paymentRequest.listingId()));
         boolean orderItemMatches = (existingPayment.getOrderItemId() == null && paymentRequest.orderItemId() == null) ||
-                (existingPayment.getOrderItemId() != null && existingPayment.getOrderItemId().equals(paymentRequest.orderItemId()));
-        boolean paymentTypeMatches = existingPayment.getProviderName() != null && existingPayment.getProviderName().equals(paymentRequest.providerName());
+                (existingPayment.getOrderItemId() != null
+                        && existingPayment.getOrderItemId().equals(paymentRequest.orderItemId()));
+        boolean paymentTypeMatches = existingPayment.getProviderName() != null
+                && existingPayment.getProviderName().equals(paymentRequest.providerName());
         boolean fromUserMatches = existingPayment.getFromUser().getId().equals(userId);
 
         if (!amountMatches || !listingMatches || !orderItemMatches || !paymentTypeMatches || !fromUserMatches) {

@@ -12,28 +12,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mappings({
-        @Mapping(target = "email", expression = "java(user.getEmail())"),
-        @Mapping(target = "plan", expression = "java(user.getEffectivePlan() != null ? user.getEffectivePlan().name() : \"FREE\")"),
-        @Mapping(target = "planExpiry", expression = "java(user.getExpirationDate())")
-    })
+    @Mapping(target = "email", expression = "java(user.getEmail())")
     UserDto toDto(User user);
 
     @Mappings({
-        @Mapping(target = "id", ignore = true),
-        @Mapping(target = "password", expression = "java(encoder.encode(registerRequest.getPassword()))"),
-        @Mapping(target = "accountStatus", constant = "ACTIVE"),
-        @Mapping(target = "role", constant = "USER"),
-        @Mapping(target = "accountCreationDate", expression = "java(java.time.LocalDate.now())"),
-        @Mapping(target = "lastLoginDate", ignore = true),
-        @Mapping(target = "lastLoginIp", ignore = true),
-        @Mapping(target = "accountVerified", constant = "false"),
-        @Mapping(target = "listings", ignore = true),
-        @Mapping(target = "emails", ignore = true),
-        @Mapping(target = "tokens", ignore = true),
-        @Mapping(target = "verifications", ignore = true),
-        @Mapping(target = "fromPayments", ignore = true),
-        @Mapping(target = "toPayments", ignore = true)
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "password", expression = "java(encoder.encode(registerRequest.getPassword()))"),
+            @Mapping(target = "accountStatus", constant = "ACTIVE"),
+            @Mapping(target = "role", constant = "USER"),
+            @Mapping(target = "accountCreationDate", expression = "java(java.time.LocalDate.now())"),
+            @Mapping(target = "lastLoginDate", ignore = true),
+            @Mapping(target = "lastLoginIp", ignore = true),
+            @Mapping(target = "accountVerified", constant = "false"),
+            @Mapping(target = "listings", ignore = true),
+            @Mapping(target = "emails", ignore = true),
+            @Mapping(target = "tokens", ignore = true),
+            @Mapping(target = "verifications", ignore = true),
+            @Mapping(target = "fromPayments", ignore = true),
+            @Mapping(target = "toPayments", ignore = true)
     })
     User toEntity(RegisterRequest registerRequest, @Context PasswordEncoder encoder);
 }

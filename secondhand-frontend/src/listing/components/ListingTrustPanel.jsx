@@ -24,7 +24,7 @@ const ListingTrustPanel = ({
   if (!listing) return null;
   const showGreatSeller = Boolean(listing.sellerGreatSellerEligible);
   const ratingAvg = stats?.averageRating ?? 5.0;
-  const reviewCount = stats?.totalReviews ?? stats?.reviewCount ?? 0;
+  const reviewCount = stats?.reviewCount ?? 0;
 
   const content = (
     <>
@@ -39,7 +39,7 @@ const ListingTrustPanel = ({
               <CheckCircle className="w-3.5 h-3.5 text-emerald-500 fill-white" />
             </div>
           </div>
-          
+
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5">
               <Link to={ROUTES.USER_PROFILE(listing.sellerId)} className="text-sm font-bold text-text-primary hover:text-primary transition-colors truncate">
@@ -47,7 +47,7 @@ const ListingTrustPanel = ({
               </Link>
             </div>
             {listing.sellerAccountCreationDate && <p className="text-xs text-text-muted font-medium mt-0.5">{t("member_since")} {new Date(listing.sellerAccountCreationDate).getFullYear()}
-              </p>}
+            </p>}
           </div>
         </div>
         {!isOwner && <FollowButton userId={listing.sellerId} size="sm" showDropdown={true} />}
@@ -69,12 +69,12 @@ const ListingTrustPanel = ({
       </div>
 
       {showGreatSeller && <div className="flex items-center gap-2 py-2 px-3 bg-status-warning-bg/50 border border-amber-105 rounded-xl mb-4">
-          <Award className="w-4 h-4 text-status-warning shrink-0" />
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("great_seller_status")}</span>
-            <p className="text-xs text-amber-700/80 font-medium mt-0.5 leading-tight">{t("highly_rated_for_excellent_customer_resp")}</p>
-          </div>
-        </div>}
+        <Award className="w-4 h-4 text-status-warning shrink-0" />
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("great_seller_status")}</span>
+          <p className="text-xs text-amber-700/80 font-medium mt-0.5 leading-tight">{t("highly_rated_for_excellent_customer_resp")}</p>
+        </div>
+      </div>}
 
       {!isOwner ? <ContactSellerButton listing={listing} className="w-full flex items-center justify-center gap-2 py-2.5 bg-text-primary hover:bg-text-primary/90 text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95">{t("contact_seller")}</ContactSellerButton> : <ShowcaseButton listingId={listing.id} onSuccess={onShowcaseSuccess} />}
     </>

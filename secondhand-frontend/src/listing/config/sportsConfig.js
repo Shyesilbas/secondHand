@@ -1,8 +1,8 @@
 import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 const SportsCreateForm = lazy(() => import('../../sports/components/SportsCreateForm.jsx'));
-import {sportsService} from '../../sports/services/sportsService.js';
-import {filterConfigs} from '../filters/filterConfigs.js';
+import { sportsService } from '../../sports/services/sportsService.js';
+import { filterConfigs } from '../filters/filterConfigs.js';
 
 export const sportsConfig = {
   label: 'Sports',

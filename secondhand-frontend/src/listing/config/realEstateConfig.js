@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 const RealEstateCreateForm = lazy(() => import('../../realEstate/components/RealEstateCreateForm.jsx'));
-import {realEstateService} from '../../realEstate/services/realEstateService.js';
-import {RealEstateCreateRequestDTO} from '../../realEstate/realEstates.js';
-import {filterConfigs} from '../filters/filterConfigs.js';
+import { realEstateService } from '../../realEstate/services/realEstateService.js';
+import { RealEstateCreateRequestDTO } from '../../realEstate/realEstates.js';
+import { filterConfigs } from '../filters/filterConfigs.js';
 
 export const realEstateConfig = {
   label: 'Real Estate',
@@ -31,7 +31,7 @@ export const realEstateConfig = {
     initialData: {
       ...RealEstateCreateRequestDTO,
       title: '', description: '', price: '', squareMeters: '', roomCount: '',
-      bathroomCount: '', floor: '', buildingAge: '', zoningStatus: '', zoningStatusKey: '', _realEstateTypeName: '',
+      bathroomCount: '', floor: '', buildingAge: '', zoningStatus: '', _realEstateTypeName: '',
     },
     steps: [
       { id: 1, title: 'Basic Information', description: 'Set the title, description and price of your listing', kind: 'basics', showQuantity: false },
@@ -81,7 +81,6 @@ export const realEstateConfig = {
           if (Boolean(ctx.formData?.furnished)) ctx.setValue('furnished', false);
         } else {
           if (ctx.formData?.zoningStatus) ctx.setValue('zoningStatus', '');
-          if (ctx.formData?.zoningStatusKey) ctx.setValue('zoningStatusKey', '');
         }
       },
     ],
@@ -136,7 +135,6 @@ export const realEstateConfig = {
             SUMMER_HOUSE: 'KONUT',
             CHALET: 'KONUT',
             MANSION: 'KONUT',
-            PREFABRICATED: 'KONUT',
 
             LAND: 'ARSA',
             FARM: 'ARSA',
@@ -150,8 +148,6 @@ export const realEstateConfig = {
             FACTORY: 'ISYERI',
             INDUSTRIAL: 'ISYERI',
             HOTEL: 'ISYERI',
-            PLAZA_OFFICE: 'ISYERI',
-            KIOSK: 'ISYERI',
 
             PARKING: 'DIGER',
             OTHER: 'DIGER'
@@ -170,7 +166,8 @@ export const realEstateConfig = {
         }
       },
       { enumKey: 'realEstateAdTypes', initialDataKey: 'adTypeId', title: 'Choose ad type', description: 'Select an ad type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], paramKey: 'adTypeId' },
-      { enumKey: 'heatingTypes', initialDataKey: 'heatingTypeId', title: 'Choose heating type', description: 'Select a heating type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], prefilter: false,
+      {
+        enumKey: 'heatingTypes', initialDataKey: 'heatingTypeId', title: 'Choose heating type', description: 'Select a heating type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], prefilter: false,
         visibleWhen: (ctx) => {
           const typeName = ctx.formData?.realEstateTypeId || ctx.selection?.realEstateTypeId
             ? String(ctx.getName('realEstateTypes', ctx.formData?.realEstateTypeId || ctx.selection?.realEstateTypeId) || '').toUpperCase()

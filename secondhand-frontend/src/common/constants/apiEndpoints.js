@@ -184,14 +184,14 @@ export const API_ENDPOINTS = {
         USER_ROOMS: '/v1/chats/rooms/user',
         DIRECT_ROOM: '/v1/chats/rooms/direct',
         CREATE_LISTING_ROOM: (listingId) => `/v1/chats/rooms/listing/${listingId}`,
-        
+
         SEND_MESSAGE: '/v1/chats/messages',
         ROOM_MESSAGES: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}/messages`,
         MARK_READ: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}/messages/read`,
-        
+
         ALL_USER_MESSAGES: '/v1/chats/messages/user',
         TOTAL_UNREAD_COUNT: `/v1/chats/messages/unread-count`,
-        
+
         DELETE_CONVERSATION: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}`,
         DELETE_MESSAGE: (messageId) => `/v1/chats/messages/${messageId}`,
     },
@@ -278,6 +278,7 @@ export const API_ENDPOINTS = {
     },
     SHOWCASES: {
         CREATE: '/v1/showcases',
+        BULK: '/v1/showcases/bulks',
         ACTIVE: '/v1/showcases/active',
         MY_SHOWCASES: '/v1/showcases/my',
         EXTEND: (id) => `/v1/showcases/${id}/extend`,

@@ -1,12 +1,12 @@
-import {LISTING_TYPES} from '../types/index.js';
+import { LISTING_TYPES } from '../types/index.js';
 import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 
-import {vehicleConfig} from './vehicleConfig.js';
-import {electronicsConfig} from './electronicsConfig.js';
-import {realEstateConfig} from './realEstateConfig.js';
-import {clothingConfig} from './clothingConfig.js';
-import {booksConfig} from './booksConfig.js';
-import {sportsConfig} from './sportsConfig.js';
+import { vehicleConfig } from './vehicleConfig.js';
+import { electronicsConfig } from './electronicsConfig.js';
+import { realEstateConfig } from './realEstateConfig.js';
+import { clothingConfig } from './clothingConfig.js';
+import { booksConfig } from './booksConfig.js';
+import { sportsConfig } from './sportsConfig.js';
 
 export const listingTypeConfig = {
   [LISTING_TYPES.VEHICLE]: vehicleConfig,
@@ -85,17 +85,7 @@ export const isCreateSelectionComplete = (listingType, selection, enums = null) 
   const steps = getCreateFlowSelectorSteps(listingType);
   if (!steps.length) return true;
 
-  const ctx = {
-    formData: selection,
-    selection,
-    enums: enums || {},
-    getName: (enumKey, idOrValue, { upper = false } = {}) => {
-      const list = enums?.[enumKey] || [];
-      const found = list.find(x => String(x?.id ?? x?.value ?? '') === String(idOrValue ?? ''));
-      const name = found?.name || found?.label || '';
-      return upper ? name.toUpperCase() : name;
-    }
-  };
+  const ctx = { formData: selection, selection, enums: enums || {} };
   const visibleSteps = steps.filter((s) => {
     if (typeof s.visibleWhen === 'function') return Boolean(s.visibleWhen(ctx));
     return true;

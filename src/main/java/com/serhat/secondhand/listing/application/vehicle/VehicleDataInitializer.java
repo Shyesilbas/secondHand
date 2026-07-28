@@ -50,26 +50,27 @@ public class VehicleDataInitializer implements SeedTask {
 
             log.info("Loading vehicle catalog metadata from {}", BRANDS_METADATA_PATH);
             List<VehicleBrandCatalogDto> brandCatalogs = loadBrandsMetadata();
-            
+
             Set<String> catalogBrandKeys = new HashSet<>();
             Set<String> catalogTypeKeys = new HashSet<>();
-            
+
             for (VehicleBrandCatalogDto brandCatalog : brandCatalogs) {
                 if (brandCatalog.getBrand() == null || brandCatalog.getBrand().isBlank()) {
                     throw new IllegalStateException("Brand code cannot be null or empty in brands.json");
                 }
                 catalogBrandKeys.add(normalizeKey(brandCatalog.getBrand()));
-                
+
                 if (brandCatalog.getSupportedTypes() != null) {
                     for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
                         if (typeFile.getType() == null || typeFile.getType().isBlank()) {
-                            throw new IllegalStateException("Vehicle type cannot be null or empty in brands.json for brand: " + brandCatalog.getBrand());
+                            throw new IllegalStateException(
+                                    "Vehicle type cannot be null or empty in brands.json for brand: "
+                                            + brandCatalog.getBrand());
                         }
                         catalogTypeKeys.add(normalizeKey(typeFile.getType()));
                     }
                 }
             }
-
 
             pruneStaleBrands(catalogBrandKeys);
             pruneStaleTypes(catalogTypeKeys);
@@ -94,11 +95,11 @@ public class VehicleDataInitializer implements SeedTask {
                 for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
                     String relativePath = typeFile.getDataFile();
                     String fullPath = VEHICLES_BASE_PATH + relativePath;
-                    
+
                     log.info("Loading brand data file: {}", fullPath);
                     List<VehicleSeedModelDto> models = loadBrandModelsFile(fullPath);
                     dataFilesRead++;
-                    
+
                     int seededForFile = 0;
                     for (VehicleSeedModelDto modelDto : models) {
                         validateAndSeedModel(brandCatalog.getBrand(), typeFile.getType(), modelDto, fullPath);
@@ -115,7 +116,7 @@ public class VehicleDataInitializer implements SeedTask {
                     brandCatalogs.size(),
                     dataFilesRead,
                     totalModelsSeeded);
-            
+
             return Result.success();
         } catch (Exception e) {
             log.error("Vehicle catalog seeding failed critically. Failing application startup.", e);
@@ -129,7 +130,8 @@ public class VehicleDataInitializer implements SeedTask {
             throw new FileNotFoundException("Brands metadata index file was not found under: " + BRANDS_METADATA_PATH);
         }
         try (InputStream is = resource.getInputStream()) {
-            return objectMapper.readValue(is, new TypeReference<List<VehicleBrandCatalogDto>>() {});
+            return objectMapper.readValue(is, new TypeReference<List<VehicleBrandCatalogDto>>() {
+            });
         } catch (Exception e) {
             throw new IllegalStateException("Failed to parse catalog metadata index " + BRANDS_METADATA_PATH, e);
         }
@@ -141,7 +143,8 @@ public class VehicleDataInitializer implements SeedTask {
             throw new FileNotFoundException("Brand-specific catalog data file was not found under: " + fullPath);
         }
         try (InputStream is = resource.getInputStream()) {
-            return objectMapper.readValue(is, new TypeReference<List<VehicleSeedModelDto>>() {});
+            return objectMapper.readValue(is, new TypeReference<List<VehicleSeedModelDto>>() {
+            });
         } catch (Exception e) {
             throw new IllegalStateException("Failed to parse brand-specific catalog array " + fullPath, e);
         }
@@ -151,7 +154,8 @@ public class VehicleDataInitializer implements SeedTask {
         return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8));
     }
 
-    private void validateAndSeedModel(String parentBrand, String parentType, VehicleSeedModelDto modelDto, String sourceFile) {
+    private void validateAndSeedModel(String parentBrand, String parentType, VehicleSeedModelDto modelDto,
+            String sourceFile) {
         if (modelDto.getBrand() == null || !modelDto.getBrand().equalsIgnoreCase(parentBrand)) {
             throw new IllegalArgumentException(String.format(
                     "Inconsistent brand code in %s: Expected %s but found %s",
@@ -176,7 +180,8 @@ public class VehicleDataInitializer implements SeedTask {
         String modelNaturalKey = "vehicle-model:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName());
         UUID modelId = generateStableUuid(modelNaturalKey);
 
-        Optional<VehicleModel> existingModelOpt = modelRepository.findFirstByBrand_IdAndType_IdAndNameIgnoreCase(brand.getId(), type.getId(), modelDto.getName());
+        Optional<VehicleModel> existingModelOpt = modelRepository
+                .findFirstByBrand_IdAndType_IdAndNameIgnoreCase(brand.getId(), type.getId(), modelDto.getName());
         VehicleModel model;
 
         if (existingModelOpt.isPresent()) {
@@ -201,19 +206,22 @@ public class VehicleDataInitializer implements SeedTask {
                 }
             }
         }
-        
+
         model = modelRepository.save(model);
 
         if (modelDto.getGenerations() != null) {
             for (VehicleGenerationDto genDto : modelDto.getGenerations()) {
                 if (genDto.getName() == null || genDto.getName().isBlank()) {
-                    throw new IllegalArgumentException("Generation name cannot be null or empty under model: " + modelDto.getName());
+                    throw new IllegalArgumentException(
+                            "Generation name cannot be null or empty under model: " + modelDto.getName());
                 }
-                
-                String genNaturalKey = "vehicle-generation:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName());
+
+                String genNaturalKey = "vehicle-generation:" + brandKey + ":" + typeKey + ":"
+                        + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName());
                 UUID genId = generateStableUuid(genNaturalKey);
 
-                Optional<VehicleGeneration> existingGenOpt = generationRepository.findByModel_IdAndNameIgnoreCase(model.getId(), genDto.getName());
+                Optional<VehicleGeneration> existingGenOpt = generationRepository
+                        .findByModel_IdAndNameIgnoreCase(model.getId(), genDto.getName());
                 VehicleGeneration generation;
 
                 if (existingGenOpt.isPresent()) {
@@ -230,13 +238,17 @@ public class VehicleDataInitializer implements SeedTask {
                 if (genDto.getEngines() != null) {
                     for (VehicleEngineDto engDto : genDto.getEngines()) {
                         if (engDto.getName() == null || engDto.getName().isBlank()) {
-                            throw new IllegalArgumentException("Engine name cannot be empty under generation: " + genDto.getName());
+                            throw new IllegalArgumentException(
+                                    "Engine name cannot be empty under generation: " + genDto.getName());
                         }
-                        
-                        String engNaturalKey = "vehicle-engine:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(engDto.getName()) + ":" + normalizeKey(engDto.getFuelType());
+
+                        String engNaturalKey = "vehicle-engine:" + brandKey + ":" + typeKey + ":"
+                                + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":"
+                                + normalizeKey(engDto.getName()) + ":" + normalizeKey(engDto.getFuelType());
                         UUID engId = generateStableUuid(engNaturalKey);
 
-                        Optional<VehicleEngine> existingEngOpt = engineRepository.findByGeneration_IdAndNameIgnoreCase(generation.getId(), engDto.getName());
+                        Optional<VehicleEngine> existingEngOpt = engineRepository
+                                .findByGeneration_IdAndNameIgnoreCase(generation.getId(), engDto.getName());
                         VehicleEngine engine;
 
                         if (existingEngOpt.isPresent()) {
@@ -248,16 +260,17 @@ public class VehicleDataInitializer implements SeedTask {
                             engine.setName(engDto.getName());
                             engine.setGeneration(generation);
                         }
-                        
+
                         if (engDto.getFuelType() == null || engDto.getFuelType().isBlank()) {
-                            throw new IllegalArgumentException("Fuel type cannot be empty under engine: " + engDto.getName());
+                            throw new IllegalArgumentException(
+                                    "Fuel type cannot be empty under engine: " + engDto.getName());
                         }
-                        
+
                         try {
                             engine.setFuelType(FuelType.valueOf(engDto.getFuelType().toUpperCase(Locale.ROOT)));
                         } catch (Exception e) {
                             throw new IllegalArgumentException(String.format(
-                                     "Invalid fuel type '%s' for engine '%s' in file %s",
+                                    "Invalid fuel type '%s' for engine '%s' in file %s",
                                     engDto.getFuelType(), engDto.getName(), sourceFile), e);
                         }
                         engineRepository.save(engine);
@@ -269,10 +282,13 @@ public class VehicleDataInitializer implements SeedTask {
                         if (trimName == null || trimName.isBlank()) {
                             continue;
                         }
-                        String trimNaturalKey = "vehicle-trim:" + brandKey + ":" + typeKey + ":" + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":" + normalizeKey(trimName);
+                        String trimNaturalKey = "vehicle-trim:" + brandKey + ":" + typeKey + ":"
+                                + normalizeKey(modelDto.getName()) + ":" + normalizeKey(genDto.getName()) + ":"
+                                + normalizeKey(trimName);
                         UUID trimId = generateStableUuid(trimNaturalKey);
 
-                        Optional<VehicleTrim> existingTrimOpt = trimRepository.findByGeneration_IdAndNameIgnoreCase(generation.getId(), trimName);
+                        Optional<VehicleTrim> existingTrimOpt = trimRepository
+                                .findByGeneration_IdAndNameIgnoreCase(generation.getId(), trimName);
                         if (existingTrimOpt.isPresent()) {
                             VehicleTrim trim = existingTrimOpt.get();
                             trim.setNew(false);
@@ -290,18 +306,12 @@ public class VehicleDataInitializer implements SeedTask {
         }
     }
 
-
-
     private void pruneStaleBrands(Set<String> catalogBrandKeys) {
         brandRepository.findAll().stream()
                 .filter(b -> !catalogBrandKeys.contains(normalizeKey(b.getName())))
                 .forEach(b -> {
-                    try {
-                        brandRepository.delete(b);
-                        log.debug("Removed stale car brand: {}", b.getName());
-                    } catch (Exception e) {
-                        log.warn("Could not remove stale car brand {}: {}", b.getName(), e.getMessage());
-                    }
+                    brandRepository.delete(b);
+                    log.debug("Removed stale car brand: {}", b.getName());
                 });
     }
 
@@ -309,12 +319,8 @@ public class VehicleDataInitializer implements SeedTask {
         typeRepository.findAll().stream()
                 .filter(t -> !catalogTypeKeys.contains(normalizeKey(t.getName())))
                 .forEach(t -> {
-                    try {
-                        typeRepository.delete(t);
-                        log.debug("Removed stale vehicle type: {}", t.getName());
-                    } catch (Exception e) {
-                        log.warn("Could not remove stale vehicle type {}: {}", t.getName(), e.getMessage());
-                    }
+                    typeRepository.delete(t);
+                    log.debug("Removed stale vehicle type: {}", t.getName());
                 });
     }
 
@@ -350,6 +356,6 @@ public class VehicleDataInitializer implements SeedTask {
     }
 
     private static String normalizeKey(String key) {
-        return key == null ? "" : key.trim().toUpperCase(Locale.ROOT).replace("-", "_");
+        return key == null ? "" : key.trim().toUpperCase(Locale.ROOT);
     }
 }

@@ -1,6 +1,5 @@
 # İş kuralları: app.* (e-posta hariç — application-email.yml)
 app:
-  seed: ${APP_SEED:}
   auth:
     cookie:
       domain: ${COOKIE_DOMAIN:localhost}

@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @org.springframework.transaction.annotation.Transactional
-@org.springframework.cache.annotation.CacheConfig(cacheNames = {"userListings", "userProfile", "listingStats"})
+@org.springframework.cache.annotation.CacheConfig(cacheNames = "userProfile")
 public class ListingCommandService {
 
     private final ListingRepository listingRepository;
@@ -40,8 +40,7 @@ public class ListingCommandService {
     private static final List<ListingStatus> EDITABLE_STATUSES = List.of(
             ListingStatus.DRAFT,
             ListingStatus.ACTIVE,
-            ListingStatus.INACTIVE
-    );
+            ListingStatus.INACTIVE);
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> publish(UUID listingId, Long userId) {
@@ -113,14 +112,14 @@ public class ListingCommandService {
     public Result<UUID> relist(UUID listingId, Long userId) {
         try {
             Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
-            
+
             if (listing.getStatus() != ListingStatus.SOLD) {
                 return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
             }
-            
+
             // Detach the entity to create a deep copy for persisting as a new record
             entityManager.detach(listing);
-            
+
             // Reset fields for the new listing
             listing.setId(null);
             listing.setListingNo(com.serhat.secondhand.listing.util.ListingNoGenerator.generate());
@@ -129,10 +128,10 @@ public class ListingCommandService {
             listing.setVersion(null);
             listing.setCreatedAt(null);
             listing.setUpdatedAt(null);
-            
+
             // Save as a new entity
             listingRepository.save(listing);
-            
+
             log.info("Listing {} relisted into new draft listing {}", listingId, listing.getId());
             return Result.success(listing.getId());
         } catch (BusinessException e) {
@@ -142,10 +141,6 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateSingleQuantity(UUID listingId, int quantity, Long userId) {
-        Result<Void> quantityValidation = listingValidationService.validateQuantity(quantity);
-        if (quantityValidation.isError()) {
-            return quantityValidation;
-        }
         Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
         try {
             inventoryService.updateQuantity(listing.getId(), quantity);
@@ -158,14 +153,16 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchQuantity(List<UUID> listingIds, int quantity, Long userId) {
-        if (listingIds == null || listingIds.isEmpty()) return Result.success();
+        if (listingIds == null || listingIds.isEmpty())
+            return Result.success();
         if (quantity < ListingBusinessConstants.MIN_LISTING_QUANTITY) {
             return Result.error(ListingErrorCodes.INVALID_QUANTITY);
         }
         if (listingRepository.countByIdInAndSellerId(listingIds, userId) != listingIds.size()) {
             return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
         }
-        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds.size()) {
+        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds
+                .size()) {
             return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
         for (UUID lId : listingIds) {
@@ -184,7 +181,7 @@ public class ListingCommandService {
         try {
             listing.updatePrice(price);
             listingRepository.save(listing);
-            
+
             log.info("Listing {} price updated to {}", listingId, price);
             return Result.success();
         } catch (BusinessException e) {
@@ -194,14 +191,16 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> updateBatchPrice(List<UUID> listingIds, BigDecimal price, Long userId) {
-        if (listingIds == null || listingIds.isEmpty()) return Result.success();
+        if (listingIds == null || listingIds.isEmpty())
+            return Result.success();
         if (price == null || price.compareTo(ListingBusinessConstants.MIN_NON_NEGATIVE_PRICE) < 0) {
             return Result.error(ListingErrorCodes.INVALID_PRICE);
         }
         if (listingRepository.countByIdInAndSellerId(listingIds, userId) != listingIds.size()) {
             return Result.error(ListingErrorCodes.NOT_LISTING_OWNER);
         }
-        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds.size()) {
+        if (listingRepository.countByIdInAndSellerIdAndStatusIn(listingIds, userId, EDITABLE_STATUSES) != listingIds
+                .size()) {
             return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
         }
         List<Listing> ownedBefore = listingRepository.findAllByIdIn(listingIds).stream()
@@ -220,7 +219,7 @@ public class ListingCommandService {
                         price,
                         l.getCurrency(),
                         "Price updated via bulk quick action");
-                
+
                 // Trigger PriceDroppedEvent if price decreased
                 if (l.getPrice() != null && price != null && price.compareTo(l.getPrice()) < 0) {
                     eventPublisher.publishEvent(new PriceDroppedEvent(
@@ -229,8 +228,7 @@ public class ListingCommandService {
                             l.getTitle(),
                             l.getPrice(),
                             price,
-                            l.getCurrency()
-                    ));
+                            l.getCurrency()));
                 }
             }
         }

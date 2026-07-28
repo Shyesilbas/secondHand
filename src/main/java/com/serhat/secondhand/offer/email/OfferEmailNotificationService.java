@@ -35,90 +35,105 @@ public class OfferEmailNotificationService {
         if (recipient == null) {
             return;
         }
-        sendOfferTemplate(recipient, emailConfig.getOffer().getReceivedSubject(), "Yeni Bir Teklif Aldınız", offer, EmailType.OFFER_RECEIVED, null);
+        sendOfferTemplate(recipient, emailConfig.getOffer().getReceivedSubject(), "Yeni Bir Teklif Aldınız", offer,
+                EmailType.OFFER_RECEIVED, null);
 
         var request = notificationTemplateCatalog.offerReceived(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null
-        );
-        notificationEventPublisher.publishDispatch(request, "offer", "offer-received:" + recipient.getId() + ":" + offer.getId());
+                offer.getListing() != null ? offer.getListing().getTitle() : null);
+        notificationEventPublisher.publishDispatch(request, "offer",
+                "offer-received:" + recipient.getId() + ":" + offer.getId());
     }
 
     @Async("notificationExecutor")
     public void notifyCounterReceived(Offer offer) {
         User recipient = getCounterRecipient(offer);
-        if (recipient == null) return;
-        sendOfferTemplate(recipient, emailConfig.getOffer().getCounterReceivedSubject(), "Karşı Teklif Aldınız", offer, EmailType.OFFER_COUNTER_RECEIVED, null);
+        if (recipient == null)
+            return;
+        sendOfferTemplate(recipient, emailConfig.getOffer().getCounterReceivedSubject(), "Karşı Teklif Aldınız", offer,
+                EmailType.OFFER_COUNTER_RECEIVED, null);
 
         var request = notificationTemplateCatalog.offerCountered(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null
-        );
-        notificationEventPublisher.publishDispatch(request, "offer", "offer-countered:" + recipient.getId() + ":" + offer.getId());
+                offer.getListing() != null ? offer.getListing().getTitle() : null);
+        notificationEventPublisher.publishDispatch(request, "offer",
+                "offer-countered:" + recipient.getId() + ":" + offer.getId());
     }
 
     @Async("notificationExecutor")
     public void notifyAcceptedToCreator(Offer offer) {
         User recipient = getCreator(offer);
-        if (recipient == null) return;
-        sendOfferTemplate(recipient, emailConfig.getOffer().getAcceptedSubject(), "Teklifiniz Kabul Edildi", offer, EmailType.OFFER_ACCEPTED, "Sıradaki Adım: Uygulama üzerinden ödemeyi tamamlayın.");
+        if (recipient == null)
+            return;
+        sendOfferTemplate(recipient, emailConfig.getOffer().getAcceptedSubject(), "Teklifiniz Kabul Edildi", offer,
+                EmailType.OFFER_ACCEPTED, "Sıradaki Adım: Uygulama üzerinden ödemeyi tamamlayın.");
 
         var request = notificationTemplateCatalog.offerAccepted(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null
-        );
-        notificationEventPublisher.publishDispatch(request, "offer", "offer-accepted:" + recipient.getId() + ":" + offer.getId());
+                offer.getListing() != null ? offer.getListing().getTitle() : null);
+        notificationEventPublisher.publishDispatch(request, "offer",
+                "offer-accepted:" + recipient.getId() + ":" + offer.getId());
     }
 
     @Async("notificationExecutor")
     public void notifyRejectedToCreator(Offer offer) {
         User recipient = getCreator(offer);
-        if (recipient == null) return;
-        sendOfferTemplate(recipient, emailConfig.getOffer().getRejectedSubject(), "Teklifiniz Reddedildi", offer, EmailType.OFFER_REJECTED, null);
+        if (recipient == null)
+            return;
+        sendOfferTemplate(recipient, emailConfig.getOffer().getRejectedSubject(), "Teklifiniz Reddedildi", offer,
+                EmailType.OFFER_REJECTED, null);
 
         var request = notificationTemplateCatalog.offerRejected(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null
-        );
-        notificationEventPublisher.publishDispatch(request, "offer", "offer-rejected:" + recipient.getId() + ":" + offer.getId());
+                offer.getListing() != null ? offer.getListing().getTitle() : null);
+        notificationEventPublisher.publishDispatch(request, "offer",
+                "offer-rejected:" + recipient.getId() + ":" + offer.getId());
     }
 
     @Async("notificationExecutor")
     public void notifyExpiredToBoth(Offer offer) {
-        if (offer == null) return;
+        if (offer == null)
+            return;
         if (offer.getBuyer() != null) {
-            sendOfferTemplate(offer.getBuyer(), emailConfig.getOffer().getExpiredSubject(), "Teklifinizin Süresi Doldu", offer, EmailType.OFFER_EXPIRED, null);
+            sendOfferTemplate(offer.getBuyer(), emailConfig.getOffer().getExpiredSubject(), "Teklifinizin Süresi Doldu",
+                    offer, EmailType.OFFER_EXPIRED, null);
             var buyerRequest = notificationTemplateCatalog.offerExpired(
                     offer.getBuyer().getId(), offer.getId(), offer.getListing().getId(),
-                    offer.getListing() != null ? offer.getListing().getTitle() : null, true
-            );
-            notificationEventPublisher.publishDispatch(buyerRequest, "offer", "offer-expired:" + offer.getBuyer().getId() + ":" + offer.getId() + ":buyer");
+                    offer.getListing() != null ? offer.getListing().getTitle() : null, true);
+            notificationEventPublisher.publishDispatch(buyerRequest, "offer",
+                    "offer-expired:" + offer.getBuyer().getId() + ":" + offer.getId() + ":buyer");
         }
         if (offer.getSeller() != null) {
-            sendOfferTemplate(offer.getSeller(), emailConfig.getOffer().getExpiredSubject(), "Bir Teklifin Süresi Doldu", offer, EmailType.OFFER_EXPIRED, null);
+            sendOfferTemplate(offer.getSeller(), emailConfig.getOffer().getExpiredSubject(),
+                    "Bir Teklifin Süresi Doldu", offer, EmailType.OFFER_EXPIRED, null);
             var sellerRequest = notificationTemplateCatalog.offerExpired(
                     offer.getSeller().getId(), offer.getId(), offer.getListing().getId(),
-                    offer.getListing() != null ? offer.getListing().getTitle() : null, false
-            );
-            notificationEventPublisher.publishDispatch(sellerRequest, "offer", "offer-expired:" + offer.getSeller().getId() + ":" + offer.getId() + ":seller");
+                    offer.getListing() != null ? offer.getListing().getTitle() : null, false);
+            notificationEventPublisher.publishDispatch(sellerRequest, "offer",
+                    "offer-expired:" + offer.getSeller().getId() + ":" + offer.getId() + ":seller");
         }
     }
 
     @Async("notificationExecutor")
     public void notifyCompletedToBoth(Offer offer) {
-        if (offer == null) return;
+        if (offer == null)
+            return;
         if (offer.getBuyer() != null) {
-            sendOfferTemplate(offer.getBuyer(), emailConfig.getOffer().getCompletedSubject(), "Teklif İşlemi Tamamlandı", offer, EmailType.OFFER_COMPLETED, null);
+            sendOfferTemplate(offer.getBuyer(), emailConfig.getOffer().getCompletedSubject(),
+                    "Teklif İşlemi Tamamlandı", offer, EmailType.OFFER_COMPLETED, null);
         }
         if (offer.getSeller() != null) {
-            sendOfferTemplate(offer.getSeller(), emailConfig.getOffer().getCompletedSubject(), "Teklif İşlemi Tamamlandı", offer, EmailType.OFFER_COMPLETED, null);
+            sendOfferTemplate(offer.getSeller(), emailConfig.getOffer().getCompletedSubject(),
+                    "Teklif İşlemi Tamamlandı", offer, EmailType.OFFER_COMPLETED, null);
         }
     }
 
-    private void sendOfferTemplate(User recipient, String subject, String headline, Offer offer, EmailType type, String nextStep) {
+    private void sendOfferTemplate(User recipient, String subject, String headline, Offer offer, EmailType type,
+            String nextStep) {
         String unitPrice = "";
         if (offer.getTotalPrice() != null && offer.getQuantity() != null && offer.getQuantity() > 0) {
-            unitPrice = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2, RoundingMode.HALF_UP) + " TL";
+            unitPrice = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2, RoundingMode.HALF_UP)
+                    + " TL";
         }
 
         var data = OfferEmailData.builder()

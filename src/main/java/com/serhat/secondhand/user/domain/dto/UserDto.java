@@ -7,23 +7,18 @@ import com.serhat.secondhand.user.domain.entity.enums.UserRole;
 import lombok.Builder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 public record UserDto(
-        Long id,
-        String name,
-        String surname,
-        String email,
-        String phoneNumber,
-        Gender gender,
-        @JsonFormat(pattern = "dd/MM/yyyy")
-        LocalDate birthdate,
-        @JsonFormat(pattern = "dd/MM/yyyy")
-        LocalDate accountCreationDate,
-        AccountStatus accountStatus,
-        boolean accountVerified,
-        UserRole role,
-        String plan,
-        LocalDateTime planExpiry
-) {}
+                Long id,
+                String name,
+                String surname,
+                String email,
+                String phoneNumber,
+                Gender gender,
+                @JsonFormat(pattern = "dd/MM/yyyy") LocalDate birthdate,
+                @JsonFormat(pattern = "dd/MM/yyyy") LocalDate accountCreationDate,
+                AccountStatus accountStatus,
+                boolean accountVerified,
+                UserRole role) {
+}

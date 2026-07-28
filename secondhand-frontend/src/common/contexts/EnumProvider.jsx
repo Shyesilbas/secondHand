@@ -154,7 +154,7 @@ export const EnumProvider = ({ children }) => {
                 },
             };
         },
-        staleTime: 24 * 60 * 60 * 1000, // 24 hours
+        staleTime: import.meta.env.DEV ? 0 : 24 * 60 * 60 * 1000, // Always fresh in DEV, 24 hours in PROD
         gcTime: 24 * 60 * 60 * 1000, // 24 hours
         refetchOnWindowFocus: false,
     });

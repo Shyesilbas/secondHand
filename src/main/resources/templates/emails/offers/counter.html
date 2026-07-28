@@ -1,44 +1,163 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${headerTitle}">Karşı Teklif Teklifi Aldınız</title>
     <style>
-        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #1e293b; -webkit-font-smoothing: antialiased; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02); border: 1px solid #e2e8f0; }
-        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 36px 32px; text-align: center; color: #ffffff; border-bottom: 3px solid #059669; }
-        .brand-badge { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; background-color: #059669; border-radius: 12px; color: #ffffff; font-weight: 900; font-size: 20px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
-        .brand-name { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #10b981; margin-bottom: 6px; }
-        .header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; }
-        .content { padding: 36px; line-height: 1.6; color: #334155; }
-        .content p { margin: 0 0 16px 0; font-size: 15px; }
-        .highlight { font-weight: 800; color: #059669; }
-        .footer { background-color: #f8fafc; padding: 28px 32px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; font-weight: 500; }
-        .button { display: inline-block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 800; font-size: 14px; margin-top: 16px; box-shadow: 0 6px 16px rgba(5, 150, 105, 0.25); letter-spacing: 0.5px; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f1f5f9;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 24px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .content {
+            padding: 32px;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .offer-box {
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 24px 0;
+            background-color: #f5f3ff;
+        }
+
+        .offer-box h2 {
+            color: #4338ca;
+            margin: 0 0 8px 0;
+            font-size: 28px;
+        }
+
+        .listing-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #1e293b;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .footer {
+            background-color: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
-            <div class="brand-badge">🔄</div>
-            <div class="brand-name">SECONDHAND KARŞI TEKLİF</div>
-            <h1 th:text="${headerTitle}">Karşı Teklif Geldi!</h1>
+            <h1 th:text="${headerTitle}">Yeni Bir Teklif Aldınız!</h1>
         </div>
         <div class="content">
             <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
-            <div th:utext="${message}" style="white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #334155; margin-bottom: 16px;">Mesaj içeriği burada yer alacak.</div>
-            
-            <p th:if="${actionUrl != null}">
-                <a th:href="${actionUrl}" class="button" th:text="${actionText != null ? actionText : 'Karşı Teklifi İncele'}">Karşı Teklifi İncele</a>
-            </p>
-            
-            <p style="margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 14px; color: #475569;" th:utext="#{email.body.team}">Saygılarımızla,<br><strong style="color: #0f172a;">SecondHand Ekibi</strong></p>
+            <p th:text="${headline}">İlanınız için yeni bir teklif geldi.</p>
+
+            <div class="listing-title" th:text="${listingTitle}">Ürün Adı</div>
+
+            <div class="offer-box">
+                <h2 th:text="${totalPrice}">0.00 TL</h2>
+                <span th:if="${quantity > 1}" style="color: #64748b; font-size: 14px;">Birim Fiyat: <span
+                        th:text="${unitPrice}">0.00 TL</span></span>
+            </div>
+
+            <div class="detail-row">
+                <span style="color: #64748b;">Miktar:</span>
+                <strong th:text="${quantity}">1</strong>
+            </div>
+            <div class="detail-row" th:if="${expiresAt != null}">
+                <span style="color: #64748b;">Geçerlilik Süresi:</span>
+                <strong th:text="${expiresAt}">...</strong>
+            </div>
+
+            <p th:if="${nextStep != null}" style="margin-top: 24px; font-weight: 600; color: #4338ca;"
+                th:text="${nextStep}">Sıradaki adım...</p>
+
+            <p style="margin-top: 32px;" th:utext="#{email.body.team}">Saygılarımızla,<br>SecondHand Ekibi</p>
         </div>
         <div class="footer">
-            &copy; 2026 SecondHand Pazaryeri. Tüm hakları saklıdır.<br>
-            <span style="font-size: 11px; color: #94a3b8; display: inline-block; margin-top: 6px;">Güvenli Alışveriş ve İkinci El Pazaryeri Platformu</span>
+            &copy; 2026 SecondHand. Tüm hakları saklıdır.
         </div>
     </div>
 </body>
+
+</html>
+<span class="detail-value" th:text="${listingTitle}">İlan Adı</span>
+</div>
+<div class="detail-row" th:if="${quantity != null && quantity > 0}">
+    <span class="detail-label">Adet:</span>
+    <span class="detail-value" th:text="${quantity}">1</span>
+</div>
+<div class="detail-row" th:if="${totalPrice != null && !#strings.isEmpty(totalPrice)}"
+    style="border-bottom: none; padding-bottom: 0;">
+    <span class="detail-label" style="font-weight: 800; color: #0f172a;">Yeni Karşı Teklif Tutarı:</span>
+    <span class="detail-value highlight" th:text="${totalPrice}">0.00 TL</span>
+</div>
+</div>
+
+<div th:if="${message != null && !#strings.isEmpty(message)}" th:utext="${message}"
+    style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 16px;"></div>
+
+<p th:if="${actionUrl != null}">
+    <a th:href="${actionUrl}" class="button" th:text="${actionText != null ? actionText : 'Karşı Teklifi İncele'}">Karşı
+        Teklifi İncele</a>
+</p>
+
+<p style="margin-top: 32px; border-top: 1px solid #f1f5f9; padding-top: 20px; font-size: 14px; color: #475569;"
+    th:utext="#{email.body.team}">Saygılarımızla,<br><strong style="color: #0f172a;">SecondHand Ekibi</strong></p>
+</div>
+<div class="footer">
+    &copy; 2026 SecondHand Pazaryeri. Tüm hakları saklıdır.<br>
+    <span style="font-size: 11px; color: #94a3b8; display: inline-block; margin-top: 6px;">Güvenli Alışveriş ve İkinci
+        El Pazaryeri Platformu</span>
+</div>
+</div>
+</body>
+
 </html>

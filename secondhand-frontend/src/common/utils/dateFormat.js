@@ -1,10 +1,6 @@
-import i18n from '../../i18n';
+/** Merkezi tarih formatı — tr-TR; forum / yorum vb. tek kaynak */
 
-const getLocale = (overrideLocale) => {
-  if (overrideLocale) return overrideLocale;
-  const currentLng = i18n?.language || 'tr';
-  return currentLng.startsWith('tr') ? 'tr-TR' : 'en-US';
-};
+const DEFAULT_LOCALE = 'tr-TR';
 
 const toDate = (value) => {
   if (value == null) return null;
@@ -13,10 +9,10 @@ const toDate = (value) => {
 };
 
 /** Örn. 08 May 2025 */
-export const formatShortDate = (value, locale) => {
+export const formatShortDate = (value) => {
   const d = toDate(value);
   if (!d) return '';
-  return d.toLocaleDateString(getLocale(locale), {
+  return d.toLocaleDateString(DEFAULT_LOCALE, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -24,10 +20,10 @@ export const formatShortDate = (value, locale) => {
 };
 
 /** Kısa tarih + saat */
-export const formatShortDateTime = (value, locale) => {
+export const formatShortDateTime = (value) => {
   const d = toDate(value);
   if (!d) return '';
-  return d.toLocaleString(getLocale(locale), {
+  return d.toLocaleString(DEFAULT_LOCALE, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -37,37 +33,12 @@ export const formatShortDateTime = (value, locale) => {
 };
 
 /** Uzun tarih (yorumlar) */
-export const formatLongDate = (value, locale) => {
+export const formatLongDate = (value) => {
   const d = toDate(value);
   if (!d) return '';
-  return d.toLocaleDateString(getLocale(locale), {
+  return d.toLocaleDateString(DEFAULT_LOCALE, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-};
-
-/** Otomatik GG/AA/YYYY slash formatlama (Girdi alanları için) */
-export const formatBirthdateInput = (value, prevValue = '') => {
-  if (!value) return '';
-  const isDeleting = value.length < prevValue.length;
-
-  if (isDeleting) {
-    if (prevValue.endsWith('/') && value.length === prevValue.length - 1) {
-      return value.slice(0, -1);
-    }
-    return value;
-  }
-
-  const clean = value.replace(/\D/g, '').substring(0, 8);
-  const day = clean.substring(0, 2);
-  const month = clean.substring(2, 4);
-  const year = clean.substring(4, 8);
-
-  if (clean.length > 4) {
-    return `${day}/${month}/${year}`;
-  } else if (clean.length > 2) {
-    return `${day}/${month}`;
-  }
-  return clean;
 };

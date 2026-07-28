@@ -1,7 +1,7 @@
 import apiClient from './config.js';
-import {clearUser} from '../storage/tokenStorage.js';
+import { clearUser } from '../storage/tokenStorage.js';
 import axios from "axios";
-import {API_BASE_URL, API_ENDPOINTS} from '../../constants/apiEndpoints.js';
+import { API_BASE_URL, API_ENDPOINTS } from '../../constants/apiEndpoints.js';
 import logger from '../../utils/logger.js';
 
 let isRefreshing = false;
@@ -42,7 +42,7 @@ apiClient.interceptors.request.use(
                 .split('; ')
                 .find(row => row.startsWith('XSRF-TOKEN='))
                 ?.split('=')[1];
-            
+
             if (csrfToken) {
                 config.headers['X-XSRF-TOKEN'] = csrfToken;
             }
@@ -62,11 +62,7 @@ apiClient.interceptors.response.use(
 
         // Enrich error object - extract messages from backend
         if (errorData) {
-            const realMessage = errorData.detail || errorData.message || (typeof errorData.error === 'string' ? errorData.error : null);
-            if (realMessage) {
-                error.message = realMessage;
-            }
-            error.userMessage = realMessage || null;
+            error.userMessage = errorData.detail || errorData.message || null;
             error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
             error.validationErrors = errorData.validationErrors ?? errorData.errors;
             error.errorDetails = {
@@ -101,7 +97,7 @@ apiClient.interceptors.response.use(
 
         // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
         if (status === 401 && !originalRequest._retry) {
-            
+
             if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
                 return Promise.reject(error);
             }
@@ -124,13 +120,13 @@ apiClient.interceptors.response.use(
 
             try {
                 const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-                    {},                     {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        withCredentials: true,                         timeout: 10000
-                    }
+                    {}, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    withCredentials: true, timeout: 10000
+                }
                 );
 
                 const newAccessToken = response.data?.data?.accessToken;

@@ -2,15 +2,15 @@ import { ListingDTO } from '../listing/types/index.js';
 
 
 export const RealEstateCreateRequestDTO = {
-    title: '',
+  title: '',
   description: '',
   price: 0,
   currency: 'TRY',
   city: '',
   district: '',
   imageUrl: '',
-  
-    adTypeId: '',
+
+  adTypeId: '',
   realEstateTypeId: '',
   heatingTypeId: '',
   ownerTypeId: '',
@@ -27,7 +27,7 @@ export const RealEstateCreateRequestDTO = {
 export const RealEstateListingDTO = {
   ...ListingDTO,
   imageUrl: '',
-    adType: null,
+  adType: null,
   realEstateType: null,
   heatingType: null,
   ownerType: null,
@@ -48,8 +48,8 @@ export const RealEstateSearchFiltersDTO = {
   minPrice: 0,
   maxPrice: 0,
   currency: 'TRY',
-  
-    adTypeId: '',
+
+  adTypeId: '',
   realEstateTypeIds: [],
   heatingTypeIds: [],
   ownerTypeId: '',
@@ -64,16 +64,15 @@ export const RealEstateSearchFiltersDTO = {
   maxBuildingAge: 0,
   furnished: false,
   zoningStatus: '',
-  
-    sortBy: 'createdAt',
+
+  sortBy: 'createdAt',
   sortDirection: 'DESC',
-  
-    page: 0,
+
+  page: 0,
   size: 20,
 };
 
 export const createRealEstateCreateRequest = (data) => {
-  const zoningVal = (data.zoningStatusKey || data.zoningStatus || '').trim() || null;
   return {
     base: {
       title: (data.title || '').trim(),
@@ -88,7 +87,7 @@ export const createRealEstateCreateRequest = (data) => {
       imageUrl: data.imageUrl || undefined,
       allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
     },
-    
+
     adTypeId: data.adTypeId || null,
     realEstateTypeId: data.realEstateTypeId || null,
     heatingTypeId: data.heatingTypeId || null,
@@ -99,14 +98,13 @@ export const createRealEstateCreateRequest = (data) => {
     floor: parseInt(data.floor) || 0,
     buildingAge: parseInt(data.buildingAge) || 0,
     furnished: Boolean(data.furnished),
-    zoningStatus: zoningVal,
-    zoningStatusKey: zoningVal,
+    zoningStatus: (data.zoningStatus || '').trim() || null,
   };
 };
 
 export const createRealEstateUpdateRequest = (data) => {
   const updateData = {};
-  
+
   const base = {};
   if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
   if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
@@ -129,15 +127,8 @@ export const createRealEstateUpdateRequest = (data) => {
   if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
   if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
   if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
-  if (data.zoningStatus !== undefined && data.zoningStatus !== '') {
-    const val = data.zoningStatus.trim();
-    updateData.zoningStatus = val;
-    updateData.zoningStatusKey = val;
-  }
-  if (data.zoningStatusKey !== undefined && data.zoningStatusKey !== '') {
-    updateData.zoningStatusKey = data.zoningStatusKey.trim();
-  }
+  if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
   if (Object.keys(base).length > 0) updateData.base = base;
-  
+
   return updateData;
 };
