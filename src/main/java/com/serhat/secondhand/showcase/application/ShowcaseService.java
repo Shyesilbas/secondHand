@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -215,5 +216,34 @@ public class ShowcaseService implements IShowcaseService {
                 showcaseConfig.getFee().getTax(),
                 showcaseConfig.getBulkDiscount().getListingThreshold(),
                 showcaseConfig.getBulkDiscount().getListingDiscountPercentage());
+    }
+
+    @Override
+    @Transactional
+    public Result<List<Showcase>> createBulkShowcase(Long userId, com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request) {
+        if (request.listingIds() == null || request.listingIds().isEmpty()) {
+            return Result.error("Listing IDs cannot be empty");
+        }
+
+        List<Showcase> createdShowcases = new ArrayList<>();
+        for (UUID listingId : request.listingIds()) {
+            ShowcasePaymentRequest singleRequest = new ShowcasePaymentRequest(
+                listingId,
+                request.days() != null ? request.days() : 1,
+                request.providerName(),
+                request.verificationCode(),
+                request.agreementsAccepted(),
+                request.acceptedAgreementIds(),
+                request.idempotencyKey()
+            );
+
+            Result<Showcase> singleResult = createShowcase(userId, singleRequest);
+            if (singleResult.isError()) {
+                return Result.error(singleResult.getMessage(), singleResult.getErrorCode());
+            }
+            createdShowcases.add(singleResult.getData());
+        }
+
+        return Result.success(createdShowcases);
     }
 }

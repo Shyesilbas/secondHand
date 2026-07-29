@@ -16,8 +16,8 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.offer.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +40,8 @@ public class ChatService {
     private final ChatNotificationService notificationService;
     private final ChatRoomUpdater chatRoomUpdater;
     private final ChatAuthorizationService chatAuthorizationService;
+    private final com.serhat.secondhand.offer.application.IOfferService offerService;
+    private final com.serhat.secondhand.offer.repository.OfferRepository offerRepository;
 
     @Transactional(readOnly = true)
     public List<ChatRoomDto> getUserChatRooms(Long userId) {
@@ -258,7 +260,84 @@ public class ChatService {
         }
         return messageRepository
                 .findByChatRoomIdOrderByCreatedAtDesc(roomId, pageable)
-                .map(chatMessageMapper::toDto);
+                .map(msg -> {
+                    ChatMessageDto dto = chatMessageMapper.toDto(msg);
+                    enrichOfferMessage(dto);
+                    return dto;
+                });
+    }
+
+    @Transactional
+    public ChatMessageDto sendInChatOffer(Long senderId, Long roomId, com.serhat.secondhand.chat.dto.SendInChatOfferRequest request) {
+        ChatRoom room = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
+
+        if (!room.getParticipantIds().contains(senderId)) {
+            throw new SecurityException("You are not a participant in this chat room.");
+        }
+
+        if (room.getListingId() == null) {
+            throw new IllegalArgumentException("Chat room is not associated with a listing.");
+        }
+
+        UUID listingId = UUID.fromString(room.getListingId());
+        Long recipientId = room.getParticipantIds().stream()
+                .filter(id -> !id.equals(senderId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Recipient not found in chat room."));
+
+        com.serhat.secondhand.offer.dto.CreateOfferRequest offerReq = com.serhat.secondhand.offer.dto.CreateOfferRequest.builder()
+                .listingId(listingId)
+                .quantity(request.getQuantity() != null ? request.getQuantity() : 1)
+                .totalPrice(request.getOfferedPrice())
+                .build();
+
+        Result<com.serhat.secondhand.offer.dto.OfferDto> offerResult = offerService.create(senderId, offerReq);
+        if (offerResult.isError()) {
+            throw new IllegalArgumentException(offerResult.getMessage());
+        }
+
+        com.serhat.secondhand.offer.dto.OfferDto offerDto = offerResult.getData();
+
+        User sender = userService.findById(senderId).getData();
+        User recipient = userService.findById(recipientId).getData();
+
+        Message msg = new Message();
+        msg.setChatRoomId(roomId);
+        msg.setSender(sender);
+        msg.setRecipient(recipient);
+        msg.setMessageType(Message.MessageType.OFFER);
+        msg.setOfferId(offerDto.getId());
+        msg.setContent("Teklif verildi: " + request.getOfferedPrice() + " TL");
+        msg.setIsRead(false);
+
+        Message savedMsg = messageRepository.save(msg);
+        chatRoomUpdater.updateLastMessage(roomId);
+
+        ChatMessageDto dto = chatMessageMapper.toDto(savedMsg);
+        dto.setListingTitle(offerDto.getListingTitle());
+        dto.setOfferPrice(offerDto.getTotalPrice());
+        dto.setListingUnitPrice(offerDto.getListingUnitPrice());
+        dto.setOfferQuantity(offerDto.getQuantity());
+        dto.setOfferStatus(offerDto.getStatus() != null ? offerDto.getStatus().name() : "PENDING");
+        dto.setOfferExpiresAt(offerDto.getExpiresAt());
+
+        notificationService.sendMessage(dto);
+        return dto;
+    }
+
+    private void enrichOfferMessage(ChatMessageDto dto) {
+        if (dto.getOfferId() == null) return;
+        offerRepository.findById(dto.getOfferId()).ifPresent(offer -> {
+            dto.setOfferPrice(offer.getTotalPrice());
+            if (offer.getListing() != null) {
+                dto.setListingTitle(offer.getListing().getTitle());
+                dto.setListingUnitPrice(offer.getListing().getPrice());
+            }
+            dto.setOfferQuantity(offer.getQuantity());
+            dto.setOfferStatus(offer.getStatus() != null ? offer.getStatus().name() : "PENDING");
+            dto.setOfferExpiresAt(offer.getExpiresAt());
+        });
     }
 
     @Transactional(readOnly = true)

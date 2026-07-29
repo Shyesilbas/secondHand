@@ -31,9 +31,9 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @org.hibernate.annotations.BatchSize(size = 20)
 @Table(name = "users", indexes = {
-    @Index(name = "idx_user_email", columnList = "email"),
-    @Index(name = "idx_user_phone", columnList = "phone"),
-    @Index(name = "idx_user_status", columnList = "acc_status")
+        @Index(name = "idx_user_email", columnList = "email"),
+        @Index(name = "idx_user_phone", columnList = "phone"),
+        @Index(name = "idx_user_status", columnList = "acc_status")
 })
 public class User implements UserDetails {
 
@@ -80,13 +80,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean accountVerified;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "acc_status", nullable = false)
     private AccountStatus accountStatus;
 
-    // Yetki seviyesi: USER (varsayılan) veya ADMIN. Yönetimsel uçlarda hasRole('ADMIN') ile kontrol edilir.
-    // Mevcut satırların ddl-auto:update sırasında otomatik dolması için DB tarafında DEFAULT 'USER' uygulanır.
     @Enumerated(EnumType.STRING)
     @Column(name = "role", length = 16)
     @org.hibernate.annotations.ColumnDefault("'USER'")
@@ -109,7 +106,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Token> tokens = new ArrayList<>();
-    
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Verification> verifications = new ArrayList<>();
@@ -130,7 +127,10 @@ public class User implements UserDetails {
     @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
 
-    /** Great Seller uygunluk geçişi; null = migrasyon/ilk değerlendirme (bildirim gönderilmez). */
+    /**
+     * Great Seller uygunluk geçişi; null = migrasyon/ilk değerlendirme (bildirim
+     * gönderilmez).
+     */
     @Column(name = "great_seller_eligible_snapshot")
     private Boolean greatSellerEligibleSnapshot;
 
@@ -170,7 +170,6 @@ public class User implements UserDetails {
     public MembershipPlan getEffectivePlan() {
         return isPremium() ? MembershipPlan.PREMIUM : MembershipPlan.FREE;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {

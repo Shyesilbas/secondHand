@@ -140,4 +140,14 @@ public class FavoriteController {
         Long userId = currentUser != null ? currentUser.getId() : null;
         return ResultResponses.ok(favoriteService.getTopFavoritedListingsWithDetails(resolvedSize, userId));
     }
+
+    @PostMapping("/listings/{listing-id}/broadcast-offer")
+    @Operation(summary = "Broadcast private offer to favoriters", description = "Seller sends a special discounted offer to all users who favorited this listing")
+    public ResponseEntity<?> broadcastOfferToFavoriters(
+            @PathVariable("listing-id") UUID listingId,
+            @Valid @RequestBody com.serhat.secondhand.favorite.domain.dto.FavoriterBroadcastRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Seller {} broadcasting offer for listing {} with price {}", currentUser.getId(), listingId, request.getDiscountedPrice());
+        return ResultResponses.ok(favoriteService.broadcastOfferToFavoriters(currentUser.getId(), listingId, request));
+    }
 }

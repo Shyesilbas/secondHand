@@ -36,6 +36,9 @@ public class Message {
     @Column(name = "chat_room_id", nullable = false)
     private Long chatRoomId;
     
+    @Column(name = "offer_id")
+    private java.util.UUID offerId;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type", nullable = false)
     private MessageType messageType;
@@ -50,6 +53,7 @@ public class Message {
     public enum MessageType {
         TEXT,
         IMAGE,
-        FILE
+        FILE,
+        OFFER
     }
 }

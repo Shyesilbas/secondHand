@@ -1408,14 +1408,3 @@
   "average_market_price": "Ortalama Piyasa Fiyatı",
   "average": "Ortalama"
 }
-  "saving": "Kaydediliyor...",
-"code_and_qr_verification_desc": "Buluşma anında alıcı kendi ekranındaki 5 dakikalık dynamic QR kodu veya 6 haneli PIN kodunu satıcıya gösterir. Satıcı kodu girerek teslimatı sisteme anında kaydeder.",
-"dual_approval_and_wallet_transfer": "Çift Onay & Cüzdana Aktarım",
-"dual_approval_desc": "Teslimat yapıldıktan sonra iki taraf da 'Ürünü elden teslim aldım/ettim' onay kutularını işaretleyip işlemi tamamlar. Escrow'daki para anında satıcının cüzdanına (wallet) aktarılır.",
-"order_placed_successfully": "Siparişiniz başarıyla oluşturuldu",
-"payment_complete_getting_ready": "Ödemeniz alındı. Siparişiniz hazırlanıyor.",
-"average_price": "Ortalama Fiyat",
-"current_item_price": "Mevcut Ürün Fiyatı",
-"average_market_price": "Ortalama Piyasa Fiyatı",
-"average": "Ortalama"
-}

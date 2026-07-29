@@ -42,6 +42,10 @@ export const chatService = {
 
     deleteMessage: async (messageId) => {
         return del(API_ENDPOINTS.CHAT.DELETE_MESSAGE(messageId));
+    },
+
+    sendInChatOffer: async (chatRoomId, offerData) => {
+        return post(`/api/v1/chats/rooms/${chatRoomId}/offers`, offerData);
     }
 
 };

@@ -50,6 +50,8 @@ public class FavoriteService {
     private final IUserService userService;
     private final NotificationTemplateCatalog notificationTemplateCatalog;
     private final NotificationEventPublisher notificationEventPublisher;
+    private final com.serhat.secondhand.chat.application.ChatService chatService;
+    private final com.serhat.secondhand.offer.application.IOfferService offerService;
 
 
     @Transactional
@@ -275,5 +277,67 @@ public class FavoriteService {
             return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
         return Result.success(userResult.getData());
+    }
+
+    @Transactional
+    public Result<com.serhat.secondhand.favorite.domain.dto.FavoriterBroadcastResponseDto> broadcastOfferToFavoriters(
+            Long sellerId, UUID listingId, com.serhat.secondhand.favorite.domain.dto.FavoriterBroadcastRequest request) {
+
+        Listing listing = listingRepository.findById(listingId).orElse(null);
+        if (listing == null) {
+            return Result.error("İlan bulunamadı.");
+        }
+
+        if (!listing.getSeller().getId().equals(sellerId)) {
+            return Result.error("Bu işlem için yetkiniz yok.");
+        }
+
+        List<User> favoriters = favoriteRepository.findUsersByListingId(listingId);
+        if (favoriters != null) {
+            favoriters = new java.util.ArrayList<>(favoriters);
+            favoriters.removeIf(u -> u.getId().equals(sellerId));
+        } else {
+            favoriters = java.util.Collections.emptyList();
+        }
+
+        if (favoriters.isEmpty()) {
+            return Result.success(com.serhat.secondhand.favorite.domain.dto.FavoriterBroadcastResponseDto.builder()
+                    .listingId(listingId)
+                    .favoriterCount(0)
+                    .broadcastCount(0)
+                    .message("Bu ilanı favorileyen alıcı bulunmuyor.")
+                    .build());
+        }
+
+        int successCount = 0;
+        for (User favoriter : favoriters) {
+            try {
+                var chatRoomDto = chatService.createOrGetListingChat(favoriter.getId(), listingId.toString(), listing.getTitle());
+                var offerResult = offerService.createSellerOffer(sellerId, favoriter.getId(), listingId, request.getDiscountedPrice(), request.getExpirationHours() != null ? request.getExpirationHours() : 48);
+
+                if (offerResult.isSuccess()) {
+                    var offerDto = offerResult.getData();
+                    com.serhat.secondhand.chat.dto.ChatMessageDto msgDto = new com.serhat.secondhand.chat.dto.ChatMessageDto();
+                    msgDto.setChatRoomId(chatRoomDto.getId());
+                    msgDto.setSenderId(sellerId);
+                    msgDto.setRecipientId(favoriter.getId());
+                    msgDto.setMessageType("OFFER");
+                    msgDto.setOfferId(offerDto.getId());
+                    msgDto.setContent("Satıcı favorilediğiniz '" + listing.getTitle() + "' ilanı için size özel " + request.getDiscountedPrice() + " TL teklif yaptı!");
+
+                    chatService.sendMessage(msgDto);
+                    successCount++;
+                }
+            } catch (Exception e) {
+                log.error("Failed to broadcast offer to favoriter userId {}", favoriter.getId(), e);
+            }
+        }
+
+        return Result.success(com.serhat.secondhand.favorite.domain.dto.FavoriterBroadcastResponseDto.builder()
+                .listingId(listingId)
+                .favoriterCount(favoriters.size())
+                .broadcastCount(successCount)
+                .message(successCount + " favorileyen kullanıcıya özel teklif başarıyla gönderildi.")
+                .build());
     }
 }

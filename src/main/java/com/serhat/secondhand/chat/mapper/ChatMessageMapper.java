@@ -15,7 +15,16 @@ public class ChatMessageMapper {
         message.setRecipient(recipient);
         message.setContent(dto.getContent());
         message.setIsRead(false);
-        message.setMessageType(Message.MessageType.TEXT);
+        message.setOfferId(dto.getOfferId());
+        if (dto.getMessageType() != null) {
+            try {
+                message.setMessageType(Message.MessageType.valueOf(dto.getMessageType()));
+            } catch (Exception e) {
+                message.setMessageType(Message.MessageType.TEXT);
+            }
+        } else {
+            message.setMessageType(Message.MessageType.TEXT);
+        }
         return message;
     }
 
@@ -26,6 +35,8 @@ public class ChatMessageMapper {
         dto.setSenderId(message.getSender().getId());
         dto.setRecipientId(message.getRecipient().getId());
         dto.setContent(message.getContent());
+        dto.setMessageType(message.getMessageType() != null ? message.getMessageType().name() : "TEXT");
+        dto.setOfferId(message.getOfferId());
         dto.setRead(message.getIsRead());
         dto.setCreatedAt(message.getCreatedAt());
         return dto;

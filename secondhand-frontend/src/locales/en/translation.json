@@ -1408,14 +1408,3 @@
   "average_market_price": "Average Market Price",
   "average": "Average"
 }
-  "saving": "Saving...",
-"code_and_qr_verification_desc": "At meetup, buyer displays dynamic QR or 6-digit PIN code to seller for instant verification.",
-"dual_approval_and_wallet_transfer": "Dual Approval & Wallet Transfer",
-"dual_approval_desc": "After handover, both parties check confirmation boxes to complete the deal and release funds to seller wallet.",
-"order_placed_successfully": "Your order was placed successfully",
-"payment_complete_getting_ready": "Payment complete. We are getting your order ready.",
-"average_price": "Average Price",
-"current_item_price": "Current Item Price",
-"average_market_price": "Average Market Price",
-"average": "Average"
-}

@@ -316,4 +316,41 @@ public class OfferService implements IOfferService {
         }
         return offerValidator.validateListingStockForOffer(offer.getListing(), offer.getQuantity());
     }
+
+    @Override
+    @Transactional
+    public Result<OfferDto> createSellerOffer(Long sellerId, Long buyerId, UUID listingId, java.math.BigDecimal price, int expirationHours) {
+        Result<User> sellerResult = findUser(sellerId);
+        if (sellerResult.isError()) return sellerResult.propagateError();
+        User seller = sellerResult.getData();
+
+        Result<User> buyerResult = findUser(buyerId);
+        if (buyerResult.isError()) return buyerResult.propagateError();
+        User buyer = buyerResult.getData();
+
+        Listing listing = listingService.findById(listingId).orElse(null);
+        if (listing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+
+        Offer offer = Offer.builder()
+                .listing(listing)
+                .seller(seller)
+                .buyer(buyer)
+                .quantity(1)
+                .totalPrice(price)
+                .status(OfferStatus.PENDING)
+                .createdBy(com.serhat.secondhand.offer.entity.OfferActor.SELLER)
+                .expiresAt(LocalDateTime.now().plusHours(expirationHours > 0 ? expirationHours : 48))
+                .build();
+
+        Offer saved;
+        try {
+            saved = offerRepository.save(offer);
+        } catch (ObjectOptimisticLockingFailureException ex) {
+            log.warn("Concurrent create seller offer conflict for listing {}", listingId, ex);
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
+        }
+
+        offerEmailNotificationService.notifyCounterReceived(saved);
+        return Result.success(offerMapper.toDto(saved));
+    }
 }

@@ -4,16 +4,28 @@ import { Trash2 as TrashIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { sameChatId } from '../chatIdUtils.js';
+import { InChatOfferCard } from './InChatOfferCard.jsx';
+
 const MessageBubble = memo(({
   message,
   isOwnMessage,
-  onDeleteMessage
+  onDeleteMessage,
+  currentUserId
 }) => {
   const { t } = useTranslation();
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const handleDeleteClick = () => {
     onDeleteMessage(message.id);
   };
+
+  if (message.messageType === 'OFFER') {
+    return (
+      <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
+        <InChatOfferCard message={message} currentUserId={currentUserId} />
+      </div>
+    );
+  }
+
   return <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
       <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl relative group shadow-sm transition-all duration-300 ease-in-out ${isOwnMessage ? 'bg-slate-900 text-white rounded-br-sm' : 'bg-background-primary text-slate-800 border border-border-light/60 rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
         <p className="text-sm break-words leading-relaxed tracking-tight">{message.content}</p>

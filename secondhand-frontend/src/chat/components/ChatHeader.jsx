@@ -10,7 +10,8 @@ const ChatHeader = ({
   isConnected,
   onClose,
   onDeleteConversation,
-  onConversationDeleted
+  onConversationDeleted,
+  onOpenOfferModal
 }) => {
   const {
     t
@@ -62,6 +63,16 @@ const ChatHeader = ({
         </div>
       </div>
       <div className="flex items-center space-x-2">
+        {selectedChatRoom?.listingId && onOpenOfferModal && (
+          <button
+            type="button"
+            onClick={onOpenOfferModal}
+            className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800 transition-all active:scale-95"
+            title={t('make_offer', 'Teklif Yap')}
+          >
+            🏷️ {t('offer', 'Teklif Yap')}
+          </button>
+        )}
         {onDeleteConversation && <div className="relative">
           <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-slate-600 hover:text-text-primary hover:bg-slate-100/50 transition-all duration-300 ease-in-out p-2 rounded-xl" title={t("options")}>
             <EllipsisVerticalIcon className="w-5 h-5" />

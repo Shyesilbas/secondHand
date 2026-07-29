@@ -24,4 +24,8 @@ export const favoriteService = {
     return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES, { params: { page, size } });
   },
 
+  broadcastOfferToFavoriters: async (listingId, broadcastData) => {
+    return post(`/api/v1/favorites/listings/${listingId}/broadcast-offer`, broadcastData);
+  }
+
 };

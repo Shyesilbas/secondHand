@@ -73,6 +73,19 @@ public class ChatRestController {
         return ResponseEntity.ok(sentMessage);
     }
 
+    @PostMapping("/rooms/{chat-room-id}/offers")
+    public ResponseEntity<?> sendInChatOffer(
+            @PathVariable("chat-room-id") Long chatRoomId,
+            @Valid @RequestBody com.serhat.secondhand.chat.dto.SendInChatOfferRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        log.info("Sending in-chat offer - sender: {}, room: {}, price: {}",
+                currentUser.getId(), chatRoomId, request.getOfferedPrice());
+        ChatMessageDto result = chatService.sendInChatOffer(currentUser.getId(), chatRoomId, request);
+        return com.serhat.secondhand.core.result.ResultResponses.ok(
+                com.serhat.secondhand.core.result.Result.success(result)
+        );
+    }
+
     @GetMapping("/rooms/{chat-room-id}/messages")
     public ResponseEntity<Page<ChatMessageDto>> getChatMessages(
             @PathVariable("chat-room-id") Long chatRoomId,
