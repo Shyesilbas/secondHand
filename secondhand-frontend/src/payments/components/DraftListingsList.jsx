@@ -1,80 +1,118 @@
+import React from 'react';
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from 'framer-motion';
 import ListingCardActions from '../../listing/components/ListingCardActions.jsx';
 import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
+
 const DraftListingsList = ({
-  listings,
+  listings = [],
   selectedListing,
   onSelectListing,
   onListingChanged
 }) => {
-  const {
-    t
-  } = useTranslation();
-    return (
-        <div className="lg:col-span-7 xl:col-span-8">
-            <div className="rounded-2xl border border-white/60 bg-background-primary/70 backdrop-blur-xl px-6 py-8 shadow-sm">
-                <div className="mb-4 flex items-baseline justify-between">
-                    <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("draft_listings")}</h2>
-                    <span className="text-xs text-slate-500">
-                        {listings.length}{t("draft")}{listings.length === 1 ? '' : 's'}
-                    </span>
-                </div>
-                    <div className="space-y-4">
-                        {listings.map(listing => {
-                            const isSelected = selectedListing?.id === listing.id;
-                            return (
-                                <div 
-                                    key={listing.id} 
-                                    onClick={() => onSelectListing(listing)}
-                                    className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 ease-out border overflow-hidden
-                                        ${isSelected 
-                                            ? 'border-primary bg-indigo-50/30 shadow-sm -translate-y-0.5' 
-                                            : 'border-border-light bg-background-primary hover:border-primary hover:shadow-md hover:-translate-y-0.5'
-                                        }`}
-                                >
-                                    {isSelected && (
-                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-                                    )}
-                                    <div className="relative flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <h3 className={`text-sm font-medium text-text-primary mb-2 tracking-tight transition-colors ${isSelected ? '' : ''}`}>
-                                                {listing.title}
-                                            </h3>
-                                            <p className="mb-3 line-clamp-2 text-sm text-slate-500 leading-relaxed">
-                                                {listing.description}
-                                            </p>
-                                            <div className="flex items-center space-x-3 text-sm text-slate-500">
-                                                <span className="font-mono tracking-tight font-medium text-slate-700 bg-slate-100/80 px-2 py-0.5 rounded-md">
-                                                    {formatPaymentAmount(listing.price, listing.currency)}
-                                                </span>
-                                                <span className="text-slate-300">•</span>
-                                                <span className="truncate max-w-[120px] font-medium">{listing.city}</span>
-                                                <span className="text-slate-300">•</span>
-                                                <span className="rounded-full bg-status-warning-bg/50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-500/20">
-                                                    {t("draft")}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="ml-4 flex flex-col items-end gap-3">
-                                            <div className={`flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors duration-300 ${isSelected ? 'border-primary bg-primary shadow-sm shadow-indigo-200' : 'border-slate-300 bg-slate-50'}`}>
-                                                {isSelected && (
-                                                    <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                )}
-                                            </div>
-                                            <div onClick={(e) => e.stopPropagation()}>
-                                                <ListingCardActions listing={listing} onChanged={onListingChanged} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-            </div>
+  const { t } = useTranslation();
+
+  return (
+    <div className="lg:col-span-7 xl:col-span-7 space-y-4">
+      {/* Section Header */}
+      <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <span>{t("draft_listings")}</span>
+            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100/80 text-emerald-800 border border-emerald-200/60">
+              {listings.length}
+            </span>
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {t("choose_a_listing_to_pay_the_listing_fee")}
+          </p>
         </div>
-    );
+      </div>
+
+      {/* Draft Item Cards */}
+      <div className="space-y-3">
+        <AnimatePresence mode="popLayout">
+          {listings.map((listing, index) => {
+            const isSelected = selectedListing?.id === listing.id;
+
+            return (
+              <motion.div
+                key={listing.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.25, delay: index * 0.04 }}
+                onClick={() => onSelectListing(listing)}
+                className={`group relative rounded-2xl p-4 cursor-pointer transition-all duration-200 border ${
+                  isSelected
+                    ? 'border-emerald-500 bg-white shadow-md ring-2 ring-emerald-500/20'
+                    : 'border-slate-200/80 bg-white hover:border-emerald-300 hover:shadow-sm'
+                }`}
+              >
+                <div className="flex items-start gap-3.5">
+                  {/* Radio Selector Icon */}
+                  <div className="pt-0.5 flex-shrink-0">
+                    <div
+                      className={`h-5 w-5 rounded-full border flex items-center justify-center transition-all ${
+                        isSelected
+                          ? 'border-emerald-600 bg-emerald-600 shadow-sm'
+                          : 'border-slate-300 bg-slate-50 group-hover:border-emerald-400'
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Main Listing Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                      <h3 className="text-sm font-bold text-slate-900 tracking-tight truncate group-hover:text-emerald-700 transition-colors">
+                        {listing.title}
+                      </h3>
+
+                      <span className="font-mono font-bold text-sm text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 flex-shrink-0">
+                        {formatPaymentAmount(listing.price, listing.currency)}
+                      </span>
+                    </div>
+
+                    {listing.description && (
+                      <p className="mb-2 line-clamp-1 text-xs text-slate-500 leading-relaxed">
+                        {listing.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                      {listing.city && (
+                        <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+                          {listing.city}
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold border border-amber-200/50">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                        {t("draft")}
+                      </span>
+                      <span className="ml-auto font-mono text-slate-400">
+                        #{listing.id ? listing.id.substring(0, 6).toUpperCase() : ''}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Context Actions */}
+                  <div className="flex-shrink-0 self-center" onClick={(e) => e.stopPropagation()}>
+                    <ListingCardActions listing={listing} onChanged={onListingChanged} />
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 };
+
 export default DraftListingsList;

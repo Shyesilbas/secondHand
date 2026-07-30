@@ -9,6 +9,7 @@ import HeaderNavLink from './header/HeaderNavLink.jsx';
 import HeaderAuthActions from './header/HeaderAuthActions.jsx';
 import HeaderGuestActions from './header/HeaderGuestActions.jsx';
 import LanguageSwitcher from './header/LanguageSwitcher.jsx';
+import CategorySubHeader from './header/CategorySubHeader.jsx';
 import { useHeaderScroll } from '../../hooks/useHeaderScroll.js';
 import { useDropdownManager } from '../../hooks/useDropdownManager.js';
 import { useClickOutside } from '../../hooks/useClickOutside.js';
@@ -106,6 +107,9 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* ── Direct Category Navigation SubHeader Bar ────────────────── */}
+                <CategorySubHeader />
             </header>
         </>;
 };

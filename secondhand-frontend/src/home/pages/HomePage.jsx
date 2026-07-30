@@ -1,34 +1,24 @@
-import { useTranslation } from "react-i18next";
 import React, { lazy, Suspense } from 'react';
 import { usePageTheme } from '../../common/theme/usePageTheme.js';
 import { HomePageTheme } from '../themes/index.js';
-import { HeroSection } from '../components/index.js';
 import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
+import RecentlyViewedSection from '../../listing/components/RecentlyViewedSection.jsx';
 
 // Lazy loaded components for optimized page load & clean structure
-const CategoryHub = lazy(() => import('../components/CategoryHub.jsx'));
 const ShowcaseSection = lazy(() => import('../components/ShowcaseSection.jsx'));
 const GreatSellersSection = lazy(() => import('../components/GreatSellersSection.jsx'));
 
 const HomePage = () => {
-  const { t } = useTranslation();
   usePageTheme(HomePageTheme);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col gap-8 pb-16">
-      {/* 1. Hero Section (Search & Showcase Stage) */}
-      <HeroSection />
+    <div className="min-h-screen bg-white flex flex-col gap-8 pt-4 pb-16">
+      {/* 1. Son Gezilen İlanlar (En Üstte - Eğer gezilen ilan varsa gösterilir) */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 w-full">
+        <RecentlyViewedSection />
+      </div>
 
-      {/* 2. Category Hub */}
-      <Suspense fallback={
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 animate-pulse">
-          <div className="h-20 bg-slate-100 rounded-2xl w-full" />
-        </div>
-      }>
-        <CategoryHub />
-      </Suspense>
-
-      {/* 3. Vitrin / Featured Showcase Listings */}
+      {/* 2. Vitrin / Featured Showcase Listings */}
       <Suspense fallback={
         <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
           <div className="h-8 bg-slate-100 rounded-lg w-1/4 mb-6 animate-pulse" />
@@ -38,7 +28,7 @@ const HomePage = () => {
         <ShowcaseSection />
       </Suspense>
 
-      {/* 4. Great Vetted Sellers */}
+      {/* 3. Güvenilir Satıcılar / Great Vetted Sellers */}
       <Suspense fallback={
         <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
           <div className="h-8 bg-slate-100 rounded-lg w-1/4 mb-6 animate-pulse" />

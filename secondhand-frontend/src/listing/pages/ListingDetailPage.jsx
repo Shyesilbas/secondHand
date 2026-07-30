@@ -48,6 +48,8 @@ import ListingReviewsSection from '../../reviews/components/ListingReviewsSectio
 import {optimizeCloudinaryUrl} from '../../common/utils/imageOptimizer.js';
 import {useActiveReservationCount} from '../../cart/hooks/useActiveReservationCount.js';
 import SafeMeetupPanel from '../components/SafeMeetupPanel.jsx';
+import RecentlyViewedSection from '../components/RecentlyViewedSection.jsx';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed.js';
 
 /* ── Helpers ─────────────────────────────────────────────── */
 
@@ -156,6 +158,15 @@ const ListingDetailPage = () => {
   useEffect(() => {
     setImageError(false);
   }, [selectedImageIndex]);
+
+  const { addRecentlyViewed } = useRecentlyViewed();
+
+  /* Save to recently viewed */
+  useEffect(() => {
+    if (listing?.id) {
+      addRecentlyViewed(listing);
+    }
+  }, [listing, addRecentlyViewed]);
 
   /* Track view */
   useEffect(() => {
@@ -567,6 +578,9 @@ const ListingDetailPage = () => {
         <div className="mt-10">
           <SimilarListings currentListing={listing} />
         </div>
+
+        {/* Recently Viewed Listings */}
+        <RecentlyViewedSection currentListingId={listing?.id} />
       </PageContainer>
 
       {/* ▸ Mobile Bottom Bar */}

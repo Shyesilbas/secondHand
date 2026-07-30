@@ -10,9 +10,9 @@ const ListingsPage = () => {
   } = useTranslation();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const categoryFromUrl = params.get('category');
+  const categoryFromUrl = params.get('category') || params.get('type');
 
-  /** Kategori yoksa prefiltreye yönlendirme yok: doğrudan grid. Filtre motoru `listingType` için VEHICLE varsayılanını kullanır; kategori seçimi Header → Categories. */
+  /** Kategori veya parametre değiştiğinde filtre motoru güncellenir */
   const engine = useListingEngine({
     initialListingType: categoryFromUrl || null,
     mode: 'browse'

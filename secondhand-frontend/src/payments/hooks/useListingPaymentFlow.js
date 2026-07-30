@@ -200,10 +200,15 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
       setCodeExpiryTime(null);
       setShowConfirmModal(false);
 
-      queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings }),
+        queryClient.invalidateQueries({ queryKey: ['ewallet'] }),
+        queryClient.invalidateQueries({ queryKey: ['payments'] }),
+        queryClient.invalidateQueries({ queryKey: ['myListings'] }),
+      ]);
 
       if (onSuccess) {
-        onSuccess();
+        await onSuccess();
       }
       return true;
     } catch (err) {
