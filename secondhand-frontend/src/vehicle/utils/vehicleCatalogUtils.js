@@ -6,11 +6,14 @@ export const getVehicleTypeName = (ctx) => {
   const typeId = ctx?.formData?.vehicleTypeId ?? ctx?.selection?.vehicleTypeId;
   if (!typeId) return '';
   const types = ctx?.enums?.vehicleTypes || [];
-  const found = types.find((t) => normalizeId(t?.id) === normalizeId(typeId));
-  return String(found?.name ?? '').toUpperCase();
+  const found = types.find((t) => normalizeId(t?.id || t?.value) === normalizeId(typeId));
+  return String(found?.name || found?.label || found?.value || '').toUpperCase();
 };
 
-export const isCarVehicle = (ctx) => getVehicleTypeName(ctx) === 'CAR';
+export const isCarVehicle = (ctx) => {
+  const name = getVehicleTypeName(ctx);
+  return ['CAR', 'OTOMOBİL', 'OTOMOBIL', 'AUTOMOBILE'].includes(name);
+};
 
 export const filterModels = (models, { typeId, brandId, bodyType } = {}) => {
   return (models || []).filter((m) => {

@@ -6,9 +6,9 @@ import {
   getBookFormatLabel,
   getBookConditionLabel
 } from '../enums/booksEnums.js';
-import { BookEnumContext } from './BookEnumContext.jsx';
+import { BooksEnumContext } from './BooksEnumContext.jsx';
 
-export const BookEnumProvider = ({ children, enums = {}, isLoading, error }) => {
+export const BooksEnumProvider = ({ children, enums = {}, isLoading, error }) => {
     const getBookTypeLabelMemo = useCallback(
         (value) => getBookTypeLabel(value, enums?.bookTypes || []),
         [enums?.bookTypes]
@@ -58,8 +58,8 @@ export const BookEnumProvider = ({ children, enums = {}, isLoading, error }) => 
     );
 
     return (
-        <BookEnumContext.Provider value={value}>
+        <BooksEnumContext.Provider value={value}>
             {children}
-        </BookEnumContext.Provider>
+        </BooksEnumContext.Provider>
     );
 };

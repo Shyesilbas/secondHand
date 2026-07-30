@@ -1,45 +1,15 @@
 {
   "types": [
-    {
-      "key": "DERS_KITABI",
-      "label": "Ders Kitabı"
-    },
-    {
-      "key": "TEST_KITABI",
-      "label": "Test Kitabı"
-    },
-    {
-      "key": "OKUMA_KITABI",
-      "label": "Okuma Kitabı"
-    },
-    {
-      "key": "DINI_KITAPLAR",
-      "label": "Dini Kitaplar"
-    },
-    {
-      "key": "COCUK_KITAPLARI",
-      "label": "Çocuk Kitapları"
-    },
-    {
-      "key": "AKADEMIK",
-      "label": "Akademik"
-    },
-    {
-      "key": "SINAV_HAZIRLIK",
-      "label": "Sınav Hazırlık"
-    },
-    {
-      "key": "KISISEL_GELISIM",
-      "label": "Kişisel Gelişim"
-    },
-    {
-      "key": "IS_VE_EKONOMI",
-      "label": "İş ve Ekonomi"
-    },
-    {
-      "key": "BILIM_VE_TEKNOLOJI",
-      "label": "Bilim ve Teknoloji"
-    }
+    { "key": "DERS_KITABI",       "label": "Ders Kitabı" },
+    { "key": "TEST_KITABI",       "label": "Test & Sınav Hazırlık Kitabı" },
+    { "key": "OKUMA_KITABI",      "label": "Roman & Edebiyat Kitabı" },
+    { "key": "DINI_KITAPLAR",     "label": "Dini & Manevi Kitaplar" },
+    { "key": "COCUK_KITAPLARI",   "label": "Çocuk & Gençlik Kitapları" },
+    { "key": "AKADEMIK",          "label": "Akademik & Bilimsel" },
+    { "key": "SINAV_HAZIRLIK",    "label": "Sınav Notları & Özetler" },
+    { "key": "KISISEL_GELISIM",   "label": "Kişisel Gelişim & Psikoloji" },
+    { "key": "IS_VE_EKONOMI",     "label": "İş, Finans & Ekonomi" },
+    { "key": "BILIM_VE_TEKNOLOJI","label": "Yazılım & Teknoloji" }
   ],
   "genres": {
     "DERS_KITABI": [
@@ -187,22 +157,21 @@
     "Korece",
     "Çince",
     "Farsça",
-    "Other"
+    "Diğer"
   ],
   "formats": [
-    "Hardcover",
-    "Paperback",
-    "Ebook",
-    "Spiral",
-    "Large Print",
-    "Pocket Book",
-    "Audio Book"
+    "Ciltli (Hardcover)",
+    "Karton Kapak (Paperback)",
+    "Spiralli",
+    "Cep Boy",
+    "E-Kitap",
+    "Sesli Kitap"
   ],
   "conditions": [
-    "New",
-    "Like New",
-    "Good",
-    "Fair",
-    "Poor"
+    "Sıfır / Ambalajında",
+    "Yeni Gibi (Temiz)",
+    "İyi Durumda",
+    "Kullanılmış / Çizikli",
+    "Yıpranmış / Hasarlı"
   ]
 }

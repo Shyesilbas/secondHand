@@ -76,6 +76,30 @@ public class VehicleFilterPredicateBuilder implements FilterPredicateBuilder<Veh
             predicates.add(root.get("bodyType").in(filters.getBodyTypes()));
         }
         
+        if (filters.getMinEngineCapacity() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("engineCapacity"), filters.getMinEngineCapacity()));
+        }
+        
+        if (filters.getMaxEngineCapacity() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("engineCapacity"), filters.getMaxEngineCapacity()));
+        }
+        
+        if (filters.getMinHorsePower() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("horsePower"), filters.getMinHorsePower()));
+        }
+        
+        if (filters.getMaxHorsePower() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("horsePower"), filters.getMaxHorsePower()));
+        }
+        
+        if (filters.getSwap() != null) {
+            predicates.add(cb.equal(root.get("swap"), filters.getSwap()));
+        }
+        
+        if (filters.getAccidentHistory() != null) {
+            predicates.add(cb.equal(root.get("accidentHistory"), filters.getAccidentHistory()));
+        }
+        
         return predicates;
     }
 

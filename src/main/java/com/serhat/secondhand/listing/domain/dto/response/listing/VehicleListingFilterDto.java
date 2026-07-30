@@ -31,4 +31,10 @@ public class VehicleListingFilterDto extends ListingFilterDto {
     private List<SeatCount> seatCounts;
     private List<Drivetrain> drivetrains;
     private List<BodyType> bodyTypes;
+    private Integer minEngineCapacity;
+    private Integer maxEngineCapacity;
+    private Integer minHorsePower;
+    private Integer maxHorsePower;
+    private Boolean swap;
+    private Boolean accidentHistory;
 }

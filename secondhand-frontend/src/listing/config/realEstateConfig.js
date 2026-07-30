@@ -128,40 +128,30 @@ export const realEstateConfig = {
             RESIDENCE: 'KONUT',
             STUDIO: 'KONUT',
             DUPLEX: 'KONUT',
-            PENTHOUSE: 'KONUT',
-            HOUSE: 'KONUT',
             VILLA: 'KONUT',
-            TOWNHOUSE: 'KONUT',
-            SUMMER_HOUSE: 'KONUT',
-            CHALET: 'KONUT',
-            MANSION: 'KONUT',
+            PREFABRICATED: 'KONUT',
 
             LAND: 'ARSA',
+            COMMERCIAL_LAND: 'ARSA',
             FARM: 'ARSA',
-            VINEYARD: 'ARSA',
-            OLIVE_GROVE: 'ARSA',
 
             OFFICE: 'ISYERI',
             COMMERCIAL: 'ISYERI',
-            SHOP: 'ISYERI',
             WAREHOUSE: 'ISYERI',
-            FACTORY: 'ISYERI',
-            INDUSTRIAL: 'ISYERI',
-            HOTEL: 'ISYERI',
+            BUILDING: 'ISYERI',
 
-            PARKING: 'DIGER',
             OTHER: 'DIGER'
           };
 
           return allTypes
             .filter((t) => {
-              const nameKey = String(t?.name || '').toUpperCase();
-              return CATEGORY_MAP[nameKey] === category;
+              const nameKey = String(t?.key || t?.name || t?.value || '').toUpperCase();
+              return CATEGORY_MAP[nameKey] === category || !CATEGORY_MAP[nameKey];
             })
             .map((t) => ({
               ...t,
-              label: String(t?.label ?? t?.name ?? ''),
-              name: String(t?.label ?? t?.name ?? '')
+              label: String(t?.label ?? t?.name ?? t?.key ?? ''),
+              name: String(t?.label ?? t?.name ?? t?.key ?? '')
             }));
         }
       },
@@ -184,14 +174,29 @@ export const realEstateConfig = {
     { value: 'buildingAge', label: 'Building Age' }, { value: 'floor', label: 'Floor' },
     { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
   ],
-  compactBadges: (listing) => [
-    { label: listing.realEstateType, icon: '🏠', show: !!listing.realEstateType },
-    { label: listing.adType, icon: '📋', show: !!listing.adType },
-    { label: listing.squareMeters ? `${listing.squareMeters} m²` : null, icon: '📏', show: !!listing.squareMeters },
-    { label: listing.roomCount ? `${listing.roomCount} rooms` : null, icon: '🚪', show: !!listing.roomCount },
-    { label: listing.heatingType, icon: '🔥', show: !!listing.heatingType },
-    { label: listing.ownerType, icon: '👤', show: !!listing.ownerType },
-  ].filter(badge => badge.show),
+  compactBadges: (listing) => {
+    const resolveLabel = (v) => {
+      if (!v) return null;
+      if (typeof v === 'string') return v;
+      if (typeof v === 'object') return v.label || v.name || v.value || null;
+      return null;
+    };
+
+    const typeLabel = resolveLabel(listing.realEstateType);
+    const adTypeLabel = resolveLabel(listing.adType);
+    const heatingLabel = resolveLabel(listing.heatingType);
+    const ownerLabel = resolveLabel(listing.ownerType);
+    const roomText = listing.roomConfigKey || (listing.roomCount ? `${listing.roomCount} Oda` : null);
+
+    return [
+      { label: typeLabel, icon: '🏠', show: !!typeLabel },
+      { label: adTypeLabel, icon: '📋', show: !!adTypeLabel },
+      { label: listing.squareMeters ? `${listing.squareMeters} m²` : null, icon: '📏', show: !!listing.squareMeters },
+      { label: roomText, icon: '🚪', show: !!roomText },
+      { label: heatingLabel, icon: '🔥', show: !!heatingLabel },
+      { label: ownerLabel, icon: '👤', show: !!ownerLabel },
+    ].filter(badge => badge.show);
+  },
   defaultFilters: { minSquareMeters: 0, minRoomCount: 1 },
 };
 

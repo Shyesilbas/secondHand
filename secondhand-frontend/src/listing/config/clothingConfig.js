@@ -146,15 +146,31 @@ export const clothingConfig = {
     { value: 'clothingCategory', label: 'Clothing Category' }, { value: 'purchaseDate', label: 'Purchase Date' },
     { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
   ],
-  compactBadges: (listing) => [
-    { label: listing.brand?.label || listing.brand?.name || listing.brand, icon: '🏷️', show: !!listing.brand },
-    { label: listing.clothingType?.label || listing.clothingType?.name || listing.clothingType, icon: '👕', show: !!listing.clothingType },
-    { label: listing.color, icon: '🎨', show: !!listing.color },
-    { label: listing.condition, icon: '⭐', show: !!listing.condition },
-    { label: listing.clothingGender, icon: '👤', show: !!listing.clothingGender },
-    { label: listing.clothingCategory, icon: '👶', show: !!listing.clothingCategory },
-    { label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, icon: '📅', show: !!listing.purchaseDate },
-  ].filter(badge => badge.show),
+  compactBadges: (listing) => {
+    const resolveLabel = (v) => {
+      if (!v) return null;
+      if (typeof v === 'string') return v;
+      if (typeof v === 'object') return v.label || v.name || v.value || null;
+      return null;
+    };
+
+    const brandLabel = resolveLabel(listing.brand);
+    const typeLabel = resolveLabel(listing.clothingType);
+    const colorLabel = resolveLabel(listing.color);
+    const conditionLabel = resolveLabel(listing.condition);
+    const genderLabel = resolveLabel(listing.clothingGender);
+    const categoryLabel = resolveLabel(listing.clothingCategory);
+
+    return [
+      { label: brandLabel, icon: '🏷️', show: !!brandLabel },
+      { label: typeLabel, icon: '👕', show: !!typeLabel },
+      { label: colorLabel, icon: '🎨', show: !!colorLabel },
+      { label: conditionLabel, icon: '⭐', show: !!conditionLabel },
+      { label: genderLabel, icon: '👤', show: !!genderLabel },
+      { label: categoryLabel, icon: '👶', show: !!categoryLabel },
+      { label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, icon: '📅', show: !!listing.purchaseDate },
+    ].filter(badge => badge.show);
+  },
   defaultFilters: {},
 };
 

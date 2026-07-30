@@ -203,18 +203,38 @@ public class ElectronicDataInitializer implements SeedTask {
 
     private String formatTypeLabel(String key) {
         if (key == null) return "";
-        if (key.equalsIgnoreCase("DESKTOP")) return "Masaüstü Bilgisayar";
-        if (key.equalsIgnoreCase("TV")) return "TV";
-        if (key.equalsIgnoreCase("TV_STB")) return "TV STB";
-        String[] parts = key.toLowerCase(Locale.ROOT).split("_");
-        StringBuilder sb = new StringBuilder();
-        for (String part : parts) {
-            if (!part.isEmpty()) {
-                sb.append(Character.toUpperCase(part.charAt(0)))
-                  .append(part.substring(1))
-                  .append(" ");
+        String upper = key.trim().toUpperCase(Locale.ROOT);
+        return switch (upper) {
+            case "MOBILE_PHONE" -> "Cep Telefonu";
+            case "LAPTOP" -> "Dizüstü Bilgisayar";
+            case "DESKTOP" -> "Masaüstü Bilgisayar";
+            case "TABLET" -> "Tablet";
+            case "HEADPHONES" -> "Kulaklık";
+            case "SMARTWATCH" -> "Akıllı Saat";
+            case "CAMERA" -> "Fotoğraf & Kamera";
+            case "GAME_CONSOLE" -> "Oyun Konsolu";
+            case "MONITOR" -> "Monitör";
+            case "SPEAKER" -> "Hoparlör & Ses Sistemi";
+            case "TV" -> "Televizyon";
+            case "TV_STB" -> "TV & Ev Elektroniği";
+            case "ROBOT_VACUUM" -> "Robot Süpürge";
+            case "PRINTER" -> "Yazıcı & Tarayıcı";
+            case "AIR_CONDITIONER" -> "Klima";
+            case "ROUTER" -> "Modem & Router";
+            case "KEYBOARD" -> "Klavye";
+            case "MOUSE" -> "Fare / Mouse";
+            default -> {
+                String[] parts = upper.toLowerCase(Locale.ROOT).split("_");
+                StringBuilder sb = new StringBuilder();
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        sb.append(Character.toUpperCase(part.charAt(0)))
+                          .append(part.substring(1))
+                          .append(" ");
+                    }
+                }
+                yield sb.toString().trim();
             }
-        }
-        return sb.toString().trim();
+        };
     }
 }
