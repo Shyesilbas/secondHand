@@ -52,7 +52,7 @@ const LegacyChatInboxRedirect = () => {
   const [sp] = useSearchParams();
   const room = sp.get('room');
   const q = new URLSearchParams();
-  q.set('tab', 'chat');
+  q.set("tab");
   if (room) {
     q.set('room', room);
   }

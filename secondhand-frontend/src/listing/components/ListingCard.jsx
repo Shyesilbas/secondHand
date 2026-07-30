@@ -133,7 +133,7 @@ const ListingCard = ({
         itemIsInCart
           ? 'bg-status-success-bg/20 text-status-success cursor-default'
           : 'bg-background-primary/90 text-slate-500 hover:text-primary hover:bg-background-primary'
-      }`} title={itemIsInCart ? t("in_cart", "In Cart") : t("add_to_cart")}>
+      }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
                         {isAddingToCart ? (
                           <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : itemIsInCart ? (

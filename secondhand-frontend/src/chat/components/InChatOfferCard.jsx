@@ -40,28 +40,28 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                     bg: 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-800',
                     badge: 'bg-emerald-500 text-white',
                     icon: <FiCheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
-                    label: t('status_accepted', 'Kabul Edildi')
+                    label: t("status_accepted")
                 };
             case 'REJECTED':
                 return {
                     bg: 'bg-rose-50 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800',
                     badge: 'bg-rose-500 text-white',
                     icon: <FiXCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
-                    label: t('status_rejected', 'Reddedildi')
+                    label: t("status_rejected")
                 };
             case 'EXPIRED':
                 return {
                     bg: 'bg-slate-50 border-slate-200 dark:bg-slate-900/60 dark:border-slate-700',
                     badge: 'bg-slate-500 text-white',
                     icon: <FiClock className="w-4 h-4 text-slate-500" />,
-                    label: t('status_expired', 'Süresi Doldu')
+                    label: t("status_expired")
                 };
             default:
                 return {
                     bg: 'bg-indigo-50/80 border-indigo-200 dark:bg-indigo-950/40 dark:border-indigo-800/60',
                     badge: 'bg-indigo-600 text-white',
                     icon: <FiTag className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
-                    label: t('status_pending', 'Yanıt Bekliyor')
+                    label: t("status_pending")
                 };
         }
     };
@@ -75,7 +75,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                 <div className="flex items-center gap-2">
                     {statusConfig.icon}
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
-                        {t('in_chat_offer_label', 'Teklif Kartı')}
+                        {t("in_chat_offer_label")}
                     </span>
                 </div>
                 <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${statusConfig.badge}`}>
@@ -92,7 +92,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                 )}
                 <div className="flex items-baseline justify-between">
                     <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                        {t('offered_price', 'Teklif Tutarı')}:
+                        {t("offered_price")}:
                     </span>
                     <span className="text-lg font-black text-slate-900 dark:text-white font-mono tracking-tight">
                         ₺{price ? Number(price).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '0.00'}
@@ -109,7 +109,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                         className="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50"
                     >
                         <FiCheckCircle className="w-3.5 h-3.5" />
-                        {acceptMutation.isPending ? t('processing', 'İşleniyor...') : t('accept', 'Kabul Et')}
+                        {acceptMutation.isPending ? t("processing") : t("accept")}
                     </button>
 
                     <button
@@ -118,7 +118,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                         className="flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-500/20 transition-all disabled:opacity-50"
                     >
                         <FiXCircle className="w-3.5 h-3.5" />
-                        {rejectMutation.isPending ? t('processing', 'İşleniyor...') : t('reject', 'Reddet')}
+                        {rejectMutation.isPending ? t("processing") : t("reject")}
                     </button>
                 </div>
             )}
@@ -130,7 +130,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.98] text-white rounded-xl text-xs font-extrabold shadow-lg shadow-emerald-600/25 transition-all"
                     >
                         <FiShoppingBag className="w-4 h-4" />
-                        <span>{t('proceed_to_checkout', 'Satın Almayı Tamamla')}</span>
+                        <span>{t("proceed_to_checkout")}</span>
                         <FiArrowRight className="w-3.5 h-3.5" />
                     </button>
                 </div>

@@ -68,9 +68,9 @@ const ChatHeader = ({
             type="button"
             onClick={onOpenOfferModal}
             className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800 transition-all active:scale-95"
-            title={t('make_offer', 'Teklif Yap')}
+            title={t("make_offer")}
           >
-            🏷️ {t('offer', 'Teklif Yap')}
+            🏷️ {t("offer")}
           </button>
         )}
         {onDeleteConversation && <div className="relative">

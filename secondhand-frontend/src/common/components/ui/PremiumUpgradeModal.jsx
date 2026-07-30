@@ -29,17 +29,17 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   const { updateUser } = useAuth();
 
   const FEATURES = useMemo(() => [
-    { icon: Zap, label: 'Aura AI', free: t('daily_4_messages', 'Günlük 4 mesaj'), premium: t('daily_10_messages', 'Günlük 10 mesaj') },
-    { icon: Package, label: 'AI İlan Oluşturma', free: t('monthly_1_credit', 'Aylık 1 hak'), premium: t('monthly_4_credits', 'Aylık 4 hak') },
-    { icon: Crown, label: 'Showcase Slot', free: t('1_slot', '1 slot'), premium: t('3_slots', '3 slot') },
-    { icon: BarChart2, label: 'Gelişmiş Analitik', free: t('basic_view', 'Temel görünüm'), premium: t('full_access', 'Tam erişim') },
-    { icon: Truck, label: 'Hızlı Teslimat', free: t('3_business_days', '3 iş günü'), premium: t('1_business_day', '1 iş günü') },
+    { icon: Zap, label: 'Aura AI', free: t("daily_4_messages"), premium: t("daily_10_messages") },
+    { icon: Package, label: 'AI İlan Oluşturma', free: t("monthly_1_credit"), premium: t("monthly_4_credits") },
+    { icon: Crown, label: 'Showcase Slot', free: t("1_slot"), premium: t("3_slots") },
+    { icon: BarChart2, label: 'Gelişmiş Analitik', free: t("basic_view"), premium: t("full_access") },
+    { icon: Truck, label: 'Hızlı Teslimat', free: t("3_business_days"), premium: t("1_business_day") },
   ], [t]);
 
   const STEPS = useMemo(() => [
-    { id: 1, label: t('step_plan', 'Plan'), icon: Crown },
-    { id: 2, label: t('step_agreements', 'Sözleşmeler'), icon: ShieldCheck },
-    { id: 3, label: t('step_verification', 'Doğrulama'), icon: Lock },
+    { id: 1, label: t("step_plan"), icon: Crown },
+    { id: 2, label: t("step_agreements"), icon: ShieldCheck },
+    { id: 3, label: t("step_verification"), icon: Lock },
   ], [t]);
 
   const [step, setStep] = useState(1);
@@ -180,14 +180,14 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
                 <Crown className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-text-primary">{t('premium_membership', 'Premium Üyelik')}</h2>
-                <p className="text-xs text-text-muted">{featureHint ?? t('access_all_features', 'Tüm özelliklere erişin')}</p>
+                <h2 className="text-sm font-bold text-text-primary">{t("premium_membership")}</h2>
+                <p className="text-xs text-text-muted">{featureHint ?? t("access_all_features")}</p>
               </div>
             </div>
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg text-text-muted hover:bg-background-secondary transition cursor-pointer"
-              aria-label={t('kapat', 'Kapat')}
+              aria-label={t("kapat")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -233,26 +233,26 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
                 <div className="flex items-center gap-2.5">
                   <Wallet className="h-4 w-4 text-text-muted" />
                   <div>
-                    <p className="text-xs font-semibold text-text-primary">{t('my_ewallet', 'E-Cüzdanım')}</p>
-                    <p className="text-[11px] text-text-muted">{t('balance', 'Bakiye')}: {Number(eWallet?.balance || 0).toFixed(2)}₺</p>
+                    <p className="text-xs font-semibold text-text-primary">{t("my_ewallet")}</p>
+                    <p className="text-[11px] text-text-muted">{t("balance")}: {Number(eWallet?.balance || 0).toFixed(2)}₺</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xl font-bold text-text-primary">₺100</p>
-                  <p className="text-[10px] text-text-muted">{t('per_month', '/ay')}</p>
+                  <p className="text-[10px] text-text-muted">{t("per_month")}</p>
                 </div>
               </div>
 
               {!canAfford && (
                 <p className="text-xs text-status-error bg-status-error-bg border border-status-error-border rounded-lg px-3 py-2">
-                  {t('insufficient_balance_please_topup', 'Yetersiz bakiye. Lütfen cüzdanınızı yükleyin.')}
+                  {t("insufficient_balance_please_topup")}
                 </p>
               )}
 
               {/* Feature list */}
               <div className="rounded-xl border border-border-light overflow-hidden">
                 <div className="bg-background-secondary px-4 py-2.5 border-b border-border-light">
-                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t('plan_comparison', 'Plan Karşılaştırması')}</p>
+                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t("plan_comparison")}</p>
                 </div>
                 {FEATURES.map((feature) => {
                   const IconComponent = feature.icon;
@@ -282,7 +282,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-background-secondary border border-border-light">
                 <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
                 <p className="text-xs text-text-secondary">
-                  {t('agreements_step_hint', 'Ödeme işleminden önce aşağıdaki sözleşmeleri onaylayın.')}
+                  {t("agreements_step_hint")}
                 </p>
               </div>
               <div className="rounded-xl border border-border-light bg-background-primary p-4">
@@ -303,13 +303,13 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
                   <Lock className="w-5 h-5 text-white" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold text-text-primary">{t('email_verification', 'E-posta Doğrulaması')}</h3>
+                  <h3 className="text-sm font-bold text-text-primary">{t("email_verification")}</h3>
                   <p className="text-xs text-text-muted mt-1 leading-relaxed">
                     {t('enter_verification_code_sent_to_email', 'E-postanıza gönderilen {{length}} haneli kodu girerek ödemeyi tamamlayın.', { length: OTP_CODE_LENGTH })}
                   </p>
                   {otpTtlActive && (
                     <p className={`text-[10px] font-semibold mt-1.5 tabular-nums ${otpTtlExpired ? 'text-amber-600' : 'text-text-muted'}`}>
-                      {otpTtlExpired ? t('code_expired_request_new', 'Kod süresi doldu — geri dönüp yeni kod isteyin.') : `${t('validity_label', 'Geçerlilik')}: ${otpTtlFormatted}`}
+                      {otpTtlExpired ? t("code_expired_request_new") : `${t("validity_label")}: ${otpTtlFormatted}`}
                     </p>
                   )}
                 </div>
@@ -318,8 +318,8 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               {/* Wallet summary */}
               <div className="rounded-xl border border-border-light p-4 flex items-center justify-between bg-background-secondary">
                 <div>
-                  <p className="text-xs font-semibold text-text-primary">{t('premium_membership', 'Premium Üyelik')}</p>
-                  <p className="text-[10px] text-text-muted">{t('my_ewallet', 'E-Cüzdan bakiyesi')}: {Number(eWallet?.balance || 0).toFixed(2)}₺</p>
+                  <p className="text-xs font-semibold text-text-primary">{t("premium_membership")}</p>
+                  <p className="text-[10px] text-text-muted">{t("my_ewallet")}: {Number(eWallet?.balance || 0).toFixed(2)}₺</p>
                 </div>
                 <span className="text-lg font-bold text-primary tabular-nums">₺100</span>
               </div>
@@ -363,7 +363,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
             onClick={handleBack}
             className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-text-muted hover:text-text-secondary hover:bg-background-primary transition border border-border-light cursor-pointer"
           >
-            {step > 1 ? `← ${t('back_button', 'Geri')}` : t('vazge', 'Vazgeç')}
+            {step > 1 ? `← ${t("back_button")}` : t("vazge")}
           </button>
 
           {step < 3 && (
@@ -375,16 +375,16 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               {loading ? (
                 <>
                   <span className="inline-block h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t('sending_progress', 'Gönderiliyor…')}
+                  {t("sending_progress")}
                 </>
               ) : step === 2 ? (
                 <>
                   <Lock className="h-3.5 w-3.5" />
-                  {t('send_code_and_continue', 'Kodu Gönder & Devam Et')}
+                  {t("send_code_and_continue")}
                 </>
               ) : (
                 <>
-                  {t('continue_button', 'Devam Et')} →
+                  {t("continue_button")} →
                 </>
               )}
             </button>
@@ -399,12 +399,12 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               {loading ? (
                 <>
                   <span className="inline-block h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t('processing_progress', 'İşleniyor…')}
+                  {t("processing_progress")}
                 </>
               ) : (
                 <>
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  {t('complete_payment', 'Ödemeyi Tamamla')}
+                  {t("complete_payment")}
                 </>
               )}
             </button>

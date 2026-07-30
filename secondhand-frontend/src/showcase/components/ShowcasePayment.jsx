@@ -345,7 +345,7 @@ const ShowcasePayment = forwardRef(function ShowcasePayment({
               onChange={setVerificationCode}
               disabled={loading}
               error={error}
-              label={t("verification_code", "Doğrulama Kodu")}
+              label={t("verification_code")}
               onComplete={() => {}}
             />
 

@@ -20,14 +20,14 @@ const DataPagination = ({
       <div className="flex items-center space-x-2">
         <button onClick={() => onPageChange(Math.max(0, currentPage - 1))} disabled={currentPage === 0} className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-border-light rounded-lg bg-background-primary hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">{t("previous")}</button>
 
-        <span className="text-xs text-slate-500 tabular-nums">{t("page", "Sayfa")} {currentPage + 1} / {totalPages}
+        <span className="text-xs text-slate-500 tabular-nums">{t("page")} {currentPage + 1} / {totalPages}
         </span>
 
         <button onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage >= totalPages - 1} className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-border-light rounded-lg bg-background-primary hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">{t("next")}</button>
       </div>
 
       <div className="flex items-center space-x-4">
-        <div className="text-xs text-slate-500 tabular-nums">{t("showing", "Gösterilen")}: {startItem}-{endItem} / {totalItems} {t("results", "sonuç")}</div>
+        <div className="text-xs text-slate-500 tabular-nums">{t("showing")}: {startItem}-{endItem} / {totalItems} {t("results")}</div>
 
         <div className="flex items-center space-x-2">
           <label htmlFor="pageSize" className="text-xs text-slate-500">{t("per_page")}</label>

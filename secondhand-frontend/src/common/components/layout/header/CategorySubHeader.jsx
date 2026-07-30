@@ -12,7 +12,6 @@ import {
   Home,
   Shirt,
   BookOpen,
-  Package,
   ChevronDown,
   ChevronRight,
   ArrowRight,
@@ -96,29 +95,51 @@ const CATEGORIES = [
     labelKey: 'real_estate',
     defaultLabel: 'Emlak',
     icon: Home,
+    hasFourSteps: true,
+    step1Title: '1. Mülk Kategorisi',
+    step2Title: '2. Mülk Tipi',
+    step3Title: '3. İlan Türü',
+    step4Title: '4. Kimden (İlan Sahibi)',
     typeEnumKey: 'realEstateTypes',
     brandEnumKey: 'realEstateAdTypes',
-    modelEnumKey: 'heatingTypes',
+    modelEnumKey: 'ownerTypes',
     typeParamKey: 'realEstateTypeIds',
     brandParamKey: 'adTypeId',
-    modelParamKey: 'heatingTypeIds',
-    step1Title: '1. Mülk Tipi Seçin',
-    step2Title: '2. İlan Türü Seçin',
-    step3Title: '3. Isınma Tipi Seçin',
+    modelParamKey: 'ownerTypeId',
     fallbacks: {
+      categories: [
+        { id: 'RESIDENTIAL', name: 'Konut' },
+        { id: 'COMMERCIAL', name: 'İş Yeri' },
+        { id: 'LAND', name: 'Arsa & Arazi' },
+        { id: 'BUILDING', name: 'Bina & Tesis' }
+      ],
       types: [
-        { id: 'APARTMENT', name: 'Daire' },
-        { id: 'RESIDENCE', name: 'Rezidans' },
-        { id: 'VILLA', name: 'Villa / Müstakil Ev' },
-        { id: 'LAND', name: 'Konut İmarlı Arsa' },
-        { id: 'OFFICE', name: 'Ofis / Büro' },
-        { id: 'COMMERCIAL', name: 'Dükkan / Mağaza' },
+        { id: '10000001-0000-0000-0000-000000000001', name: 'Daire', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000002', name: 'Rezidans', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000003', name: 'Stüdyo (1+0)', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000004', name: 'Dubleks Daire', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000005', name: 'Villa / Müstakil Ev', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000006', name: 'Prefabrik / Yazlık Ev', cat: 'RESIDENTIAL' },
+        { id: '10000001-0000-0000-0000-000000000007', name: 'Konut İmarlı Arsa', cat: 'LAND' },
+        { id: '10000001-0000-0000-0000-000000000008', name: 'Ticari / Sanayi İmarlı Arsa', cat: 'LAND' },
+        { id: '10000001-0000-0000-0000-000000000009', name: 'Tarla / Çiftlik & Bağ-Bahçe', cat: 'LAND' },
+        { id: '10000001-0000-0000-0000-000000000010', name: 'Ofis / Büro / Plaza Katı', cat: 'COMMERCIAL' },
+        { id: '10000001-0000-0000-0000-000000000011', name: 'Dükkan / Mağaza', cat: 'COMMERCIAL' },
+        { id: '10000001-0000-0000-0000-000000000012', name: 'Depo / Fabrika / Atölye', cat: 'COMMERCIAL' },
+        { id: '10000001-0000-0000-0000-000000000013', name: 'Komple Bina / Turistik Tesis', cat: 'BUILDING' },
+        { id: '10000001-0000-0000-0000-000000000014', name: 'Diğer Gayrimenkuller', cat: 'BUILDING' }
       ],
       brands: [
-        { id: 'FOR_SALE', name: 'Satılık' },
-        { id: 'FOR_RENT', name: 'Kiralık' },
-        { id: 'DAILY_RENT', name: 'Günlük Kiralık' },
-        { id: 'ROOMMATE', name: 'Devren / Ev Arkadaşı' },
+        { id: '20000002-0000-0000-0000-000000000001', name: 'Satılık' },
+        { id: '20000002-0000-0000-0000-000000000002', name: 'Kiralık' },
+        { id: '20000002-0000-0000-0000-000000000003', name: 'Günlük Kiralık' },
+        { id: '20000002-0000-0000-0000-000000000004', name: 'Devren / Ev Arkadaşı' }
+      ],
+      owners: [
+        { id: '40000004-0000-0000-0000-000000000001', name: 'Sahibinden' },
+        { id: '40000004-0000-0000-0000-000000000002', name: 'Emlak Ofisinden' },
+        { id: '40000004-0000-0000-0000-000000000003', name: 'İnşaat Firmasından' },
+        { id: '40000004-0000-0000-0000-000000000004', name: 'Bankadan Satılık' }
       ]
     }
   },
@@ -190,6 +211,17 @@ const CATEGORIES = [
   }
 ];
 
+const dedupeItems = (items) => {
+  if (!Array.isArray(items)) return [];
+  const seen = new Set();
+  return items.filter(item => {
+    const key = String(item.name || item.id || '').toUpperCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 const CategorySubHeader = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -197,6 +229,7 @@ const CategorySubHeader = () => {
   const [activeCategory, setActiveCategory] = useState(null);
 
   // Cascading step selections per active category
+  const [selectedPropertyCat, setSelectedPropertyCat] = useState(null); // Specific for Real Estate Step 1
   const [selectedType, setSelectedType] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -209,6 +242,7 @@ const CategorySubHeader = () => {
   }, !!activeCategory);
 
   const resetSelections = () => {
+    setSelectedPropertyCat(null);
     setSelectedType(null);
     setSelectedBrand(null);
     setSelectedModel(null);
@@ -228,23 +262,57 @@ const CategorySubHeader = () => {
     return CATEGORIES.find(c => c.id === activeCategory);
   }, [activeCategory]);
 
-  // Resolve Step 1 (Types)
+  // Resolve Step 1 (Types or Property Categories for Real Estate)
   const step1Items = useMemo(() => {
     if (!currentCatConfig) return [];
+    if (currentCatConfig.id === 'REAL_ESTATE') {
+      return dedupeItems(currentCatConfig.fallbacks.categories);
+    }
+
     const key = currentCatConfig.typeEnumKey;
     const backendData = enums?.[key];
     if (Array.isArray(backendData) && backendData.length > 0) {
-      return backendData.map(item => ({
+      return dedupeItems(backendData.map(item => ({
         id: item.id || item.value || String(item),
         name: item.label || item.name || item.value || String(item)
-      }));
+      })));
     }
-    return currentCatConfig.fallbacks.types || [];
+    return dedupeItems(currentCatConfig.fallbacks.types || []);
   }, [currentCatConfig, enums]);
 
-  // Resolve Step 2 (Brands / Secondary)
+  // Resolve Step 2 (Property Types for Real Estate or Brands for others)
   const step2Items = useMemo(() => {
     if (!currentCatConfig) return [];
+
+    if (currentCatConfig.id === 'REAL_ESTATE') {
+      const key = currentCatConfig.typeEnumKey;
+      const backendData = enums?.[key];
+      let items = [];
+      if (Array.isArray(backendData) && backendData.length > 0) {
+        items = backendData.map(item => ({
+          id: item.id || item.value || String(item),
+          name: item.label || item.name || item.value || String(item)
+        }));
+      } else {
+        items = currentCatConfig.fallbacks.types || [];
+      }
+
+      // Filter by selected property category if selected
+      if (selectedPropertyCat) {
+        const catId = selectedPropertyCat.id;
+        items = items.filter(it => {
+          if (it.cat) return it.cat === catId;
+          const name = String(it.name || '').toUpperCase();
+          if (catId === 'RESIDENTIAL') return ['DAİRE', 'REZİDANS', 'VİLLA', 'STÜDYO', 'DUBLEKS', 'PREFABRİK'].some(x => name.includes(x));
+          if (catId === 'COMMERCIAL') return ['OFİS', 'DÜKKAN', 'DEPO', 'BÜRO', 'MAĞAZA', 'FABRİKA'].some(x => name.includes(x));
+          if (catId === 'LAND') return ['ARSA', 'TARLA', 'ÇİFTLİK', 'BAĞ'].some(x => name.includes(x));
+          if (catId === 'BUILDING') return ['BİNA', 'TESİS', 'OTEL'].some(x => name.includes(x));
+          return true;
+        });
+      }
+      return dedupeItems(items);
+    }
+
     const key = currentCatConfig.brandEnumKey;
     const backendData = enums?.[key];
     let items = [];
@@ -269,17 +337,30 @@ const CategorySubHeader = () => {
         items = items.filter(b => validBrandIds.has(String(b.id)));
       }
     }
-    return items;
-  }, [currentCatConfig, enums, selectedType]);
+    return dedupeItems(items);
+  }, [currentCatConfig, enums, selectedType, selectedPropertyCat]);
 
-  // Resolve Step 3 (Models / Tertiary)
+  // Resolve Step 3 (Ad Types for Real Estate or Models for others)
   const step3Items = useMemo(() => {
     if (!currentCatConfig) return [];
+
+    if (currentCatConfig.id === 'REAL_ESTATE') {
+      const key = currentCatConfig.brandEnumKey; // realEstateAdTypes
+      const backendData = enums?.[key];
+      if (Array.isArray(backendData) && backendData.length > 0) {
+        return dedupeItems(backendData.map(item => ({
+          id: item.id || item.value || String(item),
+          name: item.label || item.name || item.value || String(item)
+        })));
+      }
+      return dedupeItems(currentCatConfig.fallbacks.brands || []);
+    }
+
     const modelKey = currentCatConfig.modelEnumKey;
     const allModels = enums?.[modelKey];
 
     if (Array.isArray(allModels) && allModels.length > 0) {
-      return allModels
+      const filtered = allModels
         .filter(m => {
           const typeMatch = !selectedType || String(m?.typeId ?? m?.type_id ?? '') === String(selectedType.id);
           const brandMatch = !selectedBrand || String(m?.brandId ?? m?.brand_id ?? '') === String(selectedBrand.id);
@@ -289,27 +370,59 @@ const CategorySubHeader = () => {
           id: m.id || m.value || String(m),
           name: m.label || m.name || m.value || String(m)
         }));
+      return dedupeItems(filtered);
     }
 
     return [];
   }, [currentCatConfig, enums, selectedType, selectedBrand]);
 
+  // Resolve Step 4 (Owner Types for Real Estate)
+  const step4Items = useMemo(() => {
+    if (!currentCatConfig || currentCatConfig.id !== 'REAL_ESTATE') return [];
+    const key = currentCatConfig.modelEnumKey; // ownerTypes
+    const backendData = enums?.[key];
+    if (Array.isArray(backendData) && backendData.length > 0) {
+      return dedupeItems(backendData.map(item => ({
+        id: item.id || item.value || String(item),
+        name: item.label || item.name || item.value || String(item)
+      })));
+    }
+    return dedupeItems(currentCatConfig.fallbacks.owners || []);
+  }, [currentCatConfig, enums]);
+
   // Perform navigation with accumulated search parameters
-  const executeSearch = (overrideType = selectedType, overrideBrand = selectedBrand, overrideModel = selectedModel) => {
+  const executeSearch = (
+    overridePropCat = selectedPropertyCat,
+    overrideType = selectedType,
+    overrideBrand = selectedBrand,
+    overrideModel = selectedModel
+  ) => {
     if (!currentCatConfig) return;
     setActiveCategory(null);
 
     const queryParams = new URLSearchParams();
     queryParams.set('category', currentCatConfig.id);
 
-    if (overrideType && currentCatConfig.typeParamKey) {
-      queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
-    }
-    if (overrideBrand && currentCatConfig.brandParamKey) {
-      queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
-    }
-    if (overrideModel && currentCatConfig.modelParamKey) {
-      queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
+    if (currentCatConfig.id === 'REAL_ESTATE') {
+      if (overrideType && currentCatConfig.typeParamKey) {
+        queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
+      }
+      if (overrideBrand && currentCatConfig.brandParamKey) {
+        queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
+      }
+      if (overrideModel && currentCatConfig.modelParamKey) {
+        queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
+      }
+    } else {
+      if (overrideType && currentCatConfig.typeParamKey) {
+        queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
+      }
+      if (overrideBrand && currentCatConfig.brandParamKey) {
+        queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
+      }
+      if (overrideModel && currentCatConfig.modelParamKey) {
+        queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
+      }
     }
 
     navigate(`${ROUTES.LISTINGS}?${queryParams.toString()}`);
@@ -369,15 +482,39 @@ const CategorySubHeader = () => {
 
                   <ChevronRight className="w-4 h-4 text-slate-300" />
 
-                  {selectedType ? (
-                    <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
-                      <Check className="w-3 h-3 text-emerald-600" />
-                      {selectedType.name}
-                    </span>
+                  {/* REAL ESTATE STEP 1 (Property Category) */}
+                  {currentCatConfig.id === 'REAL_ESTATE' ? (
+                    selectedPropertyCat ? (
+                      <span className="px-3 py-1 rounded-xl bg-purple-100/80 text-purple-800 text-xs font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3 text-purple-600" />
+                        {selectedPropertyCat.name}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-slate-400 italic">Adım 1: Mülk Kategorisi</span>
+                    )
                   ) : (
-                    <span className="text-xs font-semibold text-slate-400 italic">Adım 1: Tür Seçin</span>
+                    selectedType ? (
+                      <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600" />
+                        {selectedType.name}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-semibold text-slate-400 italic">Adım 1: Tür Seçin</span>
+                    )
                   )}
 
+                  {/* REAL ESTATE STEP 2 (Property Type) or OTHER STEP 2 (Brand) */}
+                  {(selectedType || (currentCatConfig.id === 'REAL_ESTATE' && selectedType)) && (
+                    <>
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
+                      <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600" />
+                        {selectedType.name}
+                      </span>
+                    </>
+                  )}
+
+                  {/* STEP 3 / Ad Type */}
                   {selectedBrand && (
                     <>
                       <ChevronRight className="w-4 h-4 text-slate-300" />
@@ -388,6 +525,7 @@ const CategorySubHeader = () => {
                     </>
                   )}
 
+                  {/* STEP 4 / Model / Owner Type */}
                   {selectedModel && (
                     <>
                       <ChevronRight className="w-4 h-4 text-slate-300" />
@@ -398,7 +536,7 @@ const CategorySubHeader = () => {
                     </>
                   )}
 
-                  {(selectedType || selectedBrand || selectedModel) && (
+                  {(selectedPropertyCat || selectedType || selectedBrand || selectedModel) && (
                     <button
                       onClick={resetSelections}
                       className="text-xs font-bold text-slate-400 hover:text-red-500 ml-2 flex items-center gap-1 transition-colors"
@@ -413,7 +551,7 @@ const CategorySubHeader = () => {
                 {/* Primary Action Execute Search Button */}
                 <button
                   onClick={() => executeSearch()}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-emerald-200 animate-pulse" />
                   <span>
@@ -423,18 +561,20 @@ const CategorySubHeader = () => {
                       ? `"${selectedBrand.name}" İlanlarını Göster`
                       : selectedType
                       ? `"${selectedType.name}" İlanlarını Göster`
+                      : selectedPropertyCat
+                      ? `"${selectedPropertyCat.name}" İlanlarını Göster`
                       : `Tüm ${t(currentCatConfig.labelKey, currentCatConfig.defaultLabel)} İlanlarını Göster`}
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* 3-Column Cascading Interactive Selector Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* STEP 1 COLUMN: Types */}
+              {/* Multi-Step Interactive Selector Grid (4 Columns for REAL ESTATE, 3 Columns for others) */}
+              <div className={`grid gap-5 ${currentCatConfig.hasFourSteps ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'}`}>
+                {/* STEP 1 COLUMN */}
                 <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
                   <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
-                    <span className="flex items-center gap-1.5 text-emerald-700">
+                    <span className="flex items-center gap-1.5 text-purple-700">
                       <Layers className="w-3.5 h-3.5" />
                       {currentCatConfig.step1Title}
                     </span>
@@ -443,8 +583,66 @@ const CategorySubHeader = () => {
                     </span>
                   </h5>
 
-                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-emerald-400">
+                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-purple-400">
                     {step1Items.map((item) => {
+                      const isSelected = currentCatConfig.id === 'REAL_ESTATE'
+                        ? selectedPropertyCat?.id === item.id
+                        : selectedType?.id === item.id;
+
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            if (currentCatConfig.id === 'REAL_ESTATE') {
+                              if (isSelected) {
+                                setSelectedPropertyCat(null);
+                                setSelectedType(null);
+                              } else {
+                                setSelectedPropertyCat(item);
+                                setSelectedType(null);
+                              }
+                            } else {
+                              if (isSelected) {
+                                setSelectedType(null);
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              } else {
+                                setSelectedType(item);
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              }
+                            }
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+                            isSelected
+                              ? 'bg-purple-600 text-white shadow-sm'
+                              : 'bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-900 border border-slate-100 hover:border-purple-200'
+                          }`}
+                        >
+                          <span className="truncate">{item.name}</span>
+                          <span className={`text-[10px] font-bold transition-all ${isSelected ? 'text-white' : 'text-slate-300 group-hover:text-purple-600'}`}>
+                            {isSelected ? '✓' : '→'}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* STEP 2 COLUMN */}
+                <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
+                  <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
+                    <span className="flex items-center gap-1.5 text-emerald-700">
+                      <Layers className="w-3.5 h-3.5" />
+                      {currentCatConfig.step2Title}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+                      {step2Items.length}
+                    </span>
+                  </h5>
+
+                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-emerald-400">
+                    {step2Items.map((item) => {
                       const isSelected = selectedType?.id === item.id;
 
                       return (
@@ -453,15 +651,11 @@ const CategorySubHeader = () => {
                           onClick={() => {
                             if (isSelected) {
                               setSelectedType(null);
-                              setSelectedBrand(null);
-                              setSelectedModel(null);
                             } else {
                               setSelectedType(item);
-                              setSelectedBrand(null);
-                              setSelectedModel(null);
                             }
                           }}
-                          className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group ${
+                          className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
                             isSelected
                               ? 'bg-emerald-600 text-white shadow-sm'
                               : 'bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-100 hover:border-emerald-200'
@@ -477,20 +671,20 @@ const CategorySubHeader = () => {
                   </div>
                 </div>
 
-                {/* STEP 2 COLUMN: Brands / Secondary */}
-                <div className={`space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100 transition-opacity ${!selectedType ? 'opacity-85' : 'opacity-100'}`}>
+                {/* STEP 3 COLUMN */}
+                <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
                   <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
                     <span className="flex items-center gap-1.5 text-teal-700">
                       <Layers className="w-3.5 h-3.5" />
-                      {currentCatConfig.step2Title}
+                      {currentCatConfig.step3Title}
                     </span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
-                      {step2Items.length}
+                      {step3Items.length}
                     </span>
                   </h5>
 
                   <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-teal-400">
-                    {step2Items.map((item) => {
+                    {step3Items.map((item) => {
                       const isSelected = selectedBrand?.id === item.id;
 
                       return (
@@ -499,13 +693,11 @@ const CategorySubHeader = () => {
                           onClick={() => {
                             if (isSelected) {
                               setSelectedBrand(null);
-                              setSelectedModel(null);
                             } else {
                               setSelectedBrand(item);
-                              setSelectedModel(null);
                             }
                           }}
-                          className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group ${
+                          className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
                             isSelected
                               ? 'bg-teal-600 text-white shadow-sm'
                               : 'bg-white hover:bg-teal-50 text-slate-700 hover:text-teal-900 border border-slate-100 hover:border-teal-200'
@@ -521,21 +713,21 @@ const CategorySubHeader = () => {
                   </div>
                 </div>
 
-                {/* STEP 3 COLUMN: Models / Tertiary */}
-                <div className={`space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100 transition-opacity ${step3Items.length === 0 ? 'opacity-70' : 'opacity-100'}`}>
-                  <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
-                    <span className="flex items-center gap-1.5 text-blue-700">
-                      <Layers className="w-3.5 h-3.5" />
-                      {currentCatConfig.step3Title}
-                    </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
-                      {step3Items.length}
-                    </span>
-                  </h5>
+                {/* STEP 4 COLUMN (ONLY FOR 4-STEP CATEGORIES LIKE REAL ESTATE) */}
+                {currentCatConfig.hasFourSteps && (
+                  <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
+                    <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
+                      <span className="flex items-center gap-1.5 text-blue-700">
+                        <Layers className="w-3.5 h-3.5" />
+                        {currentCatConfig.step4Title}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+                        {step4Items.length}
+                      </span>
+                    </h5>
 
-                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-blue-400">
-                    {step3Items.length > 0 ? (
-                      step3Items.map((item) => {
+                    <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-blue-400">
+                      {step4Items.map((item) => {
                         const isSelected = selectedModel?.id === item.id;
 
                         return (
@@ -546,10 +738,10 @@ const CategorySubHeader = () => {
                                 setSelectedModel(null);
                               } else {
                                 setSelectedModel(item);
-                                executeSearch(selectedType, selectedBrand, item);
+                                executeSearch(selectedPropertyCat, selectedType, selectedBrand, item);
                               }
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group ${
+                            className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
                               isSelected
                                 ? 'bg-blue-600 text-white shadow-sm'
                                 : 'bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-900 border border-slate-100 hover:border-blue-200'
@@ -561,16 +753,10 @@ const CategorySubHeader = () => {
                             </span>
                           </button>
                         );
-                      })
-                    ) : (
-                      <div className="p-6 text-center text-xs text-slate-400 italic bg-white/60 rounded-2xl border border-dashed border-slate-200">
-                        {selectedBrand
-                          ? `"${selectedBrand.name}" için özel model seçimi yapabilirsiniz.`
-                          : 'Marka seçerek spesifik modellere ulaşabilirsiniz.'}
-                      </div>
-                    )}
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </motion.div>

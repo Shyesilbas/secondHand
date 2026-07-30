@@ -47,22 +47,22 @@ const Footer = () => {
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <span className="text-xl font-bold tracking-tighter text-white bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
-                            {t("secondhand", "SecondHand")}
+                            {t("secondhand")}
                         </span>
                     </div>
                     <p className="text-sm text-slate-400 leading-relaxed font-light max-w-sm">
-                        {t("about_secondhand_desc", "The premium secondhand marketplace for verified items, electronics, and unique finds. Buy and trade with absolute confidence under escrow protection.")}
+                        {t("about_secondhand_desc")}
                     </p>
 
                     {/* Trust badging */}
                     <div className="pt-2 flex flex-wrap gap-3">
                         <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1 text-xs text-emerald-400 font-medium">
                             <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>{t("secure_escrow", "Secure Escrow")}</span>
+                            <span>{t("secure_escrow")}</span>
                         </div>
                         <div className="flex items-center gap-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/5 px-3 py-1 text-xs text-indigo-400 font-medium">
                             <Award className="w-3.5 h-3.5" />
-                            <span>{t("verified_sellers", "Verified Sellers")}</span>
+                            <span>{t("verified_sellers")}</span>
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@ const Footer = () => {
                     <ul className="space-y-2">
                         <li>
                             <button onClick={() => navigate(ROUTES.ABOUT)} className="text-sm text-slate-400 hover:text-white transition-all duration-300 tracking-tight font-medium hover:translate-x-1 inline-flex items-center">
-                                {t("about_secondhand", "About SecondHand")}
+                                {t("about_secondhand")}
                             </button>
                         </li>
                         <li className="text-sm text-slate-400 hover:text-slate-200 transition-all duration-300 tracking-tight font-light">{t("no_membership_fees")}</li>

@@ -43,7 +43,7 @@ const ChatPage = ({
     }
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
-      next.set('tab', 'chat');
+      next.set("tab");
       if (room?.id) {
         next.set('room', String(room.id));
       } else {

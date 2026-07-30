@@ -185,31 +185,31 @@ const EmailsPage = ({
   }, [emails, searchTerm]);
   const folderItems = useMemo(() => [{
     id: EMAIL_FILTERS.ALL,
-    label: t("folders.all", "Tüm E-postalar"),
+    label: t("folders.all"),
     icon: MailOpen
   }, {
     id: EMAIL_FILTERS.ACCOUNT_SECURITY,
-    label: t("folders.account_security", "Hesap & Güvenlik"),
+    label: t("folders.account_security"),
     icon: Shield
   }, {
     id: EMAIL_FILTERS.OFFERS,
-    label: t("folders.offers", "Teklifler"),
+    label: t("folders.offers"),
     icon: Tag
   }, {
     id: EMAIL_FILTERS.PAYMENTS,
-    label: t("folders.payments", "Ödemeler"),
+    label: t("folders.payments"),
     icon: CreditCard
   }, {
     id: EMAIL_FILTERS.SYSTEM_NOTIFICATIONS,
-    label: t("folders.system_notifications", "Sistem & Bildirimler"),
+    label: t("folders.system_notifications"),
     icon: Bell
   }, {
     id: EMAIL_FILTERS.LEGAL,
-    label: t("folders.legal", "Sözleşme & Yasal"),
+    label: t("folders.legal"),
     icon: MailOpen
   }, {
     id: EMAIL_FILTERS.PROMOTIONS,
-    label: t("folders.promotions", "Tanıtımlar & Kampanyalar"),
+    label: t("folders.promotions"),
     icon: Megaphone
   }], [t]);
   const counts = useMemo(() => {

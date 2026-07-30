@@ -106,7 +106,7 @@ const PaymentHistory = ({
     return <EmptyState
         icon={Receipt}
         title={t("no_activity_found")}
-        description={hasActiveFilters ? t("no_transactions_match_filters", "We couldn't find any transactions matching your current filters.") : t("transaction_history_empty", "Your transaction history is empty. Start exploring the marketplace to see activity here.")}
+        description={hasActiveFilters ? t("no_transactions_match_filters") : t("transaction_history_empty")}
         primaryAction={hasActiveFilters ? {
           label: t("reset_filters"),
           onClick: onClearFilters

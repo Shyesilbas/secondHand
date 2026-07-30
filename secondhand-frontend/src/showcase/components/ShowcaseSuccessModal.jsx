@@ -22,10 +22,10 @@ const ShowcaseSuccessModal = ({ isOpen, onClose, listingTitle, days, pricePaid }
                 </div>
 
                 <h3 className="text-xl font-black text-slate-900 dark:text-white mb-1">
-                    {t('showcase_success_title', 'İlanınız Vitrine Taşındı!')}
+                    {t("showcase_success_title")}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">
-                    {listingTitle ? `"${listingTitle}"` : ''} {t('showcase_success_desc', 'ilanınız öne çıkarıldı.')}
+                    {listingTitle ? `"${listingTitle}"` : ''} {t("showcase_success_desc")}
                 </p>
 
                 <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 mb-6 text-left space-y-2">
@@ -47,7 +47,7 @@ const ShowcaseSuccessModal = ({ isOpen, onClose, listingTitle, days, pricePaid }
                     onClick={onClose}
                     className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold rounded-2xl text-xs shadow-lg shadow-emerald-600/25 hover:from-emerald-700 hover:to-teal-700 transition-all"
                 >
-                    {t('close', 'Kapat')}
+                    {t("close")}
                 </button>
             </div>
         </div>

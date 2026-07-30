@@ -57,7 +57,7 @@ const HeaderProfileMenu = ({
             <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">{t("account")}</p>
             <Link to={ROUTES.PROFILE} onClick={onClose} className="text-sm font-semibold text-slate-900 truncate tracking-tight block hover:text-slate-600 transition-colors cursor-pointer flex items-center gap-1.5">
               {user?.name || 'User'}
-              {isPremium && <Crown className="h-3.5 w-3.5 text-amber-500 shrink-0" aria-label={t('premium_member', 'Premium üye')} />}
+              {isPremium && <Crown className="h-3.5 w-3.5 text-amber-500 shrink-0" aria-label={t("premium_member")} />}
             </Link>
           </div>
 
@@ -73,11 +73,11 @@ const HeaderProfileMenu = ({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-xs font-bold text-amber-900 leading-tight">{t("verify_account", "Hesabını Doğrula")}</p>
+                  <p className="text-xs font-bold text-amber-900 leading-tight">{t("verify_account")}</p>
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
                 </div>
                 <p className="text-[11px] font-medium text-amber-700 truncate mt-0.5">
-                  {t("verify_account_desc", "İlan vermek & işlem yapmak için onaylayın")}
+                  {t("verify_account_desc")}
                 </p>
               </div>
             </Link>
@@ -98,7 +98,7 @@ const HeaderProfileMenu = ({
                   <Crown className="h-3.5 w-3.5 text-amber-400" />
                   {t('upgrade_to_premium', "Premium'a Geç")}
                 </span>
-                <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">{t('upgrade_badge', 'YÜKSELT')}</span>
+                <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">{t("upgrade_badge")}</span>
               </button>
             </div>
           )}

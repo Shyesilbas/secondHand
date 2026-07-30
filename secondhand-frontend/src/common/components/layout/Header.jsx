@@ -62,9 +62,9 @@ const Header = () => {
             {isAuthenticated && user && user.accountVerified === false && (
               <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs font-bold py-1.5 px-4 text-center flex items-center justify-center gap-2 shadow-xs z-50 relative">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                <span>{t("account_unverified_bar", "Hesabınız henüz doğrulanmadı. Tüm özellikleri aktif kullanabilmek için e-postanızı doğrulayın.")}</span>
+                <span>{t("account_unverified_bar")}</span>
                 <Link to={ROUTES.VERIFY_ACCOUNT} className="underline font-black hover:text-amber-100 transition-colors ml-1 whitespace-nowrap">
-                  {t("verify_now", "Şimdi Doğrula →")}
+                  {t("verify_now")}
                 </Link>
               </div>
             )}

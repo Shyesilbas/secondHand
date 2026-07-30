@@ -401,7 +401,7 @@ const ListingDetailPage = () => {
                   }`}
                 >
                   <FileText className="w-4 h-4 text-emerald-600" />
-                  {t("details_and_specs", "Özellikler & Açıklama")}
+                  {t("details_and_specs")}
                 </button>
 
                 {hasReviews && (
@@ -415,7 +415,7 @@ const ListingDetailPage = () => {
                     }`}
                   >
                     <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                    {t("reviews", "Değerlendirmeler")}
+                    {t("reviews")}
                   </button>
                 )}
 
@@ -429,7 +429,7 @@ const ListingDetailPage = () => {
                   }`}
                 >
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  {t("safe_meetup", "Güvenli Alışveriş")}
+                  {t("safe_meetup")}
                 </button>
               </div>
 
@@ -539,12 +539,12 @@ const ListingDetailPage = () => {
                         ) : itemIsInCart ? (
                           <>
                             <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            {t("in_cart", "In Cart")}
+                            {t("in_cart")}
                           </>
                         ) : (
                           <>
                             <ShoppingBag className="w-3.5 h-3.5" />
-                            {t("add_to_cart", "Add to Cart")}
+                            {t("add_to_cart")}
                           </>
                         )}
                       </button>
@@ -623,12 +623,12 @@ const ListingDetailPage = () => {
                   ) : itemIsInCart ? (
                     <>
                       <Check className="w-4 h-4" />
-                      {t("in_cart", "In Cart")}
+                      {t("in_cart")}
                     </>
                   ) : (
                     <>
                       <ShoppingBag className="w-4 h-4" />
-                      {t("cart", "Cart")}
+                      {t("cart")}
                     </>
                   )}
                 </button>

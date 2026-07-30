@@ -7,29 +7,29 @@ export const SafeMeetupOnboardingModal = () => {
 
   const ONBOARDING_STEPS = React.useMemo(() => [{
     id: 1,
-    title: t("in_person_safe_shopping", "Elden Güvenli Alışveriş"),
-    description: t("in_person_safe_shopping_desc", "Kargo beklemeden, kargo ücreti ödemeden yüz yüze güvenli alışveriş deneyimi. Para havuzda (Escrow) güvende tutulur; siz ürünü teslim alıp onaylamadan satıcıya aktarılmaz."),
+    title: t("in_person_safe_shopping"),
+    description: t("in_person_safe_shopping_desc"),
     icon: ShieldCheck,
     color: "from-blue-500/10 to-indigo-500/10 text-primary border-primary",
     gradient: "from-indigo-600 to-violet-600"
   }, {
     id: 2,
-    title: t("setting_meetup_location", "Buluşma Noktası Belirleme"),
-    description: t("setting_meetup_location_desc", "Sipariş verilirken ortak kararlaştırılan güvenli buluşma konumları (📍 Marmara Forum, Kadıköy İskele vb.) seçilir. Böylece nerede buluşacağınızı net olarak bilirsiniz."),
+    title: t("setting_meetup_location"),
+    description: t("setting_meetup_location_desc"),
     icon: MapPin,
     color: "from-amber-500/10 to-orange-500/10 text-status-warning border-amber-100",
     gradient: "from-amber-500 to-orange-600"
   }, {
     id: 3,
-    title: t("code_and_qr_verification", "Kod ve QR Doğrulama"),
-    description: t("code_and_qr_verification_desc", "Buluşma anında alıcı kendi ekranındaki 5 dakikalık dynamic QR kodu veya 6 haneli PIN kodunu satıcıya gösterir. Satıcı kodu girerek teslimatı sisteme anında kaydeder."),
+    title: t("code_and_qr_verification"),
+    description: t("code_and_qr_verification_desc"),
     icon: QrCode,
     color: "from-emerald-500/10 to-teal-500/10 text-status-success border-emerald-100",
     gradient: "from-emerald-600 to-teal-600"
   }, {
     id: 4,
-    title: t("dual_approval_and_wallet_transfer", "Çift Onay & Cüzdana Aktarım"),
-    description: t("dual_approval_desc", "Teslimat yapıldıktan sonra iki taraf da 'Ürünü elden teslim aldım/ettim' onay kutularını işaretleyip işlemi tamamlar. Escrow'daki para anında satıcının cüzdanına (wallet) aktarılır."),
+    title: t("dual_approval_and_wallet_transfer"),
+    description: t("dual_approval_desc"),
     icon: Wallet,
     color: "from-rose-500/10 to-pink-500/10 text-rose-600 border-rose-100",
     gradient: "from-rose-600 to-pink-600"
@@ -72,7 +72,7 @@ export const SafeMeetupOnboardingModal = () => {
   }, [isOpen]);
   const handleClose = () => {
     if (!showClose) return;
-    cacheService.set('safe_meetup_onboarding_shown', 'true');
+    cacheService.set("safe_meetup_onboarding_shown");
     setIsOpen(false);
   };
   const handleNext = () => {

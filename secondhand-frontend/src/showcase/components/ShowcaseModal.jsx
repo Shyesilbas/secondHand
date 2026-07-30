@@ -448,13 +448,13 @@ const ShowcaseModal = ({
             <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-6 h-6 text-rose-500" />
             </div>
-            <h2 className="text-sm font-black text-slate-900 mb-1">{t("something_went_wrong", "Bir Hata Oluştu")}</h2>
+            <h2 className="text-sm font-black text-slate-900 mb-1">{t("something_went_wrong")}</h2>
             <p className="text-xs text-slate-500 mb-6">{listingError || 'İlan bulunamadı.'}</p>
             <button 
               className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer" 
               onClick={onClose}
             >
-              {t("close", "Kapat")}
+              {t("close")}
             </button>
           </div>
         </div>

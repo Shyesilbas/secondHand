@@ -37,8 +37,8 @@ const ListingsContent = React.memo(({
                     <div className="max-w-md w-full">
                         <EmptyState
                             icon={PackageSearch}
-                            title={hasSearch ? t("no_results_found", "No results found") : t("nothing_here_yet", "Nothing here yet")}
-                            description={hasSearch ? t("try_different_keywords", "Try different keywords or remove some filters to see more results.") : t("no_listings_in_category", { defaultValue: `No listings in ${categoryLabel} right now. Try a different category or check back soon.` })}
+                            title={hasSearch ? t("no_results_found") : t("nothing_here_yet")}
+                            description={hasSearch ? t("try_different_keywords") : t("no_listings_in_category", { defaultValue: `No listings in ${categoryLabel} right now. Try a different category or check back soon.` })}
                             primaryAction={onResetFilters ? {
                                 label: t("reset_filters"),
                                 onClick: onResetFilters

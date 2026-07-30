@@ -19,15 +19,15 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
         onSuccess: (res) => {
             const data = res?.data || res;
             notification.showSuccess(
-                t('success', 'Başarılı'),
-                data?.message || t('broadcast_success', 'Favorileyen kullanıcılara özel teklif gönderildi!')
+                t("success"),
+                data?.message || t("broadcast_success")
             );
             onClose();
         },
         onError: (err) => {
             notification.showError(
-                t('error', 'Hata'),
-                err?.response?.data?.message || t('broadcast_failed', 'İndirim gönderilemedi.')
+                t("error"),
+                err?.response?.data?.message || t("broadcast_failed")
             );
         }
     });
@@ -63,7 +63,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                         </div>
                         <div>
                             <h3 className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight">
-                                {t('broadcast_modal_title', 'Favorileyenlere Özel İndirim Gönder')}
+                                {t("broadcast_modal_title")}
                             </h3>
                             <p className="text-xs text-indigo-700 dark:text-indigo-300 font-semibold flex items-center gap-1 mt-0.5">
                                 <FiUsers className="w-3.5 h-3.5" />
@@ -100,7 +100,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                 <FiPercent className="w-3.5 h-3.5 text-indigo-500" />
-                                {t('quick_discounts', 'Hızlı İndirim Seçenekleri')}
+                                {t("quick_discounts")}
                             </label>
                             <div className="grid grid-cols-4 gap-2">
                                 {[5, 10, 15, 20].map((percent) => (
@@ -120,7 +120,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                     {/* Input Discount Price */}
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                            {t('special_offer_price', 'Favorileyenlere Özel İndirimli Fiyat (₺)')}
+                            {t("special_offer_price")}
                         </label>
                         <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-lg">₺</span>
@@ -141,7 +141,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                             <FiClock className="w-3.5 h-3.5 text-indigo-500" />
-                            {t('offer_validity_period', 'Teklif Geçerlilik Süresi')}
+                            {t("offer_validity_period")}
                         </label>
                         <select
                             value={expirationHours}
@@ -161,7 +161,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                             onClick={onClose}
                             className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-2xl text-xs transition-all"
                         >
-                            {t('cancel', 'Vazgeç')}
+                            {t("cancel")}
                         </button>
                         <button
                             type="submit"
@@ -169,7 +169,7 @@ export const FavoriterBroadcastModal = ({ isOpen, onClose, listing, favoriterCou
                             className="flex-1 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-2xl text-xs shadow-xl shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
                         >
                             <FiSend className="w-4 h-4" />
-                            {broadcastMutation.isPending ? t('broadcasting', 'Gönderiliyor...') : t('send_broadcast_offer', 'Tüm Favorileyenlere Teklifi Gönder')}
+                            {broadcastMutation.isPending ? t("broadcasting") : t("send_broadcast_offer")}
                         </button>
                     </div>
                 </form>

@@ -29,13 +29,13 @@ const RecentlyViewedSection = ({ currentListingId = null, className = '' }) => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <span>{t("recently_viewed_listings", "Son İncelediğiniz İlanlar")}</span>
+              <span>{t("recently_viewed_listings")}</span>
               <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100/80 text-emerald-800 border border-emerald-200/60">
                 {itemsToDisplay.length}
               </span>
             </h3>
             <p className="text-xs text-slate-500">
-              {t("recently_viewed_subtitle", "Son zamanlarda gezdiğiniz ürünlere hızlıca göz atın")}
+              {t("recently_viewed_subtitle")}
             </p>
           </div>
         </div>
@@ -44,7 +44,7 @@ const RecentlyViewedSection = ({ currentListingId = null, className = '' }) => {
           onClick={clearRecentlyViewed}
           className="text-xs font-bold text-slate-400 hover:text-rose-600 transition-colors px-2 py-1 rounded-lg hover:bg-rose-50"
         >
-          {t("clear_history", "Geçmişi Temizle")}
+          {t("clear_history")}
         </button>
       </div>
 
@@ -68,7 +68,7 @@ const RecentlyViewedSection = ({ currentListingId = null, className = '' }) => {
                   removeRecentlyViewed(item.id);
                 }}
                 className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-slate-900/40 hover:bg-rose-600 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all shadow-md"
-                title={t("remove", "Kaldır")}
+                title={t("remove")}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />

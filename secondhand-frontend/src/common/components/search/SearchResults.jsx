@@ -121,9 +121,9 @@ const SearchResults = ({
         {/* Tab Header */}
         <div className="px-4 py-2 bg-secondary-50 border-b border-border-light flex items-center justify-between">
           <div className="text-sm font-medium text-text-secondary capitalize">
-            {activeTab} {t("results", "sonuçları")}</div>
+            {activeTab} {t("results")}</div>
           <div className="text-xs text-text-muted">
-            {results.length} {t("found", "sonuç bulundu")}</div>
+            {results.length} {t("found")}</div>
         </div>
 
         {/* Results */}

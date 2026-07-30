@@ -71,7 +71,7 @@ const ListingsNavigation = ({
                         <p className="text-sm font-medium text-text-secondary">
                           {isListingNo && listingNoLoading ? <span className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_listing_number")}</span> : isListingNo && listingNoError ? listingNoError : loadingAllPages ? <span className="flex items-center gap-2">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_everywhere")}</span> : <>{t("found")} <span className="font-bold">{filteredListings.length}</span> {t("results", "sonuç")}
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />{t("searching_everywhere")}</span> : <>{t("found")} <span className="font-bold">{filteredListings.length}</span> {t("results")}
                                 {isTitle ? allPagesLoaded ? ' in all pages' : ' on this page' : ''}
                               </>}
                         </p>

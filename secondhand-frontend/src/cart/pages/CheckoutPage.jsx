@@ -202,7 +202,7 @@ const CheckoutPage = () => {
       <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-xs">
         <PageContainer className="py-3.5">
           <div className="flex items-center gap-4">
-            <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-slate-600 hover:text-slate-900 transition-colors" aria-label={t("back_to_cart", "Sepete Dön")}>
+            <button type="button" onClick={() => navigate(ROUTES.SHOPPING_CART)} className="-ml-2 shrink-0 p-2 text-slate-600 hover:text-slate-900 transition-colors" aria-label={t("back_to_cart")}>
               <ArrowLeft className="h-5 w-5" strokeWidth={2} />
             </button>
             <div className="min-w-0 flex-1">
@@ -217,7 +217,7 @@ const CheckoutPage = () => {
         <button type="button" onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} className="flex w-full items-center justify-between text-xs font-bold">
           <span className="flex items-center gap-1.5 text-slate-900">
             <ShoppingCart className="h-4 w-4 text-emerald-600" />
-            {isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}
+            {isOrderSummaryExpanded ? t("hide_order_summary") : t("show_order_summary")}
             <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
           </span>
           <span className="font-extrabold font-mono text-emerald-700">
@@ -238,11 +238,11 @@ const CheckoutPage = () => {
             </div>
             <div>
               <p className="text-xs font-extrabold text-slate-900">
-                {isPremium ? t('premium_shipping_advantage', 'Premium Kargo Avantajı') : t('dont_wait_for_shipping', 'Kargoda Beklemeyin!')}
+                {isPremium ? t("premium_shipping_advantage") : t("dont_wait_for_shipping")}
               </p>
               <p className="text-xs text-slate-500 font-medium">
                 {isPremium 
-                  ? t('order_processed_with_priority', 'Siparişiniz öncelikli kargo olarak işlenecek.') 
+                  ? t("order_processed_with_priority") 
                   : t('upgrade_to_premium_get_shipping_fast', "Premium'a geçerek siparişinizi en hızlı şekilde teslim alın!")}
               </p>
             </div>
