@@ -23,6 +23,7 @@ const HeaderListingsMenu = ({ isOpen, onToggle, onClose, orderCount }) => (
                         to={item.to}
                         onClick={onClose}
                         icon={item.icon}
+                        labelKey={item.labelKey}
                         label={item.label}
                         rightContent={
                             item.key === 'orders' && orderCount > 0

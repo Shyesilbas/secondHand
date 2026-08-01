@@ -3,6 +3,7 @@ import {useTranslation} from "react-i18next";
 import React, {useMemo, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {
+  AlertTriangle,
   ArrowRight,
   ChevronDown,
   Crown,
@@ -13,8 +14,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Sparkles,
-  Wallet,
-  AlertTriangle
+  Wallet
 } from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
 import {usePlan} from '@/common/hooks/usePlan';
@@ -143,7 +143,7 @@ const AccountHubPage = () => {
           return group.items.map(item => {
             const active = isRouteActive(pathname, item.route);
             return <Link key={`mobile-${group.id}-${item.route}`} to={item.route} className={`shrink-0 px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${active ? 'bg-primary text-white shadow-sm' : 'bg-background-primary text-text-secondary border border-border-light hover:bg-secondary-light'}`}>
-                  {item.name}
+                  {t(item.nameKey || item.name)}
                 </Link>;
           });
         })}
@@ -159,7 +159,7 @@ const AccountHubPage = () => {
                 <button type="button" onClick={() => toggleGroup(group.id)} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left text-xs font-bold uppercase tracking-wider text-text-muted hover:bg-secondary-light transition-colors">
                   <ChevronDown className={`h-3.5 w-3.5 text-text-muted shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-0' : '-rotate-90'}`} />
                   <GroupIcon className="h-4 w-4 text-text-muted shrink-0" strokeWidth={2} />
-                  <span className="truncate">{group.label}</span>
+                  <span className="truncate">{t(group.labelKey || group.label)}</span>
                 </button>
                 {isOpen && <div className="mt-1.5 ml-2.5 pl-3 border-l border-slate-100 space-y-1">
                     {group.items.map(item => {
@@ -167,7 +167,7 @@ const AccountHubPage = () => {
                 const active = isRouteActive(pathname, item.route);
                 return <Link key={`${group.id}-${item.route}`} to={item.route} className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-xs transition-all ${active ? 'bg-primary text-white font-bold shadow-sm' : 'text-text-secondary font-semibold hover:bg-secondary-light hover:text-text-primary'}`}>
                           <ItemIcon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-text-muted'}`} strokeWidth={active ? 2.5 : 2} />
-                          <span className="truncate">{item.name}</span>
+                          <span className="truncate">{t(item.nameKey || item.name)}</span>
                         </Link>;
               })}
                   </div>}
@@ -184,7 +184,7 @@ const AccountHubPage = () => {
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700">{t("your_membership_expires_soon")}</h4>
                 <p className="text-xs mt-1 font-medium">
-                  {t('expires_on', 'Üyeliğiniz {{date}} tarihinde sona erecektir.', { date: new Date(expirationDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US') })}
+                  {t('expires_on', { date: new Date(expirationDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US') })}
                   {!autoRenew && ` ${t("auto_renew_off_warning")}`}
                 </p>
               </div>
@@ -197,11 +197,6 @@ const AccountHubPage = () => {
               <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("welcome")}{user?.name?.split(' ')[0] || 'User'}
               </h1>
               <p className="mt-1 text-sm text-text-secondary font-medium">{t("your_personal_secondhand_space")}</p>
-            </div>
-            {/* Secure Trust Badge */}
-            <div className="inline-flex items-center self-start gap-1.5 rounded-full bg-status-success-bg border border-status-success-border px-3.5 py-1.5 text-xs font-bold text-status-success select-none shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5 text-status-success" strokeWidth={2.5} />
-              <span>{t("escrow_secured_member")}</span>
             </div>
           </div>
 

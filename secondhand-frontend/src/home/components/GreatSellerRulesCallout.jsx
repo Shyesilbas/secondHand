@@ -1,27 +1,32 @@
 import { useTranslation } from "react-i18next";
 import { GREAT_SELLER_POLICY as P } from './greatSellerPolicyCopy.js';
 import { BadgeCheck, Banknote, Star, UsersRound, Info } from 'lucide-react';
-const RULES = [{
+const getRules = (t) => [{
   icon: Banknote,
-  title: `Sales Activity`,
-  body: `At least ${P.minQualifyingSales} qualifying orders within the last ${P.rollingWindowDays} days.`
+  key: 'sales',
+  title: t('great_seller_sales_activity_title'),
+  body: t('great_seller_sales_activity_desc', { sales: P.minQualifyingSales, days: P.rollingWindowDays })
 }, {
   icon: BadgeCheck,
-  title: `Value Standards`,
-  body: `Items must meet the ${P.minUnitPriceTry.toLocaleString('tr-TR')} TRY minimum price threshold.`
+  key: 'value',
+  title: t('great_seller_value_standards_title'),
+  body: t('great_seller_value_standards_desc', { price: P.minUnitPriceTry.toLocaleString('tr-TR') })
 }, {
   icon: UsersRound,
-  title: `Account Authority`,
-  body: `Verified feedback from at least ${P.minDistinctReviewers} distinct buyers on your profile.`
+  key: 'account',
+  title: t('great_seller_account_authority_title'),
+  body: t('great_seller_account_authority_desc', { reviewers: P.minDistinctReviewers })
 }, {
   icon: Star,
-  title: `Trust Score`,
-  body: `Maintain a consistent average seller rating of ${P.minAverageRating} or higher.`
+  key: 'trust',
+  title: t('great_seller_trust_score_title'),
+  body: t('great_seller_trust_score_desc', { rating: P.minAverageRating })
 }];
 const GreatSellerRulesCallout = ({
   className = ''
 }) => {
   const { t } = useTranslation();
+  const rules = getRules(t);
   return <div className={`bg-background-primary border border-border-light rounded-xl p-6 sm:p-8 ${className}`}>
     <div className="flex items-center gap-3 mb-8">
       <div className="w-10 h-10 rounded-full bg-background-secondary flex items-center justify-center">
@@ -34,9 +39,9 @@ const GreatSellerRulesCallout = ({
     </div>
 
     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-      {RULES.map((rule) => {
+      {rules.map((rule) => {
         const Icon = rule.icon;
-        return <div key={rule.title} className="group relative">
+        return <div key={rule.key} className="group relative">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 rounded-lg bg-background-secondary text-text-muted group-hover:bg-primary-light group-hover:text-primary transition-colors">
               <Icon className="w-4 h-4" aria-hidden />

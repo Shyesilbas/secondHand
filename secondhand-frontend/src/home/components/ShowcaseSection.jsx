@@ -9,35 +9,35 @@ import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
 import { ArrowRight, BookOpen, Building2, Car, Dumbbell, Laptop, LayoutGrid, MoreHorizontal, Shirt } from 'lucide-react';
 const SHOWCASE_CATEGORY_TABS = [{
   value: 'ALL',
-  label: 'All',
+  labelKey: 'all',
   icon: LayoutGrid
 }, {
   value: 'VEHICLE',
-  label: 'Vehicle',
+  labelKey: 'vehicles',
   icon: Car
 }, {
   value: 'ELECTRONICS',
-  label: 'Electronics',
+  labelKey: 'electronics',
   icon: Laptop
 }, {
   value: 'REAL_ESTATE',
-  label: 'Real Estate',
+  labelKey: 'real_estate',
   icon: Building2
 }, {
   value: 'CLOTHING',
-  label: 'Clothing',
+  labelKey: 'fashion',
   icon: Shirt
 }, {
   value: 'BOOKS',
-  label: 'Books',
+  labelKey: 'book',
   icon: BookOpen
 }, {
   value: 'SPORTS',
-  label: 'Sports',
+  labelKey: 'sports',
   icon: Dumbbell
 }, {
   value: 'OTHER',
-  label: 'Other',
+  labelKey: 'other',
   icon: MoreHorizontal
 }];
 const normalizeListingType = listing => String(listing?.type || '').trim().toUpperCase();
@@ -89,7 +89,7 @@ const ShowcaseSection = () => {
                       ${active ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'}
                     `}>
                     <Icon className={`w-3.5 h-3.5 ${active ? 'text-primary' : 'text-text-muted'}`} />
-                    <span>{tab.label}</span>
+                    <span>{t(tab.labelKey)}</span>
                   </button>;
             })}
           </div>

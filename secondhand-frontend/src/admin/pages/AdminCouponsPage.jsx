@@ -10,20 +10,20 @@ import { adminCouponApi } from '../services/adminCouponApi.js';
 const LISTING_TYPES = ['VEHICLE', 'ELECTRONICS', 'REAL_ESTATE', 'CLOTHING', 'BOOKS', 'SPORTS', 'OTHER'];
 const AUDIENCES = [{
   value: 'ALL_USERS',
-  label: 'Tüm kullanıcılar',
-  hint: 'Kuralları sağlayan herkes kullanabilir'
+  labelKey: 'admin_audience_all_users',
+  hintKey: 'admin_audience_all_users_hint'
 }, {
   value: 'USER_ID_LIST',
-  label: 'ID listesi',
-  hint: 'Sadece yazdığınız kullanıcı kimlikleri'
+  labelKey: 'admin_audience_id_list',
+  hintKey: 'admin_audience_id_list_hint'
 }, {
   value: 'NEVER_ORDERED_FIRST_ORDER',
-  label: 'İlk sipariş (kural)',
-  hint: 'Tamamlanmış ödemeli siparişi hiç olmayan alıcılar'
+  labelKey: 'admin_audience_first_order',
+  hintKey: 'admin_audience_first_order_hint'
 }];
 const FIRST_ORDER_PRESET = {
-  title: 'İlk siparişe 300 TL indirim',
-  description: 'Daha önce ödemesi tamamlanmış siparişi olmayan alıcılar içindir. Yalnızca ilk siparişte kullanılır; sepet tutarı 300 TL altındaysa indirim sepete kadar uygulanır. Süre sınırı yoktur; kişi başı tek kullanım.',
+  titleKey: 'admin_first_order_preset_title',
+  descriptionKey: 'admin_first_order_preset_desc',
   discountKind: 'ORDER_FIXED',
   value: '300',
   usageLimitPerUser: '1',
@@ -67,28 +67,28 @@ const numOrUndef = raw => {
   const n = Number(raw);
   return Number.isFinite(n) ? n : undefined;
 };
-const audienceSummary = row => {
+const audienceSummary = (row, t) => {
   const a = row.audience || (row.forAllUsers !== false ? 'ALL_USERS' : 'USER_ID_LIST');
   if (a === 'NEVER_ORDERED_FIRST_ORDER') {
     return {
-      label: 'İlk sipariş',
+      label: t('admin_audience_first_order_short'),
       hint: ''
     };
   }
   if (a === 'USER_ID_LIST') {
     const n = row.eligibleUserIds?.length ?? 0;
     return {
-      label: 'ID listesi',
-      hint: `${n} kullanıcı`
+      label: t('admin_audience_id_list'),
+      hint: `${n} ${t('admin_users_count')}`
     };
   }
   return {
-    label: 'Tüm kullanıcılar',
+    label: t('admin_audience_all_users'),
     hint: ''
   };
 };
 
-/** Tutarlı form kontrolleri */
+/** Consistent form controls */
 const inputCn = 'mt-1.5 w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm placeholder:text-slate-400 transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-100/90 disabled:text-slate-500';
 function FormSection({
   // eslint-disable-next-line no-unused-vars
@@ -159,7 +159,9 @@ const AdminCouponsPage = () => {
           audience: value,
           forAllUsers: false,
           eligibleUserIdsText: '',
-          ...FIRST_ORDER_PRESET
+          ...FIRST_ORDER_PRESET,
+          title: t(FIRST_ORDER_PRESET.titleKey),
+          description: t(FIRST_ORDER_PRESET.descriptionKey)
         };
       }
       if (value === 'ALL_USERS') {
@@ -232,29 +234,29 @@ const AdminCouponsPage = () => {
   const firstOrderAudience = form.audience === 'NEVER_ORDERED_FIRST_ORDER';
   const buildCreateBody = () => {
     const code = form.code.trim().toUpperCase();
-    if (!code) throw new Error('Kod zorunlu');
-    if (!form.title?.trim()) throw new Error('Başlık zorunlu');
+    if (!code) throw new Error(t('admin_err_code_required'));
+    if (!form.title?.trim()) throw new Error(t('admin_err_title_required'));
     const audience = form.audience || 'ALL_USERS';
     const eligibleUserIds = parseIds(form.eligibleUserIdsText);
     if (audience === 'USER_ID_LIST' && eligibleUserIds.length === 0) {
-      throw new Error('ID listesi hedef kitle için en az bir kullanıcı ID girin.');
+      throw new Error(t('admin_err_id_list_empty'));
     }
     if (audience === 'NEVER_ORDERED_FIRST_ORDER') {
       const v = Number(form.value);
       if (form.discountKind !== 'ORDER_FIXED' || !Number.isFinite(v) || v !== 300) {
-        throw new Error('İlk sipariş kuponu: indirim türü sipariş sabit (ORDER_FIXED), tutar 300 olmalı.');
+        throw new Error(t('admin_err_first_order_discount'));
       }
       if (numOrUndef(form.usageLimitPerUser) !== 1) {
-        throw new Error('Kişi başı kullanım limiti tam olarak 1 olmalı.');
+        throw new Error(t('admin_err_per_user_limit_one'));
       }
       if (form.startsAt || form.endsAt) {
-        throw new Error('İlk sipariş kuponunda başlangıç/bitiş tarihi olmamalı.');
+        throw new Error(t('admin_err_first_order_no_dates'));
       }
       if (numOrUndef(form.usageLimitGlobal) != null) {
-        throw new Error('İlk sipariş kuponunda global kullanım limiti olmamalı.');
+        throw new Error(t('admin_err_first_order_no_global_limit'));
       }
       if (numOrUndef(form.minSubtotal) != null || numOrUndef(form.maxDiscount) != null) {
-        throw new Error('İlk sipariş kuponunda min. sepet veya max indirim alanı dolu olmamalı.');
+        throw new Error(t('admin_err_first_order_no_min_max'));
       }
     }
     return {
@@ -280,24 +282,24 @@ const AdminCouponsPage = () => {
     const audience = form.audience || 'ALL_USERS';
     const eligibleUserIds = parseIds(form.eligibleUserIdsText);
     if (audience === 'USER_ID_LIST' && eligibleUserIds.length === 0) {
-      throw new Error('ID listesi hedef kitle için en az bir kullanıcı ID girin.');
+      throw new Error(t('admin_err_id_list_empty'));
     }
     if (audience === 'NEVER_ORDERED_FIRST_ORDER') {
       const v = Number(form.value);
       if (form.discountKind !== 'ORDER_FIXED' || !Number.isFinite(v) || v !== 300) {
-        throw new Error('İlk sipariş kuponu: indirim türü sipariş sabit, tutar 300 olmalı.');
+        throw new Error(t('admin_err_first_order_discount'));
       }
       if (numOrUndef(form.usageLimitPerUser) !== 1) {
-        throw new Error('Kişi başı kullanım limiti tam olarak 1 olmalı.');
+        throw new Error(t('admin_err_per_user_limit_one'));
       }
       if (form.startsAt || form.endsAt) {
-        throw new Error('İlk sipariş kuponunda başlangıç/bitiş tarihi olmamalı.');
+        throw new Error(t('admin_err_first_order_no_dates'));
       }
       if (numOrUndef(form.usageLimitGlobal) != null) {
-        throw new Error('İlk sipariş kuponunda global kullanım limiti olmamalı.');
+        throw new Error(t('admin_err_first_order_no_global_limit'));
       }
       if (numOrUndef(form.minSubtotal) != null || numOrUndef(form.maxDiscount) != null) {
-        throw new Error('İlk sipariş kuponunda min. sepet veya max indirim alanı dolu olmamalı.');
+        throw new Error(t('admin_err_first_order_no_min_max'));
       }
     }
     return {
@@ -431,7 +433,7 @@ const AdminCouponsPage = () => {
                       const {
                         label,
                         hint
-                      } = audienceSummary(row);
+                      } = audienceSummary(row, t);
                       const a = row.audience || (row.forAllUsers !== false ? 'ALL_USERS' : 'USER_ID_LIST');
                       return <div className="text-xs">
                               <span className={a === 'NEVER_ORDERED_FIRST_ORDER' ? 'text-primary font-medium' : a === 'ALL_USERS' ? 'text-status-success font-medium' : 'text-text-primary'}>
@@ -472,10 +474,10 @@ const AdminCouponsPage = () => {
                   </div>
                   <div className="min-w-0 pt-0.5">
                     <h2 id="coupon-modal-title" className="text-lg font-semibold text-text-primary tracking-tight">
-                      {modal === 'create' ? 'Yeni kupon' : 'Kuponu düzenle'}
+                      {modal === 'create' ? t('admin_new_coupon') : t('admin_edit_coupon')}
                     </h2>
                     <p className="mt-1 text-sm font-medium leading-snug text-text-muted">
-                      {modal === 'create' ? 'Kod, hedef kitle ve indirim kurallarını tanımlayın.' : 'Metin, indirim ve limitleri güncelleyin. Hedef kitle sabittir.'}
+                      {modal === 'create' ? t('admin_coupon_create_desc') : t('admin_coupon_edit_desc')}
                     </p>
                   </div>
                 </div>
@@ -490,7 +492,7 @@ const AdminCouponsPage = () => {
 
             <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-background-primary">
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
-                <FormSection Icon={Tag} title={t("temel_bilgiler")} subtitle="Kullanıcıya görünen başlık ve kupon kodu.">
+                <FormSection Icon={Tag} title={t("temel_bilgiler")} subtitle={t('admin_basic_info_subtitle')}>
                   {modal === 'create' && <label className="block">
                       <span className="text-xs font-semibold text-text-secondary">{t("kod")}<span className="text-rose-500">*</span>
                       </span>
@@ -516,7 +518,7 @@ const AdminCouponsPage = () => {
                   </label>
                 </FormSection>
 
-                <FormSection Icon={Users} title={t("hedef_kitle")} subtitle="Kuponu kimler görebilir ve kullanabilir?">
+                <FormSection Icon={Users} title={t("hedef_kitle")} subtitle={t('admin_audience_subtitle')}>
                   <fieldset className="space-y-2.5" disabled={modal?.mode === 'edit'}>
                     <legend className="sr-only">{t("hedef_kitle")}</legend>
                     <div className="grid gap-2 sm:grid-cols-1">
@@ -525,8 +527,8 @@ const AdminCouponsPage = () => {
                     return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-primary-light shadow-sm ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-border-dark hover:bg-background-secondary'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
                             <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-border-light text-primary focus:ring-primary" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
                             <span className="min-w-0 flex-1">
-                              <span className="block text-sm font-semibold text-text-primary">{opt.label}</span>
-                              <span className="mt-0.5 block text-xs leading-relaxed text-text-secondary">{opt.hint}</span>
+                              <span className="block text-sm font-semibold text-text-primary">{t(opt.labelKey)}</span>
+                              <span className="mt-0.5 block text-xs leading-relaxed text-text-secondary">{t(opt.hintKey)}</span>
                             </span>
                           </label>;
                   })}
@@ -562,7 +564,7 @@ const AdminCouponsPage = () => {
                     </label>}
                 </FormSection>
 
-                <FormSection Icon={Clock} title={t("yay_n_ve_s_re")} subtitle="Ne zaman geçerli olsun? İlk sipariş kuralında tarih kapalıdır.">
+                <FormSection Icon={Clock} title={t("yay_n_ve_s_re")} subtitle={t('admin_publication_subtitle')}>
                   <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border-light bg-background-primary px-4 py-3.5 shadow-sm transition hover:border-border-dark">
                     <span className="text-sm font-semibold text-text-primary">{t("kupon_yay_nda")}</span>
                     <input type="checkbox" checked={form.active} onChange={e => setForm(p => ({
@@ -589,7 +591,7 @@ const AdminCouponsPage = () => {
                   {firstOrderAudience && <p className="text-xs text-text-muted">{t("bu_kuralda_s_re_s_n_r_yok_alanlar_kilitl")}</p>}
                 </FormSection>
 
-                <FormSection Icon={Percent} title={t("i_ndirim")} subtitle="Tür ve tutar. İlk sipariş kuralı sabit ₺300 sipariş indirimidir.">
+                <FormSection Icon={Percent} title={t("i_ndirim")} subtitle={t('admin_discount_subtitle')}>
                   <label className="block">
                     <span className="text-xs font-semibold text-text-secondary">{t("i_ndirim_t_r")}</span>
                     <select className={inputCn} value={form.discountKind} onChange={e => setForm(p => ({
@@ -626,7 +628,7 @@ const AdminCouponsPage = () => {
                   </label>
                 </FormSection>
 
-                <FormSection Icon={Layers} title={t("r_n_kapsam")} subtitle="Boş bırakılırsa uygun tüm ilan türleri (gayrimenkul ve araç hariç) geçerlidir.">
+                <FormSection Icon={Layers} title={t("r_n_kapsam")} subtitle={t('admin_scope_subtitle')}>
                   <div className="flex flex-wrap gap-2">
                     {LISTING_TYPES.map(t => {
                    const on = form.eligibleTypes.includes(t);
@@ -637,7 +639,7 @@ const AdminCouponsPage = () => {
                   </div>
                 </FormSection>
 
-                <FormSection Icon={Gauge} title={t("kullan_m_limitleri")} subtitle="Global tavan ve kişi başı. İlk sipariş kuralında yalnızca 1 kullanım / kişi.">
+                <FormSection Icon={Gauge} title={t("kullan_m_limitleri")} subtitle={t('admin_limits_subtitle')}>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <label className="block">
                       <span className="text-xs font-semibold text-text-secondary">{t("global_limit")}</span>

@@ -25,7 +25,9 @@ const CATEGORIES = [
   {
     id: 'VEHICLE',
     labelKey: 'vehicles',
-    defaultLabel: 'Vasıta',
+    step1Key: 'step_vehicle_type',
+    step2Key: 'step_vehicle_brand',
+    step3Key: 'step_vehicle_model',
     icon: Car,
     typeEnumKey: 'vehicleTypes',
     brandEnumKey: 'carBrands',
@@ -33,9 +35,6 @@ const CATEGORIES = [
     typeParamKey: 'vehicleTypeIds',
     brandParamKey: 'brandIds',
     modelParamKey: 'vehicleModelIds',
-    step1Title: '1. Araç Türü Seçin',
-    step2Title: '2. Marka Seçin',
-    step3Title: '3. Model Seçin',
     fallbacks: {
       types: [
         { id: 'CAR', name: 'Otomobil' },
@@ -59,7 +58,9 @@ const CATEGORIES = [
   {
     id: 'ELECTRONICS',
     labelKey: 'electronics',
-    defaultLabel: 'Elektronik',
+    step1Key: 'step_electronics_type',
+    step2Key: 'step_electronics_brand',
+    step3Key: 'step_electronics_model',
     icon: Smartphone,
     typeEnumKey: 'electronicTypes',
     brandEnumKey: 'electronicBrands',
@@ -67,9 +68,6 @@ const CATEGORIES = [
     typeParamKey: 'electronicTypeIds',
     brandParamKey: 'electronicBrandIds',
     modelParamKey: 'electronicModelIds',
-    step1Title: '1. Cihaz Türü Seçin',
-    step2Title: '2. Marka Seçin',
-    step3Title: '3. Model Seçin',
     fallbacks: {
       types: [
         { id: 'MOBILE_PHONE', name: 'Cep Telefonu' },
@@ -93,13 +91,12 @@ const CATEGORIES = [
   {
     id: 'REAL_ESTATE',
     labelKey: 'real_estate',
-    defaultLabel: 'Emlak',
+    step1Key: 'step_realestate_category',
+    step2Key: 'step_realestate_type',
+    step3Key: 'step_realestate_listing_type',
+    step4Key: 'step_realestate_owner',
     icon: Home,
     hasFourSteps: true,
-    step1Title: '1. Mülk Kategorisi',
-    step2Title: '2. Mülk Tipi',
-    step3Title: '3. İlan Türü',
-    step4Title: '4. Kimden (İlan Sahibi)',
     typeEnumKey: 'realEstateTypes',
     brandEnumKey: 'realEstateAdTypes',
     modelEnumKey: 'ownerTypes',
@@ -146,7 +143,9 @@ const CATEGORIES = [
   {
     id: 'CLOTHING',
     labelKey: 'fashion',
-    defaultLabel: 'Moda & Giyim',
+    step1Key: 'step_fashion_type',
+    step2Key: 'step_fashion_brand',
+    step3Key: 'step_fashion_gender',
     icon: Shirt,
     typeEnumKey: 'clothingTypes',
     brandEnumKey: 'clothingBrands',
@@ -154,9 +153,6 @@ const CATEGORIES = [
     typeParamKey: 'types',
     brandParamKey: 'brands',
     modelParamKey: 'clothingGenders',
-    step1Title: '1. Giyim Türü Seçin',
-    step2Title: '2. Marka Seçin',
-    step3Title: '3. Cinsiyet Seçin',
     fallbacks: {
       types: [
         { id: 'T_SHIRT', name: 'T-Shirt' },
@@ -180,8 +176,10 @@ const CATEGORIES = [
   },
   {
     id: 'BOOKS',
-    labelKey: 'books',
-    defaultLabel: 'Kitap & Kültür',
+    labelKey: 'book',
+    step1Key: 'step_book_type',
+    step2Key: 'step_book_format',
+    step3Key: 'step_book_condition',
     icon: BookOpen,
     typeEnumKey: 'bookTypes',
     brandEnumKey: 'bookFormats',
@@ -189,9 +187,6 @@ const CATEGORIES = [
     typeParamKey: 'bookTypeIds',
     brandParamKey: 'formatIds',
     modelParamKey: 'conditionIds',
-    step1Title: '1. Kitap Türü Seçin',
-    step2Title: '2. Kapak Formatı Seçin',
-    step3Title: '3. Kondisyon Seçin',
     fallbacks: {
       types: [
         { id: 'OKUMA_KITABI', name: 'Roman & Edebiyat Kitabı' },
@@ -432,7 +427,7 @@ const CategorySubHeader = () => {
   return (
     <div
       ref={containerRef}
-      className="relative z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-slate-700 shadow-xs"
+      className="relative z-30 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-slate-700 shadow-xs"
     >
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
         {/* Main Nav Bar Header Buttons */}
@@ -452,7 +447,7 @@ const CategorySubHeader = () => {
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isOpen ? 'text-white' : 'text-emerald-600'}`} />
-                  <span>{t(cat.labelKey, cat.defaultLabel)}</span>
+                  <span>{t(cat.labelKey)}</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-white' : 'text-slate-400'}`} />
                 </button>
               </div>
@@ -469,7 +464,7 @@ const CategorySubHeader = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.99 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/90 shadow-2xl z-50 p-6"
+            className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/90 shadow-2xl z-40 p-6"
           >
             <div className="max-w-[1440px] mx-auto space-y-4">
               {/* Header Action & Selection Breadcrumbs Bar */}
@@ -477,7 +472,7 @@ const CategorySubHeader = () => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 font-bold flex items-center gap-1.5 text-xs">
                     {React.createElement(currentCatConfig.icon, { className: "w-4 h-4" })}
-                    <span>{t(currentCatConfig.labelKey, currentCatConfig.defaultLabel)}</span>
+                    <span>{t(currentCatConfig.labelKey)}</span>
                   </div>
 
                   <ChevronRight className="w-4 h-4 text-slate-300" />
@@ -490,7 +485,7 @@ const CategorySubHeader = () => {
                         {selectedPropertyCat.name}
                       </span>
                     ) : (
-                      <span className="text-xs font-semibold text-slate-400 italic">Adım 1: Mülk Kategorisi</span>
+                      <span className="text-xs font-semibold text-slate-400 italic">{t(currentCatConfig.step1Key)}</span>
                     )
                   ) : (
                     selectedType ? (
@@ -499,7 +494,7 @@ const CategorySubHeader = () => {
                         {selectedType.name}
                       </span>
                     ) : (
-                      <span className="text-xs font-semibold text-slate-400 italic">Adım 1: Tür Seçin</span>
+                      <span className="text-xs font-semibold text-slate-400 italic">{t(currentCatConfig.step1Key)}</span>
                     )
                   )}
 
@@ -540,10 +535,10 @@ const CategorySubHeader = () => {
                     <button
                       onClick={resetSelections}
                       className="text-xs font-bold text-slate-400 hover:text-red-500 ml-2 flex items-center gap-1 transition-colors"
-                      title="Seçimleri Sıfırla"
+                      title={t('reset_selections')}
                     >
                       <RotateCcw className="w-3 h-3" />
-                      <span>Temizle</span>
+                      <span>{t('clear_selections')}</span>
                     </button>
                   )}
                 </div>
@@ -556,14 +551,14 @@ const CategorySubHeader = () => {
                   <Sparkles className="w-4 h-4 text-emerald-200 animate-pulse" />
                   <span>
                     {selectedModel
-                      ? `"${selectedModel.name}" İlanlarını Göster`
+                      ? t('view_listings_for', { name: selectedModel.name })
                       : selectedBrand
-                      ? `"${selectedBrand.name}" İlanlarını Göster`
+                      ? t('view_listings_for', { name: selectedBrand.name })
                       : selectedType
-                      ? `"${selectedType.name}" İlanlarını Göster`
+                      ? t('view_listings_for', { name: selectedType.name })
                       : selectedPropertyCat
-                      ? `"${selectedPropertyCat.name}" İlanlarını Göster`
-                      : `Tüm ${t(currentCatConfig.labelKey, currentCatConfig.defaultLabel)} İlanlarını Göster`}
+                      ? t('view_listings_for', { name: selectedPropertyCat.name })
+                      : t('view_all_listings', { category: t(currentCatConfig.labelKey) })}
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
@@ -576,7 +571,7 @@ const CategorySubHeader = () => {
                   <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
                     <span className="flex items-center gap-1.5 text-purple-700">
                       <Layers className="w-3.5 h-3.5" />
-                      {currentCatConfig.step1Title}
+                      {t(currentCatConfig.step1Key)}
                     </span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
                       {step1Items.length}
@@ -634,7 +629,7 @@ const CategorySubHeader = () => {
                   <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
                     <span className="flex items-center gap-1.5 text-emerald-700">
                       <Layers className="w-3.5 h-3.5" />
-                      {currentCatConfig.step2Title}
+                      {t(currentCatConfig.step2Key)}
                     </span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
                       {step2Items.length}
@@ -676,7 +671,7 @@ const CategorySubHeader = () => {
                   <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
                     <span className="flex items-center gap-1.5 text-teal-700">
                       <Layers className="w-3.5 h-3.5" />
-                      {currentCatConfig.step3Title}
+                      {t(currentCatConfig.step3Key)}
                     </span>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
                       {step3Items.length}
@@ -719,7 +714,7 @@ const CategorySubHeader = () => {
                     <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
                       <span className="flex items-center gap-1.5 text-blue-700">
                         <Layers className="w-3.5 h-3.5" />
-                        {currentCatConfig.step4Title}
+                        {t(currentCatConfig.step4Key)}
                       </span>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
                         {step4Items.length}

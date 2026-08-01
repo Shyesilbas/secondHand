@@ -18,7 +18,7 @@ const HeaderPaymentsMenu = ({
         </button>
 
         {isOpen && <HeaderDropdownPanel>
-                {getPaymentsMenuItems().map(item => <HeaderMenuItem key={item.to} to={item.to} onClick={onClose} icon={item.icon} label={item.label} />)}
+                {getPaymentsMenuItems().map(item => <HeaderMenuItem key={item.to} to={item.to} onClick={onClose} icon={item.icon} labelKey={item.labelKey} label={item.label} />)}
             </HeaderDropdownPanel>}
     </>;
 };

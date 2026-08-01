@@ -84,7 +84,7 @@ const HeaderProfileMenu = ({
           )}
 
           {getProfileMenuItems(user?.id).map(item => (
-            <HeaderMenuItem key={item.key} to={item.to} onClick={onClose} icon={item.icon} label={item.label} compact />
+            <HeaderMenuItem key={item.key} to={item.to} onClick={onClose} icon={item.icon} labelKey={item.labelKey} label={item.label} compact />
           ))}
           
           <div className="border-t border-slate-100 my-1" />

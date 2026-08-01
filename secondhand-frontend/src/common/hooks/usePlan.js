@@ -9,12 +9,12 @@ export const usePlan = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['membership', 'status'],
     queryFn: membershipService.getStatus,
-    initialData: user?.plan ? { 
+    placeholderData: user?.plan ? { 
       plan: user.plan, 
       planExpiry: user.planExpiry,
       isPremium: user.plan === 'PREMIUM'
     } : undefined,
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000,
   });
 
   const cancelMutation = useMutation({

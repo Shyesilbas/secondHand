@@ -2,19 +2,19 @@ import { CreditCard, Package, Receipt, Settings, Sparkles, TrendingUp, User } fr
 import { ROUTES } from '../../../constants/routes.js';
 
 export const getPaymentsMenuItems = () => [
-    { to: ROUTES.PAYMENTS, icon: Receipt, label: 'Payments' },
-    { to: ROUTES.PAYMENT_METHODS, icon: CreditCard, label: 'Payment Methods' },
+    { to: ROUTES.PAYMENTS, icon: Receipt, labelKey: 'payment_history' },
+    { to: ROUTES.PAYMENT_METHODS, icon: CreditCard, labelKey: 'payment_methods' },
 ];
 
 export const getListingsMenuItems = () => [
-    { to: ROUTES.MY_ORDERS, icon: Receipt, label: 'My Orders', key: 'orders' },
-    { to: ROUTES.I_SOLD, icon: TrendingUp, label: 'I Sold', key: 'sold' },
-    { to: ROUTES.MY_LISTINGS, icon: Package, label: 'My Listings', key: 'listings' },
+    { to: ROUTES.MY_ORDERS, icon: Receipt, labelKey: 'my_orders', key: 'orders' },
+    { to: ROUTES.I_SOLD, icon: TrendingUp, labelKey: 'i_sold', key: 'sold' },
+    { to: ROUTES.MY_LISTINGS, icon: Package, labelKey: 'my_listings', key: 'listings' },
 ];
 
 export const getProfileMenuItems = (userId) => [
-    { to: ROUTES.DASHBOARD, icon: Settings, label: 'Account Hub', key: 'dashboard' },
-    { to: ROUTES.AURA_CHAT, icon: Sparkles, label: 'Aura Assistant', key: 'aura' },
-    { to: ROUTES.MY_LISTINGS, icon: Package, label: 'My Listings', key: 'myListings' },
-    { to: userId ? ROUTES.USER_PROFILE(userId) : ROUTES.DASHBOARD, icon: User, label: 'Profile Page', key: 'profile' },
+    { to: ROUTES.DASHBOARD, icon: Settings, labelKey: 'account_hub', key: 'dashboard' },
+    { to: ROUTES.AURA_CHAT, icon: Sparkles, labelKey: 'aura_assistant', key: 'aura' },
+    { to: ROUTES.MY_LISTINGS, icon: Package, labelKey: 'my_listings', key: 'myListings' },
+    { to: userId ? ROUTES.USER_PROFILE(userId) : ROUTES.DASHBOARD, icon: User, labelKey: 'profile_page', key: 'profile' },
 ];
