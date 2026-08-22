@@ -17,7 +17,7 @@ public class InventoryKafkaConsumer {
 
     private final InventoryService inventoryService;
     private final ListingRepository listingRepository;
-    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    private final com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository processedKafkaEventRepository;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -30,9 +30,10 @@ public class InventoryKafkaConsumer {
             return;
         }
 
-        // Idempotency Check: check if already processed
-        String idempotencyKey = "processed:inventory:payment:" + event.paymentId();
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(idempotencyKey))) {
+        // Atomic DB-Level Idempotency Check: INSERT ON CONFLICT DO NOTHING within the same ACID Transaction
+        String dedupeKey = "inventory:payment:" + event.paymentId();
+        int inserted = processedKafkaEventRepository.insertIfNotExists(dedupeKey, "inventory-sync-consumers");
+        if (inserted == 0) {
             log.warn("Duplicate PaymentCompletedKafkaEvent detected for paymentId: {}. Skipping duplicate inventory deduction.", event.paymentId());
             return;
         }
@@ -53,21 +54,6 @@ public class InventoryKafkaConsumer {
                     listingRepository.save(listing);
                     log.info("Listing {} stock reached 0, updated status to SOLD in database.", event.listingId());
                 });
-            }
-
-            // Mark in Redis ONLY after DB transaction successfully commits!
-            if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
-                org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
-                        new org.springframework.transaction.support.TransactionSynchronization() {
-                            @Override
-                            public void afterCommit() {
-                                redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
-                                log.debug("Marked idempotency key {} in Redis after successful commit.", idempotencyKey);
-                            }
-                        }
-                );
-            } else {
-                redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
             }
 
             log.info("Successfully deducted database inventory for listingId: {}. Remaining stock: {}",

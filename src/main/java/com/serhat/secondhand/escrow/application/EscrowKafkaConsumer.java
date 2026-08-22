@@ -17,7 +17,7 @@ public class EscrowKafkaConsumer {
 
     private final IEWalletService walletService;
     private final UserRepository userRepository;
-    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    private final com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository processedKafkaEventRepository;
 
     @KafkaListener(
             topics = EscrowKafkaProducer.ESCROW_RELEASED_TOPIC,
@@ -33,9 +33,10 @@ public class EscrowKafkaConsumer {
             return;
         }
 
-        // Idempotency Check: check if already processed
-        String idempotencyKey = "processed:escrow:release:" + event.escrowId();
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(idempotencyKey))) {
+        // Atomic DB-Level Idempotency Check: INSERT ON CONFLICT DO NOTHING within the same ACID Transaction
+        String dedupeKey = "escrow:release:" + event.escrowId();
+        int inserted = processedKafkaEventRepository.insertIfNotExists(dedupeKey, "escrow-released-consumers");
+        if (inserted == 0) {
             log.warn("Duplicate EscrowReleasedKafkaEvent detected for escrowId: {}. Skipping duplicate wallet credit.", event.escrowId());
             return;
         }
@@ -43,22 +44,6 @@ public class EscrowKafkaConsumer {
         try {
             userRepository.findById(event.sellerId()).ifPresentOrElse(seller -> {
                 walletService.creditWalletQuietly(seller, event.amount());
-
-                // Mark in Redis ONLY after DB transaction successfully commits!
-                if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
-                    org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
-                            new org.springframework.transaction.support.TransactionSynchronization() {
-                                @Override
-                                public void afterCommit() {
-                                    redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
-                                    log.debug("Marked idempotency key {} in Redis after successful commit.", idempotencyKey);
-                                }
-                            }
-                    );
-                } else {
-                    redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
-                }
-
                 log.info("Successfully credited {} to seller {} wallet asynchronously via Kafka.",
                         event.amount(), seller.getEmail());
             }, () -> log.error("Seller with ID {} not found for escrow release credit.", event.sellerId()));

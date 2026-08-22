@@ -22,7 +22,7 @@ public class PaymentCompletedKafkaConsumer {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final PaymentMapper paymentMapper;
-    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    private final com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository processedKafkaEventRepository;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -33,9 +33,10 @@ public class PaymentCompletedKafkaConsumer {
         log.info("Received PaymentCompletedKafkaEvent from Kafka: paymentId={}, idempotencyKey={}",
                 event.paymentId(), event.idempotencyKey());
 
-        // Idempotency check: check if already processed
-        String idempotencyKey = "processed:payment:completed:" + event.paymentId();
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(idempotencyKey))) {
+        // Atomic DB-Level Idempotency Check: INSERT ON CONFLICT DO NOTHING within the same ACID Transaction
+        String dedupeKey = "payment:completed:" + event.paymentId();
+        int inserted = processedKafkaEventRepository.insertIfNotExists(dedupeKey, "payment-completed-consumers");
+        if (inserted == 0) {
             log.warn("Duplicate PaymentCompletedKafkaEvent detected for paymentId: {}. Skipping duplicate notification.", event.paymentId());
             return;
         }
@@ -58,21 +59,6 @@ public class PaymentCompletedKafkaConsumer {
                         paymentNotificationService.sendPaymentSuccessNotification(receiver, paymentDto);
                         log.info("Payment success notification sent to receiver ID: {}", receiver.getId());
                     });
-                }
-
-                // Mark in Redis ONLY after DB transaction successfully commits!
-                if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
-                    org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
-                            new org.springframework.transaction.support.TransactionSynchronization() {
-                                @Override
-                                public void afterCommit() {
-                                    redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
-                                    log.debug("Marked idempotency key {} in Redis after successful commit.", idempotencyKey);
-                                }
-                            }
-                    );
-                } else {
-                    redisTemplate.opsForValue().set(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
                 }
             });
         } catch (Exception ex) {
