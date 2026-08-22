@@ -114,9 +114,12 @@ Bu yüksek performanslı ve veri güvenliği sağlayan mimari platformun 4 kriti
 * **Teknoloji:** `Redis TTL Caching (showcase:active:{listingId})`
 * **Akış:** Vitrin satın alındığında kalan süre kadar Redis'te TTL'li anahtar açılır ve süresi bittiğinde otomatik düşer. DB polling yükü ortadan kaldırılır.
 
-### 5. Sipariş İptal & İade Koordinasyonu (Order Cancellation)
-* **Teknoloji:** `Transactional Outbox (order_outbox_events)` + `Apache Kafka (order.cancelled.v1)`
-* **Akış:** Sipariş iptal edildiğinde (`OrderCancellationService.cancelOrder`) aynı transaction içinde `order_outbox_events` tablosuna `ORDER_CANCELLED` eventi yazılır. `OrderOutboxWorker` eventi Kafka'ya fırlatır. İlgili consumer'lar asenkron olarak stok ve para iadesi süreçlerini hatasız koordine eder.
+### 5. Sipariş İptal & İade Koordinasyonu (Order Cancellation & Refund)
+* **Teknoloji:** `Transactional Outbox (order_outbox_events)` + `Apache Kafka (order.cancelled.v1, order.refunded.v1)`
+* **Akış:** 
+  * Sipariş iptal edildiğinde (`OrderCancellationService.cancelOrder`) outbox'a `ORDER_CANCELLED` eventi yazılır.
+  * Sipariş iade edildiğinde (`OrderRefundService.refundOrder`) outbox'a `ORDER_REFUNDED` eventi yazılır.
+  * `OrderOutboxWorker` bu eventleri Kafka'ya fırlatır. İlgili consumer'lar asenkron olarak stok iadesi, cüzdan geri ödemesi ve dekont bildirimlerini hatasız koordine eder.
 
 ---
 
