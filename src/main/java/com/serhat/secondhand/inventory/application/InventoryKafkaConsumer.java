@@ -38,6 +38,13 @@ public class InventoryKafkaConsumer {
             return;
         }
 
+        // Verify listing exists in database before attempting DB inventory deduction
+        if (!listingRepository.existsById(event.listingId())) {
+            log.warn("Listing {} no longer exists in database, skipping inventory deduction for paymentId: {}",
+                    event.listingId(), event.paymentId());
+            return;
+        }
+
         log.info("Processing asynchronous inventory deduction for listingId: {} from paymentId: {}",
                 event.listingId(), event.paymentId());
 
