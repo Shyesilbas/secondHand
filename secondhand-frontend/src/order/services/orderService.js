@@ -1,5 +1,5 @@
 import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
-import {get, post, put} from '../../common/services/api/request.js';
+import {del, get, post, put} from '../../common/services/api/request.js';
 import { ORDER_DEFAULTS } from '../constants/orderUiConstants.js';
 
 const buildPagedOrdersUrl = (endpoint, page, size, sort, direction, deliveryMethod) => {
@@ -16,6 +16,12 @@ const buildPagedOrdersUrl = (endpoint, page, size, sort, direction, deliveryMeth
 export const orderService = {
   checkout: async (payload) => {
     return post(API_ENDPOINTS.ORDERS.CHECKOUT, payload);
+  },
+  initiateCheckoutReservation: async () => {
+    return post(API_ENDPOINTS.CHECKOUT.INITIATE);
+  },
+  cancelReservation: async (listingId) => {
+    return del(API_ENDPOINTS.CHECKOUT.CANCEL_RESERVATION(listingId));
   },
   initiatePaymentVerification: async (payload) => {
     return post(API_ENDPOINTS.PAYMENTS.INITIATE_VERIFICATION, payload);

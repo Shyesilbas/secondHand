@@ -3,13 +3,14 @@
 ### Technology Stack
 
 **Frontend & UI:** React 19, Vite 5.4, TailwindCSS 3
-**Backend & Architecture:** Spring Boot 3.5.4, PostgreSQL 15, Redis 7, Flyway, MapStruct
+**Backend & Architecture:** Spring Boot 3.5.4, PostgreSQL 15, Redis 7 (Lua Scripting), Apache Kafka 3.7 (KRaft Event-Driven), Flyway, MapStruct
+**Messaging & Events:** Apache Kafka (Transactional Outbox + Asynchronous Event-Driven Architecture)
 **AI & External Services:** Google Gemini LLM API, Cloudinary, OAuth2 (Google/GitHub), JWT
-**DevOps & Observability:** Docker, Prometheus, Grafana, Spring Boot Actuator, Swagger/OpenAPI
+**DevOps & Observability:** Docker (Compose with Postgres, Redis, Kafka), Prometheus, Grafana, Spring Boot Actuator, Swagger/OpenAPI
 
-**SecondHand** is a production-grade, highly scalable, and secure C2C (Customer-to-Customer) marketplace platform. It combines enterprise-level Java backend engineering (Spring Boot 3.5) with a highly interactive, modern React 19 web application. 
+**SecondHand** is a production-grade, highly scalable, and secure C2C (Customer-to-Customer) marketplace platform. It combines enterprise-level Java backend engineering (Spring Boot 3.5) with an asynchronous **Event-Driven Kafka architecture**, **Redis Lua atomic stock reservation**, and a modern React 19 web application. 
 
-The platform features an advanced **Escrow payment & E-Wallet** model, **real-time WebSocket STOMP messaging**, **AOP-driven audit logging**, **custom cookie-based OAuth2/JWT session rotation**, and **"Aura"**—a state-of-the-art semantic search and conversational AI assistant powered by Google Gemini.
+The platform features an advanced **Escrow payment & E-Wallet** model, **Transactional Outbox + Kafka event distribution**, **real-time WebSocket STOMP messaging**, **AOP-driven audit logging**, **custom cookie-based OAuth2/JWT session rotation**, and **"Aura"**—a state-of-the-art semantic search and conversational AI assistant powered by Google Gemini.
 
 ## Agent Start (AI Coding Rules)
 

@@ -104,7 +104,7 @@ public class CartService {
         }
         User user = userResult.getData();
 
-        Listing listing = listingRepository.findByIdWithLock(listingId)
+        Listing listing = listingRepository.findById(listingId)
                 .orElse(null);
         if (listing == null) {
             return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
@@ -127,22 +127,15 @@ public class CartService {
             return Result.error(CartErrorCodes.INVALID_QUANTITY);
         }
 
-        boolean reservationEnabled = cartConfig.getReservation().isEnabled();
-        if (reservationEnabled) {
-            clearExpiredReservationsIfEnabled();
-            LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
-            LocalDateTime cutoff = now.minus(cartConfig.getReservation().getTimeoutDuration());
-            int activeReservationQty = cartRepository.countActiveReservationsByListing(listing.getId(), now, cutoff);
-
-            Result<Void> reservationValidation = cartValidator.validateReservationPossible(
-                    listing,
-                    finalTotalQty,
-                    currentInCartQty,
-                    activeReservationQty
-            );
-            if (reservationValidation.isError()) {
-                return Result.error(reservationValidation.getErrorCode());
-            }
+        // Lightweight inventory validation: ensure listing has enough stock without holding DB locks
+        Result<Void> reservationValidation = cartValidator.validateReservationPossible(
+                listing,
+                finalTotalQty,
+                currentInCartQty,
+                0
+        );
+        if (reservationValidation.isError()) {
+            return Result.error(reservationValidation.getErrorCode());
         }
 
         Cart cartItem = existingCartItemOpt.orElseGet(() ->
@@ -156,10 +149,6 @@ public class CartService {
         // Update senaryosunda not alanının temizlenebilmesi için null da yazılır.
         if (isUpdate || notes != null) {
             cartItem.setNotes(notes);
-        }
-
-        if (reservationEnabled) {
-            applyReservationIfLowStock(listing, cartItem);
         }
 
         Cart savedCart;

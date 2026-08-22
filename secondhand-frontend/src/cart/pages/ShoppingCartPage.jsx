@@ -273,6 +273,19 @@ const ShoppingCartPage = () => {
               </div>}
           </div> : <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
             <div className="space-y-4 lg:col-span-8">
+              {/* Info banner about dynamic checkout reservation */}
+              <div className="flex items-center gap-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 p-3.5 text-xs text-amber-900 shadow-xs">
+                <div className="h-8 w-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-amber-700">
+                  <AlertTriangle className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <span className="font-semibold">{t('cart_reservation_notice_title', 'Stok Güvencesi:')} </span>
+                  <span className="text-amber-800">
+                    {t('cart_reservation_notice_desc', 'Ürünler sepetteyken kilitlenmez. "Satın Al / Checkout" adımına geçtiğinizde 15 dakika boyunca adınıza geçici olarak ayrılır.')}
+                  </span>
+                </div>
+              </div>
+
               {(hasExpiredReservations || hasExpiringReservations) && <div className={`flex gap-2.5 rounded-xl border-l-4 px-3 py-2.5 text-sm ${hasExpiredReservations ? 'border-status-error-border bg-status-error-bg text-status-error' : 'border-status-warning-border bg-status-warning-bg text-status-warning'}`}>
                   <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'}`} />
                   <div>

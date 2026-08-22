@@ -57,18 +57,12 @@ public class CartValidator {
     ) {
         Integer invQty = inventoryService.getAvailableQuantity(listing.getId());
         int actualStock = Optional.ofNullable(invQty).orElse(0);
-        int effectiveReservedQty = Math.max(activeReservationQty - currentInCartQty, 0);
-        int availableStock = Math.max(actualStock - effectiveReservedQty, 0);
 
-        if (availableStock <= 0) {
+        if (actualStock <= 0) {
             return Result.error(CartErrorCodes.INSUFFICIENT_STOCK);
         }
 
-        if (requestedTotalQty > availableStock) {
-            int threshold = Optional.ofNullable(cartConfig.getReservation().getThreshold()).orElse(3);
-            if (actualStock <= threshold) {
-                return Result.error(ListingErrorCodes.LISTING_IS_RESERVED);
-            }
+        if (requestedTotalQty > actualStock) {
             return Result.error(CartErrorCodes.INSUFFICIENT_STOCK);
         }
 

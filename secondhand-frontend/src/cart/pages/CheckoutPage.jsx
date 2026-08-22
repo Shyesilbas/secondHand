@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {ArrowLeft, ChevronDown, Crown, ShoppingCart} from 'lucide-react';
+import {ArrowLeft, ChevronDown, Crown, ShoppingCart, Clock, AlertCircle} from 'lucide-react';
 import {useCart} from '../hooks/useCart.js';
 import {useCheckout} from '../hooks/useCheckout.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
@@ -17,6 +17,7 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES} from '../cartConstants.js';
 import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendingWarningModal.jsx';
 import {formatCurrency} from '../../common/formatters.js';
+import {orderService} from '../../order/services/orderService.js';
 import {usePlan} from '@/common/hooks/usePlan';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
 
@@ -39,6 +40,26 @@ const CheckoutPage = () => {
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(900); // 15 minutes in seconds
+
+  useEffect(() => {
+    // Initiate Redis stock reservation with 15-min TTL upon entering checkout
+    orderService.initiateCheckoutReservation().catch(err => {
+      console.warn("Could not initiate stock reservation in Redis:", err);
+    });
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTimer = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
   const cartKey = useMemo(() => {
     const base = cartItems.map(i => `${i.id}:${i.quantity}`).join('|');
     return `${base}|offer:${offerId || ''}`;
@@ -211,6 +232,24 @@ const CheckoutPage = () => {
           </div>
         </PageContainer>
       </header>
+
+      {/* Stock Reservation Countdown Bar */}
+      <div className="bg-amber-50 border-b border-amber-200/80 px-4 py-2.5">
+        <PageContainer>
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-amber-900 font-medium">
+              <Clock className="h-4 w-4 text-amber-600 animate-pulse shrink-0" />
+              <span>
+                {t('cart_items_reserved_for_you', 'Sepetinizdeki ürünler sizin için geçici olarak ayrıldı.')}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 font-mono font-bold text-amber-700 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">
+              <span className="text-[11px] uppercase tracking-wider text-amber-800 font-sans font-semibold">Kalan Süre:</span>
+              <span className="text-sm">{formatTimer(timeLeft)}</span>
+            </div>
+          </div>
+        </PageContainer>
+      </div>
 
       {/* Mobile Collapsible Order Summary */}
       <div className="bg-white border-b border-slate-200 lg:hidden px-4 py-3 shadow-xs">

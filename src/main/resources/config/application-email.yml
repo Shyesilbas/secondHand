@@ -1,4 +1,4 @@
-# E-posta şablonları (içerik). Sırlar burada tutulmaz; yalnızca app.email.* metinleri.
+# E-posta altyapı ve bağlantı ayarları. İçerik ve metinler messages.properties içerisindedir.
 spring:
   mail:
     host: "${SMTP_HOST:localhost}"
@@ -19,3 +19,4 @@ app:
   email:
     mock: "${EMAIL_MOCK:true}"
     sender: "${EMAIL_SENDER:secondhand@noreply.com}"
+

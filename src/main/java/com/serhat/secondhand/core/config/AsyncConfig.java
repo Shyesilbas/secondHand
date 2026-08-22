@@ -59,16 +59,15 @@ public class AsyncConfig implements AsyncConfigurer {
     public ThreadPoolTaskExecutor emailExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(100);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("email-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
-        executor.setRejectedExecutionHandler((r, e) -> 
-            log.warn("Email task rejected. Queue full. Task: {}", r.toString()));
+        executor.setRejectedExecutionHandler(new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         
-        log.info("Email executor initialized - Core: 5, Max: 10, Queue: 100");
+        log.info("Email executor initialized - Core: 5, Max: 20, Queue: 500 with CallerRunsPolicy");
         return executor;
     }
 

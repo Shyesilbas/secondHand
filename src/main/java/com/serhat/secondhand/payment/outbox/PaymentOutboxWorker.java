@@ -1,6 +1,6 @@
 package com.serhat.secondhand.payment.outbox;
 
-import com.serhat.secondhand.payment.application.PaymentCompletionDispatcher;
+import com.serhat.secondhand.payment.application.PaymentKafkaProducer;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class PaymentOutboxWorker {
 
     private final PaymentOutboxRepository paymentOutboxRepository;
     private final PaymentRepository paymentRepository;
-    private final PaymentCompletionDispatcher paymentCompletionDispatcher;
+    private final PaymentKafkaProducer paymentKafkaProducer;
 
     @Lazy
     @Autowired
@@ -60,7 +60,7 @@ public class PaymentOutboxWorker {
 
             UUID paymentId = UUID.fromString(event.getPayload());
             Payment payment = paymentRepository.findById(paymentId).orElseThrow();
-            paymentCompletionDispatcher.dispatch(payment);
+            paymentKafkaProducer.sendPaymentCompleted(payment);
 
             event.setStatus(OutboxStatus.PROCESSED);
             event.setProcessedAt(LocalDateTime.now());

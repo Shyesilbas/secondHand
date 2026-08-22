@@ -65,7 +65,7 @@ public class CheckoutOrchestrator {
         Offer acceptedOffer = pricingContext.acceptedOffer();
         PricingResultDto pricing = pricingContext.pricing();
 
-        Result<Map<UUID, Integer>> reservedResult = checkoutStockReservationService.reserveStock(effectiveCartItems);
+        Result<Map<UUID, Integer>> reservedResult = checkoutStockReservationService.reserveStock(userId, effectiveCartItems);
         if (reservedResult.isError()) {
             return Result.error(reservedResult.getErrorCode(), reservedResult.getMessage());
         }
@@ -74,7 +74,7 @@ public class CheckoutOrchestrator {
 
         Result<Order> orderResult = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
         if (orderResult.isError()) {
-            checkoutStockReservationService.releaseReservedStock(reserved);
+            checkoutStockReservationService.releaseReservedStock(userId, reserved);
             return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
         }
 
@@ -86,7 +86,7 @@ public class CheckoutOrchestrator {
 
             if (paymentResult.isError()) {
                 markOrderAsFailed(order);
-                checkoutStockReservationService.releaseReservedStock(reserved);
+                checkoutStockReservationService.releaseReservedStock(userId, reserved);
                 return Result.error(paymentResult.getErrorCode(), paymentResult.getMessage());
             }
 
@@ -107,10 +107,11 @@ public class CheckoutOrchestrator {
                     throw new IllegalStateException("Checkout finalization failed for order "
                             + order.getOrderNumber() + ": " + successResult.getMessage());
                 }
+                checkoutStockReservationService.consumeReservationsOnSuccess(userId, reserved);
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
-                checkoutStockReservationService.releaseReservedStock(reserved);
+                checkoutStockReservationService.releaseReservedStock(userId, reserved);
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, false));
                 log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
                 return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
@@ -119,7 +120,7 @@ public class CheckoutOrchestrator {
             return Result.success(orderMapper.toDto(order));
 
         } catch (Exception e) {
-            checkoutStockReservationService.releaseReservedStock(reserved);
+            checkoutStockReservationService.releaseReservedStock(userId, reserved);
             log.error("Critical exception during checkout for order: {}", order.getOrderNumber(), e);
             throw e;
         }

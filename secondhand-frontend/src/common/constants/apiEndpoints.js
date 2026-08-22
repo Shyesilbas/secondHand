@@ -97,6 +97,11 @@ export const API_ENDPOINTS = {
         GET_MEETUP_QR: (orderNumber) => `/v1/orders/${orderNumber}/qr-code`,
         REGENERATE_MEETUP_CODE: (orderNumber) => `/v1/orders/${orderNumber}/regenerate-meetup-code`,
     },
+    CHECKOUT: {
+        EXECUTE: '/v1/orders/checkout',
+        INITIATE: '/checkout/initiate',
+        CANCEL_RESERVATION: (listingId) => `/checkout/reservation/${listingId}`,
+    },
     DASHBOARD: {
         SELLER: '/v1/dashboards/seller',                                                  // GET - Seller dashboard
         BUYER: '/v1/dashboards/buyer',                                                    // GET - Buyer dashboard

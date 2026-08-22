@@ -1,10 +1,10 @@
 # secondHand Project Rules
 
 ## 0. Repository Invariants
-- **Backend:** Java 17, Spring Boot 3, Spring Data JPA (PostgreSQL), MapStruct.
+- **Backend:** Java 17, Spring Boot 3, Spring Data JPA (PostgreSQL), Redis 7 (Lua Scripting for Atomic Inventory), Apache Kafka (Transactional Outbox & Event-Driven), MapStruct.
 - **Frontend:** React 19 (Vite), TailwindCSS, React Router.
 - **Client State/Data Fetching:** React Query (`@tanstack/react-query`).
-- **Architecture/API:** RESTful APIs, Hexagonal Architecture, CQRS pattern, DTO-based responses.
+- **Architecture/API:** RESTful APIs, Hexagonal Architecture, CQRS pattern, Event-Driven Architecture (EDA), DTO-based responses.
 
 ## 1. Global AI Behavior
 - **Context Loading Strategy:** Stop reading immediately once enough context is acquired. Never continue reading out of habit. 
