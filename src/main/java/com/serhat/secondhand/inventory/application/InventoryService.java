@@ -15,6 +15,7 @@ import java.util.UUID;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final com.serhat.secondhand.listing.domain.repository.listing.ListingRepository listingRepository;
 
     @Transactional
     public void createInventory(UUID listingId, Integer initialQuantity) {
@@ -24,7 +25,7 @@ public class InventoryService {
         
         Inventory inventory = Inventory.builder()
                 .listingId(listingId)
-                .availableQuantity(initialQuantity)
+                .availableQuantity(initialQuantity != null ? initialQuantity : 0)
                 .build();
                 
         inventoryRepository.save(inventory);
@@ -36,7 +37,13 @@ public class InventoryService {
         if (listingId == null) return 0;
         return inventoryRepository.findByListingId(listingId)
                 .map(Inventory::getAvailableQuantity)
-                .orElse(1); // Default to 1 if no inventory record exists yet
+                .orElseGet(() -> {
+                    // If no inventory record exists, check if listing exists and is ACTIVE
+                    return listingRepository.findById(listingId)
+                            .filter(l -> l.getStatus() == com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.ACTIVE)
+                            .map(l -> 1)
+                            .orElse(0); // If not ACTIVE (SOLD/INACTIVE) or not found, stock is strictly 0!
+                });
     }
 
     @Transactional
