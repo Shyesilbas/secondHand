@@ -101,4 +101,14 @@ public class KafkaConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic orderCancelledTopic(
+            @Value("${app.kafka.topics.order-cancelled-partitions:3}") int partitions,
+            @Value("${app.kafka.topics.order-cancelled-replicas:1}") int replicas) {
+        return TopicBuilder.name(com.serhat.secondhand.order.application.OrderKafkaProducer.ORDER_CANCELLED_TOPIC)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

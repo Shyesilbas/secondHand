@@ -92,35 +92,23 @@ public class ConcurrentStockAndPaymentIntegrationTest {
     @Test
     @DisplayName("Flash-Sale Concurrency Test: 5 Eşzamanlı Kullanıcı, 3 Adet Stok")
     public void testConcurrentStockReservationAndOutboxFlow() throws Exception {
-        // DB'deki mevcut bir ilanı kullan veya yeni oluştur
-        com.serhat.secondhand.listing.domain.entity.Listing realListing = listingRepository.findAll().stream().findFirst().orElseThrow(
-                () -> new IllegalStateException("Test için en az 1 ilan bulunmalıdır.")
-        );
-        UUID testListingId = realListing.getId();
+        UUID testListingId = UUID.randomUUID();
         int initialStock = 3;
         int numberOfConcurrentUsers = 5;
 
         log.info("================================================================================");
         log.info("🚀 [FLASH-SALE SIMULATION STARTED]");
-        log.info("📦 Ürün ID: {} | Başlık: {}", testListingId, realListing.getTitle());
+        log.info("📦 Ürün ID: {}", testListingId);
         log.info("🔢 Başlangıç Stoğu: {}", initialStock);
         log.info("👥 Eşzamanlı Alıcı Sayısı: {}", numberOfConcurrentUsers);
         log.info("================================================================================");
 
-        // 1. Veritabanına başlangıç stoğu tanımla / güncelle
-        Inventory inventory = inventoryRepository.findByListingId(testListingId).orElseGet(() ->
-                Inventory.builder().listingId(testListingId).build()
-        );
-        inventory.setAvailableQuantity(initialStock);
-        inventoryRepository.save(inventory);
-
-        // Redis'teki olası eski anahtarları temizle
-        redisTemplate.delete("stock:" + testListingId);
+        // Redis'teki stok anahtarını başlangıç değeriyle doğrudan ayarla
+        redisTemplate.opsForValue().set("stock:" + testListingId, String.valueOf(initialStock));
         for (long u = 1; u <= numberOfConcurrentUsers; u++) {
-            redisTemplate.delete("reservation:" + u + ":" + testListingId);
+            redisTemplate.delete("reservation:" + (1000L + u) + ":" + testListingId);
         }
 
-        // Test kullanıcıları hazırla
         User seller = userRepository.findAll().stream().findFirst().orElseGet(() ->
                 userRepository.save(User.builder().email("seller_test_" + System.currentTimeMillis() + "@test.com").name("Seller").build())
         );
@@ -357,5 +345,43 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         String stockAfterCancel = redisTemplate.opsForValue().get("stock:" + testListingId);
         log.info("♻️ İptal Sonrası Redis Serbest Kalan Stok: {}", stockAfterCancel);
         Assertions.assertEquals("1", stockAfterCancel, "İptal edilen rezervasyon stoğa anında geri iade edilmelidir.");
+    }
+
+    @Autowired
+    private com.serhat.secondhand.order.outbox.OrderOutboxRepository orderOutboxRepository;
+
+    @Autowired
+    private com.serhat.secondhand.order.outbox.OrderOutboxService orderOutboxService;
+
+    @Test
+    @DisplayName("Order Cancelled -> Transactional Outbox Flow Test")
+    public void testOrderCancellationOutboxFlow() {
+        log.info("================================================================================");
+        log.info("📦 [ORDER CANCELLATION & OUTBOX SIMULATION STARTED]");
+        log.info("================================================================================");
+
+        long testOrderId = 8888L;
+        com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent event =
+                new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent(
+                        testOrderId,
+                        "ORD-TEST-8888",
+                        1001L,
+                        new BigDecimal("499.00"),
+                        List.of(new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail(
+                                UUID.randomUUID(), 1, new BigDecimal("499.00")
+                        )),
+                        "Customer cancellation test"
+                );
+
+        // 1. Outbox'a yaz
+        orderOutboxService.enqueueOrderCancelled(event);
+
+        // 2. Outbox tablosunu kontrol et
+        List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
+        boolean eventExists = outboxEvents.stream()
+                .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId)) && e.getEventType().equals("ORDER_CANCELLED"));
+
+        log.info("📬 Order Outbox Tablosunda ORDER_CANCELLED Event Kaydı Bulundu mu: {}", eventExists);
+        Assertions.assertTrue(eventExists, "Sipariş iptal eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
     }
 }

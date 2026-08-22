@@ -36,6 +36,7 @@ public class OrderCancellationService {
     private final OrderLogService orderLog;
     private final OrderMapper orderMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final com.serhat.secondhand.order.outbox.OrderOutboxService orderOutboxService;
 
     public Result<OrderDto> cancelOrder(Long orderId, OrderCancelRequest request, User user) {
         Order orderStub = new Order();
@@ -98,6 +99,25 @@ public class OrderCancellationService {
 
         Order finalOrder = savedOrderResult.getData();
         eventPublisher.publishEvent(new OrderCancelledEvent(finalOrder, user));
+        
+        // Enqueue Transactional Outbox Event for Kafka
+        List<com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail> itemDetails =
+                finalOrder.getOrderItems() != null ? finalOrder.getOrderItems().stream()
+                        .map(item -> new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail(
+                                item.getListing() != null ? item.getListing().getId() : null,
+                                item.getQuantity(),
+                                item.getTotalPrice()
+                        )).toList() : List.of();
+
+        orderOutboxService.enqueueOrderCancelled(new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent(
+                finalOrder.getId(),
+                finalOrder.getOrderNumber(),
+                finalOrder.getUser() != null ? finalOrder.getUser().getId() : null,
+                finalOrder.getTotalAmount(),
+                itemDetails,
+                "User requested cancellation"
+        ));
+
         orderLog.logOrderCancelled(order.getOrderNumber(), !allItemsCancelled, user.getEmail());
         return Result.success(orderMapper.toDto(finalOrder));
     }
