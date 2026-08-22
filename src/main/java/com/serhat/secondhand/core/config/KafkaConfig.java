@@ -91,4 +91,14 @@ public class KafkaConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic escrowReleasedTopic(
+            @Value("${app.kafka.topics.escrow-released-partitions:3}") int partitions,
+            @Value("${app.kafka.topics.escrow-released-replicas:1}") int replicas) {
+        return TopicBuilder.name(com.serhat.secondhand.escrow.application.EscrowKafkaProducer.ESCROW_RELEASED_TOPIC)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

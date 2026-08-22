@@ -26,19 +26,19 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
 const StatusBadge = ({ label, type = 'rose' }) => {
   const styles = {
-    rose: 'bg-status-error-bg border-rose-200 text-status-error',
-    amber: 'bg-status-warning-bg border-amber-200 text-status-warning',
-    success: 'bg-status-success-bg border-emerald-200 text-status-success',
+    rose: 'bg-rose-50 border-rose-200 text-rose-700',
+    amber: 'bg-amber-50 border-amber-200 text-amber-800',
+    success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
   };
   return (
-    <span className={`px-2.5 py-0.5 text-caption font-semibold rounded-md border ${styles[type]}`}>
+    <span className={`px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider rounded-md border ${styles[type]}`}>
       {label}
     </span>
   );
 };
 
 const OrderCard = React.memo(({ children, className = '' }) => (
-  <div className={`bg-white/80 border border-white/60 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] ${className}`}>
+  <div className={`bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 transition-all duration-200 hover:border-slate-300 hover:shadow-sm ${className}`}>
     {children}
   </div>
 ));
@@ -194,37 +194,37 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
   };
 
   return (
-    <div className="rounded-lg border border-border-light bg-card-bg p-6 shadow-sm mb-6 relative overflow-hidden">
-      <div className="flex items-center gap-3 border-b border-border-light pb-4 mb-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-primary shadow-sm">
-          <MapPin className="h-4 w-4" />
+    <div className="rounded-3xl border-2 border-emerald-500/40 bg-emerald-50/20 p-6 shadow-xs mb-6 relative overflow-hidden">
+      <div className="flex items-center gap-3 border-b border-emerald-100 pb-4 mb-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
+          <MapPin className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-text-primary">{t("elden_g_venli_teslimat_detaylar")}</h3>
-          <p className="text-xs text-text-muted">{t("g_venli_bulu_ma_noktas_nda_y_z_y_ze_al_v")}</p>
+          <h3 className="text-sm font-extrabold text-slate-900">{t("elden_g_venli_teslimat_detaylar", "Elden Güvenli Buluşma")}</h3>
+          <p className="text-xs text-slate-500 font-medium">{t("g_venli_bulu_ma_noktas_nda_y_z_y_ze_al_v", "Güvenli buluşma noktasında yüz yüze teslimat ve PIN doğrulama.")}</p>
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
-          <span className="block text-caption font-bold uppercase tracking-wider text-text-muted">{t("bulu_ma_konumu")}</span>
-          <span className="mt-1 block text-sm font-semibold text-text-primary">{order.meetupLocation || 'Belirtilmedi'}</span>
+          <span className="block text-xs font-bold uppercase tracking-wider text-slate-400">{t("bulu_ma_konumu", "Buluşma Konumu")}</span>
+          <span className="mt-1 block text-sm font-extrabold text-slate-900">📍 {order.meetupLocation || 'Belirtilmedi'}</span>
         </div>
 
         {/* Contact Info Card */}
-        <div className="p-3 bg-secondary rounded-lg border border-border-light shadow-sm flex items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-status-success-bg text-status-success shadow-sm">
+        <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex items-center gap-3.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
             <Phone className="w-4 h-4" />
           </div>
           <div>
-            <span className="block text-caption font-bold text-text-muted uppercase tracking-wider">{t("i_leti_im_bilgileri")}</span>
+            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("i_leti_im_bilgileri", "İletişim Bilgileri")}</span>
             {isSeller ? (
-              <p className="text-xs font-semibold text-text-primary mt-0.5">
-                {t("al_c")}: {order.buyerName} {order.buyerSurname} <span className="text-status-success ml-1">📞 {order.buyerPhone || 'Telefon Yok'}</span>
+              <p className="text-xs font-bold text-slate-900 mt-0.5">
+                Alıcı: {order.buyerName} {order.buyerSurname} <span className="text-emerald-700 font-mono ml-1.5 font-bold">📞 {order.buyerPhone || 'Telefon Yok'}</span>
               </p>
             ) : (
-              <p className="text-xs font-semibold text-text-primary mt-0.5">
-                {t("sat_c")}: {order.sellerFullName || 'Satıcı'} <span className="text-status-success ml-1">📞 {order.sellerPhone || 'Telefon Yok'}</span>
+              <p className="text-xs font-bold text-slate-900 mt-0.5">
+                Satıcı: {order.sellerFullName || 'Satıcı'} <span className="text-emerald-700 font-mono ml-1.5 font-bold">📞 {order.sellerPhone || 'Telefon Yok'}</span>
               </p>
             )}
           </div>
@@ -234,74 +234,80 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
           <>
             {!isSeller ? (
               // BUYER VIEW IN MEETUP_PENDING
-              <div className="bg-card-bg rounded-lg border border-border-light p-5 flex flex-col items-center justify-center text-center">
-                <span className="block text-xs font-bold text-primary uppercase tracking-widest mb-3">{t("sat_c_ya_g_sterilecek_qr_ve_pin")}</span>
+              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 flex flex-col items-center justify-center text-center shadow-xs">
+                <span className="block text-xs font-extrabold text-emerald-800 uppercase tracking-widest mb-3">
+                  {t("sat_c_ya_g_sterilecek_qr_ve_pin", "Satıcıya Gösterilecek Doğrulama PIN Kodu")}
+                </span>
                 {qrCountdown > 0 ? (
                   <>
-                    <div className="relative p-3 bg-card-bg rounded-lg border border-border-light shadow-sm mb-4">
+                    <div className="relative p-3 bg-white rounded-2xl border border-slate-200 shadow-xs mb-4">
                       {isQrLoading ? (
-                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-slate-50 rounded-lg">
-                          <span className="text-xs text-text-muted">{t("y_kleniyor")}</span>
+                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-slate-50 rounded-xl">
+                          <span className="text-xs text-slate-400 font-medium">{t("y_kleniyor", "Yükleniyor...")}</span>
                         </div>
                       ) : qrImageUrl ? (
-                        <img src={qrImageUrl} alt={t("meetup_qr_code")} className="w-[150px] h-[150px]" />
+                        <img src={qrImageUrl} alt={t("meetup_qr_code", "QR Kod")} className="w-[150px] h-[150px] rounded-lg" />
                       ) : (
-                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-rose-50 rounded-lg border border-rose-100">
-                          <span className="text-xs text-status-error text-center px-2">{t("qr_y_klenemedi")}</span>
+                        <div className="w-[150px] h-[150px] flex items-center justify-center bg-rose-50 rounded-xl border border-rose-100">
+                          <span className="text-xs text-rose-700 text-center px-2 font-semibold">{t("qr_y_klenemedi", "QR Yüklenemedi")}</span>
                         </div>
                       )}
                     </div>
-                    <span className="block text-3xl font-bold tracking-[0.25em] text-text-primary mb-1 font-mono">
+                    <span className="block text-3xl font-extrabold tracking-[0.25em] text-slate-900 mb-1 font-mono">
                       {order.meetupVerificationCode || '------'}
                     </span>
-                    <p className="text-caption text-text-muted font-semibold uppercase tracking-wider flex items-center gap-1.5 mt-2">
-                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                      {t("yenilenme_s_resi")}: {formatTime(qrCountdown)}
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+                      Kalan Süre: <span className="font-mono text-slate-900 font-extrabold">{formatTime(qrCountdown)}</span>
                     </p>
 
                     {/* Buyer Manual Confirmation */}
-                    <div className="mt-5 pt-4 border-t border-border-light w-full text-left">
-                      <span className="block text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("alternatif_teslimat_onay")}</span>
-                      <p className="text-caption text-text-secondary mb-3 leading-relaxed">{t("e_er_sat_c_do_rulama_kodunu_sisteme_gire")}</p>
+                    <div className="mt-6 pt-5 border-t border-slate-100 w-full text-left">
+                      <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Alternatif Teslimat Onayı</span>
+                      <p className="text-xs text-slate-500 mb-3 leading-relaxed font-medium">
+                        Satıcı kodu sisteme giremezse, ürünü teslim aldıktan sonra doğrudan buradan onaylayabilirsiniz.
+                      </p>
                       <div className="space-y-3">
                         <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-border-light text-primary focus:ring-primary/20" />
-                          <span className="text-caption font-semibold text-text-primary leading-normal">{t("r_n_elden_teslim_ald_m_ve_i_lemi_tamamla")}</span>
+                          <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                          <span className="text-xs font-semibold text-slate-800 leading-normal">Ürünü elden eksiksiz teslim aldım ve işlemi tamamlamak istiyorum.</span>
                         </label>
 
-                        <button type="button" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox} className="w-full py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider text-white bg-primary hover:bg-primary-hover transition disabled:opacity-50 shadow-sm">
+                        <button type="button" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox} className="w-full py-3 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 transition disabled:bg-slate-200 disabled:text-slate-400 shadow-xs active:scale-[0.98]">
                           {isConfirming ? 'İşlem Tamamlanıyor...' : 'Teslim Aldım & Onayla'}
                         </button>
-                        {confirmError && <p className="text-caption text-status-error font-semibold mt-1">{confirmError}</p>}
+                        {confirmError && <p className="text-xs text-rose-600 font-semibold mt-1">{confirmError}</p>}
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="py-6">
-                    <p className="text-sm text-text-secondary mb-3">{t("qr_kod_ve_pin_kodunun_s_resi_doldu")}</p>
-                    <button type="button" onClick={handleRegenerateCode} className="px-4 py-2 text-xs font-bold text-white bg-primary rounded-lg hover:bg-primary-hover transition">{t("kodu_yenile")}</button>
+                    <p className="text-xs text-slate-600 font-semibold mb-3">Kodun geçerlilik süresi doldu.</p>
+                    <button type="button" onClick={handleRegenerateCode} className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-xs transition">
+                      Kodu Yenile
+                    </button>
                   </div>
                 )}
               </div>
             ) : (
               // SELLER VIEW IN MEETUP_PENDING
-              <div className="bg-card-bg rounded-lg border border-border-light p-5 shadow-sm">
-                <span className="block text-xs font-bold text-primary uppercase tracking-widest mb-4">{t("al_c_do_rulama_kodu")}</span>
+              <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs">
+                <span className="block text-xs font-extrabold text-emerald-800 uppercase tracking-widest mb-4">Alıcı Doğrulama Kodu Girişi</span>
                 {order.verificationLockedUntil && lockCountdown > 0 ? (
-                  <div className="text-center py-4 bg-status-error-bg border border-rose-100 rounded-lg">
-                    <p className="text-xs font-bold text-status-error uppercase tracking-wide">{t("do_rulama_ge_ici_olarak_kilitlendi")}</p>
-                    <p className="text-xs text-status-error mt-1">{t("l_tfen")} {formatTime(lockCountdown)} {t("dakika_sonra_tekrar_deneyin")}</p>
+                  <div className="text-center py-4 bg-rose-50 border border-rose-200 rounded-xl">
+                    <p className="text-xs font-bold text-rose-700 uppercase tracking-wide">Doğrulama geçici olarak kilitlendi</p>
+                    <p className="text-xs text-rose-600 mt-1 font-mono font-bold">Lütfen {formatTime(lockCountdown)} sonra tekrar deneyin.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleVerify} className="space-y-3">
-                    <p className="text-xs text-text-secondary">{t("al_c_n_n_ekran_ndaki_6_haneli_kodu_veya_")}</p>
+                    <p className="text-xs text-slate-600 font-medium">Alıcının ekranındaki 6 haneli güvenlik PIN kodunu giriniz:</p>
                     <div className="flex gap-2">
-                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-sm font-semibold tracking-[0.2em] font-mono text-center border border-border-light rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 bg-card-bg shadow-sm" placeholder="000000" maxLength={6} disabled={isVerifying} />
-                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-primary rounded-lg hover:bg-primary-hover transition disabled:opacity-50">
-                        {isVerifying ? 'Doğrulanıyor...' : 'Kodu Doğrula'}
+                      <input type="text" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="flex-1 px-4 py-2.5 text-base font-extrabold tracking-[0.25em] font-mono text-center border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 bg-white shadow-xs" placeholder="000000" maxLength={6} disabled={isVerifying} />
+                      <button type="submit" disabled={isVerifying || pinCode.length !== 6} className="px-6 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition disabled:bg-slate-200 disabled:text-slate-400 shadow-xs">
+                        {isVerifying ? 'Doğrulanıyor...' : 'Kodu Onayla'}
                       </button>
                     </div>
-                    {verifyError && <p className="text-xs text-status-error font-semibold">{verifyError}</p>}
+                    {verifyError && <p className="text-xs text-rose-600 font-semibold">{verifyError}</p>}
                   </form>
                 )}
               </div>
@@ -310,36 +316,36 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
         )}
 
         {order.status === 'HANDOVER_CONFIRMED' && (
-          <div className="bg-card-bg rounded-lg border border-border-light p-5 shadow-sm">
-            <span className="block text-xs font-bold text-status-success uppercase tracking-widest mb-3 flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-status-success animate-pulse" />
-              {t("r_n_teslimat_do_ruland")}
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs">
+            <span className="block text-xs font-extrabold text-emerald-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+              Ürün Teslimatı Doğrulandı
             </span>
-            <p className="text-xs text-text-secondary mb-4">{t("r_n_elden_teslim_ald_n_z_veya_teslim_ett")}</p>
+            <p className="text-xs text-slate-600 font-medium mb-4">Teslimat onaylandı. Siparişi tamamlayarak Escrow bakiyesini satıcıya aktarabilirsiniz.</p>
 
             <div className="space-y-3">
               <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-1 h-4 w-4 rounded border-border-light text-primary focus:ring-primary/20" />
-                <span className="text-xs font-medium text-text-primary leading-normal">{t("r_n_n_elden_teslim_edildi_ini_ve_i_lemi_")}</span>
+                <input type="checkbox" checked={confirmCheckbox} onChange={e => setConfirmCheckbox(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                <span className="text-xs font-semibold text-slate-800 leading-normal">Ürünün elden teslim edildiğini ve siparişin tamamlandığını onaylıyorum.</span>
               </label>
 
-              <button type="button" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox} className="w-full py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-primary hover:bg-primary-hover rounded-lg transition disabled:opacity-50 shadow-sm">
+              <button type="button" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox} className="w-full py-3 text-xs font-extrabold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition disabled:bg-slate-200 disabled:text-slate-400 shadow-xs active:scale-[0.98]">
                 {isConfirming ? 'Tamamlanıyor...' : 'Siparişi Tamamla'}
               </button>
-              {confirmError && <p className="text-xs text-status-error font-semibold mt-1">{confirmError}</p>}
+              {confirmError && <p className="text-xs text-rose-600 font-semibold mt-1">{confirmError}</p>}
             </div>
           </div>
         )}
 
         {order.status === 'COMPLETED' && (
-          <div className="bg-status-success-bg border border-emerald-100 rounded-lg p-5 flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-status-success mt-0.5 flex-shrink-0" />
+          <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 flex items-start gap-3.5">
+            <CheckCircle className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
             <div>
-              <span className="block text-xs font-bold text-status-success uppercase tracking-wider">{t("i_lem_tamamland")}</span>
-              <p className="text-xs text-text-secondary mt-1">{t("elden_g_venli_teslimat_ba_ar_yla_tamamla")}</p>
+              <span className="block text-xs font-extrabold text-emerald-900 uppercase tracking-wider">İşlem Başarıyla Tamamlandı</span>
+              <p className="text-xs text-emerald-800 font-medium mt-0.5">Elden güvenli teslimat onaylandı ve ödeme satıcının cüzdanına aktarıldı.</p>
               {order.completedAt && (
-                <p className="text-caption text-text-muted mt-2 font-medium">
-                  {order.completedByUserName ? `Onaylayan: ${order.completedByUserName}` : 'Sistem tarafından otomatik onaylandı'}
+                <p className="text-[11px] text-emerald-700 mt-2 font-semibold">
+                  {order.completedByUserName ? `Onaylayan: ${order.completedByUserName}` : 'Sistem tarafından onaylandı'}
                   {` — ${formatDateTime(order.completedAt)}`}
                 </p>
               )}
@@ -353,33 +359,32 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
 
 // Redesigned timeline component
 const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
-  const { t } = useTranslation();
   const isMeetup = deliveryMethod === 'SAFE_MEETUP';
   const steps = isMeetup
     ? [
-      { key: ORDER_STATUSES.PENDING, label: 'Placed' },
-      { key: ORDER_STATUSES.MEETUP_PENDING, label: 'Meetup Pending' },
-      { key: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Handover Confirmed' },
-      { key: ORDER_STATUSES.COMPLETED, label: 'Delivered & Confirmed' },
+      { key: ORDER_STATUSES.PENDING, label: 'Sipariş Alındı' },
+      { key: ORDER_STATUSES.MEETUP_PENDING, label: 'Buluşma Bekleniyor' },
+      { key: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Teslimat Doğrulandı' },
+      { key: ORDER_STATUSES.COMPLETED, label: 'Tamamlandı' },
     ]
     : [
-      { key: ORDER_STATUSES.PENDING, label: 'Placed' },
-      { key: ORDER_STATUSES.CONFIRMED, label: 'Confirmed' },
-      { key: ORDER_STATUSES.PROCESSING, label: 'Preparing' },
-      { key: ORDER_STATUSES.SHIPPED, label: 'Shipped' },
-      { key: ORDER_STATUSES.DELIVERED, label: 'Delivered' },
+      { key: ORDER_STATUSES.PENDING, label: 'Sipariş Alındı' },
+      { key: ORDER_STATUSES.CONFIRMED, label: 'Onaylandı' },
+      { key: ORDER_STATUSES.PROCESSING, label: 'Hazırlanıyor' },
+      { key: ORDER_STATUSES.SHIPPED, label: 'Kargoya Verildi' },
+      { key: ORDER_STATUSES.DELIVERED, label: 'Teslim Edildi' },
     ];
 
   const currentIndex = steps.findIndex(s => s.key === currentStatus);
   const isFailed = currentStatus === ORDER_STATUSES.CANCELLED || currentStatus === ORDER_STATUSES.REFUNDED || currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
 
   return (
-    <div className="py-4">
+    <div className="py-3">
       <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0 z-0">
-        {/* Connection Line (desktop only) */}
+        {/* Connection Line */}
         <div className="absolute top-4 left-0 w-full h-[3px] bg-slate-100 z-0 hidden md:block" />
         <div
-          className="absolute top-4 left-0 h-[3px] bg-gradient-to-r from-blue-600 to-indigo-600 z-0 hidden md:block transition-all duration-500 ease-out"
+          className="absolute top-4 left-0 h-[3px] bg-emerald-600 z-0 hidden md:block transition-all duration-500 ease-out"
           style={{ width: `${Math.max(0, (currentIndex / (steps.length - 1)) * 100)}%` }}
         />
 
@@ -389,17 +394,18 @@ const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
 
           return (
             <div key={step.key} className="flex md:flex-col items-center gap-3 md:gap-0 w-full md:w-auto relative group z-10">
-              <div className="relative bg-white sm:bg-transparent rounded-full">
+              <div className="relative bg-white rounded-full">
                 {isCurrent && (
-                  <span className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping opacity-70" aria-hidden />
+                  <span className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping opacity-70" aria-hidden />
                 )}
                 <div
-                  className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-none text-white shadow-md shadow-emerald-500/20 scale-[1.05]'
+                  className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                    isDone
+                      ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                       : isCurrent
-                        ? 'bg-white border-2 border-blue-600 text-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.15)] ring-4 ring-blue-600/5 scale-[1.05]'
-                        : 'bg-white border border-border-light text-text-muted'
-                    }`}
+                      ? 'bg-white border-2 border-emerald-600 text-emerald-700 ring-4 ring-emerald-600/10 font-bold'
+                      : 'bg-white border-slate-300 text-slate-400 font-semibold'
+                  }`}
                 >
                   {isDone ? (
                     <Check className="w-4 h-4 stroke-[3px]" />
@@ -408,12 +414,13 @@ const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
                   )}
                 </div>
               </div>
-              <span className={`md:mt-3 text-[10px] font-bold uppercase tracking-wider ${isDone
-                  ? 'text-emerald-600'
+              <span className={`md:mt-3 text-[11px] font-bold uppercase tracking-wider ${
+                isDone
+                  ? 'text-emerald-700'
                   : isCurrent
-                    ? 'text-blue-600 font-extrabold'
-                    : 'text-text-muted'
-                }`}>
+                  ? 'text-slate-900 font-extrabold'
+                  : 'text-slate-400'
+              }`}>
                 {step.label}
               </span>
             </div>
@@ -422,15 +429,16 @@ const CustomOrderStepper = ({ currentStatus, deliveryMethod }) => {
       </div>
 
       {isFailed && (
-        <div className="mt-6 flex justify-center">
-          <span className="px-3.5 py-1.5 bg-status-error-bg text-status-error text-xs font-bold rounded-lg border border-rose-200 flex items-center gap-1.5 shadow-sm">
-            <AlertCircle className="w-4 h-4" /> {t("status")}: {currentStatus}
+        <div className="mt-4 flex justify-center">
+          <span className="px-3.5 py-1.5 bg-rose-50 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 flex items-center gap-1.5 shadow-xs">
+            <AlertCircle className="w-4 h-4" /> Durum: {currentStatus}
           </span>
         </div>
       )}
     </div>
   );
 };
+
 
 const OrderDetailsModal = React.memo(({
   isOpen,
@@ -607,34 +615,34 @@ const OrderDetailsModal = React.memo(({
       tabIndex={-1}
     >
       <div
-        className="w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-3xl border border-white/60 shadow-2xl bg-gradient-to-tr from-[#fbfaf8] via-[#f8f6f0] to-[#f3efe5] overflow-hidden flex flex-col relative"
+        className="w-full sm:max-w-6xl h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-3xl border border-slate-200 shadow-2xl bg-slate-50 overflow-hidden flex flex-col relative"
       >
         {/* Header (sticky at top) */}
-        <div className="px-6 py-5 border-b border-border-light flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md z-10 shrink-0">
+        <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="w-10 h-10 rounded-lg border border-border-light bg-slate-50 flex items-center justify-center shrink-0">
-              <Package className="w-5 h-5 text-text-secondary" />
+            <div className="w-10 h-10 rounded-2xl border border-slate-200 bg-slate-100/80 flex items-center justify-center shrink-0">
+              <Package className="w-5 h-5 text-slate-700" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2.5 flex-wrap mb-0.5">
                 {!isSellerView && isEditingName ? (
                   <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
-                    <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-sm font-semibold text-text-primary border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-card-bg shadow-sm" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
-                    <button onClick={handleSaveName} disabled={isSavingName} className="p-2 hover:bg-indigo-50 rounded-lg transition-colors text-primary disabled:opacity-50">
+                    <input type="text" value={orderName} onChange={e => setOrderName(e.target.value)} className="flex-1 px-3 py-1.5 text-xs font-semibold text-slate-900 border border-emerald-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 bg-white shadow-xs" placeholder={t("order_name")} maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH} autoFocus />
+                    <button onClick={handleSaveName} disabled={isSavingName} className="p-2 hover:bg-emerald-50 rounded-xl transition-colors text-emerald-600 disabled:opacity-50">
                       <Check className="w-4 h-4" />
                     </button>
-                    <button onClick={handleCancelEditName} disabled={isSavingName} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-text-secondary disabled:opacity-50">
+                    <button onClick={handleCancelEditName} disabled={isSavingName} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500 disabled:opacity-50">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
                   <>
-                    <h2 id="modal-title" className="text-md font-bold text-text-primary tracking-tight truncate">
+                    <h2 id="modal-title" className="text-base font-extrabold text-slate-900 tracking-tight truncate">
                       {headerTitle}
                     </h2>
-                    {!isSellerView && selectedOrder?.name ? <span className="text-xs text-text-muted font-medium">#{selectedOrder.orderNumber}</span> : null}
+                    {!isSellerView && selectedOrder?.name ? <span className="text-xs text-slate-400 font-mono font-bold">#{selectedOrder.orderNumber}</span> : null}
                     {!isSellerView && selectedOrder && (
-                      <button onClick={() => setIsEditingName(true)} className="p-1 hover:bg-slate-100 rounded transition-colors text-text-muted hover:text-text-primary" title={t("edit_order_name")}>
+                      <button onClick={() => setIsEditingName(true)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-700" title={t("edit_order_name")}>
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -644,22 +652,22 @@ const OrderDetailsModal = React.memo(({
               {selectedOrder && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${getOrderStatusIndicatorClass(selectedOrder.status)}`} />
-                  <span className={`text-xs font-bold uppercase tracking-wide ${getStatusColor(selectedOrder.status)}`}>
+                  <span className={`text-[11px] font-bold uppercase tracking-wider ${getStatusColor(selectedOrder.status)}`}>
                     {resolveEnumLabel(enums, 'orderStatuses', selectedOrder.status) || selectedOrder.status}
                   </span>
-                  <span className="text-border-light">•</span>
-                  <span className="text-xs text-text-muted font-semibold">{formatDateTime(selectedOrder.createdAt)}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-xs text-slate-500 font-semibold">{formatDateTime(selectedOrder.createdAt)}</span>
                 </div>
               )}
             </div>
           </div>
-          <button onClick={onClose} aria-label={t("close")} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-all text-text-muted hover:text-text-primary border border-border-light">
+          <button onClick={onClose} aria-label={t("close")} className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-700 border border-slate-200">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Modal Content */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-gradient-to-b from-white/20 to-[#f5f3eb]/40">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 bg-slate-50">
           {isLoading ? (
             <OrderDetailsSkeleton />
           ) : error ? (

@@ -16,6 +16,7 @@ public record PaymentCompletedKafkaEvent(
         String providerName,
         UUID listingId,
         Long orderItemId,
+        Integer quantity,
         String status,
         LocalDateTime completedAt
 ) {}

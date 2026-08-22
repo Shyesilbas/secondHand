@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState, useMemo, useEffect, memo } from 'react';
-import { ChevronDown, Plus, ArrowLeft, ArrowRight, Info } from 'lucide-react';
+import { ChevronDown, Plus, ArrowLeft, ArrowRight, Info, Truck, Users, MapPin, CheckCircle2 } from 'lucide-react';
 import AddressForm from '../../../user/components/address/AddressForm.jsx';
 import useAddresses from '../../../user/hooks/useAddresses.js';
 
@@ -22,9 +22,7 @@ const CheckoutAddressStep = ({
   onNext,
   onBack
 }) => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const { addAddress, loading: addressMutating, error: addressError } = useAddresses();
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
   const hasAddresses = Array.isArray(addresses) && addresses.length > 0;
@@ -43,12 +41,14 @@ const CheckoutAddressStep = ({
       console.error('Failed to add address:', e);
     }
   };
+
   const handleShippingChange = id => {
     setSelectedShippingAddressId(Number(id));
     if (billingSameAsShipping || deliveryMethod === 'SAFE_MEETUP') {
       setSelectedBillingAddressId(Number(id));
     }
   };
+
   const handleBillingToggle = () => {
     const next = !billingSameAsShipping;
     setBillingSameAsShipping(next);
@@ -56,6 +56,7 @@ const CheckoutAddressStep = ({
       setSelectedBillingAddressId(selectedShippingAddressId);
     }
   };
+
   useEffect(() => {
     if (deliveryMethod === 'SAFE_MEETUP' && hasAddresses) {
       if (!selectedShippingAddressId) {
@@ -68,6 +69,7 @@ const CheckoutAddressStep = ({
       }
     }
   }, [deliveryMethod, selectedShippingAddressId, selectedBillingAddressId, addresses, hasAddresses, setSelectedShippingAddressId, setSelectedBillingAddressId]);
+
   const canMeetup = Array.isArray(cartItems) && cartItems.length > 0 && cartItems.every(item => Boolean(item.listing?.allowMeetup));
   const sellerLocations = useMemo(() => {
     if (!Array.isArray(cartItems)) return [];
@@ -80,216 +82,381 @@ const CheckoutAddressStep = ({
     }).filter(Boolean);
     return Array.from(new Set(locations));
   }, [cartItems]);
-  const isStepValid = selectedShippingAddressId && selectedBillingAddressId && (deliveryMethod !== 'SAFE_MEETUP' || meetupLocation && meetupLocation.trim().length > 0);
+
+  const isStepValid = selectedShippingAddressId && selectedBillingAddressId && (deliveryMethod !== 'SAFE_MEETUP' || (meetupLocation && meetupLocation.trim().length > 0));
   const selectedBillingAddress = addresses?.find(a => String(a.id) === String(selectedBillingAddressId));
+
   const getValidationWarning = () => {
-    if (!hasAddresses) return 'Please add an address first';
-    if (!selectedShippingAddressId) return 'Select a shipping address';
-    if (!selectedBillingAddressId) return 'Select a billing address';
+    if (!hasAddresses) return 'Lütfen önce bir teslimat/fatura adresi ekleyin.';
+    if (!selectedShippingAddressId) return 'Lütfen teslimat adresi seçin.';
+    if (!selectedBillingAddressId) return 'Lütfen fatura adresi seçin.';
     if (deliveryMethod === 'SAFE_MEETUP' && (!meetupLocation || !meetupLocation.trim())) {
-      return 'Buluşma noktası seçiniz veya giriniz';
+      return 'Lütfen bir buluşma noktası seçin veya girin.';
     }
     return null;
   };
+
   const warning = getValidationWarning();
-  const predefinedHubs = ['📍 Kadıköy İskele', '📍 Marmara Forum', '📍 Metrobüs Avcılar'];
-  return <div className="p-5 sm:p-7">
-    {/* Delivery Method Selection */}
-    <div className="mb-8 border-b border-border-light pb-6">
-      <h3 className="text-sm font-bold text-text-primary mb-4 tracking-wide uppercase">{t("teslimat_y_ntemi")}</h3>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Cargo Option */}
-        <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${deliveryMethod === 'CARGO' ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
-          <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="sr-only" />
-          <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${deliveryMethod === 'CARGO' ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
-            {deliveryMethod === 'CARGO' && <span className="h-2 w-2 rounded-full bg-primary" />}
-          </span>
-          <div>
-            <span className="block text-sm font-bold text-text-primary">{t("kargo_ile_g_nderim")}</span>
-            <span className="mt-1 block text-xs text-text-muted leading-relaxed">{t("standart_kargo_irketi_arac_l_yla_adrese_")}</span>
-          </div>
-        </label>
+  const predefinedHubs = ['📍 Kadıköy İskele Meydanı', '📍 Mecidiyeköy Meydanı / Metro Çıkışı', '📍 Beşiktaş Çarşı / Kartal Heykeli', '📍 Kızılay Meydanı (Ankara)', '📍 Konak Vapur İskelesi (İzmir)'];
 
-        {/* Safe Meetup Option */}
-        <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${!canMeetup ? 'opacity-50 cursor-not-allowed border-border-light bg-background-secondary' : deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
-          <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="sr-only" />
-          <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${deliveryMethod === 'SAFE_MEETUP' ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
-            {deliveryMethod === 'SAFE_MEETUP' && <span className="h-2 w-2 rounded-full bg-primary" />}
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
+      {/* Delivery Method Selection */}
+      <div className="mb-8 border-b border-slate-100 pb-7">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t("teslimat_y_ntemi", "Teslimat Yöntemi")}</h3>
+          <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            {deliveryMethod === 'CARGO' ? '📦 Standart Gönderim' : '🤝 Elden Teslim'}
           </span>
-          <div>
-            <span className="block text-sm font-bold text-text-primary flex items-center gap-1.5">{t("elden_g_venli_teslimat")}<button type="button" onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.dispatchEvent(new CustomEvent('open-safe-meetup-onboarding'));
-            }} className="inline-flex items-center justify-center p-0.5 rounded-full text-primary hover:text-primary hover:bg-primary/15 transition-all focus:outline-none animate-pulse cursor-pointer" title={t("elden_g_venli_teslimat_nedir_detayl_bilg")}>
-              <Info className="h-3.5 w-3.5" />
-            </button>
-              {canMeetup && <span className="rounded-lg bg-status-success-bg px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase tracking-widest border border-emerald-500/20">{t("aktif")}</span>}
-            </span>
-            <span className="mt-1 block text-xs text-text-muted leading-relaxed">
-              {!canMeetup ? 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.' : 'Ortak bir güvenli buluşma noktasında yüz yüze teslimat.'}
-            </span>
-            {canMeetup && sellerLocations.length > 0 && <span className="mt-3 inline-flex items-center gap-1 text-[10px] text-primary font-bold bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/25">{t("sat_c_n_n_konumu")}<span className="text-text-primary font-bold">{sellerLocations.join(', ')}</span>
-            </span>}
-          </div>
-        </label>
-      </div>
-
-      {/* Meetup Location Selector */}
-      {deliveryMethod === 'SAFE_MEETUP' && <div className="mt-6 rounded-xl border border-border-light bg-background-primary p-4 animate-fadeIn">
-        <h4 className="mb-3 text-body font-bold uppercase tracking-wider text-text-muted">{t("bulu_ma_noktas_se_in")}</h4>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 mb-4">
-          {predefinedHubs.map(hub => {
-            const isSelected = meetupLocation === hub;
-            return <button key={hub} type="button" onClick={() => {
-              setMeetupLocation(hub);
-              setCustomLocationActive(false);
-            }} className={`rounded-lg border px-3.5 py-2.5 text-left text-xs font-medium transition-all ${isSelected ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-border-light text-text-secondary hover:border-border hover:bg-background-secondary'}`}>
-              {hub}
-            </button>;
-          })}
-          <button type="button" onClick={() => {
-            setCustomLocationActive(true);
-            if (predefinedHubs.includes(meetupLocation)) {
-              setMeetupLocation('');
-            }
-          }} className={`rounded-lg border px-3.5 py-2.5 text-left text-xs font-medium transition-all ${customLocationActive || !predefinedHubs.includes(meetupLocation) && meetupLocation ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-border-light text-text-secondary hover:border-border hover:bg-background-secondary'}`}>{t("serbest_metin_zel_konum")}</button>
         </div>
 
-        {(customLocationActive || !predefinedHubs.includes(meetupLocation) && meetupLocation) && <div className="animate-slideDown">
-          <label className="mb-1.5 block text-xs font-semibold text-text-secondary">{t("zel_bulu_ma_noktas_girin")}</label>
-          <input type="text" value={meetupLocation || ''} onChange={e => setMeetupLocation(e.target.value)} className="w-full rounded-lg border border-border-light bg-background-primary px-3 py-2 text-sm text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/5" placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k")} />
-        </div>}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Cargo Option */}
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-5 transition-all duration-200 ${
+            deliveryMethod === 'CARGO'
+              ? 'border-emerald-600 bg-emerald-50/40 shadow-xs ring-1 ring-emerald-600/20'
+              : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs'
+          }`}>
+            <input type="radio" name="deliveryMethod" value="CARGO" checked={deliveryMethod === 'CARGO'} onChange={() => setDeliveryMethod('CARGO')} className="sr-only" />
+            <div className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+              deliveryMethod === 'CARGO' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              <Truck className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <span className="block text-sm font-bold text-slate-900">{t("kargo_ile_g_nderim", "Adrese Kargo Teslimatı")}</span>
+                {deliveryMethod === 'CARGO' && <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />}
+              </div>
+              <span className="mt-1 block text-xs text-slate-500 font-medium leading-relaxed">
+                {t("standart_kargo_irketi_arac_l_yla_adrese_", "Anlaşmalı kargo firmaları ile kapınıza kadar güvenli teslimat.")}
+              </span>
+            </div>
+          </label>
 
-        {meetupLocation && <p className="mt-3 text-xs text-text-muted font-medium">{t("se_ilen_konum")}<span className="font-semibold text-text-primary">{meetupLocation}</span>
-        </p>}
-      </div>}
-    </div>
+          {/* Safe Meetup Option */}
+          <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-5 transition-all duration-200 ${
+            !canMeetup
+              ? 'opacity-50 cursor-not-allowed border-slate-200 bg-slate-50'
+              : deliveryMethod === 'SAFE_MEETUP'
+              ? 'border-emerald-600 bg-emerald-50/40 shadow-xs ring-1 ring-emerald-600/20'
+              : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs'
+          }`}>
+            <input type="radio" name="deliveryMethod" value="SAFE_MEETUP" disabled={!canMeetup} checked={deliveryMethod === 'SAFE_MEETUP'} onChange={() => setDeliveryMethod('SAFE_MEETUP')} className="sr-only" />
+            <div className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+              deliveryMethod === 'SAFE_MEETUP' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              <Users className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <span className="block text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  {t("elden_g_venli_teslimat", "Elden Güvenli Buluşma")}
+                  <button
+                    type="button"
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.dispatchEvent(new CustomEvent('open-safe-meetup-onboarding'));
+                    }}
+                    className="inline-flex items-center justify-center p-0.5 rounded-full text-emerald-600 hover:bg-emerald-100 transition-all cursor-pointer"
+                    title={t("elden_g_venli_teslimat_nedir_detayl_bilg", "Güvenli Buluşma Rehberi")}
+                  >
+                    <Info className="h-3.5 w-3.5" />
+                  </button>
+                </span>
+                {deliveryMethod === 'SAFE_MEETUP' && <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />}
+              </div>
+              <span className="mt-1 block text-xs text-slate-500 font-medium leading-relaxed">
+                {!canMeetup ? 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.' : 'Ortak belirlenen güvenli noktada 6 haneli PIN ile teslimat.'}
+              </span>
+              {canMeetup && sellerLocations.length > 0 && (
+                <div className="mt-2.5 inline-flex items-center gap-1 text-[11px] text-emerald-800 font-semibold bg-emerald-100/70 px-2.5 py-1 rounded-lg border border-emerald-200">
+                  <MapPin className="h-3 w-3 text-emerald-600" />
+                  <span>Satıcı Konumu: <strong className="text-slate-900">{sellerLocations.join(', ')}</strong></span>
+                </div>
+              )}
+            </div>
+          </label>
+        </div>
 
-    {/* Section: Shipping */}
-    <div className="mb-6">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-text-primary">
-          {deliveryMethod === 'SAFE_MEETUP' ? 'Fatura Adresi' : 'Adres Bilgisi'}
-        </h3>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setIsAddAddressModalOpen(true)} className="inline-flex items-center gap-1 text-xs font-bold text-primary uppercase tracking-wider hover:text-primary-hover">
+        {/* Meetup Location Selector */}
+        {deliveryMethod === 'SAFE_MEETUP' && (
+          <div className="mt-6 rounded-2xl border border-amber-200/90 bg-amber-50/40 p-5 animate-fadeIn">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="h-4 w-4 text-amber-700" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900">
+                {t("bulu_ma_noktas_se_in", "Buluşma Noktası Seçin")}
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3">
+              {predefinedHubs.map(hub => {
+                const isSelected = meetupLocation === hub;
+                return (
+                  <button
+                    key={hub}
+                    type="button"
+                    onClick={() => {
+                      setMeetupLocation(hub);
+                      setCustomLocationActive(false);
+                    }}
+                    className={`rounded-xl border px-3.5 py-2.5 text-left text-xs font-semibold transition-all ${
+                      isSelected
+                        ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {hub}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomLocationActive(true);
+                  if (predefinedHubs.includes(meetupLocation)) {
+                    setMeetupLocation('');
+                  }
+                }}
+                className={`rounded-xl border px-3.5 py-2.5 text-left text-xs font-semibold transition-all ${
+                  customLocationActive || (!predefinedHubs.includes(meetupLocation) && meetupLocation)
+                    ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                ✏️ Farklı / Özel Konum Gir
+              </button>
+            </div>
+
+            {(customLocationActive || (!predefinedHubs.includes(meetupLocation) && meetupLocation)) && (
+              <div className="mt-3">
+                <input
+                  type="text"
+                  value={meetupLocation || ''}
+                  onChange={e => setMeetupLocation(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-xs placeholder:text-slate-400"
+                  placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k", "Örn: Kadıköy Boğa Heykeli önü veya Levent Metro çıkışı")}
+                />
+              </div>
+            )}
+
+            {meetupLocation && (
+              <p className="mt-3 text-xs text-amber-900 font-medium">
+                Seçilen Buluşma Noktası: <strong className="text-slate-900">{meetupLocation}</strong>
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Section: Shipping Addresses */}
+      <div className="mb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              {deliveryMethod === 'SAFE_MEETUP' ? 'Fatura Adresi' : 'Teslimat Adresi'}
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              {deliveryMethod === 'SAFE_MEETUP' ? 'Yasal fatura düzenlemesi için kayıtlı adresiniz.' : 'Siparişinizin gönderileceği kayıtlı adresiniz.'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsAddAddressModalOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 uppercase tracking-wider hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 transition-colors"
+          >
             <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-            {t("add_address")}
-          </button>
-          <span className="text-caption font-medium uppercase tracking-widest text-text-muted">{t("gerekli")}</span>
-        </div>
-      </div>
-
-      {!hasAddresses ? (
-        <div className="rounded-lg border border-dashed border-border-light bg-background-secondary py-10 text-center">
-          <p className="mb-4 text-sm text-text-muted">{t("no_saved_addresses")}</p>
-          <button type="button" onClick={() => setIsAddAddressModalOpen(true)} className="inline-flex items-center gap-1.5 rounded-lg border border-primary bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary-hover">
-            <Plus className="h-3.5 w-3.5" strokeWidth={2} />{t("add_address")}
+            {t("add_address", "Yeni Adres Ekle")}
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {addresses.map(address => {
-            const isSelected = String(selectedShippingAddressId) === String(address.id);
-            return (
-              <label key={address.id} className={`relative cursor-pointer rounded-2xl border p-5 transition-all duration-300 active:scale-[0.99] ${isSelected ? 'border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10' : 'border-border-light bg-background-primary hover:border-border hover:shadow-[0_2px_12px_rgba(0,0,0,0.02)]'}`}>
-                <input type="radio" name="shipping" value={address.id} checked={isSelected} onChange={e => handleShippingChange(e.target.value)} className="sr-only" />
-                <div className="flex items-start gap-3">
-                  {/* Radio indicator */}
-                  <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${isSelected ? 'border-primary bg-white ring-4 ring-primary/10' : 'border-border bg-white'}`}>
-                    {isSelected && <span className="h-2 w-2 rounded-full bg-primary" />}
-                  </span>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-bold tracking-tight text-text-primary">{address.addressLine}</div>
-                    <div className="mt-1.5 text-xs text-text-secondary leading-relaxed font-medium">
-                      {address.city}, {address.state}
-                      {address.neighborhoodKey ? `, ${address.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}
-                      {` ${address.postalCode}`}
-                    </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{address.country}</span>
-                      {address.mainAddress && <span className="rounded-lg border border-border-light bg-background-secondary px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-text-muted">{t("default")}</span>}
+        {!hasAddresses ? (
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 py-10 text-center">
+            <p className="mb-4 text-sm text-slate-500 font-medium">{t("no_saved_addresses", "Henüz kayıtlı bir adresiniz bulunmuyor.")}</p>
+            <button
+              type="button"
+              onClick={() => setIsAddAddressModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-emerald-700 shadow-xs"
+            >
+              <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+              {t("add_address", "Adres Ekle")}
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {addresses.map(address => {
+              const isSelected = String(selectedShippingAddressId) === String(address.id);
+              return (
+                <label
+                  key={address.id}
+                  className={`relative cursor-pointer rounded-2xl border-2 p-5 transition-all duration-200 ${
+                    isSelected
+                      ? 'border-emerald-600 bg-emerald-50/30 shadow-xs ring-1 ring-emerald-600/20'
+                      : 'border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value={address.id}
+                    checked={isSelected}
+                    onChange={e => handleShippingChange(e.target.value)}
+                    className="sr-only"
+                  />
+                  <div className="flex items-start gap-3">
+                    <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                      isSelected ? 'border-emerald-600 bg-white ring-2 ring-emerald-600/20' : 'border-slate-300 bg-white'
+                    }`}>
+                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-emerald-600" />}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-slate-900 tracking-tight">{address.title || 'Ev / İş Adresi'}</span>
+                        {address.mainAddress && (
+                          <span className="rounded-md bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                            {t("default", "Varsayılan")}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1.5 text-xs text-slate-700 leading-relaxed font-semibold">
+                        {address.addressLine}
+                      </div>
+                      <div className="mt-1 text-xs text-slate-500 font-medium">
+                        {address.city}, {address.state} {address.postalCode}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </label>
-            );
-          })}
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Section: Billing Address Selection (when delivery is CARGO) */}
+      {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && (
+        <div className="mb-8 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <label className="flex cursor-pointer select-none items-center gap-3">
+              <input
+                type="checkbox"
+                checked={billingSameAsShipping}
+                onChange={handleBillingToggle}
+                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                {t("billing_same_as_shipping", "Fatura adresi teslimat adresiyle aynı")}
+              </span>
+            </label>
+
+            {!billingSameAsShipping && (
+              <div className="relative w-full sm:w-72">
+                <select
+                  value={selectedBillingAddressId || ''}
+                  onChange={e => setSelectedBillingAddressId(Number(e.target.value))}
+                  className="w-full appearance-none rounded-xl border border-slate-300 bg-white px-4 py-2.5 pr-10 text-xs font-semibold text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 shadow-xs"
+                >
+                  <option value="">{t("choose_billing_address", "Fatura Adresi Seçin")}</option>
+                  {addresses.map(a => (
+                    <option key={a.id} value={a.id}>
+                      {a.addressLine} — {a.city}, {a.state}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
 
-    {/* Section: Billing */}
-    {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && <div className="mb-6 rounded-xl border border-border-light bg-background-primary shadow-sm p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <label className="flex cursor-pointer select-none items-center gap-3">
-          <input type="checkbox" checked={billingSameAsShipping} onChange={handleBillingToggle} className="h-4 w-4 rounded border-border text-primary focus:ring-primary/20" />
-          <span className="text-sm font-semibold text-text-primary">{t("billing_same_as_shipping")}</span>
-        </label>
-
-        {!billingSameAsShipping && <div className="relative w-full sm:w-64">
-          <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(Number(e.target.value))} className="w-full appearance-none rounded-xl border border-border-light bg-background-secondary px-4 py-2.5 pr-10 text-sm text-text-primary outline-none transition focus:border-primary focus:bg-background-primary focus:ring-2 focus:ring-primary/20 shadow-inner">
-            <option value="">{t("choose_billing_address")}</option>
-            {addresses.map(a => <option key={a.id} value={a.id}>
-              {a.addressLine} — {a.city}, {a.state}
-            </option>)}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-          {selectedBillingAddress && !billingSameAsShipping && <p className="mt-1.5 truncate pl-0.5 text-caption text-text-muted">
-            {selectedBillingAddress.city}, {selectedBillingAddress.state}
-            {selectedBillingAddress.neighborhoodKey ? `, ${selectedBillingAddress.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : ''}{' '}
-            {selectedBillingAddress.postalCode}
-          </p>}
-        </div>}
+      {/* Order name & notes */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            {t("order_name", "Sipariş Başlığı")} <span className="font-normal text-slate-400 lowercase">({t("optional", "isteğe bağlı")})</span>
+          </label>
+          <input
+            type="text"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition shadow-xs placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10"
+            placeholder={t("e_g_birthday_gift", "Örn: Kendime Doğum Günü Hediyesi")}
+            value={orderName || ''}
+            onChange={e => setOrderName(e.target.value)}
+            maxLength={100}
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">
+            {t("notes", "Teslimat / Sipariş Notu")} <span className="font-normal text-slate-400 lowercase">({t("optional", "isteğe bağlı")})</span>
+          </label>
+          <input
+            type="text"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition shadow-xs placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10"
+            placeholder={t("delivery_notes", "Kurye için kapı zili veya teslimat notu...")}
+            value={notes || ''}
+            onChange={e => setNotes(e.target.value)}
+          />
+        </div>
       </div>
-    </div>}
 
-    {/* Order name & notes */}
-    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-text-muted">{t("order_name")}<span className="font-normal text-text-muted capitalize">{t("optional")}</span>
-        </label>
-        <input type="text" className="w-full rounded-xl border border-border-light bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder={t("e_g_birthday_gift")} value={orderName || ''} onChange={e => setOrderName(e.target.value)} maxLength={100} />
-      </div>
-      <div>
-        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-text-muted">{t("notes")}<span className="font-normal text-text-muted capitalize">{t("optional")}</span>
-        </label>
-        <input type="text" className="w-full rounded-xl border border-border-light bg-background-primary px-4 py-3 text-sm text-text-primary outline-none transition shadow-sm placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20" placeholder={t("delivery_notes")} value={notes} onChange={e => setNotes(e.target.value)} />
-      </div>
-    </div>
-
-    {/* Navigation — desktop */}
-    <div className="hidden items-center justify-between border-t border-border-light pt-6 sm:flex">
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-secondary transition-colors hover:text-text-primary">
-        <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
-      <div className="flex items-center gap-4">
-        {warning && <span className="text-xs text-status-warning font-semibold tracking-wide">{warning}</span>}
-        <button type="button" onClick={onNext} disabled={!isStepValid} className="flex items-center gap-2 rounded-xl bg-primary px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted shadow-sm active:scale-[0.98]">{t("continue")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
+      {/* Navigation — desktop */}
+      <div className="hidden items-center justify-between border-t border-slate-100 pt-6 sm:flex">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+          {t("back", "Geri")}
         </button>
+        <div className="flex items-center gap-4">
+          {warning && <span className="text-xs text-amber-700 font-semibold">{warning}</span>}
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!isStepValid}
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 shadow-xs active:scale-[0.98]"
+          >
+            {t("continue", "Ödeme Adımına Geç")}
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+          </button>
+        </div>
       </div>
-    </div>
 
-    {/* Navigation — mobile */}
-    <div className="sticky bottom-0 -mx-5 mt-6 flex flex-col gap-2 border-t border-border-light bg-background-primary px-5 py-4 sm:hidden">
-      {warning && <p className="text-center text-xs text-status-warning font-semibold tracking-wide mb-1">{warning}</p>}
-      <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:bg-background-secondary">
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
-        <button type="button" onClick={onNext} disabled={!isStepValid} className="flex items-center justify-center gap-1.5 rounded-xl bg-primary py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary-hover disabled:bg-background-secondary disabled:text-text-muted">{t("continue")}<ArrowRight className="h-4 w-4" strokeWidth={2} />
-        </button>
+      {/* Navigation — mobile */}
+      <div className="mt-6 flex flex-col gap-2 border-t border-slate-100 pt-5 sm:hidden">
+        {warning && <p className="text-center text-xs text-amber-700 font-semibold mb-1">{warning}</p>}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+            {t("back", "Geri")}
+          </button>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!isStepValid}
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white disabled:bg-slate-200 disabled:text-slate-400"
+          >
+            {t("continue", "Devam Et")}
+            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+          </button>
+        </div>
       </div>
-    </div>
 
-    <AddressForm
-      isOpen={isAddAddressModalOpen}
-      onClose={() => setIsAddAddressModalOpen(false)}
-      onSubmit={handleAddAddressSubmit}
-      loading={addressMutating}
-      error={addressError}
-    />
-  </div>;
+      <AddressForm
+        isOpen={isAddAddressModalOpen}
+        onClose={() => setIsAddAddressModalOpen(false)}
+        onSubmit={handleAddAddressSubmit}
+        loading={addressMutating}
+        error={addressError}
+      />
+    </div>
+  );
 };
 
 export default memo(CheckoutAddressStep);

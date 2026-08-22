@@ -39,6 +39,7 @@ public class EscrowService {
     private final PaymentRepository paymentRepository;
     private final IEWalletService walletService;
     private final ApplicationEventPublisher eventPublisher;
+    private final com.serhat.secondhand.escrow.outbox.EscrowOutboxService escrowOutboxService;
 
     @Transactional
     @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
@@ -139,12 +140,11 @@ public class EscrowService {
                 }
             }
 
-            // 3. Credit the money to Seller's Wallet (Real move)
-            // Note: We use a new internal credit method that doesn't create duplicate payment records
-            creditWalletQuietly(escrow.getSeller(), escrow.getAmount());
+            // 3. Enqueue Transactional Outbox Event for resilient asynchronous wallet credit via Kafka
+            escrowOutboxService.enqueueEscrowReleased(escrow);
 
-            log.info("Released {} to seller {} for order item {}", 
-                    escrow.getAmount(), escrow.getSeller().getEmail(), escrow.getOrderItem().getId());
+            log.info("Released {} for seller {} (Order: {}) via Transactional Outbox", 
+                    escrow.getAmount(), escrow.getSeller().getEmail(), order.getOrderNumber());
         }
 
         return Result.success();

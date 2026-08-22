@@ -39,6 +39,7 @@ public class OfferService implements IOfferService {
     private final OfferEmailNotificationService offerEmailNotificationService;
     private final OfferValidator offerValidator;
     private final OfferMapper offerMapper;
+    private final OfferRedisReservationService offerRedisReservationService;
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
@@ -128,6 +129,7 @@ public class OfferService implements IOfferService {
         Offer saved;
         try {
             saved = offerRepository.save(offer);
+            offerRedisReservationService.lockAcceptedOffer(lockedListing.getId(), offer.getBuyer().getId(), offer.getId());
         } catch (ObjectOptimisticLockingFailureException ex) {
             log.warn("Concurrent accept offer conflict for offer {}", offerId, ex);
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);

@@ -3,51 +3,68 @@ import React, { useCallback, useState } from 'react';
 import { BarChart3, ChevronRight, Eye, RefreshCw, TrendingUp } from 'lucide-react';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
+
 const ListingAnalyticsPanel = ({
   listing,
   isOwner,
   displayPrice
 }) => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const openInfo = useCallback(() => setIsInfoOpen(true), []);
   const closeInfo = useCallback(() => setIsInfoOpen(false), []);
+
   if (!listing) return null;
   const price = displayPrice != null ? displayPrice : listing?.price;
-  return <div className="mt-5">
-      <button type="button" onClick={openInfo} className="group w-full rounded-xl border border-border-light bg-background-primary p-4 sm:p-5 text-left transition-all hover:border-primary/80 hover:shadow-sm">
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={openInfo}
+        className="group w-full rounded-3xl border border-slate-200/80 bg-white p-5 text-left transition-all hover:border-slate-300 hover:shadow-xs cursor-pointer shadow-xs"
+      >
         {/* Header row */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3.5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary group-hover:bg-primary/10 transition-colors">
-              <BarChart3 className="h-[18px] w-[18px]" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 group-hover:scale-105 transition-transform">
+              <BarChart3 className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">{t("market_insights")}</p>
-              <p className="text-caption font-medium text-text-muted mt-0.5">{t("trends_rates_performance")}</p>
+              <p className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">{t("market_insights", "Piyasa Analizi")}</p>
+              <p className="text-[11px] font-medium text-slate-400 mt-0.5">{t("trends_rates_performance", "Fiyat trendi ve döviz kurları")}</p>
             </div>
           </div>
-          <ChevronRight className="h-4 w-4 shrink-0 text-slate-300 transition-all group-hover:translate-x-0.5 group-hover:text-primary" />
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition-all group-hover:translate-x-0.5 group-hover:text-emerald-700" />
         </div>
 
         {/* Metric chips */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-background-secondary px-2.5 py-1.5 text-caption font-bold text-text-secondary border border-border-light">
-            <TrendingUp className="h-3 w-3 text-emerald-500" />{t("price_trend")}</span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-background-secondary px-2.5 py-1.5 text-caption font-bold text-text-secondary border border-border-light">
-            <RefreshCw className="h-3 w-3 text-primary" />{t("currency_rates")}</span>
-          {isOwner && <span className="inline-flex items-center gap-1.5 rounded-lg bg-background-secondary px-2.5 py-1.5 text-caption font-bold text-text-secondary border border-border-light">
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-slate-50 px-2.5 py-1 text-[11px] font-extrabold text-slate-700 border border-slate-200/60">
+            <TrendingUp className="h-3 w-3 text-emerald-600" />
+            {t("price_trend", "Fiyat Trendi")}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-xl bg-slate-50 px-2.5 py-1 text-[11px] font-extrabold text-slate-700 border border-slate-200/60">
+            <RefreshCw className="h-3 w-3 text-emerald-600" />
+            {t("currency_rates", "Döviz Kurları")}
+          </span>
+          {isOwner && (
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-slate-50 px-2.5 py-1 text-[11px] font-extrabold text-slate-700 border border-slate-200/60">
               <Eye className="h-3 w-3 text-amber-500" />
-              {listing.viewCount || 0}{t("views")}</span>}
-          {price != null && <span className="ml-auto inline-flex items-center rounded-lg bg-primary-light px-2.5 py-1 text-caption font-bold text-primary border border-primary/20">
+              {listing.viewCount || 0} {t("views", "Görüntülenme")}
+            </span>
+          )}
+          {price != null && (
+            <span className="ml-auto inline-flex items-center rounded-xl bg-emerald-50 px-2.5 py-1 text-xs font-extrabold font-mono text-emerald-700 border border-emerald-200">
               {formatCurrency(price, listing.currency)}
-            </span>}
+            </span>
+          )}
         </div>
       </button>
 
       <ListingInfoModal isOpen={isInfoOpen} onClose={closeInfo} listing={listing} displayPrice={displayPrice} isOwner={isOwner} />
-    </div>;
+    </div>
+  );
 };
+
 export default ListingAnalyticsPanel;

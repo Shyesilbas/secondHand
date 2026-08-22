@@ -1,10 +1,13 @@
 import { useTranslation } from "react-i18next";
 import React, { useState, memo } from 'react';
-import { Wallet, AlertCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Wallet, AlertCircle, Loader2, ArrowLeft, ArrowRight, PlusCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import PaymentAgreementsSection from '../../../payments/components/PaymentAgreementsSection.jsx';
 import { formatCurrency } from '../../../common/formatters.js';
 import { CART_PAYMENT_TYPES } from '../../cartConstants.js';
 import { ewalletService } from '../../../ewallet/services/ewalletService.js';
+import { ROUTES } from '../../../common/constants/routes.js';
+
 const CheckoutPaymentStep = ({
   selectedPaymentType,
   setSelectedPaymentType,
@@ -18,16 +21,18 @@ const CheckoutPaymentStep = ({
   onRequiredAgreementsChange,
   areAllAgreementsAccepted
 }) => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const totalAmount = calculateTotal();
   const cur = currency || 'TRY';
   const [warningData, setWarningData] = useState(null);
   const [isCheckingWarning, setIsCheckingWarning] = useState(false);
+
   const walletBalance = Number(eWallet?.balance || 0);
   const hasEnoughBalance = !!eWallet && totalAmount <= walletBalance;
   const canProceed = hasEnoughBalance && areAllAgreementsAccepted();
+  const remainingBalance = walletBalance - totalAmount;
+
   const handleNext = async () => {
     if (!canProceed) return;
     if (!warningData) {
@@ -46,78 +51,205 @@ const CheckoutPaymentStep = ({
     }
     onNext();
   };
-  return <div className="p-5 sm:p-7">
-    <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-      <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("payment")}</h2>
-      <div className="text-sm font-semibold tabular-nums text-primary">
-        {formatCurrency(totalAmount, cur)}
-      </div>
-    </div>
 
-    <div className="mb-5">
-      <label className="flex items-center gap-4 rounded-2xl border border-primary bg-primary/[0.02] shadow-[0_4px_20px_rgba(20,102,198,0.06)] ring-1 ring-primary/10 p-5 transition-all duration-300 active:scale-[0.99] cursor-pointer">
-        <input type="radio" name="payment" value={CART_PAYMENT_TYPES.EWALLET} checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET} onChange={event => setSelectedPaymentType(event.target.value)} className="sr-only" />
-        <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border border-primary bg-white ring-4 ring-primary/10">
-          <span className="h-2 w-2 rounded-full bg-primary" />
-        </span>
-        <Wallet className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
-        <div className="min-w-0 flex-1">
-          <div className="text-sm font-bold tracking-tight text-text-primary">{t("wallet")}</div>
-          <div className="mt-1 text-xs font-medium text-text-muted">
-            {eWallet ? `Balance: ${formatCurrency(walletBalance, cur)}` : 'No wallet available'}
-          </div>
-        </div>
-      </label>
-
-      <div className="mt-3 space-y-2 pl-9 text-sm">
-        <div className="flex justify-between gap-4">
-          <span className="text-text-secondary">{t("available")}</span>
-          <span className="font-medium tabular-nums text-text-primary">{formatCurrency(walletBalance, cur)}</span>
-        </div>
-        <div className="flex justify-between gap-4">
-          <span className="text-text-secondary">{t("order_total")}</span>
-          <span className="font-medium tabular-nums text-text-primary">{formatCurrency(totalAmount, cur)}</span>
-        </div>
-        {!hasEnoughBalance && <div className="mt-2 rounded-lg border border-status-error/20 bg-status-error-bg px-3 py-2.5 text-xs text-status-error">{t("insufficient_wallet_balance_add_funds_to")}</div>}
-      </div>
-    </div>
-
-    <div className="mb-6 rounded-xl border border-border-light bg-background-primary p-5 shadow-sm">
-      <PaymentAgreementsSection acceptedAgreements={acceptedAgreements} onToggle={onAgreementToggle} onRequiredAgreementsChange={onRequiredAgreementsChange} />
-    </div>
-
-    {warningData ? <div className="mt-4 rounded-xl border border-amber-100 bg-status-warning-bg/30 p-5">
-      <div className="flex items-start gap-3">
-        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-status-warning" />
-        <div className="min-w-0">
-          <h3 className="text-sm font-medium text-text-primary">{t("spending_limit_warning")}</h3>
-          <p className="mt-1 text-xs font-medium leading-relaxed text-text-secondary">{t("with_this_order_monthly_spending_reaches")}{' '}
-            <strong>{formatCurrency(warningData.projectedSpending, cur)}</strong>.
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
+      {/* Header */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
+        <div>
+          <h2 className="text-base font-extrabold text-slate-900 tracking-tight">{t("payment", "Ödeme Yöntemi")}</h2>
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
+            {t("secure_escrow_payment_desc", "Ödemeniz güvenli havuz hesabında (Escrow) bloke edilir, onayınızdan sonra satıcıya aktarılır.")}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={() => setWarningData(null)} className="rounded-xl border border-border-light bg-background-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition hover:bg-background-secondary">{t("cancel")}</button>
-            <button type="button" onClick={handleNext} className="rounded-xl bg-primary px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-primary-hover">{t("continue_anyway")}</button>
-          </div>
+        </div>
+        <div className="text-right">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{t("order_total", "Ödenecek Tutar")}</span>
+          <span className="text-lg font-extrabold font-mono text-emerald-700">
+            {formatCurrency(totalAmount, cur)}
+          </span>
         </div>
       </div>
-    </div> : <>
-      <div className="hidden items-center justify-between border-t border-border-light pt-6 sm:flex">
-        <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-secondary transition-colors hover:text-text-primary">
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
-        <button type="button" onClick={handleNext} disabled={!canProceed || isCheckingWarning} className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition-all hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted active:scale-[0.98]">
-          {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
-          {!isCheckingWarning && <ArrowRight className="h-4 w-4" strokeWidth={2} />}
-        </button>
+
+      {/* Payment Selection Box */}
+      <div className="mb-6">
+        <label className={`relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-5 transition-all duration-200 ${
+          selectedPaymentType === CART_PAYMENT_TYPES.EWALLET
+            ? 'border-emerald-600 bg-emerald-50/40 shadow-xs ring-1 ring-emerald-600/20'
+            : 'border-slate-200/80 bg-white hover:border-slate-300'
+        }`}>
+          <input
+            type="radio"
+            name="payment"
+            value={CART_PAYMENT_TYPES.EWALLET}
+            checked={selectedPaymentType === CART_PAYMENT_TYPES.EWALLET}
+            onChange={event => setSelectedPaymentType(event.target.value)}
+            className="sr-only"
+          />
+          <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-600 bg-emerald-600 text-white shadow-xs">
+            <Wallet className="h-5 w-5" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-slate-900 tracking-tight">{t("wallet", "SecondHand Cüzdanım")}</span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                Güvenli Ödeme
+              </span>
+            </div>
+
+            <p className="mt-1 text-xs text-slate-600 font-medium">
+              {eWallet ? (
+                <>Mevcut Bakiye: <strong className="font-mono text-slate-900">{formatCurrency(walletBalance, cur)}</strong></>
+              ) : (
+                'Kayıtlı cüzdan bulunamadı'
+              )}
+            </p>
+          </div>
+        </label>
+
+        {/* Balance Breakdown Card */}
+        <div className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 p-5">
+          <div className="space-y-2.5 text-xs">
+            <div className="flex justify-between items-center text-slate-600 font-medium">
+              <span>{t("available", "Cüzdan Bakiyesi")}</span>
+              <span className="font-mono font-bold text-slate-900">{formatCurrency(walletBalance, cur)}</span>
+            </div>
+            <div className="flex justify-between items-center text-slate-600 font-medium">
+              <span>{t("order_total", "Sipariş Tutarı")}</span>
+              <span className="font-mono font-bold text-slate-900">−{formatCurrency(totalAmount, cur)}</span>
+            </div>
+            <div className="border-t border-slate-200 pt-2 flex justify-between items-center">
+              <span className="font-bold text-slate-800">{hasEnoughBalance ? 'İşlem Sonrası Kalan Bakiye' : 'Eksik Tutar'}</span>
+              <span className={`font-mono font-extrabold text-sm ${hasEnoughBalance ? 'text-emerald-700' : 'text-rose-600'}`}>
+                {hasEnoughBalance
+                  ? formatCurrency(remainingBalance, cur)
+                  : formatCurrency(Math.abs(remainingBalance), cur)}
+              </span>
+            </div>
+          </div>
+
+          {!hasEnoughBalance && (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-rose-800 text-xs font-semibold">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
+                  <span>{t("insufficient_wallet_balance_add_funds_to", "Cüzdan bakiyeniz bu sipariş için yetersiz.")}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.EWALLET || '/ewallet')}
+                  className="inline-flex items-center gap-1.5 shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-700 shadow-xs transition-colors"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  Bakiye Yükle
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="sticky bottom-0 -mx-5 mt-6 grid grid-cols-2 gap-2 border-t border-border-light bg-background-primary px-5 py-4 sm:hidden">
-        <button type="button" onClick={onBack} className="flex items-center justify-center gap-1.5 rounded-xl border border-border-light bg-background-primary py-3.5 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:bg-background-secondary">
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} />{t("back")}</button>
-        <button type="button" onClick={handleNext} disabled={!canProceed || isCheckingWarning} className="flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary-hover disabled:bg-background-secondary disabled:text-text-muted">
-          {isCheckingWarning ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Continue'}
-        </button>
+      {/* Agreements Section */}
+      <div className="mb-8 rounded-2xl border border-slate-200/90 bg-white p-5">
+        <PaymentAgreementsSection
+          acceptedAgreements={acceptedAgreements}
+          onToggle={onAgreementToggle}
+          onRequiredAgreementsChange={onRequiredAgreementsChange}
+        />
       </div>
-    </>}
-  </div>;
+
+      {warningData ? (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-5">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-amber-900">{t("spending_limit_warning", "Harcama Limiti Uyarısı")}</h3>
+              <p className="mt-1 text-xs font-medium leading-relaxed text-amber-800">
+                {t("with_this_order_monthly_spending_reaches", "Bu sipariş ile birlikte aylık harcama limitiniz")} {' '}
+                <strong className="font-bold">{formatCurrency(warningData.projectedSpending, cur)}</strong> seviyesine ulaşacaktır.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWarningData(null)}
+                  className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50"
+                >
+                  {t("cancel", "İptal Et")}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="rounded-xl bg-amber-600 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-amber-700 shadow-xs"
+                >
+                  {t("continue_anyway", "Yine de Devam Et")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Navigation — desktop */}
+          <div className="hidden items-center justify-between border-t border-slate-100 pt-6 sm:flex">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 transition-colors hover:text-slate-900"
+            >
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+              {t("back", "Geri")}
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={!canProceed || isCheckingWarning}
+              className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-xs transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 active:scale-[0.98]"
+            >
+              {isCheckingWarning ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Kontrol Ediliyor...
+                </>
+              ) : (
+                <>
+                  {t("continue", "Siparişi İncele")}
+                  <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Navigation — mobile */}
+          <div className="mt-6 grid grid-cols-2 gap-2 border-t border-slate-100 pt-5 sm:hidden">
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold uppercase tracking-wider text-slate-700"
+            >
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+              {t("back", "Geri")}
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={!canProceed || isCheckingWarning}
+              className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white disabled:bg-slate-200 disabled:text-slate-400"
+            >
+              {isCheckingWarning ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {t("continue", "Devam Et")}
+                  <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                </>
+              )}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
+
 export default memo(CheckoutPaymentStep);

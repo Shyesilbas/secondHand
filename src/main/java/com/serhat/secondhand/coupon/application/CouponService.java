@@ -43,6 +43,7 @@ public class CouponService {
     private final IPricingService pricingService;
     private final IUserService userService;
     private final UserRepository userRepository;
+    private final CouponRedisLimiterService couponRedisLimiterService;
 
     public CouponService(
             CouponRepository couponRepository,
@@ -53,7 +54,8 @@ public class CouponService {
             IOfferService offerService,
             IPricingService pricingService,
             IUserService userService,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            CouponRedisLimiterService couponRedisLimiterService) {
         this.couponRepository = couponRepository;
         this.couponRedemptionRepository = couponRedemptionRepository;
         this.couponMapper = couponMapper;
@@ -63,6 +65,7 @@ public class CouponService {
         this.pricingService = pricingService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.couponRedisLimiterService = couponRedisLimiterService;
     }
 
     public Result<CouponDto> create(CreateCouponRequest request) {
@@ -114,10 +117,27 @@ public class CouponService {
         if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
 
         return couponRepository.findByCodeIgnoreCaseForUpdate(normalizeCode(code))
-                .map(coupon -> {
+                .<Result<Void>>map(coupon -> {
+                    // 1. Atomic Redis Limiter Pre-Check
+                    long ttlSeconds = 86400 * 30; // 30 days default
+                    int limitAcquire = couponRedisLimiterService.acquireCouponUsage(
+                            coupon.getCode(),
+                            userId,
+                            coupon.getUsageLimitGlobal(),
+                            coupon.getUsageLimitPerUser(),
+                            ttlSeconds
+                    );
+
+                    if (limitAcquire == -1) {
+                        return Result.error(CouponErrorCodes.COUPON_USAGE_LIMIT_REACHED);
+                    } else if (limitAcquire == -2) {
+                        return Result.error(CouponErrorCodes.COUPON_USAGE_LIMIT_REACHED);
+                    }
+
+                    // 2. Standard Domain Validation
                     Result<Void> usableResult = couponValidator.validateUsable(coupon, userResult.getData());
                     if (usableResult.isError()) {
-                        return Result.<Void>error(usableResult.getErrorCode(), usableResult.getMessage());
+                        return Result.error(usableResult.getMessage(), usableResult.getErrorCode());
                     }
 
                     CouponRedemption redemption = CouponRedemption.builder()
@@ -126,7 +146,7 @@ public class CouponService {
                             .order(order)
                             .build();
                     couponRedemptionRepository.save(redemption);
-                    return Result.<Void>success();
+                    return Result.success();
                 })
                 .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
     }

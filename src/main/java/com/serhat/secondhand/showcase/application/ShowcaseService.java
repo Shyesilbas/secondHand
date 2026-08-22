@@ -49,6 +49,7 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseValidator showcaseValidator;
     private final PaymentRequestFactory paymentRequestFactory;
     private final PlanValidator planValidator;
+    private final ShowcaseRedisManagerService showcaseRedisManagerService;
 
     private <T> Result<T> validateShowcaseDays(int days) {
         Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
@@ -109,7 +110,9 @@ public class ShowcaseService implements IShowcaseService {
 
         Showcase showcase = showcaseMapper.fromCreateRequest(request, user, listing, showcaseDailyCost, totalCost,
                 startDate, endDate);
-        return Result.success(showcaseRepository.save(showcase));
+        Showcase saved = showcaseRepository.save(showcase);
+        showcaseRedisManagerService.registerActiveShowcase(saved.getId(), listing.getId(), endDate);
+        return Result.success(saved);
     }
 
     @Override
@@ -176,10 +179,12 @@ public class ShowcaseService implements IShowcaseService {
         }
 
         // Success - Update dates and cost
-        showcase.setEndDate(showcase.getEndDate().plusDays(request.days()));
+        LocalDateTime newEndDate = showcase.getEndDate().plusDays(request.days());
+        showcase.setEndDate(newEndDate);
         showcase.setTotalCost(showcase.getTotalCost().add(additionalCost));
 
         showcaseRepository.save(showcase);
+        showcaseRedisManagerService.registerActiveShowcase(showcase.getId(), showcase.getListing().getId(), newEndDate);
         log.info("Successfully extended showcase {} by {} days for user {}", showcase.getId(), request.days(), userId);
         return Result.success();
     }
@@ -193,6 +198,7 @@ public class ShowcaseService implements IShowcaseService {
                     }
                     showcase.setStatus(ShowcaseStatus.CANCELLED);
                     showcaseRepository.save(showcase);
+                    showcaseRedisManagerService.removeShowcase(showcase.getListing().getId());
                     return Result.<Void>success();
                 })
                 .orElseGet(() -> Result.error(ShowcaseErrorCodes.SHOWCASE_NOT_FOUND));

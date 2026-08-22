@@ -387,7 +387,6 @@ const CategorySubHeader = () => {
 
   // Perform navigation with accumulated search parameters
   const executeSearch = (
-    overridePropCat = selectedPropertyCat,
     overrideType = selectedType,
     overrideBrand = selectedBrand,
     overrideModel = selectedModel
@@ -498,30 +497,54 @@ const CategorySubHeader = () => {
                     )
                   )}
 
-                  {/* REAL ESTATE STEP 2 (Property Type) or OTHER STEP 2 (Brand) */}
-                  {(selectedType || (currentCatConfig.id === 'REAL_ESTATE' && selectedType)) && (
-                    <>
-                      <ChevronRight className="w-4 h-4 text-slate-300" />
-                      <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
-                        <Check className="w-3 h-3 text-emerald-600" />
-                        {selectedType.name}
-                      </span>
-                    </>
+                  {/* STEP 2 BREADCRUMB */}
+                  {currentCatConfig.id === 'REAL_ESTATE' ? (
+                    selectedType ? (
+                      <>
+                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                        <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          {selectedType.name}
+                        </span>
+                      </>
+                    ) : null
+                  ) : (
+                    selectedBrand ? (
+                      <>
+                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                        <span className="px-3 py-1 rounded-xl bg-emerald-100/80 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          {selectedBrand.name}
+                        </span>
+                      </>
+                    ) : null
                   )}
 
-                  {/* STEP 3 / Ad Type */}
-                  {selectedBrand && (
-                    <>
-                      <ChevronRight className="w-4 h-4 text-slate-300" />
-                      <span className="px-3 py-1 rounded-xl bg-teal-100/80 text-teal-800 text-xs font-bold flex items-center gap-1">
-                        <Check className="w-3 h-3 text-teal-600" />
-                        {selectedBrand.name}
-                      </span>
-                    </>
+                  {/* STEP 3 BREADCRUMB */}
+                  {currentCatConfig.id === 'REAL_ESTATE' ? (
+                    selectedBrand ? (
+                      <>
+                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                        <span className="px-3 py-1 rounded-xl bg-teal-100/80 text-teal-800 text-xs font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3 text-teal-600" />
+                          {selectedBrand.name}
+                        </span>
+                      </>
+                    ) : null
+                  ) : (
+                    selectedModel ? (
+                      <>
+                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                        <span className="px-3 py-1 rounded-xl bg-teal-100/80 text-teal-800 text-xs font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3 text-teal-600" />
+                          {selectedModel.name}
+                        </span>
+                      </>
+                    ) : null
                   )}
 
-                  {/* STEP 4 / Model / Owner Type */}
-                  {selectedModel && (
+                  {/* STEP 4 BREADCRUMB (REAL ESTATE ONLY) */}
+                  {currentCatConfig.id === 'REAL_ESTATE' && selectedModel && (
                     <>
                       <ChevronRight className="w-4 h-4 text-slate-300" />
                       <span className="px-3 py-1 rounded-xl bg-blue-100/80 text-blue-800 text-xs font-bold flex items-center gap-1">
@@ -638,16 +661,32 @@ const CategorySubHeader = () => {
 
                   <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-emerald-400">
                     {step2Items.map((item) => {
-                      const isSelected = selectedType?.id === item.id;
+                      const isSelected = currentCatConfig.id === 'REAL_ESTATE'
+                        ? selectedType?.id === item.id
+                        : selectedBrand?.id === item.id;
 
                       return (
                         <button
                           key={item.id}
                           onClick={() => {
-                            if (isSelected) {
-                              setSelectedType(null);
+                            if (currentCatConfig.id === 'REAL_ESTATE') {
+                              if (isSelected) {
+                                setSelectedType(null);
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              } else {
+                                setSelectedType(item);
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              }
                             } else {
-                              setSelectedType(item);
+                              if (isSelected) {
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              } else {
+                                setSelectedBrand(item);
+                                setSelectedModel(null);
+                              }
                             }
                           }}
                           className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
@@ -680,16 +719,29 @@ const CategorySubHeader = () => {
 
                   <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-teal-400">
                     {step3Items.map((item) => {
-                      const isSelected = selectedBrand?.id === item.id;
+                      const isSelected = currentCatConfig.id === 'REAL_ESTATE'
+                        ? selectedBrand?.id === item.id
+                        : selectedModel?.id === item.id;
 
                       return (
                         <button
                           key={item.id}
                           onClick={() => {
-                            if (isSelected) {
-                              setSelectedBrand(null);
+                            if (currentCatConfig.id === 'REAL_ESTATE') {
+                              if (isSelected) {
+                                setSelectedBrand(null);
+                                setSelectedModel(null);
+                              } else {
+                                setSelectedBrand(item);
+                                setSelectedModel(null);
+                              }
                             } else {
-                              setSelectedBrand(item);
+                              if (isSelected) {
+                                setSelectedModel(null);
+                              } else {
+                                setSelectedModel(item);
+                                executeSearch(selectedPropertyCat, selectedType, selectedBrand, item);
+                              }
                             }
                           }}
                           className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${

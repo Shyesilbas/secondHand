@@ -33,8 +33,9 @@ public class InventoryKafkaConsumer {
                 event.listingId(), event.paymentId());
 
         try {
-            // Deduct from PostgreSQL Inventory record (default 1 unit per item purchase if not batch)
-            inventoryService.reserveQuantity(event.listingId(), 1);
+            int quantityToDeduct = (event.quantity() != null && event.quantity() > 0) ? event.quantity() : 1;
+            // Deduct from PostgreSQL Inventory record
+            inventoryService.reserveQuantity(event.listingId(), quantityToDeduct);
 
             // Check if listing has zero available stock left to update listing status
             int remainingStock = inventoryService.getAvailableQuantity(event.listingId());
