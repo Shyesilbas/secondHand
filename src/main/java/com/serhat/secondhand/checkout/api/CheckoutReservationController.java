@@ -24,18 +24,13 @@ import java.util.UUID;
 public class CheckoutReservationController {
 
     private final CheckoutStockReservationService stockReservationService;
-    private final com.serhat.secondhand.cart.repository.CartRepository cartRepository;
 
     @PostMapping("/initiate")
     @Operation(summary = "Initiate checkout stock reservation", description = "Reserves user's cart items in Redis with 15-min TTL upon entering checkout")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> initiateReservation(@AuthenticationPrincipal User currentUser) {
         log.info("User {} initiating checkout stock reservation", currentUser.getId());
-        java.util.List<com.serhat.secondhand.cart.entity.Cart> cartItems = cartRepository.findByUserIdWithListing(currentUser.getId());
-        if (cartItems.isEmpty()) {
-            return ResultResponses.ok(Result.success("Cart is empty, no reservation needed."));
-        }
-        Result<Map<UUID, Integer>> reserveResult = stockReservationService.reserveStock(currentUser.getId(), cartItems);
+        Result<Map<UUID, Integer>> reserveResult = stockReservationService.reserveUserCartStock(currentUser.getId());
         return ResultResponses.ok(reserveResult);
     }
 

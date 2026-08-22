@@ -16,17 +16,11 @@ import java.time.LocalDateTime;
 public class PaymentKafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final com.serhat.secondhand.order.repository.OrderItemRepository orderItemRepository;
 
     public java.util.concurrent.CompletableFuture<Void> sendPaymentCompleted(Payment payment) {
         String key = payment.getFromUser() != null ? String.valueOf(payment.getFromUser().getId()) : payment.getId().toString();
 
         Integer quantity = 1;
-        if (payment.getOrderItemId() != null) {
-            quantity = orderItemRepository.findById(payment.getOrderItemId())
-                    .map(com.serhat.secondhand.order.entity.OrderItem::getQuantity)
-                    .orElse(1);
-        }
 
         PaymentCompletedKafkaEvent event = new PaymentCompletedKafkaEvent(
                 payment.getId(),

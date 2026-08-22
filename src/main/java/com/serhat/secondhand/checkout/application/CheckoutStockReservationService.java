@@ -23,6 +23,15 @@ public class CheckoutStockReservationService {
 
     private final ListingRepository listingRepository;
     private final InventoryRedisReservationService redisReservationService;
+    private final com.serhat.secondhand.cart.repository.CartRepository cartRepository;
+
+    public Result<Map<UUID, Integer>> reserveUserCartStock(Long userId) {
+        List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
+        if (cartItems.isEmpty()) {
+            return Result.success(Map.of());
+        }
+        return reserveStock(userId, cartItems);
+    }
 
     public Result<Map<UUID, Integer>> reserveStock(Long userId, List<Cart> cartItems) {
         Map<UUID, Integer> reserved = new HashMap<>();

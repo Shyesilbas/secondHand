@@ -22,6 +22,7 @@ public class PaymentCompletedKafkaConsumer {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final PaymentMapper paymentMapper;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -30,6 +31,14 @@ public class PaymentCompletedKafkaConsumer {
     public void consumePaymentCompleted(PaymentCompletedKafkaEvent event) {
         log.info("Received PaymentCompletedKafkaEvent from Kafka: paymentId={}, idempotencyKey={}",
                 event.paymentId(), event.idempotencyKey());
+
+        // Idempotency check: prevent duplicate notifications/handlers for the same payment event
+        String idempotencyKey = "processed:payment:completed:" + event.paymentId();
+        Boolean isFirstDelivery = redisTemplate.opsForValue().setIfAbsent(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
+        if (Boolean.FALSE.equals(isFirstDelivery)) {
+            log.warn("Duplicate PaymentCompletedKafkaEvent detected for paymentId: {}. Skipping duplicate notification.", event.paymentId());
+            return;
+        }
 
         try {
             paymentRepository.findById(event.paymentId()).ifPresent(payment -> {
