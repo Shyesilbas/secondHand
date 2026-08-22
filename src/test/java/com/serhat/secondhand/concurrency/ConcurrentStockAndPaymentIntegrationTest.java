@@ -219,4 +219,143 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("🔍 Redis'te Kalan Fiziksel Stok Değeri: {}", remainingRedisStock);
         Assertions.assertEquals("0", remainingRedisStock, "Redis'te kalan stok tam 0 olmalıdır.");
     }
+
+    @Autowired
+    private com.serhat.secondhand.coupon.application.CouponRedisLimiterService couponRedisLimiterService;
+
+    @Test
+    @DisplayName("Flash-Sale Coupon Concurrency Test: 5 Eşzamanlı Kullanıcı, 2 Adet Kupon Limiti")
+    public void testConcurrentCouponRedemptionLimit() throws Exception {
+        String testCouponCode = "FLASH_TEST_" + System.currentTimeMillis();
+        int globalLimit = 2;
+        int numberOfConcurrentUsers = 5;
+
+        log.info("================================================================================");
+        log.info("🎟️ [COUPON FLASH-SALE CONCURRENCY SIMULATION STARTED]");
+        log.info("🔖 Kupon Kodu: {}", testCouponCode);
+        log.info("🔢 Global Kullanım Limiti: {}", globalLimit);
+        log.info("👥 Eşzamanlı İstek Sayısı: {}", numberOfConcurrentUsers);
+        log.info("================================================================================");
+
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfConcurrentUsers);
+        CountDownLatch readyLatch = new CountDownLatch(numberOfConcurrentUsers);
+        CountDownLatch startGate = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(numberOfConcurrentUsers);
+
+        List<String> successfulUsers = Collections.synchronizedList(new ArrayList<>());
+        List<String> rejectedUsers = Collections.synchronizedList(new ArrayList<>());
+
+        for (int i = 1; i <= numberOfConcurrentUsers; i++) {
+            final long userId = 2000L + i;
+            final String userName = "CouponUser-" + i;
+
+            executorService.submit(() -> {
+                readyLatch.countDown();
+                try {
+                    startGate.await();
+                    int result = couponRedisLimiterService.acquireCouponUsage(
+                            testCouponCode, userId, globalLimit, 1, 3600L
+                    );
+
+                    if (result > 0) {
+                        successfulUsers.add(userName);
+                        log.info("✅ [{}] -> KUPON BAŞARIYLA ALINDI! (Redis Sıra No: {})", userName, result);
+                    } else {
+                        rejectedUsers.add(userName);
+                        log.warn("❌ [{}] -> KUPON LİMİTİ DOLDU (Sonuç Kodu: {})", userName, result);
+                    }
+                } catch (Exception e) {
+                    log.error("Hata:", e);
+                } finally {
+                    doneLatch.countDown();
+                }
+            });
+        }
+
+        readyLatch.await();
+        startGate.countDown();
+        doneLatch.await(5, TimeUnit.SECONDS);
+        executorService.shutdown();
+
+        log.info("🟢 Kupon Kazananlar: {} -> {}", successfulUsers.size(), successfulUsers);
+        log.info("🔴 Kupon Kaçıranlar: {} -> {}", rejectedUsers.size(), rejectedUsers);
+
+        Assertions.assertEquals(2, successfulUsers.size(), "Kuponu tam olarak 2 kişi alabilmelidir.");
+        Assertions.assertEquals(3, rejectedUsers.size(), "Kupon kotası dolduğu için 3 kişi reddedilmelidir.");
+    }
+
+    @Autowired
+    private com.serhat.secondhand.escrow.outbox.EscrowOutboxRepository escrowOutboxRepository;
+
+    @Autowired
+    private com.serhat.secondhand.escrow.outbox.EscrowOutboxService escrowOutboxService;
+
+    @Autowired
+    private com.serhat.secondhand.escrow.domain.repository.EscrowRepository escrowRepository;
+
+    @Test
+    @DisplayName("Escrow Release -> Transactional Outbox Flow Test")
+    public void testEscrowOutboxReleaseFlow() {
+        log.info("================================================================================");
+        log.info("🤝 [ESCROW RELEASE & OUTBOX SIMULATION STARTED]");
+        log.info("================================================================================");
+
+        User seller = userRepository.findAll().stream().findFirst().orElseThrow();
+        com.serhat.secondhand.escrow.domain.entity.Escrow escrow = com.serhat.secondhand.escrow.domain.entity.Escrow.builder()
+                .seller(seller)
+                .buyer(seller)
+                .amount(new BigDecimal("750.00"))
+                .status(PaymentStatus.ESCROW)
+                .listingId(UUID.randomUUID())
+                .listingTitle("Test Güvenceli Ürün")
+                .listingNo("ESC-999")
+                .blockedAt(LocalDateTime.now())
+                .build();
+        final com.serhat.secondhand.escrow.domain.entity.Escrow savedEscrow = escrowRepository.save(escrow);
+
+        // 1. Escrow Release tetikle (Outbox'a yaz)
+        escrowOutboxService.enqueueEscrowReleased(savedEscrow);
+
+        // 2. Outbox tablosunu kontrol et
+        List<com.serhat.secondhand.escrow.outbox.EscrowOutboxEvent> outboxEvents = escrowOutboxRepository.findAll();
+        boolean eventExists = outboxEvents.stream()
+                .anyMatch(e -> e.getAggregateId().equals(savedEscrow.getId().toString()) && e.getEventType().equals("ESCROW_RELEASED"));
+
+        log.info("📬 Escrow Outbox Tablosunda ESCROW_RELEASED Event Kaydı Bulundu mu: {}", eventExists);
+        Assertions.assertTrue(eventExists, "Escrow release eventi escrow_outbox_events tablosuna ACID ile yazılmalıdır.");
+    }
+
+    @Test
+    @DisplayName("Stock Reservation Manual Cancellation & TTL Release Test")
+    public void testStockReservationTtlAndCancellation() {
+        log.info("================================================================================");
+        log.info("⏳ [STOCK RESERVATION CANCELLATION & TTL SIMULATION STARTED]");
+        log.info("================================================================================");
+
+        com.serhat.secondhand.listing.domain.entity.Listing realListing = listingRepository.findAll().stream().findFirst().orElseThrow();
+        UUID testListingId = realListing.getId();
+        long testUserId = 9999L;
+
+        // 1. Başlangıç stoğu 1 yap
+        Inventory inventory = inventoryRepository.findByListingId(testListingId).orElseGet(() ->
+                Inventory.builder().listingId(testListingId).build()
+        );
+        inventory.setAvailableQuantity(1);
+        inventoryRepository.save(inventory);
+
+        redisTemplate.delete("stock:" + testListingId);
+        redisTemplate.delete("reservation:" + testUserId + ":" + testListingId);
+
+        // 2. Kullanıcı stoğu rezerve eder
+        redisReservationService.reserveStockWithTtl(testUserId, testListingId, 1, 900L);
+        String stockAfterReserve = redisTemplate.opsForValue().get("stock:" + testListingId);
+        log.info("📦 Rezervasyon Sonrası Redis Kalan Stok: {}", stockAfterReserve);
+        Assertions.assertEquals("0", stockAfterReserve);
+
+        // 3. Kullanıcı sepetten ürünü çıkarır veya checkout iptal eder
+        redisReservationService.cancelUserReservation(testUserId, testListingId);
+        String stockAfterCancel = redisTemplate.opsForValue().get("stock:" + testListingId);
+        log.info("♻️ İptal Sonrası Redis Serbest Kalan Stok: {}", stockAfterCancel);
+        Assertions.assertEquals("1", stockAfterCancel, "İptal edilen rezervasyon stoğa anında geri iade edilmelidir.");
+    }
 }
