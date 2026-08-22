@@ -40,4 +40,26 @@ public class OrderOutboxService {
             throw new RuntimeException("Failed to enqueue outbox event", ex);
         }
     }
+
+    @Transactional
+    public void enqueueOrderRefunded(com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent event) {
+        try {
+            String payload = objectMapper.writeValueAsString(event);
+
+            OrderOutboxEvent outboxEvent = OrderOutboxEvent.builder()
+                    .eventType("ORDER_REFUNDED")
+                    .aggregateType("Order")
+                    .aggregateId(String.valueOf(event.orderId()))
+                    .payload(payload)
+                    .status(OutboxStatus.PENDING)
+                    .nextAttemptAt(LocalDateTime.now())
+                    .build();
+
+            orderOutboxRepository.save(outboxEvent);
+            log.info("OrderOutboxEvent enqueued: eventType=ORDER_REFUNDED, orderId={}", event.orderId());
+        } catch (Exception ex) {
+            log.error("Failed to enqueue ORDER_REFUNDED event for orderId: {}", event.orderId(), ex);
+            throw new RuntimeException("Failed to enqueue outbox event", ex);
+        }
+    }
 }

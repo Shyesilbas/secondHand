@@ -384,4 +384,36 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("📬 Order Outbox Tablosunda ORDER_CANCELLED Event Kaydı Bulundu mu: {}", eventExists);
         Assertions.assertTrue(eventExists, "Sipariş iptal eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
     }
+
+    @Test
+    @DisplayName("Order Refunded -> Transactional Outbox Flow Test")
+    public void testOrderRefundOutboxFlow() {
+        log.info("================================================================================");
+        log.info("🔄 [ORDER REFUND & OUTBOX SIMULATION STARTED]");
+        log.info("================================================================================");
+
+        long testOrderId = 7777L;
+        com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent event =
+                new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent(
+                        testOrderId,
+                        "ORD-REFUND-7777",
+                        1001L,
+                        new BigDecimal("299.00"),
+                        List.of(new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.RefundedItemDetail(
+                                UUID.randomUUID(), 1, new BigDecimal("299.00")
+                        )),
+                        "Customer refund test"
+                );
+
+        // 1. Outbox'a yaz
+        orderOutboxService.enqueueOrderRefunded(event);
+
+        // 2. Outbox tablosunu kontrol et
+        List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
+        boolean eventExists = outboxEvents.stream()
+                .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId)) && e.getEventType().equals("ORDER_REFUNDED"));
+
+        log.info("📬 Order Outbox Tablosunda ORDER_REFUNDED Event Kaydı Bulundu mu: {}", eventExists);
+        Assertions.assertTrue(eventExists, "Sipariş iade eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
+    }
 }

@@ -111,4 +111,14 @@ public class KafkaConfig {
                 .replicas(replicas)
                 .build();
     }
+
+    @Bean
+    public NewTopic orderRefundedTopic(
+            @Value("${app.kafka.topics.order-refunded-partitions:3}") int partitions,
+            @Value("${app.kafka.topics.order-refunded-replicas:1}") int replicas) {
+        return TopicBuilder.name(com.serhat.secondhand.order.application.OrderKafkaProducer.ORDER_REFUNDED_TOPIC)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
 }

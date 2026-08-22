@@ -36,6 +36,7 @@ public class OrderRefundService {
     private final OrderCompensationPersistenceService compensationPersistenceService;
     private final OrderRefundPolicy orderRefundPolicy;
     private final ApplicationEventPublisher eventPublisher;
+    private final com.serhat.secondhand.order.outbox.OrderOutboxService orderOutboxService;
 
 
     public Result<OrderDto> refundOrder(Long orderId, OrderRefundRequest request, User user) {
@@ -89,6 +90,25 @@ public class OrderRefundService {
         Order savedOrder = savedOrderResult.getData();
 
         eventPublisher.publishEvent(new OrderRefundedEvent(savedOrder, user));
+
+        // Enqueue Transactional Outbox Event for Kafka
+        List<com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.RefundedItemDetail> itemDetails =
+                itemsToRefund.stream()
+                        .map(item -> new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.RefundedItemDetail(
+                                item.getListing() != null ? item.getListing().getId() : null,
+                                item.getQuantity(),
+                                item.getTotalPrice()
+                        )).toList();
+
+        orderOutboxService.enqueueOrderRefunded(new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent(
+                savedOrder.getId(),
+                savedOrder.getOrderNumber(),
+                savedOrder.getUser() != null ? savedOrder.getUser().getId() : null,
+                totalRefundAmount,
+                itemDetails,
+                request.getReason() != null ? request.getReason().name() : "Customer requested refund"
+        ));
+
         orderLog.logOrderRefunded(order.getOrderNumber(), totalRefundAmount, !allItemsRefunded, user.getEmail());
         return Result.success(orderMapper.toDto(savedOrder));
     }

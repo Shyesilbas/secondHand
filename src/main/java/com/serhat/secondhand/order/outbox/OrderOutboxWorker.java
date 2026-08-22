@@ -43,6 +43,9 @@ public class OrderOutboxWorker {
                 if ("ORDER_CANCELLED".equals(event.getEventType())) {
                     OrderCancelledKafkaEvent payload = objectMapper.readValue(event.getPayload(), OrderCancelledKafkaEvent.class);
                     orderKafkaProducer.publishOrderCancelled(payload).join();
+                } else if ("ORDER_REFUNDED".equals(event.getEventType())) {
+                    com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent payload = objectMapper.readValue(event.getPayload(), com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.class);
+                    orderKafkaProducer.publishOrderRefunded(payload).join();
                 }
 
                 event.setStatus(OutboxStatus.PROCESSED);
