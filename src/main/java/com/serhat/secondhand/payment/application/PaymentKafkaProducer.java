@@ -18,7 +18,7 @@ public class PaymentKafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final com.serhat.secondhand.order.repository.OrderItemRepository orderItemRepository;
 
-    public void sendPaymentCompleted(Payment payment) {
+    public java.util.concurrent.CompletableFuture<Void> sendPaymentCompleted(Payment payment) {
         String key = payment.getFromUser() != null ? String.valueOf(payment.getFromUser().getId()) : payment.getId().toString();
 
         Integer quantity = 1;
@@ -46,14 +46,12 @@ public class PaymentKafkaProducer {
         );
 
         log.info("Publishing PaymentCompletedKafkaEvent to Kafka topic: {} with key: {}", KafkaConfig.PAYMENT_COMPLETED_TOPIC, key);
-        kafkaTemplate.send(KafkaConfig.PAYMENT_COMPLETED_TOPIC, key, event)
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        log.error("Failed to send PaymentCompletedKafkaEvent for paymentId: {}", payment.getId(), ex);
-                    } else {
-                        log.info("Successfully sent PaymentCompletedKafkaEvent for paymentId: {} offset: {}",
-                                payment.getId(), result.getRecordMetadata().offset());
-                    }
+        return kafkaTemplate.send(KafkaConfig.PAYMENT_COMPLETED_TOPIC, key, event)
+                .thenAccept(result -> log.info("Successfully sent PaymentCompletedKafkaEvent for paymentId: {} offset: {}",
+                        payment.getId(), result.getRecordMetadata().offset()))
+                .exceptionally(ex -> {
+                    log.error("Failed to send PaymentCompletedKafkaEvent for paymentId: {}", payment.getId(), ex);
+                    throw new RuntimeException("Kafka publish failed for payment completed", ex);
                 });
     }
 }

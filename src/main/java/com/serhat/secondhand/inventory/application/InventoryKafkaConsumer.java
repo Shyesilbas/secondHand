@@ -17,6 +17,7 @@ public class InventoryKafkaConsumer {
 
     private final InventoryService inventoryService;
     private final ListingRepository listingRepository;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -26,6 +27,14 @@ public class InventoryKafkaConsumer {
     public void consumePaymentCompleted(PaymentCompletedKafkaEvent event) {
         if (event.listingId() == null) {
             log.debug("PaymentCompletedKafkaEvent {} has no listingId, skipping inventory deduction.", event.paymentId());
+            return;
+        }
+
+        // Idempotency Check: Prevent duplicate inventory deduction if Kafka redelivers this event
+        String idempotencyKey = "processed:inventory:payment:" + event.paymentId();
+        Boolean isFirstDelivery = redisTemplate.opsForValue().setIfAbsent(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
+        if (Boolean.FALSE.equals(isFirstDelivery)) {
+            log.warn("Duplicate PaymentCompletedKafkaEvent detected for paymentId: {}. Skipping duplicate inventory deduction.", event.paymentId());
             return;
         }
 

@@ -60,7 +60,7 @@ public class PaymentOutboxWorker {
 
             UUID paymentId = UUID.fromString(event.getPayload());
             Payment payment = paymentRepository.findById(paymentId).orElseThrow();
-            paymentKafkaProducer.sendPaymentCompleted(payment);
+            paymentKafkaProducer.sendPaymentCompleted(payment).join();
 
             event.setStatus(OutboxStatus.PROCESSED);
             event.setProcessedAt(LocalDateTime.now());

@@ -36,6 +36,8 @@ if currentStock >= requestedQty then
     local remaining = redis.call('DECRBY', stockKey, requestedQty)
     -- Record user reservation with TTL
     redis.call('SET', reservationKey, requestedQty, 'EX', ttlSeconds)
+    -- Also keep stockKey alive for the duration of active reservations
+    redis.call('EXPIRE', stockKey, ttlSeconds)
     return remaining
 else
     return -1 -- Insufficient stock

@@ -17,6 +17,7 @@ public class EscrowKafkaConsumer {
 
     private final IEWalletService walletService;
     private final UserRepository userRepository;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     @KafkaListener(
             topics = EscrowKafkaProducer.ESCROW_RELEASED_TOPIC,
@@ -32,6 +33,14 @@ public class EscrowKafkaConsumer {
             return;
         }
 
+        // Idempotency Check: Prevent duplicate wallet credit if Kafka redelivers this event
+        String idempotencyKey = "processed:escrow:release:" + event.escrowId();
+        Boolean isFirstDelivery = redisTemplate.opsForValue().setIfAbsent(idempotencyKey, "PROCESSED", java.time.Duration.ofDays(7));
+        if (Boolean.FALSE.equals(isFirstDelivery)) {
+            log.warn("Duplicate EscrowReleasedKafkaEvent detected for escrowId: {}. Skipping duplicate wallet credit.", event.escrowId());
+            return;
+        }
+
         try {
             userRepository.findById(event.sellerId()).ifPresentOrElse(seller -> {
                 walletService.creditWalletQuietly(seller, event.amount());
@@ -39,6 +48,8 @@ public class EscrowKafkaConsumer {
                         event.amount(), seller.getEmail());
             }, () -> log.error("Seller with ID {} not found for escrow release credit.", event.sellerId()));
         } catch (Exception ex) {
+            // Remove idempotency key on failure so it can be retried safely
+            redisTemplate.delete(idempotencyKey);
             log.error("Failed to credit seller wallet for escrowId: {}, sellerId: {}",
                     event.escrowId(), event.sellerId(), ex);
             throw ex;
