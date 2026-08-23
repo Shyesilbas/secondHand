@@ -2,90 +2,90 @@ import { useTranslation } from "react-i18next";
 import { REVIEW_MESSAGES } from '../reviewConstants.js';
 import { RatingStarsDisplay } from './RatingStarsDisplay.jsx';
 const ReviewStats = ({
-  stats,
-  loading
+ stats,
+ loading
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const getRatingColor = rating => {
-    if (rating >= 4.5) return 'text-status-success';
-    if (rating >= 3.5) return 'text-status-warning';
-    if (rating >= 2.5) return 'text-status-warning-text';
-    return 'text-status-error';
-  };
-  if (loading) {
-    return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
-        <div className="animate-pulse">
-          <div className="h-4 bg-background-tertiary rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-3 bg-background-tertiary rounded w-1/2"></div>
-            <div className="h-3 bg-background-tertiary rounded w-1/3"></div>
-          </div>
-        </div>
-      </div>;
-  }
-  if (!stats) {
-    return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
-        <p className="text-text-muted">{REVIEW_MESSAGES.NO_REVIEW_INFO}</p>
-      </div>;
-  }
-  const starDistribution = [{
-    stars: 5,
-    count: stats.fiveStarReviews || 0
-  }, {
-    stars: 4,
-    count: stats.fourStarReviews || 0
-  }, {
-    stars: 3,
-    count: stats.threeStarReviews || 0
-  }, {
-    stars: 2,
-    count: stats.twoStarReviews || 0
-  }, {
-    stars: 1,
-    count: stats.oneStarReviews || 0
-  }, {
-    stars: 0,
-    count: stats.zeroStarReviews || 0
-  }];
-  return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
-      <h3 className="text-lg font-bold text-text-primary tracking-tight mb-6">{t("review_stats")}</h3>
+ const {
+ t
+ } = useTranslation();
+ const getRatingColor = rating => {
+ if (rating >= 4.5) return 'text-status-success';
+ if (rating >= 3.5) return 'text-status-warning';
+ if (rating >= 2.5) return 'text-status-warning-text';
+ return 'text-status-error';
+ };
+ if (loading) {
+ return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
+ <div className="animate-pulse">
+ <div className="h-4 bg-background-tertiary rounded w-1/4 mb-4"></div>
+ <div className="space-y-3">
+ <div className="h-3 bg-background-tertiary rounded w-1/2"></div>
+ <div className="h-3 bg-background-tertiary rounded w-1/3"></div>
+ </div>
+ </div>
+ </div>;
+ }
+ if (!stats) {
+ return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
+ <p className="text-text-muted">{REVIEW_MESSAGES.NO_REVIEW_INFO}</p>
+ </div>;
+ }
+ const starDistribution = [{
+ stars: 5,
+ count: stats.fiveStarReviews || 0
+ }, {
+ stars: 4,
+ count: stats.fourStarReviews || 0
+ }, {
+ stars: 3,
+ count: stats.threeStarReviews || 0
+ }, {
+ stars: 2,
+ count: stats.twoStarReviews || 0
+ }, {
+ stars: 1,
+ count: stats.oneStarReviews || 0
+ }, {
+ stars: 0,
+ count: stats.zeroStarReviews || 0
+ }];
+ return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
+ <h3 className="text-lg font-bold text-text-primary tracking-tight mb-6">{t("review_stats")}</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="text-center flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border-light pb-6 md:pb-0 md:pr-6">
-          <div className="flex items-center justify-center mb-3">
-            <RatingStarsDisplay value={stats.averageRating || 0} iconClassName="w-5 h-5" />
-          </div>
-          <div className={`text-4xl font-bold mb-1 ${getRatingColor(stats.averageRating || 0)}`}>
-            {(stats.averageRating || 0).toFixed(1)}
-          </div>
-          <p className="text-sm font-medium text-text-muted">
-            {stats.totalReviews || 0} {t("reviews")}</p>
-        </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <div className="text-center flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border-light pb-6 md:pb-0 md:pr-6">
+ <div className="flex items-center justify-center mb-3">
+ <RatingStarsDisplay value={stats.averageRating || 0} iconClassName="w-5 h-5" />
+ </div>
+ <div className={`text-4xl font-bold mb-1 ${getRatingColor(stats.averageRating || 0)}`}>
+ {(stats.averageRating || 0).toFixed(1)}
+ </div>
+ <p className="text-sm font-medium text-text-muted">
+ {stats.totalReviews || 0} {t("reviews")}</p>
+ </div>
 
-        <div className="space-y-2">
-          {starDistribution.map(({
-          stars,
-          count
-        }) => {
-          const percentage = stats.totalReviews > 0 ? count / stats.totalReviews * 100 : 0;
-          return <div key={stars} className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-text-secondary w-6 flex items-center justify-end">
-                  {stars === 0 ? '0' : stars} <span className="text-status-warning ml-0.5 text-xs">★</span>
-                </span>
-                <div className="flex-1 bg-background-secondary rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out" style={{
-                width: `${percentage}%`
-              }} />
-                </div>
-                <span className="text-sm font-medium text-text-muted w-8 text-right">
-                  {count}
-                </span>
-              </div>;
-        })}
-        </div>
-      </div>
-    </div>;
+ <div className="space-y-2">
+ {starDistribution.map(({
+ stars,
+ count
+ }) => {
+ const percentage = stats.totalReviews > 0 ? count / stats.totalReviews * 100 : 0;
+ return <div key={stars} className="flex items-center space-x-3">
+ <span className="text-sm font-medium text-text-secondary w-6 flex items-center justify-end">
+ {stars === 0 ? '0' : stars} <span className="text-status-warning ml-0.5 text-xs">★</span>
+ </span>
+ <div className="flex-1 bg-background-secondary rounded-full h-2.5 overflow-hidden">
+ <div className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out" style={{
+ width: `${percentage}%`
+ }} />
+ </div>
+ <span className="text-sm font-medium text-text-muted w-8 text-right">
+ {count}
+ </span>
+ </div>;
+ })}
+ </div>
+ </div>
+ </div>;
 };
 export default ReviewStats;

@@ -1,7 +1,7 @@
 package com.serhat.secondhand.order.application;
 
-import com.serhat.secondhand.core.config.KafkaConfig;
 import com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent;
+import com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -31,7 +31,7 @@ public class OrderKafkaProducer {
                 });
     }
 
-    public CompletableFuture<Void> publishOrderRefunded(com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent event) {
+    public CompletableFuture<Void> publishOrderRefunded(OrderRefundedKafkaEvent event) {
         String key = event.orderId() != null ? event.orderId().toString() : "unknown-order";
 
         return kafkaTemplate.send(ORDER_REFUNDED_TOPIC, key, event)

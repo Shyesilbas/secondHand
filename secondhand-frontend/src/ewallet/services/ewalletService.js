@@ -2,51 +2,51 @@ import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { get, post, put, del } from '../../common/services/api/request.js';
 
 export const ewalletService = {
-        createEWallet: async (request) => {
-        return post(API_ENDPOINTS.EWALLET.CREATE, request);
-    },
+ createEWallet: async (request) => {
+ return post(API_ENDPOINTS.EWALLET.CREATE, request);
+ },
 
-        getEWallet: async () => {
-        return get(API_ENDPOINTS.EWALLET.GET);
-    },
+ getEWallet: async () => {
+ return get(API_ENDPOINTS.EWALLET.GET);
+ },
 
-        updateLimits: async (newLimit) => {
-        return put(API_ENDPOINTS.EWALLET.UPDATE_LIMITS, { newLimit });
-    },
+ updateLimits: async (newLimit) => {
+ return put(API_ENDPOINTS.EWALLET.UPDATE_LIMITS, { newLimit });
+ },
 
-    updateSpendingWarningLimit: async (newLimit) => {
-        return put(API_ENDPOINTS.EWALLET.UPDATE_SPENDING_WARNING, newLimit);
-    },
+ updateSpendingWarningLimit: async (newLimit) => {
+ return put(API_ENDPOINTS.EWALLET.UPDATE_SPENDING_WARNING, newLimit);
+ },
 
-    removeSpendingWarningLimit: async () => {
-        return del(API_ENDPOINTS.EWALLET.REMOVE_SPENDING_WARNING);
-    },
+ removeSpendingWarningLimit: async () => {
+ return del(API_ENDPOINTS.EWALLET.REMOVE_SPENDING_WARNING);
+ },
 
-    deposit: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
-        return post(API_ENDPOINTS.EWALLET.DEPOSIT, { 
-            amount, 
-            agreementsAccepted, 
-            acceptedAgreementIds 
-        });
-    },
+ deposit: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
+ return post(API_ENDPOINTS.EWALLET.DEPOSIT, { 
+ amount, 
+ agreementsAccepted, 
+ acceptedAgreementIds 
+ });
+ },
 
-    withdraw: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
-        return post(API_ENDPOINTS.EWALLET.WITHDRAW, { 
-            amount, 
-            agreementsAccepted, 
-            acceptedAgreementIds 
-        });
-    },
+ withdraw: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
+ return post(API_ENDPOINTS.EWALLET.WITHDRAW, { 
+ amount, 
+ agreementsAccepted, 
+ acceptedAgreementIds 
+ });
+ },
 
-        getTransactions: async (page = 0, size = 10) => {
-        return get(`${API_ENDPOINTS.EWALLET.TRANSACTIONS}?page=${page}&size=${size}`);
-    },
+ getTransactions: async (page = 0, size = 10) => {
+ return get(`${API_ENDPOINTS.EWALLET.TRANSACTIONS}?page=${page}&size=${size}`);
+ },
 
-        checkBalance: async (amount) => {
-        return get(`${API_ENDPOINTS.EWALLET.CHECK_BALANCE}?amount=${amount}`);
-    },
+ checkBalance: async (amount) => {
+ return get(`${API_ENDPOINTS.EWALLET.CHECK_BALANCE}?amount=${amount}`);
+ },
 
-    checkSpendingWarning: async (amount) => {
-        return get(`${API_ENDPOINTS.EWALLET.SPENDING_WARNING_CHECK}?amount=${amount}`);
-    }
+ checkSpendingWarning: async (amount) => {
+ return get(`${API_ENDPOINTS.EWALLET.SPENDING_WARNING_CHECK}?amount=${amount}`);
+ }
 };

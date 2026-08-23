@@ -3,176 +3,176 @@ import React, { useEffect, useState } from 'react';
 import { AlertCircle, Check, CheckCircle2, Clock, Home, Package2, Timer, Truck, MapPin, Handshake } from 'lucide-react';
 import { ORDER_STATUSES, ORDER_TIME } from '../../constants/orderUiConstants.js';
 const DeliveryCountdown = ({
-  deliveredAt
+ deliveredAt
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const [timeRemaining, setTimeRemaining] = useState(null);
-  useEffect(() => {
-    if (!deliveredAt) return;
-    const update = () => {
-      const deadline = new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS);
-      const diff = deadline - new Date();
-      if (diff <= 0) {
-        setTimeRemaining({
-          expired: true
-        });
-        return;
-      }
-      setTimeRemaining({
-        h: Math.floor(diff / 3600000),
-        m: Math.floor(diff % 3600000 / 60000),
-        s: Math.floor(diff % 60000 / 1000),
-        expired: false
-      });
-    };
-    update();
-    const timer = setInterval(update, ORDER_TIME.SECOND_MS);
-    return () => clearInterval(timer);
-  }, [deliveredAt]);
-  if (!timeRemaining) return null;
-  const critical = !timeRemaining.expired;
-  const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${critical ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10' : 'bg-background-primary/80 border-border-light/60 shadow-sm'}`;
-  return <div className={cardClass}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className={`p-1.5 rounded-md ${critical ? 'bg-background-primary/10' : 'bg-slate-200'}`}>
-            <Timer className={`w-3.5 h-3.5 ${critical ? 'text-emerald-400' : 'text-slate-600'}`} />
-          </div>
-          <div>
-            <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-text-primary'}`}>{t("confirmation_window")}</p>
-            <p className={`text-caption font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
-              {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
-            </p>
-          </div>
-        </div>
-        {critical ? <div className="flex gap-1.5 items-baseline">
-            <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.h).padStart(2, '0')}</span>
-            <span className="text-caption font-semibold text-slate-400 uppercase">{t("h")}</span>
-            <span className="text-lg font-mono font-semibold text-emerald-400">{String(timeRemaining.m).padStart(2, '0')}</span>
-            <span className="text-caption font-semibold text-slate-400 uppercase">{t("m")}</span>
-          </div> : null}
-      </div>
-    </div>;
+ const {
+ t
+ } = useTranslation();
+ const [timeRemaining, setTimeRemaining] = useState(null);
+ useEffect(() => {
+ if (!deliveredAt) return;
+ const update = () => {
+ const deadline = new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS);
+ const diff = deadline - new Date();
+ if (diff <= 0) {
+ setTimeRemaining({
+ expired: true
+ });
+ return;
+ }
+ setTimeRemaining({
+ h: Math.floor(diff / 3600000),
+ m: Math.floor(diff % 3600000 / 60000),
+ s: Math.floor(diff % 60000 / 1000),
+ expired: false
+ });
+ };
+ update();
+ const timer = setInterval(update, ORDER_TIME.SECOND_MS);
+ return () => clearInterval(timer);
+ }, [deliveredAt]);
+ if (!timeRemaining) return null;
+ const critical = !timeRemaining.expired;
+ const cardClass = `rounded-2xl border backdrop-blur-sm transition-all mt-5 p-4 ${critical ? 'bg-slate-900 text-white border-white/10 shadow-lg shadow-slate-900/10' : 'bg-background-primary/80 border-border-light/60 shadow-sm'}`;
+ return <div className={cardClass}>
+ <div className="flex items-center justify-between">
+ <div className="flex items-center gap-2.5">
+ <div className={`p-1.5 rounded-md ${critical ? 'bg-background-primary/10' : 'bg-slate-200'}`}>
+ <Timer className={`w-3.5 h-3.5 ${critical ? 'text-slate-600' : 'text-slate-600'}`} />
+ </div>
+ <div>
+ <p className={`text-xs font-semibold ${critical ? 'text-white' : 'text-text-primary'}`}>{t("confirmation_window")}</p>
+ <p className={`text-caption font-medium mt-0.5 ${critical ? 'text-slate-400' : 'text-slate-500'}`}>
+ {timeRemaining.expired ? 'Window closed. Order finalizing...' : 'Verify your items before the timer ends'}
+ </p>
+ </div>
+ </div>
+ {critical ? <div className="flex gap-1.5 items-baseline">
+ <span className="text-lg font-semibold text-slate-600">{String(timeRemaining.h).padStart(2, '0')}</span>
+ <span className="text-caption font-semibold text-slate-400 uppercase">{t("h")}</span>
+ <span className="text-lg font-semibold text-slate-600">{String(timeRemaining.m).padStart(2, '0')}</span>
+ <span className="text-caption font-semibold text-slate-400 uppercase">{t("m")}</span>
+ </div> : null}
+ </div>
+ </div>;
 };
 const OrderProgressStepper = ({
-  currentStatus,
-  deliveryMethod,
-  variant = 'compact'
+ currentStatus,
+ deliveryMethod,
+ variant = 'compact'
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const isMeetup = deliveryMethod === 'SAFE_MEETUP';
-  const steps = isMeetup ? [{
-    key: ORDER_STATUSES.PENDING,
-    label: 'Placed',
-    icon: Clock
-  }, {
-    key: ORDER_STATUSES.MEETUP_PENDING,
-    label: 'Meetup Pending',
-    icon: MapPin
-  }, {
-    key: ORDER_STATUSES.HANDOVER_CONFIRMED,
-    label: 'Handover Confirmed',
-    icon: Handshake
-  }, {
-    key: ORDER_STATUSES.COMPLETED,
-    label: 'Finalized',
-    icon: Check
-  }] : [{
-    key: ORDER_STATUSES.PENDING,
-    label: 'Placed',
-    icon: Clock
-  }, {
-    key: ORDER_STATUSES.CONFIRMED,
-    label: 'Confirmed',
-    icon: CheckCircle2
-  }, {
-    key: ORDER_STATUSES.PROCESSING,
-    label: 'Preparing',
-    icon: Package2
-  }, {
-    key: ORDER_STATUSES.SHIPPED,
-    label: 'On Way',
-    icon: Truck
-  }, {
-    key: ORDER_STATUSES.DELIVERED,
-    label: 'Delivered',
-    icon: Home
-  }, {
-    key: ORDER_STATUSES.COMPLETED,
-    label: 'Finalized',
-    icon: Check
-  }];
-  const currentIndex = steps.findIndex(s => s.key === currentStatus);
-  const isFailed = currentStatus === ORDER_STATUSES.CANCELLED || currentStatus === ORDER_STATUSES.REFUNDED || currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
-  if (variant === 'wide') {
-    return <div className="py-8 px-2">
-        <div className="relative flex justify-between">
-          <div className="absolute top-5 left-0 w-full h-[2px] bg-slate-100 -z-10" />
-          <div className="absolute top-5 left-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 -z-10" style={{
-          width: `${Math.max(0, currentIndex / (steps.length - 1) * 100)}%`
-        }} />
+ const {
+ t
+ } = useTranslation();
+ const isMeetup = deliveryMethod === 'SAFE_MEETUP';
+ const steps = isMeetup ? [{
+ key: ORDER_STATUSES.PENDING,
+ label: 'Placed',
+ icon: Clock
+ }, {
+ key: ORDER_STATUSES.MEETUP_PENDING,
+ label: 'Meetup Pending',
+ icon: MapPin
+ }, {
+ key: ORDER_STATUSES.HANDOVER_CONFIRMED,
+ label: 'Handover Confirmed',
+ icon: Handshake
+ }, {
+ key: ORDER_STATUSES.COMPLETED,
+ label: 'Finalized',
+ icon: Check
+ }] : [{
+ key: ORDER_STATUSES.PENDING,
+ label: 'Placed',
+ icon: Clock
+ }, {
+ key: ORDER_STATUSES.CONFIRMED,
+ label: 'Confirmed',
+ icon: CheckCircle2
+ }, {
+ key: ORDER_STATUSES.PROCESSING,
+ label: 'Preparing',
+ icon: Package2
+ }, {
+ key: ORDER_STATUSES.SHIPPED,
+ label: 'On Way',
+ icon: Truck
+ }, {
+ key: ORDER_STATUSES.DELIVERED,
+ label: 'Delivered',
+ icon: Home
+ }, {
+ key: ORDER_STATUSES.COMPLETED,
+ label: 'Finalized',
+ icon: Check
+ }];
+ const currentIndex = steps.findIndex(s => s.key === currentStatus);
+ const isFailed = currentStatus === ORDER_STATUSES.CANCELLED || currentStatus === ORDER_STATUSES.REFUNDED || currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
+ if (variant === 'wide') {
+ return <div className="py-8 px-2">
+ <div className="relative flex justify-between">
+ <div className="absolute top-5 left-0 w-full h-[2px] bg-slate-100 -z-10" />
+ <div className="absolute top-5 left-0 h-[2px] bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-1000 -z-10" style={{
+ width: `${Math.max(0, currentIndex / (steps.length - 1) * 100)}%`
+ }} />
 
-          {steps.map((step, idx) => {
-          const Icon = step.icon;
-          const isDone = idx <= currentIndex;
-          const isCurrent = idx === currentIndex;
-          return <div key={step.key} className="flex flex-col items-center group">
-                <div className="relative">
-                  {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
-                  <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-emerald-500 text-white shadow-md shadow-emerald-900/20' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2' : ''}`}>
-                    <Icon className="w-5 h-5 stroke-[2.5px]" />
-                  </div>
-                </div>
-                <span className={`mt-3 text-caption font-bold uppercase tracking-tight ${isDone ? 'text-text-primary' : 'text-slate-400'}`}>
-                  {step.label}
-                </span>
-              </div>;
-        })}
-        </div>
-        {isFailed ? <div className="mt-4 flex justify-center">
-            <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-semibold rounded-full border border-rose-100 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" />{t("status")}{currentStatus}
-            </span>
-          </div> : null}
-      </div>;
-  }
-  return <div className="py-6 px-1">
-      <div className="relative flex items-center">
-        {steps.map((step, idx) => {
-        const Icon = step.icon;
-        const isDone = idx <= currentIndex;
-        const isCurrent = idx === currentIndex;
-        const isLast = idx === steps.length - 1;
-        return <React.Fragment key={step.key}>
-              <div className="flex flex-col items-center group relative z-10">
-                <div className="relative">
-                  {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
-                  <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-emerald-500 text-white shadow-sm shadow-emerald-900/15' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-2 ring-emerald-500/25 ring-offset-1' : ''}`}>
-                    <Icon className="w-4 h-4 stroke-[2.5]" />
-                  </div>
-                </div>
-                <span className={`mt-2.5 text-caption uppercase tracking-wide ${isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'}`}>
-                  {step.label}
-                </span>
-              </div>
-              {!isLast ? <div className="flex-1 mx-1 relative" style={{
-            height: '2px'
-          }}>
-                  <div className="absolute inset-0 bg-slate-100 rounded-full" />
-                  {isDone ? <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000" /> : null}
-                </div> : null}
-            </React.Fragment>;
-      })}
-      </div>
-      {isFailed ? <div className="mt-4 flex justify-center">
-          <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-caption font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
-            <AlertCircle className="w-3 h-3" /> {currentStatus}
-          </span>
-        </div> : null}
-    </div>;
+ {steps.map((step, idx) => {
+ const Icon = step.icon;
+ const isDone = idx <= currentIndex;
+ const isCurrent = idx === currentIndex;
+ return <div key={step.key} className="flex flex-col items-center group">
+ <div className="relative">
+ {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
+ <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-slate-700 text-white shadow-md shadow-slate-900/10' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-4 ring-slate-900/10 ring-offset-2' : ''}`}>
+ <Icon className="w-5 h-5 stroke-[2.5px]" />
+ </div>
+ </div>
+ <span className={`mt-3 text-caption font-bold uppercase tracking-tight ${isDone ? 'text-text-primary' : 'text-slate-400'}`}>
+ {step.label}
+ </span>
+ </div>;
+ })}
+ </div>
+ {isFailed ? <div className="mt-4 flex justify-center">
+ <span className="px-3 py-1 bg-rose-50 text-rose-600 text-xs font-semibold rounded-full border border-rose-100 flex items-center gap-1">
+ <AlertCircle className="w-3 h-3" />{t("status")}{currentStatus}
+ </span>
+ </div> : null}
+ </div>;
+ }
+ return <div className="py-6 px-1">
+ <div className="relative flex items-center">
+ {steps.map((step, idx) => {
+ const Icon = step.icon;
+ const isDone = idx <= currentIndex;
+ const isCurrent = idx === currentIndex;
+ const isLast = idx === steps.length - 1;
+ return <React.Fragment key={step.key}>
+ <div className="flex flex-col items-center group relative z-10">
+ <div className="relative">
+ {isCurrent && <span className="absolute inset-0 rounded-full bg-status-success-bg animate-ping opacity-30" aria-hidden />}
+ <div className={`relative w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isDone ? 'bg-status-success-bg border-slate-700 text-white shadow-sm shadow-slate-900/10' : 'bg-background-primary border-border-light text-slate-400'} ${isCurrent ? 'ring-2 ring-slate-900/20 ring-offset-1' : ''}`}>
+ <Icon className="w-4 h-4 stroke-[2.5]" />
+ </div>
+ </div>
+ <span className={`mt-2.5 text-caption uppercase tracking-wide ${isDone ? 'font-bold text-slate-800' : 'font-medium text-slate-400'}`}>
+ {step.label}
+ </span>
+ </div>
+ {!isLast ? <div className="flex-1 mx-1 relative" style={{
+ height: '2px'
+ }}>
+ <div className="absolute inset-0 bg-slate-100 rounded-full" />
+ {isDone ? <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-1000" /> : null}
+ </div> : null}
+ </React.Fragment>;
+ })}
+ </div>
+ {isFailed ? <div className="mt-4 flex justify-center">
+ <span className="px-2.5 py-1 bg-rose-50 text-rose-600 text-caption font-semibold rounded-full border border-rose-100 flex items-center gap-1.5">
+ <AlertCircle className="w-3 h-3" /> {currentStatus}
+ </span>
+ </div> : null}
+ </div>;
 };
 export { DeliveryCountdown, OrderProgressStepper };

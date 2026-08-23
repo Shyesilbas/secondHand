@@ -4,19 +4,19 @@ import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
 
 const getValueByPath = (obj, path) => {
-  if (!obj || !path) return undefined;
-  if (typeof path !== 'string') return undefined;
+ if (!obj || !path) return undefined;
+ if (typeof path !== 'string') return undefined;
 
-  return path.split('.').reduce((acc, key) => {
-    if (acc == null) return undefined;
-    return acc[key];
-  }, obj);
+ return path.split('.').reduce((acc, key) => {
+ if (acc == null) return undefined;
+ return acc[key];
+ }, obj);
 };
 
 const DetailItem = ({ label, value }) => (
-  <div>
-    <dt className="text-sm font-medium text-text-muted">{label}</dt>
-    <dd className="mt-1 text-sm text-text-primary">{value || '-'}</dd>
+  <div className="bg-slate-50/70 border border-slate-200/70 rounded-2xl p-3.5">
+    <dt className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{label}</dt>
+    <dd className="mt-1 text-sm font-extrabold text-slate-900">{value || '-'}</dd>
   </div>
 );
 
@@ -29,7 +29,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
   const sections = useMemo(() => {
     if (!schema) return [];
     if (Array.isArray(schema.sections)) return schema.sections;
-    if (Array.isArray(schema.fields)) return [{ id: 'details', label: 'Details', title: schema.title, fields: schema.fields }];
+    if (Array.isArray(schema.fields)) return [{ id: 'details', label: 'Genel', fields: schema.fields }];
     return [];
   }, [schema]);
 
@@ -39,34 +39,28 @@ const GenericListingDetails = ({ listing, flat = false }) => {
 
   if (!schema || !sections.length) return null;
 
-  const title = schema.title || config?.label || 'Details';
-
   const content = (
-    <>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
-        {sections.length > 1 ? (
-          <div className="flex flex-wrap gap-2">
-            {sections.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1.5 text-sm rounded-lg border font-semibold transition-all ${
-                  activeSection === tab.id
-                    ? 'bg-text-primary text-text-inverse border-text-primary'
-                    : 'bg-background-primary text-text-secondary border-border-light hover:border-border-DEFAULT'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      {sections.length > 1 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {sections.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveSection(tab.id)}
+              className={`px-3 py-1.5 text-xs rounded-xl border font-bold transition-all cursor-pointer ${
+                activeSection === tab.id
+                  ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {active?.title ? <h4 className="text-sm font-semibold text-text-muted mb-3">{active.title}</h4> : null}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
         {(active?.fields || [])
           .filter((field) => {
             if (typeof field.visibleWhen === 'function') {
@@ -80,15 +74,15 @@ const GenericListingDetails = ({ listing, flat = false }) => {
             return <DetailItem key={field.key || field.label} label={field.label} value={resolved} />;
           })}
       </div>
-    </>
+    </div>
   );
 
   if (flat) {
-    return <div className="mt-2">{content}</div>;
+    return <div>{content}</div>;
   }
 
   return (
-    <div className="bg-background-primary rounded-xl shadow-sm border border-border-light p-6">
+    <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-6">
       {content}
     </div>
   );

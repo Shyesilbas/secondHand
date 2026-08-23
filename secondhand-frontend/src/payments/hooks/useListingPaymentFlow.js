@@ -4,12 +4,12 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
 import {
-  createListingFeePaymentRequest,
-  OTP_CODE_VALIDITY_SECONDS,
-  PAYMENT_FLOW_DEFAULTS,
-  PAYMENT_TRANSACTION_TYPES,
-  PAYMENT_TYPES,
-  PAYMENT_QUERY_KEYS,
+ createListingFeePaymentRequest,
+ OTP_CODE_VALIDITY_SECONDS,
+ PAYMENT_FLOW_DEFAULTS,
+ PAYMENT_TRANSACTION_TYPES,
+ PAYMENT_TYPES,
+ PAYMENT_QUERY_KEYS,
 } from '../paymentSchema.js';
 import { handleError } from '../../common/errorHandler.js';
 import { listingService } from '../../listing/services/listingService.js';
@@ -17,250 +17,250 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { normalizeArrayResponse } from '../../common/utils/normalizeArrayResponse.js';
 
 export const useAgreementsState = () => {
-  const [acceptedAgreements, setAcceptedAgreements] = useState(new Set());
-  const [requiredAgreementIds, setRequiredAgreementIds] = useState(new Set());
+ const [acceptedAgreements, setAcceptedAgreements] = useState(new Set());
+ const [requiredAgreementIds, setRequiredAgreementIds] = useState(new Set());
 
-  const onAgreementToggle = useCallback((agreementId) => {
-    setAcceptedAgreements((prev) => {
-      const next = new Set(prev);
-      if (next.has(agreementId)) {
-        next.delete(agreementId);
-      } else {
-        next.add(agreementId);
-      }
-      return next;
-    });
-  }, []);
+ const onAgreementToggle = useCallback((agreementId) => {
+ setAcceptedAgreements((prev) => {
+ const next = new Set(prev);
+ if (next.has(agreementId)) {
+ next.delete(agreementId);
+ } else {
+ next.add(agreementId);
+ }
+ return next;
+ });
+ }, []);
 
-  const onRequiredAgreementsChange = useCallback((agreements) => {
-    if (!Array.isArray(agreements)) {
-      setRequiredAgreementIds(new Set());
-      return;
-    }
+ const onRequiredAgreementsChange = useCallback((agreements) => {
+ if (!Array.isArray(agreements)) {
+ setRequiredAgreementIds(new Set());
+ return;
+ }
 
-    const ids = agreements
-      .map((a) => (typeof a === 'string' ? a : a?.agreementId))
-      .filter(Boolean);
+ const ids = agreements
+ .map((a) => (typeof a === 'string' ? a : a?.agreementId))
+ .filter(Boolean);
 
-    setRequiredAgreementIds(new Set(ids));
-  }, []);
+ setRequiredAgreementIds(new Set(ids));
+ }, []);
 
-  const areAllAgreementsAccepted = useCallback(() => {
-    if (requiredAgreementIds.size === 0) return true;
-    for (const id of requiredAgreementIds) {
-      if (!acceptedAgreements.has(id)) return false;
-    }
-    return true;
-  }, [acceptedAgreements, requiredAgreementIds]);
+ const areAllAgreementsAccepted = useCallback(() => {
+ if (requiredAgreementIds.size === 0) return true;
+ for (const id of requiredAgreementIds) {
+ if (!acceptedAgreements.has(id)) return false;
+ }
+ return true;
+ }, [acceptedAgreements, requiredAgreementIds]);
 
-  const getAcceptedAgreementIds = useCallback(() => Array.from(acceptedAgreements), [acceptedAgreements]);
+ const getAcceptedAgreementIds = useCallback(() => Array.from(acceptedAgreements), [acceptedAgreements]);
 
-  return {
-    acceptedAgreements,
-    onAgreementToggle,
-    onRequiredAgreementsChange,
-    areAllAgreementsAccepted,
-    getAcceptedAgreementIds,
-  };
+ return {
+ acceptedAgreements,
+ onAgreementToggle,
+ onRequiredAgreementsChange,
+ areAllAgreementsAccepted,
+ getAcceptedAgreementIds,
+ };
 };
 
 export const useDraftListings = () => {
-  const { user, isAuthenticated } = useAuthState();
+ const { user, isAuthenticated } = useAuthState();
 
-  const queryFn = useCallback(async () => {
-    const pageSize = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_PAGE_SIZE;
-    const maxPages = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_MAX_PAGES;
-    const merged = [];
-    for (let page = 0; page < maxPages; page += 1) {
-      const data = await listingService.getMyListingsByStatus('DRAFT', page, pageSize);
-      const chunk = normalizeArrayResponse(data);
-      merged.push(...chunk);
-      const totalPages = data?.totalPages ?? 1;
-      if (page >= totalPages - 1 || chunk.length < pageSize) break;
-    }
-    return merged;
-  }, []);
+ const queryFn = useCallback(async () => {
+ const pageSize = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_PAGE_SIZE;
+ const maxPages = PAYMENT_FLOW_DEFAULTS.DRAFT_LISTINGS_MAX_PAGES;
+ const merged = [];
+ for (let page = 0; page < maxPages; page += 1) {
+ const data = await listingService.getMyListingsByStatus('DRAFT', page, pageSize);
+ const chunk = normalizeArrayResponse(data);
+ merged.push(...chunk);
+ const totalPages = data?.totalPages ?? 1;
+ if (page >= totalPages - 1 || chunk.length < pageSize) break;
+ }
+ return merged;
+ }, []);
 
-  const {
-    data: draftListings = [],
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: [...PAYMENT_QUERY_KEYS.draftListings, user?.id],
-    queryFn,
-    enabled: !!(isAuthenticated && user?.id),
-    staleTime: 30 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    retry: 1,
-  });
+ const {
+ data: draftListings = [],
+ isLoading,
+ error,
+ refetch,
+ } = useQuery({
+ queryKey: [...PAYMENT_QUERY_KEYS.draftListings, user?.id],
+ queryFn,
+ enabled: !!(isAuthenticated && user?.id),
+ staleTime: 30 * 1000,
+ gcTime: 10 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: true,
+ retry: 1,
+ });
 
-  return {
-    draftListings,
-    isLoading,
-    error: error?.response?.data?.message || error?.message || null,
-    refetch,
-  };
+ return {
+ draftListings,
+ isLoading,
+ error: error?.response?.data?.message || error?.message || null,
+ refetch,
+ };
 };
 
 export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeConfig, onSuccess }) => {
-  const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
-  const listingFeeIdempotencyKeyRef = useRef(null);
-  const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.EWALLET);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [codeExpiryTime, setCodeExpiryTime] = useState(null);
-  const [isResendingCode, setIsResendingCode] = useState(false);
-  const { showSuccess, showError, showInfo } = useNotification();
-  const queryClient = useQueryClient();
+ const [selectedListing, setSelectedListing] = useState(initialSelectedListing);
+ const listingFeeIdempotencyKeyRef = useRef(null);
+ const [paymentType, setPaymentType] = useState(PAYMENT_TYPES.EWALLET);
+ const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+ const [verificationCode, setVerificationCode] = useState('');
+ const [showConfirmModal, setShowConfirmModal] = useState(false);
+ const [codeExpiryTime, setCodeExpiryTime] = useState(null);
+ const [isResendingCode, setIsResendingCode] = useState(false);
+ const { showSuccess, showError, showInfo } = useNotification();
+ const queryClient = useQueryClient();
 
-  const {
-    acceptedAgreements,
-    onAgreementToggle,
-    onRequiredAgreementsChange,
-    areAllAgreementsAccepted,
-    getAcceptedAgreementIds,
-  } = useAgreementsState();
+ const {
+ acceptedAgreements,
+ onAgreementToggle,
+ onRequiredAgreementsChange,
+ areAllAgreementsAccepted,
+ getAcceptedAgreementIds,
+ } = useAgreementsState();
 
-  useEffect(() => {
-    listingFeeIdempotencyKeyRef.current = null;
-  }, [selectedListing?.id]);
+ useEffect(() => {
+ listingFeeIdempotencyKeyRef.current = null;
+ }, [selectedListing?.id]);
 
-  const handlePayment = async () => {
-    if (!selectedListing) {
-      showError('Error', 'Please select a listing to pay for.');
-      return;
-    }
+ const handlePayment = async () => {
+ if (!selectedListing) {
+ showError('Error', 'Please select a listing to pay for.');
+ return;
+ }
 
-    if (!feeConfig) {
-      showError('Error', 'Fee configuration not loaded. Please refresh the page.');
-      return;
-    }
-    setShowConfirmModal(true);
-  };
+ if (!feeConfig) {
+ showError('Error', 'Fee configuration not loaded. Please refresh the page.');
+ return;
+ }
+ setShowConfirmModal(true);
+ };
 
-  const startVerification = useCallback(async () => {
-    if (!selectedListing || !feeConfig) {
-      showError('Error', 'Please select a listing and ensure fee configuration is loaded.');
-      return false;
-    }
+ const startVerification = useCallback(async () => {
+ if (!selectedListing || !feeConfig) {
+ showError('Error', 'Please select a listing and ensure fee configuration is loaded.');
+ return false;
+ }
 
-    setIsProcessingPayment(true);
+ setIsProcessingPayment(true);
 
-    try {
-      await orderService.initiatePaymentVerification({
-        transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
-        listingId: selectedListing.id,
-        amount: feeConfig.totalCreationFee
-      });
-      showInfo('Verification Required', 'Enter the verification code sent to your email.');
-      setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
-      return true;
-    } catch (err) {
-      handleError(err, showError);
-      return false;
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  }, [selectedListing, feeConfig, showError, showInfo]);
+ try {
+ await orderService.initiatePaymentVerification({
+ transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
+ listingId: selectedListing.id,
+ amount: feeConfig.totalCreationFee
+ });
+ showInfo('Verification Required', 'Enter the verification code sent to your email.');
+ setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
+ return true;
+ } catch (err) {
+ handleError(err, showError);
+ return false;
+ } finally {
+ setIsProcessingPayment(false);
+ }
+ }, [selectedListing, feeConfig, showError, showInfo]);
 
-  const verifyAndPay = useCallback(async () => {
-    if (!selectedListing || !feeConfig) {
-      showError('Error', 'Please select a listing and ensure fee configuration is loaded.');
-      return false;
-    }
+ const verifyAndPay = useCallback(async () => {
+ if (!selectedListing || !feeConfig) {
+ showError('Error', 'Please select a listing and ensure fee configuration is loaded.');
+ return false;
+ }
 
-    setIsProcessingPayment(true);
+ setIsProcessingPayment(true);
 
-    try {
-      if (!listingFeeIdempotencyKeyRef.current) {
-        listingFeeIdempotencyKeyRef.current =
-          typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.randomUUID === 'function'
-            ? `listing-fee-${globalThis.crypto.randomUUID()}`
-            : `listing-fee-${selectedListing.id}-${feeConfig.totalCreationFee}`;
-      }
-      const paymentData = createListingFeePaymentRequest({
-        listingId: selectedListing.id,
-        paymentType: paymentType,
-        verificationCode: verificationCode,
-        agreementsAccepted: true,
-        acceptedAgreementIds: getAcceptedAgreementIds(),
-        idempotencyKey: listingFeeIdempotencyKeyRef.current,
-      });
-      await paymentService.createListingFeePayment(paymentData);
+ try {
+ if (!listingFeeIdempotencyKeyRef.current) {
+ listingFeeIdempotencyKeyRef.current =
+ typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.randomUUID === 'function'
+ ? `listing-fee-${globalThis.crypto.randomUUID()}`
+ : `listing-fee-${selectedListing.id}-${feeConfig.totalCreationFee}`;
+ }
+ const paymentData = createListingFeePaymentRequest({
+ listingId: selectedListing.id,
+ paymentType: paymentType,
+ verificationCode: verificationCode,
+ agreementsAccepted: true,
+ acceptedAgreementIds: getAcceptedAgreementIds(),
+ idempotencyKey: listingFeeIdempotencyKeyRef.current,
+ });
+ await paymentService.createListingFeePayment(paymentData);
 
-      showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
+ showSuccess('Success', 'Listing fee payment successful! Your listing will be published.');
 
-      listingFeeIdempotencyKeyRef.current = null;
-      setSelectedListing(null);
-      setVerificationCode('');
-      setCodeExpiryTime(null);
-      setShowConfirmModal(false);
+ listingFeeIdempotencyKeyRef.current = null;
+ setSelectedListing(null);
+ setVerificationCode('');
+ setCodeExpiryTime(null);
+ setShowConfirmModal(false);
 
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings }),
-        queryClient.invalidateQueries({ queryKey: ['ewallet'] }),
-        queryClient.invalidateQueries({ queryKey: ['payments'] }),
-        queryClient.invalidateQueries({ queryKey: ['myListings'] }),
-      ]);
+ await Promise.all([
+ queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings }),
+ queryClient.invalidateQueries({ queryKey: ['ewallet'] }),
+ queryClient.invalidateQueries({ queryKey: ['payments'] }),
+ queryClient.invalidateQueries({ queryKey: ['myListings'] }),
+ ]);
 
-      if (onSuccess) {
-        await onSuccess();
-      }
-      return true;
-    } catch (err) {
-      handleError(err, showError);
-      return false;
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  }, [selectedListing, feeConfig, paymentType, verificationCode, getAcceptedAgreementIds, onSuccess, showError, showSuccess, queryClient]);
+ if (onSuccess) {
+ await onSuccess();
+ }
+ return true;
+ } catch (err) {
+ handleError(err, showError);
+ return false;
+ } finally {
+ setIsProcessingPayment(false);
+ }
+ }, [selectedListing, feeConfig, paymentType, verificationCode, getAcceptedAgreementIds, onSuccess, showError, showSuccess, queryClient]);
 
-  const resendVerificationCode = async () => {
-    if (!selectedListing) {
-      showError('Error', 'Please select a listing first.');
-      return;
-    }
+ const resendVerificationCode = async () => {
+ if (!selectedListing) {
+ showError('Error', 'Please select a listing first.');
+ return;
+ }
 
-    setIsResendingCode(true);
-    try {
-      await orderService.initiatePaymentVerification({
-        transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
-        listingId: selectedListing.id,
-        amount: feeConfig?.totalCreationFee
-      });
-      showSuccess('Success', 'A new verification code has been sent to your email.');
-      setVerificationCode('');
-      setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
-    } catch (err) {
-      handleError(err, showError);
-    } finally {
-      setIsResendingCode(false);
-    }
-  };
+ setIsResendingCode(true);
+ try {
+ await orderService.initiatePaymentVerification({
+ transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
+ listingId: selectedListing.id,
+ amount: feeConfig?.totalCreationFee
+ });
+ showSuccess('Success', 'A new verification code has been sent to your email.');
+ setVerificationCode('');
+ setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
+ } catch (err) {
+ handleError(err, showError);
+ } finally {
+ setIsResendingCode(false);
+ }
+ };
 
-  return {
-    selectedListing,
-    setSelectedListing,
-    paymentType,
-    setPaymentType,
-    isProcessingPayment,
-    verificationCode,
-    setVerificationCode,
-    codeExpiryTime,
-    isResendingCode,
-    showConfirmModal,
-    setShowConfirmModal,
-    handlePayment,
-    startVerification,
-    verifyAndPay,
-    resendVerificationCode,
-    acceptedAgreements,
-    agreementsAccepted: areAllAgreementsAccepted(),
-    onAgreementToggle,
-    onRequiredAgreementsChange
-  };
+ return {
+ selectedListing,
+ setSelectedListing,
+ paymentType,
+ setPaymentType,
+ isProcessingPayment,
+ verificationCode,
+ setVerificationCode,
+ codeExpiryTime,
+ isResendingCode,
+ showConfirmModal,
+ setShowConfirmModal,
+ handlePayment,
+ startVerification,
+ verifyAndPay,
+ resendVerificationCode,
+ acceptedAgreements,
+ agreementsAccepted: areAllAgreementsAccepted(),
+ onAgreementToggle,
+ onRequiredAgreementsChange
+ };
 };

@@ -5,94 +5,94 @@ import { ShieldAlert, FileSearch } from 'lucide-react';
 import { useComplaints } from '../hooks/useComplaints.js';
 import ComplaintCard from '../components/ComplaintCard.jsx';
 const ComplaintsPage = () => {
-  const {
-    t
-  } = useTranslation();
-  const {
-    complaints,
-    isLoading,
-    error,
-    getUserComplaints
-  } = useComplaints();
-  useEffect(() => {
-    getUserComplaints();
-  }, [getUserComplaints]);
-  return <div className="min-h-screen bg-[#F8FAFC]">
-            <div className="sticky top-0 z-20 border-b border-border-light/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
-                <PageContainer className="flex items-center justify-between py-4">
-                    <div className="flex items-center gap-4">
-                        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-sm ring-1 ring-primary/40">
-                            <div className="absolute inset-px rounded-2xl bg-background-primary/60 backdrop-blur-md" />
-                            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-slate-900 text-white">
-                                <ShieldAlert className="h-5 w-5" />
-                            </div>
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-semibold text-text-primary tracking-tighter">{t("my_complaints")}</h1>
-                            <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
-                                <span className="leading-relaxed">{t("track_and_manage_your_submissions_to_our")}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="hidden sm:flex items-center gap-2">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-indigo-50/80 px-3 py-1 text-xs font-medium tracking-tight text-primary">
-                            <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-sm animate-pulse" />
-                            <span>
-                                {complaints?.length || 0}{t("complaint")}{complaints?.length !== 1 ? 's' : ''}
-                            </span>
-                        </div>
-                    </div>
-                </PageContainer>
-            </div>
+ const {
+ t
+ } = useTranslation();
+ const {
+ complaints,
+ isLoading,
+ error,
+ getUserComplaints
+ } = useComplaints();
+ useEffect(() => {
+ getUserComplaints();
+ }, [getUserComplaints]);
+ return <div className="min-h-screen bg-[#F8FAFC]">
+ <div className="sticky top-0 z-20 border-b border-border-light/80 bg-[#F8FAFC]/80 backdrop-blur-xl">
+ <PageContainer className="flex items-center justify-between py-4">
+ <div className="flex items-center gap-4">
+ <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 via-slate-50 to-slate-100 shadow-sm ring-1 ring-primary/40">
+ <div className="absolute inset-px rounded-2xl bg-background-primary/60 backdrop-blur-md" />
+ <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-slate-900 text-white">
+ <ShieldAlert className="h-5 w-5" />
+ </div>
+ </div>
+ <div>
+ <h1 className="text-2xl font-semibold text-text-primary tracking-tighter">{t("my_complaints")}</h1>
+ <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+ <span className="leading-relaxed">{t("track_and_manage_your_submissions_to_our")}</span>
+ </div>
+ </div>
+ </div>
+ <div className="hidden sm:flex items-center gap-2">
+ <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-slate-100/80 px-3 py-1 text-xs font-medium tracking-tight text-primary">
+ <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-sm animate-pulse" />
+ <span>
+ {complaints?.length || 0}{t("complaint")}{complaints?.length !== 1 ? 's' : ''}
+ </span>
+ </div>
+ </div>
+ </PageContainer>
+ </div>
 
-            <PageContainer className="pb-10 pt-6">
-                {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {[...Array(6)].map((_, i) => <div key={i} className="rounded-2xl border border-border-light/70 bg-background-primary/80 p-6 shadow-sm animate-pulse">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-9 w-9 rounded-2xl bg-slate-100" />
-                                        <div className="space-y-2">
-                                            <div className="h-4 w-28 rounded-2xl bg-slate-100" />
-                                            <div className="h-3 w-40 rounded-2xl bg-slate-100" />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="h-3 w-3/4 rounded-2xl bg-slate-100" />
-                                        <div className="h-3 w-2/3 rounded-2xl bg-slate-100" />
-                                        <div className="h-3 w-5/6 rounded-2xl bg-slate-100" />
-                                    </div>
-                                    <div className="h-9 rounded-2xl bg-slate-100" />
-                                </div>
-                            </div>)}
-                    </div> : error ? <div className="flex items-center justify-center py-16">
-                        <div className="w-full max-w-md rounded-2xl border border-rose-200/80 bg-background-primary/90 p-8 text-center shadow-sm">
-                            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
-                                <ShieldAlert className="h-7 w-7 text-rose-500" />
-                            </div>
-                            <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("unable_to_load_complaints")}</h3>
-                            <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                                {error}
-                            </p>
-                            <button onClick={() => getUserComplaints()} className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">{t("try_again")}</button>
-                        </div>
-                    </div> : complaints && complaints.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-2xl border border-border-light/70 bg-background-primary/90 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
-                                <ComplaintCard complaint={complaint} />
-                            </div>)}
-                    </div> : <div className="flex items-center justify-center py-20">
-                        <div className="mx-auto max-w-md text-center">
-                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/10 via-slate-100 to-slate-50">
-                                <FileSearch className="h-10 w-10 text-primary" />
-                            </div>
-                            <h3 className="text-sm font-medium text-text-primary tracking-tighter">{t("no_complaints_submitted")}</h3>
-                            <p className="mt-2 text-sm leading-relaxed text-slate-500">{t("if_you_encounter_inappropriate_behavior_")}</p>
-                            <button className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">
-                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800">
-                                    <span className="h-2 w-2 rounded-full bg-background-primary" />
-                                </span>{t("submit_new_complaint")}</button>
-                        </div>
-                    </div>}
-            </PageContainer>
-        </div>;
+ <PageContainer className="pb-10 pt-6">
+ {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+ {[...Array(6)].map((_, i) => <div key={i} className="rounded-2xl border border-border-light/70 bg-background-primary/80 p-6 shadow-sm animate-pulse">
+ <div className="space-y-4">
+ <div className="flex items-center gap-3">
+ <div className="h-9 w-9 rounded-2xl bg-slate-100" />
+ <div className="space-y-2">
+ <div className="h-4 w-28 rounded-2xl bg-slate-100" />
+ <div className="h-3 w-40 rounded-2xl bg-slate-100" />
+ </div>
+ </div>
+ <div className="space-y-2">
+ <div className="h-3 w-3/4 rounded-2xl bg-slate-100" />
+ <div className="h-3 w-2/3 rounded-2xl bg-slate-100" />
+ <div className="h-3 w-5/6 rounded-2xl bg-slate-100" />
+ </div>
+ <div className="h-9 rounded-2xl bg-slate-100" />
+ </div>
+ </div>)}
+ </div> : error ? <div className="flex items-center justify-center py-16">
+ <div className="w-full max-w-md rounded-2xl border border-rose-200/80 bg-background-primary/90 p-8 text-center shadow-sm">
+ <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50">
+ <ShieldAlert className="h-7 w-7 text-rose-500" />
+ </div>
+ <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("unable_to_load_complaints")}</h3>
+ <p className="mt-2 text-sm leading-relaxed text-slate-500">
+ {error}
+ </p>
+ <button onClick={() => getUserComplaints()} className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">{t("try_again")}</button>
+ </div>
+ </div> : complaints && complaints.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+ {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-2xl border border-border-light/70 bg-background-primary/90 shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/50">
+ <ComplaintCard complaint={complaint} />
+ </div>)}
+ </div> : <div className="flex items-center justify-center py-20">
+ <div className="mx-auto max-w-md text-center">
+ <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/10 via-slate-100 to-slate-50">
+ <FileSearch className="h-10 w-10 text-primary" />
+ </div>
+ <h3 className="text-sm font-medium text-text-primary tracking-tighter">{t("no_complaints_submitted")}</h3>
+ <p className="mt-2 text-sm leading-relaxed text-slate-500">{t("if_you_encounter_inappropriate_behavior_")}</p>
+ <button className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold tracking-tight text-white shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg">
+ <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800">
+ <span className="h-2 w-2 rounded-full bg-background-primary" />
+ </span>{t("submit_new_complaint")}</button>
+ </div>
+ </div>}
+ </PageContainer>
+ </div>;
 };
 export default ComplaintsPage;

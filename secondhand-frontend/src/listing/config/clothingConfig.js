@@ -5,172 +5,172 @@ import {clothingService} from '../../clothing/services/clothingService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const clothingConfig = {
-  label: 'Clothing',
-  icon: '👕',
-  description: 'Clothing, shoes and fashion accessories',
+ label: 'Clothing',
+ icon: '👕',
+ description: 'Clothing, shoes and fashion accessories',
 
-  detailsComponent: GenericListingDetails,
-  detailsSchema: {
-    title: 'Clothing Information',
-    fields: [
-      { label: 'Brand', key: 'brand', enumKey: 'clothingBrands' },
-      { label: 'Type', key: 'clothingType', enumKey: 'clothingTypes' },
-      { label: 'Color', key: 'color', enumKey: 'colors' },
-      { label: 'Condition', key: 'condition', enumKey: 'clothingConditions' },
-      { label: 'Gender (male, female, unisex)', key: 'clothingGender', enumKey: 'clothingGenders' },
-      { label: 'Clothing Category', key: 'clothingCategory', enumKey: 'clothingCategories' },
-      { label: 'Purchase Year', key: 'purchaseDate', format: (_listing, v) => (v ? String(new Date(v).getFullYear()) : null) },
-    ],
-  },
-  createComponent: ClothingCreateForm,
-  formSchema: {
-    initialData: {
-      title: '', description: '', price: '', currency: 'TRY', quantity: 1,
-      brandId: '', clothingTypeId: '', _clothingTypeName: '', color: '', condition: '',
-      size: '', shoeSizeEu: '', material: '', clothingGender: '', clothingCategory: '',
-      purchaseYear: '', city: '', district: '', imageUrl: '',
-    },
-    steps: [
-      { id: 1, title: 'Basic Information', description: 'Set the title, description and price of your listing', kind: 'basics', showQuantity: true },
-      {
-        id: 2, title: 'Clothing Specifications', description: 'Specify the details of your clothing item', kind: 'details',
-        sections: [
-          {
-            id: 'clothing-details', title: 'Product Details', description: 'Material, fit and purchase details',
-            fields: [
-              { name: 'brandId', label: 'Brand', type: 'enum', enumKey: 'clothingBrands', required: true },
-              { name: 'clothingTypeId', label: 'Type', type: 'enum', enumKey: 'clothingTypes', required: true },
-              { name: 'color', label: 'Color', type: 'enum', enumKey: 'colors', required: true },
-              { name: 'condition', label: 'Condition', type: 'enum', enumKey: 'clothingConditions', required: true },
-              {
-                name: 'clothingGender',
-                label: 'Gender (male, female, unisex)',
-                type: 'enum',
-                enumKey: 'clothingGenders',
-                required: true,
-                description: 'Pick who this item is intended for. Unisex is for items that fit any gender.',
-              },
-              { name: 'clothingCategory', label: 'Clothing Category', type: 'enum', enumKey: 'clothingCategories', required: true },
-              {
-                name: 'size', label: 'Size', type: 'enum', enumKey: 'clothingSizes', required: true,
-                visibleWhen: (ctx) => {
-                  const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
-                  const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
-                  const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
-                  return Boolean(t) && !footwear && !accessory;
-                },
-              },
-              {
-                name: 'shoeSizeEu', label: 'Shoe Size (EU)', type: 'number', required: true, min: 20, max: 55,
-                visibleWhen: (ctx) => ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(String(ctx.formData?._clothingTypeName || '').toUpperCase()),
-              },
-              { name: 'material', label: 'Material', type: 'text' },
-              { name: 'purchaseYear', label: 'Purchase Year', type: 'number', required: true, min: 1900, max: new Date().getFullYear() },
-            ],
-          },
-        ],
-      },
-      { id: 3, title: 'Location', description: 'Set the location of your item', kind: 'mediaLocation' },
-    ],
-    derivedFields: [{ sourceField: 'clothingTypeId', enumKey: 'clothingTypes', targetField: '_clothingTypeName', uppercase: true }],
-    effects: [
-      (ctx) => {
-        const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
-        const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
-        const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
-        const apparel = Boolean(t) && !footwear && !accessory;
-        if (footwear && ctx.formData?.size) ctx.setValue('size', '');
-        if (apparel && ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', '');
-        if (accessory) { if (ctx.formData?.size) ctx.setValue('size', ''); if (ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', ''); }
-      },
-    ],
-    getTitle: ({ isEdit }) => (isEdit ? 'Edit Clothing Listing' : 'Create Clothing Listing'),
-    getSubtitle: ({ isEdit }) => (isEdit ? 'Update your clothing listing details' : 'Create your clothing listing step by step'),
-    normalizeInitialData: (data) => {
-      if (!data) return null;
-      return { ...data, brandId: data?.brandId || data?.brand?.id || '', clothingTypeId: data?.clothingTypeId || data?.clothingType?.id || '' };
-    },
-  },
-  service: {
-    getById: (id) => clothingService.getClothingDetails(id),
-    update: (id, payload) => clothingService.updateClothingListing(id, payload),
-  },
-  createFlow: {
-    subtypeSelector: {
-      enumKey: 'clothingTypes',
-      queryParamKey: 'clothingTypeId',
-      initialDataKey: 'clothingTypeId',
-      title: 'Choose clothing type',
-      description: 'Select a type to tailor the form fields.',
-      paramKey: 'types',
-      getOptions: ({ enums }) => {
-        const all = enums?.clothingTypes || [];
-        return all.map((t) => {
-          const fullLabel = String(t?.label ?? t?.name ?? '');
-          const label = fullLabel.includes(' > ') ? fullLabel.split(' > ')[1].trim() : fullLabel;
-          return { ...t, label, name: label };
-        });
-      }
-    },
-    preFormSelectors: [
-      {
-        enumKey: 'clothingBrands', initialDataKey: 'brandId', title: 'Choose brand', description: 'Select a brand to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], paramKey: 'brands',
-      },
-      { enumKey: 'colors', initialDataKey: 'color', title: 'Choose color', description: 'Select a color for your clothing item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
-      { enumKey: 'clothingConditions', initialDataKey: 'condition', title: 'Choose condition', description: 'Select a condition to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
-      {
-        enumKey: 'clothingGenders',
-        initialDataKey: 'clothingGender',
-        title: 'Gender: male, female, or unisex',
-        description: 'Choose whether this item is for men, women, or unisex. Unisex appears in listings filtered for male or female.',
-        kind: 'grid',
-        dependsOn: ['clothingTypeId'],
-        prefilter: false,
-      },
-      { enumKey: 'clothingCategories', initialDataKey: 'clothingCategory', title: 'Choose clothing category', description: 'Select a clothing category to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
-      {
-        enumKey: 'clothingSizes', initialDataKey: 'size', title: 'Choose size', description: 'Select size of the item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false,
-        visibleWhen: (ctx) => {
-          const t = String(ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId ? ctx.getName('clothingTypes', ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId) : '').toUpperCase();
-          const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
-          const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
-          return Boolean(t) && !footwear && !accessory;
-        }
-      },
-    ],
-  },
-  filterConfig: filterConfigs.CLOTHING,
-  sortOptions: [
-    { value: 'brand', label: 'Brand' }, { value: 'type', label: 'Type' },
-    { value: 'condition', label: 'Condition' }, { value: 'clothingGender', label: 'Gender' },
-    { value: 'clothingCategory', label: 'Clothing Category' }, { value: 'purchaseDate', label: 'Purchase Date' },
-    { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
-  ],
-  compactBadges: (listing) => {
-    const resolveLabel = (v) => {
-      if (!v) return null;
-      if (typeof v === 'string') return v;
-      if (typeof v === 'object') return v.label || v.name || v.value || null;
-      return null;
-    };
+ detailsComponent: GenericListingDetails,
+ detailsSchema: {
+ title: 'Clothing Information',
+ fields: [
+ { label: 'Brand', key: 'brand', enumKey: 'clothingBrands' },
+ { label: 'Type', key: 'clothingType', enumKey: 'clothingTypes' },
+ { label: 'Color', key: 'color', enumKey: 'colors' },
+ { label: 'Condition', key: 'condition', enumKey: 'clothingConditions' },
+ { label: 'Gender (male, female, unisex)', key: 'clothingGender', enumKey: 'clothingGenders' },
+ { label: 'Clothing Category', key: 'clothingCategory', enumKey: 'clothingCategories' },
+ { label: 'Purchase Year', key: 'purchaseDate', format: (_listing, v) => (v ? String(new Date(v).getFullYear()) : null) },
+ ],
+ },
+ createComponent: ClothingCreateForm,
+ formSchema: {
+ initialData: {
+ title: '', description: '', price: '', currency: 'TRY', quantity: 1,
+ brandId: '', clothingTypeId: '', _clothingTypeName: '', color: '', condition: '',
+ size: '', shoeSizeEu: '', material: '', clothingGender: '', clothingCategory: '',
+ purchaseYear: '', city: '', district: '', imageUrl: '',
+ },
+ steps: [
+ { id: 1, title: 'Basic Information', description: 'Set the title, description and price of your listing', kind: 'basics', showQuantity: true },
+ {
+ id: 2, title: 'Clothing Specifications', description: 'Specify the details of your clothing item', kind: 'details',
+ sections: [
+ {
+ id: 'clothing-details', title: 'Product Details', description: 'Material, fit and purchase details',
+ fields: [
+ { name: 'brandId', label: 'Brand', type: 'enum', enumKey: 'clothingBrands', required: true },
+ { name: 'clothingTypeId', label: 'Type', type: 'enum', enumKey: 'clothingTypes', required: true },
+ { name: 'color', label: 'Color', type: 'enum', enumKey: 'colors', required: true },
+ { name: 'condition', label: 'Condition', type: 'enum', enumKey: 'clothingConditions', required: true },
+ {
+ name: 'clothingGender',
+ label: 'Gender (male, female, unisex)',
+ type: 'enum',
+ enumKey: 'clothingGenders',
+ required: true,
+ description: 'Pick who this item is intended for. Unisex is for items that fit any gender.',
+ },
+ { name: 'clothingCategory', label: 'Clothing Category', type: 'enum', enumKey: 'clothingCategories', required: true },
+ {
+ name: 'size', label: 'Size', type: 'enum', enumKey: 'clothingSizes', required: true,
+ visibleWhen: (ctx) => {
+ const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
+ const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
+ const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
+ return Boolean(t) && !footwear && !accessory;
+ },
+ },
+ {
+ name: 'shoeSizeEu', label: 'Shoe Size (EU)', type: 'number', required: true, min: 20, max: 55,
+ visibleWhen: (ctx) => ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(String(ctx.formData?._clothingTypeName || '').toUpperCase()),
+ },
+ { name: 'material', label: 'Material', type: 'text' },
+ { name: 'purchaseYear', label: 'Purchase Year', type: 'number', required: true, min: 1900, max: new Date().getFullYear() },
+ ],
+ },
+ ],
+ },
+ { id: 3, title: 'Location', description: 'Set the location of your item', kind: 'mediaLocation' },
+ ],
+ derivedFields: [{ sourceField: 'clothingTypeId', enumKey: 'clothingTypes', targetField: '_clothingTypeName', uppercase: true }],
+ effects: [
+ (ctx) => {
+ const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
+ const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
+ const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
+ const apparel = Boolean(t) && !footwear && !accessory;
+ if (footwear && ctx.formData?.size) ctx.setValue('size', '');
+ if (apparel && ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', '');
+ if (accessory) { if (ctx.formData?.size) ctx.setValue('size', ''); if (ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', ''); }
+ },
+ ],
+ getTitle: ({ isEdit }) => (isEdit ? 'Edit Clothing Listing' : 'Create Clothing Listing'),
+ getSubtitle: ({ isEdit }) => (isEdit ? 'Update your clothing listing details' : 'Create your clothing listing step by step'),
+ normalizeInitialData: (data) => {
+ if (!data) return null;
+ return { ...data, brandId: data?.brandId || data?.brand?.id || '', clothingTypeId: data?.clothingTypeId || data?.clothingType?.id || '' };
+ },
+ },
+ service: {
+ getById: (id) => clothingService.getClothingDetails(id),
+ update: (id, payload) => clothingService.updateClothingListing(id, payload),
+ },
+ createFlow: {
+ subtypeSelector: {
+ enumKey: 'clothingTypes',
+ queryParamKey: 'clothingTypeId',
+ initialDataKey: 'clothingTypeId',
+ title: 'Choose clothing type',
+ description: 'Select a type to tailor the form fields.',
+ paramKey: 'types',
+ getOptions: ({ enums }) => {
+ const all = enums?.clothingTypes || [];
+ return all.map((t) => {
+ const fullLabel = String(t?.label ?? t?.name ?? '');
+ const label = fullLabel.includes(' > ') ? fullLabel.split(' > ')[1].trim() : fullLabel;
+ return { ...t, label, name: label };
+ });
+ }
+ },
+ preFormSelectors: [
+ {
+ enumKey: 'clothingBrands', initialDataKey: 'brandId', title: 'Choose brand', description: 'Select a brand to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], paramKey: 'brands',
+ },
+ { enumKey: 'colors', initialDataKey: 'color', title: 'Choose color', description: 'Select a color for your clothing item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
+ { enumKey: 'clothingConditions', initialDataKey: 'condition', title: 'Choose condition', description: 'Select a condition to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
+ {
+ enumKey: 'clothingGenders',
+ initialDataKey: 'clothingGender',
+ title: 'Gender: male, female, or unisex',
+ description: 'Choose whether this item is for men, women, or unisex. Unisex appears in listings filtered for male or female.',
+ kind: 'grid',
+ dependsOn: ['clothingTypeId'],
+ prefilter: false,
+ },
+ { enumKey: 'clothingCategories', initialDataKey: 'clothingCategory', title: 'Choose clothing category', description: 'Select a clothing category to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
+ {
+ enumKey: 'clothingSizes', initialDataKey: 'size', title: 'Choose size', description: 'Select size of the item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false,
+ visibleWhen: (ctx) => {
+ const t = String(ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId ? ctx.getName('clothingTypes', ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId) : '').toUpperCase();
+ const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
+ const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
+ return Boolean(t) && !footwear && !accessory;
+ }
+ },
+ ],
+ },
+ filterConfig: filterConfigs.CLOTHING,
+ sortOptions: [
+ { value: 'brand', label: 'Brand' }, { value: 'type', label: 'Type' },
+ { value: 'condition', label: 'Condition' }, { value: 'clothingGender', label: 'Gender' },
+ { value: 'clothingCategory', label: 'Clothing Category' }, { value: 'purchaseDate', label: 'Purchase Date' },
+ { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
+ ],
+ compactBadges: (listing) => {
+ const resolveLabel = (v) => {
+ if (!v) return null;
+ if (typeof v === 'string') return v;
+ if (typeof v === 'object') return v.label || v.name || v.value || null;
+ return null;
+ };
 
-    const brandLabel = resolveLabel(listing.brand);
-    const typeLabel = resolveLabel(listing.clothingType);
-    const colorLabel = resolveLabel(listing.color);
-    const conditionLabel = resolveLabel(listing.condition);
-    const genderLabel = resolveLabel(listing.clothingGender);
-    const categoryLabel = resolveLabel(listing.clothingCategory);
+ const brandLabel = resolveLabel(listing.brand);
+ const typeLabel = resolveLabel(listing.clothingType);
+ const colorLabel = resolveLabel(listing.color);
+ const conditionLabel = resolveLabel(listing.condition);
+ const genderLabel = resolveLabel(listing.clothingGender);
+ const categoryLabel = resolveLabel(listing.clothingCategory);
 
-    return [
-      { label: brandLabel, icon: '🏷️', show: !!brandLabel },
-      { label: typeLabel, icon: '👕', show: !!typeLabel },
-      { label: colorLabel, icon: '🎨', show: !!colorLabel },
-      { label: conditionLabel, icon: '⭐', show: !!conditionLabel },
-      { label: genderLabel, icon: '👤', show: !!genderLabel },
-      { label: categoryLabel, icon: '👶', show: !!categoryLabel },
-      { label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, icon: '📅', show: !!listing.purchaseDate },
-    ].filter(badge => badge.show);
-  },
-  defaultFilters: {},
+ return [
+ { label: brandLabel, icon: '🏷️', show: !!brandLabel },
+ { label: typeLabel, icon: '👕', show: !!typeLabel },
+ { label: colorLabel, icon: '🎨', show: !!colorLabel },
+ { label: conditionLabel, icon: '⭐', show: !!conditionLabel },
+ { label: genderLabel, icon: '👤', show: !!genderLabel },
+ { label: categoryLabel, icon: '👶', show: !!categoryLabel },
+ { label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, icon: '📅', show: !!listing.purchaseDate },
+ ].filter(badge => badge.show);
+ },
+ defaultFilters: {},
 };
 

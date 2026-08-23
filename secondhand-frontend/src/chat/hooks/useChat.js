@@ -8,237 +8,237 @@ import { CHAT_DEFAULTS, CHAT_MESSAGE_TYPES } from '../chatConstants.js';
 import { sameChatId } from '../chatIdUtils.js';
 
 export const useChat = (userId, options = {}) => {
-    const { user } = useAuthState();
-    const queryClient = useQueryClient();
-    const [selectedChatRoom, setSelectedChatRoom] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const enableChatRoomsFetch = options.enableChatRoomsFetch ?? false;
-    const connectWebSocket = options.connectWebSocket ?? true;
+ const { user } = useAuthState();
+ const queryClient = useQueryClient();
+ const [selectedChatRoom, setSelectedChatRoom] = useState(null);
+ const [messages, setMessages] = useState([]);
+ const enableChatRoomsFetch = options.enableChatRoomsFetch ?? false;
+ const connectWebSocket = options.connectWebSocket ?? true;
 
-    const {
-        isConnected,
-        joinRoom,
-        leaveRoom,
-        subscribeToChatRoom,
-        unsubscribeFromChatRoom,
-        addMessageCallback,
-        removeMessageCallback
-    } = useWebSocket(user?.id, { enabled: connectWebSocket });
+ const {
+ isConnected,
+ joinRoom,
+ leaveRoom,
+ subscribeToChatRoom,
+ unsubscribeFromChatRoom,
+ addMessageCallback,
+ removeMessageCallback
+ } = useWebSocket(user?.id, { enabled: connectWebSocket });
 
-    const {
-        data: chatRooms = [],
-        isLoading: isLoadingRooms,
-        error: roomsError,
-        refetch: refetchRooms
-    } = useQuery({
-        queryKey: ['chatRooms', user?.id],
-        queryFn: () => chatService.getUserChatRooms(),
-        enabled: !!user?.id && enableChatRoomsFetch,
-        staleTime: CHAT_DEFAULTS.ROOM_STALE_TIME_MS,
-        cacheTime: CHAT_DEFAULTS.ROOM_CACHE_TIME_MS,
-        refetchInterval: false,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        refetchIntervalInBackground: false,
-        retry: 1,
-    });
+ const {
+ data: chatRooms = [],
+ isLoading: isLoadingRooms,
+ error: roomsError,
+ refetch: refetchRooms
+ } = useQuery({
+ queryKey: ['chatRooms', user?.id],
+ queryFn: () => chatService.getUserChatRooms(),
+ enabled: !!user?.id && enableChatRoomsFetch,
+ staleTime: CHAT_DEFAULTS.ROOM_STALE_TIME_MS,
+ cacheTime: CHAT_DEFAULTS.ROOM_CACHE_TIME_MS,
+ refetchInterval: false,
+ refetchOnWindowFocus: false,
+ refetchOnMount: false,
+ refetchIntervalInBackground: false,
+ retry: 1,
+ });
 
-    const {
-        data: chatMessagesData,
-        isLoading: isLoadingMessages,
-        error: messagesError,
-        refetch: refetchMessages,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage
-    } = useInfiniteQuery({
-        queryKey: ['chatMessages', user?.id, selectedChatRoom?.id],
-        queryFn: ({ pageParam = 0 }) => chatService.getChatMessages(selectedChatRoom.id, pageParam),
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.last) return undefined;
-            return allPages.length;
-        },
-        enabled: !!(user?.id && selectedChatRoom?.id),
-        staleTime: CHAT_DEFAULTS.MESSAGE_STALE_TIME_MS,
-        cacheTime: CHAT_DEFAULTS.MESSAGE_CACHE_TIME_MS,
-        refetchInterval: false,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        retry: 1,
-    });
+ const {
+ data: chatMessagesData,
+ isLoading: isLoadingMessages,
+ error: messagesError,
+ refetch: refetchMessages,
+ fetchNextPage,
+ hasNextPage,
+ isFetchingNextPage
+ } = useInfiniteQuery({
+ queryKey: ['chatMessages', user?.id, selectedChatRoom?.id],
+ queryFn: ({ pageParam = 0 }) => chatService.getChatMessages(selectedChatRoom.id, pageParam),
+ getNextPageParam: (lastPage, allPages) => {
+ if (lastPage.last) return undefined;
+ return allPages.length;
+ },
+ enabled: !!(user?.id && selectedChatRoom?.id),
+ staleTime: CHAT_DEFAULTS.MESSAGE_STALE_TIME_MS,
+ cacheTime: CHAT_DEFAULTS.MESSAGE_CACHE_TIME_MS,
+ refetchInterval: false,
+ refetchOnWindowFocus: false,
+ refetchOnMount: false,
+ retry: 1,
+ });
 
-    const sendMessageMutation = useMutation({
-        mutationFn: (messageData) => chatService.sendMessage(messageData),
-        onSuccess: (data) => {
-            setMessages(prev => {
-                if (prev.some(msg => sameChatId(msg.id, data.id))) return prev;
-                return [...prev, data];
-            });
-            // Only update specific queries, don't invalidate everything
-            queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
-                if (!oldData || !oldData.pages || oldData.pages.length === 0) return oldData;
-                const newPages = [...oldData.pages];
-                const firstPage = { ...newPages[0] };
-                firstPage.content = [data, ...(firstPage.content || [])];
-                newPages[0] = firstPage;
-                return {
-                    ...oldData,
-                    pages: newPages
-                };
-            });
-        }
-    });
+ const sendMessageMutation = useMutation({
+ mutationFn: (messageData) => chatService.sendMessage(messageData),
+ onSuccess: (data) => {
+ setMessages(prev => {
+ if (prev.some(msg => sameChatId(msg.id, data.id))) return prev;
+ return [...prev, data];
+ });
+ // Only update specific queries, don't invalidate everything
+ queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
+ if (!oldData || !oldData.pages || oldData.pages.length === 0) return oldData;
+ const newPages = [...oldData.pages];
+ const firstPage = { ...newPages[0] };
+ firstPage.content = [data, ...(firstPage.content || [])];
+ newPages[0] = firstPage;
+ return {
+ ...oldData,
+ pages: newPages
+ };
+ });
+ }
+ });
 
-    const markAsReadMutation = useMutation({
-        mutationFn: ({ chatRoomId }) => chatService.markMessagesAsRead(chatRoomId),
-        onSuccess: (_, { chatRoomId }) => {
-            // Don't invalidate queries, just update unread counts
-            queryClient.setQueryData(UNREAD_COUNT_KEYS.room(chatRoomId, user?.id), 0);
-            queryClient.invalidateQueries({
-                queryKey: UNREAD_COUNT_KEYS.total(user?.id),
-                refetchType: 'none'
-            });
-        }
-    });
+ const markAsReadMutation = useMutation({
+ mutationFn: ({ chatRoomId }) => chatService.markMessagesAsRead(chatRoomId),
+ onSuccess: (_, { chatRoomId }) => {
+ // Don't invalidate queries, just update unread counts
+ queryClient.setQueryData(UNREAD_COUNT_KEYS.room(chatRoomId, user?.id), 0);
+ queryClient.invalidateQueries({
+ queryKey: UNREAD_COUNT_KEYS.total(user?.id),
+ refetchType: 'none'
+ });
+ }
+ });
 
-    const deleteMessageMutation = useMutation({
-        mutationFn: ({ messageId }) => chatService.deleteMessage(messageId),
-        onSuccess: (_, { messageId }) => {
-            setMessages((prev) => prev.filter((msg) => !sameChatId(msg.id, messageId)));
-            // Only update the specific message cache, don't refetch everything
-            queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
-                if (!oldData || !oldData.pages) return oldData;
-                return {
-                    ...oldData,
-                    pages: oldData.pages.map(page => ({
-                        ...page,
-                        content: (page.content || []).filter(msg => !sameChatId(msg.id, messageId))
-                    }))
-                };
-            });
-        }
-    });
+ const deleteMessageMutation = useMutation({
+ mutationFn: ({ messageId }) => chatService.deleteMessage(messageId),
+ onSuccess: (_, { messageId }) => {
+ setMessages((prev) => prev.filter((msg) => !sameChatId(msg.id, messageId)));
+ // Only update the specific message cache, don't refetch everything
+ queryClient.setQueryData(['chatMessages', user?.id, selectedChatRoom?.id], (oldData) => {
+ if (!oldData || !oldData.pages) return oldData;
+ return {
+ ...oldData,
+ pages: oldData.pages.map(page => ({
+ ...page,
+ content: (page.content || []).filter(msg => !sameChatId(msg.id, messageId))
+ }))
+ };
+ });
+ }
+ });
 
-    const deleteConversationMutation = useMutation({
-        mutationFn: ({ chatRoomId }) => chatService.deleteConversation(chatRoomId),
-        onSuccess: () => {
-            setSelectedChatRoom(null);
-            setMessages([]);
-            // Only invalidate chat rooms when absolutely necessary
-            queryClient.invalidateQueries({ queryKey: ['chatRooms', user?.id] });
-        }
-    });
+ const deleteConversationMutation = useMutation({
+ mutationFn: ({ chatRoomId }) => chatService.deleteConversation(chatRoomId),
+ onSuccess: () => {
+ setSelectedChatRoom(null);
+ setMessages([]);
+ // Only invalidate chat rooms when absolutely necessary
+ queryClient.invalidateQueries({ queryKey: ['chatRooms', user?.id] });
+ }
+ });
 
-    const selectChatRoom = useCallback((chatRoom) => {
-        if (selectedChatRoom?.id) {
-            leaveRoom(selectedChatRoom.id, user?.id);
-            unsubscribeFromChatRoom(selectedChatRoom.id);
-        }
+ const selectChatRoom = useCallback((chatRoom) => {
+ if (selectedChatRoom?.id) {
+ leaveRoom(selectedChatRoom.id, user?.id);
+ unsubscribeFromChatRoom(selectedChatRoom.id);
+ }
 
-        setSelectedChatRoom(chatRoom);
+ setSelectedChatRoom(chatRoom);
 
-        if (chatRoom?.id) {
-            joinRoom(chatRoom.id, user?.id);
-            subscribeToChatRoom(chatRoom.id);
-            // Only mark as read if there are actually unread messages
-            if (chatRoom.unreadCount > 0) {
-                setTimeout(() => {
-                    markAsReadMutation.mutate({ chatRoomId: chatRoom.id });
-                }, CHAT_DEFAULTS.MARK_READ_DELAY_MS);
-            }
-        }
-    }, [selectedChatRoom, user?.id, leaveRoom, joinRoom, subscribeToChatRoom, unsubscribeFromChatRoom, markAsReadMutation]);
+ if (chatRoom?.id) {
+ joinRoom(chatRoom.id, user?.id);
+ subscribeToChatRoom(chatRoom.id);
+ // Only mark as read if there are actually unread messages
+ if (chatRoom.unreadCount > 0) {
+ setTimeout(() => {
+ markAsReadMutation.mutate({ chatRoomId: chatRoom.id });
+ }, CHAT_DEFAULTS.MARK_READ_DELAY_MS);
+ }
+ }
+ }, [selectedChatRoom, user?.id, leaveRoom, joinRoom, subscribeToChatRoom, unsubscribeFromChatRoom, markAsReadMutation]);
 
-    const sendMessage = useCallback((content) => {
-        if (!selectedChatRoom?.id || !user?.id) return;
+ const sendMessage = useCallback((content) => {
+ if (!selectedChatRoom?.id || !user?.id) return;
 
-        const otherParticipant = [...(selectedChatRoom.participantIds || [])].find(
-            (id) => !sameChatId(id, user.id)
-        );
-        if (!otherParticipant) return;
+ const otherParticipant = [...(selectedChatRoom.participantIds || [])].find(
+ (id) => !sameChatId(id, user.id)
+ );
+ if (!otherParticipant) return;
 
-        const messageData = {
-            content,
-            senderId: user.id,
-            recipientId: otherParticipant,
-            chatRoomId: selectedChatRoom.id,
-            messageType: CHAT_MESSAGE_TYPES.TEXT
-        };
+ const messageData = {
+ content,
+ senderId: user.id,
+ recipientId: otherParticipant,
+ chatRoomId: selectedChatRoom.id,
+ messageType: CHAT_MESSAGE_TYPES.TEXT
+ };
 
-        sendMessageMutation.mutate(messageData);
-    }, [selectedChatRoom?.id, selectedChatRoom?.participantIds, user?.id, sendMessageMutation]);
+ sendMessageMutation.mutate(messageData);
+ }, [selectedChatRoom?.id, selectedChatRoom?.participantIds, user?.id, sendMessageMutation]);
 
-    const createDirectChat = useCallback(async (otherUserId) => {
-        const chatRoom = await chatService.createOrGetDirectChat(otherUserId);
-        setSelectedChatRoom(chatRoom);
-        return chatRoom;
-    }, []);
+ const createDirectChat = useCallback(async (otherUserId) => {
+ const chatRoom = await chatService.createOrGetDirectChat(otherUserId);
+ setSelectedChatRoom(chatRoom);
+ return chatRoom;
+ }, []);
 
-    const createListingChat = useCallback(async (listingId, listingTitle) => {
-        const chatRoom = await chatService.createOrGetListingChat(listingId, listingTitle);
-        setSelectedChatRoom(chatRoom);
-        return chatRoom;
-    }, []);
+ const createListingChat = useCallback(async (listingId, listingTitle) => {
+ const chatRoom = await chatService.createOrGetListingChat(listingId, listingTitle);
+ setSelectedChatRoom(chatRoom);
+ return chatRoom;
+ }, []);
 
-    const deleteMessage = useCallback((messageId) => {
-        deleteMessageMutation.mutate({ messageId });
-    }, [deleteMessageMutation]);
+ const deleteMessage = useCallback((messageId) => {
+ deleteMessageMutation.mutate({ messageId });
+ }, [deleteMessageMutation]);
 
-    const deleteConversation = useCallback((chatRoomId) => {
-        deleteConversationMutation.mutate({ chatRoomId });
-    }, [deleteConversationMutation]);
+ const deleteConversation = useCallback((chatRoomId) => {
+ deleteConversationMutation.mutate({ chatRoomId });
+ }, [deleteConversationMutation]);
 
-    useEffect(() => {
-        if (isConnected && selectedChatRoom?.id) {
-            const handleNewMessage = (messageData) => {
-                if (sameChatId(messageData.senderId, user?.id)) return;
-                setMessages(prev => {
-                    if (prev.some(msg => sameChatId(msg.id, messageData.id))) return prev;
-                    return [...prev, messageData];
-                });
-            };
+ useEffect(() => {
+ if (isConnected && selectedChatRoom?.id) {
+ const handleNewMessage = (messageData) => {
+ if (sameChatId(messageData.senderId, user?.id)) return;
+ setMessages(prev => {
+ if (prev.some(msg => sameChatId(msg.id, messageData.id))) return prev;
+ return [...prev, messageData];
+ });
+ };
 
-            addMessageCallback(handleNewMessage);
-            return () => removeMessageCallback(handleNewMessage);
-        }
-    }, [isConnected, selectedChatRoom?.id, user?.id, addMessageCallback, removeMessageCallback]);
+ addMessageCallback(handleNewMessage);
+ return () => removeMessageCallback(handleNewMessage);
+ }
+ }, [isConnected, selectedChatRoom?.id, user?.id, addMessageCallback, removeMessageCallback]);
 
-    useEffect(() => {
-        setMessages([]);
-    }, [selectedChatRoom?.id]);
+ useEffect(() => {
+ setMessages([]);
+ }, [selectedChatRoom?.id]);
 
-    useEffect(() => {
-        if (chatMessagesData?.pages) {
-            const allMessages = chatMessagesData.pages
-                .flatMap(page => page.content || [])
-                .reverse();
-            setMessages(allMessages);
-        }
-    }, [chatMessagesData]);
+ useEffect(() => {
+ if (chatMessagesData?.pages) {
+ const allMessages = chatMessagesData.pages
+ .flatMap(page => page.content || [])
+ .reverse();
+ setMessages(allMessages);
+ }
+ }, [chatMessagesData]);
 
-    return {
-        chatRooms: chatRooms || [],
-        selectedChatRoom,
-        messages,
-        isConnected,
-        isLoadingRooms,
-        isLoadingMessages,
-        isSendingMessage: sendMessageMutation.isPending,
-        isDeletingMessage: deleteMessageMutation.isPending,
-        isDeletingConversation: deleteConversationMutation.isPending,
-        roomsError,
-        messagesError,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        selectChatRoom,
-        sendMessage,
-        deleteMessage,
-        deleteConversation,
-        createDirectChat,
-        createListingChat,
-        markAsRead: markAsReadMutation.mutate,
-        refetchRooms,
-        refetchMessages
-    };
+ return {
+ chatRooms: chatRooms || [],
+ selectedChatRoom,
+ messages,
+ isConnected,
+ isLoadingRooms,
+ isLoadingMessages,
+ isSendingMessage: sendMessageMutation.isPending,
+ isDeletingMessage: deleteMessageMutation.isPending,
+ isDeletingConversation: deleteConversationMutation.isPending,
+ roomsError,
+ messagesError,
+ fetchNextPage,
+ hasNextPage,
+ isFetchingNextPage,
+ selectChatRoom,
+ sendMessage,
+ deleteMessage,
+ deleteConversation,
+ createDirectChat,
+ createListingChat,
+ markAsRead: markAsReadMutation.mutate,
+ refetchRooms,
+ refetchMessages
+ };
 };

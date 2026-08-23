@@ -1,8 +1,8 @@
 package com.serhat.secondhand.escrow.application;
 
+import com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository;
 import com.serhat.secondhand.escrow.contract.EscrowReleasedKafkaEvent;
 import com.serhat.secondhand.ewallet.application.IEWalletService;
-import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class EscrowKafkaConsumer {
 
     private final IEWalletService walletService;
     private final UserRepository userRepository;
-    private final com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository processedKafkaEventRepository;
+    private final ProcessedKafkaEventRepository processedKafkaEventRepository;
 
     @KafkaListener(
             topics = EscrowKafkaProducer.ESCROW_RELEASED_TOPIC,

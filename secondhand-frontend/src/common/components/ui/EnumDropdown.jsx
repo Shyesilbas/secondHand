@@ -2,28 +2,28 @@ import { useEnums } from '../../hooks/useEnums.js';
 import SearchableDropdown from './SearchableDropdown.jsx';
 
 const EnumDropdown = ({ label, enumKey, value, onChange, placeholder = '', searchPlaceholder = '', multiple = false, className = '', options = null, disabled = false, usePortal = false }) => {
-  const { enums } = useEnums();
-  const enumOptions = options ?? (enums?.[enumKey] || []);
-  const selectedValues = value ? (multiple ? value : [value]) : [];
+ const { enums } = useEnums();
+ const enumOptions = options ?? (enums?.[enumKey] || []);
+ const selectedValues = value ? (multiple ? value : [value]) : [];
 
-  const handleChange = (values) => {
-    onChange(multiple ? values : (values?.[0] ?? ''));
-  };
+ const handleChange = (values) => {
+ onChange(multiple ? values : (values?.[0] ?? ''));
+ };
 
-  return (
-    <SearchableDropdown
-      label={label}
-      options={enumOptions}
-      selectedValues={selectedValues}
-      onSelectionChange={handleChange}
-      placeholder={placeholder || 'Select…'}
-      searchPlaceholder={searchPlaceholder || 'Search…'}
-      multiple={multiple}
-      className={className}
-      disabled={disabled}
-      usePortal={usePortal}
-    />
-  );
+ return (
+ <SearchableDropdown
+ label={label}
+ options={enumOptions}
+ selectedValues={selectedValues}
+ onSelectionChange={handleChange}
+ placeholder={placeholder || 'Select…'}
+ searchPlaceholder={searchPlaceholder || 'Search…'}
+ multiple={multiple}
+ className={className}
+ disabled={disabled}
+ usePortal={usePortal}
+ />
+ );
 };
 
 export default EnumDropdown;

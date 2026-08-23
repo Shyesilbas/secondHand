@@ -6,55 +6,55 @@ import { LISTING_DEFAULTS } from '../../types/index.js';
  * Builds default filter values from listing config fields
  */
 export const buildDefaultsFromFilterConfig = (config) => {
-  const fields = config?.getFields?.() || [];
-  const defaults = {};
+ const fields = config?.getFields?.() || [];
+ const defaults = {};
 
-  fields.forEach((field) => {
-    if (!field?.key) return;
+ fields.forEach((field) => {
+ if (!field?.key) return;
 
-    if (field.type === 'enum') {
-      defaults[field.key] = field.multiple === false ? '' : [];
-      return;
-    }
+ if (field.type === 'enum') {
+ defaults[field.key] = field.multiple === false ? '' : [];
+ return;
+ }
 
-    if (field.type === 'numericRange' || field.type === 'dateRange') {
-      defaults[getMinKey(field.key)] = null;
-      defaults[getMaxKey(field.key)] = null;
-      return;
-    }
+ if (field.type === 'numericRange' || field.type === 'dateRange') {
+ defaults[getMinKey(field.key)] = null;
+ defaults[getMaxKey(field.key)] = null;
+ return;
+ }
 
-    if (field.type === 'text') {
-      defaults[field.key] = '';
-    }
-  });
+ if (field.type === 'text') {
+ defaults[field.key] = '';
+ }
+ });
 
-  return defaults;
+ return defaults;
 };
 
 /**
  * Returns default filter object for a listing type
  */
 export const getDefaultFiltersForType = (listingType, initialFilters) => {
-  const type = listingType ? String(listingType).toUpperCase() : null;
-  const cfg = type ? getListingConfig(type) : null;
+ const type = listingType ? String(listingType).toUpperCase() : null;
+ const cfg = type ? getListingConfig(type) : null;
 
-  const base = {
-    type,
-    listingType: type,
-    status: LISTING_DEFAULTS.STATUS,
-    city: '',
-    district: '',
-    minPrice: LISTING_DEFAULTS.MIN_PRICE,
-    maxPrice: LISTING_DEFAULTS.MAX_PRICE,
-    currency: LISTING_DEFAULTS.CURRENCY,
-    sortBy: LISTING_DEFAULTS.SORT_BY,
-    sortDirection: LISTING_DEFAULTS.SORT_DIRECTION,
-    page: LISTING_DEFAULTS.PAGE,
-    size: LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-  };
+ const base = {
+ type,
+ listingType: type,
+ status: LISTING_DEFAULTS.STATUS,
+ city: '',
+ district: '',
+ minPrice: LISTING_DEFAULTS.MIN_PRICE,
+ maxPrice: LISTING_DEFAULTS.MAX_PRICE,
+ currency: LISTING_DEFAULTS.CURRENCY,
+ sortBy: LISTING_DEFAULTS.SORT_BY,
+ sortDirection: LISTING_DEFAULTS.SORT_DIRECTION,
+ page: LISTING_DEFAULTS.PAGE,
+ size: LISTING_DEFAULTS.FILTER_PAGE_SIZE,
+ };
 
-  const dynamic = cfg ? buildDefaultsFromFilterConfig(cfg?.filterConfig) : {};
-  const configDefaults = cfg?.defaultFilters || {};
+ const dynamic = cfg ? buildDefaultsFromFilterConfig(cfg?.filterConfig) : {};
+ const configDefaults = cfg?.defaultFilters || {};
 
-  return { ...base, ...dynamic, ...configDefaults, ...(initialFilters || {}), listingType: type, type };
+ return { ...base, ...dynamic, ...configDefaults, ...(initialFilters || {}), listingType: type, type };
 };

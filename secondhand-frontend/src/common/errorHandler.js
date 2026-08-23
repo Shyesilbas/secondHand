@@ -5,12 +5,12 @@ import logger from './utils/logger.js';
  * Frontend does NOT invent business messages — öncelik backend RFC 7807 ProblemDetail (detail, title, errors).
  */
 export const ERROR_TYPES = Object.freeze({
-  VALIDATION: 'validation',
-  AUTHENTICATION: 'authentication',
-  AUTHORIZATION: 'authorization',
-  NETWORK: 'network',
-  SERVER: 'server',
-  UNKNOWN: 'unknown',
+ VALIDATION: 'validation',
+ AUTHENTICATION: 'authentication',
+ AUTHORIZATION: 'authorization',
+ NETWORK: 'network',
+ SERVER: 'server',
+ UNKNOWN: 'unknown',
 });
 
 /**
@@ -18,22 +18,22 @@ export const ERROR_TYPES = Object.freeze({
  * The actual error MESSAGE always comes from backend.
  */
 const STATUS_TO_TYPE = {
-  400: ERROR_TYPES.VALIDATION,
-  401: ERROR_TYPES.AUTHENTICATION,
-  403: ERROR_TYPES.AUTHORIZATION,
-  404: ERROR_TYPES.VALIDATION,
-  409: ERROR_TYPES.VALIDATION,
-  422: ERROR_TYPES.VALIDATION,
-  429: ERROR_TYPES.VALIDATION,
+ 400: ERROR_TYPES.VALIDATION,
+ 401: ERROR_TYPES.AUTHENTICATION,
+ 403: ERROR_TYPES.AUTHORIZATION,
+ 404: ERROR_TYPES.VALIDATION,
+ 409: ERROR_TYPES.VALIDATION,
+ 422: ERROR_TYPES.VALIDATION,
+ 429: ERROR_TYPES.VALIDATION,
 };
 
 const ERROR_TITLES = Object.freeze({
-  [ERROR_TYPES.AUTHENTICATION]: 'Authentication Error',
-  [ERROR_TYPES.AUTHORIZATION]: 'Authorization Error',
-  [ERROR_TYPES.VALIDATION]: 'Validation Error',
-  [ERROR_TYPES.NETWORK]: 'Network Error',
-  [ERROR_TYPES.SERVER]: 'Server Error',
-  [ERROR_TYPES.UNKNOWN]: 'Error',
+ [ERROR_TYPES.AUTHENTICATION]: 'Authentication Error',
+ [ERROR_TYPES.AUTHORIZATION]: 'Authorization Error',
+ [ERROR_TYPES.VALIDATION]: 'Validation Error',
+ [ERROR_TYPES.NETWORK]: 'Network Error',
+ [ERROR_TYPES.SERVER]: 'Server Error',
+ [ERROR_TYPES.UNKNOWN]: 'Error',
 });
 
 // Only used as absolute last resort when backend is unreachable
@@ -45,72 +45,72 @@ const GENERIC_FALLBACK_MESSAGE = 'An unexpected error occurred. Please try again
  * Message priority: ProblemDetail.detail | legacy message | interceptor userMessage | fallback
  */
 export const parseError = (error) => {
-  if (!error) {
-    return buildParsedError({ type: ERROR_TYPES.UNKNOWN, message: GENERIC_FALLBACK_MESSAGE });
-  }
+ if (!error) {
+ return buildParsedError({ type: ERROR_TYPES.UNKNOWN, message: GENERIC_FALLBACK_MESSAGE });
+ }
 
-  // Network error (no response from server at all)
-  if (error.code === 'NETWORK_ERROR' || error.code === 'ERR_NETWORK' || !error.response) {
-    return buildParsedError({
-      type: ERROR_TYPES.NETWORK,
-      message: error.userMessage || NETWORK_FALLBACK_MESSAGE,
-      originalError: error,
-    });
-  }
+ // Network error (no response from server at all)
+ if (error.code === 'NETWORK_ERROR' || error.code === 'ERR_NETWORK' || !error.response) {
+ return buildParsedError({
+ type: ERROR_TYPES.NETWORK,
+ message: error.userMessage || NETWORK_FALLBACK_MESSAGE,
+ originalError: error,
+ });
+ }
 
-  const { response } = error;
-  const status = response?.status;
-  const data = response?.data;
+ const { response } = error;
+ const status = response?.status;
+ const data = response?.data;
 
-  // RFC 7807 ProblemDetail + legacy ErrorResponse
-  const backendMessage = data?.detail ?? data?.message;
-  const errorCode = data?.errorCode ?? data?.title ?? data?.error;
-  const validationErrors = data?.validationErrors ?? data?.errors ?? null;
+ // RFC 7807 ProblemDetail + legacy ErrorResponse
+ const backendMessage = data?.detail ?? data?.message;
+ const errorCode = data?.errorCode ?? data?.title ?? data?.error;
+ const validationErrors = data?.validationErrors ?? data?.errors ?? null;
 
-  // Determine type from status
-  let type = ERROR_TYPES.UNKNOWN;
-  if (status >= 400 && status < 500) {
-    type = STATUS_TO_TYPE[status] || ERROR_TYPES.VALIDATION;
-  } else if (status >= 500) {
-    type = ERROR_TYPES.SERVER;
-  }
+ // Determine type from status
+ let type = ERROR_TYPES.UNKNOWN;
+ if (status >= 400 && status < 500) {
+ type = STATUS_TO_TYPE[status] || ERROR_TYPES.VALIDATION;
+ } else if (status >= 500) {
+ type = ERROR_TYPES.SERVER;
+ }
 
-  // Message priority: backend message → enriched userMessage → generic fallback
-  const message = backendMessage || error.userMessage || GENERIC_FALLBACK_MESSAGE;
+ // Message priority: backend message → enriched userMessage → generic fallback
+ const message = backendMessage || error.userMessage || GENERIC_FALLBACK_MESSAGE;
 
-  return buildParsedError({
-    type,
-    message,
-    statusCode: status,
-    errorCode,
-    validationErrors,
-    path: data?.path ?? data?.instance ?? null,
-    timestamp: data?.timestamp,
-    originalError: error,
-  });
+ return buildParsedError({
+ type,
+ message,
+ statusCode: status,
+ errorCode,
+ validationErrors,
+ path: data?.path ?? data?.instance ?? null,
+ timestamp: data?.timestamp,
+ originalError: error,
+ });
 };
 
 function buildParsedError({
-  type = ERROR_TYPES.UNKNOWN,
-  message = GENERIC_FALLBACK_MESSAGE,
-  statusCode = null,
-  errorCode = null,
-  validationErrors = null,
-  path = null,
-  timestamp = null,
-  originalError = null,
+ type = ERROR_TYPES.UNKNOWN,
+ message = GENERIC_FALLBACK_MESSAGE,
+ statusCode = null,
+ errorCode = null,
+ validationErrors = null,
+ path = null,
+ timestamp = null,
+ originalError = null,
 }) {
-  return Object.freeze({
-    type,
-    message,
-    statusCode,
-    errorCode,
-    validationErrors,
-    path,
-    timestamp: timestamp || new Date().toISOString(),
-    title: ERROR_TITLES[type] || ERROR_TITLES[ERROR_TYPES.UNKNOWN],
-    originalError,
-  });
+ return Object.freeze({
+ type,
+ message,
+ statusCode,
+ errorCode,
+ validationErrors,
+ path,
+ timestamp: timestamp || new Date().toISOString(),
+ title: ERROR_TITLES[type] || ERROR_TITLES[ERROR_TYPES.UNKNOWN],
+ originalError,
+ });
 }
 
 /**
@@ -118,69 +118,69 @@ function buildParsedError({
  * Uses backend-provided message by default.
  */
 export const handleError = (error, showError, options = {}) => {
-  const parsedError = parseError(error);
+ const parsedError = parseError(error);
 
-  const {
-    customTitle = null,
-    customMessage = null,
-    useModal = false,
-  } = options;
+ const {
+ customTitle = null,
+ customMessage = null,
+ useModal = false,
+ } = options;
 
-  const messageToShow = customMessage || parsedError.message;
-  const titleToShow = customTitle || parsedError.title;
+ const messageToShow = customMessage || parsedError.message;
+ const titleToShow = customTitle || parsedError.title;
 
-  logger.error('🚨 Error:', parsedError);
+ logger.error('🚨 Error:', parsedError);
 
-  if (useModal && typeof showError === 'function') {
-    try {
-      if (showError.showDetailedError) {
-        showError.showDetailedError(parsedError, {
-          customTitle: titleToShow,
-          customMessage: messageToShow,
-        });
-      } else {
-        showError(titleToShow, messageToShow);
-      }
-    } catch (e) {
-      logger.error('Error notification failed:', e);
-    }
-  } else if (typeof showError === 'function') {
-    showError(messageToShow);
-  }
+ if (useModal && typeof showError === 'function') {
+ try {
+ if (showError.showDetailedError) {
+ showError.showDetailedError(parsedError, {
+ customTitle: titleToShow,
+ customMessage: messageToShow,
+ });
+ } else {
+ showError(titleToShow, messageToShow);
+ }
+ } catch (e) {
+ logger.error('Error notification failed:', e);
+ }
+ } else if (typeof showError === 'function') {
+ showError(messageToShow);
+ }
 
-  return parsedError;
+ return parsedError;
 };
 
 /**
  * Handle error with modal notification context.
  */
 export const handleErrorWithModal = (error, notificationContext, options = {}) => {
-  const parsedError = parseError(error);
+ const parsedError = parseError(error);
 
-  const {
-    customTitle = null,
-    customMessage = null,
-    showDetails = true,
-    actions = [],
-  } = options;
+ const {
+ customTitle = null,
+ customMessage = null,
+ showDetails = true,
+ actions = [],
+ } = options;
 
-  const title = customTitle || parsedError.title;
-  const message = customMessage || parsedError.message;
+ const title = customTitle || parsedError.title;
+ const message = customMessage || parsedError.message;
 
-  logger.error('🚨 Error:', parsedError);
+ logger.error('🚨 Error:', parsedError);
 
-  if (notificationContext?.showDetailedError) {
-    notificationContext.showDetailedError(parsedError, {
-      customTitle: title,
-      customMessage: message,
-      showDetails,
-      actions,
-    });
-  } else if (notificationContext?.showError) {
-    notificationContext.showError(title, message);
-  }
+ if (notificationContext?.showDetailedError) {
+ notificationContext.showDetailedError(parsedError, {
+ customTitle: title,
+ customMessage: message,
+ showDetails,
+ actions,
+ });
+ } else if (notificationContext?.showError) {
+ notificationContext.showError(title, message);
+ }
 
-  return parsedError;
+ return parsedError;
 };
 
 /**
@@ -188,30 +188,30 @@ export const handleErrorWithModal = (error, notificationContext, options = {}) =
  * Only token-related 401 errors (not login failures).
  */
 export const shouldTriggerLogout = (parsedError) => {
-  if (parsedError.type !== ERROR_TYPES.AUTHENTICATION) return false;
+ if (parsedError.type !== ERROR_TYPES.AUTHENTICATION) return false;
 
-  const code = (parsedError.errorCode || '').toLowerCase();
-  const msg = (parsedError.message || '').toLowerCase();
+ const code = (parsedError.errorCode || '').toLowerCase();
+ const msg = (parsedError.message || '').toLowerCase();
 
-  // Login failure → don't logout
-  if (msg.includes('invalid email or password') || msg.includes('bad credentials')) {
-    return false;
-  }
+ // Login failure → don't logout
+ if (msg.includes('invalid email or password') || msg.includes('bad credentials')) {
+ return false;
+ }
 
-  // Token/session expiry → logout
-  return (
-    code.includes('token_expired') ||
-    code.includes('invalid_token') ||
-    msg.includes('token expired') ||
-    msg.includes('invalid token') ||
-    msg.includes('session expired')
-  );
+ // Token/session expiry → logout
+ return (
+ code.includes('token_expired') ||
+ code.includes('invalid_token') ||
+ msg.includes('token expired') ||
+ msg.includes('invalid token') ||
+ msg.includes('session expired')
+ );
 };
 
 export default {
-  parseError,
-  handleError,
-  handleErrorWithModal,
-  shouldTriggerLogout,
-  ERROR_TYPES,
+ parseError,
+ handleError,
+ handleErrorWithModal,
+ shouldTriggerLogout,
+ ERROR_TYPES,
 };

@@ -9,196 +9,196 @@ import { useListingSearch } from './useListingSearch.js';
 import { LISTING_DEFAULTS, LISTING_TYPES, NON_PURCHASABLE_TYPES } from '../types/index.js';
 
 const LISTING_ENGINE_QUERY_KEYS = {
-  listings: ['listings'],
-  filtered: (filters) => ['listings', 'filtered', filters],
-  mine: (userId, page, size, listingType, title, status) => ['listings', 'mine', userId, page, size, listingType || null, title || null, status || null],
+ listings: ['listings'],
+ filtered: (filters) => ['listings', 'filtered', filters],
+ mine: (userId, page, size, listingType, title, status) => ['listings', 'mine', userId, page, size, listingType || null, title || null, status || null],
 };
 
 /**
  * Orchestrates listing filters, pagination, and search sub-hooks
  */
 export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, mode: initialMode = 'browse' } = {}) => {
-  const location = useLocation();
-  const { user, isAuthenticated } = useAuthState();
+ const location = useLocation();
+ const { user, isAuthenticated } = useAuthState();
 
-  const navState = useMemo(() => {
-    if (location?.state) return location.state;
-    return window.history.state?.usr || null;
-  }, [location?.state]);
-  const engineModeFromNav = navState?.mode || null;
-  const [mode] = useState(engineModeFromNav || initialMode || 'browse');
+ const navState = useMemo(() => {
+ if (location?.state) return location.state;
+ return window.history.state?.usr || null;
+ }, [location?.state]);
+ const engineModeFromNav = navState?.mode || null;
+ const [mode] = useState(engineModeFromNav || initialMode || 'browse');
 
-  // Initialize filters sub-hook (onFiltersChange will be set after search hook initialization)
-  const filterHook = useListingFilters({
-    initialListingType,
-    mode,
-    location,
-    navState,
-    user,
-    onFiltersChange: undefined,
-  });
+ // Initialize filters sub-hook (onFiltersChange will be set after search hook initialization)
+ const filterHook = useListingFilters({
+ initialListingType,
+ mode,
+ location,
+ navState,
+ user,
+ onFiltersChange: undefined,
+ });
 
-  // React Query data fetching
-  const queryKey = useMemo(() => {
-    if (mode === 'mine') {
-      return LISTING_ENGINE_QUERY_KEYS.mine(
-        user?.id,
-        filterHook.cleanedFilters?.page ?? 0,
-        filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-        filterHook.cleanedFilters?.listingType || null,
-        filterHook.cleanedFilters?.title || null,
-        filterHook.mineStatus || null
-      );
-    }
-    return LISTING_ENGINE_QUERY_KEYS.filtered({ ...filterHook.cleanedFilters, userId: user?.id || null });
-  }, [filterHook.cleanedFilters, filterHook.mineStatus, mode, user?.id]);
+ // React Query data fetching
+ const queryKey = useMemo(() => {
+ if (mode === 'mine') {
+ return LISTING_ENGINE_QUERY_KEYS.mine(
+ user?.id,
+ filterHook.cleanedFilters?.page ?? 0,
+ filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
+ filterHook.cleanedFilters?.listingType || null,
+ filterHook.cleanedFilters?.title || null,
+ filterHook.mineStatus || null
+ );
+ }
+ return LISTING_ENGINE_QUERY_KEYS.filtered({ ...filterHook.cleanedFilters, userId: user?.id || null });
+ }, [filterHook.cleanedFilters, filterHook.mineStatus, mode, user?.id]);
 
-  const canFetch = mode === 'mine'
-    ? Boolean(isAuthenticated && user?.id)
-    : true;
+ const canFetch = mode === 'mine'
+ ? Boolean(isAuthenticated && user?.id)
+ : true;
 
-  const { data, isLoading, error: queryError, refetch } = useQuery({
-    queryKey,
-    queryFn: () => {
-      if (mode === 'mine') {
-        return listingService.getMyListings(
-          filterHook.cleanedFilters?.page ?? 0,
-          filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
-          filterHook.cleanedFilters?.listingType || null,
-          filterHook.cleanedFilters?.title || null,
-          filterHook.mineStatus || null
-        );
-      }
-      return listingService.filterListings(filterHook.cleanedFilters);
-    },
-    enabled: canFetch,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
+ const { data, isLoading, error: queryError, refetch } = useQuery({
+ queryKey,
+ queryFn: () => {
+ if (mode === 'mine') {
+ return listingService.getMyListings(
+ filterHook.cleanedFilters?.page ?? 0,
+ filterHook.cleanedFilters?.size ?? LISTING_DEFAULTS.FILTER_PAGE_SIZE,
+ filterHook.cleanedFilters?.listingType || null,
+ filterHook.cleanedFilters?.title || null,
+ filterHook.mineStatus || null
+ );
+ }
+ return listingService.filterListings(filterHook.cleanedFilters);
+ },
+ enabled: canFetch,
+ staleTime: 2 * 60 * 1000,
+ gcTime: 5 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: false,
+ retry: 2,
+ retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+ });
 
-  const rawListings = useMemo(() => data?.content || [], [data?.content]);
-  const listings = rawListings;
-  const error = queryError?.message || null;
+ const rawListings = useMemo(() => data?.content || [], [data?.content]);
+ const listings = rawListings;
+ const error = queryError?.message || null;
 
-  const paginationHook = useListingPagination({
-    data,
-    filters: filterHook.filters,
-    onPageChange: (page) => filterHook.updateFilters({ page }),
-  });
+ const paginationHook = useListingPagination({
+ data,
+ filters: filterHook.filters,
+ onPageChange: (page) => filterHook.updateFilters({ page }),
+ });
 
-  // Initialize search sub-hook
-  const urlSearchQuery = useMemo(() => {
-    try {
-      return new URLSearchParams(location.search).get('q') || '';
-    } catch {
-      return '';
-    }
-  }, [location.search]);
+ // Initialize search sub-hook
+ const urlSearchQuery = useMemo(() => {
+ try {
+ return new URLSearchParams(location.search).get('q') || '';
+ } catch {
+ return '';
+ }
+ }, [location.search]);
 
-  const searchHook = useListingSearch({
-    listings,
-    mode,
-    filters: filterHook.filters,
-    selectedCategory: filterHook.selectedCategory,
-    urlSearchQuery,
-    updateFilters: filterHook.updateFilters,
-  });
+ const searchHook = useListingSearch({
+ listings,
+ mode,
+ filters: filterHook.filters,
+ selectedCategory: filterHook.selectedCategory,
+ urlSearchQuery,
+ updateFilters: filterHook.updateFilters,
+ });
 
-  // Wire up filter changes to clear search
-  const wrappedUpdateFilters = useCallback((newFilters) => {
-    filterHook.updateFilters(newFilters);
-    searchHook.clearSearch();
-  }, [filterHook, searchHook]);
+ // Wire up filter changes to clear search
+ const wrappedUpdateFilters = useCallback((newFilters) => {
+ filterHook.updateFilters(newFilters);
+ searchHook.clearSearch();
+ }, [filterHook, searchHook]);
 
-  const wrappedResetFilters = useCallback(() => {
-    filterHook.resetFilters();
-    searchHook.clearSearch();
-  }, [filterHook, searchHook]);
+ const wrappedResetFilters = useCallback(() => {
+ filterHook.resetFilters();
+ searchHook.clearSearch();
+ }, [filterHook, searchHook]);
 
-  const wrappedOnCategoryChange = useCallback((category) => {
-    filterHook.onCategoryChange(category);
-    searchHook.clearSearch();
-  }, [filterHook, searchHook]);
+ const wrappedOnCategoryChange = useCallback((category) => {
+ filterHook.onCategoryChange(category);
+ searchHook.clearSearch();
+ }, [filterHook, searchHook]);
 
-  const wrappedSetMineStatus = useCallback((status) => {
-    filterHook.setMineStatus(status);
-    searchHook.clearSearch();
-  }, [filterHook, searchHook]);
+ const wrappedSetMineStatus = useCallback((status) => {
+ filterHook.setMineStatus(status);
+ searchHook.clearSearch();
+ }, [filterHook, searchHook]);
 
-  const refresh = useCallback(() => refetch(), [refetch]);
+ const refresh = useCallback(() => refetch(), [refetch]);
 
-  // Mine-mode specific: low stock alerts
-  const lowStockListings = useMemo(() => {
-    if (mode !== 'mine') return [];
-    const source = searchHook.title.allPagesLoaded ? searchHook.filteredListings : rawListings;
-    if (!Array.isArray(source)) return [];
-    return source.filter((listing) => {
-      if (!listing) return false;
-      if (NON_PURCHASABLE_TYPES.includes(listing.type)) return false;
-      if (listing.quantity == null) return false;
-      const qty = Number(listing.quantity);
-      if (!Number.isFinite(qty)) return false;
-      return qty > 0 && qty < LISTING_DEFAULTS.LOW_STOCK_MAX_QUANTITY;
-    });
-  }, [mode, rawListings, searchHook.filteredListings, searchHook.title.allPagesLoaded]);
+ // Mine-mode specific: low stock alerts
+ const lowStockListings = useMemo(() => {
+ if (mode !== 'mine') return [];
+ const source = searchHook.title.allPagesLoaded ? searchHook.filteredListings : rawListings;
+ if (!Array.isArray(source)) return [];
+ return source.filter((listing) => {
+ if (!listing) return false;
+ if (NON_PURCHASABLE_TYPES.includes(listing.type)) return false;
+ if (listing.quantity == null) return false;
+ const qty = Number(listing.quantity);
+ if (!Number.isFinite(qty)) return false;
+ return qty > 0 && qty < LISTING_DEFAULTS.LOW_STOCK_MAX_QUANTITY;
+ });
+ }, [mode, rawListings, searchHook.filteredListings, searchHook.title.allPagesLoaded]);
 
-  const [lowStockOpen, setLowStockOpen] = useState(false);
-  const openLowStock = useCallback(() => setLowStockOpen(true), []);
-  const closeLowStock = useCallback(() => setLowStockOpen(false), []);
-  const toggleLowStock = useCallback(() => setLowStockOpen((v) => !v), []);
+ const [lowStockOpen, setLowStockOpen] = useState(false);
+ const openLowStock = useCallback(() => setLowStockOpen(true), []);
+ const closeLowStock = useCallback(() => setLowStockOpen(false), []);
+ const toggleLowStock = useCallback(() => setLowStockOpen((v) => !v), []);
 
-  // Return unified interface (backward compatible)
-  return {
-    mode,
-    listings,
-    filteredListings: searchHook.filteredListings,
-    totalPages: paginationHook.totalPages,
-    totalElements: paginationHook.totalElements,
-    currentPage: paginationHook.currentPage,
-    handlePageChange: paginationHook.handlePageChange,
-    isLoading,
-    error,
-    filters: filterHook.filters,
-    selectedCategory: filterHook.selectedCategory,
-    updateFilters: wrappedUpdateFilters,
-    resetFilters: wrappedResetFilters,
-    refresh,
-    onCategoryChange: wrappedOnCategoryChange,
-    showFilterSidebar: filterHook.showFilterSidebar,
-    hasActiveFilters: filterHook.hasActiveFilters,
-    toggleFilterSidebar: filterHook.toggleFilterSidebar,
-    openFilterSidebar: filterHook.openFilterSidebar,
-    closeFilterSidebar: filterHook.closeFilterSidebar,
-    search: {
-      term: searchHook.searchTerm,
-      setTerm: searchHook.setSearchTerm,
-      mode: searchHook.searchMode,
-      listingNo: searchHook.listingNo,
-      title: searchHook.title,
-      clear: searchHook.clearSearch,
-    },
-    mine: mode === 'mine'
-      ? {
-          status: filterHook.mineStatus,
-          setStatus: wrappedSetMineStatus,
-        }
-      : null,
-    alerts: mode === 'mine'
-      ? {
-          lowStock: {
-            isOpen: lowStockOpen,
-            open: openLowStock,
-            close: closeLowStock,
-            toggle: toggleLowStock,
-            listings: lowStockListings,
-            count: lowStockListings.length,
-          },
-        }
-      : null,
-  };
+ // Return unified interface (backward compatible)
+ return {
+ mode,
+ listings,
+ filteredListings: searchHook.filteredListings,
+ totalPages: paginationHook.totalPages,
+ totalElements: paginationHook.totalElements,
+ currentPage: paginationHook.currentPage,
+ handlePageChange: paginationHook.handlePageChange,
+ isLoading,
+ error,
+ filters: filterHook.filters,
+ selectedCategory: filterHook.selectedCategory,
+ updateFilters: wrappedUpdateFilters,
+ resetFilters: wrappedResetFilters,
+ refresh,
+ onCategoryChange: wrappedOnCategoryChange,
+ showFilterSidebar: filterHook.showFilterSidebar,
+ hasActiveFilters: filterHook.hasActiveFilters,
+ toggleFilterSidebar: filterHook.toggleFilterSidebar,
+ openFilterSidebar: filterHook.openFilterSidebar,
+ closeFilterSidebar: filterHook.closeFilterSidebar,
+ search: {
+ term: searchHook.searchTerm,
+ setTerm: searchHook.setSearchTerm,
+ mode: searchHook.searchMode,
+ listingNo: searchHook.listingNo,
+ title: searchHook.title,
+ clear: searchHook.clearSearch,
+ },
+ mine: mode === 'mine'
+ ? {
+ status: filterHook.mineStatus,
+ setStatus: wrappedSetMineStatus,
+ }
+ : null,
+ alerts: mode === 'mine'
+ ? {
+ lowStock: {
+ isOpen: lowStockOpen,
+ open: openLowStock,
+ close: closeLowStock,
+ toggle: toggleLowStock,
+ listings: lowStockListings,
+ count: lowStockListings.length,
+ },
+ }
+ : null,
+ };
 };
 

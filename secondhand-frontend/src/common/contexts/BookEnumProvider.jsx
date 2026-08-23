@@ -1,65 +1,65 @@
 import { useCallback, useMemo } from 'react';
 import {
-  getBookTypeLabel,
-  getBookGenreLabel,
-  getBookLanguageLabel,
-  getBookFormatLabel,
-  getBookConditionLabel
+ getBookTypeLabel,
+ getBookGenreLabel,
+ getBookLanguageLabel,
+ getBookFormatLabel,
+ getBookConditionLabel
 } from '../enums/booksEnums.js';
 import { BookEnumContext } from './BookEnumContext.jsx';
 
 export const BookEnumProvider = ({ children, enums = {}, isLoading, error }) => {
-    const getBookTypeLabelMemo = useCallback(
-        (value) => getBookTypeLabel(value, enums?.bookTypes || []),
-        [enums?.bookTypes]
-    );
+ const getBookTypeLabelMemo = useCallback(
+ (value) => getBookTypeLabel(value, enums?.bookTypes || []),
+ [enums?.bookTypes]
+ );
 
-    const getBookGenreLabelMemo = useCallback(
-        (value) => getBookGenreLabel(value, enums?.bookGenres || []),
-        [enums?.bookGenres]
-    );
+ const getBookGenreLabelMemo = useCallback(
+ (value) => getBookGenreLabel(value, enums?.bookGenres || []),
+ [enums?.bookGenres]
+ );
 
-    const getBookLanguageLabelMemo = useCallback(
-        (value) => getBookLanguageLabel(value, enums?.bookLanguages || []),
-        [enums?.bookLanguages]
-    );
+ const getBookLanguageLabelMemo = useCallback(
+ (value) => getBookLanguageLabel(value, enums?.bookLanguages || []),
+ [enums?.bookLanguages]
+ );
 
-    const getBookFormatLabelMemo = useCallback(
-        (value) => getBookFormatLabel(value, enums?.bookFormats || []),
-        [enums?.bookFormats]
-    );
+ const getBookFormatLabelMemo = useCallback(
+ (value) => getBookFormatLabel(value, enums?.bookFormats || []),
+ [enums?.bookFormats]
+ );
 
-    const getBookConditionLabelMemo = useCallback(
-        (value) => getBookConditionLabel(value, enums?.bookConditions || []),
-        [enums?.bookConditions]
-    );
+ const getBookConditionLabelMemo = useCallback(
+ (value) => getBookConditionLabel(value, enums?.bookConditions || []),
+ [enums?.bookConditions]
+ );
 
-    const value = useMemo(
-        () => ({
-            enums,
-            isLoading,
-            error,
-            getBookTypeLabel: getBookTypeLabelMemo,
-            getBookGenreLabel: getBookGenreLabelMemo,
-            getBookLanguageLabel: getBookLanguageLabelMemo,
-            getBookFormatLabel: getBookFormatLabelMemo,
-            getBookConditionLabel: getBookConditionLabelMemo,
-        }),
-        [
-            enums,
-            isLoading,
-            error,
-            getBookTypeLabelMemo,
-            getBookGenreLabelMemo,
-            getBookLanguageLabelMemo,
-            getBookFormatLabelMemo,
-            getBookConditionLabelMemo,
-        ]
-    );
+ const value = useMemo(
+ () => ({
+ enums,
+ isLoading,
+ error,
+ getBookTypeLabel: getBookTypeLabelMemo,
+ getBookGenreLabel: getBookGenreLabelMemo,
+ getBookLanguageLabel: getBookLanguageLabelMemo,
+ getBookFormatLabel: getBookFormatLabelMemo,
+ getBookConditionLabel: getBookConditionLabelMemo,
+ }),
+ [
+ enums,
+ isLoading,
+ error,
+ getBookTypeLabelMemo,
+ getBookGenreLabelMemo,
+ getBookLanguageLabelMemo,
+ getBookFormatLabelMemo,
+ getBookConditionLabelMemo,
+ ]
+ );
 
-    return (
-        <BookEnumContext.Provider value={value}>
-            {children}
-        </BookEnumContext.Provider>
-    );
+ return (
+ <BookEnumContext.Provider value={value}>
+ {children}
+ </BookEnumContext.Provider>
+ );
 };

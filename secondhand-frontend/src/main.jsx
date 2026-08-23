@@ -5,7 +5,7 @@ import './index.css'
 import './common/services/api/interceptors.js'
 import './i18n.js'
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
+ <React.StrictMode>
+ <App />
+ </React.StrictMode>,
 )

@@ -14,142 +14,142 @@ import logger from '../../common/utils/logger.js';
 // --- Components ---
 
 const PageLoader = () => {
-    const { t } = useTranslation();
-    return (
-      <div className="min-h-screen bg-background-secondary flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-        <h3 className="text-sm font-medium text-text-primary">{t("loading_listing_details")}</h3>
-      </div>
-    );
+ const { t } = useTranslation();
+ return (
+ <div className="min-h-screen bg-background-secondary flex flex-col items-center justify-center">
+ <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+ <h3 className="text-sm font-medium text-text-primary">{t("loading_listing_details")}</h3>
+ </div>
+ );
 };
 const PageError = ({ error, onBack }) => {
-    const { t } = useTranslation();
-    return (
-      <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
-        <div className="bg-background-primary max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-status-error-bg text-status-error rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-8 h-8" />
-            </div>
-            <h3 className="text-sm font-medium text-text-primary mb-2">{t("something_went_wrong")}</h3>
-            <p className="text-text-secondary mb-8">{error}</p>
-            <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-colors font-medium w-full justify-center">
-                <ArrowLeft className="w-4 h-4" />{t("go_back_to_listings")}</button>
-        </div>
-      </div>
-    );
+ const { t } = useTranslation();
+ return (
+ <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
+ <div className="bg-background-primary max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
+ <div className="w-16 h-16 bg-status-error-bg text-status-error rounded-full flex items-center justify-center mx-auto mb-6">
+ <AlertTriangle className="w-8 h-8" />
+ </div>
+ <h3 className="text-sm font-medium text-text-primary mb-2">{t("something_went_wrong")}</h3>
+ <p className="text-text-secondary mb-8">{error}</p>
+ <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-colors font-medium w-full justify-center">
+ <ArrowLeft className="w-4 h-4" />{t("go_back_to_listings")}</button>
+ </div>
+ </div>
+ );
 };
 const EditListingPage = ({
-  service = null,
-  type = null
+ service = null,
+ type = null
 }) => {
-  const {
-    id
-  } = useParams();
-  const navigate = useNavigate();
-  const {
-    user,
-    isAuthenticated
-  } = useAuthState();
-  const notification = useNotification();
-  const queryClient = useQueryClient();
+ const {
+ id
+ } = useParams();
+ const navigate = useNavigate();
+ const {
+ user,
+ isAuthenticated
+ } = useAuthState();
+ const notification = useNotification();
+ const queryClient = useQueryClient();
 
-  // 1. Fetch Logic
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const fetchingRef = useRef(false);
-  const serviceConfig = useMemo(() => {
-    if (service) {
-      return service;
-    }
-    if (type) {
-      return getListingConfig(type)?.service || null;
-    }
-    return null;
-  }, [type, service]);
-  useEffect(() => {
-    if (!id || fetchingRef.current) {
-      return;
-    }
-    fetchingRef.current = true;
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        let initialData = null;
-        let activeService;
-        if (serviceConfig) {
-          activeService = serviceConfig;
-        } else {
-          initialData = await listingService.getListingById(id);
-          const currentType = initialData?.type;
-          activeService = getListingConfig(currentType)?.service || null;
-        }
-        if (!activeService?.getById) {
-          throw new Error('Editor service not found for this listing type');
-        }
-        const fullData = await activeService.getById(id);
-        setData(fullData);
-      } catch (err) {
-        logger.error('Failed to fetch listing:', err);
-        setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
-      } finally {
-        setIsLoading(false);
-        fetchingRef.current = false;
-      }
-    };
-    fetchData();
-    return () => {
-      fetchingRef.current = false;
-    };
-  }, [id, serviceConfig]);
+ // 1. Fetch Logic
+ const [data, setData] = useState(null);
+ const [isLoading, setIsLoading] = useState(true);
+ const [error, setError] = useState(null);
+ const fetchingRef = useRef(false);
+ const serviceConfig = useMemo(() => {
+ if (service) {
+ return service;
+ }
+ if (type) {
+ return getListingConfig(type)?.service || null;
+ }
+ return null;
+ }, [type, service]);
+ useEffect(() => {
+ if (!id || fetchingRef.current) {
+ return;
+ }
+ fetchingRef.current = true;
+ const fetchData = async () => {
+ setIsLoading(true);
+ setError(null);
+ try {
+ let initialData = null;
+ let activeService;
+ if (serviceConfig) {
+ activeService = serviceConfig;
+ } else {
+ initialData = await listingService.getListingById(id);
+ const currentType = initialData?.type;
+ activeService = getListingConfig(currentType)?.service || null;
+ }
+ if (!activeService?.getById) {
+ throw new Error('Editor service not found for this listing type');
+ }
+ const fullData = await activeService.getById(id);
+ setData(fullData);
+ } catch (err) {
+ logger.error('Failed to fetch listing:', err);
+ setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
+ } finally {
+ setIsLoading(false);
+ fetchingRef.current = false;
+ }
+ };
+ fetchData();
+ return () => {
+ fetchingRef.current = false;
+ };
+ }, [id, serviceConfig]);
 
-  // 2. Authorization Check
-  useEffect(() => {
-    if (!isLoading && data && isAuthenticated) {
-      const isOwner = user?.id === data?.sellerId;
-      if (!isOwner) {
-        notification.showError('Access Denied', 'You can only edit your own listings.');
-        navigate(ROUTES.MY_LISTINGS, {
-          replace: true
-        });
-      }
-    }
-  }, [isLoading, data, isAuthenticated, user, navigate, notification]);
+ // 2. Authorization Check
+ useEffect(() => {
+ if (!isLoading && data && isAuthenticated) {
+ const isOwner = user?.id === data?.sellerId;
+ if (!isOwner) {
+ notification.showError('Access Denied', 'You can only edit your own listings.');
+ navigate(ROUTES.MY_LISTINGS, {
+ replace: true
+ });
+ }
+ }
+ }, [isLoading, data, isAuthenticated, user, navigate, notification]);
 
-  // 3. Update Handler
-  const handleUpdate = async updatedFields => {
-    try {
-      const currentType = type || data?.type;
-      const activeService = service || getListingConfig(currentType)?.service || null;
-      if (!activeService?.update) {
-        throw new Error('Update service not found for this listing type');
-      }
-      await activeService.update(id, updatedFields);
-      queryClient.invalidateQueries({ queryKey: LISTING_KEYS.detail(id) });
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-      notification.showSuccess('Success', 'Listing updated successfully');
-      navigate(ROUTES.MY_LISTINGS);
-    } catch (err) {
-      logger.error('Update failed:', err);
-      notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
-      throw err;
-    }
-  };
-  if (isLoading) return <PageLoader />;
-  if (error) return <PageError error={error} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
-  if (!data) return <PageError error="Listing not found" onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+ // 3. Update Handler
+ const handleUpdate = async updatedFields => {
+ try {
+ const currentType = type || data?.type;
+ const activeService = service || getListingConfig(currentType)?.service || null;
+ if (!activeService?.update) {
+ throw new Error('Update service not found for this listing type');
+ }
+ await activeService.update(id, updatedFields);
+ queryClient.invalidateQueries({ queryKey: LISTING_KEYS.detail(id) });
+ queryClient.invalidateQueries({ queryKey: ['listings'] });
+ notification.showSuccess('Success', 'Listing updated successfully');
+ navigate(ROUTES.MY_LISTINGS);
+ } catch (err) {
+ logger.error('Update failed:', err);
+ notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
+ throw err;
+ }
+ };
+ if (isLoading) return <PageLoader />;
+ if (error) return <PageError error={error} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+ if (!data) return <PageError error="Listing not found" onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
 
-  // 4. Render Form
-  // We render the specific form component directly without a wrapping container
-  // The form component (e.g. VehicleCreateForm) handles its own layout via ListingWizard
+ // 4. Render Form
+ // We render the specific form component directly without a wrapping container
+ // The form component (e.g. VehicleCreateForm) handles its own layout via ListingWizard
 
-  const listingType = type || data.type;
-  const config = listingTypeRegistry[listingType];
-  const EditComponent = config?.editComponent;
-  if (!EditComponent) {
-    return <PageError error={`No editor available for listing type: ${listingType}`} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
-  }
-  return <EditComponent initialData={data} isEdit={true} onUpdate={handleUpdate} onBack={() => navigate(-1)} />;
+ const listingType = type || data.type;
+ const config = listingTypeRegistry[listingType];
+ const EditComponent = config?.editComponent;
+ if (!EditComponent) {
+ return <PageError error={`No editor available for listing type: ${listingType}`} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
+ }
+ return <EditComponent initialData={data} isEdit={true} onUpdate={handleUpdate} onBack={() => navigate(-1)} />;
 };
 export default EditListingPage;

@@ -1,7 +1,8 @@
 package com.serhat.secondhand.inventory.application;
 
 import com.serhat.secondhand.core.config.KafkaConfig;
-import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.payment.contract.PaymentCompletedKafkaEvent;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class InventoryKafkaConsumer {
 
     private final InventoryService inventoryService;
     private final ListingRepository listingRepository;
-    private final com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository processedKafkaEventRepository;
+    private final ProcessedKafkaEventRepository processedKafkaEventRepository;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -57,7 +58,7 @@ public class InventoryKafkaConsumer {
             int remainingStock = inventoryService.getAvailableQuantity(event.listingId());
             if (remainingStock <= 0) {
                 listingRepository.findById(event.listingId()).ifPresent(listing -> {
-                    listing.setStatus(com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus.SOLD);
+                    listing.setStatus(ListingStatus.SOLD);
                     listingRepository.save(listing);
                     log.info("Listing {} stock reached 0, updated status to SOLD in database.", event.listingId());
                 });

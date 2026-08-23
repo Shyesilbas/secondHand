@@ -8,7 +8,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "payment_outbox_events", indexes = {
-        @Index(name = "idx_payment_outbox_status_next_attempt", columnList = "status,next_attempt_at"),
+        @Index(name = "idx_payment_outbox_status_attempt_created", columnList = "status,next_attempt_at,created_at"),
+        @Index(name = "idx_payment_outbox_status_processed", columnList = "status,processed_at"),
         @Index(name = "idx_payment_outbox_aggregate", columnList = "aggregate_type,aggregate_id")
 })
 @Getter

@@ -8,155 +8,155 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom => {
-        if (error) {
-            prom.reject(error);
-        } else {
-            prom.resolve(token);
-        }
-    });
-    failedQueue = [];
+ failedQueue.forEach(prom => {
+ if (error) {
+ prom.reject(error);
+ } else {
+ prom.resolve(token);
+ }
+ });
+ failedQueue = [];
 };
 
 const showTokenExpiredMessage = () => {
-    logger.error('Session Expired. Please Login again.');
+ logger.error('Session Expired. Please Login again.');
 };
 
 let authContextRef = null;
 export const setAuthContextRef = (authContext) => {
-    authContextRef = authContext;
+ authContextRef = authContext;
 };
 
 import i18n from '../../../i18n.js';
 
 apiClient.interceptors.request.use(
-    (config) => {
-        if (i18n.language) {
-            config.headers['Accept-Language'] = i18n.language;
-        }
-        config.withCredentials = true;
+ (config) => {
+ if (i18n.language) {
+ config.headers['Accept-Language'] = i18n.language;
+ }
+ config.withCredentials = true;
 
-        // Manually add CSRF token from cookie if not already present
-        if (!config.headers['X-XSRF-TOKEN']) {
-            const csrfToken = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1];
+ // Manually add CSRF token from cookie if not already present
+ if (!config.headers['X-XSRF-TOKEN']) {
+ const csrfToken = document.cookie
+ .split('; ')
+ .find(row => row.startsWith('XSRF-TOKEN='))
+ ?.split('=')[1];
 
-            if (csrfToken) {
-                config.headers['X-XSRF-TOKEN'] = csrfToken;
-            }
-        }
+ if (csrfToken) {
+ config.headers['X-XSRF-TOKEN'] = csrfToken;
+ }
+ }
 
-        return config;
-    },
-    (error) => Promise.reject(error)
+ return config;
+ },
+ (error) => Promise.reject(error)
 );
 
 apiClient.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        const originalRequest = error.config;
-        const status = error.response?.status;
-        const errorData = error.response?.data;
+ (response) => response,
+ async (error) => {
+ const originalRequest = error.config;
+ const status = error.response?.status;
+ const errorData = error.response?.data;
 
-        // Enrich error object - extract messages from backend
-        if (errorData) {
-            error.userMessage = errorData.detail || errorData.message || null;
-            error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
-            error.validationErrors = errorData.validationErrors ?? errorData.errors;
-            error.errorDetails = {
-                status: status,
-                statusText: error.response?.statusText,
-                timestamp: errorData.timestamp,
-                path: errorData.path || errorData.instance,
-                title: errorData.title,
-            };
-        } else if (!error.response) {
-            // Network error
-            error.userMessage = 'Network error. Please check your connection';
-            error.errorCode = 'NETWORK_ERROR';
-        }
+ // Enrich error object - extract messages from backend
+ if (errorData) {
+ error.userMessage = errorData.detail || errorData.message || null;
+ error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
+ error.validationErrors = errorData.validationErrors ?? errorData.errors;
+ error.errorDetails = {
+ status: status,
+ statusText: error.response?.statusText,
+ timestamp: errorData.timestamp,
+ path: errorData.path || errorData.instance,
+ title: errorData.title,
+ };
+ } else if (!error.response) {
+ // Network error
+ error.userMessage = 'Network error. Please check your connection';
+ error.errorCode = 'NETWORK_ERROR';
+ }
 
-        const AUTH = API_ENDPOINTS.AUTH;
-        const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
-            .some(path => originalRequest.url?.includes(path));
+ const AUTH = API_ENDPOINTS.AUTH;
+ const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
+ .some(path => originalRequest.url?.includes(path));
 
-        if (isAuthEndpoint) {
-            // Keep backend message for auth endpoints
-            return Promise.reject(error);
-        }
+ if (isAuthEndpoint) {
+ // Keep backend message for auth endpoints
+ return Promise.reject(error);
+ }
 
-        // 403: Permission/CSRF error - special handling
-        if (status === 403) {
-            if (errorData?.message?.toLowerCase().includes('csrf')) {
-                error.errorCode = 'CSRF_ERROR';
-            }
-            return Promise.reject(error);
-        }
+ // 403: Permission/CSRF error - special handling
+ if (status === 403) {
+ if (errorData?.message?.toLowerCase().includes('csrf')) {
+ error.errorCode = 'CSRF_ERROR';
+ }
+ return Promise.reject(error);
+ }
 
-        // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
-        if (status === 401 && !originalRequest._retry) {
+ // Only retry on 401 (unauthorized). 403 can be CSRF or permission error, not a token expiry.
+ if (status === 401 && !originalRequest._retry) {
 
-            if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
-                return Promise.reject(error);
-            }
+ if (originalRequest.url?.includes('/validate') || originalRequest.url?.includes('/showcases/active')) {
+ return Promise.reject(error);
+ }
 
-            if (isRefreshing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject });
-                }).then(token => {
-                    if (token !== 'cookie-based') {
-                        originalRequest.headers.Authorization = `Bearer ${token}`;
-                    }
-                    return apiClient(originalRequest);
-                }).catch(err => {
-                    return Promise.reject(err);
-                });
-            }
+ if (isRefreshing) {
+ return new Promise((resolve, reject) => {
+ failedQueue.push({ resolve, reject });
+ }).then(token => {
+ if (token !== 'cookie-based') {
+ originalRequest.headers.Authorization = `Bearer ${token}`;
+ }
+ return apiClient(originalRequest);
+ }).catch(err => {
+ return Promise.reject(err);
+ });
+ }
 
-            originalRequest._retry = true;
-            isRefreshing = true;
+ originalRequest._retry = true;
+ isRefreshing = true;
 
-            try {
-                const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-                    {}, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    withCredentials: true, timeout: 10000
-                }
-                );
+ try {
+ const response = await axios.post(`${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+ {}, {
+ headers: {
+ 'Content-Type': 'application/json',
+ 'Accept': 'application/json'
+ },
+ withCredentials: true, timeout: 10000
+ }
+ );
 
-                const newAccessToken = response.data?.data?.accessToken;
-                if (newAccessToken && authContextRef?.handleTokenRefreshSuccess) {
-                    authContextRef.handleTokenRefreshSuccess(newAccessToken);
-                }
+ const newAccessToken = response.data?.data?.accessToken;
+ if (newAccessToken && authContextRef?.handleTokenRefreshSuccess) {
+ authContextRef.handleTokenRefreshSuccess(newAccessToken);
+ }
 
-                processQueue(null, 'cookie-based');
-                delete originalRequest.headers.Authorization;
+ processQueue(null, 'cookie-based');
+ delete originalRequest.headers.Authorization;
 
-                return apiClient(originalRequest);
+ return apiClient(originalRequest);
 
-            } catch (refreshError) {
-                processQueue(refreshError, null);
+ } catch (refreshError) {
+ processQueue(refreshError, null);
 
-                if (authContextRef?.handleTokenRefreshFailure) {
-                    authContextRef.handleTokenRefreshFailure();
-                } else {
-                    showTokenExpiredMessage();
-                    clearUser();
-                }
+ if (authContextRef?.handleTokenRefreshFailure) {
+ authContextRef.handleTokenRefreshFailure();
+ } else {
+ showTokenExpiredMessage();
+ clearUser();
+ }
 
-                return Promise.reject(refreshError);
-            } finally {
-                isRefreshing = false;
-            }
-        }
+ return Promise.reject(refreshError);
+ } finally {
+ isRefreshing = false;
+ }
+ }
 
-        return Promise.reject(error);
-    }
+ return Promise.reject(error);
+ }
 );
 
 export default apiClient;

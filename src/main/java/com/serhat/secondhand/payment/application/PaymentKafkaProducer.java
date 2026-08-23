@@ -9,6 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,7 @@ public class PaymentKafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public java.util.concurrent.CompletableFuture<Void> sendPaymentCompleted(Payment payment) {
+    public CompletableFuture<Void> sendPaymentCompleted(Payment payment) {
         String key = payment.getFromUser() != null ? String.valueOf(payment.getFromUser().getId()) : payment.getId().toString();
 
         Integer quantity = 1;

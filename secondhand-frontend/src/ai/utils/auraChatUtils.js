@@ -1,36 +1,36 @@
 import { cacheService } from '../../common/services/cacheService.js';
 
 export const getAuraChatStorageKey = (userId) =>
-  userId != null ? `aura.chat.started.${userId}` : 'aura.chat.started.anonymous';
+ userId != null ? `aura.chat.started.${userId}` : 'aura.chat.started.anonymous';
 
 /** Oturum mesajları — sadece bu tarayıcıda; çoklu “sohbet listesi” için sunucu tarafı gerekir. */
 export const getAuraChatMessagesStorageKey = (userId, surface) =>
-  userId != null ? `aura.chat.messages.${surface}.${userId}` : `aura.chat.messages.${surface}.anonymous`;
+ userId != null ? `aura.chat.messages.${surface}.${userId}` : `aura.chat.messages.${surface}.anonymous`;
 
 export const clearAuraPersistedMessages = (userId, surface) => {
-  try {
-    cacheService.remove(getAuraChatMessagesStorageKey(userId, surface));
-  } catch {
-    /* ignore */
-  }
+ try {
+ cacheService.remove(getAuraChatMessagesStorageKey(userId, surface));
+ } catch {
+ /* ignore */
+ }
 };
 
 export const clearAllAuraPersistedMessages = (userId) => {
-  clearAuraPersistedMessages(userId, 'page');
-  clearAuraPersistedMessages(userId, 'widget');
+ clearAuraPersistedMessages(userId, 'page');
+ clearAuraPersistedMessages(userId, 'widget');
 };
 
 export const createAuraChatId = (prefix) =>
-  `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+ `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 export const getApiErrorMessage = (error, fallback) =>
-  error?.response?.data?.message || error?.message || fallback;
+ error?.response?.data?.message || error?.message || fallback;
 
 export const createChatMessage = ({ role, content, typing = false, meta = undefined }) => ({
-  id: createAuraChatId(role === 'user' ? 'user' : 'aura'),
-  role,
-  content,
-  typing,
-  meta,
-  createdAt: Date.now(),
+ id: createAuraChatId(role === 'user' ? 'user' : 'aura'),
+ role,
+ content,
+ typing,
+ meta,
+ createdAt: Date.now(),
 });

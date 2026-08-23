@@ -6,8 +6,7 @@ Bu dizin, secondHand platformunun yüksek performanslı, olay güdümlü ve fina
 
 ## 📚 Doküman Haritası
 
-| Doküman | Kapsam ve Açıklama |
-| :--- | :--- |
+| **[redis-and-kafka-architecture.md](file:///Users/serhat/IdeaProjects/secondHand/docs/redis-and-kafka-architecture.md)** | Redis (Multi-Tier Caching, Lua Scripting, Idempotency) ve Apache Kafka (Transactional Outbox, Consumer Idempotency, Topics) uçtan uca mimari raporu. |
 | **[new-payment-system.md](file:///Users/serhat/IdeaProjects/secondHand/docs/new-payment-system.md)** | Ödeme, Stok, Escrow, Kupon, Teklif ve Vitrin sistemlerinin uçtan uca mimari tasarımı, Redis Lua scriptleri, Transactional Outbox Pattern ve Apache Kafka entegrasyon prensipleri. |
 | **[concurrency-test-report.md](file:///Users/serhat/IdeaProjects/secondHand/docs/concurrency-test-report.md)** | 4 kritik entegrasyon testinin (`ConcurrentStockAndPaymentIntegrationTest`) canlı test sonuçları, milisaniyelik log analizleri ve performans metrikleri. |
 

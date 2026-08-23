@@ -6,62 +6,62 @@ import logger from '../../utils/logger.js';
  *
  * Handles two backend response patterns:
  * 1. Result pattern (from ResultResponses): { data, message, error }
- *    - Success: unwraps `data` field, attaches `message` as hidden prop
- *    - Error: converts to standard error format
+ * - Success: unwraps `data` field, attaches `message` as hidden prop
+ * - Error: converts to standard error format
  * 2. ProblemDetail (RFC 7807) / legacy error body from GlobalExceptionHandler
- *    - Already handled by axios interceptor, just re-throw
+ * - Already handled by axios interceptor, just re-throw
  */
 export const request = async (method, url, data, config = {}) => {
-  try {
-    const response = await apiClient({ method, url, data, ...config });
-    const responseData = response.data;
+ try {
+ const response = await apiClient({ method, url, data, ...config });
+ const responseData = response.data;
 
-    // Non-object responses (strings, nulls, etc.) — return as-is
-    if (!responseData || typeof responseData !== 'object') {
-      return responseData;
-    }
+ // Non-object responses (strings, nulls, etc.) — return as-is
+ if (!responseData || typeof responseData !== 'object') {
+ return responseData;
+ }
 
-    // Result pattern error: { error: "SOME_CODE", message: "..." }
-    if (responseData.error) {
-      const error = new Error(responseData.message || 'An error occurred');
-      error.response = {
-        ...response,
-        data: {
-          message: responseData.message,
-          error: responseData.error,
-          errorCode: responseData.error,
-        },
-        status: response.status || 400,
-      };
-      throw error;
-    }
+ // Result pattern error: { error: "SOME_CODE", message: "..." }
+ if (responseData.error) {
+ const error = new Error(responseData.message || 'An error occurred');
+ error.response = {
+ ...response,
+ data: {
+ message: responseData.message,
+ error: responseData.error,
+ errorCode: responseData.error,
+ },
+ status: response.status || 400,
+ };
+ throw error;
+ }
 
-    // Result pattern success: { data: ..., message: "..." }
-    if ('data' in responseData && responseData.data !== undefined) {
-      const resultData = responseData.data;
-      // Attach backend success message as hidden property (used by successHandler)
-      if (responseData.message && resultData && typeof resultData === 'object') {
-        try {
-          Object.defineProperty(resultData, '__message', {
-            value: responseData.message,
-            writable: false,
-            enumerable: false,
-            configurable: true,
-          });
-        } catch {
-          // Primitive or frozen object — skip message attachment
-        }
-      }
-      return resultData;
-    }
+ // Result pattern success: { data: ..., message: "..." }
+ if ('data' in responseData && responseData.data !== undefined) {
+ const resultData = responseData.data;
+ // Attach backend success message as hidden property (used by successHandler)
+ if (responseData.message && resultData && typeof resultData === 'object') {
+ try {
+ Object.defineProperty(resultData, '__message', {
+ value: responseData.message,
+ writable: false,
+ enumerable: false,
+ configurable: true,
+ });
+ } catch {
+ // Primitive or frozen object — skip message attachment
+ }
+ }
+ return resultData;
+ }
 
-    // Non-Result response (legacy endpoints) — return as-is
-    return responseData;
-  } catch (error) {
-    logger.error(`API Error: ${method.toUpperCase()} ${url}`, error);
-    // Error is already enriched by interceptors — just re-throw
-    throw error;
-  }
+ // Non-Result response (legacy endpoints) — return as-is
+ return responseData;
+ } catch (error) {
+ logger.error(`API Error: ${method.toUpperCase()} ${url}`, error);
+ // Error is already enriched by interceptors — just re-throw
+ throw error;
+ }
 };
 
 export const get = (url, config) => request('get', url, undefined, config);

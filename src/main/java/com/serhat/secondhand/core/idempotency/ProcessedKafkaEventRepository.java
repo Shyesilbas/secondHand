@@ -12,4 +12,8 @@ public interface ProcessedKafkaEventRepository extends JpaRepository<ProcessedKa
     @Modifying
     @Query(value = "INSERT INTO processed_kafka_events (id, consumer_group, processed_at) VALUES (:id, :consumerGroup, NOW()) ON CONFLICT (id) DO NOTHING", nativeQuery = true)
     int insertIfNotExists(@Param("id") String id, @Param("consumerGroup") String consumerGroup);
+
+    @Modifying
+    @Query("DELETE FROM ProcessedKafkaEvent e WHERE e.processedAt < :cutoff")
+    int deleteByProcessedAtBefore(@Param("cutoff") java.time.LocalDateTime cutoff);
 }

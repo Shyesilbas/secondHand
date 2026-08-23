@@ -6,147 +6,147 @@ import {useNotification} from '../../notification/NotificationContext.jsx';
 import {cacheService} from '../../common/services/cacheService.js';
 
 export const useCart = (options = {}) => {
-    const { user } = useAuthState();
-    const queryClient = useQueryClient();
-    const { showSuccess, showError } = useNotification();
+ const { user } = useAuthState();
+ const queryClient = useQueryClient();
+ const { showSuccess, showError } = useNotification();
 
-    const isEnabled = options.enabled ?? true;
-    const loadCartItems = options.loadCartItems ?? isEnabled;
+ const isEnabled = options.enabled ?? true;
+ const loadCartItems = options.loadCartItems ?? isEnabled;
 
-    const syncCartCount = (nextCount) => {
-        const safeCount = Math.max(0, Number(nextCount) || 0);
-        cacheService.set('cartCount', safeCount.toString());
-        window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: safeCount }));
-    };
+ const syncCartCount = (nextCount) => {
+ const safeCount = Math.max(0, Number(nextCount) || 0);
+ cacheService.set('cartCount', safeCount.toString());
+ window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: safeCount }));
+ };
 
-    const {
-        data: cartItems = [],
-        isLoading: isLoadingItems,
-        error: itemsError,
-        refetch: refetchItems
-    } = useQuery({
-        queryKey: ['cartItems', user?.id],
-        queryFn: () => cartService.getCartItems(),
-        select: (res) => {
-            if (Array.isArray(res)) return res;
-            if (Array.isArray(res?.content)) return res.content;
-            return [];
-        },
-        enabled: !!user && loadCartItems,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: true,
-    });
+ const {
+ data: cartItems = [],
+ isLoading: isLoadingItems,
+ error: itemsError,
+ refetch: refetchItems
+ } = useQuery({
+ queryKey: ['cartItems', user?.id],
+ queryFn: () => cartService.getCartItems(),
+ select: (res) => {
+ if (Array.isArray(res)) return res;
+ if (Array.isArray(res?.content)) return res.content;
+ return [];
+ },
+ enabled: !!user && loadCartItems,
+ staleTime: 10 * 60 * 1000,
+ gcTime: 30 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: true,
+ });
 
-    const cartCount = Array.isArray(cartItems) ?
-        cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 0;
+ const cartCount = Array.isArray(cartItems) ?
+ cartItems.reduce((total, item) => total + (item.quantity || 1), 0) : 0;
 
-    useEffect(() => {
-        if (loadCartItems && !isLoadingItems) {
-            const handler = setTimeout(() => {
-                syncCartCount(cartCount);
-            }, 200);
-            return () => clearTimeout(handler);
-        }
-    }, [cartCount, cartItems, isLoadingItems, loadCartItems]);
+ useEffect(() => {
+ if (loadCartItems && !isLoadingItems) {
+ const handler = setTimeout(() => {
+ syncCartCount(cartCount);
+ }, 200);
+ return () => clearTimeout(handler);
+ }
+ }, [cartCount, cartItems, isLoadingItems, loadCartItems]);
 
-    const invalidateCart = () => {
-        queryClient.invalidateQueries({ queryKey: ['cartItems'] });
-    };
+ const invalidateCart = () => {
+ queryClient.invalidateQueries({ queryKey: ['cartItems'] });
+ };
 
-    const getStoredCartCount = () => {
-        const raw = Number(cacheService.get('cartCount'));
-        return Number.isFinite(raw) && raw >= 0 ? raw : 0;
-    };
+ const getStoredCartCount = () => {
+ const raw = Number(cacheService.get('cartCount'));
+ return Number.isFinite(raw) && raw >= 0 ? raw : 0;
+ };
 
-    const isInCart = (listingId) => {
-        if (!listingId) return false;
-        return Array.isArray(cartItems) && cartItems.some(item =>
-            String(item?.listing?.id || item?.listingId) === String(listingId)
-        );
-    };
+ const isInCart = (listingId) => {
+ if (!listingId) return false;
+ return Array.isArray(cartItems) && cartItems.some(item =>
+ String(item?.listing?.id || item?.listingId) === String(listingId)
+ );
+ };
 
-    const addToCartMutation = useMutation({
-        mutationFn: ({ listingId, quantity, notes }) => cartService.addToCart(listingId, quantity, notes),
-        onSuccess: (_data, variables) => {
-            invalidateCart();
-            const qty = Number(variables?.quantity) || 1;
-            syncCartCount(getStoredCartCount() + qty);
-            showSuccess(null, 'Added to cart successfully.', { toast: true });
-        },
-        onError: (err) => {
-            showError(null, err?.response?.data?.message || err?.message || 'Failed to add item to cart.', { toast: true });
-        }
-    });
+ const addToCartMutation = useMutation({
+ mutationFn: ({ listingId, quantity, notes }) => cartService.addToCart(listingId, quantity, notes),
+ onSuccess: (_data, variables) => {
+ invalidateCart();
+ const qty = Number(variables?.quantity) || 1;
+ syncCartCount(getStoredCartCount() + qty);
+ showSuccess(null, 'Added to cart successfully.', { toast: true });
+ },
+ onError: (err) => {
+ showError(null, err?.response?.data?.message || err?.message || 'Failed to add item to cart.', { toast: true });
+ }
+ });
 
-    const removeFromCartMutation = useMutation({
-        mutationFn: (listingId) => cartService.removeFromCart(listingId),
-        onSuccess: (_data, listingId) => {
-            invalidateCart();
-            const currentItems = queryClient.getQueryData(['cartItems', user?.id]);
-            const normalizedItems = Array.isArray(currentItems)
-                ? currentItems
-                : Array.isArray(currentItems?.content) ? currentItems.content : [];
-            const removedItem = normalizedItems.find((item) => String(item?.listing?.id) === String(listingId));
-            const removedQty = Number(removedItem?.quantity) || 1;
-            syncCartCount(getStoredCartCount() - removedQty);
-        },
-        onError: (err) => {
-            showError(null, err?.response?.data?.message || err?.message || 'Failed to remove item from cart.', { toast: true });
-        }
-    });
+ const removeFromCartMutation = useMutation({
+ mutationFn: (listingId) => cartService.removeFromCart(listingId),
+ onSuccess: (_data, listingId) => {
+ invalidateCart();
+ const currentItems = queryClient.getQueryData(['cartItems', user?.id]);
+ const normalizedItems = Array.isArray(currentItems)
+ ? currentItems
+ : Array.isArray(currentItems?.content) ? currentItems.content : [];
+ const removedItem = normalizedItems.find((item) => String(item?.listing?.id) === String(listingId));
+ const removedQty = Number(removedItem?.quantity) || 1;
+ syncCartCount(getStoredCartCount() - removedQty);
+ },
+ onError: (err) => {
+ showError(null, err?.response?.data?.message || err?.message || 'Failed to remove item from cart.', { toast: true });
+ }
+ });
 
-    const updateCartItemMutation = useMutation({
-        mutationFn: ({ listingId, quantity, notes }) => cartService.updateCartItem(listingId, quantity, notes),
-        onSuccess: (_data, variables) => {
-            invalidateCart();
-            const currentItems = queryClient.getQueryData(['cartItems', user?.id]);
-            const normalizedItems = Array.isArray(currentItems)
-                ? currentItems
-                : Array.isArray(currentItems?.content) ? currentItems.content : [];
-            const targetItem = normalizedItems.find((item) => String(item?.listing?.id) === String(variables?.listingId));
-            const previousQty = Number(targetItem?.quantity) || 0;
-            const nextQty = Number(variables?.quantity) || 0;
-            syncCartCount(getStoredCartCount() - previousQty + nextQty);
-        },
-        onError: (err) => {
-            showError(null, err?.response?.data?.message || err?.message || 'Failed to update cart item.', { toast: true });
-        }
-    });
+ const updateCartItemMutation = useMutation({
+ mutationFn: ({ listingId, quantity, notes }) => cartService.updateCartItem(listingId, quantity, notes),
+ onSuccess: (_data, variables) => {
+ invalidateCart();
+ const currentItems = queryClient.getQueryData(['cartItems', user?.id]);
+ const normalizedItems = Array.isArray(currentItems)
+ ? currentItems
+ : Array.isArray(currentItems?.content) ? currentItems.content : [];
+ const targetItem = normalizedItems.find((item) => String(item?.listing?.id) === String(variables?.listingId));
+ const previousQty = Number(targetItem?.quantity) || 0;
+ const nextQty = Number(variables?.quantity) || 0;
+ syncCartCount(getStoredCartCount() - previousQty + nextQty);
+ },
+ onError: (err) => {
+ showError(null, err?.response?.data?.message || err?.message || 'Failed to update cart item.', { toast: true });
+ }
+ });
 
-    const clearCartMutation = useMutation({
-        mutationFn: () => cartService.clearCart(),
-        onSuccess: () => {
-            invalidateCart();
-            syncCartCount(0);
-        },
-        onError: (err) => {
-            showError(null, err?.response?.data?.message || err?.message || 'Failed to clear cart.', { toast: true });
-        }
-    });
+ const clearCartMutation = useMutation({
+ mutationFn: () => cartService.clearCart(),
+ onSuccess: () => {
+ invalidateCart();
+ syncCartCount(0);
+ },
+ onError: (err) => {
+ showError(null, err?.response?.data?.message || err?.message || 'Failed to clear cart.', { toast: true });
+ }
+ });
 
-    const resetCartState = () => {
-        queryClient.setQueriesData({ queryKey: ['cartItems'] }, []);
-        invalidateCart();
-        syncCartCount(0);
-    };
+ const resetCartState = () => {
+ queryClient.setQueriesData({ queryKey: ['cartItems'] }, []);
+ invalidateCart();
+ syncCartCount(0);
+ };
 
-    return {
-        cartItems,
-        cartCount,
-        isLoading: isLoadingItems,
-        error: itemsError,
-        addToCart: (listingId, quantity = 1, notes = '') => addToCartMutation.mutate({ listingId, quantity, notes }),
-        updateCartItem: (listingId, quantity, notes = '') => updateCartItemMutation.mutate({ listingId, quantity, notes }),
-        removeFromCart: (listingId) => removeFromCartMutation.mutate(listingId),
-        clearCart: () => clearCartMutation.mutate(),
-        resetCartState,
-        refetchItems,
-        isInCart,
-        isAdding: addToCartMutation.isPending,
-        isAddingToCart: addToCartMutation.isPending,
-        isUpdating: updateCartItemMutation.isPending,
-        isRemoving: removeFromCartMutation.isPending,
-    };
+ return {
+ cartItems,
+ cartCount,
+ isLoading: isLoadingItems,
+ error: itemsError,
+ addToCart: (listingId, quantity = 1, notes = '') => addToCartMutation.mutate({ listingId, quantity, notes }),
+ updateCartItem: (listingId, quantity, notes = '') => updateCartItemMutation.mutate({ listingId, quantity, notes }),
+ removeFromCart: (listingId) => removeFromCartMutation.mutate(listingId),
+ clearCart: () => clearCartMutation.mutate(),
+ resetCartState,
+ refetchItems,
+ isInCart,
+ isAdding: addToCartMutation.isPending,
+ isAddingToCart: addToCartMutation.isPending,
+ isUpdating: updateCartItemMutation.isPending,
+ isRemoving: removeFromCartMutation.isPending,
+ };
 };

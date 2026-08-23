@@ -4,71 +4,71 @@ import { showcaseService } from '../services/showcaseService.js';
 import { SHOWCASE_QUERY_KEYS } from './queries.js';
 
 export const useShowcase = () => {
-    const [error, setError] = useState(null);
-    const queryClient = useQueryClient();
+ const [error, setError] = useState(null);
+ const queryClient = useQueryClient();
 
-    const {
-        data: showcasePage,
-        isLoading: loading,
-        error: queryError,
-        refetch: fetchShowcases
-    } = useQuery({
-        queryKey: SHOWCASE_QUERY_KEYS.active(0, 12),
-        queryFn: () => showcaseService.getActiveShowcases({ page: 0, size: 12 }),
-        staleTime: 5 * 60 * 1000,
-        gcTime: 10 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: false,
-        onError: (err) => setError(err.message)
-    });
-    const showcases = Array.isArray(showcasePage?.content) ? showcasePage.content : [];
+ const {
+ data: showcasePage,
+ isLoading: loading,
+ error: queryError,
+ refetch: fetchShowcases
+ } = useQuery({
+ queryKey: SHOWCASE_QUERY_KEYS.active(0, 12),
+ queryFn: () => showcaseService.getActiveShowcases({ page: 0, size: 12 }),
+ staleTime: 5 * 60 * 1000,
+ gcTime: 10 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: false,
+ onError: (err) => setError(err.message)
+ });
+ const showcases = Array.isArray(showcasePage?.content) ? showcasePage.content : [];
 
-    const createShowcaseMutation = useMutation({
-        mutationFn: ({ listingId, days, paymentType }) =>
-            showcaseService.createShowcase(listingId, days, paymentType),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
-        },
-        onError: (err) => setError(err.message)
-    });
+ const createShowcaseMutation = useMutation({
+ mutationFn: ({ listingId, days, paymentType }) =>
+ showcaseService.createShowcase(listingId, days, paymentType),
+ onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
+ },
+ onError: (err) => setError(err.message)
+ });
 
-    const extendShowcaseMutation = useMutation({
-        mutationFn: ({ showcaseId, request }) =>
-            showcaseService.extendShowcase(showcaseId, request),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
-        },
-        onError: (err) => setError(err.message)
-    });
+ const extendShowcaseMutation = useMutation({
+ mutationFn: ({ showcaseId, request }) =>
+ showcaseService.extendShowcase(showcaseId, request),
+ onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
+ },
+ onError: (err) => setError(err.message)
+ });
 
-    const cancelShowcaseMutation = useMutation({
-        mutationFn: (showcaseId) => showcaseService.cancelShowcase(showcaseId),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
-            queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
-        },
-        onError: (err) => setError(err.message)
-    });
+ const cancelShowcaseMutation = useMutation({
+ mutationFn: (showcaseId) => showcaseService.cancelShowcase(showcaseId),
+ onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.active() });
+ queryClient.invalidateQueries({ queryKey: SHOWCASE_QUERY_KEYS.all });
+ },
+ onError: (err) => setError(err.message)
+ });
 
-    const createShowcase = (listingId, days, paymentType) =>
-        createShowcaseMutation.mutateAsync({ listingId, days, paymentType });
+ const createShowcase = (listingId, days, paymentType) =>
+ createShowcaseMutation.mutateAsync({ listingId, days, paymentType });
 
-    const extendShowcase = (showcaseId, request) =>
-        extendShowcaseMutation.mutateAsync({ showcaseId, request });
+ const extendShowcase = (showcaseId, request) =>
+ extendShowcaseMutation.mutateAsync({ showcaseId, request });
 
-    const cancelShowcase = (showcaseId) =>
-        cancelShowcaseMutation.mutateAsync(showcaseId);
+ const cancelShowcase = (showcaseId) =>
+ cancelShowcaseMutation.mutateAsync(showcaseId);
 
-    return {
-        showcases,
-        loading: loading || createShowcaseMutation.isLoading ||
-            extendShowcaseMutation.isLoading || cancelShowcaseMutation.isLoading,
-        error: error || queryError?.message,
-        fetchShowcases,
-        createShowcase,
-        extendShowcase,
-        cancelShowcase
-    };
+ return {
+ showcases,
+ loading: loading || createShowcaseMutation.isLoading ||
+ extendShowcaseMutation.isLoading || cancelShowcaseMutation.isLoading,
+ error: error || queryError?.message,
+ fetchShowcases,
+ createShowcase,
+ extendShowcase,
+ cancelShowcase
+ };
 };

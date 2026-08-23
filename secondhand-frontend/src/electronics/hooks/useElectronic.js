@@ -6,33 +6,33 @@ import { electronicService } from '../services/electronicService.js';
 import { ElectronicListingDTO } from '../electronics.js';
 
 export const useElectronic = (electronicId = null) => {
-  const adapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
-  return useListingEntityAlias(adapter, {
-    entityId: electronicId,
-    defaultData: ElectronicListingDTO,
-    entityName: 'Electronic',
-    keys: {
-      entity: 'electronic',
-      fetch: 'fetchElectronic',
-      create: 'createElectronic',
-      update: 'updateElectronic',
-      delete: 'deleteElectronic',
-    },
-  });
+ const adapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
+ return useListingEntityAlias(adapter, {
+ entityId: electronicId,
+ defaultData: ElectronicListingDTO,
+ entityName: 'Electronic',
+ keys: {
+ entity: 'electronic',
+ fetch: 'fetchElectronic',
+ create: 'createElectronic',
+ update: 'updateElectronic',
+ delete: 'deleteElectronic',
+ },
+ });
 };
 
 export const useElectronicSearch = () => {
-  const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
+ const electronicsServiceAdapter = useMemo(() => createElectronicsServiceAdapter(electronicService), []);
 
-  const result = useEntitySearch({
-    service: electronicsServiceAdapter,
-    entityName: 'Electronic',
-    defaultData: [],
-  });
+ const result = useEntitySearch({
+ service: electronicsServiceAdapter,
+ entityName: 'Electronic',
+ defaultData: [],
+ });
 
-  return {
-    ...result,
-    electronics: result.entities,
-    searchByType: result.searchByCriteria,
-  };
+ return {
+ ...result,
+ electronics: result.entities,
+ searchByType: result.searchByCriteria,
+ };
 };

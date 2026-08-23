@@ -3,46 +3,46 @@ import {createContext, useContext, useMemo} from 'react';
 export const ElectronicsEnumContext = createContext();
 
 export const useElectronicsEnums = () => {
-    const context = useContext(ElectronicsEnumContext);
-    if (!context) {
-        throw new Error('useElectronicsEnums must be used within an ElectronicsEnumProvider');
-    }
-    return context;
+ const context = useContext(ElectronicsEnumContext);
+ if (!context) {
+ throw new Error('useElectronicsEnums must be used within an ElectronicsEnumProvider');
+ }
+ return context;
 };
 
 // Selector hooks for specific electronics enums
 export const useElectronicTypes = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.electronicTypes, [enums.electronicTypes]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.electronicTypes, [enums.electronicTypes]);
 };
 
 export const useElectronicBrands = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.electronicBrands, [enums.electronicBrands]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.electronicBrands, [enums.electronicBrands]);
 };
 
 export const useElectronicModels = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.electronicModels, [enums.electronicModels]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.electronicModels, [enums.electronicModels]);
 };
 
 export const useStorageTypes = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.storageTypes, [enums.storageTypes]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.storageTypes, [enums.storageTypes]);
 };
 
 export const useElectronicConnectionTypes = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.electronicConnectionTypes, [enums.electronicConnectionTypes]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.electronicConnectionTypes, [enums.electronicConnectionTypes]);
 };
 
 export const useProcessors = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.processors, [enums.processors]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.processors, [enums.processors]);
 };
 
 export const useElectronicConditions = () => {
-    const { enums } = useElectronicsEnums();
-    return useMemo(() => enums.electronicConditions, [enums.electronicConditions]);
+ const { enums } = useElectronicsEnums();
+ return useMemo(() => enums.electronicConditions, [enums.electronicConditions]);
 };
 

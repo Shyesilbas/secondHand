@@ -3,6 +3,7 @@ package com.serhat.secondhand.core.idempotency;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +13,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "processed_kafka_events")
+@Table(name = "processed_kafka_events", indexes = {
+        @Index(name = "idx_processed_kafka_processed_at", columnList = "processed_at")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

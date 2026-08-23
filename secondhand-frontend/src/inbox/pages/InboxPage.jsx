@@ -7,18 +7,18 @@ import InboxNotificationsPanel from '../../notification/components/InboxNotifica
 import { INBOX_TABS, normalizeInboxTab } from '../inboxConstants.js';
 
 const InboxPage = () => {
-  const [searchParams] = useSearchParams();
-  const activeTab = useMemo(() => normalizeInboxTab(searchParams.get('tab')), [searchParams]);
+ const [searchParams] = useSearchParams();
+ const activeTab = useMemo(() => normalizeInboxTab(searchParams.get('tab')), [searchParams]);
 
-  return (
-    <div className="flex flex-col w-full h-[calc(100vh-70px)] bg-slate-50/90 overflow-hidden">
-      <PageContainer className="flex flex-col flex-1 min-h-0 w-full max-w-[min(100%,1420px)] py-4 sm:py-6 lg:py-8">
-        {activeTab === INBOX_TABS.EMAILS && <EmailsPage embedded />}
-        {activeTab === INBOX_TABS.NOTIFICATIONS && <InboxNotificationsPanel />}
-        {activeTab === INBOX_TABS.CHAT && <ChatPage embedded />}
-      </PageContainer>
-    </div>
-  );
+ return (
+ <div className="flex flex-col w-full h-[calc(100vh-70px)] bg-slate-50/90 overflow-hidden">
+ <PageContainer className="flex flex-col flex-1 min-h-0 w-full max-w-[min(100%,1420px)] py-4 sm:py-6 lg:py-8">
+ {activeTab === INBOX_TABS.EMAILS && <EmailsPage embedded />}
+ {activeTab === INBOX_TABS.NOTIFICATIONS && <InboxNotificationsPanel />}
+ {activeTab === INBOX_TABS.CHAT && <ChatPage embedded />}
+ </PageContainer>
+ </div>
+ );
 };
 
 export default InboxPage;

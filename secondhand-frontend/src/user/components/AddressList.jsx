@@ -6,124 +6,124 @@ import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
 import logger from '../../common/utils/logger.js';
 const AddressList = memo(({
-  isActive
+ isActive
 }) => {
-  const { t } = useTranslation();
-  const {
-    addresses,
-    loading,
-    error,
-    addAddress,
-    updateAddress,
-    selectMainAddress,
-    deleteAddress
-  } = useAddresses({
-    enabled: isActive
-  });
-  const {
-    showSuccess,
-    showError,
-    showConfirmation
-  } = useNotification();
-  const [showAddAddress, setShowAddAddress] = useState(false);
-  const [showUpdateAddress, setShowUpdateAddress] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [adding, setAdding] = useState(false);
-  const [updating, setUpdating] = useState(false);
-  const [addError, setAddError] = useState(null);
-  const [updateError, setUpdateError] = useState(null);
-  const handleAddAddress = useCallback(async addressData => {
-    setAdding(true);
-    setAddError(null);
-    try {
-      await addAddress(addressData);
-      setShowAddAddress(false);
-      showSuccess('Address Added', 'Address has been added successfully.');
-    } catch (err) {
-      logger.error('Failed to add address:', err);
-      setAddError('Failed to add address.');
-    } finally {
-      setAdding(false);
-    }
-  }, [addAddress, showSuccess]);
-  const handleUpdateAddress = useCallback(async addressData => {
-    setUpdating(true);
-    setUpdateError(null);
-    try {
-      await updateAddress(selectedAddress.id, addressData);
-      setShowUpdateAddress(false);
-      setSelectedAddress(null);
-      showSuccess('Address Updated', 'Address has been updated successfully.');
-    } catch (err) {
-      logger.error('Failed to update address:', err);
-      setUpdateError('Failed to update address.');
-    } finally {
-      setUpdating(false);
-    }
-  }, [updateAddress, selectedAddress, showSuccess]);
-  const handleSelectAsMain = useCallback(async addressId => {
-    try {
-      await selectMainAddress(addressId);
-      showSuccess('Main Address Set', 'Address has been set as your main address successfully.');
-    } catch (err) {
-      logger.error('Failed to select main address:', err);
-      showError('Error', err.response?.data?.message || 'Failed to set main address. Please try again.');
-    }
-  }, [selectMainAddress, showSuccess, showError]);
-  const handleDeleteAddress = useCallback((addressId, addressType) => {
-    showConfirmation('Delete Address', `Are you sure you want to delete this ${addressType.toLowerCase()} address? This action cannot be undone.`, async () => {
-      try {
-        await deleteAddress(addressId);
-        showSuccess('Address Deleted', 'Address has been deleted successfully.');
-      } catch (err) {
-        logger.error('Failed to delete address:', err);
-        showError('Error', err.response?.data?.message || 'Failed to delete address. Please try again.');
-      }
-    });
-  }, [deleteAddress, showConfirmation, showSuccess, showError]);
-  const handleEditAddress = useCallback(address => {
-    setSelectedAddress({
-      ...address
-    });
-    setShowUpdateAddress(true);
-  }, []);
-  const handleCloseAddForm = useCallback(() => {
-    setShowAddAddress(false);
-    setAddError(null);
-  }, []);
-  const handleCloseUpdateForm = useCallback(() => {
-    setShowUpdateAddress(false);
-    setSelectedAddress(null);
-    setUpdateError(null);
-  }, []);
-  const handleAddClick = useCallback(() => {
-    setShowAddAddress(true);
-  }, []);
-  return <div className="mt-10">
-      <div className="flex items-center mb-6">
-        <h2 className="text-lg font-semibold text-text-primary">{t("addresses")}</h2>
-        <button className="ml-3 text-btn-primary hover:text-btn-primary-hover transition-colors" onClick={handleAddClick} title={t("add_address")}>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-        </button>
-      </div>
+ const { t } = useTranslation();
+ const {
+ addresses,
+ loading,
+ error,
+ addAddress,
+ updateAddress,
+ selectMainAddress,
+ deleteAddress
+ } = useAddresses({
+ enabled: isActive
+ });
+ const {
+ showSuccess,
+ showError,
+ showConfirmation
+ } = useNotification();
+ const [showAddAddress, setShowAddAddress] = useState(false);
+ const [showUpdateAddress, setShowUpdateAddress] = useState(false);
+ const [selectedAddress, setSelectedAddress] = useState(null);
+ const [adding, setAdding] = useState(false);
+ const [updating, setUpdating] = useState(false);
+ const [addError, setAddError] = useState(null);
+ const [updateError, setUpdateError] = useState(null);
+ const handleAddAddress = useCallback(async addressData => {
+ setAdding(true);
+ setAddError(null);
+ try {
+ await addAddress(addressData);
+ setShowAddAddress(false);
+ showSuccess('Address Added', 'Address has been added successfully.');
+ } catch (err) {
+ logger.error('Failed to add address:', err);
+ setAddError('Failed to add address.');
+ } finally {
+ setAdding(false);
+ }
+ }, [addAddress, showSuccess]);
+ const handleUpdateAddress = useCallback(async addressData => {
+ setUpdating(true);
+ setUpdateError(null);
+ try {
+ await updateAddress(selectedAddress.id, addressData);
+ setShowUpdateAddress(false);
+ setSelectedAddress(null);
+ showSuccess('Address Updated', 'Address has been updated successfully.');
+ } catch (err) {
+ logger.error('Failed to update address:', err);
+ setUpdateError('Failed to update address.');
+ } finally {
+ setUpdating(false);
+ }
+ }, [updateAddress, selectedAddress, showSuccess]);
+ const handleSelectAsMain = useCallback(async addressId => {
+ try {
+ await selectMainAddress(addressId);
+ showSuccess('Main Address Set', 'Address has been set as your main address successfully.');
+ } catch (err) {
+ logger.error('Failed to select main address:', err);
+ showError('Error', err.response?.data?.message || 'Failed to set main address. Please try again.');
+ }
+ }, [selectMainAddress, showSuccess, showError]);
+ const handleDeleteAddress = useCallback((addressId, addressType) => {
+ showConfirmation('Delete Address', `Are you sure you want to delete this ${addressType.toLowerCase()} address? This action cannot be undone.`, async () => {
+ try {
+ await deleteAddress(addressId);
+ showSuccess('Address Deleted', 'Address has been deleted successfully.');
+ } catch (err) {
+ logger.error('Failed to delete address:', err);
+ showError('Error', err.response?.data?.message || 'Failed to delete address. Please try again.');
+ }
+ });
+ }, [deleteAddress, showConfirmation, showSuccess, showError]);
+ const handleEditAddress = useCallback(address => {
+ setSelectedAddress({
+ ...address
+ });
+ setShowUpdateAddress(true);
+ }, []);
+ const handleCloseAddForm = useCallback(() => {
+ setShowAddAddress(false);
+ setAddError(null);
+ }, []);
+ const handleCloseUpdateForm = useCallback(() => {
+ setShowUpdateAddress(false);
+ setSelectedAddress(null);
+ setUpdateError(null);
+ }, []);
+ const handleAddClick = useCallback(() => {
+ setShowAddAddress(true);
+ }, []);
+ return <div className="mt-10">
+ <div className="flex items-center mb-6">
+ <h2 className="text-lg font-semibold text-text-primary">{t("addresses")}</h2>
+ <button className="ml-3 text-btn-primary hover:text-btn-primary-hover transition-colors" onClick={handleAddClick} title={t("add_address")}>
+ <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+ </svg>
+ </button>
+ </div>
 
-      <AddressForm isOpen={showAddAddress} onClose={handleCloseAddForm} onSubmit={handleAddAddress} isEditing={false} loading={adding} error={addError} />
+ <AddressForm isOpen={showAddAddress} onClose={handleCloseAddForm} onSubmit={handleAddAddress} isEditing={false} loading={adding} error={addError} />
 
-      <AddressForm isOpen={showUpdateAddress} onClose={handleCloseUpdateForm} onSubmit={handleUpdateAddress} initialData={selectedAddress} isEditing={true} loading={updating} error={updateError} />
+ <AddressForm isOpen={showUpdateAddress} onClose={handleCloseUpdateForm} onSubmit={handleUpdateAddress} initialData={selectedAddress} isEditing={true} loading={updating} error={updateError} />
 
-      {loading ? <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-btn-primary"></div>
-          <p className="mt-2 text-text-secondary">{t("loading_addresses")}</p>
-        </div> : error ? <div className="text-center py-8">
-          <div className="text-status-error">{t("failed_to_load_addresses")}</div>
-        </div> : addresses.length === 0 ? <div className="text-center py-8">
-          <div className="text-text-muted">{t("no_addresses_found_add_your_first_addres")}</div>
-        </div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {addresses.map(address => <AddressCard key={address.id} address={address} onEdit={handleEditAddress} onDelete={handleDeleteAddress} onSelectAsMain={handleSelectAsMain} />)}
-        </div>}
-    </div>;
+ {loading ? <div className="text-center py-8">
+ <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-btn-primary"></div>
+ <p className="mt-2 text-text-secondary">{t("loading_addresses")}</p>
+ </div> : error ? <div className="text-center py-8">
+ <div className="text-status-error">{t("failed_to_load_addresses")}</div>
+ </div> : addresses.length === 0 ? <div className="text-center py-8">
+ <div className="text-text-muted">{t("no_addresses_found_add_your_first_addres")}</div>
+ </div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ {addresses.map(address => <AddressCard key={address.id} address={address} onEdit={handleEditAddress} onDelete={handleDeleteAddress} onSelectAsMain={handleSelectAsMain} />)}
+ </div>}
+ </div>;
 });
 AddressList.displayName = 'AddressList';
 export default AddressList;

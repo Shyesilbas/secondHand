@@ -18,4 +18,8 @@ public interface EscrowOutboxRepository extends JpaRepository<EscrowOutboxEvent,
             LocalDateTime now,
             Pageable pageable
     );
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM EscrowOutboxEvent e WHERE e.status = :status AND e.processedAt < :cutoff")
+    int deleteByStatusAndProcessedAtBefore(@org.springframework.data.repository.query.Param("status") OutboxStatus status, @org.springframework.data.repository.query.Param("cutoff") LocalDateTime cutoff);
 }

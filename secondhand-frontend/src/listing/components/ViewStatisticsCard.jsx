@@ -1,75 +1,75 @@
 import { useTranslation } from "react-i18next";
 import { Calendar, Eye, TrendingUp, Users } from 'lucide-react';
 const ViewStatisticsCard = ({
-  viewStats,
-  periodDays
+ viewStats,
+ periodDays
 }) => {
-  const {
-    t
-  } = useTranslation();
-  if (!viewStats) return null;
-  const {
-    totalViews,
-    uniqueViews
-  } = viewStats;
-  const repeatViews = Math.max(0, (totalViews || 0) - (uniqueViews || 0));
-  const engagementRate = uniqueViews > 0 ? Math.round(totalViews / uniqueViews * 10) / 10 : 0;
-  const stats = [{
-    icon: Eye,
-    label: 'Total Views',
-    value: totalViews || 0,
-    color: 'text-primary',
-    bg: 'bg-indigo-50'
-  }, {
-    icon: Users,
-    label: 'Unique Visitors',
-    value: uniqueViews || 0,
-    color: 'text-status-success',
-    bg: 'bg-status-success-bg'
-  }, {
-    icon: TrendingUp,
-    label: 'Avg. Views/User',
-    value: engagementRate,
-    color: 'text-status-warning',
-    bg: 'bg-status-warning-bg'
-  }];
-  return <div className="rounded-2xl border border-slate-100 bg-background-primary overflow-hidden shadow-sm mb-5">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/60">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-primary-50 flex items-center justify-center">
-            <Eye className="w-3.5 h-3.5 text-primary" />
-          </div>
-          <span className="text-sm font-semibold text-slate-700">{t("view_statistics")}</span>
-        </div>
-        <div className="flex items-center gap-1 text-caption text-slate-400">
-          <Calendar className="w-3 h-3" />
-          <span>{t("last")}{periodDays || 7}{t("days")}</span>
-        </div>
-      </div>
+ const {
+ t
+ } = useTranslation();
+ if (!viewStats) return null;
+ const {
+ totalViews,
+ uniqueViews
+ } = viewStats;
+ const repeatViews = Math.max(0, (totalViews || 0) - (uniqueViews || 0));
+ const engagementRate = uniqueViews > 0 ? Math.round(totalViews / uniqueViews * 10) / 10 : 0;
+ const stats = [{
+ icon: Eye,
+ label: 'Total Views',
+ value: totalViews || 0,
+ color: 'text-primary',
+ bg: 'bg-slate-100'
+ }, {
+ icon: Users,
+ label: 'Unique Visitors',
+ value: uniqueViews || 0,
+ color: 'text-status-success',
+ bg: 'bg-status-success-bg'
+ }, {
+ icon: TrendingUp,
+ label: 'Avg. Views/User',
+ value: engagementRate,
+ color: 'text-status-warning',
+ bg: 'bg-status-warning-bg'
+ }];
+ return <div className="rounded-2xl border border-slate-100 bg-background-primary overflow-hidden shadow-sm mb-5">
+ {/* Header */}
+ <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+ <div className="flex items-center gap-2">
+ <div className="w-7 h-7 rounded-xl bg-primary-50 flex items-center justify-center">
+ <Eye className="w-3.5 h-3.5 text-primary" />
+ </div>
+ <span className="text-sm font-semibold text-slate-700">{t("view_statistics")}</span>
+ </div>
+ <div className="flex items-center gap-1 text-caption text-slate-400">
+ <Calendar className="w-3 h-3" />
+ <span>{t("last")}{periodDays || 7}{t("days")}</span>
+ </div>
+ </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-3 divide-x divide-slate-100">
-        {stats.map(({
-        icon: Icon,
-        label,
-        value,
-        color,
-        bg
-      }) => <div key={label} className="flex flex-col items-center justify-center py-4 px-2 gap-1.5">
-            <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
-              <Icon className={`w-4 h-4 ${color}`} />
-            </div>
-            <span className={`text-xl font-bold tracking-tight ${color}`}>{value}</span>
-            <span className="text-caption text-slate-400 font-medium text-center leading-tight">{label}</span>
-          </div>)}
-      </div>
+ {/* Stats grid */}
+ <div className="grid grid-cols-3 divide-x divide-slate-100">
+ {stats.map(({
+ icon: Icon,
+ label,
+ value,
+ color,
+ bg
+ }) => <div key={label} className="flex flex-col items-center justify-center py-4 px-2 gap-1.5">
+ <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
+ <Icon className={`w-4 h-4 ${color}`} />
+ </div>
+ <span className={`text-xl font-bold tracking-tight ${color}`}>{value}</span>
+ <span className="text-caption text-slate-400 font-medium text-center leading-tight">{label}</span>
+ </div>)}
+ </div>
 
-      {/* Footer note */}
-      {repeatViews > 0 && <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
-          <p className="text-caption text-slate-400 text-center">
-            <span className="font-semibold text-slate-600">{repeatViews}</span>{t("repeat_visit")}{repeatViews !== 1 ? 's' : ''}{t("recorded")}</p>
-        </div>}
-    </div>;
+ {/* Footer note */}
+ {repeatViews > 0 && <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
+ <p className="text-caption text-slate-400 text-center">
+ <span className="font-semibold text-slate-600">{repeatViews}</span>{t("repeat_visit")}{repeatViews !== 1 ? 's' : ''}{t("recorded")}</p>
+ </div>}
+ </div>;
 };
 export default ViewStatisticsCard;

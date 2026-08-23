@@ -14,7 +14,8 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "order_outbox_events", indexes = {
-        @Index(name = "idx_order_outbox_status_next_attempt", columnList = "status, next_attempt_at"),
+        @Index(name = "idx_order_outbox_status_attempt_created", columnList = "status, next_attempt_at, created_at"),
+        @Index(name = "idx_order_outbox_status_processed", columnList = "status, processed_at"),
         @Index(name = "idx_order_outbox_aggregate", columnList = "aggregate_type, aggregate_id")
 })
 public class OrderOutboxEvent {

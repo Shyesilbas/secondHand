@@ -5,77 +5,77 @@ import { getForumVisibilitySettings, setForumCommentAuthorVisibility, setForumTh
 import { FORUM_AUTHOR_VISIBILITY, FORUM_MESSAGES } from '../forumConstants.js';
 const normalize = value => value === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME ? FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME : FORUM_AUTHOR_VISIBILITY.ANONYMOUS;
 const ChoiceButton = ({
-  active,
-  disabled,
-  onClick,
-  children
+ active,
+ disabled,
+ onClick,
+ children
 }) => {
-  const {
-    t
-  } = useTranslation();
-  return <button type="button" onClick={onClick} disabled={disabled} className={`h-10 rounded-lg border px-3 text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${active ? 'border-primary bg-indigo-50 text-primary' : 'border-border-light bg-background-primary text-slate-700 hover:bg-slate-50'}`}>
-      {children}
-    </button>;
+ const {
+ t
+ } = useTranslation();
+ return <button type="button" onClick={onClick} disabled={disabled} className={`h-10 rounded-lg border px-3 text-sm font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${active ? 'border-primary bg-slate-100 text-primary' : 'border-border-light bg-background-primary text-slate-700 hover:bg-slate-50'}`}>
+ {children}
+ </button>;
 };
 export const ForumVisibilitySettingsModal = ({
-  isOpen,
-  onClose
+ isOpen,
+ onClose
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const initial = useMemo(() => getForumVisibilitySettings(), []);
-  const [threadVisibility, setThreadVisibility] = useState(normalize(initial.threadAuthorVisibility));
-  const [commentVisibility, setCommentVisibility] = useState(normalize(initial.commentAuthorVisibility));
-  const handleClose = () => {
-    onClose?.();
-  };
-  const setThread = v => {
-    const next = normalize(v);
-    setThreadVisibility(next);
-    setForumThreadAuthorVisibility(next);
-  };
-  const setComment = v => {
-    const next = normalize(v);
-    setCommentVisibility(next);
-    setForumCommentAuthorVisibility(next);
-  };
-  if (!isOpen) return null;
-  return <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
-      <div className="relative w-full max-w-xl rounded-2xl border border-border-light bg-background-primary shadow-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-text-primary tracking-tight truncate">{FORUM_MESSAGES.FORUM_SETTINGS}</p>
-            <p className="text-xs text-slate-500 mt-0.5 truncate">{t("choose_how_your_name_appears_when_postin")}</p>
-            <p className="text-xs text-slate-500 mt-0.5 truncate">{t("updates_do_not_affect_existing_threads_o")}</p>
-          </div>
-          <button type="button" className="h-9 w-9 rounded-lg border border-border-light bg-background-primary hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300" onClick={handleClose}>
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+ const {
+ t
+ } = useTranslation();
+ const initial = useMemo(() => getForumVisibilitySettings(), []);
+ const [threadVisibility, setThreadVisibility] = useState(normalize(initial.threadAuthorVisibility));
+ const [commentVisibility, setCommentVisibility] = useState(normalize(initial.commentAuthorVisibility));
+ const handleClose = () => {
+ onClose?.();
+ };
+ const setThread = v => {
+ const next = normalize(v);
+ setThreadVisibility(next);
+ setForumThreadAuthorVisibility(next);
+ };
+ const setComment = v => {
+ const next = normalize(v);
+ setCommentVisibility(next);
+ setForumCommentAuthorVisibility(next);
+ };
+ if (!isOpen) return null;
+ return <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+ <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+ <div className="relative w-full max-w-xl rounded-2xl border border-border-light bg-background-primary shadow-2xl overflow-hidden">
+ <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+ <div className="min-w-0">
+ <p className="text-sm font-semibold text-text-primary tracking-tight truncate">{FORUM_MESSAGES.FORUM_SETTINGS}</p>
+ <p className="text-xs text-slate-500 mt-0.5 truncate">{t("choose_how_your_name_appears_when_postin")}</p>
+ <p className="text-xs text-slate-500 mt-0.5 truncate">{t("updates_do_not_affect_existing_threads_o")}</p>
+ </div>
+ <button type="button" className="h-9 w-9 rounded-lg border border-border-light bg-background-primary hover:bg-slate-50 text-slate-700 inline-flex items-center justify-center transition-colors duration-300" onClick={handleClose}>
+ <X className="w-4 h-4" />
+ </button>
+ </div>
 
-        <div className="p-5 space-y-5">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">{t("new_thread_author")}</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <ChoiceButton active={threadVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS} onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}>{t("anonymous")}</ChoiceButton>
-              <ChoiceButton active={threadVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME} onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}>{t("display_name")}</ChoiceButton>
-            </div>
-          </div>
+ <div className="p-5 space-y-5">
+ <div>
+ <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">{t("new_thread_author")}</label>
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+ <ChoiceButton active={threadVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS} onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}>{t("anonymous")}</ChoiceButton>
+ <ChoiceButton active={threadVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME} onClick={() => setThread(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}>{t("display_name")}</ChoiceButton>
+ </div>
+ </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">{t("comment_author")}</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <ChoiceButton active={commentVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS} onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}>{t("anonymous")}</ChoiceButton>
-              <ChoiceButton active={commentVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME} onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}>{t("display_name")}</ChoiceButton>
-            </div>
-          </div>
-        </div>
+ <div>
+ <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">{t("comment_author")}</label>
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+ <ChoiceButton active={commentVisibility === FORUM_AUTHOR_VISIBILITY.ANONYMOUS} onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.ANONYMOUS)}>{t("anonymous")}</ChoiceButton>
+ <ChoiceButton active={commentVisibility === FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME} onClick={() => setComment(FORUM_AUTHOR_VISIBILITY.DISPLAY_NAME)}>{t("display_name")}</ChoiceButton>
+ </div>
+ </div>
+ </div>
 
-        <div className="px-5 py-4 border-t border-slate-100 bg-background-primary flex items-center justify-end">
-          <button type="button" onClick={handleClose} className="px-3 py-2 rounded-lg border border-border-light bg-background-primary text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors duration-300">{t("done")}</button>
-        </div>
-      </div>
-    </div>;
+ <div className="px-5 py-4 border-t border-slate-100 bg-background-primary flex items-center justify-end">
+ <button type="button" onClick={handleClose} className="px-3 py-2 rounded-lg border border-border-light bg-background-primary text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors duration-300">{t("done")}</button>
+ </div>
+ </div>
+ </div>;
 };

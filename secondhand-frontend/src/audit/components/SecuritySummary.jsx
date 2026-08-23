@@ -1,50 +1,50 @@
 import { useTranslation } from "react-i18next";
 import { AlertTriangle as ExclamationTriangleIcon, ShieldCheck as ShieldCheckIcon } from 'lucide-react';
 const SecuritySummary = ({
-  totalElements,
-  auditLogs
+ totalElements,
+ auditLogs
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const successfulLogins = auditLogs.filter(log => log.eventType === 'LOGIN_SUCCESS').length;
-  const failedAttempts = auditLogs.filter(log => log.eventType === 'LOGIN_FAILURE').length;
-  return <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-text-secondary mb-2">{t("total_events")}</p>
-                        <p className="text-3xl font-bold text-text-primary">{totalElements}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
-                        <ShieldCheckIcon className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </div>
+ const {
+ t
+ } = useTranslation();
+ const successfulLogins = auditLogs.filter(log => log.eventType === 'LOGIN_SUCCESS').length;
+ const failedAttempts = auditLogs.filter(log => log.eventType === 'LOGIN_FAILURE').length;
+ return <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+ <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className="text-sm font-medium text-text-secondary mb-2">{t("total_events")}</p>
+ <p className="text-3xl font-bold text-text-primary">{totalElements}</p>
+ </div>
+ <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+ <ShieldCheckIcon className="w-6 h-6 text-white" />
+ </div>
+ </div>
+ </div>
 
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-text-secondary mb-2">{t("successful_logins")}</p>
-                        <p className="text-3xl font-bold text-text-primary">{successfulLogins}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center">
-                        <ShieldCheckIcon className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </div>
+ <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className="text-sm font-medium text-text-secondary mb-2">{t("successful_logins")}</p>
+ <p className="text-3xl font-bold text-text-primary">{successfulLogins}</p>
+ </div>
+ <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center">
+ <ShieldCheckIcon className="w-6 h-6 text-white" />
+ </div>
+ </div>
+ </div>
 
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-text-secondary mb-2">{t("failed_attempts")}</p>
-                        <p className="text-3xl font-bold text-text-primary">{failedAttempts}</p>
-                    </div>
-                    <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
-                        <ExclamationTriangleIcon className="w-6 h-6 text-white" />
-                    </div>
-                </div>
-            </div>
-        </div>;
+ <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-border-light p-6 hover:shadow-lg transition-shadow">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className="text-sm font-medium text-text-secondary mb-2">{t("failed_attempts")}</p>
+ <p className="text-3xl font-bold text-text-primary">{failedAttempts}</p>
+ </div>
+ <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+ <ExclamationTriangleIcon className="w-6 h-6 text-white" />
+ </div>
+ </div>
+ </div>
+ </div>;
 };
 export default SecuritySummary;

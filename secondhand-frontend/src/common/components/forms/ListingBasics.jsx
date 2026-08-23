@@ -4,158 +4,158 @@ import { PriceInput } from '../ui/PriceInput.jsx';
 import { Type, DollarSign, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 const FieldError = ({
-  error
+ error
 }) => {
-  const {
-    t
-  } = useTranslation();
-  if (!error) return null;
-  return <motion.p initial={{
-    opacity: 0,
-    y: -4
-  }} animate={{
-    opacity: 1,
-    y: 0
-  }} className="mt-1.5 flex items-center gap-1 text-body text-status-error">
-      <AlertCircle className="h-3 w-3 shrink-0" />
-      {error}
-    </motion.p>;
+ const {
+ t
+ } = useTranslation();
+ if (!error) return null;
+ return <motion.p initial={{
+ opacity: 0,
+ y: -4
+ }} animate={{
+ opacity: 1,
+ y: 0
+ }} className="mt-1.5 flex items-center gap-1 text-body text-status-error">
+ <AlertCircle className="h-3 w-3 shrink-0" />
+ {error}
+ </motion.p>;
 };
 const SectionCard = ({
-  title,
-  description,
-  icon: Icon,
-  children
+ title,
+ description,
+ icon: Icon,
+ children
 }) => {
-  const {
-    t
-  } = useTranslation();
-  return <div className="wizard-glass-elevated wizard-card-lift rounded-xl overflow-hidden">
-      <div className="flex items-center gap-3 border-b border-zinc-100/60 px-5 py-3.5">
-        {Icon && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-50 to-zinc-100 shadow-sm">
-            <Icon className="h-4 w-4 text-zinc-600" />
-          </div>}
-        <div>
-          <h3 className="text-sm font-medium text-text-primary">{title}</h3>
-          {description && <p className="mt-0.5 text-xs text-zinc-500">{description}</p>}
-        </div>
-      </div>
-      <div className="p-5 sm:p-6">{children}</div>
-    </div>;
+ const {
+ t
+ } = useTranslation();
+ return <div className="wizard-glass-elevated wizard-card-lift rounded-xl overflow-hidden">
+ <div className="flex items-center gap-3 border-b border-zinc-100/60 px-5 py-3.5">
+ {Icon && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-50 to-zinc-100 shadow-sm">
+ <Icon className="h-4 w-4 text-zinc-600" />
+ </div>}
+ <div>
+ <h3 className="text-sm font-medium text-text-primary">{title}</h3>
+ {description && <p className="mt-0.5 text-xs text-zinc-500">{description}</p>}
+ </div>
+ </div>
+ <div className="p-5 sm:p-6">{children}</div>
+ </div>;
 };
 const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
 const inputNormal = `${inputBase} border-zinc-200/60 bg-background-primary focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
 const inputError = `${inputBase} border-status-error-border bg-status-error-bg/30 focus:border-status-error-border focus:ring-2 focus:ring-status-error/10`;
 const ListingBasics = ({
-  formData,
-  errors = {},
-  onInputChange,
-  enums,
-  showQuantity = true
+ formData,
+ errors = {},
+ onInputChange,
+ enums,
+ showQuantity = true
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const titleLen = formData.title?.length || 0;
-  const titleProgress = Math.min(titleLen / 100, 1);
-  const titleCountColor = titleProgress > 0.9 ? 'text-status-error' : titleProgress > 0.7 ? 'text-amber-500' : 'text-zinc-400';
-  return <div className="space-y-6 wizard-stagger">
-      <SectionCard title={t("general_information")} description="Basic listing details" icon={Type}>
-        <div className="space-y-5">
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("listing_title")}<span className="text-status-error">*</span>
-            </label>
-            <div className="relative">
-              <input type="text" name="title" value={formData.title} onChange={onInputChange} className={errors.title ? inputError : inputNormal} placeholder={t("e_g_iphone_13_pro_excellent_condition")} maxLength={100} />
-              <span className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-caption tabular-nums transition-colors duration-200 ${titleCountColor}`}>
-                {titleLen}/100
-              </span>
-            </div>
-            {/* Subtle progress bar under title input */}
-            <div className="mt-1 h-0.5 w-full overflow-hidden rounded-full bg-zinc-100">
-              <motion.div className="h-full rounded-full bg-zinc-300" animate={{
-              width: `${titleProgress * 100}%`
-            }} transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 30
-            }} />
-            </div>
-            <FieldError error={errors.title} />
-          </div>
+ const {
+ t
+ } = useTranslation();
+ const titleLen = formData.title?.length || 0;
+ const titleProgress = Math.min(titleLen / 100, 1);
+ const titleCountColor = titleProgress > 0.9 ? 'text-status-error' : titleProgress > 0.7 ? 'text-amber-500' : 'text-zinc-400';
+ return <div className="space-y-6 wizard-stagger">
+ <SectionCard title={t("general_information")} description="Basic listing details" icon={Type}>
+ <div className="space-y-5">
+ <div>
+ <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("listing_title")}<span className="text-status-error">*</span>
+ </label>
+ <div className="relative">
+ <input type="text" name="title" value={formData.title} onChange={onInputChange} className={errors.title ? inputError : inputNormal} placeholder={t("e_g_iphone_13_pro_excellent_condition")} maxLength={100} />
+ <span className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-caption tabular-nums transition-colors duration-200 ${titleCountColor}`}>
+ {titleLen}/100
+ </span>
+ </div>
+ {/* Subtle progress bar under title input */}
+ <div className="mt-1 h-0.5 w-full overflow-hidden rounded-full bg-zinc-100">
+ <motion.div className="h-full rounded-full bg-zinc-300" animate={{
+ width: `${titleProgress * 100}%`
+ }} transition={{
+ type: 'spring',
+ stiffness: 300,
+ damping: 30
+ }} />
+ </div>
+ <FieldError error={errors.title} />
+ </div>
 
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("description")}<span className="text-status-error">*</span>
-            </label>
-            <div className="relative">
-              <textarea name="description" value={formData.description} onChange={onInputChange} rows={5} className={`${errors.description ? inputError : inputNormal} resize-none pb-7`} placeholder={t("describe_your_item_in_detail_condition_f")} />
-              <span className="absolute bottom-2.5 right-3 text-caption tabular-nums text-zinc-400">
-                {formData.description?.length || 0} / 5000
-              </span>
-            </div>
-            <FieldError error={errors.description} />
-          </div>
-        </div>
-      </SectionCard>
+ <div>
+ <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("description")}<span className="text-status-error">*</span>
+ </label>
+ <div className="relative">
+ <textarea name="description" value={formData.description} onChange={onInputChange} rows={5} className={`${errors.description ? inputError : inputNormal} resize-none pb-7`} placeholder={t("describe_your_item_in_detail_condition_f")} />
+ <span className="absolute bottom-2.5 right-3 text-caption tabular-nums text-zinc-400">
+ {formData.description?.length || 0} / 5000
+ </span>
+ </div>
+ <FieldError error={errors.description} />
+ </div>
+ </div>
+ </SectionCard>
 
-      <SectionCard title={t("pricing")} description="Set the price and quantity" icon={DollarSign}>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("price")}<span className="text-status-error">*</span>
-            </label>
-            <div className="relative flex">
-              <PriceInput value={parsePrice(formData.price) ?? 0} onChange={n => onInputChange({
-              target: {
-                name: 'price',
-                value: n != null ? String(n) : ''
-              }
-            })} placeholder="0,00" className={`flex-1 min-w-0 rounded-l-lg rounded-r-none border-r-0 focus:outline-none ${errors.price ? inputError : inputNormal}`} />
-              <div className="flex shrink-0 items-center">
-                <select name="currency" value={formData.currency} onChange={onInputChange} className="h-full cursor-pointer rounded-r-lg border border-l-0 border-zinc-200/60 bg-zinc-50/80 py-0 pl-2.5 pr-6 text-sm font-medium text-zinc-700 transition-colors focus:outline-none hover:bg-zinc-100">
-                  {enums.currencies?.map(currency => <option key={currency.value} value={currency.value}>
-                      {currency.symbol} {currency.value}
-                    </option>)}
-                </select>
-              </div>
-            </div>
-            {formData.price && parsePrice(formData.price) != null && <motion.p initial={{
-            opacity: 0
-          }} animate={{
-            opacity: 1
-          }} className="mt-1.5 text-body text-zinc-500">{t("preview")}{' '}
-                <span className="font-semibold tabular-nums text-zinc-800">
-                  {formatCurrency(parsePrice(formData.price), formData.currency)}
-                </span>
-              </motion.p>}
-            <FieldError error={errors.price} />
-          </div>
+ <SectionCard title={t("pricing")} description="Set the price and quantity" icon={DollarSign}>
+ <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+ <div>
+ <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("price")}<span className="text-status-error">*</span>
+ </label>
+ <div className="relative flex">
+ <PriceInput value={parsePrice(formData.price) ?? 0} onChange={n => onInputChange({
+ target: {
+ name: 'price',
+ value: n != null ? String(n) : ''
+ }
+ })} placeholder="0,00" className={`flex-1 min-w-0 rounded-l-lg rounded-r-none border-r-0 focus:outline-none ${errors.price ? inputError : inputNormal}`} />
+ <div className="flex shrink-0 items-center">
+ <select name="currency" value={formData.currency} onChange={onInputChange} className="h-full cursor-pointer rounded-r-lg border border-l-0 border-zinc-200/60 bg-zinc-50/80 py-0 pl-2.5 pr-6 text-sm font-medium text-zinc-700 transition-colors focus:outline-none hover:bg-zinc-100">
+ {enums.currencies?.map(currency => <option key={currency.value} value={currency.value}>
+ {currency.symbol} {currency.value}
+ </option>)}
+ </select>
+ </div>
+ </div>
+ {formData.price && parsePrice(formData.price) != null && <motion.p initial={{
+ opacity: 0
+ }} animate={{
+ opacity: 1
+ }} className="mt-1.5 text-body text-zinc-500">{t("preview")}{' '}
+ <span className="font-semibold tabular-nums text-zinc-800">
+ {formatCurrency(parsePrice(formData.price), formData.currency)}
+ </span>
+ </motion.p>}
+ <FieldError error={errors.price} />
+ </div>
 
-          {showQuantity && <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("quantity")}<span className="text-status-error">*</span>
-              </label>
-              <input type="number" name="quantity" value={formData.quantity ?? ''} onChange={onInputChange} className={errors.quantity ? inputError : inputNormal} placeholder={t("e_g_5")} min="1" step="1" />
-              <FieldError error={errors.quantity} />
-            </div>}
+ {showQuantity && <div>
+ <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("quantity")}<span className="text-status-error">*</span>
+ </label>
+ <input type="number" name="quantity" value={formData.quantity ?? ''} onChange={onInputChange} className={errors.quantity ? inputError : inputNormal} placeholder={t("e_g_5")} min="1" step="1" />
+ <FieldError error={errors.quantity} />
+ </div>}
 
-          <div className="md:col-span-2 mt-4 pt-4 border-t border-zinc-100">
-            <label className="flex items-start gap-3 cursor-pointer select-none">
-              <input type="checkbox" name="allowMeetup" checked={Boolean(formData.allowMeetup)} onChange={e => onInputChange({
-              target: {
-                name: 'allowMeetup',
-                checked: e.target.checked,
-                type: 'checkbox'
-              }
-            })} className="mt-1 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
-              <div>
-                <span className="block text-sm font-medium text-zinc-900">{t("sadece_kendi_ehrimde_elden_teslimat_yapm")}</span>
-                <span className="block text-xs text-zinc-500">{t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu")}</span>
-                <span className="block text-xs text-primary/95 mt-1.5 font-medium bg-indigo-50/60 rounded-xl p-2.5 border border-primary/50 shadow-sm max-w-lg leading-relaxed">{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari")}</span>
-              </div>
-            </label>
-            <FieldError error={errors.allowMeetup} />
-          </div>
-        </div>
-      </SectionCard>
-    </div>;
+ <div className="md:col-span-2 mt-4 pt-4 border-t border-zinc-100">
+ <label className="flex items-start gap-3 cursor-pointer select-none">
+ <input type="checkbox" name="allowMeetup" checked={Boolean(formData.allowMeetup)} onChange={e => onInputChange({
+ target: {
+ name: 'allowMeetup',
+ checked: e.target.checked,
+ type: 'checkbox'
+ }
+ })} className="mt-1 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+ <div>
+ <span className="block text-sm font-medium text-zinc-900">{t("sadece_kendi_ehrimde_elden_teslimat_yapm")}</span>
+ <span className="block text-xs text-zinc-500">{t("al_c_yla_g_venli_bulu_ma_noktas_nda_bulu")}</span>
+ <span className="block text-xs text-primary/95 mt-1.5 font-medium bg-slate-100/60 rounded-xl p-2.5 border border-primary/50 shadow-sm max-w-lg leading-relaxed">{t("bu_alan_i_aretledi_inizde_r_n_n_z_sipari")}</span>
+ </div>
+ </label>
+ <FieldError error={errors.allowMeetup} />
+ </div>
+ </div>
+ </SectionCard>
+ </div>;
 };
 export default ListingBasics;

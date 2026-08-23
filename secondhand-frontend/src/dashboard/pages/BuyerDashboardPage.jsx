@@ -13,137 +13,137 @@ import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
 import { DollarSign, ShoppingBag, TrendingUp, Heart, Tag } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 const ChartCard = ({
-  children,
-  title,
-  delay = 0
+ children,
+ title,
+ delay = 0
 }) => <motion.div initial={{
-  opacity: 0,
-  y: 16
+ opacity: 0,
+ y: 16
 }} animate={{
-  opacity: 1,
-  y: 0
+ opacity: 1,
+ y: 0
 }} transition={{
-  delay,
-  duration: 0.4
+ delay,
+ duration: 0.4
 }} className="bg-background-primary rounded-2xl border border-border-light p-5 shadow-sm">
-    {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
-    {children}
-  </motion.div>;
+ {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
+ {children}
+ </motion.div>;
 const BuyerDashboardPage = () => {
-  const {
-    t
-  } = useTranslation();
-  const [startDate, setStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(date.getDate() - 30);
-    return date;
-  });
-  const [endDate, setEndDate] = useState(new Date());
-  const {
-    data: dashboard,
-    isLoading,
-    error
-  } = useBuyerDashboard(startDate, endDate);
-  const handlePresetSelect = (start, end) => {
-    setStartDate(start);
-    setEndDate(end);
-  };
-  if (isLoading) {
-    return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
-        <LoadingIndicator />
-      </div>;
-  }
-  if (error) {
-    return <motion.div initial={{
-      opacity: 0
-    }} animate={{
-      opacity: 1
-    }} className="min-h-screen bg-background-secondary flex items-center justify-center">
-        <div className="text-center p-8 bg-background-primary rounded-2xl border border-border-light shadow-sm max-w-sm">
-          <div className="w-14 h-14 bg-status-error-bg text-status-error rounded-xl flex items-center justify-center mx-auto mb-4">
-            <ShoppingBag className="w-7 h-7" />
-          </div>
-          <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
-          <p className="text-slate-400 text-sm">{error.message}</p>
-        </div>
-      </motion.div>;
-  }
-  if (!dashboard) return null;
-  return <div className="min-h-screen bg-background-secondary">
-      {/* Header */}
-      <div className="bg-background-dark border-b border-border-dark">
-        <PageContainer className="py-6 px-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <motion.div initial={{
-            opacity: 0,
-            x: -16
-          }} animate={{
-            opacity: 1,
-            x: 0
-          }}>
-              <h1 className="text-2xl font-semibold text-white tracking-tight">{t("my_purchases")}</h1>
-              <div className="flex items-center gap-3 mt-0.5">
-                <p className="text-xs text-text-muted font-medium">{t("track_your_spending_orders")}</p>
-                {dashboard.totalFavorites > 0 && <>
-                    <span className="text-text-muted">·</span>
-                    <div className="flex items-center gap-1">
-                      <Heart className="w-3 h-3 text-text-muted" />
-                      <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
-                    </div>
-                  </>}
-              </div>
-            </motion.div>
-            <motion.div initial={{
-            opacity: 0,
-            x: 16
-          }} animate={{
-            opacity: 1,
-            x: 0
-          }}>
-              <TimeRangeSelector startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate} onPresetSelect={handlePresetSelect} />
-            </motion.div>
-          </div>
-        </PageContainer>
-      </div>
+ const {
+ t
+ } = useTranslation();
+ const [startDate, setStartDate] = useState(() => {
+ const date = new Date();
+ date.setDate(date.getDate() - 30);
+ return date;
+ });
+ const [endDate, setEndDate] = useState(new Date());
+ const {
+ data: dashboard,
+ isLoading,
+ error
+ } = useBuyerDashboard(startDate, endDate);
+ const handlePresetSelect = (start, end) => {
+ setStartDate(start);
+ setEndDate(end);
+ };
+ if (isLoading) {
+ return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
+ <LoadingIndicator />
+ </div>;
+ }
+ if (error) {
+ return <motion.div initial={{
+ opacity: 0
+ }} animate={{
+ opacity: 1
+ }} className="min-h-screen bg-background-secondary flex items-center justify-center">
+ <div className="text-center p-8 bg-background-primary rounded-2xl border border-border-light shadow-sm max-w-sm">
+ <div className="w-14 h-14 bg-status-error-bg text-status-error rounded-xl flex items-center justify-center mx-auto mb-4">
+ <ShoppingBag className="w-7 h-7" />
+ </div>
+ <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
+ <p className="text-slate-400 text-sm">{error.message}</p>
+ </div>
+ </motion.div>;
+ }
+ if (!dashboard) return null;
+ return <div className="min-h-screen bg-background-secondary">
+ {/* Header */}
+ <div className="bg-background-dark border-b border-border-dark">
+ <PageContainer className="py-6 px-6">
+ <div className="flex items-center justify-between flex-wrap gap-4">
+ <motion.div initial={{
+ opacity: 0,
+ x: -16
+ }} animate={{
+ opacity: 1,
+ x: 0
+ }}>
+ <h1 className="text-2xl font-semibold text-white tracking-tight">{t("my_purchases")}</h1>
+ <div className="flex items-center gap-3 mt-0.5">
+ <p className="text-xs text-text-muted font-medium">{t("track_your_spending_orders")}</p>
+ {dashboard.totalFavorites > 0 && <>
+ <span className="text-text-muted">·</span>
+ <div className="flex items-center gap-1">
+ <Heart className="w-3 h-3 text-text-muted" />
+ <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
+ </div>
+ </>}
+ </div>
+ </motion.div>
+ <motion.div initial={{
+ opacity: 0,
+ x: 16
+ }} animate={{
+ opacity: 1,
+ x: 0
+ }}>
+ <TimeRangeSelector startDate={startDate} endDate={endDate} onStartDateChange={setStartDate} onEndDateChange={setEndDate} onPresetSelect={handlePresetSelect} />
+ </motion.div>
+ </div>
+ </PageContainer>
+ </div>
 
-      {/* Content */}
-      <PageContainer className="py-6 px-6 space-y-6">
-        {/* Primary KPIs — 4 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" color="blue" />
-          <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} color="green" />
-          <MetricCard index={2} title={t("avg_order_value")} value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')} icon={TrendingUp} subtitle="Per order" color="purple" />
-          <MetricCard index={3} title={t("savings")} value={(dashboard.cancelledOrders || 0) + (dashboard.refundedOrders || 0) > 0 ? `${dashboard.cancelledOrders || 0} cancelled · ${dashboard.refundedOrders || 0} refunded` : '—'} icon={Tag} subtitle="Cancels & refunds" color="amber" />
-        </div>
+ {/* Content */}
+ <PageContainer className="py-6 px-6 space-y-6">
+ {/* Primary KPIs — 4 columns */}
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+ <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" color="blue" />
+ <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} color="green" />
+ <MetricCard index={2} title={t("avg_order_value")} value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')} icon={TrendingUp} subtitle="Per order" color="purple" />
+ <MetricCard index={3} title={t("savings")} value={(dashboard.cancelledOrders || 0) + (dashboard.refundedOrders || 0) > 0 ? `${dashboard.cancelledOrders || 0} cancelled · ${dashboard.refundedOrders || 0} refunded` : '—'} icon={Tag} subtitle="Cancels & refunds" color="amber" />
+ </div>
 
-        {/* Quick Status Summary */}
-        <QuickStatusSummary ordersByStatus={dashboard.ordersByStatus || {}} />
+ {/* Quick Status Summary */}
+ <QuickStatusSummary ordersByStatus={dashboard.ordersByStatus || {}} />
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-border-light" />}>
-            <ChartCard title={t("spending_trend")} delay={0.2}>
-              <RevenueChart data={dashboard.spendingTrend || []} title={t("spending_trend")} label={t("spending")} />
-            </ChartCard>
-          </Suspense>
-          <ChartCard title={t("spending_by_category")} delay={0.25}>
-            <CategoryBreakdown data={dashboard.categorySpending || {}} label={t("total_spending")} />
-          </ChartCard>
-        </div>
+ {/* Charts Row */}
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+ <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-border-light" />}>
+ <ChartCard title={t("spending_trend")} delay={0.2}>
+ <RevenueChart data={dashboard.spendingTrend || []} title={t("spending_trend")} label={t("spending")} />
+ </ChartCard>
+ </Suspense>
+ <ChartCard title={t("spending_by_category")} delay={0.25}>
+ <CategoryBreakdown data={dashboard.categorySpending || {}} label={t("total_spending")} />
+ </ChartCard>
+ </div>
 
-        {/* Order Status Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartCard title={t("orders_by_status")} delay={0.3}>
-            <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
-          </ChartCard>
-          
-          {/* Optional: Add a placeholder or future feature card here to keep grid balance */}
-          <div className="hidden lg:block" />
-        </div>
+ {/* Order Status Breakdown */}
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+ <ChartCard title={t("orders_by_status")} delay={0.3}>
+ <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
+ </ChartCard>
+ 
+ {/* Optional: Add a placeholder or future feature card here to keep grid balance */}
+ <div className="hidden lg:block" />
+ </div>
 
-        {/* Spacer */}
-        <div className="pb-8" />
-      </PageContainer>
-    </div>;
+ {/* Spacer */}
+ <div className="pb-8" />
+ </PageContainer>
+ </div>;
 };
 export default BuyerDashboardPage;

@@ -5,68 +5,68 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../constants/routes.js';
 const ProtectedRoute = ({
-  children
+ children
 }) => {
-  const {
-    t
-  } = useTranslation();
-  const {
-    authState: {
-      isAuthenticated,
-      isLoading
-    }
-  } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const notification = useNotification();
-  const notificationShown = useRef(false);
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated && !notificationShown.current) {
-      notificationShown.current = true;
-      notification.addNotification({
-        type: 'info',
-        title: 'Authentication Required',
-        message: 'Please Log In',
-        autoClose: false,
-        showCloseButton: false,
-        actions: [{
-          label: 'Cancel',
-          primary: false,
-          onClick: () => {
-            navigate(ROUTES.HOME, {
-              replace: true
-            });
-          }
-        }, {
-          label: 'OK',
-          primary: true,
-          onClick: () => {
-            navigate(ROUTES.LOGIN, {
-              state: {
-                from: location
-              },
-              replace: true
-            });
-          }
-        }]
-      });
-    }
-    if (isAuthenticated) {
-      notificationShown.current = false;
-    }
-  }, [isAuthenticated, isLoading, location, navigate, notification]);
-  if (isLoading) {
-    return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                <p className="text-sm text-slate-500">{t("verifying_authentication")}</p>
-            </div>;
-  }
-  if (!isAuthenticated) {
-    // Notification modal is already shown via useEffect, render minimal placeholder
-    return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-                <p className="text-sm text-slate-500">{t("redirecting_to_login")}</p>
-            </div>;
-  }
-  return children;
+ const {
+ t
+ } = useTranslation();
+ const {
+ authState: {
+ isAuthenticated,
+ isLoading
+ }
+ } = useAuth();
+ const location = useLocation();
+ const navigate = useNavigate();
+ const notification = useNotification();
+ const notificationShown = useRef(false);
+ useEffect(() => {
+ if (!isLoading && !isAuthenticated && !notificationShown.current) {
+ notificationShown.current = true;
+ notification.addNotification({
+ type: 'info',
+ title: 'Authentication Required',
+ message: 'Please Log In',
+ autoClose: false,
+ showCloseButton: false,
+ actions: [{
+ label: 'Cancel',
+ primary: false,
+ onClick: () => {
+ navigate(ROUTES.HOME, {
+ replace: true
+ });
+ }
+ }, {
+ label: 'OK',
+ primary: true,
+ onClick: () => {
+ navigate(ROUTES.LOGIN, {
+ state: {
+ from: location
+ },
+ replace: true
+ });
+ }
+ }]
+ });
+ }
+ if (isAuthenticated) {
+ notificationShown.current = false;
+ }
+ }, [isAuthenticated, isLoading, location, navigate, notification]);
+ if (isLoading) {
+ return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+ <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+ <p className="text-sm text-slate-500">{t("verifying_authentication")}</p>
+ </div>;
+ }
+ if (!isAuthenticated) {
+ // Notification modal is already shown via useEffect, render minimal placeholder
+ return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+ <p className="text-sm text-slate-500">{t("redirecting_to_login")}</p>
+ </div>;
+ }
+ return children;
 };
 export default ProtectedRoute;

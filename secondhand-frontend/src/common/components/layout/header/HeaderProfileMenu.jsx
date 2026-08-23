@@ -10,110 +10,110 @@ import HeaderMenuItem from './HeaderMenuItem.jsx';
 import { getProfileMenuItems } from './headerMenuConfig.js';
 
 const HeaderProfileMenu = ({
-  user,
-  isOpen,
-  onToggle,
-  onClose,
-  onLogout
+ user,
+ isOpen,
+ onToggle,
+ onClose,
+ onLogout
 }) => {
-  const { t } = useTranslation();
-  const { isPremium } = usePlan();
-  const [showUpgrade, setShowUpgrade] = useState(false);
+ const { t } = useTranslation();
+ const { isPremium } = usePlan();
+ const [showUpgrade, setShowUpgrade] = useState(false);
 
-  const isUnverified = Boolean(user && user.accountVerified === false);
+ const isUnverified = Boolean(user && user.accountVerified === false);
 
-  return (
-    <>
-      <button onClick={onToggle} className="flex items-center gap-2.5 pl-2 group cursor-pointer" type="button">
-        <div className="relative">
-          <div className={`w-9 h-9 rounded-full bg-slate-100 border flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${isUnverified ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-border-light/60 group-hover:border-slate-300/60'}`}>
-            {user?.avatar ? (
-              <img src={user.avatar} alt={t("profile")} className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-5 h-5 text-slate-600" />
-            )}
-          </div>
+ return (
+ <>
+ <button onClick={onToggle} className="flex items-center gap-2.5 pl-2 group cursor-pointer" type="button">
+ <div className="relative">
+ <div className={`w-9 h-9 rounded-full bg-slate-100 border flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${isUnverified ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-border-light/60 group-hover:border-slate-300/60'}`}>
+ {user?.avatar ? (
+ <img src={user.avatar} alt={t("profile")} className="w-full h-full object-cover" />
+ ) : (
+ <User className="w-5 h-5 text-slate-600" />
+ )}
+ </div>
 
-          {/* Premium Badge */}
-          {isPremium && (
-            <div className="absolute -top-1 -right-1.5 h-4 w-4 rounded-full bg-amber-500 border border-white flex items-center justify-center shadow-sm">
-              <Crown className="h-2.5 w-2.5 text-white" />
-            </div>
-          )}
+ {/* Premium Badge */}
+ {isPremium && (
+ <div className="absolute -top-1 -right-1.5 h-4 w-4 rounded-full bg-amber-500 border border-white flex items-center justify-center shadow-sm">
+ <Crown className="h-2.5 w-2.5 text-white" />
+ </div>
+ )}
 
-          {/* Account Unverified Exclamation Badge */}
-          {isUnverified && (
-            <div className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center shadow-md animate-bounce">
-              <span className="text-[10px] font-black text-white leading-none">!</span>
-            </div>
-          )}
-        </div>
-        <ChevronDown className={`w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-all duration-300 ease-in-out ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+ {/* Account Unverified Exclamation Badge */}
+ {isUnverified && (
+ <div className="absolute -top-1 -right-1 w-4.5 h-4.5 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center shadow-md animate-bounce">
+ <span className="text-[10px] font-black text-white leading-none">!</span>
+ </div>
+ )}
+ </div>
+ <ChevronDown className={`w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-all duration-300 ease-in-out ${isOpen ? 'rotate-180' : ''}`} />
+ </button>
 
-      {isOpen && (
-        <HeaderDropdownPanel className="z-[9999]">
-          <div className="px-4 py-3 border-b border-slate-100">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">{t("account")}</p>
-            <Link to={ROUTES.PROFILE} onClick={onClose} className="text-sm font-semibold text-slate-900 truncate tracking-tight block hover:text-slate-600 transition-colors cursor-pointer flex items-center gap-1.5">
-              {user?.name || 'User'}
-              {isPremium && <Crown className="h-3.5 w-3.5 text-amber-500 shrink-0" aria-label={t("premium_member")} />}
-            </Link>
-          </div>
+ {isOpen && (
+ <HeaderDropdownPanel className="z-[9999]">
+ <div className="px-4 py-3 border-b border-slate-100">
+ <p className="text-xs font-medium text-slate-500 uppercase tracking-tight">{t("account")}</p>
+ <Link to={ROUTES.PROFILE} onClick={onClose} className="text-sm font-semibold text-slate-900 truncate tracking-tight block hover:text-slate-600 transition-colors cursor-pointer flex items-center gap-1.5">
+ {user?.name || 'User'}
+ {isPremium && <Crown className="h-3.5 w-3.5 text-amber-500 shrink-0" aria-label={t("premium_member")} />}
+ </Link>
+ </div>
 
-          {/* Prominent Verification Callout Banner if Unverified */}
-          {isUnverified && (
-            <Link
-              to={ROUTES.VERIFY_ACCOUNT}
-              onClick={onClose}
-              className="mx-2 my-2 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 flex items-center gap-3 hover:from-amber-100 hover:to-orange-100 transition-all group cursor-pointer shadow-xs"
-            >
-              <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 font-black text-sm shadow-xs">
-                !
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-xs font-bold text-amber-900 leading-tight">{t("verify_account")}</p>
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
-                </div>
-                <p className="text-[11px] font-medium text-amber-700 truncate mt-0.5">
-                  {t("verify_account_desc")}
-                </p>
-              </div>
-            </Link>
-          )}
+ {/* Prominent Verification Callout Banner if Unverified */}
+ {isUnverified && (
+ <Link
+ to={ROUTES.VERIFY_ACCOUNT}
+ onClick={onClose}
+ className="mx-2 my-2 p-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 flex items-center gap-3 hover:from-amber-100 hover:to-orange-100 transition-all group cursor-pointer shadow-xs"
+ >
+ <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0 font-black text-sm shadow-xs">
+ !
+ </div>
+ <div className="min-w-0 flex-1">
+ <div className="flex items-center gap-1.5">
+ <p className="text-xs font-bold text-amber-900 leading-tight">{t("verify_account")}</p>
+ <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
+ </div>
+ <p className="text-[11px] font-medium text-amber-700 truncate mt-0.5">
+ {t("verify_account_desc")}
+ </p>
+ </div>
+ </Link>
+ )}
 
-          {getProfileMenuItems(user?.id).map(item => (
-            <HeaderMenuItem key={item.key} to={item.to} onClick={onClose} icon={item.icon} labelKey={item.labelKey} label={item.label} compact />
-          ))}
-          
-          <div className="border-t border-slate-100 my-1" />
+ {getProfileMenuItems(user?.id).map(item => (
+ <HeaderMenuItem key={item.key} to={item.to} onClick={onClose} icon={item.icon} labelKey={item.labelKey} label={item.label} compact />
+ ))}
+ 
+ <div className="border-t border-slate-100 my-1" />
 
-          {!isPremium && (
-            <div className="px-2 py-1.5 bg-slate-50 border border-slate-100 rounded-xl mx-2 my-1">
-              <button
-                onClick={() => setShowUpgrade(true)}
-                className="flex w-full items-center justify-between px-3 py-2 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all duration-200 rounded-lg cursor-pointer shadow-sm active:scale-97">
-                <span className="flex items-center gap-1.5">
-                  <Crown className="h-3.5 w-3.5 text-amber-400" />
-                  {t('upgrade_to_premium', "Premium'a Geç")}
-                </span>
-                <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">{t("upgrade_badge")}</span>
-              </button>
-            </div>
-          )}
+ {!isPremium && (
+ <div className="px-2 py-1.5 bg-slate-50 border border-slate-100 rounded-xl mx-2 my-1">
+ <button
+ onClick={() => setShowUpgrade(true)}
+ className="flex w-full items-center justify-between px-3 py-2 text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all duration-200 rounded-lg cursor-pointer shadow-sm active:scale-97">
+ <span className="flex items-center gap-1.5">
+ <Crown className="h-3.5 w-3.5 text-amber-400" />
+ {t('upgrade_to_premium', "Premium'a Geç")}
+ </span>
+ <span className="text-[9px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-extrabold tracking-wider">{t("upgrade_badge")}</span>
+ </button>
+ </div>
+ )}
 
-          <button onClick={onLogout} type="button" className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer font-medium">
-            <LogOut className="w-4 h-4" />{t("sign_out")}</button>
-        </HeaderDropdownPanel>
-      )}
+ <button onClick={onLogout} type="button" className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-all duration-300 ease-in-out rounded-xl mx-1 cursor-pointer font-medium">
+ <LogOut className="w-4 h-4" />{t("sign_out")}</button>
+ </HeaderDropdownPanel>
+ )}
 
-      <PremiumUpgradeModal
-        isOpen={showUpgrade}
-        onClose={() => setShowUpgrade(false)}
-      />
-    </>
-  );
+ <PremiumUpgradeModal
+ isOpen={showUpgrade}
+ onClose={() => setShowUpgrade(false)}
+ />
+ </>
+ );
 };
 
 export default HeaderProfileMenu;

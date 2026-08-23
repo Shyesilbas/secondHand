@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.Modifying;
+
 public interface OrderOutboxRepository extends JpaRepository<OrderOutboxEvent, UUID> {
 
     @Query("SELECT e FROM OrderOutboxEvent e " +
@@ -21,4 +23,8 @@ public interface OrderOutboxRepository extends JpaRepository<OrderOutboxEvent, U
             @Param("now") LocalDateTime now,
             Pageable pageable
     );
+
+    @Modifying
+    @Query("DELETE FROM OrderOutboxEvent e WHERE e.status = :status AND e.processedAt < :cutoff")
+    int deleteByStatusAndProcessedAtBefore(@Param("status") OutboxStatus status, @Param("cutoff") LocalDateTime cutoff);
 }

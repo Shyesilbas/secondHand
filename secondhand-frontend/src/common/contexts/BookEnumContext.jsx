@@ -3,36 +3,36 @@ import {createContext, useContext, useMemo} from 'react';
 export const BookEnumContext = createContext();
 
 export const useBookEnums = () => {
-    const context = useContext(BookEnumContext);
-    if (!context) {
-        throw new Error('useBookEnums must be used within a BookEnumProvider');
-    }
-    return context;
+ const context = useContext(BookEnumContext);
+ if (!context) {
+ throw new Error('useBookEnums must be used within a BookEnumProvider');
+ }
+ return context;
 };
 
 // Selector hooks for specific book enums
 export const useBookTypes = () => {
-    const { enums } = useBookEnums();
-    return useMemo(() => enums.bookTypes, [enums.bookTypes]);
+ const { enums } = useBookEnums();
+ return useMemo(() => enums.bookTypes, [enums.bookTypes]);
 };
 
 export const useBookGenres = () => {
-    const { enums } = useBookEnums();
-    return useMemo(() => enums.bookGenres, [enums.bookGenres]);
+ const { enums } = useBookEnums();
+ return useMemo(() => enums.bookGenres, [enums.bookGenres]);
 };
 
 export const useBookLanguages = () => {
-    const { enums } = useBookEnums();
-    return useMemo(() => enums.bookLanguages, [enums.bookLanguages]);
+ const { enums } = useBookEnums();
+ return useMemo(() => enums.bookLanguages, [enums.bookLanguages]);
 };
 
 export const useBookFormats = () => {
-    const { enums } = useBookEnums();
-    return useMemo(() => enums.bookFormats, [enums.bookFormats]);
+ const { enums } = useBookEnums();
+ return useMemo(() => enums.bookFormats, [enums.bookFormats]);
 };
 
 export const useBookConditions = () => {
-    const { enums } = useBookEnums();
-    return useMemo(() => enums.bookConditions, [enums.bookConditions]);
+ const { enums } = useBookEnums();
+ return useMemo(() => enums.bookConditions, [enums.bookConditions]);
 };
 

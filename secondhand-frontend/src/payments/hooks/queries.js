@@ -4,42 +4,42 @@ import { paymentService } from '../services/paymentService.js';
 import { PAYMENT_QUERY_KEYS } from '../paymentSchema.js';
 
 export const usePaymentsQuery = ({ userId, currentPage, pageSize, filters }) => {
-  return useQuery({
-    queryKey: [...PAYMENT_QUERY_KEYS.payments, 'my', 'list', userId || 'anonymous', currentPage, pageSize, filters],
-    queryFn: async () => {
-      const paymentsData = await paymentService.getMyPayments(currentPage, pageSize, filters);
-      const payments = paymentsData.content || [];
+ return useQuery({
+ queryKey: [...PAYMENT_QUERY_KEYS.payments, 'my', 'list', userId || 'anonymous', currentPage, pageSize, filters],
+ queryFn: async () => {
+ const paymentsData = await paymentService.getMyPayments(currentPage, pageSize, filters);
+ const payments = paymentsData.content || [];
 
-      return {
-        payments,
-        pagination: {
-          totalElements: paymentsData.totalElements || 0,
-          totalPages: paymentsData.totalPages || 0,
-          number: paymentsData.number || currentPage,
-          size: paymentsData.size || pageSize,
-        },
-      };
-    },
-    enabled: !!userId,
-    staleTime: 30 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-  });
+ return {
+ payments,
+ pagination: {
+ totalElements: paymentsData.totalElements || 0,
+ totalPages: paymentsData.totalPages || 0,
+ number: paymentsData.number || currentPage,
+ size: paymentsData.size || pageSize,
+ },
+ };
+ },
+ enabled: !!userId,
+ staleTime: 30 * 1000,
+ gcTime: 10 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: true,
+ });
 };
 
 export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
-  const { enabled = true } = options;
-  const { user, isAuthenticated } = useAuthState();
+ const { enabled = true } = options;
+ const { user, isAuthenticated } = useAuthState();
 
-  return useQuery({
-    queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, paymentType],
-    queryFn: () => paymentService.getStatistics(paymentType),
-    enabled: enabled && !!(isAuthenticated && user?.id),
-    staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: 1,
-  });
+ return useQuery({
+ queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, paymentType],
+ queryFn: () => paymentService.getStatistics(paymentType),
+ enabled: enabled && !!(isAuthenticated && user?.id),
+ staleTime: 2 * 60 * 1000,
+ gcTime: 10 * 60 * 1000,
+ refetchOnWindowFocus: false,
+ refetchOnMount: false,
+ retry: 1,
+ });
 };

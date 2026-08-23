@@ -1,10 +1,10 @@
 import { useEnumContext } from '../contexts/EnumContext.jsx';
 
 export const useGenderEnum = () => {
-  const { enums, isLoading } = useEnumContext();
+ const { enums, isLoading } = useEnumContext();
 
-  return { 
-    genders: enums.general?.genders || [], 
-    isLoading 
-  };
+ return { 
+ genders: enums.general?.genders || [], 
+ isLoading 
+ };
 };

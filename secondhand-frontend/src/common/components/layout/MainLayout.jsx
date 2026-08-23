@@ -8,26 +8,26 @@ import { ListingActionProvider } from '../../../listing/context/ListingActionPro
 import GlobalActionModal from '../../../listing/components/GlobalActionModal.jsx';
 
 const MainLayout = () => {
-    const { pathname } = useLocation();
-    const pageName = getPageName(pathname);
-    const fullHeightWizard = pathname === ROUTES.CREATE_LISTING || pathname === ROUTES.AURA_CHAT || pathname === '/aura';
-    return (
-        <ListingActionProvider>
-            <div
-                className="flex min-h-screen flex-col bg-main-bg"
-                data-page={pageName ?? undefined}
-                data-path={pathname}
-            >
-                <Header />
-                <main className="flex flex-1 flex-col min-h-0">
-                    <Outlet />
-                </main>
-                {!fullHeightWizard ? <Footer /> : null}
-                <AuraChatWidget />
-                <GlobalActionModal />
-            </div>
-        </ListingActionProvider>
-    );
+ const { pathname } = useLocation();
+ const pageName = getPageName(pathname);
+ const fullHeightWizard = pathname === ROUTES.CREATE_LISTING || pathname === ROUTES.AURA_CHAT || pathname === '/aura';
+ return (
+ <ListingActionProvider>
+ <div
+ className="flex min-h-screen flex-col bg-main-bg"
+ data-page={pageName ?? undefined}
+ data-path={pathname}
+ >
+ <Header />
+ <main className="flex flex-1 flex-col min-h-0">
+ <Outlet />
+ </main>
+ {!fullHeightWizard ? <Footer /> : null}
+ <AuraChatWidget />
+ <GlobalActionModal />
+ </div>
+ </ListingActionProvider>
+ );
 };
 
 export default MainLayout;
