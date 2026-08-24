@@ -154,7 +154,7 @@ export const useAuraChat = ({
  ? { message: payload.message, context: payload.context }
  : { message: payload }
  );
- const answer = response?.answer || response?.message || 'No response.';
+ const answer = response?.answer || response?.message || (response?.success === false ? response?.error : null) || 'Üzgünüm, şu an bu soruya yanıt verilemedi. Lütfen tekrar deneyiniz.';
  const dataSources = Array.isArray(response?.dataSources) ? response.dataSources : undefined;
  const suggestedListings = Array.isArray(response?.suggestedListings) ? response.suggestedListings : undefined;
  const meta = {};

@@ -1,109 +1,135 @@
-import PageContainer from '@/common/components/layout/PageContainer';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
-import React, { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
-import { Bot, RotateCcw, Send, Sparkles, Trash2, UserRound, Zap, Shield, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Info, Layers, BrainCircuit } from 'lucide-react';
+import {
+  Sparkles,
+  RotateCcw,
+  Trash2,
+  BrainCircuit,
+  PanelRight,
+  PanelRightClose,
+  Send,
+  UserRound,
+  ShieldCheck,
+  Tag,
+  ExternalLink,
+  ChevronRight,
+  Zap,
+  TrendingDown,
+  Info,
+  Layers,
+  ArrowRight,
+  CheckCircle2
+} from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
-import AuraListingContextCard from '../components/AuraListingContextCard.jsx';
 import AuraSuggestedListingChips from '../components/AuraSuggestedListingChips.jsx';
 import AuraPriceAdvisorGauge from '../components/AuraPriceAdvisorGauge.jsx';
 import AuraMemoryProfileHub from '../components/AuraMemoryProfileHub.jsx';
-import { buildAuraListingSessionContext } from '../utils/auraListingContext.js';
+import { buildAuraListingSessionContext, formatListingPriceLabel, listingStatusLabel, listingTypeLabel } from '../utils/auraListingContext.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
 import { cacheService } from '../../common/services/cacheService.js';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const renderMessageContent = (content) => {
- if (typeof content !== 'string') return content;
+  if (typeof content !== 'string') return content;
 
- const gaugeRegex = /<PriceAdvisorGauge\s+([^>]+)\s*\/?>/i;
- const match = content.match(gaugeRegex);
+  const gaugeRegex = /<PriceAdvisorGauge\s+([^>]+)\s*\/?>/i;
+  const match = content.match(gaugeRegex);
 
- if (match) {
- const rawAttrs = match[1];
- const getAttr = (name) => {
- const regex = new RegExp(`${name}="([^"]+)"`, 'i');
- const attrMatch = rawAttrs.match(regex);
- return attrMatch ? attrMatch[1] : null;
- };
+  if (match) {
+    const rawAttrs = match[1];
+    const getAttr = (name) => {
+      const regex = new RegExp(`${name}="([^"]+)"`, 'i');
+      const attrMatch = rawAttrs.match(regex);
+      return attrMatch ? attrMatch[1] : null;
+    };
 
- const min = getAttr('min');
- const max = getAttr('max');
- const avg = getAttr('avg');
- const current = getAttr('current');
- const currency = getAttr('currency') || 'TRY';
- const status = getAttr('status') || 'Good Deal';
+    const min = getAttr('min');
+    const max = getAttr('max');
+    const avg = getAttr('avg');
+    const current = getAttr('current');
+    const currency = getAttr('currency') || 'TRY';
+    const status = getAttr('status') || 'Good Deal';
 
- const index = content.indexOf(match[0]);
- const before = content.substring(0, index);
- const after = content.substring(index + match[0].length);
+    const index = content.indexOf(match[0]);
+    const before = content.substring(0, index);
+    const after = content.substring(index + match[0].length);
 
- return (
- <>
- {before && <span className="block mb-2">{before}</span>}
- <AuraPriceAdvisorGauge
- min={min}
- max={max}
- avg={avg}
- current={current}
- currency={currency}
- status={status}
- />
- {after && <span className="block mt-2">{after}</span>}
- </>
- );
- }
+    return (
+      <div className="space-y-3">
+        {before && <p className="whitespace-pre-wrap leading-relaxed">{before}</p>}
+        <div className="my-2">
+          <AuraPriceAdvisorGauge
+            min={min}
+            max={max}
+            avg={avg}
+            current={current}
+            currency={currency}
+            status={status}
+          />
+        </div>
+        {after && <p className="whitespace-pre-wrap leading-relaxed">{after}</p>}
+      </div>
+    );
+  }
 
- return content;
+  return <p className="whitespace-pre-wrap leading-relaxed">{content}</p>;
 };
 
-const AuraChatPage = () => {
- const {
- t
- } = useTranslation();
- const {
- user
- } = useAuthState();
- const location = useLocation();
+export const AuraChatPage = () => {
+  const { t } = useTranslation();
+  const { user } = useAuthState();
+  const location = useLocation();
 
- const listingFromState = location?.state?.listing || null;
- const listingIdFromState = location?.state?.listingId || null;
- const { listing: fetchedListing } = useListingData(listingIdFromState, !listingFromState && !!listingIdFromState);
- const listing = listingFromState || fetchedListing;
+  const listingFromState = location?.state?.listing || null;
+  const listingIdFromState = location?.state?.listingId || null;
+  const { listing: fetchedListing } = useListingData(listingIdFromState, !listingFromState && !!listingIdFromState);
+  const listing = listingFromState || fetchedListing;
 
- const [agentMode, setAgentMode] = React.useState(AI_AGENT_MODE_ENABLED);
- const [sidebarOpen, setSidebarOpen] = React.useState(true);
- const [rightPanelOpen, setRightPanelOpen] = React.useState(true);
- const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
- const [upgradeHint, setUpgradeHint] = React.useState('');
- const [showMemoryHub, setShowMemoryHub] = React.useState(false);
- const userId = user?.id ?? null;
- const listingContext = useMemo(() => buildAuraListingSessionContext(listing), [listing]);
- const buildPayload = useMemo(() => {
- return text => {
- const trimmed = text.trim();
- return {
- message: trimmed,
- context: listingContext || undefined,
- agentMode,
- uiContext: {
- currentPage: 'AuraChatPage',
- route: location.pathname,
- listingId: listing?.id ? String(listing.id) : undefined
- }
- };
- };
- }, [agentMode, listing?.id, listingContext, location.pathname]);
+  const [agentMode] = useState(AI_AGENT_MODE_ENABLED);
+  const [rightPanelOpen, setRightPanelOpen] = useState(Boolean(listing));
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeHint, setUpgradeHint] = useState('');
+  const [showMemoryHub, setShowMemoryHub] = useState(false);
+
+  const userId = user?.id ?? null;
+  const listingContext = useMemo(() => buildAuraListingSessionContext(listing), [listing]);
+
+  // Keep right panel open by default if listing exists
+  useEffect(() => {
+    if (listing) {
+      setRightPanelOpen(true);
+    }
+  }, [listing]);
+
+  const buildPayload = useMemo(() => {
+    return (text) => {
+      const trimmed = text.trim();
+      return {
+        message: trimmed,
+        context: listingContext || undefined,
+        agentMode,
+        uiContext: {
+          currentPage: 'AuraChatPage',
+          route: location.pathname,
+          listingId: listing?.id ? String(listing.id) : undefined,
+        },
+      };
+    };
+  }, [agentMode, listing?.id, listingContext, location.pathname]);
+
   const sendApi = useMemo(() => {
-    return async payload => {
+    return async (payload) => {
       const message = typeof payload === 'object' && payload != null ? payload.message : payload;
       const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
       const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
+
       try {
         if (AI_AGENT_MODE_ENABLED && agentMode) {
           try {
@@ -111,337 +137,516 @@ const AuraChatPage = () => {
               message,
               context,
               uiContext,
-              agentMode: true
+              agentMode: true,
             });
           } catch (agentErr) {
-            console.warn("Agent query fallback to direct chat:", agentErr);
+            console.warn('Agent query error, falling back directly to chat:', agentErr);
             return await aiChatService.chat({
               message,
-              context
+              context,
             });
           }
         }
         return await aiChatService.chat({
           message,
-          context
+          context,
         });
       } catch (error) {
         if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED' || error.errorCode === 'AURA_LIMIT_EXCEEDED') {
           setShowUpgradeModal(true);
-          setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
+          setUpgradeHint(t("aura_daily_limit_exceeded", "Günlük Aura AI limitinize ulaştınız."));
           throw error;
         }
         throw error;
       }
     };
   }, [agentMode, t]);
- const {
- storageKey,
- messages,
- setMessages,
- input,
- setInput,
- isSending,
- setIsSending,
- listRef,
- sendMessage,
- onKeyDown,
- scrollToBottom
- } = useAuraChat({
- userId,
- isAuthenticated: userId != null,
- initialMessages: [{
- id: 'aura-welcome',
- role: 'assistant',
- content: "Hi, I'm Aura. I'm here to help you with listing search, offers, secure payment, and showcases on SecondHand. What do you need today?",
- createdAt: Date.now()
- }],
- withTyping: true,
- buildPayload,
- sendApi,
- echoUserMessageWhenUnauthed: false,
- persistMessagesSurface: 'page'
- });
- const hasUserTurn = useMemo(() => messages.some(m => m.role === 'user'), [messages]);
- const showQuickPrompts = userId != null && !hasUserTurn && !isSending;
- const handleNewChat = async () => {
- if (userId == null) {
- setMessages([createChatMessage({
- role: 'assistant',
- content: 'Please log in to continue.'
- })]);
- return;
- }
- setIsSending(true);
- try {
- await aiChatService.newChat();
- clearAllAuraPersistedMessages(userId);
- cacheService.remove(storageKey);
- setMessages([createChatMessage({
- role: 'assistant',
- content: 'New chat started. What are we looking at today?'
- })]);
- queueMicrotask(scrollToBottom);
- } catch (e) {
- const errorMessage = getApiErrorMessage(e, 'Could not create new chat.');
- setMessages(prev => [...prev, createChatMessage({
- role: 'assistant',
- content: errorMessage
- })]);
- } finally {
- setIsSending(false);
- }
- };
- const handleDeleteHistory = async () => {
- if (userId == null) return;
- if (!window.confirm(t("confirm_delete_all_chat_history") || 'Do you want to delete all chat history?')) return;
- setIsSending(true);
- try {
- await aiChatService.deleteHistory();
- clearAllAuraPersistedMessages(userId);
- cacheService.remove(storageKey);
- setMessages([createChatMessage({
- role: 'assistant',
- content: 'History cleared. You can start a new conversation below.'
- })]);
- queueMicrotask(scrollToBottom);
- } catch (e) {
- const errorMessage = getApiErrorMessage(e, 'Could not delete history.');
- setMessages(prev => [...prev, createChatMessage({
- role: 'assistant',
- content: errorMessage
- })]);
- } finally {
- setIsSending(false);
- }
- };
- const handleDeleteMemory = async () => {
- if (userId == null) return;
- if (!window.confirm(t("confirm_reset_memory_cache") || 'Memory and chat history will be deleted. Continue?')) return;
- setIsSending(true);
- try {
- await aiChatService.deleteMemory();
- clearAllAuraPersistedMessages(userId);
- cacheService.remove(storageKey);
- setMessages([createChatMessage({
- role: 'assistant',
- content: "Memory reset. Start a new chat below if you'd like."
- })]);
- queueMicrotask(scrollToBottom);
- } catch (e) {
- const errorMessage = getApiErrorMessage(e, 'Could not delete memory.');
- setMessages(prev => [...prev, createChatMessage({
- role: 'assistant',
- content: errorMessage
- })]);
- } finally {
- setIsSending(false);
- }
- };
- return <div className="h-[calc(100vh-68px)] bg-background-primary flex overflow-hidden min-h-0 relative w-full text-slate-800">
 
- {/* ── 1. LEFT SIDEBAR PANEL (Navigation & Session) ─────── */}
- <div className={`${sidebarOpen ? 'w-64 border-r opacity-100 p-5' : 'w-0 border-r-0 opacity-0 p-0 pointer-events-none'}
- hidden lg:flex flex-col h-full bg-background-secondary border-border-light overflow-y-auto shrink-0 justify-between transition-all duration-300 ease-in-out z-25
- `}>
- <div className="space-y-6">
- {/* Brand header inside sidebar */}
- <div className="flex items-center gap-2">
- <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
- <Sparkles className="w-4.5 h-4.5 text-white" />
- </div>
- <div>
- <p className="text-xs font-bold text-text-primary leading-none">{t("aura_workspace")}</p>
- <span className="text-[9px] text-text-muted font-semibold tracking-wider uppercase mt-1 inline-block">{t("ai_console")}</span>
- </div>
- </div>
+  const {
+    storageKey,
+    messages,
+    setMessages,
+    input,
+    setInput,
+    isSending,
+    setIsSending,
+    listRef,
+    sendMessage,
+    onKeyDown,
+    scrollToBottom,
+  } = useAuraChat({
+    userId,
+    isAuthenticated: userId != null,
+    initialMessages: [
+      {
+        id: 'aura-welcome',
+        role: 'assistant',
+        content: listing
+          ? `Merhaba! "${listing.title || 'İlan'}" hakkında detaylı bilgi, piyasa fiyatı değerlendirmesi veya satıcıyla pazarlık tavsiyeleri konusunda sana yardımcı olabilirim. Ne sormak istersin?`
+          : "Merhaba! Ben Aura AI. İkinci el ürün arama, piyasa fiyat analizleri, teklif stratejileri ve güvenli ödeme süreçlerinde sana yardımcı olmak için buradayım. Bugün nasıl yardımcı olabilirim?",
+        createdAt: Date.now(),
+      },
+    ],
+    withTyping: true,
+    buildPayload,
+    sendApi,
+    echoUserMessageWhenUnauthed: false,
+    persistMessagesSurface: 'page',
+  });
 
- {/* New Chat Button */}
- <button type="button" onClick={handleNewChat} disabled={isSending} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary hover:bg-primary-hover disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm active:scale-95">
- <RotateCcw className="w-3.5 h-3.5" />{t("new_conversation")}</button>
+  const handleNewChat = async () => {
+    if (userId == null) {
+      setMessages([
+        createChatMessage({
+          role: 'assistant',
+          content: 'Sohbet geçmişinizi kaydetmek için lütfen giriş yapınız.',
+        }),
+      ]);
+      return;
+    }
+    setIsSending(true);
+    try {
+      await aiChatService.newChat();
+      clearAllAuraPersistedMessages(userId);
+      cacheService.remove(storageKey);
+      setMessages([
+        createChatMessage({
+          role: 'assistant',
+          content: listing
+            ? `Yeni sohbet başlatıldı. "${listing.title}" hakkında ne öğrenmek istersiniz?`
+            : 'Yeni sohbet başlatıldı. Bugün hangi ürünü veya konuyu incelemek istersiniz?',
+        }),
+      ]);
+      queueMicrotask(scrollToBottom);
+    } catch (e) {
+      const errorMessage = getApiErrorMessage(e, 'Yeni sohbet oluşturulamadı.');
+      setMessages((prev) => [
+        ...prev,
+        createChatMessage({ role: 'assistant', content: errorMessage }),
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
- {/* Settings Section */}
- <div className="space-y-2 pt-4 border-t border-border-light">
- <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("controls")}</p>
+  const handleClearHistory = async () => {
+    if (userId == null) return;
+    if (!window.confirm('Tüm sohbet geçmişiniz silinecek. Onaylıyor musunuz?')) return;
+    setIsSending(true);
+    try {
+      await aiChatService.deleteHistory();
+      clearAllAuraPersistedMessages(userId);
+      cacheService.remove(storageKey);
+      setMessages([
+        createChatMessage({
+          role: 'assistant',
+          content: 'Sohbet geçmişiniz temizlendi.',
+        }),
+      ]);
+      queueMicrotask(scrollToBottom);
+    } catch (e) {
+      const errorMessage = getApiErrorMessage(e, 'Geçmiş silinemedi.');
+      setMessages((prev) => [
+        ...prev,
+        createChatMessage({ role: 'assistant', content: errorMessage }),
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
- <button type="button" onClick={handleDeleteHistory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-background-primary hover:bg-secondary-light text-xs font-semibold text-text-secondary transition-all active:scale-95">
- <Trash2 className="w-3.5 h-3.5 text-text-muted" />{t("clear_history")}</button>
+  const quickListingActions = [
+    {
+      label: '💰 Fiyat Analizi',
+      prompt: `Bu ürünün (${listing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre nasıl? Fiyat analizi yapabilir misin?`,
+    },
+    {
+      label: '🛡️ Güvenlik & Satıcı',
+      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme nasıl işliyor?`,
+    },
+    {
+      label: '🤝 Pazarlık Tavsiyesi',
+      prompt: `Bu ürün için mantıklı ve kabul edilebilir bir pazarlık teklifi sence ne kadar olmalı?`,
+    },
+    {
+      label: '🔍 Artı / Eksi Özellikler',
+      prompt: `Bu ürünün teknik özellikleri ve açıklamasına göre öne çıkan avantajları ve olası dezavantajları nelerdir?`,
+    },
+  ];
 
- <button type="button" onClick={handleDeleteMemory} disabled={isSending} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light bg-background-primary hover:bg-secondary-light text-xs font-semibold text-text-secondary transition-all active:scale-95">
- <Shield className="w-3.5 h-3.5 text-text-muted" />{t("reset_memory_cache")}</button>
+  return (
+    <div className="flex h-[calc(100vh-68px)] w-full overflow-hidden bg-slate-50 text-slate-800">
+      {/* ── MAIN CHAT AREA ────────────────────────────────────────── */}
+      <div className="flex flex-1 flex-col h-full min-w-0 min-h-0 bg-white relative">
+        
+        {/* Top Floating Glass Header */}
+        <div className="shrink-0 h-16 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-4 z-20">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 shadow-sm shadow-indigo-500/20 text-white">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                  Aura AI Asistanı
+                </h1>
+                <span className="px-2 py-0.5 text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full">
+                  Gemini 3.1 Pro
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                Akıllı Pazar Yeri & İlan Danışmanı
+              </p>
+            </div>
+          </div>
 
- <button type="button" onClick={() => setShowMemoryHub(prev => !prev)} className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border-light text-xs font-semibold transition-all active:scale-95 ${showMemoryHub ? 'bg-primary text-white hover:bg-primary-hover border-transparent shadow-sm' : 'bg-background-primary hover:bg-secondary-light text-text-secondary'}`}>
- <BrainCircuit className={`w-3.5 h-3.5 ${showMemoryHub ? 'text-white' : 'text-text-muted'}`} />{showMemoryHub ? 'Aura Hafızasını Kapat' : 'Aura Bellek Profili'}</button>
- </div>
+          {/* Header Controls */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleNewChat}
+              disabled={isSending}
+              title="Yeni Sohbet"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden sm:inline">Yeni Sohbet</span>
+            </button>
 
- {showMemoryHub && (
- <div className="pt-4 border-t border-border-light">
- <AuraMemoryProfileHub />
- </div>
- )}
- </div>
+            <button
+              type="button"
+              onClick={() => setShowMemoryHub((prev) => !prev)}
+              title="Aura Bellek Profili"
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 ${
+                showMemoryHub
+                  ? 'bg-indigo-600 text-white border-transparent'
+                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <BrainCircuit className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Bellek</span>
+            </button>
 
- {/* Footer info in sidebar */}
- <div className="pt-4 border-t border-border-light">
- <div className="flex items-center gap-2.5">
- <div className="w-7 h-7 rounded-full bg-background-tertiary flex items-center justify-center text-caption font-bold text-text-secondary uppercase">
- {user?.name?.slice(0, 2) || 'US'}
- </div>
- <div className="min-w-0 flex-1">
- <p className="text-xs font-semibold text-text-primary truncate">{user?.name || t("guest_user") || 'Guest User'}</p>
- <p className="text-[9px] text-text-muted font-medium truncate">{user?.email || t("sync_enabled") || 'Sync enabled'}</p>
- </div>
- </div>
- </div>
- </div>
+            <button
+              type="button"
+              onClick={handleClearHistory}
+              disabled={isSending}
+              title="Geçmişi Temizle"
+              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
 
- {/* ── 2. MIDDLE PANEL (Main Conversational Lane) ───────── */}
- <div className="flex-1 flex flex-col min-h-0 min-w-0 h-full bg-background-primary relative z-10">
+            {listing && (
+              <button
+                type="button"
+                onClick={() => setRightPanelOpen((prev) => !prev)}
+                title={rightPanelOpen ? 'İlan Panelini Kapat' : 'İlan Panelini Aç'}
+                className={`p-2 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 ${
+                  rightPanelOpen
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
+              </button>
+            )}
+          </div>
+        </div>
 
- {/* Workspace Toolbar (Header) */}
- <div className="shrink-0 bg-background-primary border-b border-border-light px-4 py-3 flex items-center justify-between gap-4 z-20">
+        {/* Memory Hub Drawer overlay */}
+        {showMemoryHub && (
+          <div className="absolute inset-x-0 top-16 z-30 p-4 bg-white/95 backdrop-blur-md border-b border-indigo-100 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto">
+            <div className="max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <BrainCircuit className="w-4 h-4 text-indigo-600" />
+                  <h3 className="text-sm font-bold text-slate-900">Aura AI Akıllı Bellek Profili</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMemoryHub(false)}
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+                >
+                  Kapat ✕
+                </button>
+              </div>
+              <AuraMemoryProfileHub />
+            </div>
+          </div>
+        )}
 
- {/* Left tools: sidebar toggle + Brand */}
- <div className="flex items-center gap-3">
- <button type="button" onClick={() => setSidebarOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={sidebarOpen ? t("collapse_navigation") || 'Collapse Navigation' : t("expand_navigation") || 'Expand Navigation'}>
- {sidebarOpen ? <PanelLeftClose className="w-4.5 h-4.5" /> : <PanelLeft className="w-4.5 h-4.5" />}
- </button>
+        {/* ── CONVERSATION STREAM ──────────────────────────────────── */}
+        <div ref={listRef} className="flex-1 overflow-y-auto w-full px-4 sm:px-6 py-6 space-y-6">
+          <div className="max-w-3xl mx-auto space-y-6">
 
- <span className="lg:hidden w-1.5 h-1.5 rounded-full bg-status-success-bg" />
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("aura_assistant")}</h2>
- <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-text-muted bg-background-tertiary border border-border-light rounded">{t("pro")}</span>
- </div>
+            {/* Active Listing Interactive Context Hero Banner */}
+            {listing && (
+              <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 via-white to-amber-50/40 p-4 sm:p-5 shadow-xs transition-all">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-indigo-100/60">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shrink-0 shadow-2xs">
+                      {listing.imageUrl ? (
+                        <img src={listing.imageUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                          <Tag className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-600 text-white font-extrabold text-[10px] tracking-wider uppercase">
+                          Aktif İlan
+                        </span>
+                        {listing.type && (
+                          <span className="text-[11px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+                            {listingTypeLabel(listing.type)}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-sm sm:text-base font-extrabold text-slate-900 truncate mt-1">
+                        {listing.title}
+                      </h2>
+                      <p className="text-xs font-bold text-indigo-700 mt-0.5">
+                        {formatListingPriceLabel(listing.price, listing.currency)}
+                      </p>
+                    </div>
+                  </div>
 
- {/* Center tools: Agent switch */}
- {AI_AGENT_MODE_ENABLED && <button type="button" role="switch" aria-checked={agentMode} onClick={() => setAgentMode(v => !v)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 active:scale-95 ${agentMode ? 'bg-primary text-white border border-transparent shadow-sm' : 'bg-background-primary text-text-secondary border border-border-light hover:bg-secondary-light'}`}>
- <Zap className="w-3.5 h-3.5" />{t("agent_mode")}{agentMode ? 'ON' : 'OFF'}
- </button>}
+                  <Link
+                    to={ROUTES.LISTING_DETAIL(listing.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition-all shrink-0 shadow-2xs hover:text-indigo-600"
+                  >
+                    <span>İlana Git</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
 
- {/* Right tools: context toggle */}
- <button type="button" onClick={() => setRightPanelOpen(prev => !prev)} className="hidden lg:inline-flex items-center justify-center p-1.5 rounded-lg text-text-secondary hover:bg-secondary-light hover:text-text-primary transition-all active:scale-95" title={rightPanelOpen ? t("collapse_information") || 'Collapse Information' : t("expand_information") || 'Expand Information'}>
- {rightPanelOpen ? <PanelRightClose className="w-4.5 h-4.5" /> : <PanelRight className="w-4.5 h-4.5" />}
- </button>
- </div>
+                {/* Quick Smart Actions for Listing */}
+                <div className="mt-3.5">
+                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-900/60 mb-2">
+                    Aura Hızlı Analiz Soruları:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {quickListingActions.map((qa) => (
+                      <button
+                        key={qa.label}
+                        type="button"
+                        disabled={isSending}
+                        onClick={() => sendMessage({ text: qa.prompt })}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 hover:text-white border border-indigo-100 text-slate-700 text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50"
+                      >
+                        <span>{qa.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
- {/* Mobile active context view banner (shown inline only on mobile) */}
- {listing && <div className="lg:hidden p-4 pb-0 shrink-0">
- <AuraListingContextCard listing={listing} />
- </div>}
+            {/* Chat Messages */}
+            {messages.map((m) => {
+              const isUser = m.role === 'user';
+              return (
+                <div
+                  key={m.id}
+                  className={`flex gap-3 sm:gap-4 ${
+                    isUser ? 'flex-row-reverse' : 'flex-row'
+                  } items-start animate-in fade-in-50 duration-200`}
+                >
+                  {/* Avatar */}
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl shadow-2xs ${
+                      isUser
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 text-white'
+                    }`}
+                  >
+                    {isUser ? <UserRound className="w-4.5 h-4.5" /> : <Sparkles className="w-4.5 h-4.5" />}
+                  </div>
 
- {/* Conversation Stream */}
- <div ref={listRef} className="flex-1 overflow-y-auto w-full custom-scrollbar">
- <PageContainer narrow className="py-8 w-full space-y-6">
+                  {/* Message Bubble */}
+                  <div className={`min-w-0 max-w-[85%] sm:max-w-[80%] ${isUser ? 'text-right' : 'text-left'}`}>
+                    <div
+                      className={`inline-block rounded-3xl px-5 py-4 text-xs sm:text-sm leading-relaxed shadow-xs ${
+                        isUser
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-tr-xs font-medium'
+                          : 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-xs'
+                      }`}
+                    >
+                      {m.typing ? (
+                        <div className="flex items-center gap-2 py-1 px-1">
+                          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                          <span className="text-xs text-slate-400 font-semibold ml-1.5">Aura yanıt hazırlıyor...</span>
+                        </div>
+                      ) : (
+                        <>
+                          {renderMessageContent(m.content)}
+                          {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-slate-100">
+                              <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
 
- {/* Elegant Welcome Greeting Card if there is only 1 message (initial welcome) */}
- {messages.length === 1 && <div className="rounded-xl border border-border-light bg-background-tertiary p-6 text-center space-y-4 mb-6 shadow-sm">
- <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center mx-auto shadow-md">
- <Bot className="w-6 h-6 text-white" />
- </div>
- <div className="space-y-1">
- <h3 className="text-sm font-medium text-text-primary">{t("secure_agentic_trade_companion")}</h3>
- <p className="text-xs text-text-secondary leading-normal max-w-md mx-auto">{t("aura_provides_automated_database_queries")}</p>
- </div>
- </div>}
+            {/* Empty State / Suggested Prompts if only 1 message and no listing */}
+            {messages.length === 1 && !listing && (
+              <div className="mt-8 pt-4">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3 text-center">
+                  Önerilen Başlangıç Soruları
+                </p>
+                <AuraSuggestedPrompts
+                  disabled={isSending}
+                  onPick={(msg) => sendMessage({ text: msg })}
+                />
+              </div>
+            )}
+          </div>
+        </div>
 
- {/* Conversation Messages */}
- {messages.map(m => {
- const isUser = m.role === 'user';
- return <div key={m.id} className={`flex gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end`}>
- {/* Avatar */}
- <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm border ${isUser ? 'bg-background-tertiary border-border-light text-text-primary' : 'bg-primary border-primary text-white'}`}>
- {isUser ? <UserRound className="h-4.5 w-4.5" /> : <Sparkles className="h-4 w-4" />}
- </div>
+        {/* ── FLOATING INPUT BAR ──────────────────────────────────── */}
+        <div className="shrink-0 p-4 sm:p-5 bg-gradient-to-t from-white via-white to-white/70 border-t border-slate-100">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-2xl p-2 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 focus-within:bg-white transition-all shadow-xs">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onKeyDown}
+                placeholder={
+                  listing
+                    ? `"${listing.title?.slice(0, 30)}..." hakkında Aura'ya soru sorun...`
+                    : "İkinci el ürün ara, fiyat analizi veya pazarlık tavsiyesi iste..."
+                }
+                rows={1}
+                className="flex-1 resize-none bg-transparent px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none min-h-[40px] max-h-[120px]"
+              />
+              <button
+                type="button"
+                onClick={() => sendMessage()}
+                disabled={isSending || !input.trim()}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:active:scale-100 cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-[10px] text-slate-400 text-center font-medium">
+              Aura AI, güvenli alışveriş ve ilan analizleri için gerçek veritabanı bağlamını kullanır.
+            </p>
+          </div>
+        </div>
+      </div>
 
- {/* Bubble content */}
- <div className={`min-w-0 max-w-[85%] ${isUser ? 'text-right' : ''}`}>
- <div className={`inline-block rounded-xl px-4 py-3.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white shadow-md rounded-br-sm' : 'bg-background-tertiary border border-border-light text-text-primary rounded-bl-sm shadow-sm'}`}>
- {m.typing ? <div className="flex items-center gap-1.5 py-1 px-1">
- <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
- animationDelay: '0ms'
- }} />
- <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
- animationDelay: '150ms'
- }} />
- <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{
- animationDelay: '300ms'
- }} />
- </div> : <>
- {renderMessageContent(m.content)}
- {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 ? <AuraSuggestedListingChips listings={m.meta.suggestedListings} /> : null}
- {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-3 flex flex-wrap gap-1 pt-2 border-t border-border-light">
- {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded bg-background-secondary px-2 py-0.5 text-[9px] font-bold text-text-muted border border-border-light">
- {source.source.toUpperCase()}:{source.status}
- </span>)}
- </div> : null}
- </>}
- </div>
- </div>
- </div>;
- })}
- </PageContainer>
- </div>
+      {/* ── RIGHT PANEL: LISTING CANVAS ──────────────────────────── */}
+      {listing && rightPanelOpen && (
+        <aside className="w-80 border-l border-slate-200 bg-white h-full overflow-y-auto hidden lg:flex flex-col p-5 space-y-6 shrink-0 shadow-xs z-20">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">
+                İlan İnceleme Paneli
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRightPanelOpen(false)}
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+            >
+              ✕
+            </button>
+          </div>
 
- {/* Mobile quick prompts feed panel (only visible if prompts exist and screen is mobile) */}
- {showQuickPrompts && <div className="lg:hidden shrink-0 border-t border-border-light px-4 py-4 bg-background-secondary">
- <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("suggested_questions")}</p>
- <AuraSuggestedPrompts disabled={isSending} onPick={msg => sendMessage({
- text: msg
- })} dense />
- </div>}
+          {/* Product Media & Core Info */}
+          <div className="space-y-3">
+            <div className="aspect-4/3 w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-inner">
+              {listing.imageUrl ? (
+                <img src={listing.imageUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                  <Tag className="w-8 h-8" />
+                </div>
+              )}
+            </div>
 
- {/* Floating Chat Input Section */}
- <div className="shrink-0 bg-transparent p-4 sm:p-6 pb-6 mt-auto">
- <div className="max-w-3xl mx-auto flex items-end gap-3 bg-surface-elevated shadow-lg rounded-2xl border border-border-light p-2 transition-all">
- <div className="flex-1 relative">
- <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("type_a_message_or_ask_a_shopping_questio")} className="w-full resize-none rounded-xl bg-transparent px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-0 min-h-[44px] max-h-[120px]" rows={2} />
- </div>
- <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm hover:bg-primary-hover active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:active:scale-100 mb-0.5">
- <Send className="w-4.5 h-4.5" />
- </button>
- </div>
- <p className="mt-3 text-[9px] text-text-muted text-center font-medium">{t("aura_agent_will_guide_you_securely_verif")}</p>
- </div>
- </div>
+            <div>
+              <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                {listingTypeLabel(listing.type) || 'Genel İlan'}
+              </span>
+              <h4 className="text-sm font-extrabold text-slate-900 mt-1 leading-snug">
+                {listing.title}
+              </h4>
+              <p className="text-base font-black text-indigo-600 mt-1">
+                {formatListingPriceLabel(listing.price, listing.currency)}
+              </p>
+            </div>
+          </div>
 
- {/* ── 3. RIGHT PANEL (Listing Information Canvas) ───────── */}
- <div className={`${rightPanelOpen ? 'w-80 border-l opacity-100 p-5' : 'w-0 border-l-0 opacity-0 p-0 pointer-events-none'}
- hidden lg:flex flex-col h-full bg-background-secondary border-border-light overflow-y-auto shrink-0 space-y-6 transition-all duration-300 ease-in-out z-25
- `}>
+          {/* Quick Specifications */}
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 space-y-2 text-xs">
+            <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
+              Özet Bilgiler
+            </p>
+            <div className="flex justify-between py-1 border-b border-slate-200/40">
+              <span className="text-slate-500">Konum</span>
+              <span className="font-bold text-slate-800">
+                {[listing.district, listing.city].filter(Boolean).join(', ') || 'Belirtilmedi'}
+              </span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-200/40">
+              <span className="text-slate-500">Durum</span>
+              <span className="font-bold text-emerald-600">
+                {listingStatusLabel(listing.status) || 'Aktif'}
+              </span>
+            </div>
+            {listing.listingNo && (
+              <div className="flex justify-between py-1">
+                <span className="text-slate-500">İlan No</span>
+                <span className="font-mono font-bold text-slate-700">{listing.listingNo}</span>
+              </div>
+            )}
+          </div>
 
- {/* Active Product Analysis section */}
- {listing ? <div>
- <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("workspace_context")}</p>
- <AuraListingContextCard listing={listing} />
- </div> : <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
- <div className="flex items-center gap-2 text-text-primary font-bold text-xs">
- <Layers className="w-4 h-4 text-text-muted" />{t("general_workspace")}</div>
- <p className="text-caption text-text-secondary leading-normal">{t("no_product_is_currently_active_in_your_c")}</p>
- </div>}
+          {/* Escrow Protection Info */}
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 space-y-2">
+            <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-xs">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Güvenli Havuz Koruması</span>
+            </div>
+            <p className="text-[11px] text-emerald-900/80 leading-relaxed font-medium">
+              Ödemeniz, ürünü teslim alıp onaylayana kadar sistem emanetinde (escrow) güvende tutulur.
+            </p>
+          </div>
 
- {/* Quick Suggestions Cards */}
- {showQuickPrompts && <div>
- <p className="text-caption font-bold text-text-muted uppercase tracking-wider mb-2">{t("suggested_queries")}</p>
- <AuraSuggestedPrompts disabled={isSending} onPick={msg => sendMessage({
- text: msg
- })} dense />
- </div>}
+          <Link
+            to={ROUTES.LISTING_DETAIL(listing.id)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition-all shadow-xs cursor-pointer"
+          >
+            <span>İlan Detayına Dön</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </aside>
+      )}
 
- {/* Secure shopping widget info */}
- <div className="rounded-xl border border-border-light bg-background-primary p-4 shadow-sm space-y-2">
- <div className="flex-1 flex flex-col gap-2">
- <div className="flex items-center gap-2 text-text-primary font-bold text-xs">
- <Info className="w-4 h-4 text-text-muted" />{t("security_shield")}</div>
- <p className="text-caption text-text-secondary leading-normal">{t("for_secure_payments_always_checkout_usin")}</p>
- </div>
- </div>
-
- </div>
-
- <PremiumUpgradeModal
- isOpen={showUpgradeModal}
- onClose={() => setShowUpgradeModal(false)}
- featureHint={upgradeHint}
- />
- </div>;
+      {/* Upgrade Modal */}
+      <PremiumUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureHint={upgradeHint}
+      />
+    </div>
+  );
 };
+
 export default AuraChatPage;
