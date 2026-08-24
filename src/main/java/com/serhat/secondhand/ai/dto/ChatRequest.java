@@ -8,7 +8,7 @@ public record ChatRequest(
         @Size(min = 1, max = 5000, message = "Message must be between 1-5000 characters")
         String message,
 
-        @Size(max = 2000, message = "Context must be at most 2000 characters")
+        @Size(max = 25000, message = "Context must be at most 25000 characters")
         String context
 ) {
 }

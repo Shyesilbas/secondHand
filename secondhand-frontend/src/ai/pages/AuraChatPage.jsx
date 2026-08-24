@@ -99,34 +99,42 @@ const AuraChatPage = () => {
  };
  };
  }, [agentMode, listing?.id, listingContext, location.pathname]);
- const sendApi = useMemo(() => {
- return async payload => {
- const message = typeof payload === 'object' && payload != null ? payload.message : payload;
- const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
- const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
- try {
- if (AI_AGENT_MODE_ENABLED && agentMode) {
- return await aiChatService.agentQuery({
- message,
- context,
- uiContext,
- agentMode: true
- });
- }
- return await aiChatService.chat({
- message,
- context
- });
- } catch (error) {
- if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED') {
- setShowUpgradeModal(true);
- setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
- throw error;
- }
- throw error;
- }
- };
- }, [agentMode, t]);
+  const sendApi = useMemo(() => {
+    return async payload => {
+      const message = typeof payload === 'object' && payload != null ? payload.message : payload;
+      const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
+      const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
+      try {
+        if (AI_AGENT_MODE_ENABLED && agentMode) {
+          try {
+            return await aiChatService.agentQuery({
+              message,
+              context,
+              uiContext,
+              agentMode: true
+            });
+          } catch (agentErr) {
+            console.warn("Agent query fallback to direct chat:", agentErr);
+            return await aiChatService.chat({
+              message,
+              context
+            });
+          }
+        }
+        return await aiChatService.chat({
+          message,
+          context
+        });
+      } catch (error) {
+        if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED' || error.errorCode === 'AURA_LIMIT_EXCEEDED') {
+          setShowUpgradeModal(true);
+          setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
+          throw error;
+        }
+        throw error;
+      }
+    };
+  }, [agentMode, t]);
  const {
  storageKey,
  messages,

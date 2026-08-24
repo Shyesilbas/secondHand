@@ -114,9 +114,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private int determineRateLimit(String requestURI) {
-        if (requestURI.startsWith("/api/auth/")) {
+        if (requestURI.startsWith("/api/auth/") || requestURI.startsWith("/api/v1/auth/")) {
             return rateLimitConfig.getAuth().getRequestsPerSecond();
-        } else if (requestURI.startsWith("/api/ai/")) {
+        } else if (requestURI.startsWith("/api/ai/") || requestURI.startsWith("/api/v1/ai/")) {
             return rateLimitConfig.getAi().getRequestsPerSecond();
         } else if (requestURI.startsWith("/api/payment/") || 
                    requestURI.startsWith("/api/v1/payments/") || 
@@ -128,9 +128,9 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getRateLimitCategory(String requestURI) {
-        if (requestURI.startsWith("/api/auth/")) {
+        if (requestURI.startsWith("/api/auth/") || requestURI.startsWith("/api/v1/auth/")) {
             return "auth";
-        } else if (requestURI.startsWith("/api/ai/")) {
+        } else if (requestURI.startsWith("/api/ai/") || requestURI.startsWith("/api/v1/ai/")) {
             return "ai";
         } else if (requestURI.startsWith("/api/payment/") || 
                    requestURI.startsWith("/api/v1/payments/") || 
