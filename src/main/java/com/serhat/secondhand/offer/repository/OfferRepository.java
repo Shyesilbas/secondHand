@@ -29,4 +29,17 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
     @EntityGraph(attributePaths = {"listing", "buyer", "seller"})
     Page<Offer> findBySellerId(Long sellerId, Pageable pageable);
 
+    @org.springframework.data.jpa.repository.Query("SELECT o.status, COUNT(o) FROM Offer o WHERE o.seller.id = :sellerId AND o.createdAt BETWEEN :startDate AND :endDate GROUP BY o.status")
+    List<Object[]> countOffersBySellerAndStatusGrouped(@org.springframework.data.repository.query.Param("sellerId") Long sellerId,
+                                                      @org.springframework.data.repository.query.Param("startDate") LocalDateTime startDate,
+                                                      @org.springframework.data.repository.query.Param("endDate") LocalDateTime endDate);
+
+    @org.springframework.data.jpa.repository.Query("SELECT o.status, COUNT(o) FROM Offer o WHERE o.buyer.id = :buyerId AND o.createdAt BETWEEN :startDate AND :endDate GROUP BY o.status")
+    List<Object[]> countOffersByBuyerAndStatusGrouped(@org.springframework.data.repository.query.Param("buyerId") Long buyerId,
+                                                     @org.springframework.data.repository.query.Param("startDate") LocalDateTime startDate,
+                                                     @org.springframework.data.repository.query.Param("endDate") LocalDateTime endDate);
+
+    long countBySellerIdAndCreatedAtBetween(Long sellerId, LocalDateTime startDate, LocalDateTime endDate);
+
+    long countByBuyerIdAndCreatedAtBetween(Long buyerId, LocalDateTime startDate, LocalDateTime endDate);
 }

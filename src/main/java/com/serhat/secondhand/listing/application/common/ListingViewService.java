@@ -10,6 +10,7 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,6 +32,7 @@ public class ListingViewService {
     private final ListingViewRepository listingViewRepository;
     private final ListingRepository listingRepository;
     private final IUserService userService;
+    private final StringRedisTemplate redisTemplate;
 
     @Async("viewTrackingExecutor")
     public void trackView(UUID listingId, Long userId, String sessionId, String ipAddress, String userAgent) {
@@ -48,16 +51,21 @@ public class ListingViewService {
             }
 
             String ipHash = hashIpAddress(ipAddress);
-            LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(ListingBusinessConstants.VIEW_DUPLICATE_WINDOW_HOURS);
-            boolean isDuplicate = false;
 
-            if (userId != null) {
-                isDuplicate = listingViewRepository.existsByListingIdAndUserIdAndViewedAtAfter(listingId, userId, oneHourAgo);
-            } else if (sessionId != null) {
-                isDuplicate = listingViewRepository.existsByListingIdAndSessionIdAndViewedAtAfter(listingId, sessionId, oneHourAgo);
+            // Fast Redis-based deduplication (0ms DB SELECT overhead)
+            String dedupIdentifier = (userId != null) ? "u:" + userId : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId : "ip:" + ipHash);
+            String dedupKey = "v4:listing:view:dedup:" + dedupIdentifier + ":" + listingId;
+            Duration dedupTtl = Duration.ofHours(ListingBusinessConstants.VIEW_DUPLICATE_WINDOW_HOURS);
+
+            try {
+                Boolean isNew = redisTemplate.opsForValue().setIfAbsent(dedupKey, "1", dedupTtl);
+                if (Boolean.FALSE.equals(isNew)) {
+                    log.debug("Skipping duplicate view for listing {} - already tracked in Redis dedup window", listingId);
+                    return;
+                }
+            } catch (Exception e) {
+                log.warn("Redis view deduplication check failed, falling back to direct tracking: {}", e.getMessage());
             }
-
-            if (isDuplicate) return;
 
             ListingView view = ListingView.builder()
                     .listing(listing)
@@ -65,6 +73,8 @@ public class ListingViewService {
                     .sessionId(sessionId)
                     .ipHash(ipHash)
                     .userAgent(truncateUserAgent(userAgent))
+                    .category(listing.getListingType() != null ? listing.getListingType().name() : null)
+                    .priceSnapshot(listing.getPrice())
                     .viewedAt(LocalDateTime.now())
                     .build();
 
@@ -78,7 +88,7 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "sellerViewStats", key = "#sellerId")
+    @Cacheable(value = "listing:views:seller", key = "#sellerId")
     public ListingViewStatsDto getAggregatedViewStatisticsForSeller(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         List<Object[]> stats = listingViewRepository.getAggregatedStats(sellerId, startDate, endDate);
 
@@ -120,7 +130,7 @@ public class ListingViewService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "listingViewStats", key = "#listingId")
+    @Cacheable(value = "listing:views:listing", key = "#listingId")
     public ListingViewStatsDto getViewStatistics(UUID listingId, LocalDateTime startDate, LocalDateTime endDate) {
         if (!listingRepository.existsById(listingId)) {
             throw new com.serhat.secondhand.core.exception.BusinessException(
@@ -128,23 +138,26 @@ public class ListingViewService {
         }
 
         int periodDays = (int) java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        long totalViews = listingViewRepository.countByListingId(listingId);
         
         List<Object[]> stats = listingViewRepository.getViewStatisticsWithDailyBreakdown(listingId, startDate, endDate);
         
-        long totalViews = 0;
         long uniqueViews = 0;
         Map<LocalDate, Long> viewsByDate = new HashMap<>();
         
         if (!stats.isEmpty()) {
-            Object[] firstRow = stats.get(0);
-            totalViews = ((Number) firstRow[0]).longValue();
-            uniqueViews = ((Number) firstRow[1]).longValue();
-            
             for (Object[] row : stats) {
-                LocalDate date = row[2] instanceof Date ? ((java.sql.Date) row[2]).toLocalDate() : (LocalDate) row[2];
-                Long count = ((Number) row[3]).longValue();
-                viewsByDate.put(date, count);
+                Long uniqueCount = ((Number) row[1]).longValue();
+                if (uniqueCount > uniqueViews) {
+                    uniqueViews = uniqueCount;
+                }
+                LocalDate date = row[2] instanceof java.sql.Date ? ((java.sql.Date) row[2]).toLocalDate() : (LocalDate) row[2];
+                Long dailyCount = ((Number) row[3]).longValue();
+                viewsByDate.put(date, dailyCount);
             }
+        }
+        if (uniqueViews == 0 && totalViews > 0) {
+            uniqueViews = totalViews;
         }
 
         return ListingViewStatsDto.builder()

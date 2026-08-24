@@ -13,6 +13,7 @@ import java.util.UUID;
 @Repository
 public interface ListingViewRepository extends JpaRepository<ListingView, UUID> {
 
+    long countByListingId(UUID listingId);
 
     long countByListingIdAndViewedAtBetween(UUID listingId, LocalDateTime startDate, LocalDateTime endDate);
 

@@ -50,7 +50,7 @@ public class EmailService {
         return emailRepository.countByUserIdAndReadAtIsNull(userId);
     }
 
-    @CacheEvict(value = "userBadges", key = "#userId")
+    @CacheEvict(value = "user:badges", key = "#userId")
     public Result<String> deleteEmail(UUID emailId, Long userId) {
         int affected = emailRepository.softDeleteByIdAndUserId(emailId, userId, LocalDateTime.now());
         if (affected > 0) {
@@ -59,13 +59,13 @@ public class EmailService {
         return Result.error("Email not found or unauthorized", "EMAIL_NOT_FOUND");
     }
 
-    @CacheEvict(value = "userBadges", key = "#userId")
+    @CacheEvict(value = "user:badges", key = "#userId")
     public String deleteAllEmails(Long userId) {
         emailRepository.softDeleteAllByUserId(userId, LocalDateTime.now());
         return "Emails deleted for userId: " + userId;
     }
 
-    @CacheEvict(value = "userBadges", key = "#userId")
+    @CacheEvict(value = "user:badges", key = "#userId")
     public EmailDto markAsRead(UUID emailId, Long userId, String userEmail) {
         Email email = emailRepository.findByIdAndRecipientEmail(emailId, userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found or unauthorized"));

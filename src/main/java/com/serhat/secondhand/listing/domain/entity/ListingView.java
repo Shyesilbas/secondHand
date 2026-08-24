@@ -12,7 +12,8 @@ import java.util.UUID;
     @Index(name = "idx_listing_view_listing", columnList = "listing_id"),
     @Index(name = "idx_listing_view_user", columnList = "user_id"),
     @Index(name = "idx_listing_view_session", columnList = "session_id"),
-    @Index(name = "idx_listing_view_date", columnList = "viewed_at")
+    @Index(name = "idx_listing_view_date", columnList = "viewed_at"),
+    @Index(name = "idx_listing_view_category", columnList = "category")
 })
 @Getter
 @Setter
@@ -42,6 +43,12 @@ public class ListingView {
 
     @Column(name = "user_agent", length = 500)
     private String userAgent;
+
+    @Column(name = "category", length = 50)
+    private String category;
+
+    @Column(name = "price_snapshot", precision = 19, scale = 2)
+    private java.math.BigDecimal priceSnapshot;
 
     @Column(name = "viewed_at", nullable = false, updatable = false)
     private LocalDateTime viewedAt;

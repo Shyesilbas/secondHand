@@ -13,7 +13,7 @@ import java.util.UUID;
 @Slf4j
 public class OfferRedisReservationService {
 
-    private static final String OFFER_LOCK_KEY_PREFIX = "offer:reservation:";
+    private static final String OFFER_LOCK_KEY_PREFIX = "v4:offer:lock:";
     private static final Duration DEFAULT_OFFER_TTL = Duration.ofHours(24);
 
     private final StringRedisTemplate redisTemplate;

@@ -31,7 +31,7 @@ public class FavoriteStatsService {
     }
 
     @Cacheable(
-            value = "favoriteStatsBatch",
+            value = "user:stats:favorites",
             key = "T(java.util.Objects).hash(#listingIds) + '_' + #userId",
             unless = "#result == null || #result.isEmpty()"
     )

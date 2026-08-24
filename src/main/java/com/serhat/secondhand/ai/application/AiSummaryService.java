@@ -22,7 +22,7 @@ public class AiSummaryService {
     private final ReviewRepository reviewRepository;
     private final GeminiClient geminiClient;
 
-    @Cacheable(value = "aiSummaries", key = "'user::' + #userId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
+    @Cacheable(value = "ai:summaries", key = "'user:' + #userId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getUserReviewsSummary(Long userId) {
         log.info("Generating AI summary for user reviews: userId={}", userId);
         
@@ -52,7 +52,7 @@ public class AiSummaryService {
         }
     }
 
-    @Cacheable(value = "aiSummaries", key = "'listing::' + #listingId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
+    @Cacheable(value = "ai:summaries", key = "'listing:' + #listingId", unless = "#result == T(com.serhat.secondhand.ai.application.AiSummaryService).summaryUnavailableMessage()")
     public String getListingReviewsSummary(UUID listingId) {
         log.info("Generating AI summary for listing reviews: listingId={}", listingId);
         

@@ -35,7 +35,7 @@ public class OrderCompletionService {
     private final OrderCompletionPolicy orderCompletionPolicy;
     private final ApplicationEventPublisher eventPublisher;
 
-    @CacheEvict(value = "pendingOrders", key = "#user.id")
+    @CacheEvict(value = "order:pending", key = "#user.id")
     public Result<OrderDto> completeOrder(Long orderId, User user) {
         Result<Order> orderResult = validateOrderForCompletion(orderId, user);
         if (orderResult.isError()) return orderResult.propagateError();

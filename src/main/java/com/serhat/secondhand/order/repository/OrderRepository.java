@@ -72,5 +72,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("deliveryMethod") DeliveryMethod deliveryMethod,
             Pageable pageable);
 
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN FETCH o.orderItems oi " +
+           "JOIN FETCH oi.listing l " +
+           "LEFT JOIN FETCH oi.seller s " +
+           "WHERE o.user.id = :userId " +
+           "AND o.status IN :statuses " +
+           "ORDER BY o.createdAt DESC")
+    List<Order> findActiveOrdersForBuyer(@Param("userId") Long userId, @Param("statuses") List<OrderStatus> statuses);
+
     boolean existsByUserIdAndStatus(Long userId, OrderStatus status);
 }

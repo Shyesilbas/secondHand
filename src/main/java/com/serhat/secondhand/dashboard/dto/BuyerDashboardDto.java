@@ -39,6 +39,12 @@ public class BuyerDashboardDto {
     
     // Review Statistics
     private Long reviewsGiven;
+
+    // Priority Enrichment Metrics
+    private BigDecimal totalSavings;
+    private BuyerOfferStatsDto offerStats;
+    private List<ActiveDeliveryDto> activeDeliveries;
+    private List<PriceDropAlertDto> priceDropAlerts;
     
     // Period Info
     private LocalDateTime startDate;

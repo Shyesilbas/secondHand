@@ -102,9 +102,9 @@ public class OrderQueryService {
      * Statüsü artık değişmeyecek siparişleri cache'ler.
      * COMPLETED, CANCELLED, REFUNDED → 2 saat TTL
      */
-    @Cacheable(value = "completedOrder", key = "#orderId")
+    @Cacheable(value = "order:completed", key = "#orderId")
     public OrderDto getCachedCompletedOrder(Long orderId, Order order) {
-        log.info("[CACHE MISS] completedOrder::{}", orderId);
+        log.info("[CACHE MISS] order:completed:{}", orderId);
         MetadataContext metadata = fetchMetadata(order);
         return orderMapper.toDto(order, 
                 metadata.cancelled(), metadata.refunded(),
@@ -221,7 +221,7 @@ public class OrderQueryService {
         return orderDto;
     }
 
-    @Cacheable(value = "pendingOrders", key = "#userId")
+    @Cacheable(value = "order:pending", key = "#userId")
     public Map<String, Object> getPendingCompletionStatus(Long userId) {
         long count = orderRepository.countByUserIdAndStatus(userId, OrderStatus.DELIVERED);
 

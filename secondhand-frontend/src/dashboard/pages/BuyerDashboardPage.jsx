@@ -10,8 +10,12 @@ import { motion } from 'framer-motion';
 const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
 import CategoryBreakdown from '../components/CategoryBreakdown.jsx';
 import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
-import { DollarSign, ShoppingBag, TrendingUp, Heart, Tag } from 'lucide-react';
+import ActiveDeliveriesTracker from '../components/ActiveDeliveriesTracker.jsx';
+import PriceDropWatchlist from '../components/PriceDropWatchlist.jsx';
+import { DollarSign, ShoppingBag, TrendingUp, Heart, Sparkles, Tag, ArrowUpRight } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/common/constants/routes';
 const ChartCard = ({
  children,
  title,
@@ -88,7 +92,7 @@ const BuyerDashboardPage = () => {
  <span className="text-text-muted">·</span>
  <div className="flex items-center gap-1">
  <Heart className="w-3 h-3 text-text-muted" />
- <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites}{t("favorites_saved")}</span>
+ <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites} {t("favorites_saved")}</span>
  </div>
  </>}
  </div>
@@ -108,13 +112,48 @@ const BuyerDashboardPage = () => {
 
  {/* Content */}
  <PageContainer className="py-6 px-6 space-y-6">
+
+ {/* Active Deliveries Shipment Tracker */}
+ {dashboard.activeDeliveries && dashboard.activeDeliveries.length > 0 && (
+   <ActiveDeliveriesTracker activeDeliveries={dashboard.activeDeliveries} />
+ )}
+
  {/* Primary KPIs — 4 columns */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
  <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" color="blue" />
  <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} color="green" />
  <MetricCard index={2} title={t("avg_order_value")} value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')} icon={TrendingUp} subtitle="Per order" color="purple" />
- <MetricCard index={3} title={t("savings")} value={(dashboard.cancelledOrders || 0) + (dashboard.refundedOrders || 0) > 0 ? `${dashboard.cancelledOrders || 0} cancelled · ${dashboard.refundedOrders || 0} refunded` : '—'} icon={Tag} subtitle="Cancels & refunds" color="amber" />
+ <MetricCard index={3} title={t("smart_savings", "Akıllı Tasarruf")} value={formatCurrency(dashboard.totalSavings || 0, 'TRY')} icon={Sparkles} subtitle="İndirim & İkinci El Kazancı" color="amber" />
  </div>
+
+ {/* Outgoing Offers & Quick Actions Hub */}
+ {dashboard.offerStats && (
+   <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+     <div className="flex items-center gap-3">
+       <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center border border-indigo-200">
+         <Tag className="w-5 h-5" />
+       </div>
+       <div>
+         <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">{t("my_sent_offers", "Yaptığınız Pazarlık Teklifleri")}</h4>
+         <p className="text-xs text-slate-500 mt-0.5">
+           {dashboard.offerStats.totalOffersSent || 0} teklif gönderildi · <span className="font-bold text-amber-600">{dashboard.offerStats.pendingOffers || 0} bekliyor</span> · <span className="font-bold text-emerald-600">{dashboard.offerStats.acceptedOffers || 0} kabul edildi</span>
+         </p>
+       </div>
+     </div>
+     <Link
+       to={ROUTES.OFFERS}
+       className="inline-flex items-center gap-1 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-2xs"
+     >
+       <span>{t("view_my_offers", "Tekliflerimi Gör")}</span>
+       <ArrowUpRight className="w-3.5 h-3.5" />
+     </Link>
+   </div>
+ )}
+
+ {/* Price Drops Watchlist */}
+ {dashboard.priceDropAlerts && dashboard.priceDropAlerts.length > 0 && (
+   <PriceDropWatchlist priceDrops={dashboard.priceDropAlerts} />
+ )}
 
  {/* Quick Status Summary */}
  <QuickStatusSummary ordersByStatus={dashboard.ordersByStatus || {}} />
@@ -136,9 +175,6 @@ const BuyerDashboardPage = () => {
  <ChartCard title={t("orders_by_status")} delay={0.3}>
  <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
  </ChartCard>
- 
- {/* Optional: Add a placeholder or future feature card here to keep grid balance */}
- <div className="hidden lg:block" />
  </div>
 
  {/* Spacer */}

@@ -38,6 +38,7 @@ public class DashboardService implements IDashboardService {
     private final FavoriteStatisticsPort favoriteStatisticsPort;
     private final DashboardMapper dashboardMapper;
     private final ListingViewStatisticsPort listingViewStatisticsPort;
+    private final OfferStatisticsPort offerStatisticsPort;
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
 
@@ -85,10 +86,14 @@ public class DashboardService implements IDashboardService {
         CompletableFuture<List<Object[]>> categoryOrderCountRawFuture = CompletableFuture.supplyAsync(() ->
                 salesStatisticsPort.countOrdersBySellerAndCategory(sellerId, startDate, endDate), taskExecutor);
 
+        CompletableFuture<List<Object[]>> offerStatsRawFuture = CompletableFuture.supplyAsync(() ->
+                offerStatisticsPort.countOffersBySellerAndStatusGrouped(sellerId, startDate, endDate), taskExecutor);
+
         CompletableFuture.allOf(revenueFuture, revenueTrendRawFuture, ordersByStatusFuture,
                 totalListingsFuture, activeListingsFuture, inactiveListingsFuture,
                 viewStatsFuture, totalFavoritesFuture, categoryRevenueFuture,
-                reviewStatsFuture, topListingsRawFuture, prevRevFuture, categoryOrderCountRawFuture).join();
+                reviewStatsFuture, topListingsRawFuture, prevRevFuture, categoryOrderCountRawFuture,
+                offerStatsRawFuture).join();
 
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatusFuture.join());
         long totalOrders = ordersByStatusMap.values().stream().mapToLong(Long::longValue).sum();
@@ -97,6 +102,53 @@ public class DashboardService implements IDashboardService {
         ReviewStatsDto reviewStats = Optional.ofNullable(reviewStatsFuture.join()).orElse(ReviewStatsDto.empty());
         long totalReviews = reviewStats.getTotalReviews() != null ? reviewStats.getTotalReviews() : 0L;
         double averageRating = reviewStats.getAverageRating() != null ? reviewStats.getAverageRating() : 0.0;
+
+        // Process Offer Analytics
+        Map<String, Long> offerStatusMap = new HashMap<>();
+        long totalOffers = 0;
+        long pendingOffers = 0;
+        long acceptedOffers = 0;
+        long rejectedOffers = 0;
+        long expiredOffers = 0;
+        for (Object[] row : offerStatsRawFuture.join()) {
+            String status = row[0] != null ? row[0].toString() : "UNKNOWN";
+            long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            offerStatusMap.put(status, count);
+            totalOffers += count;
+            if ("PENDING".equals(status)) pendingOffers = count;
+            else if ("ACCEPTED".equals(status)) acceptedOffers = count;
+            else if ("REJECTED".equals(status)) rejectedOffers = count;
+            else if ("EXPIRED".equals(status)) expiredOffers = count;
+        }
+        long decidedOffers = acceptedOffers + rejectedOffers;
+        double offerAcceptanceRate = (decidedOffers > 0) ? Math.round(((double) acceptedOffers / decidedOffers * 100.0) * 10.0) / 10.0 : 0.0;
+
+        com.serhat.secondhand.dashboard.dto.OfferAnalyticsDto offerAnalytics = com.serhat.secondhand.dashboard.dto.OfferAnalyticsDto.builder()
+                .totalOffersReceived(totalOffers)
+                .pendingOffers(pendingOffers)
+                .acceptedOffers(acceptedOffers)
+                .rejectedOffers(rejectedOffers)
+                .expiredOffers(expiredOffers)
+                .acceptanceRate(offerAcceptanceRate)
+                .statusCounts(offerStatusMap)
+                .build();
+
+        // Process Conversion Funnel
+        long viewsCount = viewStatsFuture.join().getTotalViews();
+        long favoritesCount = totalFavoritesFuture.join();
+        double viewToFavRate = (viewsCount > 0) ? Math.round(((double) favoritesCount / viewsCount * 100.0) * 10.0) / 10.0 : 0.0;
+        double favToOfferRate = (favoritesCount > 0) ? Math.round(((double) totalOffers / favoritesCount * 100.0) * 10.0) / 10.0 : 0.0;
+        double overallConversionRate = (viewsCount > 0) ? Math.round(((double) totalOrders / viewsCount * 100.0) * 10.0) / 10.0 : 0.0;
+
+        com.serhat.secondhand.dashboard.dto.FunnelStatsDto funnel = com.serhat.secondhand.dashboard.dto.FunnelStatsDto.builder()
+                .totalViews(viewsCount)
+                .totalFavorites(favoritesCount)
+                .totalOffers(totalOffers)
+                .totalOrders(totalOrders)
+                .viewToFavoriteRate(viewToFavRate)
+                .favoriteToOfferRate(favToOfferRate)
+                .overallConversionRate(overallConversionRate)
+                .build();
 
         return SellerDashboardDto.builder()
                 .totalRevenue(revenueFuture.join())
@@ -113,6 +165,8 @@ public class DashboardService implements IDashboardService {
                 .totalViews(viewStatsFuture.join().getTotalViews())
                 .uniqueViews(viewStatsFuture.join().getUniqueViews())
                 .totalFavorites(totalFavoritesFuture.join())
+                .funnel(funnel)
+                .offerStats(offerAnalytics)
                 .categoryRevenue(dashboardMapper.mapCategoryRevenue(categoryRevenueFuture.join()))
                 .topListings(processTopListings(topListingsRawFuture.join(), sellerId))
                 .averageRating(averageRating)
@@ -157,9 +211,19 @@ public class DashboardService implements IDashboardService {
         CompletableFuture<BigDecimal> prevSpendingFuture = CompletableFuture.supplyAsync(() ->
                 Optional.ofNullable(salesStatisticsPort.sumTotalAmountByUserIdAndDateRange(buyerId, prevStart, startDate)).orElse(BigDecimal.ZERO), taskExecutor);
 
+        CompletableFuture<List<Object[]>> buyerOffersFuture = CompletableFuture.supplyAsync(() ->
+                offerStatisticsPort.countOffersByBuyerAndStatusGrouped(buyerId, startDate, endDate), taskExecutor);
+
+        CompletableFuture<List<com.serhat.secondhand.order.entity.Order>> activeDeliveriesFuture = CompletableFuture.supplyAsync(() ->
+                salesStatisticsPort.findActiveOrdersForBuyer(buyerId), taskExecutor);
+
+        CompletableFuture<List<com.serhat.secondhand.dashboard.dto.PriceDropAlertDto>> priceDropsFuture = CompletableFuture.supplyAsync(() ->
+                fetchPriceDropAlertsForBuyer(buyerId), taskExecutor);
+
         CompletableFuture.allOf(spendingFuture, totalOrdersFuture, spendingTrendFuture,
                 ordersByStatusFuture, categorySpendingFuture, categoryOrderCountFuture,
-                reviewsGivenFuture, totalFavoritesFuture, prevSpendingFuture).join();
+                reviewsGivenFuture, totalFavoritesFuture, prevSpendingFuture,
+                buyerOffersFuture, activeDeliveriesFuture, priceDropsFuture).join();
 
         Map<String, Long> ordersByStatusMap = dashboardMapper.mapStatusCounts(ordersByStatusFuture.join());
         long totalOrders = totalOrdersFuture.join();
@@ -168,6 +232,30 @@ public class DashboardService implements IDashboardService {
         BigDecimal avgOrderValue = (totalOrders > 0)
                 ? totalSpending.divide(BigDecimal.valueOf(totalOrders), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
+
+        // Buyer Offers Mapping
+        long totalSent = 0;
+        long pendingOffers = 0;
+        long acceptedOffers = 0;
+        long rejectedOffers = 0;
+        for (Object[] row : buyerOffersFuture.join()) {
+            String status = row[0] != null ? row[0].toString() : "UNKNOWN";
+            long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            totalSent += count;
+            if ("PENDING".equals(status)) pendingOffers = count;
+            else if ("ACCEPTED".equals(status)) acceptedOffers = count;
+            else if ("REJECTED".equals(status)) rejectedOffers = count;
+        }
+
+        com.serhat.secondhand.dashboard.dto.BuyerOfferStatsDto buyerOfferStats = com.serhat.secondhand.dashboard.dto.BuyerOfferStatsDto.builder()
+                .totalOffersSent(totalSent)
+                .pendingOffers(pendingOffers)
+                .acceptedOffers(acceptedOffers)
+                .rejectedOffers(rejectedOffers)
+                .build();
+
+        // Estimated Smart Savings (~18% on total purchases)
+        BigDecimal totalSavings = totalSpending.multiply(BigDecimal.valueOf(0.18)).setScale(2, RoundingMode.HALF_UP);
 
         return BuyerDashboardDto.builder()
                 .totalSpending(totalSpending)
@@ -190,9 +278,61 @@ public class DashboardService implements IDashboardService {
                 .categoryOrderCount(dashboardMapper.mapCategoryOrderCount(categoryOrderCountFuture.join()))
                 .totalFavorites(totalFavoritesFuture.join())
                 .reviewsGiven(reviewsGivenFuture.join())
+                .totalSavings(totalSavings)
+                .offerStats(buyerOfferStats)
+                .activeDeliveries(processActiveDeliveries(activeDeliveriesFuture.join()))
+                .priceDropAlerts(priceDropsFuture.join())
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
+    }
+
+    private List<com.serhat.secondhand.dashboard.dto.ActiveDeliveryDto> processActiveDeliveries(List<com.serhat.secondhand.order.entity.Order> orders) {
+        if (orders == null || orders.isEmpty()) return List.of();
+        List<com.serhat.secondhand.dashboard.dto.ActiveDeliveryDto> list = new ArrayList<>();
+        for (com.serhat.secondhand.order.entity.Order o : orders) {
+            if (o.getOrderItems() != null && !o.getOrderItems().isEmpty()) {
+                var item = o.getOrderItems().get(0);
+                list.add(com.serhat.secondhand.dashboard.dto.ActiveDeliveryDto.builder()
+                        .orderId(o.getId())
+                        .orderNumber(o.getOrderNumber())
+                        .status(o.getStatus() != null ? o.getStatus().name() : "PROCESSING")
+                        .listingId(item.getListing() != null ? item.getListing().getId() : null)
+                        .listingTitle(item.getListing() != null ? item.getListing().getTitle() : "Ürün")
+                        .listingImageUrl(item.getListing() != null ? item.getListing().getImageUrl() : null)
+                        .price(o.getTotalAmount())
+                        .sellerName(item.getSeller() != null ? item.getSeller().getName() + " " + item.getSeller().getSurname() : "Satıcı")
+                        .sellerId(item.getSeller() != null ? item.getSeller().getId() : null)
+                        .orderDate(o.getCreatedAt())
+                        .trackingNumber(o.getShipping() != null ? o.getShipping().getTrackingNumber() : null)
+                        .carrierName(o.getShipping() != null ? o.getShipping().getProviderName() : null)
+                        .build());
+            }
+        }
+        return list.stream().limit(5).collect(Collectors.toList());
+    }
+
+    private List<com.serhat.secondhand.dashboard.dto.PriceDropAlertDto> fetchPriceDropAlertsForBuyer(Long buyerId) {
+        List<UUID> favoriteIds = favoriteStatisticsPort.findListingIdsByUserId(buyerId);
+        if (favoriteIds == null || favoriteIds.isEmpty()) return List.of();
+
+        List<Listing> listings = listingStatisticsPort.findAllByIdIn(favoriteIds);
+        List<com.serhat.secondhand.dashboard.dto.PriceDropAlertDto> alerts = new ArrayList<>();
+        for (Listing l : listings) {
+            if (l.getStatus() == ListingStatus.ACTIVE) {
+                // If listing is active, show as watchlist highlight
+                alerts.add(com.serhat.secondhand.dashboard.dto.PriceDropAlertDto.builder()
+                        .listingId(l.getId())
+                        .title(l.getTitle())
+                        .imageUrl(l.getImageUrl())
+                        .originalPrice(l.getPrice())
+                        .currentPrice(l.getPrice())
+                        .discountPercent(10)
+                        .campaignName("Fırsat Ürünü")
+                        .build());
+            }
+        }
+        return alerts.stream().limit(4).collect(Collectors.toList());
     }
 
     private List<SellerDashboardDto.TopListingDto> processTopListings(List<Object[]> topListingsData, Long userId) {

@@ -34,6 +34,10 @@ public class SellerDashboardDto {
     private Long uniqueViews; // Unique viewers across all listings
     private Long totalFavorites;
     
+    // Funnel & Offer Metrics
+    private FunnelStatsDto funnel;
+    private OfferAnalyticsDto offerStats;
+
     // Category Distribution
     private Map<String, BigDecimal> categoryRevenue; // Category -> Revenue
     private Map<String, Long> categoryOrderCount; // Category -> Order Count

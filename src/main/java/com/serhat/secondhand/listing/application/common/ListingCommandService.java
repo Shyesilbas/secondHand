@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @org.springframework.transaction.annotation.Transactional
-@org.springframework.cache.annotation.CacheConfig(cacheNames = "userProfile")
+@org.springframework.cache.annotation.CacheConfig(cacheNames = "user:profile")
 public class ListingCommandService {
 
     private final ListingRepository listingRepository;

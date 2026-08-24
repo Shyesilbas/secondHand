@@ -31,4 +31,9 @@ public class FavoriteStatisticsAdapter implements FavoriteStatisticsPort {
     public Long countByUserId(Long buyerId) {
         return favoriteRepository.countByUserId(buyerId);
     }
+
+    @Override
+    public List<UUID> findListingIdsByUserId(Long userId) {
+        return favoriteRepository.findListingIdsByUserId(userId);
+    }
 }

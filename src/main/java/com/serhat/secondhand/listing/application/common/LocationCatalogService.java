@@ -8,9 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -18,17 +17,17 @@ import java.time.Duration;
 import java.util.*;
 
 /**
- * Location catalog servisi — tüm veri Redis'te yaşar, JVM heap'te tutulmaz.
+ * Location catalog servisi — tüm coğrafi veri Redis Hash yapısında yaşar, JVM heap'te tutulmaz.
  *
  * <h3>Tasarım</h3>
  * <ul>
- *   <li><b>getCities / getDistricts / getNeighborhoods</b> → Spring {@code @Cacheable}
- *       ile Redis'e gider; hit varsa JSON parse yapılmaz.</li>
- *   <li><b>Validation metodları</b> → aynı cache üzerinden çalışır,
- *       ayrı in-memory map tutulmaz.</li>
- *   <li><b>Restart-safe:</b> {@code @PostConstruct} içinde önce Redis'e bakılır;
- *       veri zaten varsa JSON yüklenmez → restart'ta cache silinmez.</li>
- *   <li><b>TTL:</b> 7 gün (CacheConfig içindeki "locations" konfigürasyonu).</li>
+ *   <li><b>Hiyerarşik Redis Hash:</b> 900+ tekil string key yerine 3 anahtar (cities, districts hash, neighborhoods hash)
+ *       kullanılarak anahtar kalabalığı ve bellek ayak izi minimize edilmiştir.</li>
+ *   <li><b>getCities / getDistricts / getNeighborhoods</b> → Redis Hash (HGET / GET) üzerinden O(1) okunur.</li>
+ *   <li><b>Validation metodları</b> → doğrudan aynı Redis yapısı üzerinden doğrular.</li>
+ *   <li><b>Restart-safe:</b> {@code @PostConstruct} içinde önce sentinel key kontrol edilir;
+ *       veri varsa JSON parse atlanır.</li>
+ *   <li><b>TTL:</b> 7 gün.</li>
  * </ul>
  */
 @Service
@@ -37,7 +36,11 @@ import java.util.*;
 public class LocationCatalogService {
 
     private static final String CATALOG_PATH = "data/common/locations.json";
-    private static final String SENTINEL_KEY = "location::sentinel::v2";
+    private static final String CITIES_KEY = "v4:catalog:locations:cities";
+    private static final String DISTRICTS_HASH_KEY = "v4:catalog:locations:districts";
+    private static final String NEIGHBORHOODS_HASH_KEY = "v4:catalog:locations:neighborhoods";
+    private static final String SENTINEL_KEY = "v4:catalog:locations:sentinel";
+    private static final Duration CATALOG_TTL = Duration.ofDays(7);
     private static final Duration SENTINEL_TTL = Duration.ofDays(8);
 
     private final ObjectMapper objectMapper;
@@ -48,7 +51,7 @@ public class LocationCatalogService {
     /**
      * Uygulama ayağa kalkarken çalışır.
      * Redis'te sentinel key varsa hiçbir şey yapmaz (restart-safe).
-     * Yoksa JSON'dan parse edip Redis'e yazar; JVM heap'te veri tutulmaz.
+     * Yoksa JSON'dan parse edip Redis Hash yapılarına yazar; JVM heap'te veri tutulmaz.
      */
     @PostConstruct
     public void init() {
@@ -68,54 +71,89 @@ public class LocationCatalogService {
         }
     }
 
-    // ── Public API — Spring Cache (@Cacheable) ───────────────────────────
+    // ── Public API — Redis Hash / Value Access ───────────────────────────
 
-    @Cacheable(cacheNames = "locations", key = "'cities'")
+    @SuppressWarnings("unchecked")
     public List<CityDto> getCities() {
-        log.warn("[LocationCatalog] getCities cache miss — JSON fallback.");
-        return loadCitiesFromJson();
+        try {
+            Object cached = redisTemplate.opsForValue().get(CITIES_KEY);
+            if (cached instanceof List<?>) {
+                return (List<CityDto>) cached;
+            }
+        } catch (Exception e) {
+            log.warn("[LocationCatalog] getCities Redis okuma hatası, JSON fallback devreye giriyor: {}", e.getMessage());
+        }
+        List<CityDto> fallback = loadCitiesFromJson();
+        if (!fallback.isEmpty()) {
+            redisTemplate.opsForValue().set(CITIES_KEY, fallback, CATALOG_TTL);
+        }
+        return fallback;
     }
 
-    @Cacheable(cacheNames = "locations", key = "'districts::' + #cityKey.toUpperCase()")
+    @SuppressWarnings("unchecked")
     public List<DistrictDto> getDistricts(String cityKey) {
-        if (cityKey == null) return Collections.emptyList();
-        log.warn("[LocationCatalog] getDistricts cache miss: {}", cityKey);
-        return loadDistrictsFromJson(cityKey.toUpperCase());
+        if (cityKey == null || cityKey.isBlank()) return Collections.emptyList();
+        String normalizedKey = cityKey.trim().toUpperCase(Locale.ENGLISH);
+        try {
+            Object cached = redisTemplate.opsForHash().get(DISTRICTS_HASH_KEY, normalizedKey);
+            if (cached instanceof List<?>) {
+                return (List<DistrictDto>) cached;
+            }
+        } catch (Exception e) {
+            log.warn("[LocationCatalog] getDistricts Redis okuma hatası: {} | {}", normalizedKey, e.getMessage());
+        }
+        List<DistrictDto> fallback = loadDistrictsFromJson(normalizedKey);
+        if (!fallback.isEmpty()) {
+            redisTemplate.opsForHash().put(DISTRICTS_HASH_KEY, normalizedKey, fallback);
+            redisTemplate.expire(DISTRICTS_HASH_KEY, CATALOG_TTL);
+        }
+        return fallback;
     }
 
-    @Cacheable(cacheNames = "locations", key = "'neighborhoods::' + #districtKey.toUpperCase()")
+    @SuppressWarnings("unchecked")
     public List<NeighborhoodDto> getNeighborhoods(String districtKey) {
-        if (districtKey == null) return Collections.emptyList();
-        log.warn("[LocationCatalog] getNeighborhoods cache miss: {}", districtKey);
-        return loadNeighborhoodsFromJson(districtKey.toUpperCase());
+        if (districtKey == null || districtKey.isBlank()) return Collections.emptyList();
+        String normalizedKey = districtKey.trim().toUpperCase(Locale.ENGLISH);
+        try {
+            Object cached = redisTemplate.opsForHash().get(NEIGHBORHOODS_HASH_KEY, normalizedKey);
+            if (cached instanceof List<?>) {
+                return (List<NeighborhoodDto>) cached;
+            }
+        } catch (Exception e) {
+            log.warn("[LocationCatalog] getNeighborhoods Redis okuma hatası: {} | {}", normalizedKey, e.getMessage());
+        }
+        List<NeighborhoodDto> fallback = loadNeighborhoodsFromJson(normalizedKey);
+        if (!fallback.isEmpty()) {
+            redisTemplate.opsForHash().put(NEIGHBORHOODS_HASH_KEY, normalizedKey, fallback);
+            redisTemplate.expire(NEIGHBORHOODS_HASH_KEY, CATALOG_TTL);
+        }
+        return fallback;
     }
 
     // ── Validation Helpers (cache uzerinden) ────────────────────────────
 
     public boolean isValidCity(String cityKey) {
         if (cityKey == null) return false;
-        String upper = cityKey.toUpperCase();
+        String upper = cityKey.toUpperCase(Locale.ENGLISH);
         return getCities().stream().anyMatch(c -> upper.equals(c.getKey()));
     }
 
     public boolean isValidDistrict(String cityKey, String districtKey) {
         if (cityKey == null || districtKey == null) return false;
-        String upper = districtKey.toUpperCase();
+        String upper = districtKey.toUpperCase(Locale.ENGLISH);
         return getDistricts(cityKey).stream().anyMatch(d -> upper.equals(d.getKey()));
     }
 
     public boolean isValidNeighborhood(String districtKey, String neighborhoodKey) {
         if (districtKey == null || neighborhoodKey == null) return false;
-        String upper = neighborhoodKey.toUpperCase();
+        String upper = neighborhoodKey.toUpperCase(Locale.ENGLISH);
         return getNeighborhoods(districtKey).stream().anyMatch(n -> upper.equals(n.getKey()));
     }
 
     // ── Redis Populate (sadece ilk yuklemede) ────────────────────────────
 
     /**
-     * JSON'u parse edip tum city/district/neighborhood listelerini
-     * dogrudan RedisTemplate ile yazar (Spring Cache proxy disinda self-call).
-     * Key formati CacheConfig computePrefixWith ile uyumludur: v4::locations::...
+     * JSON'u parse edip tüm city/district/neighborhood yapılarını Redis Hash ve Value olarak kaydeder.
      */
     private void loadAndPopulateRedis() throws Exception {
         try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
@@ -124,9 +162,11 @@ public class LocationCatalogService {
             if (citiesNode == null || !citiesNode.isArray()) return;
 
             List<CityDto> cities = new ArrayList<>();
+            Map<String, Object> districtsMap = new HashMap<>();
+            Map<String, Object> neighborhoodsMap = new HashMap<>();
 
             for (JsonNode cityNode : citiesNode) {
-                String cityKey = cityNode.get("key").asText();
+                String cityKey = cityNode.get("key").asText().toUpperCase(Locale.ENGLISH);
                 String cityLabel = cityNode.get("label").asText();
                 cities.add(new CityDto(cityKey, cityLabel));
 
@@ -134,7 +174,7 @@ public class LocationCatalogService {
                 JsonNode districtsNode = cityNode.get("districts");
                 if (districtsNode != null && districtsNode.isArray()) {
                     for (JsonNode districtNode : districtsNode) {
-                        String districtKey = districtNode.get("key").asText();
+                        String districtKey = districtNode.get("key").asText().toUpperCase(Locale.ENGLISH);
                         String districtLabel = districtNode.get("label").asText();
                         districts.add(new DistrictDto(districtKey, districtLabel));
 
@@ -142,26 +182,29 @@ public class LocationCatalogService {
                         JsonNode neighborhoodsNode = districtNode.get("neighborhoods");
                         if (neighborhoodsNode != null && neighborhoodsNode.isArray()) {
                             for (JsonNode neighborhoodNode : neighborhoodsNode) {
-                                String nbKey = neighborhoodNode.get("key").asText();
+                                String nbKey = neighborhoodNode.get("key").asText().toUpperCase(Locale.ENGLISH);
                                 String nbLabel = neighborhoodNode.get("label").asText();
                                 neighborhoods.add(new NeighborhoodDto(nbKey, nbLabel));
                             }
                         }
-                        writeToCache("neighborhoods::" + districtKey, neighborhoods);
+                        neighborhoodsMap.put(districtKey, neighborhoods);
                     }
                 }
-                writeToCache("districts::" + cityKey, districts);
+                districtsMap.put(cityKey, districts);
             }
-            writeToCache("cities", cities);
-        }
-    }
 
-    /**
-     * CacheConfig computePrefixWith formatiyla (v4::locations::...) Redis'e yazar.
-     */
-    private void writeToCache(String cacheKey, Object value) {
-        String redisKey = "v4::locations::" + cacheKey;
-        redisTemplate.opsForValue().set(redisKey, value, Duration.ofDays(7));
+            redisTemplate.opsForValue().set(CITIES_KEY, cities, CATALOG_TTL);
+            if (!districtsMap.isEmpty()) {
+                redisTemplate.opsForHash().putAll(DISTRICTS_HASH_KEY, districtsMap);
+                redisTemplate.expire(DISTRICTS_HASH_KEY, CATALOG_TTL);
+            }
+            if (!neighborhoodsMap.isEmpty()) {
+                redisTemplate.opsForHash().putAll(NEIGHBORHOODS_HASH_KEY, neighborhoodsMap);
+                redisTemplate.expire(NEIGHBORHOODS_HASH_KEY, CATALOG_TTL);
+            }
+            log.info("[LocationCatalog] Redis Hash populated: {} cities, {} districts, {} neighborhood groups.",
+                    cities.size(), districtsMap.size(), neighborhoodsMap.size());
+        }
     }
 
     // ── JSON Fallback (cache miss durumunda) ─────────────────────────────
@@ -185,7 +228,7 @@ public class LocationCatalogService {
         try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
             JsonNode root = objectMapper.readTree(is);
             for (JsonNode cityNode : root.get("cities")) {
-                if (cityKey.equals(cityNode.get("key").asText())) {
+                if (cityKey.equalsIgnoreCase(cityNode.get("key").asText())) {
                     List<DistrictDto> result = new ArrayList<>();
                     for (JsonNode d : cityNode.get("districts"))
                         result.add(new DistrictDto(d.get("key").asText(), d.get("label").asText()));
@@ -203,7 +246,7 @@ public class LocationCatalogService {
             JsonNode root = objectMapper.readTree(is);
             for (JsonNode cityNode : root.get("cities")) {
                 for (JsonNode d : cityNode.get("districts")) {
-                    if (districtKey.equals(d.get("key").asText())) {
+                    if (districtKey.equalsIgnoreCase(d.get("key").asText())) {
                         List<NeighborhoodDto> result = new ArrayList<>();
                         JsonNode nbNodes = d.get("neighborhoods");
                         if (nbNodes != null)

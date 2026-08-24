@@ -115,7 +115,7 @@ public class NotificationService implements INotificationService {
     }
 
 
-    @CacheEvict(value = "userBadges", key = "#userId")
+    @CacheEvict(value = "user:badges", key = "#userId")
     public Result<Void> markAsRead(UUID notificationId, Long userId) {
         log.info("Marking notification {} as read for user: {}", notificationId, userId);
 
@@ -153,7 +153,7 @@ public class NotificationService implements INotificationService {
     }
 
 
-    @CacheEvict(value = "userBadges", key = "#userId")
+    @CacheEvict(value = "user:badges", key = "#userId")
     public void markAllAsRead(Long userId) {
         log.info("Marking all notifications as read for user: {}", userId);
 

@@ -89,17 +89,15 @@ public class ListingQueryService {
         CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
                 enrichmentService.enrichInPlace(dto, userId), taskExecutor);
 
-        if (currentUserId != null && listing.isOwnedBy(currentUserId)) {
-            CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
-                    listingViewService.getViewStatistics(id,
-                            LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
-                            LocalDateTime.now()), taskExecutor);
+        CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
+                listingViewService.getViewStatistics(id,
+                        LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
+                        LocalDateTime.now()), taskExecutor);
 
-            CompletableFuture.allOf(enrichTask, statsTask).join();
-            dto.setViewStats(statsTask.join());
-        } else {
-            enrichTask.join();
-        }
+        CompletableFuture.allOf(enrichTask, statsTask).join();
+        ListingViewStatsDto stats = statsTask.join();
+        dto.setViewStats(stats);
+        dto.setViewCount(stats != null && stats.getTotalViews() != null ? stats.getTotalViews() : 0L);
 
         if (dto.getType() != null
                 && !ListingBusinessConstants.LISTING_TYPES_EXCLUDED_FROM_INLINE_REVIEWS.contains(dto.getType())) {
@@ -146,9 +144,9 @@ public class ListingQueryService {
         return getMyListings(userId, page, size, null, null, title);
     }
 
-    @Cacheable(value = "userListings", key = "'listings:' + #userId + ':' + #page + ':' + #size")
+    @Cacheable(value = "listing:userListings", key = "'listings:' + #userId + ':' + #page + ':' + #size")
     public CachedPage<ListingDto> getCachedUserListings(Long userId, int page, int size) {
-        log.info("[CACHE MISS] userListings::{} page={}", userId, page);
+        log.info("[CACHE MISS] listing:userListings:{} page={}", userId, page);
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         Page<Listing> listingsPage = listingRepository.findBySellerId(userId, pageable);

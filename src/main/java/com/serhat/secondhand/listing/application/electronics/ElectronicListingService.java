@@ -55,7 +55,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         this.electronicListingResolver = electronicListingResolver;
     }
 
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<UUID> createElectronicListing(ElectronicCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -104,7 +104,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<Void> updateElectronicListings(UUID id, ElectronicUpdateRequest request, Long currentUserId) {
         return standardUpdate(
                 id, request, currentUserId,

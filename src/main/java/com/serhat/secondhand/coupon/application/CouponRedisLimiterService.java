@@ -27,8 +27,8 @@ public class CouponRedisLimiterService {
     }
 
     public int acquireCouponUsage(String couponCode, Long userId, Integer globalLimit, Integer userLimit, long ttlSeconds) {
-        String globalKey = "coupon:usage:global:" + couponCode.toUpperCase();
-        String userKey = "coupon:usage:user:" + couponCode.toUpperCase() + ":" + userId;
+        String globalKey = "v4:coupon:usage:global:" + couponCode.toUpperCase();
+        String userKey = "v4:coupon:usage:user:" + couponCode.toUpperCase() + ":" + userId;
 
         int gLimit = (globalLimit != null && globalLimit > 0) ? globalLimit : -1;
         int uLimit = (userLimit != null && userLimit > 0) ? userLimit : -1;

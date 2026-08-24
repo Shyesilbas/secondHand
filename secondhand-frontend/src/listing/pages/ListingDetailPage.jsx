@@ -126,7 +126,6 @@ const ListingDetailPage = () => {
  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
  const [imageError, setImageError] = useState(false);
- const [activeTab, setActiveTab] = useState('details');
  const viewTrackedRef = useRef(false);
  const galleryRef = useRef(null);
  const { count: activeReservations } = useActiveReservationCount(listing?.id);
@@ -229,7 +228,6 @@ const ListingDetailPage = () => {
  const canMakeOffer = listing && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
  const isLowStock = listing?.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
  const hasStockInfo = listing?.quantity != null && Number.isFinite(Number(listing?.quantity));
- const categoryBadges = listing ? listingTypeRegistry[listing.type]?.compactBadges?.(listing) || [] : [];
  const selectedImage = images[selectedImageIndex];
  const shouldClampDescription = listing?.description?.length > 420;
  const locationLabel = listing ? [listing.district, listing.city].filter(Boolean).join(', ') || 'Konum belirtilmedi' : '';
@@ -241,31 +239,31 @@ const ListingDetailPage = () => {
  if (!listing) return null;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFB] pb-24 text-slate-900 selection:bg-slate-200 selection:text-slate-900 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pb-24 text-slate-900 selection:bg-slate-200 selection:text-slate-900 font-sans">
       
-      {/* ▸ Minimal Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
-        <PageContainer className="max-w-[1320px] h-14 flex items-center justify-between gap-4">
-          {/* Breadcrumb */}
+      {/* ── Top Navigation & Quick Action Bar ── */}
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/70 shadow-xs">
+        <PageContainer className="max-w-[1360px] h-14 flex items-center justify-between gap-4">
+          {/* Breadcrumb Path */}
           <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0">
             <Link to={ROUTES.LISTINGS} className="hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0">
               <ArrowLeft className="w-4 h-4" />
-              <span>{t("all_listings", "Tüm İlanlar")}</span>
+              <span>{t("all_listings", "İlanlar")}</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-            <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px] shrink-0">{listing.type}</span>
+            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] shrink-0 bg-slate-100 px-2 py-0.5 rounded-md">{listing.type}</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 hidden md:block" />
-            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[280px]">{listing.title}</span>
+            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[320px]">{listing.title}</span>
           </nav>
 
-          {/* Top Quick Actions */}
+          {/* Quick Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-slate-900 border border-indigo-200/60 rounded-xl text-xs font-extrabold transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span className="hidden sm:inline">{t("ask_aura", "Aura AI")}</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+              <span>{t("ask_aura", "Aura AI")}</span>
             </button>
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
             {!isOwner && (
@@ -274,12 +272,12 @@ const ListingDetailPage = () => {
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="p-2 border border-slate-200 bg-white text-slate-600 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-200 shadow-xs cursor-pointer"
+                className="p-2 border border-slate-200 bg-white text-slate-600 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-200 shadow-2xs cursor-pointer active:scale-95"
               />
             )}
             <button
               onClick={handleShare}
-              className="p-2 text-slate-600 hover:text-slate-900 rounded-xl transition-all hover:bg-slate-100 border border-slate-200 bg-white shadow-xs cursor-pointer"
+              className="p-2 text-slate-600 hover:text-slate-900 rounded-xl transition-all hover:bg-slate-100 border border-slate-200 bg-white shadow-2xs cursor-pointer active:scale-95"
               aria-label={t("share", "Paylaş")}
               title={t("share", "Paylaş")}
             >
@@ -293,105 +291,194 @@ const ListingDetailPage = () => {
       {/* Offer Modal */}
       <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
 
-      {/* ▸ Main Hero Stage */}
-      <PageContainer className="max-w-[1320px] pt-6 sm:pt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+      {/* ── Main Stage (2 Columns: Left Storyline, Right Floating Buy Box) ── */}
+      <PageContainer className="max-w-[1360px] pt-6 sm:pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
 
-          {/* ── Left Column: Clean Focused Media Gallery (7 cols) ── */}
-          <div className="lg:col-span-7 space-y-3">
-            {/* Main Image Stage */}
-            <div 
-              ref={galleryRef} 
-              className="w-full aspect-[4/3] sm:aspect-[1/1] lg:max-h-[580px] bg-white rounded-3xl overflow-hidden relative group border border-slate-200/90 shadow-2xs flex items-center justify-center"
-            >
-              {selectedImage && !imageError ? (
-                <img
-                  key={selectedImage}
-                  src={optimizeCloudinaryUrl(selectedImage, { width: 1400 })}
-                  onError={() => setImageError(true)}
-                  alt={`${listing.title} - ${selectedImageIndex + 1}`}
-                  className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-300"
-                  fetchpriority="high"
-                  decoding="async"
-                  loading="eager"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                  <Package className="w-10 h-10 mb-2 stroke-[1.5]" />
-                  <p className="text-xs font-semibold">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
-                </div>
-              )}
-
-              {/* Gallery Navigation Controls */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={showPreviousImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105"
-                    aria-label={t("previous", "Önceki")}
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={showNextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105"
-                    aria-label={t("next", "Sonraki")}
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-
-                  <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs">
-                    {selectedImageIndex + 1} / {images.length}
+          {/* ══════════════════════════════════════════════════════════════
+              LEFT COLUMN: Media Gallery + Rich Storyline Content (7 Cols)
+             ══════════════════════════════════════════════════════════════ */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-8">
+            
+            {/* 1. Gallery Stage */}
+            <div className="space-y-3">
+              <div 
+                ref={galleryRef} 
+                className="w-full aspect-[4/3] sm:aspect-[16/11] bg-white rounded-3xl overflow-hidden relative group border border-slate-200/80 shadow-xs flex items-center justify-center"
+              >
+                {selectedImage && !imageError ? (
+                  <img
+                    key={selectedImage}
+                    src={optimizeCloudinaryUrl(selectedImage, { width: 1400 })}
+                    onError={() => setImageError(true)}
+                    alt={`${listing.title} - ${selectedImageIndex + 1}`}
+                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-300 group-hover:scale-[1.02]"
+                    fetchpriority="high"
+                    decoding="async"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                    <Package className="w-12 h-12 mb-2 stroke-[1.5]" />
+                    <p className="text-xs font-semibold">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
                   </div>
-                </>
+                )}
+
+                {/* Gallery Navigation Controls */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={showPreviousImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105 active:scale-95"
+                      aria-label={t("previous", "Önceki")}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={showNextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105 active:scale-95"
+                      aria-label={t("next", "Sonraki")}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+
+                    <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xs">
+                      {selectedImageIndex + 1} / {images.length}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnail Strip */}
+              {images.length > 1 && (
+                <div className="flex gap-2.5 overflow-x-auto py-1 px-0.5 scrollbar-none">
+                  {images.map((imgUrl, idx) => (
+                    <button
+                      key={`${imgUrl}-${idx}`}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`h-16 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all cursor-pointer bg-white ${
+                        selectedImageIndex === idx
+                          ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-xs scale-100'
+                          : 'border-slate-200/80 opacity-60 hover:opacity-100 hover:border-slate-400 scale-95'
+                      }`}
+                    >
+                      <img
+                        src={optimizeCloudinaryUrl(imgUrl, { width: 160 })}
+                        alt=""
+                        className="h-full w-full object-contain p-1"
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
-            {/* Thumbnail Strip */}
-            {images.length > 1 && (
-              <div className="flex gap-2.5 overflow-x-auto py-1 px-0.5 scrollbar-none">
-                {images.map((imgUrl, idx) => (
-                  <button
-                    key={`${imgUrl}-${idx}`}
-                    onClick={() => setSelectedImageIndex(idx)}
-                    className={`h-16 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all cursor-pointer bg-white ${
-                      selectedImageIndex === idx
-                        ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-xs'
-                        : 'border-slate-200/80 opacity-60 hover:opacity-100 hover:border-slate-400'
-                    }`}
-                  >
-                    <img
-                      src={optimizeCloudinaryUrl(imgUrl, { width: 160 })}
-                      alt=""
-                      className="h-full w-full object-contain p-1"
-                      loading="lazy"
-                    />
-                  </button>
-                ))}
+            {/* 2. Aura AI Smart Insights Highlight Card */}
+            <div className="bg-gradient-to-br from-indigo-50/70 via-purple-50/40 to-amber-50/50 rounded-3xl border border-indigo-100/90 p-6 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-xs">
+                    <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Aura AI İlan Analizi</h3>
+                    <p className="text-[11px] text-slate-500 font-medium">Yapay zeka destekli piyasa ve satıcı değerlendirmesi</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
+                  className="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white border border-indigo-200/80 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+                >
+                  Soru Sor →
+                </button>
+              </div>
+
+              {/* AI Summary Content */}
+              <div className="text-xs leading-relaxed text-slate-700 font-medium bg-white/75 backdrop-blur-xs rounded-2xl p-4 border border-indigo-100/60">
+                <AuraSummary listing={listing} />
+              </div>
+            </div>
+
+            {/* 3. Description Section */}
+            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                <FileText className="w-4 h-4 text-slate-400" />
+                <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                  {t("about_this_item", "Ürün Açıklaması")}
+                </h2>
+              </div>
+              <div className={`text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden relative' : ''}`}>
+                {listing.description || 'Bu ilan için detaylı açıklama girilmemiş.'}
+                {!isDescriptionExpanded && shouldClampDescription && (
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                )}
+              </div>
+              {shouldClampDescription && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="mt-3 inline-flex items-center gap-1.5 text-slate-900 font-extrabold text-xs uppercase tracking-wider hover:underline cursor-pointer"
+                >
+                  {isDescriptionExpanded ? (
+                    <>
+                      <ChevronUp className="w-4 h-4" />
+                      <span>{t("show_less", "Daha Az Göster")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      <span>{t("read_more", "Devamını Oku")}</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* 4. Structured Technical Specifications */}
+            {DetailsComponent && (
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                  <Tag className="w-4 h-4 text-slate-400" />
+                  <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                    {t("specifications", "Teknik Özellikler & Detaylar")}
+                  </h2>
+                </div>
+                <DetailsComponent listing={listing} flat={true} />
               </div>
             )}
+
+            {/* 5. Safe Meetup & Escrow Protection Hub */}
+            <SafeMeetupPanel listing={listing} />
+
+            {/* 6. Verified Reviews & Community Feedback */}
+            {hasReviews && (
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
+                <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+                  <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                    {t("reviews", "Kullanıcı Değerlendirmeleri")}
+                  </h2>
+                </div>
+                <ListingReviewsSection listing={listing} />
+              </div>
+            )}
+
           </div>
 
-          {/* ── Right Column: Unified Buy Box & Product Identity (5 cols) ── */}
-          <div className="lg:col-span-5 space-y-5">
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-5">
+          {/* ══════════════════════════════════════════════════════════════
+              RIGHT COLUMN: Floating Sticky Buy Box & Trust Hub (5 Cols)
+             ══════════════════════════════════════════════════════════════ */}
+          <div className="lg:col-span-5 xl:col-span-5 space-y-6 lg:sticky lg:top-20">
+            
+            {/* Unified Floating Buy Box */}
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-sm space-y-5">
               
-              {/* Product Header & Meta */}
+              {/* Product Header & Meta Badges */}
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white uppercase tracking-wider">
                     {listing.type}
                   </span>
-                  {categoryBadges.flatMap((badge, bIdx) => {
-                    const labelStr = String(badge.label || '');
-                    const parts = labelStr.includes(' • ') ? labelStr.split(' • ').map(p => p.trim()).filter(Boolean) : [labelStr];
-                    return parts.map((part, pIdx) => (
-                      <span key={`${bIdx}-${pIdx}`} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-bold border border-slate-200/70">
-                        {pIdx === 0 && badge.icon && <span className="text-xs">{badge.icon}</span>}
-                        <span>{part}</span>
-                      </span>
-                    ));
-                  })}
                   {hasCampaign && (
                     <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-900 border border-amber-200">
                       <Tag className="w-3 h-3 text-amber-600" />
@@ -406,7 +493,7 @@ const ListingDetailPage = () => {
                   )}
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                   {listing.title}
                 </h1>
 
@@ -420,16 +507,20 @@ const ListingDetailPage = () => {
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>{formatDateTime(listing.createdAt)}</span>
                   </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{listing.viewCount || 0} {t("views", "görüntülenme")}</span>
-                  </div>
+                  {isOwner && (
+                    <>
+                      <span>•</span>
+                      <div className="inline-flex items-center gap-1 text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80 text-[11px]" title="Sadece satıcıya özel görüntülenme verisi">
+                        <Eye className="w-3.5 h-3.5 text-slate-500" />
+                        <span>{listing.viewCount ?? listing.viewStats?.totalViews ?? 0} {t("views", "görüntülenme")}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Price Row */}
-              <div className="py-3.5 px-4 rounded-2xl bg-slate-50/80 border border-slate-200/70 flex items-center justify-between gap-4 flex-wrap">
+              {/* Price & Scarcity Row */}
+              <div className="py-4 px-4.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 flex-wrap">
                 <div>
                   <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                     {formatCurrency(displayPrice, listing.currency)}
@@ -451,7 +542,7 @@ const ListingDetailPage = () => {
                     </span>
                   )}
                   {activeReservations > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 shadow-2xs">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 shadow-2xs animate-pulse">
                       <Flame className="w-3.5 h-3.5 text-amber-600" />
                       <span>{activeReservations} {t("people_looking", "kişi inceliyor")}</span>
                     </span>
@@ -469,7 +560,7 @@ const ListingDetailPage = () => {
                       className={`w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
                         itemIsInCart
                           ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
-                          : 'bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10'
+                          : 'bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg'
                       }`}
                     >
                       {isAddingToCart ? (
@@ -499,8 +590,8 @@ const ListingDetailPage = () => {
                 </div>
               )}
 
-              {/* Trust Badge Bar */}
-              <div className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60 text-xs font-bold text-slate-700">
+              {/* Trust Badge Guarantee */}
+              <div className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs font-bold text-slate-700">
                 <ShieldCheck className="w-4 h-4 text-slate-900 shrink-0" />
                 <span>Escrow Güvenceli Ödeme & Güvenli Teslimat</span>
               </div>
@@ -511,127 +602,29 @@ const ListingDetailPage = () => {
               </div>
             </div>
 
-            {/* Market Insights Card */}
+            {/* Market Insights & Analytics Card */}
             <ListingAnalyticsPanel listing={listing} isOwner={isOwner} displayPrice={displayPrice} />
+
           </div>
 
         </div>
 
-        {/* ── Bottom Section: Full-Width Tabs (Specs, Description, Reviews) ── */}
-        <div className="mt-12 bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs">
-          {/* Tab Navigation */}
-          <div className="flex border-b border-slate-200 gap-6 mb-8 overflow-x-auto scrollbar-none">
-            <button
-              type="button"
-              onClick={() => setActiveTab('details')}
-              className={`pb-3 text-sm font-extrabold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                activeTab === 'details'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>{t("details_and_specs", "Detaylar & Özellikler")}</span>
-            </button>
-
-            {hasReviews && (
-              <button
-                type="button"
-                onClick={() => setActiveTab('reviews')}
-                className={`pb-3 text-sm font-extrabold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                  activeTab === 'reviews'
-                    ? 'border-slate-900 text-slate-900'
-                    : 'border-transparent text-slate-400 hover:text-slate-700'
-                }`}
-              >
-                <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                <span>{t("reviews", "Değerlendirmeler")}</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('safety')}
-              className={`pb-3 text-sm font-extrabold uppercase tracking-wider transition-all border-b-2 flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-                activeTab === 'safety'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-400 hover:text-slate-700'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{t("safe_meetup", "Güvenli Buluşma")}</span>
-            </button>
-          </div>
-
-          {/* Tab Content */}
+        {/* ── Bottom Section: Similar & Recently Viewed Listings ── */}
+        <div className="mt-14 space-y-12">
+          {/* Similar Listings Carousel */}
           <div>
-            {activeTab === 'details' && (
-              <div className="space-y-8">
-                {/* Description */}
-                <div>
-                  <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">
-                    {t("about_this_item", "Ürün Açıklaması")}
-                  </h3>
-                  <div className={`text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden relative' : ''}`}>
-                    {listing.description || 'Bu ilan için detaylı açıklama girilmemiş.'}
-                    {!isDescriptionExpanded && shouldClampDescription && (
-                      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                    )}
-                  </div>
-                  {shouldClampDescription && (
-                    <button
-                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                      className="mt-3 inline-flex items-center gap-1.5 text-slate-900 font-extrabold text-xs uppercase tracking-wider hover:underline cursor-pointer"
-                    >
-                      {isDescriptionExpanded ? (
-                        <>
-                          <ChevronUp className="w-4 h-4" />
-                          <span>{t("show_less", "Daha Az Göster")}</span>
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-4 h-4" />
-                          <span>{t("read_more", "Devamını Oku")}</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
+            <SimilarListings currentListing={listing} />
+          </div>
 
-                {/* Structured Specifications Grid */}
-                {DetailsComponent && (
-                  <div className="pt-6 border-t border-slate-100">
-                    <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-4">
-                      {t("specifications", "Teknik Özellikler")}
-                    </h3>
-                    <DetailsComponent listing={listing} flat={true} />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'reviews' && hasReviews && (
-              <ListingReviewsSection listing={listing} />
-            )}
-
-            {activeTab === 'safety' && (
-              <SafeMeetupPanel listing={listing} />
-            )}
+          {/* Recently Viewed Listings */}
+          <div>
+            <RecentlyViewedSection currentListingId={listing?.id} />
           </div>
         </div>
 
-        {/* Similar Listings */}
-        <div className="mt-10">
-          <SimilarListings currentListing={listing} />
-        </div>
-
-        {/* Recently Viewed Listings */}
-        <div className="mt-8">
-          <RecentlyViewedSection currentListingId={listing?.id} />
-        </div>
       </PageContainer>
 
-      {/* ▸ Mobile Bottom Bar */}
+      {/* ── Mobile Sticky Bottom Bar ── */}
       {(canAddToCart || canMakeOffer || !isOwner) && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 pb-safe shadow-2xl">
           <div className="flex items-center justify-between gap-3">
@@ -650,7 +643,7 @@ const ListingDetailPage = () => {
               )}
             </div>
 
-            {/* CTA buttons */}
+            {/* Action Buttons */}
             <div className="flex items-center gap-2 flex-1 justify-end">
               {!isOwner && <ContactSellerButton listing={listing} className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors" />}
               {canMakeOffer && (

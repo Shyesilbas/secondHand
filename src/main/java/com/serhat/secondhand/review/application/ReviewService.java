@@ -52,7 +52,7 @@ public class ReviewService implements IReviewService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    @CacheEvict(value = "reviewStatsBatch", allEntries = true)
+    @CacheEvict(value = "user:stats:reviews", allEntries = true)
     public Result<ReviewDto> createReview(Long reviewerId, CreateReviewRequest request) {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewerId);
 
@@ -157,7 +157,7 @@ public class ReviewService implements IReviewService {
 
     @Transactional(readOnly = true)
     @Cacheable(
-            value = "reviewStatsBatch",
+            value = "user:stats:reviews",
             key = "#root.target.createStableListingStatsKey(#listingIds)",
             unless = "#result == null || #result.isEmpty()"
     )

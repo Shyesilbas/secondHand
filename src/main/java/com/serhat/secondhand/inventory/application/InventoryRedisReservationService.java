@@ -128,10 +128,10 @@ public class InventoryRedisReservationService {
     }
 
     private String getStockKey(UUID listingId) {
-        return "stock:" + listingId;
+        return "v4:inventory:stock:" + listingId;
     }
 
     private String getReservationKey(Long userId, UUID listingId) {
-        return "reservation:" + userId + ":" + listingId;
+        return "v4:inventory:reservation:" + userId + ":" + listingId;
     }
 }

@@ -90,7 +90,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "paymentStats", allEntries = true)
+    @CacheEvict(value = "payment:stats", allEntries = true)
     public void deposit(DepositRequest request) {
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -107,7 +107,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "paymentStats", allEntries = true)
+    @CacheEvict(value = "payment:stats", allEntries = true)
     public void withdraw(WithdrawRequest request) {
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
@@ -237,7 +237,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "paymentStats", allEntries = true)
+    @CacheEvict(value = "payment:stats", allEntries = true)
     public void creditToUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser) {
         log.info("Crediting {} to user's e-wallet: {}", amount, user.getEmail());
 
@@ -285,7 +285,7 @@ public class EWalletService implements IEWalletService {
     }
 
     @Transactional
-    @CacheEvict(value = "paymentStats", allEntries = true)
+    @CacheEvict(value = "payment:stats", allEntries = true)
     public void debitFromUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser) {
         log.info("Debiting {} from user's e-wallet: {}", amount, user.getEmail());
 

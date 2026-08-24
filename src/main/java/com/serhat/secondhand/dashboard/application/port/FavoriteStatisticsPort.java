@@ -11,5 +11,7 @@ public interface FavoriteStatisticsPort {
     Map<UUID, FavoriteStatsDto> getFavoriteStatsForListings(List<UUID> listingIds, Long userId);
 
     Long countByUserId(Long buyerId);
+
+    List<UUID> findListingIdsByUserId(Long userId);
 }
 

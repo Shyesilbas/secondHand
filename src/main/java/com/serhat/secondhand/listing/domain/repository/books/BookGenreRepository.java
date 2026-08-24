@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public interface BookGenreRepository extends JpaRepository<BookGenre, UUID> {
     
-    @Cacheable(value = "bookGenres", key = "'all'")
+    @Cacheable(value = "catalog:bookGenres", key = "'all'")
     List<BookGenre> findAll();
     
-    @Cacheable(value = "bookGenres", key = "#name", unless = "#result == null")
+    @Cacheable(value = "catalog:bookGenres", key = "#name", unless = "#result == null")
     Optional<BookGenre> findByNameIgnoreCase(String name);
 }
 

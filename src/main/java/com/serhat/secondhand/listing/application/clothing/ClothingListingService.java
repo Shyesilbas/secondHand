@@ -56,7 +56,7 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
         this.clothingListingResolver = clothingListingResolver;
     }
 
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<UUID> createClothingListing(ClothingCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -111,7 +111,7 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<Void> updateClothingListing(UUID id, ClothingUpdateRequest request, Long currentUserId) {
         return standardUpdate(
                 id, request, currentUserId,

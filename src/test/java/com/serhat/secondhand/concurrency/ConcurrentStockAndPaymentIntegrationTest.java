@@ -104,9 +104,9 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("================================================================================");
 
         // Redis'teki stok anahtarını başlangıç değeriyle doğrudan ayarla
-        redisTemplate.opsForValue().set("stock:" + testListingId, String.valueOf(initialStock));
+        redisTemplate.opsForValue().set("v4:inventory:stock:" + testListingId, String.valueOf(initialStock));
         for (long u = 1; u <= numberOfConcurrentUsers; u++) {
-            redisTemplate.delete("reservation:" + (1000L + u) + ":" + testListingId);
+            redisTemplate.delete("v4:inventory:reservation:" + (1000L + u) + ":" + testListingId);
         }
 
         User seller = userRepository.findAll().stream().findFirst().orElseGet(() ->
@@ -203,7 +203,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         Assertions.assertEquals(2, rejectedUsers.size(), "Stok tükendiği için tam 2 kullanıcı reddedilmelidir.");
 
         // Redis'teki stok anahtarının değerini doğrula (3 adet rezerve edildiği için kalan 0 olmalı)
-        String remainingRedisStock = redisTemplate.opsForValue().get("stock:" + testListingId);
+        String remainingRedisStock = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
         log.info("🔍 Redis'te Kalan Fiziksel Stok Değeri: {}", remainingRedisStock);
         Assertions.assertEquals("0", remainingRedisStock, "Redis'te kalan stok tam 0 olmalıdır.");
     }
@@ -331,18 +331,18 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         inventory.setAvailableQuantity(1);
         inventoryRepository.save(inventory);
 
-        redisTemplate.delete("stock:" + testListingId);
-        redisTemplate.delete("reservation:" + testUserId + ":" + testListingId);
+        redisTemplate.delete("v4:inventory:stock:" + testListingId);
+        redisTemplate.delete("v4:inventory:reservation:" + testUserId + ":" + testListingId);
 
         // 2. Kullanıcı stoğu rezerve eder
         redisReservationService.reserveStockWithTtl(testUserId, testListingId, 1, 900L);
-        String stockAfterReserve = redisTemplate.opsForValue().get("stock:" + testListingId);
+        String stockAfterReserve = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
         log.info("📦 Rezervasyon Sonrası Redis Kalan Stok: {}", stockAfterReserve);
         Assertions.assertEquals("0", stockAfterReserve);
 
         // 3. Kullanıcı sepetten ürünü çıkarır veya checkout iptal eder
         redisReservationService.cancelUserReservation(testUserId, testListingId);
-        String stockAfterCancel = redisTemplate.opsForValue().get("stock:" + testListingId);
+        String stockAfterCancel = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
         log.info("♻️ İptal Sonrası Redis Serbest Kalan Stok: {}", stockAfterCancel);
         Assertions.assertEquals("1", stockAfterCancel, "İptal edilen rezervasyon stoğa anında geri iade edilmelidir.");
     }

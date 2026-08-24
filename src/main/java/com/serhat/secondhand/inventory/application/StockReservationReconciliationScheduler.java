@@ -25,18 +25,18 @@ public class StockReservationReconciliationScheduler {
     @Scheduled(fixedDelayString = "${app.inventory.reconciliation.fixed-delay-ms:300000}", initialDelay = 60000)
     public void reconcileOrphanedStockReservations() {
         try {
-            Set<String> stockKeys = redisTemplate.keys("stock:*");
+            Set<String> stockKeys = redisTemplate.keys("v4:inventory:stock:*");
             if (stockKeys == null || stockKeys.isEmpty()) {
                 return;
             }
 
             for (String stockKey : stockKeys) {
-                String listingIdStr = stockKey.replace("stock:", "");
+                String listingIdStr = stockKey.replace("v4:inventory:stock:", "");
                 try {
                     UUID listingId = UUID.fromString(listingIdStr);
 
                     // Find all active reservation keys for this listing
-                    Set<String> activeReservations = redisTemplate.keys("reservation:*:" + listingIdStr);
+                    Set<String> activeReservations = redisTemplate.keys("v4:inventory:reservation:*:" + listingIdStr);
                     int totalReservedInRedis = 0;
                     if (activeReservations != null) {
                         for (String resKey : activeReservations) {

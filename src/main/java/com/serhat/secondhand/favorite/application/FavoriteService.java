@@ -55,7 +55,7 @@ public class FavoriteService {
 
 
     @Transactional
-    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
+    @CacheEvict(value = "user:stats:favorites", allEntries = true)
     public Result<FavoriteDto> addToFavorites(Long userId, UUID listingId) {
         log.info("Adding listing {} to favorites for userId {}", listingId, userId);
         Result<User> userResult = resolveUser(userId);
@@ -130,7 +130,7 @@ public class FavoriteService {
 
 
     @Transactional
-    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
+    @CacheEvict(value = "user:stats:favorites", allEntries = true)
     public Result<Void> removeFromFavorites(Long userId, UUID listingId) {
         log.info("Removing listing {} from favorites for userId {}", listingId, userId);
         Result<User> userResult = resolveUser(userId);
@@ -152,7 +152,7 @@ public class FavoriteService {
 
 
     @Transactional
-    @CacheEvict(value = "favoriteStatsBatch", allEntries = true)
+    @CacheEvict(value = "user:stats:favorites", allEntries = true)
     public Result<FavoriteStatsDto> toggleFavorite(Long userId, UUID listingId) {
         log.info("Toggling favorite status for listing {} and userId {}", listingId, userId);
 

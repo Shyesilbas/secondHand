@@ -36,9 +36,9 @@ public class UserBadgeService {
         this.taskExecutor = taskExecutor;
     }
 
-    @Cacheable(value = "userBadges", key = "#userId")
+    @Cacheable(value = "user:badges", key = "#userId")
     public Map<String, Object> getUserBadges(Long userId) {
-        log.info("[CACHE MISS] userBadges::{}", userId);
+        log.info("[CACHE MISS] user:badges:{}", userId);
 
         // Run all count queries in parallel using the application's taskExecutor
         var notificationFuture = CompletableFuture.supplyAsync(() -> 

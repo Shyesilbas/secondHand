@@ -81,5 +81,15 @@ public class SalesStatisticsAdapter implements SalesStatisticsPort {
     public List<Object[]> findTopListingsByRevenue(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         return orderItemRepository.findTopListingsByRevenue(sellerId, startDate, endDate);
     }
+
+    @Override
+    public List<com.serhat.secondhand.order.entity.Order> findActiveOrdersForBuyer(Long buyerId) {
+        return orderRepository.findActiveOrdersForBuyer(buyerId, List.of(
+                com.serhat.secondhand.order.entity.enums.OrderStatus.PENDING,
+                com.serhat.secondhand.order.entity.enums.OrderStatus.CONFIRMED,
+                com.serhat.secondhand.order.entity.enums.OrderStatus.PROCESSING,
+                com.serhat.secondhand.order.entity.enums.OrderStatus.SHIPPED
+        ));
+    }
 }
 

@@ -14,7 +14,7 @@ import java.util.UUID;
 @Slf4j
 public class ShowcaseRedisManagerService {
 
-    private static final String SHOWCASE_ACTIVE_KEY_PREFIX = "showcase:active:";
+    private static final String SHOWCASE_ACTIVE_KEY_PREFIX = "v4:listing:showcase:active:";
 
     private final StringRedisTemplate redisTemplate;
 

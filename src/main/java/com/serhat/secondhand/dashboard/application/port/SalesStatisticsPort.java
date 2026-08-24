@@ -31,5 +31,7 @@ public interface SalesStatisticsPort {
     List<Object[]> findTopListingsByRevenue(Long sellerId, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Object[]> countOrdersBySellerAndCategory(Long sellerId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<com.serhat.secondhand.order.entity.Order> findActiveOrdersForBuyer(Long buyerId);
 }
 

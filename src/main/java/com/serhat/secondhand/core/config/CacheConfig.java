@@ -61,11 +61,11 @@ public class CacheConfig {
                 new GenericJackson2JsonRedisSerializer(buildCacheObjectMapper());
 
         // Tüm cache'lerin paylaştığı temel konfig.
-        // computePrefixWith ile her cache name'in önüne "v<N>::" eklenir → eski versiyon anahtarlarıyla çakışmaz.
+        // computePrefixWith ile her cache name'in önüne "v<N>:<cacheName>:" eklenir.
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(30))
                 .disableCachingNullValues()
-                .computePrefixWith(cacheName -> CACHE_VERSION + "::" + cacheName + "::")
+                .computePrefixWith(cacheName -> CACHE_VERSION + ":" + cacheName + ":")
                 .serializeKeysWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
@@ -73,9 +73,6 @@ public class CacheConfig {
 
         // ── Tier 1: Statik Lookup — 24 saat ────────────────────────────
         RedisCacheConfiguration lookupConfig = defaultConfig.entryTtl(Duration.ofHours(24));
-
-        // ── Tier 0: Coğrafi Katalog — 7 gün (restart-safe, JVM heap'te tutulmaz) ────
-        RedisCacheConfiguration locationsConfig = defaultConfig.entryTtl(Duration.ofDays(7));
 
         // ── Tier 0b: AI Yorum Özetleri — 3 gün ────────────────────────────
         RedisCacheConfiguration aiSummariesConfig = defaultConfig.entryTtl(Duration.ofDays(3));
@@ -95,46 +92,43 @@ public class CacheConfig {
         // ── Tier 4: Ultra Kısa — 5 dakika ────────────────────────────
         RedisCacheConfiguration ultraShortConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
 
-        log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}::", CACHE_VERSION);
+        log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}:", CACHE_VERSION);
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
 
-                // Tier 0 — Coğrafi katalog (7 gün, restart'ta silinmez)
-                .withCacheConfiguration("locations", locationsConfig)
-
                 // Tier 0b — AI Yorum Özetleri (3 gün)
-                .withCacheConfiguration("aiSummaries", aiSummariesConfig)
+                .withCacheConfiguration("ai:summaries", aiSummariesConfig)
 
                 // Tier 1 — Statik lookup tabloları (24 saat)
-                .withCacheConfiguration("brands", lookupConfig)
-                .withCacheConfiguration("vehicleTypes", lookupConfig)
-                .withCacheConfiguration("electronicTypes", lookupConfig)
-                .withCacheConfiguration("bookGenres", lookupConfig)
-                .withCacheConfiguration("clothingTypes", lookupConfig)
+                .withCacheConfiguration("catalog:brands", lookupConfig)
+                .withCacheConfiguration("catalog:vehicleTypes", lookupConfig)
+                .withCacheConfiguration("catalog:electronicTypes", lookupConfig)
+                .withCacheConfiguration("catalog:bookGenres", lookupConfig)
+                .withCacheConfiguration("catalog:clothingTypes", lookupConfig)
 
                 // Tier 2 — Tamamlanmış işlemler (2 saat)
-                .withCacheConfiguration("completedOrder", completedConfig)
-                .withCacheConfiguration("paymentHistory", completedConfig)
-                .withCacheConfiguration("paymentStats", completedConfig)
-                .withCacheConfiguration("exchangeRates", completedConfig)
+                .withCacheConfiguration("order:completed", completedConfig)
+                .withCacheConfiguration("payment:history", completedConfig)
+                .withCacheConfiguration("payment:stats", completedConfig)
+                .withCacheConfiguration("payment:exchangeRates", completedConfig)
 
                 // Tier 2b — Kullanıcı profili (15 dakika)
-                .withCacheConfiguration("userProfile", profileConfig)
+                .withCacheConfiguration("user:profile", profileConfig)
 
                 // Tier 3 — Aggregation istatistikleri (10 dakika)
-                .withCacheConfiguration("reviewStatsBatch", aggregationConfig)
-                .withCacheConfiguration("favoriteStatsBatch", aggregationConfig)
-                .withCacheConfiguration("sellerViewStats", aggregationConfig)
-                .withCacheConfiguration("userListings", aggregationConfig)
+                .withCacheConfiguration("user:stats:reviews", aggregationConfig)
+                .withCacheConfiguration("user:stats:favorites", aggregationConfig)
+                .withCacheConfiguration("listing:views:seller", aggregationConfig)
+                .withCacheConfiguration("listing:userListings", aggregationConfig)
 
                 // Tier 3b — Kısa süreli (5 dakika)
-                .withCacheConfiguration("pendingOrders", shortConfig)
-                .withCacheConfiguration("listingViewStats", shortConfig)
-                .withCacheConfiguration("activeShowcases", shortConfig)
+                .withCacheConfiguration("order:pending", shortConfig)
+                .withCacheConfiguration("listing:views:listing", shortConfig)
+                .withCacheConfiguration("listing:showcases", shortConfig)
 
                 // Tier 4 — Ultra Kısa (5 dakika)
-                .withCacheConfiguration("userBadges", ultraShortConfig)
+                .withCacheConfiguration("user:badges", ultraShortConfig)
 
                 .build();
     }

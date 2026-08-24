@@ -13,6 +13,8 @@ import { motion } from 'framer-motion';
 const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
 import CategoryBreakdown from '../components/CategoryBreakdown.jsx';
 import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
+import ConversionFunnel from '../components/ConversionFunnel.jsx';
+import OfferAnalyticsCard from '../components/OfferAnalyticsCard.jsx';
 import { DollarSign, ShoppingBag, Package, Star, Percent, Wallet } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
 const ChartCard = ({
@@ -131,6 +133,20 @@ const SellerDashboardPage = () => {
  <MetricCard index={4} title={t("conversion_rate")} value={conversionRate !== null ? conversionRate + '%' : '—'} icon={Percent} subtitle={`${dashboard.totalViews || 0} views → ${dashboard.totalOrders || 0} orders`} color="cyan" />
  <MetricCard index={5} title={t("pending_escrow")} value={formatCurrency(pendingEscrow, 'TRY')} icon={Wallet} subtitle="Awaiting order completion" color="amber" />
  </div>
+
+ {/* Conversion Funnel */}
+ {dashboard.funnel && (
+   <ChartCard delay={0.15}>
+     <ConversionFunnel funnel={dashboard.funnel} />
+   </ChartCard>
+ )}
+
+ {/* Offer Analytics */}
+ {dashboard.offerStats && (
+   <ChartCard delay={0.18}>
+     <OfferAnalyticsCard offerStats={dashboard.offerStats} />
+   </ChartCard>
+ )}
 
  {/* Charts Row 1 */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

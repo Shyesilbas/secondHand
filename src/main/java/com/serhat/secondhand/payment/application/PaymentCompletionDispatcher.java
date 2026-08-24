@@ -25,13 +25,7 @@ public class PaymentCompletionDispatcher {
         User sender = payment.getFromUser();
         if (sender != null) {
             paymentNotificationService.sendPaymentSuccessNotification(sender, paymentDto);
-            log.info("Payment success notification sent to sender ID: {}", sender.getId());
-        }
-
-        User receiver = payment.getToUser();
-        if (receiver != null && (sender == null || !receiver.getId().equals(sender.getId()))) {
-            paymentNotificationService.sendPaymentSuccessNotification(receiver, paymentDto);
-            log.info("Payment success notification sent to receiver ID: {}", receiver.getId());
+            log.info("Payment success notification sent to payer ID: {}", sender.getId());
         }
     }
 }

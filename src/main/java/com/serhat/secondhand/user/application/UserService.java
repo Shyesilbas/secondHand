@@ -65,7 +65,7 @@ public class UserService implements IUserService {
         return Result.success();
     }
 
-    @CacheEvict(value = "userProfile", key = "#user.id")
+    @CacheEvict(value = "user:profile", key = "#user.id")
     public void update(User user) {
         userRepository.save(user);
     }
@@ -148,9 +148,9 @@ public class UserService implements IUserService {
         return Result.success(userDto);
     }
 
-    @Cacheable(value = "userProfile", key = "#id")
+    @Cacheable(value = "user:profile", key = "#id")
     public UserDto getCachedUserDto(Long id) {
-        log.info("[CACHE MISS] userProfile::{}", id);
+        log.info("[CACHE MISS] user:profile:{}", id);
         return userRepository.findById(id)
                 .map(userMapper::toDto)
                 .orElse(null);

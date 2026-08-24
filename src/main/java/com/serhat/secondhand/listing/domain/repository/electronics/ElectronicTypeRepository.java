@@ -12,10 +12,10 @@ import java.util.UUID;
 @Repository
 public interface ElectronicTypeRepository extends JpaRepository<ElectronicType, UUID> {
     
-    @Cacheable(value = "electronicTypes", key = "'all'")
+    @Cacheable(value = "catalog:electronicTypes", key = "'all'")
     List<ElectronicType> findAll();
     
-    @Cacheable(value = "electronicTypes", key = "#name", unless = "#result == null")
+    @Cacheable(value = "catalog:electronicTypes", key = "#name", unless = "#result == null")
     Optional<ElectronicType> findByNameIgnoreCase(String name);
 }
 

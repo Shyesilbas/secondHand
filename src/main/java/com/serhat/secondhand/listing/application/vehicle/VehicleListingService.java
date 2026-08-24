@@ -56,7 +56,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         this.vehicleListingResolver = vehicleListingResolver;
     }
 
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<UUID> createVehicleListing(VehicleCreateRequest request, Long sellerId) {
         return createListing(request, sellerId);
     }
@@ -111,7 +111,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
 
     @Transactional
     @TrackPriceChange(reason = "Price updated via listing edit")
-    @org.springframework.cache.annotation.CacheEvict(value = "userProfile", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
     public Result<Void> updateVehicleListing(UUID id, VehicleUpdateRequest request, Long currentUserId) {
         log.info("Updating vehicle listing: {} by user: {}", id, currentUserId);
         Result<Void> ownershipResult = validateOwnership(id, currentUserId);

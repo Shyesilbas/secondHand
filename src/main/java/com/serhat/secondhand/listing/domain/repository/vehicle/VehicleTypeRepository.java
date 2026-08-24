@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface VehicleTypeRepository extends JpaRepository<VehicleType, UUID> {
     
-    @Cacheable(value = "vehicleTypes", key = "'all'")
+    @Cacheable(value = "catalog:vehicleTypes", key = "'all'")
     List<VehicleType> findAll();
 
     /** Uncached — seed sırasında Hibernate proxy Redis'e yazılmasın. */

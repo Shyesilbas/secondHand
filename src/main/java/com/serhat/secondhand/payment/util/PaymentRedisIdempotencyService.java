@@ -18,7 +18,7 @@ public class PaymentRedisIdempotencyService {
         CONFLICT
     }
 
-    private static final String KEY_PREFIX = "payment:idem:";
+    private static final String KEY_PREFIX = "v4:payment:idempotency:";
     private static final String STATE_PENDING = "PENDING";
     private static final String STATE_DONE = "DONE";
 

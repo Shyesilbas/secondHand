@@ -51,14 +51,7 @@ public class PaymentCompletedKafkaConsumer {
                 if (event.fromUserId() != null) {
                     userRepository.findById(event.fromUserId()).ifPresent(sender -> {
                         paymentNotificationService.sendPaymentSuccessNotification(sender, paymentDto);
-                        log.info("Payment success notification sent to sender ID: {}", sender.getId());
-                    });
-                }
-
-                if (event.toUserId() != null && !event.toUserId().equals(event.fromUserId())) {
-                    userRepository.findById(event.toUserId()).ifPresent(receiver -> {
-                        paymentNotificationService.sendPaymentSuccessNotification(receiver, paymentDto);
-                        log.info("Payment success notification sent to receiver ID: {}", receiver.getId());
+                        log.info("Payment success notification sent to payer ID: {}", sender.getId());
                     });
                 }
             });

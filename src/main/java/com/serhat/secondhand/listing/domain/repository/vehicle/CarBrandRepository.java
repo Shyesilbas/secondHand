@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface CarBrandRepository extends JpaRepository<CarBrand, UUID> {
     
-    @Cacheable(value = "brands", key = "'all'")
+    @Cacheable(value = "catalog:brands", key = "'all'")
     List<CarBrand> findAll();
 
     /** Uncached — seed ve yazma sonrası tutarlılık için entity cache'lenmez. */

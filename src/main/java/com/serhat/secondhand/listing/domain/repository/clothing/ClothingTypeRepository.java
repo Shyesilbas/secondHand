@@ -12,10 +12,10 @@ import java.util.UUID;
 @Repository
 public interface ClothingTypeRepository extends JpaRepository<ClothingType, UUID> {
     
-    @Cacheable(value = "clothingTypes", key = "'all'")
+    @Cacheable(value = "catalog:clothingTypes", key = "'all'")
     List<ClothingType> findAll();
     
-    @Cacheable(value = "clothingTypes", key = "#name", unless = "#result == null")
+    @Cacheable(value = "catalog:clothingTypes", key = "#name", unless = "#result == null")
     Optional<ClothingType> findByNameIgnoreCase(String name);
 }
 
