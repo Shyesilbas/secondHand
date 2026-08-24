@@ -28,7 +28,9 @@ public class AgentQueryService {
     }
 
     public AgentContextBundle buildContext(Long userId, AgentUiContextRequest uiContext) {
-        String memoryData = memoryService.buildMemoryData(memoryService.getOrCreate(userId));
+        String memoryData = (userId != null) 
+                ? memoryService.buildMemoryData(memoryService.getOrCreate(userId)) 
+                : "";
         
         List<CompletableFuture<AgentContextSection>> futures = contextAdapters.stream()
                 .map(adapter -> CompletableFuture.supplyAsync(() -> adapter.fetch(userId, uiContext), taskExecutor))

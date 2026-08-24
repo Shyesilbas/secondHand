@@ -3,6 +3,7 @@ package com.serhat.secondhand.ai.api;
 import com.serhat.secondhand.ai.application.AiSummaryService;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/ai/summary")
 @RequiredArgsConstructor
+@PublicEndpoint
 @Tag(name = "AI Summary", description = "AI-powered review summarization operations")
 public class AiSummaryController {
 

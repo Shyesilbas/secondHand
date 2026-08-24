@@ -396,7 +396,7 @@ const ListingDetailPage = () => {
 
               {/* AI Summary Content */}
               <div className="text-xs leading-relaxed text-slate-700 font-medium bg-white/75 backdrop-blur-xs rounded-2xl p-4 border border-indigo-100/60">
-                <AuraSummary listing={listing} />
+                <AuraSummary type="listing" id={listing?.id} listing={listing} />
               </div>
             </div>
 

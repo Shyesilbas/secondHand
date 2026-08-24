@@ -40,7 +40,7 @@ public class AgentController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody AgentQueryRequest request
     ) {
-        Long userId = user.getId();
+        Long userId = (user != null) ? user.getId() : null;
         UserQuestionRequest question = new UserQuestionRequest(request.message(), request.context());
 
         AgentQueryService.AgentContextBundle contextBundle = agentQueryService.buildContext(userId, request.uiContext());
