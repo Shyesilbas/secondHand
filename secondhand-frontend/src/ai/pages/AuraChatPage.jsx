@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -16,13 +16,13 @@ import {
   ShieldCheck,
   Tag,
   ExternalLink,
-  ChevronRight,
-  Zap,
-  TrendingDown,
-  Info,
-  Layers,
+  Copy,
+  Check,
   ArrowRight,
-  CheckCircle2
+  Bot,
+  Flame,
+  Lightbulb,
+  Compass
 } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
@@ -36,7 +36,7 @@ import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
 import { cacheService } from '../../common/services/cacheService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 
-const renderMessageContent = (content) => {
+const MessageRenderer = ({ content }) => {
   if (typeof content !== 'string') return content;
 
   const gaugeRegex = /<PriceAdvisorGauge\s+([^>]+)\s*\/?>/i;
@@ -63,7 +63,7 @@ const renderMessageContent = (content) => {
 
     return (
       <div className="space-y-3">
-        {before && <p className="whitespace-pre-wrap leading-relaxed">{before}</p>}
+        {before && <p className="whitespace-pre-line leading-relaxed font-normal">{before.trim()}</p>}
         <div className="my-2">
           <AuraPriceAdvisorGauge
             min={min}
@@ -74,12 +74,32 @@ const renderMessageContent = (content) => {
             status={status}
           />
         </div>
-        {after && <p className="whitespace-pre-wrap leading-relaxed">{after}</p>}
+        {after && <p className="whitespace-pre-line leading-relaxed font-normal">{after.trim()}</p>}
       </div>
     );
   }
 
-  return <p className="whitespace-pre-wrap leading-relaxed">{content}</p>;
+  // Format bullets and bold text cleanly
+  const lines = content.split('\n');
+  return (
+    <div className="space-y-1.5 leading-relaxed font-normal text-[13px] sm:text-sm">
+      {lines.map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={i} className="h-1.5" />;
+        
+        if (trimmed.startsWith('- ') || trimmed.startsWith('• ') || trimmed.startsWith('* ')) {
+          return (
+            <div key={i} className="flex items-start gap-2 pl-1 py-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 shrink-0" />
+              <span>{trimmed.substring(2)}</span>
+            </div>
+          );
+        }
+
+        return <p key={i} className="whitespace-pre-wrap">{line}</p>;
+      })}
+    </div>
+  );
 };
 
 export const AuraChatPage = () => {
@@ -97,11 +117,12 @@ export const AuraChatPage = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeHint, setUpgradeHint] = useState('');
   const [showMemoryHub, setShowMemoryHub] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
 
   const userId = user?.id ?? null;
   const listingContext = useMemo(() => buildAuraListingSessionContext(listing), [listing]);
 
-  // Keep right panel open by default if listing exists
+  // Keep right panel open if listing is supplied
   useEffect(() => {
     if (listing) {
       setRightPanelOpen(true);
@@ -182,8 +203,8 @@ export const AuraChatPage = () => {
         id: 'aura-welcome',
         role: 'assistant',
         content: listing
-          ? `Merhaba! "${listing.title || 'İlan'}" hakkında detaylı bilgi, piyasa fiyatı değerlendirmesi veya satıcıyla pazarlık tavsiyeleri konusunda sana yardımcı olabilirim. Ne sormak istersin?`
-          : "Merhaba! Ben Aura AI. İkinci el ürün arama, piyasa fiyat analizleri, teklif stratejileri ve güvenli ödeme süreçlerinde sana yardımcı olmak için buradayım. Bugün nasıl yardımcı olabilirim?",
+          ? `Merhaba! "${listing.title || 'İlan'}" incelemesine hoş geldiniz. Fiyat analizi, satıcı değerlendirmesi veya pazarlık stratejisi hakkında sorularınızı yanıtlayabilirim.`
+          : "Merhaba! Ben Aura AI. İkinci el ürün arama, piyasa fiyat analizleri, teklif stratejileri ve güvenli ödeme süreçlerinde sana yardımcı olmak için buradayım. Bugün neyi incelemek istersin?",
         createdAt: Date.now(),
       },
     ],
@@ -193,6 +214,14 @@ export const AuraChatPage = () => {
     echoUserMessageWhenUnauthed: false,
     persistMessagesSurface: 'page',
   });
+
+  const copyToClipboard = (id, text) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
 
   const handleNewChat = async () => {
     if (userId == null) {
@@ -213,7 +242,7 @@ export const AuraChatPage = () => {
         createChatMessage({
           role: 'assistant',
           content: listing
-            ? `Yeni sohbet başlatıldı. "${listing.title}" hakkında ne öğrenmek istersiniz?`
+            ? `Yeni sohbet başlatıldı. "${listing.title}" hakkında ne sormak istersiniz?`
             : 'Yeni sohbet başlatıldı. Bugün hangi ürünü veya konuyu incelemek istersiniz?',
         }),
       ]);
@@ -262,7 +291,7 @@ export const AuraChatPage = () => {
     },
     {
       label: '🛡️ Güvenlik & Satıcı',
-      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme nasıl işliyor?`,
+      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu nasıl işliyor?`,
     },
     {
       label: '🤝 Pazarlık Tavsiyesi',
@@ -275,14 +304,14 @@ export const AuraChatPage = () => {
   ];
 
   return (
-    <div className="flex h-[calc(100vh-68px)] w-full overflow-hidden bg-slate-50 text-slate-800">
+    <div className="flex h-[calc(100vh-68px)] w-full overflow-hidden bg-slate-950/2 text-slate-800 antialiased">
       {/* ── MAIN CHAT AREA ────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col h-full min-w-0 min-h-0 bg-white relative">
         
-        {/* Top Floating Glass Header */}
-        <div className="shrink-0 h-16 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-4 z-20">
+        {/* Top Header Bar */}
+        <header className="shrink-0 h-16 border-b border-slate-150/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-4 z-20">
           <div className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 shadow-sm shadow-indigo-500/20 text-white">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/20 text-white">
               <Sparkles className="w-5 h-5 animate-pulse" />
               <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -291,27 +320,27 @@ export const AuraChatPage = () => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight">
                   Aura AI Asistanı
                 </h1>
-                <span className="px-2 py-0.5 text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full">
+                <span className="px-2 py-0.5 text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full">
                   Gemini 3.1 Pro
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Akıllı Pazar Yeri & İlan Danışmanı
+              <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
+                Akıllı İlan, Fiyat Analizi ve Güvenli Ticaret Danışmanı
               </p>
             </div>
           </div>
 
-          {/* Header Controls */}
+          {/* Action buttons */}
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleNewChat}
               disabled={isSending}
               title="Yeni Sohbet"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
             >
               <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
               <span className="hidden sm:inline">Yeni Sohbet</span>
@@ -323,8 +352,8 @@ export const AuraChatPage = () => {
               title="Aura Bellek Profili"
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 ${
                 showMemoryHub
-                  ? 'bg-indigo-600 text-white border-transparent'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-indigo-600 text-white border-transparent shadow-sm'
+                  : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50'
               }`}
             >
               <BrainCircuit className="w-3.5 h-3.5" />
@@ -336,7 +365,7 @@ export const AuraChatPage = () => {
               onClick={handleClearHistory}
               disabled={isSending}
               title="Geçmişi Temizle"
-              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+              className="p-2 rounded-xl border border-slate-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-400 hover:text-rose-600 transition-all shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -345,34 +374,34 @@ export const AuraChatPage = () => {
               <button
                 type="button"
                 onClick={() => setRightPanelOpen((prev) => !prev)}
-                title={rightPanelOpen ? 'İlan Panelini Kapat' : 'İlan Panelini Aç'}
+                title={rightPanelOpen ? 'İlan Panelini Gizle' : 'İlan Panelini Göster'}
                 className={`p-2 rounded-xl border text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95 ${
                   rightPanelOpen
                     ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                    : 'bg-white border-slate-200/90 text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 {rightPanelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
               </button>
             )}
           </div>
-        </div>
+        </header>
 
         {/* Memory Hub Drawer overlay */}
         {showMemoryHub && (
-          <div className="absolute inset-x-0 top-16 z-30 p-4 bg-white/95 backdrop-blur-md border-b border-indigo-100 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto">
+          <div className="absolute inset-x-0 top-16 z-30 p-4 sm:p-6 bg-white/95 backdrop-blur-md border-b border-indigo-100 shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[75vh] overflow-y-auto">
             <div className="max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-4 pb-2.5 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <BrainCircuit className="w-4 h-4 text-indigo-600" />
-                  <h3 className="text-sm font-bold text-slate-900">Aura AI Akıllı Bellek Profili</h3>
+                  <BrainCircuit className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-sm font-extrabold text-slate-900">Aura AI Akıllı Bellek Profili</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowMemoryHub(false)}
-                  className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+                  className="text-xs font-bold text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
-                  Kapat ✕
+                  ✕ Kapat
                 </button>
               </div>
               <AuraMemoryProfileHub />
@@ -381,13 +410,16 @@ export const AuraChatPage = () => {
         )}
 
         {/* ── CONVERSATION STREAM ──────────────────────────────────── */}
-        <div ref={listRef} className="flex-1 overflow-y-auto w-full px-4 sm:px-6 py-6 space-y-6">
+        <div
+          ref={listRef}
+          className="flex-1 overflow-y-auto w-full px-4 sm:px-6 py-6 space-y-6 custom-scrollbar"
+        >
           <div className="max-w-3xl mx-auto space-y-6">
 
-            {/* Active Listing Interactive Context Hero Banner */}
+            {/* Active Listing Hero Capsule (When active listing is present) */}
             {listing && (
-              <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 via-white to-amber-50/40 p-4 sm:p-5 shadow-xs transition-all">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-indigo-100/60">
+              <div className="rounded-3xl border border-indigo-100/80 bg-gradient-to-br from-indigo-50/60 via-white to-amber-50/30 p-4 sm:p-5 shadow-xs transition-all">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 pb-3.5 border-b border-indigo-100/60">
                   <div className="flex items-center gap-3.5 min-w-0">
                     <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/80 shrink-0 shadow-2xs">
                       {listing.imageUrl ? (
@@ -399,12 +431,12 @@ export const AuraChatPage = () => {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md bg-indigo-600 text-white font-extrabold text-[10px] tracking-wider uppercase">
-                          Aktif İlan
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="px-2 py-0.5 rounded-md bg-indigo-600 text-white font-black text-[9px] tracking-wider uppercase">
+                          İncelenen İlan
                         </span>
                         {listing.type && (
-                          <span className="text-[11px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+                          <span className="text-[10px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
                             {listingTypeLabel(listing.type)}
                           </span>
                         )}
@@ -412,7 +444,7 @@ export const AuraChatPage = () => {
                       <h2 className="text-sm sm:text-base font-extrabold text-slate-900 truncate mt-1">
                         {listing.title}
                       </h2>
-                      <p className="text-xs font-bold text-indigo-700 mt-0.5">
+                      <p className="text-xs font-black text-indigo-600 mt-0.5">
                         {formatListingPriceLabel(listing.price, listing.currency)}
                       </p>
                     </div>
@@ -420,17 +452,17 @@ export const AuraChatPage = () => {
 
                   <Link
                     to={ROUTES.LISTING_DETAIL(listing.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition-all shrink-0 shadow-2xs hover:text-indigo-600"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition-all shrink-0 shadow-2xs hover:text-indigo-600"
                   >
-                    <span>İlana Git</span>
+                    <span>İlan Sayfası</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
                 </div>
 
-                {/* Quick Smart Actions for Listing */}
-                <div className="mt-3.5">
-                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-900/60 mb-2">
-                    Aura Hızlı Analiz Soruları:
+                {/* Quick Smart Actions */}
+                <div className="mt-3">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-2">
+                    Aura Hızlı Analiz Önerileri:
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {quickListingActions.map((qa) => (
@@ -439,7 +471,7 @@ export const AuraChatPage = () => {
                         type="button"
                         disabled={isSending}
                         onClick={() => sendMessage({ text: qa.prompt })}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 hover:text-white border border-indigo-100 text-slate-700 text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-600 hover:text-white border border-indigo-100/90 text-slate-700 text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer disabled:opacity-50"
                       >
                         <span>{qa.label}</span>
                       </button>
@@ -449,7 +481,7 @@ export const AuraChatPage = () => {
               </div>
             )}
 
-            {/* Chat Messages */}
+            {/* Conversation Messages */}
             {messages.map((m) => {
               const isUser = m.role === 'user';
               return (
@@ -457,46 +489,81 @@ export const AuraChatPage = () => {
                   key={m.id}
                   className={`flex gap-3 sm:gap-4 ${
                     isUser ? 'flex-row-reverse' : 'flex-row'
-                  } items-start animate-in fade-in-50 duration-200`}
+                  } items-start animate-in fade-in-50 duration-200 group`}
                 >
                   {/* Avatar */}
                   <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl shadow-2xs ${
                       isUser
                         ? 'bg-slate-900 text-white'
-                        : 'bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 text-white'
+                        : 'bg-gradient-to-tr from-amber-500 via-indigo-600 to-violet-600 text-white shadow-indigo-500/10'
                     }`}
                   >
                     {isUser ? <UserRound className="w-4.5 h-4.5" /> : <Sparkles className="w-4.5 h-4.5" />}
                   </div>
 
-                  {/* Message Bubble */}
-                  <div className={`min-w-0 max-w-[85%] sm:max-w-[80%] ${isUser ? 'text-right' : 'text-left'}`}>
+                  {/* Bubble Container */}
+                  <div className={`min-w-0 max-w-[85%] sm:max-w-[82%] ${isUser ? 'text-right' : 'text-left'}`}>
+                    
+                    {/* Header meta */}
+                    <div className={`flex items-center gap-2 mb-1 text-[10px] font-bold text-slate-400 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <span>{isUser ? 'Siz' : 'Aura AI'}</span>
+                      {m.createdAt && (
+                        <span>
+                          {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Content Card */}
                     <div
-                      className={`inline-block rounded-3xl px-5 py-4 text-xs sm:text-sm leading-relaxed shadow-xs ${
+                      className={`inline-block rounded-3xl p-4 sm:p-5 text-left transition-all ${
                         isUser
-                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-tr-xs font-medium'
-                          : 'bg-white border border-slate-200/90 text-slate-800 rounded-tl-xs'
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-tr-xs shadow-sm shadow-indigo-500/10'
+                          : 'bg-slate-50/70 border border-slate-200/80 text-slate-800 rounded-tl-xs shadow-2xs backdrop-blur-xs'
                       }`}
                     >
                       {m.typing ? (
-                        <div className="flex items-center gap-2 py-1 px-1">
+                        <div className="flex items-center gap-2 py-1 px-1 text-slate-500">
                           <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '0ms' }} />
                           <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                           <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                          <span className="text-xs text-slate-400 font-semibold ml-1.5">Aura yanıt hazırlıyor...</span>
+                          <span className="text-xs font-semibold ml-1 text-slate-400">Aura düşünüyor...</span>
                         </div>
                       ) : (
                         <>
-                          {renderMessageContent(m.content)}
+                          <MessageRenderer content={m.content} />
                           {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-slate-100">
+                            <div className="mt-3 pt-3 border-t border-slate-200/60">
                               <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
                             </div>
                           )}
                         </>
                       )}
                     </div>
+
+                    {/* Bottom Actions for Assistant Message */}
+                    {!isUser && !m.typing && m.content && (
+                      <div className="flex items-center gap-2 mt-1.5 pl-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(m.id, m.content)}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                        >
+                          {copiedId === m.id ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span className="text-emerald-600">Kopyalandı</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Kopyala</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -504,9 +571,9 @@ export const AuraChatPage = () => {
 
             {/* Empty State / Suggested Prompts if only 1 message and no listing */}
             {messages.length === 1 && !listing && (
-              <div className="mt-8 pt-4">
+              <div className="mt-6 pt-4">
                 <p className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3 text-center">
-                  Önerilen Başlangıç Soruları
+                  Hızlı Başlangıç Konuları
                 </p>
                 <AuraSuggestedPrompts
                   disabled={isSending}
@@ -518,9 +585,9 @@ export const AuraChatPage = () => {
         </div>
 
         {/* ── FLOATING INPUT BAR ──────────────────────────────────── */}
-        <div className="shrink-0 p-4 sm:p-5 bg-gradient-to-t from-white via-white to-white/70 border-t border-slate-100">
+        <div className="shrink-0 p-4 sm:p-5 bg-gradient-to-t from-white via-white to-white/80 border-t border-slate-100">
           <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-2xl p-2 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 focus-within:bg-white transition-all shadow-xs">
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 rounded-3xl p-2 pl-4 focus-within:border-indigo-500 focus-within:ring-3 focus-within:ring-indigo-100 focus-within:bg-white transition-all shadow-sm">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -531,20 +598,21 @@ export const AuraChatPage = () => {
                     : "İkinci el ürün ara, fiyat analizi veya pazarlık tavsiyesi iste..."
                 }
                 rows={1}
-                className="flex-1 resize-none bg-transparent px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none min-h-[40px] max-h-[120px]"
+                className="flex-1 resize-none bg-transparent py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none min-h-[40px] max-h-[120px]"
               />
               <button
                 type="button"
                 onClick={() => sendMessage()}
                 disabled={isSending || !input.trim()}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:active:scale-100 cursor-pointer"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:active:scale-100 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
-            <p className="mt-2 text-[10px] text-slate-400 text-center font-medium">
-              Aura AI, güvenli alışveriş ve ilan analizleri için gerçek veritabanı bağlamını kullanır.
-            </p>
+            <div className="flex items-center justify-between mt-2 px-2 text-[10px] text-slate-400 font-medium">
+              <span>Enter ↵ ile gönder, Shift + Enter ile yeni satır</span>
+              <span className="hidden sm:inline">Güvenli Yapay Zeka Danışmanı</span>
+            </div>
           </div>
         </div>
       </div>
@@ -554,15 +622,15 @@ export const AuraChatPage = () => {
         <aside className="w-80 border-l border-slate-200 bg-white h-full overflow-y-auto hidden lg:flex flex-col p-5 space-y-6 shrink-0 shadow-xs z-20">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
                 İlan İnceleme Paneli
               </h3>
             </div>
             <button
               type="button"
               onClick={() => setRightPanelOpen(false)}
-              className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+              className="text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
             >
               ✕
             </button>
@@ -633,7 +701,7 @@ export const AuraChatPage = () => {
             to={ROUTES.LISTING_DETAIL(listing.id)}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold transition-all shadow-xs cursor-pointer"
           >
-            <span>İlan Detayına Dön</span>
+            <span>İlan Detayına Git</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </aside>

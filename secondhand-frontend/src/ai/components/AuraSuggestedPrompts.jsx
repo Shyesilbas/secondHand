@@ -1,72 +1,80 @@
-import {Sparkles, MessageCircle, HelpCircle, ShoppingCart} from 'lucide-react';
+import React from 'react';
+import { Sparkles, HelpCircle, MessageCircle, ShoppingBag, ArrowRight } from 'lucide-react';
 
-/**
- * ChatGPT / Claude style quick start suggestions (English).
- */
 const AURA_QUICK_PROMPTS = [
- {
- label: 'How to list items',
- message: 'How do I create my second-hand listing? Which page should I start from?',
- subtitle: 'Learn listing creation step-by-step',
- icon: Sparkles,
- },
- {
- label: 'Secure shopping',
- message: 'What should I pay attention to for secure shopping?',
- subtitle: 'Tips for safe payments and handovers',
- icon: HelpCircle,
- },
- {
- label: 'Offers and Cart',
- message: 'What is the difference between making an offer and adding to cart?',
- subtitle: 'Understand bids vs checkout options',
- icon: MessageCircle,
- },
- {
- label: 'Payment and Showcase',
- message: 'What is a listing fee and showcase? Where do I pay?',
- subtitle: 'Promote and highlights for your products',
- icon: ShoppingCart,
- },
+  {
+    label: 'İlan Nasıl Oluşturulur?',
+    message: 'İkinci el ilanımı nasıl oluşturabilirim? Fotoğraf ve fiyatlandırma için tavsiyelerin neler?',
+    subtitle: 'Adım adım ilan yayınlama rehberi',
+    icon: Sparkles,
+    gradient: 'from-amber-500 to-orange-500',
+    bgLight: 'bg-amber-50/60',
+    border: 'border-amber-100',
+  },
+  {
+    label: 'Güvenli Alışveriş & Havuz',
+    message: 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu nasıl çalışır?',
+    subtitle: 'Emanet (escrow) ve iade güvencesi',
+    icon: HelpCircle,
+    gradient: 'from-emerald-500 to-teal-500',
+    bgLight: 'bg-emerald-50/60',
+    border: 'border-emerald-100',
+  },
+  {
+    label: 'Teklif ve Pazarlık Stratejisi',
+    message: 'Bir ilana teklif vermek ile sepete eklemek arasındaki fark nedir? Pazarlık yaparken nelere dikkat etmeliyim?',
+    subtitle: 'Doğru fiyat teklifi oluşturma',
+    icon: MessageCircle,
+    gradient: 'from-indigo-500 to-violet-500',
+    bgLight: 'bg-indigo-50/60',
+    border: 'border-indigo-100',
+  },
+  {
+    label: 'Vitrin & İlan Öne Çıkarma',
+    message: 'İlanımı vitrinde nasıl öne çıkarabilirim ve daha hızlı nasıl satabilirim?',
+    subtitle: 'Görünürlük ve satış artırma ipuçları',
+    icon: ShoppingBag,
+    gradient: 'from-rose-500 to-pink-500',
+    bgLight: 'bg-rose-50/60',
+    border: 'border-rose-100',
+  },
 ];
 
-export default function AuraSuggestedPrompts({onPick, disabled = false, dense = false, className = ''}) {
- return (
- <div className={`grid grid-cols-1 ${dense ? '' : 'md:grid-cols-2'} gap-3 ${className}`}>
- {AURA_QUICK_PROMPTS.map((p) => {
- const Icon = p.icon;
- return (
- <button
- key={p.message}
- type="button"
- disabled={disabled}
- onClick={() => onPick(p.message)}
- className={`group text-left rounded-xl border border-border-light bg-background-primary transition-all duration-200 hover:border-slate-400 hover:bg-slate-50/50 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none ${
- dense ? 'p-3' : 'p-4'
- }`}
- >
- <div className="flex items-start gap-3">
- <div className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 group-hover:border-slate-300 group-hover:bg-background-primary flex items-center justify-center shrink-0 transition-all duration-200 shadow-sm">
- <Icon className="w-4 h-4 text-slate-500 group-hover:text-text-primary transition-colors duration-200" />
- </div>
- <div className="min-w-0 flex-1">
- <p className={`font-semibold text-slate-800 group-hover:text-slate-950 transition-colors ${
- dense ? 'text-xs' : 'text-sm'
- }`}>
- {p.label}
- </p>
- <p className={`text-slate-400 group-hover:text-slate-500 mt-0.5 line-clamp-1 transition-colors leading-normal ${
- dense ? 'text-caption' : 'text-xs'
- }`}>
- {p.subtitle}
- </p>
- </div>
- </div>
- </button>
- );
- })}
- </div>
- );
+export default function AuraSuggestedPrompts({
+  onPick,
+  disabled = false,
+  dense = false,
+  className = ''
+}) {
+  return (
+    <div className={`grid grid-cols-1 ${dense ? '' : 'sm:grid-cols-2'} gap-3 ${className}`}>
+      {AURA_QUICK_PROMPTS.map((p) => {
+        const Icon = p.icon;
+        return (
+          <button
+            key={p.label}
+            type="button"
+            disabled={disabled}
+            onClick={() => onPick(p.message)}
+            className={`group text-left rounded-2xl border ${p.border} ${p.bgLight} p-4 transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:border-indigo-200 bg-white/90 disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-between gap-3`}
+          >
+            <div className="flex items-start gap-3.5 min-w-0">
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${p.gradient} flex items-center justify-center shrink-0 shadow-xs text-white`}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+                  {p.label}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                  {p.subtitle}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all shrink-0" />
+          </button>
+        );
+      })}
+    </div>
+  );
 }
-
-
