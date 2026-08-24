@@ -8,7 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 
 public class PhoneUpdateEmailEvent extends EmailEvent<GenericEmailData> {
     public PhoneUpdateEmailEvent(User recipient, String subject, GenericEmailData data) {
-        super(recipient, subject, EmailType.NOTIFICATION, EmailPriority.HIGH, data);
+        super(recipient, subject, EmailType.PHONE_UPDATE, EmailPriority.HIGH, data);
     }
 
     @Override

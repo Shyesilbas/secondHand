@@ -8,7 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 
 public class OrderRefundedEmailEvent extends EmailEvent<GenericEmailData> {
     public OrderRefundedEmailEvent(User recipient, String subject, GenericEmailData data) {
-        super(recipient, subject, EmailType.NOTIFICATION, EmailPriority.HIGH, data);
+        super(recipient, subject, EmailType.ORDER_REFUNDED, EmailPriority.HIGH, data);
     }
 
     @Override

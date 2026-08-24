@@ -8,7 +8,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 
 public class SaleNotificationEmailEvent extends EmailEvent<OrderConfirmationEmailData> {
     public SaleNotificationEmailEvent(User recipient, String subject, OrderConfirmationEmailData data) {
-        super(recipient, subject, EmailType.NOTIFICATION, EmailPriority.HIGH, data);
+        super(recipient, subject, EmailType.SALE_NOTIFICATION, EmailPriority.HIGH, data);
     }
 
     @Override
