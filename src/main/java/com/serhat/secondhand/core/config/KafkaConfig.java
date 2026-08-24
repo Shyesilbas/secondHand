@@ -12,7 +12,6 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -28,6 +27,7 @@ public class KafkaConfig {
     public static final String PAYMENT_COMPLETED_TOPIC = "payment.completed.v1";
     public static final String PAYMENT_FAILED_TOPIC = "payment.failed.v1";
     public static final String PAYMENT_REFUNDED_TOPIC = "payment.refunded.v1";
+    public static final String MAIL_DISPATCH_TOPIC = "mail.dispatch.v1";
 
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
@@ -117,6 +117,16 @@ public class KafkaConfig {
             @Value("${app.kafka.topics.order-refunded-partitions:3}") int partitions,
             @Value("${app.kafka.topics.order-refunded-replicas:1}") int replicas) {
         return TopicBuilder.name(com.serhat.secondhand.order.application.OrderKafkaProducer.ORDER_REFUNDED_TOPIC)
+                .partitions(partitions)
+                .replicas(replicas)
+                .build();
+    }
+
+    @Bean
+    public NewTopic mailDispatchTopic(
+            @Value("${app.kafka.topics.mail-dispatch-partitions:3}") int partitions,
+            @Value("${app.kafka.topics.mail-dispatch-replicas:1}") int replicas) {
+        return TopicBuilder.name(MAIL_DISPATCH_TOPIC)
                 .partitions(partitions)
                 .replicas(replicas)
                 .build();

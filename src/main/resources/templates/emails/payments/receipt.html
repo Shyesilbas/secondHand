@@ -16,7 +16,7 @@
         .receipt-card { background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 16px; padding: 24px; text-align: center; margin: 24px 0; }
         .receipt-amount { font-size: 32px; font-weight: 800; color: #047857; margin: 8px 0; }
         .receipt-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #059669; }
-        .details-table { width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .details-table { width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
         .details-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid #e2e8f0; }
         .details-table tr:last-child td { border-bottom: none; }
         .detail-key { color: #64748b; font-weight: 600; }
@@ -34,13 +34,41 @@
         </div>
         <div class="content">
             <p th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
-            <p>Ödeme işleminiz başarıyla gerçekleşti. İşlem detayları aşağıda yer almaktadır:</p>
+            <p th:if="${listingTitle != null}">
+                <strong th:text="'\'' + ${listingTitle} + '\''">Ürün</strong> başlıklı ilan için ödemeniz başarıyla tamamlandı.
+            </p>
+            <p th:if="${listingTitle == null}">Ödeme işleminiz başarıyla gerçekleşti. İşlem detayları aşağıda yer almaktadır:</p>
 
             <div class="receipt-card" th:if="${amount != null}">
                 <div class="receipt-label">ÖDENEN TUTAR</div>
-                <div class="receipt-amount" th:text="${amount}">0.00 TL</div>
+                <div class="receipt-amount" th:text="${amount} + ' ' + ${currency != null ? currency : 'TL'}">0.00 TL</div>
             </div>
 
+            <!-- Structured Payment Details Table -->
+            <table class="details-table" th:if="${transactionNumber != null || typeLabel != null || paymentMethod != null}">
+                <tr th:if="${transactionNumber != null}">
+                    <td class="detail-key">İşlem Numarası</td>
+                    <td class="detail-val" th:text="'#' + ${transactionNumber}">#00000000</td>
+                </tr>
+                <tr th:if="${typeLabel != null}">
+                    <td class="detail-key">Hizmet / Tür</td>
+                    <td class="detail-val" th:text="${typeLabel}">Ürün Satın Alma</td>
+                </tr>
+                <tr th:if="${listingTitle != null}">
+                    <td class="detail-key">İlan</td>
+                    <td class="detail-val" th:text="${listingTitle}">İlan Başlığı</td>
+                </tr>
+                <tr th:if="${paymentMethod != null}">
+                    <td class="detail-key">Ödeme Yöntemi</td>
+                    <td class="detail-val" th:text="${paymentMethod}">E-Cüzdan</td>
+                </tr>
+                <tr th:if="${transactionDate != null}">
+                    <td class="detail-key">İşlem Tarihi</td>
+                    <td class="detail-val" th:text="${transactionDate}">24.08.2026 17:00</td>
+                </tr>
+            </table>
+
+            <!-- Legacy / Custom Message HTML fallback if provided -->
             <div th:if="${message != null && !#strings.isEmpty(message)}" th:utext="${message}"
                 style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 16px;"></div>
 

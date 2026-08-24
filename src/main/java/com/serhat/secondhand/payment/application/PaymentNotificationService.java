@@ -51,82 +51,20 @@ public class PaymentNotificationService {
                     ? DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(paymentDto.processedAt())
                     : DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(java.time.LocalDateTime.now());
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("<p>'").append(listingTitle).append("' başlıklı ilan için ödemeniz başarıyla tamamlandı.</p>");
-            sb.append(
-                    "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse; margin-top: 24px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;\">");
-            sb.append("  <tr>");
-            sb.append("    <td style=\"padding: 18px 20px;\">");
-            sb.append(
-                    "      <h3 style=\"margin-top: 0; margin-bottom: 16px; font-size: 14px; color: #0f172a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;\">İşlem Detayları</h3>");
-            sb.append("      <table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">");
-
-            // Transaction ID
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">İşlem Numarası</td>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">#")
-                    .append(paymentDto.paymentId() != null
-                            ? paymentDto.paymentId().toString().substring(0, 8).toUpperCase()
-                            : "")
-                    .append("</td>");
-            sb.append("        </tr>");
-
-            // Service Row
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Hizmet / Tür</td>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                    .append(typeLabel).append("</td>");
-            sb.append("        </tr>");
-
-            // Listing title row
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">İlan</td>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                    .append(listingTitle).append("</td>");
-            sb.append("        </tr>");
-
-            // Payment method
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Ödeme Yöntemi</td>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                    .append(methodLabel).append("</td>");
-            sb.append("        </tr>");
-
-            // Date
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">İşlem Tarihi</td>");
-            sb.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                    .append(formattedDate).append("</td>");
-            sb.append("        </tr>");
-
-            // Total Amount
-            sb.append("        <tr>");
-            sb.append(
-                    "          <td style=\"padding: 12px 0 0 0; color: #0f172a; font-size: 13px; font-weight: 700;\">Toplam Ödenen</td>");
-            sb.append(
-                    "          <td style=\"padding: 12px 0 0 0; color: #4f46e5; font-size: 14px; font-weight: 700; text-align: right;\">")
-                    .append(paymentDto.amount()).append(" ").append(paymentDto.currency()).append("</td>");
-            sb.append("        </tr>");
-
-            sb.append("      </table>");
-            sb.append("    </td>");
-            sb.append("  </tr>");
-            sb.append("</table>");
-
             var data = GenericEmailData.builder()
                     .userName(user.getName())
                     .headerTitle("Ödeme Başarılı")
-                    .message(sb.toString())
+                    .amount(paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "0.00")
+                    .currency(paymentDto.currency() != null ? paymentDto.currency() : "TRY")
+                    .transactionNumber(paymentDto.paymentId() != null
+                            ? paymentDto.paymentId().toString().substring(0, 8).toUpperCase()
+                            : "")
+                    .typeLabel(typeLabel)
+                    .listingTitle(listingTitle)
+                    .paymentMethod(methodLabel)
+                    .transactionDate(formattedDate)
+                    .actionText("Hesabımı Görüntüle")
+                    .actionUrl("/account/hub")
                     .build();
 
             emailEventPublisher.publish(new PaymentSuccessEmailEvent(user, subject, data));

@@ -15,4 +15,13 @@ public class GenericEmailData {
     private String message;
     private String actionText;
     private String actionUrl;
+
+    // Structured receipt / order / details fields
+    private String amount;
+    private String currency;
+    private String transactionNumber;
+    private String typeLabel;
+    private String listingTitle;
+    private String paymentMethod;
+    private String transactionDate;
 }

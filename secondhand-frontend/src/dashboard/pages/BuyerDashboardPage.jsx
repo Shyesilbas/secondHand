@@ -19,6 +19,7 @@ import { ROUTES } from '@/common/constants/routes';
 const ChartCard = ({
  children,
  title,
+ action,
  delay = 0
 }) => <motion.div initial={{
  opacity: 0,
@@ -30,7 +31,10 @@ const ChartCard = ({
  delay,
  duration: 0.4
 }} className="bg-background-primary rounded-2xl border border-border-light p-5 shadow-sm">
- {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
+ {title && <div className="mb-4 flex items-center justify-between gap-3">
+   <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider">{title}</h3>
+   {action}
+ </div>}
  {children}
  </motion.div>;
 const BuyerDashboardPage = () => {
@@ -172,7 +176,11 @@ const BuyerDashboardPage = () => {
 
  {/* Order Status Breakdown */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <ChartCard title={t("orders_by_status")} delay={0.3}>
+ <ChartCard
+   title={t("orders_by_status")}
+   action={<Link to={ROUTES.MY_ORDERS} className="inline-flex items-center rounded-lg border border-border-light px-3 py-2 text-xs font-semibold text-text-primary transition-colors hover:border-primary/30 hover:text-primary">{t("my_orders")}</Link>}
+   delay={0.3}
+ >
  <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
  </ChartCard>
  </div>
