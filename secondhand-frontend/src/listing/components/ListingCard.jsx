@@ -7,8 +7,9 @@ import ListingCardActions from './ListingCardActions.jsx';
 import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award, Check } from 'lucide-react';
+import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award, Check, Flame } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
+import { useActiveReservationCount } from '../../cart/hooks/useActiveReservationCount.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
@@ -42,6 +43,7 @@ const ListingCard = ({
  const {
  isInComparison
  } = useComparison();
+ const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id);
  if (!listing) return null;
  const isGreatSeller = Boolean(listing.sellerGreatSellerEligible);
  const isInCompare = isInComparison(listing.id);
@@ -168,13 +170,24 @@ const ListingCard = ({
  {/* Gradient overlay */}
  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
- {/* Top-left badges */}
- <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
- {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
- {statusConfig.label}
- </span>}
- {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">
- <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
+  {/* Top-left badges */}
+  <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 items-start">
+  {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
+  {statusConfig.label}
+  </span>}
+  {cartReservations > 0 ? (
+    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs animate-pulse">
+      <Flame className="w-3 h-3 fill-current text-white" />
+      {cartReservations} sepette
+    </span>
+  ) : activeViewers > 1 ? (
+    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-900/85 text-white backdrop-blur shadow-xs">
+      <Eye className="w-3 h-3 text-amber-400" />
+      {activeViewers} inceliyor
+    </span>
+  ) : null}
+  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">
+  <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
  {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
  <Award className="w-3 h-3 shrink-0 text-amber-600" />{t("great_seller")}</span>}
  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white shadow-sm ">

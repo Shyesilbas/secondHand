@@ -160,12 +160,12 @@ public class Order {
     @Column(name = "meetup_verification_code", length = 10)
     private String meetupVerificationCode;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     @org.hibernate.annotations.BatchSize(size = 20)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Shipping shipping;
 
     public Order(String orderNumber, User user, Address shippingAddress, Address billingAddress, 

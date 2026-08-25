@@ -31,7 +31,14 @@ public class CheckoutReservationController {
     public ResponseEntity<?> initiateReservation(@AuthenticationPrincipal User currentUser) {
         log.info("User {} initiating checkout stock reservation", currentUser.getId());
         Result<Map<UUID, Integer>> reserveResult = stockReservationService.reserveUserCartStock(currentUser.getId());
-        return ResultResponses.ok(reserveResult);
+        if (reserveResult.isError()) {
+            return ResultResponses.ok(reserveResult);
+        }
+        long remainingTtl = stockReservationService.getRemainingTtlForUser(currentUser.getId());
+        return ResultResponses.ok(Result.success(Map.of(
+                "reserved", reserveResult.getData(),
+                "remainingTtlSeconds", remainingTtl
+        )));
     }
 
     @DeleteMapping("/reservation/{listingId}")

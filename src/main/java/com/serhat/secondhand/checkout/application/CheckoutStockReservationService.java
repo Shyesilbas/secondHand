@@ -33,6 +33,24 @@ public class CheckoutStockReservationService {
         return reserveStock(userId, cartItems);
     }
 
+    public long getRemainingTtlForUser(Long userId) {
+        List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
+        long minTtl = 900L;
+        boolean found = false;
+        for (Cart item : cartItems) {
+            if (item.getListing() != null) {
+                Long ttl = redisReservationService.getReservationRemainingTtl(userId, item.getListing().getId());
+                if (ttl != null && ttl > 0) {
+                    found = true;
+                    if (ttl < minTtl) {
+                        minTtl = ttl;
+                    }
+                }
+            }
+        }
+        return found ? minTtl : 900L;
+    }
+
     public Result<Map<UUID, Integer>> reserveStock(Long userId, List<Cart> cartItems) {
         Map<UUID, Integer> reserved = new HashMap<>();
         for (Cart item : cartItems) {

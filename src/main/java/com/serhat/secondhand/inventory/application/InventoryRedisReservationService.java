@@ -90,6 +90,13 @@ public class InventoryRedisReservationService {
         log.info("Consumed reservation key {} upon successful purchase by user {}", reservationKey, userId);
     }
 
+    public Long getReservationRemainingTtl(Long userId, UUID listingId) {
+        if (userId == null || listingId == null) return 0L;
+        String reservationKey = getReservationKey(userId, listingId);
+        Long ttl = stringRedisTemplate.getExpire(reservationKey);
+        return (ttl != null && ttl > 0) ? ttl : 0L;
+    }
+
     public void reserveStock(UUID listingId, int quantity) {
         String stockKey = getStockKey(listingId);
         int currentDbStock = inventoryService.getAvailableQuantity(listingId);

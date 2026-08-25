@@ -20,6 +20,7 @@ import {formatCurrency} from '../../common/formatters.js';
 import {orderService} from '../../order/services/orderService.js';
 import {usePlan} from '@/common/hooks/usePlan';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
+import logger from '../../common/utils/logger.js';
 
 const CheckoutPage = () => {
  const {
@@ -40,19 +41,50 @@ const CheckoutPage = () => {
  const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
  const [isOrderSummaryExpanded, setIsOrderSummaryExpanded] = useState(false);
- const [timeLeft, setTimeLeft] = useState(900); // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(() => {
+    try {
+      const savedExpiry = sessionStorage.getItem('checkout_reservation_expiry');
+      if (savedExpiry) {
+        const remaining = Math.max(0, Math.floor((parseInt(savedExpiry, 10) - Date.now()) / 1000));
+        if (remaining > 0) return remaining;
+      }
+    } catch (err) {
+      logger.debug('SessionStorage read skipped', err);
+    }
+    return 900;
+  });
 
- useEffect(() => {
- // Initiate Redis stock reservation with 15-min TTL upon entering checkout
- orderService.initiateCheckoutReservation().catch(err => {
- console.warn("Could not initiate stock reservation in Redis:", err);
- });
+  useEffect(() => {
+    // Initiate Redis stock reservation and synchronize exact remaining TTL
+    orderService.initiateCheckoutReservation().then(res => {
+      const remaining = res?.data?.remainingTtlSeconds ?? res?.remainingTtlSeconds;
+      if (typeof remaining === 'number' && remaining > 0) {
+        setTimeLeft(remaining);
+        try {
+          sessionStorage.setItem('checkout_reservation_expiry', String(Date.now() + remaining * 1000));
+        } catch (err) {
+          logger.debug('SessionStorage write skipped', err);
+        }
+      }
+    }).catch(err => {
+      logger.warn("Could not initiate stock reservation in Redis:", err);
+    });
 
- const timer = setInterval(() => {
- setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
- }, 1000);
- return () => clearInterval(timer);
- }, []);
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          try {
+            sessionStorage.removeItem('checkout_reservation_expiry');
+          } catch (err) {
+            logger.debug('SessionStorage remove skipped', err);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
  const formatTimer = (seconds) => {
  const mins = Math.floor(seconds / 60);
@@ -264,38 +296,9 @@ const CheckoutPage = () => {
  </span>
  </button>
  {isOrderSummaryExpanded && <div className="mt-3 pt-3 border-t border-slate-100 overflow-hidden">
- <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} />
+ <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} isPremium={isPremium} onOpenPremiumModal={() => setIsPremiumModalOpen(true)} />
  </div>}
  </div>
-
- {/* Premium Shipping Perk Banner */}
- <PageContainer className="mt-4">
- <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-4 ${isPremium ? 'bg-amber-50/70 border-amber-200/80 shadow-xs' : 'bg-white border-slate-200/80 shadow-xs'}`}>
- <div className="flex items-center gap-3">
- <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${isPremium ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600'}`}>
- <Crown className="h-5 w-5" />
- </div>
- <div>
- <p className="text-xs font-extrabold text-slate-900">
- {isPremium ? t("premium_shipping_advantage") : t("dont_wait_for_shipping")}
- </p>
- <p className="text-xs text-slate-500 font-medium">
- {isPremium 
- ? t("order_processed_with_priority") 
- : t('upgrade_to_premium_get_shipping_fast', "Premium'a geçerek siparişinizi en hızlı şekilde teslim alın!")}
- </p>
- </div>
- </div>
- {!isPremium && (
- <button 
- onClick={() => setIsPremiumModalOpen(true)}
- className="text-xs font-extrabold text-slate-900 hover:text-slate-900 uppercase tracking-wider cursor-pointer"
- >
- {t('explore_premium', "Premium'u Keşfet →")}
- </button>
- )}
- </div>
- </PageContainer>
 
  {/* Body */}
  <PageContainer className="py-6">
@@ -306,7 +309,7 @@ const CheckoutPage = () => {
 
  {/* Desktop-only Order Summary sidebar */}
  <div className="hidden lg:block lg:col-span-4">
- <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} />
+ <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} couponInput={couponInput} setCouponInput={setCouponInput} appliedCouponCode={appliedCouponCode} couponError={couponError} isPreviewLoading={isPreviewLoading} onApplyCoupon={onApplyCoupon} onRemoveCoupon={onRemoveCoupon} onOpenCouponsModal={() => setIsCouponsModalOpen(true)} isPremium={isPremium} onOpenPremiumModal={() => setIsPremiumModalOpen(true)} />
  </div>
  </div>
  </PageContainer>

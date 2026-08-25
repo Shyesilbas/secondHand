@@ -65,6 +65,7 @@ export const API_ENDPOINTS = {
  BY_USER: (userId) => `/v1/users/${userId}/listings`,
  FILTER: '/v1/listings/filter',
  TRACK_VIEW: (id) => `/v1/listings/${id}/view`,
+ ACTIVE_VIEWERS: (id) => `/v1/listings/${id}/active-viewers`,
  VIEW_STATS: (id) => `/v1/listings/${id}/view-stats`,
  MY_LISTINGS_VIEW_STATS: '/v1/listings/my/view-stats',
  },
@@ -233,6 +234,7 @@ export const API_ENDPOINTS = {
  CLEAR_CART: '/v1/cart/items',
  GET_COUNT: '/v1/cart/count',
  CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
+ RESERVATIONS_COUNT: (listingId) => `/v1/cart/reservations/count/${listingId}`,
  },
  COUPONS: {
  PREVIEW: '/v1/coupons/preview',

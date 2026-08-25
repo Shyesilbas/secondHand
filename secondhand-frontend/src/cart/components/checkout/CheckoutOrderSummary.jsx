@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { memo } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
-import { Check, Tag, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { Check, Tag, ShieldCheck, ShoppingBag, Crown } from 'lucide-react';
 
 const CheckoutOrderSummary = ({
  cartItems,
@@ -14,7 +14,9 @@ const CheckoutOrderSummary = ({
  isPreviewLoading,
  onApplyCoupon,
  onRemoveCoupon,
- onOpenCouponsModal
+ onOpenCouponsModal,
+ isPremium = false,
+ onOpenPremiumModal = null,
 }) => {
  const { t } = useTranslation();
  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -175,35 +177,62 @@ const CheckoutOrderSummary = ({
  </div>
  )}
 
- <div className="flex justify-between items-center text-slate-600 font-medium">
- <span>{t("shipping", "Kargo Ücreti")}</span>
- <span className="font-bold text-slate-900">{t("free", "Ücretsiz")}</span>
- </div>
+  <div className="flex justify-between items-center text-slate-600 font-medium">
+    <span>{t("shipping", "Kargo Ücreti")}</span>
+    <div className="flex items-center gap-1.5">
+      {isPremium && (
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold text-amber-800 bg-amber-100/90 border border-amber-200">
+          <Crown className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+          Öncelikli
+        </span>
+      )}
+      <span className="font-bold text-slate-900">{t("free", "Ücretsiz")}</span>
+    </div>
+  </div>
 
- <div className="flex justify-between items-center text-slate-600 font-medium">
- <span>{t("tax", "KDV & Hizmet Bedeli")}</span>
- <span className="font-semibold text-slate-900">{formatCurrency(tax, currency)}</span>
- </div>
- </div>
+  <div className="flex justify-between items-center text-slate-600 font-medium">
+  <span>{t("tax", "KDV & Hizmet Bedeli")}</span>
+  <span className="font-semibold text-slate-900">{formatCurrency(tax, currency)}</span>
+  </div>
+  </div>
 
- {/* Total */}
- <div className="border-t border-slate-200 pt-3.5">
- <div className="flex items-baseline justify-between gap-4">
- <span className="text-xs font-extrabold uppercase tracking-wider text-slate-900">{t("total", "Toplam")}</span>
- <span className="text-xl font-extrabold text-slate-900">
- {formatCurrency(total, currency)}
- </span>
- </div>
- </div>
- </div>
+  {/* Total */}
+  <div className="border-t border-slate-200 pt-3.5">
+  <div className="flex items-baseline justify-between gap-4">
+  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-900">{t("total", "Toplam")}</span>
+  <span className="text-xl font-extrabold text-slate-900">
+  {formatCurrency(total, currency)}
+  </span>
+  </div>
+  </div>
+  </div>
 
- {/* Security badge footer */}
- <div className="border-t border-slate-100 bg-slate-50 px-6 py-3 text-center flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
- <ShieldCheck className="h-3.5 w-3.5 text-slate-900" />
- <span>256-Bit SSL ile %100 Güvenli Ödeme</span>
- </div>
- </div>
- </aside>
+  {/* Priority Shipping Perk Row */}
+  {isPremium ? (
+    <div className="border-t border-amber-100 bg-amber-50/60 px-6 py-2.5 flex items-center gap-2 text-[11px] text-amber-900 font-medium">
+      <Crown className="h-3.5 w-3.5 text-amber-600 fill-amber-500 shrink-0" />
+      <span>{t("order_processed_with_priority", "Premium Avantajı: Siparişiniz öncelikli olarak işlenecektir.")}</span>
+    </div>
+  ) : onOpenPremiumModal ? (
+    <div className="border-t border-slate-100 bg-slate-50/70 px-6 py-2.5 flex items-center justify-between text-[11px]">
+      <span className="text-slate-600 font-medium">Kargonuz öncelikli hazırlansın mı?</span>
+      <button
+        type="button"
+        onClick={onOpenPremiumModal}
+        className="font-extrabold text-amber-700 hover:text-amber-800 uppercase tracking-wider cursor-pointer text-[10px]"
+      >
+        {t('explore_premium', "Premium'u Keşfet →")}
+      </button>
+    </div>
+  ) : null}
+
+  {/* Security badge footer */}
+  <div className="border-t border-slate-100 bg-slate-50 px-6 py-3 text-center flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+  <ShieldCheck className="h-3.5 w-3.5 text-slate-900" />
+  <span>256-Bit SSL ile %100 Güvenli Ödeme</span>
+  </div>
+  </div>
+  </aside>
  );
 };
 

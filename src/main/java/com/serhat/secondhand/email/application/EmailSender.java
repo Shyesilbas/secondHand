@@ -32,7 +32,11 @@ public class EmailSender {
     private boolean mockMode;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendEmail(Email email) {
+    public void sendEmail(Email emailInput) {
+        Email email = emailInput.getId() != null 
+                ? emailRepository.findById(emailInput.getId()).orElse(emailInput) 
+                : emailInput;
+
         log.info("Preparing to send outbound email to {}, type: {}", email.getRecipientEmail(), email.getEmailType());
 
         // 1. Rate Limiting check

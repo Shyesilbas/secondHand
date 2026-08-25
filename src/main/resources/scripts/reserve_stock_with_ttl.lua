@@ -13,8 +13,7 @@ local ttlSeconds = tonumber(ARGV[3])
 -- Check if user already holds an active reservation for this listing
 local existingReservation = redis.call('GET', reservationKey)
 if existingReservation then
-    -- User already reserved this, refresh TTL and return current stock
-    redis.call('EXPIRE', reservationKey, ttlSeconds)
+    -- User already reserved this, preserve remaining TTL and return current stock
     local currentStock = redis.call('GET', stockKey)
     return tonumber(currentStock) or 0
 end

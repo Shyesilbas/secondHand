@@ -37,6 +37,7 @@ export const ROUTES = {
  /** Mail + bildirim + sohbet sekmeli hub */
  INBOX: '/inbox',
  EMAILS: '/emails',
+ NOTIFICATIONS: '/notifications',
  CHAT: '/chat',
  AURA_CHAT: '/aura',
  AGREEMENTS: '/agreements',

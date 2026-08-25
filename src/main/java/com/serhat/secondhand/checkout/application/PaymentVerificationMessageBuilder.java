@@ -29,22 +29,17 @@ public class PaymentVerificationMessageBuilder {
 
     public String buildPaymentDetails(User user, PaymentTransactionType type, InitiateVerificationRequest req) {
         StringBuilder details = new StringBuilder();
-        details.append(
-                "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse; margin-top: 24px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;\">");
+        details.append("<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse; margin-top: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden;\">");
         details.append("  <tr>");
-        details.append("    <td style=\"padding: 18px 20px;\">");
-        details.append(
-                "      <h3 style=\"margin-top: 0; margin-bottom: 16px; font-size: 14px; color: #0f172a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;\">Ödeme Detayları</h3>");
-
+        details.append("    <td style=\"padding: 20px 24px;\">");
+        details.append("      <div style=\"margin-bottom: 14px; font-size: 13px; color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;\">📦 Sipariş & Ödeme Özeti</div>");
         details.append("      <table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">");
 
         // Service Row
         details.append("        <tr>");
-        details.append(
-                "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Hizmet</td>");
-        details.append(
-                "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                .append(type.name().replace("_", " ")).append("</td>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">İşlem Türü</td>");
+        details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700; text-align: right;\">")
+                .append(getTransactionTypeLabel(type)).append("</td>");
         details.append("        </tr>");
 
         switch (type) {
@@ -54,10 +49,8 @@ public class PaymentVerificationMessageBuilder {
                 appendListingDetails(details, req, req != null ? req.getAmount() : null);
                 if (req != null && req.getDays() != null) {
                     details.append("        <tr>");
-                    details.append(
-                            "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Süre (Gün)</td>");
-                    details.append(
-                            "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Süre</td>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700; text-align: right;\">")
                             .append(req.getDays()).append(" Gün</td>");
                     details.append("        </tr>");
                 }
@@ -65,11 +58,9 @@ public class PaymentVerificationMessageBuilder {
             default -> {
                 if (req != null && req.getAmount() != null) {
                     details.append("        <tr>");
-                    details.append(
-                            "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Tutar</td>");
-                    details.append(
-                            "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                            .append(req.getAmount()).append(" TRY</td>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Tutar</td>");
+                    details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700; text-align: right;\">")
+                            .append(formatMoney(req.getAmount())).append("</td>");
                     details.append("        </tr>");
                 }
             }
@@ -77,11 +68,10 @@ public class PaymentVerificationMessageBuilder {
 
         // Date Row
         details.append("        <tr>");
-        details.append("          <td style=\"padding: 8px 0 0 0; color: #64748b; font-size: 13px;\">Tarih</td>");
-        details.append(
-                "          <td style=\"padding: 8px 0 0 0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+        details.append("          <td style=\"padding: 10px 0 0 0; color: #94a3b8; font-size: 12px;\">İşlem Tarihi</td>");
+        details.append("          <td style=\"padding: 10px 0 0 0; color: #64748b; font-size: 12px; font-weight: 600; text-align: right;\">")
                 .append(java.time.LocalDateTime.now()
-                        .format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")))
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
                 .append("</td>");
         details.append("        </tr>");
 
@@ -123,30 +113,53 @@ public class PaymentVerificationMessageBuilder {
     }
 
     private void appendPricingSummary(StringBuilder details, PricingResultDto pricing) {
-        details.append("        <tr>");
-        details.append(
-                "          <td colspan=\"2\" style=\"padding: 12px 0 6px 0; color: #64748b; font-size: 13px; font-weight: 600;\">Sipariş Özeti</td>");
-        details.append("        </tr>");
+        if (pricing == null) return;
 
-        if (pricing.getItems() != null) {
+        if (pricing.getItems() != null && !pricing.getItems().isEmpty()) {
             for (var item : pricing.getItems()) {
+                String itemTitle = "Ürün";
+                if (item.getListingId() != null) {
+                    var listingOpt = listingService.findById(item.getListingId());
+                    if (listingOpt.isPresent() && listingOpt.get().getTitle() != null) {
+                        itemTitle = listingOpt.get().getTitle();
+                    }
+                }
+
                 details.append("        <tr>");
-                details.append(
-                        "          <td style=\"padding: 4px 0 4px 10px; color: #475569; font-size: 12px;\">Ürün x")
-                        .append(item.getQuantity()).append("</td>");
-                details.append(
-                        "          <td style=\"padding: 4px 0 4px 0; color: #475569; font-size: 12px; text-align: right;\">")
-                        .append(item.getCampaignUnitPrice()).append(" TRY</td>");
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px dashed #e2e8f0; color: #334155; font-size: 13px; font-weight: 500;\">")
+                        .append(itemTitle)
+                        .append(" <span style=\"background-color: #e2e8f0; color: #475569; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px;\">x")
+                        .append(item.getQuantity()).append("</span></td>");
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px dashed #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                        .append(formatMoney(item.getNetLineTotal() != null ? item.getNetLineTotal() : item.getCampaignUnitPrice()))
+                        .append("</td>");
                 details.append("        </tr>");
             }
         }
 
+        if (pricing.getCouponDiscount() != null && pricing.getCouponDiscount().compareTo(BigDecimal.ZERO) > 0) {
+            details.append("        <tr>");
+            details.append("          <td style=\"padding: 6px 0; color: #059669; font-size: 12px; font-weight: 600;\">🏷️ Kupon İndirimi")
+                    .append(pricing.getCouponCode() != null ? " (" + pricing.getCouponCode() + ")" : "")
+                    .append("</td>");
+            details.append("          <td style=\"padding: 6px 0; color: #059669; font-size: 12px; font-weight: 700; text-align: right;\">-")
+                    .append(formatMoney(pricing.getCouponDiscount())).append("</td>");
+            details.append("        </tr>");
+        }
+
+        if (pricing.getCampaignDiscount() != null && pricing.getCampaignDiscount().compareTo(BigDecimal.ZERO) > 0) {
+            details.append("        <tr>");
+            details.append("          <td style=\"padding: 6px 0; color: #059669; font-size: 12px; font-weight: 600;\">✨ Kampanya İndirimi</td>");
+            details.append("          <td style=\"padding: 6px 0; color: #059669; font-size: 12px; font-weight: 700; text-align: right;\">-")
+                    .append(formatMoney(pricing.getCampaignDiscount())).append("</td>");
+            details.append("        </tr>");
+        }
+
+        BigDecimal total = pricing.getTotal() != null ? pricing.getTotal() : BigDecimal.ZERO;
         details.append("        <tr>");
-        details.append(
-                "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700;\">Toplam</td>");
-        details.append(
-                "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #4f46e5; font-size: 14px; font-weight: 700; text-align: right;\">")
-                .append(pricing.getTotal()).append(" TRY</td>");
+        details.append("          <td style=\"padding: 12px 0 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 14px; font-weight: 800;\">Ödenecek Toplam Tutar</td>");
+        details.append("          <td style=\"padding: 12px 0 8px 0; border-bottom: 1px solid #e2e8f0; color: #4338ca; font-size: 16px; font-weight: 800; text-align: right;\">")
+                .append(formatMoney(total)).append("</td>");
         details.append("        </tr>");
     }
 
@@ -156,7 +169,7 @@ public class PaymentVerificationMessageBuilder {
             if (req.getCustomTitle() != null && !req.getCustomTitle().isBlank()) {
                 title = req.getCustomTitle();
             } else if (req.isBulk()) {
-                title = "Bulk Showcase Payment (Multiple Listings)";
+                title = "Toplu Vitrin Öne Çıkarma";
             } else if (req.getListingId() != null) {
                 var listingOpt = listingService.findById(req.getListingId());
                 if (listingOpt.isPresent()) {
@@ -166,10 +179,8 @@ public class PaymentVerificationMessageBuilder {
 
             if (title != null) {
                 details.append("        <tr>");
-                details.append(
-                        "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">İlan</td>");
-                details.append(
-                        "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">İlan</td>");
+                details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 700; text-align: right;\">")
                         .append(title).append("</td>");
                 details.append("        </tr>");
             }
@@ -177,13 +188,31 @@ public class PaymentVerificationMessageBuilder {
 
         if (amount != null) {
             details.append("        <tr>");
-            details.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px;\">Tutar</td>");
-            details.append(
-                    "          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right;\">")
-                    .append(amount).append(" TRY</td>");
+            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Ödenecek Tutar</td>");
+            details.append("          <td style=\"padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #4338ca; font-size: 15px; font-weight: 800; text-align: right;\">")
+                    .append(formatMoney(amount)).append("</td>");
             details.append("        </tr>");
         }
+    }
+
+    private String getTransactionTypeLabel(PaymentTransactionType type) {
+        if (type == null) return "Ödeme İşlemi";
+        return switch (type) {
+            case ITEM_PURCHASE -> "Ürün Satın Alma";
+            case ITEM_SALE -> "Ürün Satışı";
+            case LISTING_CREATION -> "Yeni İlan Yayınlama";
+            case SHOWCASE_PAYMENT -> "Vitrin & Öne Çıkarma";
+            case REFUND -> "İade İşlemi";
+            case EWALLET_DEPOSIT -> "Cüzdana Bakiye Yükleme";
+            case EWALLET_WITHDRAWAL -> "Cüzdandan Para Çekme";
+            case EWALLET_PAYMENT_RECEIVED -> "Cüzdan Ödeme Tahsilatı";
+            case MEMBERSHIP_PAYMENT -> "Premium Üyelik Ödemesi";
+        };
+    }
+
+    private String formatMoney(BigDecimal amount) {
+        if (amount == null) return "0.00 TL";
+        return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", amount);
     }
 
     private BigDecimal calculateTotalListingFee() {

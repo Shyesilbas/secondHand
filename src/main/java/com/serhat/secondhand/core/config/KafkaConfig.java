@@ -1,6 +1,5 @@
 package com.serhat.secondhand.core.config;
 
-import com.serhat.secondhand.payment.contract.PaymentCompletedKafkaEvent;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -33,29 +32,28 @@ public class KafkaConfig {
     private String bootstrapServers;
 
     @Bean
-    public ConsumerFactory<String, PaymentCompletedKafkaEvent> consumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        JsonDeserializer<PaymentCompletedKafkaEvent> jsonDeserializer =
-                new JsonDeserializer<>(PaymentCompletedKafkaEvent.class);
+        JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>(Object.class);
         jsonDeserializer.addTrustedPackages("com.serhat.secondhand.*", "*");
-        jsonDeserializer.setUseTypeHeaders(false);
+        jsonDeserializer.setUseTypeHeaders(true);
 
-        ErrorHandlingDeserializer<PaymentCompletedKafkaEvent> errorHandlingValueDeserializer =
+        ErrorHandlingDeserializer<Object> errorHandlingValueDeserializer =
                 new ErrorHandlingDeserializer<>(jsonDeserializer);
 
         ErrorHandlingDeserializer<String> errorHandlingKeyDeserializer =
                 new ErrorHandlingDeserializer<>(new StringDeserializer());
 
-        return new DefaultKafkaConsumerFactory<String, PaymentCompletedKafkaEvent>(
+        return new DefaultKafkaConsumerFactory<>(
                 props, errorHandlingKeyDeserializer, errorHandlingValueDeserializer);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedKafkaEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedKafkaEvent> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(1000L, 2L)));

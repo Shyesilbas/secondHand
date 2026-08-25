@@ -74,6 +74,9 @@ public class CacheConfig {
         // ── Tier 1: Statik Lookup — 24 saat ────────────────────────────
         RedisCacheConfiguration lookupConfig = defaultConfig.entryTtl(Duration.ofHours(24));
 
+        // ── Tier 1b: Favori İstatistikleri — 12 saat ────────────────────
+        RedisCacheConfiguration favoriteStatsConfig = defaultConfig.entryTtl(Duration.ofHours(12));
+
         // ── Tier 0b: AI Yorum Özetleri — 3 gün ────────────────────────────
         RedisCacheConfiguration aiSummariesConfig = defaultConfig.entryTtl(Duration.ofDays(3));
 
@@ -113,12 +116,14 @@ public class CacheConfig {
                 .withCacheConfiguration("payment:stats", completedConfig)
                 .withCacheConfiguration("payment:exchangeRates", completedConfig)
 
+                // Tier 1b — Favori istatistikleri (12 saat)
+                .withCacheConfiguration("user:stats:favorites", favoriteStatsConfig)
+
                 // Tier 2b — Kullanıcı profili (15 dakika)
                 .withCacheConfiguration("user:profile", profileConfig)
 
                 // Tier 3 — Aggregation istatistikleri (10 dakika)
                 .withCacheConfiguration("user:stats:reviews", aggregationConfig)
-                .withCacheConfiguration("user:stats:favorites", aggregationConfig)
                 .withCacheConfiguration("listing:views:seller", aggregationConfig)
                 .withCacheConfiguration("listing:userListings", aggregationConfig)
 

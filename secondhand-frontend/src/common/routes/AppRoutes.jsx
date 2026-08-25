@@ -214,6 +214,7 @@ const AppRoutes = () => {
  <InboxPage />
  </Suspense>} />
  <Route path={ROUTES.EMAILS} element={<Navigate to={`${ROUTES.INBOX}?tab=emails`} replace />} />
+ <Route path={ROUTES.NOTIFICATIONS} element={<Navigate to={`${ROUTES.INBOX}?tab=notifications`} replace />} />
  <Route path={ROUTES.CHAT} element={<LegacyChatInboxRedirect />} />
  <Route path={ROUTES.AURA_CHAT} element={<Suspense fallback={<PageLoader />}>
  <AuraChatPage />

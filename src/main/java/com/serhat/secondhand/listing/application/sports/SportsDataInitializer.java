@@ -29,7 +29,7 @@ import java.util.Optional;
 @Slf4j
 public class SportsDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/sports.json";
+    private static final String CATALOG_PATH = "data/sports/sports.json";
 
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;

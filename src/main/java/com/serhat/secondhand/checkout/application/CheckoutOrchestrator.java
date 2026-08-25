@@ -85,7 +85,7 @@ public class CheckoutOrchestrator {
                     user, order, request, order.getOrderNumber(), pricing, order.getExternalId());
 
             if (paymentResult.isError()) {
-                markOrderAsFailed(order);
+                cleanupFailedOrder(order);
                 checkoutStockReservationService.releaseReservedStock(userId, reserved);
                 return Result.error(paymentResult.getErrorCode(), paymentResult.getMessage());
             }
@@ -93,9 +93,8 @@ public class CheckoutOrchestrator {
             List<PaymentDto> paymentResults = paymentResult.getData();
             boolean allSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
 
-            applyPaymentResultToOrder(order, paymentResults, allSuccessful, request.getProviderName());
-
             if (allSuccessful) {
+                applyPaymentResultToOrder(order, paymentResults, true, request.getProviderName());
                 Result<Void> escrowResult = escrowService.hold(order);
                 if (escrowResult.isError()) {
                     throw new IllegalStateException("Escrow creation failed for order "
@@ -111,8 +110,8 @@ public class CheckoutOrchestrator {
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
+                cleanupFailedOrder(order);
                 checkoutStockReservationService.releaseReservedStock(userId, reserved);
-                eventPublisher.publishEvent(new OrderCreatedEvent(order, user, false));
                 log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
                 return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
             }
@@ -120,6 +119,7 @@ public class CheckoutOrchestrator {
             return Result.success(orderMapper.toDto(order));
 
         } catch (Exception e) {
+            cleanupFailedOrder(order);
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
             log.error("Critical exception during checkout for order: {}", order.getOrderNumber(), e);
             throw e;
@@ -146,11 +146,15 @@ public class CheckoutOrchestrator {
                 order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentProviderName());
     }
 
-    private void markOrderAsFailed(Order order) {
-        order.setPaymentStatus(PaymentStatus.FAILED);
-        order.setStatus(OrderStatus.CANCELLED);
-        orderRepository.save(order);
-        log.error("Order {} marked as failed due to payment error", order.getOrderNumber());
+    private void cleanupFailedOrder(Order order) {
+        if (order != null && order.getId() != null) {
+            try {
+                orderRepository.delete(order);
+                log.info("Cleaned up uncompleted order {} after payment failure/cancellation", order.getOrderNumber());
+            } catch (Exception e) {
+                log.warn("Failed to delete uncompleted order {}: {}", order.getOrderNumber(), e.getMessage());
+            }
+        }
     }
 
     private Result<Void> handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {

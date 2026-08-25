@@ -40,7 +40,7 @@ import java.util.UUID;
 @Slf4j
 public class RealEstateDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/realestate.json";
+    private static final String CATALOG_PATH = "data/realestate/realestate.json";
 
     private final RealEstateTypeRepository realEstateTypeRepository;
     private final RealEstateAdTypeRepository realEstateAdTypeRepository;

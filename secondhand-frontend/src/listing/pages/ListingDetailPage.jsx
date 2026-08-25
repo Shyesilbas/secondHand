@@ -25,6 +25,7 @@ import {
  Flame,
  FileText,
  HandCoins,
+ Heart,
  MapPin,
  Package,
  Share2,
@@ -40,7 +41,7 @@ import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import ListingTrustPanel from '../components/ListingTrustPanel.jsx';
 import ListingAnalyticsPanel from '../components/ListingAnalyticsPanel.jsx';
-import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { formatCurrency, formatPrice, formatDateTime } from '../../common/formatters.js';
 import AuraSummary from '../../common/components/AuraSummary.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import SimilarListings from '../components/SimilarListings.jsx';
@@ -128,7 +129,7 @@ const ListingDetailPage = () => {
  const [imageError, setImageError] = useState(false);
  const viewTrackedRef = useRef(false);
  const galleryRef = useRef(null);
- const { count: activeReservations } = useActiveReservationCount(listing?.id);
+ const { count: activeInterestCount, cartReservations, activeViewers, urgencyType } = useActiveReservationCount(listing?.id, { enablePolling: true, pollInterval: 10 * 60 * 1000 });
  const images = listing?.imageUrls?.length > 0 ? listing.imageUrls : listing?.imageUrl ? [listing.imageUrl] : [];
  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
  const hasCampaign = listing?.campaignId && listing?.campaignPrice != null && parseFloat(listing?.campaignPrice) < parseFloat(listing?.price);
@@ -507,6 +508,11 @@ const ListingDetailPage = () => {
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     <span>{formatDateTime(listing.createdAt)}</span>
                   </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-1 text-slate-600">
+                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                    <span>{listing?.favoriteStats?.favoriteCount ?? listing?.favoriteCount ?? 0} {t("favorites", "favori")}</span>
+                  </div>
                   {isOwner && (
                     <>
                       <span>•</span>
@@ -519,35 +525,88 @@ const ListingDetailPage = () => {
                 </div>
               </div>
 
-              {/* Price & Scarcity Row */}
-              <div className="py-4 px-4.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                    {formatCurrency(displayPrice, listing.currency)}
-                  </span>
-                  {hasCampaign && (
-                    <div className="text-xs text-slate-400 line-through font-semibold mt-0.5">
-                      {formatCurrency(listing.price, listing.currency)}
+              {/* ── Price & Stock Availability Card ── */}
+              <div className="p-5 rounded-2xl bg-gradient-to-b from-slate-50/90 via-slate-50/40 to-white border border-slate-200/80 shadow-2xs space-y-3">
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  {/* Price Block */}
+                  <div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-base font-extrabold text-slate-500 select-none">
+                        {listing.currency === 'TRY' ? '₺' : listing.currency === 'USD' ? '$' : listing.currency === 'EUR' ? '€' : listing.currency}
+                      </span>
+                      <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
+                        {formatPrice(displayPrice, { decimals: 0 })}
+                      </span>
+                      {Number(displayPrice) % 1 !== 0 && (
+                        <span className="text-base font-extrabold text-slate-500 tabular-nums">
+                          ,{String(Number(displayPrice).toFixed(2)).split('.')[1]}
+                        </span>
+                      )}
+                    </div>
+
+                    {hasCampaign && (
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className="text-xs text-slate-400 line-through font-bold tabular-nums">
+                          {formatCurrency(listing.price, listing.currency)}
+                        </span>
+                        {discount && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100/90 text-emerald-800 text-[11px] font-black tracking-tight border border-emerald-200">
+                            −%{discount} İndirim
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stock Availability Badge */}
+                  {hasStockInfo && (
+                    <div className="flex flex-col items-end gap-1 pt-0.5">
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+                        Number(listing.quantity) === 0
+                          ? 'bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs'
+                          : isLowStock
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200 ring-2 ring-rose-500/10 shadow-2xs'
+                          : 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs'
+                      }`}>
+                        {Number(listing.quantity) === 0 ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-slate-400" />
+                            <span>Tükendi</span>
+                          </>
+                        ) : isLowStock ? (
+                          <>
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            </span>
+                            <span>Son {Number(listing.quantity)} Adet!</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs" />
+                            <span>Stokta ({Number(listing.quantity)} Adet)</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {hasStockInfo && (
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold ${
-                      isLowStock ? 'bg-rose-100 text-rose-800' : 'bg-white text-slate-700 border border-slate-200 shadow-2xs'
-                    }`}>
-                      <Package className="w-3.5 h-3.5" />
-                      <span>{isLowStock ? `Son ${Number(listing.quantity)} Adet!` : `${Number(listing.quantity)} Adet Stokta`}</span>
-                    </span>
-                  )}
-                  {activeReservations > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 shadow-2xs animate-pulse">
-                      <Flame className="w-3.5 h-3.5 text-amber-600" />
-                      <span>{activeReservations} {t("people_looking", "kişi inceliyor")}</span>
-                    </span>
-                  )}
-                </div>
+                {/* Live Urgency / Active Interest Banner */}
+                {activeInterestCount > 0 && (
+                  <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100 text-xs font-bold text-amber-900 bg-amber-50/80 px-3.5 py-2 rounded-xl border border-amber-200/70">
+                    <Flame className="w-4 h-4 text-amber-600 shrink-0 fill-amber-500 animate-pulse" />
+                    {urgencyType === 'CART' ? (
+                      <span>
+                        Şu an <strong className="text-amber-950 font-black">{cartReservations} kişinin</strong> sepetinde / satın alma adımında.
+                      </span>
+                    ) : (
+                      <span>
+                        Son 24 saatte <strong className="text-amber-950 font-black">{activeViewers} kişi</strong> bu ilanı inceledi.
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}

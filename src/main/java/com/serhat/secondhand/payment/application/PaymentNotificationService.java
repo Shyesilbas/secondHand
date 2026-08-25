@@ -130,13 +130,11 @@ public class PaymentNotificationService {
         try {
             String subject = emailConfig.getPaymentVerificationSubject();
             String base = String.format(
-                    "<div style=\"text-align: center; margin: 24px 0;\">" +
-                            "  <p style=\"margin-bottom: 8px; font-size: 14px; color: #64748b; font-weight: 500;\">Ödeme Doğrulama Kodunuz</p>"
-                            +
-                            "  <div style=\"display: inline-block; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 28px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 4px; color: #4f46e5; font-family: monospace;\">%s</div>"
-                            +
-                            "  <p style=\"margin-top: 8px; font-size: 13px; color: #94a3b8;\">Bu kod %d dakika boyunca geçerlidir.</p>"
-                            +
+                    "<div style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; text-align: center; margin: 20px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.02);\">" +
+                            "  <div style=\"font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;\">Ödeme Doğrulama Kodunuz</div>" +
+                            "  <div style=\"display: inline-block; background-color: #ffffff; border: 2px dashed #6366f1; padding: 12px 32px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #4338ca; font-family: 'SF Mono', Consolas, Monaco, monospace; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);\">%s</div>" +
+                            "  <div style=\"margin-top: 14px; font-size: 13px; color: #64748b; font-weight: 500;\">⏱️ Bu kod <strong>%d dakika</strong> boyunca geçerlidir.</div>" +
+                            "  <div style=\"margin-top: 12px; background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #b91c1c; font-weight: 500; display: inline-block;\">🔒 Güvenliğiniz için bu kodu kimseyle paylaşmayınız.</div>" +
                             "</div>",
                     code, verificationConfig.getExpiryMinutes());
             String content = base + (extraDetails != null ? extraDetails : "");

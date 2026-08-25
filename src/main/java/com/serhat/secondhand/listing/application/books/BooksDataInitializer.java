@@ -38,7 +38,7 @@ import java.util.Optional;
 @Slf4j
 public class BooksDataInitializer implements SeedTask {
 
-    private static final String CATALOG_PATH = "seed/books.json";
+    private static final String CATALOG_PATH = "data/books/books.json";
 
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;

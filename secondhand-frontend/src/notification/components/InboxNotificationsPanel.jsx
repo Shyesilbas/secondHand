@@ -1,67 +1,299 @@
-import { useTranslation } from "react-i18next";
-import { Bell, CheckCheck, RefreshCw, Loader2 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  Bell,
+  CheckCheck,
+  Filter,
+  Loader2,
+  RefreshCw,
+  Search as MagnifyingGlassIcon,
+  Inbox,
+  Calendar
+} from 'lucide-react';
 import { useInAppNotificationsContext } from '../InAppNotificationContext.jsx';
-import NotificationItem from './NotificationItem.jsx';
-const MS_BORDER = '#edebe9';
-const MS_HEADER = '#f3f2f1';
+import NotificationCard from './NotificationCard.jsx';
+import {
+  NOTIFICATION_FILTERS,
+  NOTIFICATION_CATEGORIES,
+  NOTIFICATION_CATEGORY_MAP,
+  getNotificationConfig,
+  groupNotificationsByTimeline
+} from '../notificationConstants.js';
 
-/** Tam sayfa bildirim listesi — Mailbox ile aynı kabuk ve üst şerit. */
+/**
+ * Dedicated Notification Hub & Activity Feed
+ * Clean, interactive timeline feed with category pills, unread toggle, search, and direct in-card actions.
+ */
 const InboxNotificationsPanel = () => {
- const {
- t
- } = useTranslation();
- const {
- notifications,
- isLoading,
- unreadCount,
- markAsRead,
- markAllAsRead,
- refetch
- } = useInAppNotificationsContext();
- if (isLoading) {
- return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-2xl border border-border-light/80 bg-background-primary shadow-lg shadow-slate-100/50">
- <div className="flex h-16 shrink-0 items-center border-b border-slate-100 bg-slate-50/60 px-5" />
- <div className="flex flex-1 items-center justify-center px-6 text-sm text-slate-400 font-medium">
- <Loader2 className="w-5 h-5 animate-spin text-primary mr-2" />{t("bildirimler_y_kleniyor")}</div>
- </div>;
- }
- return <div className="flex h-[clamp(540px,min(88vh,920px))] flex-col overflow-hidden rounded-2xl border border-border-light/80 bg-background-primary/95 backdrop-blur-xl shadow-lg shadow-slate-100/40 relative">
- {/* Premium Header Bar */}
- <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-100/90 bg-slate-50/70 px-5 sm:px-6 relative z-10">
- <div className="flex min-w-0 items-center gap-3">
- <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 border border-primary text-primary shadow-sm">
- <Bell className="h-5 w-5 animate-[swing_1s_ease-in-out_infinite]" strokeWidth={2} aria-hidden />
- </div>
- <div className="min-w-0">
- <h1 className="text-2xl font-semibold text-text-primary truncate tracking-tight">{t("bildirim_kutusu")}</h1>
- <p className="truncate text-xs text-slate-400 font-medium mt-0.5">
- {notifications?.length ? `${notifications.length} bildirim mevcut` : 'Uyarilar ve güncellemeleriniz'}
- </p>
- </div>
- {unreadCount > 0 && <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary text-white shadow-sm shadow-indigo-900/10">
- {unreadCount > 99 ? '99+' : unreadCount}{t("yeni")}</span>}
- </div>
+  const { t } = useTranslation();
+  const {
+    notifications = [],
+    isLoading,
+    unreadCount = 0,
+    markAsRead,
+    markAllAsRead,
+    refetch
+  } = useInAppNotificationsContext();
 
- <div className="flex shrink-0 items-center gap-2">
- <button type="button" onClick={() => refetch()} className="p-2 text-slate-400 hover:text-primary rounded-xl hover:bg-slate-100 border border-transparent hover:border-primary/50 transition-all shadow-none hover:shadow-sm" title={t("yenile")}>
- <RefreshCw className="h-4.5 w-4.5" />
- </button>
- {unreadCount > 0 && <button type="button" onClick={markAllAsRead} className="inline-flex items-center gap-1.5 rounded-xl border border-border-light/80 bg-background-primary px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 active:bg-slate-100" title={t("hepsini_okundu_olarak_i_aretle")}>
- <CheckCheck className="h-4 w-4 text-status-success" />
- <span className="hidden sm:inline">{t("hepsini_okundu_yap")}</span>
- </button>}
- </div>
- </header>
+  const [filterCategory, setFilterCategory] = useState(NOTIFICATION_FILTERS.ALL);
+  const [onlyUnread, setOnlyUnread] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
- {notifications.length === 0 ? <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-20 text-center bg-gradient-to-b from-white to-slate-50/30">
- <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-50 to-slate-50 border border-border-light/80 flex items-center justify-center mb-4 shadow-sm">
- <Bell className="w-10 h-10 text-slate-300" />
- </div>
- <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("harika_her_ey_yolunda")}</h3>
- <p className="max-w-xs text-sm text-slate-400 leading-relaxed font-medium">{t("u_anda_yeni_bir_bildiriminiz_yok_teklifl")}</p>
- </div> : <div className="min-h-0 flex-1 overflow-y-auto bg-background-primary divide-y divide-slate-100/50">
- {notifications.map(n => <NotificationItem key={n.id} notification={n} onMarkAsRead={markAsRead} />)}
- </div>}
- </div>;
+  // Category notification counts for pill badges
+  const categoryCounts = useMemo(() => {
+    const counts = { [NOTIFICATION_FILTERS.ALL]: notifications.length };
+    notifications.forEach((n) => {
+      const cat = NOTIFICATION_CATEGORY_MAP[n.type] || NOTIFICATION_FILTERS.SYSTEM;
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return counts;
+  }, [notifications]);
+
+  // Filtered notifications
+  const filteredNotifications = useMemo(() => {
+    let list = [...notifications];
+
+    // 1. Category Filter
+    if (filterCategory !== NOTIFICATION_FILTERS.ALL) {
+      list = list.filter(
+        (n) => (NOTIFICATION_CATEGORY_MAP[n.type] || NOTIFICATION_FILTERS.SYSTEM) === filterCategory
+      );
+    }
+
+    // 2. Unread Filter
+    if (onlyUnread) {
+      list = list.filter((n) => !n.isRead);
+    }
+
+    // 3. Search Query
+    if (searchTerm && searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      list = list.filter((n) => {
+        const titleMatch = n.title?.toLowerCase().includes(q);
+        const msgMatch = n.message?.toLowerCase().includes(q);
+        const config = getNotificationConfig(n.type);
+        const badgeMatch = config?.badge?.toLowerCase().includes(q);
+        const catMatch = config?.categoryLabel?.toLowerCase().includes(q);
+        return titleMatch || msgMatch || badgeMatch || catMatch;
+      });
+    }
+
+    return list;
+  }, [notifications, filterCategory, onlyUnread, searchTerm]);
+
+  // Group notifications into timeline sections (Bugün, Dün, Bu Hafta, Daha Önce)
+  const timelineGroups = useMemo(() => {
+    return groupNotificationsByTimeline(filteredNotifications);
+  }, [filteredNotifications]);
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await refetch?.();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 400);
+    }
+  };
+
+  if (isLoading && notifications.length === 0) {
+    return (
+      <div className="min-h-0 h-full w-full bg-white border border-slate-200/90 rounded-3xl flex flex-col items-center justify-center p-12 text-slate-400">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
+        <span className="text-xs font-semibold">{t('loading_notifications', 'Bildirimler yükleniyor...')}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-0 h-full w-full bg-white border border-slate-200/90 rounded-3xl flex flex-col overflow-hidden shadow-xs">
+      {/* 1. Header Control Bar */}
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/90 bg-white px-5 sm:px-7 py-3.5 sm:py-4 shrink-0">
+        {/* Title & Status Summary */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 shadow-2xs">
+            <Bell className="h-5 w-5" />
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-black text-slate-900 tracking-tight">
+                {t('notifications', 'Bildirimler')}
+              </h1>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[11px] font-bold tabular-nums shadow-xs">
+                  {unreadCount > 99 ? '99+' : unreadCount} yeni
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-400 font-medium truncate mt-0.5">
+              {notifications.length} toplam bildirim • Sipariş, teklif ve mesaj güncellemeleri
+            </p>
+          </div>
+        </div>
+
+        {/* Action Controls & Search */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-56">
+            <input
+              id="notification-search"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('search_notifications', 'Bildirimlerde ara...')}
+              className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+            />
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          </div>
+
+          {/* Refresh Button */}
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors border border-transparent hover:border-slate-200"
+            title={t('refresh', 'Yenile')}
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
+          </button>
+
+          {/* Mark All Read Button */}
+          {unreadCount > 0 && (
+            <button
+              type="button"
+              onClick={markAllAsRead}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 active:scale-[0.98] transition-all"
+              title={t('mark_all_read', 'Tümünü okundu olarak işaretle')}
+            >
+              <CheckCheck className="h-4 w-4 text-emerald-600" />
+              <span className="hidden md:inline">{t('mark_all_read_btn', 'Tümünü Okundu Yap')}</span>
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* 2. Category Filter Pills & Toggle Row */}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 sm:px-7 py-2.5 shrink-0 overflow-x-auto no-scrollbar">
+        {/* Category Pills */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {NOTIFICATION_CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            const active = filterCategory === cat.id;
+            const count = categoryCounts[cat.id] || 0;
+
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setFilterCategory(cat.id)}
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                  active
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                <Icon className={`h-3.5 w-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                <span>{cat.label}</span>
+                {count > 0 && (
+                  <span
+                    className={`ml-0.5 px-1.5 py-0.2 rounded-md text-[10px] tabular-nums font-bold ${
+                      active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Unread Only Toggle */}
+        <button
+          type="button"
+          onClick={() => setOnlyUnread((prev) => !prev)}
+          className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            onlyUnread
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Filter className="h-3.5 w-3.5" />
+          <span>{t('unread_only', 'Sadece Okunmamışlar')}</span>
+        </button>
+      </div>
+
+      {/* 3. Activity Feed Content */}
+      <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/40 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {timelineGroups.length === 0 ? (
+            /* Empty State */
+            <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-3xl border border-slate-200/80 shadow-xs my-6">
+              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-indigo-50 border border-indigo-100 text-indigo-500 mb-4 shadow-2xs">
+                <Inbox className="h-8 w-8" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900 mb-1.5">
+                {searchTerm
+                  ? 'Arama Kriterlerine Uygun Bildirim Yok'
+                  : onlyUnread
+                  ? 'Harika! Okunmamış Bildiriminiz Yok'
+                  : 'Henüz Bildiriminiz Bulunmuyor'}
+              </h3>
+              <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+                {searchTerm
+                  ? 'Farklı bir anahtar kelime deneyebilir veya filtreleri sıfırlayabilirsiniz.'
+                  : onlyUnread
+                  ? 'Tüm bildirimlerinizi okudunuz. Yeni bir hareket olduğunda burada görünecektir.'
+                  : 'Siparişleriniz, teklifleriniz ve mesajlarınızla ilgili tüm güncellemeler burada listelenecektir.'}
+              </p>
+
+              {(searchTerm || onlyUnread || filterCategory !== NOTIFICATION_FILTERS.ALL) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setOnlyUnread(false);
+                    setFilterCategory(NOTIFICATION_FILTERS.ALL);
+                  }}
+                  className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs"
+                >
+                  Filtreleri Temizle
+                </button>
+              )}
+            </div>
+          ) : (
+            /* Grouped Timeline Cards */
+            timelineGroups.map((group) => (
+              <div key={group.key} className="space-y-3">
+                {/* Timeline Header */}
+                <div className="flex items-center gap-3 px-1">
+                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {group.title}
+                  </span>
+                  <div className="h-px flex-1 bg-slate-200/80" />
+                  <span className="text-[11px] font-semibold text-slate-400 tabular-nums">
+                    {group.items.length} bildirim
+                  </span>
+                </div>
+
+                {/* Cards List */}
+                <div className="space-y-2.5">
+                  {group.items.map((notification) => (
+                    <NotificationCard
+                      key={notification.id}
+                      notification={notification}
+                      onMarkAsRead={markAsRead}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export default InboxNotificationsPanel;

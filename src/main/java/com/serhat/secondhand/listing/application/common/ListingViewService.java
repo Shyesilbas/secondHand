@@ -52,8 +52,17 @@ public class ListingViewService {
 
             String ipHash = hashIpAddress(ipAddress);
 
-            // Fast Redis-based deduplication (0ms DB SELECT overhead)
+            // Active Viewer Presence tracking in Redis (24-hour sliding window)
             String dedupIdentifier = (userId != null) ? "u:" + userId : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId : "ip:" + ipHash);
+            try {
+                String presenceKey = "v4:listing:active_viewers:" + listingId;
+                redisTemplate.opsForZSet().add(presenceKey, dedupIdentifier, (double) System.currentTimeMillis());
+                redisTemplate.expire(presenceKey, Duration.ofHours(26));
+            } catch (Exception e) {
+                log.warn("Failed to record active viewer presence in Redis for listing {}: {}", listingId, e.getMessage());
+            }
+
+            // Fast Redis-based deduplication (0ms DB SELECT overhead)
             String dedupKey = "v4:listing:view:dedup:" + dedupIdentifier + ":" + listingId;
             Duration dedupTtl = Duration.ofHours(ListingBusinessConstants.VIEW_DUPLICATE_WINDOW_HOURS);
 
@@ -166,5 +175,19 @@ public class ListingViewService {
                 .periodDays(periodDays)
                 .viewsByDate(viewsByDate)
                 .build();
+    }
+
+    public int getActiveViewerCount(UUID listingId) {
+        if (listingId == null) return 0;
+        String presenceKey = "v4:listing:active_viewers:" + listingId;
+        long twentyFourHoursAgo = System.currentTimeMillis() - (24L * 60L * 60L * 1000L);
+        try {
+            redisTemplate.opsForZSet().removeRangeByScore(presenceKey, 0, (double) twentyFourHoursAgo);
+            Long count = redisTemplate.opsForZSet().zCard(presenceKey);
+            return count != null ? count.intValue() : 0;
+        } catch (Exception e) {
+            log.warn("Failed to get active viewer count from Redis for listing {}: {}", listingId, e.getMessage());
+            return 0;
+        }
     }
 }

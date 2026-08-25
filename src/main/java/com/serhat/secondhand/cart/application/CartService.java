@@ -78,14 +78,12 @@ public class CartService {
     private void applyReservationIfLowStock(Listing listing, Cart cartItem) {
         Integer qty = inventoryService.getAvailableQuantity(listing.getId());
         int threshold = Optional.ofNullable(cartConfig.getReservation().getThreshold()).orElse(3);
+        LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
+        cartItem.setReservedAt(now);
+        cartItem.setReservationEndTime(now.plusMinutes(cartConfig.getReservation().getTimeoutDuration().toMinutes()));
         if (qty != null && qty <= threshold) {
-            LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
-            cartItem.setReservedAt(now);
-            cartItem.setReservationEndTime(now.plusMinutes(cartConfig.getReservation().getTimeoutDuration().toMinutes()));
             cartItem.setIsReserved(true);
         } else {
-            cartItem.setReservedAt(null);
-            cartItem.setReservationEndTime(null);
             cartItem.setIsReserved(false);
         }
     }

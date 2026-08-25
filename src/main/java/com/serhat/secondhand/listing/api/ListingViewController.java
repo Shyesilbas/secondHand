@@ -67,4 +67,12 @@ public class ListingViewController {
         ListingViewStatsDto stats = listingViewService.getViewStatistics(id, startDate, endDate);
         return ResultResponses.ok(Result.success(stats));
     }
+
+    @PublicEndpoint
+    @GetMapping("/{id}/active-viewers")
+    @Operation(summary = "Get active viewers count", description = "Get the number of unique active viewers in the last 10 minutes")
+    public ResponseEntity<?> getActiveViewers(@PathVariable UUID id) {
+        int count = listingViewService.getActiveViewerCount(id);
+        return ResultResponses.okWithBody(Result.success(), java.util.Map.of("count", count));
+    }
 }

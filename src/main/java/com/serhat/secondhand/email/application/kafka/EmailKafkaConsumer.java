@@ -8,7 +8,6 @@ import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.email.contract.MailDispatchKafkaEvent;
 import com.serhat.secondhand.email.domain.entity.Email;
 import com.serhat.secondhand.email.domain.entity.enums.EmailStatus;
-import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,6 @@ import java.time.LocalDateTime;
 @Slf4j
 public class EmailKafkaConsumer {
 
-    private final EmailRepository emailRepository;
     private final EmailSender emailSender;
     private final EmailTemplateService templateService;
     private final EmailConfig emailConfig;
@@ -63,7 +61,7 @@ public class EmailKafkaConsumer {
                     ? userRepository.findById(event.recipientUserId()).orElse(null) 
                     : null;
 
-            // 4. Persist Email entity with status PENDING
+            // 4. Build Email entity (transient, id=null)
             Email email = Email.builder()
                     .user(user)
                     .recipientEmail(event.recipientEmail())
@@ -77,10 +75,7 @@ public class EmailKafkaConsumer {
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            email = emailRepository.save(email);
-            log.info("Persisted email record: emailId={}, recipient={}", email.getId(), email.getRecipientEmail());
-
-            // 5. Transmit via EmailSender (with rate limiter & metrics)
+            // 5. Transmit via EmailSender (persists in dedicated transaction)
             emailSender.sendEmail(email);
 
         } catch (Exception ex) {
