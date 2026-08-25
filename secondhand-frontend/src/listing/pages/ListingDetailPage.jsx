@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
@@ -129,12 +129,67 @@ const ListingDetailPage = () => {
  const [imageError, setImageError] = useState(false);
  const viewTrackedRef = useRef(false);
  const galleryRef = useRef(null);
- const { count: activeInterestCount, cartReservations, activeViewers, urgencyType } = useActiveReservationCount(listing?.id, { enablePolling: true, pollInterval: 10 * 60 * 1000 });
+ const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id, { enablePolling: true, pollInterval: 10 * 60 * 1000 });
  const images = listing?.imageUrls?.length > 0 ? listing.imageUrls : listing?.imageUrl ? [listing.imageUrl] : [];
  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
  const hasCampaign = listing?.campaignId && listing?.campaignPrice != null && parseFloat(listing?.campaignPrice) < parseFloat(listing?.price);
  const displayPrice = hasCampaign ? listing?.campaignPrice : listing?.price;
  const discount = hasCampaign ? discountPercent(listing?.price, listing?.campaignPrice) : null;
+ const favoriteCount = listing?.favoriteStats?.favoriteCount ?? listing?.favoriteCount ?? 0;
+
+  // ── Sequential Social Proof Story Ticker ──
+  const detailStoryItems = useMemo(() => {
+    const list = [];
+    if (activeViewers > 0) {
+      list.push({
+        id: 'viewers',
+        icon: <Eye className="w-4 h-4 text-amber-500 shrink-0" />,
+        text: `Son 24 saatte ${activeViewers} kişi bu ilanı inceledi.`,
+        bg: 'bg-slate-900 text-white border-slate-800'
+      });
+    }
+    if (favoriteCount > 0) {
+      list.push({
+        id: 'favorites',
+        icon: <Heart className="w-4 h-4 text-rose-500 fill-rose-500 shrink-0" />,
+        text: `Toplam ${favoriteCount} kişi bu ilanı favorilerine ekledi.`,
+        bg: 'bg-rose-50 text-rose-900 border-rose-200/80'
+      });
+    }
+    if (cartReservations > 0) {
+      list.push({
+        id: 'cart',
+        icon: <Flame className="w-4 h-4 text-amber-600 fill-amber-500 shrink-0 animate-pulse" />,
+        text: `Şu an ${cartReservations} kişinin sepetinde / satın alma adımında.`,
+        bg: 'bg-amber-50 text-amber-950 border-amber-200/80'
+      });
+    }
+    return list;
+  }, [activeViewers, favoriteCount, cartReservations]);
+
+  const [detailStoryIndex, setDetailStoryIndex] = useState(0);
+  const [detailStoryFinished, setDetailStoryFinished] = useState(false);
+
+  useEffect(() => {
+    if (detailStoryFinished || detailStoryItems.length === 0) return;
+
+    const timer = setTimeout(() => {
+      setDetailStoryIndex(prev => {
+        if (prev + 1 < detailStoryItems.length) {
+          return prev + 1;
+        } else {
+          setDetailStoryFinished(true);
+          return -1;
+        }
+      });
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [detailStoryIndex, detailStoryFinished, detailStoryItems.length]);
+
+  const currentDetailStory = !detailStoryFinished && detailStoryIndex >= 0 && detailStoryIndex < detailStoryItems.length 
+    ? detailStoryItems[detailStoryIndex] 
+    : null;
 
  /* Reset image on listing change */
  useEffect(() => {
@@ -592,19 +647,14 @@ const ListingDetailPage = () => {
                   )}
                 </div>
 
-                {/* Live Urgency / Active Interest Banner */}
-                {activeInterestCount > 0 && (
-                  <div className="flex items-center gap-2 pt-2.5 border-t border-slate-100 text-xs font-bold text-amber-900 bg-amber-50/80 px-3.5 py-2 rounded-xl border border-amber-200/70">
-                    <Flame className="w-4 h-4 text-amber-600 shrink-0 fill-amber-500 animate-pulse" />
-                    {urgencyType === 'CART' ? (
-                      <span>
-                        Şu an <strong className="text-amber-950 font-black">{cartReservations} kişinin</strong> sepetinde / satın alma adımında.
-                      </span>
-                    ) : (
-                      <span>
-                        Son 24 saatte <strong className="text-amber-950 font-black">{activeViewers} kişi</strong> bu ilanı inceledi.
-                      </span>
-                    )}
+                {/* Live Urgency / Sequential Social Proof Story Banner */}
+                {currentDetailStory && (
+                  <div 
+                    key={currentDetailStory.id}
+                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 transform animate-in fade-in slide-in-from-bottom-1 shadow-xs ${currentDetailStory.bg}`}
+                  >
+                    {currentDetailStory.icon}
+                    <span>{currentDetailStory.text}</span>
                   </div>
                 )}
               </div>
