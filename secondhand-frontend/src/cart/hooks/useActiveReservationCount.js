@@ -40,8 +40,8 @@ export const useActiveReservationCount = (listingId, options = {}) => {
     },
     enabled: Boolean(listingId),
     refetchInterval: enablePolling ? pollInterval : false,
-    staleTime: 10 * 60 * 1000, // 10 minutes cache
-    refetchOnWindowFocus: false,
+    staleTime: 30 * 1000, // 30 seconds cache
+    refetchOnWindowFocus: true,
   });
 
   return {

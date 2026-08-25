@@ -4,6 +4,7 @@ import com.serhat.secondhand.cart.application.CartService;
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -113,6 +114,7 @@ public class CartController {
         return ResultResponses.okWithBody(result, Map.of("inCart", result.getData()));
     }
 
+    @PublicEndpoint
     @GetMapping("/reservations/count/{listing-id}")
     @Operation(summary = "Get active reservation count", description = "Get the total number of active reservations for a listing")
 
