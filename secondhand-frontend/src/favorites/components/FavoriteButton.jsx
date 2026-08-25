@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { favoriteService } from '../services/favoriteService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -19,8 +20,9 @@ const FavoriteButton = ({
  className = ''
  }) => {
 
+ const queryClient = useQueryClient();
  const { isAuthenticated, user } = useAuthState();
- const { showSuccess, showError, showWarning, addNotification } = useNotification();
+ const { showSuccess, showError, addNotification } = useNotification();
  const location = useLocation();
  const navigate = useNavigate();
  const notificationShown = useRef(false);
@@ -97,6 +99,11 @@ const FavoriteButton = ({
 
  setIsFavorited(statsDto.isFavorited);
  setFavoriteCount(statsDto.favoriteCount);
+
+ // Invalidate React Query caches so all listing cards and detail pages sync immediately
+ queryClient.invalidateQueries({ queryKey: ['favorites'] });
+ queryClient.invalidateQueries({ queryKey: ['listings'] });
+ queryClient.invalidateQueries({ queryKey: ['listing', listingId] });
 
  showSuccess(
  FAVORITE_MESSAGES.SUCCESS_TITLE,

@@ -45,7 +45,12 @@ const ListingCard = ({
  } = useComparison();
  const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id);
 
- const favoriteCount = listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0;
+ const initialFavCount = listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0;
+ const [cardFavoriteCount, setCardFavoriteCount] = useState(initialFavCount);
+
+ useEffect(() => {
+   setCardFavoriteCount(listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0);
+ }, [listing?.favoriteStats?.favoriteCount, listing?.favoriteCount]);
 
  // ── Sequential Micro-Story Social Proof Ticker ──
  const storyItems = useMemo(() => {
@@ -58,11 +63,11 @@ const ListingCard = ({
        bg: 'bg-slate-900/90 text-white'
      });
    }
-   if (favoriteCount > 0) {
+   if (cardFavoriteCount > 0) {
      list.push({
        id: 'favorites',
        icon: <Heart className="w-2.5 h-2.5 text-rose-400 fill-rose-400" />,
-       text: `${favoriteCount} kişi favoriledi`,
+       text: `${cardFavoriteCount} kişi favoriledi`,
        bg: 'bg-rose-900/90 text-white'
      });
    }
@@ -75,7 +80,7 @@ const ListingCard = ({
      });
    }
    return list;
- }, [activeViewers, favoriteCount, cartReservations]);
+ }, [activeViewers, cardFavoriteCount, cartReservations]);
 
  const [storyIndex, setStoryIndex] = useState(-1);
  const [storyPlayed, setStoryPlayed] = useState(false);
@@ -124,30 +129,27 @@ const ListingCard = ({
  };
  case LISTING_STATUS.SOLD:
  return {
- cls: 'bg-rose-600 text-white font-bold shadow-xs',
+ cls: 'bg-status-error-bg text-status-error font-bold',
  label: 'Sold'
  };
- case LISTING_STATUS.INACTIVE:
+ case LISTING_STATUS.PENDING:
  return {
- cls: 'bg-slate-600 text-white font-bold shadow-xs',
- label: 'Inactive'
+ cls: 'bg-status-warning-bg text-status-warning font-bold',
+ label: 'Pending'
  };
  default:
  return {
- cls: 'bg-slate-600 text-white font-bold shadow-xs',
+ cls: 'bg-slate-100 text-slate-700 font-bold',
  label: status
  };
  }
  };
  const reviewCount = Number(
- listing.reviewStats?.totalReviews ??
  listing.reviewStats?.reviewCount ??
- listing.reviewStats?.totalCount ??
+ listing.reviewStats?.totalReviews ??
  listing.reviewStats?.count ??
- listing.totalReviews ??
  listing.reviewCount ??
- listing.ratingCount ??
- listing.reviewsCount ??
+ listing.totalReviews ??
  (Array.isArray(listing.reviews) ? listing.reviews.length : 0)
  ) || 0;
 
@@ -190,7 +192,7 @@ const ListingCard = ({
  {/* Top-right action buttons */}
  <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2 md:group-hover:translate-x-0">
  {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
- <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={listing.favoriteStats?.favoriteCount ?? 0} size="sm" showCount={false} />
+ <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} onToggle={(stats) => setCardFavoriteCount(stats.favoriteCount)} size="sm" showCount={false} />
  {canAddToCart && <button onClick={e => {
  e.preventDefault();
  e.stopPropagation();
@@ -336,7 +338,7 @@ const ListingCard = ({
  </div>}
  <div className="flex items-center gap-0.5 text-caption text-slate-400">
  <Heart className="w-2.5 h-2.5 shrink-0 fill-current" />
- <span>{favoriteCount}</span>
+ <span>{cardFavoriteCount}</span>
  </div>
  </div>
  </div>
@@ -357,6 +359,8 @@ export default memo(ListingCard, (prevProps, nextProps) =>
  prevProps.listing?.averageRating === nextProps.listing?.averageRating &&
  prevProps.listing?.rating === nextProps.listing?.rating &&
  prevProps.listing?.favoriteStats?.favoriteCount === nextProps.listing?.favoriteStats?.favoriteCount &&
+ prevProps.listing?.favoriteStats?.isFavorited === nextProps.listing?.favoriteStats?.isFavorited &&
+ prevProps.listing?.favoriteCount === nextProps.listing?.favoriteCount &&
  prevProps.isOwner === nextProps.isOwner &&
  prevProps.currentUserId === nextProps.currentUserId &&
  prevProps.showActions === nextProps.showActions &&
