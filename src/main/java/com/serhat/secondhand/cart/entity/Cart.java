@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "listing_id"}),
     indexes = {
         @Index(name = "idx_cart_user", columnList = "user_id"),
+        @Index(name = "idx_cart_listing", columnList = "listing_id"),
         @Index(name = "idx_cart_reservation_end", columnList = "reservation_end_time"),
         @Index(name = "idx_cart_reserved", columnList = "is_reserved")
     }
