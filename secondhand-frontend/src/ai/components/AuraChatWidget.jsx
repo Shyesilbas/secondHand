@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
@@ -22,8 +22,13 @@ const AuraChatWidget = () => {
  isAuthenticated
  } = useAuthState();
  const navigate = useNavigate();
+ const location = useLocation();
  const userId = user?.id ?? null;
  const [isOpen, setIsOpen] = useState(false);
+
+ if (location.pathname === '/aura' || location.pathname === ROUTES.AURA_CHAT) {
+ return null;
+ }
 
  const [agentMode, setAgentMode] = useState(AI_AGENT_MODE_ENABLED);
  const [showUpgradeModal, setShowUpgradeModal] = useState(false);

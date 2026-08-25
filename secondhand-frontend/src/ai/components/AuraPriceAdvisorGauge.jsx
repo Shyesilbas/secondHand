@@ -1,126 +1,113 @@
 import React from 'react';
-import { Tag, TrendingDown, AlertCircle } from 'lucide-react';
+import { Tag, TrendingDown, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AuraPriceAdvisorGauge({
- min,
- max,
- avg,
- current,
- currency = 'TRY',
- status = 'Good Deal'
+  min,
+  max,
+  avg,
+  current,
+  currency = 'TRY',
+  status = 'Good Deal'
 }) {
- const { t, i18n } = useTranslation();
- const currentNum = Number(current);
- const minNum = Number(min);
- const maxNum = Number(max);
- const avgNum = Number(avg);
+  const { i18n } = useTranslation();
+  const currentNum = Number(current);
+  const minNum = Number(min);
+  const maxNum = Number(max);
+  const avgNum = Number(avg);
 
- if (isNaN(currentNum) || isNaN(minNum) || isNaN(maxNum)) {
- return null;
- }
+  if (isNaN(currentNum) || isNaN(minNum) || isNaN(maxNum)) {
+    return null;
+  }
 
- // Calculate percentage of current price on the range
- const totalRange = maxNum - minNum;
- const currentPct = totalRange > 0 ? Math.min(Math.max(((currentNum - minNum) / totalRange) * 100, 0), 100) : 50;
- const avgPct = totalRange > 0 ? Math.min(Math.max(((avgNum - minNum) / totalRange) * 100, 0), 100) : 50;
+  // Calculate percentage of current price on the range
+  const totalRange = maxNum - minNum;
+  const currentPct = totalRange > 0 ? Math.min(Math.max(((currentNum - minNum) / totalRange) * 100, 0), 100) : 50;
+  const avgPct = totalRange > 0 ? Math.min(Math.max(((avgNum - minNum) / totalRange) * 100, 0), 100) : 50;
 
- // Format currencies
- const formatPrice = (val) => {
- return new Intl.NumberFormat(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US', { style: 'currency', currency }).format(val);
- };
+  // Format currencies
+  const formatPrice = (val) => {
+    return new Intl.NumberFormat(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0
+    }).format(val);
+  };
 
- // Determine colors based on status
- const getStatusConfig = () => {
- const s = status.toLowerCase();
- if (s.includes('good') || s.includes('bargain') || s.includes('ucuz') || s.includes('iyi')) {
- return {
- label: t("good_price"),
- badgeClass: 'bg-slate-800/10 text-slate-600 border border-slate-700/20',
- barColor: 'from-emerald-500 to-teal-500',
- glowColor: 'shadow-slate-900/10',
- icon: <TrendingDown className="w-4.5 h-4.5 text-slate-600" />
- };
- } else if (s.includes('high') || s.includes('pahalı') || s.includes('yüksek')) {
- return {
- label: t("above_market_price"),
- badgeClass: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
- barColor: 'from-orange-500 to-rose-500',
- glowColor: 'shadow-rose-500/20',
- icon: <AlertCircle className="w-4.5 h-4.5 text-rose-400" />
- };
- } else {
- return {
- label: t("average_price"),
- badgeClass: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
- barColor: 'from-teal-500 to-amber-500',
- glowColor: 'shadow-amber-500/20',
- icon: <Tag className="w-4.5 h-4.5 text-amber-400" />
- };
- }
- };
+  const isGoodDeal = status.toLowerCase().includes('good') || status.toLowerCase().includes('iyi') || status.toLowerCase().includes('fırsat');
+  const isHigh = status.toLowerCase().includes('high') || status.toLowerCase().includes('yüksek') || status.toLowerCase().includes('pahalı');
 
- const config = getStatusConfig();
+  return (
+    <div className="my-3 rounded-2xl border border-zinc-200/90 bg-gradient-to-b from-zinc-50/80 to-white p-4 shadow-sm backdrop-blur-xs transition-all">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-900 text-white shadow-xs">
+            <Tag className="w-3.5 h-3.5" />
+          </div>
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-900 block">
+              Piyasa Değerlemesi & Fiyat Aralığı
+            </span>
+            <span className="text-[10px] text-zinc-500">Benzer ilan verileriyle kıyaslandı</span>
+          </div>
+        </div>
 
- return (
- <div className="mt-4 p-5 rounded-2xl border border-border-light bg-background-primary shadow-lg backdrop-blur-md overflow-hidden relative group">
- {/* Glow Effect */}
- <div className={`absolute -right-16 -top-16 w-32 h-32 rounded-full bg-gradient-to-br from-primary/10 to-transparent blur-2xl group-hover:scale-125 transition-transform duration-500`} />
- 
- <div className="flex items-center justify-between gap-4 mb-4">
- <div>
- <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted">{t("aura_price_advisor")}</span>
- <h4 className="text-sm font-extrabold text-text-primary mt-0.5">{t("market_price_evaluation")}</h4>
- </div>
- <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black tracking-wide ${config.badgeClass}`}>
- {config.icon}
- {config.label}
- </span>
- </div>
+        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+          isGoodDeal 
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+            : isHigh 
+            ? 'bg-amber-50 text-amber-700 border-amber-200' 
+            : 'bg-zinc-100 text-zinc-800 border-zinc-200'
+        }`}>
+          {isGoodDeal && <CheckCircle className="w-3 h-3 text-emerald-600" />}
+          {isHigh && <AlertTriangle className="w-3 h-3 text-amber-600" />}
+          {status}
+        </span>
+      </div>
 
- <div className="space-y-4">
- {/* Comparison Values */}
- <div className="grid grid-cols-2 gap-4">
- <div className="p-3 rounded-xl bg-background-secondary border border-border-light/50">
- <span className="text-[10px] font-semibold text-text-muted block">{t("current_item_price")}</span>
- <span className="text-base font-black text-text-primary mt-1 block">{formatPrice(currentNum)}</span>
- </div>
- <div className="p-3 rounded-xl bg-background-secondary border border-border-light/50">
- <span className="text-[10px] font-semibold text-text-muted block">{t("average_market_price")}</span>
- <span className="text-base font-black text-text-primary mt-1 block">{formatPrice(avgNum)}</span>
- </div>
- </div>
+      {/* Progress Bar Container */}
+      <div className="relative pt-4 pb-2 px-1">
+        {/* Track Bar */}
+        <div className="h-2.5 w-full bg-zinc-200/80 rounded-full overflow-hidden relative shadow-inner">
+          <div
+            className="h-full bg-gradient-to-r from-emerald-500 via-zinc-800 to-rose-500 rounded-full opacity-90"
+          />
+          {/* Indicator Dot on the bar */}
+          <div
+            className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white border-2 border-zinc-900 rounded-full shadow-md transition-all duration-300"
+            style={{ left: `${currentPct}%` }}
+          />
+        </div>
 
- {/* Visual Bar Gauge */}
- <div className="pt-2">
- <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 relative">
- {/* The Gradient Range Bar */}
- <div className={`absolute top-0 left-0 h-full w-full rounded-full bg-gradient-to-r ${config.barColor} opacity-70`} />
- 
- {/* Average Market Marker */}
- <div 
- className="absolute top-1/2 -translate-y-1/2 w-1.5 h-4 bg-slate-400 dark:bg-slate-500 rounded-full z-10 cursor-help"
- style={{ left: `${avgPct}%` }}
- title={`${t("average_market_price")}: ${formatPrice(avgNum)}`}
- />
+        {/* Average Marker */}
+        {totalRange > 0 && (
+          <div
+            className="absolute top-0.5 -ml-2.5 flex flex-col items-center pointer-events-none"
+            style={{ left: `${avgPct}%` }}
+          >
+            <div className="w-1.5 h-2 bg-zinc-400 rounded-xs" />
+            <span className="text-[8px] font-semibold text-zinc-400 mt-2.5 whitespace-nowrap">
+              Ortalama
+            </span>
+          </div>
+        )}
+      </div>
 
- {/* Current Price Selector Pin */}
- <div 
- className="absolute top-1/2 -translate-y-1/2 -ml-2.5 w-5 h-5 rounded-full bg-background-primary border-4 border-primary shadow-md flex items-center justify-center transition-all duration-500 ease-out z-20"
- style={{ left: `${currentPct}%` }}
- >
- <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
- </div>
- </div>
- 
- {/* Label Ranges */}
- <div className="flex justify-between items-center text-[10px] font-extrabold text-text-muted mt-2 px-0.5">
- <span>Min: {formatPrice(minNum)}</span>
- <span className="text-slate-400 dark:text-slate-500">{t("average")}: {formatPrice(avgNum)}</span>
- <span>Max: {formatPrice(maxNum)}</span>
- </div>
- </div>
- </div>
- </div>
- );
+      {/* Price Labels */}
+      <div className="grid grid-cols-3 gap-2 text-[11px] font-semibold mt-3 pt-2.5 border-t border-zinc-100">
+        <div>
+          <span className="block text-[9px] uppercase tracking-wider text-zinc-400 font-bold">En Düşük</span>
+          <span className="text-zinc-700 font-medium">{formatPrice(minNum)}</span>
+        </div>
+        <div className="text-center">
+          <span className="block text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Bu İlan</span>
+          <span className="font-extrabold text-zinc-950 text-xs">{formatPrice(currentNum)}</span>
+        </div>
+        <div className="text-right">
+          <span className="block text-[9px] uppercase tracking-wider text-zinc-400 font-bold">En Yüksek</span>
+          <span className="text-zinc-700 font-medium">{formatPrice(maxNum)}</span>
+        </div>
+      </div>
+    </div>
+  );
 }
