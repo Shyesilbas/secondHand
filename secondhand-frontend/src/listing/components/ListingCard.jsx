@@ -175,74 +175,78 @@ const ListingCard = ({
   {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
   {statusConfig.label}
   </span>}
-  {cartReservations > 0 ? (
-    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs animate-pulse">
-      <Flame className="w-3 h-3 fill-current text-white" />
-      {cartReservations} sepette
-    </span>
-  ) : activeViewers > 1 ? (
-    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-900/85 text-white backdrop-blur shadow-xs">
-      <Eye className="w-3 h-3 text-amber-400" />
-      {activeViewers} inceliyor
-    </span>
-  ) : null}
   {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">
   <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
- {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
- <Award className="w-3 h-3 shrink-0 text-amber-600" />{t("great_seller")}</span>}
- {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white shadow-sm ">
- <TrendingDown className="w-3 h-3" />
- -{discountPct}%
- </span>}
- </div>
+  {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
+  <Award className="w-3 h-3 shrink-0 text-amber-600" />{t("great_seller")}</span>}
+  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white shadow-sm ">
+  <TrendingDown className="w-3 h-3" />
+  -{discountPct}%
+  </span>}
+  </div>
 
- {/* Quick View */}
- <button onClick={e => {
- e.preventDefault();
- e.stopPropagation();
- setShowInfo(true);
- }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-background-primary/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
- <Eye className="w-3 h-3" />{t("quick_view")}</button>
- </div>
+  {/* Quick View */}
+  <button onClick={e => {
+  e.preventDefault();
+  e.stopPropagation();
+  setShowInfo(true);
+  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-background-primary/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+  <Eye className="w-3 h-3" />{t("quick_view")}</button>
+  </div>
 
- {/* Body */}
- <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-3.5">
+  {/* Body */}
+  <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-3.5">
 
- {/* Title */}
- <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 group- transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
- {listing.title}
- </h3>
+  {/* Title */}
+  <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 group- transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
+  {listing.title}
+  </h3>
 
- {/* Reviews: en az bir değerlendirme veya puan varsa göster */}
- {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
- <div className="flex shrink-0" aria-hidden>
- {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}
- </div>
- <span className="text-caption text-slate-500 tabular-nums leading-none">
- <span className="font-medium text-slate-600">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
- {reviewCount > 0 && <span className="text-slate-400"> ({reviewCount})</span>}
- </span>
- </div>}
+  {/* Reviews: en az bir değerlendirme veya puan varsa göster */}
+  {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
+  <div className="flex shrink-0" aria-hidden>
+  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}
+  </div>
+  <span className="text-caption text-slate-500 tabular-nums leading-none">
+  <span className="font-medium text-slate-600">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
+  {reviewCount > 0 && <span className="text-slate-400"> ({reviewCount})</span>}
+  </span>
+  </div>}
 
- {/* Price row */}
- <div className="flex items-end gap-2 flex-wrap mb-1">
- <span className={`text-base font-bold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
- {formatCurrency(displayPrice, listing.currency)}
- </span>
- {hasCampaign && <span className="text-caption text-slate-400 line-through font-medium">
- {formatCurrency(listing.price, listing.currency)}
- </span>}
- </div>
+  {/* Price row */}
+  <div className="flex items-end gap-2 flex-wrap mb-1">
+  <span className={`text-base font-bold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
+  {formatCurrency(displayPrice, listing.currency)}
+  </span>
+  {hasCampaign && <span className="text-caption text-slate-400 line-through font-medium">
+  {formatCurrency(listing.price, listing.currency)}
+  </span>}
+  </div>
 
- {/* Campaign tag */}
- {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-caption font-semibold border border-rose-100 mb-1.5">
- {listing.campaignName || 'Campaign'}
- </span>}
+  {/* Campaign tag */}
+  {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-caption font-semibold border border-rose-100 mb-1.5">
+  {listing.campaignName || 'Campaign'}
+  </span>}
 
- {/* Stock badge */}
- {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold mb-1.5 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
- {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
- </span>}
+  {/* Stock badge & Hover Social Proof */}
+  <div className="flex flex-wrap items-center gap-1.5 mb-1.5 min-h-[22px]">
+    {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold shrink-0 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
+      {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
+    </span>}
+
+    {/* Dynamic Hover Social Proof */}
+    {cartReservations > 0 ? (
+      <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-amber-500 text-white shadow-xs animate-pulse">
+        <Flame className="w-2.5 h-2.5 fill-white" />
+        {cartReservations} kişinin sepetinde
+      </span>
+    ) : activeViewers > 0 ? (
+      <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-900/85 backdrop-blur-sm text-white shadow-xs">
+        <Eye className="w-2.5 h-2.5 text-amber-400" />
+        Son 24s'de {activeViewers} kişi inceledi
+      </span>
+    ) : null}
+  </div>
 
  {/* Description */}
  {listing.description && <p className="text-caption text-slate-400 line-clamp-2 leading-relaxed mb-2">
