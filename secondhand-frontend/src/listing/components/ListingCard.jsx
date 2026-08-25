@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, memo } from 'react';
+import React, { useState, useMemo, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
@@ -44,7 +44,72 @@ const ListingCard = ({
  isInComparison
  } = useComparison();
  const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id);
+
+ const favoriteCount = listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0;
+
+ // ── Sequential Micro-Story Social Proof Ticker ──
+ const storyItems = useMemo(() => {
+   const list = [];
+   if (activeViewers > 0) {
+     list.push({
+       id: 'viewers',
+       icon: <Eye className="w-2.5 h-2.5 text-amber-400" />,
+       text: `${activeViewers} kişi inceledi`,
+       bg: 'bg-slate-900/90 text-white'
+     });
+   }
+   if (favoriteCount > 0) {
+     list.push({
+       id: 'favorites',
+       icon: <Heart className="w-2.5 h-2.5 text-rose-400 fill-rose-400" />,
+       text: `${favoriteCount} kişi favoriledi`,
+       bg: 'bg-rose-900/90 text-white'
+     });
+   }
+   if (cartReservations > 0) {
+     list.push({
+       id: 'cart',
+       icon: <Flame className="w-2.5 h-2.5 text-amber-300 fill-amber-300" />,
+       text: `${cartReservations} kişi sepete ekledi`,
+       bg: 'bg-amber-600/95 text-white animate-pulse'
+     });
+   }
+   return list;
+ }, [activeViewers, favoriteCount, cartReservations]);
+
+ const [storyIndex, setStoryIndex] = useState(-1);
+ const [storyPlayed, setStoryPlayed] = useState(false);
+ const storyTimerRef = useRef(null);
+
+ const handleCardMouseEnter = () => {
+   if (storyPlayed || storyItems.length === 0) return;
+   setStoryIndex(0);
+ };
+
+ const handleCardMouseLeave = () => {
+   if (storyTimerRef.current) clearTimeout(storyTimerRef.current);
+   setStoryIndex(-1);
+   setStoryPlayed(false);
+ };
+
+ useEffect(() => {
+   if (storyIndex >= 0 && storyIndex < storyItems.length) {
+     storyTimerRef.current = setTimeout(() => {
+       setStoryIndex(prev => prev + 1);
+     }, 1500);
+     return () => {
+       if (storyTimerRef.current) clearTimeout(storyTimerRef.current);
+     };
+   } else if (storyIndex >= storyItems.length && storyItems.length > 0) {
+     setStoryPlayed(true);
+     setStoryIndex(-1);
+   }
+ }, [storyIndex, storyItems.length]);
+
+ const currentStory = storyIndex >= 0 && storyIndex < storyItems.length ? storyItems[storyIndex] : null;
+
  if (!listing) return null;
+
  const isGreatSeller = Boolean(listing.sellerGreatSellerEligible);
  const isInCompare = isInComparison(listing.id);
  const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
@@ -99,14 +164,16 @@ const ListingCard = ({
  const averageRating = Number.isFinite(avgRaw) && avgRaw > 0 ? avgRaw : 0;
  const shouldShowReviews = reviewCount > 0 || averageRating > 0;
  const roundedForStars = shouldShowReviews ? Math.round(averageRating || 5) : 0;
- const favoriteCount = listing.favoriteStats?.favoriteCount || listing.favoriteCount || 0;
  const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
  const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
  const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
  const hasStockInfo = listing.quantity != null && Number.isFinite(Number(listing.quantity));
  const discountPct = hasCampaign ? Math.round((1 - parseFloat(listing.campaignPrice) / parseFloat(listing.price)) * 100) : 0;
  const statusConfig = getStatusConfig(listing.status);
- return <div className={`group relative flex flex-col h-full
+ return <div
+  onMouseEnter={handleCardMouseEnter}
+  onMouseLeave={handleCardMouseLeave}
+  className={`group relative flex flex-col h-full
  bg-background-primary rounded-2xl
  border transition-[transform,box-shadow,border-color] duration-200 ease-out
  hover:shadow-xl hover:-translate-y-1
@@ -228,24 +295,22 @@ const ListingCard = ({
   {listing.campaignName || 'Campaign'}
   </span>}
 
-  {/* Stock badge & Hover Social Proof */}
+  {/* Stock badge & Sequential Social Proof Micro-Story */}
   <div className="flex flex-wrap items-center gap-1.5 mb-1.5 min-h-[22px]">
     {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold shrink-0 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
       {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
     </span>}
 
-    {/* Dynamic Hover Social Proof */}
-    {cartReservations > 0 ? (
-      <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-amber-500 text-white shadow-xs animate-pulse">
-        <Flame className="w-2.5 h-2.5 fill-white" />
-        {cartReservations} kişinin sepetinde
+    {/* Dynamic Sequential Micro-Story Ticker */}
+    {currentStory && (
+      <span
+        key={currentStory.id}
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-xs transition-all duration-300 transform scale-100 ${currentStory.bg}`}
+      >
+        {currentStory.icon}
+        <span>{currentStory.text}</span>
       </span>
-    ) : activeViewers > 0 ? (
-      <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-slate-900/85 backdrop-blur-sm text-white shadow-xs">
-        <Eye className="w-2.5 h-2.5 text-amber-400" />
-        Son 24s'de {activeViewers} kişi inceledi
-      </span>
-    ) : null}
+    )}
   </div>
 
  {/* Description */}
