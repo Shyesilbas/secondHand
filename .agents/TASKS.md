@@ -6,10 +6,23 @@ This is the ONLY state tracking file for AI execution. Update this file immediat
 
 ## Current Work
 - Status: In Progress
-- Active Task: Email Architecture Refactoring & Template Modernization Completed
-- Next Step: Ready for user testing / review.
+- Active Task: Implementation of Unified Social Proof Metrics Completed
+- Next Step: Ready for user review / testing.
 
 ## Backlog / Completed
+- [x] Standardized `favoriteCount` metrics end-to-end:
+  - Linked `ListingSocialProofService` to `FavoriteStatsService` ensuring unified counts and cache consistency.
+  - Added root getter `getFavoriteCount()` in [ListingDto.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/listing/domain/dto/response/listing/ListingDto.java) delegating to `favoriteStats` and `socialProof`.
+  - Created standardized `getListingFavoriteCount(listing)` helper in frontend [favorites.js](file:///Users/serhat/IdeaProjects/secondHand/secondhand-frontend/src/favorites/favorites.js).
+  - Cleaned up confusing multi-level fallback chains across `ListingCard`, `ListingDetailPage`, `FavoritesPage`, and `ShoppingCartPage`.
+  - Validated tests: `ListingSocialProofServiceTest` and `CartSocialMetricServiceTest` passing (6/6).
+- [x] Created `CartSocialMetricService` with O(1) Redis operations (`recordListingAddedToCart`, `recordListingRemovedFromCart`, `getInCartCount`).
+- [x] Created unified `ListingSocialProofDto` and `ListingSocialProofService`.
+- [x] Cleaned up legacy DB query `CartRepository.countActiveReservationsByListing` and deprecated direct count queries.
+- [x] Added `GET /api/v1/listings/{id}/social-proof` endpoint to `ListingViewController`.
+- [x] Synchronized `CartReservationScheduler` to drop expired reservations from Redis set.
+- [x] Updated frontend `useActiveReservationCount` hook and `apiEndpoints.js` to use unified `/social-proof` endpoint.
+- [x] Added automated unit tests `CartSocialMetricServiceTest` and `ListingSocialProofServiceTest` (all passed).
 - [x] Fixed Kafka Deserialization Exception in `inventory-sync-consumers` with `ErrorHandlingDeserializer`.
 - [x] Implemented Checkout Page Stock Reservation via `POST /api/checkout/initiate` (Redis TTL 15 min).
 - [x] Fixed broken/duplicate HTML tags across Thymeleaf templates (`offers/accepted.html`, `offers/rejected.html`, `offers/completed.html`, `offers/expired.html`, `orders/sale-notification.html`, `payments/receipt.html`).

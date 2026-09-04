@@ -20,6 +20,7 @@ public class CartReservationScheduler {
 
     private final CartRepository cartRepository;
     private final CartConfig cartConfig;
+    private final CartSocialMetricService cartSocialMetricService;
 
     @Scheduled(fixedRateString = "${app.cart.scheduler.cleanup-fixed-rate-ms:60000}")
     @Transactional
@@ -38,11 +39,19 @@ public class CartReservationScheduler {
     public int clearExpiredReservationsNow() {
         ZoneId zoneId = ZoneId.of(Optional.ofNullable(cartConfig.getZoneId()).orElse("Europe/Istanbul"));
         LocalDateTime now = LocalDateTime.now(zoneId);
-        List<Long> expiredIds = cartRepository.findExpiredReservationIds(now);
-        if (expiredIds.isEmpty()) return 0;
+        List<com.serhat.secondhand.cart.entity.Cart> expiredCarts = cartRepository.findExpiredReservations(now);
+        if (expiredCarts.isEmpty()) return 0;
 
+        List<Long> expiredIds = expiredCarts.stream().map(com.serhat.secondhand.cart.entity.Cart::getId).toList();
         log.info("Clearing {} expired cart reservations", expiredIds.size());
         cartRepository.clearReservationsByIdInBatch(expiredIds);
+
+        for (com.serhat.secondhand.cart.entity.Cart cart : expiredCarts) {
+            if (cart.getListing() != null && cart.getUser() != null) {
+                cartSocialMetricService.recordListingRemovedFromCart(cart.getListing().getId(), cart.getUser().getId());
+            }
+        }
+
         return expiredIds.size();
     }
 }

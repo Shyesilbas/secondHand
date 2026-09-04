@@ -49,6 +49,7 @@ public class CartService {
     private final CartConfig cartConfig;
     private final CartReservationScheduler cartReservationScheduler;
     private final InventoryService inventoryService;
+    private final CartSocialMetricService cartSocialMetricService;
 
     @Transactional
     public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
@@ -160,6 +161,7 @@ public class CartService {
             return Result.error(CartErrorCodes.RESERVATION_FAILED);
         }
         CartDto dto = cartMapper.toDto(savedCart);
+        cartSocialMetricService.recordListingAddedToCart(listingId, userId);
 
         enrichmentService.enrichInPlace(dto.getListing(), userId);
         return Result.success(dto);
@@ -187,12 +189,23 @@ public class CartService {
             return Result.error(CartErrorCodes.ITEM_NOT_FOUND_IN_CART);
         }
         cartRepository.deleteByUserIdAndListingId(userId, listingId);
+        cartSocialMetricService.recordListingRemovedFromCart(listingId, userId);
         return Result.success();
     }
 
     @Transactional
     public Result<Void> clearCart(Long userId) {
-        cartRepository.deleteByUserId(userId);
+        List<Cart> userCarts = cartRepository.findByUserId(userId);
+        if (!userCarts.isEmpty()) {
+            List<UUID> listingIds = userCarts.stream()
+                    .map(c -> c.getListing() != null ? c.getListing().getId() : null)
+                    .filter(Objects::nonNull)
+                    .toList();
+            cartRepository.deleteByUserId(userId);
+            cartSocialMetricService.recordListingsRemovedFromCart(listingIds, userId);
+        } else {
+            cartRepository.deleteByUserId(userId);
+        }
         return Result.success();
     }
 
@@ -207,12 +220,9 @@ public class CartService {
         return Result.success(cartRepository.existsByUserIdAndListingId(userId, listingId));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Result<Integer> getActiveReservationCount(UUID listingId) {
-        clearExpiredReservationsIfEnabled();
-        LocalDateTime now = LocalDateTime.now(getConfiguredZoneId());
-        LocalDateTime cutoff = now.minus(cartConfig.getReservation().getTimeoutDuration());
-        int count = cartRepository.countActiveReservationsByListing(listingId, now, cutoff);
+        int count = cartSocialMetricService.getInCartCount(listingId);
         return Result.success(count);
     }
 

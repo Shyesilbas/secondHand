@@ -41,10 +41,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("DELETE FROM Cart c WHERE c.user.id = :userId AND c.listing.id = :listingId")
     void deleteByUserIdAndListingId(@Param("userId") Long userId, @Param("listingId") UUID listingId);
 
-    @Query("SELECT COALESCE(SUM(c.quantity), 0) FROM Cart c WHERE c.listing.id = :listingId")
-    int countActiveReservationsByListing(@Param("listingId") UUID listingId, @Param("now") LocalDateTime now, @Param("cutoff") LocalDateTime cutoff);
-
-    @Query("SELECT c FROM Cart c WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")
+    @Query("SELECT c FROM Cart c JOIN FETCH c.user JOIN FETCH c.listing WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")
     List<Cart> findExpiredReservations(@Param("now") LocalDateTime now);
 
     @Query("SELECT c.id FROM Cart c WHERE c.isReserved = true AND c.reservationEndTime IS NOT NULL AND c.reservationEndTime < :now")

@@ -21,9 +21,10 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     
         long countByListingId(UUID listingId);
     
-        @Query("SELECT f.listing.id, COUNT(f) FROM Favorite f " +
-           "WHERE f.listing.id IN :listingIds " +
-           "GROUP BY f.listing.id")
+    @Query("SELECT l.id, COUNT(f.id) FROM Favorite f " +
+           "JOIN f.listing l " +
+           "WHERE l.id IN :listingIds " +
+           "GROUP BY l.id")
     List<Object[]> countByListingIds(@Param("listingIds") List<UUID> listingIds);
     
         void deleteByUserAndListingId(User user, UUID listingId);

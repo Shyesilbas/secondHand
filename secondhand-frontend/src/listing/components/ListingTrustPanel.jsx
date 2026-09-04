@@ -5,7 +5,7 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ShowcaseButton from '../../showcase/components/ShowcaseButton.jsx';
 import { FollowButton } from '../../follow/index.js';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
-import { Award, ShieldCheck, Star, CheckCircle, ShieldAlert, QrCode, MapPin, Wallet } from 'lucide-react';
+import { Award, Star, CheckCircle } from 'lucide-react';
 
 const ListingTrustPanel = ({
  listing,

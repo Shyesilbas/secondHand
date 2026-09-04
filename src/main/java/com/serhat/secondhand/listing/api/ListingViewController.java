@@ -32,6 +32,7 @@ public class ListingViewController {
 
     private final ListingViewService listingViewService;
     private final AuditLogService auditLogService;
+    private final com.serhat.secondhand.listing.application.common.ListingSocialProofService socialProofService;
 
     @PublicEndpoint
     @PostMapping("/{id}/view")
@@ -43,9 +44,8 @@ public class ListingViewController {
             HttpServletRequest httpRequest) {
 
         String sessionId = request != null ? request.getSessionId() : null;
-        String userAgent = request != null ? request.getUserAgent() : (httpRequest.getHeader("User-Agent"));
+        String userAgent = request != null ? request.getUserAgent() : httpRequest.getHeader("User-Agent");
         String ipAddress = auditLogService.getClientIpAddress(httpRequest);
-
         Long userId = (currentUser != null) ? currentUser.getId() : null;
 
         listingViewService.trackView(id, userId, sessionId, ipAddress, userAgent);
@@ -70,9 +70,17 @@ public class ListingViewController {
 
     @PublicEndpoint
     @GetMapping("/{id}/active-viewers")
-    @Operation(summary = "Get active viewers count", description = "Get the number of unique active viewers in the last 10 minutes")
+    @Operation(summary = "Get active viewers count", description = "Get the number of unique active viewers in the last 24 hours")
     public ResponseEntity<?> getActiveViewers(@PathVariable UUID id) {
         int count = listingViewService.getActiveViewerCount(id);
         return ResultResponses.okWithBody(Result.success(), java.util.Map.of("count", count));
+    }
+
+    @PublicEndpoint
+    @GetMapping("/{id}/social-proof")
+    @Operation(summary = "Get unified social proof metrics", description = "Get active viewers in 24h, distinct users with listing in cart, and favorite count")
+    public ResponseEntity<?> getSocialProof(@PathVariable UUID id) {
+        var socialProof = socialProofService.getSocialProof(id);
+        return ResultResponses.ok(Result.success(socialProof));
     }
 }

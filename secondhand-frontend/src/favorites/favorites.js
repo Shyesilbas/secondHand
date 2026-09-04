@@ -50,3 +50,21 @@ export const createBulkStatsRequest = (listingIds) => {
  
  return listingIds.filter(id => id != null).map(id => id.toString().trim());
 };
+
+/**
+ * Standard accessor for a listing's total favorite count.
+ * Checks favoriteStats.favoriteCount -> socialProof.favoriteCount -> favoriteCount -> 0.
+ */
+export const getListingFavoriteCount = (listing) => {
+  if (!listing) return 0;
+  if (typeof listing.favoriteStats?.favoriteCount === 'number') {
+    return listing.favoriteStats.favoriteCount;
+  }
+  if (typeof listing.socialProof?.favoriteCount === 'number') {
+    return listing.socialProof.favoriteCount;
+  }
+  if (typeof listing.favoriteCount === 'number') {
+    return listing.favoriteCount;
+  }
+  return 0;
+};

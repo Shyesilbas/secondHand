@@ -6,36 +6,26 @@ export const useActiveReservationCount = (listingId, options = {}) => {
   const { enablePolling = false, pollInterval = 10 * 60 * 1000 } = options;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['listing', 'active-interest', listingId],
+    queryKey: ['listing', 'social-proof', listingId],
     queryFn: async () => {
       try {
-        const [cartRes, viewersRes] = await Promise.allSettled([
-          apiClient.get(API_ENDPOINTS.CART.RESERVATIONS_COUNT(listingId)),
-          apiClient.get(API_ENDPOINTS.LISTINGS.ACTIVE_VIEWERS(listingId))
-        ]);
-
-        const extractCount = (res) => {
-          if (res?.status !== 'fulfilled') return 0;
-          const val = res.value;
-          if (typeof val === 'number') return val;
-          if (typeof val?.data?.count === 'number') return val.data.count;
-          if (typeof val?.count === 'number') return val.count;
-          if (typeof val?.data === 'number') return val.data;
-          return 0;
-        };
-
-        const cartCount = extractCount(cartRes);
-        const viewersCount = extractCount(viewersRes);
-        const urgencyType = cartCount > 0 ? 'CART' : (viewersCount > 0 ? 'VIEWERS' : null);
+        const response = await apiClient.get(API_ENDPOINTS.LISTINGS.SOCIAL_PROOF(listingId));
+        const proof = response?.data || response;
+        const inCart = typeof proof?.inCartCount === 'number' ? proof.inCartCount : 0;
+        const viewers = typeof proof?.viewsLast24Hours === 'number' ? proof.viewsLast24Hours : 0;
+        const favorites = typeof proof?.favoriteCount === 'number' ? proof.favoriteCount : 0;
+        const urgencyType = inCart > 0 ? 'CART' : (viewers > 0 ? 'VIEWERS' : null);
 
         return {
-          cartReservations: cartCount,
-          activeViewers: viewersCount,
-          count: Math.max(cartCount, viewersCount),
+          cartReservations: inCart,
+          inCartCount: inCart,
+          activeViewers: viewers,
+          favoriteCount: favorites,
+          count: Math.max(inCart, viewers),
           urgencyType
         };
       } catch {
-        return { cartReservations: 0, activeViewers: 0, count: 0, urgencyType: null };
+        return { cartReservations: 0, inCartCount: 0, activeViewers: 0, favoriteCount: 0, count: 0, urgencyType: null };
       }
     },
     enabled: Boolean(listingId),
@@ -47,7 +37,9 @@ export const useActiveReservationCount = (listingId, options = {}) => {
   return {
     count: data?.count || 0,
     cartReservations: data?.cartReservations || 0,
+    inCartCount: data?.inCartCount || 0,
     activeViewers: data?.activeViewers || 0,
+    favoriteCount: data?.favoriteCount || 0,
     urgencyType: data?.urgencyType || null,
     isLoading,
     error

@@ -17,6 +17,7 @@ public class ListingEnrichmentService {
     private final ListingReviewStatsUtil reviewStatsUtil;
     private final ListingCampaignPricingUtil campaignPricingUtil;
     private final ListingGreatSellerUtil greatSellerUtil;
+    private final ListingSocialProofService socialProofService;
 
     public List<ListingDto> enrich(List<ListingDto> dtos, Long userId) {
         if (dtos == null || dtos.isEmpty()) return dtos;
@@ -24,6 +25,7 @@ public class ListingEnrichmentService {
         reviewStatsUtil.enrichWithReviewStats(dtos);
         campaignPricingUtil.enrichWithCampaignPricing(dtos);
         greatSellerUtil.enrichWithGreatSeller(dtos);
+        socialProofService.enrichWithSocialProof(dtos);
         return dtos;
     }
 
@@ -33,6 +35,7 @@ public class ListingEnrichmentService {
         reviewStatsUtil.enrichWithReviewStats(dto);
         campaignPricingUtil.enrichWithCampaignPricing(dto);
         greatSellerUtil.enrichWithGreatSeller(dto);
+        socialProofService.enrichWithSocialProof(dto);
         return dto;
     }
 

@@ -11,6 +11,7 @@ import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { formatDate } from '../../common/formatters.js';
 import { FAVORITE_DEFAULTS, FAVORITES_PAGE_TABS } from '../favoriteConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import { getListingFavoriteCount } from '../favorites.js';
 const FavoritesPage = () => {
  const {
  t
@@ -42,7 +43,7 @@ const FavoritesPage = () => {
  return favorites.map(fav => {
  const listing = fav?.listing;
  if (!listing) return null;
- const favoriteCount = listing?.favoriteCount ?? listing?.favoriteStats?.favoriteCount ?? 0;
+ const favoriteCount = getListingFavoriteCount(listing);
  const isFavorited = true;
  return {
  ...listing,

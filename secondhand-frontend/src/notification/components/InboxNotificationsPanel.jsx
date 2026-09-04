@@ -7,6 +7,7 @@ import {
   Loader2,
   RefreshCw,
   Search as MagnifyingGlassIcon,
+  X,
   Inbox,
   Calendar
 } from 'lucide-react';
@@ -100,7 +101,7 @@ const InboxNotificationsPanel = () => {
     return (
       <div className="min-h-0 h-full w-full bg-white border border-slate-200/90 rounded-3xl flex flex-col items-center justify-center p-12 text-slate-400">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
-        <span className="text-xs font-semibold">{t('loading_notifications', 'Bildirimler yükleniyor...')}</span>
+        <span className="text-xs font-bold text-slate-600">{t('loading_notifications', 'Bildirimler yükleniyor...')}</span>
       </div>
     );
   }
@@ -108,51 +109,62 @@ const InboxNotificationsPanel = () => {
   return (
     <div className="min-h-0 h-full w-full bg-white border border-slate-200/90 rounded-3xl flex flex-col overflow-hidden shadow-xs">
       {/* 1. Header Control Bar */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/90 bg-white px-5 sm:px-7 py-3.5 sm:py-4 shrink-0">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 border-b border-slate-200/80 bg-white px-5 sm:px-7 py-3.5 sm:py-4 shrink-0">
         {/* Title & Status Summary */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 shadow-2xs">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 shadow-2xs">
             <Bell className="h-5 w-5" />
           </div>
 
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-lg font-black text-slate-900 tracking-tight">
                 {t('notifications', 'Bildirimler')}
               </h1>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[11px] font-bold tabular-nums shadow-xs">
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[11px] font-black tabular-nums shadow-xs">
                   {unreadCount > 99 ? '99+' : unreadCount} yeni
                 </span>
               )}
             </div>
             <p className="text-xs text-slate-400 font-medium truncate mt-0.5">
-              {notifications.length} toplam bildirim • Sipariş, teklif ve mesaj güncellemeleri
+              {notifications.length} {t('total_notifications_count', 'toplam bildirim • Sipariş, teklif ve mesaj güncellemeleri')}
             </p>
           </div>
         </div>
 
         {/* Action Controls & Search */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Search Input */}
-          <div className="relative w-full sm:w-56">
+          {/* Search Input with Clear Button */}
+          <div className="relative w-full sm:w-60">
             <input
               id="notification-search"
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('search_notifications', 'Bildirimlerde ara...')}
-              className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+              className="h-9.5 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-8.5 pr-8 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium"
             />
             <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+                title={t('clear_search', 'Aramayı Temizle')}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
           </div>
 
           {/* Refresh Button */}
           <button
             type="button"
             onClick={handleRefresh}
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors border border-transparent hover:border-slate-200"
+            className="rounded-xl p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors border border-slate-200/70 shadow-2xs cursor-pointer active:scale-95"
             title={t('refresh', 'Yenile')}
+            aria-label={t('refresh', 'Yenile')}
           >
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
           </button>
@@ -162,7 +174,7 @@ const InboxNotificationsPanel = () => {
             <button
               type="button"
               onClick={markAllAsRead}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 active:scale-[0.98] transition-all"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold text-slate-700 shadow-2xs hover:bg-emerald-50/50 hover:text-emerald-700 hover:border-emerald-200 active:scale-[0.98] transition-all cursor-pointer"
               title={t('mark_all_read', 'Tümünü okundu olarak işaretle')}
             >
               <CheckCheck className="h-4 w-4 text-emerald-600" />
@@ -173,7 +185,7 @@ const InboxNotificationsPanel = () => {
       </header>
 
       {/* 2. Category Filter Pills & Toggle Row */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 sm:px-7 py-2.5 shrink-0 overflow-x-auto no-scrollbar">
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/60 px-5 sm:px-7 py-2.5 shrink-0 overflow-x-auto no-scrollbar">
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 shrink-0">
           {NOTIFICATION_CATEGORIES.map((cat) => {
@@ -186,10 +198,10 @@ const InboxNotificationsPanel = () => {
                 key={cat.id}
                 type="button"
                 onClick={() => setFilterCategory(cat.id)}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                   active
                     ? 'bg-slate-900 text-white shadow-xs'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    : 'bg-white border border-slate-200/90 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
                 <Icon className={`h-3.5 w-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
@@ -212,14 +224,17 @@ const InboxNotificationsPanel = () => {
         <button
           type="button"
           onClick={() => setOnlyUnread((prev) => !prev)}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+          className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             onlyUnread
               ? 'bg-indigo-600 text-white shadow-xs'
-              : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+              : 'bg-white border border-slate-200/90 text-slate-600 hover:bg-slate-100'
           }`}
         >
           <Filter className="h-3.5 w-3.5" />
           <span>{t('unread_only', 'Sadece Okunmamışlar')}</span>
+          {unreadCount > 0 && !onlyUnread && (
+            <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+          )}
         </button>
       </div>
 
@@ -239,7 +254,7 @@ const InboxNotificationsPanel = () => {
                   ? 'Harika! Okunmamış Bildiriminiz Yok'
                   : 'Henüz Bildiriminiz Bulunmuyor'}
               </h3>
-              <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+              <p className="text-xs text-slate-500 max-w-sm leading-relaxed font-medium">
                 {searchTerm
                   ? 'Farklı bir anahtar kelime deneyebilir veya filtreleri sıfırlayabilirsiniz.'
                   : onlyUnread
@@ -255,7 +270,7 @@ const InboxNotificationsPanel = () => {
                     setOnlyUnread(false);
                     setFilterCategory(NOTIFICATION_FILTERS.ALL);
                   }}
-                  className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs"
+                  className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer active:scale-95"
                 >
                   Filtreleri Temizle
                 </button>
@@ -267,12 +282,12 @@ const InboxNotificationsPanel = () => {
               <div key={group.key} className="space-y-3">
                 {/* Timeline Header */}
                 <div className="flex items-center gap-3 px-1">
-                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-400">
                     <Calendar className="h-3.5 w-3.5" />
                     {group.title}
                   </span>
                   <div className="h-px flex-1 bg-slate-200/80" />
-                  <span className="text-[11px] font-semibold text-slate-400 tabular-nums">
+                  <span className="text-[11px] font-bold text-slate-400 tabular-nums">
                     {group.items.length} bildirim
                   </span>
                 </div>

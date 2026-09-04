@@ -1,63 +1,106 @@
+import React from 'react';
 import { useTranslation } from "react-i18next";
-import { AlertTriangle as ExclamationTriangleIcon, X as XMarkIcon } from 'lucide-react';
+import { AlertTriangle, X, ShieldAlert, LogOut } from 'lucide-react';
+
 const RevokeSessionsModal = ({
- isOpen,
- onClose,
- onConfirm,
- isLoading
+  isOpen,
+  onClose,
+  onConfirm,
+  isLoading
 }) => {
- const {
- t
- } = useTranslation();
- if (!isOpen) return null;
- return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
- <div className="bg-background-primary rounded-lg shadow-xl max-w-md w-full mx-4">
- <div className="p-6">
- {/* Header */}
- <div className="flex items-center justify-between mb-4">
- <div className="flex items-center space-x-3">
- <div className="p-2 bg-status-error-bg rounded-lg">
- <ExclamationTriangleIcon className="w-6 h-6 text-status-error" />
- </div>
- <h3 className="text-sm font-medium text-text-primary">{t("revoke_all_sessions")}</h3>
- </div>
- <button onClick={onClose} disabled={isLoading} className="p-1 hover:bg-tertiary rounded-lg transition-colors disabled:opacity-50">
- <XMarkIcon className="w-5 h-5" />
- </button>
- </div>
+  const { t } = useTranslation();
 
- {/* Content */}
- <div className="mb-6">
- <p className="text-text-secondary mb-4">{t("this_action_will_immediately_log_you_out")}</p>
- 
- <div className="bg-status-error-bg border border-status-error-border rounded-lg p-4">
- <div className="flex items-start space-x-3">
- <ExclamationTriangleIcon className="w-5 h-5 text-status-error mt-0.5 flex-shrink-0" />
- <div>
- <h4 className="text-sm font-medium text-status-error-text mb-1">{t("important_security_notice")}</h4>
- <ul className="text-sm text-status-error-text space-y-1">
- <li>{t("all_active_sessions_will_be_terminated")}</li>
- <li>{t("you_ll_be_logged_out_from_all_devices")}</li>
- <li>{t("this_action_cannot_be_undone")}</li>
- <li>{t("use_this_if_you_suspect_unauthorized_acc")}</li>
- </ul>
- </div>
- </div>
- </div>
- </div>
+  if (!isOpen) return null;
 
- {/* Actions */}
- <div className="flex space-x-3">
- <button onClick={onClose} disabled={isLoading} className="flex-1 px-4 py-2 text-text-secondary bg-tertiary hover:bg-tertiary rounded-lg transition-colors disabled:opacity-50">{t("cancel")}</button>
- <button onClick={onConfirm} disabled={isLoading} className="flex-1 px-4 py-2 text-white bg-status-error-bg hover:bg-status-error-bg rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center space-x-2">
- {isLoading ? <>
- <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
- <span>{t("revoking")}</span>
- </> : <span>{t("revoke_all_sessions")}</span>}
- </button>
- </div>
- </div>
- </div>
- </div>;
+  return (
+    <div
+      className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-150"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="p-6 pb-4 flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-2xs shrink-0">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight">
+                {t("revoke_all_sessions", "Tüm Oturumları Kapat")}
+              </h3>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">
+                {t("security_action_confirmation", "Kritik güvenlik aksiyonu")}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50 cursor-pointer"
+            aria-label={t("close", "Kapat")}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="px-6 py-2 space-y-4">
+          <p className="text-xs text-slate-600 font-medium leading-relaxed">
+            {t(
+              "this_action_will_immediately_log_you_out",
+              "Bu işlem şu anda kullandığınız cihaz da dahil olmak üzere tüm aktif cihaz ve tarayıcılardaki oturumlarınızı anında sonlandırır."
+            )}
+          </p>
+
+          <div className="p-4 bg-rose-50/70 border border-rose-200/70 rounded-2xl space-y-2">
+            <div className="flex items-center gap-2 text-rose-800 font-bold text-xs">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{t("important_security_notice", "Önemli Güvenlik Bilgisi")}</span>
+            </div>
+            <ul className="text-xs text-rose-900/80 font-medium space-y-1.5 pl-6 list-disc">
+              <li>{t("all_active_sessions_will_be_terminated", "Tüm aktif oturumlar derhal sonlandırılır.")}</li>
+              <li>{t("you_ll_be_logged_out_from_all_devices", "Tüm cihazlardan çıkış yapılacak ve oturumunuz kapatılacaktır.")}</li>
+              <li>{t("this_action_cannot_be_undone", "Bu işlem geri alınamaz.")}</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Modal Footer Actions */}
+        <div className="p-6 pt-5 flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/40">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {t("cancel", "Vazgeç")}
+          </button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 cursor-pointer active:scale-95"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>{t("revoking", "Kapatılıyor...")}</span>
+              </>
+            ) : (
+              <>
+                <LogOut className="w-4 h-4" />
+                <span>{t("revoke_all_sessions", "Oturumları Kapat")}</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export default RevokeSessionsModal;

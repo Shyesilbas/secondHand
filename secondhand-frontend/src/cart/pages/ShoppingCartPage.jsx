@@ -1,8 +1,11 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
+import { usePlan } from '@/common/hooks/usePlan';
+import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
+import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
 import { AlertTriangle, ArrowLeft, Check, Heart, ShoppingBag } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
 import { formatCurrency } from '../../common/formatters.js';
@@ -18,6 +21,7 @@ import { campaignService } from '../../listing/services/campaignService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useFavorites } from '../../favorites/hooks/useFavorites.js';
+import { getListingFavoriteCount } from '../../favorites/favorites.js';
 import { CART_UI, cartBtnPrimary, cartBtnSecondary, cartPageCanvas, cartPageHeader, cartSurfacePanel, CART_SHAPE } from '../uiPalette.js';
 const ShoppingCartPage = () => {
  const {
@@ -52,26 +56,87 @@ const ShoppingCartPage = () => {
  return cartItems.map(i => `${i?.listing?.id || i?.id}:${i.quantity}`).join('|');
  }, [cartItems]);
 
- const { data: pricingData } = useQuery({
- queryKey: ['cartPricingAndCampaigns', cartKey, sellerIds],
- queryFn: async () => {
- const [pricingRes, campaignsRes] = await Promise.all([
- couponService.preview(null),
- campaignService.listBySellers(sellerIds)
- ]);
- return {
- pricing: pricingRes?.data || pricingRes,
- sellerCampaigns: Array.isArray(campaignsRes?.data) ? campaignsRes.data : Array.isArray(campaignsRes) ? campaignsRes : []
- };
- },
- enabled: cartItems.length > 0,
- staleTime: 30 * 1000,
- gcTime: 5 * 60 * 1000,
- });
+  const { isPremium } = usePlan();
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCouponCode, setAppliedCouponCode] = useState(null);
+  const [couponError, setCouponError] = useState(null);
+  const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
- const pricing = pricingData?.pricing || null;
- const sellerCampaigns = useMemo(() => pricingData?.sellerCampaigns || [], [pricingData?.sellerCampaigns]);
- const [showClearModal, setShowClearModal] = useState(false);
+  const { data: pricingData, isLoading: isPreviewLoading } = useQuery({
+    queryKey: ['cartPricingAndCampaigns', cartKey, sellerIds, appliedCouponCode],
+    queryFn: async () => {
+      const requested = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
+      let pricingRes;
+      let couponSuccess = true;
+      let couponErr = null;
+
+      try {
+        pricingRes = await couponService.preview(requested);
+      } catch (e) {
+        if (requested) {
+          pricingRes = await couponService.preview(null);
+          couponSuccess = false;
+          couponErr = e;
+        } else {
+          throw e;
+        }
+      }
+
+      const campaignsRes = await campaignService.listBySellers(sellerIds).catch(() => ({ data: [] }));
+
+      return {
+        pricing: pricingRes?.data || pricingRes,
+        sellerCampaigns: Array.isArray(campaignsRes?.data) ? campaignsRes.data : Array.isArray(campaignsRes) ? campaignsRes : [],
+        couponSuccess,
+        couponError: couponErr
+      };
+    },
+    enabled: cartItems.length > 0,
+    staleTime: 10 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+  const pricing = pricingData?.pricing || null;
+  const sellerCampaigns = useMemo(() => pricingData?.sellerCampaigns || [], [pricingData?.sellerCampaigns]);
+  const [showClearModal, setShowClearModal] = useState(false);
+
+  useEffect(() => {
+    if (pricingData) {
+      if (pricingData.couponSuccess) {
+        const echoed = pricing?.couponCode != null && String(pricing.couponCode).trim() !== '' ? String(pricing.couponCode).trim().toUpperCase() : null;
+        if (!appliedCouponCode) {
+          setCouponError(null);
+        } else if (echoed && echoed === appliedCouponCode) {
+          setCouponError(null);
+        } else {
+          setAppliedCouponCode(null);
+          setCouponError(CART_MESSAGES.COUPON_APPLY_FAILED);
+        }
+      } else {
+        const e = pricingData.couponError;
+        const message = e?.response?.data?.message || e?.response?.data?.error || CART_MESSAGES.COUPON_APPLY_FAILED;
+        setCouponError(message);
+        setAppliedCouponCode(null);
+      }
+    }
+  }, [pricingData, pricing, appliedCouponCode]);
+
+  const onApplyCoupon = () => {
+    const next = couponInput?.trim() || '';
+    if (!next) {
+      setCouponError(null);
+      setAppliedCouponCode(null);
+      return;
+    }
+    setAppliedCouponCode(next.toUpperCase());
+  };
+
+  const onRemoveCoupon = () => {
+    setAppliedCouponCode(null);
+    setCouponInput('');
+    setCouponError(null);
+  };
  const checkReservationStatus = reservedAt => {
  if (!reservedAt) return {
  isExpired: false,
@@ -164,19 +229,19 @@ const ShoppingCartPage = () => {
  const discountedTotal = pricing?.total != null ? parseFloat(pricing.total) : calculateTotal();
  const campaignDiscount = pricing?.campaignDiscount != null ? parseFloat(pricing.campaignDiscount) : Math.max(0, (originalTotal || 0) - (discountedTotal || 0));
  const favoriteListings = useMemo(() => favorites.map(fav => {
- const listing = fav?.listing;
- if (!listing) return null;
- const favoriteCount = listing?.favoriteCount ?? listing?.favoriteStats?.favoriteCount ?? 0;
- return {
- ...listing,
- favoriteStats: {
- ...listing.favoriteStats,
- favoriteCount,
- isFavorited: true,
- favorited: true
- }
- };
- }).filter(Boolean), [favorites]);
+    const listing = fav?.listing;
+    if (!listing) return null;
+    const favoriteCount = getListingFavoriteCount(listing);
+    return {
+      ...listing,
+      favoriteStats: {
+        ...listing.favoriteStats,
+        favoriteCount,
+        isFavorited: true,
+        favorited: true
+      }
+    };
+  }).filter(Boolean), [favorites]);
  const handleQuantityChange = (listingId, newQuantity) => {
  if (newQuantity < 1) return;
  const item = cartItems.find(ci => ci?.listing?.id === listingId);
@@ -350,13 +415,45 @@ const ShoppingCartPage = () => {
  </div>
  </div>
 
- <div className="lg:col-span-4">
- <OrderSummary cartItems={cartItems} cartCount={cartCount} calculateTotal={calculateTotal} pricing={pricing} onCheckout={() => navigate(ROUTES.CHECKOUT)} disabled={cartCount === 0} />
- </div>
- </div>}
+  <div className="lg:col-span-4">
+    <OrderSummary
+      cartItems={cartItems}
+      cartCount={cartCount}
+      calculateTotal={calculateTotal}
+      pricing={pricing}
+      onCheckout={() => navigate(ROUTES.CHECKOUT, { state: { couponCode: appliedCouponCode } })}
+      disabled={cartCount === 0 || hasExpiredReservations}
+      couponInput={couponInput}
+      setCouponInput={setCouponInput}
+      appliedCouponCode={appliedCouponCode}
+      couponError={couponError}
+      isPreviewLoading={isPreviewLoading}
+      onApplyCoupon={onApplyCoupon}
+      onRemoveCoupon={onRemoveCoupon}
+      onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
+      isPremium={isPremium}
+      onOpenPremiumModal={() => setIsPremiumModalOpen(true)}
+    />
+  </div>
+  </div>}
 
- <ClearCartModal isOpen={showClearModal} onClose={() => setShowClearModal(false)} onConfirm={handleClearCart} isClearing={isClearingCart} />
- </PageContainer>
- </div>;
+  <ClearCartModal isOpen={showClearModal} onClose={() => setShowClearModal(false)} onConfirm={handleClearCart} isClearing={isClearingCart} />
+  <ActiveCouponsModal 
+    isOpen={isCouponsModalOpen} 
+    onClose={() => setIsCouponsModalOpen(false)} 
+    onApply={code => {
+      const c = typeof code === 'string' ? code.trim() : '';
+      setCouponInput(c);
+      setIsCouponsModalOpen(false);
+      setAppliedCouponCode(c ? c.toUpperCase() : null);
+    }} 
+  />
+  <PremiumUpgradeModal 
+    isOpen={isPremiumModalOpen} 
+    onClose={() => setIsPremiumModalOpen(false)} 
+    featureHint="Öncelikli Kargo" 
+  />
+  </PageContainer>
+  </div>;
 };
 export default ShoppingCartPage;

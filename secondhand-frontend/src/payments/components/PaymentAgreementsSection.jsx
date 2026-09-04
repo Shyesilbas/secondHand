@@ -44,50 +44,53 @@ const PaymentAgreementsSection = ({
  );
  }
 
- return (
- <div className="space-y-2">
- {agreements.map(agreement => {
- const isChecked = acceptedAgreements.has(agreement.agreementId);
- return (
- <div
- key={agreement.agreementId}
- className={`flex items-center gap-2.5 p-2 rounded-xl border transition-all text-xs ${
- isChecked
- ? 'bg-slate-100/60 border-slate-300/80 text-slate-900'
- : 'bg-slate-50/60 border-slate-200/60 text-slate-600 hover:border-slate-300'
- }`}
- >
- <input
- id={`agreement-${agreement.agreementId}`}
- type="checkbox"
- checked={isChecked}
- onChange={() => handleAgreementToggle(agreement.agreementId)}
- className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer accent-slate-900"
- />
- <label
- htmlFor={`agreement-${agreement.agreementId}`}
- className="flex-1 font-medium cursor-pointer truncate"
- >
- {AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType}
- </label>
- <button
- type="button"
- onClick={() => handleAgreementClick(agreement)}
- className="text-[11px] font-bold text-slate-900 hover:underline flex-shrink-0"
- >
- {t("read_full_agreement")}
- </button>
- </div>
- );
- })}
+  return (
+    <div className="space-y-1.5">
+      {agreements.map(agreement => {
+        const isChecked = acceptedAgreements.has(agreement.agreementId);
+        const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+        return (
+          <div
+            key={agreement.agreementId}
+            className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl border transition-all text-xs ${
+              isChecked
+                ? 'bg-slate-50 border-slate-300 text-slate-900'
+                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            <label 
+              htmlFor={`agreement-${agreement.agreementId}`}
+              className="flex items-center gap-2.5 cursor-pointer select-none flex-1 min-w-0"
+            >
+              <input
+                id={`agreement-${agreement.agreementId}`}
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => handleAgreementToggle(agreement.agreementId)}
+                className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer accent-slate-900 shrink-0"
+              />
+              <span className="font-medium truncate text-[11px] text-slate-700">
+                {agreementName}
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={() => handleAgreementClick(agreement)}
+              className="text-[10px] font-bold text-slate-500 hover:text-slate-900 underline shrink-0 cursor-pointer transition-colors"
+            >
+              {t("read_full_agreement")}
+            </button>
+          </div>
+        );
+      })}
 
- <AgreementModal
- agreement={selectedAgreement}
- open={showAgreementModal}
- onClose={handleCloseModal}
- />
- </div>
- );
+      <AgreementModal
+        agreement={selectedAgreement}
+        open={showAgreementModal}
+        onClose={handleCloseModal}
+      />
+    </div>
+  );
 };
 
 export default PaymentAgreementsSection;

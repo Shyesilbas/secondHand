@@ -1,0 +1,244 @@
+{
+  "info": {
+    "_postman_id": "secondhand-checkout-flow",
+    "name": "SecondHand - End-to-End Checkout Flow",
+    "description": "Otomatik Dinamik CSRF ve JWT senkronizasyonlu Checkout Akışı.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// 1. En güncel XSRF cookie'sini al",
+          "let xsrf = pm.cookies.get('XSRF-TOKEN');",
+          "if (!xsrf) {",
+          "    xsrf = pm.collectionVariables.get('xsrf_token');",
+          "}",
+          "if (xsrf) {",
+          "    pm.request.headers.upsert({ key: 'X-XSRF-TOKEN', value: xsrf });",
+          "    pm.collectionVariables.set('xsrf_token', xsrf);",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "// Response döndüğünde cookie tazelenmişse anında yakala",
+          "const xsrf = pm.cookies.get('XSRF-TOKEN');",
+          "if (xsrf) {",
+          "    pm.collectionVariables.set('xsrf_token', xsrf);",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "xsrf_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_listing_id",
+      "value": "61bb5611-ff79-4c91-9037-c63a2eb115ad",
+      "type": "string"
+    },
+    {
+      "key": "user_address_id",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "payment_otp_code",
+      "value": "123456",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "if (res.data && res.data.accessToken) {",
+              "    pm.collectionVariables.set('jwt_token', res.data.accessToken);",
+              "    console.log('JWT Token set successfully');",
+              "}",
+              "const xsrfCookie = pm.cookies.get('XSRF-TOKEN');",
+              "if (xsrfCookie) {",
+              "    pm.collectionVariables.set('xsrf_token', xsrfCookie);",
+              "    console.log('Initial XSRF Token set from cookie:', xsrfCookie);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"jasont@gmail.com\",\n  \"password\": \"Maus1734.\",\n  \"rememberMe\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Add Item to Cart",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"listingId\": \"{{test_listing_id}}\",\n  \"quantity\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/cart/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "cart", "items"]
+        }
+      }
+    },
+    {
+      "name": "3. Initiate Checkout Reservation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/checkout/initiate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "checkout", "initiate"]
+        }
+      }
+    },
+    {
+      "name": "4. Send Verification Code",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transactionType\": \"ITEM_PURCHASE\",\n  \"providerName\": \"EWALLET\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/payments/initiate-verification",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "payments", "initiate-verification"]
+        }
+      }
+    },
+    {
+      "name": "5. Get Payment Verification Emails",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();",
+              "if (res.content && res.content.length > 0) {",
+              "    const latestEmail = res.content[0];",
+              "    const match = JSON.stringify(latestEmail).match(/\\b\\d{6}\\b/);",
+              "    if (match) {",
+              "        pm.collectionVariables.set('payment_otp_code', match[0]);",
+              "        console.log('Automatically extracted OTP code:', match[0]);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/emails/my-emails/PAYMENT_VERIFICATION?page=0&size=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "emails", "my-emails", "PAYMENT_VERIFICATION"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Final Checkout & Escrow Commit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shippingAddressId\": {{user_address_id}},\n  \"billingAddressId\": {{user_address_id}},\n  \"notes\": \"Test order checkout\",\n  \"name\": \"E-Wallet Payment\",\n  \"providerName\": \"EWALLET\",\n  \"paymentVerificationCode\": \"{{payment_otp_code}}\",\n  \"agreementsAccepted\": true,\n  \"acceptedAgreementIds\": [\n    \"885e7871-c8b4-4eac-8f4a-a59fc0b3a9b3\",\n    \"a5fd366d-a061-45d0-a977-9d638d891836\"\n  ],\n  \"couponCode\": null,\n  \"offerId\": null,\n  \"deliveryMethod\": \"CARGO\",\n  \"meetupLocation\": null\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/orders/checkout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "orders", "checkout"]
+        }
+      }
+    }
+  ]
+}

@@ -11,30 +11,33 @@ import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { trackView } from '../services/listingAddonService.js';
 import { getOrCreateSessionId } from '../../common/utils/sessionId.js';
+import { getListingFavoriteCount } from '../../favorites/favorites.js';
 import {
- AlertTriangle,
- ArrowLeft,
- Calendar,
- Check,
- ChevronDown,
- ChevronLeft,
- ChevronRight,
- ChevronUp,
- Clock,
- Eye,
- Flame,
- FileText,
- HandCoins,
- Heart,
- MapPin,
- Package,
- Share2,
- Shield,
- ShieldCheck,
- ShoppingBag,
- Sparkles,
- Star,
- Tag
+  AlertTriangle,
+  ArrowLeft,
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Clock,
+  Eye,
+  Flame,
+  FileText,
+  HandCoins,
+  Heart,
+  Layers,
+  MapPin,
+  Package,
+  Share2,
+  Shield,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Tag,
+  Settings
 } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
@@ -55,292 +58,345 @@ import { useRecentlyViewed } from '../hooks/useRecentlyViewed.js';
 /* ── Helpers ─────────────────────────────────────────────── */
 
 const discountPercent = (original, sale) => {
- const o = parseFloat(original);
- const s = parseFloat(sale);
- if (!o || !s || o <= s) return null;
- return Math.round((o - s) / o * 100);
+  const o = parseFloat(original);
+  const s = parseFloat(sale);
+  if (!o || !s || o <= s) return null;
+  return Math.round(((o - s) / o) * 100);
 };
 
 /* ── Sub-components ──────────────────────────────────────── */
 
-/** Skeleton loader */
+/** High-fidelity skeleton loader */
 const DetailSkeleton = () => (
- <div className="min-h-screen bg-slate-50/50">
- <div className="h-14 bg-white border-b border-slate-200/80" />
- <PageContainer className="max-w-[1280px] pt-6">
- <div className="grid lg:grid-cols-12 gap-6">
- <div className="lg:col-span-7 xl:col-span-8 space-y-4">
- <div className="bg-white rounded-3xl p-6 border border-slate-200/80 animate-pulse">
- <div className="h-5 w-20 bg-slate-100 rounded-full mb-3" />
- <div className="h-8 w-3/4 bg-slate-200 rounded-xl mb-3" />
- <div className="h-4 w-1/2 bg-slate-100 rounded-lg" />
- </div>
- <div className="aspect-[16/9] bg-slate-200 rounded-3xl animate-pulse" />
- </div>
- <div className="lg:col-span-5 xl:col-span-4">
- <div className="bg-white rounded-3xl p-6 border border-slate-200/80 animate-pulse space-y-4">
- <div className="h-4 w-14 bg-slate-100 rounded-full" />
- <div className="h-9 w-36 bg-slate-200 rounded-xl" />
- <div className="h-11 w-full bg-slate-200 rounded-xl" />
- <div className="h-11 w-full bg-slate-100 rounded-xl" />
- </div>
- </div>
- </div>
- </PageContainer>
- </div>
+  <div className="min-h-screen bg-slate-50/60 font-sans pb-24">
+    <div className="h-14 bg-white/80 border-b border-slate-200/80 animate-pulse" />
+    <PageContainer className="max-w-[1360px] pt-6 sm:pt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
+        {/* Left Column Skeleton */}
+        <div className="lg:col-span-7 xl:col-span-7 space-y-6">
+          <div className="aspect-[4/3] sm:aspect-[16/11] bg-slate-200/70 rounded-[28px] animate-pulse" />
+          <div className="flex gap-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-20 w-24 bg-slate-200/60 rounded-2xl animate-pulse shrink-0" />
+            ))}
+          </div>
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/70 animate-pulse space-y-3">
+            <div className="h-5 w-40 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-full bg-slate-100 rounded-md" />
+            <div className="h-4 w-4/5 bg-slate-100 rounded-md" />
+          </div>
+        </div>
+        {/* Right Column Skeleton */}
+        <div className="lg:col-span-5 xl:col-span-5">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 animate-pulse space-y-5">
+            <div className="flex gap-2">
+              <div className="h-5 w-20 bg-slate-200 rounded-md" />
+              <div className="h-5 w-24 bg-slate-100 rounded-md" />
+            </div>
+            <div className="h-8 w-4/5 bg-slate-200 rounded-xl" />
+            <div className="h-4 w-1/2 bg-slate-100 rounded-md" />
+            <div className="h-24 bg-slate-50 rounded-2xl border border-slate-100" />
+            <div className="h-12 w-full bg-slate-900/10 rounded-2xl" />
+            <div className="h-10 w-full bg-slate-100 rounded-2xl" />
+          </div>
+        </div>
+      </div>
+    </PageContainer>
+  </div>
 );
 
-/** Error state */
+/** Modern Error state */
 const DetailError = ({ error }) => {
- const { t } = useTranslation();
- return (
- <div className="min-h-screen bg-slate-50/50 flex items-center justify-center p-4">
- <div className="text-center max-w-sm rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-sm">
- <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 shadow-xs">
- <AlertTriangle className="w-7 h-7" />
- </div>
- <h3 className="text-sm font-extrabold text-slate-900 mb-1.5 tracking-tight">{t("listing_unavailable", "İlan Bulunamadı")}</h3>
- <p className="text-slate-500 text-xs font-medium mb-6 leading-relaxed">{error || 'Bu ilan yayından kaldırılmış veya silinmiş olabilir.'}</p>
- <Link
- to={ROUTES.LISTINGS}
- className="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95"
- >
- <ArrowLeft className="w-4 h-4" />
- <span>{t("back_to_listings", "İlanlara Dön")}</span>
- </Link>
- </div>
- </div>
- );
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen bg-slate-50/50 flex items-center justify-center p-4 font-sans">
+      <div className="text-center max-w-md w-full rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-lg shadow-slate-900/5">
+        <div className="w-16 h-16 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 shadow-xs">
+          <AlertTriangle className="w-8 h-8 stroke-[1.75]" />
+        </div>
+        <h3 className="text-lg font-black text-slate-900 mb-2 tracking-tight">
+          {t("listing_unavailable", "İlan Bulunamadı")}
+        </h3>
+        <p className="text-slate-500 text-xs font-medium mb-6 leading-relaxed">
+          {error || t("listing_unavailable_desc", "Bu ilan yayından kaldırılmış, satılmış veya silinmiş olabilir.")}
+        </p>
+        <Link
+          to={ROUTES.LISTINGS}
+          className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>{t("back_to_listings", "İlanlara Dön")}</span>
+        </Link>
+      </div>
+    </div>
+  );
 };
 
 /* ── Main Page ───────────────────────────────────────────── */
 
 const ListingDetailPage = () => {
- const { t } = useTranslation();
- const { id } = useParams();
- const navigate = useNavigate();
- const { user, isAuthenticated } = useAuthState();
- const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
- const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: true });
- const itemIsInCart = isInCart(listing?.id);
- const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
- const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
- const [selectedImageIndex, setSelectedImageIndex] = useState(0);
- const [imageError, setImageError] = useState(false);
- const viewTrackedRef = useRef(false);
- const galleryRef = useRef(null);
- const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id, { enablePolling: true, pollInterval: 10 * 60 * 1000 });
- const images = listing?.imageUrls?.length > 0 ? listing.imageUrls : listing?.imageUrl ? [listing.imageUrl] : [];
- const isOwner = isAuthenticated && user?.id === listing?.sellerId;
- const hasCampaign = listing?.campaignId && listing?.campaignPrice != null && parseFloat(listing?.campaignPrice) < parseFloat(listing?.price);
- const displayPrice = hasCampaign ? listing?.campaignPrice : listing?.price;
- const discount = hasCampaign ? discountPercent(listing?.price, listing?.campaignPrice) : null;
- const favoriteCount = listing?.favoriteStats?.favoriteCount ?? listing?.favoriteCount ?? 0;
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuthState();
+  const { listing, isLoading, error, refetch: fetchListing } = useListingData(id);
+  const { addToCart, isAddingToCart, isInCart } = useCart({ loadCartItems: true });
+  const itemIsInCart = isInCart(listing?.id);
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const viewTrackedRef = useRef(false);
+  const galleryRef = useRef(null);
 
-  // ── Sequential Social Proof Story Ticker ──
+  const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id, {
+    enablePolling: true,
+    pollInterval: 10 * 60 * 1000
+  });
+
+  const images = listing?.imageUrls?.length > 0
+    ? listing.imageUrls
+    : listing?.imageUrl
+    ? [listing.imageUrl]
+    : [];
+
+  const isOwner = isAuthenticated && user?.id === listing?.sellerId;
+  const hasCampaign = listing?.campaignId && listing?.campaignPrice != null && parseFloat(listing?.campaignPrice) < parseFloat(listing?.price);
+  const displayPrice = hasCampaign ? listing?.campaignPrice : listing?.price;
+  const discount = hasCampaign ? discountPercent(listing?.price, listing?.campaignPrice) : null;
+  const favoriteCount = getListingFavoriteCount(listing);
+
+  // ── Live Urgency & Social Proof Story Ticker ──
   const detailStoryItems = useMemo(() => {
     const list = [];
-    if (activeViewers > 0) {
-      list.push({
-        id: 'viewers',
-        icon: <Eye className="w-4 h-4 text-amber-500 shrink-0" />,
-        text: `Son 24 saatte ${activeViewers} kişi bu ilanı inceledi.`,
-        bg: 'bg-slate-900 text-white border-slate-800'
-      });
-    }
-    if (favoriteCount > 0) {
-      list.push({
-        id: 'favorites',
-        icon: <Heart className="w-4 h-4 text-rose-500 fill-rose-500 shrink-0" />,
-        text: `Toplam ${favoriteCount} kişi bu ilanı favorilerine ekledi.`,
-        bg: 'bg-rose-50 text-rose-900 border-rose-200/80'
-      });
-    }
     if (cartReservations > 0) {
       list.push({
         id: 'cart',
-        icon: <Flame className="w-4 h-4 text-amber-600 fill-amber-500 shrink-0 animate-pulse" />,
-        text: `Şu an ${cartReservations} kişinin sepetinde / satın alma adımında.`,
-        bg: 'bg-amber-50 text-amber-950 border-amber-200/80'
+        icon: <Flame className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0 animate-pulse" />,
+        text: `Şu an ${cartReservations} kişinin sepetinde / satın alma adımında`,
+        badge: 'Yüksek Talep',
+        bg: 'bg-amber-500/10 text-amber-950 border-amber-300/80 shadow-xs'
+      });
+    }
+    if (activeViewers > 0) {
+      list.push({
+        id: 'viewers',
+        icon: <Eye className="w-4 h-4 text-slate-700 shrink-0" />,
+        text: `Son 24 saatte ${activeViewers} kişi bu ilanı inceledi`,
+        badge: 'Popüler',
+        bg: 'bg-slate-100/90 text-slate-900 border-slate-200/90 shadow-2xs'
       });
     }
     return list;
-  }, [activeViewers, favoriteCount, cartReservations]);
+  }, [activeViewers, cartReservations]);
 
   const [detailStoryIndex, setDetailStoryIndex] = useState(0);
-  const [detailStoryFinished, setDetailStoryFinished] = useState(false);
 
+  // Soft loop rotation if multiple signals exist
   useEffect(() => {
-    if (detailStoryFinished || detailStoryItems.length === 0) return;
+    if (detailStoryItems.length <= 1) return;
 
-    const timer = setTimeout(() => {
-      setDetailStoryIndex(prev => {
-        if (prev + 1 < detailStoryItems.length) {
-          return prev + 1;
-        } else {
-          setDetailStoryFinished(true);
-          return -1;
-        }
-      });
-    }, 2500);
+    const timer = setInterval(() => {
+      setDetailStoryIndex(prev => (prev + 1) % detailStoryItems.length);
+    }, 3500);
 
-    return () => clearTimeout(timer);
-  }, [detailStoryIndex, detailStoryFinished, detailStoryItems.length]);
+    return () => clearInterval(timer);
+  }, [detailStoryItems.length]);
 
-  const currentDetailStory = !detailStoryFinished && detailStoryIndex >= 0 && detailStoryIndex < detailStoryItems.length 
-    ? detailStoryItems[detailStoryIndex] 
+  const currentDetailStory = detailStoryItems.length > 0
+    ? detailStoryItems[detailStoryIndex % detailStoryItems.length]
     : null;
 
- /* Reset image on listing change */
- useEffect(() => {
- setSelectedImageIndex(0);
- setImageError(false);
- }, [listing?.id]);
+  /* Reset image on listing change */
+  useEffect(() => {
+    setSelectedImageIndex(0);
+    setImageError(false);
+  }, [listing?.id]);
 
- useEffect(() => {
- setImageError(false);
- }, [selectedImageIndex]);
+  useEffect(() => {
+    setImageError(false);
+  }, [selectedImageIndex]);
 
- const { addRecentlyViewed } = useRecentlyViewed();
+  const { addRecentlyViewed } = useRecentlyViewed();
 
- /* Save to recently viewed */
- useEffect(() => {
- if (listing?.id) {
- addRecentlyViewed(listing);
- }
- }, [listing, addRecentlyViewed]);
+  /* Save to recently viewed */
+  useEffect(() => {
+    if (listing?.id) {
+      addRecentlyViewed(listing);
+    }
+  }, [listing, addRecentlyViewed]);
 
- /* Track view */
- useEffect(() => {
- if (listing && !viewTrackedRef.current && !isOwner) {
- viewTrackedRef.current = true;
- trackView(listing.id, getOrCreateSessionId(), navigator.userAgent);
- }
- }, [listing, isOwner]);
+  /* Track view */
+  useEffect(() => {
+    if (listing && !viewTrackedRef.current && !isOwner) {
+      viewTrackedRef.current = true;
+      trackView(listing.id, getOrCreateSessionId(), navigator.userAgent);
+    }
+  }, [listing, isOwner]);
 
- /* SEO */
- useEffect(() => {
- if (!listing) return;
- document.title = `${listing.title} - ${formatCurrency(displayPrice, listing.currency)} | SecondHand`;
- const schemaId = 'listing-structured-data';
- let scriptEl = document.getElementById(schemaId);
- if (!scriptEl) {
- scriptEl = document.createElement('script');
- scriptEl.id = schemaId;
- scriptEl.type = 'application/ld+json';
- document.head.appendChild(scriptEl);
- }
- scriptEl.textContent = JSON.stringify({
- "@context": "https://schema.org/",
- "@type": "Product",
- "name": listing.title,
- "image": listing.imageUrl ? optimizeCloudinaryUrl(listing.imageUrl, { width: 1200 }) : "",
- "description": listing.description || "",
- "offers": {
- "@type": "Offer",
- "price": displayPrice?.toString(),
- "priceCurrency": listing.currency || "TRY",
- "availability": listing.status === 'ACTIVE' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
- }
- });
- return () => document.getElementById(schemaId)?.remove();
- }, [listing, displayPrice]);
+  /* SEO */
+  useEffect(() => {
+    if (!listing) return;
+    document.title = `${listing.title} - ${formatCurrency(displayPrice, listing.currency)} | SecondHand`;
+    const schemaId = 'listing-structured-data';
+    let scriptEl = document.getElementById(schemaId);
+    if (!scriptEl) {
+      scriptEl = document.createElement('script');
+      scriptEl.id = schemaId;
+      scriptEl.type = 'application/ld+json';
+      document.head.appendChild(scriptEl);
+    }
+    scriptEl.textContent = JSON.stringify({
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": listing.title,
+      "image": listing.imageUrl ? optimizeCloudinaryUrl(listing.imageUrl, { width: 1200 }) : "",
+      "description": listing.description || "",
+      "offers": {
+        "@type": "Offer",
+        "price": displayPrice?.toString(),
+        "priceCurrency": listing.currency || "TRY",
+        "availability": listing.status === 'ACTIVE' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      }
+    });
+    return () => document.getElementById(schemaId)?.remove();
+  }, [listing, displayPrice]);
 
- /* Share */
- const handleShare = useCallback(async () => {
- const url = window.location.href;
- if (navigator.share) {
- await navigator.share({
- title: listing?.title || 'SecondHand İlanı',
- url
- });
- return;
- }
- await navigator.clipboard?.writeText(url);
- }, [listing?.title]);
+  /* Share */
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: listing?.title || 'SecondHand İlanı',
+          url
+        });
+        return;
+      } catch {
+        // Share cancelled or not supported, fallback to clipboard
+      }
+    }
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2200);
+    }
+  }, [listing?.title]);
 
- /* Gallery nav */
- const showPreviousImage = useCallback(() => {
- setSelectedImageIndex(c => c === 0 ? Math.max(images.length - 1, 0) : c - 1);
- }, [images.length]);
- const showNextImage = useCallback(() => {
- setSelectedImageIndex(c => c + 1 >= images.length ? 0 : c + 1);
- }, [images.length]);
+  /* Gallery nav */
+  const showPreviousImage = useCallback(() => {
+    setSelectedImageIndex(c => (c === 0 ? Math.max(images.length - 1, 0) : c - 1));
+  }, [images.length]);
 
- /* Keyboard nav for gallery */
- useEffect(() => {
- const handler = e => {
- if (e.key === 'ArrowLeft') showPreviousImage();
- if (e.key === 'ArrowRight') showNextImage();
- };
- window.addEventListener('keydown', handler);
- return () => window.removeEventListener('keydown', handler);
- }, [showPreviousImage, showNextImage]);
+  const showNextImage = useCallback(() => {
+    setSelectedImageIndex(c => (c + 1 >= images.length ? 0 : c + 1));
+  }, [images.length]);
 
- /* Derived */
- const DetailsComponent = listing ? listingTypeRegistry[listing.type]?.detailsComponent : null;
- const hasReviews = listing ? !NON_PURCHASABLE_TYPES.includes(listing.type) : false;
- const canAddToCart = listing && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
- const canMakeOffer = listing && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
- const isLowStock = listing?.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
- const hasStockInfo = listing?.quantity != null && Number.isFinite(Number(listing?.quantity));
- const selectedImage = images[selectedImageIndex];
- const shouldClampDescription = listing?.description?.length > 420;
- const locationLabel = listing ? [listing.district, listing.city].filter(Boolean).join(', ') || 'Konum belirtilmedi' : '';
+  /* Keyboard nav for gallery */
+  useEffect(() => {
+    const handler = e => {
+      if (e.key === 'ArrowLeft') showPreviousImage();
+      if (e.key === 'ArrowRight') showNextImage();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [showPreviousImage, showNextImage]);
 
- /* ── Render ──────────────────────────────────────────── */
+  /* Derived */
+  const DetailsComponent = listing ? listingTypeRegistry[listing.type]?.detailsComponent : null;
+  const hasReviews = listing ? !NON_PURCHASABLE_TYPES.includes(listing.type) : false;
+  const canAddToCart = listing && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+  const canMakeOffer = listing && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
+  const isLowStock = listing?.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
+  const hasStockInfo = listing?.quantity != null && Number.isFinite(Number(listing?.quantity));
+  const selectedImage = images[selectedImageIndex];
+  const shouldClampDescription = listing?.description?.length > 400;
+  const locationLabel = listing ? [listing.district, listing.city].filter(Boolean).join(', ') || 'Konum belirtilmedi' : '';
 
- if (isLoading) return <DetailSkeleton />;
- if (error) return <DetailError error={error} />;
- if (!listing) return null;
+  /* ── Render ──────────────────────────────────────────── */
+
+  if (isLoading) return <DetailSkeleton />;
+  if (error) return <DetailError error={error} />;
+  if (!listing) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-24 text-slate-900 selection:bg-slate-200 selection:text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50/50 pb-28 text-slate-900 selection:bg-slate-200 selection:text-slate-900 font-sans">
       
       {/* ── Top Navigation & Quick Action Bar ── */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/70 shadow-xs">
-        <PageContainer className="max-w-[1360px] h-14 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/70 shadow-xs transition-all">
+        <PageContainer className="max-w-[1360px] h-14 sm:h-15 flex items-center justify-between gap-4">
+          
           {/* Breadcrumb Path */}
-          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0">
-            <Link to={ROUTES.LISTINGS} className="hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0" aria-label="Breadcrumb">
+            <Link
+              to={ROUTES.LISTINGS}
+              className="hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0 px-2 py-1 rounded-lg hover:bg-slate-100"
+            >
               <ArrowLeft className="w-4 h-4" />
-              <span>{t("all_listings", "İlanlar")}</span>
+              <span className="font-bold">{t("all_listings", "İlanlar")}</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] shrink-0 bg-slate-100 px-2 py-0.5 rounded-md">{listing.type}</span>
+            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] shrink-0 bg-slate-100/90 border border-slate-200/60 px-2.5 py-0.5 rounded-lg">
+              {listing.type}
+            </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 hidden md:block" />
-            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[320px]">{listing.title}</span>
+            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[340px]">
+              {listing.title}
+            </span>
           </nav>
 
           {/* Quick Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Aura AI Chat Button */}
             <button
               onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-slate-900 border border-indigo-200/60 rounded-xl text-xs font-extrabold transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-slate-900 border border-indigo-200/70 rounded-xl text-xs font-extrabold transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
+              title={t("ask_aura_tip", "Bu ilan hakkında Aura AI ile konuş")}
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
               <span>{t("ask_aura", "Aura AI")}</span>
             </button>
+
+            {/* Compare Button */}
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
+
+            {/* Favorite Button */}
             {!isOwner && (
               <FavoriteButton
                 listingId={listing.id}
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="p-2 border border-slate-200 bg-white text-slate-600 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50 hover:border-rose-200 shadow-2xs cursor-pointer active:scale-95"
+                className="p-2 border border-slate-200/90 bg-white text-slate-600 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50/60 hover:border-rose-200 shadow-2xs cursor-pointer active:scale-95"
               />
             )}
+
+            {/* Share Button with Copied State Feedback */}
             <button
               onClick={handleShare}
-              className="p-2 text-slate-600 hover:text-slate-900 rounded-xl transition-all hover:bg-slate-100 border border-slate-200 bg-white shadow-2xs cursor-pointer active:scale-95"
+              className={`p-2 rounded-xl transition-all border shadow-2xs cursor-pointer active:scale-95 flex items-center gap-1.5 text-xs font-bold ${
+                copiedLink
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 border-slate-200/90'
+              }`}
               aria-label={t("share", "Paylaş")}
-              title={t("share", "Paylaş")}
+              title={copiedLink ? t("link_copied", "Bağlantı kopyalandı!") : t("share", "Paylaş")}
             >
-              <Share2 className="w-4 h-4" />
+              {copiedLink ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600 animate-in zoom-in-50" />
+                  <span className="hidden sm:inline text-[11px] text-emerald-700">{t("copied", "Kopyalandı!")}</span>
+                </>
+              ) : (
+                <Share2 className="w-4 h-4" />
+              )}
             </button>
+
+            {/* Owner Listing Actions */}
             {isOwner && <ListingCardActions listing={listing} onChanged={fetchListing} />}
           </div>
+
         </PageContainer>
       </header>
 
@@ -354,13 +410,13 @@ const ListingDetailPage = () => {
           {/* ══════════════════════════════════════════════════════════════
               LEFT COLUMN: Media Gallery + Rich Storyline Content (7 Cols)
              ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-8">
+          <div className="lg:col-span-7 xl:col-span-7 space-y-7">
             
-            {/* 1. Gallery Stage */}
-            <div className="space-y-3">
+            {/* 1. Media Gallery Stage */}
+            <div className="space-y-3.5">
               <div 
                 ref={galleryRef} 
-                className="w-full aspect-[4/3] sm:aspect-[16/11] bg-white rounded-3xl overflow-hidden relative group border border-slate-200/80 shadow-xs flex items-center justify-center"
+                className="w-full aspect-[4/3] sm:aspect-[16/11] bg-gradient-to-b from-white to-slate-50/60 rounded-[28px] overflow-hidden relative group border border-slate-200/80 shadow-xs flex items-center justify-center transition-all"
               >
                 {selectedImage && !imageError ? (
                   <img
@@ -368,38 +424,44 @@ const ListingDetailPage = () => {
                     src={optimizeCloudinaryUrl(selectedImage, { width: 1400 })}
                     onError={() => setImageError(true)}
                     alt={`${listing.title} - ${selectedImageIndex + 1}`}
-                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-300 group-hover:scale-[1.02]"
+                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-500 ease-out group-hover:scale-[1.02]"
                     fetchpriority="high"
                     decoding="async"
                     loading="eager"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                    <Package className="w-12 h-12 mb-2 stroke-[1.5]" />
-                    <p className="text-xs font-semibold">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-3 text-slate-400">
+                      <Package className="w-8 h-8 stroke-[1.5]" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-500">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{t("seller_no_upload", "Satıcı bu ilan için görsel eklemedi.")}</p>
                   </div>
                 )}
 
-                {/* Gallery Navigation Controls */}
+                {/* Gallery Navigation Floating Controls */}
                 {images.length > 1 && (
                   <>
                     <button
                       onClick={showPreviousImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105 active:scale-95"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200/80 cursor-pointer hover:scale-105 active:scale-95"
                       aria-label={t("previous", "Önceki")}
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                       onClick={showNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200 cursor-pointer hover:scale-105 active:scale-95"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200/80 cursor-pointer hover:scale-105 active:scale-95"
                       aria-label={t("next", "Sonraki")}
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
 
-                    <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-xs">
-                      {selectedImageIndex + 1} / {images.length}
+                    {/* Image Counter Badge */}
+                    <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1.5 rounded-full shadow-xs border border-white/10 flex items-center gap-1">
+                      <span>{selectedImageIndex + 1}</span>
+                      <span className="opacity-50">/</span>
+                      <span>{images.length}</span>
                     </div>
                   </>
                 )}
@@ -412,14 +474,15 @@ const ListingDetailPage = () => {
                     <button
                       key={`${imgUrl}-${idx}`}
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`h-16 w-20 shrink-0 overflow-hidden rounded-2xl border-2 transition-all cursor-pointer bg-white ${
+                      className={`h-16 w-20 sm:h-18 sm:w-22 shrink-0 overflow-hidden rounded-2xl border-2 transition-all cursor-pointer bg-white ${
                         selectedImageIndex === idx
                           ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-xs scale-100'
                           : 'border-slate-200/80 opacity-60 hover:opacity-100 hover:border-slate-400 scale-95'
                       }`}
+                      aria-label={`Görsel ${idx + 1}`}
                     >
                       <img
-                        src={optimizeCloudinaryUrl(imgUrl, { width: 160 })}
+                        src={optimizeCloudinaryUrl(imgUrl, { width: 180 })}
                         alt=""
                         className="h-full w-full object-contain p-1"
                         loading="lazy"
@@ -431,27 +494,31 @@ const ListingDetailPage = () => {
             </div>
 
             {/* 2. Aura AI Smart Insights Highlight Card */}
-            <div className="bg-gradient-to-br from-indigo-50/70 via-purple-50/40 to-amber-50/50 rounded-3xl border border-indigo-100/90 p-6 shadow-xs relative overflow-hidden">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-xs">
+            <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-amber-50/50 rounded-3xl border border-indigo-100/90 p-6 sm:p-7 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-xs">
                     <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Aura AI İlan Analizi</h3>
-                    <p className="text-[11px] text-slate-500 font-medium">Yapay zeka destekli piyasa ve satıcı değerlendirmesi</p>
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                      Aura AI İlan Analizi
+                    </h3>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Yapay zeka destekli piyasa ve satıcı değerlendirmesi
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-                  className="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white/80 hover:bg-white border border-indigo-200/80 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+                  className="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white/90 hover:bg-white border border-indigo-200/80 px-3.5 py-1.5 rounded-xl transition-all shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0"
                 >
                   Soru Sor →
                 </button>
               </div>
 
               {/* AI Summary Content */}
-              <div className="text-xs leading-relaxed text-slate-700 font-medium bg-white/75 backdrop-blur-xs rounded-2xl p-4 border border-indigo-100/60">
+              <div className="text-xs leading-relaxed text-slate-700 font-medium bg-white/80 backdrop-blur-xs rounded-2xl p-4 sm:p-5 border border-indigo-100/70 shadow-2xs">
                 <AuraSummary type="listing" id={listing?.id} listing={listing} />
               </div>
             </div>
@@ -460,12 +527,12 @@ const ListingDetailPage = () => {
             <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
                 <FileText className="w-4 h-4 text-slate-400" />
-                <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
                   {t("about_this_item", "Ürün Açıklaması")}
                 </h2>
               </div>
               <div className={`text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden relative' : ''}`}>
-                {listing.description || 'Bu ilan için detaylı açıklama girilmemiş.'}
+                {listing.description || t("no_description_provided", "Bu ilan için detaylı açıklama girilmemiş.")}
                 {!isDescriptionExpanded && shouldClampDescription && (
                   <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                 )}
@@ -473,7 +540,7 @@ const ListingDetailPage = () => {
               {shouldClampDescription && (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="mt-3 inline-flex items-center gap-1.5 text-slate-900 font-extrabold text-xs uppercase tracking-wider hover:underline cursor-pointer"
+                  className="mt-3.5 inline-flex items-center gap-1.5 text-slate-900 font-black text-xs uppercase tracking-wider hover:underline cursor-pointer"
                 >
                   {isDescriptionExpanded ? (
                     <>
@@ -495,7 +562,7 @@ const ListingDetailPage = () => {
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
                   <Tag className="w-4 h-4 text-slate-400" />
-                  <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
                     {t("specifications", "Teknik Özellikler & Detaylar")}
                   </h2>
                 </div>
@@ -511,7 +578,7 @@ const ListingDetailPage = () => {
               <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
                 <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                  <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
+                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
                     {t("reviews", "Kullanıcı Değerlendirmeleri")}
                   </h2>
                 </div>
@@ -539,7 +606,7 @@ const ListingDetailPage = () => {
                     <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-900 border border-amber-200">
                       <Tag className="w-3 h-3 text-amber-600" />
                       {listing.campaignName || 'İndirim'}
-                      {discount && <span>−{discount}%</span>}
+                      {discount && <span>−%{discount}</span>}
                     </span>
                   )}
                   {listing.status !== LISTING_STATUS.ACTIVE && (
@@ -566,7 +633,7 @@ const ListingDetailPage = () => {
                   <span>•</span>
                   <div className="flex items-center gap-1 text-slate-600">
                     <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                    <span>{listing?.favoriteStats?.favoriteCount ?? listing?.favoriteCount ?? 0} {t("favorites", "favori")}</span>
+                    <span>{favoriteCount} {t("favorites", "favori")}</span>
                   </div>
                   {isOwner && (
                     <>
@@ -581,19 +648,19 @@ const ListingDetailPage = () => {
               </div>
 
               {/* ── Price & Stock Availability Card ── */}
-              <div className="p-5 rounded-2xl bg-gradient-to-b from-slate-50/90 via-slate-50/40 to-white border border-slate-200/80 shadow-2xs space-y-3">
+              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-2xs space-y-3.5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   {/* Price Block */}
                   <div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-base font-extrabold text-slate-500 select-none">
+                      <span className="text-base font-extrabold text-slate-400 select-none">
                         {listing.currency === 'TRY' ? '₺' : listing.currency === 'USD' ? '$' : listing.currency === 'EUR' ? '€' : listing.currency}
                       </span>
                       <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
                         {formatPrice(displayPrice, { decimals: 0 })}
                       </span>
                       {Number(displayPrice) % 1 !== 0 && (
-                        <span className="text-base font-extrabold text-slate-500 tabular-nums">
+                        <span className="text-base font-extrabold text-slate-400 tabular-nums">
                           ,{String(Number(displayPrice).toFixed(2)).split('.')[1]}
                         </span>
                       )}
@@ -605,7 +672,7 @@ const ListingDetailPage = () => {
                           {formatCurrency(listing.price, listing.currency)}
                         </span>
                         {discount && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100/90 text-emerald-800 text-[11px] font-black tracking-tight border border-emerald-200">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-black tracking-tight border border-emerald-200">
                             −%{discount} İndirim
                           </span>
                         )}
@@ -646,21 +713,48 @@ const ListingDetailPage = () => {
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Live Urgency / Sequential Social Proof Story Banner */}
-                {currentDetailStory && (
-                  <div 
-                    key={currentDetailStory.id}
-                    className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all duration-300 transform animate-in fade-in slide-in-from-bottom-1 shadow-xs ${currentDetailStory.bg}`}
-                  >
+              {/* Live Urgency / Social Proof Trigger Banner (Directly motivating the CTA) */}
+              {currentDetailStory && (
+                <div 
+                  key={currentDetailStory.id}
+                  className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 animate-in fade-in slide-in-from-bottom-1 ${currentDetailStory.bg}`}
+                >
+                  <div className="flex items-center gap-2.5">
                     {currentDetailStory.icon}
                     <span>{currentDetailStory.text}</span>
                   </div>
-                )}
-              </div>
+                  {currentDetailStory.badge && (
+                    <span className="text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded-md bg-white/80 border border-current/20 shrink-0">
+                      {currentDetailStory.badge}
+                    </span>
+                  )}
+                </div>
+              )}
 
-              {/* Action Buttons */}
-              {(canAddToCart || canMakeOffer) && (
+              {/* Action Buttons: Buyer Actions vs. Seller Management */}
+              {isOwner ? (
+                <div className="space-y-2.5 pt-1">
+                  <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
+                        <Settings className="w-3.5 h-3.5 text-indigo-600" />
+                        {t('seller_controls', 'İlan Sahibi Yönetim Paneli')}
+                      </span>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800">
+                        {t('your_listing', 'Senin İlanın')}
+                      </span>
+                    </div>
+                    <p className="text-xs text-indigo-950/80 font-medium">
+                      {t('seller_controls_desc', 'Fiyatını kır, stok güncelle, vitrine çıkar veya ilan durumunu değiştir.')}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <ListingCardActions listing={listing} onChanged={fetchListing} variant="button" />
+                    </div>
+                  </div>
+                </div>
+              ) : (canAddToCart || canMakeOffer) ? (
                 <div className="space-y-2.5 pt-1">
                   {canAddToCart && (
                     <button
@@ -697,12 +791,12 @@ const ListingDetailPage = () => {
                     </button>
                   )}
                 </div>
-              )}
+              ) : null}
 
               {/* Trust Badge Guarantee */}
               <div className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs font-bold text-slate-700">
                 <ShieldCheck className="w-4 h-4 text-slate-900 shrink-0" />
-                <span>Escrow Güvenceli Ödeme & Güvenli Teslimat</span>
+                <span>{t("escrow_guarantee_text", "Escrow Güvenceli Ödeme & Güvenli Teslimat")}</span>
               </div>
 
               {/* Integrated Seller Profile */}
@@ -735,7 +829,7 @@ const ListingDetailPage = () => {
 
       {/* ── Mobile Sticky Bottom Bar ── */}
       {(canAddToCart || canMakeOffer || !isOwner) && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 pb-safe shadow-2xl">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 py-3 pb-safe shadow-2xl">
           <div className="flex items-center justify-between gap-3">
             {/* Price */}
             <div className="flex-1 min-w-0">
@@ -745,7 +839,7 @@ const ListingDetailPage = () => {
               {hasCampaign ? (
                 <div className="flex items-center gap-2">
                   <p className="text-xs text-slate-400 line-through font-bold tabular-nums">{formatCurrency(listing.price, listing.currency)}</p>
-                  {discount && <span className="text-xs font-black text-slate-900">−{discount}%</span>}
+                  {discount && <span className="text-xs font-black text-slate-900">−%{discount}</span>}
                 </div>
               ) : (
                 <p className="text-xs text-slate-500 font-bold truncate">{locationLabel}</p>
@@ -754,7 +848,12 @@ const ListingDetailPage = () => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2 flex-1 justify-end">
-              {!isOwner && <ContactSellerButton listing={listing} className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors" />}
+              {!isOwner && (
+                <ContactSellerButton
+                  listing={listing}
+                  className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors"
+                />
+              )}
               {canMakeOffer && (
                 <button
                   onClick={() => setIsOfferModalOpen(true)}

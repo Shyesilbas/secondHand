@@ -15,6 +15,7 @@ import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
+import { getListingFavoriteCount } from '../../favorites/favorites.js';
 const ListingCard = ({
  listing,
  onDeleted,
@@ -44,13 +45,7 @@ const ListingCard = ({
  isInComparison
  } = useComparison();
  const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id);
-
- const initialFavCount = listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0;
- const [cardFavoriteCount, setCardFavoriteCount] = useState(initialFavCount);
-
- useEffect(() => {
-   setCardFavoriteCount(listing?.favoriteStats?.favoriteCount || listing?.favoriteCount || 0);
- }, [listing?.favoriteStats?.favoriteCount, listing?.favoriteCount]);
+ const cardFavoriteCount = getListingFavoriteCount(listing);
 
  // ── Sequential Micro-Story Social Proof Ticker ──
  const storyItems = useMemo(() => {
@@ -192,7 +187,7 @@ const ListingCard = ({
  {/* Top-right action buttons */}
  <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2 md:group-hover:translate-x-0">
  {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
- <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} onToggle={(stats) => setCardFavoriteCount(stats.favoriteCount)} size="sm" showCount={false} />
+ <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} size="sm" showCount={false} />
  {canAddToCart && <button onClick={e => {
  e.preventDefault();
  e.stopPropagation();
@@ -358,7 +353,7 @@ export default memo(ListingCard, (prevProps, nextProps) =>
  prevProps.listing?.reviewStats?.averageRating === nextProps.listing?.reviewStats?.averageRating &&
  prevProps.listing?.averageRating === nextProps.listing?.averageRating &&
  prevProps.listing?.rating === nextProps.listing?.rating &&
- prevProps.listing?.favoriteStats?.favoriteCount === nextProps.listing?.favoriteStats?.favoriteCount &&
+ getListingFavoriteCount(prevProps.listing) === getListingFavoriteCount(nextProps.listing) &&
  prevProps.listing?.favoriteStats?.isFavorited === nextProps.listing?.favoriteStats?.isFavorited &&
  prevProps.listing?.favoriteCount === nextProps.listing?.favoriteCount &&
  prevProps.isOwner === nextProps.isOwner &&

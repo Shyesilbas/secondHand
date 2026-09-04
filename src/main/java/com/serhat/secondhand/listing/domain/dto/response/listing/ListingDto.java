@@ -84,7 +84,7 @@ public abstract class ListingDto {
     private List<ReviewDto> reviews;
     private ListingViewStatsDto viewStats;
     private Long viewCount;
-    private Integer activeReservations;
+    private ListingSocialProofDto socialProof;
 
     private BigDecimal campaignPrice;
     private BigDecimal campaignDiscountAmount;
@@ -92,4 +92,17 @@ public abstract class ListingDto {
     private BigDecimal campaignValue;
     private UUID campaignId;
     private String campaignName;
+
+    /**
+     * Root-level getter for backward-compatibility with clients expecting listing.favoriteCount.
+     */
+    public Long getFavoriteCount() {
+        if (favoriteStats != null && favoriteStats.getFavoriteCount() != null) {
+            return favoriteStats.getFavoriteCount();
+        }
+        if (socialProof != null) {
+            return socialProof.getFavoriteCount();
+        }
+        return 0L;
+    }
 }

@@ -66,6 +66,7 @@ export const API_ENDPOINTS = {
  FILTER: '/v1/listings/filter',
  TRACK_VIEW: (id) => `/v1/listings/${id}/view`,
  ACTIVE_VIEWERS: (id) => `/v1/listings/${id}/active-viewers`,
+ SOCIAL_PROOF: (id) => `/v1/listings/${id}/social-proof`,
  VIEW_STATS: (id) => `/v1/listings/${id}/view-stats`,
  MY_LISTINGS_VIEW_STATS: '/v1/listings/my/view-stats',
  },

@@ -51,16 +51,32 @@ public class FavoriteStatsService {
         }
 
         List<Object[]> countResults = favoriteRepository.countByListingIds(uniqueListingIds);
-        Map<UUID, Long> favoriteCounts = countResults.stream()
-            .collect(Collectors.toMap(
-                result -> (UUID) result[0],
-                result -> (Long) result[1],
-                Long::sum
-            ));
+        Map<UUID, Long> favoriteCounts = new HashMap<>();
+        if (countResults != null) {
+            for (Object[] result : countResults) {
+                if (result != null && result.length >= 2 && result[0] != null) {
+                    try {
+                        UUID listingId = (result[0] instanceof UUID u) ? u : UUID.fromString(result[0].toString());
+                        long count = (result[1] instanceof Number n) ? n.longValue() : 0L;
+                        favoriteCounts.put(listingId, count);
+                    } catch (Exception e) {
+                        log.warn("Failed to parse count result for favorite stats: {}", e.getMessage());
+                    }
+                }
+            }
+        }
 
-        Set<UUID> userFavoriteSet = userId != null
-                ? new HashSet<>(favoriteRepository.findListingIdsByUserIdAndListingIdIn(userId, uniqueListingIds))
-                : Set.of();
+        Set<UUID> userFavoriteSet = new HashSet<>();
+        if (userId != null) {
+            try {
+                List<UUID> userFavs = favoriteRepository.findListingIdsByUserIdAndListingIdIn(userId, uniqueListingIds);
+                if (userFavs != null) {
+                    userFavoriteSet.addAll(userFavs);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fetch user favorites: {}", e.getMessage());
+            }
+        }
 
         return uniqueListingIds.stream()
                 .collect(Collectors.toMap(
