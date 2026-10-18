@@ -149,7 +149,7 @@ const OrderDetailsModal = React.memo(({
 
  if (!isOpen) return null;
 
- const headerTitle = isSellerView ? `Order #${selectedOrder?.orderNumber || orderId}` : selectedOrder?.name || `Order #${selectedOrder?.orderNumber || orderId}`;
+ const headerTitle = selectedOrder?.name || orderItems[0]?.listing?.title || t('order_details', 'Sipariş Detayı');
 
 const header = (
  <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
@@ -168,7 +168,6 @@ const header = (
  ) : (
  <>
  <h2 className="truncate text-lg font-semibold text-text-primary">{headerTitle}</h2>
- {!isSellerView && selectedOrder?.name ? <span className="text-sm tabular-nums text-text-tertiary">#{selectedOrder.orderNumber}</span> : null}
  {!isSellerView && selectedOrder && (
  <button type="button" onClick={() => setIsEditingName(true)} aria-label={t("edit_order_name")} className="rounded p-1 text-text-muted transition-colors hover:bg-background-secondary hover:text-text-secondary">
  <Pencil className="h-4 w-4" strokeWidth={1.5} />

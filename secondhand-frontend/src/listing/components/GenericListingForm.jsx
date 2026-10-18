@@ -17,48 +17,66 @@ import { getListingConfig } from '../config/listingConfig.js';
 import { validationRegistry } from '../validation/ValidationRegistry.js';
 import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { ImageIcon, MapPin, Package, FileText, CheckCircle2 } from 'lucide-react';
+import { ImageIcon, MapPin, Package, FileText, CheckCircle2, Check } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
 import { FieldError, SectionCard } from '../../common/components/forms/FormPrimitives.jsx';
 import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
+import { formatCurrency, parsePrice } from '../../common/formatters.js';
 
 /* ── Small UI Primitives ───────────────────────────────────── */
 
 const ToggleCardField = ({
- name,
- label,
- description,
- value,
- onToggle
-}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded border px-4 py-3.5 transition-all duration-200 ${value ? 'border-primary bg-primary/5 border-l-2 border-l-primary' : 'border-border-light bg-background-primary hover:border-border-focus'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
- if (e.key === 'Enter' || e.key === ' ') {
- e.preventDefault();
- onToggle();
- }
-}}>
- <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200 ${value ? 'border-primary bg-primary' : 'border-border-dark bg-background-primary'}`}>
- {value && <motion.svg initial={{
- scale: 0
- }} animate={{
- scale: 1
- }} transition={{
- type: 'spring',
- stiffness: 500,
- damping: 25
- }} className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
- <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
- </motion.svg>}
- </div>
- <input id={name} type="checkbox" name={name} checked={Boolean(value)} onChange={() => onToggle()} className="sr-only" />
- <div>
- <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-text-primary">
- {label}
- </label>
- {description && <p className="mt-0.5 text-body text-text-secondary">
- {description}
- </p>}
- </div>
- </div>;
+  name,
+  label,
+  description,
+  value,
+  onToggle
+}) => (
+  <div
+    className={`flex cursor-pointer select-none items-start gap-3 rounded border p-3.5 transition-colors ${
+      value
+        ? 'border-primary bg-background-secondary'
+        : 'border-border-light bg-background-primary hover:border-card-border-hover'
+    }`}
+    onClick={onToggle}
+    role="button"
+    tabIndex={0}
+    onKeyDown={e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onToggle();
+      }
+    }}
+  >
+    <div
+      className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors ${
+        value
+          ? 'border-primary bg-primary text-text-inverse'
+          : 'border-border bg-background-primary'
+      }`}
+    >
+      {value && <Check className="h-3 w-3 stroke-[2.5]" />}
+    </div>
+    <input
+      id={name}
+      type="checkbox"
+      name={name}
+      checked={Boolean(value)}
+      onChange={() => onToggle()}
+      className="sr-only"
+    />
+    <div className="min-w-0 flex-1">
+      <label htmlFor={name} className="block cursor-pointer text-xs font-semibold text-text-primary">
+        {label}
+      </label>
+      {description && (
+        <p className="mt-0.5 text-xs text-text-secondary leading-relaxed">
+          {description}
+        </p>
+      )}
+    </div>
+  </div>
+);
 
 /* ── Input Classes ─────────────────────────────────────────── */
 
@@ -87,12 +105,6 @@ const GenericListingForm = ({
  mutationFn: (data) => listingConfig.service.create(data)
  });
  const formSchema = listingConfig?.formSchema || null;
- const uiChrome = useMemo(() => !isEdit ? 'composer' : 'neutral', [isEdit]);
- const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
- const labelClass = 'text-text-primary';
- const descFieldClass = 'text-text-secondary';
- const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded border border-border-light bg-background-primary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT' : inputNormal, [uiChrome]);
- const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded border border-border bg-background-secondary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 focus:border-border focus:ring-2 focus:ring-status-error/20' : inputError, [uiChrome]);
  const wizardSteps = useMemo(() => {
  const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
  if (!steps.length) return steps;
@@ -270,184 +282,238 @@ const GenericListingForm = ({
  if (field.type === 'enum') {
  const options = typeof field.getOptions === 'function' ? field.getOptions(ctx) : null;
  const disabled = typeof field.disabledWhen === 'function' ? field.disabledWhen(ctx) : Boolean(field.disabled);
- return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
- <EnumDropdown label={label} enumKey={field.enumKey} value={value} onChange={v => {
- if (typeof field.onChange === 'function') {
- field.onChange({
- value: v,
- ctx
- });
- } else {
- handleDropdownChange(field.name, v);
- }
- }} options={options} disabled={disabled} usePortal={true} />
- {field.description && <p className={`mt-1.5 text-xs ${descFieldClass}`}>{field.description}</p>}
- <FieldError error={error} />
- </div>;
+ return (
+  <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
+   <EnumDropdown
+    label={label}
+    enumKey={field.enumKey}
+    value={value}
+    onChange={v => {
+     if (typeof field.onChange === 'function') {
+      field.onChange({ value: v, ctx });
+     } else {
+      handleDropdownChange(field.name, v);
+     }
+    }}
+    options={options}
+    disabled={disabled}
+    usePortal={true}
+   />
+   {field.description && <p className="mt-1 text-xs text-text-muted">{field.description}</p>}
+   <FieldError error={error} />
+  </div>
+ );
  }
  if (field.type === 'searchable') {
  const options = typeof field.getOptions === 'function' ? field.getOptions(ctx) : [];
  const disabled = typeof field.disabledWhen === 'function' ? field.disabledWhen(ctx) : Boolean(field.disabled);
- return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
- <SearchableDropdown label={label} options={options} disabled={disabled} selectedValues={value ? [value] : []} onSelectionChange={values => {
- const v = values?.[0] ?? '';
- if (typeof field.onChange === 'function') {
- field.onChange({
- value: v,
- ctx
- });
- } else {
- handleDropdownChange(field.name, v);
- }
- }} placeholder={field.placeholder || 'Select...'} searchPlaceholder={field.searchPlaceholder || 'Search...'} multiple={false} usePortal={true} />
- <FieldError error={error} />
- </div>;
+ return (
+  <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
+   <SearchableDropdown
+    label={label}
+    options={options}
+    disabled={disabled}
+    selectedValues={value ? [value] : []}
+    onSelectionChange={values => {
+     const v = values?.[0] ?? '';
+     if (typeof field.onChange === 'function') {
+      field.onChange({ value: v, ctx });
+     } else {
+      handleDropdownChange(field.name, v);
+     }
+    }}
+    placeholder={field.placeholder || t("select", "Seçiniz...")}
+    searchPlaceholder={field.searchPlaceholder || t("search", "Ara...")}
+    multiple={false}
+    usePortal={true}
+   />
+   <FieldError error={error} />
+  </div>
+ );
  }
  if (field.type === 'toggle') {
- return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
- <ToggleCardField name={field.name} label={field.label} description={field.description} value={Boolean(value)} chrome={toggleChrome} onToggle={() => {
- const next = !value;
- if (typeof field.onChange === 'function') {
- field.onChange({
- value: next,
- ctx
- });
- } else {
- ctx.setChecked(field.name, next);
- }
- }} />
- <FieldError error={error} />
- </div>;
+ return (
+  <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
+   <ToggleCardField
+    name={field.name}
+    label={field.label}
+    description={field.description}
+    value={Boolean(value)}
+    onToggle={() => {
+     const next = !value;
+     if (typeof field.onChange === 'function') {
+      field.onChange({ value: next, ctx });
+     } else {
+      ctx.setChecked(field.name, next);
+     }
+    }}
+   />
+   <FieldError error={error} />
+  </div>
+ );
  }
  if (field.type === 'textarea') {
- return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
- <label className={`mb-2 block text-sm font-medium ${labelClass}`}>{label}</label>
- <textarea name={field.name} value={value || ''} onChange={handleInputChange} rows={field.rows || 3} placeholder={field.placeholder || ''} className={`${error ? fieldInputErr : fieldInputOk} resize-none`} />
- <FieldError error={error} />
- </div>;
+ return (
+  <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
+   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</label>
+   <textarea
+    name={field.name}
+    value={value || ''}
+    onChange={handleInputChange}
+    rows={field.rows || 3}
+    placeholder={field.placeholder || ''}
+    className={`${error ? inputError : inputNormal} resize-none`}
+   />
+   <FieldError error={error} />
+  </div>
+ );
  }
  const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
- return <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
- <label className={`mb-2 block text-sm font-medium ${labelClass}`}>{label}</label>
- <input type={inputType} name={field.name} value={value ?? ''} onChange={handleInputChange} min={field.min} max={field.max} step={field.step} placeholder={field.placeholder || ''} className={error ? fieldInputErr : fieldInputOk} />
- <FieldError error={error} />
- </div>;
+ return (
+  <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
+   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</label>
+   <input
+    type={inputType}
+    name={field.name}
+    value={value ?? ''}
+    onChange={handleInputChange}
+    min={field.min}
+    max={field.max}
+    step={field.step}
+    placeholder={field.placeholder || ''}
+    className={error ? inputError : inputNormal}
+   />
+   <FieldError error={error} />
+  </div>
+ );
  };
 
  /* ── Step Renderers ────────────────────────────────────── */
 
  const renderDetailsStep = step => {
  const sections = step?.sections || [];
- return <div className="space-y-6">
- {sections.map(section => {
- const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
- if (!isVisible) return null;
- return <SectionCard key={section.id || section.title} title={section.title} description={section.description}>
- <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
- {(section.fields || []).map(renderField)}
- </div>
- </SectionCard>;
- })}
- </div>;
+ return (
+  <div className="space-y-8">
+   {sections.map(section => {
+    const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
+    if (!isVisible) return null;
+    return (
+     <SectionCard key={section.id || section.title} title={section.title} description={section.description}>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+       {(section.fields || []).map(renderField)}
+      </div>
+     </SectionCard>
+    );
+   })}
+  </div>
+ );
  };
  const renderMediaLocationStep = () => {
- return <div className="space-y-6">
- <SectionCard title={t("photos")} description="Upload images of your item" icon={ImageIcon}>
- <ImageUpload onImageUpload={imageUrl => ctx.setValue('imageUrl', imageUrl)} onImageRemove={() => ctx.setValue('imageUrl', '')} imageUrl={formData?.imageUrl} disabled={false} />
- </SectionCard>
- <SectionCard title={t("location")} description="Where is the item located?" icon={MapPin}>
- <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
- </SectionCard>
- </div>;
+ return (
+  <div className="space-y-8">
+   <SectionCard title={t("photos", "Görseller")} description={t("photos_description", "Ürününüzün fotoğraflarını ekleyin")} icon={ImageIcon}>
+    <ImageUpload onImageUpload={imageUrl => ctx.setValue('imageUrl', imageUrl)} onImageRemove={() => ctx.setValue('imageUrl', '')} imageUrl={formData?.imageUrl} disabled={false} />
+   </SectionCard>
+   <SectionCard title={t("location", "Konum")} description={t("location_description", "Ürün nerede bulunuyor?")} icon={MapPin}>
+    <LocationFields formData={formData} errors={errors} onInputChange={handleInputChange} />
+   </SectionCard>
+  </div>
+ );
  };
  const formatSummaryValue = (field, rawValue) => {
  const text = toDisplayText(rawValue, enums, field?.enumKey);
  return text ?? '';
  };
  const renderSummaryStep = () => {
- const basics = [{
- label: 'Title',
- value: String(formData?.title ?? '')
- }, {
- label: 'Price',
- value: formData?.price != null && String(formData.price).trim() ? `${formData.price} ${formData?.currency || ''}`.trim() : ''
- }, {
- label: 'Quantity',
- value: formData?.quantity != null && String(formData.quantity).trim() ? String(formData.quantity) : ''
- }].filter(x => String(x.value || '').trim());
- const location = [{
- label: 'City',
- value: String(formData?.city ?? '')
- }, {
- label: 'District',
- value: String(formData?.district ?? '')
- }, {
- label: 'Neighborhood',
- value: formData?.neighborhoodKey ? formData.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : ''
- }].filter(x => String(x.value || '').trim());
+ const basics = [
+  { label: t("listing_title", "Başlık"), value: String(formData?.title ?? '') },
+  {
+   label: t("price", "Fiyat"),
+   value: formData?.price != null && String(formData.price).trim()
+    ? formatCurrency(parsePrice(formData.price), formData?.currency)
+    : ''
+  },
+  {
+   label: t("quantity", "Miktar"),
+   value: formData?.quantity != null && String(formData.quantity).trim() ? String(formData.quantity) : ''
+  }
+ ].filter(x => String(x.value || '').trim());
+
+ const location = [
+  { label: t("city_i_l", "Şehir"), value: String(formData?.city ?? '') },
+  { label: t("district_i_l_e", "İlçe"), value: String(formData?.district ?? '') },
+  {
+   label: t("neighborhood_mahalle", "Mahalle"),
+   value: formData?.neighborhoodKey ? formData.neighborhoodKey.split('_').pop().replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : ''
+  }
+ ].filter(x => String(x.value || '').trim());
+
  const detailFields = [];
  (formSchema?.steps || []).forEach(step => {
  if (step?.kind !== 'details') return;
  (step?.sections || []).forEach(section => {
- const sectionVisible = typeof section.visibleWhen === 'function' ? Boolean(section.visibleWhen(ctx)) : true;
- if (!sectionVisible) return;
- (section.fields || []).forEach(field => {
- const visible = typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
- if (!visible) return;
- const value = formatSummaryValue(field, formData?.[field.name]);
- if (!value) return;
- detailFields.push({
- label: field.label || field.name,
- value
- });
- });
+  const sectionVisible = typeof section.visibleWhen === 'function' ? Boolean(section.visibleWhen(ctx)) : true;
+  if (!sectionVisible) return;
+  (section.fields || []).forEach(field => {
+   const visible = typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
+   if (!visible) return;
+   const value = formatSummaryValue(field, formData?.[field.name]);
+   if (!value) return;
+   detailFields.push({
+    label: field.label || field.name,
+    value
+   });
+  });
  });
  });
  const typeLabel = listingConfig?.label || listingType;
- return <div className="space-y-4">
- {/* Hero preview card */}
- <div className="bg-background-primary ring-1 ring-border-light rounded overflow-hidden">
- <div className="p-5 sm:p-6">
- <div className="flex items-start justify-between gap-4">
- <div className="min-w-0 flex-1">
- <span className="inline-flex items-center rounded bg-background-secondary border border-border-light px-2.5 py-1 text-xs font-semibold text-text-secondary">
- {typeLabel}
- </span>
- <h3 className={`text-sm font-medium text-text-primary mt-2.5 tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
- {formData?.description && <p className={`mt-2 whitespace-pre-wrap line-clamp-3 text-sm leading-relaxed ${descFieldClass}`}>{formData.description}</p>}
- </div>
- {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded border border-border-light bg-background-secondary">
- <img src={formData.imageUrl} alt={t("listing")} className="h-full w-full object-cover" />
- </div>}
- </div>
- </div>
- </div>
+ return (
+  <div className="space-y-6">
+   {/* Hero preview card */}
+   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 rounded border border-border-light bg-background-secondary p-4">
+    <div className="min-w-0 flex-1">
+     <span className="inline-flex items-center rounded-sm border border-border-light bg-background-primary px-2 py-0.5 text-xs font-semibold text-text-secondary">
+      {typeLabel}
+     </span>
+     <h2 className="mt-2 text-base font-semibold text-text-primary">
+      {formData?.title || t("untitled_listing", "İsimsiz İlan")}
+     </h2>
+     {formData?.description && (
+      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-text-secondary">
+       {formData.description}
+      </p>
+     )}
+     {formData?.price && (
+      <p className="mt-2.5 text-base font-semibold tabular-nums text-text-primary">
+       {formatCurrency(parsePrice(formData.price), formData?.currency)}
+      </p>
+     )}
+    </div>
+    {formData?.imageUrl && (
+     <div className="h-20 w-20 shrink-0 overflow-hidden rounded border border-border-light bg-background-primary">
+      <img src={formData.imageUrl} alt={t("listing", "Listing")} className="h-full w-full object-cover" />
+     </div>
+    )}
+   </div>
 
- {basics.length > 0 && <SummarySection title={t("basics")} icon={Package} rows={basics} />}
- {location.length > 0 && <SummarySection title={t("location")} icon={MapPin} rows={location} />}
- {detailFields.length > 0 && <SummarySection title={t("details")} icon={FileText} rows={detailFields} />}
+   {basics.length > 0 && <SummarySection title={t("basics", "Temel Bilgiler")} icon={Package} rows={basics} />}
+   {location.length > 0 && <SummarySection title={t("location", "Konum")} icon={MapPin} rows={location} />}
+   {detailFields.length > 0 && <SummarySection title={t("details", "Detaylar")} icon={FileText} rows={detailFields} />}
 
- {/* Ready indicator */}
- <motion.div initial={{
- opacity: 0,
- y: 8
- }} animate={{
- opacity: 1,
- y: 0
- }} transition={{
- delay: 0.3
- }} className="flex items-center gap-2.5 rounded border border-border bg-background-secondary px-4 py-3">
- <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
- <p className="text-sm text-status-success font-medium">{t("your_listing_is_ready_to_publish")}</p>
- </motion.div>
- </div>;
+   {/* Ready indicator */}
+   <div className="flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3.5 py-2.5">
+    <span className="h-1.5 w-1.5 rounded-full bg-status-success shrink-0" />
+    <p className="text-xs font-medium text-text-secondary">{t("your_listing_is_ready_to_publish", "İlanınız yayınlanmaya hazır.")}</p>
+   </div>
+  </div>
+ );
  };
  const renderStep = stepId => {
  const step = wizardSteps?.find(s => Number(s.id) === Number(stepId)) || null;
  const kind = step?.kind || (stepId === 1 ? 'basics' : stepId === totalSteps ? 'mediaLocation' : 'details');
  if (kind === 'basics') {
  const showQuantity = Boolean(step?.showQuantity);
- return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} showQuantity={showQuantity} wizardTone={uiChrome === 'composer' ? 'composer' : 'default'} />;
+ return <ListingBasics formData={formData} errors={errors} onInputChange={handleInputChange} enums={enums} showQuantity={showQuantity} />;
  }
  if (kind === 'mediaLocation') return renderMediaLocationStep();
  if (kind === 'details') return renderDetailsStep(step);
@@ -502,25 +568,21 @@ const SummarySection = ({
  icon: Icon,
  rows
 }) => {
- return <div className="bg-background-primary ring-1 ring-border-light rounded overflow-hidden">
- <div className="border-b border-border-light bg-background-secondary px-4 py-2.5 flex items-center gap-2">
- {Icon && <Icon className="h-3.5 w-3.5 text-text-secondary" />}
- <h4 className="text-xs font-semibold text-text-secondary">{title}</h4>
- </div>
- <div className="divide-y divide-border-light">
- {rows.map((row, i) => <motion.div key={`${row.label}-${row.value}`} initial={{
- opacity: 0,
- x: -8
- }} animate={{
- opacity: 1,
- x: 0
- }} transition={{
- delay: i * 0.05
- }} className="flex items-start justify-between gap-3 px-4 py-3">
- <span className="text-body text-text-secondary">{row.label}</span>
- <span className="text-right text-sm font-medium tabular-nums text-text-primary">{row.value}</span>
- </motion.div>)}
- </div>
- </div>;
+ return (
+  <div className="rounded border border-border-light bg-background-primary overflow-hidden">
+   <div className="border-b border-border-light bg-background-secondary/40 px-4 py-2.5 flex items-center gap-2">
+    {Icon && <Icon className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />}
+    <h4 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">{title}</h4>
+   </div>
+   <div className="divide-y divide-border-light">
+    {rows.map((row) => (
+     <div key={`${row.label}-${row.value}`} className="flex items-start justify-between gap-4 px-4 py-2 text-xs">
+      <span className="text-text-secondary">{row.label}</span>
+      <span className="text-right font-medium tabular-nums text-text-primary">{row.value}</span>
+     </div>
+    ))}
+   </div>
+  </div>
+ );
 };
 export default GenericListingForm;

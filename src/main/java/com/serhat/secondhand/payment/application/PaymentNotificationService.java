@@ -130,11 +130,10 @@ public class PaymentNotificationService {
         try {
             String subject = emailConfig.getPaymentVerificationSubject();
             String base = String.format(
-                    "<div style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; text-align: center; margin: 20px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.02);\">" +
-                            "  <div style=\"font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;\">Ödeme Doğrulama Kodunuz</div>" +
-                            "  <div style=\"display: inline-block; background-color: #ffffff; border: 2px dashed #6366f1; padding: 12px 32px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #4338ca; font-family: 'SF Mono', Consolas, Monaco, monospace; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);\">%s</div>" +
-                            "  <div style=\"margin-top: 14px; font-size: 13px; color: #64748b; font-weight: 500;\">⏱️ Bu kod <strong>%d dakika</strong> boyunca geçerlidir.</div>" +
-                            "  <div style=\"margin-top: 12px; background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 8px 14px; font-size: 12px; color: #b91c1c; font-weight: 500; display: inline-block;\">🔒 Güvenliğiniz için bu kodu kimseyle paylaşmayınız.</div>" +
+                    "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">" +
+                            "  <div class=\"code-label\" style=\"font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px;\">Ödeme Doğrulama Kodunuz</div>" +
+                            "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>" +
+                            "  <div style=\"margin-top: 6px; font-size: 12px; color: #64748b;\">Bu kod <strong>%d dakika</strong> boyunca geçerlidir. Güvenliğiniz için bu kodu kimseyle paylaşmayınız.</div>" +
                             "</div>",
                     code, verificationConfig.getExpiryMinutes());
             String content = base + (extraDetails != null ? extraDetails : "");

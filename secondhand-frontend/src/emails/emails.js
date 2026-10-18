@@ -78,36 +78,89 @@ export const EMAIL_TYPE_LABELS = {
   [EMAIL_TYPES.AUDIT_ALERT]: 'Güvenlik Uyarısı'
 };
 
-export const EMAIL_TYPE_BADGE_COLORS = {
-  [EMAIL_TYPES.VERIFICATION]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.VERIFICATION_CODE]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.PASSWORD_RESET]: 'bg-background-secondary text-status-error-text border-border',
-  [EMAIL_TYPES.WELCOME]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.PHONE_UPDATE]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.NOTIFICATION]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.OFFER_RECEIVED]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.OFFER_COUNTER_RECEIVED]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.OFFER_ACCEPTED]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.OFFER_REJECTED]: 'bg-background-secondary text-status-error-text border-border',
-  [EMAIL_TYPES.OFFER_EXPIRED]: 'bg-background-tertiary text-text-secondary border-border',
-  [EMAIL_TYPES.OFFER_COMPLETED]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.PROMOTIONAL]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.PAYMENT_SUCCESS]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.PAYMENT_RECEIPT]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-background-tertiary text-text-secondary border-border',
-  [EMAIL_TYPES.AGREEMENT_UPDATE]: 'bg-background-tertiary text-text-secondary border-border',
-  [EMAIL_TYPES.SYSTEM]: 'bg-background-tertiary text-text-secondary border-border',
-  [EMAIL_TYPES.ORDER_CONFIRMATION]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.ORDER_CANCELLED]: 'bg-background-secondary text-status-error-text border-border',
-  [EMAIL_TYPES.ORDER_COMPLETED]: 'bg-background-secondary text-status-success-text border-border',
-  [EMAIL_TYPES.ORDER_REFUNDED]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.SALE_NOTIFICATION]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.MEMBERSHIP_ACTIVATED]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.MEMBERSHIP_UPGRADE]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.GREAT_SELLER]: 'bg-background-secondary text-status-warning-text border-border',
-  [EMAIL_TYPES.PRICE_CHANGE]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.NEW_LISTING]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.NEW_LISTING_NOTIFICATION]: 'bg-background-secondary text-text-primary border-border',
-  [EMAIL_TYPES.AUDIT_ALERT]: 'bg-background-secondary text-status-error-text border-border'
+export const EMAIL_TYPE_DOT_COLORS = {
+  [EMAIL_TYPES.VERIFICATION]: 'bg-status-warning',
+  [EMAIL_TYPES.VERIFICATION_CODE]: 'bg-status-warning',
+  [EMAIL_TYPES.PASSWORD_RESET]: 'bg-status-error',
+  [EMAIL_TYPES.WELCOME]: 'bg-status-success',
+  [EMAIL_TYPES.PHONE_UPDATE]: 'bg-status-warning',
+  [EMAIL_TYPES.NOTIFICATION]: 'bg-primary',
+  [EMAIL_TYPES.OFFER_RECEIVED]: 'bg-primary',
+  [EMAIL_TYPES.OFFER_COUNTER_RECEIVED]: 'bg-primary',
+  [EMAIL_TYPES.OFFER_ACCEPTED]: 'bg-status-success',
+  [EMAIL_TYPES.OFFER_REJECTED]: 'bg-status-error',
+  [EMAIL_TYPES.OFFER_EXPIRED]: 'bg-text-muted',
+  [EMAIL_TYPES.OFFER_COMPLETED]: 'bg-status-success',
+  [EMAIL_TYPES.PROMOTIONAL]: 'bg-primary',
+  [EMAIL_TYPES.PAYMENT_VERIFICATION]: 'bg-status-warning',
+  [EMAIL_TYPES.PAYMENT_SUCCESS]: 'bg-status-success',
+  [EMAIL_TYPES.PAYMENT_RECEIPT]: 'bg-status-success',
+  [EMAIL_TYPES.AGREEMENT_UPDATED]: 'bg-text-muted',
+  [EMAIL_TYPES.AGREEMENT_UPDATE]: 'bg-text-muted',
+  [EMAIL_TYPES.SYSTEM]: 'bg-text-muted',
+  [EMAIL_TYPES.ORDER_CONFIRMATION]: 'bg-status-success',
+  [EMAIL_TYPES.ORDER_CANCELLED]: 'bg-status-error',
+  [EMAIL_TYPES.ORDER_COMPLETED]: 'bg-status-success',
+  [EMAIL_TYPES.ORDER_REFUNDED]: 'bg-status-warning',
+  [EMAIL_TYPES.SALE_NOTIFICATION]: 'bg-status-success',
+  [EMAIL_TYPES.MEMBERSHIP_ACTIVATED]: 'bg-primary',
+  [EMAIL_TYPES.MEMBERSHIP_UPGRADE]: 'bg-primary',
+  [EMAIL_TYPES.GREAT_SELLER]: 'bg-status-success',
+  [EMAIL_TYPES.PRICE_CHANGE]: 'bg-primary',
+  [EMAIL_TYPES.NEW_LISTING]: 'bg-primary',
+  [EMAIL_TYPES.NEW_LISTING_NOTIFICATION]: 'bg-primary',
+  [EMAIL_TYPES.AUDIT_ALERT]: 'bg-status-error'
 };
+
+export const EMAIL_TYPE_BADGE_COLORS = Object.fromEntries(
+  Object.values(EMAIL_TYPES).map((type) => [
+    type,
+    'bg-background-secondary text-text-secondary border-border'
+  ])
+);
+
+const EMOJI_STRIP_RE = /(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]|\u{FE0F}|\u{200D})/gu;
+
+export const stripEmailEmojis = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text.replace(EMOJI_STRIP_RE, '');
+};
+
+export const extractEmailPreview = (rawContent, subject = '') => {
+  if (!rawContent || typeof rawContent !== 'string') return '';
+
+  const htmlEndIdx = rawContent.toLowerCase().indexOf('</html>');
+  const bounded = htmlEndIdx !== -1 ? rawContent.slice(0, htmlEndIdx + 7) : rawContent;
+
+  const cleaned = bounded
+    .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, ' ')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<div[^>]*style=["'][^"']*display\s*:\s*none[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
+    .replace(/<div[^>]*class=["'][^"']*(?:header|footer|brand-badge|brand-name)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&copy;|\u00A9/gi, '')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"');
+
+  let text = stripEmailEmojis(cleaned).replace(/\s+/g, ' ').trim();
+
+  if (subject) {
+    const cleanSubj = stripEmailEmojis(String(subject)).trim();
+    if (cleanSubj && text.toLowerCase().startsWith(cleanSubj.toLowerCase())) {
+      text = text.slice(cleanSubj.length).trim();
+    }
+  }
+
+  text = text
+    .replace(/^Merhaba\s+[^,]{1,40},\s*/i, '')
+    .replace(/\s*Saygılarımızla,?\s*SecondHand\s*Ekibi.*$/i, '')
+    .replace(/\s*20\d{2}\s*SecondHand.*$/i, '')
+    .trim();
+
+  return text;
+};
+

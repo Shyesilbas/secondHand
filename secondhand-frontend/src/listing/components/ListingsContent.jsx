@@ -28,8 +28,8 @@ const ListingsContent = React.memo(({
  const { t } = useTranslation();
  const hasSearch = Boolean(searchTerm) && searchMode !== 'none';
  const categoryLabel = getListingTypeLabel?.(filters.listingType) || 'this category';
- return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[60vh]">
- {!isLoading && (!searchTerm || searchMode === 'none') && <div className="mb-8">
+ return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-[60vh]">
+ {!isLoading && (!searchTerm || searchMode === 'none') && <div className="mb-6">
  <FilterStatus totalElements={totalElements} filters={filters} getListingTypeLabel={getListingTypeLabel} onResetFilters={onResetFilters} updateFilters={updateFilters} />
  </div>}
 

@@ -110,103 +110,87 @@ const ImageUpload = ({
  }
  setError(null);
  };
- return <div className="w-full">
- <AnimatePresence mode="wait">
- {imageUrl ? <motion.div key="preview" initial={{
- opacity: 0,
- scale: 0.95
- }} animate={{
- opacity: 1,
- scale: 1
- }} exit={{
- opacity: 0,
- scale: 0.95
- }} className="relative group">
- <div className="w-full h-72 bg-background-secondary/50 rounded overflow-hidden border border-border/40 flex items-center justify-center">
- <img src={imageUrl} alt={t("product")} className="w-full h-full object-contain transition-transform duration-300" />
- </div>
- {!disabled && <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-5 rounded">
- <motion.button whileHover={{
- scale: 1.05
- }} whileTap={{
- scale: 0.95
- }} type="button" onClick={handleRemoveImage} className="bg-background-primary text-status-error px-5 py-2.5 rounded text-sm font-medium hover:bg-background-primary transition-colors flex items-center gap-1.5 focus:outline-none">
- <X className="w-4 h-4" />{t("remove")}</motion.button>
- </div>}
- {/* Success badge */}
- <motion.div initial={{
- opacity: 0,
- scale: 0,
- y: 10
- }} animate={{
- opacity: 1,
- scale: 1,
- y: 0
- }} transition={{
- delay: 0.2,
- type: 'spring',
- stiffness: 400,
- damping: 20
- }} className="absolute top-3 right-3 flex items-center gap-1.5 rounded bg-status-success px-2.5 py-1 text-xs font-medium text-white shadow-sm">
- <CheckCircle2 className="w-3 w-3" />{t("uploaded")}</motion.div>
- </motion.div> : <motion.div key="dropzone" initial={{
- opacity: 0
- }} animate={{
- opacity: 1
- }} exit={{
- opacity: 0
- }} className={`w-full h-56 rounded flex flex-col items-center justify-center cursor-pointer transition-all duration-200 relative overflow-hidden
- ${dragActive ? 'bg-background-secondary' : 'bg-background-primary hover:bg-background-secondary/50'}
- ${disabled ? 'cursor-not-allowed opacity-40 bg-background-secondary' : ''}
- ${isUploading ? 'pointer-events-none' : ''}
- border-2 border-dashed ${dragActive ? 'border-border-dark' : error ? 'border-status-error' : 'border-border'}
- `} onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onClick={handleClick}>
+  return (
+    <div className="w-full">
+      <AnimatePresence mode="wait">
+        {imageUrl ? (
+          <div key="preview" className="relative overflow-hidden rounded border border-border-light bg-background-secondary">
+            <div className="flex h-56 w-full items-center justify-center p-3">
+              <img
+                src={imageUrl}
+                alt={t("product", "Product")}
+                className="h-full w-full object-contain"
+              />
+            </div>
+            {!disabled && (
+              <div className="flex items-center justify-between border-t border-border-light bg-background-primary px-3.5 py-2">
+                <div className="inline-flex items-center gap-1.5 text-xs text-text-secondary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-status-success" />
+                  <span>{t("uploaded", "Yüklendi")}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="inline-flex items-center gap-1 rounded border border-border-light bg-background-primary px-2.5 py-1 text-xs font-semibold text-status-error transition-colors hover:bg-background-secondary"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  <span>{t("remove", "Kaldır")}</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div
+            key="dropzone"
+            className={`relative flex h-44 w-full cursor-pointer flex-col items-center justify-center rounded border border-dashed transition-colors ${
+              dragActive
+                ? 'border-primary bg-background-secondary'
+                : error
+                ? 'border-status-error bg-background-secondary/30'
+                : 'border-border bg-background-secondary/20 hover:border-card-border-hover hover:bg-background-secondary/50'
+            } ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${isUploading ? 'pointer-events-none' : ''}`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={handleClick}
+          >
+            {isUploading ? (
+              <div className="flex flex-col items-center text-center">
+                <div className="mb-3 h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
+                <p className="text-xs font-semibold text-text-primary">{t("uploading", "Yükleniyor...")}</p>
+                <p className="mt-0.5 text-xs text-text-muted">{t("compressing_and_uploading_your_image", "Görsel işleniyor ve yükleniyor")}</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center p-4 text-center">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded bg-background-tertiary text-text-secondary">
+                  {dragActive ? <Upload className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}
+                </div>
+                <p className="text-xs font-semibold text-text-primary">
+                  {dragActive ? t("drop_to_upload", "Yüklemek için bırakın") : t("drag_drop_click", "Görsel yüklemek için sürükleyin veya seçin")}
+                </p>
+                <p className="mt-0.5 text-xs text-text-muted">{t("png_jpg_or_gif_max_10mb", "PNG, JPG veya GIF (maks. 10MB)")}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </AnimatePresence>
 
- {isUploading ? <div className="flex flex-col items-center relative z-10">
- <div className="relative mb-4">
- <div className="w-12 h-12 rounded-full border-2 border-border border-t-secondary-600 animate-spin" />
- </div>
- <p className="text-sm font-medium text-text-secondary">{t("uploading")}</p>
- <p className="mt-1 text-xs text-text-muted">{t("compressing_and_uploading_your_image")}</p>
- </div> : <div className="flex flex-col items-center p-6 text-center relative z-10">
- <motion.div animate={dragActive ? {
- scale: 1.1,
- y: -4
- } : {
- scale: 1,
- y: 0
- }} transition={{
- type: 'spring',
- stiffness: 400,
- damping: 20
- }} className={`p-3.5 rounded mb-3 transition-colors ${dragActive ? 'bg-secondary-200/60' : 'bg-background-tertiary/60'}`}>
- {dragActive ? <Upload className="w-6 h-6 text-text-secondary" /> : <ImageIcon className="w-6 h-6 text-text-muted" />}
- </motion.div>
- <p className="text-sm font-medium text-text-secondary mb-1">
- {dragActive ? 'Drop to upload' : 'Drag & drop or click to browse'}
- </p>
- <p className="text-xs text-text-muted">{t("png_jpg_or_gif_max_10mb")}</p>
- </div>}
- </motion.div>}
- </AnimatePresence>
- 
- <AnimatePresence>
- {error && <motion.div initial={{
- opacity: 0,
- y: -4
- }} animate={{
- opacity: 1,
- y: 0
- }} exit={{
- opacity: 0,
- y: -4
- }} className="mt-3 px-3.5 py-2.5 bg-background-secondary border border-border rounded flex items-start gap-2 text-body text-status-error-text">
- <X className="w-3.5 h-3.5 shrink-0 mt-0.5" />
- <span>{error}</span>
- </motion.div>}
- </AnimatePresence>
+      {error && (
+        <div className="mt-2.5 flex items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-xs text-status-error">
+          <X className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
- <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" disabled={disabled || isUploading} />
- </div>;
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+        disabled={disabled || isUploading}
+      />
+    </div>
+  );
 };
 export default ImageUpload;

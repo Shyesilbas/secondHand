@@ -83,10 +83,10 @@ public class UserNotificationService {
         try {
             String subject = emailConfig.getVerificationSubject();
             String content = String.format(
-                "<div style=\"text-align: center; margin: 24px 0;\">" +
-                "  <p style=\"margin-bottom: 10px; font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;\">Doğrulama Kodunuz</p>" +
-                "  <div style=\"display: inline-block; background-color: #f0fdf4; border: 1px solid #a7f3d0; padding: 14px 32px; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #047857; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\">%s</div>" +
-                "  <p style=\"margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 600;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
+                "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">" +
+                "  <div class=\"code-label\" style=\"margin-bottom: 6px; font-size: 12px; color: #475569; font-weight: 600;\">Doğrulama Kodunuz</div>" +
+                "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>" +
+                "  <p style=\"margin: 6px 0 0 0; font-size: 12px; color: #64748b;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
                 "</div>",
                 verificationCode
             );
@@ -109,10 +109,10 @@ public class UserNotificationService {
         try {
             String subject = emailConfig.getPasswordResetSubject();
             String content = String.format(
-                "<div style=\"text-align: center; margin: 24px 0;\">" +
-                "  <p style=\"margin-bottom: 10px; font-size: 13px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;\">Şifre Sıfırlama Kodunuz</p>" +
-                "  <div style=\"display: inline-block; background-color: #f0fdf4; border: 1px solid #a7f3d0; padding: 14px 32px; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #047857; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;\">%s</div>" +
-                "  <p style=\"margin-top: 10px; font-size: 12px; color: #94a3b8; font-weight: 600;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
+                "<div class=\"code-card\" style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin: 8px 0;\">" +
+                "  <div class=\"code-label\" style=\"margin-bottom: 6px; font-size: 12px; color: #475569; font-weight: 600;\">Şifre Sıfırlama Kodunuz</div>" +
+                "  <div class=\"code-value\" style=\"display: inline-block; background-color: #ffffff; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-size: 24px; font-weight: 600; letter-spacing: 6px; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-variant-numeric: tabular-nums;\">%s</div>" +
+                "  <p style=\"margin: 6px 0 0 0; font-size: 12px; color: #64748b;\">Bu güvenlik kodu 15 dakika boyunca geçerlidir.</p>" +
                 "</div>",
                 verificationCode
             );

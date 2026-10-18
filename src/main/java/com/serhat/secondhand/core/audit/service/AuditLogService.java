@@ -90,43 +90,39 @@ public class AuditLogService {
         String formattedTime = formatTimestamp(timestamp);
         String formattedAgent = simplifyUserAgent(userAgent);
 
-        String statusBadgeColor = isWarning ? "#dc2626" : "#16a34a";
-        String statusBgColor = isWarning ? "#fef2f2" : "#f0fdf4";
-        String warningBoxBg = isWarning ? "#fffbe6" : "#f0fdf4";
-        String warningBoxBorder = isWarning ? "#ffe58f" : "#bbf7d0";
-        String warningBoxTextColor = isWarning ? "#8c6b00" : "#166534";
+        String statusColor = isWarning ? "#dc2626" : "#0f172a";
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<p style='font-size: 15px; color: #334155; margin-bottom: 20px; line-height: 1.6;'>").append(description).append("</p>");
+        sb.append("<p style='font-size: 13px; color: #334155; margin-bottom: 8px; line-height: 1.5;'>").append(description).append("</p>");
 
         // Detail Box Card
-        sb.append("<div style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;'>");
-        sb.append("<h3 style='margin: 0 0 16px 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b;'>Erişim Detayları</h3>");
+        sb.append("<div class='details-box' style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;'>");
+        sb.append("<div style='margin: 0 0 6px 0; font-size: 13px; font-weight: 600; color: #0f172a;'>Erişim Detayları</div>");
 
-        sb.append("<table style='width: 100%; border-collapse: collapse; font-size: 14px;'>");
+        sb.append("<table class='details-table' style='width: 100%; border-collapse: collapse; font-size: 13px;'>");
 
         // Event Type row
         sb.append("<tr>");
-        sb.append("<td style='padding: 8px 0; color: #64748b; font-weight: 500; width: 130px;'>İşlem Türü:</td>");
-        sb.append("<td style='padding: 8px 0; font-weight: 600; color: #0f172a;'><span style='display: inline-block; padding: 3px 10px; background-color: ").append(statusBgColor).append("; color: ").append(statusBadgeColor).append("; border-radius: 6px; font-size: 12px; font-weight: 700;'>").append(eventTypeTitle).append("</span></td>");
+        sb.append("<td class='detail-key' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 500;'>İşlem Türü</td>");
+        sb.append("<td class='detail-val' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600; text-align: right; color: ").append(statusColor).append(";'>").append(eventTypeTitle).append("</td>");
         sb.append("</tr>");
 
         // IP Row
         sb.append("<tr>");
-        sb.append("<td style='padding: 8px 0; color: #64748b; font-weight: 500;'>IP Adresi:</td>");
-        sb.append("<td style='padding: 8px 0; font-weight: 600; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;'>").append(formattedIp).append("</td>");
+        sb.append("<td class='detail-key' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 500;'>IP Adresi</td>");
+        sb.append("<td class='detail-val' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600; text-align: right; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;'>").append(formattedIp).append("</td>");
         sb.append("</tr>");
 
         // Device Row
         sb.append("<tr>");
-        sb.append("<td style='padding: 8px 0; color: #64748b; font-weight: 500;'>Cihaz / Tarayıcı:</td>");
-        sb.append("<td style='padding: 8px 0; font-weight: 600; color: #0f172a;'>").append(formattedAgent).append("</td>");
+        sb.append("<td class='detail-key' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 500;'>Cihaz / Tarayıcı</td>");
+        sb.append("<td class='detail-val' style='padding: 5px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600; text-align: right; color: #0f172a;'>").append(formattedAgent).append("</td>");
         sb.append("</tr>");
 
         // Time Row
         sb.append("<tr>");
-        sb.append("<td style='padding: 8px 0; color: #64748b; font-weight: 500;'>Tarih ve Saat:</td>");
-        sb.append("<td style='padding: 8px 0; font-weight: 600; color: #0f172a;'>").append(formattedTime).append("</td>");
+        sb.append("<td class='detail-key' style='padding: 5px 0; color: #64748b; font-weight: 500;'>Tarih ve Saat</td>");
+        sb.append("<td class='detail-val' style='padding: 5px 0; font-weight: 600; text-align: right; color: #0f172a; font-variant-numeric: tabular-nums;'>").append(formattedTime).append("</td>");
         sb.append("</tr>");
 
         sb.append("</table>");
@@ -134,8 +130,8 @@ public class AuditLogService {
 
         // Warning callout box if present
         if (warningMessage != null && !warningMessage.isBlank()) {
-            sb.append("<div style='background-color: ").append(warningBoxBg).append("; border: 1px solid ").append(warningBoxBorder).append("; border-radius: 10px; padding: 16px; margin-bottom: 20px; color: ").append(warningBoxTextColor).append("; font-size: 14px; line-height: 1.5;'>");
-            sb.append("<strong>🛡️ Güvenlik Tavsiyesi:</strong> ").append(warningMessage);
+            sb.append("<div class='action-box' style='background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; color: #334155; font-size: 13px; line-height: 1.5;'>");
+            sb.append("<strong style='color: #0f172a;'>Güvenlik Notu:</strong> ").append(warningMessage);
             sb.append("</div>");
         }
 

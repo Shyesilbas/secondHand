@@ -102,92 +102,150 @@ const MyListingsPage = () => {
  setSaving(false);
  }
  }, [bulkMode, bulkValue, selectedIds, showSuccess, showError, clearBulk, engine]);
- const extraActions = <div className="flex items-center gap-2 sm:gap-3">
- <Link to={ROUTES.CREATE_LISTING} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
- <Plus className="w-4 h-4" strokeWidth={3} />{t("new_listing")}</Link>
- </div>;
- const topSlot = useMemo(() => {
- const hasLowStock = lowStock && lowStock.count > 0;
- const stockText = hasLowStock ? `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}` : '';
- return <div className="mb-8 space-y-4">
- <div className="relative overflow-hidden bg-background-primary rounded-md border border-border-light p-6 group">
- 
- <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
- <div className="space-y-0.5">
- <h2 className="text-lg font-semibold text-text-primary">{t("portfolio_performance")}</h2>
- <div className="flex items-baseline gap-1">
- <span className="text-3xl font-semibold text-text-primary tracking-tight">
- {formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[0]}
- </span>
- <span className="text-sm font-semibold text-text-muted">
- ,{formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[1] || '00'}
- </span>
- </div>
- <p className="text-xs text-text-secondary font-medium">{t("store_value_across")} {totalValueStats.activeCount} {t("live_listings")}</p>
- </div>
- <div className="flex items-center gap-2">
- <div className="flex items-center gap-1.5 bg-background-secondary px-3 py-1.5 rounded-md border border-border">
- <span className="relative flex h-1.5 w-1.5">
- <span className="absolute inline-flex h-full w-full rounded-full bg-status-success-border opacity-75"></span>
- <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-success-border"></span>
- </span>
- <span className="text-xs font-semibold text-status-success-text">
- {totalValueStats.activeCount} {t("active")}</span>
- </div>
- <div className="flex items-center gap-1.5 bg-secondary-light px-3 py-1.5 rounded-md border border-border-light">
- <span className="text-xs font-semibold text-text-secondary">
- {engine.listings?.length || 0} {t("total")}</span>
- </div>
- </div>
- </div>
- </div>
+  const extraActions = (
+    <div className="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end gap-2.5 sm:gap-3 w-full sm:w-auto">
+      <div className="flex items-center gap-2.5 sm:gap-3 py-1.5 px-3 rounded bg-background-secondary border border-border-light text-xs">
+        <div className="flex flex-col text-left sm:text-right">
+          <span className="text-text-muted font-medium">{t("portfolio_performance")}</span>
+          <span className="text-sm font-semibold text-text-primary tabular-nums">
+            {formatCurrency(totalValueStats.totalVal, 'TRY')}
+          </span>
+        </div>
+        <div className="h-6 w-px bg-border-light hidden sm:block" />
+        <div className="flex sm:flex-col items-center sm:items-start gap-2 sm:gap-0.5 text-text-secondary">
+          <span className="inline-flex items-center gap-1.5 font-medium text-text-primary tabular-nums">
+            <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
+            {totalValueStats.activeCount} <span className="font-normal text-text-secondary">{t("active")}</span>
+          </span>
+          <span className="text-border sm:hidden">·</span>
+          <span className="tabular-nums text-text-muted">
+            {engine.listings?.length || 0} {t("total")}
+          </span>
+        </div>
+      </div>
+      <Link
+        to={ROUTES.CREATE_LISTING}
+        className="inline-flex items-center justify-center gap-1.5 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 sm:h-10 px-3.5 sm:px-4 shrink-0"
+      >
+        <Plus className="w-4 h-4" strokeWidth={2.5} />
+        {t("new_listing")}
+      </Link>
+    </div>
+  );
 
- {hasLowStock && <div className="bg-background-primary rounded-md border border-border-light overflow-hidden">
- <div className="p-4 cursor-pointer hover:bg-secondary-light transition-colors border-b border-border-light" onClick={lowStock.toggle}>
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-3">
- <AlertTriangle className="h-5 w-5 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
- <div>
- <h3 className="text-sm font-medium text-text-primary">{t("inventory_alert")}</h3>
- <p className="text-xs text-text-secondary font-medium">{stockText}{t("needs_attention")}</p>
- </div>
- </div>
- <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} />
- </div>
- </div>
+  const topSlot = useMemo(() => {
+    const hasLowStock = lowStock && lowStock.count > 0;
+    if (!hasLowStock) return null;
+    const stockText = `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}`;
+    return (
+      <div className="space-y-3">
+        <div className="bg-background-primary rounded border border-border-light overflow-hidden">
+          <div
+            className="p-3.5 cursor-pointer hover:bg-secondary-light transition-colors border-b border-border-light"
+            onClick={lowStock.toggle}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
+                <div>
+                  <h3 className="text-sm font-medium text-text-primary">{t("inventory_alert")}</h3>
+                  <p className="text-xs text-text-secondary font-medium">{stockText} {t("needs_attention")}</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} />
+            </div>
+          </div>
 
- {lowStock.isOpen && <div className="p-4 bg-background-primary">
- {!bulkMode ? <>
- <div className="flex gap-2 mb-4">
- <button onClick={() => setBulkMode('quantity')} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("batch_stock")}</button>
- <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-secondary-light text-primary text-xs font-semibold rounded hover:bg-secondary-200 transition-all">{t("batch_prices")}</button>
- </div>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
- {lowStock.listings.slice(0, 4).map(listing => <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />)}
- </div>
- </> : <div className="space-y-3">
- <div className="flex items-center justify-between p-3 bg-primary-50 rounded border border-primary">
- <div className="flex items-center gap-2">
- {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-background-primary border border-primary rounded outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-background-primary text-xs" />}
- <button onClick={applyBulk} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("apply")}</button>
- </div>
- <X onClick={clearBulk} className="w-4 h-4 text-primary cursor-pointer" />
- </div>
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-1">
- {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-primary-50 border-primary' : 'bg-background-primary border-border-light'}`}>
- <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="w-4 h-4 rounded border-border-light text-primary" />
- <div className="min-w-0 flex-1">
- <p className="text-xs font-semibold text-text-primary truncate">{listing.title}</p>
- <p className="text-xs font-medium text-text-secondary">{t("current")}{bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
- </p>
- </div>
- </label>)}
- </div>
- </div>}
- </div>}
- </div>}
- </div>;
- }, [lowStock, engine, bulkMode, selectedIds, bulkValue, saving, toggleSelect, clearBulk, applyBulk, listings, showSuccess, showError, totalValueStats, t]);
+          {lowStock.isOpen && (
+            <div className="p-4 bg-background-primary">
+              {!bulkMode ? (
+                <>
+                  <div className="flex gap-2 mb-4">
+                    <button
+                      onClick={() => setBulkMode('quantity')}
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
+                    >
+                      {t("batch_stock")}
+                    </button>
+                    <button
+                      onClick={() => setBulkMode('price')}
+                      className="px-4 py-1.5 bg-secondary-light text-primary text-xs font-semibold rounded hover:bg-secondary-200 transition-all"
+                    >
+                      {t("batch_prices")}
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {lowStock.listings.slice(0, 4).map(listing => (
+                      <LowStockCard
+                        key={listing.id}
+                        listing={listing}
+                        onRefresh={engine.refresh}
+                        showSuccess={showSuccess}
+                        showError={showError}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-secondary-light rounded border border-border">
+                    <div className="flex items-center gap-2">
+                      {bulkMode === 'quantity' ? (
+                        <input
+                          type="number"
+                          min={1}
+                          value={bulkValue}
+                          onChange={e => setBulkValue(e.target.value)}
+                          placeholder={t("qty")}
+                          className="w-24 px-3 py-1.5 text-xs bg-background-primary border border-border rounded outline-none"
+                        />
+                      ) : (
+                        <PriceInput
+                          value={parsePrice(bulkValue) ?? 0}
+                          onChange={n => setBulkValue(n != null ? String(n) : '')}
+                          placeholder={t("price")}
+                          className="w-32 bg-background-primary text-xs"
+                        />
+                      )}
+                      <button
+                        onClick={applyBulk}
+                        disabled={saving}
+                        className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
+                      >
+                        {t("apply")}
+                      </button>
+                    </div>
+                    <X onClick={clearBulk} className="w-4 h-4 text-text-secondary hover:text-text-primary cursor-pointer" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-1">
+                    {listings.map(listing => (
+                      <label
+                        key={listing.id}
+                        className={`flex items-center gap-2.5 p-3 rounded border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-secondary-light border-primary' : 'bg-background-primary border-border-light'}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(listing.id)}
+                          onChange={() => toggleSelect(listing.id)}
+                          className="w-4 h-4 rounded border-border-light text-primary"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-text-primary truncate">{listing.title}</p>
+                          <p className="text-xs font-medium text-text-secondary">
+                            {t("current")} {bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }, [lowStock, bulkMode, bulkValue, selectedIds, saving, applyBulk, clearBulk, listings, toggleSelect, engine.refresh, showSuccess, showError, t]);
  return <div className="min-h-screen bg-background-secondary">
  <ListingsModuleLayout mode="mine" title={t("my_listings")} getListingTypeLabel={getListingTypeLabel} engine={engine} extraActions={extraActions} topSlot={topSlot} disableSticky={true} isSelectable={false} />
  </div>;

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AlertCircle, Award, CheckCircle2, Grid3X3, Heart, Package, Plus, Sparkles, Star } from 'lucide-react';
+import { AlertCircle, Heart, Package, Plus, Star } from 'lucide-react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { userService } from '../services/userService.js';
 import { useUserListings } from '../hooks/useUserListings.js';
@@ -14,325 +14,392 @@ import UserProfileHeader from '../components/UserProfileHeader.jsx';
 import UserReviews from '../components/UserReviews.jsx';
 import Pagination from '../../common/components/ui/Pagination.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
+import Button from '../../common/components/ui/Button.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useGreatSellerStatus } from '../hooks/useGreatSellerStatus.js';
-import Skeleton from '../../common/components/ui/Skeleton.jsx';
-const TABS = [{
- key: 'listings',
- label: 'Listings',
- icon: Package
-}, {
- key: 'lists',
- label: 'Lists',
- icon: Heart
-}, {
- key: 'reviews',
- label: 'Reviews',
- icon: Star
-}];
+import Skeleton, { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
 
-/** Own profile — Great Seller dört ölçüt (tek satış metriği fiyat filtresini içerir). */
-const GreatSellerProgressCard = ({
- gs
-}) => {
- const {
- t
- } = useTranslation();
- if (!gs) return null;
- const minTry = Number(gs.minUnitPriceThreshold ?? 1500);
- const days = gs.rollingWindowDays ?? 60;
- const salesTarget = gs.qualifyingSalesTarget || 1;
- const revTarget = gs.distinctReviewerTarget || 1;
- const salesPct = Math.min(100, gs.qualifyingSalesLastWindow / salesTarget * 100);
- const revPct = Math.min(100, gs.distinctReviewerCount / revTarget * 100);
- const minRating = gs.minimumAverageRating ?? 4.7;
- const avg = gs.averageRating ?? 0;
- const ratingPct = gs.ratingMet ? 100 : Math.min(100, minRating ? avg / minRating * 100 : 0);
- const Bar = ({
- pct,
- done
- }) => <div className="h-1.5 bg-secondary-light rounded-full overflow-hidden mt-1.5">
- <div className={`h-full rounded-full transition-all ${done ? 'bg-status-success' : 'bg-primary'}`} style={{
- width: `${Math.min(100, pct)}%`
- }} />
- </div>;
- return <PageContainer className="pb-5">
- <div className="bg-background-primary rounded-md border border-border/80 p-5">
- <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
- <div className="flex items-center gap-2">
- <Award className="h-5 w-5 shrink-0 text-status-warning-text" strokeWidth={1.5} aria-hidden />
- <div>
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("great_seller_milestones")}</h2>
- <p className="text-xs font-medium text-text-muted">{t("progress_is_calculated_from_completed_ma")}</p>
- </div>
- </div>
- {gs.eligible ? <span className="inline-flex items-center gap-1 text-xs font-semibold text-text-primary bg-background-secondary px-2 py-0.5 rounded-sm border border-border">
- <CheckCircle2 className="w-3.5 h-3.5" />{t("completed")}</span> : null}
- </div>
+const TABS = [
+  { key: 'listings', labelKey: 'listings', defaultLabel: 'İlanlar', icon: Package },
+  { key: 'lists', labelKey: 'lists', defaultLabel: 'Listeler', icon: Heart },
+  { key: 'reviews', labelKey: 'reviews', defaultLabel: 'Değerlendirmeler', icon: Star }
+];
 
- <div className="grid gap-4 md:grid-cols-3">
- <div className="rounded border border-border-light bg-secondary-light p-4">
- <div className="flex justify-between items-baseline gap-2">
- <p className="text-body font-semibold text-text-primary">{t("paid_order_lines")} ({days} {t("days")})</p>
- <span className="text-xs font-semibold tabular-nums text-text-muted">
- {gs.qualifyingSalesLastWindow}&nbsp;/&nbsp;{gs.qualifyingSalesTarget}
- {gs.salesMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-text-secondary ml-1 align-text-bottom" /> : null}
- </span>
- </div>
- <p className="text-xs text-text-muted mt-0.5 leading-snug">{t("completed_checkout_try_lines_with_unit_p")}{minTry.toLocaleString('tr-TR')}
- </p>
- <Bar pct={salesPct} done={gs.salesMet} />
- </div>
 
- <div className="rounded border border-border-light bg-secondary-light p-4">
- <div className="flex justify-between items-baseline gap-2">
- <p className="text-body font-semibold text-text-primary">{t("unique_buyer_reviews")}</p>
- <span className="text-xs font-semibold tabular-nums text-text-muted">
- {gs.distinctReviewerCount}&nbsp;/&nbsp;{gs.distinctReviewerTarget}
- {gs.reviewersMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-text-secondary ml-1 align-text-bottom" /> : null}
- </span>
- </div>
- <Bar pct={revPct} done={gs.reviewersMet} />
- </div>
-
- <div className="rounded border border-border-light bg-secondary-light p-4">
- <div className="flex justify-between items-baseline gap-2">
- <p className="text-body font-semibold text-text-primary">{t("average_rating")}</p>
- <span className="text-xs font-semibold tabular-nums text-text-muted">
- {(avg ?? 0).toFixed(2)}
- {' / '}
- {minRating.toFixed(1)}
- {gs.ratingMet ? <CheckCircle2 className="inline w-3.5 h-3.5 text-text-secondary ml-1 align-text-bottom" /> : null}
- </span>
- </div>
- <Bar pct={ratingPct} done={gs.ratingMet} />
- </div>
- </div>
- </div>
- </PageContainer>;
+const useUserProfile = (userId) => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users', 'profile', userId],
+    queryFn: () => userService.getUserById(userId),
+    enabled: !!userId
+  });
+  return {
+    user: data?.id ? data : null,
+    isLoading: !!userId && isLoading,
+    error: error ? error.message || null : null
+  };
 };
-const useUserProfile = userId => {
- const { data, isLoading, error } = useQuery({
- queryKey: ['users', 'profile', userId],
- queryFn: () => userService.getUserById(userId),
- enabled: !!userId
- });
- return {
- user: data?.id ? data : null,
- isLoading: !!userId && isLoading,
- error: error ? error.message || 'Unable to load this profile.' : null
- };
-};
+
 const UserProfilePage = () => {
- const {
- t
- } = useTranslation();
- const {
- userId
- } = useParams();
- const navigate = useNavigate();
- const {
- user: currentUser
- } = useAuthState();
- const [activeTab, setActiveTab] = useState('listings');
- const [showCreateListModal, setShowCreateListModal] = useState(false);
- const {
- user,
- isLoading: userLoading,
- error: userError
- } = useUserProfile(userId);
- const {
- listings,
- isLoading: listingsLoading,
- error: listingsError,
- pagination,
- loadPage,
- handlePageSizeChange
- } = useUserListings(userId, {
- enabled: activeTab === 'listings',
- page: 0,
- size: 12
- });
- const {
- reviews: receivedReviews,
- loading: receivedReviewsLoading,
- isFetching: receivedReviewsFetching,
- error: receivedReviewsError,
- pagination: reviewsPagination,
- loadPage: loadReviewsPage,
- handlePageSizeChange: handleReviewsPageSizeChange
- } = usePagedUserReceivedReviews(userId, {
- enabled: activeTab === 'reviews',
- size: 10
- });
- const {
- stats: reviewStats
- } = useUserReviewStats(userId, {
- enabled: true
- });
- const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
- const {
- data: greatSeller
- } = useGreatSellerStatus(userId, {
- enabled: Boolean(userId)
- });
- const {
- data: favoriteLists = [],
- isLoading: listsLoading,
- refetch: refetchLists
- } = useUserFavoriteLists(userId, isOwnProfile, {
- enabled: activeTab === 'lists'
- });
- const handlePageChange = page => loadPage(page);
+  const { t } = useTranslation();
+  const { userId } = useParams();
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuthState();
+  const [activeTab, setActiveTab] = useState('listings');
+  const [showCreateListModal, setShowCreateListModal] = useState(false);
 
- // Loading state
- if (userLoading) {
- return <PageContainer className="space-y-4 py-8" aria-busy="true" aria-label={t("loading_profile")}>
- <Skeleton className="h-32 w-full" />
- <Skeleton className="h-64 w-full" />
- </PageContainer>;
- }
+  const {
+    user,
+    isLoading: userLoading,
+    error: userError
+  } = useUserProfile(userId);
 
- // Error state
- if (userError || !user) {
- return <div className="min-h-screen bg-background-secondary flex items-center justify-center">
- <div className="text-center max-w-sm">
- <AlertCircle className="mx-auto mb-4 block h-5 w-5 shrink-0 text-status-error" strokeWidth={1.5} aria-hidden />
- <p className="text-lg font-semibold text-text-primary mb-1">{t("user_not_found")}</p>
- <p className="text-sm text-text-muted mb-6">{userError || 'The profile you\'re looking for doesn\'t exist.'}</p>
- <button onClick={() => navigate(-1)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">{t("go_back")}</button>
- </div>
- </div>;
- }
- return <div className="min-h-screen bg-background-secondary">
- {/* ── Profile Header (full-width banner) ──────────── */}
- <UserProfileHeader user={user} isOwnProfile={isOwnProfile} reviewStats={reviewStats} greatSellerEligible={greatSeller?.eligible} />
+  const {
+    listings,
+    isLoading: listingsLoading,
+    error: listingsError,
+    pagination,
+    loadPage,
+    handlePageSizeChange
+  } = useUserListings(userId, {
+    enabled: activeTab === 'listings',
+    page: 0,
+    size: 12
+  });
 
- {isOwnProfile && greatSeller ? <GreatSellerProgressCard gs={greatSeller} /> : null}
+  const {
+    reviews: receivedReviews,
+    loading: receivedReviewsLoading,
+    isFetching: receivedReviewsFetching,
+    error: receivedReviewsError,
+    pagination: reviewsPagination,
+    loadPage: loadReviewsPage,
+    handlePageSizeChange: handleReviewsPageSizeChange
+  } = usePagedUserReceivedReviews(userId, {
+    enabled: activeTab === 'reviews',
+    size: 10
+  });
 
- {/* ── Tab Bar ─────────────────────────────────────── */}
- <div className="sticky top-0 z-10 border-y border-border-light/80 bg-background-primary">
- <PageContainer>
- <div className="flex items-center gap-2 overflow-x-auto py-3">
- {TABS.map(tab => {
- const Icon = tab.icon;
- const isActive = activeTab === tab.key;
- let count = null;
- if (tab.key === 'listings' && pagination.totalElements > 0) count = pagination.totalElements;
- if (tab.key === 'lists' && favoriteLists.length > 0) count = favoriteLists.length;
- if (tab.key === 'reviews' && reviewStats?.totalReviews > 0) count = reviewStats.totalReviews;
- return <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative flex h-10 shrink-0 items-center gap-2 rounded px-4 text-sm font-semibold transition-all duration-200 ${isActive ? 'bg-primary text-white' : 'bg-secondary-light text-text-secondary hover:bg-secondary-light hover:text-text-primary'}`}>
- <Icon className="w-4 h-4" />
- {tab.label}
- {count !== null && <span className={`inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-sm text-xs font-semibold tabular-nums ${isActive ? 'bg-background-primary/15 text-white' : 'bg-background-primary text-text-muted'}`}>
- {count}
- </span>}
- </button>;
- })}
- </div>
- </PageContainer>
- </div>
+  const { stats: reviewStats } = useUserReviewStats(userId, {
+    enabled: true
+  });
 
- {/* ── Tab Content ─────────────────────────────────── */}
- <PageContainer className="py-7">
- <div key={activeTab} className="animate-fadeIn min-w-0">
+  const isOwnProfile = currentUser && String(currentUser.id) === String(userId);
 
- {/* ── Listings Tab ─────────────────────────── */}
- {activeTab === 'listings' && <div>
- {/* Controls row */}
- <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
- <div>
- <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold text-text-muted">
- <Grid3X3 className="h-3.5 w-3.5" />{t("marketplace")}</div>
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("listings")}</h2>
- <p className="text-sm text-text-muted mt-0.5">
- {isOwnProfile ? 'Your active listings' : 'All active listings by this user'}
- </p>
- </div>
- {!listingsLoading && pagination.totalElements > 0 && <div className="flex items-center gap-2 rounded border border-border-light bg-background-primary p-1.5">
- <select value={pagination.size} onChange={e => handlePageSizeChange(Number(e.target.value))} className="h-9 border border-border-light rounded px-3 text-sm font-semibold text-text-secondary bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-border-DEFAULT cursor-pointer">
- <option value={10}>10</option>
- <option value={15}>15</option>
- <option value={20}>20</option>
- </select>
- <span className="text-xs text-text-muted font-medium">{t("per_page")}</span>
- </div>}
- </div>
+  const { data: greatSeller } = useGreatSellerStatus(userId, {
+    enabled: Boolean(userId)
+  });
 
- {listingsLoading ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
- {[...Array(8)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-md overflow-hidden animate-pulse">
- <div className="aspect-square bg-secondary-light" />
- <div className="p-3.5 space-y-2">
- <div className="h-4 bg-secondary-light rounded w-3/4" />
- <div className="h-3 bg-secondary-light rounded w-1/2" />
- </div>
- </div>)}
- </div> : listingsError ? <EmptyState icon={AlertCircle} title={t("failed_to_load_listings")} description="Please try again later" /> : listings.length === 0 ? <EmptyState icon={Package} title={t("no_listings_yet")} description={isOwnProfile ? "You haven't created any listings yet" : "This user hasn't created any listings yet"} primaryAction={isOwnProfile ? {
- label: 'Create Listing',
- onClick: () => navigate(ROUTES.CREATE_LISTING)
- } : null} /> : <>
- <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
- {listings.map((listing, index) => <ListingCard key={listing.id} listing={listing} showActions={false} isOwner={currentUser?.id === listing.sellerId} currentUserId={currentUser?.id} priorityImage={index === 0} />)}
- </div>
- {!listingsLoading && pagination.totalPages > 1 && <div className="mt-6">
- <Pagination page={pagination.number} totalPages={pagination.totalPages} onPageChange={handlePageChange} />
- </div>}
- </>}
- </div>}
+  const {
+    data: favoriteLists = [],
+    isLoading: listsLoading,
+    refetch: refetchLists
+  } = useUserFavoriteLists(userId, isOwnProfile, {
+    enabled: activeTab === 'lists'
+  });
 
- {/* ── Lists Tab ────────────────────────────── */}
- {activeTab === 'lists' && <div>
- <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
- <div>
- <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold text-text-muted">
- <Sparkles className="h-3.5 w-3.5" />{t("curated")}</div>
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("lists")}</h2>
- <p className="text-sm text-text-muted mt-0.5">
- {isOwnProfile ? 'Your favorite lists' : 'Public favorite lists'}
- </p>
- </div>
- {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
- <Plus className="w-4 h-4" />{t("new_list")}</button>}
- </div>
+  const handlePageChange = (page) => loadPage(page);
 
- {listsLoading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
- {[...Array(3)].map((_, i) => <div key={i} className="bg-background-primary border border-border-light rounded-md overflow-hidden animate-pulse">
- <div className="aspect-4/3 bg-secondary-light" />
- <div className="p-4 space-y-2">
- <div className="h-4 bg-secondary-light rounded w-3/4" />
- <div className="h-3 bg-secondary-light rounded w-1/2" />
- </div>
- </div>)}
- </div> : favoriteLists.length === 0 ? <EmptyState icon={Heart} title={t("no_lists_yet")} description={isOwnProfile ? "You haven't created any lists yet" : "This user hasn't shared any public lists yet"} primaryAction={isOwnProfile ? {
- label: 'Create List',
- onClick: () => setShowCreateListModal(true)
- } : null} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
- {favoriteLists.map(list => <FavoriteListCard key={list.id} list={list} />)}
- {isOwnProfile && <button onClick={() => setShowCreateListModal(true)} className="aspect-4/3 bg-background-primary border-2 border-dashed border-border-light rounded-md flex flex-col items-center justify-center hover:border-border-DEFAULT hover:bg-secondary-light transition-all duration-200 group">
- <Plus className="mb-3 h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
- <span className="text-sm font-semibold text-text-muted group-hover:text-text-secondary">{t("new_list")}</span>
- </button>}
- </div>}
- </div>}
+  // Loading state
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-background-secondary">
+        <PageContainer className="py-8 space-y-6" aria-busy="true" aria-label={t("loading_profile", "Profil yükleniyor")}>
+          <div className="rounded border border-border bg-background-primary p-6 space-y-4">
+            <div className="flex items-center gap-4">
+              <Skeleton className="w-20 h-20 rounded-full" />
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-6 w-48 rounded" />
+                <Skeleton className="h-4 w-64 rounded" />
+              </div>
+            </div>
+          </div>
+          <Skeleton className="h-12 w-full rounded" />
+          <SkeletonGrid count={8} columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" />
+        </PageContainer>
+      </div>
+    );
+  }
 
- {/* ── Reviews Tab ──────────────────────────── */}
- {activeTab === 'reviews' && <UserReviews profileUserId={user.id ?? userId} receivedReviews={receivedReviews} receivedReviewsLoading={receivedReviewsLoading} receivedReviewsFetching={receivedReviewsFetching} receivedReviewsError={receivedReviewsError} pagination={reviewsPagination} loadPage={loadReviewsPage} handlePageSizeChange={handleReviewsPageSizeChange} reviewStats={reviewStats} isOwnProfile={isOwnProfile} />}
- </div>
- </PageContainer>
+  // Error state
+  if (userError || !user) {
+    return (
+      <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
+        <div className="w-full max-w-sm rounded border border-border bg-background-primary p-6 text-center shadow-xs">
+          <AlertCircle className="mx-auto mb-3 h-6 w-6 text-status-error" strokeWidth={1.5} aria-hidden />
+          <h2 className="text-lg font-semibold text-text-primary mb-1">
+            {t("user_not_found", "Kullanıcı Bulunamadı")}
+          </h2>
+          <p className="text-xs text-text-muted mb-5 leading-relaxed">
+            {userError || t("profile_not_exist", "Görüntülemek istediğiniz profil bulunamadı veya silinmiş olabilir.")}
+          </p>
+          <Button variant="primary" onClick={() => navigate(-1)} className="w-full">
+            {t("go_back", "Geri Dön")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
- <FavoriteListModal isOpen={showCreateListModal} onClose={() => setShowCreateListModal(false)} onSuccess={() => {
- refetchLists();
- setShowCreateListModal(false);
- }} />
+  return (
+    <div className="min-h-screen bg-background-secondary">
+      {/* ── Profile Header (integrated with PageContainer) ──────────── */}
+      <UserProfileHeader
+        user={user}
+        isOwnProfile={isOwnProfile}
+        reviewStats={reviewStats}
+        greatSeller={greatSeller}
+        greatSellerEligible={greatSeller?.eligible}
+      />
 
- <style>{`
- @keyframes fadeIn {
- from { opacity: 0; transform: translateY(6px); }
- to { opacity: 1; transform: translateY(0); }
- }
- .animate-fadeIn { animation: fadeIn 0.25s ease-out forwards; }
- `}</style>
- </div>;
+      {/* ── Tab Bar (clean segmented navigation) ────────────────────── */}
+      <div className="sticky top-0 z-10 border-b border-border bg-background-primary/95 backdrop-blur-xs">
+        <PageContainer>
+          <nav className="flex items-center gap-1.5 overflow-x-auto py-2.5 [scrollbar-width:none]">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.key;
+              let count = null;
+              if (tab.key === 'listings' && pagination.totalElements > 0) count = pagination.totalElements;
+              if (tab.key === 'lists' && favoriteLists.length > 0) count = favoriteLists.length;
+              if (tab.key === 'reviews' && reviewStats?.totalReviews > 0) count = reviewStats.totalReviews;
+
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded text-sm font-medium transition-colors duration-150 cursor-pointer ${
+                    isActive
+                      ? 'bg-background-secondary text-text-primary font-semibold border border-border'
+                      : 'text-text-muted hover:text-text-primary hover:bg-background-secondary/60 border border-transparent'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" strokeWidth={1.5} />
+                  <span>{t(tab.labelKey, tab.defaultLabel)}</span>
+                  {count !== null && (
+                    <span
+                      className={`inline-flex items-center justify-center px-1.5 py-0.5 rounded-sm text-xs tabular-nums ${
+                        isActive
+                          ? 'bg-background-primary text-text-secondary border border-border'
+                          : 'bg-background-secondary text-text-muted'
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </PageContainer>
+      </div>
+
+      {/* ── Tab Content ─────────────────────────────────── */}
+      <PageContainer className="py-6 sm:py-8">
+        <div key={activeTab} className="min-w-0">
+          {/* ── Listings Tab ─────────────────────────── */}
+          {activeTab === 'listings' && (
+            <div>
+              {/* Header and Controls */}
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
+                    {t("listings", "İlanlar")}
+                    {!listingsLoading && pagination.totalElements > 0 && (
+                      <span className="ml-2 text-xs font-normal text-text-muted tabular-nums">
+                        ({pagination.totalElements})
+                      </span>
+                    )}
+                  </h2>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {isOwnProfile
+                      ? t("your_active_listings", "Satışta olan aktif ilanlarınız")
+                      : t("all_active_listings_by_user", "Kullanıcının satışta olan tüm ilanları")}
+                  </p>
+                </div>
+
+                {!listingsLoading && pagination.totalElements > 0 && (
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <label className="flex items-center gap-2 text-xs text-text-muted">
+                      <span>{t("per_page", "Sayfa başı:")}</span>
+                      <select
+                        value={pagination.size}
+                        onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                        aria-label={t("per_page", "Sayfa başı ilan sayısı")}
+                        className="h-8 rounded border border-border bg-background-primary px-2.5 text-xs font-medium text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-border cursor-pointer"
+                      >
+                        <option value={10}>10</option>
+                        <option value={15}>15</option>
+                        <option value={20}>20</option>
+                      </select>
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {listingsLoading ? (
+                <SkeletonGrid count={8} columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" />
+              ) : listingsError ? (
+                <EmptyState
+                  icon={AlertCircle}
+                  title={t("failed_to_load_listings", "İlanlar yüklenemedi")}
+                  description={t("please_try_again_later", "Lütfen daha sonra tekrar deneyin.")}
+                />
+              ) : listings.length === 0 ? (
+                <EmptyState
+                  icon={Package}
+                  title={t("no_listings_yet", "Henüz ilan bulunmuyor")}
+                  description={
+                    isOwnProfile
+                      ? t("no_listings_created_yet", "Henüz bir ilan oluşturmadınız.")
+                      : t("user_no_listings_yet", "Bu kullanıcının henüz aktif bir ilanı bulunmuyor.")
+                  }
+                  primaryAction={
+                    isOwnProfile
+                      ? {
+                          label: t("create_listing", "İlan Oluştur"),
+                          onClick: () => navigate(ROUTES.CREATE_LISTING)
+                        }
+                      : null
+                  }
+                />
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {listings.map((listing, index) => (
+                      <ListingCard
+                        key={listing.id}
+                        listing={listing}
+                        showActions={false}
+                        isOwner={currentUser?.id === listing.sellerId}
+                        currentUserId={currentUser?.id}
+                        priorityImage={index === 0}
+                      />
+                    ))}
+                  </div>
+                  {!listingsLoading && pagination.totalPages > 1 && (
+                    <div className="mt-6">
+                      <Pagination
+                        page={pagination.number}
+                        totalPages={pagination.totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── Lists Tab ────────────────────────────── */}
+          {activeTab === 'lists' && (
+            <div>
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
+                    {t("lists", "Listeler")}
+                    {favoriteLists.length > 0 && (
+                      <span className="ml-2 text-xs font-normal text-text-muted tabular-nums">
+                        ({favoriteLists.length})
+                      </span>
+                    )}
+                  </h2>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {isOwnProfile
+                      ? t("your_favorite_lists", "Oluşturduğunuz favori listeleriniz")
+                      : t("public_favorite_lists", "Kullanıcının paylaştığı herkese açık listeler")}
+                  </p>
+                </div>
+
+                {isOwnProfile && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setShowCreateListModal(true)}
+                    className="self-start sm:self-auto"
+                  >
+                    <Plus className="w-4 h-4" strokeWidth={1.5} />
+                    <span>{t("new_list", "Yeni Liste")}</span>
+                  </Button>
+                )}
+              </div>
+
+              {listsLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="rounded border border-border bg-background-primary p-4 space-y-3 animate-pulse">
+                      <div className="aspect-4/3 rounded bg-background-secondary" />
+                      <div className="h-4 bg-background-secondary rounded w-3/4" />
+                      <div className="h-3 bg-background-secondary rounded w-1/2" />
+                    </div>
+                  ))}
+                </div>
+              ) : favoriteLists.length === 0 ? (
+                <EmptyState
+                  icon={Heart}
+                  title={t("no_lists_yet", "Henüz liste bulunmuyor")}
+                  description={
+                    isOwnProfile
+                      ? t("no_lists_created_yet", "Henüz bir favori listesi oluşturmadınız.")
+                      : t("user_no_lists_yet", "Bu kullanıcının herkese açık bir listesi bulunmuyor.")
+                  }
+                  primaryAction={
+                    isOwnProfile
+                      ? {
+                          label: t("create_list", "Liste Oluştur"),
+                          onClick: () => setShowCreateListModal(true)
+                        }
+                      : null
+                  }
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {favoriteLists.map((list) => (
+                    <FavoriteListCard key={list.id} list={list} />
+                  ))}
+                  {isOwnProfile && (
+                    <button
+                      onClick={() => setShowCreateListModal(true)}
+                      className="aspect-4/3 rounded border-2 border-dashed border-border hover:border-text-secondary bg-background-primary hover:bg-background-secondary flex flex-col items-center justify-center transition-colors group cursor-pointer"
+                    >
+                      <Plus className="mb-2 h-5 w-5 text-text-muted group-hover:text-text-primary transition-colors" strokeWidth={1.5} />
+                      <span className="text-xs font-semibold text-text-muted group-hover:text-text-primary transition-colors">
+                        {t("new_list", "Yeni Liste")}
+                      </span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Reviews Tab ──────────────────────────── */}
+          {activeTab === 'reviews' && (
+            <UserReviews
+              profileUserId={user.id ?? userId}
+              receivedReviews={receivedReviews}
+              receivedReviewsLoading={receivedReviewsLoading}
+              receivedReviewsFetching={receivedReviewsFetching}
+              receivedReviewsError={receivedReviewsError}
+              pagination={reviewsPagination}
+              loadPage={loadReviewsPage}
+              handlePageSizeChange={handleReviewsPageSizeChange}
+              reviewStats={reviewStats}
+              isOwnProfile={isOwnProfile}
+            />
+          )}
+        </div>
+      </PageContainer>
+
+      <FavoriteListModal
+        isOpen={showCreateListModal}
+        onClose={() => setShowCreateListModal(false)}
+        onSuccess={() => {
+          refetchLists();
+          setShowCreateListModal(false);
+        }}
+      />
+    </div>
+  );
 };
 
 export default UserProfilePage;

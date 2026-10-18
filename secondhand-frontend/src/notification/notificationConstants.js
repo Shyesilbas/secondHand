@@ -294,6 +294,7 @@ export const getNotificationTargetRoute = (notification) => {
 export const formatRelativeTime = (isoString) => {
   if (!isoString) return '';
   const date = new Date(isoString);
+  if (isNaN(date.getTime())) return '';
   const now = new Date();
   const diffMs = now - date;
   const diffSecs = Math.floor(diffMs / 1000);
@@ -327,11 +328,15 @@ export const groupNotificationsByTimeline = (notifications = []) => {
   const oneWeekAgo = todayStart - 86400000 * 7;
 
   notifications.forEach((item) => {
-    if (!item.createdAt) {
+    if (!item?.createdAt) {
       groups.earlier.push(item);
       return;
     }
     const itemTime = new Date(item.createdAt).getTime();
+    if (isNaN(itemTime)) {
+      groups.earlier.push(item);
+      return;
+    }
     if (itemTime >= todayStart) {
       groups.today.push(item);
     } else if (itemTime >= yesterdayStart) {

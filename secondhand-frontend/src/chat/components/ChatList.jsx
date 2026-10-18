@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { MessageCircle, Search } from 'lucide-react';
 import ChatRoomListItem from './ChatRoomListItem.jsx';
 import { CHAT_MESSAGES } from '../chatConstants.js';
+import { SkeletonList } from '../../common/components/ui/index.js';
+
 const ChatList = ({
  chatRooms,
  isLoadingRooms,

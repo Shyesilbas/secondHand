@@ -46,8 +46,8 @@ const stepVariants = {
 };
 
 /* ── Shared chrome classes (theme tokens only) ── */
-const secondaryBtn = 'inline-flex items-center gap-2 rounded border border-border bg-background-primary px-4 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50';
-const primaryBtn = 'inline-flex items-center gap-2 rounded bg-primary px-6 py-2.5 text-sm font-semibold text-text-inverse transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50';
+const secondaryBtn = 'inline-flex items-center gap-2 rounded border border-border bg-background-primary px-3.5 py-2 text-xs font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50';
+const primaryBtn = 'inline-flex items-center gap-2 rounded bg-primary px-5 py-2 text-xs font-semibold text-text-inverse transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50';
 const ListingWizard = ({
  title,
  subtitle,
@@ -65,6 +65,7 @@ const ListingWizard = ({
  canGoNext,
  renderStep,
  children,
+ headerExtra = null,
  footerExtra = null,
  lastStepAction = null,
  lastStepActionOverride = null,
@@ -198,34 +199,34 @@ const ListingWizard = ({
  {/* ── Top bar: cancel · step dots · counter · progress ── */}
  <div className="shrink-0 border-b border-border-light bg-background-primary">
  <div className={`mx-auto w-full ${containerClass} px-4 sm:px-6 lg:px-8`}>
- <div className="flex h-16 items-center justify-between gap-4">
+ <div className="flex h-12 items-center justify-between gap-4">
  <button
  type="button"
  onClick={onBack}
- className="group inline-flex items-center gap-2 rounded px-2 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
+ className="group inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
  >
  <ArrowLeft className="h-4 w-4 transition-transform" />
  <span>{t("cancel") || "Cancel"}</span>
  </button>
 
  {/* Step dots */}
- <div className="flex min-w-0 items-center gap-1.5 overflow-hidden sm:gap-2.5">
+ <div className="flex min-w-0 items-center gap-1.5 overflow-hidden sm:gap-2">
  {stepsList.map(step => {
  const isActive = activeStep === step.id;
  const isCompleted = activeStep > step.id;
  return (
  <div key={step.id} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
  <div
- className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 ${
+ className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 ${
  isActive
- ? 'bg-primary text-text-inverse ring-4 ring-primary/15'
+ ? 'bg-primary text-text-inverse ring-2 ring-primary/15'
  : isCompleted
- ? 'bg-primary-100 text-primary-700'
+ ? 'bg-background-tertiary text-text-secondary'
  : 'border border-border bg-background-secondary text-text-muted'
  }`}
  >
  {isCompleted ? (
- <Check className="h-3.5 w-3.5" strokeWidth={3} />
+ <Check className="h-3 w-3" strokeWidth={2.5} />
  ) : (
  step.id
  )}
@@ -233,7 +234,7 @@ const ListingWizard = ({
  {step.id < stepsList.length && (
  <div
  className={`h-0.5 rounded-full transition-all duration-500 ease-out ${
- isCompleted ? 'w-4 bg-primary sm:w-8' : 'w-3 bg-border sm:w-6'
+ isCompleted ? 'w-3 bg-primary sm:w-6' : 'w-2 bg-border sm:w-4'
  }`}
  />
  )}
@@ -242,59 +243,59 @@ const ListingWizard = ({
  })}
  </div>
 
- <span className="hidden shrink-0 items-center rounded-sm border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 sm:inline-flex">
+ <span className="hidden shrink-0 items-center rounded-sm border border-border bg-background-secondary px-2.5 py-0.5 text-xs font-semibold tabular-nums text-text-primary sm:inline-flex">
  {t("step") || "Step"} {activeStep} / {stepsList.length}
  </span>
  </div>
  </div>
 
  {/* Progress bar */}
- <div className="h-1 w-full bg-border-light">
+ <div className="h-0.5 w-full bg-border-light">
  <div
- className="h-full rounded-r-full bg-primary transition-all duration-500 ease-out"
+ className="h-full bg-primary transition-all duration-500 ease-out"
  style={{ width: `${progress}%` }}
  />
  </div>
  </div>
 
  {/* ── Main content: step rail + step panel ── */}
- <div className={`mx-auto flex w-full ${containerClass} flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10`}>
- <div className="grid flex-1 grid-cols-1 items-start gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-8">
+ <div className={`mx-auto flex w-full ${containerClass} flex-1 flex-col px-4 py-3 sm:px-6 sm:py-4 lg:px-8 lg:py-5`}>
+ <div className="grid flex-1 grid-cols-1 items-start gap-4 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-5">
  {/* ── Step rail (desktop) ── */}
  <aside className="hidden lg:block">
- <div className="sticky top-20 rounded-md border border-border-light bg-background-primary p-4 shadow-sm">
+ <div className="sticky top-16 rounded border border-border-light bg-background-primary p-3">
  {headerEyebrow ? (
- <span className="mb-3 inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">
+ <span className="mb-2 inline-flex items-center rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-semibold text-text-primary">
  {headerEyebrow}
  </span>
  ) : null}
- <p className="px-3 pb-2 text-xs font-semibold text-text-muted">
+ <p className="px-2 pb-1.5 text-xs font-semibold text-text-muted">
  {t("steps") || "Steps"}
  </p>
- <nav className="space-y-1" aria-label={t("form_steps")}>
+ <nav className="space-y-0.5" aria-label={t("form_steps")}>
  {stepsList.map(step => {
  const isActive = activeStep === step.id;
  const isCompleted = activeStep > step.id;
  const goBackHere = typeof onStepPick === 'function' && step.id < activeStep;
  const rowInner = (
  <>
- <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold transition-colors duration-200 ${
+ <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-xs font-semibold transition-colors duration-200 ${
  isActive
  ? 'bg-primary text-text-inverse'
  : isCompleted
- ? 'bg-primary-100 text-primary-700'
+ ? 'bg-background-tertiary text-text-secondary'
  : 'border border-border bg-background-secondary text-text-muted'
  }`}>
- {isCompleted ? <Check className="h-3.5 w-3.5" /> : step.id}
+ {isCompleted ? <Check className="h-3 w-3" /> : step.id}
  </div>
  <div className="min-w-0 text-left">
- <p className={`truncate text-sm font-semibold transition-colors duration-200 ${
+ <p className={`truncate text-xs font-semibold transition-colors duration-200 ${
  isActive ? 'text-text-primary' : isCompleted ? 'text-text-secondary' : 'text-text-muted'
  }`}>
  {step.title}
  </p>
  {step.description ? (
- <p className="mt-0.5 line-clamp-2 text-xs text-text-muted">
+ <p className="mt-0.5 line-clamp-1 text-xs text-text-muted">
  {step.description}
  </p>
  ) : null}
@@ -307,7 +308,7 @@ const ListingWizard = ({
  key={step.id}
  type="button"
  onClick={() => onStepPick(step.id)}
- className="flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-background-secondary"
+ className="flex w-full items-start gap-2.5 rounded px-2.5 py-1.5 text-left transition-colors hover:bg-background-secondary"
  >
  {rowInner}
  </button>
@@ -316,7 +317,7 @@ const ListingWizard = ({
  return (
  <div
  key={step.id}
- className={`flex items-start gap-3 rounded px-3 py-2.5 transition-colors ${
+ className={`flex items-start gap-2.5 rounded px-2.5 py-1.5 transition-colors ${
  isActive ? 'border border-border-light bg-background-secondary' : ''
  }`}
  >
@@ -329,24 +330,27 @@ const ListingWizard = ({
  </aside>
 
  {/* ── Step panel ── */}
- <section className="flex min-w-0 flex-col rounded-md border border-border-light bg-background-primary">
- <header className="border-b border-border-light px-5 py-5 sm:px-8 sm:py-6">
+ <section className="flex min-w-0 flex-col rounded border border-border-light bg-background-primary">
+ <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border-light px-5 py-3 sm:px-6 sm:py-3.5">
+ <div className="min-w-0">
  <div className="flex items-center gap-2 lg:hidden">
  <span className="text-xs font-semibold text-text-muted">
  {t("step") || "Step"} {activeStep} / {stepsList.length}
  </span>
  </div>
- <h1 className="mt-1 text-xl font-semibold tracking-tight text-text-primary sm:text-2xl lg:mt-0">
+ <h1 className="text-base font-semibold tracking-tight text-text-primary sm:text-lg">
  {currentStepInfo?.title || title}
  </h1>
  {(currentStepInfo?.description || subtitle) && (
- <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-text-secondary">
+ <p className="mt-0.5 max-w-2xl text-xs leading-relaxed text-text-secondary">
  {currentStepInfo?.description || subtitle}
  </p>
  )}
+ </div>
+ {headerExtra ? <div className="shrink-0">{headerExtra}</div> : null}
  </header>
 
- <div ref={stepPanelRef} className="flex-1 px-5 py-6 sm:px-8 sm:py-7">
+ <div ref={stepPanelRef} className="flex-1 px-5 py-4 sm:px-6 sm:py-4.5">
  <AnimatePresence mode="wait" custom={direction}>
  <motion.div key={activeStep} custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
  {typeof renderStep === 'function' ? renderStep(activeStep) : children}
@@ -354,7 +358,7 @@ const ListingWizard = ({
  </AnimatePresence>
  </div>
 
- <footer className="border-t border-border-light bg-background-secondary px-5 py-4 sm:px-8 sm:py-5">
+ <footer className="border-t border-border-light bg-background-secondary px-5 py-3 sm:px-6 sm:py-3.5">
  {footerElement}
  </footer>
  </section>

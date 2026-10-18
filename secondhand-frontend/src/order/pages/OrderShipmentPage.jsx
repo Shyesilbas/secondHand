@@ -43,7 +43,14 @@ const OrderShipmentPage = () => {
  staleTime: ORDER_TIME.ORDERS_LIST_STALE_MS
  });
  const backPath = isSellerView ? ROUTES.I_SOLD : ROUTES.MY_ORDERS;
- const title = order?.name || (order?.orderNumber != null ? `Order #${order.orderNumber}` : 'Shipment');
+ const formattedOrderDate = order?.createdAt
+ ? new Date(order.createdAt).toLocaleDateString('tr-TR', {
+ day: 'numeric',
+ month: 'long',
+ year: 'numeric',
+ })
+ : '';
+ const title = order?.name || order?.orderItems?.[0]?.listing?.title || formattedOrderDate || t('shipment_tracking', 'Shipment');
  const copyTracking = () => {
  const n = order?.shipping?.trackingNumber;
  if (!n) return;

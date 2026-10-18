@@ -489,7 +489,7 @@ const UnifiedOrderItem = React.memo(({
  ) : (
  <div className="flex flex-wrap items-center gap-2">
  <span className="max-w-xs truncate text-sm font-medium text-text-primary">
- {order.name || uiCopy.orderCardTitleFallback}
+ {order.name || items[0]?.listing?.title || uiCopy.orderCardTitleFallback}
  </span>
 
  <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
@@ -513,17 +513,14 @@ const UnifiedOrderItem = React.memo(({
  </div>
  )}
 
- {/* Meta: date & count */}
- <div className="flex items-center gap-2 text-sm tabular-nums text-text-tertiary">
- <time dateTime={order.createdAt || undefined}>{formatLongDate(order.createdAt, uiCopy.locale)}</time>
- <span className="w-1 h-1 rounded-full bg-secondary-300 shrink-0" aria-hidden />
- <span>{uiCopy.itemsSummary ? uiCopy.itemsSummary(items.length) : `${items.length} ürün`}</span>
- </div>
-
- {/* Order number */}
- <p className="text-sm tabular-nums text-text-tertiary">
- #{order.orderNumber}
- </p>
+ {order.createdAt ? (
+ <time
+ dateTime={order.createdAt}
+ className="text-sm tabular-nums text-text-tertiary"
+ >
+ {formatLongDate(order.createdAt, uiCopy.locale)}
+ </time>
+ ) : null}
  </div>
 
  {/* Right: Price & Actions */}

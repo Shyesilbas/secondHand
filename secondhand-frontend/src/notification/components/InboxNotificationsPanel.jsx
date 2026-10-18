@@ -1,8 +1,19 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Bell, CheckCheck, Filter, RefreshCw, Search as MagnifyingGlassIcon, X, Inbox, Calendar } from 'lucide-react';
+import {
+  Bell,
+  Calendar,
+  CheckCheck,
+  Filter,
+  Inbox,
+  RefreshCw,
+  Search as MagnifyingGlassIcon,
+  X
+} from 'lucide-react';
 import { useInAppNotificationsContext } from '../InAppNotificationContext.jsx';
 import NotificationCard from './NotificationCard.jsx';
+import { Button, EmptyState } from '../../common/components/ui/index.js';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import {
   NOTIFICATION_FILTERS,
   NOTIFICATION_CATEGORIES,
@@ -11,9 +22,56 @@ import {
   groupNotificationsByTimeline
 } from '../notificationConstants.js';
 
+const InboxNotificationsSkeleton = ({ t }) => (
+  <div
+    className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md border border-border bg-background-primary"
+    aria-busy="true"
+    aria-label={t('loading_notifications', 'Bildirimler yükleniyor')}
+  >
+    {/* Header Skeleton */}
+    <div className="flex h-12 shrink-0 items-center justify-between border-b border-border px-3 sm:px-4">
+      <div className="flex items-center gap-2.5">
+        <Skeleton className="h-4 w-4 rounded-full" />
+        <Skeleton className="h-4 w-28" />
+      </div>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-36 sm:w-52" />
+        <Skeleton className="h-8 w-8 rounded" />
+      </div>
+    </div>
+
+    {/* Filter Row Skeleton */}
+    <div className="flex items-center gap-1.5 border-b border-border-light bg-background-secondary/40 px-3 sm:px-4 py-1.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Skeleton key={i} className="h-6 w-18 rounded" />
+      ))}
+    </div>
+
+    {/* Feed Skeleton */}
+    <div className="min-h-0 flex-1 space-y-3 p-2.5 sm:p-3.5 overflow-y-auto bg-background-secondary/20">
+      <div className="w-full max-w-4xl mx-auto space-y-3">
+        <Skeleton className="h-3.5 w-20" />
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="rounded border border-border bg-background-primary p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-3.5 w-32" />
+              </div>
+              <Skeleton className="h-3 w-14" />
+            </div>
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="h-2.5 w-1/2" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 /**
  * Dedicated Notification Hub & Activity Feed
- * Clean, interactive timeline feed with category pills, unread toggle, search, and direct in-card actions.
+ * Compact, restrained timeline feed with category pills, unread toggle, instant search, and inline actions.
  */
 const InboxNotificationsPanel = () => {
   const { t } = useTranslation();
@@ -66,7 +124,12 @@ const InboxNotificationsPanel = () => {
         const config = getNotificationConfig(n.type);
         const badgeMatch = config?.badge?.toLowerCase().includes(q);
         const catMatch = config?.categoryLabel?.toLowerCase().includes(q);
-        return titleMatch || msgMatch || badgeMatch || catMatch;
+        let metaMatch = false;
+        if (n.metadata) {
+          const metaStr = typeof n.metadata === 'string' ? n.metadata : JSON.stringify(n.metadata);
+          metaMatch = metaStr.toLowerCase().includes(q);
+        }
+        return titleMatch || msgMatch || badgeMatch || catMatch || metaMatch;
       });
     }
 
@@ -88,59 +151,57 @@ const InboxNotificationsPanel = () => {
   };
 
   if (isLoading && notifications.length === 0) {
-    return (
-      <div className="h-full w-full rounded border border-border bg-background-primary p-4" aria-busy="true" aria-label={t('loading_notifications', 'Bildirimler yükleniyor...')}>
-        <SkeletonList />
-      </div>
-    );
+    return <InboxNotificationsSkeleton t={t} />;
   }
 
   return (
-    <div className="min-h-0 h-full w-full bg-white border border-border/90 rounded-md flex flex-col overflow-hidden">
-      {/* 1. Header Control Bar */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 border-b border-border/80 bg-white px-5 sm:px-7 py-3.5 sm:py-4 shrink-0">
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md border border-border bg-background-primary">
+      {/* 1. Header Control Bar (Compact h-12) */}
+      <header className="flex h-12 shrink-0 items-center justify-between gap-2.5 border-b border-border bg-background-primary px-3 sm:px-4">
         {/* Title & Status Summary */}
-        <div className="flex items-center gap-3.5 min-w-0">
-          <Bell className="shrink-0 h-5 w-5 text-text-primary" strokeWidth={1.5} aria-hidden />
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Bell className="h-4.5 w-4.5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden="true" />
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-semibold text-text-primary tracking-tight">
-                {t('notifications', 'Bildirimler')}
-              </h1>
-              {unreadCount > 0 && (
-                <span className="px-2.5 py-0.5 rounded-sm bg-primary text-white text-xs font-semibold tabular-nums">
-                  {unreadCount > 99 ? '99+' : unreadCount} yeni
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-text-muted font-medium truncate mt-0.5">
-              {notifications.length} {t('total_notifications_count', 'toplam bildirim • Sipariş, teklif ve mesaj güncellemeleri')}
-            </p>
+          <div className="min-w-0 flex items-center gap-2">
+            <h1 className="text-sm sm:text-base font-semibold text-text-primary tracking-tight">
+              {t('notifications', 'Bildirimler')}
+            </h1>
+            {unreadCount > 0 && (
+              <span className="rounded-sm bg-primary px-1.5 py-0.5 text-xs font-semibold tabular-nums text-white">
+                {unreadCount > 99 ? '99+' : unreadCount} {t('new_lower', 'yeni')}
+              </span>
+            )}
+            <span className="hidden sm:inline text-xs text-text-muted">
+              ({notifications.length})
+            </span>
           </div>
         </div>
 
         {/* Action Controls & Search */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* Search Input with Clear Button */}
-          <div className="relative w-full sm:w-60">
+          <div className="relative w-36 sm:w-56">
             <input
               id="notification-search"
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t('search_notifications', 'Bildirimlerde ara...')}
-              className="h-9.5 w-full rounded border border-border bg-background-secondary/70 pl-8.5 pr-8 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
+              className="h-8 w-full rounded border border-border bg-background-secondary pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-border-focus/20 transition-colors"
             />
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
+            <MagnifyingGlassIcon
+              className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted"
+              strokeWidth={1.5}
+            />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-text-muted hover:text-text-secondary hover:bg-secondary-200/60 transition-colors"
-                title={t('clear_search', 'Aramayı Temizle')}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                title={t('clear_search', 'Aramayı temizle')}
+                aria-label={t('clear_search', 'Aramayı temizle')}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3" strokeWidth={1.5} />
               </button>
             )}
           </div>
@@ -149,32 +210,37 @@ const InboxNotificationsPanel = () => {
           <button
             type="button"
             onClick={handleRefresh}
-            className="rounded p-2.5 text-text-muted hover:bg-background-tertiary hover:text-text-primary transition-colors border border-border/70 cursor-pointer"
+            disabled={isRefreshing}
+            className="flex h-8 w-8 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors hover:border-card-border-hover hover:bg-background-secondary hover:text-text-primary disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             title={t('refresh', 'Yenile')}
             aria-label={t('refresh', 'Yenile')}
           >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin text-text-primary' : ''}`} />
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin text-text-primary' : ''}`}
+              strokeWidth={1.5}
+            />
           </button>
 
           {/* Mark All Read Button */}
           {unreadCount > 0 && (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={markAllAsRead}
-              className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
+              className="!h-8 !px-2.5 text-xs"
               title={t('mark_all_read', 'Tümünü okundu olarak işaretle')}
             >
-              <CheckCheck className="h-4 w-4 text-status-success-text" />
-              <span className="hidden md:inline">{t('mark_all_read_btn', 'Tümünü Okundu Yap')}</span>
-            </button>
+              <CheckCheck className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} />
+              <span className="hidden sm:inline">{t('mark_all_read_btn', 'Tümünü okundu yap')}</span>
+            </Button>
           )}
         </div>
       </header>
 
-      {/* 2. Category Filter Pills & Toggle Row */}
-      <div className="flex items-center justify-between gap-3 border-b border-border-light bg-background-secondary/60 px-5 sm:px-7 py-2.5 shrink-0 overflow-x-auto no-scrollbar">
+      {/* 2. Category Filter Pills & Toggle Row (Compact py-1.5) */}
+      <div className="flex items-center justify-between gap-2 border-b border-border-light bg-background-secondary/40 px-3 sm:px-4 py-1.5 shrink-0 overflow-x-auto no-scrollbar">
         {/* Category Pills */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {NOTIFICATION_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const active = filterCategory === cat.id;
@@ -185,17 +251,17 @@ const InboxNotificationsPanel = () => {
                 key={cat.id}
                 type="button"
                 onClick={() => setFilterCategory(cat.id)}
-                className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
                   active
-                    ? 'bg-primary text-white'
-                    : 'bg-white border border-border/90 text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
+                    ? 'bg-primary font-semibold text-white'
+                    : 'border border-border bg-background-primary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${active ? 'text-white' : 'text-text-muted'}`} />
+                <Icon className={`h-3 w-3 ${active ? 'text-white' : 'text-text-muted'}`} strokeWidth={1.5} />
                 <span>{cat.label}</span>
                 {count > 0 && (
                   <span
-                    className={`ml-0.5 px-1.5 py-0.2 rounded-md text-xs tabular-nums font-semibold ${
+                    className={`rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums ${
                       active ? 'bg-white/20 text-white' : 'bg-background-tertiary text-text-tertiary'
                     }`}
                   >
@@ -211,74 +277,70 @@ const InboxNotificationsPanel = () => {
         <button
           type="button"
           onClick={() => setOnlyUnread((prev) => !prev)}
-          className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
+          className={`shrink-0 inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
             onlyUnread
-              ? 'bg-primary text-white'
-              : 'bg-white border border-border/90 text-text-secondary hover:bg-background-tertiary'
+              ? 'bg-primary font-semibold text-white'
+              : 'border border-border bg-background-primary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
           }`}
         >
-          <Filter className="h-3.5 w-3.5" />
-          <span>{t('unread_only', 'Sadece Okunmamışlar')}</span>
+          <Filter className="h-3 w-3" strokeWidth={1.5} />
+          <span>{t('unread_only', 'Sadece okunmamışlar')}</span>
           {unreadCount > 0 && !onlyUnread && (
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
           )}
         </button>
       </div>
 
-      {/* 3. Activity Feed Content */}
-      <div className="min-h-0 flex-1 overflow-y-auto bg-background-secondary/40 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-4xl mx-auto space-y-6">
+      {/* 3. Activity Feed Content (Compact p-2.5 sm:p-3.5) */}
+      <div className="min-h-0 flex-1 overflow-y-auto bg-background-secondary/20 p-2.5 sm:p-3.5">
+        <div className="w-full max-w-4xl mx-auto space-y-3.5">
           {timelineGroups.length === 0 ? (
-            /* Empty State */
-            <div className="flex flex-col items-center justify-center p-12 text-center bg-white rounded-md border border-border/80 my-6">
-              <Inbox className="mb-4 h-5 w-5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden />
-              <h3 className="text-base font-semibold text-text-primary mb-1.5">
-                {searchTerm
-                  ? 'Arama Kriterlerine Uygun Bildirim Yok'
+            <EmptyState
+              icon={Inbox}
+              title={
+                searchTerm
+                  ? t('no_matching_notifications', 'Arama kriterlerine uygun bildirim bulunamadı')
                   : onlyUnread
-                  ? 'Harika! Okunmamış Bildiriminiz Yok'
-                  : 'Henüz Bildiriminiz Bulunmuyor'}
-              </h3>
-              <p className="text-xs text-text-tertiary max-w-sm leading-relaxed font-medium">
-                {searchTerm
-                  ? 'Farklı bir anahtar kelime deneyebilir veya filtreleri sıfırlayabilirsiniz.'
+                  ? t('no_unread_notifications', 'Okunmamış bildirim bulunmuyor')
+                  : t('no_notifications_yet', 'Henüz bildirim bulunmuyor')
+              }
+              description={
+                searchTerm
+                  ? t('try_different_search', 'Farklı bir arama terimi deneyebilir veya filtreleri temizleyebilirsiniz.')
                   : onlyUnread
-                  ? 'Tüm bildirimlerinizi okudunuz. Yeni bir hareket olduğunda burada görünecektir.'
-                  : 'Siparişleriniz, teklifleriniz ve mesajlarınızla ilgili tüm güncellemeler burada listelenecektir.'}
-              </p>
-
-              {(searchTerm || onlyUnread || filterCategory !== NOTIFICATION_FILTERS.ALL) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setOnlyUnread(false);
-                    setFilterCategory(NOTIFICATION_FILTERS.ALL);
-                  }}
-                  className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 mt-5"
-                >
-                  Filtreleri Temizle
-                </button>
-              )}
-            </div>
+                  ? t('all_notifications_read', 'Tüm bildirimlerinizi okudunuz. Yeni bir hareket olduğunda burada listelenecektir.')
+                  : t('notifications_empty_help', 'Siparişleriniz, teklifleriniz ve mesajlarınızla ilgili tüm güncellemeler burada yer alır.')
+              }
+              primaryAction={
+                searchTerm || onlyUnread || filterCategory !== NOTIFICATION_FILTERS.ALL
+                  ? {
+                      label: t('clear_filters', 'Filtreleri temizle'),
+                      onClick: () => {
+                        setSearchTerm('');
+                        setOnlyUnread(false);
+                        setFilterCategory(NOTIFICATION_FILTERS.ALL);
+                      }
+                    }
+                  : undefined
+              }
+            />
           ) : (
-            /* Grouped Timeline Cards */
             timelineGroups.map((group) => (
-              <div key={group.key} className="space-y-3">
+              <div key={group.key} className="space-y-2">
                 {/* Timeline Header */}
-                <div className="flex items-center gap-3 px-1">
+                <div className="flex items-center gap-2.5 px-0.5">
                   <span className="flex items-center gap-1.5 text-xs font-semibold text-text-muted">
-                    <Calendar className="h-3.5 w-3.5" />
+                    <Calendar className="h-3.5 w-3.5" strokeWidth={1.5} />
                     {group.title}
                   </span>
-                  <div className="h-px flex-1 bg-secondary-200/80" />
-                  <span className="text-xs font-semibold text-text-muted tabular-nums">
-                    {group.items.length} bildirim
+                  <div className="h-px flex-1 bg-border-light" />
+                  <span className="text-xs font-medium text-text-muted tabular-nums">
+                    {group.items.length} {t('notifications_count_lower', 'bildirim')}
                   </span>
                 </div>
 
-                {/* Cards List */}
-                <div className="space-y-2.5">
+                {/* Cards List (Tight spacing) */}
+                <div className="space-y-1.5">
                   {group.items.map((notification) => (
                     <NotificationCard
                       key={notification.id}

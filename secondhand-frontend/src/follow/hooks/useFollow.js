@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { followService } from '../services/followService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -115,6 +115,92 @@ export const useFollow = (userId) => {
  refetch: refetchStats,
  isOwnProfile,
  canFollow: !!user && !isOwnProfile,
+ };
+};
+
+export const useFollowingList = (page = 0, size = 20) => {
+ const { user, isAuthenticated } = useAuthState();
+ const [currentPage, setCurrentPage] = useState(page);
+
+ useEffect(() => {
+ setCurrentPage(0);
+ }, [user?.id]);
+
+ const {
+ data: followingData,
+ isLoading,
+ error,
+ refetch
+ } = useQuery({
+ queryKey: ['following', user?.id, currentPage, size],
+ queryFn: () => followService.getFollowing({ page: currentPage, size }),
+ enabled: !!(isAuthenticated && user?.id),
+ staleTime: 5 * 60 * 1000,
+ gcTime: 30 * 60 * 1000,
+ });
+
+ const following = followingData?.content || [];
+ const pagination = {
+ number: followingData?.number || 0,
+ size: followingData?.size || 20,
+ totalPages: followingData?.totalPages || 0,
+ totalElements: followingData?.totalElements || 0
+ };
+
+ const loadPage = useCallback((newPage) => {
+ setCurrentPage(newPage);
+ }, []);
+
+ return {
+ following,
+ pagination,
+ isLoading,
+ error: error?.response?.data?.message || error?.message,
+ loadPage,
+ refetch
+ };
+};
+
+export const useFollowersList = (page = 0, size = 20) => {
+ const { user, isAuthenticated } = useAuthState();
+ const [currentPage, setCurrentPage] = useState(page);
+
+ useEffect(() => {
+ setCurrentPage(0);
+ }, [user?.id]);
+
+ const {
+ data: followersData,
+ isLoading,
+ error,
+ refetch
+ } = useQuery({
+ queryKey: ['followers', user?.id, currentPage, size],
+ queryFn: () => followService.getFollowers({ page: currentPage, size }),
+ enabled: !!(isAuthenticated && user?.id),
+ staleTime: 5 * 60 * 1000,
+ gcTime: 30 * 60 * 1000,
+ });
+
+ const followers = followersData?.content || [];
+ const pagination = {
+ number: followersData?.number || 0,
+ size: followersData?.size || 20,
+ totalPages: followersData?.totalPages || 0,
+ totalElements: followersData?.totalElements || 0
+ };
+
+ const loadPage = useCallback((newPage) => {
+ setCurrentPage(newPage);
+ }, []);
+
+ return {
+ followers,
+ pagination,
+ isLoading,
+ error: error?.response?.data?.message || error?.message,
+ loadPage,
+ refetch
  };
 };
 

@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Check, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
+import { Search, Check, ChevronRight, ArrowRight } from 'lucide-react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry, getCreateFlowSelectorSteps, getListingTypeOptions, getPrefilterSelectors, isCreateSelectionComplete } from '../config/listingConfig.js';
 import { getAuxiliaryUi, getCategoryCardClasses, getGridCheckDotClass, getGridOptionClasses, getGridOptionLabelClass, PREFLOW_WIZARD_VARIANT } from '../config/prefilterFlowUi.js';
@@ -285,62 +285,43 @@ const ListingPrefilterSelectionFlow = ({
  }, [enums]);
  const renderSelectionStep = useCallback(stepId => {
  if (stepId === 1) {
- const categoryGrid = <div className="space-y-4">
- {mode === 'browse' && <motion.div initial={{
- opacity: 0,
- y: -10
- }} animate={{
- opacity: 1,
- y: 0
- }} transition={{
- duration: 0.3
- }} className="flex flex-col gap-4 rounded border border-primary-200 bg-primary-50 p-5 sm:flex-row sm:items-center sm:justify-between">
- <div className="flex items-start gap-3.5">
- <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-background-primary text-primary">
- <Sparkles className="h-5 w-5" />
- </div>
- <div className="min-w-0">
- <h4 className="text-sm font-semibold text-text-primary">{t("just_want_to_look_around") || "Tüm İlanları Keşfedin"}</h4>
- <p className="mt-1 text-sm leading-relaxed text-text-secondary">{t("skip_selecting_a_category_and_filters_to") || "Kategori ve filtre seçmeden doğrudan tüm aktif ilanları listeleyin."}</p>
- </div>
- </div>
- <Link to={ROUTES.LISTINGS} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 shrink-0">
- <span>{t("browse_all_listings") || "Tüm İlanlara Bak"}</span>
- <ArrowRight className="h-4 w-4" />
- </Link>
- </motion.div>}
- <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
- {listingTypeOptions.map(type => {
- const isSelected = selectedType === type.value;
- const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
-
- const TypeIcon = type.icon;
- return <motion.button key={type.value} variants={gridItemVariants} type="button" onClick={() => handleTypeSelect(type.value)} aria-pressed={isSelected} className={card.wrapper}>
- {TypeIcon ? <TypeIcon className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden /> : null}
- <div className="min-w-0 flex-1">
- <div className="flex items-center gap-2">
- <h3 className={`text-sm font-semibold text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
- </div>
- <p className={`mt-1 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
- </div>
- {isSelected ? <motion.div initial={{
- scale: 0,
- rotate: -45
- }} animate={{
- scale: 1,
- rotate: 0
- }} transition={{
- type: 'spring',
- stiffness: 500,
- damping: 22
- }} className={card.checkOuter}>
- <Check className={card.checkInner} strokeWidth={3} />
- </motion.div> : <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />}
- </motion.button>;
- })}
- </motion.div>
- </div>;
- return categoryGrid;
+  return (
+   <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    {listingTypeOptions.map(type => {
+     const isSelected = selectedType === type.value;
+     const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
+     const TypeIcon = type.icon;
+     return (
+      <motion.button
+       key={type.value}
+       variants={gridItemVariants}
+       type="button"
+       onClick={() => handleTypeSelect(type.value)}
+       aria-pressed={isSelected}
+       className={card.wrapper}
+      >
+       {TypeIcon ? <TypeIcon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden /> : null}
+       <div className="min-w-0 flex-1">
+        <h3 className={`text-sm font-semibold text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
+        <p className={`mt-0.5 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
+       </div>
+       {isSelected ? (
+        <motion.div
+         initial={{ scale: 0, rotate: -45 }}
+         animate={{ scale: 1, rotate: 0 }}
+         transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+         className={card.checkOuter}
+        >
+         <Check className={card.checkInner} strokeWidth={2.5} />
+        </motion.div>
+       ) : (
+        <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />
+       )}
+      </motion.button>
+     );
+    })}
+   </motion.div>
+  );
  }
  const selectorIndex = stepId - 2;
  const selector = selectorSteps[selectorIndex];
@@ -466,6 +447,15 @@ const ListingPrefilterSelectionFlow = ({
  </div>;
  }
  const showBrowseMidSearch = mode === 'browse' && partialBrowseSearchEnabled && selectionStep > 1;
+ const browseHeaderExtra = mode === 'browse' ? (
+  <Link
+   to={ROUTES.LISTINGS}
+   className="inline-flex items-center gap-1.5 rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:border-card-border-hover hover:text-text-primary shrink-0"
+  >
+   <span>{t("browse_all_listings", "Tüm İlanlara Bak")}</span>
+   <ArrowRight className="h-3.5 w-3.5" />
+  </Link>
+ ) : null;
  const browseFooterExtra = showBrowseMidSearch ? <div className="flex justify-end">
  <button type="button" onClick={triggerBrowseSearch} className={auxUi.midSearchBtn}>
  <Search className="h-4 w-4" />{t("search_listings")}</button>
@@ -488,6 +478,7 @@ const ListingPrefilterSelectionFlow = ({
  canSubmit={canGoNextSelection}
  onCancel={onCancel}
  isCompleting={isReadyToFinish}
+ headerExtra={browseHeaderExtra}
  footerExtra={browseFooterExtra}
  lastStepAction={browseLastStepAction}
  categoryCardCount={listingTypeOptions.length}
