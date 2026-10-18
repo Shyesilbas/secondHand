@@ -6,32 +6,32 @@ const statuses = [{
  label: 'Pending',
  icon: Clock,
  color: 'text-status-warning',
- bg: 'bg-status-warning-bg',
- border: 'border-amber-200/50',
+ bg: 'bg-background-secondary',
+ border: 'border-border/50',
  keys: ['PENDING', 'CONFIRMED', 'PROCESSING']
 }, {
  key: 'shipped',
  label: 'Shipped',
  icon: Truck,
- color: 'text-sky-600',
- bg: 'bg-sky-50',
- border: 'border-sky-200/50',
+ color: 'text-text-primary',
+ bg: 'bg-background-secondary',
+ border: 'border-border/50',
  keys: ['SHIPPED']
 }, {
  key: 'delivered',
  label: 'Delivered',
  icon: PackageCheck,
  color: 'text-status-success',
- bg: 'bg-status-success-bg',
- border: 'border-slate-300/50',
+ bg: 'bg-background-secondary',
+ border: 'border-card-border-hover/50',
  keys: ['DELIVERED', 'COMPLETED']
 }, {
  key: 'cancelled',
  label: 'Cancelled',
  icon: XCircle,
- color: 'text-rose-600',
- bg: 'bg-rose-50',
- border: 'border-rose-200/50',
+ color: 'text-status-error-text',
+ bg: 'bg-background-secondary',
+ border: 'border-border/50',
  keys: ['CANCELLED', 'REFUNDED']
 }];
 const QuickStatusSummary = ({
@@ -54,10 +54,10 @@ const QuickStatusSummary = ({
  y: 0
  }} transition={{
  delay: 0.25
- }} className="bg-background-primary rounded-2xl border border-slate-100 p-4 shadow-sm">
+ }} className="bg-background-primary rounded-md border border-border-light p-4">
  <div className="flex items-center gap-3 flex-wrap">
- <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("order_status")}</span>
- <div className="h-4 w-px bg-slate-200" />
+ <span className="text-xs font-semibold text-text-muted">{t("order_status")}</span>
+ <div className="h-4 w-px bg-secondary-200" />
  <div className="flex items-center gap-2 flex-wrap">
  {counts.map(({
  key,
@@ -67,10 +67,10 @@ const QuickStatusSummary = ({
  bg,
  border,
  count
- }) => <div key={key} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${bg} border ${border} transition-all`}>
+ }) => <div key={key} className={`flex items-center gap-1.5 px-3 py-1.5 rounded ${bg} border ${border} transition-all`}>
  <Icon className={`w-3.5 h-3.5 ${color}`} />
- <span className={`text-xs font-bold ${color}`}>{count}</span>
- <span className="text-caption text-slate-500 font-medium">{label}</span>
+ <span className={`text-xs font-semibold ${color}`}>{count}</span>
+ <span className="text-xs text-text-tertiary font-medium">{label}</span>
  </div>)}
  </div>
  </div>

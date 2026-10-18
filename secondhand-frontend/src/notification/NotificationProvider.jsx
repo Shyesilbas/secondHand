@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import NotificationModal from './NotificationModal.jsx';
 import Toast from './components/Toast.jsx';
 import { NotificationContext } from './NotificationContext.jsx';
@@ -157,7 +157,7 @@ export const NotificationProvider = ({ children }) => {
  onClose={() => removeNotification(notification.id)}
  />
  ))}
- <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2">
+ <div className="fixed bottom-4 right-4 z-tooltip flex flex-col gap-2">
  {toasts.map(toast => (
  <Toast
  key={toast.id}

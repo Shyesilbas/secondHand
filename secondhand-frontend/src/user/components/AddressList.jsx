@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import useAddresses from '../hooks/useAddresses.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
@@ -113,9 +113,8 @@ const AddressList = memo(({
 
  <AddressForm isOpen={showUpdateAddress} onClose={handleCloseUpdateForm} onSubmit={handleUpdateAddress} initialData={selectedAddress} isEditing={true} loading={updating} error={updateError} />
 
- {loading ? <div className="text-center py-8">
- <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-btn-primary"></div>
- <p className="mt-2 text-text-secondary">{t("loading_addresses")}</p>
+ {loading ? <div className="py-4" aria-busy="true" aria-label={t("loading_addresses")}>
+ <SkeletonList />
  </div> : error ? <div className="text-center py-8">
  <div className="text-status-error">{t("failed_to_load_addresses")}</div>
  </div> : addresses.length === 0 ? <div className="text-center py-8">

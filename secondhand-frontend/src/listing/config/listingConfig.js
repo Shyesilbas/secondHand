@@ -1,3 +1,4 @@
+import { createElement, lazy } from 'react';
 import { LISTING_TYPES } from '../types/index.js';
 import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 
@@ -45,10 +46,6 @@ export const getCreateFlowSelectorSteps = (listingType) => {
  return list;
 };
 
-export const getAllListingTypes = () => {
- return Object.keys(listingTypeConfig);
-};
-
 export const getListingTypeOptions = () => {
  return Object.entries(listingTypeConfig).map(([value, config]) => ({
  value,
@@ -58,25 +55,23 @@ export const getListingTypeOptions = () => {
  }));
 };
 
-export const isValidListingType = (listingType) => {
- return listingType && listingTypeConfig.hasOwnProperty(listingType);
-};
+const GenericListingForm = lazy(() => import('../components/GenericListingForm.jsx'));
+
+// One form serves every category; each registry entry binds its listing type.
+export const createFormRegistry = Object.fromEntries(
+ Object.keys(listingTypeConfig).map((type) => [
+ type,
+ (props) => createElement(GenericListingForm, { ...props, listingType: type })
+ ])
+);
 
 export const listingTypeRegistry = Object.fromEntries(
  Object.entries(listingTypeConfig).map(([type, config]) => [
  type,
  {
  detailsComponent: config.detailsComponent,
- editComponent: config.createComponent,
- compactBadges: config.compactBadges
+ editComponent: createFormRegistry[type]
  }
- ])
-);
-
-export const createFormRegistry = Object.fromEntries(
- Object.entries(listingTypeConfig).map(([type, config]) => [
- type,
- config.createComponent
  ])
 );
 
@@ -96,4 +91,3 @@ export const isCreateSelectionComplete = (listingType, selection, enums = null) 
  );
 };
 
-export default listingTypeConfig;

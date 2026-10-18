@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { formatPhoneNumber } from '../../utils/phoneFormatter.js';
+import Button from '../ui/Button.jsx';
+import Modal from '../ui/Modal.jsx';
+const INPUT = 'h-10 w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus';
 const PhoneUpdateModal = ({
  isOpen,
  formData,
@@ -11,40 +14,24 @@ const PhoneUpdateModal = ({
  const {
  t
  } = useTranslation();
- if (!isOpen) return null;
- return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
- <div className="bg-background-primary rounded-lg p-6 max-w-md w-full mx-4">
- <div className="flex items-center justify-between mb-4">
- <h3 className="text-sm font-medium text-text-primary">{t("update_phone_number")}</h3>
- <button onClick={closeModal} className="text-text-muted hover:text-text-secondary">
- <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
- </svg>
- </button>
- </div>
-
- <div className="space-y-4">
+ const handleSubmit = e => {
+ e.preventDefault();
+ submit();
+ };
+ return <Modal isOpen={isOpen} onClose={closeModal} title={t("update_phone_number")} size="sm" footer={<>
+ <Button variant="secondary" onClick={closeModal} disabled={isUpdating}>{t("cancel")}</Button>
+ <Button type="submit" form="phone-update-form" disabled={isUpdating}>{isUpdating ? 'Updating...' : 'Update phone number'}</Button>
+ </>}>
+ <form id="phone-update-form" onSubmit={handleSubmit} className="space-y-4">
  <div>
- <label className="block text-sm font-medium text-text-secondary mb-2">{t("new_phone_number")}</label>
- <input type="tel" value={formData.newPhone} onChange={e => {
- const formattedPhone = formatPhoneNumber(e.target.value, true);
- handleChange('newPhone', formattedPhone);
- }} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder={t("90_5xx_xxx_xx_xx")} />
+ <label htmlFor="phone-update-new" className="mb-1 block text-sm font-medium text-text-primary">{t("new_phone_number")}</label>
+ <input id="phone-update-new" type="tel" autoComplete="tel" value={formData.newPhone} onChange={e => handleChange('newPhone', formatPhoneNumber(e.target.value, true))} className={INPUT} placeholder={t("90_5xx_xxx_xx_xx")} />
  </div>
-
  <div>
- <label className="block text-sm font-medium text-text-secondary mb-2">{t("password")}</label>
- <input type="password" value={formData.password} onChange={e => handleChange('password', e.target.value)} className="w-full px-3 py-2 border border-header-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder={t("enter_your_password")} />
+ <label htmlFor="phone-update-password" className="mb-1 block text-sm font-medium text-text-primary">{t("password")}</label>
+ <input id="phone-update-password" type="password" autoComplete="current-password" value={formData.password} onChange={e => handleChange('password', e.target.value)} className={INPUT} placeholder={t("enter_your_password")} />
  </div>
- </div>
-
- <div className="flex justify-end space-x-3 mt-4">
- <button onClick={closeModal} className="px-4 py-2 text-text-secondary hover:text-gray-800 font-medium" disabled={isUpdating}>{t("cancel")}</button>
- <button onClick={submit} disabled={isUpdating} className="px-6 py-2 bg-btn-primary text-white rounded-md hover:bg-btn-primary-hover disabled:opacity-50 font-medium">
- {isUpdating ? 'Updating...' : 'Update'}
- </button>
- </div>
- </div>
- </div>;
+ </form>
+ </Modal>;
 };
 export default PhoneUpdateModal;

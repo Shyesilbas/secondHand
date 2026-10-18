@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Clock, Gauge, Layers, Pencil, Percent, Plus, RefreshCw, Search, Shield, Tag, Ticket, Users, X } from 'lucide-react';
+import { ArrowLeft, Clock, Gauge, Layers, Pencil, Percent, Plus, RefreshCw, Search, Shield, Tag, Users } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatDateTime } from '../../common/formatters.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { adminCouponApi } from '../services/adminCouponApi.js';
+import { Button, Modal, SkeletonList } from '../../common/components/ui/index.js';
 const LISTING_TYPES = ['VEHICLE', 'ELECTRONICS', 'REAL_ESTATE', 'CLOTHING', 'BOOKS', 'SPORTS', 'OTHER'];
 const AUDIENCES = [{
  value: 'ALL_USERS',
@@ -89,20 +90,17 @@ const audienceSummary = (row, t) => {
 };
 
 /** Consistent form controls */
-const inputCn = 'mt-1.5 w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm placeholder:text-slate-400 transition-colors focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-100/90 disabled:text-slate-500';
+const inputCn = 'mt-1.5 w-full rounded border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-background-tertiary/90 disabled:text-text-tertiary';
 function FormSection({
- // eslint-disable-next-line no-unused-vars
  Icon,
  title,
  subtitle,
  children,
  className = ''
 }) {
- return <section className={`rounded-2xl border border-border-light bg-background-primary p-4 shadow-sm ${className}`}>
+ return <section className={`rounded-md border border-border-light bg-background-primary p-4 shadow-sm ${className}`}>
  <div className="mb-3 flex items-start gap-3">
- <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
- <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
- </div>
+ <Icon className="shrink-0 h-5 w-5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <div className="min-w-0 flex-1 pt-0.5">
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
  {subtitle ? <p className="mt-0.5 text-xs leading-relaxed text-text-muted">{subtitle}</p> : null}
@@ -178,14 +176,13 @@ const AdminCouponsPage = () => {
  forAllUsers: false
  };
  });
- }, []);
+ }, [t]);
  const createMut = useMutation({
  mutationFn: body => adminCouponApi.create(body),
  onSuccess: () => {
  showSuccess('Saved', 'Coupon created.');
  invalidate();
- setModal(null);
- setForm(emptyForm());
+ closeCouponModal();
  },
  onError: e => showError('Create failed', e?.response?.data?.message || e.message)
  });
@@ -197,11 +194,14 @@ const AdminCouponsPage = () => {
  onSuccess: () => {
  showSuccess('Saved', 'Coupon updated.');
  invalidate();
- setModal(null);
- setForm(emptyForm());
+ closeCouponModal();
  },
  onError: e => showError('Update failed', e?.response?.data?.message || e.message)
  });
+ const closeCouponModal = () => {
+ setModal(null);
+ setForm(emptyForm());
+ };
  const openCreate = () => {
  setForm(emptyForm());
  setModal('create');
@@ -355,13 +355,13 @@ const AdminCouponsPage = () => {
 
  return <div className="min-h-screen bg-background-secondary">
  <div className="max-w-7xl mx-auto px-4 pb-10">
- <div className="sticky top-0 z-10 -mx-4 mb-4 px-4 py-4 bg-background-secondary/90 backdrop-blur border-b border-border-light flex flex-wrap items-center justify-between gap-3">
+ <div className="sticky top-0 z-10 -mx-4 mb-4 px-4 py-4 bg-background-secondary border-b border-border-light flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-3 min-w-0">
  <Link to={ROUTES.DASHBOARD} className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-primary shrink-0">
  <ArrowLeft className="w-4 h-4" />{t("account")}</Link>
  <div className="h-8 w-px bg-border-light hidden sm:block" />
  <div className="flex items-center gap-2 min-w-0">
- <div className="p-2 rounded-xl bg-primary-light text-primary">
+ <div className="p-2 rounded bg-primary-light text-primary">
  <Shield className="w-5 h-5" />
  </div>
  <div className="min-w-0">
@@ -371,22 +371,22 @@ const AdminCouponsPage = () => {
  </div>
  </div>
  <div className="flex items-center gap-2">
- <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border-light bg-background-primary text-sm text-text-primary hover:bg-background-secondary disabled:opacity-60">
+ <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
  <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />{t("refresh")}</button>
- <button type="button" onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-hover shadow-sm">
+ <button type="button" onClick={openCreate} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  <Plus className="w-4 h-4" />{t("new_coupon")}</button>
  </div>
  </div>
 
- <div className="rounded-2xl border border-border-light bg-background-primary shadow-sm overflow-hidden">
- {isLoading ? <div className="p-16 flex justify-center">
- <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+ <div className="rounded-md border border-border-light bg-background-primary overflow-hidden">
+ {isLoading ? <div className="p-4" aria-busy="true">
+ <SkeletonList />
  </div> : sorted.length === 0 ? <div className="p-16 text-center text-text-muted text-sm">{t("no_coupons_yet_create_one_with_new_coupo")}</div> : <>
  <div className="flex flex-col gap-2 border-b border-border-light bg-background-secondary px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
  <label className="relative block min-w-0 flex-1 sm:max-w-sm">
  <span className="sr-only">{t("filter_by_coupon_code")}</span>
  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden />
- <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded-xl border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary shadow-sm placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-[3px] focus:ring-primary/15" />
+ <input type="search" value={codeFilter} onChange={e => setCodeFilter(e.target.value)} placeholder={t("filter_by_code")} autoComplete="off" className="w-full rounded border border-border-light bg-background-primary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15" />
  </label>
  {normalizedCodeQuery ? <span className="shrink-0 text-xs font-medium tabular-nums text-text-muted">
  {filteredSorted.length}{t("of")}{sorted.length}
@@ -408,18 +408,18 @@ const AdminCouponsPage = () => {
  <th className="px-4 py-3 font-semibold">{t("audience")}</th>
  <th className="px-4 py-3 font-semibold">{t("period")}</th>
  <th className="px-4 py-3 font-semibold">{t("active")}</th>
- <th className="px-4 py-3 font-semibold w-[100px]" />
+ <th className="px-4 py-3 font-semibold w-24" />
  </tr>
  </thead>
  <tbody className="divide-y divide-border-light">
  {filteredSorted.map(row => <tr key={row.id} className="hover:bg-background-secondary">
  <td className="px-4 py-3 font-medium text-text-primary">{row.code}</td>
- <td className="px-4 py-3 max-w-[200px]">
+ <td className="px-4 py-3 max-w-48">
  <div className="truncate text-text-primary">{row.title}</div>
  {row.description && <div className="truncate text-xs text-text-muted">{row.description}</div>}
  </td>
  <td className="px-4 py-3 text-text-primary whitespace-nowrap">
- <span className="text-xs text-text-muted uppercase">{String(row.discountKind || '').replace(/_/g, ' ')}</span>
+ <span className="text-xs text-text-muted">{String(row.discountKind || '').replace(/_/g, ' ')}</span>
  <div>{row.value != null ? row.value : '—'}</div>
  </td>
  <td className="px-4 py-3 whitespace-nowrap tabular-nums text-xs text-text-primary">
@@ -448,7 +448,7 @@ const AdminCouponsPage = () => {
  <div>{formatDateTime(row.endsAt)}</div>
  </td>
  <td className="px-4 py-3">
- <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${row.active ? 'bg-status-success-bg text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
+ <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-medium ${row.active ? 'bg-background-secondary text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
  {row.active ? 'On' : 'Off'}
  </span>
  </td>
@@ -464,37 +464,14 @@ const AdminCouponsPage = () => {
  </div>
  </div>
 
- {modal && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="coupon-modal-title">
- <div className="flex max-h-[min(92vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-t-[1.75rem] border border-border-light bg-background-primary shadow-md sm:rounded-xl sm:shadow-lg">
- <header className="relative shrink-0 overflow-hidden border-b border-border-light bg-background-secondary px-5 py-5 text-text-primary">
- <div className="relative flex items-start justify-between gap-4">
- <div className="flex min-w-0 items-start gap-3">
- <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-light text-primary">
- <Ticket className="h-6 w-6 opacity-95" strokeWidth={2} />
- </div>
- <div className="min-w-0 pt-0.5">
- <h2 id="coupon-modal-title" className="text-lg font-semibold text-text-primary tracking-tight">
- {modal === 'create' ? t('admin_new_coupon') : t('admin_edit_coupon')}
- </h2>
- <p className="mt-1 text-sm font-medium leading-snug text-text-muted">
- {modal === 'create' ? t('admin_coupon_create_desc') : t('admin_coupon_edit_desc')}
- </p>
- </div>
- </div>
- <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl hover:bg-background-tertiary text-text-secondary transition-colors" onClick={() => {
- setModal(null);
- setForm(emptyForm());
- }} aria-label={t("kapat")}>
- <X className="h-5 w-5" />
- </button>
- </div>
- </header>
-
- <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col bg-background-primary">
- <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
+ <Modal isOpen={!!modal} onClose={closeCouponModal} title={modal === 'create' ? t('admin_new_coupon') : t('admin_edit_coupon')} description={modal === 'create' ? t('admin_coupon_create_desc') : t('admin_coupon_edit_desc')} size="lg" footer={<>
+ <Button variant="secondary" onClick={closeCouponModal}>{t("vazge")}</Button>
+ <Button type="submit" form="admin-coupon-form" disabled={submitting}>{submitting ? 'Kaydediliyor…' : 'Kaydet'}</Button>
+ </>}>
+ <form id="admin-coupon-form" onSubmit={handleSubmit} className="space-y-4">
  <FormSection Icon={Tag} title={t("temel_bilgiler")} subtitle={t('admin_basic_info_subtitle')}>
  {modal === 'create' && <label className="block">
- <span className="text-xs font-semibold text-text-secondary">{t("kod")}<span className="text-rose-500">*</span>
+ <span className="text-xs font-semibold text-text-secondary">{t("kod")}<span className="text-status-error">*</span>
  </span>
  <input className={`${inputCn} uppercase tracking-wide`} value={form.code} onChange={e => setForm(p => ({
  ...p,
@@ -502,7 +479,7 @@ const AdminCouponsPage = () => {
  }))} placeholder={t("ilk300")} required />
  </label>}
  <label className="block">
- <span className="text-xs font-semibold text-text-secondary">{t("ba_l_k")}<span className="text-rose-500">*</span>
+ <span className="text-xs font-semibold text-text-secondary">{t("ba_l_k")}<span className="text-status-error">*</span>
  </span>
  <input className={inputCn} value={form.title} onChange={e => setForm(p => ({
  ...p,
@@ -511,7 +488,7 @@ const AdminCouponsPage = () => {
  </label>
  <label className="block">
  <span className="text-xs font-semibold text-text-secondary">{t("a_klama")}</span>
- <textarea className={`${inputCn} min-h-[88px] resize-y leading-relaxed`} value={form.description} onChange={e => setForm(p => ({
+ <textarea className={`${inputCn} min-h-20 resize-y leading-relaxed`} value={form.description} onChange={e => setForm(p => ({
  ...p,
  description: e.target.value
  }))} placeholder={t("kuponun_artlar_n_k_saca_yaz_n")} />
@@ -524,7 +501,7 @@ const AdminCouponsPage = () => {
  <div className="grid gap-2 sm:grid-cols-1">
  {AUDIENCES.map(opt => {
  const selected = form.audience === opt.value;
- return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-primary-light shadow-sm ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-border-dark hover:bg-background-secondary'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
+ return <label key={opt.value} className={`flex cursor-pointer items-start gap-3 rounded-md border p-3.5 transition-all sm:p-4 ${selected ? 'border-primary bg-primary-light ring-2 ring-primary/20' : 'border-border-light bg-background-primary hover:border-border-dark hover:bg-background-secondary'} ${modal?.mode === 'edit' ? 'cursor-default opacity-95' : ''}`}>
  <input type="radio" name="coupon-audience" className="mt-1 h-4 w-4 shrink-0 border-border-light text-primary focus:ring-primary" checked={selected} onChange={() => setAudienceSelection(opt.value)} />
  <span className="min-w-0 flex-1">
  <span className="block text-sm font-semibold text-text-primary">{t(opt.labelKey)}</span>
@@ -534,11 +511,11 @@ const AdminCouponsPage = () => {
  })}
  </div>
  </fieldset>
- {modal?.mode === 'edit' && <p className="rounded-xl border border-status-warning-border bg-status-warning-bg px-3 py-2 text-xs text-status-warning-text">{t("hedef_kitle_olu_turulduktan_sonra_de_i_t")}</p>}
+ {modal?.mode === 'edit' && <p className="rounded border border-border bg-background-secondary px-3 py-2 text-xs text-status-warning-text">{t("hedef_kitle_olu_turulduktan_sonra_de_i_t")}</p>}
 
- {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border-light bg-background-secondary px-4 py-3.5">
+ {form.audience === 'NEVER_ORDERED_FIRST_ORDER' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border-light bg-background-secondary px-4 py-3.5">
  <div className="flex items-center gap-2.5 text-sm text-text-primary">
- <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background-primary shadow-sm border border-border-light">
+ <div className="flex h-10 w-10 items-center justify-center rounded bg-background-primary border border-border-light">
  <Users className="h-5 w-5 text-primary" />
  </div>
  <div>
@@ -546,17 +523,17 @@ const AdminCouponsPage = () => {
  <p className="text-xs text-text-muted">{t("tamamlanm_demeli_sipari_i_olmayan_kay_tl")}</p>
  </div>
  </div>
- <div className="rounded-xl bg-background-primary px-4 py-2 text-center shadow-sm border border-border-light">
- <span className="block text-2xl font-bold tabular-nums tracking-tight text-primary">
+ <div className="rounded bg-background-primary px-4 py-2 text-center border border-border-light">
+ <span className="block text-2xl font-semibold tabular-nums tracking-tight text-primary">
  {audienceStatsLoading ? '…' : audienceStats?.eligibleUserCount ?? '—'}
  </span>
- <span className="text-caption font-medium uppercase tracking-wide text-text-muted">{t("ki_i")}</span>
+ <span className="text-xs font-medium text-text-muted">{t("ki_i")}</span>
  </div>
  </div>}
 
  {form.audience === 'USER_ID_LIST' && <label className="block">
  <span className="text-xs font-semibold text-text-secondary">{t("kullan_c_id_leri")}</span>
- <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
+ <span className="mt-0.5 block text-xs font-normal text-text-muted">{t("virg_l_veya_bo_lukla_ay_r_n_yinelenenler")}</span>
  <input className={`${inputCn} text-sm`} value={form.eligibleUserIdsText} onChange={e => setForm(p => ({
  ...p,
  eligibleUserIdsText: e.target.value
@@ -565,7 +542,7 @@ const AdminCouponsPage = () => {
  </FormSection>
 
  <FormSection Icon={Clock} title={t("yay_n_ve_s_re")} subtitle={t('admin_publication_subtitle')}>
- <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border-light bg-background-primary px-4 py-3.5 shadow-sm transition hover:border-border-dark">
+ <label className="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-border-light bg-background-primary px-4 py-3.5 transition hover:border-border-dark">
  <span className="text-sm font-semibold text-text-primary">{t("kupon_yay_nda")}</span>
  <input type="checkbox" checked={form.active} onChange={e => setForm(p => ({
  ...p,
@@ -632,7 +609,7 @@ const AdminCouponsPage = () => {
  <div className="flex flex-wrap gap-2">
  {LISTING_TYPES.map(t => {
  const on = form.eligibleTypes.includes(t);
- return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-primary-light text-primary shadow-sm ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-text-secondary hover:border-border-dark hover:bg-background-secondary'}`}>
+ return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-primary-light text-primary ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-text-secondary hover:border-border-dark hover:bg-background-secondary'}`}>
  {t.replace(/_/g, ' ')}
  </button>;
  })}
@@ -643,7 +620,7 @@ const AdminCouponsPage = () => {
  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
  <label className="block">
  <span className="text-xs font-semibold text-text-secondary">{t("global_limit")}</span>
- <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
+ <span className="mt-0.5 block text-xs font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
  <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitGlobal} onChange={e => setForm(p => ({
  ...p,
  usageLimitGlobal: e.target.value
@@ -651,7 +628,7 @@ const AdminCouponsPage = () => {
  </label>
  <label className="block">
  <span className="text-xs font-semibold text-text-secondary">{t("ki_i_ba_limit")}</span>
- <span className="mt-0.5 block text-caption font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
+ <span className="mt-0.5 block text-xs font-normal text-text-muted">{t("bo_s_n_rs_z")}</span>
  <input type="number" min={0} step={1} className={inputCn} value={form.usageLimitPerUser} onChange={e => setForm(p => ({
  ...p,
  usageLimitPerUser: e.target.value
@@ -659,20 +636,8 @@ const AdminCouponsPage = () => {
  </label>
  </div>
  </FormSection>
- </div>
-
- <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border-light bg-background-secondary/90 px-4 py-4 backdrop-blur-md sm:px-5">
- <button type="button" className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-border-light bg-background-primary px-5 text-sm font-semibold text-text-secondary shadow-sm transition hover:bg-background-secondary" onClick={() => {
- setModal(null);
- setForm(emptyForm());
- }}>{t("vazge")}</button>
- <button type="submit" disabled={submitting} className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-hover disabled:pointer-events-none disabled:opacity-50">
- {submitting ? 'Kaydediliyor…' : 'Kaydet'}
- </button>
- </footer>
  </form>
- </div>
- </div>}
+ </Modal>
  </div>;
 };
 

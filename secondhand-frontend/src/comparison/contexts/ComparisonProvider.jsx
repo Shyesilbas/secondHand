@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import logger from '../../common/utils/logger.js';
 import { ComparisonContext } from './ComparisonContext.jsx';
 import { cacheService } from '../../common/services/cacheService.js';

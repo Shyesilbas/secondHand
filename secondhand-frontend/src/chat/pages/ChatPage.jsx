@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useChat } from '../hooks/useChat.js';
 import ChatWindow from '../components/ChatWindow.jsx';
@@ -96,17 +96,17 @@ const ChatPage = ({
  </PageContainer>;
  }
  const gridHeightClass = embedded ? 'h-[min(72vh,calc(100vh-260px))]' : 'h-[calc(100vh-200px)]';
- return <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-slate-50'}>
- <PageContainer className={`max-w-[1600px] ${embedded ? 'px-0 sm:px-0 lg:px-0 py-0' : 'py-8'}`}>
+ return <div className={embedded ? 'min-h-0 bg-transparent' : 'min-h-screen bg-background-secondary'}>
+ <PageContainer className={`max-w-screen-2xl ${embedded ? 'px-0 sm:px-0 lg:px-0 py-0' : 'py-8'}`}>
  {!embedded && <div className="flex items-center justify-between mb-8">
  <div>
  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("messages")}</h1>
- <p className="text-slate-500 mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
+ <p className="text-text-tertiary mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
  </div>
  <div className="flex items-center space-x-3">
- <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded-xl border border-border-light/60 shadow-sm">
- <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-slate-300'}`}></div>
- <span className="text-sm font-semibold text-slate-700 tracking-tight">
+ <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded border border-border-light/60">
+ <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`}></div>
+ <span className="text-sm font-semibold text-text-secondary tracking-tight">
  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
  </span>
  </div>
@@ -114,15 +114,15 @@ const ChatPage = ({
  </div>}
 
  {embedded && <div className="mb-3 flex justify-end">
- <div className="flex items-center space-x-2 rounded-xl border border-border-light/60 bg-background-primary px-4 py-2 shadow-sm">
- <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-slate-300'}`} />
- <span className="text-xs font-semibold text-slate-700">
+ <div className="flex items-center space-x-2 rounded border border-border-light/60 bg-background-primary px-4 py-2">
+ <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`} />
+ <span className="text-xs font-semibold text-text-secondary">
  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
  </span>
  </div>
  </div>}
 
- <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-2xl border border-border-light/60 bg-background-primary shadow-sm`}>
+ <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light/60 bg-background-primary shadow-sm`}>
  {/* Chat Rooms List */}
  <div className="lg:col-span-4 border-r border-border-light/60 h-full flex flex-col overflow-hidden">
  <ChatList chatRooms={chatRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
@@ -133,18 +133,18 @@ const ChatPage = ({
  <div className="lg:col-span-8 flex flex-col h-full overflow-hidden">
  {selectedChatRoom ? <div className="h-full flex flex-col overflow-hidden">
  {/* Chat Header */}
- <div className="bg-background-primary/80 backdrop-blur-md px-6 py-4 border-b border-border-light/60 flex items-center justify-between flex-shrink-0">
+ <div className="bg-background-primary px-6 py-4 border-b border-border-light/60 flex items-center justify-between flex-shrink-0">
  <div className="flex items-center space-x-4">
  <button onClick={() => {
  selectChatRoom(null);
  syncRoomToUrl(null);
- }} className="lg:hidden p-2 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out">
- <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ }} className="lg:hidden p-2 hover:bg-background-tertiary/50 rounded transition-all duration-300 ease-in-out">
+ <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
  </svg>
  </button>
- <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center shadow-sm">
- <span className="text-base font-bold text-white tracking-tight">
+ <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
+ <span className="text-base font-semibold text-white tracking-tight">
  {(selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'U').charAt(0).toUpperCase()}
  </span>
  </div>
@@ -153,34 +153,34 @@ const ChatPage = ({
  {selectedChatRoom.otherParticipantName || selectedChatRoom.title || 'Chat'}
  </h3>
  <div className="flex items-center space-x-2 mt-1">
- <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success-bg' : 'bg-text-muted'}`}></div>
- <span className="text-xs font-medium text-slate-500 tracking-tight">
+ <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-text-muted'}`}></div>
+ <span className="text-xs font-medium text-text-tertiary tracking-tight">
  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
  </span>
  </div>
  </div>
  </div>
  <div className="flex items-center space-x-2">
- <button className="p-2.5 hover:bg-slate-100/50 rounded-xl transition-all duration-300 ease-in-out">
- <EllipsisVerticalIcon className="w-5 h-5 text-slate-600" />
+ <button className="p-2.5 hover:bg-background-tertiary/50 rounded transition-all duration-300 ease-in-out">
+ <EllipsisVerticalIcon className="w-5 h-5 text-text-secondary" />
  </button>
  </div>
  </div>
 
  {/* Chat Messages Area */}
- <div className="flex-1 bg-slate-50/50 min-h-0 overflow-hidden">
+ <div className="flex-1 bg-background-secondary/50 min-h-0 overflow-hidden">
  <ChatWindow isOpen={true} onClose={() => {}} selectedChatRoom={selectedChatRoom} messages={messages} onSendMessage={sendMessage} onDeleteMessage={deleteMessage} onDeleteConversation={deleteConversation} isLoadingMessages={isLoadingMessages} isConnected={isConnected} onConversationDeleted={() => {
  selectChatRoom(null);
  syncRoomToUrl(null);
  }} isEmbedded={true} />
  </div>
- </div> : <div className="h-full flex items-center justify-center bg-slate-50">
+ </div> : <div className="h-full flex items-center justify-center bg-background-secondary">
  <div className="text-center px-8">
- <div className="w-28 h-28 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-sm">
- <MessageCircle className="w-14 h-14 text-slate-400" />
+ <div className="w-28 h-28 bg-background-tertiary rounded-md flex items-center justify-center mx-auto mb-8">
+ <MessageCircle className="w-14 h-14 text-text-muted" />
  </div>
  <h3 className="text-sm font-medium text-text-primary mb-3 tracking-tight">{t("select_a_conversation")}</h3>
- <p className="text-slate-500 max-w-sm mx-auto tracking-tight leading-relaxed">{t("choose_a_chat_from_the_sidebar_to_start_")}</p>
+ <p className="text-text-tertiary max-w-sm mx-auto tracking-tight leading-relaxed">{t("choose_a_chat_from_the_sidebar_to_start_")}</p>
  </div>
  </div>}
  </div>

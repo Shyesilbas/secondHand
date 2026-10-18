@@ -1,197 +1,79 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useTranslation } from "react-i18next";
 import { useLocation, Link } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
 import { aiChatService } from '../services/aiChatService.js';
 import {
-  Sparkles,
-  RotateCcw,
-  Trash2,
+  ArrowUp,
   BrainCircuit,
-  Send,
-  UserRound,
-  ExternalLink,
-  Copy,
   Check,
-  TrendingDown,
-  ShieldCheck,
-  Tag,
-  Info,
-  DollarSign,
+  ChevronDown,
+  Copy,
+  ExternalLink,
+  MessageSquare,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
-  ArrowUp,
-  MessageSquare,
+  RotateCcw,
   Search,
-  Zap,
-  ThumbsUp,
+  ShieldCheck,
+  Sparkles,
+  Tag,
   ThumbsDown,
-  Volume2,
+  ThumbsUp,
+  Trash2,
+  TrendingDown,
+  UserRound,
   Wand2,
-  ChevronDown,
-  CheckCircle2,
-  Bot,
-  Layers,
-  Flame
+  X
 } from 'lucide-react';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage } from '../utils/auraChatUtils.js';
 import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
 import AuraSuggestedListingChips from '../components/AuraSuggestedListingChips.jsx';
-import AuraPriceAdvisorGauge from '../components/AuraPriceAdvisorGauge.jsx';
+import AuraMessageContent from '../components/AuraMessageContent.jsx';
 import AuraMemoryProfileHub from '../components/AuraMemoryProfileHub.jsx';
 import { buildAuraListingSessionContext, formatListingPriceLabel, listingTypeLabel } from '../utils/auraListingContext.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+import Button from '@/common/components/ui/Button';
+import Modal from '@/common/components/ui/Modal';
 import { cacheService } from '../../common/services/cacheService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 
-// Enhanced Message Renderer supporting Markdown-like formatting, Price Gauges, and Quotes
-const MessageRenderer = ({ content, isUser }) => {
-  if (typeof content !== 'string') return content;
+// Shared by the sidebar shortcuts and the composer's quick-tools menu.
+const AURA_CAPABILITIES = [
+  {
+    icon: TrendingDown,
+    label: 'Piyasa Değerleme & Analiz',
+    prompt: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün fırsat olduğunu nasıl anlarım?',
+  },
+  {
+    icon: MessageSquare,
+    label: 'Pazarlık & Teklif Asistanı',
+    prompt: 'İlan satıcısına gönderilecek nazik, piyasaya uygun ve kabul görme şansı yüksek bir pazarlık mesajı taslağı üretir misin?',
+  },
+  {
+    icon: ShieldCheck,
+    label: 'Güvenli Ödeme & Escrow',
+    prompt: 'İkinci el alışverişte dolandırıcılıktan nasıl korunabilirim? Escrow güvenli havuz hesabı süreci nasıl çalışır?',
+  },
+  {
+    icon: Search,
+    label: 'Akıllı İlan Arama',
+    prompt: 'Platformdaki en son fırsat ve öne çıkan ilanları filtreleme konusunda bana yardımcı olur musun?',
+  },
+];
 
-  // Check for embedded Price Advisor Gauge
-  const gaugeRegex = /<PriceAdvisorGauge\s+([^>]+)\s*\/?>/i;
-  const match = content.match(gaugeRegex);
+const DISCOVERY_PROMPTS = [
+  'iPhone 14 piyasa fiyatı nedir?',
+  'MacBook Air M2 pazarlık payı',
+  'Güvenli Havuz (Escrow) nasıl işler?',
+  'Kamera alırken nelere bakılmalı?',
+];
 
-  if (match) {
-    const rawAttrs = match[1];
-    const getAttr = (name) => {
-      const regex = new RegExp(`${name}="([^"]+)"`, 'i');
-      const attrMatch = rawAttrs.match(regex);
-      return attrMatch ? attrMatch[1] : null;
-    };
-
-    const min = getAttr('min');
-    const max = getAttr('max');
-    const avg = getAttr('avg');
-    const current = getAttr('current');
-    const currency = getAttr('currency') || 'TRY';
-    const status = getAttr('status') || 'Good Deal';
-
-    const index = content.indexOf(match[0]);
-    const before = content.substring(0, index);
-    const after = content.substring(index + match[0].length);
-
-    return (
-      <div className="space-y-3">
-        {before && <FormattedText text={before.trim()} isUser={isUser} />}
-        <AuraPriceAdvisorGauge
-          min={min}
-          max={max}
-          avg={avg}
-          current={current}
-          currency={currency}
-          status={status}
-        />
-        {after && <FormattedText text={after.trim()} isUser={isUser} />}
-      </div>
-    );
-  }
-
-  return <FormattedText text={content} isUser={isUser} />;
-};
-
-const FormattedText = ({ text, isUser }) => {
-  const lines = text.split('\n');
-
-  return (
-    <div className={`space-y-1.5 leading-relaxed text-[13px] sm:text-[14px] ${isUser ? 'text-white' : 'text-zinc-800'}`}>
-      {lines.map((line, i) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <div key={i} className="h-1.5" />;
-
-        // Header ###
-        if (trimmed.startsWith('### ')) {
-          return (
-            <h4 key={i} className={`font-bold text-sm sm:text-base mt-2.5 mb-1 ${isUser ? 'text-white' : 'text-zinc-950'}`}>
-              {trimmed.replace('### ', '')}
-            </h4>
-          );
-        }
-        // Header ##
-        if (trimmed.startsWith('## ')) {
-          return (
-            <h3 key={i} className={`font-extrabold text-base sm:text-lg mt-3 mb-1.5 ${isUser ? 'text-white' : 'text-zinc-950'}`}>
-              {trimmed.replace('## ', '')}
-            </h3>
-          );
-        }
-
-        // Bullet point
-        if (trimmed.startsWith('- ') || trimmed.startsWith('• ') || trimmed.startsWith('* ')) {
-          const bulletText = trimmed.substring(2);
-          return (
-            <div key={i} className="flex items-start gap-2 pl-1 py-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${isUser ? 'bg-white' : 'bg-zinc-700'}`} />
-              <span className="flex-1">
-                <InlineBoldText text={bulletText} />
-              </span>
-            </div>
-          );
-        }
-
-        // Numbered list (e.g. "1. ")
-        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
-        if (numMatch) {
-          return (
-            <div key={i} className="flex items-start gap-2 pl-1 py-0.5">
-              <span className={`text-[11px] font-bold mt-0.5 shrink-0 px-1.5 py-0.2 rounded ${isUser ? 'bg-white/20 text-white' : 'bg-zinc-100 text-zinc-700'}`}>
-                {numMatch[1]}
-              </span>
-              <span className="flex-1">
-                <InlineBoldText text={numMatch[2]} />
-              </span>
-            </div>
-          );
-        }
-
-        // Blockquote >
-        if (trimmed.startsWith('> ')) {
-          return (
-            <blockquote key={i} className={`border-l-2 pl-3 py-1 my-1 italic rounded-r-md ${isUser ? 'border-white/40 bg-white/10 text-white/90' : 'border-zinc-300 bg-zinc-50 text-zinc-600'}`}>
-              <InlineBoldText text={trimmed.substring(2)} />
-            </blockquote>
-          );
-        }
-
-        return (
-          <p key={i} className="whitespace-pre-wrap">
-            <InlineBoldText text={line} />
-          </p>
-        );
-      })}
-    </div>
-  );
-};
-
-const InlineBoldText = ({ text }) => {
-  // Parse **bold** and `code`
-  const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
-  return (
-    <>
-      {parts.map((part, index) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return (
-            <strong key={index} className="font-bold text-zinc-950 dark:text-white">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
-        if (part.startsWith('`') && part.endsWith('`')) {
-          return (
-            <code key={index} className="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-800 font-mono text-xs border border-zinc-200">
-              {part.slice(1, -1)}
-            </code>
-          );
-        }
-        return part;
-      })}
-    </>
-  );
-};
+const ICON_BUTTON = 'inline-flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary disabled:opacity-50';
 
 export const AuraChatPage = () => {
   const { t } = useTranslation();
@@ -201,15 +83,11 @@ export const AuraChatPage = () => {
   const listingFromState = location?.state?.listing || null;
   const listingIdFromState = location?.state?.listingId || null;
   const { listing: fetchedListing } = useListingData(listingIdFromState, !listingFromState && !!listingIdFromState);
-  const [activeListing, setActiveListing] = useState(listingFromState || fetchedListing);
+  const [detachedListingId, setDetachedListingId] = useState(null);
+  const sourceListing = listingFromState || fetchedListing || null;
+  const activeListing = sourceListing && sourceListing.id !== detachedListingId ? sourceListing : null;
 
-  useEffect(() => {
-    if (listingFromState || fetchedListing) {
-      setActiveListing(listingFromState || fetchedListing);
-    }
-  }, [listingFromState, fetchedListing]);
-
-  const [agentMode, setAgentMode] = useState(AI_AGENT_MODE_ENABLED);
+  const [agentMode] = useState(AI_AGENT_MODE_ENABLED);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeHint, setUpgradeHint] = useState('');
   const [showMemoryHub, setShowMemoryHub] = useState(false);
@@ -217,6 +95,7 @@ export const AuraChatPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showQuickTools, setShowQuickTools] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState({});
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const userId = user?.id ?? null;
   const listingContext = useMemo(() => buildAuraListingSessionContext(activeListing), [activeListing]);
@@ -367,8 +246,8 @@ export const AuraChatPage = () => {
 
   // Clear History
   const handleClearHistory = async () => {
+    setConfirmClear(false);
     if (userId == null) return;
-    if (!window.confirm('Tüm sohbet geçmişiniz silinecek. Onaylıyor musunuz?')) return;
     setIsSending(true);
     try {
       await aiChatService.deleteHistory();
@@ -392,7 +271,6 @@ export const AuraChatPage = () => {
     }
   };
 
-  // Quick Listing Action Prompts
   const quickListingActions = [
     {
       icon: TrendingDown,
@@ -416,41 +294,9 @@ export const AuraChatPage = () => {
     },
   ];
 
-  // Quick Tools Menu (Inside Omnibar)
-  const quickTools = [
-    {
-      icon: TrendingDown,
-      title: 'Piyasa Fiyat Analizi İste',
-      prompt: 'Bir ürünün ikinci el piyasa değerini ve fırsat olup olmadığını analiz etmeni istiyorum.',
-    },
-    {
-      icon: MessageSquare,
-      title: 'Pazarlık Teklifi Oluştur',
-      prompt: 'Satıcıya göndermek için etkili ve profesyonel bir pazarlık teklifi metni hazırla.',
-    },
-    {
-      icon: ShieldCheck,
-      title: 'Güvenlik & Dolandırıcılık Kontrolü',
-      prompt: 'İkinci el alışverişte dolandırıcılıktan korunma yöntemleri ve Escrow güvencesini açıkla.',
-    },
-    {
-      icon: Search,
-      title: 'Fırsat İlanlarını Tara',
-      prompt: 'Platformdaki öne çıkan fırsat ilanları ve bütçe dostu seçenekler hakkında bilgi ver.',
-    }
-  ];
-
-  // Quick Trend Pills for New Conversation
-  const quickDiscoveryPills = [
-    "📱 iPhone 14 piyasa fiyatı nedir?",
-    "💻 MacBook Air M2 pazarlık payı",
-    "🛡️ Güvenli Havuz (Escrow) nasıl işler?",
-    "📸 Kamera alırken nelere bakılmalı?"
-  ];
-
   const textareaRef = useRef(null);
 
-  // Auto adjust textarea height
+  // Grow the composer with its content, up to five lines.
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -459,456 +305,219 @@ export const AuraChatPage = () => {
   }, [input]);
 
   const isHeroState = messages.length <= 1;
+  const send = (text) => sendMessage({ text });
 
   return (
-    <div className="flex h-[calc(100dvh-70px)] max-h-[calc(100dvh-70px)] w-full bg-zinc-50 text-zinc-900 overflow-hidden font-sans select-text">
-      
-      {/* ── 1. COLLAPSIBLE MODERN AI SIDEBAR ───────────────────────── */}
-      <aside 
-        className={`shrink-0 border-r border-zinc-200/80 bg-white transition-all duration-300 flex flex-col justify-between z-20 ${
-          sidebarOpen ? 'w-72 sm:w-80' : 'w-0 -translate-x-full overflow-hidden opacity-0 border-none'
-        }`}
-      >
-        <div className="p-3.5 flex flex-col h-full overflow-hidden">
-          
-          {/* Top New Chat Action */}
-          <div className="flex items-center justify-between gap-2 pb-3 border-b border-zinc-100">
-            <button
-              type="button"
-              onClick={handleNewChat}
-              disabled={isSending}
-              className="flex-1 flex items-center justify-between px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 active:scale-[0.98] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer disabled:opacity-50"
-            >
-              <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4 text-zinc-300" />
-                <span>Yeni Sohbet</span>
-              </div>
-              <kbd className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
-                ⌘K
-              </kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(false)}
-              title="Paneli Kapat"
-              className="p-2 rounded-xl hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
-            >
-              <PanelLeftClose className="w-4 h-4" />
+    <div className="flex h-[calc(100dvh-70px)] w-full overflow-hidden bg-background-secondary text-text-primary">
+      <aside className={`z-20 flex shrink-0 flex-col border-r border-border bg-background-primary ${sidebarOpen ? 'w-72 sm:w-80' : 'hidden'}`}>
+        <div className="flex h-full flex-col overflow-hidden p-3">
+          <div className="flex items-center gap-2 border-b border-border-light pb-3">
+            <Button className="flex-1 justify-start" onClick={handleNewChat} disabled={isSending}>
+              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>Yeni Sohbet</span>
+            </Button>
+            <button type="button" onClick={() => setSidebarOpen(false)} aria-label="Paneli Kapat" className={ICON_BUTTON}>
+              <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </div>
 
-          {/* Attached Listing Context Strip in Sidebar */}
           {activeListing && (
-            <div className="mt-3 p-2.5 rounded-xl border border-zinc-200 bg-zinc-50/70">
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1">
-                  <Tag className="w-3 h-3 text-zinc-600" />
-                  <span>Aktif İlan Bağlantısı</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setActiveListing(null)}
-                  className="text-[10px] text-zinc-400 hover:text-rose-600 font-medium transition-colors"
-                >
+            <div className="mt-3 rounded border border-border-light p-3">
+              <div className="mb-2 flex items-center justify-between gap-2 text-sm">
+                <span className="text-text-tertiary">Aktif İlan Bağlantısı</span>
+                <button type="button" onClick={() => setDetachedListingId(activeListing.id)} className="text-text-secondary transition-colors hover:text-status-error-text">
                   Kaldır
                 </button>
               </div>
-
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-lg bg-zinc-200 overflow-hidden shrink-0 border border-zinc-200">
-                  {activeListing.imageUrl ? (
-                    <img src={activeListing.imageUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                      <Tag className="w-3.5 h-3.5" />
-                    </div>
-                  )}
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
+                  {activeListing.imageUrl ? <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" /> : <Tag className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-zinc-900 truncate">
-                    {activeListing.title}
-                  </p>
-                  <p className="text-[11px] font-semibold text-emerald-600">
-                    {formatListingPriceLabel(activeListing.price, activeListing.currency)}
-                  </p>
+                  <p className="truncate text-sm font-medium text-text-primary">{activeListing.title}</p>
+                  <p className="text-sm tabular-nums text-text-secondary">{formatListingPriceLabel(activeListing.price, activeListing.currency)}</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Quick AI Capabilities Deck */}
-          <div className="flex-1 overflow-y-auto mt-4 space-y-1.5 pr-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-2 mb-1">
-              Aura Yetenekleri
-            </p>
-
-            <button
-              type="button"
-              disabled={isSending}
-              onClick={() => sendMessage({ text: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün fırsat olduğunu nasıl anlarım?' })}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 transition-colors group cursor-pointer"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/60 group-hover:bg-emerald-100">
-                <TrendingDown className="w-3.5 h-3.5" />
-              </div>
-              <span className="truncate">Piyasa Değerleme & Analiz</span>
-            </button>
-
-            <button
-              type="button"
-              disabled={isSending}
-              onClick={() => sendMessage({ text: 'İlan satıcısına gönderilecek nazik, piyasaya uygun ve kabul görme şansı yüksek bir pazarlık mesajı taslağı üretir misin?' })}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 transition-colors group cursor-pointer"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-50 text-blue-700 border border-blue-200/60 group-hover:bg-blue-100">
-                <MessageSquare className="w-3.5 h-3.5" />
-              </div>
-              <span className="truncate">Pazarlık & Teklif Asistanı</span>
-            </button>
-
-            <button
-              type="button"
-              disabled={isSending}
-              onClick={() => sendMessage({ text: 'İkinci el alışverişte dolandırıcılıktan nasıl korunabilirim? Escrow güvenli havuz hesabı süreci nasıl çalışır?' })}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 transition-colors group cursor-pointer"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-50 text-amber-700 border border-amber-200/60 group-hover:bg-amber-100">
-                <ShieldCheck className="w-3.5 h-3.5" />
-              </div>
-              <span className="truncate">Güvenli Ödeme & Escrow</span>
-            </button>
-
-            <button
-              type="button"
-              disabled={isSending}
-              onClick={() => sendMessage({ text: 'Platformdaki en son fırsat ve öne çıkan ilanları filtreleme konusunda bana yardımcı olur musun?' })}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left text-xs font-medium text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 transition-colors group cursor-pointer"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-purple-50 text-purple-700 border border-purple-200/60 group-hover:bg-purple-100">
-                <Search className="w-3.5 h-3.5" />
-              </div>
-              <span className="truncate">Akıllı İlan Arama</span>
-            </button>
+          <div className="mt-4 flex-1 space-y-1 overflow-y-auto">
+            <p className="px-2 pb-1 text-sm text-text-tertiary">Aura Yetenekleri</p>
+            {AURA_CAPABILITIES.map(({ icon: Icon, label, prompt }) => (
+              <button
+                key={label}
+                type="button"
+                disabled={isSending}
+                onClick={() => send(prompt)}
+                className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-50"
+              >
+                <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                <span className="truncate">{label}</span>
+              </button>
+            ))}
           </div>
 
-          {/* Bottom Sidebar Footer */}
-          <div className="pt-3 border-t border-zinc-100 space-y-2">
-            {/* Memory Profile Button */}
+          <div className="space-y-1 border-t border-border-light pt-3">
             <button
               type="button"
               onClick={() => setShowMemoryHub(prev => !prev)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold transition-all cursor-pointer"
+              aria-expanded={showMemoryHub}
+              className="flex w-full items-center gap-2 rounded px-2 py-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
             >
-              <div className="flex items-center gap-2">
-                <BrainCircuit className="w-4 h-4 text-zinc-700" />
-                <span>Aura Hafıza Profili</span>
-              </div>
-              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800">
-                Aktif
-              </span>
+              <BrainCircuit className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+              <span>Aura Hafıza Profili</span>
             </button>
-
-            {/* Clear history */}
             <button
               type="button"
-              onClick={handleClearHistory}
-              disabled={isSending}
-              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-zinc-500 hover:text-rose-600 hover:bg-rose-50 text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-40"
+              onClick={() => setConfirmClear(true)}
+              disabled={isSending || userId == null}
+              className="flex w-full items-center gap-2 rounded px-2 py-2 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-status-error-text disabled:opacity-50"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>Sohbet Geçmişini Temizle</span>
             </button>
           </div>
-
         </div>
       </aside>
 
-      {/* ── 2. CENTRAL CONVERSATION STAGE ─────────────────────────── */}
-      <main className="flex flex-1 flex-col h-full min-w-0 min-h-0 bg-white relative">
-        
-        {/* Top Header Floating Ribbon */}
-        <header className="shrink-0 h-13 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between gap-3 z-10">
-          <div className="flex items-center gap-3 min-w-0">
+      <main className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background-primary">
+        <header className="z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
             {!sidebarOpen && (
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                title="Paneli Aç"
-                className="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
-              >
-                <PanelLeftOpen className="w-4 h-4" />
+              <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Paneli Aç" className={ICON_BUTTON}>
+                <PanelLeftOpen className="h-4 w-4" strokeWidth={1.5} />
               </button>
             )}
-
-            <div className="flex items-center gap-2.5">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 text-white shadow-xs">
-                <Sparkles className="w-4 h-4 text-white" />
-                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xs sm:text-sm font-extrabold text-zinc-950 tracking-tight">
-                    Aura AI
-                  </h1>
-                  <span className="px-2 py-0.5 text-[9px] font-bold text-zinc-700 bg-zinc-100 border border-zinc-200/80 rounded-full">
-                    3.1 Reasoning Agent
-                  </span>
-                </div>
-                <p className="text-[10px] text-zinc-400 font-medium hidden sm:block">
-                  İkinci El Alışveriş & Analiz Motoru
-                </p>
-              </div>
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold text-text-primary">Aura AI</h1>
+              <p className="hidden truncate text-sm text-text-tertiary sm:block">İkinci El Alışveriş & Analiz Motoru</p>
             </div>
           </div>
-
-          {/* Header Action Buttons */}
           <div className="flex items-center gap-2">
             {activeListing && (
               <Link
                 to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-xs font-semibold text-zinc-800 transition-colors"
+                className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 hidden md:inline-flex"
               >
-                <span className="truncate max-w-[140px]">{activeListing.title}</span>
-                <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="max-w-xs truncate">{activeListing.title}</span>
+                <ExternalLink className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
               </Link>
             )}
-
-            <button
-              type="button"
-              onClick={() => setShowMemoryHub(prev => !prev)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-95 ${
-                showMemoryHub
-                  ? 'bg-zinc-900 text-white shadow-xs'
-                  : 'bg-zinc-100 border border-zinc-200/80 text-zinc-800 hover:bg-zinc-200/70'
-              }`}
-            >
-              <BrainCircuit className="w-3.5 h-3.5" />
+            <Button variant={showMemoryHub ? 'primary' : 'secondary'} size="sm" onClick={() => setShowMemoryHub(prev => !prev)} aria-expanded={showMemoryHub}>
+              <BrainCircuit className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span className="hidden sm:inline">Hafıza</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleNewChat}
-              disabled={isSending}
-              title="Yeni Oturum"
-              className="p-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer disabled:opacity-40"
-            >
-              <RotateCcw className="w-4 h-4" />
+            </Button>
+            <button type="button" onClick={handleNewChat} disabled={isSending} aria-label="Yeni Oturum" className={ICON_BUTTON}>
+              <RotateCcw className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </div>
         </header>
 
-        {/* Memory Hub Drawer Overlay */}
         {showMemoryHub && (
-          <div className="absolute inset-x-0 top-13 z-30 p-4 sm:p-6 bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-xl animate-in slide-in-from-top-3 duration-200 max-h-[80vh] overflow-y-auto">
-            <div className="max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-900 text-white">
-                    <BrainCircuit className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-extrabold text-zinc-900">Aura AI Bellek & Tercih Paneli</h3>
-                    <p className="text-[11px] text-zinc-500">Aura bu bilgileri sohbetlerinizde kişiselleştirilmiş yanıtlar için hatırlar.</p>
-                  </div>
+          <div className="absolute inset-x-0 top-14 z-30 max-h-[80vh] overflow-y-auto border-b border-border bg-background-primary p-4 shadow-sm sm:p-6">
+            <div className="mx-auto max-w-2xl">
+              <div className="mb-4 flex items-start justify-between gap-4 border-b border-border-light pb-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-text-primary">Aura AI Bellek & Tercih Paneli</h2>
+                  <p className="mt-1 text-sm text-text-secondary">Aura bu bilgileri sohbetlerinizde kişiselleştirilmiş yanıtlar için hatırlar.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowMemoryHub(false)}
-                  className="px-2.5 py-1 text-xs font-bold text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
-                >
-                  Kapat
-                </button>
+                <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(false)}>Kapat</Button>
               </div>
               <AuraMemoryProfileHub />
             </div>
           </div>
         )}
 
-        {/* ── CHAT SCROLL AREA ──────────────────────────────────────── */}
-        <div
-          ref={listRef}
-          className="flex-1 overflow-y-auto w-full px-3 sm:px-6 py-6 space-y-6"
-        >
-          <div className="max-w-3xl mx-auto space-y-6">
-
-            {/* Ambient Hero Greeting (When starting new chat or 1 message) */}
+        <div ref={listRef} className="w-full flex-1 overflow-y-auto px-3 py-6 sm:px-6">
+          <div className="mx-auto max-w-3xl space-y-6">
             {isHeroState && (
-              <div className="flex flex-col items-center text-center py-6 sm:py-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                {/* Glowing Aura Orb */}
-                <div className="relative mb-5">
-                  <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
-                  <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-950 text-white shadow-xl border border-zinc-800">
-                    <Sparkles className="w-8 h-8 text-white animate-spin-slow" />
-                  </div>
-                </div>
-
-                <h2 className="text-xl sm:text-2xl font-extrabold text-zinc-950 tracking-tight">
-                  Nasıl yardımcı olabilirim?
-                </h2>
-                <p className="text-xs sm:text-sm text-zinc-500 mt-1.5 max-w-lg leading-relaxed font-normal">
+              <div className="flex flex-col items-center py-6 text-center sm:py-10">
+                <h2 className="text-2xl font-semibold text-text-primary">Nasıl yardımcı olabilirim?</h2>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-text-secondary">
                   Piyasa fiyat değerlemesi, pazarlık teklif metinleri, satıcı güvenlik kontrolleri veya aradığınız ilanlar için hazırım.
                 </p>
-
-                {/* 4 Interactive Feature Capability Cards */}
-                <div className="w-full mt-6 text-left">
-                  <AuraSuggestedPrompts
-                    disabled={isSending}
-                    onPick={(msg) => sendMessage({ text: msg })}
-                  />
+                <div className="mt-6 w-full text-left">
+                  <AuraSuggestedPrompts disabled={isSending} onPick={send} />
                 </div>
-
-                {/* Quick Discovery Pills */}
-                <div className="mt-5 flex flex-wrap items-center justify-center gap-2 max-w-xl">
-                  {quickDiscoveryPills.map((pill, idx) => (
+                <div className="mt-5 flex max-w-xl flex-wrap items-center justify-center gap-2">
+                  {DISCOVERY_PROMPTS.map(prompt => (
                     <button
-                      key={idx}
+                      key={prompt}
                       type="button"
                       disabled={isSending}
-                      onClick={() => sendMessage({ text: pill })}
-                      className="px-3 py-1.5 rounded-full border border-zinc-200 bg-white hover:border-zinc-900 hover:bg-zinc-50 text-[11px] font-medium text-zinc-700 hover:text-zinc-950 shadow-2xs transition-all cursor-pointer disabled:opacity-40"
+                      onClick={() => send(prompt)}
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
                     >
-                      {pill}
+                      {prompt}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Active Listing Context Ribbon (Attached to current thread) */}
             {activeListing && (
-              <div className="rounded-2xl border border-zinc-200/90 bg-gradient-to-r from-zinc-50 via-white to-zinc-50 p-4 shadow-sm">
-                <div className="flex items-center justify-between gap-3 pb-3 border-b border-zinc-100">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200 shrink-0">
-                      {activeListing.imageUrl ? (
-                        <img src={activeListing.imageUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-zinc-400">
-                          <Tag className="w-5 h-5" />
-                        </div>
-                      )}
+              <div className="rounded border border-border p-4">
+                <div className="flex items-center justify-between gap-3 border-b border-border-light pb-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
+                      {activeListing.imageUrl ? <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" /> : <Tag className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.2 rounded-md bg-zinc-900 text-white font-extrabold text-[9px] uppercase tracking-wider">
-                          İncelenen İlan
-                        </span>
-                        {activeListing.type && (
-                          <span className="text-[10px] font-bold text-zinc-600 bg-zinc-100 px-2 py-0.2 rounded-md">
-                            {listingTypeLabel(activeListing.type)}
-                          </span>
-                        )}
-                        <span className="text-xs sm:text-sm font-extrabold text-emerald-600">
-                          {formatListingPriceLabel(activeListing.price, activeListing.currency)}
-                        </span>
-                      </div>
-                      <h3 className="text-xs sm:text-sm font-bold text-zinc-950 truncate mt-0.5">
-                        {activeListing.title}
-                      </h3>
+                      <p className="flex flex-wrap items-center gap-x-2 text-sm text-text-tertiary">
+                        <span>İncelenen İlan</span>
+                        {activeListing.type && <span>{listingTypeLabel(activeListing.type)}</span>}
+                        <span className="tabular-nums text-text-secondary">{formatListingPriceLabel(activeListing.price, activeListing.currency)}</span>
+                      </p>
+                      <h3 className="mt-0.5 truncate text-sm font-medium text-text-primary">{activeListing.title}</h3>
                     </div>
                   </div>
-
                   <Link
                     to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-100 text-xs font-bold text-zinc-800 transition-colors shrink-0 shadow-2xs"
+                    className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 shrink-0"
                   >
                     <span>İlan Sayfası</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
+                    <ExternalLink className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                   </Link>
                 </div>
-
-                {/* 4 Instant Action Buttons */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
-                  {quickListingActions.map((qa) => {
-                    const ActionIcon = qa.icon;
-                    return (
-                      <button
-                        key={qa.label}
-                        type="button"
-                        disabled={isSending}
-                        onClick={() => sendMessage({ text: qa.prompt })}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-zinc-200/80 bg-white hover:bg-zinc-900 hover:text-white hover:border-zinc-900 text-zinc-700 text-xs font-semibold transition-all cursor-pointer active:scale-95 disabled:opacity-40 shadow-2xs"
-                      >
-                        <ActionIcon className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">{qa.label}</span>
-                      </button>
-                    );
-                  })}
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {quickListingActions.map(({ icon: Icon, label, prompt }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      disabled={isSending}
+                      onClick={() => send(prompt)}
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
+                    >
+                      <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                      <span className="truncate">{label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Conversation Flow */}
             {messages.map((m) => {
               const isUser = m.role === 'user';
               return (
-                <div
-                  key={m.id}
-                  className={`flex gap-3 sm:gap-4 ${
-                    isUser ? 'flex-row-reverse' : 'flex-row'
-                  } items-start animate-in fade-in slide-in-from-bottom-2 duration-200 group`}
-                >
-                  {/* Avatar */}
-                  <div
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-xs transition-all ${
-                      isUser
-                        ? 'bg-zinc-900 text-white'
-                        : 'bg-gradient-to-br from-zinc-950 to-zinc-800 text-white'
-                    }`}
-                  >
-                    {isUser ? <UserRound className="w-4 h-4" /> : <Sparkles className="w-4 h-4 text-emerald-400" />}
+                <div key={m.id} className={`group flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${isUser ? 'bg-primary text-white' : 'border border-border bg-background-secondary text-text-secondary'}`}>
+                    {isUser ? <UserRound className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
                   </div>
-
-                  {/* Message Bubble Container */}
-                  <div className={`min-w-0 max-w-[92%] sm:max-w-[85%] ${isUser ? 'text-right' : 'text-left'}`}>
-                    
-                    {/* Header Label & Timestamp */}
-                    <div className={`flex items-center gap-2 mb-1 text-[11px] font-semibold text-zinc-400 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                      <span className="text-zinc-700 font-bold">{isUser ? 'Siz' : 'Aura AI'}</span>
-                      {!isUser && (
-                        <span className="px-1.5 py-0.2 rounded bg-zinc-100 text-[9px] font-bold text-zinc-500 border border-zinc-200/60">
-                          Model
-                        </span>
-                      )}
+                  <div className={`min-w-0 max-w-full sm:max-w-xl ${isUser ? 'text-right' : 'text-left'}`}>
+                    <div className={`mb-1 flex items-center gap-2 text-sm text-text-tertiary ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <span className="text-text-secondary">{isUser ? 'Siz' : 'Aura AI'}</span>
                       {m.createdAt && (
-                        <span>
-                          {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        <span className="tabular-nums">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       )}
                     </div>
-
-                    {/* Message Card */}
-                    <div
-                      className={`rounded-2xl p-4 sm:p-5 text-left transition-all ${
-                        isUser
-                          ? 'bg-zinc-900 text-white rounded-tr-xs shadow-md'
-                          : 'bg-white border border-zinc-200/90 text-zinc-900 rounded-tl-xs shadow-xs'
-                      }`}
-                    >
+                    <div className={`rounded-md p-4 text-left ${isUser ? 'bg-primary text-white' : 'border border-border bg-background-primary text-text-primary'}`}>
                       {m.typing ? (
-                        <div className="flex items-center gap-3 py-1 text-zinc-500">
-                          <div className="flex gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                          </div>
-                          <span className="text-xs font-semibold text-zinc-600">
-                            Aura piyasa verilerini ve ilan geçmişini analiz ediyor...
-                          </span>
-                        </div>
+                        <p className="text-sm text-text-secondary motion-safe:animate-pulse">Aura piyasa verilerini ve ilan geçmişini analiz ediyor...</p>
                       ) : (
                         <>
-                          <MessageRenderer content={m.content} isUser={isUser} />
-                          
-                          {/* Embedded Suggested Listings */}
+                          <AuraMessageContent content={m.content} isUser={isUser} />
                           {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
-                            <div className="mt-4 pt-3 border-t border-zinc-100">
+                            <div className="mt-4 border-t border-border-light pt-3">
                               <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
                             </div>
                           )}
@@ -916,50 +525,33 @@ export const AuraChatPage = () => {
                       )}
                     </div>
 
-                    {/* Action Bar (Assistant Only) */}
                     {!isUser && !m.typing && m.content && (
-                      <div className="flex items-center gap-1.5 mt-1.5 pl-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                        {/* Copy Button */}
+                      <div className="mt-1.5 flex items-center gap-1 pl-1">
                         <button
                           type="button"
                           onClick={() => copyToClipboard(m.id, m.content)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-zinc-100 text-[11px] font-medium text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
                         >
-                          {copiedId === m.id ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span className="text-emerald-600 font-bold">Kopyalandı</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>Kopyala</span>
-                            </>
-                          )}
+                          {copiedId === m.id ? <Check className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden /> : <Copy className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                          <span>{copiedId === m.id ? 'Kopyalandı' : 'Kopyala'}</span>
                         </button>
-
-                        {/* Thumbs Up */}
                         <button
                           type="button"
                           onClick={() => handleFeedback(m.id, 'up')}
-                          className={`p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-                            feedbackGiven[m.id] === 'up' ? 'text-emerald-600 font-bold' : 'text-zinc-400 hover:text-zinc-700'
-                          }`}
-                          title="Faydalı Yanıt"
+                          aria-pressed={feedbackGiven[m.id] === 'up'}
+                          aria-label="Faydalı Yanıt"
+                          className={`rounded p-1.5 transition-colors hover:bg-background-secondary ${feedbackGiven[m.id] === 'up' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}
                         >
-                          <ThumbsUp className="w-3.5 h-3.5" />
+                          <ThumbsUp className="h-4 w-4" strokeWidth={1.5} />
                         </button>
-
-                        {/* Thumbs Down */}
                         <button
                           type="button"
                           onClick={() => handleFeedback(m.id, 'down')}
-                          className={`p-1 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-                            feedbackGiven[m.id] === 'down' ? 'text-rose-600 font-bold' : 'text-zinc-400 hover:text-zinc-700'
-                          }`}
-                          title="Yetersiz Yanıt"
+                          aria-pressed={feedbackGiven[m.id] === 'down'}
+                          aria-label="Yetersiz Yanıt"
+                          className={`rounded p-1.5 transition-colors hover:bg-background-secondary ${feedbackGiven[m.id] === 'down' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}
                         >
-                          <ThumbsDown className="w-3.5 h-3.5" />
+                          <ThumbsDown className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                       </div>
                     )}
@@ -970,125 +562,95 @@ export const AuraChatPage = () => {
           </div>
         </div>
 
-        {/* ── 3. FLOATING OMNIBAR PROMPT DOCK ──────────────────────── */}
-        <div className="shrink-0 p-3 sm:p-5 bg-gradient-to-t from-white via-white to-transparent">
-          <div className="max-w-3xl mx-auto relative">
-            
-            {/* Quick Tools Dropdown */}
+        <div className="shrink-0 bg-background-primary p-3 sm:p-5">
+          <div className="relative mx-auto max-w-3xl">
             {showQuickTools && (
-              <div className="absolute bottom-full mb-3 left-0 right-0 sm:right-auto sm:w-96 rounded-2xl border border-zinc-200 bg-white/95 backdrop-blur-md shadow-2xl p-3 z-30 animate-in slide-in-from-bottom-2 duration-150">
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-zinc-100">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                    Hızlı Yapay Zeka Araçları
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowQuickTools(false)}
-                    className="text-xs text-zinc-400 hover:text-zinc-800"
-                  >
-                    ✕
+              <div className="absolute bottom-full left-0 right-0 z-30 mb-3 rounded border border-border bg-background-primary p-2 shadow-sm sm:right-auto sm:w-96">
+                <div className="mb-1 flex items-center justify-between border-b border-border-light px-2 pb-2">
+                  <span className="text-sm text-text-tertiary">Hızlı Yapay Zeka Araçları</span>
+                  <button type="button" onClick={() => setShowQuickTools(false)} aria-label="Kapat" className="rounded p-1 text-text-muted transition-colors hover:text-text-primary">
+                    <X className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
-                <div className="space-y-1">
-                  {quickTools.map((tool, idx) => {
-                    const ToolIcon = tool.icon;
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          sendMessage({ text: tool.prompt });
-                          setShowQuickTools(false);
-                        }}
-                        className="w-full flex items-center gap-2.5 p-2 rounded-xl text-left hover:bg-zinc-100 text-xs font-semibold text-zinc-800 transition-colors group cursor-pointer"
-                      >
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white transition-colors">
-                          <ToolIcon className="w-4 h-4" />
-                        </div>
-                        <span className="flex-1 truncate">{tool.title}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                {AURA_CAPABILITIES.map(({ icon: Icon, label, prompt }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      send(prompt);
+                      setShowQuickTools(false);
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-sm text-text-primary transition-colors hover:bg-background-secondary"
+                  >
+                    <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                    <span className="flex-1 truncate">{label}</span>
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Omnibar Input Box */}
-            <div className="relative flex flex-col rounded-2xl border border-zinc-300/90 bg-white p-2 shadow-lg shadow-zinc-200/50 focus-within:border-zinc-900 focus-within:ring-2 focus-within:ring-zinc-900/10 transition-all">
-              
-              {/* Textarea */}
+            <div className="flex flex-col rounded border border-border bg-background-primary p-2 transition-colors focus-within:border-border-focus">
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
+                aria-label="Aura'ya mesaj"
                 placeholder={
                   activeListing
                     ? `"${activeListing.title?.slice(0, 30)}..." hakkında fiyat, pazarlık veya güvenlik sorusu sorun...`
                     : "Aura'ya ikinci el piyasası, fiyat analizi veya ürünler hakkında soru sorun..."
                 }
                 rows={1}
-                className="w-full resize-none bg-transparent px-3 py-2 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none min-h-[38px] max-h-[120px] leading-relaxed"
+                className="w-full resize-none bg-transparent px-3 py-2 text-sm leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none"
               />
-
-              {/* Bottom Dock Controls */}
-              <div className="flex items-center justify-between pt-1 px-1 border-t border-zinc-100/60 mt-1">
-                {/* Left quick actions toggle */}
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setShowQuickTools(prev => !prev)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-[11px] font-semibold transition-colors cursor-pointer"
-                  >
-                    <Wand2 className="w-3.5 h-3.5 text-zinc-600" />
-                    <span>Hızlı Araçlar</span>
-                    <ChevronDown className="w-3 h-3 text-zinc-400" />
-                  </button>
-
-                  {activeListing && (
-                    <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
-                      <Tag className="w-2.5 h-2.5" />
-                      <span>İlan Aktif</span>
-                    </span>
-                  )}
-                </div>
-
-                {/* Right Send Button */}
+              <div className="mt-1 flex items-center justify-between border-t border-border-light px-1 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowQuickTools(prev => !prev)}
+                  aria-expanded={showQuickTools}
+                  className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-text-secondary transition-colors hover:bg-background-secondary"
+                >
+                  <Wand2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>Hızlı Araçlar</span>
+                  <ChevronDown className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                </button>
                 <div className="flex items-center gap-2">
-                  <span className="hidden sm:inline-block text-[10px] text-zinc-400 font-medium">
-                    Enter ↵ gönderir
-                  </span>
-
+                  <span className="hidden text-sm text-text-muted sm:inline">Enter ile gönderin</span>
                   <button
                     type="button"
                     onClick={() => sendMessage()}
                     disabled={isSending || !input.trim()}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-white hover:bg-zinc-800 active:scale-95 transition-all disabled:opacity-30 disabled:active:scale-100 cursor-pointer shadow-xs"
+                    aria-label="Gönder"
+                    className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-9 shrink-0"
                   >
-                    {isSending ? (
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <ArrowUp className="w-4 h-4" />
-                    )}
+                    <ArrowUp className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Disclaimer */}
-            <p className="text-center text-[10px] text-zinc-400 mt-2 font-normal">
+            <p className="mt-2 text-center text-xs text-text-muted">
               Aura AI hata yapabilir. Önemli alışveriş ve ödeme adımlarında ilan ve satıcı detaylarını teyit ediniz.
             </p>
           </div>
         </div>
       </main>
 
-      {/* Upgrade Modal */}
-      <PremiumUpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureHint={upgradeHint}
-      />
+      <PremiumUpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} featureHint={upgradeHint} />
+
+      <Modal
+        isOpen={confirmClear}
+        onClose={() => setConfirmClear(false)}
+        title="Sohbet Geçmişini Temizle"
+        size="sm"
+        footer={<>
+          <Button variant="secondary" onClick={() => setConfirmClear(false)}>{t("cancel")}</Button>
+          <Button variant="danger" onClick={handleClearHistory}>Temizle</Button>
+        </>}
+      >
+        <p className="text-sm text-text-secondary">Tüm sohbet geçmişiniz silinecek. Bu işlem geri alınamaz.</p>
+      </Modal>
     </div>
   );
 };

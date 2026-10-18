@@ -61,7 +61,7 @@ export const useRegisterForm = () => {
  agreementsAccepted: agreementsApi.acceptedAgreements.size === agreementsApi.agreements.length,
  acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
  };
- const response = await authService.register(registerData);
+ await authService.register(registerData);
 
  notification.showSuccess('Account Created', 'Your account has been created. You can now log in with your credentials.');
  navigate(ROUTES.LOGIN, { state: { message: 'Your account has been created. You can now log in with your credentials.' } });

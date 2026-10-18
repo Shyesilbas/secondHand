@@ -1,9 +1,8 @@
 import { useTranslation } from "react-i18next";
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import ListingCard from './ListingCard.jsx';
-import { Sparkles, Compass } from 'lucide-react';
+import { Compass } from 'lucide-react';
 import { SkeletonGrid } from '../../common/components/ui/index.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 const SimilarListings = ({
@@ -45,17 +44,17 @@ const SimilarListings = ({
  staleTime: 5 * 60 * 1000 // 5 minutes cache
  });
  if (isLoading) {
- return <div className="border-t border-slate-100/80 pt-10 mt-10">
+ return <div className="border-t border-border-light/80 pt-10 mt-10">
  <h3 className="text-sm font-medium text-text-primary mb-6 flex items-center gap-2">
  <Compass className="w-4 h-4 text-primary animate-spin" />{t("finding_similar_listings")}</h3>
  <SkeletonGrid count={4} columns="grid-cols-2 md:grid-cols-4 gap-4" />
  </div>;
  }
  if (error || !data || data.length === 0) return null;
- return <div className="border-t border-slate-100/80 pt-10 mt-10">
+ return <div className="border-t border-border-light/80 pt-10 mt-10">
  <div className="flex items-center justify-between mb-6">
  <div>
- <span className="text-caption font-bold uppercase tracking-wider text-primary bg-slate-100 px-2.5 py-1 rounded-full border border-primary/50">{t("more_to_explore")}</span>
+ <span className="text-xs font-semibold text-primary bg-background-tertiary px-2.5 py-1 rounded-sm border border-primary/50">{t("more_to_explore")}</span>
  <h3 className="text-sm font-medium text-text-primary mt-2 flex items-center gap-2">{t("similar_listings")}</h3>
  </div>
  </div>

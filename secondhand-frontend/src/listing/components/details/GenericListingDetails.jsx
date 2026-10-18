@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
@@ -14,9 +14,9 @@ const getValueByPath = (obj, path) => {
 };
 
 const DetailItem = ({ label, value }) => (
-  <div className="bg-slate-50/70 border border-slate-200/70 rounded-2xl p-3.5">
-    <dt className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{label}</dt>
-    <dd className="mt-1 text-sm font-extrabold text-slate-900">{value || '-'}</dd>
+  <div className="bg-background-secondary/70 border border-border/70 rounded-md p-3.5">
+    <dt className="text-xs font-semibold text-text-muted">{label}</dt>
+    <dd className="mt-1 text-sm font-semibold text-text-primary">{value || '-'}</dd>
   </div>
 );
 
@@ -48,10 +48,10 @@ const GenericListingDetails = ({ listing, flat = false }) => {
               key={tab.id}
               type="button"
               onClick={() => setActiveSection(tab.id)}
-              className={`px-3 py-1.5 text-xs rounded-xl border font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 text-xs rounded border font-semibold transition-all cursor-pointer ${
                 activeSection === tab.id
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-text-secondary border-border hover:border-card-border-hover'
               }`}
             >
               {tab.label}
@@ -82,7 +82,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xs border border-slate-200 p-6">
+    <div className="bg-white rounded-md border border-border p-6">
       {content}
     </div>
   );

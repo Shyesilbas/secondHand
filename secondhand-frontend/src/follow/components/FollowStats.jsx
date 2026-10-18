@@ -1,5 +1,5 @@
 import {useTranslation} from "react-i18next";
-import React, {memo, useState} from 'react';
+import { memo, useState } from 'react';
 import {Users} from 'lucide-react';
 import {useFollowStats} from '../hooks/useFollow.js';
 import FollowListModal from './FollowListModal.jsx';

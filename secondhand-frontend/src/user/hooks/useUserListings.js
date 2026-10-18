@@ -1,96 +1,42 @@
-import {useCallback, useEffect, useState} from 'react';
-import {listingService} from '../../listing/services/listingService.js';
-import logger from '../../common/utils/logger.js';
+import { useMemo, useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { listingService } from '../../listing/services/listingService.js';
 import { normalizeArrayResponse } from '../../common/utils/normalizeArrayResponse.js';
 
 export const useUserListings = (userId, options = {}) => {
- const [listings, setListings] = useState([]);
- const [isLoading, setIsLoading] = useState(false);
- const [error, setError] = useState(null);
- const [pagination, setPagination] = useState({
- number: 0,
- size: 10,
- totalPages: 0,
- totalElements: 0,
- first: true,
- last: false
- });
  const enabled = options.enabled ?? true;
- const initialPage = options.page ?? 0;
- const initialSize = options.size ?? 10;
+ const [page, setPage] = useState(options.page ?? 0);
+ const [size, setSize] = useState(options.size ?? 10);
 
- const fetchUserListings = useCallback(async (page = initialPage, size = initialSize) => {
- if (!userId || !enabled) return;
-
- setIsLoading(true);
- setError(null);
- try {
- const response = await listingService.getListingByUserId(userId, page, size);
- const data = response.data || response;
- const content = normalizeArrayResponse(data);
-
- if (data && data.content && Array.isArray(data.content)) {
- setListings(content);
- setPagination({
- number: data.pageable?.pageNumber || data.number || page,
- size: data.pageable?.pageSize || data.size || size,
- totalPages: data.totalPages || 0,
- totalElements: data.totalElements || 0,
- first: data.first !== undefined ? data.first : (page === 0),
- last: data.last !== undefined ? data.last : false
+ const query = useQuery({
+ queryKey: ['listings', 'byUser', userId, page, size],
+ queryFn: () => listingService.getListingByUserId(userId, page, size),
+ enabled: enabled && !!userId,
+ placeholderData: keepPreviousData,
  });
- } else if (data && Array.isArray(data)) {
- // Fallback for non-paginated response (shouldn't happen with new backend)
- setListings(content);
- setPagination({
- number: 0,
- size: data.length,
- totalPages: 1,
- totalElements: data.length,
- first: true,
- last: true
- });
- } else {
- setListings([]);
- setPagination({
- number: 0,
- size: size,
- totalPages: 0,
- totalElements: 0,
- first: true,
- last: true
- });
- }
- } catch (err) {
- logger.error('User listings fetch error:', err);
- setError(err.response?.data?.message || err.message || 'Failed to fetch listings');
- setListings([]);
- } finally {
- setIsLoading(false);
- }
- }, [userId, enabled, initialPage, initialSize]);
 
- const loadPage = useCallback((page) => {
- fetchUserListings(page, pagination.size);
- }, [fetchUserListings, pagination.size]);
-
- const handlePageSizeChange = useCallback((size) => {
- fetchUserListings(0, size);
- }, [fetchUserListings]);
-
- useEffect(() => {
- if (enabled) {
- fetchUserListings(initialPage, initialSize);
- }
- }, [userId, enabled, fetchUserListings, initialPage, initialSize]);
+ const data = query.data?.data || query.data;
+ const listings = useMemo(() => normalizeArrayResponse(data), [data]);
+ const isPlainArray = Array.isArray(data);
+ const pagination = {
+ number: data?.pageable?.pageNumber ?? data?.number ?? page,
+ size: data?.pageable?.pageSize ?? data?.size ?? size,
+ totalPages: data?.totalPages ?? (isPlainArray ? 1 : 0),
+ totalElements: data?.totalElements ?? (isPlainArray ? data.length : 0),
+ first: data?.first ?? page === 0,
+ last: data?.last ?? isPlainArray,
+ };
 
  return {
  listings,
- isLoading,
- error,
+ isLoading: query.isLoading,
+ error: query.error ? query.error.response?.data?.message || query.error.message || 'Failed to fetch listings' : null,
  pagination,
- refetch: () => fetchUserListings(pagination.number, pagination.size),
- loadPage,
- handlePageSizeChange
+ refetch: query.refetch,
+ loadPage: setPage,
+ handlePageSizeChange: (nextSize) => {
+ setPage(0);
+ setSize(nextSize);
+ },
  };
 };

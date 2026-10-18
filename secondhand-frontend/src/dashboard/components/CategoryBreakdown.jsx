@@ -4,45 +4,45 @@ import { formatCurrency } from '../../common/formatters.js';
 const CATEGORY_COLORS = {
  VEHICLE: {
  bg: 'bg-primary',
- light: 'bg-slate-100',
+ light: 'bg-background-tertiary',
  text: 'text-primary',
  border: 'border-primary'
  },
  ELECTRONICS: {
- bg: 'bg-status-success-bg',
- light: 'bg-status-success-bg',
- text: 'text-slate-900',
- border: 'border-slate-300'
+ bg: 'bg-status-success',
+ light: 'bg-background-secondary',
+ text: 'text-text-primary',
+ border: 'border-card-border-hover'
  },
  REAL_ESTATE: {
- bg: 'bg-status-warning-bg',
- light: 'bg-status-warning-bg',
- text: 'text-amber-700',
- border: 'border-amber-200'
+ bg: 'bg-status-warning',
+ light: 'bg-background-secondary',
+ text: 'text-status-warning-text',
+ border: 'border-border'
  },
  CLOTHING: {
  bg: 'bg-primary',
- light: 'bg-pink-50',
+ light: 'bg-background-secondary',
  text: 'text-primary',
  border: 'border-primary-200'
  },
  BOOKS: {
- bg: 'bg-sky-500',
- light: 'bg-sky-50',
- text: 'text-sky-700',
- border: 'border-sky-200'
+ bg: 'bg-primary',
+ light: 'bg-background-secondary',
+ text: 'text-text-primary',
+ border: 'border-border'
  },
  SPORTS: {
  bg: 'bg-primary',
- light: 'bg-purple-50',
+ light: 'bg-background-secondary',
  text: 'text-primary',
  border: 'border-primary-200'
  }
 };
 const DEFAULT_COLOR = {
  bg: 'bg-text-muted',
- light: 'bg-slate-50',
- text: 'text-slate-700',
+ light: 'bg-background-secondary',
+ text: 'text-text-secondary',
  border: 'border-border-light'
 };
 const formatCategoryName = key => key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
@@ -61,7 +61,7 @@ const CategoryBreakdown = ({
  const total = entries.reduce((sum, e) => sum + e.value, 0);
  if (entries.length === 0 || total === 0) {
  return <div className="flex items-center justify-center h-48">
- <p className="text-slate-400 text-xs font-medium">{t("no_category_data_for_this_period")}</p>
+ <p className="text-text-muted text-xs font-medium">{t("no_category_data_for_this_period")}</p>
  </div>;
  }
  const maxValue = entries[0]?.value || 1;
@@ -82,14 +82,14 @@ const CategoryBreakdown = ({
  <div className="flex items-center justify-between mb-1">
  <div className="flex items-center gap-2">
  <div className={`w-2 h-2 rounded-full ${colors.bg}`} />
- <span className="text-xs font-semibold text-slate-700">{formatCategoryName(entry.key)}</span>
+ <span className="text-xs font-semibold text-text-secondary">{formatCategoryName(entry.key)}</span>
  </div>
  <div className="flex items-center gap-2">
- <span className="text-xs font-bold text-text-primary">{formatCurrency(entry.value, currency)}</span>
- <span className={`text-caption font-bold px-1.5 py-0.5 rounded ${colors.light} ${colors.text}`}>{pct}%</span>
+ <span className="text-xs font-semibold text-text-primary">{formatCurrency(entry.value, currency)}</span>
+ <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${colors.light} ${colors.text}`}>{pct}%</span>
  </div>
  </div>
- <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+ <div className="h-1.5 bg-background-tertiary rounded-full overflow-hidden">
  <motion.div initial={{
  width: 0
  }} animate={{
@@ -104,9 +104,9 @@ const CategoryBreakdown = ({
  })}
 
  {/* Total */}
- <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between">
- <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{label}</span>
- <span className="text-sm font-bold text-text-primary">{formatCurrency(total, currency)}</span>
+ <div className="pt-2 mt-2 border-t border-border-light flex items-center justify-between">
+ <span className="text-xs font-semibold text-text-muted">{label}</span>
+ <span className="text-sm font-semibold text-text-primary">{formatCurrency(total, currency)}</span>
  </div>
  </div>;
 };

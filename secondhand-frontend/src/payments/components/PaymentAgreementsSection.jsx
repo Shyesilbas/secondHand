@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
 import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
@@ -37,7 +37,7 @@ const PaymentAgreementsSection = ({
 
  if (loading) {
  return (
- <div className="flex items-center gap-2 text-xs text-slate-500 py-1">
+ <div className="flex items-center gap-2 text-xs text-text-tertiary py-1">
  <LoadingIndicator size="h-4 w-4" />
  <span>{t("loading_payment_agreements")}...</span>
  </div>
@@ -52,10 +52,10 @@ const PaymentAgreementsSection = ({
         return (
           <div
             key={agreement.agreementId}
-            className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl border transition-all text-xs ${
+            className={`flex items-center justify-between gap-3 px-3 py-2 rounded border transition-all text-xs ${
               isChecked
-                ? 'bg-slate-50 border-slate-300 text-slate-900'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                ? 'bg-background-secondary border-card-border-hover text-text-primary'
+                : 'bg-white border-border text-text-secondary hover:border-card-border-hover'
             }`}
           >
             <label 
@@ -67,16 +67,16 @@ const PaymentAgreementsSection = ({
                 type="checkbox"
                 checked={isChecked}
                 onChange={() => handleAgreementToggle(agreement.agreementId)}
-                className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer accent-slate-900 shrink-0"
+                className="w-4 h-4 rounded border-card-border-hover text-text-primary focus:ring-primary cursor-pointer accent-primary shrink-0"
               />
-              <span className="font-medium truncate text-[11px] text-slate-700">
+              <span className="font-medium truncate text-xs text-text-secondary">
                 {agreementName}
               </span>
             </label>
             <button
               type="button"
               onClick={() => handleAgreementClick(agreement)}
-              className="text-[10px] font-bold text-slate-500 hover:text-slate-900 underline shrink-0 cursor-pointer transition-colors"
+              className="text-xs font-semibold text-text-tertiary hover:text-text-primary underline shrink-0 cursor-pointer transition-colors"
             >
               {t("read_full_agreement")}
             </button>

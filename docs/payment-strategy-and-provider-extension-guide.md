@@ -40,7 +40,7 @@ if ("EWALLET".equals(provider)) {
          └───► [Gelecekteki Yeni Sağlayıcı...] ──(supports: "NEW_PROVIDER")
 ```
 
-### A. Çekirdek Port Arayüzü: [`PaymentProviderPort.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/port/out/PaymentProviderPort.java)
+### A. Çekirdek Port Arayüzü: [`PaymentProviderPort.java`](../src/main/java/com/serhat/secondhand/payment/port/out/PaymentProviderPort.java)
 Tüm ödeme sağlayıcıları bu sözleşmeyi (contract) uygular:
 
 ```java
@@ -58,7 +58,7 @@ public interface PaymentProviderPort {
 
 ---
 
-### B. Dinamik Yönlendirici (Orchestrator): [`PaymentProcessor.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/application/PaymentProcessor.java)
+### B. Dinamik Yönlendirici (Orchestrator): [`PaymentProcessor.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentProcessor.java)
 
 `PaymentProcessor`, Spring'in Dependency Injection yeteneğiyle kayıtlı tüm `PaymentProviderPort` bean'lerini otomatik listeler. Gelen istekteki `providerName` değerine göre doğru sağlayıcıyı O(1) hızında seçer:
 
@@ -116,7 +116,7 @@ sequenceDiagram
 Örneğin sisteme **İyzico / Kredi Kartı** sağlayıcısını entegre etmek için izlenecek adımlar:
 
 ### Adım 1: Adapter Sınıfını Oluşturun
-[`com.serhat.secondhand.payment.creditcard`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/creditcard) (veya ilgili alt paket) altında yeni sınıfı yazın:
+[`com.serhat.secondhand.payment.creditcard`](../src/main/java/com/serhat/secondhand/payment/creditcard) (veya ilgili alt paket) altında yeni sınıfı yazın:
 
 ```java
 package com.serhat.secondhand.payment.creditcard;
@@ -170,7 +170,7 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
 
 ---
 
-## 5. Ödeme Sonrası Yan Etki Deseni ([`PaymentCompletedHandler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandler.java))
+## 5. Ödeme Sonrası Yan Etki Deseni ([`PaymentCompletedHandler.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandler.java))
 
 Ödeme tamamlandıktan sonra tetiklenecek işlemler de (Vitrin uzatma, ilan satın alma, komisyon kesme) yine Açık/Kapalı Prensibiyle yönetilir:
 
@@ -180,7 +180,7 @@ public interface PaymentCompletedHandler {
     PaymentCompletedHandleResult handle(Payment payment);
 }
 ```
-* [`PaymentCompletedHandlerRegistry.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandlerRegistry.java) ödeme kaydını destekleyen doğru handler'ı dinamik olarak bularak işletir.
+* [`PaymentCompletedHandlerRegistry.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandlerRegistry.java) ödeme kaydını destekleyen doğru handler'ı dinamik olarak bularak işletir.
 
 ---
 

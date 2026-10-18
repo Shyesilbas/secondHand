@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authService } from '../services/authService.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -58,23 +58,21 @@ const ForgotPasswordPage = () => {
  return <div className="flex flex-col w-full animate-fade-in">
  {/* Logo Monogram */}
  <div className="flex items-center gap-2 mb-8">
- <div className="w-8 h-8 rounded-lg bg-primary shadow-sm flex items-center justify-center shrink-0">
+ <div className="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
  <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
  </div>
  <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
  </div>
 
  <div className="text-center mb-8">
- <div className="w-12 h-12 mx-auto mb-4 bg-background-secondary rounded-full flex items-center justify-center text-text-primary">
- <EnvelopeIcon className="w-5 h-5 stroke-[1.5]" />
- </div>
+ <EnvelopeIcon className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-primary stroke-1.5" strokeWidth={1.5} aria-hidden />
  <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("check_verification_code")}</h2>
  <p className="mt-2 text-xs text-text-secondary font-normal max-w-xs mx-auto leading-relaxed">{t("a_verification_code_has_been_generated_u")}</p>
  </div>
 
- {verificationCode && <div className="mb-6 p-4 rounded-xl border border-border-light bg-background-secondary text-center">
- <div className="text-caption tracking-wider font-semibold text-text-muted uppercase mb-1">{t("developer_environment_code")}</div>
- <div className="text-2xl tracking-widest font-semibold text-text-primary">{verificationCode}</div>
+ {verificationCode && <div className="mb-6 p-4 rounded border border-border-light bg-background-secondary text-center">
+ <div className="text-xs font-semibold text-text-muted mb-1">{t("developer_environment_code")}</div>
+ <div className="text-2xl font-semibold text-text-primary">{verificationCode}</div>
  </div>}
 
  <form onSubmit={async e => {
@@ -120,7 +118,7 @@ const ForgotPasswordPage = () => {
  confirmPassword: e.target.value
  })} required leftIcon={<LockClosedIcon className="w-4 h-4" />} />
 
- {error && <div className="p-3.5 rounded-xl bg-status-error-bg border border-status-error-border text-xs text-status-error">
+ {error && <div className="p-3.5 rounded bg-background-secondary border border-border text-xs text-status-error-text">
  {error}
  </div>}
 
@@ -138,7 +136,7 @@ const ForgotPasswordPage = () => {
  return <div className="flex flex-col w-full animate-fade-in">
  {/* Logo Monogram */}
  <div className="flex items-center gap-2 mb-8">
- <div className="w-8 h-8 rounded-lg bg-primary shadow-sm flex items-center justify-center shrink-0">
+ <div className="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
  <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
  </div>
  <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>

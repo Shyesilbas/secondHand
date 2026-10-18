@@ -2,7 +2,6 @@ import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {get} from '../../common/services/api/request.js';
 import logger from '../../common/utils/logger.js';
 
-
 export const searchUsers = async (query, limit = 10) => {
  if (!query || query.trim().length < 2) {
  return [];
@@ -24,6 +23,3 @@ export const searchUsers = async (query, limit = 10) => {
  }
 };
 
-export const userSearchService = {
- searchUsers
-};

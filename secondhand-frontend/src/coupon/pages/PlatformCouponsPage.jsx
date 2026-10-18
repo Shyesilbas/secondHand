@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, ExternalLink, RefreshCw, Ticket } from 'lucide-react';
@@ -8,6 +8,7 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { formatDateTime } from '../../common/formatters.js';
 import { couponService } from '../../cart/services/couponService.js';
 import { formatCouponDiscount, formatCouponKindLabel } from '../utils/couponUiFormat.js';
+import { SkeletonList } from '../../common/components/ui/Skeleton.jsx';
 const TABS = {
  ACTIVE: 'active',
  PARTICIPATED: 'participated'
@@ -76,16 +77,16 @@ const PlatformCouponsPage = () => {
  const loading = tab === TABS.ACTIVE ? activeQ.isLoading : participationsQ.isLoading;
  const error = tab === TABS.ACTIVE ? activeQ.error : participationsQ.error;
  const ordersHref = orderId => orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
- const tableShell = 'rounded-2xl border border-border-light bg-background-primary shadow-sm overflow-hidden';
+ const tableShell = 'rounded-md border border-border-light bg-background-primary overflow-hidden';
  return <div className="min-h-screen bg-background-secondary">
  <PageContainer className="pb-10">
- <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border-light bg-background-secondary/90 px-4 py-4 backdrop-blur">
+ <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border-light bg-background-secondary px-4 py-4">
  <div className="flex min-w-0 items-center gap-3">
  <Link to={ROUTES.DASHBOARD} className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-primary">
  <ArrowLeft className="h-4 w-4" />{t("hesap")}</Link>
  <div className="hidden h-8 w-px bg-border-light sm:block" />
  <div className="flex min-w-0 items-center gap-2">
- <div className="shrink-0 rounded-xl bg-primary text-white p-2 shadow-sm">
+ <div className="shrink-0 rounded bg-primary text-white p-2">
  <Ticket className="h-5 w-5" strokeWidth={2.2} />
  </div>
  <div className="min-w-0">
@@ -94,58 +95,58 @@ const PlatformCouponsPage = () => {
  </div>
  </div>
  </div>
- <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center gap-1.5 rounded-xl border border-border-light bg-background-primary px-3 py-2 text-sm font-semibold text-text-primary shadow-sm hover:bg-background-secondary disabled:opacity-60">
+ <button type="button" onClick={() => refetch()} disabled={isFetching} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
  <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />{t("yenile")}</button>
  </div>
 
- <div className="mb-6 flex w-full max-w-md rounded-2xl border border-border-light bg-background-primary p-1 shadow-sm">
- <button type="button" onClick={() => setTab(TABS.ACTIVE)} className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${tab === TABS.ACTIVE ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>{t("kullan_labilir")}</button>
- <button type="button" onClick={() => setTab(TABS.PARTICIPATED)} className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${tab === TABS.PARTICIPATED ? 'bg-primary text-white shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>{t("kulland_klar_m")}</button>
+ <div className="mb-6 flex w-full max-w-md rounded-md border border-border-light bg-background-primary p-1">
+ <button type="button" onClick={() => setTab(TABS.ACTIVE)} className={`flex-1 rounded px-4 py-2.5 text-sm font-semibold transition-all ${tab === TABS.ACTIVE ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}>{t("kullan_labilir")}</button>
+ <button type="button" onClick={() => setTab(TABS.PARTICIPATED)} className={`flex-1 rounded px-4 py-2.5 text-sm font-semibold transition-all ${tab === TABS.PARTICIPATED ? 'bg-primary text-white' : 'text-text-secondary hover:text-text-primary'}`}>{t("kulland_klar_m")}</button>
  </div>
 
- {loading && <div className="flex justify-center py-16">
- <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+ {loading && <div className="py-4" aria-busy="true">
+ <SkeletonList />
  </div>}
 
- {!loading && error && <div className="rounded-2xl border border-status-error-border bg-status-error-bg px-4 py-3 text-sm text-status-error-text">
+ {!loading && error && <div className="rounded-md border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text">
  {error?.response?.data?.message || error?.message || 'Yüklenemedi.'}
  </div>}
 
- {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && <div className="rounded-2xl border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("u_an_size_atanm_kullan_labilir_kupon_yok")}</div>}
+ {!loading && !error && tab === TABS.ACTIVE && activeList.length === 0 && <div className="rounded-md border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("u_an_size_atanm_kullan_labilir_kupon_yok")}</div>}
 
- {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && <div className="rounded-2xl border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("hen_z_bir_sipari_te_kupon_kullanmad_n_z")}</div>}
+ {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length === 0 && <div className="rounded-md border border-dashed border-border-light bg-background-primary px-6 py-12 text-center text-sm text-text-secondary">{t("hen_z_bir_sipari_te_kupon_kullanmad_n_z")}</div>}
 
  {!loading && !error && tab === TABS.ACTIVE && activeList.length > 0 && <div className={tableShell}>
  <div className="overflow-x-auto">
  <table className="w-full min-w-[720px] border-collapse text-left text-sm">
  <thead>
- <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold uppercase tracking-wide text-text-secondary">
+ <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold text-text-secondary">
  <th className="whitespace-nowrap px-4 py-3">{t("kod")}</th>
- <th className="min-w-[180px] px-4 py-3">{t("kampanya")}</th>
+ <th className="min-w-44 px-4 py-3">{t("kampanya")}</th>
  <th className="whitespace-nowrap px-4 py-3">{t("i_ndirim")}</th>
  <th className="whitespace-nowrap px-4 py-3">{t("genel_hak")}<span className="mt-0.5 block font-normal normal-case tracking-normal text-text-muted">{t("global_kalan_limit")}</span>
  </th>
  <th className="whitespace-nowrap px-4 py-3">{t("size_zel")}<span className="mt-0.5 block font-normal normal-case tracking-normal text-text-muted">{t("ki_i_ba_kalan_limit")}</span>
  </th>
- <th className="min-w-[140px] px-4 py-3">{t("ge_erlilik")}</th>
+ <th className="min-w-36 px-4 py-3">{t("ge_erlilik")}</th>
  <th className="whitespace-nowrap px-4 py-3 text-right">{t("i_lem")}</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-border-light">
  {activeList.map(c => <tr key={c.id} className="bg-background-primary transition-colors hover:bg-background-secondary">
- <td className="align-top px-4 py-3 text-sm font-bold text-text-primary">{c.code}</td>
+ <td className="align-top px-4 py-3 text-sm font-semibold text-text-primary">{c.code}</td>
  <td className="align-top px-4 py-3">
- <div className="max-w-[220px] truncate font-semibold text-text-primary" title={c.title}>
+ <div className="max-w-56 truncate font-semibold text-text-primary" title={c.title}>
  {c.title?.trim() || '—'}
  </div>
  {c.description?.trim() && <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-text-secondary" title={c.description.trim()}>
  {c.description.trim()}
  </p>}
- {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-caption text-text-muted">{c.eligibleTypes.join(', ')}</p>}
+ {Array.isArray(c.eligibleTypes) && c.eligibleTypes.length > 0 && <p className="mt-1 text-xs text-text-muted">{c.eligibleTypes.join(', ')}</p>}
  </td>
  <td className="align-top whitespace-nowrap px-4 py-3">
  <span className="inline-flex flex-col gap-1">
- <span className="w-fit rounded-lg border border-primary/20 bg-primary-light px-2 py-0.5 text-xs font-semibold text-primary">
+ <span className="w-fit rounded border border-primary/20 bg-primary-light px-2 py-0.5 text-xs font-semibold text-primary">
  {formatCouponKindLabel(c.discountKind)}
  </span>
  <span className="text-xs font-semibold tabular-nums text-text-primary">{formatCouponDiscount(c)}</span>
@@ -161,32 +162,32 @@ const PlatformCouponsPage = () => {
  <CouponPeriod startsAt={c.startsAt} endsAt={c.endsAt} />
  </td>
  <td className="align-top whitespace-nowrap px-4 py-3 text-right">
- <Link to={ROUTES.CHECKOUT} className="inline-flex items-center gap-1 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-primary-hover transition">{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" />
+ <Link to={ROUTES.CHECKOUT} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" />
  </Link>
  </td>
  </tr>)}
  </tbody>
  </table>
  </div>
- <p className="border-t border-border-light bg-background-secondary px-4 py-2.5 text-caption text-text-muted">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
+ <p className="border-t border-border-light bg-background-secondary px-4 py-2.5 text-xs text-text-muted">{t("genel_hak_kampanyan_n_t_m_kullan_c_lar_i")}</p>
  </div>}
 
  {!loading && !error && tab === TABS.PARTICIPATED && participationsList.length > 0 && <div className={tableShell}>
  <div className="overflow-x-auto">
  <table className="w-full min-w-[560px] border-collapse text-left text-sm">
  <thead>
- <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold uppercase tracking-wide text-text-secondary">
+ <tr className="border-b border-border-light bg-background-secondary text-xs font-semibold text-text-secondary">
  <th className="whitespace-nowrap px-4 py-3">{t("kod")}</th>
- <th className="min-w-[200px] px-4 py-3">{t("kampanya")}</th>
+ <th className="min-w-48 px-4 py-3">{t("kampanya")}</th>
  <th className="whitespace-nowrap px-4 py-3">{t("kullan_ld")}</th>
  <th className="whitespace-nowrap px-4 py-3 text-right">{t("sipari")}</th>
  </tr>
  </thead>
  <tbody className="divide-y divide-border-light">
  {participationsList.map(row => <tr key={row.redemptionId} className="bg-background-primary transition-colors hover:bg-background-secondary">
- <td className="align-top px-4 py-3 text-sm font-bold text-text-primary">{row.couponCode}</td>
+ <td className="align-top px-4 py-3 text-sm font-semibold text-text-primary">{row.couponCode}</td>
  <td className="align-top px-4 py-3">
- <div className="max-w-[280px] truncate font-semibold text-text-primary">
+ <div className="max-w-72 truncate font-semibold text-text-primary">
  {row.couponTitle?.trim() || '—'}
  </div>
  {row.couponDescription?.trim() && <p className="mt-1 line-clamp-2 text-xs text-text-secondary">{row.couponDescription.trim()}</p>}

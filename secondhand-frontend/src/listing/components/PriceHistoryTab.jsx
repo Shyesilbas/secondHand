@@ -1,27 +1,28 @@
 import { useTranslation } from "react-i18next";
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { formatCurrency, formatCurrencyCompact } from '../../common/formatters.js';
 import { Clock, DollarSign, Minus, TrendingDown, TrendingUp, ArrowLeftRight } from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { computeHistoryStats, computePercentageChange, formatHistoryDateLabel, getHistoryCurrency, sortPriceHistoryAsc, sortPriceHistoryDesc } from '../utils/priceHistoryUtils.js';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { theme } from '../../common/theme/theme.js';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-// eslint-disable-next-line no-unused-vars
 const StatItem = ({
  title,
  value,
  subtext,
  icon: Icon
-}) => <div className="rounded-lg border border-border-light bg-background-primary px-4 py-3 shadow-sm hover:border-slate-300 transition-colors duration-300">
+}) => <div className="rounded border border-border-light bg-background-primary px-4 py-3 hover:border-card-border-hover transition-colors duration-300">
  <div className="flex items-center justify-between gap-3">
  <div className="min-w-0">
  <div className="flex items-center gap-2">
- <Icon className="w-4 h-4 text-slate-500 shrink-0" />
- <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider truncate">{title}</p>
+ <Icon className="w-4 h-4 text-text-tertiary shrink-0" />
+ <p className="text-xs font-semibold text-text-secondary truncate">{title}</p>
  </div>
  <p className="text-lg font-semibold text-text-primary mt-1 tracking-tight truncate">{value}</p>
- {subtext && <p className="text-xs text-slate-500 mt-1 truncate">{subtext}</p>}
+ {subtext && <p className="text-xs text-text-tertiary mt-1 truncate">{subtext}</p>}
  </div>
  </div>
  </div>;
@@ -45,19 +46,19 @@ const PriceHistoryTab = ({
  datasets: [{
  label: 'Price',
  data: prices,
- borderColor: '#4F46E5',
+ borderColor: theme.colors.text.primary,
  backgroundColor: context => {
  const ctx = context.chart.ctx;
  const gradient = ctx.createLinearGradient(0, 0, 0, 260);
- gradient.addColorStop(0, 'rgba(79, 70, 229, 0.16)');
- gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+ gradient.addColorStop(0, 'rgba(15, 23, 42, 0.16)');
+ gradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
  return gradient;
  },
  borderWidth: 2,
  pointRadius: 2,
  pointHoverRadius: 5,
- pointBackgroundColor: '#FFFFFF',
- pointBorderColor: '#4F46E5',
+ pointBackgroundColor: theme.colors.background.primary,
+ pointBorderColor: theme.colors.text.primary,
  pointBorderWidth: 2,
  fill: true,
  tension: 0.25
@@ -77,8 +78,8 @@ const PriceHistoryTab = ({
  },
  tooltip: {
  backgroundColor: 'rgba(15, 23, 42, 0.92)',
- titleColor: '#F9FAFB',
- bodyColor: '#F9FAFB',
+ titleColor: theme.colors.background.secondary,
+ bodyColor: theme.colors.background.secondary,
  padding: 10,
  cornerRadius: 10,
  displayColors: false,
@@ -97,7 +98,7 @@ const PriceHistoryTab = ({
  display: false
  },
  ticks: {
- color: '#64748B',
+ color: theme.colors.text.tertiary,
  font: {
  size: 10
  }
@@ -109,7 +110,7 @@ const PriceHistoryTab = ({
  borderDash: [6, 6]
  },
  ticks: {
- color: '#64748B',
+ color: theme.colors.text.tertiary,
  font: {
  size: 10
  },
@@ -163,38 +164,34 @@ const PriceHistoryTab = ({
  }];
  }, [currencyCode, stats]);
  if (error) {
- return <div className="rounded-xl border border-border-light bg-background-primary p-6 text-center">
- <div className="mx-auto w-10 h-10 rounded-lg bg-status-error-bg text-status-error flex items-center justify-center mb-3">
- <TrendingUp className="w-5 h-5" />
- </div>
+ return <div className="rounded border border-border-light bg-background-primary p-6 text-center">
+ <TrendingUp className="mx-auto mb-3 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
  <p className="text-sm font-semibold text-text-primary">{t("unable_to_load_price_history")}</p>
- <p className="text-sm text-slate-500 mt-1">{t("please_try_again_later")}</p>
+ <p className="text-sm text-text-tertiary mt-1">{t("please_try_again_later")}</p>
  </div>;
  }
  if (loading) {
- return <div className="rounded-xl border border-border-light bg-background-primary p-10 flex flex-col items-center justify-center">
- <div className="w-10 h-10 border-2 border-primary border-t-slate-900 rounded-full animate-spin" />
- <p className="text-sm text-slate-600 mt-4">{t("analyzing_price_trends")}</p>
+ return <div className="space-y-3 rounded border border-border bg-background-primary p-5" aria-busy="true" aria-label={t("analyzing_price_trends")}>
+ <Skeleton className="h-4 w-40" />
+ <Skeleton className="h-40 w-full" />
  </div>;
  }
  if (!priceHistory || priceHistory.length === 0) {
- return <div className="rounded-xl border border-border-light bg-background-primary p-10 text-center">
- <div className="mx-auto w-10 h-10 rounded-lg bg-slate-100 text-primary flex items-center justify-center mb-3">
- <Clock className="w-5 h-5" />
- </div>
+ return <div className="rounded border border-border-light bg-background-primary p-10 text-center">
+ <Clock className="mx-auto mb-3 block h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
  <p className="text-sm font-semibold text-text-primary">{t("no_price_history_yet")}</p>
- <p className="text-sm text-slate-500 mt-1">{t("this_listing_hasn_t_had_any_price_change")}</p>
+ <p className="text-sm text-text-tertiary mt-1">{t("this_listing_hasn_t_had_any_price_change")}</p>
  </div>;
  }
  return <div className="space-y-5">
- <div className="rounded-xl border border-border-light bg-background-primary p-5 shadow-sm">
+ <div className="rounded border border-border-light bg-background-primary p-5">
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  {statItems.map(s => <StatItem key={s.title} {...s} />)}
  </div>
  </div>
 
- <div className="bg-background-primary rounded-xl border border-border-light shadow-sm overflow-hidden">
- <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
+ <div className="bg-background-primary rounded border border-border-light overflow-hidden">
+ <div className="px-5 py-4 border-b border-border-light bg-background-secondary/60">
  <h3 className="text-sm font-medium text-text-primary">{t("price_evolution")}</h3>
  </div>
  <div className="p-5">
@@ -204,11 +201,11 @@ const PriceHistoryTab = ({
  </div>
  </div>
 
- <div className="bg-background-primary rounded-xl border border-border-light shadow-sm overflow-hidden">
- <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60">
+ <div className="bg-background-primary rounded border border-border-light overflow-hidden">
+ <div className="px-5 py-4 border-b border-border-light bg-background-secondary/60">
  <h3 className="text-sm font-medium text-text-primary">{t("price_history")}</h3>
  </div>
- <div className="divide-y divide-slate-100">
+ <div className="divide-y divide-border-light">
  {historyDesc.map((entry, idx) => {
  const pct = entry?.percentageChange ?? computePercentageChange(entry?.oldPrice, entry?.newPrice);
  const pctValue = Number(pct);
@@ -216,26 +213,26 @@ const PriceHistoryTab = ({
  const isUp = hasPct ? pctValue > 0 : false;
  const isDown = hasPct ? pctValue < 0 : false;
  const entryCurrency = getHistoryCurrency(entry, currencyCode) || currencyCode;
- const badgeClass = isUp ? 'bg-status-error-bg text-status-error-text border-status-error-border' : isDown ? 'bg-status-success-bg text-slate-900 border-slate-200' : 'bg-slate-50 text-slate-700 border-border-light';
- const dotClass = isUp ? 'bg-status-error-bg' : isDown ? 'bg-status-success-bg' : 'bg-primary';
- return <div key={entry.id ?? idx} className="px-5 py-4 hover:bg-slate-50/40 transition-colors duration-300">
+ const badgeClass = isUp ? 'bg-background-secondary text-status-error-text border-border' : isDown ? 'bg-background-secondary text-text-primary border-border' : 'bg-background-secondary text-text-secondary border-border-light';
+ const dotClass = isUp ? 'bg-status-error' : isDown ? 'bg-status-success' : 'bg-primary';
+ return <div key={entry.id ?? idx} className="px-5 py-4 hover:bg-background-secondary/40 transition-colors duration-300">
  <div className="flex items-start justify-between gap-4">
  <div className="min-w-0">
  <div className="flex items-center gap-2">
  <span className={`w-2 h-2 rounded-full ${dotClass} shrink-0`} />
  <p className="text-sm font-medium text-text-primary truncate">{formatHistoryDateLabel(entry?.changeDate)}</p>
  </div>
- {entry?.oldPrice != null && <p className="text-xs text-slate-500 mt-1 truncate">{t("previous")}{formatCurrency(entry?.oldPrice, entryCurrency)}
+ {entry?.oldPrice != null && <p className="text-xs text-text-tertiary mt-1 truncate">{t("previous")}{formatCurrency(entry?.oldPrice, entryCurrency)}
  </p>}
  </div>
 
  <div className="text-right shrink-0">
  <p className="text-sm font-semibold text-text-primary">{formatCurrency(entry?.newPrice, entryCurrency)}</p>
  <div className="mt-2 flex justify-end">
- {hasPct ? <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border ${badgeClass}`}>
+ {hasPct ? <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border ${badgeClass}`}>
  {isUp ? <TrendingUp className="w-3.5 h-3.5" /> : isDown ? <TrendingDown className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
  {Math.abs(pctValue).toFixed(1)}%
- </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-caption font-semibold border bg-slate-50 text-slate-600 border-border-light">
+ </span> : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border bg-background-secondary text-text-secondary border-border-light">
  <Minus className="w-3.5 h-3.5" />
  —
  </span>}

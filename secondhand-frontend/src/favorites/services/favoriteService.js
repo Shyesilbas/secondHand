@@ -12,7 +12,6 @@ export const favoriteService = {
  return post(API_ENDPOINTS.FAVORITES.TOGGLE, requestData);
  },
 
-
  isFavorited: async (listingId) => {
  return get(API_ENDPOINTS.FAVORITES.CHECK(listingId));
  },
@@ -22,10 +21,6 @@ export const favoriteService = {
  size = FAVORITE_DEFAULTS.PAGE_SIZE,
  } = {}) => {
  return get(API_ENDPOINTS.FAVORITES.MY_FAVORITES, { params: { page, size } });
- },
-
- broadcastOfferToFavoriters: async (listingId, broadcastData) => {
- return post(`/api/v1/favorites/listings/${listingId}/broadcast-offer`, broadcastData);
  }
 
 };

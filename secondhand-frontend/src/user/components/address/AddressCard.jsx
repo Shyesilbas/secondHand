@@ -1,4 +1,6 @@
+import React from 'react';
 import { useTranslation } from "react-i18next";
+import { Building2, Home, MapPin } from 'lucide-react';
 import { USER_ADDRESS_TYPES } from '../../userConstants.js';
 const AddressCard = ({
  address,
@@ -12,13 +14,13 @@ const AddressCard = ({
  const getAddressTypeIcon = type => {
  switch (type) {
  case USER_ADDRESS_TYPES.HOME:
- return '🏠';
+ return Home;
  case USER_ADDRESS_TYPES.WORK:
- return '🏢';
+ return Building2;
  case USER_ADDRESS_TYPES.OTHER:
- return '📍';
+ return MapPin;
  default:
- return '📍';
+ return MapPin;
  }
  };
  const getAddressTypeLabel = type => {
@@ -33,15 +35,15 @@ const AddressCard = ({
  return 'Other';
  }
  };
- return <div className={`p-4 rounded-lg border shadow-sm bg-background-primary transition-all hover:shadow-md ${address.mainAddress ? 'border-primary bg-blue-50' : 'border-border-light'}`}>
+ return <div className={`p-4 rounded border shadow-sm bg-background-primary transition-all ${address.mainAddress ? 'border-primary bg-background-secondary' : 'border-border-light'}`}>
  <div className="flex justify-between items-start">
  <div className="flex-1">
  <div className="flex items-center gap-2 mb-2">
- <span className="text-lg">{getAddressTypeIcon(address.addressType)}</span>
+ {React.createElement(getAddressTypeIcon(address.addressType), { className: "h-5 w-5 text-text-tertiary", strokeWidth: 1.5, "aria-hidden": true })}
  <h3 className="text-sm font-medium text-text-primary">
  {getAddressTypeLabel(address.addressType)}
  </h3>
- {address.mainAddress && <span className="px-2 py-0.5 text-xs bg-primary-50 text-primary rounded-full font-medium">{t("main")}</span>}
+ {address.mainAddress && <span className="px-2 py-0.5 text-xs bg-primary-50 text-primary rounded-sm font-medium">{t("main")}</span>}
  </div>
  
  <div className="text-sm text-text-secondary space-y-1">

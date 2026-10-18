@@ -121,6 +121,10 @@ public class PasswordService {
         }
 
         var verification = verificationOpt.get();
+
+        if (verification.getVerificationAttemptLeft() <= 0) {
+            return Result.error(AuthErrorCodes.TOO_MANY_VERIFICATION_ATTEMPTS);
+        }
         
         if (!request.getVerificationCode().equals(verification.getCode())) {
             verificationService.decrementVerificationAttempts(verification);

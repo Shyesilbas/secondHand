@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from "react-i18next";
 import { useQuery } from '@tanstack/react-query';
 import { Sparkles, AlertCircle } from 'lucide-react';
@@ -39,30 +38,30 @@ export const AuraSummary = ({
   }
 
   return (
-    <div className="rounded-2xl border border-indigo-100 bg-white/90 p-4 shadow-2xs">
+    <div className="rounded-md border border-border-light bg-white/90 p-4">
       <div className="flex items-center justify-between gap-3 mb-2.5 flex-wrap">
-        <div className="flex items-center gap-2 text-slate-900 font-extrabold text-xs tracking-tight">
-          <Sparkles className="w-4 h-4 animate-pulse text-amber-500 fill-amber-400 shrink-0" />
+        <div className="flex items-center gap-2 text-text-primary font-semibold text-xs tracking-tight">
+          <Sparkles className="w-4 h-4 animate-pulse text-status-warning fill-status-warning shrink-0" />
           <span>{t("aura_ai_yorum_analizi", "Aura AI Akıllı Değerlendirme")}</span>
         </div>
-        <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full shrink-0">
+        <span className="text-xs font-semibold text-text-primary bg-background-secondary border border-border-light px-2 py-0.5 rounded-sm shrink-0">
           Otomatik Analiz
         </span>
       </div>
 
       {isLoading ? (
         <div className="space-y-2 py-1.5 animate-pulse">
-          <div className="h-3 bg-slate-200/80 rounded w-full" />
-          <div className="h-3 bg-slate-200/80 rounded w-5/6" />
-          <div className="h-3 bg-slate-200/80 rounded w-3/4" />
+          <div className="h-3 bg-secondary-200/80 rounded w-full" />
+          <div className="h-3 bg-secondary-200/80 rounded w-5/6" />
+          <div className="h-3 bg-secondary-200/80 rounded w-3/4" />
         </div>
       ) : error ? (
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium py-1">
-          <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-xs text-text-tertiary font-medium py-1">
+          <AlertCircle className="w-3.5 h-3.5 text-text-muted shrink-0" />
           <span>Henüz yeterli değerlendirme verisi bulunmuyor veya analiz hazırlanıyor.</span>
         </div>
       ) : (
-        <p className="text-xs text-slate-700 leading-relaxed font-medium whitespace-pre-line">
+        <p className="text-xs text-text-secondary leading-relaxed font-medium whitespace-pre-line">
           {summary || 'Bu ilan için otomatik Aura AI analizi hazırlanıyor.'}
         </p>
       )}

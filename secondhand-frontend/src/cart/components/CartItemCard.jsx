@@ -1,9 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Clock, Minus, Plus, Star, X } from 'lucide-react';
 import { formatCurrency } from '../../common/formatters.js';
-import { useSellerReviewStatsCache } from '../../reviews/hooks/useSellerReviewStatsCache.js';
+import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useReservationTimer } from '../hooks/useReservationTimer.js';
-import { CART_UI, CART_SHAPE } from '../uiPalette.js';
 const CartItemCard = ({
  item,
  onQuantityChange,
@@ -37,7 +36,7 @@ const CartItemCard = ({
  const totalReviews = reviewStats?.totalReviews || 0;
  const {
  stats: sellerStats
- } = useSellerReviewStatsCache(sellerId);
+ } = useUserReviewStats(sellerId);
  const sellerRating = sellerStats?.averageRating || 0;
  const sellerTotalReviews = sellerStats?.totalReviews || 0;
  const maxStock = item?.listing?.quantity;
@@ -52,11 +51,11 @@ const CartItemCard = ({
  return <div className="group px-4 py-4 transition-colors hover:bg-background-secondary/50 sm:px-5">
  <div className="flex gap-4">
  <div className="relative shrink-0">
- {item.listing.imageUrl ? <img src={item.listing.imageUrl} alt="" loading="lazy" className={`h-20 w-20 border border-border-light object-cover sm:h-24 sm:w-24 ${CART_SHAPE.radiusThumb}`} onError={e => {
+ {item.listing.imageUrl ? <img src={item.listing.imageUrl} alt="" loading="lazy" className={`h-20 w-20 border border-border-light object-cover sm:h-24 sm:w-24 rounded`} onError={e => {
  e.target.style.display = 'none';
  e.target.nextSibling.style.display = 'flex';
  }} /> : null}
- <div className={`flex h-20 w-20 items-center justify-center border border-border-light bg-secondary-light sm:h-24 sm:w-24 ${CART_SHAPE.radiusThumb} ${item.listing.imageUrl ? 'hidden' : 'flex'}`}>
+ <div className={`flex h-20 w-20 items-center justify-center border border-border-light bg-secondary-light sm:h-24 sm:w-24 rounded ${item.listing.imageUrl ? 'hidden' : 'flex'}`}>
  <span className="text-sm font-medium text-text-muted">
  {item.listing.title.charAt(0).toUpperCase()}
  </span>
@@ -79,12 +78,12 @@ const CartItemCard = ({
  </span>}
  </p>}
  </div>
- <button type="button" onClick={handleRemove} disabled={isRemoving} className="shrink-0 rounded-xl p-1.5 text-text-muted transition hover:bg-background-secondary hover:text-primary disabled:opacity-40" title={t("remove")}>
+ <button type="button" onClick={handleRemove} disabled={isRemoving} className="shrink-0 rounded p-1.5 text-text-muted transition hover:bg-background-secondary hover:text-primary disabled:opacity-40" title={t("remove")}>
  <X className="h-4 w-4" strokeWidth={1.75} />
  </button>
  </div>
 
- <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-text-secondary">
+ <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-secondary">
  {isLowStock && <span className="tabular-nums">{t("stock")}{Number(maxStock)}</span>}
  {isReserved && !isExpired && <span className={`inline-flex items-center gap-1 tabular-nums ${isReservationExpiring ? 'text-status-error' : 'text-primary'}`}>
  <Clock className="h-3 w-3" strokeWidth={1.75} />
@@ -115,11 +114,11 @@ const CartItemCard = ({
  </p>}
  </div>
 
- <div className={`inline-flex items-stretch overflow-hidden border border-border-light bg-background-primary ${CART_SHAPE.radiusBox}`}>
+ <div className={`inline-flex items-stretch overflow-hidden border border-border-light bg-background-primary rounded`}>
  <button type="button" onClick={() => handleQuantityChange(item.quantity - 1)} disabled={isUpdating || item.quantity <= 1} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-background-secondary disabled:opacity-35">
  <Minus className="h-3.5 w-3.5" strokeWidth={2} />
  </button>
- <span className="flex min-w-[2rem] items-center justify-center border-x border-border-light px-2 text-sm font-medium tabular-nums text-text-primary">
+ <span className="flex min-w-8 items-center justify-center border-x border-border-light px-2 text-sm font-medium tabular-nums text-text-primary">
  {item.quantity}
  </span>
  <button type="button" onClick={() => handleQuantityChange(item.quantity + 1)} disabled={isUpdating || maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock)} className="px-2 py-1.5 text-text-secondary transition enabled:hover:bg-background-secondary disabled:opacity-35">

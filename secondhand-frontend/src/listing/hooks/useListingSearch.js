@@ -1,16 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useDebouncedValue } from '../../common/hooks/useDebouncedValue.js';
 import { listingService } from '../services/listingService.js';
-import { LISTING_DEFAULTS } from '../types/index.js';
 
 /**
  * Handles title-based search (client-side) and listingNo search (API call)
  */
 export const useListingSearch = ({ listings, mode, urlSearchQuery = '', updateFilters }) => {
  const [searchTerm, setSearchTerm] = useState(() => String(urlSearchQuery || '').trim());
- const [listingNoLoading, setListingNoLoading] = useState(false);
- const [listingNoError, setListingNoError] = useState('');
- const [listingNoResult, setListingNoResult] = useState(null);
- const listingNoRequestRef = useRef(0);
 
  useEffect(() => {
  const q = String(urlSearchQuery || '').trim();
@@ -31,54 +28,21 @@ export const useListingSearch = ({ listings, mode, urlSearchQuery = '', updateFi
  return isListingNoSearch ? 'listingNo' : 'title';
  }, [isListingNoSearch, mode, searchTrimmed]);
 
- // Sync title search term to parent filters state with debounce
+ // Title search filters on the server; push the debounced term into the parent filters.
+ const debouncedTitle = useDebouncedValue(searchMode === 'title' ? searchTrimmed : '', 400);
  useEffect(() => {
- if (searchMode !== 'title') {
- updateFilters?.({ title: null });
- return;
- }
+ updateFilters?.({ title: debouncedTitle || null });
+ }, [debouncedTitle, updateFilters]);
 
- const handler = setTimeout(() => {
- updateFilters?.({ title: searchTrimmed || null });
- }, 400);
-
- return () => clearTimeout(handler);
- }, [searchTrimmed, searchMode, updateFilters]);
-
- // ListingNo API call effect
- useEffect(() => {
- if (searchMode !== 'listingNo') {
- setListingNoLoading(false);
- setListingNoError('');
- setListingNoResult(null);
- return;
- }
-
- const requestId = listingNoRequestRef.current + 1;
- listingNoRequestRef.current = requestId;
-
- setListingNoLoading(true);
- setListingNoError('');
- setListingNoResult(null);
-
- listingService
- .getListingByNo(searchUpper)
- .then((res) => {
- if (listingNoRequestRef.current !== requestId) return;
- setListingNoResult(res || null);
- })
- .catch((err) => {
- if (listingNoRequestRef.current !== requestId) return;
- setListingNoResult(null);
- const status = err?.response?.status;
- if (status === 404) setListingNoError('No listing found with this number');
- else setListingNoError('Search failed. Please try again.');
- })
- .finally(() => {
- if (listingNoRequestRef.current !== requestId) return;
- setListingNoLoading(false);
+ const { data: listingNoData, isFetching: listingNoLoading, error: listingNoQueryError } = useQuery({
+ queryKey: ['listings', 'byNo', searchUpper],
+ queryFn: () => listingService.getListingByNo(searchUpper),
+ enabled: searchMode === 'listingNo',
+ retry: false,
  });
- }, [searchMode, searchUpper]);
+ const listingNoResult = searchMode === 'listingNo' ? listingNoData || null : null;
+ const listingNoError = searchMode !== 'listingNo' || !listingNoQueryError ? ''
+ : listingNoQueryError?.response?.status === 404 ? 'No listing found with this number' : 'Search failed. Please try again.';
 
  const filteredListings = useMemo(() => {
  if (searchMode === 'listingNo') {
@@ -89,9 +53,6 @@ export const useListingSearch = ({ listings, mode, urlSearchQuery = '', updateFi
 
  const clearSearch = useCallback(() => {
  setSearchTerm('');
- setListingNoLoading(false);
- setListingNoError('');
- setListingNoResult(null);
  updateFilters?.({ title: null });
  }, [updateFilters]);
 
@@ -104,11 +65,6 @@ export const useListingSearch = ({ listings, mode, urlSearchQuery = '', updateFi
  listingNo: {
  loading: listingNoLoading,
  error: listingNoError,
- },
- title: {
- allPagesLoaded: true,
- loadingAllPages: false,
- loadAllPages: () => {},
  },
  };
 };

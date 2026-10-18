@@ -1,9 +1,8 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import AgreementsList from './AgreementsList.jsx';
-import { useAgreements, useUserAgreements } from '../hooks/useAgreements.js';
-import { agreementService } from '../services/agreementService.js';
+import { useAgreements, useRequiredAgreements, useUserAgreements } from '../hooks/useAgreements.js';
 import { FileText, UserCheck, CreditCard } from 'lucide-react';
 const CATEGORIES = [{
  key: 'registration',
@@ -31,31 +30,9 @@ const AgreementsPage = () => {
  isLoading: userAgreementsLoading,
  refetch: refetchUserAgreements
  } = useUserAgreements();
- const [requiredRegisterAgreements, setRequiredRegisterAgreements] = useState([]);
- const [requiredPaymentAgreements, setRequiredPaymentAgreements] = useState([]);
- const loading = agreementsLoading || userAgreementsLoading;
- useEffect(() => {
- let mounted = true;
- const load = async () => {
- try {
- const [reg, pay] = await Promise.all([agreementService.getRequiredAgreementsForRegister(), agreementService.getRequiredAgreementsForPayment()]);
- if (!mounted) return;
- setRequiredRegisterAgreements(Array.isArray(reg) ? reg : []);
- setRequiredPaymentAgreements(Array.isArray(pay) ? pay : []);
- } catch {
- if (!mounted) return;
- setRequiredRegisterAgreements([]);
- setRequiredPaymentAgreements([]);
- }
- };
- load();
- return () => {
- mounted = false;
- };
- }, []);
- useEffect(() => {
- setFilter('all');
- }, [category]);
+ const { requiredAgreements: requiredRegisterAgreements, isLoading: registerLoading } = useRequiredAgreements('REGISTER');
+ const { requiredAgreements: requiredPaymentAgreements, isLoading: paymentLoading } = useRequiredAgreements('ONLINE_PAYMENT');
+ const loading = agreementsLoading || userAgreementsLoading || registerLoading || paymentLoading;
  const requiredIds = useMemo(() => {
  const list = category === 'registration' ? requiredRegisterAgreements : requiredPaymentAgreements;
  return new Set((list || []).map(a => a?.agreementId).filter(Boolean));
@@ -71,9 +48,7 @@ const AgreementsPage = () => {
  <div className="bg-background-primary border-b border-border-light">
  <PageContainer className="py-8">
  <div className="flex items-center gap-4">
- <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-sm">
- <FileText className="w-6 h-6 text-white" />
- </div>
+ <FileText className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <div>
  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("legal_agreements")}</h1>
  <p className="text-sm text-text-muted mt-0.5">{t("review_and_accept_required_legal_documen")}</p>
@@ -87,23 +62,26 @@ const AgreementsPage = () => {
 
  {/* ── Left: Category Sidebar ──────────────── */}
  <div className="lg:w-64 shrink-0">
- <nav className="bg-background-primary rounded-2xl border border-border-light overflow-hidden lg:sticky lg:top-6">
+ <nav className="bg-background-primary rounded-md border border-border-light overflow-hidden lg:sticky lg:top-6">
  <div className="px-4 py-3 border-b border-border-light">
- <span className="text-caption font-semibold text-text-muted uppercase tracking-wider">{t("category")}</span>
+ <span className="text-xs font-semibold text-text-muted">{t("category")}</span>
  </div>
  <div className="p-2">
  {CATEGORIES.map(cat => {
  const Icon = cat.icon;
  const isActive = category === cat.key;
- return <button key={cat.key} type="button" onClick={() => setCategory(cat.key)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
- <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? 'bg-primary/20 text-primary' : 'bg-background-secondary text-text-muted'}`}>
+ return <button key={cat.key} type="button" onClick={() => {
+ setCategory(cat.key);
+ setFilter('all');
+ }} className={`w-full flex items-center gap-3 px-3 py-3 rounded text-left transition-all duration-200 ${isActive ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'}`}>
+ <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${isActive ? 'bg-primary/20 text-primary' : 'bg-background-secondary text-text-muted'}`}>
  <Icon className="w-4 h-4" />
  </div>
  <div className="min-w-0">
  <div className={`text-sm font-semibold ${isActive ? 'text-primary' : 'text-text-primary'}`}>
  {cat.label}
  </div>
- <div className={`text-caption truncate mt-0.5 ${isActive ? 'text-primary/80' : 'text-text-muted'}`}>
+ <div className={`text-xs truncate mt-0.5 ${isActive ? 'text-primary/80' : 'text-text-muted'}`}>
  {cat.description}
  </div>
  </div>
@@ -115,12 +93,10 @@ const AgreementsPage = () => {
 
  {/* ── Right: Content Panel ────────────────── */}
  <div className="flex-1 min-w-0">
- <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden">
+ <div className="bg-background-primary rounded-md border border-border-light overflow-hidden">
  <div className="px-6 py-5 border-b border-border-light">
  <div className="flex items-center gap-3">
- {activeCat && <div className="w-9 h-9 rounded-lg bg-background-secondary flex items-center justify-center">
- <activeCat.icon className="w-4.5 h-4.5 text-text-secondary" />
- </div>}
+ {activeCat && <activeCat.icon className="h-5 w-5 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />}
  <div>
  <h2 className="text-lg font-semibold text-text-primary">{activeCat?.label} {t("agreements")}</h2>
  <p className="text-xs text-text-muted mt-0.5">{activeCat?.description}</p>
@@ -130,9 +106,7 @@ const AgreementsPage = () => {
 
  <div className="p-6">
  {!loading && requiredIds.size === 0 ? <div className="py-12 text-center">
- <div className="w-14 h-14 rounded-2xl bg-background-secondary flex items-center justify-center mx-auto mb-4">
- <FileText className="w-6 h-6 text-text-muted" />
- </div>
+ <FileText className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
  <p className="text-sm font-semibold text-text-primary">{t("no_required_agreements")}</p>
  <p className="text-sm text-text-muted mt-1">{t("this_section_has_no_required_agreements_")}</p>
  </div> : <AgreementsList agreements={filteredAgreements} userAgreements={userAgreements} loading={loading} filter={filter} setFilter={setFilter} onAccepted={() => {

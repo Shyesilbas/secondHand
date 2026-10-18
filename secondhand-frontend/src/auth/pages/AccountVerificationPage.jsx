@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -7,13 +7,13 @@ import { verificationService } from '../services/verificationService.js';
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import AuthButton from '../../common/components/ui/AuthButton.jsx';
-import { SuccessIcon, WarningIcon } from '../../common/components/ui/Icons.jsx';
-import { ShieldCheck as ShieldCheckIcon, Mail as EnvelopeIcon } from 'lucide-react';
+import { WarningIcon } from '../../common/components/ui/Icons.jsx';
+import { ShieldCheck as ShieldCheckIcon } from 'lucide-react';
 const ResendButton = ({
  onClick,
  countdown,
  isSending
-}) => <button type="button" onClick={onClick} disabled={countdown > 0 || isSending} className={`font-semibold text-xs tracking-wider uppercase transition-all duration-300 ${countdown > 0 || isSending ? 'text-text-muted cursor-not-allowed' : 'text-text-primary hover:text-text-secondary underline underline-offset-4 decoration-border-DEFAULT hover:decoration-text-primary'}`}>
+}) => <button type="button" onClick={onClick} disabled={countdown > 0 || isSending} className={`font-semibold text-xs transition-all duration-300 ${countdown > 0 || isSending ? 'text-text-muted cursor-not-allowed' : 'text-text-primary hover:text-text-secondary underline underline-offset-4 decoration-border-DEFAULT hover:decoration-text-primary'}`}>
  {countdown > 0 ? `Resend in ${countdown}s` : isSending ? 'Sending...' : 'Send Code Again'}
  </button>;
 const AccountVerificationPage = () => {
@@ -136,19 +136,17 @@ const AccountVerificationPage = () => {
  }
  };
  return <div className="min-h-screen bg-background-secondary flex items-center justify-center py-16 px-6">
- <div className="max-w-md w-full bg-background-primary rounded-2xl border border-border-light shadow-sm p-8 md:p-10 space-y-8 animate-fade-in">
+ <div className="max-w-md w-full bg-background-primary rounded-md border border-border-light p-8 md:p-10 space-y-8 animate-fade-in">
  {/* Logo Monogram */}
  <div className="flex items-center justify-center gap-2 mb-2">
- <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-sm">
+ <div className="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
  <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
  </div>
  <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
  </div>
 
  <div className="text-center">
- <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-background-secondary text-text-primary mb-4">
- <ShieldCheckIcon className="w-5 h-5 stroke-[1.5]" />
- </div>
+ <ShieldCheckIcon className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-primary stroke-1.5" strokeWidth={1.5} aria-hidden />
  <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("verify_your_account")}</h2>
  <p className="mt-2.5 text-xs text-text-secondary font-normal leading-relaxed max-w-xs mx-auto">
  {!codeSent ? 'Verify your credentials to unlock full marketplace functionalities and trade securely.' : `We have dispatched a 6-digit confirmation code to ${user?.email}`}
@@ -156,7 +154,7 @@ const AccountVerificationPage = () => {
  </div>
 
  {/* Soft Custom Alert */}
- {!codeSent && <div className="p-4 rounded-xl border border-status-warning-border bg-status-warning-bg text-xs text-status-warning leading-normal flex items-start gap-3">
+ {!codeSent && <div className="p-4 rounded border border-border bg-background-secondary text-xs text-status-warning-text leading-normal flex items-start gap-3">
  <WarningIcon className="w-4.5 h-4.5 shrink-0 text-status-warning mt-0.5" />
  <div>
  <span className="font-semibold block mb-0.5">{t("account_unverified")}</span>
@@ -165,21 +163,21 @@ const AccountVerificationPage = () => {
  </div>}
 
  {!codeSent ? <div className="space-y-6 text-center">
- <div className="p-4 rounded-2xl bg-background-secondary border border-border-light flex flex-col gap-1">
- <span className="text-caption tracking-wider uppercase font-semibold text-text-muted">{t("registered_email")}</span>
+ <div className="p-4 rounded-md bg-background-secondary border border-border-light flex flex-col gap-1">
+ <span className="text-xs font-semibold text-text-muted">{t("registered_email")}</span>
  <span className="text-sm font-semibold text-text-primary">{user?.email}</span>
  </div>
  <AuthButton onClick={handleSendCode} isLoading={isSendingCode} disabled={isSendingCode} size="lg">{t("send_verification_code")}</AuthButton>
  </div> : <form className="space-y-6" onSubmit={handleVerifyCode}>
  <div className="space-y-4">
- <label className="block text-caption font-semibold tracking-widest uppercase text-text-secondary text-center">{t("verification_code")}</label>
+ <label className="block text-xs font-semibold text-text-secondary text-center">{t("verification_code")}</label>
  
  {/* Segmented OTP code boxes */}
  <div className="flex gap-2.5 justify-center" onPaste={handlePaste}>
- {otp.map((digit, idx) => <input key={idx} ref={inputRefs[idx]} type="text" maxLength={1} value={digit} onChange={e => handleOtpChange(idx, e.target.value)} onKeyDown={e => handleKeyDown(idx, e)} className="w-12 h-14 text-center text-xl font-semibold rounded-xl bg-background-secondary border border-border-light focus:bg-background-primary focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none" />)}
+ {otp.map((digit, idx) => <input key={idx} ref={inputRefs[idx]} type="text" maxLength={1} value={digit} onChange={e => handleOtpChange(idx, e.target.value)} onKeyDown={e => handleKeyDown(idx, e)} className="w-12 h-14 text-center text-xl font-semibold rounded bg-background-secondary border border-border-light focus:bg-background-primary focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none" />)}
  </div>
 
- {errors.code && <div className="p-3 rounded-xl bg-status-error-bg border border-status-error-border text-xs text-status-error leading-normal flex items-start gap-2">
+ {errors.code && <div className="p-3 rounded bg-background-secondary border border-border text-xs text-status-error-text leading-normal flex items-start gap-2">
  <svg className="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
  </svg>
@@ -192,13 +190,13 @@ const AccountVerificationPage = () => {
  </div>
 
  <div className="flex gap-3">
- <AuthButton type="submit" isLoading={isLoading} disabled={isLoading || otp.join('').length !== 6} className="flex-[2]">{t("verify_account")}</AuthButton>
- <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="flex-1 py-3 px-4 border border-border-light hover:border-border-DEFAULT rounded-xl text-xs font-semibold text-text-secondary hover:text-text-primary active:scale-95 bg-background-primary transition-all">{t("cancel")}</button>
+ <AuthButton type="submit" isLoading={isLoading} disabled={isLoading || otp.join('').length !== 6} className="flex-1">{t("verify_account")}</AuthButton>
+ <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 flex-1">{t("cancel")}</button>
  </div>
  </form>}
 
  <div className="text-center">
- <p className="text-caption text-text-muted font-medium leading-relaxed">{t("code_expires_in_10_minutes_need_assistan")}{' '}
+ <p className="text-xs text-text-muted font-medium leading-relaxed">{t("code_expires_in_10_minutes_need_assistan")}{' '}
  <button onClick={() => navigate(ROUTES.PROFILE)} className="font-semibold text-text-secondary hover:text-text-primary underline underline-offset-2">{t("return_to_profile")}</button>
  </p>
  </div>

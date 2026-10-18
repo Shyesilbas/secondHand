@@ -12,23 +12,23 @@ const ChatInput = ({
  t
  } = useTranslation();
  if (isEmbedded) {
- return <div className="border-t border-border-light/60 bg-background-primary/80 backdrop-blur-sm p-5 flex-shrink-0">
+ return <div className="border-t border-border-light/60 bg-background-primary p-5 flex-shrink-0">
  <div className="flex items-end space-x-3">
  <div className="flex-1">
- <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />
+ <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />
  </div>
- <button onClick={handleSendMessage} disabled={!messageText.trim()} className="p-3.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-0.5">
+ <button onClick={handleSendMessage} disabled={!messageText.trim()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
  <PaperAirplaneIcon className="w-5 h-5" />
  </button>
  </div>
  </div>;
  }
- return <div className="p-4 border-t border-border-light/60 bg-background-primary/80 backdrop-blur-sm">
+ return <div className="p-4 border-t border-border-light/60 bg-background-primary">
  <div className="flex items-end space-x-3">
  <div className="flex-1">
- <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />
+ <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />
  </div>
- <button onClick={handleSendMessage} disabled={!messageText.trim()} className="p-3.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-300 ease-in-out hover:shadow-lg">
+ <button onClick={handleSendMessage} disabled={!messageText.trim()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
  <PaperAirplaneIcon className="w-5 h-5" />
  </button>
  </div>

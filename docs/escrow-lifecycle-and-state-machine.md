@@ -71,7 +71,7 @@ sequenceDiagram
 ## 4. Kritik İş Mantığı ve Teknik Mekanizmalar
 
 ### A. Çoklu Sepetlerde Oransal Tutar Bölüştürme (`calculateEscrowAmounts`)
-Kullanıcı sepetinde birden fazla farklı satıcıya ait ürün olduğunda ve genel bir sepet kuponu veya indirim uygulandığında, her ürün kaleminin (`OrderItem`) emanet tutarı kuruş hassasiyetinde (`RoundingMode.HALF_UP`) oransal olarak hesaplanır ([`EscrowService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java)):
+Kullanıcı sepetinde birden fazla farklı satıcıya ait ürün olduğunda ve genel bir sepet kuponu veya indirim uygulandığında, her ürün kaleminin (`OrderItem`) emanet tutarı kuruş hassasiyetinde (`RoundingMode.HALF_UP`) oransal olarak hesaplanır ([`EscrowService.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java)):
 
 $$\text{Escrow Tutarı} = \text{Toplam Ödenen Tutar} \times \frac{\text{Ürün Fiyatı}}{\text{Sepet Ürün Toplamı}}$$
 
@@ -79,7 +79,7 @@ $$\text{Escrow Tutarı} = \text{Toplam Ödenen Tutar} \times \frac{\text{Ürün 
 
 ---
 
-### B. Otomatik Serbest Bırakma Mekanizması ([`OrderCompletionScheduler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
+### B. Otomatik Serbest Bırakma Mekanizması ([`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
 
 Alıcı ürünü teslim almasına rağmen panelden onay vermeyi unutursa satıcının mağdur olmaması için **Otomatik Mutabakat Scheduler'ı** devrededir:
 1. **Kargolu Gönderimler:** Ürün `DELIVERED` durumuna geçtikten sonra belirlenen yasal inceleme süresi (örneğin 3 gün) boyunca alıcı uyuşmazlık bildirmezse scheduler `escrowService.release(order)` çağrısını yapar.
@@ -93,8 +93,8 @@ Doğrudan `escrowService.release()` içinde üçüncü parti cüzdan/banka servi
 
 Bu nedenle **Transactional Outbox** mimarisi uygulanmıştır:
 1. `escrowService.release(order)` çalıştığında Escrow tablosu `COMPLETED` yapılır ve aynı ACID transaction içinde `escrow_outbox_events` tablosuna `EscrowReleased` event'i yazılır.
-2. [`EscrowOutboxWorker.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) bekleyen eventleri okuyup `escrow.released.v1` Kafka topic'ine gönderir.
-3. [`EscrowKafkaConsumer.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java) mesajı tüketir.
+2. [`EscrowOutboxWorker.java`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) bekleyen eventleri okuyup `escrow.released.v1` Kafka topic'ine gönderir.
+3. [`EscrowKafkaConsumer.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java) mesajı tüketir.
 4. **Idempotency Kilidi:** `ProcessedKafkaEventRepository` üzerinden `escrow:release:{escrowId}` deduplication kontrolü yapılır (`INSERT ON CONFLICT DO NOTHING`).
 5. Satıcının cüzdanına (`IEWalletService.creditWalletQuietly`) güvenle aktarılır.
 

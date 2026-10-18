@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Copy, CornerDownRight, Mail } from 'lucide-react';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { OTP_CODE_LENGTH } from '../../../common/constants/otp.js';
@@ -52,37 +52,35 @@ const OtpSuggestionBanner = ({
  const emailSubject = sourceEmail?.subject || null;
  const emailDate = sourceEmail?.sentAt || sourceEmail?.createdAt || null;
  if (!suggestedCode || String(suggestedCode).length !== OTP_CODE_LENGTH) return null;
- return <div className="overflow-hidden rounded-lg border border-[#e5e3df] bg-background-primary shadow-sm">
+ return <div className="overflow-hidden rounded border border-border bg-background-primary">
  {/* Header */}
- <div className="flex items-center gap-2.5 border-b border-[#f0efed] bg-[#fafaf9] px-4 py-2.5">
- <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#111] text-white">
- <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
- </div>
+ <div className="flex items-center gap-2.5 border-b border-border-light bg-background-secondary px-4 py-2.5">
+ <Mail className="shrink-0 h-5 w-5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <div className="min-w-0 flex-1">
- <p className="text-xs font-semibold text-[#111]">
+ <p className="text-xs font-semibold text-text-primary">
  {emailSubject || 'Payment Verification'}
  </p>
- {emailDate && <p className="text-caption text-[#999]">
+ {emailDate && <p className="text-xs text-text-muted">
  {new Date(emailDate).toLocaleString()}
  </p>}
  </div>
  </div>
 
  {/* Email content preview */}
- {emailPreview && <div className="border-b border-[#f0efed] px-4 py-3">
- <p className="text-xs leading-relaxed text-[#555]">
+ {emailPreview && <div className="border-b border-border-light px-4 py-3">
+ <p className="text-xs leading-relaxed text-text-tertiary">
  {emailPreview}
  </p>
  </div>}
 
  {/* Code + actions */}
  <div className="flex flex-wrap items-center gap-2.5 px-4 py-3">
- <span className="inline-flex rounded-md border border-[#e5e3df] bg-[#fafaf9] px-3 py-1.5 text-lg font-bold tabular-nums tracking-[0.3em] text-[#111]" aria-label={t("suggested_verification_code")}>
+ <span className="inline-flex rounded-md border border-border bg-background-secondary px-3 py-1.5 text-lg font-semibold tabular-nums text-text-primary" aria-label={t("suggested_verification_code")}>
  {String(suggestedCode)}
  </span>
- <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-lg border border-[#1466c6] bg-[#1466c6] px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-[#0f529e]">
+ <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded border border-border-dark bg-secondary-500 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-primary">
  <Copy className="h-3.5 w-3.5 shrink-0" />{t("copy")}</button>
- <button type="button" onClick={apply} className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e3df] bg-background-primary px-3 py-1.5 text-xs font-medium text-[#111] transition-all hover:bg-[#fafaf9]">
+ <button type="button" onClick={apply} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
  <CornerDownRight className="h-3.5 w-3.5 shrink-0" />{t("fill_inputs")}</button>
  </div>
  </div>;

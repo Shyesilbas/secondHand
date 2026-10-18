@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import ReactDOM from 'react-dom';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -132,42 +132,22 @@ const CreateCampaignModal = ({
  setIsSaving(false);
  }
  };
- const modal = <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1a1918]/60 backdrop-blur-sm px-4" onMouseDown={e => {
- if (e.target === e.currentTarget) onClose?.();
- }}>
- <div className="w-full max-w-4xl bg-background-primary rounded-2xl shadow-2xl border border-[#e5e3df] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
- {/* Header */}
- <div className="px-8 py-5 border-b border-[#f0efed] bg-[#fafaf9] flex items-center justify-between shrink-0">
- <div>
- <h2 className="text-lg font-semibold text-text-primary text-[#1a1918] tracking-tight">
- {editingCampaign ? 'Edit Campaign' : 'Create New Campaign'}
- </h2>
- <p className="text-sm text-text-secondary mt-1">{t("boost_your_sales_with_attractive_discoun")}</p>
- </div>
- <button type="button" onClick={onClose} className="p-2.5 rounded-full hover:bg-[#ebeae8] text-text-muted transition-colors">
- <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
- </svg>
- </button>
- </div>
-
- <div className="flex flex-1 min-h-0 overflow-hidden">
+ return <Modal isOpen={isOpen} onClose={onClose} title={editingCampaign ? 'Edit campaign' : 'Create new campaign'} description={t("boost_your_sales_with_attractive_discoun")} size="xl" footer={<>
+ <Button variant="secondary" onClick={onClose}>{t("cancel")}</Button>
+ <Button onClick={save} disabled={isSaving}>{isSaving ? 'Processing...' : editingCampaign ? 'Save changes' : 'Launch campaign'}</Button>
+ </>}>
+ <div className="-mx-5 -my-4 flex min-h-0 flex-col sm:flex-row">
  {/* Sidebar - Campaign Type Selection */}
- <div className="w-72 bg-[#fafaf9] border-r border-[#f0efed] p-6 space-y-4 overflow-y-auto shrink-0">
- <div className="text-xs font-bold text-text-muted uppercase tracking-widest mb-4">{t("choose_type")}</div>
+ <div className="shrink-0 space-y-2 border-b border-border-light bg-background-secondary p-5 sm:w-64 sm:border-b-0 sm:border-r">
+ <div className="mb-2 text-sm font-medium text-text-primary">{t("choose_type")}</div>
  
  <button onClick={() => setForm(p => ({
  ...p,
  campaignType: 'STANDARD',
  minQuantity: 1
- }))} className={`w-full text-left p-4 rounded-2xl border-2 transition-all ${form.campaignType === 'STANDARD' ? 'bg-background-primary border-primary shadow-md' : 'bg-transparent border-transparent hover:bg-[#ebeae8] text-text-secondary'}`}>
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${form.campaignType === 'STANDARD' ? 'bg-primary-50 text-primary' : 'bg-[#f0efed] text-text-muted'}`}>
- <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
- </svg>
- </div>
- <div className="font-bold text-sm">{t("standard_discount")}</div>
- <div className="text-xs opacity-70 mt-1">{t("apply_to_specific_items_or_categories")}</div>
+ }))} type="button" aria-pressed={form.campaignType === 'STANDARD'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'STANDARD' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
+ <div className="text-sm font-medium">{t("standard_discount")}</div>
+ <div className="mt-1 text-xs text-text-tertiary">{t("apply_to_specific_items_or_categories")}</div>
  </button>
 
  <button onClick={() => setForm(p => ({
@@ -175,108 +155,103 @@ const CreateCampaignModal = ({
  campaignType: 'BUNDLE',
  mode: 'ALL',
  minQuantity: 2
- }))} className={`w-full text-left p-4 rounded-2xl border-2 transition-all ${form.campaignType === 'BUNDLE' ? 'bg-background-primary border-primary shadow-md' : 'bg-transparent border-transparent hover:bg-[#ebeae8] text-text-secondary'}`}>
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${form.campaignType === 'BUNDLE' ? 'bg-primary-50 text-primary' : 'bg-[#f0efed] text-text-muted'}`}>
- <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
- </svg>
- </div>
- <div className="font-bold text-sm">{t("bundle_save")}</div>
- <div className="text-xs opacity-70 mt-1">{t("multi_item_rewards_for_all_your_listings")}</div>
+ }))} type="button" aria-pressed={form.campaignType === 'BUNDLE'} className={`w-full rounded border p-4 text-left transition-colors ${form.campaignType === 'BUNDLE' ? 'border-primary bg-background-primary text-text-primary ring-1 ring-primary' : 'border-transparent text-text-secondary hover:border-border hover:bg-background-primary'}`}>
+ <div className="text-sm font-medium">{t("bundle_save")}</div>
+ <div className="mt-1 text-xs text-text-tertiary">{t("multi_item_rewards_for_all_your_listings")}</div>
  </button>
  </div>
 
  {/* Main Content */}
- <div className="flex-1 overflow-y-auto p-8 bg-background-primary custom-scrollbar">
+ <div className="min-w-0 flex-1 p-5 sm:p-6">
  <div className="space-y-8">
  {/* Basic Info Section */}
  <section className="space-y-4">
- <div className="text-sm font-bold text-[#1a1918]">{t("basic_information")}</div>
+ <div className="text-sm font-semibold text-text-primary">{t("basic_information")}</div>
  <div className="grid grid-cols-1 gap-4">
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-background-primary text-caption font-bold text-text-muted uppercase">{t("campaign_name")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("campaign_name")}</label>
  <input value={form.name} onChange={e => setForm(p => ({
  ...p,
  name: e.target.value
- }))} className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder={t("e_g_summer_special_2024")} />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder={t("e_g_summer_special_2024")} />
  </div>
  </div>
 
  <div className="grid grid-cols-2 gap-4">
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-background-primary text-caption font-bold text-text-muted uppercase">{t("discount_type")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("discount_type")}</label>
  <select value={form.discountKind} onChange={e => setForm(p => ({
  ...p,
  discountKind: e.target.value
- }))} className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-background-primary">
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none bg-background-primary">
  <option value="PERCENT">{t("percentage")}</option>
  <option value="FIXED">{t("fixed_amount")}</option>
  </select>
  </div>
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-background-primary text-caption font-bold text-text-muted uppercase">{t("value")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("value")}</label>
  <input value={form.value} onChange={e => setForm(p => ({
  ...p,
  value: e.target.value
- }))} type="number" className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="0.00" />
+ }))} type="number" className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="0.00" />
  </div>
  </div>
 
  <div className="grid grid-cols-2 gap-4">
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-background-primary text-caption font-bold text-text-muted uppercase">{t("starts_at")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("starts_at")}</label>
  <input type="datetime-local" value={form.startsAt} onChange={e => setForm(p => ({
  ...p,
  startsAt: e.target.value
- }))} className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
  </div>
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-background-primary text-caption font-bold text-text-muted uppercase">{t("ends_at")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-primary text-xs font-semibold text-text-muted">{t("ends_at")}</label>
  <input type="datetime-local" value={form.endsAt} onChange={e => setForm(p => ({
  ...p,
  endsAt: e.target.value
- }))} className="w-full px-4 py-3.5 border border-[#e5e3df] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
  </div>
  </div>
  </section>
 
  {/* Type Specific Section */}
- {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-slate-100 border border-primary rounded-2xl space-y-4">
+ {form.campaignType === 'BUNDLE' ? <section className="p-6 bg-background-tertiary border border-primary rounded-md space-y-4">
  <div className="flex items-center gap-3">
- <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
+ <div className="w-8 h-8 bg-primary text-white rounded flex items-center justify-center">
  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
  </svg>
  </div>
- <div className="text-sm font-bold text-primary">{t("bundle_configuration")}</div>
+ <div className="text-sm font-semibold text-primary">{t("bundle_configuration")}</div>
  </div>
  
  <div className="space-y-4">
  <div className="relative">
- <label className="absolute -top-2 left-3 px-1 bg-slate-100 text-caption font-bold text-primary uppercase">{t("minimum_item_quantity")}</label>
+ <label className="absolute -top-2 left-3 px-1 bg-background-tertiary text-xs font-semibold text-primary">{t("minimum_item_quantity")}</label>
  <input type="number" min="2" value={form.minQuantity} onChange={e => setForm(p => ({
  ...p,
  minQuantity: e.target.value
- }))} className="w-full px-4 py-3.5 bg-background-primary border border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+ }))} className="w-full px-4 py-3.5 bg-background-primary border border-primary rounded focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
  </div>
  <p className="text-xs text-primary leading-relaxed">{t("this_bundle_will_automatically_apply_to")}<b>{t("all_your_active_listings")}</b>{t("customers_will_receive_the_discount_only")}<b>{form.minQuantity || 2}{t("or_more")}</b>{t("items_to_their_cart")}</p>
  </div>
  </section> : <section className="space-y-4">
- <div className="text-sm font-bold text-[#1a1918]">{t("select_eligibility")}</div>
+ <div className="text-sm font-semibold text-text-primary">{t("select_eligibility")}</div>
  <div className="flex gap-2">
  {['ALL', 'LISTING', 'TYPE'].map(m => <button key={m} onClick={() => setForm(p => ({
  ...p,
  mode: m,
  eligibleListingIds: [],
  eligibleTypes: []
- }))} className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${form.mode === m ? 'bg-[#1a1918] text-white border-[#1a1918]' : 'bg-background-primary text-text-secondary border-[#e5e3df] hover:border-[#1a1918]'}`}>
+ }))} className={`px-4 py-2 rounded text-xs font-semibold border transition-all ${form.mode === m ? 'bg-primary text-white border-primary' : 'bg-background-primary text-text-secondary border-border hover:border-primary'}`}>
  {m === 'ALL' ? 'Everything' : m === 'LISTING' ? 'Specific Listings' : 'Listing Types'}
  </button>)}
  </div>
 
- {form.mode === 'LISTING' && <div className="border border-[#e5e3df] rounded-2xl overflow-hidden">
+ {form.mode === 'LISTING' && <div className="border border-border rounded-md overflow-hidden">
  <div className="max-h-48 overflow-y-auto p-4 space-y-2">
- {availableListings.map(l => <label key={l.id} className="flex items-center gap-3 p-2 hover:bg-[#fafaf9] rounded-lg cursor-pointer transition-colors">
+ {availableListings.map(l => <label key={l.id} className="flex items-center gap-3 p-2 hover:bg-background-secondary rounded cursor-pointer transition-colors">
  <input type="checkbox" checked={form.eligibleListingIds.includes(l.id)} onChange={() => {
  setForm(p => {
  const exists = p.eligibleListingIds.includes(l.id);
@@ -286,10 +261,10 @@ const CreateCampaignModal = ({
  eligibleListingIds: newList
  };
  });
- }} className="w-5 h-5 rounded-md border-[#e5e3df] text-primary focus:ring-primary" />
+ }} className="w-5 h-5 rounded-md border-border text-primary focus:ring-primary" />
  <div className="flex-1 min-w-0">
- <div className="text-sm font-medium text-[#1a1918] truncate">{l.title}</div>
- <div className="text-caption text-text-muted">{formatCurrency(l.price, l.currency)}</div>
+ <div className="text-sm font-medium text-text-primary truncate">{l.title}</div>
+ <div className="text-xs text-text-muted">{formatCurrency(l.price, l.currency)}</div>
  </div>
  </label>)}
  </div>
@@ -305,21 +280,21 @@ const CreateCampaignModal = ({
  eligibleTypes: newList
  };
  });
- }} className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${form.eligibleTypes.includes(t) ? 'bg-primary text-white border-primary' : 'bg-[#fafaf9] text-text-secondary border-[#e5e3df]'}`}>
+ }} className={`px-4 py-2 rounded text-xs font-semibold border transition-all ${form.eligibleTypes.includes(t) ? 'bg-primary text-white border-primary' : 'bg-background-secondary text-text-secondary border-border'}`}>
  {t}
  </button>)}
  </div>}
  </section>}
 
- <section className="flex items-center justify-between p-4 bg-[#fafaf9] rounded-2xl border border-[#f0efed]">
+ <section className="flex items-center justify-between p-4 bg-background-secondary rounded-md border border-border-light">
  <div>
- <div className="text-sm font-bold text-[#1a1918]">{t("active_status")}</div>
+ <div className="text-sm font-semibold text-text-primary">{t("active_status")}</div>
  <div className="text-xs text-text-muted">{t("campaign_will_be_visible_once_saved")}</div>
  </div>
  <button type="button" onClick={() => setForm(p => ({
  ...p,
  active: !p.active
- }))} className={`w-14 h-8 rounded-full transition-all relative ${form.active ? 'bg-primary' : 'bg-[#e5e3df]'}`}>
+ }))} className={`w-14 h-8 rounded-full transition-all relative ${form.active ? 'bg-primary' : 'bg-secondary-200'}`}>
  <div className={`absolute top-1 w-6 h-6 bg-background-primary rounded-full transition-all ${form.active ? 'left-7' : 'left-1'}`} />
  </button>
  </section>
@@ -327,15 +302,6 @@ const CreateCampaignModal = ({
  </div>
  </div>
 
- {/* Footer */}
- <div className="px-8 py-5 border-t border-[#f0efed] bg-[#fafaf9] flex items-center justify-end gap-4 shrink-0">
- <button type="button" onClick={onClose} className="px-6 py-2.5 text-sm font-bold text-text-secondary hover:text-[#1a1918] transition-colors">{t("cancel")}</button>
- <button type="button" onClick={save} disabled={isSaving} className="px-8 py-3 bg-[#1a1918] text-white rounded-2xl text-sm font-bold hover:bg-black transition-all disabled:opacity-50 shadow-lg shadow-black/10">
- {isSaving ? 'Processing...' : editingCampaign ? 'Save Changes' : 'Launch Campaign'}
- </button>
- </div>
- </div>
- </div>;
- return ReactDOM.createPortal(modal, document.body);
+ </Modal>;
 };
 export default CreateCampaignModal;

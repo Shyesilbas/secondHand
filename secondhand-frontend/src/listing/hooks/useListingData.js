@@ -27,4 +27,3 @@ export const useListingData = (listingId, autoFetch = true) => {
  return { listing: listing || null, isLoading, error, refetch };
 };
 
-export default useListingData;

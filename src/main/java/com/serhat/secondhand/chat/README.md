@@ -5,11 +5,11 @@ The `chat` domain provides real-time user-to-user messaging capabilities using t
 
 ## Architecture Overview
 - **ChatMessageService:** Persists messages to PostgreSQL and retrieves chat history.
-- **WebSocketAuthInterceptor:** Validates JWT tokens during the initial WS connection (CONNECT frame).
+- **WebSocketSecurityConfig (channel interceptor):** Validates JWT tokens during the initial WS connection (CONNECT frame).
 - **RedisMessagePublisher / Subscriber:** Routes messages across multiple application instances.
 
 ## Business Invariants & Constraints
-- **WebSocket Authentication:** HTTP filters are bypassed for WS connections. All auth validation must occur inside the `WebSocketAuthInterceptor`.
+- **WebSocket Authentication:** HTTP filters are bypassed for WS connections. All auth validation must occur inside the `WebSocketSecurityConfig (channel interceptor)`.
 - **Durability:** While Redis routes messages, PostgreSQL is the source of truth for message persistence.
 - **Session State:** User online/offline status relies on detecting WS CONNECT/DISCONNECT frames.
 
@@ -19,6 +19,3 @@ The `chat` domain provides real-time user-to-user messaging capabilities using t
 
 ## Public APIs
 - WebSocket STOMP Endpoints mapped via `@MessageMapping`.
-
-## Related Knowledge
-- *(No specific runbooks extracted; modifications usually require Redis and WS security knowledge)*

@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import FilterSidebar from './FilterSidebar.jsx';
 import ListingsNavigation from './ListingsNavigation.jsx';
 import ListingsContent from './ListingsContent.jsx';
-import { ShoppingBag } from 'lucide-react';
 
 const ListingsModuleLayout = ({
  mode = 'browse',
@@ -10,7 +9,6 @@ const ListingsModuleLayout = ({
  getListingTypeLabel,
  onListingChanged,
  title,
- icon,
  extraActions,
  topSlot,
  isSelectable = false,
@@ -50,7 +48,6 @@ const ListingsModuleLayout = ({
  engineSearch={engine.search}
  filteredListings={engine.filteredListings}
  title={title || (mode === 'mine' ? 'My Listings' : 'Browse Listings')}
- icon={icon || <ShoppingBag className="w-6 h-6 text-white" />}
  extraActions={extraActions}
  topSlot={topSlot}
  >

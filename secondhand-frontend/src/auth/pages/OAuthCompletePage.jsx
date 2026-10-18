@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight as ArrowRightIcon, Calendar as CalendarIcon, Phone as PhoneIcon } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -129,16 +129,16 @@ const OAuthCompletePage = () => {
  return <div className="flex flex-col gap-1">
  {/* Logo */}
  <div className="flex items-center gap-2 mb-8">
- <div className="w-9 h-9 rounded-xl bg-primary shadow-sm flex items-center justify-center shrink-0">
- <span className="text-primary-content text-base font-bold leading-none">{t("s")}</span>
+ <div className="w-9 h-9 rounded bg-primary flex items-center justify-center shrink-0">
+ <span className="text-primary-content text-base font-semibold leading-none">{t("s")}</span>
  </div>
- <span className="text-lg font-bold text-text-primary tracking-tight">{t("secondhand")}</span>
+ <span className="text-lg font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
  </div>
 
  {/* User avatar + header */}
  <div className="flex items-center gap-4 mb-6">
- {baseInfo.picture ? <img src={baseInfo.picture} alt={baseInfo.name} className="w-12 h-12 rounded-full object-cover border-2 border-border-light" /> : <div className="w-12 h-12 rounded-full bg-status-warning-bg border-2 border-status-warning-border flex items-center justify-center shrink-0">
- <span className="text-status-warning font-bold text-sm">{initials || '?'}</span>
+ {baseInfo.picture ? <img src={baseInfo.picture} alt={baseInfo.name} className="w-12 h-12 rounded-full object-cover border-2 border-border-light" /> : <div className="w-12 h-12 rounded bg-background-secondary border-2 border-border flex items-center justify-center shrink-0">
+ <span className="text-status-warning font-semibold text-sm">{initials || '?'}</span>
  </div>}
  <div>
  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("almost_there")}{baseInfo.name}!
@@ -148,24 +148,24 @@ const OAuthCompletePage = () => {
  </div>
 
  {/* Error banner */}
- {errors.submit && <div className="mb-4 rounded-xl bg-status-error-bg border border-status-error-border px-4 py-3 text-sm text-status-error">
+ {errors.submit && <div className="mb-4 rounded bg-background-secondary border border-border px-4 py-3 text-sm text-status-error-text">
  {errors.submit}
  </div>}
 
  <form onSubmit={handleSubmit} className="flex flex-col gap-4">
- <p className="text-caption font-semibold text-text-muted uppercase tracking-widest">{t("missing_information")}</p>
+ <p className="text-xs font-semibold text-text-muted">{t("missing_information")}</p>
 
  {/* Read-only prefilled fields */}
  <div className="grid grid-cols-2 gap-3">
  <div className="flex flex-col gap-1.5">
  <label className="text-xs font-medium text-text-muted">{t("first_name")}</label>
- <div className="px-3 py-2.5 rounded-xl bg-background-secondary border border-border-light text-sm text-text-secondary">
+ <div className="px-3 py-2.5 rounded bg-background-secondary border border-border-light text-sm text-text-secondary">
  {baseInfo.name || '—'}
  </div>
  </div>
  <div className="flex flex-col gap-1.5">
  <label className="text-xs font-medium text-text-muted">{t("last_name")}</label>
- <div className="px-3 py-2.5 rounded-xl bg-background-secondary border border-border-light text-sm text-text-secondary">
+ <div className="px-3 py-2.5 rounded bg-background-secondary border border-border-light text-sm text-text-secondary">
  {baseInfo.surname || '—'}
  </div>
  </div>
@@ -173,33 +173,33 @@ const OAuthCompletePage = () => {
 
  <div className="flex flex-col gap-1.5">
  <label className="text-xs font-medium text-text-muted">{t("email")}</label>
- <div className="px-3 py-2.5 rounded-xl bg-background-secondary border border-border-light text-sm text-text-secondary">
+ <div className="px-3 py-2.5 rounded bg-background-secondary border border-border-light text-sm text-text-secondary">
  {baseInfo.email || '—'}
  </div>
  </div>
 
  <div className="border-t border-border-light pt-4 flex flex-col gap-4">
- <AuthInput label={t("phone")} type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder={t("90_5xx_xxx_xx_xx")} required error={errors.phone} leftIcon={<PhoneIcon className="h-4 w-4" />} inputClassName="rounded-xl" labelClassName="text-text-secondary text-xs" />
+ <AuthInput label={t("phone")} type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder={t("90_5xx_xxx_xx_xx")} required error={errors.phone} leftIcon={<PhoneIcon className="h-4 w-4" />} inputClassName="rounded" labelClassName="text-text-secondary text-xs" />
 
  <div className="grid grid-cols-2 gap-3">
  <div className="flex flex-col gap-1.5">
  <label className="text-xs font-medium text-text-secondary">{t("gender")}<span className="text-status-error">*</span>
  </label>
- {gendersLoading ? <div className="flex items-center gap-2 px-3 py-2.5 border border-border-light rounded-xl text-sm text-text-secondary">
+ {gendersLoading ? <div className="flex items-center gap-2 px-3 py-2.5 border border-border-light rounded text-sm text-text-secondary">
  <LoadingIndicator size="h-4 w-4" />
  <span>{t("loading")}</span>
- </div> : <select name="gender" value={form.gender} onChange={handleChange} className="w-full px-3 py-2.5 border border-border-light rounded-xl text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" required>
+ </div> : <select name="gender" value={form.gender} onChange={handleChange} className="w-full px-3 py-2.5 border border-border-light rounded text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" required>
  <option value="">{t("select_gender")}</option>
  {genders.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
  </select>}
  {errors.gender && <p className="text-xs text-status-error">{errors.gender}</p>}
  </div>
 
- <AuthInput label={t("birth_date")} name="birthdate" value={form.birthdate} onChange={handleChange} placeholder={t("dd_mm_yyyy")} required error={errors.birthdate} leftIcon={<CalendarIcon className="h-4 w-4" />} inputClassName="rounded-xl" labelClassName="text-text-secondary text-xs" />
+ <AuthInput label={t("birth_date")} name="birthdate" value={form.birthdate} onChange={handleChange} placeholder={t("dd_mm_yyyy")} required error={errors.birthdate} leftIcon={<CalendarIcon className="h-4 w-4" />} inputClassName="rounded" labelClassName="text-text-secondary text-xs" />
  </div>
  </div>
 
- <AuthButton type="submit" isLoading={submitting} size="lg" className="rounded-xl mt-1" rightIcon={!submitting ? <ArrowRightIcon className="h-4 w-4" /> : null}>
+ <AuthButton type="submit" isLoading={submitting} size="lg" className="rounded mt-1" rightIcon={!submitting ? <ArrowRightIcon className="h-4 w-4" /> : null}>
  {submitting ? 'Saving...' : 'Save and Continue'}
  </AuthButton>
  </form>

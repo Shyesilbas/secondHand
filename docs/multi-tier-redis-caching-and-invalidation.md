@@ -20,7 +20,7 @@ Büyük ölçekli Spring Boot uygulamalarında standart Redis önbellekleme kull
 
 ## 2. Kademeli TTL Hiyerarşisi (Tiered Architecture)
 
-[`CacheConfig.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/CacheConfig.java) üzerinde tanımlanan katmanlar:
+[`CacheConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java) üzerinde tanımlanan katmanlar:
 
 | Katman | TTL Süresi | Cache İsimleri | Veri Karakteristiği / Amacı |
 | :--- | :--- | :--- | :--- |
@@ -79,8 +79,8 @@ Veri güncellendiğinde veya silindiğinde önbelleğin tutarlı kalması için 
 
 ## 5. Hata Toleransı & Dayanıklılık (Resilience)
 
-### A. Redis Çökmesinde Kesintisiz Hizmet ([`CacheErrorHandlerConfig.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/CacheErrorHandlerConfig.java))
+### A. Redis Çökmesinde Kesintisiz Hizmet ([`CacheErrorHandlerConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheErrorHandlerConfig.java))
 Redis geçici olarak erişilemez olduğunda veya timeout verdiğinde, uygulama `500 Internal Server Error` **vermez**. `CacheErrorHandler` hataları sessizce loglar ve isteği doğrudan PostgreSQL veritabanından şeffaf bir şekilde çeker.
 
-### B. Uygulama Başlangıç Temizliği ([`CacheStartupCleaner.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/CacheStartupCleaner.java))
+### B. Uygulama Başlangıç Temizliği ([`CacheStartupCleaner.java`](../src/main/java/com/serhat/secondhand/core/config/CacheStartupCleaner.java))
 Uygulama bootstrap anında ayağa kalkarken geçici sayaç veya eski kilit anahtarlarını temizleyerek temiz bir başlangıç durumu garantiler.

@@ -1,4 +1,3 @@
-import { ListingDTO } from '../listing/types/index.js';
 
 export const VehicleCreateRequestDTO = Object.freeze({
  title: '',
@@ -38,36 +37,6 @@ export const VehicleCreateRequestDTO = Object.freeze({
  drivetrain: '',
  bodyType: '',
 });
-
-export const VehicleListingDTO = {
- ...ListingDTO,
- imageUrl: '',
- vehicleType: null,
- brand: null,
- model: null,
- generation: null,
- engine: null,
- trim: null,
- year: 0,
- mileage: 0,
- engineCapacity: 0,
- gearbox: '',
- seatCount: '',
- doors: '',
- wheels: 0,
- color: '',
- fuelCapacity: 0,
- fuelConsumption: 0,
- horsePower: 0,
- kilometersPerLiter: 0,
- fuelType: '',
- swap: false,
- accidentHistory: false,
- accidentDetails: '',
- inspectionValidUntil: '',
- drivetrain: '',
- bodyType: '',
-};
 
 const toUuidOrNull = (value) => {
  const s = value == null ? '' : String(value).trim();

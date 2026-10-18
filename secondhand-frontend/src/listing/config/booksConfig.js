@@ -1,12 +1,11 @@
-import { lazy } from 'react';
+import { BookOpen } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const BooksCreateForm = lazy(() => import('../../books/components/BooksCreateForm.jsx'));
 import {booksService} from '../../books/services/booksService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const booksConfig = {
  label: 'Books',
- icon: '📚',
+ icon: BookOpen,
  description: 'Books, magazines and printed materials',
 
  detailsComponent: GenericListingDetails,
@@ -24,7 +23,6 @@ export const booksConfig = {
  { label: 'ISBN', key: 'isbn' },
  ],
  },
- createComponent: BooksCreateForm,
  formSchema: {
  initialData: {
  title: '', description: '', price: '', currency: 'TRY', quantity: 1,
@@ -92,6 +90,7 @@ export const booksConfig = {
  },
  },
  service: {
+ create: (payload) => booksService.createBooksListing(payload),
  getById: (id) => booksService.getBooksDetails(id),
  update: (id, payload) => booksService.updateBooksListing(id, payload),
  },
@@ -124,13 +123,6 @@ export const booksConfig = {
  { value: 'pageCount', label: 'Page Count' }, { value: 'genre', label: 'Genre' },
  { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) => [
- { label: listing.author, icon: '✍️', show: !!listing.author },
- { label: listing.bookType?.label || listing.bookType?.name || listing.bookType, icon: '📚', show: !!listing.bookType },
- { label: listing.genre?.label || listing.genre?.name || listing.genre, icon: '🏷️', show: !!listing.genre },
- { label: listing.publicationYear, icon: '📅', show: !!listing.publicationYear },
- { label: listing.pageCount ? `${listing.pageCount} pages` : null, icon: '📖', show: !!listing.pageCount },
- ].filter(badge => badge.show),
  defaultFilters: { minYear: 1450, maxYear: new Date().getFullYear() },
 };
 

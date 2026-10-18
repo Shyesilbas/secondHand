@@ -1,13 +1,12 @@
-import { lazy } from 'react';
+import { Smartphone } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const ElectronicCreateForm = lazy(() => import('../../electronics/components/ElectronicCreateForm.jsx'));
 import {electronicService} from '../../electronics/services/electronicService.js';
 import {ElectronicCreateRequestDTO} from '../../electronics/electronics.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const electronicsConfig = {
  label: 'Electronics',
- icon: '📱',
+ icon: Smartphone,
  description: 'Mobile phones, laptops, TVs and electronic devices',
 
  detailsComponent: GenericListingDetails,
@@ -47,7 +46,6 @@ export const electronicsConfig = {
  { label: 'Warranty End Date', key: 'warrantyEndDate' },
  ],
  },
- createComponent: ElectronicCreateForm,
  formSchema: {
  initialData: {
  ...ElectronicCreateRequestDTO,
@@ -222,6 +220,7 @@ export const electronicsConfig = {
  },
  },
  service: {
+ create: (payload) => electronicService.createElectronicListing(payload),
  getById: (id) => electronicService.getElectronicById(id),
  update: (id, payload) => electronicService.updateElectronicListing(id, payload),
  },
@@ -264,35 +263,6 @@ export const electronicsConfig = {
  { value: 'type', label: 'Type' }, { value: 'price', label: 'Price' },
  { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) => {
- const parts = [];
- 
- // Core specs
- if (listing.processor) {
- parts.push(listing.processor);
- } else if (listing.electronicModel?.label || listing.electronicModel?.name || listing.model) {
- parts.push(listing.electronicModel?.label || listing.electronicModel?.name || listing.model);
- } else if (listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand) {
- parts.push(listing.electronicBrand?.label || listing.electronicBrand?.name || listing.electronicBrand);
- }
-
- if (listing.storage) {
- parts.push(`${listing.storage} GB${listing.storageType ? ' ' + listing.storageType : ''}`);
- }
- 
- if (listing.ram) {
- parts.push(`${listing.ram} GB RAM`);
- }
- 
- if (listing.color) parts.push(listing.color);
- if (listing.year) parts.push(listing.year);
-
- if (parts.length > 0) {
- return [{ label: parts.join(' • '), show: true }];
- }
- 
- return [];
- },
  defaultFilters: { minYear: 2000, maxYear: new Date().getFullYear() },
 };
 

@@ -8,7 +8,7 @@ Provides instructions for adding post-payment side effects (e.g., notifications,
 - When refactoring the `PaymentCompletedHandler` registry or logic.
 
 ## When NOT to Load
-- When modifying the core payment processing logic or strategies.
+- When modifying the core payment processing logic or providers.
 - When debugging optimistic locking or idempotency issues.
 - When creating a new payment method.
 

@@ -71,14 +71,12 @@ const UserReviewsPage = () => {
  };
  return <PageContainer className="py-8">
  {/* Premium Header */}
- <div className="bg-background-secondary rounded-2xl border border-border-light p-8 mb-8 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+ <div className="bg-background-secondary rounded-md border border-border-light p-8 mb-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
  <Star className="w-48 h-48" />
  </div>
- <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-md relative z-10">
- <Star className="w-7 h-7 text-white" />
- </div>
- <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2 relative z-10">{getPageTitle()}</h1>
+ <Star className="mb-4 h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+ <h1 className="text-3xl font-semibold text-text-primary tracking-tight mb-2 relative z-10">{getPageTitle()}</h1>
  <p className="text-sm text-text-secondary relative z-10 max-w-md mx-auto">
  {isReceivedReviews ? t("see_reviews_you_have_received") : t("see_reviews_you_have_given")}
  </p>

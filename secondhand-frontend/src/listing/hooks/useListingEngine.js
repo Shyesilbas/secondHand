@@ -134,7 +134,7 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
  // Mine-mode specific: low stock alerts
  const lowStockListings = useMemo(() => {
  if (mode !== 'mine') return [];
- const source = searchHook.title.allPagesLoaded ? searchHook.filteredListings : rawListings;
+ const source = searchHook.filteredListings;
  if (!Array.isArray(source)) return [];
  return source.filter((listing) => {
  if (!listing) return false;
@@ -144,7 +144,7 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
  if (!Number.isFinite(qty)) return false;
  return qty > 0 && qty < LISTING_DEFAULTS.LOW_STOCK_MAX_QUANTITY;
  });
- }, [mode, rawListings, searchHook.filteredListings, searchHook.title.allPagesLoaded]);
+ }, [mode, searchHook.filteredListings]);
 
  const [lowStockOpen, setLowStockOpen] = useState(false);
  const openLowStock = useCallback(() => setLowStockOpen(true), []);
@@ -178,7 +178,6 @@ export const useListingEngine = ({ initialListingType = LISTING_TYPES.VEHICLE, m
  setTerm: searchHook.setSearchTerm,
  mode: searchHook.searchMode,
  listingNo: searchHook.listingNo,
- title: searchHook.title,
  clear: searchHook.clearSearch,
  },
  mine: mode === 'mine'

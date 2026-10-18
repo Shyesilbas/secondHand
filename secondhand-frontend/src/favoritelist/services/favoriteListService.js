@@ -36,5 +36,4 @@ export const favoriteListService = {
  get(API_ENDPOINTS.FAVORITE_LISTS.LISTING_LISTS(listingId)),
 };
 
-export default favoriteListService;
 

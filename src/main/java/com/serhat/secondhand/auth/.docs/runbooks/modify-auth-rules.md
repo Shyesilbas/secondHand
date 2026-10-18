@@ -13,7 +13,7 @@ Provides execution instructions for modifying registration, token rotation, pass
 - When debugging simple database query errors unrelated to security rules.
 
 ## Assumptions
-- `AuthService` orchestrates the flow.
+- `LoginService`, `RegistrationService`, `PasswordService` and `OAuthService` orchestrate the flows.
 - Security-critical logic requires verifying state (e.g., is account ACTIVE).
 
 ## Procedure
@@ -37,5 +37,6 @@ Provides execution instructions for modifying registration, token rotation, pass
 - Skipping DB status checks during token refresh.
 
 ## Related Files
-- `src/main/java/com/serhat/secondhand/auth/application/AuthService.java`
+- `src/main/java/com/serhat/secondhand/auth/application/LoginService.java`
+- `src/main/java/com/serhat/secondhand/auth/application/RegistrationService.java`
 - `src/main/java/com/serhat/secondhand/auth/application/TokenService.java`

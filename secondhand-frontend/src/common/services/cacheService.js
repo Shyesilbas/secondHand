@@ -1,7 +1,7 @@
 const readRaw = (key) => {
  try {
  return localStorage.getItem(key);
- } catch (_) {
+ } catch {
  return null;
  }
 };
@@ -10,7 +10,7 @@ const writeRaw = (key, value) => {
  try {
  localStorage.setItem(key, value);
  return true;
- } catch (_) {
+ } catch {
  return false;
  }
 };
@@ -19,7 +19,7 @@ const removeRaw = (key) => {
  try {
  localStorage.removeItem(key);
  return true;
- } catch (_) {
+ } catch {
  return false;
  }
 };
@@ -27,7 +27,7 @@ const removeRaw = (key) => {
 const safeJsonParse = (value) => {
  try {
  return JSON.parse(value);
- } catch (_) {
+ } catch {
  return null;
  }
 };

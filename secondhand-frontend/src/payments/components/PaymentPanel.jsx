@@ -1,7 +1,5 @@
-import React from 'react';
 import { useTranslation } from "react-i18next";
 import PaymentAgreementsSection from './PaymentAgreementsSection.jsx';
-import { PAYMENT_TYPES } from '../paymentSchema.js';
 import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
 
 const PaymentPanel = ({
@@ -28,13 +26,13 @@ const PaymentPanel = ({
 
  return (
  <div className="lg:col-span-5 xl:col-span-5">
- <div className="sticky top-20 rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/40 space-y-4">
+ <div className="sticky top-20 rounded-md border border-border bg-white p-5 shadow-md space-y-4">
  {/* Header */}
- <div className="flex items-center justify-between pb-3 border-b border-slate-100">
- <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+ <div className="flex items-center justify-between pb-3 border-b border-border-light">
+ <h3 className="text-sm font-semibold text-text-primary">
  {t("payment_panel")}
  </h3>
- <span className="text-[11px] font-semibold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300/60">
+ <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-card-border-hover/60">
  {t("instant_activation")}
  </span>
  </div>
@@ -42,25 +40,25 @@ const PaymentPanel = ({
  {selectedListing ? (
  <div className="space-y-3.5">
  {/* Listing Summary Card */}
- <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-3.5 space-y-2">
+ <div className="rounded border border-border/80 bg-background-secondary/70 p-3.5 space-y-2">
  <div className="flex items-center justify-between gap-2">
- <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+ <span className="text-xs font-semibold text-text-muted">
  {t("chosen_listing")}
  </span>
- <span className="text-[10px] font-semibold text-slate-500">
+ <span className="text-xs font-semibold text-text-tertiary">
  #{selectedListing.id ? selectedListing.id.substring(0, 6).toUpperCase() : ''}
  </span>
  </div>
- <h4 className="text-xs font-bold text-slate-900 truncate">
+ <h4 className="text-xs font-semibold text-text-primary truncate">
  {selectedListing.title}
  </h4>
 
  {feeConfig && (
- <div className="pt-2 border-t border-slate-200/60 flex items-baseline justify-between">
- <span className="text-xs font-semibold text-slate-600">
+ <div className="pt-2 border-t border-border/60 flex items-baseline justify-between">
+ <span className="text-xs font-semibold text-text-secondary">
  {t("total_due")}
  </span>
- <span className="text-lg font-extrabold text-slate-900">
+ <span className="text-lg font-semibold text-text-primary">
  {formatPaymentAmount(feeConfig.totalCreationFee)}
  </span>
  </div>
@@ -68,15 +66,15 @@ const PaymentPanel = ({
  </div>
 
  {/* E-Wallet Balance Info */}
- <div className="rounded-xl border border-slate-200/80 bg-white p-3 flex items-center justify-between text-xs">
+ <div className="rounded border border-border/80 bg-white p-3 flex items-center justify-between text-xs">
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-slate-200 text-slate-900 flex items-center justify-center font-bold">
+ <div className="w-7 h-7 rounded bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
  ₺
  </div>
  <div>
- <span className="font-bold text-slate-800 block">{t("ewallet")}</span>
+ <span className="font-semibold text-text-primary block">{t("ewallet")}</span>
  {eWallet && (
- <span className="text-[11px] text-slate-500 ">
+ <span className="text-xs text-text-tertiary ">
  {formatPaymentAmount(eWalletBalance)}
  </span>
  )}
@@ -85,11 +83,11 @@ const PaymentPanel = ({
 
  {eWallet && (
  hasSufficientEWalletBalance ? (
- <span className="text-[10px] font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+ <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-card-border-hover">
  {t("sufficient_balance")}
  </span>
  ) : (
- <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+ <span className="text-xs font-semibold text-status-warning-text bg-background-secondary px-2 py-0.5 rounded border border-border">
  {t("insufficient_balance")}
  </span>
  )
@@ -110,7 +108,7 @@ const PaymentPanel = ({
  <button
  onClick={onPayment}
  disabled={isButtonDisabled}
- className="w-full rounded-xl bg-slate-900 hover:bg-slate-900 px-4 py-3 text-xs font-bold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-900 flex items-center justify-center gap-2"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-full"
  >
  {isProcessingPayment ? (
  <>
@@ -135,21 +133,21 @@ const PaymentPanel = ({
  </button>
 
  {/* Security Badges */}
- <div className="flex items-center justify-center gap-3 text-[10px] text-slate-400 font-medium pt-1">
- <span>🔒 {t("ssl_secured")}</span>
+ <div className="flex items-center justify-center gap-3 text-xs text-text-muted font-medium pt-1">
+ <span>{t("ssl_secured")}</span>
  <span>•</span>
  <span>{t("pci_dss_compliant")}</span>
  </div>
  </div>
  ) : (
  <div className="text-center py-8">
- <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-2 text-slate-400 font-bold">
+ <div className="w-10 h-10 bg-background-tertiary rounded flex items-center justify-center mx-auto mb-2 text-text-muted font-semibold">
  ?
  </div>
- <h4 className="text-xs font-bold text-slate-800 mb-1">
+ <h4 className="text-xs font-semibold text-text-primary mb-1">
  {t("no_listing_selected")}
  </h4>
- <p className="text-xs text-slate-500 max-w-[200px] mx-auto">
+ <p className="text-xs text-text-tertiary max-w-48 mx-auto">
  {t("choose_a_listing_to_pay_the_listing_fee")}
  </p>
  </div>

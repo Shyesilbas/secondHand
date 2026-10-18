@@ -1,24 +1,3 @@
-export const SportsListingDTO = {
- id: '',
- listingNo: '',
- title: '',
- description: '',
- price: 0,
- currency: '',
- status: '',
- city: '',
- district: '',
- imageUrl: '',
- createdAt: '',
- updatedAt: '',
- sellerName: '',
- sellerSurname: '',
- sellerId: 0,
- type: '',
- discipline: null,
- equipmentType: null,
- condition: null
-};
 
 export const createSportsCreateRequest = (data) => ({
  base: {
@@ -63,7 +42,6 @@ export const createSportsUpdateRequest = (data) => {
  return updateData;
 };
 
-
 export const createSportsFilterRequest = (data) => ({
  type: 'SPORTS',
  listingType: 'SPORTS',
@@ -81,5 +59,4 @@ export const createSportsFilterRequest = (data) => ({
  page: parseInt(data.page) || 0,
  size: parseInt(data.size) || 20,
 });
-
 

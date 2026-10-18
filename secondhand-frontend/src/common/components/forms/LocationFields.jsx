@@ -1,22 +1,13 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, MapPin, Loader2 } from 'lucide-react';
-import { get } from '../../services/api/request.js';
-import { API_ENDPOINTS } from '../../constants/apiEndpoints.js';
+import { useState } from 'react';
+import { MapPin, Loader2, Building2, Home } from 'lucide-react';
+import { useLocationOptions } from '../../hooks/useLocationOptions.js';
 import useAddresses from '../../../user/hooks/useAddresses.js';
+import { FieldError } from './FormPrimitives.jsx';
+import { inputError as baseError, inputNormal as baseNormal } from './inputStyles.js';
 
-const FieldError = ({
- error
-}) => {
- if (!error) return null;
- return <p className="mt-1.5 flex items-center gap-1 text-body text-status-error">
- <AlertCircle className="h-3 w-3 shrink-0" />
- {error}
- </p>;
-};
-const inputBase = 'w-full pl-10 pr-8 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200 appearance-none bg-background-primary';
-const inputNormal = `${inputBase} border-zinc-200/60 text-zinc-900 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 wizard-input-glow hover:border-zinc-300`;
-const inputError = `${inputBase} border-status-error-border bg-status-error-bg/30 focus:border-status-error-border focus:ring-2 focus:ring-status-error/10`;
+const inputNormal = `${baseNormal} pl-10 pr-8 appearance-none`;
+const inputError = `${baseError} pl-10 pr-8 appearance-none`;
 const LocationFields = ({
  formData,
  errors = {},
@@ -27,69 +18,7 @@ const LocationFields = ({
  } = useTranslation();
  const { addresses = [] } = useAddresses();
  const [selectedAddressId, setSelectedAddressId] = useState('');
- const [cities, setCities] = useState([]);
- const [districts, setDistricts] = useState([]);
- const [neighborhoods, setNeighborhoods] = useState([]);
- const [loadingCities, setLoadingCities] = useState(false);
- const [loadingDistricts, setLoadingDistricts] = useState(false);
- const [loadingNeighborhoods, setLoadingNeighborhoods] = useState(false);
-
- // 1. Fetch cities on mount
- useEffect(() => {
- const fetchCities = async () => {
- setLoadingCities(true);
- try {
- const data = await get(API_ENDPOINTS.CATALOG.LOCATIONS.CITIES);
- setCities(data || []);
- } catch (err) {
- console.error('Failed to load cities', err);
- } finally {
- setLoadingCities(false);
- }
- };
- fetchCities();
- }, []);
-
- // 2. Fetch districts when cityKey changes or exists initially (edit mode)
- useEffect(() => {
- if (!formData.cityKey) {
- setDistricts([]);
- setNeighborhoods([]);
- return;
- }
- const fetchDistricts = async () => {
- setLoadingDistricts(true);
- try {
- const data = await get(API_ENDPOINTS.CATALOG.LOCATIONS.DISTRICTS(formData.cityKey));
- setDistricts(data || []);
- } catch (err) {
- console.error('Failed to load districts', err);
- } finally {
- setLoadingDistricts(false);
- }
- };
- fetchDistricts();
- }, [formData.cityKey]);
-
- // 3. Fetch neighborhoods when districtKey changes or exists initially (edit mode)
- useEffect(() => {
- if (!formData.districtKey) {
- setNeighborhoods([]);
- return;
- }
- const fetchNeighborhoods = async () => {
- setLoadingNeighborhoods(true);
- try {
- const data = await get(API_ENDPOINTS.CATALOG.LOCATIONS.NEIGHBORHOODS(formData.districtKey));
- setNeighborhoods(data || []);
- } catch (err) {
- console.error('Failed to load neighborhoods', err);
- } finally {
- setLoadingNeighborhoods(false);
- }
- };
- fetchNeighborhoods();
- }, [formData.districtKey]);
+ const { cities, districts, neighborhoods, loadingCities, loadingDistricts, loadingNeighborhoods, error: locationError } = useLocationOptions(formData.cityKey, formData.districtKey);
 
  // Handlers for selection change
  const handleCityChange = e => {
@@ -195,17 +124,15 @@ const LocationFields = ({
  return <div className="space-y-4">
  {/* Saved Address Quick Pick Banner / Chips */}
  {addresses.length > 0 && (
- <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 transition-all">
+ <div className="rounded border border-primary/20 bg-primary/5 p-4 transition-all">
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
  <div className="flex items-center gap-2.5">
- <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
- <MapPin className="h-4 w-4" />
- </div>
+ <MapPin className="shrink-0 h-5 w-5 text-primary" strokeWidth={1.5} aria-hidden />
  <div>
  <p className="text-xs font-semibold text-text-primary">
  Kayıtlı Adreslerinizden Seçin
  </p>
- <p className="text-caption text-text-secondary">
+ <p className="text-xs text-text-secondary">
  Konum bilgilerinizi otomatik doldurmak için kayıtlı adresinizi tıklayın.
  </p>
  </div>
@@ -221,17 +148,17 @@ const LocationFields = ({
  key={addr.id}
  type="button"
  onClick={() => handleSelectSavedAddress(addr)}
- className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+ className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition-all ${
  isSelected
- ? 'bg-primary text-white shadow-sm ring-2 ring-primary/30'
+ ? 'bg-primary text-white ring-2 ring-primary/30'
  : 'border border-border-light bg-background-primary text-text-primary hover:border-primary/50 hover:bg-primary/5'
  }`}
  >
- <span>{addr.addressType === 'HOME' ? '🏠' : addr.addressType === 'WORK' ? '🏢' : '📍'}</span>
+ {addr.addressType === 'HOME' ? <Home className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : addr.addressType === 'WORK' ? <Building2 className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <MapPin className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  <span>{label}</span>
  {addr.city && <span className="opacity-80">({addr.city})</span>}
  {addr.mainAddress && (
- <span className={`ml-0.5 rounded px-1 py-0.2 text-[10px] uppercase font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'}`}>
+ <span className={`ml-0.5 rounded px-1 py-0.2 text-xs font-semibold ${isSelected ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'}`}>
  Varsayılan
  </span>
  )}
@@ -246,18 +173,18 @@ const LocationFields = ({
  <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
  {/* City Select */}
  <div>
- <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("city_i_l")}<span className="text-status-error">*</span>
+ <label className="mb-1.5 block text-sm font-medium text-text-primary">{t("city_i_l")}<span className="text-status-error">*</span>
  </label>
  <div className="relative">
- <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+ <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
  <select name="cityKey" value={formData.cityKey || ''} onChange={handleCityChange} disabled={loadingCities} className={errors.cityKey || errors.city ? inputError : inputNormal}>
  <option value="">{t("select_city")}</option>
  {cities.map(c => <option key={c.key} value={c.key}>
  {c.label}
  </option>)}
  </select>
- {loadingCities && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-zinc-400" />}
- {!loadingCities && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 flex items-center justify-center">
+ {loadingCities && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" />}
+ {!loadingCities && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted flex items-center justify-center">
  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
  </svg>
@@ -268,18 +195,18 @@ const LocationFields = ({
 
  {/* District Select */}
  <div>
- <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("district_i_l_e")}<span className="text-status-error">*</span>
+ <label className="mb-1.5 block text-sm font-medium text-text-primary">{t("district_i_l_e")}<span className="text-status-error">*</span>
  </label>
  <div className="relative">
- <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+ <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
  <select name="districtKey" value={formData.districtKey || ''} onChange={handleDistrictChange} disabled={!formData.cityKey || loadingDistricts} className={errors.districtKey || errors.district ? inputError : inputNormal}>
  <option value="">{t("select_district")}</option>
  {districts.map(d => <option key={d.key} value={d.key}>
  {d.label}
  </option>)}
  </select>
- {loadingDistricts && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-zinc-400" />}
- {!loadingDistricts && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 flex items-center justify-center">
+ {loadingDistricts && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" />}
+ {!loadingDistricts && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted flex items-center justify-center">
  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
  </svg>
@@ -290,18 +217,18 @@ const LocationFields = ({
 
  {/* Neighborhood Select */}
  <div>
- <label className="mb-1.5 block text-sm font-medium text-zinc-900">{t("neighborhood_mahalle")}<span className="text-zinc-400">{t("optional")}</span>
+ <label className="mb-1.5 block text-sm font-medium text-text-primary">{t("neighborhood_mahalle")}<span className="text-text-muted">{t("optional")}</span>
  </label>
  <div className="relative">
- <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+ <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
  <select name="neighborhoodKey" value={formData.neighborhoodKey || ''} onChange={handleNeighborhoodChange} disabled={!formData.districtKey || loadingNeighborhoods} className={errors.neighborhoodKey ? inputError : inputNormal}>
  <option value="">{t("select_neighborhood")}</option>
  {neighborhoods.map(n => <option key={n.key} value={n.key}>
  {n.label}
  </option>)}
  </select>
- {loadingNeighborhoods && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-zinc-400" />}
- {!loadingNeighborhoods && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 flex items-center justify-center">
+ {loadingNeighborhoods && <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-text-muted" />}
+ {!loadingNeighborhoods && <div className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted flex items-center justify-center">
  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
  </svg>
@@ -310,6 +237,7 @@ const LocationFields = ({
  <FieldError error={errors.neighborhoodKey} />
  </div>
  </div>
+ <FieldError error={locationError} />
  </div>;
 };
 export default LocationFields;

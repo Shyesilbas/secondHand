@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
-import { Truck, Hash, Send, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Truck } from 'lucide-react';
+import Button from '../../../common/components/ui/Button.jsx';
+
+// The backend creates the shipment with the chosen provider and assigns the tracking number itself.
 export const ShipOrderForm = ({
  onShip,
  carriers = [],
@@ -11,59 +14,46 @@ export const ShipOrderForm = ({
  t
  } = useTranslation();
  const [carrier, setCarrier] = useState('');
- const [trackingNumber, setTrackingNumber] = useState('');
  const [error, setError] = useState('');
  const handleSubmit = async e => {
  e.preventDefault();
- setError('');
  if (!carrier) {
  setError('Please select a carrier');
  return;
  }
- if (!trackingNumber.trim()) {
- setError('Please enter a tracking number');
- return;
- }
+ setError('');
  try {
  await onShip({
- carrier,
- trackingNumber
+ providerName: carrier
  });
  } catch (err) {
  setError(err?.response?.data?.message || 'Failed to ship order');
  }
  };
- return <CardComponent className="p-5 border-primary bg-slate-100/30">
- <div className="flex items-center gap-2 mb-4">
- <Truck className="w-5 h-5 text-primary" />
+ return <CardComponent className="p-5">
+ <div className="mb-4 flex items-center gap-2">
+ <Truck className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
  <h3 className="text-sm font-medium text-text-primary">{t("ship_this_order")}</h3>
  </div>
 
- <form onSubmit={handleSubmit} className="space-y-4">
- <div>
- <label className="block text-caption font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("select_carrier")}</label>
- <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
- {carriers.map(c => <button key={c.value} type="button" onClick={() => setCarrier(c.value)} className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${carrier === c.value ? 'bg-primary border-primary text-white shadow-md shadow-indigo-200' : 'bg-background-primary border-border-light text-slate-600 hover:border-primary hover:text-primary'}`}>
+ <form onSubmit={handleSubmit} noValidate className="space-y-4">
+ <fieldset>
+ <legend className="mb-2 text-sm text-text-secondary">{t("select_carrier")}</legend>
+ {carriers.length ? <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup">
+ {carriers.map(c => <button key={c.value} type="button" role="radio" aria-checked={carrier === c.value} onClick={() => {
+ setCarrier(c.value);
+ setError('');
+ }} className={`h-10 rounded border px-3 text-sm transition-colors ${carrier === c.value ? 'border-primary text-text-primary ring-1 ring-primary' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'}`}>
  {c.label}
  </button>)}
- </div>
- </div>
+ </div> : <p className="text-sm text-status-error-text">No cargo provider is available. Please try again later.</p>}
+ </fieldset>
 
- <div>
- <label className="block text-caption font-bold text-slate-400 uppercase tracking-wider mb-1.5">{t("tracking_number")}</label>
- <div className="relative">
- <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
- <input type="text" value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border-light focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm font-semibold bg-background-primary" placeholder={t("e_g_ar123456789")} />
- </div>
- </div>
+ {error && <p role="alert" className="text-sm text-status-error-text">{error}</p>}
 
- {error && <div className="flex items-center gap-2 p-3 rounded-lg bg-rose-50 border border-rose-100 text-rose-600 text-xs font-medium">
- <AlertCircle className="w-4 h-4" />
- {error}
- </div>}
-
- <button type="submit" disabled={isProcessing} className="w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-slate-900/10">
- {isProcessing ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-4 h-4" />}{t("mark_as_shipped")}</button>
+ <Button type="submit" disabled={isProcessing || !carriers.length} className="w-full">
+ {isProcessing ? 'Shipping...' : t("mark_as_shipped")}
+ </Button>
  </form>
  </CardComponent>;
 };

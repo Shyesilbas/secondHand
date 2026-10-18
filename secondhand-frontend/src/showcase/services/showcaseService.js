@@ -25,7 +25,5 @@ export const showcaseService = {
  post(API_ENDPOINTS.SHOWCASES.EXTEND(showcaseId), payload),
 
  cancelShowcase: (showcaseId) =>
- post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId)),
-
- getPricingConfig: () => get(API_ENDPOINTS.SHOWCASES.PRICING_CONFIG),
+ post(API_ENDPOINTS.SHOWCASES.CANCEL(showcaseId))
 };

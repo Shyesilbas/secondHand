@@ -13,8 +13,8 @@ const HeaderPaymentsMenu = ({
  } = useTranslation();
 
  return <>
- <button onClick={onToggle} title={t("payments")} type="button" className="group relative p-2.5 text-slate-600 hover:text-text-primary transition-all duration-300 ease-in-out rounded-xl hover:bg-slate-100/50">
- <Receipt className="w-[20px] h-[20px] stroke-[1.5px]" />
+ <button onClick={onToggle} title={t("payments")} type="button" className="group relative p-2.5 text-text-secondary hover:text-text-primary transition-all duration-300 ease-in-out rounded hover:bg-background-tertiary/50">
+ <Receipt className="w-5 h-5 stroke-1.5" />
  </button>
 
  {isOpen && <HeaderDropdownPanel>

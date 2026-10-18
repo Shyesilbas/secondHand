@@ -70,7 +70,7 @@ sequenceDiagram
 
 ## 4. Kritik Eşzamanlılık ve Güvenlik Mekanizmaları
 
-### A. Redis Tabanlı 24 Saatlik Alıcı Kilidi ([`OfferRedisReservationService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/offer/application/OfferRedisReservationService.java))
+### A. Redis Tabanlı 24 Saatlik Alıcı Kilidi ([`OfferRedisReservationService.java`](../src/main/java/com/serhat/secondhand/offer/application/OfferRedisReservationService.java))
 ```java
 public boolean lockAcceptedOffer(UUID listingId, Long buyerId, UUID offerId) {
     String key = "offer:reservation:" + listingId;

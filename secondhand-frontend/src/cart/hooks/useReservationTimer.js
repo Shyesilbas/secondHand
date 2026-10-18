@@ -6,7 +6,10 @@ export const useReservationTimer = (reservedAt, reservationEndTime) => {
  const [timeRemaining, setTimeRemaining] = useState(null);
  const [isExpired, setIsExpired] = useState(false);
 
- const endTime = reservationEndTime || (reservedAt && new Date(new Date(reservedAt).getTime() + RESERVATION_TIMEOUT_MINUTES * 60 * 1000));
+ // A primitive timestamp keeps the effect from restarting the interval on every render.
+ const endTime = reservationEndTime
+ ? new Date(reservationEndTime).getTime()
+ : reservedAt ? new Date(reservedAt).getTime() + RESERVATION_TIMEOUT_MINUTES * 60 * 1000 : null;
 
  useEffect(() => {
  if (!endTime) {
@@ -16,9 +19,7 @@ export const useReservationTimer = (reservedAt, reservationEndTime) => {
  }
 
  const calculateTimeRemaining = () => {
- const expirationTime = new Date(endTime);
- const now = new Date();
- const diff = expirationTime - now;
+ const diff = endTime - Date.now();
 
  if (diff <= 0) {
  setIsExpired(true);

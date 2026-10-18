@@ -21,6 +21,3 @@ The `core` domain provides cross-cutting infrastructural services, including glo
 
 ## Public APIs
 - Provides standard infrastructure; no direct business endpoints.
-
-## Related Knowledge
-- *(No runbooks extracted; modifications affect the entire application architecture)*

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import ListingCard from './ListingCard.jsx';
 import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { AlertCircle as ExclamationCircleIcon, Image as PhotoIcon } from 'lucide-react';
@@ -29,7 +29,7 @@ const ListingGrid = memo(({
  return <SkeletonGrid count={10} columns="grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8" />;
  }
  if (error) {
- return <div className="flex items-center justify-center min-h-[320px]">
+ return <div className="flex items-center justify-center min-h-80">
  <div className="max-w-md w-full">
  <EmptyState icon={ExclamationCircleIcon} title={t("listings_did_not_load")} description={error} primaryAction={{
  label: 'Try Again',
@@ -39,7 +39,7 @@ const ListingGrid = memo(({
  </div>;
  }
  if (!listings || listings.length === 0) {
- return <div className="flex items-center justify-center min-h-[320px]">
+ return <div className="flex items-center justify-center min-h-80">
  <div className="max-w-md w-full">
  <EmptyState icon={PhotoIcon} title={t("no_listings_found")} description="No listings found for the criteria." className="w-full" />
  </div>

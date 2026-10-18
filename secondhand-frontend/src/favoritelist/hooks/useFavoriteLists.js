@@ -46,14 +46,6 @@ export const useFavoriteListById = (listId) => {
  });
 };
 
-export const usePopularLists = (page = FAVORITE_LIST_PAGING.PAGE, size = FAVORITE_LIST_PAGING.POPULAR_SIZE) => {
- return useQuery({
- queryKey: ['favoriteLists', 'popular', page, size],
- queryFn: () => favoriteListService.getPopularLists(page, size),
- staleTime: FAVORITE_LIST_QUERY.STALE_POPULAR_MS,
- });
-};
-
 export const useListsContainingListing = (listingId) => {
  return useQuery({
  queryKey: ['favoriteLists', 'containing', listingId],
@@ -130,7 +122,7 @@ export const useDeleteFavoriteList = () => {
 
 export const useAddItemToList = () => {
  const queryClient = useQueryClient();
- const { showSuccess, showError } = useNotification();
+ const { showError } = useNotification();
  const { user } = useAuthState();
 
  return useMutation({
@@ -150,7 +142,7 @@ export const useAddItemToList = () => {
 
 export const useRemoveItemFromList = () => {
  const queryClient = useQueryClient();
- const { showSuccess, showError } = useNotification();
+ const { showError } = useNotification();
  const { user } = useAuthState();
 
  return useMutation({

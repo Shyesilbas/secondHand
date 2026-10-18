@@ -58,7 +58,7 @@ export const validateRegisterForm = (formData, acceptedAgreements, agreements) =
  } else if (formData.password.length < 8) {
  errors.password = 'Password must be at least 8 characters';
  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]).*/.test(formData.password)) {
- errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character';
+ errors.password = 'Password must contain at least one letter, one lowercase letter, one digit and one special character';
  }
 
  if (formData.password !== formData.confirmPassword) {
@@ -72,4 +72,3 @@ export const validateRegisterForm = (formData, acceptedAgreements, agreements) =
  return errors;
 };
 
-export default validateRegisterForm;

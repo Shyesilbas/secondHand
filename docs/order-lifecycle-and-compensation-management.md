@@ -45,7 +45,7 @@ stateDiagram-v2
 
 ---
 
-## 3. Sipariş Durumları ve İşlem Yetki Matrisi ([`OrderStatus.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/entity/enums/OrderStatus.java))
+## 3. Sipariş Durumları ve İşlem Yetki Matrisi ([`OrderStatus.java`](../src/main/java/com/serhat/secondhand/order/entity/enums/OrderStatus.java))
 
 | Durum | Açıklama | İptal Edilebilir (`isCancellable`) | İade Edilebilir (`isRefundable`) | Adres/Not Değişebilir (`isModifiable`) | Tamamlanabilir (`isCompletable`) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
@@ -66,27 +66,27 @@ stateDiagram-v2
 
 Bir siparişte farklı satıcılara ait birden fazla ürün bulunabilir. Bu nedenle iptal ve iade işlemleri hem **tüm sipariş** hem de **tek bir ürün kalemi (`OrderItem`)** bazında bağımsız işletilebilir.
 
-### A. İptal Akışı ([`OrderCancellationService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCancellationService.java))
+### A. İptal Akışı ([`OrderCancellationService.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCancellationService.java))
 * **Koşul:** Sipariş `CONFIRMED` veya `MEETUP_PENDING` aşamasında olmalıdır (kargolanmış ürün iptal edilemez).
 * **Adımlar:**
-  1. [`OrderItemCompensationPlanner`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderItemCompensationPlanner.java) iptal edilecek kalemleri planlar.
+  1. [`OrderItemCompensationPlanner`](../src/main/java/com/serhat/secondhand/order/application/OrderItemCompensationPlanner.java) iptal edilecek kalemleri planlar.
   2. Her iptal edilen kalem için `OrderItemCancel` audit kaydı oluşturulur.
-  3. [`EscrowService.cancel`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java) emanet havuzundaki parayı satıcıya gitmeden doğrudan alıcının e-cüzdanına iade eder.
-  4. [`OrderOutboxService`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxService.java) üzerinden `ORDER_CANCELLED` eventi Outbox tablosuna yazılır.
+  3. [`EscrowService.cancel`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java) emanet havuzundaki parayı satıcıya gitmeden doğrudan alıcının e-cüzdanına iade eder.
+  4. [`OrderOutboxService`](../src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxService.java) üzerinden `ORDER_CANCELLED` eventi Outbox tablosuna yazılır.
   5. Kafka `order.cancelled.v1` topic'i üzerinden stoğun Redis ve PostgreSQL'e geri kazandırılması tetiklenir.
 
 ---
 
-### B. İade Akışı ([`OrderRefundService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderRefundService.java))
+### B. İade Akışı ([`OrderRefundService.java`](../src/main/java/com/serhat/secondhand/order/application/OrderRefundService.java))
 * **Koşul:** Sipariş `DELIVERED` durumunda olmalıdır (henüz `COMPLETED` olmamış, havuzdaki para satıcıya serbest bırakılmamış olmalıdır).
 * **Adımlar:**
   1. İade nedeni (`CancelRefundReason`) ile birlikte `OrderItemRefund` kaydı açılır.
-  2. [`EscrowService.refund`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java) havuzdaki parayı alıcıya iade eder.
+  2. [`EscrowService.refund`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java) havuzdaki parayı alıcıya iade eder.
   3. `OrderOutboxService` aracılığıyla `order.refunded.v1` Kafka eventi oluşturulur.
 
 ---
 
-## 5. Otomasyon & Tamamlama Scheduler'ı ([`OrderCompletionScheduler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
+## 5. Otomasyon & Tamamlama Scheduler'ı ([`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
 
 Sipariş durum geçişleri ve zaman aşımı mutabakatları arka planda periyodik olarak işletilir:
 * **Kargo Simülasyonu & Durum İlerletme:** Test ortamında `CONFIRMED` $\rightarrow$ `PROCESSING` $\rightarrow$ `SHIPPED` $\rightarrow$ `DELIVERED` geçişleri zaman damgalarına göre otomatik ilerletilir.

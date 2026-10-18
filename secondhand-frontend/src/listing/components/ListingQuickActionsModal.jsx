@@ -1,23 +1,7 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { 
-  X, 
-  Pencil, 
-  Trash2, 
-  Megaphone, 
-  Zap, 
-  Power, 
-  PowerOff, 
-  CheckCircle, 
-  Copy, 
-  CreditCard, 
-  Check, 
-  Loader2, 
-  Package, 
-  TrendingUp, 
-  AlertCircle 
-} from 'lucide-react';
+import { Pencil, Trash2, Megaphone, Zap, Power, PowerOff, CheckCircle, Copy, CreditCard } from 'lucide-react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { listingService } from '../services/listingService.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
@@ -61,7 +45,10 @@ export const ListingQuickActionsModal = ({
       ? value 
       : parseFloat(String(value).replace(',', '.'));
 
-    if (!Number.isFinite(num) || (field === 'quantity' && num < 1) || (field === 'price' && num < 0)) return;
+    if (!Number.isFinite(num) || (field === 'quantity' && num < 1) || (field === 'price' && num < 0)) {
+      showError?.(t('error', 'Hata'), field === 'quantity' ? t('invalid_quantity', 'Stok en az 1 olmalı.') : t('invalid_price', 'Geçerli bir fiyat girin.'));
+      return;
+    }
 
     if (field === 'quantity') setSavingQty(true);
     else setSavingPrice(true);
@@ -88,267 +75,158 @@ export const ListingQuickActionsModal = ({
     setPriceVal(discounted);
   };
 
-  const modalContent = (
-    <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200"
-      onClick={onClose}
+  const tile = 'flex flex-col items-center justify-center gap-2 rounded border border-border p-3 text-sm text-text-secondary transition-colors hover:border-card-border-hover hover:text-text-primary';
+  const row = 'flex w-full items-center gap-3 rounded border border-border p-3 text-left transition-colors hover:border-card-border-hover';
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('quick_actions', 'Hızlı İlan Yönetimi')}
+      description={listing.title}
+      size="lg"
+      footer={
+        <>
+          <span className="mr-auto self-center text-xs tabular-nums text-text-tertiary">
+            {t('listing_no', 'İlan No')}: {listing.listingNo}
+          </span>
+          <Button variant="ghost" onClick={actions.handleDelete} className="text-status-error-text hover:text-status-error-text">
+            <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            {t('delete_listing', 'İlanı Sil')}
+          </Button>
+        </>
+      }
     >
-      <div 
-        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50/50">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-              <Zap className="w-5 h-5 text-amber-400" />
+      <div className="space-y-6">
+        {canEdit && (
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-text-primary">{t('quick_price_stock', 'Hızlı Fiyat & Stok Güncelleme')}</h3>
+              <span className="text-xs tabular-nums text-text-tertiary">
+                {t('current', 'Mevcut')}: {formatCurrency(listing.price, listing.currency)}
+              </span>
             </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-extrabold text-slate-900 truncate">
-                {t('quick_actions', 'Hızlı İlan Yönetimi')}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium truncate max-w-sm">
-                {listing.title}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer"
-            aria-label={t('close', 'Kapat')}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-          {/* Section 1: Quick Price & Stock Adjustments */}
-          {canEdit && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                  {t('quick_price_stock', 'Hızlı Fiyat & Stok Güncelleme')}
-                </span>
-                <span className="text-[11px] font-semibold text-slate-500">
-                  {t('current', 'Mevcut')}: {formatCurrency(listing.price, listing.currency)}
-                </span>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="quick-price" className="block text-sm text-text-secondary">{t('price', 'Fiyat')} ({listing.currency || 'TRY'})</label>
+                <div className="flex items-center gap-2">
+                  <PriceInput
+                    id="quick-price"
+                    value={priceVal}
+                    onChange={n => setPriceVal(p => n != null ? n : p)}
+                    onKeyDown={e => e.key === 'Enter' && saveField('price', priceVal)}
+                    className="h-10 w-full rounded border border-border bg-background-primary px-3 text-sm tabular-nums text-text-primary focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus"
+                  />
+                  <Button size="md" onClick={() => saveField('price', priceVal)} disabled={savingPrice || Number(priceVal) === Number(listing.price)}>
+                    {savingPrice ? 'Saving...' : t('save', 'Kaydet')}
+                  </Button>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-text-tertiary">{t('quick_discount', 'Hızlı İndirim')}:</span>
+                  {[5, 10, 15].map(pct => (
+                    <button
+                      key={pct}
+                      type="button"
+                      onClick={() => applyPriceDiscount(pct)}
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
+                    >
+                      -%{pct}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Price Quick Input */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                  <span className="text-xs font-bold text-slate-700 block">
-                    {t('price', 'Fiyat')}
-                  </span>
+              {showQty && (
+                <div className="space-y-2">
+                  <label htmlFor="quick-qty" className="block text-sm text-text-secondary">{t('stock_quantity', 'Stok Miktarı')}</label>
                   <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <PriceInput 
-                        value={priceVal} 
-                        onChange={n => setPriceVal(p => n != null ? n : p)} 
-                        onKeyDown={e => e.key === 'Enter' && saveField('price', priceVal)}
-                        className="w-full py-2 pl-3 pr-10 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/10"
-                      />
-                      <span className="absolute right-3 top-2.5 text-xs font-extrabold text-slate-400 pointer-events-none">
-                        {listing.currency || 'TRY'}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => saveField('price', priceVal)}
-                      disabled={savingPrice || Number(priceVal) === Number(listing.price)}
-                      className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 text-xs font-bold transition-all flex items-center justify-center shrink-0 cursor-pointer shadow-xs"
-                      title={t('save_price', 'Fiyatı Kaydet')}
-                    >
-                      {savingPrice ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                    </button>
+                    <input
+                      id="quick-qty"
+                      type="number"
+                      min={1}
+                      value={qty}
+                      onChange={e => setQty(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && saveField('quantity', qty)}
+                      className="h-10 w-full rounded border border-border bg-background-primary px-3 text-sm tabular-nums text-text-primary focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus"
+                    />
+                    <Button size="md" onClick={() => saveField('quantity', qty)} disabled={savingQty || String(qty) === String(listing.quantity)}>
+                      {savingQty ? 'Saving...' : t('save', 'Kaydet')}
+                    </Button>
                   </div>
-
-                  {/* Fast discount tags */}
-                  <div className="flex items-center gap-1.5 pt-1">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{t('quick_discount', 'Hızlı İndirim')}:</span>
-                    <button
-                      type="button"
-                      onClick={() => applyPriceDiscount(5)}
-                      className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200 transition-colors cursor-pointer"
-                    >
-                      -%5
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyPriceDiscount(10)}
-                      className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200 transition-colors cursor-pointer"
-                    >
-                      -%10
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyPriceDiscount(15)}
-                      className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200 transition-colors cursor-pointer"
-                    >
-                      -%15
-                    </button>
-                  </div>
+                  <p className="text-xs text-text-tertiary">
+                    {Number(qty) === 0 ? t('out_of_stock_warning', '0 adet ilanı tükendi gösterir.') : t('stock_helper', 'Alıcılar için anlık rezerve edilir.')}
+                  </p>
                 </div>
-
-                {/* Stock Quick Input */}
-                {showQty && (
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-                    <span className="text-xs font-bold text-slate-700 block">
-                      {t('stock_quantity', 'Stok Miktarı')}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="number" 
-                        min={1} 
-                        value={qty} 
-                        onChange={e => setQty(e.target.value)} 
-                        onKeyDown={e => e.key === 'Enter' && saveField('quantity', qty)} 
-                        className="w-full py-2 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:ring-2 focus:ring-slate-900/10 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
-                      />
-                      <button
-                        type="button"
-                        onClick={() => saveField('quantity', qty)}
-                        disabled={savingQty || String(qty) === String(listing.quantity)}
-                        className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 text-xs font-bold transition-all flex items-center justify-center shrink-0 cursor-pointer shadow-xs"
-                        title={t('save_quantity', 'Stoku Kaydet')}
-                      >
-                        {savingQty ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium">
-                      {Number(qty) === 0 ? t('out_of_stock_warning', '0 adet ilanı tükendi gösterir.') : t('stock_helper', 'Alıcılar için anlık rezerve edilir.')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Section 2: Promotional & Growth Actions */}
-          <div className="space-y-3">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-amber-500" />
-              {t('promotions_growth', 'Öne Çıkarma & Satış Artırma')}
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {listing.status === LISTING_STATUS.ACTIVE && !listingInShowcase && (
-                <button
-                  onClick={actions.handleOpenShowcase}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-900 transition-all text-left cursor-pointer group"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                    <Zap className="w-4 h-4 text-amber-300" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-extrabold block">{t('add_to_showcase', 'Vitrine Ekle')}</span>
-                    <span className="text-[11px] text-indigo-700/80 font-medium">{t('showcase_desc', 'Anasayfada en üstte sergile')}</span>
-                  </div>
-                </button>
               )}
+            </div>
+          </section>
+        )}
 
-              <button
-                onClick={actions.handleOpenCampaign}
-                className="flex items-center gap-3 p-3.5 rounded-2xl border border-purple-200 bg-purple-50/50 hover:bg-purple-50 text-purple-900 transition-all text-left cursor-pointer group"
-              >
-                <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                  <Megaphone className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <span className="text-xs font-extrabold block">{t('create_campaign', 'Kampanya Oluştur')}</span>
-                  <span className="text-[11px] text-purple-700/80 font-medium">{t('campaign_desc', 'İndirim & aciliyet tanımla')}</span>
-                </div>
+        <section className="space-y-3">
+          <h3 className="text-sm font-medium text-text-primary">{t('promotions_growth', 'Öne Çıkarma & Satış Artırma')}</h3>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {listing.status === LISTING_STATUS.ACTIVE && !listingInShowcase && (
+              <button type="button" onClick={actions.handleOpenShowcase} className={row}>
+                <Zap className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                <span>
+                  <span className="block text-sm font-medium text-text-primary">{t('add_to_showcase', 'Vitrine Ekle')}</span>
+                  <span className="block text-xs text-text-secondary">{t('showcase_desc', 'Anasayfada en üstte sergile')}</span>
+                </span>
               </button>
-            </div>
-          </div>
-
-          {/* Section 3: Status & Lifecycle Operations */}
-          <div className="space-y-3">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Package className="w-3.5 h-3.5 text-slate-500" />
-              {t('listing_status_ops', 'İlan Durum İşlemleri')}
-            </span>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {canEdit && (
-                <button
-                  onClick={actions.handleEdit}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all cursor-pointer shadow-2xs hover:border-slate-300"
-                >
-                  <Pencil className="w-4 h-4 text-slate-600" />
-                  <span>{t('edit_full', 'Tam Düzenle')}</span>
-                </button>
-              )}
-
-              {listing.status === LISTING_STATUS.DRAFT && (
-                <button
-                  onClick={actions.handlePayListingFee}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                >
-                  <CreditCard className="w-4 h-4 text-emerald-600" />
-                  <span>{t('pay_fee', 'Ücret Öde')}</span>
-                </button>
-              )}
-
-              {listing.status === LISTING_STATUS.ACTIVE && (
-                <button
-                  onClick={actions.handleDeactivate}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50 hover:border-amber-200 text-slate-700 hover:text-amber-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                >
-                  <PowerOff className="w-4 h-4 text-amber-600" />
-                  <span>{t('deactivate', 'Pasife Al')}</span>
-                </button>
-              )}
-
-              {listing.status === LISTING_STATUS.INACTIVE && (
-                <button
-                  onClick={actions.handleReactivate}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                >
-                  <Power className="w-4 h-4 text-emerald-600" />
-                  <span>{t('reactivate', 'Yayına Al')}</span>
-                </button>
-              )}
-
-              {listing.status !== LISTING_STATUS.SOLD && (
-                <button
-                  onClick={actions.handleMarkAsSold}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-200 text-slate-700 hover:text-emerald-800 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                >
-                  <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span>{t('mark_as_sold', 'Satıldı Yap')}</span>
-                </button>
-              )}
-
-              {listing.status === LISTING_STATUS.SOLD && (
-                <button
-                  onClick={actions.handleRelist}
-                  className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 font-bold text-xs transition-all cursor-pointer shadow-2xs"
-                >
-                  <Copy className="w-4 h-4 text-indigo-600" />
-                  <span>{t('relist', 'Tekrar Yayınla')}</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Section 4: Danger Zone */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-              <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
-              {t('listing_no', 'İlan No')}: <strong className="text-slate-600">{listing.listingNo}</strong>
-            </span>
-            <button
-              onClick={actions.handleDelete}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>{t('delete_listing', 'İlanı Sil')}</span>
+            )}
+            <button type="button" onClick={actions.handleOpenCampaign} className={row}>
+              <Megaphone className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+              <span>
+                <span className="block text-sm font-medium text-text-primary">{t('create_campaign', 'Kampanya Oluştur')}</span>
+                <span className="block text-xs text-text-secondary">{t('campaign_desc', 'İndirim & aciliyet tanımla')}</span>
+              </span>
             </button>
           </div>
-        </div>
-      </div>
-    </div>
-  );
+        </section>
 
-  return createPortal(modalContent, document.body);
+        <section className="space-y-3">
+          <h3 className="text-sm font-medium text-text-primary">{t('listing_status_ops', 'İlan Durum İşlemleri')}</h3>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {canEdit && (
+              <button type="button" onClick={actions.handleEdit} className={tile}>
+                <Pencil className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('edit_full', 'Tam Düzenle')}
+              </button>
+            )}
+            {listing.status === LISTING_STATUS.DRAFT && (
+              <button type="button" onClick={actions.handlePayListingFee} className={tile}>
+                <CreditCard className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('pay_fee', 'Ücret Öde')}
+              </button>
+            )}
+            {listing.status === LISTING_STATUS.ACTIVE && (
+              <button type="button" onClick={actions.handleDeactivate} className={tile}>
+                <PowerOff className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('deactivate', 'Pasife Al')}
+              </button>
+            )}
+            {listing.status === LISTING_STATUS.INACTIVE && (
+              <button type="button" onClick={actions.handleReactivate} className={tile}>
+                <Power className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('reactivate', 'Yayına Al')}
+              </button>
+            )}
+            {listing.status !== LISTING_STATUS.SOLD && (
+              <button type="button" onClick={actions.handleMarkAsSold} className={tile}>
+                <CheckCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('mark_as_sold', 'Satıldı Yap')}
+              </button>
+            )}
+            {listing.status === LISTING_STATUS.SOLD && (
+              <button type="button" onClick={actions.handleRelist} className={tile}>
+                <Copy className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                {t('relist', 'Tekrar Yayınla')}
+              </button>
+            )}
+          </div>
+        </section>
+      </div>
+    </Modal>
+  );
 };

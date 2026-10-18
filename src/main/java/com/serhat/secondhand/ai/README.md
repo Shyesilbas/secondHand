@@ -19,6 +19,3 @@ The `ai` domain orchestrates interactions with the "Aura" AI assistant, translat
 
 ## Public APIs
 - Aura Semantic Search, Price Advisor, and Listing Generator endpoints.
-
-## Related Knowledge
-- *(No specific runbooks extracted; modifications involve prompt engineering and context adapter implementation)*

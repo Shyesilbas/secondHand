@@ -24,6 +24,3 @@ The `checkout` domain acts as the orchestration layer that ties together the car
 - `POST /api/checkout/initiate`: Atomically reserves user's cart items in Redis with a 15-minute TTL when entering checkout.
 - `POST /api/orders/checkout`: Finalizes order and processes payment.
 - `DELETE /api/checkout/reservation/{listingId}`: Explicitly cancels user's temporary stock reservation and restores stock to Redis.
-
-## Related Knowledge
-- *(No specific runbooks extracted; modifications usually require coordinating changes across `order`, `payment`, and `cart`)*

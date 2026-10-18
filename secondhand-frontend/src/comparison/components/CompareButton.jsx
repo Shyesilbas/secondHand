@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Scale } from 'lucide-react';
 import { useComparison } from '../hooks/useComparison.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -69,8 +69,8 @@ const CompareButton = memo(({ listing, size = 'sm', className = '' }) => {
  className={`${sizeClasses[size]}
  rounded-full flex items-center justify-center transition-all duration-200
  ${isAdded
- ? 'bg-primary text-white shadow-md shadow-slate-900/10'
- : 'bg-background-primary/90 backdrop-blur border border-border-light hover:border-primary text-slate-600 hover:text-primary shadow-sm'
+ ? 'bg-primary text-white'
+ : 'bg-background-primary border border-border-light hover:border-primary text-text-secondary hover:text-primary'
  }
  ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''}
  ${className}

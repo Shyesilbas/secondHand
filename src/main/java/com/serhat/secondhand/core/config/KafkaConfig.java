@@ -11,6 +11,9 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -52,11 +55,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(KafkaTemplate<String, Object> kafkaTemplate) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(1000L, 2L)));
+        factory.setCommonErrorHandler(new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate,
+                (r, e) -> new org.apache.kafka.common.TopicPartition(r.topic() + ".DLT", -1)), new FixedBackOff(1000L, 2L)));
         return factory;
     }
 
@@ -128,5 +132,14 @@ public class KafkaConfig {
                 .partitions(partitions)
                 .replicas(replicas)
                 .build();
+    }
+
+    /** DLTs for every consumed topic; 1 partition matches the -1 partition used by the recoverer. */
+    @Bean
+    public KafkaAdmin.NewTopics deadLetterTopics() {
+        return new KafkaAdmin.NewTopics(
+                TopicBuilder.name(PAYMENT_COMPLETED_TOPIC + ".DLT").partitions(1).replicas(1).build(),
+                TopicBuilder.name(com.serhat.secondhand.escrow.application.EscrowKafkaProducer.ESCROW_RELEASED_TOPIC + ".DLT").partitions(1).replicas(1).build(),
+                TopicBuilder.name(MAIL_DISPATCH_TOPIC + ".DLT").partitions(1).replicas(1).build());
     }
 }

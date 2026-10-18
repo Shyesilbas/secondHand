@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { passwordService } from '../services/passwordService.js';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -112,12 +112,12 @@ const ChangePasswordPage = () => {
  if (score <= 2) return {
  level: score,
  label: 'Weak',
- color: 'bg-status-error-bg'
+ color: 'bg-status-error'
  };
  if (score <= 3) return {
  level: score,
  label: 'Fair',
- color: 'bg-status-warning-bg'
+ color: 'bg-status-warning'
  };
  if (score <= 4) return {
  level: score,
@@ -127,15 +127,15 @@ const ChangePasswordPage = () => {
  return {
  level: score,
  label: 'Strong',
- color: 'bg-status-success-bg'
+ color: 'bg-status-success'
  };
  };
  const passwordStrength = getPasswordStrength(formData.newPassword);
  return <div className="min-h-screen bg-secondary flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
  <div className="max-w-md w-full">
- <div className="bg-background-primary rounded-lg shadow-sm border border-border-light p-6">
+ <div className="bg-background-primary rounded border border-border-light p-6">
  <div className="text-center mb-6">
- <div className="w-10 h-10 bg-background-secondary border border-border-light rounded-lg flex items-center justify-center mx-auto mb-3">
+ <div className="w-10 h-10 bg-background-secondary border border-border-light rounded flex items-center justify-center mx-auto mb-3">
  <svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
  </svg>
@@ -178,7 +178,7 @@ const ChangePasswordPage = () => {
  {isLoading ? 'Updating...' : 'Update Password'}
  </AuthButton>
  
- <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="w-full py-2 px-4 border border-border-light rounded-lg text-sm font-medium text-text-secondary bg-background-primary hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">{t("cancel")}</button>
+ <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 w-full">{t("cancel")}</button>
  </div>
  </form>
 

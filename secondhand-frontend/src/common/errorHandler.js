@@ -129,7 +129,7 @@ export const handleError = (error, showError, options = {}) => {
  const messageToShow = customMessage || parsedError.message;
  const titleToShow = customTitle || parsedError.title;
 
- logger.error('🚨 Error:', parsedError);
+ logger.error('Error:', parsedError);
 
  if (useModal && typeof showError === 'function') {
  try {
@@ -151,67 +151,3 @@ export const handleError = (error, showError, options = {}) => {
  return parsedError;
 };
 
-/**
- * Handle error with modal notification context.
- */
-export const handleErrorWithModal = (error, notificationContext, options = {}) => {
- const parsedError = parseError(error);
-
- const {
- customTitle = null,
- customMessage = null,
- showDetails = true,
- actions = [],
- } = options;
-
- const title = customTitle || parsedError.title;
- const message = customMessage || parsedError.message;
-
- logger.error('🚨 Error:', parsedError);
-
- if (notificationContext?.showDetailedError) {
- notificationContext.showDetailedError(parsedError, {
- customTitle: title,
- customMessage: message,
- showDetails,
- actions,
- });
- } else if (notificationContext?.showError) {
- notificationContext.showError(title, message);
- }
-
- return parsedError;
-};
-
-/**
- * Determines if a parsed error should trigger a logout.
- * Only token-related 401 errors (not login failures).
- */
-export const shouldTriggerLogout = (parsedError) => {
- if (parsedError.type !== ERROR_TYPES.AUTHENTICATION) return false;
-
- const code = (parsedError.errorCode || '').toLowerCase();
- const msg = (parsedError.message || '').toLowerCase();
-
- // Login failure → don't logout
- if (msg.includes('invalid email or password') || msg.includes('bad credentials')) {
- return false;
- }
-
- // Token/session expiry → logout
- return (
- code.includes('token_expired') ||
- code.includes('invalid_token') ||
- msg.includes('token expired') ||
- msg.includes('invalid token') ||
- msg.includes('session expired')
- );
-};
-
-export default {
- parseError,
- handleError,
- handleErrorWithModal,
- shouldTriggerLogout,
- ERROR_TYPES,
-};

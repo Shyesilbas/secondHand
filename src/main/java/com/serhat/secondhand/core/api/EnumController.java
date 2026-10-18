@@ -20,6 +20,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.electronic.StorageType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.shipping.entity.enums.ShippingStatus;
+import com.serhat.secondhand.shipping.port.out.CargoProviderPort;
 import com.serhat.secondhand.showcase.application.ShowcaseService;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +43,7 @@ public class EnumController {
     private final ListingFeePaymentService listingFeePaymentService;
     private final ShowcaseService showcaseService;
     private final EnumReadService enumReadService;
+    private final List<CargoProviderPort> cargoProviders;
 
     private ResponseEntity<List<Map<String, Object>>> getListingTypes() {
         List<Map<String, Object>> listingTypes = Arrays.stream(ListingType.values())
@@ -49,7 +51,6 @@ public class EnumController {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
                     typeMap.put("value", type.name());
                     typeMap.put("label", type.getLabel());
-                    typeMap.put("icon", getListingTypeIcon(type));
                     return typeMap;
                 })
                 .toList();
@@ -421,19 +422,6 @@ public class EnumController {
         return ResponseEntity.ok(list);
     }
 
-    
-
-    private String getListingTypeIcon(ListingType type) {
-        return switch (type) {
-            case VEHICLE -> "🚗";
-            case ELECTRONICS -> "📱";
-            case REAL_ESTATE -> "🏠";
-            case CLOTHING -> "👕";
-            case BOOKS -> "📚";
-            case SPORTS -> "⚽";
-            case OTHER -> "📦";
-        };
-    }
 
     private String getEmailTypeLabel(EmailType type) {
         return toTitleCase(type.name());
@@ -563,6 +551,9 @@ public class EnumController {
         allEnums.put("sportConditions", getSportConditions().getBody());
         allEnums.put("genders", getGenders().getBody());
         allEnums.put("shippingStatuses", getShippingStatuses().getBody());
+        allEnums.put("carriers", cargoProviders.stream()
+                .map(provider -> Map.<String, Object>of("value", provider.providerName(), "label", provider.providerName()))
+                .toList());
         allEnums.put("orderStatuses", getOrderStatuses().getBody());
         allEnums.put("cancellableOrderStatuses", getCancellableOrderStatuses());
         allEnums.put("refundableOrderStatuses", getRefundableOrderStatuses());

@@ -51,7 +51,7 @@ Redis projemizde iki ana amaçla kullanılır:
 1. **Multi-Tiered Cache (Çok Katmanlı Önbellek)**: Okuma performansını maksimize etmek ve DB yükünü azaltmak.
 2. **Atomik Eşzamanlılık & Dağıtık Kilit (Concurrency & Rate Limiting)**: Race condition'ları ve tutarsızlıkları sub-millisecond seviyesinde engellemek.
 
-### A. Çok Katmanlı Önbellek Mimarisi ([CacheConfig.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/CacheConfig.java))
+### A. Çok Katmanlı Önbellek Mimarisi ([CacheConfig.java](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java))
 
 * **Cache Key Versioning:** Tüm cache anahtarları `v4::<cache_name>::<key>` standardıyla saklanır. Serializer veya DTO format değişikliklerinde `CACHE_VERSION` artırılarak eski kayıtlarla çakışma (corrupted cache) önlenir; eski kayıtlar TTL bitiminde Redis tarafından temizlenir.
 * **Polymorphic Jackson Serializer:** `GenericJackson2JsonRedisSerializer` üzerinde `DefaultTyping.EVERYTHING` ve `JsonTypeInfo.As.PROPERTY` kullanılarak `@class` tipi korunur. Bu sayede `CachedPage` (record), `PageImpl`, `UUID`, enum ve domain DTO'ları hem yazarken hem okurken tip kaybı olmadan deserialize edilir.
@@ -77,7 +77,7 @@ Redis projemizde iki ana amaçla kullanılır:
   * `stock:{listingId}`: Ürünün o anki rezerve edilmemiş boşta kalan stok adedi.
   * `reservation:{userId}:{listingId}`: Kullanıcının sepete aldığı miktar ve TTL bilgisi.
 
-* **Lua Scriptleri ([src/main/resources/scripts/](file:///Users/serhat/IdeaProjects/secondHand/src/main/resources/scripts/)):**
+* **Lua Scriptleri ([src/main/resources/scripts/](../src/main/resources/scripts/)):**
   1. `reserve_stock_with_ttl.lua`:
      * Redis'te stok anahtarı yoksa veritabanındaki mevcut stoktan anahtarı ilk kez doldurur (`lazy-init`).
      * Yeterli stok olup olmadığını atomik olarak denetler.
@@ -88,17 +88,17 @@ Redis projemizde iki ana amaçla kullanılır:
   3. `release_stock.lua`:
      * Genel amaçlı stok serbest bırakma ve artırma scripti.
 
-* **Reconciliation Scheduler ([StockReservationReconciliationScheduler.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java)):**
+* **Reconciliation Scheduler ([StockReservationReconciliationScheduler.java](../src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java)):**
   * Periyodik arka plan görevi (cron) çalışarak Redis üzerindeki in-memory stok miktarlarını PostgreSQL'deki kesin fiziksel stok durumuyla karşılaştırır; olası drift ve senkron uyumsuzluklarını onarır.
 
 ---
 
 ### C. Dağıtık Kilit, Idempotency & Kupon Limiter
 
-1. **Ödeme İdempotency Kilidi ([PaymentRedisIdempotencyService.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/util/PaymentRedisIdempotencyService.java)):**
+1. **Ödeme İdempotency Kilidi ([PaymentRedisIdempotencyService.java](../src/main/java/com/serhat/secondhand/payment/util/PaymentRedisIdempotencyService.java)):**
    * Kullanıcıdan gelen `Idempotency-Key` başlığı Redis üzerinde `SET key value NX EX 120` komutu ile kilitlenir.
    * Aynı anahtarla 2 dakika içinde gelen mükerrer ödeme istekleri veritabanına veya banka gateway'ine gitmeden engellenir (çift çekim önlenir).
-2. **Kupon Limitleme ([CouponRedisLimiterService.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) & [apply_coupon_with_limit.lua](file:///Users/serhat/IdeaProjects/secondHand/src/main/resources/scripts/apply_coupon_with_limit.lua)):**
+2. **Kupon Limitleme ([CouponRedisLimiterService.java](../src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) & [apply_coupon_with_limit.lua](../src/main/resources/scripts/apply_coupon_with_limit.lua)):**
    * Kuponun genel toplam kullanım limiti ve kullanıcı bazlı kullanım limiti Redis üzerinde tek bir atomik Lua çağrısıyla denetlenir ve güncellenir.
 
 ---
@@ -113,7 +113,7 @@ Veritabanına kayıt yazıp hemen ardından Kafka'ya mesaj gönderildiğinde mey
 
 1. Ödeme, sipariş iptali veya emanet (escrow) işlemleri sırasında event **doğrudan Kafka'ya atılmaz**.
 2. Event kaydı, ana entity kaydı ile **aynı ACID veritabanı transaction'ında** Outbox tablosuna (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) yazılır.
-3. Arka plandaki worker'lar ([PaymentOutboxWorker](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/payment/outbox/PaymentOutboxWorker.java), [OrderOutboxWorker](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxWorker.java), [EscrowOutboxWorker](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java)) `PENDING` ve `FAILED` durumundaki eventleri periyodik olarak sorgular ve Kafka'ya gönderir.
+3. Arka plandaki worker'lar ([PaymentOutboxWorker](../src/main/java/com/serhat/secondhand/payment/outbox/PaymentOutboxWorker.java), [OrderOutboxWorker](../src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxWorker.java), [EscrowOutboxWorker](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java)) `PENDING` ve `FAILED` durumundaki eventleri periyodik olarak sorgular ve Kafka'ya gönderir.
 4. Başarılı gönderimde event statüsü `PROCESSED` olur; hata durumunda `attemptCount` artırılarak artan aralıklarla (exponential backoff) tekrar denenir.
 
 #### 1. Outbox Polling Yükü vs. CDC (Change Data Capture / Debezium)
@@ -128,7 +128,7 @@ Outbox pattern uygulamasında iki temel yaklaşım bulunur:
 #### 2. Outbox Tablo Temizliği (Housekeeping / Purge Job)
 Başarıyla işlenen (`PROCESSED`) outbox eventleri ve tüketilen Kafka idempotency anahtarları zamanla tabloları şişirir (table bloat) ve sorgu performansını düşürür.
 
-* **[OutboxHousekeepingScheduler](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/outbox/OutboxHousekeepingScheduler.java):**
+* **[OutboxHousekeepingScheduler](../src/main/java/com/serhat/secondhand/core/outbox/OutboxHousekeepingScheduler.java):**
   * Her gece saat 03:00'te (`cron = "0 0 3 * * ?"`) otomatik çalışır.
   * `PROCESSED` durumunda olan ve **3 günden eski** (`app.outbox.cleanup.retention-days = 3`) tüm outbox kayıtlarını (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) temizler.
   * Aynı zamanda `processed_kafka_events` tablosundaki eski idempotency loglarını purge eder.
@@ -143,7 +143,7 @@ Başarıyla işlenen (`PROCESSED`) outbox eventleri ve tüketilen Kafka idempote
 
 Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garantisi sunar. Rebalancing, timeout veya retry senaryolarında aynı mesaj bir consumer'a tekrar gelebilir.
 
-* **DB-Level Deduplication ([ProcessedKafkaEvent.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/idempotency/ProcessedKafkaEvent.java)):**
+* **DB-Level Deduplication ([ProcessedKafkaEvent.java](../src/main/java/com/serhat/secondhand/core/idempotency/ProcessedKafkaEvent.java)):**
 * Consumer tarafında işlem başlamadan önce:
   ```sql
   INSERT INTO processed_kafka_events (event_id, consumer_group, processed_at)
@@ -154,7 +154,7 @@ Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garan
 
 ---
 
-### C. Topic'ler ve Event Tüketim Akışları ([KafkaConfig.java](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/KafkaConfig.java))
+### C. Topic'ler ve Event Tüketim Akışları ([KafkaConfig.java](../src/main/java/com/serhat/secondhand/core/config/KafkaConfig.java))
 
 | Topic | Partition / Replica | Producer (Outbox) | Consumer | İşlenen Görevler |
 | :--- | :--- | :--- | :--- | :--- |

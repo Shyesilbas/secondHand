@@ -12,7 +12,7 @@ const PasswordRequirements = ({
  label: 'At least one lowercase letter (a-z)',
  valid: validation.hasLowercase
  }, {
- label: 'At least one uppercase letter (A-Z)',
+ label: 'At least one letter (A-Z)',
  valid: validation.hasUppercase
  }, {
  label: 'At least one number (0-9)',
@@ -31,7 +31,7 @@ const PasswordRequirements = ({
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
  </svg>;
  };
- return <div className="bg-secondary rounded-lg p-3 border border-border-light">
+ return <div className="bg-secondary rounded p-3 border border-border-light">
  <p className="text-xs font-medium text-text-secondary mb-2">{t("requirements")}</p>
  <div className="space-y-1">
  {rules.map((rule, idx) => <div key={idx} className={`flex items-center text-xs ${rule.valid ? 'text-status-success-text' : 'text-text-secondary'}`}>

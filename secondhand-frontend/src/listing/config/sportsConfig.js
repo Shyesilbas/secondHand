@@ -1,12 +1,11 @@
-import { lazy } from 'react';
+import { Dumbbell } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const SportsCreateForm = lazy(() => import('../../sports/components/SportsCreateForm.jsx'));
 import { sportsService } from '../../sports/services/sportsService.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
 
 export const sportsConfig = {
  label: 'Sports',
- icon: '⚽',
+ icon: Dumbbell,
  description: 'Sports equipment and accessories',
 
  detailsComponent: GenericListingDetails,
@@ -18,7 +17,6 @@ export const sportsConfig = {
  { label: 'Condition', key: 'condition', enumKey: 'sportConditions' },
  ],
  },
- createComponent: SportsCreateForm,
  formSchema: {
  initialData: {
  title: '', description: '', price: '', currency: 'TRY', quantity: 1,
@@ -71,6 +69,7 @@ export const sportsConfig = {
  },
  },
  service: {
+ create: (payload) => sportsService.createSportsListing(payload),
  getById: (id) => sportsService.getSportsDetails(id),
  update: (id, payload) => sportsService.updateSportsListing(id, payload),
  },
@@ -104,11 +103,6 @@ export const sportsConfig = {
  { value: 'condition', label: 'Condition' }, { value: 'price', label: 'Price' },
  { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) => [
- { label: listing.discipline?.label || listing.discipline?.name || listing.discipline, icon: '🏅', show: !!listing.discipline },
- { label: listing.equipmentType?.label || listing.equipmentType?.name || listing.equipmentType, icon: '🎽', show: !!listing.equipmentType },
- { label: listing.condition?.label || listing.condition?.name || listing.condition, icon: '⭐', show: !!listing.condition },
- ].filter(badge => badge.show),
  defaultFilters: {},
 };
 

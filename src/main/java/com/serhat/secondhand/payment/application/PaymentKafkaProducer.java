@@ -1,6 +1,7 @@
 package com.serhat.secondhand.payment.application;
 
 import com.serhat.secondhand.core.config.KafkaConfig;
+import com.serhat.secondhand.order.repository.OrderItemRepository;
 import com.serhat.secondhand.payment.contract.PaymentCompletedKafkaEvent;
 import com.serhat.secondhand.payment.entity.Payment;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,13 @@ import java.util.concurrent.CompletableFuture;
 public class PaymentKafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OrderItemRepository orderItemRepository;
 
     public CompletableFuture<Void> sendPaymentCompleted(Payment payment) {
         String key = payment.getFromUser() != null ? String.valueOf(payment.getFromUser().getId()) : payment.getId().toString();
 
-        Integer quantity = 1;
+        Integer quantity = payment.getOrderItemId() == null ? 1
+                : orderItemRepository.findById(payment.getOrderItemId()).map(i -> i.getQuantity()).orElse(1);
 
         PaymentCompletedKafkaEvent event = new PaymentCompletedKafkaEvent(
                 payment.getId(),

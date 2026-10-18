@@ -25,20 +25,20 @@ const ListingReviewsSection = ({
  };
  });
  }, [stats]);
- return <div className="bg-background-primary rounded-2xl border border-border-light/60 shadow-sm p-6">
+ return <div className="bg-background-primary rounded-md border border-border-light/60 p-6">
  <h3 className="text-sm font-medium text-text-primary mb-6 tracking-tight">{t("product_reviews")}</h3>
 
- {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-6 p-5 bg-slate-50/80 rounded-xl border border-border-light/40">
+ {stats && (stats.totalReviews ?? 0) > 0 && <div className="mb-6 p-5 bg-background-secondary/80 rounded border border-border-light/40">
  <div className="flex flex-wrap items-center gap-4 mb-4">
  <div className="flex items-center gap-2">
- <span className="text-2xl font-bold text-text-primary">
+ <span className="text-2xl font-semibold text-text-primary">
  {Number(stats.averageRating ?? 0).toFixed(1)}
  </span>
  <div className="flex gap-0.5">
- {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-5 h-5 ${star <= Math.round(stats.averageRating ?? 0) ? 'fill-amber-400 text-amber-400' : 'fill-transparent text-slate-200'}`} />)}
+ {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-5 h-5 ${star <= Math.round(stats.averageRating ?? 0) ? 'fill-status-warning text-status-warning' : 'fill-transparent text-secondary-200'}`} />)}
  </div>
  </div>
- <span className="text-slate-500 text-sm">
+ <span className="text-text-tertiary text-sm">
  {stats.totalReviews}{t("reviews")}</span>
  </div>
 
@@ -48,14 +48,14 @@ const ListingReviewsSection = ({
  count,
  percentage
  }) => <div key={rating} className="flex items-center gap-3 text-sm">
- <span className="w-6 text-slate-500 font-medium">{rating}</span>
- <Star className="w-4 h-4 text-amber-400 fill-amber-400 shrink-0" />
- <div className="flex-1 min-w-0 h-2 bg-slate-200 rounded-full overflow-hidden">
- <div className="h-full bg-status-warning-bg rounded-full transition-all duration-300" style={{
+ <span className="w-6 text-text-tertiary font-medium">{rating}</span>
+ <Star className="w-4 h-4 text-status-warning fill-status-warning shrink-0" />
+ <div className="flex-1 min-w-0 h-2 bg-secondary-200 rounded-full overflow-hidden">
+ <div className="h-full bg-background-secondary rounded-full transition-all duration-300" style={{
  width: `${Math.min(percentage, 100)}%`
  }} />
  </div>
- <span className="w-8 text-slate-500 text-right shrink-0">{count}</span>
+ <span className="w-8 text-text-tertiary text-right shrink-0">{count}</span>
  </div>)}
  </div>}
  </div>}
@@ -63,8 +63,8 @@ const ListingReviewsSection = ({
  {hasReviews ? <div className="space-y-4 max-h-[28rem] overflow-y-auto pr-1">
  {reviews.map(review => <ReviewCard key={review.id} review={review} compact />)}
  </div> : <div className="text-center py-12">
- <Star className="w-12 h-12 mx-auto text-slate-300 mb-3" strokeWidth={1} />
- <p className="text-slate-500 text-sm">{t("no_reviews_for_this_product_yet")}</p>
+ <Star className="w-12 h-12 mx-auto text-secondary-300 mb-3" strokeWidth={1} />
+ <p className="text-text-tertiary text-sm">{t("no_reviews_for_this_product_yet")}</p>
  </div>}
  </div>;
 };

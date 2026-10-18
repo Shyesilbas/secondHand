@@ -78,13 +78,9 @@ export default {
         'warning-text': theme.colors.status.warning.text,
       },
       boxShadow: {
-        'card': theme.shadows.sm,
-        'card-lg': theme.shadows.md,
         ...theme.shadows,
       },
       borderRadius: {
-        'card': theme.borderRadius.lg,
-        'card-2xl': theme.borderRadius.xl,
         ...theme.borderRadius,
       },
       transitionDuration: {
@@ -94,6 +90,9 @@ export default {
         slower: theme.transitions.slower,
       },
       zIndex: theme.zIndex,
+      // Named ratios for image frames and the icon stroke from DESIGN.md, so pages need no arbitrary values.
+      aspectRatio: { '4/3': '4 / 3', '3/4': '3 / 4', '16/10': '16 / 10', '16/11': '16 / 11' },
+      strokeWidth: { 1.5: '1.5' },
       fontFamily: theme.typography.fontFamily,
       fontSize: theme.typography.fontSize,
     },

@@ -1,7 +1,7 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { SkeletonList } from '@/common/components/ui/Skeleton';
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { offerService } from '../services/offerService.js';
@@ -182,36 +182,36 @@ const OffersPage = () => {
 
  return <div className="min-h-screen bg-background-secondary">
  <PageContainer className="py-6 sm:py-7">
- <div className="rounded-2xl border border-border-light bg-card-bg p-4 shadow-sm sm:p-5">
+ <div className="rounded-md border border-border-light bg-card-bg p-4 sm:p-5">
  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
- <div className="inline-flex rounded-xl bg-background-tertiary p-1">
+ <div className="inline-flex rounded bg-background-tertiary p-1">
  <button type="button" onClick={() => {
  setActiveTab(OFFER_TABS.MADE);
  setStatusFilter(STATUS_FILTER.ALL);
- }} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.MADE ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>
- <LayoutGrid className="h-4 w-4 opacity-70" />{t("made")}<span className="rounded-full bg-background-secondary px-2 py-0.5 text-xs font-bold text-text-secondary">
+ }} className={`inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.MADE ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
+ <LayoutGrid className="h-4 w-4 opacity-70" />{t("made")}<span className="rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-semibold text-text-secondary">
  {madeTotalElements}
  </span>
  </button>
  <button type="button" onClick={() => {
  setActiveTab(OFFER_TABS.RECEIVED);
  setStatusFilter(STATUS_FILTER.ALL);
- }} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.RECEIVED ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-secondary hover:text-text-primary'}`}>
- <Handshake className="h-4 w-4 opacity-70" />{t("received")}<span className="rounded-full bg-background-secondary px-2 py-0.5 text-xs font-bold text-text-secondary">
+ }} className={`inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold transition ${activeTab === OFFER_TABS.RECEIVED ? 'bg-background-primary text-text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
+ <Handshake className="h-4 w-4 opacity-70" />{t("received")}<span className="rounded-sm bg-background-secondary px-2 py-0.5 text-xs font-semibold text-text-secondary">
  {receivedTotalElements}
  </span>
  </button>
  </div>
 
  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
- <div className="relative min-w-[200px] flex-1">
+ <div className="relative min-w-48 flex-1">
  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
- <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded-lg border border-border-light bg-background-secondary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+ <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t("search_listing_or_name")} className="w-full rounded border border-border-light bg-background-secondary py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:bg-background-primary focus:outline-none focus:ring-1 focus:ring-primary" />
  </div>
  <div className="flex items-center gap-2">
  <SlidersHorizontal className="hidden h-4 w-4 text-text-muted sm:block" aria-hidden />
  <label className="sr-only" htmlFor="offer-sort">{t("sort")}</label>
- <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded-lg border border-border-light bg-background-primary px-3 py-2 text-sm font-medium text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:w-auto">
+ <select id="offer-sort" value={sortBy} onChange={e => setSortBy(e.target.value)} className="w-full rounded border border-border-light bg-background-primary px-3 py-2 text-sm font-medium text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:w-auto">
  <option value={SORT.NEWEST}>{t("newest_first")}</option>
  <option value={SORT.EXPIRING}>{t("expiring_soon")}</option>
  </select>
@@ -230,7 +230,7 @@ const OffersPage = () => {
  </div>
  </div>
 
- <div className="mt-6 rounded-2xl border border-border-light bg-card-bg p-4 shadow-sm sm:p-6">
+ <div className="mt-6 rounded-md border border-border-light bg-card-bg p-4 sm:p-6">
  {totalElements > 0 ? <p className="mb-4 text-xs text-text-muted">
  {pageFrom}–{pageTo} / {totalElements} teklif
  </p> : null}
@@ -239,15 +239,13 @@ const OffersPage = () => {
  {Array.from({ length: 3 }).map((_, i) => (
  <SkeletonList key={`offer-skeleton-${i}`} />
  ))}
- </div> : error ? <div className="rounded-2xl border border-status-error-border bg-status-error-bg px-4 py-3">
+ </div> : error ? <div className="rounded-md border border-border bg-background-secondary px-4 py-3">
  <p className="text-sm font-medium text-status-error-text">{error}</p>
- </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-light bg-background-secondary px-6 py-16 text-center">
- <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-primary-light">
- <Handshake className="h-8 w-8 text-primary" />
- </div>
+ </div> : items.length === 0 ? <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-border-light bg-background-secondary px-6 py-16 text-center">
+ <Handshake className="mb-4 h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
  <h2 className="text-lg font-semibold text-text-primary">{t("no")}{activeTab === OFFER_TABS.MADE ? 'offers made' : 'offers received'}{t("yet")}</h2>
  <p className="mt-2 max-w-md text-sm text-text-muted">{t("when_you_send_or_receive_offers_they_wil")}</p>
- </div> : processedItems.length === 0 ? <div className="rounded-2xl border border-status-warning-border bg-status-warning-bg px-4 py-8 text-center">
+ </div> : processedItems.length === 0 ? <div className="rounded-md border border-border bg-background-secondary px-4 py-8 text-center">
  <p className="text-sm font-medium text-status-warning-text">{t("no_offers_match_your_filters")}</p>
  <button type="button" onClick={() => {
  setStatusFilter(STATUS_FILTER.ALL);
@@ -260,7 +258,7 @@ const OffersPage = () => {
  </li>)}
  </ul>
 
- <div className="mt-6 overflow-hidden rounded-xl border border-border-light bg-background-secondary">
+ <div className="mt-6 overflow-hidden rounded border border-border-light bg-background-secondary">
  <Pagination page={page} totalPages={totalPages} onPageChange={p => {
  const next = Math.max(0, Math.min(p, Math.max(0, totalPages - 1)));
  if (activeTab === OFFER_TABS.MADE) {

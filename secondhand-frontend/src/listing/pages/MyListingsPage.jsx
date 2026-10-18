@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
@@ -10,7 +10,7 @@ import { listingService } from '../services/listingService.js';
 import { ListingQuickEdit } from '../components/ListingQuickEdit.jsx';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { formatCurrency, parsePrice } from '../../common/formatters.js';
-import { AlertTriangle, ChevronDown, ChevronUp, Loader2, Pencil, Plus, X } from 'lucide-react';
+import { AlertTriangle, ChevronDown, Pencil, Plus, X } from 'lucide-react';
 const LowStockCard = ({
  listing,
  onRefresh,
@@ -18,8 +18,8 @@ const LowStockCard = ({
  showError
 }) => {
  const { t } = useTranslation();
- return <div className="flex flex-wrap items-center gap-3 rounded-lg p-3 bg-background-primary border border-border-light hover:border-border-dark hover:shadow-sm transition-all" onClick={e => e.stopPropagation()}>
- <div className="flex-shrink-0 w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center font-semibold text-sm shadow-sm">
+ return <div className="flex flex-wrap items-center gap-3 rounded p-3 bg-background-primary border border-border-light hover:border-border-dark transition-all" onClick={e => e.stopPropagation()}>
+ <div className="flex-shrink-0 w-10 h-10 bg-primary text-white rounded flex items-center justify-center font-semibold text-sm">
  {listing.title?.charAt(0)?.toUpperCase() || 'L'}
  </div>
  <div className="flex-1 min-w-0">
@@ -27,7 +27,7 @@ const LowStockCard = ({
  <p className="text-sm text-text-muted">{listing.listingNo}</p>
  </div>
  <ListingQuickEdit listing={listing} onChanged={onRefresh} showSuccess={showSuccess} showError={showError} />
- <Link to={ROUTES.EDIT_LISTING(listing.id)} className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-text-secondary bg-secondary-light hover:bg-secondary-200 rounded-lg">
+ <Link to={ROUTES.EDIT_LISTING(listing.id)} className="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-text-secondary bg-secondary-light hover:bg-secondary-200 rounded">
  <Pencil className="w-3.5 h-3.5" />{t("edit")}</Link>
  </div>;
 };
@@ -103,58 +103,53 @@ const MyListingsPage = () => {
  }
  }, [bulkMode, bulkValue, selectedIds, showSuccess, showError, clearBulk, engine]);
  const extraActions = <div className="flex items-center gap-2 sm:gap-3">
- <Link to={ROUTES.CREATE_LISTING} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg
- hover:bg-primary-hover transition-all duration-200 font-bold shadow-sm
- hover:shadow-md active:scale-95">
+ <Link to={ROUTES.CREATE_LISTING} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4">
  <Plus className="w-4 h-4" strokeWidth={3} />{t("new_listing")}</Link>
  </div>;
  const topSlot = useMemo(() => {
  const hasLowStock = lowStock && lowStock.count > 0;
  const stockText = hasLowStock ? `${lowStock.count} listing${lowStock.count === 1 ? '' : 's'}` : '';
  return <div className="mb-8 space-y-4">
- <div className="relative overflow-hidden bg-background-primary rounded-2xl border border-border-light p-6 shadow-sm group">
- <div className="absolute top-0 right-0 w-48 h-48 bg-primary-50 rounded-full -mr-16 -mt-16 blur-2xl transition-colors" />
+ <div className="relative overflow-hidden bg-background-primary rounded-md border border-border-light p-6 group">
  
  <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
  <div className="space-y-0.5">
- <h2 className="text-lg font-semibold text-text-primary uppercase tracking-widest">{t("portfolio_performance")}</h2>
+ <h2 className="text-lg font-semibold text-text-primary">{t("portfolio_performance")}</h2>
  <div className="flex items-baseline gap-1">
- <span className="text-3xl font-bold text-text-primary tracking-tight">
+ <span className="text-3xl font-semibold text-text-primary tracking-tight">
  {formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[0]}
  </span>
- <span className="text-sm font-bold text-text-muted">
+ <span className="text-sm font-semibold text-text-muted">
  ,{formatCurrency(totalValueStats.totalVal, 'TRY').split(',')[1] || '00'}
  </span>
  </div>
  <p className="text-xs text-text-secondary font-medium">{t("store_value_across")} {totalValueStats.activeCount} {t("live_listings")}</p>
  </div>
  <div className="flex items-center gap-2">
- <div className="flex items-center gap-1.5 bg-status-success-bg px-3 py-1.5 rounded-md border border-status-success-border">
+ <div className="flex items-center gap-1.5 bg-background-secondary px-3 py-1.5 rounded-md border border-border">
  <span className="relative flex h-1.5 w-1.5">
- <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success-border opacity-75"></span>
+ <span className="absolute inline-flex h-full w-full rounded-full bg-status-success-border opacity-75"></span>
  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-success-border"></span>
  </span>
- <span className="text-caption font-bold text-status-success-text">
+ <span className="text-xs font-semibold text-status-success-text">
  {totalValueStats.activeCount} {t("active")}</span>
  </div>
  <div className="flex items-center gap-1.5 bg-secondary-light px-3 py-1.5 rounded-md border border-border-light">
- <span className="text-caption font-bold text-text-secondary">
+ <span className="text-xs font-semibold text-text-secondary">
  {engine.listings?.length || 0} {t("total")}</span>
  </div>
  </div>
  </div>
  </div>
 
- {hasLowStock && <div className="bg-background-primary rounded-2xl border border-border-light overflow-hidden shadow-sm">
+ {hasLowStock && <div className="bg-background-primary rounded-md border border-border-light overflow-hidden">
  <div className="p-4 cursor-pointer hover:bg-secondary-light transition-colors border-b border-border-light" onClick={lowStock.toggle}>
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
- <div className="w-10 h-10 bg-status-warning-bg rounded-lg flex items-center justify-center">
- <AlertTriangle className="w-5 h-5 text-status-warning" />
- </div>
+ <AlertTriangle className="h-5 w-5 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
  <div>
  <h3 className="text-sm font-medium text-text-primary">{t("inventory_alert")}</h3>
- <p className="text-caption text-text-secondary font-medium">{stockText}{t("needs_attention")}</p>
+ <p className="text-xs text-text-secondary font-medium">{stockText}{t("needs_attention")}</p>
  </div>
  </div>
  <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${lowStock.isOpen ? 'rotate-180' : ''}`} />
@@ -164,26 +159,26 @@ const MyListingsPage = () => {
  {lowStock.isOpen && <div className="p-4 bg-background-primary">
  {!bulkMode ? <>
  <div className="flex gap-2 mb-4">
- <button onClick={() => setBulkMode('quantity')} className="px-4 py-1.5 bg-primary text-white text-caption font-bold rounded-lg hover:bg-primary-hover transition-all">{t("batch_stock")}</button>
- <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-secondary-light text-primary text-caption font-bold rounded-lg hover:bg-secondary-200 transition-all">{t("batch_prices")}</button>
+ <button onClick={() => setBulkMode('quantity')} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("batch_stock")}</button>
+ <button onClick={() => setBulkMode('price')} className="px-4 py-1.5 bg-secondary-light text-primary text-xs font-semibold rounded hover:bg-secondary-200 transition-all">{t("batch_prices")}</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  {lowStock.listings.slice(0, 4).map(listing => <LowStockCard key={listing.id} listing={listing} onRefresh={engine.refresh} showSuccess={showSuccess} showError={showError} />)}
  </div>
  </> : <div className="space-y-3">
- <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg border border-primary">
+ <div className="flex items-center justify-between p-3 bg-primary-50 rounded border border-primary">
  <div className="flex items-center gap-2">
- {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-background-primary border border-primary rounded-lg outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-background-primary text-xs" />}
- <button onClick={applyBulk} disabled={saving} className="px-4 py-1.5 bg-primary text-white text-caption font-bold rounded-lg hover:bg-primary-hover disabled:opacity-50">{t("apply")}</button>
+ {bulkMode === 'quantity' ? <input type="number" min={1} value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={t("qty")} className="w-24 px-3 py-1.5 text-xs bg-background-primary border border-primary rounded outline-none" /> : <PriceInput value={parsePrice(bulkValue) ?? 0} onChange={n => setBulkValue(n != null ? String(n) : '')} placeholder={t("price")} className="w-32 bg-background-primary text-xs" />}
+ <button onClick={applyBulk} disabled={saving} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("apply")}</button>
  </div>
  <X onClick={clearBulk} className="w-4 h-4 text-primary cursor-pointer" />
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto p-1">
- {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded-lg border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-primary-50 border-primary' : 'bg-background-primary border-border-light'}`}>
+ {listings.map(listing => <label key={listing.id} className={`flex items-center gap-2.5 p-3 rounded border transition-all cursor-pointer ${selectedIds.has(listing.id) ? 'bg-primary-50 border-primary' : 'bg-background-primary border-border-light'}`}>
  <input type="checkbox" checked={selectedIds.has(listing.id)} onChange={() => toggleSelect(listing.id)} className="w-4 h-4 rounded border-border-light text-primary" />
  <div className="min-w-0 flex-1">
- <p className="text-caption font-bold text-text-primary truncate">{listing.title}</p>
- <p className="text-caption font-medium text-text-secondary">{t("current")}{bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
+ <p className="text-xs font-semibold text-text-primary truncate">{listing.title}</p>
+ <p className="text-xs font-medium text-text-secondary">{t("current")}{bulkMode === 'quantity' ? `${listing.quantity} pcs` : formatCurrency(listing.price, listing.currency)}
  </p>
  </div>
  </label>)}
@@ -193,7 +188,7 @@ const MyListingsPage = () => {
  </div>}
  </div>;
  }, [lowStock, engine, bulkMode, selectedIds, bulkValue, saving, toggleSelect, clearBulk, applyBulk, listings, showSuccess, showError, totalValueStats, t]);
- return <div className="min-h-screen bg-[#fafafa]">
+ return <div className="min-h-screen bg-background-secondary">
  <ListingsModuleLayout mode="mine" title={t("my_listings")} getListingTypeLabel={getListingTypeLabel} engine={engine} extraActions={extraActions} topSlot={topSlot} disableSticky={true} isSelectable={false} />
  </div>;
 };

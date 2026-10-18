@@ -1,20 +1,4 @@
-import {
-  Inbox,
-  ShoppingBag,
-  Tag,
-  MessageSquare,
-  Star,
-  CreditCard,
-  Award,
-  Bell,
-  CheckCircle,
-  XCircle,
-  Package,
-  DollarSign,
-  RefreshCw,
-  Clock,
-  ShieldCheck
-} from 'lucide-react';
+import { ShoppingBag, Tag, MessageSquare, Star, CreditCard, Award, Bell, CheckCircle, XCircle, Package, DollarSign, RefreshCw, ShieldCheck } from 'lucide-react';
 import { ROUTES } from '../common/constants/routes.js';
 
 export const NOTIFICATION_FILTERS = Object.freeze({
@@ -72,10 +56,6 @@ export const NOTIFICATION_CATEGORY_MAP = {
   AGREEMENT_UPDATED: NOTIFICATION_FILTERS.SYSTEM
 };
 
-export const getNotificationCategory = (type) => {
-  return NOTIFICATION_CATEGORY_MAP[type] || NOTIFICATION_FILTERS.SYSTEM;
-};
-
 export const getNotificationConfig = (type) => {
   switch (type) {
     case 'OFFER_RECEIVED':
@@ -83,8 +63,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Tag,
         badge: 'Yeni Teklif',
-        badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
-        iconBgClass: 'bg-amber-500/10 text-amber-600 border-amber-200/60',
+        badgeClass: 'text-status-warning-text',
+        iconClass: 'text-status-warning-text',
         actionLabel: 'Teklifi İncele',
         categoryLabel: 'Pazarlık & Teklif'
       };
@@ -92,8 +72,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: CheckCircle,
         badge: 'Teklif Kabul Edildi',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        iconBgClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/60',
+        badgeClass: 'text-status-success-text',
+        iconClass: 'text-status-success-text',
         actionLabel: 'Siparişe Git',
         categoryLabel: 'Pazarlık & Teklif'
       };
@@ -102,8 +82,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: XCircle,
         badge: type === 'OFFER_EXPIRED' ? 'Süresi Doldu' : 'Teklif Reddedildi',
-        badgeClass: 'bg-slate-100 text-slate-600 border-slate-200',
-        iconBgClass: 'bg-slate-500/10 text-slate-600 border-slate-200/60',
+        badgeClass: 'text-text-secondary',
+        iconClass: 'text-text-secondary',
         actionLabel: 'Teklifleri Gör',
         categoryLabel: 'Pazarlık & Teklif'
       };
@@ -112,8 +92,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: ShoppingBag,
         badge: 'Yeni Sipariş',
-        badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        iconBgClass: 'bg-indigo-500/10 text-indigo-600 border-indigo-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'Siparişi Görüntüle',
         categoryLabel: 'Sipariş'
       };
@@ -121,8 +101,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Package,
         badge: 'Kargo Güncellemesi',
-        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
-        iconBgClass: 'bg-blue-500/10 text-blue-600 border-blue-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'Kargo Takibi',
         categoryLabel: 'Sipariş'
       };
@@ -130,8 +110,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: CheckCircle,
         badge: 'Sipariş Tamamlandı',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        iconBgClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/60',
+        badgeClass: 'text-status-success-text',
+        iconClass: 'text-status-success-text',
         actionLabel: 'Sipariş Detayı',
         categoryLabel: 'Sipariş'
       };
@@ -139,8 +119,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: XCircle,
         badge: 'Sipariş İptal Edildi',
-        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
-        iconBgClass: 'bg-rose-500/10 text-rose-600 border-rose-200/60',
+        badgeClass: 'text-status-error-text',
+        iconClass: 'text-status-error-text',
         actionLabel: 'Detayları İncele',
         categoryLabel: 'Sipariş'
       };
@@ -148,8 +128,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: RefreshCw,
         badge: 'İade Yapıldı',
-        badgeClass: 'bg-teal-50 text-teal-700 border-teal-200',
-        iconBgClass: 'bg-teal-500/10 text-teal-600 border-teal-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'İadeyi İncele',
         categoryLabel: 'Sipariş'
       };
@@ -157,8 +137,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: MessageSquare,
         badge: 'Yeni Mesaj',
-        badgeClass: 'bg-violet-50 text-violet-700 border-violet-200',
-        iconBgClass: 'bg-violet-500/10 text-violet-600 border-violet-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'Sohbete Git',
         categoryLabel: 'Mesajlaşma'
       };
@@ -166,8 +146,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: DollarSign,
         badge: 'Fiyat Düştü',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        iconBgClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/60',
+        badgeClass: 'text-status-success-text',
+        iconClass: 'text-status-success-text',
         actionLabel: 'İlanı İncele',
         categoryLabel: 'İlan & Favori'
       };
@@ -175,8 +155,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Star,
         badge: 'Yeni İlan',
-        badgeClass: 'bg-purple-50 text-purple-700 border-purple-200',
-        iconBgClass: 'bg-purple-500/10 text-purple-600 border-purple-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'İlana Git',
         categoryLabel: 'Takip Ettiklerin'
       };
@@ -184,8 +164,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Package,
         badge: 'İlan Satıldı',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        iconBgClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/60',
+        badgeClass: 'text-status-success-text',
+        iconClass: 'text-status-success-text',
         actionLabel: 'Satış Detayı',
         categoryLabel: 'İlan'
       };
@@ -193,8 +173,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Star,
         badge: 'Favoriye Eklendi',
-        badgeClass: 'bg-pink-50 text-pink-700 border-pink-200',
-        iconBgClass: 'bg-pink-500/10 text-pink-600 border-pink-200/60',
+        badgeClass: 'text-text-primary',
+        iconClass: 'text-text-primary',
         actionLabel: 'İlanı Gör',
         categoryLabel: 'İlan & Favori'
       };
@@ -202,8 +182,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Star,
         badge: 'Yeni Değerlendirme',
-        badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
-        iconBgClass: 'bg-amber-500/10 text-amber-600 border-amber-200/60',
+        badgeClass: 'text-status-warning-text',
+        iconClass: 'text-status-warning-text',
         actionLabel: 'Değerlendirmeleri Gör',
         categoryLabel: 'Değerlendirme'
       };
@@ -211,8 +191,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: CheckCircle,
         badge: 'Ödeme Başarılı',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        iconBgClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-200/60',
+        badgeClass: 'text-status-success-text',
+        iconClass: 'text-status-success-text',
         actionLabel: 'Cüzdanımı Gör',
         categoryLabel: 'Ödeme'
       };
@@ -220,8 +200,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: XCircle,
         badge: 'Ödeme Başarısız',
-        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
-        iconBgClass: 'bg-rose-500/10 text-rose-600 border-rose-200/60',
+        badgeClass: 'text-status-error-text',
+        iconClass: 'text-status-error-text',
         actionLabel: 'Ödemeyi Tekrar Dene',
         categoryLabel: 'Ödeme'
       };
@@ -229,8 +209,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: ShieldCheck,
         badge: 'Sözleşme Güncellemesi',
-        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
-        iconBgClass: 'bg-slate-500/10 text-slate-600 border-slate-200/60',
+        badgeClass: 'text-text-secondary',
+        iconClass: 'text-text-secondary',
         actionLabel: 'Sözleşmeyi İncele',
         categoryLabel: 'Sözleşmeler'
       };
@@ -238,8 +218,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Award,
         badge: 'Başarılı Satıcı Rozeti',
-        badgeClass: 'bg-yellow-50 text-yellow-700 border-yellow-300',
-        iconBgClass: 'bg-yellow-500/15 text-yellow-600 border-yellow-200',
+        badgeClass: 'text-status-warning-text',
+        iconClass: 'text-status-warning-text',
         actionLabel: 'Profili Görüntüle',
         categoryLabel: 'Başarılar'
       };
@@ -247,8 +227,8 @@ export const getNotificationConfig = (type) => {
       return {
         icon: Bell,
         badge: 'Bildirim',
-        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
-        iconBgClass: 'bg-slate-500/10 text-slate-600 border-slate-200/60',
+        badgeClass: 'text-text-secondary',
+        iconClass: 'text-text-secondary',
         actionLabel: 'Detayı Gör',
         categoryLabel: 'Genel'
       };

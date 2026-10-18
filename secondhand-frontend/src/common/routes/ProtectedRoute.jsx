@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../constants/routes.js';
+import Skeleton from '../components/ui/Skeleton.jsx';
+import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 const ProtectedRoute = ({
  children
 }) => {
@@ -16,55 +17,22 @@ const ProtectedRoute = ({
  isLoading
  }
  } = useAuth();
- const location = useLocation();
  const navigate = useNavigate();
- const notification = useNotification();
- const notificationShown = useRef(false);
+ const goHome = useCallback(() => navigate(ROUTES.HOME, { replace: true }), [navigate]);
+ const promptLogin = useLoginPrompt({ onCancel: goHome });
  useEffect(() => {
- if (!isLoading && !isAuthenticated && !notificationShown.current) {
- notificationShown.current = true;
- notification.addNotification({
- type: 'info',
- title: 'Authentication Required',
- message: 'Please Log In',
- autoClose: false,
- showCloseButton: false,
- actions: [{
- label: 'Cancel',
- primary: false,
- onClick: () => {
- navigate(ROUTES.HOME, {
- replace: true
- });
- }
- }, {
- label: 'OK',
- primary: true,
- onClick: () => {
- navigate(ROUTES.LOGIN, {
- state: {
- from: location
- },
- replace: true
- });
- }
- }]
- });
- }
- if (isAuthenticated) {
- notificationShown.current = false;
- }
- }, [isAuthenticated, isLoading, location, navigate, notification]);
+ if (!isLoading && !isAuthenticated) promptLogin();
+ }, [isAuthenticated, isLoading, promptLogin]);
  if (isLoading) {
- return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
- <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
- <p className="text-sm text-slate-500">{t("verifying_authentication")}</p>
+ return <div className="mx-auto max-w-7xl space-y-4 px-4 py-8" aria-busy="true" aria-label={t("verifying_authentication")}>
+ <Skeleton className="h-8 w-48" />
+ <Skeleton className="h-64 w-full" />
  </div>;
  }
  if (!isAuthenticated) {
  // Notification modal is already shown via useEffect, render minimal placeholder
  return <div className="flex flex-col items-center justify-center min-h-screen gap-4">
- <p className="text-sm text-slate-500">{t("redirecting_to_login")}</p>
+ <p className="text-sm text-text-tertiary">{t("redirecting_to_login")}</p>
  </div>;
  }
  return children;

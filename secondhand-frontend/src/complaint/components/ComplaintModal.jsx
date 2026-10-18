@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { COMPLAINT_REASONS } from '../types/complaintTypes.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
-import { AlertCircle, Loader2, ShieldCheck, X } from 'lucide-react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import logger from '../../common/utils/logger.js';
 import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES } from '../complaintConstants.js';
+const FIELD = 'w-full rounded border bg-background-primary px-3 text-sm text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus';
 const ComplaintModal = ({
  isOpen,
  onClose,
@@ -66,6 +67,7 @@ const ComplaintModal = ({
  await onSubmit(complaintData);
  onClose();
  } catch (error) {
+ // useComplaints already shows the error toast; keep the form open so the user can retry.
  logger.error('Complaint submission failed:', error);
  }
  };
@@ -81,83 +83,43 @@ const ComplaintModal = ({
  }));
  }
  };
- if (!isOpen) return null;
- return <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
- <div className="bg-background-primary rounded-2xl shadow-2xl shadow-slate-900/20 max-w-md w-full max-h-[90vh] overflow-y-auto">
- <div className="p-6">
- <div className="flex items-start justify-between mb-6">
- <div className="flex-1">
- <h3 className="text-sm font-medium text-text-primary tracking-tight mb-3">
- {listingId ? 'Report Listing' : 'Report User'}
- </h3>
- <div className="bg-slate-50 rounded-xl px-4 py-3 border border-border-light/60">
- <p className="text-sm text-slate-600 tracking-tight">
- {listingId && listingTitle ? <>{t("you_are_reporting")}<span className="font-semibold text-text-primary">{listingTitle}</span>"</> : <>{t("you_are_reporting")}<span className="font-semibold text-text-primary">{targetUserName}</span></>}
+ return <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={listingId ? 'Report listing' : 'Report user'} size="sm" footer={<>
+ <Button variant="secondary" onClick={onClose} disabled={isLoading}>{t("cancel")}</Button>
+ <Button type="submit" form="complaint-form" disabled={isLoading || !formData.reason || !formData.description.trim()}>
+ {isLoading ? t("submitting") : t("submit_complaint")}
+ </Button>
+ </>}>
+ <p className="mb-4 text-sm text-text-secondary">
+ {t("you_are_reporting")}<span className="font-medium text-text-primary">{listingId && listingTitle ? listingTitle : targetUserName}</span>
  </p>
- </div>
- </div>
- <button onClick={onClose} className="ml-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-500 disabled:opacity-50" disabled={isLoading}>
- <X className="h-5 w-5" />
- </button>
- </div>
-
- <form onSubmit={handleSubmit} className="space-y-5">
+ <form id="complaint-form" onSubmit={handleSubmit} noValidate className="space-y-4">
  <div>
- <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-2.5">{t("reason")}</label>
- <div className="relative">
- <select value={formData.reason} onChange={e => handleInputChange('reason', e.target.value)} className={`w-full px-4 py-3 border rounded-2xl tracking-tight text-text-primary bg-background-primary transition-all focus:outline-none focus:ring-4 focus:ring-rose-500/10 ${errors.reason ? 'border-rose-500' : 'border-border-light'}`} disabled={isLoading}>
+ <label htmlFor="complaint-reason" className="mb-1 block text-sm font-medium text-text-primary">{t("reason")}</label>
+ <select id="complaint-reason" value={formData.reason} onChange={e => handleInputChange('reason', e.target.value)} aria-invalid={Boolean(errors.reason)} className={`h-10 ${FIELD} ${errors.reason ? 'border-status-error' : 'border-border'}`} disabled={isLoading}>
  <option value="">{t("select_a_reason")}</option>
  {COMPLAINT_REASONS.map(reason => <option key={reason.value} value={reason.value}>
  {reason.label}
  </option>)}
  </select>
- {errors.reason && <div className="mt-2 flex items-center gap-1.5 text-sm text-rose-600">
- <AlertCircle className="h-4 w-4" />
- <span>{errors.reason}</span>
- </div>}
- </div>
+ {errors.reason && <p className="mt-1 text-xs text-status-error-text">{errors.reason}</p>}
  </div>
 
  <div>
- <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-2.5">{t("detailed_description")}</label>
- <div className="relative">
- <textarea value={formData.description} onChange={e => handleInputChange('description', e.target.value)} rows={5} className={`w-full px-4 py-3 border rounded-2xl tracking-tight text-text-primary bg-background-primary resize-none transition-all focus:outline-none focus:ring-4 focus:ring-rose-500/10 ${errors.description ? 'border-rose-500' : 'border-border-light'}`} placeholder={t("please_explain_your_complaint_in_detail")} disabled={isLoading} maxLength={COMPLAINT_DEFAULTS.MAX_DESCRIPTION_LENGTH} />
- <div className="mt-2 flex items-start justify-between">
- {errors.description ? <div className="flex items-center gap-1.5 text-sm text-rose-600">
- <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
- <span>{errors.description}</span>
- </div> : <p className="text-xs text-slate-500 tracking-tight">{t("a_detailed_explanation_helps_us_resolve_")}</p>}
- <p className="text-xs text-slate-400 tracking-tight">
+ <label htmlFor="complaint-description" className="mb-1 block text-sm font-medium text-text-primary">{t("detailed_description")}</label>
+ <textarea id="complaint-description" value={formData.description} onChange={e => handleInputChange('description', e.target.value)} rows={5} aria-invalid={Boolean(errors.description)} className={`resize-none py-2 ${FIELD} ${errors.description ? 'border-status-error' : 'border-border'}`} placeholder={t("please_explain_your_complaint_in_detail")} disabled={isLoading} maxLength={COMPLAINT_DEFAULTS.MAX_DESCRIPTION_LENGTH} />
+ <div className="mt-1 flex items-start justify-between gap-3 text-xs">
+ {errors.description ? <p className="text-status-error-text">{errors.description}</p> : <p className="text-text-tertiary">{t("a_detailed_explanation_helps_us_resolve_")}</p>}
+ <p className="shrink-0 tabular-nums text-text-tertiary">
  {formData.description.length}/{COMPLAINT_DEFAULTS.MAX_DESCRIPTION_LENGTH}
  </p>
  </div>
  </div>
- </div>
 
- <div className="bg-slate-50 rounded-2xl border border-border-light/60 px-4 py-4 mt-6">
- <div className="flex items-start gap-3">
- <div className="flex-shrink-0 mt-0.5">
- <ShieldCheck className="h-5 w-5 text-slate-600" />
- </div>
- <div className="flex-1">
- <h4 className="text-sm font-semibold tracking-tight text-text-primary mb-1.5">{t("how_does_the_complaint_process_work")}</h4>
- <p className="text-xs text-slate-600 leading-relaxed tracking-tight">{t("we_will_review_your_complaint_and_get_ba")}</p>
- </div>
- </div>
- </div>
-
- <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-border-light">
- <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-semibold tracking-tight text-slate-600 hover:text-text-primary transition-colors disabled:opacity-50" disabled={isLoading}>{t("cancel")}</button>
- <button type="submit" disabled={isLoading || !formData.reason || !formData.description.trim()} className="px-6 py-2.5 bg-rose-600 text-white rounded-xl hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold tracking-tight text-sm flex items-center gap-2 transition-all shadow-sm hover:shadow-md">
- {isLoading ? <>
- <Loader2 className="h-4 w-4 animate-spin" />
- <span>{t("submitting")}</span>
- </> : <span>{t("submit_complaint")}</span>}
- </button>
+ <div className="border-t border-border-light pt-4">
+ <h4 className="text-sm font-medium text-text-primary">{t("how_does_the_complaint_process_work")}</h4>
+ <p className="mt-1 text-sm text-text-secondary">{t("we_will_review_your_complaint_and_get_ba")}</p>
  </div>
  </form>
- </div>
- </div>
- </div>;
+ </Modal>;
 };
 export default ComplaintModal;

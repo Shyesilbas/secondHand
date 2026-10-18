@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from 'framer-motion';
 import ListingCardActions from '../../listing/components/ListingCardActions.jsx';
@@ -15,15 +14,15 @@ const DraftListingsList = ({
  return (
  <div className="lg:col-span-7 xl:col-span-7 space-y-4">
  {/* Section Header */}
- <div className="flex items-center justify-between pb-2 border-b border-slate-200/70">
+ <div className="flex items-center justify-between pb-2 border-b border-border/70">
  <div>
- <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+ <h2 className="text-lg font-semibold text-text-primary tracking-tight flex items-center gap-2">
  <span>{t("draft_listings")}</span>
- <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-200/80 text-slate-900 border border-slate-300/60">
+ <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-sm text-xs font-semibold bg-secondary-200/80 text-text-primary border border-card-border-hover/60">
  {listings.length}
  </span>
  </h2>
- <p className="text-xs text-slate-500 mt-0.5">
+ <p className="text-xs text-text-tertiary mt-0.5">
  {t("choose_a_listing_to_pay_the_listing_fee")}
  </p>
  </div>
@@ -43,10 +42,10 @@ const DraftListingsList = ({
  exit={{ opacity: 0, scale: 0.98 }}
  transition={{ duration: 0.25, delay: index * 0.04 }}
  onClick={() => onSelectListing(listing)}
- className={`group relative rounded-2xl p-4 cursor-pointer transition-all duration-200 border ${
+ className={`group relative rounded-md p-4 cursor-pointer transition-all duration-200 border ${
  isSelected
- ? 'border-slate-700 bg-white shadow-md ring-2 ring-slate-900/10'
- : 'border-slate-200/80 bg-white hover:border-slate-400 hover:shadow-sm'
+ ? 'border-secondary-700 bg-white ring-2 ring-primary/10'
+ : 'border-border/80 bg-white hover:border-secondary-400'
  }`}
  >
  <div className="flex items-start gap-3.5">
@@ -55,8 +54,8 @@ const DraftListingsList = ({
  <div
  className={`h-5 w-5 rounded-full border flex items-center justify-center transition-all ${
  isSelected
- ? 'border-slate-900 bg-slate-900 shadow-sm'
- : 'border-slate-300 bg-slate-50 group-hover:border-slate-400'
+ ? 'border-primary bg-primary'
+ : 'border-card-border-hover bg-background-secondary group-hover:border-secondary-400'
  }`}
  >
  {isSelected && (
@@ -70,32 +69,32 @@ const DraftListingsList = ({
  {/* Main Listing Details */}
  <div className="flex-1 min-w-0">
  <div className="flex items-start justify-between gap-3 mb-1">
- <h3 className="text-sm font-bold text-slate-900 tracking-tight truncate group-hover:text-slate-900 transition-colors">
+ <h3 className="text-sm font-semibold text-text-primary tracking-tight truncate group-hover:text-text-primary transition-colors">
  {listing.title}
  </h3>
 
- <span className="font-bold text-sm text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-300/60 flex-shrink-0">
+ <span className="font-semibold text-sm text-text-primary bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover/60 flex-shrink-0">
  {formatPaymentAmount(listing.price, listing.currency)}
  </span>
  </div>
 
  {listing.description && (
- <p className="mb-2 line-clamp-1 text-xs text-slate-500 leading-relaxed">
+ <p className="mb-2 line-clamp-1 text-xs text-text-tertiary leading-relaxed">
  {listing.description}
  </p>
  )}
 
- <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+ <div className="flex items-center gap-2 text-xs text-text-tertiary font-medium">
  {listing.city && (
- <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+ <span className="bg-background-tertiary px-2 py-0.5 rounded text-text-secondary">
  {listing.city}
  </span>
  )}
- <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold border border-amber-200/50">
- <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+ <span className="inline-flex items-center gap-1 text-status-warning-text bg-background-secondary px-2 py-0.5 rounded font-semibold border border-border/50">
+ <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
  {t("draft")}
  </span>
- <span className="ml-auto text-slate-400">
+ <span className="ml-auto text-text-muted">
  #{listing.id ? listing.id.substring(0, 6).toUpperCase() : ''}
  </span>
  </div>

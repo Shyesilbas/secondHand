@@ -218,6 +218,7 @@ public class OrderQueryService {
             orderDto.setOrderItems(sellerOrderItems);
         }
         orderDto.setEscrowAmount(null);
+        orderDto.setMeetupVerificationCode(null); // kod yalnızca alıcıya görünür
         return orderDto;
     }
 

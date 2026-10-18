@@ -126,13 +126,13 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
  const getEventStatusColor = (eventStatus) => {
  switch (eventStatus) {
  case 'SUCCESS':
- return 'text-status-success bg-status-success-bg';
+ return 'text-status-success-text';
  case 'FAILURE':
- return 'text-status-error bg-status-error-bg';
+ return 'text-status-error-text';
  case 'ATTEMPT':
- return 'text-status-warning bg-status-warning-bg';
+ return 'text-status-warning-text';
  default:
- return 'text-text-secondary bg-tertiary';
+ return 'text-text-secondary';
  }
  };
 

@@ -1,14 +1,15 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { listingService } from '../services/listingService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { LISTING_KEYS } from '../hooks/useListingData.js';
 import { listingTypeRegistry, getListingConfig } from '../config/listingConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { Loader2, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Button, Skeleton } from '../../common/components/ui/index.js';
 import logger from '../../common/utils/logger.js';
 
 // --- Components ---
@@ -16,9 +17,10 @@ import logger from '../../common/utils/logger.js';
 const PageLoader = () => {
  const { t } = useTranslation();
  return (
- <div className="min-h-screen bg-background-secondary flex flex-col items-center justify-center">
- <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
- <h3 className="text-sm font-medium text-text-primary">{t("loading_listing_details")}</h3>
+ <div className="mx-auto max-w-3xl space-y-4 px-4 py-10" aria-busy="true" aria-label={t("loading_listing_details")}>
+ <Skeleton className="h-8 w-64" />
+ <Skeleton className="h-40 w-full" />
+ <Skeleton className="h-40 w-full" />
  </div>
  );
 };
@@ -26,14 +28,12 @@ const PageError = ({ error, onBack }) => {
  const { t } = useTranslation();
  return (
  <div className="min-h-screen bg-background-secondary flex items-center justify-center p-4">
- <div className="bg-background-primary max-w-md w-full rounded-2xl shadow-xl p-8 text-center">
- <div className="w-16 h-16 bg-status-error-bg text-status-error rounded-full flex items-center justify-center mx-auto mb-6">
- <AlertTriangle className="w-8 h-8" />
- </div>
- <h3 className="text-sm font-medium text-text-primary mb-2">{t("something_went_wrong")}</h3>
- <p className="text-text-secondary mb-8">{error}</p>
- <button onClick={onBack} className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-hover transition-colors font-medium w-full justify-center">
- <ArrowLeft className="w-4 h-4" />{t("go_back_to_listings")}</button>
+ <div className="w-full max-w-md rounded border border-border bg-background-primary p-6 text-center">
+ <AlertTriangle className="mx-auto mb-3 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
+ <h3 className="text-lg font-semibold text-text-primary">{t("something_went_wrong")}</h3>
+ <p className="mt-1 text-sm text-text-secondary">{error}</p>
+ <Button variant="secondary" onClick={onBack} className="mt-5">
+ <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />{t("go_back_to_listings")}</Button>
  </div>
  </div>
  );
@@ -54,10 +54,6 @@ const EditListingPage = ({
  const queryClient = useQueryClient();
 
  // 1. Fetch Logic
- const [data, setData] = useState(null);
- const [isLoading, setIsLoading] = useState(true);
- const [error, setError] = useState(null);
- const fetchingRef = useRef(false);
  const serviceConfig = useMemo(() => {
  if (service) {
  return service;
@@ -67,42 +63,18 @@ const EditListingPage = ({
  }
  return null;
  }, [type, service]);
- useEffect(() => {
- if (!id || fetchingRef.current) {
- return;
- }
- fetchingRef.current = true;
- const fetchData = async () => {
- setIsLoading(true);
- setError(null);
- try {
- let initialData = null;
- let activeService;
- if (serviceConfig) {
- activeService = serviceConfig;
- } else {
- initialData = await listingService.getListingById(id);
- const currentType = initialData?.type;
- activeService = getListingConfig(currentType)?.service || null;
- }
- if (!activeService?.getById) {
- throw new Error('Editor service not found for this listing type');
- }
- const fullData = await activeService.getById(id);
- setData(fullData);
- } catch (err) {
- logger.error('Failed to fetch listing:', err);
- setError(err.response?.data?.message || err.message || 'Failed to load listing details.');
- } finally {
- setIsLoading(false);
- fetchingRef.current = false;
- }
- };
- fetchData();
- return () => {
- fetchingRef.current = false;
- };
- }, [id, serviceConfig]);
+ const { data, isLoading, error: queryError } = useQuery({
+ queryKey: ['listings', 'edit', id],
+ queryFn: async () => {
+ // Without an explicit type, read the base listing first to pick the type-specific editor service.
+ const activeService = serviceConfig || getListingConfig((await listingService.getListingById(id))?.type)?.service;
+ if (!activeService?.getById) throw new Error('Editor service not found for this listing type');
+ return activeService.getById(id);
+ },
+ enabled: !!id,
+ staleTime: 0
+ });
+ const error = queryError ? queryError.response?.data?.message || queryError.message || 'Failed to load listing details.' : null;
 
  // 2. Authorization Check
  useEffect(() => {

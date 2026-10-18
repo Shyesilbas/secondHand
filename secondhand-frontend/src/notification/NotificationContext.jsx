@@ -1,6 +1,4 @@
-import React, {createContext, useCallback, useContext, useState} from 'react';
-import NotificationModal from './NotificationModal.jsx';
-import Toast from './components/Toast.jsx';
+import { createContext, useContext } from 'react';
 
 const noop = () => {};
 const defaultContext = {

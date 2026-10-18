@@ -3,15 +3,15 @@ import { motion } from 'framer-motion';
 const STATUS_CONFIG = {
  PENDING: {
  label: 'Pending',
- color: 'bg-status-warning-bg',
- light: 'bg-status-warning-bg',
- text: 'text-amber-700',
- dot: 'bg-status-warning-bg'
+ color: 'bg-status-warning',
+ light: 'bg-background-secondary',
+ text: 'text-status-warning-text',
+ dot: 'bg-status-warning'
  },
  CONFIRMED: {
  label: 'Confirmed',
  color: 'bg-primary',
- light: 'bg-blue-50',
+ light: 'bg-background-secondary',
  text: 'text-primary',
  dot: 'bg-primary'
  },
@@ -19,42 +19,42 @@ const STATUS_CONFIG = {
  label: 'Processing',
  color: 'bg-primary',
  light: 'bg-primary',
- text: 'text-violet-700',
+ text: 'text-text-primary',
  dot: 'bg-primary'
  },
  SHIPPED: {
  label: 'Shipped',
- color: 'bg-sky-500',
- light: 'bg-sky-50',
- text: 'text-sky-700',
- dot: 'bg-sky-400'
+ color: 'bg-primary',
+ light: 'bg-background-secondary',
+ text: 'text-text-primary',
+ dot: 'bg-secondary-300'
  },
  DELIVERED: {
  label: 'Delivered',
- color: 'bg-status-success-bg',
- light: 'bg-status-success-bg',
- text: 'text-slate-900',
- dot: 'bg-status-success-bg'
+ color: 'bg-status-success',
+ light: 'bg-background-secondary',
+ text: 'text-text-primary',
+ dot: 'bg-status-success'
  },
  COMPLETED: {
  label: 'Completed',
- color: 'bg-status-success-bg',
- light: 'bg-status-success-bg',
+ color: 'bg-status-success',
+ light: 'bg-background-secondary',
  text: 'text-status-success-text',
- dot: 'bg-status-success-bg'
+ dot: 'bg-status-success'
  },
  CANCELLED: {
  label: 'Cancelled',
- color: 'bg-rose-500',
- light: 'bg-rose-50',
- text: 'text-rose-700',
- dot: 'bg-rose-400'
+ color: 'bg-status-error',
+ light: 'bg-background-secondary',
+ text: 'text-status-error-text',
+ dot: 'bg-status-error'
  },
  REFUNDED: {
  label: 'Refunded',
  color: 'bg-text-muted',
- light: 'bg-slate-50',
- text: 'text-slate-600',
+ light: 'bg-background-secondary',
+ text: 'text-text-secondary',
  dot: 'bg-text-muted'
  }
 };
@@ -73,7 +73,7 @@ const OrderStatusBreakdown = ({
  const total = entries.reduce((sum, e) => sum + e.count, 0);
  if (entries.length === 0 || total === 0) {
  return <div className="flex items-center justify-center h-48">
- <p className="text-slate-400 text-xs font-medium">{t("no_order_data_for_this_period")}</p>
+ <p className="text-text-muted text-xs font-medium">{t("no_order_data_for_this_period")}</p>
  </div>;
  }
  return <div>
@@ -105,23 +105,23 @@ const OrderStatusBreakdown = ({
  y: 0
  }} transition={{
  delay: idx * 0.04 + 0.3
- }} className={`flex items-center justify-between px-3 py-2 rounded-lg ${entry.light} border border-transparent hover:border-border-light transition-colors`}>
+ }} className={`flex items-center justify-between px-3 py-2 rounded ${entry.light} border border-transparent hover:border-border-light transition-colors`}>
  <div className="flex items-center gap-2">
  <div className={`w-2 h-2 rounded-full ${entry.dot}`} />
- <span className={`text-caption font-semibold ${entry.text}`}>{entry.label}</span>
+ <span className={`text-xs font-semibold ${entry.text}`}>{entry.label}</span>
  </div>
  <div className="flex items-center gap-1.5">
- <span className="text-xs font-bold text-text-primary">{entry.count}</span>
- <span className="text-caption font-medium text-slate-400">{pct}%</span>
+ <span className="text-xs font-semibold text-text-primary">{entry.count}</span>
+ <span className="text-xs font-medium text-text-muted">{pct}%</span>
  </div>
  </motion.div>;
  })}
  </div>
 
  {/* Total */}
- <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
- <span className="text-caption font-bold text-slate-400 uppercase tracking-wider">{t("total_orders")}</span>
- <span className="text-sm font-bold text-text-primary">{total}</span>
+ <div className="pt-3 mt-3 border-t border-border-light flex items-center justify-between">
+ <span className="text-xs font-semibold text-text-muted">{t("total_orders")}</span>
+ <span className="text-sm font-semibold text-text-primary">{total}</span>
  </div>
  </div>;
 };

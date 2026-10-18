@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Check,
@@ -17,16 +17,16 @@ import {
 /* ── Smart Metadata Formatter Helpers ────────────────────────── */
 
 const STATUS_LABELS = {
-  DELIVERED: { label: 'Teslim Edildi', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  SHIPPED: { label: 'Kargoya Verildi', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  PREPARING: { label: 'Hazırlanıyor', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  CONFIRMED: { label: 'Onaylandı', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-  CANCELLED: { label: 'İptal Edildi', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-  REFUNDED: { label: 'İade Edildi', color: 'bg-teal-50 text-teal-700 border-teal-200' },
-  ACCEPTED: { label: 'Kabul Edildi', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  REJECTED: { label: 'Reddedildi', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-  EXPIRED: { label: 'Süresi Doldu', color: 'bg-slate-100 text-slate-600 border-slate-200' },
-  COUNTERED: { label: 'Karşı Teklif', color: 'bg-amber-50 text-amber-700 border-amber-200' }
+  DELIVERED: { label: 'Teslim Edildi', color: 'bg-background-secondary text-status-success-text border-border' },
+  SHIPPED: { label: 'Kargoya Verildi', color: 'bg-background-secondary text-text-primary border-border' },
+  PREPARING: { label: 'Hazırlanıyor', color: 'bg-background-secondary text-status-warning-text border-border' },
+  CONFIRMED: { label: 'Onaylandı', color: 'bg-background-secondary text-text-primary border-border' },
+  CANCELLED: { label: 'İptal Edildi', color: 'bg-background-secondary text-status-error-text border-border' },
+  REFUNDED: { label: 'İade Edildi', color: 'bg-background-secondary text-text-primary border-border' },
+  ACCEPTED: { label: 'Kabul Edildi', color: 'bg-background-secondary text-status-success-text border-border' },
+  REJECTED: { label: 'Reddedildi', color: 'bg-background-secondary text-status-error-text border-border' },
+  EXPIRED: { label: 'Süresi Doldu', color: 'bg-background-tertiary text-text-secondary border-border' },
+  COUNTERED: { label: 'Karşı Teklif', color: 'bg-background-secondary text-status-warning-text border-border' }
 };
 
 // Internal keys to suppress from user view
@@ -115,50 +115,43 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
           handleCardClick();
         }
       }}
-      className={`group relative flex flex-col gap-3.5 rounded-2xl p-4 sm:p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+      className={`group relative flex flex-col gap-3.5 rounded-md p-4 sm:p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
         isUnread
-          ? 'bg-gradient-to-r from-indigo-50/40 via-white to-white border border-indigo-200/90 shadow-xs hover:shadow-md hover:border-indigo-300'
-          : 'bg-white border border-slate-200/80 hover:bg-slate-50/40 hover:border-slate-300 hover:shadow-xs'
+          ? 'bg-background-secondary/40 border border-border/90 hover:border-card-border-hover'
+          : 'bg-white border border-border/80 hover:bg-background-secondary/40 hover:border-card-border-hover'
       }`}
     >
       {/* Top Header Row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3.5 min-w-0">
-          {/* Icon Badge */}
-          <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-transform duration-200 group-hover:scale-105 shadow-2xs ${
-              config.iconBgClass
-            }`}
-          >
-            <Icon className="h-5 w-5" strokeWidth={2} />
-          </div>
+          <Icon className={`h-5 w-5 shrink-0 ${config.iconClass}`} strokeWidth={1.5} aria-hidden />
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border shadow-2xs ${config.badgeClass}`}
+                className={`inline-flex items-center text-xs font-medium ${config.badgeClass}`}
               >
                 {config.badge}
               </span>
 
               {isUnread && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100/90 shadow-2xs">
-                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-600 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary bg-background-secondary px-2 py-0.5 rounded-sm border border-border-light/90">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
                   Yeni
                 </span>
               )}
 
               {/* Status Transition Badge (if present) */}
               {statusInfo && (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${statusInfo.color}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold border ${statusInfo.color}`}>
                   {statusInfo.label}
                 </span>
               )}
             </div>
 
             <h3
-              className={`text-sm sm:text-[15px] mt-1 truncate tracking-tight ${
-                isUnread ? 'font-black text-slate-900' : 'font-bold text-slate-700'
+              className={`text-sm sm:text-base mt-1 truncate tracking-tight ${
+                isUnread ? 'font-semibold text-text-primary' : 'font-semibold text-text-secondary'
               }`}
               title={notification.title}
             >
@@ -169,7 +162,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
 
         {/* Right Info & Quick Mark as Read Action */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[11px] font-semibold text-slate-400 tabular-nums whitespace-nowrap">
+          <span className="text-xs font-semibold text-text-muted tabular-nums whitespace-nowrap">
             {formatRelativeTime(notification.createdAt)}
           </span>
 
@@ -177,7 +170,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
             <button
               type="button"
               onClick={handleQuickMarkRead}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 transition-all border border-transparent hover:border-emerald-200"
+              className="flex h-7 w-7 items-center justify-center rounded text-text-muted hover:bg-background-secondary hover:text-status-success-text transition-all border border-transparent hover:border-border"
               title="Okundu olarak işaretle"
               aria-label="Okundu olarak işaretle"
             >
@@ -189,7 +182,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
 
       {/* Message Body */}
       {notification.message && (
-        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium pl-0 sm:pl-13.5">
+        <p className="text-xs sm:text-sm text-text-secondary leading-relaxed font-medium pl-0 sm:pl-13.5">
           {notification.message}
         </p>
       )}
@@ -199,8 +192,8 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
         <div className="flex flex-wrap items-center gap-2 pl-0 sm:pl-13.5 pt-0.5">
           {/* Clean Order Number Badge */}
           {orderNumber && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-mono font-bold border border-slate-200/80 shadow-2xs">
-              <Package className="w-3 h-3 text-slate-400" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-background-tertiary text-text-secondary text-xs font-mono font-semibold border border-border/80">
+              <Package className="w-3 h-3 text-text-muted" />
               <span>#{orderNumber}</span>
             </span>
           )}
@@ -208,26 +201,26 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
           {/* Product Pill */}
           {listingTitle && (
             <span
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 text-[11px] font-semibold border border-slate-200/80 shadow-2xs max-w-[260px] truncate"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-background-secondary text-text-secondary text-xs font-semibold border border-border/80 max-w-64 truncate"
               title={listingTitle}
             >
-              <ShoppingBag className="w-3 h-3 text-slate-400 shrink-0" />
+              <ShoppingBag className="w-3 h-3 text-text-muted shrink-0" />
               <span className="truncate">{listingTitle}</span>
             </span>
           )}
 
           {/* Offer/Price Amount */}
           {amount != null && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200 shadow-2xs">
-              <Tag className="w-3 h-3 text-emerald-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-background-secondary text-status-success-text text-xs font-semibold border border-border">
+              <Tag className="w-3 h-3 text-status-success-text" />
               <span>₺{Number(amount).toLocaleString('tr-TR')}</span>
             </span>
           )}
 
           {/* Tracking Number */}
           {trackingNumber && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-200 shadow-2xs">
-              <Truck className="w-3 h-3 text-blue-500" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-background-secondary text-text-primary text-xs font-semibold border border-border">
+              <Truck className="w-3 h-3 text-text-primary" />
               <span>{carrier ? `${carrier}: ` : ''}{trackingNumber}</span>
             </span>
           )}
@@ -236,10 +229,10 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
           {remainingAttributes.map(([key, value]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] font-medium text-slate-600"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-background-secondary border border-border/80 text-xs font-medium text-text-secondary"
             >
-              <span className="text-slate-400 font-semibold">{key}:</span>
-              <span className="text-slate-800 font-bold truncate max-w-[180px]">
+              <span className="text-text-muted font-semibold">{key}:</span>
+              <span className="text-text-primary font-semibold truncate max-w-44">
                 {String(value)}
               </span>
             </span>
@@ -248,8 +241,8 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
       )}
 
       {/* Bottom Action Strip */}
-      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 mt-0.5 pl-0 sm:pl-13.5">
-        <span className="text-[11px] font-semibold text-slate-400">
+      <div className="flex items-center justify-between pt-2.5 border-t border-border-light mt-0.5 pl-0 sm:pl-13.5">
+        <span className="text-xs font-semibold text-text-muted">
           {config.categoryLabel}
         </span>
 
@@ -259,7 +252,7 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
             e.stopPropagation();
             handleCardClick();
           }}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 group-hover:translate-x-0.5 transition-all cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:text-text-primary transition-all cursor-pointer"
         >
           <span>{config.actionLabel}</span>
           <ChevronRight className="h-3.5 w-3.5" />

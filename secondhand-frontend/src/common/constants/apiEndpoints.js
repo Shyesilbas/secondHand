@@ -211,8 +211,6 @@ export const API_ENDPOINTS = {
  },
  PRICE_HISTORY: {
  BY_LISTING: (listingId) => `/v1/price-history/listing/${listingId}`,
- LATEST: (listingId) => `/v1/price-history/listing/${listingId}/latest`,
- EXISTS: (listingId) => `/v1/price-history/listing/${listingId}/exists`,
  },
  AUDIT_LOGS: {
  USER_BY_EMAIL: (userEmail) => `/v1/admin/audit-logs/user/${userEmail}`,
@@ -268,7 +266,6 @@ export const API_ENDPOINTS = {
  GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/users/${userId}/reviews/written`,
  GET_USER_REVIEW_STATS: (userId) => `/v1/users/${userId}/review-stats`,
  GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews',
- GET_REVIEW_BY_ORDER_ITEM: (orderItemId) => `/v1/orders/items/${orderItemId}/review`,
  GET_REVIEWS_FOR_LISTING: (listingId) => `/v1/listings/${listingId}/reviews`,
  GET_LISTING_REVIEW_STATS: (listingId) => `/v1/listings/${listingId}/review-stats`,
  },

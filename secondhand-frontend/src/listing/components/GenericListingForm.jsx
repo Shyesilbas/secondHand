@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
@@ -16,53 +17,20 @@ import { getListingConfig } from '../config/listingConfig.js';
 import { validationRegistry } from '../validation/ValidationRegistry.js';
 import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { PREFLOW_WIZARD_VARIANT } from '../config/prefilterFlowUi.js';
-import { AlertCircle, ImageIcon, MapPin, Package, FileText, CheckCircle2 } from 'lucide-react';
+import { ImageIcon, MapPin, Package, FileText, CheckCircle2 } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
+import { FieldError, SectionCard } from '../../common/components/forms/FormPrimitives.jsx';
+import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
 
 /* ── Small UI Primitives ───────────────────────────────────── */
 
-const FieldError = ({
- error
-}) => {
- if (!error) return null;
- return <motion.p initial={{
- opacity: 0,
- y: -4
- }} animate={{
- opacity: 1,
- y: 0
- }} className="mt-1.5 flex items-center gap-1 text-xs text-status-error">
- <AlertCircle className="w-3 h-3 shrink-0" />
- {error}
- </motion.p>;
-};
-const SectionCard = ({
- title,
- description,
- icon: Icon,
- children
-}) => {
- return <div className="bg-background-primary shadow-sm ring-1 ring-border-light rounded-xl overflow-visible">
- <div className="flex items-center gap-3 border-b border-border-light px-5 py-4">
- {Icon && <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background-secondary border border-border-light">
- <Icon className="h-4 w-4 text-text-secondary" />
- </div>}
- <div>
- <h3 className="text-sm font-medium text-text-primary">{title}</h3>
- {description && <p className="mt-0.5 text-xs text-text-secondary">{description}</p>}
- </div>
- </div>
- <div className="p-5 sm:p-6">{children}</div>
- </div>;
-};
 const ToggleCardField = ({
  name,
  label,
  description,
  value,
  onToggle
-}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded-xl border px-4 py-3.5 transition-all duration-200 ${value ? 'border-primary bg-primary/5 shadow-sm border-l-[3px] border-l-primary' : 'border-border-light bg-background-primary hover:border-border-focus hover:shadow-sm'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
+}) => <div className={`flex cursor-pointer select-none items-center gap-3 rounded border px-4 py-3.5 transition-all duration-200 ${value ? 'border-primary bg-primary/5 border-l-2 border-l-primary' : 'border-border-light bg-background-primary hover:border-border-focus'}`} onClick={onToggle} role="button" tabIndex={0} onKeyDown={e => {
  if (e.key === 'Enter' || e.key === ' ') {
  e.preventDefault();
  onToggle();
@@ -94,9 +62,6 @@ const ToggleCardField = ({
 
 /* ── Input Classes ─────────────────────────────────────────── */
 
-const inputBase = 'w-full px-3.5 py-2.5 text-sm border rounded-lg focus:outline-none transition-all duration-200';
-const inputNormal = `${inputBase} border-border-light bg-background-primary focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT`;
-const inputError = `${inputBase} border-status-error-border bg-status-error-bg focus:border-status-error-border focus:ring-2 focus:ring-status-error/20`;
 
 /* ── Main Form ─────────────────────────────────────────────── */
 
@@ -106,10 +71,6 @@ const GenericListingForm = ({
  initialData = null,
  isEdit = false,
  onUpdate = null,
- submitFunction,
- isLoading = false,
- successMessage,
- errorMessage,
  redirectRoute
 }) => {
  const {
@@ -122,13 +83,16 @@ const GenericListingForm = ({
  enums
  } = useEnums();
  const listingConfig = useMemo(() => getListingConfig(listingType), [listingType]);
+ const createMutation = useMutation({
+ mutationFn: (data) => listingConfig.service.create(data)
+ });
  const formSchema = listingConfig?.formSchema || null;
  const uiChrome = useMemo(() => !isEdit ? 'composer' : 'neutral', [isEdit]);
  const toggleChrome = uiChrome === 'composer' ? 'composer' : 'default';
  const labelClass = 'text-text-primary';
  const descFieldClass = 'text-text-secondary';
- const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-border-light bg-background-primary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT' : inputNormal, [uiChrome]);
- const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded-lg border border-status-error-border bg-status-error-bg px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 focus:border-status-error-border focus:ring-2 focus:ring-status-error/20' : inputError, [uiChrome]);
+ const fieldInputOk = useMemo(() => uiChrome === 'composer' ? 'w-full rounded border border-border-light bg-background-primary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 placeholder:text-text-muted focus:border-border-focus focus:ring-2 focus:ring-primary/10 hover:border-border-DEFAULT' : inputNormal, [uiChrome]);
+ const fieldInputErr = useMemo(() => uiChrome === 'composer' ? 'w-full rounded border border-border bg-background-secondary px-3.5 py-2.5 text-sm text-text-primary outline-none transition-all duration-200 focus:border-border focus:ring-2 focus:ring-status-error/20' : inputError, [uiChrome]);
  const wizardSteps = useMemo(() => {
  const steps = Array.isArray(formSchema?.steps) ? formSchema.steps : [];
  if (!steps.length) return steps;
@@ -184,10 +148,10 @@ const GenericListingForm = ({
  const {
  handleSubmit
  } = useFormSubmission({
- submitFunction: isEdit && onUpdate ? onUpdate : submitFunction,
+ submitFunction: isEdit && onUpdate ? onUpdate : createMutation.mutateAsync,
  formState,
- successMessage: successMessage || (isEdit ? 'Listing updated successfully!' : submitIntentRef.current === 'DRAFT' ? 'Listing saved as draft!' : 'Listing created! Redirecting to payment...'),
- errorMessage: errorMessage || (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
+ successMessage: (isEdit ? 'Listing updated successfully!' : submitIntentRef.current === 'DRAFT' ? 'Listing saved as draft!' : 'Listing created! Redirecting to payment...'),
+ errorMessage: (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
  onSuccess: response => {
  if (!isEdit) {
  cacheService.remove(draftKey);
@@ -374,7 +338,7 @@ const GenericListingForm = ({
 
  const renderDetailsStep = step => {
  const sections = step?.sections || [];
- return <div className="space-y-6 wizard-stagger">
+ return <div className="space-y-6">
  {sections.map(section => {
  const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
  if (!isVisible) return null;
@@ -387,7 +351,7 @@ const GenericListingForm = ({
  </div>;
  };
  const renderMediaLocationStep = () => {
- return <div className="space-y-6 wizard-stagger">
+ return <div className="space-y-6">
  <SectionCard title={t("photos")} description="Upload images of your item" icon={ImageIcon}>
  <ImageUpload onImageUpload={imageUrl => ctx.setValue('imageUrl', imageUrl)} onImageRemove={() => ctx.setValue('imageUrl', '')} imageUrl={formData?.imageUrl} disabled={false} />
  </SectionCard>
@@ -440,19 +404,19 @@ const GenericListingForm = ({
  });
  });
  const typeLabel = listingConfig?.label || listingType;
- return <div className="space-y-4 wizard-stagger">
+ return <div className="space-y-4">
  {/* Hero preview card */}
- <div className="bg-background-primary ring-1 ring-border-light shadow-sm rounded-xl overflow-hidden">
+ <div className="bg-background-primary ring-1 ring-border-light rounded overflow-hidden">
  <div className="p-5 sm:p-6">
  <div className="flex items-start justify-between gap-4">
  <div className="min-w-0 flex-1">
- <span className="inline-flex items-center rounded-lg bg-background-secondary border border-border-light px-2.5 py-1 text-caption font-semibold uppercase tracking-wider text-text-secondary">
+ <span className="inline-flex items-center rounded bg-background-secondary border border-border-light px-2.5 py-1 text-xs font-semibold text-text-secondary">
  {typeLabel}
  </span>
  <h3 className={`text-sm font-medium text-text-primary mt-2.5 tracking-tight ${labelClass}`}>{formData?.title || 'Untitled'}</h3>
  {formData?.description && <p className={`mt-2 whitespace-pre-wrap line-clamp-3 text-sm leading-relaxed ${descFieldClass}`}>{formData.description}</p>}
  </div>
- {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border-light bg-background-secondary shadow-sm">
+ {formData?.imageUrl && <div className="h-24 w-24 shrink-0 overflow-hidden rounded border border-border-light bg-background-secondary">
  <img src={formData.imageUrl} alt={t("listing")} className="h-full w-full object-cover" />
  </div>}
  </div>
@@ -472,7 +436,7 @@ const GenericListingForm = ({
  y: 0
  }} transition={{
  delay: 0.3
- }} className="flex items-center gap-2.5 rounded-xl border border-status-success-border bg-status-success-bg px-4 py-3">
+ }} className="flex items-center gap-2.5 rounded border border-border bg-background-secondary px-4 py-3">
  <CheckCircle2 className="h-4 w-4 text-status-success shrink-0" />
  <p className="text-sm text-status-success font-medium">{t("your_listing_is_ready_to_publish")}</p>
  </motion.div>
@@ -528,7 +492,7 @@ const GenericListingForm = ({
  }} onSaveDraft={!isEdit ? e => {
  submitIntentRef.current = 'DRAFT';
  handleSubmit(e);
- } : undefined} isLoading={Boolean(isLoading)} canSubmit={canGoForward} renderStep={renderStep} wizardVariant={undefined} layoutViewportLocked={false} onStepPick={isEdit ? undefined : stepId => goToStep(stepId)} continueLabel="Continue" />;
+ } : undefined} isLoading={createMutation.isPending} canSubmit={canGoForward} renderStep={renderStep} wizardVariant={undefined} layoutViewportLocked={false} onStepPick={isEdit ? undefined : stepId => goToStep(stepId)} continueLabel="Continue" />;
 };
 
 /* ── Summary Section ────────────────────────────────────────── */
@@ -538,10 +502,10 @@ const SummarySection = ({
  icon: Icon,
  rows
 }) => {
- return <div className="bg-background-primary ring-1 ring-border-light shadow-sm rounded-xl overflow-hidden">
+ return <div className="bg-background-primary ring-1 ring-border-light rounded overflow-hidden">
  <div className="border-b border-border-light bg-background-secondary px-4 py-2.5 flex items-center gap-2">
  {Icon && <Icon className="h-3.5 w-3.5 text-text-secondary" />}
- <h4 className="text-caption font-semibold uppercase tracking-wider text-text-secondary">{title}</h4>
+ <h4 className="text-xs font-semibold text-text-secondary">{title}</h4>
  </div>
  <div className="divide-y divide-border-light">
  {rows.map((row, i) => <motion.div key={`${row.label}-${row.value}`} initial={{

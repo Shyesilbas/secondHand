@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck, CreditCard, RotateCcw } from 'lucide-react';
 
 const features = [

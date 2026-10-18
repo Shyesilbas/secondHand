@@ -63,63 +63,6 @@ export const createClothingUpdateRequest = (data) => {
  return updateData;
 };
 
-export const ClothingListingDTO = {
- id: '',
- listingNo: '',
- title: '',
- description: '',
- price: 0,
- currency: '',
- status: '',
- listingFeePaid: false,
- city: '',
- district: '',
- createdAt: '',
- updatedAt: '',
- sellerName: '',
- sellerSurname: '',
- sellerId: 0,
- type: '',
- brand: null,
- clothingType: null,
- color: '',
- purchaseDate: '',
- condition: '',
- size: '',
- shoeSizeEu: null,
- material: '',
- clothingGender: '',
- clothingCategory: ''
-};
-
-export const createClothingListingDto = (data) => ({
- id: data.id,
- listingNo: data.listingNo,
- title: data.title,
- description: data.description,
- price: data.price,
- currency: data.currency,
- status: data.status,
- listingFeePaid: data.listingFeePaid,
- city: data.city,
- district: data.district,
- createdAt: data.createdAt,
- updatedAt: data.updatedAt,
- sellerName: data.sellerName,
- sellerSurname: data.sellerSurname,
- sellerId: data.sellerId,
- type: data.type,
- brand: data.brand,
- clothingType: data.clothingType,
- color: data.color,
- purchaseDate: data.purchaseDate,
- condition: data.condition,
- size: data.size,
- shoeSizeEu: data.shoeSizeEu,
- material: data.material,
- imageUrl: data.imageUrl
-});
-
 export const createClothingFilterRequest = (data) => ({
  type: 'CLOTHING',
  listingType: 'CLOTHING',

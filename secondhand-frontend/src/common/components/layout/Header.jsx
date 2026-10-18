@@ -1,11 +1,10 @@
 import { useTranslation } from "react-i18next";
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { ROUTES } from '../../constants/routes.js';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import UnifiedSearchBar from '../search/UnifiedSearchBar.jsx';
-import HeaderNavLink from './header/HeaderNavLink.jsx';
 import HeaderAuthActions from './header/HeaderAuthActions.jsx';
 import HeaderGuestActions from './header/HeaderGuestActions.jsx';
 import LanguageSwitcher from './header/LanguageSwitcher.jsx';
@@ -60,34 +59,32 @@ const Header = () => {
  };
  return <>
  {isAuthenticated && user && user.accountVerified === false && (
- <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs font-bold py-1.5 px-4 text-center flex items-center justify-center gap-2 shadow-xs z-50 relative">
+ <div className="bg-status-warning text-white text-xs font-semibold py-1.5 px-4 text-center flex items-center justify-center gap-2 z-50 relative">
  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
  <span>{t("account_unverified_bar")}</span>
- <Link to={ROUTES.VERIFY_ACCOUNT} className="underline font-black hover:text-amber-100 transition-colors ml-1 whitespace-nowrap">
+ <Link to={ROUTES.VERIFY_ACCOUNT} className="underline font-semibold hover:text-status-warning transition-colors ml-1 whitespace-nowrap">
  {t("verify_now")}
  </Link>
  </div>
  )}
- <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm' : 'bg-white/95 backdrop-blur-md border-b border-slate-100'}`}>
- <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
+ <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-background-primary border-b border-border' : 'bg-background-primary border-b border-border-light'}`}>
+ <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10">
  <div className={`flex items-center justify-between gap-4 transition-all duration-300 ${scrolled ? 'h-14' : 'h-16'}`}>
 
  {/* ── Logo ─────────────────────────────── */}
  <Link to={ROUTES.HOME} className="flex items-center gap-2.5 group shrink-0">
- <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center shadow-md shadow-slate-900/10 transition-transform duration-300 group-hover:scale-105">
- <ShoppingBag className="w-5 h-5 text-white" />
- </div>
- <span className="text-xl font-extrabold tracking-tight text-slate-900 hidden sm:inline font-sans">
- second<span className="text-slate-500">Hand</span>
+ <ShoppingBag className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+ <span className="text-xl font-semibold tracking-tight text-text-primary hidden sm:inline font-sans">
+ second<span className="text-text-tertiary">Hand</span>
  </span>
  </Link>
 
  {/* ── Desktop Nav Links ────────────────── */}
  {isAuthenticated && <nav className="hidden lg:flex items-center gap-1.5 ml-2">
- <Link to={ROUTES.LISTINGS_PREFILTER} className="text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-all">
+ <Link to={ROUTES.LISTINGS_PREFILTER} className="text-sm font-semibold text-text-secondary hover:text-text-primary px-3 py-1.5 rounded hover:bg-background-tertiary transition-all">
  {t("categories")}
  </Link>
- <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center gap-1.5 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl shadow-md shadow-slate-900/10 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+ <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  + {t("sell")}
  </Link>
  </nav>}

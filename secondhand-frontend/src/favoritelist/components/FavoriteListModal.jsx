@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Globe, List, Lock, X } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { useCreateFavoriteList, useUpdateFavoriteList } from '../hooks/useFavoriteLists.js';
 import logger from '../../common/utils/logger.js';
 import { FAVORITE_LIST_MODAL_LIMITS } from '../favoriteListConstants.js';
+const FIELD = "w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus";
 const FavoriteListModal = ({
  isOpen,
  onClose,
@@ -50,97 +51,56 @@ const FavoriteListModal = ({
  onSuccess?.();
  onClose();
  } catch (error) {
+ // The mutation hook shows the error toast; keep the form open with the user's input.
  logger.error('Error saving list:', error);
  }
  };
- if (!isOpen) return null;
  const isLoading = createMutation.isPending || updateMutation.isPending;
- const modalContent = <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
- <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose} />
- 
- <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-2xl ring-1 ring-slate-950/5 animate-scaleIn">
- <div className="bg-primary px-6 py-5">
- <div className="flex items-center justify-between">
- <div className="flex items-center gap-3">
- <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background-primary/15 backdrop-blur-sm">
- <List className="h-6 w-6 text-white" />
- </div>
- <h2 className="text-lg font-semibold text-white">
- {editList ? 'Edit List' : 'Create New List'}
- </h2>
- </div>
- <button type="button" onClick={onClose} className="w-8 h-8 rounded-lg bg-background-primary/10 hover:bg-background-primary/20 flex items-center justify-center transition-colors">
- <X className="w-5 h-5 text-white" />
- </button>
- </div>
- </div>
-
- <form onSubmit={handleSubmit} className="p-6 space-y-5">
+ const privacyClass = active => `flex h-10 items-center justify-center gap-2 rounded border text-sm transition-colors ${active ? 'border-primary text-text-primary ring-1 ring-primary' : 'border-border text-text-secondary hover:border-card-border-hover'}`;
+ return <Modal isOpen={isOpen} onClose={onClose} title={editList ? 'Edit list' : 'Create new list'} size="sm" footer={<>
+ <Button variant="secondary" onClick={onClose}>{t("cancel")}</Button>
+ <Button type="submit" form="favorite-list-form" disabled={isLoading || !formData.name.trim()}>
+ {isLoading ? 'Saving...' : editList ? 'Save changes' : 'Create list'}
+ </Button>
+ </>}>
+ <form id="favorite-list-form" onSubmit={handleSubmit} className="space-y-4">
  <div>
- <label className="mb-2 block text-sm font-medium text-slate-700">{t("list_name")}</label>
- <input type="text" value={formData.name} onChange={e => setFormData({
+ <label htmlFor="favorite-list-name" className="mb-1 block text-sm font-medium text-text-primary">{t("list_name")}</label>
+ <input id="favorite-list-name" type="text" value={formData.name} onChange={e => setFormData({
  ...formData,
  name: e.target.value
- })} placeholder={t("e_g_home_decoration")} className="w-full rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20" maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX} required autoFocus />
+ })} placeholder={t("e_g_home_decoration")} className={`h-10 ${FIELD}`} maxLength={FAVORITE_LIST_MODAL_LIMITS.NAME_MAX} required autoFocus />
  </div>
 
  <div>
- <label className="mb-2 block text-sm font-medium text-slate-700">{t("description_optional")}</label>
- <textarea value={formData.description} onChange={e => setFormData({
+ <label htmlFor="favorite-list-description" className="mb-1 block text-sm font-medium text-text-primary">{t("description_optional")}</label>
+ <textarea id="favorite-list-description" value={formData.description} onChange={e => setFormData({
  ...formData,
  description: e.target.value
- })} placeholder={t("a_short_description_about_the_list")} className="w-full resize-none rounded-xl border border-border-light px-4 py-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20" rows={3} maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX} />
+ })} placeholder={t("a_short_description_about_the_list")} className={`resize-none py-2 ${FIELD}`} rows={3} maxLength={FAVORITE_LIST_MODAL_LIMITS.DESCRIPTION_MAX} />
  </div>
 
- <div>
- <label className="mb-3 block text-sm font-medium text-slate-700">{t("privacy")}</label>
- <div className="grid grid-cols-2 gap-3">
- <button type="button" onClick={() => setFormData({
+ <fieldset>
+ <legend className="mb-1 text-sm font-medium text-text-primary">{t("privacy")}</legend>
+ <div className="grid grid-cols-2 gap-2">
+ <button type="button" aria-pressed={!formData.isPublic} onClick={() => setFormData({
  ...formData,
  isPublic: false
- })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${!formData.isPublic ? 'border-primary bg-primary/5 text-primary' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
- <Lock className="w-4 h-4" />
- <span className="font-medium">{t("private")}</span>
+ })} className={privacyClass(!formData.isPublic)}>
+ <Lock className="h-4 w-4" strokeWidth={1.5} aria-hidden />{t("private")}
  </button>
- <button type="button" onClick={() => setFormData({
+ <button type="button" aria-pressed={formData.isPublic} onClick={() => setFormData({
  ...formData,
  isPublic: true
- })} className={`flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 transition-all ${formData.isPublic ? 'border-primary bg-primary/5 text-primary' : 'border-border-light text-slate-600 hover:border-slate-300'}`}>
- <Globe className="w-4 h-4" />
- <span className="font-medium">{t("public")}</span>
+ })} className={privacyClass(formData.isPublic)}>
+ <Globe className="h-4 w-4" strokeWidth={1.5} aria-hidden />{t("public")}
  </button>
  </div>
- <p className="mt-2 text-xs text-slate-500">
+ <p className="mt-1 text-xs text-text-tertiary">
  {formData.isPublic ? 'Everyone can view and like this list' : 'Only you can view this list'}
  </p>
- </div>
-
- <div className="flex gap-3 pt-4">
- <button type="button" onClick={onClose} className="flex-1 rounded-xl border border-border-light px-4 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-50">{t("cancel")}</button>
- <button type="submit" disabled={isLoading || !formData.name.trim()} className="flex-1 rounded-xl bg-btn-primary px-4 py-3 font-medium text-white shadow-sm transition-all hover:bg-btn-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
- {isLoading ? 'Saving...' : editList ? 'Update' : 'Create'}
- </button>
- </div>
+ </fieldset>
  </form>
- </div>
- 
- <style>{`
- @keyframes fadeIn {
- from { opacity: 0; }
- to { opacity: 1; }
- }
- @keyframes scaleIn {
- from { opacity: 0; transform: scale(0.95); }
- to { opacity: 1; transform: scale(1); }
- }
- .animate-fadeIn {
- animation: fadeIn 0.2s ease-out;
- }
- .animate-scaleIn {
- animation: scaleIn 0.2s ease-out;
- }
- `}</style>
- </div>;
- return createPortal(modalContent, document.body);
+ </Modal>;
 };
 export default FavoriteListModal;

@@ -18,32 +18,25 @@ import {
  ORDER_TIME,
  ORDER_VIEW_MODES
 } from '../../constants/orderUiConstants.js';
-import { getOrderStatusBadgeClass } from '../../utils/statusPresentation.js';
+import { getOrderStatusDotClass } from '../../utils/statusPresentation.js';
+import Button, { buttonClasses } from '../../../common/components/ui/Button.jsx';
+import DataPagination from '../../../common/components/ui/DataPagination.jsx';
+import EmptyState from '../../../common/components/ui/EmptyState.jsx';
+import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import {
- AlertTriangle,
- ArrowRight,
  BarChart3,
- CheckCircle,
+ Check,
+ ChevronRight,
  CircleCheck,
- Clock,
- ExternalLink,
  Info,
- Layers,
- Loader2,
  Package,
- PackageCheck,
  Pencil,
  RefreshCw,
- RotateCcw,
  Search,
  SlidersHorizontal,
- Sparkles,
  Star,
  Truck,
- Wallet,
- X,
- XCircle,
- ChevronRight
+ X
 } from 'lucide-react';
 
 const mergeUiCopy = partial => ({
@@ -85,9 +78,6 @@ const DEFAULT_UI_COPY = {
  escrowHintEmpty: 'Bekleyen güvence bakiyesi yok',
  escrowByOrder: 'Sipariş Bazında',
  paginationShowing: (from, to, total) => `${total} siparişten ${from}–${to} arası gösteriliyor`,
- paginationPage: (p, t) => `Sayfa ${p} / ${t}`,
- paginationPrev: 'Önceki',
- paginationNext: 'Sonraki',
  paginationPerPage: n => `${n} / sayfa`,
  emptyShopping: 'Alışverişe Başla',
  startShopping: 'Alışverişe Başla'
@@ -106,8 +96,6 @@ const formatLongDate = (iso, locale) => {
  }
 };
 
-const statusKey = s => String(s || '').toUpperCase();
-
 const getListPaginationSlice = (pagination, pageSizeFallback = ORDER_DEFAULTS.INITIAL_PAGE_SIZE) => {
  if (!pagination || pagination.totalPages === 0) return null;
  const currentPage = pagination.number || 0;
@@ -125,9 +113,6 @@ const getListPaginationSlice = (pagination, pageSizeFallback = ORDER_DEFAULTS.IN
  };
 };
 
-const btnToolbarIcon = 'inline-flex items-center justify-center rounded-2xl bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 shadow-xs hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer';
-const orderActionBtnBase = 'inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all duration-200 focus:outline-none shadow-xs active:scale-[0.98] cursor-pointer';
-
 const Header = React.memo(({
  title,
  subtitle,
@@ -143,32 +128,22 @@ const Header = React.memo(({
  <div className="flex flex-row items-center justify-between gap-4">
  <div className="flex flex-col gap-0.5 min-w-0">
  <div className="flex items-center gap-2.5 min-w-0">
- <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight truncate">{title}</h1>
- {showIndicator ? <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse shrink-0 shadow-xs" /> : null}
+ <h1 className="truncate text-2xl font-semibold text-text-primary">{title}</h1>
+ {showIndicator ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-status-error" aria-hidden /> : null}
  </div>
- {subtitle ? <p className="text-xs text-slate-500 font-medium truncate">{subtitle}</p> : null}
+ {subtitle ? <p className="truncate text-sm text-text-secondary">{subtitle}</p> : null}
  </div>
  <div className="flex items-center gap-2 shrink-0">
  {onAnalytics ? (
- <button 
- type="button" 
- onClick={onAnalytics} 
- className={`${btnToolbarIcon} gap-2 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-900 hover:text-slate-900`}
- >
- <BarChart3 className="w-4 h-4 text-slate-900 shrink-0" />
+ <Button variant="secondary" size="sm" onClick={onAnalytics}>
+ <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
  <span className="hidden sm:inline">{analyticsLabel}</span>
- </button>
+ </Button>
  ) : null}
  {onRefresh ? (
- <button 
- type="button" 
- onClick={onRefresh} 
- disabled={loading} 
- className={`${btnToolbarIcon} p-2.5 disabled:opacity-40 disabled:pointer-events-none`} 
- title={t("refresh", "Yenile")}
- >
- <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-slate-900' : ''}`} />
- </button>
+ <Button variant="secondary" size="sm" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
+ <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} />
+ </Button>
  ) : null}
  </div>
  </div>
@@ -178,7 +153,7 @@ const Header = React.memo(({
  return <div className="mb-6">{headerContent}</div>;
  }
  return (
- <div className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-xs transition-all">
+ <div className="sticky top-0 z-30 border-b border-border bg-background-primary">
  <PageContainer className="py-4">{headerContent}</PageContainer>
  </div>
  );
@@ -199,7 +174,7 @@ const StatusTabs = React.memo(({
  ], [uiCopy]);
 
  return (
- <div className="flex flex-wrap gap-1 p-1 rounded-2xl bg-slate-100/90 border border-slate-200/80 w-full lg:w-auto shadow-xs" role="tablist" aria-label={t("order_status_filters", "Sipariş durum filtreleri")}>
+ <div className="flex w-full flex-wrap gap-1 rounded bg-background-tertiary p-1 lg:w-auto" role="tablist" aria-label={t("order_status_filters", "Sipariş durum filtreleri")}>
  {tabs.map(tab => {
  const active = (statusFilter || '') === (tab.value || '');
  return (
@@ -210,10 +185,10 @@ const StatusTabs = React.memo(({
  aria-selected={active}
  id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`}
  onClick={() => setStatusFilter?.(tab.value)}
- className={`flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+ className={`flex-1 rounded px-3 py-1.5 text-sm transition-colors duration-150 sm:flex-none ${
  active
- ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/80 font-extrabold'
- : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
+ ? 'bg-background-primary font-medium text-text-primary'
+ : 'text-text-secondary hover:text-text-primary'
  }`}
  >
  {tab.label}
@@ -248,7 +223,7 @@ const SearchToolbar = React.memo(({
  <div className="flex flex-col w-full sm:w-auto relative" role="search" aria-label={t("search_orders", "Sipariş ara")}>
  <div className="flex items-center gap-2 w-full">
  <form onSubmit={onSearch} className="flex items-center relative group w-full sm:w-64 transition-all duration-300 focus-within:w-full sm:focus-within:w-80">
- <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none group-focus-within:text-slate-900 transition-colors" strokeWidth={2.5} />
+ <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" strokeWidth={1.5} aria-hidden />
  <input
  type="text"
  value={searchTerm}
@@ -257,16 +232,17 @@ const SearchToolbar = React.memo(({
  disabled={searchLoading}
  aria-invalid={Boolean(searchError)}
  aria-describedby={searchError ? 'orders-search-error' : undefined}
- className="w-full pl-9 pr-9 py-2 rounded-2xl border border-slate-200/80 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all shadow-xs"
+ aria-label={uiCopy.searchPlaceholder}
+ className="h-10 w-full rounded border border-border bg-background-primary pl-9 pr-9 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus"
  />
  {searchTerm ? (
  <button
  type="button"
- onClick={isSearchMode ? onClearSearch : () => setSearchTerm('')}
- className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+ onClick={onClearSearch}
+ className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-secondary rounded hover:bg-background-tertiary transition-colors cursor-pointer"
  aria-label={uiCopy.clear}
  >
- <X className="w-3.5 h-3.5" />
+ <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  ) : null}
  <button type="submit" className="sr-only" disabled={searchLoading || !searchTerm.trim()}>{uiCopy.searchSubmit}</button>
@@ -276,22 +252,23 @@ const SearchToolbar = React.memo(({
  onClick={() => setFiltersOpen(v => !v)}
  aria-expanded={filtersOpen}
  aria-controls={filtersPopoverId}
- className={`p-2.5 rounded-2xl border transition-all duration-200 shrink-0 shadow-xs cursor-pointer ${
+ className={`flex h-10 w-10 shrink-0 items-center justify-center rounded border transition-colors duration-150 ${
  filtersOpen
- ? 'border-slate-900 bg-slate-100 text-slate-900 ring-2 ring-slate-900/10'
- : 'border-slate-200/80 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+ ? 'border-primary text-text-primary'
+ : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
  }`}
  title={uiCopy.openFilters}
  aria-label={uiCopy.openFilters}
  >
- <SlidersHorizontal className="w-4 h-4" />
+ <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
  {filtersOpen && !isSearchMode ? (
- <div className="absolute top-full right-0 mt-2 z-20 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-lg min-w-[220px]" id={filtersPopoverId} role="region" aria-label={uiCopy.pageSizeHint}>
- <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">{uiCopy.pageSizeHint}</span>
+ <div className="absolute right-0 top-full z-20 mt-2 flex min-w-56 items-center gap-3 rounded border border-border bg-background-primary px-4 py-3 shadow-sm" id={filtersPopoverId} role="region" aria-label={uiCopy.pageSizeHint}>
+ <span className="text-sm text-text-secondary">{uiCopy.pageSizeHint}</span>
  <select
- className="px-3 py-1.5 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-900/10 flex-1 cursor-pointer"
+ aria-label={uiCopy.pageSizeHint}
+ className="h-9 flex-1 rounded border border-border bg-background-primary px-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
  value={pagination?.size ?? ORDER_DEFAULTS.INITIAL_PAGE_SIZE}
  onChange={e => onPageSizeChange(Number(e.target.value))}
  >
@@ -304,7 +281,7 @@ const SearchToolbar = React.memo(({
  </div>
  ) : null}
  {searchError ? (
- <div id="orders-search-error" role="status" aria-live="polite" className="absolute top-full right-0 mt-2 z-20 px-4 py-2.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-semibold text-rose-800 shadow-lg max-w-xs">
+ <div id="orders-search-error" role="status" aria-live="polite" className="absolute right-0 top-full z-20 mt-2 max-w-xs rounded border border-border bg-background-primary px-4 py-2.5 text-sm text-status-error-text shadow-sm">
  {searchError}
  </div>
  ) : null}
@@ -313,84 +290,34 @@ const SearchToolbar = React.memo(({
 });
 
 const OrderItemSkeleton = () => (
- <div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs animate-pulse overflow-hidden">
- <div className="flex gap-4 sm:gap-6 items-start">
- <div className="flex -space-x-3 shrink-0">
- <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-200 border-2 border-white shadow-xs" />
- <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-100 border-2 border-white shadow-xs" />
+ <div className="flex items-start gap-4 rounded border border-border bg-background-primary p-5">
+ <Skeleton className="h-16 w-16 shrink-0" />
+ <div className="flex-1 space-y-3 pt-1">
+ <Skeleton className="h-4 w-44 max-w-full" />
+ <Skeleton className="h-4 w-32" />
  </div>
- <div className="flex-1 space-y-3 min-w-0 pt-1">
- <div className="h-4 w-44 max-w-full bg-slate-200 rounded-lg" />
- <div className="h-5 w-24 bg-slate-100 rounded-full" />
- <div className="h-3 w-32 bg-slate-100 rounded" />
- </div>
- <div className="shrink-0 text-right space-y-2 pt-1">
- <div className="h-3 w-10 bg-slate-100 rounded ml-auto" />
- <div className="h-7 w-24 bg-slate-200 rounded-xl ml-auto" />
- </div>
- </div>
+ <Skeleton className="h-6 w-24 shrink-0" />
  </div>
 );
 
-const Pagination = React.memo(({
- pagination,
- isSearchMode,
- loading,
- onPageChange,
- onPageSizeChange,
- uiCopy
-}) => {
- if (isSearchMode || loading) return null;
- const slice = getListPaginationSlice(pagination);
+const OrdersPagination = ({ pagination, hidden, onPageChange, onPageSizeChange }) => {
+ const slice = hidden ? null : getListPaginationSlice(pagination);
  if (!slice) return null;
- const {
- currentPage,
- totalPages,
- pageSize,
- totalElements,
- startItem,
- endItem
- } = slice;
-
  return (
- <div className="flex items-center justify-between flex-wrap gap-4 mt-8 pt-6 border-t border-slate-200/80">
- <p className="text-xs text-slate-500 font-semibold tabular-nums">{uiCopy.paginationShowing(startItem, endItem, totalElements)}</p>
- <div className="flex items-center gap-2 flex-wrap">
- <button
- type="button"
- onClick={() => onPageChange(Math.max(0, currentPage - 1))}
- disabled={currentPage === 0 || totalPages <= 1}
- className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-200/80 bg-white text-xs font-extrabold uppercase tracking-wider text-slate-700 hover:bg-slate-50 hover:border-slate-300 disabled:opacity-40 shadow-xs transition-all cursor-pointer"
- >
- {uiCopy.paginationPrev}
- </button>
- <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 tabular-nums px-2">
- {uiCopy.paginationPage(currentPage + 1, totalPages)}
- </span>
- <button
- type="button"
- onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))}
- disabled={currentPage >= totalPages - 1 || totalPages <= 1}
- className="inline-flex items-center px-4 py-2 rounded-xl border border-slate-900 bg-slate-900 text-xs font-extrabold uppercase tracking-wider text-white hover:bg-slate-800 disabled:opacity-40 shadow-xs transition-all cursor-pointer"
- >
- {uiCopy.paginationNext}
- </button>
- <span className="hidden sm:inline w-px h-5 bg-slate-200 mx-1" />
- <select
- className="px-3 py-2 text-xs font-bold text-slate-800 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/10 shadow-xs cursor-pointer transition-all"
- value={pageSize}
- onChange={e => onPageSizeChange(Number(e.target.value))}
- >
- {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map(option => (
- <option key={option} value={option}>
- {uiCopy.paginationPerPage(option)}
- </option>
- ))}
- </select>
- </div>
- </div>
+ <DataPagination
+ shouldShowPagination
+ currentPage={slice.currentPage}
+ totalPages={slice.totalPages}
+ startItem={slice.startItem}
+ endItem={slice.endItem}
+ totalItems={slice.totalElements}
+ pageSize={slice.pageSize}
+ pageSizeOptions={ORDER_DEFAULTS.PAGE_SIZE_OPTIONS}
+ onPageChange={onPageChange}
+ onPageSizeChange={onPageSizeChange}
+ />
  );
-});
+};
 
 const UnifiedOrderItem = React.memo(({
  viewMode,
@@ -433,20 +360,6 @@ const UnifiedOrderItem = React.memo(({
  const displayedItems = items.slice(0, 3);
  const extraCount = items.length > 3 ? items.length - 3 : 0;
 
- const statusDotColor = {
- [ORDER_STATUSES.COMPLETED]: 'bg-slate-800',
- [ORDER_STATUSES.DELIVERED]: 'bg-slate-800',
- [ORDER_STATUSES.SHIPPED]: 'bg-blue-500',
- [ORDER_STATUSES.PROCESSING]: 'bg-amber-500',
- [ORDER_STATUSES.CONFIRMED]: 'bg-slate-800',
- [ORDER_STATUSES.PENDING]: 'bg-slate-400',
- [ORDER_STATUSES.CANCELLED]: 'bg-rose-500',
- [ORDER_STATUSES.REFUNDED]: 'bg-rose-500',
- [ORDER_STATUSES.MEETUP_PENDING]: 'bg-amber-500',
- [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'bg-slate-800',
- [ORDER_STATUSES.VERIFICATION_LOCKED]: 'bg-purple-600'
- }[statusKey(order.status)] || 'bg-slate-400';
-
  let primaryAction = null;
  if (isBuyer) {
  if (isShipped) {
@@ -457,9 +370,9 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onOpenOrder(order);
  }}
- className={`${orderActionBtnBase} bg-blue-600 text-white hover:bg-blue-700`}
+ className={buttonClasses('primary', 'sm')}
  >
- <Truck className="w-3.5 h-3.5" />
+ <Truck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{uiCopy.trackShipment}</span>
  </button>
  );
@@ -471,9 +384,9 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onCompleteOrder(order.id, e);
  }}
- className={`${orderActionBtnBase} bg-slate-900 text-white hover:bg-slate-900`}
+ className={buttonClasses('primary', 'sm')}
  >
- <CircleCheck className="w-3.5 h-3.5" />
+ <CircleCheck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{uiCopy.confirmReceipt}</span>
  </button>
  );
@@ -486,28 +399,14 @@ const UnifiedOrderItem = React.memo(({
  if (onOpenQuickReview) onOpenQuickReview(order);
  else onOpenOrder(order);
  }}
- className={`${orderActionBtnBase} bg-amber-500 text-slate-950 hover:bg-amber-400`}
+ className={buttonClasses('secondary', 'sm')}
  >
- <Star className="w-3.5 h-3.5 fill-current" />
+ <Star className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{uiCopy.reviewNow}</span>
  </button>
  );
  }
  }
-
- const accentBorder = {
- [ORDER_STATUSES.COMPLETED]: 'border-l-emerald-500',
- [ORDER_STATUSES.DELIVERED]: 'border-l-emerald-500',
- [ORDER_STATUSES.SHIPPED]: 'border-l-blue-500',
- [ORDER_STATUSES.PROCESSING]: 'border-l-amber-500',
- [ORDER_STATUSES.CONFIRMED]: 'border-l-emerald-400',
- [ORDER_STATUSES.PENDING]: 'border-l-slate-300',
- [ORDER_STATUSES.CANCELLED]: 'border-l-rose-500',
- [ORDER_STATUSES.REFUNDED]: 'border-l-rose-500',
- [ORDER_STATUSES.MEETUP_PENDING]: 'border-l-amber-500',
- [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'border-l-emerald-500',
- [ORDER_STATUSES.VERIFICATION_LOCKED]: 'border-l-purple-600'
- }[statusKey(order.status)] || 'border-l-slate-300';
 
  return (
  <article
@@ -522,28 +421,28 @@ const UnifiedOrderItem = React.memo(({
  }
  }}
  aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`}
- className={`group relative rounded-3xl border border-slate-200/80 bg-white shadow-xs hover:shadow-md hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col sm:flex-row items-start gap-4 sm:gap-6 p-5 sm:p-6 border-l-4 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 ${accentBorder}`}
+ className="group relative flex cursor-pointer flex-col items-start gap-4 overflow-hidden rounded border border-border bg-background-primary p-5 transition-colors duration-150 hover:border-card-border-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:flex-row sm:gap-6"
  >
  {/* Thumbnails */}
  <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-0.5">
  {displayedItems.map((item, i) => (
  <div
  key={item.id || i}
- className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 border-white shadow-xs overflow-hidden bg-slate-50 relative group-hover:scale-105 transition-transform"
+ className="relative h-14 w-14 overflow-hidden rounded border-2 border-background-primary bg-background-secondary sm:h-16 sm:w-16"
  style={{ zIndex: 30 - i * 10 }}
  >
  {item.listing?.imageUrl ? (
  <img src={item.listing.imageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
  ) : (
- <div className="w-full h-full flex items-center justify-center bg-slate-100">
- <Package className="w-5 h-5 text-slate-400" />
+ <div className="flex h-full w-full items-center justify-center">
+ <Package className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
  </div>
  )}
  </div>
  ))}
  {extraCount > 0 && (
- <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 border-white shadow-xs flex items-center justify-center bg-slate-100 relative z-0">
- <span className="text-xs font-extrabold text-slate-600">+{extraCount}</span>
+ <div className="relative z-0 flex h-14 w-14 items-center justify-center rounded border-2 border-background-primary bg-background-tertiary sm:h-16 sm:w-16">
+ <span className="text-sm tabular-nums text-text-secondary">+{extraCount}</span>
  </div>
  )}
  </div>
@@ -558,7 +457,8 @@ const UnifiedOrderItem = React.memo(({
  onChange={e => setEditingOrderName(e.target.value)}
  onClick={e => e.stopPropagation()}
  onKeyDown={e => e.stopPropagation()}
- className="w-40 sm:w-52 px-3 py-1.5 text-xs font-bold text-slate-900 border border-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 bg-white shadow-xs"
+ aria-label={t("order_name", "Sipariş Adı")}
+ className="h-9 w-40 rounded border border-border-focus bg-background-primary px-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus sm:w-52"
  placeholder={t("order_name", "Sipariş Adı")}
  maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
  autoFocus
@@ -569,10 +469,10 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onSaveOrderName(order.id, e);
  }}
- className="p-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-900 shadow-xs transition-colors cursor-pointer"
- title={t("save", "Kaydet")}
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-9"
+ aria-label={t("save", "Kaydet")}
  >
- <CheckCircle className="w-4 h-4" />
+ <Check className="h-4 w-4" strokeWidth={1.5} />
  </button>
  <button
  type="button"
@@ -580,20 +480,20 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onCancelEditName();
  }}
- className="p-1.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
- title={t("cancel", "İptal")}
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 w-9"
+ aria-label={t("cancel", "İptal")}
  >
- <X className="w-4 h-4" />
+ <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
  ) : (
  <div className="flex flex-wrap items-center gap-2">
- <span className="text-sm font-extrabold text-slate-900 tracking-tight truncate max-w-[200px] sm:max-w-xs">
+ <span className="max-w-xs truncate text-sm font-medium text-text-primary">
  {order.name || uiCopy.orderCardTitleFallback}
  </span>
 
- <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider border ${getOrderStatusBadgeClass(order.status)}`}>
- <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDotColor} ${order.status === ORDER_STATUSES.PROCESSING ? 'animate-pulse' : ''}`} aria-hidden />
+ <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
  {statusLabel}
  </span>
 
@@ -604,24 +504,24 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onStartEditName(order, e);
  }}
- className="p-1 text-slate-300 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
- title={t("rename_order", "Siparişi İsimlendir")}
+ className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 hover:text-text-primary focus-visible:opacity-100 group-hover:opacity-100"
+ aria-label={t("rename_order", "Siparişi İsimlendir")}
  >
- <Pencil className="w-3.5 h-3.5" />
+ <Pencil className="h-4 w-4" strokeWidth={1.5} />
  </button>
  ) : null}
  </div>
  )}
 
  {/* Meta: date & count */}
- <div className="flex items-center gap-2 text-xs text-slate-400 tabular-nums font-medium">
+ <div className="flex items-center gap-2 text-sm tabular-nums text-text-tertiary">
  <time dateTime={order.createdAt || undefined}>{formatLongDate(order.createdAt, uiCopy.locale)}</time>
- <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" aria-hidden />
+ <span className="w-1 h-1 rounded-full bg-secondary-300 shrink-0" aria-hidden />
  <span>{uiCopy.itemsSummary ? uiCopy.itemsSummary(items.length) : `${items.length} ürün`}</span>
  </div>
 
  {/* Order number */}
- <p className="text-[11px] text-slate-400 font-bold tracking-tight">
+ <p className="text-sm tabular-nums text-text-tertiary">
  #{order.orderNumber}
  </p>
  </div>
@@ -629,8 +529,8 @@ const UnifiedOrderItem = React.memo(({
  {/* Right: Price & Actions */}
  <div className="shrink-0 flex z-10 mt-1 sm:mt-0 w-full sm:w-auto flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3">
  <div className="flex flex-col items-start sm:items-end">
- <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">{uiCopy.totalLabel}</span>
- <span className={`text-lg sm:text-xl font-extrabold tabular-nums tracking-tight mt-0.5 ${isCompleted ? 'text-slate-900' : 'text-slate-900'}`}>
+ <span className="text-sm text-text-tertiary">{uiCopy.totalLabel}</span>
+ <span className="mt-0.5 text-lg font-semibold tabular-nums text-text-primary">
  {formatCurrency(displayTotal, currency)}
  </span>
  </div>
@@ -639,9 +539,9 @@ const UnifiedOrderItem = React.memo(({
  {primaryAction ? (
  primaryAction
  ) : (
- <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 group-hover:text-slate-900 transition-colors" aria-hidden>
+ <span className="inline-flex items-center gap-1 text-sm text-text-tertiary transition-colors group-hover:text-text-primary" aria-hidden>
  <span>{uiCopy.detail}</span>
- <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+ <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
  </span>
  )}
  </div>
@@ -706,25 +606,22 @@ const OrdersListLayout = ({
  }, [flow.search, flow.loading, flow.orders?.length, flow.pagination]);
 
  const topSlot = isSellerView && !flow.escrow.isLoading ? (
- <div className={`p-5 rounded-3xl border ${flow.escrow.pendingEscrowAmount > 0 ? 'bg-white border-slate-200/80 shadow-xs' : 'bg-slate-50/60 border-slate-200/60'}`}>
- <div className="flex items-start gap-3.5">
- <div className="p-2.5 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200 shrink-0">
- <Wallet className="w-5 h-5" />
- </div>
- <div className="flex-1 min-w-0">
+ <div className="rounded border border-border bg-background-primary p-5">
+ <div>
+ <div className="min-w-0">
  <div className="flex items-baseline gap-2 mb-0.5">
- <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">{uiCopy.escrowLabel}</span>
- <span className={`text-xl font-extrabold tabular-nums tracking-tight ${flow.escrow.pendingEscrowAmount > 0 ? 'text-slate-900' : 'text-slate-400'}`}>
+ <span className="text-sm text-text-secondary">{uiCopy.escrowLabel}</span>
+ <span className={`text-xl font-semibold tabular-nums ${flow.escrow.pendingEscrowAmount > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
  {formatCurrency(flow.escrow.pendingEscrowAmount)}
  </span>
  </div>
- <p className="text-xs text-slate-500 font-medium mb-0">
+ <p className="text-sm text-text-tertiary">
  {flow.escrow.pendingEscrowAmount > 0 ? uiCopy.escrowHintPending : uiCopy.escrowHintEmpty}
  </p>
 
  {flow.escrow.pendingEscrowAmount > 0 && flow.orders.length > 0 ? (
- <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
- <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">{uiCopy.escrowByOrder}</div>
+ <div className="mt-4 pt-3 border-t border-border-light space-y-2">
+ <div className="text-sm text-text-secondary">{uiCopy.escrowByOrder}</div>
  {flow.orders.filter(order => (parseFloat(order.escrowAmount) || 0) > 0).map(order => {
  const escrowAmt = parseFloat(order.escrowAmount) || 0;
  const deliveredAt = order.shipping?.deliveredAt;
@@ -740,23 +637,23 @@ const OrdersListLayout = ({
  tooltipText = `~${h} saat içinde aktarılacak.`;
  }
  return (
- <div key={order.id} className="flex items-center justify-between text-xs">
+ <div key={order.id} className="flex items-center justify-between text-sm">
  <div className="flex items-center gap-1.5">
  <button
  type="button"
  onClick={() => flow.modal.openOrderModal(order)}
- className="text-slate-700 hover:text-slate-900 font-bold truncate max-w-[14rem] text-left cursor-pointer"
+ className="max-w-56 truncate text-left text-text-secondary hover:text-text-primary"
  >
  {order.name || uiCopy.orderCardTitleFallback}
  </button>
  <div className="relative group">
- <Info className="w-3 h-3 text-slate-400 cursor-help" />
- <div className="absolute left-0 bottom-full mb-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-50 w-48 p-2 bg-slate-900 text-white text-[10px] font-medium rounded-xl shadow-lg">
+ <Info className="h-4 w-4 cursor-help text-text-muted" strokeWidth={1.5} aria-label={tooltipText} />
+ <div className="invisible absolute bottom-full left-0 z-50 mb-2 w-48 rounded bg-primary p-2 text-xs text-white opacity-0 shadow-sm group-hover:visible group-hover:opacity-100">
  {tooltipText}
  </div>
  </div>
  </div>
- <span className="font-extrabold text-slate-900">{formatCurrency(escrowAmt, order.currency)}</span>
+ <span className="font-medium tabular-nums text-text-primary">{formatCurrency(escrowAmt, order.currency)}</span>
  </div>
  );
  })}
@@ -768,7 +665,7 @@ const OrdersListLayout = ({
  ) : null;
 
  return (
- <div className="min-h-screen bg-slate-50/50 relative pb-20 font-sans">
+ <div className="relative min-h-screen bg-background-secondary pb-20">
  <Header
  title={title}
  subtitle={subtitle}
@@ -782,14 +679,15 @@ const OrdersListLayout = ({
 
  <PageContainer className={containerClassName || 'py-6'}>
  {banner ? (
- <div className="mb-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-slate-100 border border-slate-300 text-slate-900 text-xs font-bold shadow-xs">
- <Sparkles className="w-3.5 h-3.5 text-slate-900" />
+ <div className="mb-5 flex items-center gap-2 text-sm text-text-secondary">
  <span>{uiCopy.nameBannerTitle}</span>
  <button
+ type="button"
  onClick={flow.ui.dismissNameBanner}
- className="ml-2 p-0.5 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+ aria-label={uiCopy.nameBannerOk}
+ className="rounded p-1 text-text-muted transition-colors hover:text-text-primary"
  >
- <X className="w-3 h-3" />
+ <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
  ) : null}
@@ -797,7 +695,7 @@ const OrdersListLayout = ({
  {topSlot ? <div className="mb-6">{topSlot}</div> : null}
 
  {/* Segmented Delivery Method Switcher */}
- <div className="mb-6 flex p-1 rounded-2xl bg-slate-200/60 border border-slate-200/80 max-w-md shadow-xs">
+ <div className="mb-6 flex max-w-md rounded bg-background-tertiary p-1">
  {['ALL', 'CARGO', 'SAFE_MEETUP'].map(method => {
  const isActive = deliveryMethodFilter === method;
  const label = {
@@ -810,10 +708,11 @@ const OrdersListLayout = ({
  key={method}
  type="button"
  onClick={() => setDeliveryMethodFilter(method)}
- className={`flex-1 py-2 rounded-xl text-xs font-extrabold tracking-wider uppercase transition-all duration-200 cursor-pointer ${
+ aria-pressed={isActive}
+ className={`flex-1 rounded py-2 text-sm transition-colors duration-150 ${
  isActive
- ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200/60'
- : 'text-slate-500 hover:text-slate-900'
+ ? 'bg-background-primary font-medium text-text-primary'
+ : 'text-text-secondary hover:text-text-primary'
  }`}
  >
  {label}
@@ -824,7 +723,7 @@ const OrdersListLayout = ({
 
  {flow.search ? (
  <>
- <div className="mb-6 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-white p-3 rounded-3xl border border-slate-200/80 shadow-xs">
+ <div className="mb-6 flex flex-col items-stretch justify-between gap-3 rounded border border-border bg-background-primary p-3 lg:flex-row lg:items-center">
  <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
  <SearchToolbar
  search={flow.search}
@@ -839,7 +738,7 @@ const OrdersListLayout = ({
  </div>
  {topListSummarySlice ? (
  <div className="flex justify-end -mt-3 mb-4 px-2">
- <p className="text-xs text-slate-400 font-semibold tabular-nums">
+ <p className="text-sm tabular-nums text-text-tertiary">
  {uiCopy.paginationShowing(topListSummarySlice.startItem, topListSummarySlice.endItem, topListSummarySlice.totalElements)}
  </p>
  </div>
@@ -849,29 +748,21 @@ const OrdersListLayout = ({
 
  {flow.loading ? (
  <div className="space-y-3.5">
- {[...Array(isSellerView ? 2 : 3)].map((_, i) => <OrderItemSkeleton key={i} />)}
+ {(isSellerView ? ['a', 'b'] : ['a', 'b', 'c']).map(k => <OrderItemSkeleton key={k} />)}
+ </div>
+ ) : flow.error ? (
+ <div role="alert" className="flex flex-col items-start gap-3 rounded border border-border bg-background-primary p-5 sm:flex-row sm:items-center sm:justify-between">
+ <p className="text-sm text-status-error-text">{flow.error}</p>
+ <Button variant="secondary" size="sm" onClick={flow.refreshAll}>{t("try_again", "Try again")}</Button>
  </div>
  ) : !displayedOrders?.length && !flow.search?.isSearchMode ? (
- <div className="py-20 text-center rounded-3xl border border-dashed border-slate-200 bg-white shadow-xs relative overflow-hidden">
- <div className="relative flex flex-col items-center max-w-sm mx-auto px-4">
- <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4 shadow-xs">
- <Package className="w-8 h-8 text-slate-400" />
- </div>
- <h3 className="text-sm font-extrabold text-slate-900 mb-1">{emptyText || (isSellerView ? 'Henüz satışınız yok' : 'Henüz siparişiniz bulunmuyor')}</h3>
- <p className="text-xs text-slate-500 mb-6 font-medium leading-relaxed">
- {isSellerView ? 'Satışa çıkardığınız ürünler alıcı bulduğunda burada listelenecektir.' : 'Binlerce avantajlı ikinci el ilanı keşfedin ve ilk siparişinizi oluşturun.'}
- </p>
- {isBuyerView && emptyAction ? (
- <button
- type="button"
- onClick={emptyAction}
- className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-extrabold uppercase tracking-wider hover:bg-slate-900 shadow-xs transition-all cursor-pointer active:scale-95"
- >
- {uiCopy.startShopping}
- </button>
- ) : null}
- </div>
- </div>
+ <EmptyState
+ icon={Package}
+ title={emptyText || (isSellerView ? 'Henüz satışınız yok' : 'Henüz siparişiniz bulunmuyor')}
+ description={isSellerView ? 'Satışa çıkardığınız ürünler alıcı bulduğunda burada listelenecektir.' : 'Binlerce avantajlı ikinci el ilanı keşfedin ve ilk siparişinizi oluşturun.'}
+ primaryAction={isBuyerView && emptyAction ? { label: uiCopy.startShopping, onClick: emptyAction } : undefined}
+ className="py-16"
+ />
  ) : (
  <div className="space-y-3.5">
  {(displayedOrders || []).map(order => (
@@ -882,7 +773,6 @@ const OrdersListLayout = ({
  enums={enums}
  onOpenOrder={flow.modal.openOrderModal}
  onOpenQuickReview={flow.reviewQuick?.openForOrder}
- onOpenReceipt={flow.receipt.openReceipt}
  onCompleteOrder={flow.actions.completeOrder}
  onReorder={onReorderListing}
  editingOrderId={flow.ui.editingOrderId}
@@ -892,21 +782,18 @@ const OrdersListLayout = ({
  onCancelEditName={flow.actions.cancelEditOrderName}
  onSaveOrderName={flow.actions.saveOrderName}
  uiCopy={uiCopy}
- isReviewed={Boolean(flow.reviews?.reviewedOrderIds?.[order.id])}
- reviewSummary={flow.reviews?.reviewedOrderSummaries?.[order.id]}
+ isReviewed={Boolean(flow.reviews.reviewedOrderSummaries[order.id])}
  />
  </div>
  ))}
  </div>
  )}
 
- <Pagination
+ <OrdersPagination
  pagination={flow.pagination}
- isSearchMode={flow.search?.isSearchMode}
- loading={flow.loading}
+ hidden={flow.search?.isSearchMode || flow.loading}
  onPageChange={onPageChange}
  onPageSizeChange={onPageSizeChange}
- uiCopy={uiCopy}
  />
  </PageContainer>
 
@@ -920,8 +807,6 @@ const OrdersListLayout = ({
  isOpen={flow.modal.orderModalOpen}
  selectedOrderId={flow.modal.selectedOrder?.id}
  selectedOrder={flow.modal.selectedOrder}
- orderReviews={flow.reviews.orderReviews}
- reviewsLoading={flow.reviews.reviewsLoading}
  onClose={flow.modal.closeOrderModal}
  onOpenReceipt={flow.receipt.openReceipt}
  onReviewSuccess={flow.actions.handleReviewSuccess}
@@ -939,6 +824,4 @@ const OrdersListLayout = ({
  );
 };
 
-OrdersListLayout.Header = Header;
-OrdersListLayout.Pagination = Pagination;
 export default OrdersListLayout;

@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { offerService } from '../services/offerService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
@@ -84,7 +83,6 @@ const MakeOfferModal = ({
  setQuantity(e.target.value);
  setSelectedPreset(null);
  };
- if (!isOpen) return null;
  const handleSubmit = async e => {
  e.preventDefault();
  e.stopPropagation();
@@ -120,80 +118,56 @@ const MakeOfferModal = ({
  setIsSubmitting(false);
  }
  };
- const modal = <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/45 px-4 backdrop-blur-[2px]" onMouseDown={e => {
- if (e.target === e.currentTarget) onClose?.();
- }}>
- <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border-light/90 bg-background-primary shadow-2xl shadow-slate-900/15 ring-1 ring-slate-950/5" role="dialog" aria-modal="true" aria-labelledby="make-offer-title">
- <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-5 py-4">
- <div className="min-w-0 border-l-[3px] border-primary pl-3">
- <h2 id="make-offer-title" className="text-lg font-semibold text-text-primary tracking-tight">{t("make_offer")}</h2>
- <p className="mt-0.5 line-clamp-2 text-sm text-slate-600">{listingTitle}</p>
- </div>
- <button type="button" onClick={onClose} className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800" aria-label={t("close")}>
- <X className="h-5 w-5" strokeWidth={2} />
- </button>
- </div>
-
- <form onSubmit={handleSubmit} className="space-y-5 p-5">
+ return <Modal isOpen={isOpen} onClose={onClose} title={t("make_offer")} size="md" footer={<>
+ <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>{t("cancel")}</Button>
+ <Button type="submit" form="make-offer-form" disabled={isSubmitting}>{isSubmitting ? 'Sending…' : 'Send offer'}</Button>
+ </>}>
+ <p className="mb-4 line-clamp-2 text-sm text-text-secondary">{listingTitle}</p>
+ <form id="make-offer-form" onSubmit={handleSubmit} noValidate className="space-y-5">
  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
- <label htmlFor="offer-qty" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t("quantity")}</label>
- <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+ <label htmlFor="offer-qty" className="mb-1 block text-sm font-medium text-text-primary">{t("quantity")}</label>
+ <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
  </div>
  <div>
- <label htmlFor="offer-total" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t("total_offer_price")}</label>
- <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className="w-full rounded-xl border border-border-light bg-background-primary px-3 py-2.5 text-sm text-text-primary shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
+ <label htmlFor="offer-total" className="mb-1 block text-sm font-medium text-text-primary">{t("total_offer_price")}</label>
+ <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
  </div>
  </div>
 
- {recommendedOffers.length > 0 ? <div className="rounded-xl border border-border-light bg-slate-50/80 p-4">
- <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
- <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("recommended_offer")}</span>
- {listTotal != null ? <span className="text-xs text-slate-500">{t("list_total")} ({qtyNum}{t("unit")}){' '}
- <span className="font-semibold text-slate-800">{formatCurrency(listTotal, currency)}</span>
- </span> : null}
+ {recommendedOffers.length > 0 ? <fieldset>
+ <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+ <legend className="text-sm font-medium text-text-primary">{t("recommended_offer")}</legend>
+ {listTotal != null ? <span className="text-xs tabular-nums text-text-tertiary">{t("list_total")} ({qtyNum}{t("unit")}){' '}{formatCurrency(listTotal, currency)}</span> : null}
  </div>
- <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+ <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
  {recommendedOffers.map(rec => {
  const active = selectedPreset === rec.key;
  const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
- return <button key={rec.key} type="button" onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-xl border px-4 py-3 text-left transition ${active ? 'border-primary bg-primary/5 ring-1 ring-primary/25' : 'border-border-light bg-background-primary hover:border-slate-300 hover:bg-slate-50'}`}>
- <span className="text-caption font-semibold uppercase tracking-wide text-slate-500">{rec.title}</span>
- <span className="mt-1 text-lg font-bold tabular-nums text-text-primary">
- {formatCurrency(rec.amount, currency)}
- </span>
- <span className="mt-1 text-xs text-slate-500">
+ return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'}`}>
+ <span className="text-xs text-text-secondary">{rec.title}</span>
+ <span className="mt-1 text-lg font-semibold tabular-nums text-text-primary">{formatCurrency(rec.amount, currency)}</span>
+ <span className="mt-1 text-xs text-text-tertiary">
  {rec.hint}
- {saveVsList != null && saveVsList > 0 ? <span className="text-highlight">{t("save")}{formatCurrency(saveVsList, currency)}</span> : null}
+ {saveVsList != null && saveVsList > 0 ? <span className="tabular-nums"> · {t("save")}{formatCurrency(saveVsList, currency)}</span> : null}
  </span>
  </button>;
  })}
  </div>
- <p className="mt-3 text-caption leading-relaxed text-slate-500">{t("each_option_fills_your_offer_with_a_tota")}</p>
- </div> : listingUnitPrice == null ? <p className="rounded-xl border border-amber-200/80 bg-status-warning-bg/60 px-3 py-2 text-xs text-amber-900">{t("list_price_unavailable_enter_your_total_")}</p> : null}
+ <p className="mt-2 text-xs text-text-tertiary">{t("each_option_fills_your_offer_with_a_tota")}</p>
+ </fieldset> : listingUnitPrice == null ? <p className="text-sm text-status-warning-text">{t("list_price_unavailable_enter_your_total_")}</p> : null}
 
- <div className="rounded-xl border border-slate-100 bg-background-primary px-4 py-3 shadow-sm ring-1 ring-slate-950/5">
- <p className="text-xs leading-relaxed text-slate-600">{t("offering_for")}<span className="font-semibold text-text-primary">{qtyNum}</span>{t("item_s")}{previewTotal != null && <>
- {' '}{t("your_total")}<span className="font-semibold text-text-primary">{formatCurrency(previewTotal, currency)}</span>
+ <p className="border-t border-border-light pt-4 text-sm text-text-secondary">{t("offering_for")}<span className="font-medium tabular-nums text-text-primary">{qtyNum}</span>{t("item_s")}{previewTotal != null && <>
+ {' '}{t("your_total")}<span className="font-medium tabular-nums text-text-primary">{formatCurrency(previewTotal, currency)}</span>
  </>}
  {listingUnitPrice != null && <>
  {' '}{t("unit_on_listing")}{' '}
- <span className="font-semibold text-text-primary">{formatCurrency(listingUnitPrice, currency)}</span>
+ <span className="font-medium tabular-nums text-text-primary">{formatCurrency(listingUnitPrice, currency)}</span>
  </>}
  </p>
- </div>
 
- {error ? <div className="text-sm font-medium text-status-error-text">{error}</div> : null}
-
- <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
- <button type="button" onClick={onClose} className="rounded-xl border border-border-light px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" disabled={isSubmitting}>{t("cancel")}</button>
- <button type="submit" className="rounded-xl bg-btn-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-btn-primary-hover disabled:opacity-60" disabled={isSubmitting}>
- {isSubmitting ? 'Sending…' : 'Send offer'}
- </button>
- </div>
+ {error ? <p role="alert" className="text-sm text-status-error-text">{error}</p> : null}
  </form>
- </div>
- </div>;
- return ReactDOM.createPortal(modal, document.body);
+ </Modal>;
 };
 export default MakeOfferModal;

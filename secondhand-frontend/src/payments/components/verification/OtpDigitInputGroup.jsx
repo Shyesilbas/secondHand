@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import { useCallback } from 'react';
 import {
  OTP_CODE_LENGTH,
  sanitizeOtpInput,
@@ -87,8 +87,8 @@ const OtpDigitInputGroup = ({
  onKeyDown={(e) => handleKeyDown(index, e)}
  onPaste={handlePaste}
  aria-label={`Verification digit ${index + 1} of ${OTP_CODE_LENGTH}`}
- className={`w-11 h-12 text-center text-base rounded-xl transition-all duration-150 focus:outline-none ${
- disabled ? 'opacity-50 cursor-not-allowed border border-slate-100 bg-slate-50 text-slate-400' :
+ className={`w-11 h-12 text-center text-base rounded transition-all duration-150 focus:outline-none ${
+ disabled ? 'opacity-50 cursor-not-allowed border border-border-light bg-background-secondary text-text-muted' :
  hasValue
  ? 'border-primary bg-primary text-white border'
  : 'border border-border-light bg-background-primary text-text-primary focus:border-primary focus:ring-4 focus:ring-primary-200'
@@ -104,7 +104,7 @@ const OtpDigitInputGroup = ({
  {Array.from({length: OTP_CODE_LENGTH}, (_, i) => (
  <div
  key={i}
- className={`w-1 h-1 rounded-full transition-colors ${i < filledCount ? 'bg-gray-900' : 'bg-tertiary'}`}
+ className={`w-1 h-1 rounded-full transition-colors ${i < filledCount ? 'bg-primary' : 'bg-tertiary'}`}
  />
  ))}
  </div>

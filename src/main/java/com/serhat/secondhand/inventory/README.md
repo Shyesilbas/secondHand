@@ -46,16 +46,16 @@ sequenceDiagram
 ```
 
 ### Core Components
-1. **[InventoryRedisReservationService](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/InventoryRedisReservationService.java):**
+1. **[InventoryRedisReservationService](application/InventoryRedisReservationService.java):**
    - Coordinates in-memory stock states.
    - Executes atomic Lua scripts so that balance check, decrement, and user reservation binding occur in a single atomic Redis operation.
-2. **[InventoryService](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/InventoryService.java):**
+2. **[InventoryService](application/InventoryService.java):**
    - Manages physical PostgreSQL `inventory` entity state, reserved quantities, and available balances.
-3. **[InventoryKafkaConsumer](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/InventoryKafkaConsumer.java):**
+3. **[InventoryKafkaConsumer](application/InventoryKafkaConsumer.java):**
    - Asynchronously consumes `payment.completed.v1`.
    - Performs DB-level idempotency via `ProcessedKafkaEventRepository`.
    - Finalizes stock deduction in PostgreSQL and transitions listings to `SOLD` if stock hits zero.
-4. **[StockReservationReconciliationScheduler](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java):**
+4. **[StockReservationReconciliationScheduler](application/StockReservationReconciliationScheduler.java):**
    - Scheduled watchdog that syncs Redis caches with PostgreSQL ground-truth inventory to heal anomalies from unexpected server restarts.
 
 ---
@@ -66,7 +66,7 @@ sequenceDiagram
 - **Stock Counter:** `stock:{listingId}` — Stores the currently unreserved available stock in Redis.
 - **User Reservation:** `reservation:{userId}:{listingId}` — Stores the quantity reserved by a specific user with an explicit TTL (default 15 minutes / 900s).
 
-### Lua Scripts ([src/main/resources/scripts/](file:///Users/serhat/IdeaProjects/secondHand/src/main/resources/scripts/))
+### Lua Scripts ([src/main/resources/scripts/](../../../../../resources/scripts/))
 | Script | Purpose | Arguments / Logic |
 | :--- | :--- | :--- |
 | `reserve_stock_with_ttl.lua` | Atomically verifies stock $\ge$ requested quantity. Initializes from DB fallback if Redis key is missing. Decrements `stock:{listingId}` and writes `reservation:{userId}:{listingId}` with `EXPIRE`. | Returns remaining stock or `-1` if insufficient. |

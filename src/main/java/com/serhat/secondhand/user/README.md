@@ -22,6 +22,3 @@ The `user` domain manages user profiles, delivery/billing addresses, user badges
 
 ## Public APIs
 - Standard Profile CRUD and Address Management.
-
-## Related Knowledge
-- *(Modifications to profile rules are contained within the entity and validation services)*

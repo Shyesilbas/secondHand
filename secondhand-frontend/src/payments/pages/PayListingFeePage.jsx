@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useDraftListings, usePayListingFee } from '../hooks/useListingPaymentFlow.js';
@@ -43,8 +43,6 @@ const PayListingFeePage = () => {
  const {
  selectedListing,
  setSelectedListing,
- paymentType,
- setPaymentType,
  isProcessingPayment,
  verificationCode,
  setVerificationCode,
@@ -88,12 +86,7 @@ const PayListingFeePage = () => {
  }, [showConfirmModal, refetchPaymentMethods]);
 
  return (
- <div className="min-h-screen bg-slate-50/60 relative overflow-hidden pb-16">
- {/* Ambient background glows */}
- <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 overflow-hidden pointer-events-none z-0">
- <div className="absolute -top-24 left-1/4 w-[40rem] h-[40rem] rounded-full bg-slate-800/10 blur-[130px]" />
- <div className="absolute top-10 right-1/4 w-[30rem] h-[30rem] rounded-full bg-slate-800/10 blur-[120px]" />
- </div>
+ <div className="min-h-screen bg-background-secondary/60 relative overflow-hidden pb-16">
 
  <PageContainer className="py-4 lg:py-6 relative z-10">
  {/* Header Navigation & Banner */}
@@ -107,37 +100,37 @@ const PayListingFeePage = () => {
  <BackButton onClick={() => navigate(-1)} />
  </div>
 
- <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-slate-200/80">
+ <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-border/80">
  <div>
- <span className="text-xs font-extrabold uppercase tracking-widest text-slate-900 mb-1 block">
+ <span className="text-xs font-semibold text-text-primary mb-1 block">
  {t("checkout_marketplace")}
  </span>
- <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+ <h1 className="text-3xl font-semibold text-text-primary tracking-tight">
  {t("listing_fee_payment")}
  </h1>
- <p className="mt-1.5 text-sm text-slate-500 max-w-xl leading-relaxed">
+ <p className="mt-1.5 text-sm text-text-tertiary max-w-xl leading-relaxed">
  {t("complete_a_secure_payment_to_publish_you")}
  </p>
  </div>
 
  {/* Workflow Step Indicator */}
- <div className="flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-slate-200/80 p-2.5 rounded-2xl shadow-sm self-start md:self-auto">
- <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 text-slate-900 font-bold text-xs">
- <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-white text-[10px]">1</span>
+ <div className="flex items-center gap-2 bg-background-primary border border-border/80 p-2.5 rounded-md self-start md:self-auto">
+ <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
+ <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
  <span>Select</span>
  </div>
- <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
  </svg>
- <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-medium text-xs">
- <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-400 text-white text-[10px]">2</span>
+ <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
+ <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">2</span>
  <span>Pay Fee</span>
  </div>
- <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
  </svg>
- <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 text-slate-600 font-medium text-xs">
- <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-400 text-white text-[10px]">3</span>
+ <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
+ <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">3</span>
  <span>Published</span>
  </div>
  </div>
@@ -149,10 +142,10 @@ const PayListingFeePage = () => {
  <motion.div
  initial={{ opacity: 0 }}
  animate={{ opacity: 1 }}
- className="flex flex-col items-center justify-center py-20 bg-white/60 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-sm"
+ className="flex flex-col items-center justify-center py-20 bg-background-primary rounded-md border border-border/80"
  >
  <LoadingIndicator />
- <p className="mt-4 text-sm font-semibold text-slate-600 animate-pulse">{t("loading_listings")}...</p>
+ <p className="mt-4 text-sm font-semibold text-text-secondary animate-pulse">{t("loading_listings")}...</p>
  </motion.div>
  )}
 
@@ -170,17 +163,17 @@ const PayListingFeePage = () => {
  initial={{ opacity: 0, scale: 0.95 }}
  animate={{ opacity: 1, scale: 1 }}
  transition={{ duration: 0.3 }}
- className="rounded-3xl border border-slate-200/80 bg-white/80 backdrop-blur-xl px-8 py-16 text-center shadow-xl shadow-slate-200/50"
+ className="rounded-md border border-border/80 bg-background-primary px-8 py-16 text-center"
  >
  <EmptyState
  title={t("no_draft_listings")}
  description={
  <div className="space-y-4">
- <p className="text-slate-500">
+ <p className="text-text-tertiary">
  {t("no_draft_listings_found_you_can_create_a")}{' '}
  <button
  onClick={() => navigate(ROUTES.CREATE_LISTING)}
- className="font-bold text-slate-900 hover:text-slate-900 underline decoration-slate-300 underline-offset-4"
+ className="font-semibold text-text-primary hover:text-text-primary underline decoration-secondary-300 underline-offset-4"
  >
  {t("clicking_here")}
  </button>.

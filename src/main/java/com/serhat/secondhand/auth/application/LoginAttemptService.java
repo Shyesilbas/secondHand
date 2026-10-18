@@ -1,59 +1,42 @@
 package com.serhat.secondhand.auth.application;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Duration;
+import java.util.Locale;
 
 @Service
 public class LoginAttemptService {
 
-    private final int MAX_ATTEMPT = 5;
-    private final int LOCK_TIME_DURATION_MINUTES = 15;
-    
-    private final Map<String, LoginAttempt> attemptsCache = new ConcurrentHashMap<>();
+    private static final int MAX_ATTEMPT = 5;
+    private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
-    private static class LoginAttempt {
-        int attempts;
-        LocalDateTime lastAttempt;
-
-        LoginAttempt(int attempts, LocalDateTime lastAttempt) {
-            this.attempts = attempts;
-            this.lastAttempt = lastAttempt;
-        }
-    }
+    // Bounded and self-expiring: entries disappear LOCK_DURATION after the last failure
+    private final Cache<String, Integer> attempts = Caffeine.newBuilder()
+            .maximumSize(100_000)
+            .expireAfterWrite(LOCK_DURATION)
+            .build();
 
     public void loginSucceeded(String key) {
-        if (key != null) {
-            attemptsCache.remove(key);
-        }
+        String k = normalize(key);
+        if (k != null) attempts.invalidate(k);
     }
 
     public void loginFailed(String key) {
-        if (key == null) return;
-        
-        LoginAttempt attempt = attemptsCache.getOrDefault(key, new LoginAttempt(0, LocalDateTime.now()));
-        attempt.attempts++;
-        attempt.lastAttempt = LocalDateTime.now();
-        
-        attemptsCache.put(key, attempt);
+        String k = normalize(key);
+        if (k != null) attempts.asMap().merge(k, 1, Integer::sum);
     }
 
     public boolean isBlocked(String key) {
-        if (key == null || !attemptsCache.containsKey(key)) {
-            return false;
-        }
-        
-        LoginAttempt attempt = attemptsCache.get(key);
-        if (attempt.attempts >= MAX_ATTEMPT) {
-            if (attempt.lastAttempt.plusMinutes(LOCK_TIME_DURATION_MINUTES).isAfter(LocalDateTime.now())) {
-                return true;
-            } else {
-                attemptsCache.remove(key);
-                return false;
-            }
-        }
-        return false;
+        String k = normalize(key);
+        Integer count = k == null ? null : attempts.getIfPresent(k);
+        return count != null && count >= MAX_ATTEMPT;
+    }
+
+    // Case/whitespace variants of the same account must share one counter
+    private static String normalize(String key) {
+        return key == null ? null : key.trim().toLowerCase(Locale.ROOT);
     }
 }

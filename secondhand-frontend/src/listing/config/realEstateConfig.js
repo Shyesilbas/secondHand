@@ -1,13 +1,12 @@
-import { lazy } from 'react';
+import { Home } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const RealEstateCreateForm = lazy(() => import('../../realEstate/components/RealEstateCreateForm.jsx'));
 import { realEstateService } from '../../realEstate/services/realEstateService.js';
 import { RealEstateCreateRequestDTO } from '../../realEstate/realEstates.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
 
 export const realEstateConfig = {
  label: 'Real Estate',
- icon: '🏠',
+ icon: Home,
  description: 'Houses, apartments, land and real estate properties',
 
  detailsComponent: GenericListingDetails,
@@ -26,7 +25,6 @@ export const realEstateConfig = {
  { label: 'Furnished', key: 'furnished', format: (_listing, v) => (v ? 'Yes' : 'No') },
  ],
  },
- createComponent: RealEstateCreateForm,
  formSchema: {
  initialData: {
  ...RealEstateCreateRequestDTO,
@@ -78,7 +76,7 @@ export const realEstateConfig = {
  if (ctx.formData?.bathroomCount) ctx.setValue('bathroomCount', '');
  if (ctx.formData?.floor) ctx.setValue('floor', '');
  if (ctx.formData?.buildingAge) ctx.setValue('buildingAge', '');
- if (Boolean(ctx.formData?.furnished)) ctx.setValue('furnished', false);
+ if (ctx.formData?.furnished) ctx.setValue('furnished', false);
  } else {
  if (ctx.formData?.zoningStatus) ctx.setValue('zoningStatus', '');
  }
@@ -92,16 +90,17 @@ export const realEstateConfig = {
  },
  },
  service: {
+ create: (payload) => realEstateService.createRealEstateListing(payload),
  getById: (id) => realEstateService.getRealEstateById(id),
  update: (id, payload) => realEstateService.updateRealEstateListing(id, payload),
  },
  createFlow: {
  subtypeSelector: {
  options: [
- { value: 'KONUT', label: 'Konut (Residential)', icon: '🏠', description: 'Daire, rezidans, müstakil ev, villa...' },
- { value: 'ISYERI', label: 'İşyeri (Commercial)', icon: '🏢', description: 'Ofis, dükkan, mağaza, depo, fabrika...' },
- { value: 'ARSA', label: 'Arsa (Land)', icon: '🌳', description: 'Konut imarlı arsa, tarla, zeytinlik, bağ...' },
- { value: 'DIGER', label: 'Diğer (Other)', icon: '📦', description: 'Otopark ve diğer tüm gayrimenkuller...' }
+ { value: 'KONUT', label: 'Konut (Residential)', description: 'Daire, rezidans, müstakil ev, villa...' },
+ { value: 'ISYERI', label: 'İşyeri (Commercial)', description: 'Ofis, dükkan, mağaza, depo, fabrika...' },
+ { value: 'ARSA', label: 'Arsa (Land)', description: 'Konut imarlı arsa, tarla, zeytinlik, bağ...' },
+ { value: 'DIGER', label: 'Diğer (Other)', description: 'Otopark ve diğer tüm gayrimenkuller...' }
  ],
  queryParamKey: 'realEstateCategory',
  initialDataKey: 'realEstateCategory',
@@ -174,29 +173,6 @@ export const realEstateConfig = {
  { value: 'buildingAge', label: 'Building Age' }, { value: 'floor', label: 'Floor' },
  { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) => {
- const resolveLabel = (v) => {
- if (!v) return null;
- if (typeof v === 'string') return v;
- if (typeof v === 'object') return v.label || v.name || v.value || null;
- return null;
- };
-
- const typeLabel = resolveLabel(listing.realEstateType);
- const adTypeLabel = resolveLabel(listing.adType);
- const heatingLabel = resolveLabel(listing.heatingType);
- const ownerLabel = resolveLabel(listing.ownerType);
- const roomText = listing.roomConfigKey || (listing.roomCount ? `${listing.roomCount} Oda` : null);
-
- return [
- { label: typeLabel, icon: '🏠', show: !!typeLabel },
- { label: adTypeLabel, icon: '📋', show: !!adTypeLabel },
- { label: listing.squareMeters ? `${listing.squareMeters} m²` : null, icon: '📏', show: !!listing.squareMeters },
- { label: roomText, icon: '🚪', show: !!roomText },
- { label: heatingLabel, icon: '🔥', show: !!heatingLabel },
- { label: ownerLabel, icon: '👤', show: !!ownerLabel },
- ].filter(badge => badge.show);
- },
  defaultFilters: { minSquareMeters: 0, minRoomCount: 1 },
 };
 

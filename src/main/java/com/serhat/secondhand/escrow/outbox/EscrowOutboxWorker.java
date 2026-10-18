@@ -35,11 +35,10 @@ public class EscrowOutboxWorker {
             fixedDelayString = "${app.escrow.outbox.fixed-delay-ms:5000}",
             initialDelayString = "${app.escrow.outbox.initial-delay-ms:5000}"
     )
-    @Transactional
     public void processPendingEvents() {
         List<EscrowOutboxEvent> events = escrowOutboxRepository
                 .findByStatusInAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
-                        List.of(OutboxStatus.PENDING, OutboxStatus.FAILED),
+                        List.of(OutboxStatus.PENDING),
                         LocalDateTime.now(),
                         PageRequest.of(0, 50)
                 );
@@ -51,7 +50,7 @@ public class EscrowOutboxWorker {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processEvent(UUID eventId) {
-        EscrowOutboxEvent event = escrowOutboxRepository.findById(eventId).orElse(null);
+        EscrowOutboxEvent event = escrowOutboxRepository.findByIdForUpdate(eventId).orElse(null);
         if (event == null || event.getStatus() == OutboxStatus.PROCESSED) {
             return;
         }
@@ -61,7 +60,7 @@ public class EscrowOutboxWorker {
             escrowOutboxRepository.save(event);
 
             EscrowReleasedKafkaEvent releasedEvent = objectMapper.readValue(event.getPayload(), EscrowReleasedKafkaEvent.class);
-            escrowKafkaProducer.sendEscrowReleased(releasedEvent);
+            escrowKafkaProducer.sendEscrowReleased(releasedEvent).join();
 
             event.setStatus(OutboxStatus.PROCESSED);
             event.setProcessedAt(LocalDateTime.now());
@@ -78,7 +77,7 @@ public class EscrowOutboxWorker {
                 event.setStatus(OutboxStatus.FAILED);
                 log.error("Escrow outbox event ID: {} max attempts reached ({})", eventId, attempts);
             } else {
-                event.setStatus(OutboxStatus.FAILED);
+                event.setStatus(OutboxStatus.PENDING);
                 long delaySeconds = (long) Math.min(300, Math.pow(2, attempts) * 5);
                 event.setNextAttemptAt(LocalDateTime.now().plusSeconds(delaySeconds));
             }

@@ -36,30 +36,6 @@ export const useAgreements = (options = {}) => {
  };
 };
 
-export const useAgreementByType = (agreementType) => {
- const {
- data: agreement,
- isLoading,
- error,
- refetch
- } = useQuery({
- queryKey: AGREEMENT_KEYS.byType(agreementType),
- queryFn: () => agreementService.getAgreementByType(agreementType),
- enabled: !!agreementType,
- staleTime: 30 * 60 * 1000,
- cacheTime: 60 * 60 * 1000,
- refetchOnWindowFocus: false,
- retry: 1,
- });
-
- return {
- agreement,
- isLoading,
- error,
- refetch
- };
-};
-
 export const useUserAgreements = () => {
  const { user, isAuthenticated } = useAuthState();
  const {

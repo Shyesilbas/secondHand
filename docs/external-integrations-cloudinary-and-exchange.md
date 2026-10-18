@@ -11,11 +11,11 @@ Bu doküman, **secondHand** platformundaki **Cloudinary (Bulut Görsel Yönetimi
 ### A. Mimari Akış ve Kullanım
 * **Yükleme (`uploadImage`):**
   - İstemci `POST /api/images/upload` üzerinden `MultipartFile` gönderir.
-  - [`CloudinaryService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/cloudinary/application/CloudinaryService.java) dosyayı `secondhand/listings` klasörüne yükler ve dönen güvenli HTTPS URL'ini (`secure_url`) veritabanına kaydeder.
+  - [`CloudinaryService.java`](../src/main/java/com/serhat/secondhand/cloudinary/application/CloudinaryService.java) dosyayı `secondhand/listings` klasörüne yükler ve dönen güvenli HTTPS URL'ini (`secure_url`) veritabanına kaydeder.
 * **Silme (`deleteImage`):**
   - İlan silindiğinde veya görsel güncellendiğinde görsel URL'inden `public_id` ayrıştırılır ve Cloudinary üzerinden `destroy(publicId)` ile fiziksel olarak silinir.
 
-### B. Ortam Değişkenleri ([`application-core.yml`](file:///Users/serhat/IdeaProjects/secondHand/src/main/resources/config/application-core.yml))
+### B. Ortam Değişkenleri ([`application-core.yml`](../src/main/resources/config/application-core.yml))
 ```yaml
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
@@ -33,7 +33,7 @@ Platformda farklı para birimlerinde fiyat görüntüleme ve kur çevrimi için 
 * **Endpoint:** `GET /api/v1/exchange-rates?from=USD&to=TRY`
 * **Dış API Çağrısı:** `https://v6.exchangerate-api.com/v6/{apiKey}/pair/{base}/{target}`
 * **Önbellekleme (Tier 2 Redis Cache):**
-  - Harici API kota aşımını önlemek ve yanıt süresini < 5 ms seviyesinde tutmak için [`ExchangeRateService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/exchange/application/ExchangeRateService.java) üzerinde **2 saatlik Redis cache** devrededir:
+  - Harici API kota aşımını önlemek ve yanıt süresini < 5 ms seviyesinde tutmak için [`ExchangeRateService.java`](../src/main/java/com/serhat/secondhand/exchange/application/ExchangeRateService.java) üzerinde **2 saatlik Redis cache** devrededir:
     ```java
     @Cacheable(value = "exchangeRates", key = "#from.toUpperCase() + '_' + #to.toUpperCase()")
     public ExchangeRateDto getRate(String from, String to) { ... }

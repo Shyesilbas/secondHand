@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation, useSearchParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
+import { orderItemIds, reviewItemKey, useOrderItemReviews } from './useOrderItemReviews.js';
+import { useOrderSearch } from './useOrderSearch.js';
 import {
  ORDER_DEFAULTS,
  ORDER_MESSAGES,
@@ -15,20 +16,7 @@ import {
  ORDER_VIEW_MODES,
 } from '../constants/orderUiConstants.js';
 
-/** Normalize order-item id so review maps stay consistent across API number/string shapes. */
-const reviewItemKey = (id) =>
- id === undefined || id === null || id === '' ? null : String(id);
-
-const reviewOrderItemIdFromRow = (row) =>
- reviewItemKey(row?.orderItemId ?? row?.order_item_id);
-
-const normalizeReviewsBulkResponse = (res) => {
- if (!res) return [];
- if (Array.isArray(res)) return res;
- if (Array.isArray(res.content)) return res.content;
- if (Array.isArray(res.data)) return res.data;
- return [];
-};
+const REVIEWABLE_STATUSES = [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED];
 
 const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod }) => {
  const { user } = useAuthState();
@@ -72,39 +60,6 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod 
  };
 };
 
-export const usePendingCompletionOrders = (options = {}) => {
- const { user } = useAuthState();
- const location = useLocation();
- const enabled = options.enabled !== false && !!user?.id;
-
- const isRelevantPage =
- location.pathname.includes('/orders') ||
- location.pathname.includes('/dashboard') ||
- location.pathname === '/';
-
- const refetchInterval = isRelevantPage
- ? ORDER_TIME.PENDING_COMPLETION_REFRESH_ACTIVE_MS
- : ORDER_TIME.PENDING_COMPLETION_REFRESH_IDLE_MS;
-
- const { data, isLoading } = useQuery({
- queryKey: ORDER_QUERY_KEYS.pendingCompletion(user?.id),
- queryFn: () => orderService.getPendingCompletionStatus(),
- enabled,
- staleTime: ORDER_TIME.PENDING_COMPLETION_STALE_MS,
- gcTime: ORDER_TIME.ORDERS_QUERY_GC_MS,
- refetchInterval,
- refetchOnWindowFocus: false,
- refetchOnMount: false,
- retry: 1,
- });
-
- return {
- hasPendingOrders: data?.hasPendingOrders ?? false,
- pendingCount: data?.pendingCount ?? 0,
- loading: isLoading,
- };
-};
-
 export const usePendingEscrowAmount = (options = {}) => {
  const { user } = useAuthState();
  const enabled = options.enabled !== false && !!user?.id;
@@ -139,81 +94,26 @@ export const useOrderFlow = ({
  initialSortDirection = ORDER_DEFAULTS.SORT_DIRECTION,
 }) => {
  const mode = viewMode === ORDER_VIEW_MODES.SELLER ? ORDER_VIEW_MODES.SELLER : ORDER_VIEW_MODES.BUYER;
+ const isBuyer = mode === ORDER_VIEW_MODES.BUYER;
  const notification = useNotification();
+ const queryClient = useQueryClient();
 
  const [page, setPage] = useState(initialPage);
  const [size, setSize] = useState(initialSize);
  const [sortField, setSortField] = useState(initialSortField);
  const [sortDirection, setSortDirection] = useState(initialSortDirection);
- const [deliveryMethodFilter, setDeliveryMethodFilter] = useState('ALL');
-
- useEffect(() => {
- setPage(0);
- }, [deliveryMethodFilter]);
-
- const [searchResult, setSearchResult] = useState(null);
+ const [deliveryMethodFilter, setDeliveryMethod] = useState('ALL');
+ const [statusFilter, setStatusFilter] = useState('');
 
  const [selectedOrder, setSelectedOrder] = useState(null);
- const [orderModalOpen, setOrderModalOpen] = useState(false);
-
- const [receiptOpen, setReceiptOpen] = useState(false);
  const [receiptPayment, setReceiptPayment] = useState(null);
-
- const [orderReviews, setOrderReviews] = useState({});
- const [reviewsLoading, setReviewsLoading] = useState(false);
- const [reviewedOrderIds, setReviewedOrderIds] = useState({});
- const [reviewedOrderSummaries, setReviewedOrderSummaries] = useState({});
- const [reviewedOrderItemIds, setReviewedOrderItemIds] = useState({});
-
- const [quickReviewOpen, setQuickReviewOpen] = useState(false);
  const [quickReviewTarget, setQuickReviewTarget] = useState(null);
-
- const [searchParams, setSearchParams] = useSearchParams();
- const urlQ = searchParams.get('q') || '';
-
- const orderDetailRequestRef = useRef(0);
-
- const [searchTerm, setSearchTerm] = useState(urlQ);
- const [searchLoading, setSearchLoading] = useState(false);
- const [searchError, setSearchError] = useState(null);
- const [isSearchMode, setIsSearchMode] = useState(false);
-
- useEffect(() => {
- if (urlQ) setSearchTerm(urlQ);
- }, []);
-
- const lastUrlQ = useRef('');
- useEffect(() => {
- if (!urlQ) return;
- if (urlQ === lastUrlQ.current) return;
- lastUrlQ.current = urlQ;
- setSearchLoading(true);
- orderService.getByOrderNumber(urlQ.trim())
- .then((order) => {
- if (order) {
- setSearchOrder(order);
- setIsSearchMode(true);
- setSearchTerm('');
- setSearchError(null);
- } else {
- setSearchResult(null);
- setIsSearchMode(false);
- setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
- }
- })
- .catch(() => {
- setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
- setSearchResult(null);
- setIsSearchMode(false);
- })
- .finally(() => setSearchLoading(false));
- }, [urlQ]);
 
  const [editingOrderId, setEditingOrderId] = useState(null);
  const [editingOrderName, setEditingOrderName] = useState('');
  const [showNameBanner, setShowNameBanner] = useState(true);
- const [statusFilter, setStatusFilter] = useState('');
 
+ const search = useOrderSearch();
  const { data, loading, error, refresh } = useOrdersListQuery({
  mode,
  page,
@@ -222,119 +122,43 @@ export const useOrderFlow = ({
  direction: sortDirection,
  deliveryMethod: deliveryMethodFilter,
  });
+ const escrow = usePendingEscrowAmount({ enabled: !isBuyer });
 
- const escrow = usePendingEscrowAmount({ enabled: viewMode === ORDER_VIEW_MODES.SELLER });
-
- useEffect(() => {
- setPage(initialPage);
- setSize(initialSize);
- setSearchResult(null);
- setSearchTerm('');
- setSearchError(null);
- setIsSearchMode(false);
- setDeliveryMethodFilter('ALL');
- }, [initialPage, initialSize, viewMode]);
+ const setDeliveryMethodFilter = useCallback((method) => {
+ setDeliveryMethod(method);
+ setPage(0);
+ }, []);
 
  const ordersRaw = useMemo(() => data?.content || [], [data]);
- const ordersUnfiltered = useMemo(() => (searchResult ? [searchResult] : ordersRaw), [ordersRaw, searchResult]);
  const orders = useMemo(() => {
- if (!statusFilter) return ordersUnfiltered;
+ const list = search.searchResult ? [search.searchResult] : ordersRaw;
+ if (!statusFilter) return list;
  if (statusFilter === ORDER_STATUS_TAB_FILTER.PREPARING) {
- return ordersUnfiltered.filter((o) =>
- [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.PROCESSING].includes(o.status)
- );
+ return list.filter((o) => [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.PROCESSING].includes(o.status));
  }
  if (statusFilter === ORDER_STATUS_TAB_FILTER.DELIVERED_GROUP) {
- return ordersUnfiltered.filter((o) =>
- [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED].includes(o.status)
- );
+ return list.filter((o) => REVIEWABLE_STATUSES.includes(o.status));
  }
- return ordersUnfiltered.filter((o) => o.status === statusFilter);
- }, [ordersUnfiltered, statusFilter]);
+ return list.filter((o) => o.status === statusFilter);
+ }, [ordersRaw, search.searchResult, statusFilter]);
 
- useEffect(() => {
- let cancelled = false;
-
- const fetchListReviewState = async () => {
- if (mode === ORDER_VIEW_MODES.SELLER || !orders?.length) {
- setReviewedOrderIds({});
- setReviewedOrderSummaries({});
- setReviewedOrderItemIds({});
- return;
- }
-
- const reviewEligibleOrders = orders.filter((order) =>
- [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED].includes(order?.status)
+ // Buyer list: which delivered orders already carry a review (first reviewed item is the summary).
+ const reviewableOrders = useMemo(
+ () => (isBuyer ? orders.filter((o) => REVIEWABLE_STATUSES.includes(o?.status)) : []),
+ [isBuyer, orders]
  );
- const orderItemIds = reviewEligibleOrders.flatMap((order) =>
- (order?.orderItems || [])
- .map((item) => item?.id ?? item?.orderItemId)
- .filter((id) => id !== undefined && id !== null && id !== '')
- );
-
- if (!orderItemIds.length) {
- setReviewedOrderIds({});
- setReviewedOrderSummaries({});
- setReviewedOrderItemIds({});
- return;
- }
-
- try {
- const { reviewService } = await import('../../reviews/services/reviewService.js');
- const reviewsResponse = await reviewService.getReviewsForOrderItems(orderItemIds);
- if (cancelled) return;
-
- const reviewsList = normalizeReviewsBulkResponse(reviewsResponse);
-
- const reviewedItemLookup = {};
- reviewsList.forEach((review) => {
- const k = reviewOrderItemIdFromRow(review);
- if (!k) return;
- reviewedItemLookup[k] = true;
+ const reviewableItemIds = useMemo(() => orderItemIds(reviewableOrders), [reviewableOrders]);
+ const { reviews: listReviews } = useOrderItemReviews(reviewableItemIds);
+ const reviewedOrderSummaries = useMemo(() => {
+ const summaries = {};
+ reviewableOrders.forEach((order) => {
+ const review = (order.orderItems || [])
+ .map((item) => listReviews[reviewItemKey(item?.id ?? item?.orderItemId)])
+ .find(Boolean);
+ if (review) summaries[order.id] = { rating: review.rating, comment: review.comment };
  });
-
- const orderReviewMap = {};
- const orderReviewSummaryMap = {};
- reviewEligibleOrders.forEach((order) => {
- const firstReviewedItem = (order?.orderItems || []).find((item) => {
- const k = reviewItemKey(item?.id ?? item?.orderItemId);
- return k && reviewedItemLookup[k];
- });
- const hasReviewedItem = Boolean(firstReviewedItem);
- if (hasReviewedItem) {
- orderReviewMap[order.id] = true;
- orderReviewMap[String(order.id)] = true;
- const firstKey = reviewItemKey(firstReviewedItem?.id ?? firstReviewedItem?.orderItemId);
- const reviewDetails = reviewsList.find(
- (review) => reviewOrderItemIdFromRow(review) === firstKey
- );
- if (reviewDetails) {
- orderReviewSummaryMap[order.id] = {
- rating: reviewDetails.rating,
- comment: reviewDetails.comment,
- };
- orderReviewSummaryMap[String(order.id)] = orderReviewSummaryMap[order.id];
- }
- }
- });
-
- setReviewedOrderIds(orderReviewMap);
- setReviewedOrderSummaries(orderReviewSummaryMap);
- setReviewedOrderItemIds(reviewedItemLookup);
- } catch {
- if (!cancelled) {
- setReviewedOrderIds({});
- setReviewedOrderSummaries({});
- setReviewedOrderItemIds({});
- }
- }
- };
-
- fetchListReviewState();
- return () => {
- cancelled = true;
- };
- }, [mode, orders]);
+ return summaries;
+ }, [reviewableOrders, listReviews]);
 
  const pagination = useMemo(
  () => ({
@@ -348,13 +172,9 @@ export const useOrderFlow = ({
  [data, page, size]
  );
 
- const loadPage = useCallback(
- (newPage) => {
- if (isSearchMode) return;
- setPage(newPage);
- },
- [isSearchMode]
- );
+ const loadPage = useCallback((newPage) => {
+ if (!search.isSearchMode) setPage(newPage);
+ }, [search.isSearchMode]);
 
  const fetchOrders = useCallback((newPage, newSize, newSort, newDirection) => {
  setPage(newPage);
@@ -363,256 +183,46 @@ export const useOrderFlow = ({
  if (newDirection !== undefined) setSortDirection(newDirection);
  }, []);
 
- const setSearchOrder = useCallback((order) => {
- setSearchResult(order);
- }, []);
-
- const handleSearch = useCallback(
- async (e) => {
- e.preventDefault();
- if (!searchTerm.trim()) return;
-
- const term = searchTerm.trim();
- setSearchLoading(true);
- setSearchError(null);
-
- try {
- const order = await orderService.getByOrderNumber(term);
- if (order) {
- setSearchOrder(order);
- setIsSearchMode(true);
- setSearchTerm('');
- setSearchParams((prev) => {
- const next = new URLSearchParams(prev);
- next.set('q', term);
- return next;
- });
- } else {
- setSearchResult(null);
- setIsSearchMode(false);
- setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
- }
- } catch (err) {
- setSearchError(ORDER_MESSAGES.ORDER_NOT_FOUND);
- setSearchResult(null);
- setIsSearchMode(false);
- } finally {
- setSearchLoading(false);
- }
- },
- [searchTerm, setSearchOrder, setSearchParams]
- );
-
- const clearSearch = useCallback(() => {
- setSearchTerm('');
- setSearchError(null);
- setIsSearchMode(false);
- setSearchResult(null);
- lastUrlQ.current = '';
- setSearchParams((prev) => {
- const next = new URLSearchParams(prev);
- next.delete('q');
- return next;
- });
- refresh();
- }, [refresh, setSearchParams]);
-
  const openReceipt = useCallback(async (paymentReference) => {
  try {
- const payments = await paymentService.getMyPayments(
- ORDER_DEFAULTS.INITIAL_PAGE,
- ORDER_DEFAULTS.SEARCH_PAYMENT_FETCH_SIZE
- );
- const list = payments.content || [];
- const payment = list.find((p) => String(p.paymentId) === String(paymentReference));
- if (payment) {
- setReceiptPayment(payment);
- setReceiptOpen(true);
+ const payments = await paymentService.getMyPayments(ORDER_DEFAULTS.INITIAL_PAGE, ORDER_DEFAULTS.SEARCH_PAYMENT_FETCH_SIZE);
+ const payment = (payments.content || []).find((p) => String(p.paymentId) === String(paymentReference));
+ if (payment) setReceiptPayment(payment);
+ else notification.showError('Receipt', ORDER_MESSAGES.RECEIPT_NOT_FOUND);
+ } catch (err) {
+ notification.showError('Receipt', err?.response?.data?.message || ORDER_MESSAGES.RECEIPT_LOAD_FAILED);
  }
- } catch (e) {}
- }, []);
+ }, [notification]);
 
- const closeReceipt = useCallback(() => {
- setReceiptOpen(false);
- setReceiptPayment(null);
- }, []);
+ const closeReceipt = useCallback(() => setReceiptPayment(null), []);
+ const closeOrderModal = useCallback(() => setSelectedOrder(null), []);
+ const closeQuickReview = useCallback(() => setQuickReviewTarget(null), []);
 
- const fetchReviewsData = useCallback(async (order, detailRequestId) => {
- const stillCurrent = () => detailRequestId === undefined || orderDetailRequestRef.current === detailRequestId;
-
- if (!order?.orderItems || order.orderItems.length === 0) {
- if (stillCurrent()) setOrderReviews({});
- return;
- }
-
- setReviewsLoading(true);
- try {
- if (order.status !== ORDER_STATUSES.DELIVERED && order.status !== ORDER_STATUSES.COMPLETED) {
- if (stillCurrent()) setOrderReviews({});
- return;
- }
-
- const orderItemIds = order.orderItems
- .map((item) => item?.id ?? item?.orderItemId)
- .filter((id) => id !== undefined && id !== null && id !== '');
-
- if (!orderItemIds.length) {
- if (stillCurrent()) setOrderReviews({});
- return;
- }
-
- const { reviewService } = await import('../../reviews/services/reviewService.js');
- let reviewsRaw;
- try {
- reviewsRaw = await reviewService.getReviewsForOrderItems(orderItemIds);
- } catch {
- if (stillCurrent()) setOrderReviews({});
- return;
- }
-
- if (!stillCurrent()) return;
-
- const reviewsList = normalizeReviewsBulkResponse(reviewsRaw);
- const reviewsMap = {};
- reviewsList.forEach((review) => {
- const k = reviewOrderItemIdFromRow(review);
- if (!k) return;
- reviewsMap[k] = review;
+ const openQuickReviewForOrder = useCallback((order) => {
+ const unrated = isBuyer && (order?.orderItems || []).find((item) => {
+ const key = reviewItemKey(item?.id);
+ return key && !listReviews[key];
  });
+ if (unrated) setQuickReviewTarget({ orderItem: unrated, orderId: order.id });
+ else setSelectedOrder(order);
+ }, [isBuyer, listReviews]);
 
- setOrderReviews(reviewsMap);
- } finally {
- if (stillCurrent()) setReviewsLoading(false);
- }
- }, []);
-
- const clearReviews = useCallback(() => {
- setOrderReviews({});
- }, []);
-
- const openOrderModal = useCallback(
- async (order) => {
- const requestId = ++orderDetailRequestRef.current;
- if (mode !== ORDER_VIEW_MODES.SELLER) {
- clearReviews();
- }
- try {
- const freshOrder = mode === ORDER_VIEW_MODES.SELLER
- ? await orderService.getSellerOrderById(order.id)
- : await orderService.getById(order.id);
- if (orderDetailRequestRef.current !== requestId) return;
- setSelectedOrder(freshOrder);
- setOrderModalOpen(true);
- if (mode !== ORDER_VIEW_MODES.SELLER) {
- await fetchReviewsData(freshOrder, requestId);
- }
- } catch (e) {
- if (orderDetailRequestRef.current !== requestId) return;
- setSelectedOrder(order);
- setOrderModalOpen(true);
- if (mode !== ORDER_VIEW_MODES.SELLER) {
- await fetchReviewsData(order, requestId);
- }
- }
- },
- [mode, fetchReviewsData, clearReviews]
- );
-
- const closeOrderModal = useCallback(() => {
- setOrderModalOpen(false);
- setSelectedOrder(null);
- setReviewsLoading(false);
- setOrderReviews({});
- }, []);
-
- const closeQuickReview = useCallback(() => {
- setQuickReviewOpen(false);
- setQuickReviewTarget(null);
- }, []);
-
- const openQuickReviewForOrder = useCallback(
- (order) => {
- if (!order || mode !== ORDER_VIEW_MODES.BUYER) {
- openOrderModal(order);
- return;
- }
- const items = order.orderItems || [];
- const unrated = items.find((item) => {
- const oid = item?.id;
- if (oid === undefined || oid === null || oid === '') return false;
- const k = reviewItemKey(oid);
- return !reviewedOrderItemIds[k];
- });
- if (!unrated) {
- openOrderModal(order);
- return;
- }
- setQuickReviewTarget({ orderItem: unrated, orderId: order.id });
- setQuickReviewOpen(true);
- },
- [mode, openOrderModal, reviewedOrderItemIds]
- );
-
- const refreshSelectedOrder = useCallback(async () => {
- if (!selectedOrder?.id) return;
- const requestId = ++orderDetailRequestRef.current;
- const updatedOrder = mode === ORDER_VIEW_MODES.SELLER
- ? await orderService.getSellerOrderById(selectedOrder.id)
- : await orderService.getById(selectedOrder.id);
- if (orderDetailRequestRef.current !== requestId) return;
- setSelectedOrder(updatedOrder);
- if (mode !== ORDER_VIEW_MODES.SELLER) {
- await fetchReviewsData(updatedOrder, requestId);
- }
- }, [selectedOrder?.id, mode, fetchReviewsData]);
-
- const handleReviewSuccess = useCallback(async () => {
+ // Order list, detail and item reviews all live under the `orders` key, so one invalidation refreshes them.
+ const handleReviewSuccess = useCallback(() => {
+ queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.orders });
  refresh();
- await refreshSelectedOrder();
- }, [refresh, refreshSelectedOrder]);
+ }, [queryClient, refresh]);
 
- const handleQuickReviewCreated = useCallback(
- async (payload) => {
- const messageBody = payload?.comment?.trim()
- ? ORDER_MESSAGES.REVIEW_SUBMITTED_WITH_COMMENT
- : ORDER_MESSAGES.REVIEW_SUBMITTED_RATING_ONLY;
- notification.showSuccess(ORDER_MESSAGES.REVIEW_SUBMITTED_TITLE, messageBody);
-
- const itemId = payload?.orderItemId;
- const k = reviewItemKey(itemId);
- if (k) {
- const draft = {
- orderItemId: itemId,
- rating: payload?.rating,
- comment: payload?.comment,
- };
- setReviewedOrderItemIds((prev) => ({ ...prev, [k]: true }));
- setOrderReviews((prev) => ({ ...prev, [k]: draft }));
- }
-
- const orderId = payload?.orderId;
- if (orderId !== undefined && orderId !== null && orderId !== '') {
- const oidStr = String(orderId);
- setReviewedOrderIds((prev) => ({
- ...prev,
- [orderId]: true,
- [oidStr]: true,
- }));
- const summary = { rating: payload?.rating, comment: payload?.comment };
- setReviewedOrderSummaries((prev) => ({
- ...prev,
- [orderId]: summary,
- [oidStr]: summary,
- }));
- }
-
- await handleReviewSuccess();
- },
- [handleReviewSuccess, notification]
+ const handleQuickReviewCreated = useCallback((payload) => {
+ notification.showSuccess(
+ ORDER_MESSAGES.REVIEW_SUBMITTED_TITLE,
+ payload?.comment?.trim() ? ORDER_MESSAGES.REVIEW_SUBMITTED_WITH_COMMENT : ORDER_MESSAGES.REVIEW_SUBMITTED_RATING_ONLY
  );
+ handleReviewSuccess();
+ }, [handleReviewSuccess, notification]);
 
  const startEditOrderName = useCallback((order, e) => {
- if (e?.stopPropagation) e.stopPropagation();
+ e?.stopPropagation?.();
  setEditingOrderId(order.id);
  setEditingOrderName(order.name || '');
  }, []);
@@ -622,19 +232,19 @@ export const useOrderFlow = ({
  setEditingOrderName('');
  }, []);
 
- const saveOrderName = useCallback(
- async (orderId, e) => {
- if (e?.stopPropagation) e.stopPropagation();
+ const saveOrderName = useCallback(async (orderId, e) => {
+ e?.stopPropagation?.();
+ try {
  await orderService.updateOrderName(orderId, editingOrderName);
  cancelEditOrderName();
  refresh();
- },
- [editingOrderName, cancelEditOrderName, refresh]
- );
+ } catch (err) {
+ notification.showError('Error', err?.response?.data?.message || ORDER_MESSAGES.UPDATE_NAME_FAILED);
+ }
+ }, [editingOrderName, cancelEditOrderName, refresh, notification]);
 
- const completeOrder = useCallback(
- (orderId, e) => {
- if (e?.stopPropagation) e.stopPropagation();
+ const completeOrder = useCallback((orderId, e) => {
+ e?.stopPropagation?.();
  notification.showConfirmation(
  ORDER_MESSAGES.CONFIRM_ORDER_MODAL_TITLE,
  ORDER_MESSAGES.CONFIRM_ORDER_MODAL_BODY,
@@ -643,87 +253,47 @@ export const useOrderFlow = ({
  await orderService.completeOrder(orderId);
  refresh();
  } catch (err) {
- notification.showError(
- 'Error',
- err?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED
- );
+ notification.showError('Error', err?.response?.data?.message || ORDER_MESSAGES.COMPLETE_ORDER_FAILED);
  }
  },
- {
- confirmLabel: ORDER_MESSAGES.CONFIRM_ORDER_BUTTON,
- cancelLabel: ORDER_MESSAGES.CANCEL_ORDER_BUTTON,
- }
+ { confirmLabel: ORDER_MESSAGES.CONFIRM_ORDER_BUTTON, cancelLabel: ORDER_MESSAGES.CANCEL_ORDER_BUTTON }
  );
- },
- [notification, refresh]
- );
-
- const dismissNameBanner = useCallback(() => {
- setShowNameBanner(false);
- }, []);
+ }, [notification, refresh]);
 
  const refreshAll = useCallback(() => {
  refresh();
- if (viewMode === ORDER_VIEW_MODES.SELLER) {
- escrow.refetch();
- }
- }, [refresh, escrow, viewMode]);
+ if (!isBuyer) escrow.refetch();
+ }, [refresh, escrow, isBuyer]);
 
  return {
  viewMode,
- mode,
  orders,
- ordersRaw,
  loading,
  error: error?.message || null,
  pagination,
- page,
- size,
  deliveryMethodFilter,
  setDeliveryMethodFilter,
  sortField,
  sortDirection,
- setSortField,
- setSortDirection,
  loadPage,
  fetchOrders,
- refresh,
  refreshAll,
- setSearchOrder,
- search: {
- searchTerm,
- setSearchTerm,
- searchLoading,
- searchError,
- isSearchMode,
- handleSearch,
- clearSearch,
- statusFilter,
- setStatusFilter,
- },
+ search: { ...search, statusFilter, setStatusFilter },
  modal: {
  selectedOrder,
- setSelectedOrder,
- orderModalOpen,
- openOrderModal,
+ orderModalOpen: !!selectedOrder,
+ openOrderModal: setSelectedOrder,
  closeOrderModal,
  },
  receipt: {
- receiptOpen,
+ receiptOpen: !!receiptPayment,
  receiptPayment,
  openReceipt,
  closeReceipt,
  },
- reviews: {
- orderReviews,
- reviewsLoading,
- fetchReviewsData,
- clearReviews,
- reviewedOrderIds,
- reviewedOrderSummaries,
- },
+ reviews: { reviewedOrderSummaries },
  reviewQuick: {
- isOpen: quickReviewOpen,
+ isOpen: !!quickReviewTarget,
  target: quickReviewTarget,
  openForOrder: openQuickReviewForOrder,
  close: closeQuickReview,
@@ -734,7 +304,7 @@ export const useOrderFlow = ({
  editingOrderName,
  setEditingOrderName,
  showNameBanner,
- dismissNameBanner,
+ dismissNameBanner: () => setShowNameBanner(false),
  },
  actions: {
  handleReviewSuccess,
@@ -746,4 +316,3 @@ export const useOrderFlow = ({
  escrow,
  };
 };
-

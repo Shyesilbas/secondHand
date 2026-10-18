@@ -5,15 +5,6 @@ export const LoginRequestDTO = Object.freeze({
  rememberMe: false,
 });
 
-export const LoginResponseDTO = Object.freeze({
- message: '',
- success: false,
- userId: null,
- email: '',
- accessToken: '',
- refreshToken: '',
-});
-
 export const RegisterRequestDTO = Object.freeze({
  name: '',
  surname: '',
@@ -26,35 +17,14 @@ export const RegisterRequestDTO = Object.freeze({
  acceptedAgreementIds: [],
 });
 
-export const RegisterResponseDTO = Object.freeze({
- welcomeMessage: '',
- importantMessage: '',
- informationMessage: '',
- userId: null,
- email: '',
- name: '',
- surname: '',
-});
-
 export const ForgotPasswordRequestDTO = Object.freeze({
  email: '',
-});
-
-export const ResetPasswordRequestDTO = Object.freeze({
- token: '',
- newPassword: '',
 });
 
 export const ChangePasswordRequestDTO = Object.freeze({
  currentPassword: '',
  newPassword: '',
  confirmPassword: '',
-});
-
-export const TokenValidationResultDTO = Object.freeze({
- valid: false,
- user: null,
- message: '',
 });
 
 export const createLoginRequest = (data) => {

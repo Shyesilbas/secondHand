@@ -3,7 +3,7 @@ import { StarIcon } from './StarIcon.jsx';
 
 const VARIANTS = {
  form: { button: 'w-8 h-8 transition-colors', icon: 'h-full w-full' },
- modal: { button: 'w-10 h-10 transition-transform hover:scale-110 focus:outline-none focus:scale-110', icon: 'h-full w-full' },
+ modal: { button: 'w-10 h-10 transition-transform focus:outline-none', icon: 'h-full w-full' },
 };
 
 /**
@@ -38,7 +38,7 @@ export function InteractiveStarRating({
  key={index}
  type="button"
  onClick={handleClick}
- className={`${button} ${active ? 'text-status-warning-text' : 'text-gray-300'} hover:text-status-warning-text`}
+ className={`${button} ${active ? 'text-status-warning-text' : 'text-secondary-300'} hover:text-status-warning-text`}
  >
  <StarIcon className={icon} />
  </button>

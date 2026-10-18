@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
-import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../constants/routes.js';
 import { isAdminUser } from '../utils/admin.js';
+import Skeleton from '../components/ui/Skeleton.jsx';
 
 /** Children only if authenticated user has ADMIN role; otherwise 403-style redirect home. */
 const AdminRoute = ({
@@ -21,9 +21,9 @@ const AdminRoute = ({
  } = useAuth();
  const location = useLocation();
  if (isLoading) {
- return <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
- <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
- <p className="text-sm text-slate-500">{t("loading")}</p>
+ return <div className="mx-auto max-w-7xl space-y-4 px-4 py-8" aria-busy="true" aria-label={t("loading")}>
+ <Skeleton className="h-8 w-48" />
+ <Skeleton className="h-64 w-full" />
  </div>;
  }
  if (!isAuthenticated) {

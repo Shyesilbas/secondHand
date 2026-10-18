@@ -89,7 +89,7 @@ sequenceDiagram
 ---
 
 ### C. Brute-Force Kaba Kuvvet Koruması (`VERIFICATION_LOCKED`)
-[`OrderCompletionService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCompletionService.java) üzerinde:
+[`OrderCompletionService.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionService.java) üzerinde:
 ```java
 int newAttempts = order.getVerificationAttempts() + 1;
 order.setVerificationAttempts(newAttempts);
@@ -105,14 +105,14 @@ if (newAttempts >= 3) {
 ---
 
 ### D. QR Kod ile Hızlı Doğrulama
-* [`generateMeetupQrCode`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCompletionService.java) servisi, alıcının doğrulama kodunu içeren dinamik bir QR kod bayt dizisi (`byte[]`) üretir.
+* [`generateMeetupQrCode`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionService.java) servisi, alıcının doğrulama kodunu içeren dinamik bir QR kod bayt dizisi (`byte[]`) üretir.
 * Satıcı mobil kamerasıyla QR kodu okuttuğunda kod otomatik olarak `verifyMeetupCode` endpoint'ine gönderilir; el ile yazma zahmeti ve hata payı ortadan kalkar.
 
 ---
 
 ### E. Otomatik Serbest Bırakma (24 Saatlik Garanti)
 * Ürün elden teslim edilip `HANDOVER_CONFIRMED` statüsüne geçtikten sonra, alıcı eve gidip onay vermeyi unutursa satıcı mağdur edilmez.
-* [`OrderCompletionScheduler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java) tam **24 saat sonra** (`duration.toHours() >= 24`) devreye girerek siparişi tamamlar ve EscrowOutbox üzerinden satıcının hesabına parayı aktarır.
+* [`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java) tam **24 saat sonra** (`duration.toHours() >= 24`) devreye girerek siparişi tamamlar ve EscrowOutbox üzerinden satıcının hesabına parayı aktarır.
 
 ---
 

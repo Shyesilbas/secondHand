@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon } from 'lucide-react';
 import { CHAT_ROOM_TYPES } from '../chatConstants.js';
 import { sameChatId } from '../chatIdUtils.js';
@@ -38,14 +38,14 @@ const ChatRoomListItem = ({
  return sameChatId(room.lastMessageSenderId, userId) ? 'You' : room.lastMessageSenderName || `User ${room.lastMessageSenderId}`;
  };
  const title = getRoomTitle();
- return <div className={`relative cursor-pointer transition-all duration-300 ease-in-out ${isSelected ? 'bg-slate-100/50 border-l-4 border-l-indigo-600' : 'hover:bg-slate-50/50'}`} onClick={onClick}>
+ return <div className={`relative cursor-pointer transition-all duration-300 ease-in-out ${isSelected ? 'bg-background-tertiary/50 border-l-2 border-l-primary' : 'hover:bg-background-secondary/50'}`} onClick={onClick}>
  <div className="flex justify-between items-start">
  <div className="flex-1 min-w-0">
- <div className="p-4 border-b border-slate-100/60">
+ <div className="p-4 border-b border-border-light/60">
  <div className="flex items-start space-x-3 w-full">
  <div className="flex-shrink-0">
- <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center shadow-sm">
- <span className="text-sm font-bold text-white tracking-tight">
+ <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
+ <span className="text-sm font-semibold text-white tracking-tight">
  {title ? title.charAt(0).toUpperCase() : '?'}
  </span>
  </div>
@@ -60,10 +60,10 @@ const ChatRoomListItem = ({
  </div>
 
  <div className="flex items-center space-x-2 flex-shrink-0">
- {unreadCount > 0 && <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-primary rounded-full shadow-sm">
+ {unreadCount > 0 && <span className="flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-semibold text-white bg-primary rounded-sm">
  {unreadCount > 99 ? '99+' : unreadCount}
  </span>}
- {room.lastMessageTime && <span className="text-xs text-slate-500 whitespace-nowrap tracking-tight">
+ {room.lastMessageTime && <span className="text-xs text-text-tertiary whitespace-nowrap tracking-tight">
  {new Date(room.lastMessageTime).toLocaleDateString()}
  </span>}
  </div>
@@ -73,12 +73,12 @@ const ChatRoomListItem = ({
  <button onClick={e => {
  e.stopPropagation();
  onListingClick(room.listingId, e);
- }} className="text-xs text-slate-600 hover:text-text-primary hover:underline transition-all duration-300 ease-in-out break-words tracking-tight">
- 📦 {room.listingTitle}
+ }} className="text-xs text-text-secondary hover:text-text-primary hover:underline transition-all duration-300 ease-in-out break-words tracking-tight">
+ {room.listingTitle}
  </button>
  </div>}
 
- <p className={`text-xs line-clamp-2 break-words tracking-tight ${isSelected ? 'text-slate-600' : 'text-slate-500'}`}>
+ <p className={`text-xs line-clamp-2 break-words tracking-tight ${isSelected ? 'text-text-secondary' : 'text-text-tertiary'}`}>
  {room.lastMessage ? <span>
  <span className="font-semibold">
  {getLastMessageSenderName()}:
@@ -95,12 +95,12 @@ const ChatRoomListItem = ({
  <button onClick={e => {
  e.stopPropagation();
  setShowOptions(!showOptions);
- }} className="text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out p-1.5 rounded-xl hover:bg-slate-100/50">
+ }} className="text-text-muted hover:text-text-secondary transition-all duration-300 ease-in-out p-1.5 rounded hover:bg-background-tertiary/50">
  <EllipsisVerticalIcon className="w-4 h-4" />
  </button>
 
- {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary/95 backdrop-blur-md border border-border-light/60 rounded-xl shadow-2xl z-10 min-w-[140px]">
- <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error hover:bg-status-error-bg/80 transition-all duration-300 ease-in-out rounded-lg mx-1 my-1 tracking-tight">
+ {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light/60 rounded shadow-md z-10 min-w-36">
+ <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
  <TrashIcon className="w-4 h-4" />
  <span>{t("delete_chat")}</span>
  </button>

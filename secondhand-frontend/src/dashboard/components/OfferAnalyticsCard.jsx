@@ -1,4 +1,3 @@
-import React from 'react';
 import { Tag, CheckCircle2, Clock, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/common/constants/routes';
@@ -13,16 +12,16 @@ const OfferAnalyticsCard = ({ offerStats }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-text-primary">
             {t('offer_analytics', 'Teklif Analitiği')}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-text-tertiary mt-0.5">
             {t('offer_analytics_desc', 'Gelen pazarlık teklifleri ve kabul performansı')}
           </p>
         </div>
         <Link
           to={ROUTES.OFFERS}
-          className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-text-primary hover:text-text-primary bg-background-secondary hover:bg-background-tertiary px-3 py-1.5 rounded transition-colors"
         >
           <span>{t('manage_offers', 'Teklifleri Yönet')}</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -31,44 +30,44 @@ const OfferAnalyticsCard = ({ offerStats }) => {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Total Received */}
-        <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-1">
-            <Tag className="w-3.5 h-3.5 text-slate-400" />
+        <div className="p-3.5 bg-background-secondary rounded-md border border-border/80">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-text-tertiary mb-1">
+            <Tag className="w-3.5 h-3.5 text-text-muted" />
             <span>{t('total_received', 'Toplam Teklif')}</span>
           </div>
-          <div className="text-xl font-black text-slate-900">
+          <div className="text-xl font-semibold text-text-primary">
             {offerStats.totalOffersReceived || 0}
           </div>
         </div>
 
         {/* Pending */}
-        <div className="p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200/80">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 mb-1">
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+        <div className="p-3.5 bg-background-secondary/70 rounded-md border border-border/80">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-status-warning-text mb-1">
+            <Clock className="w-3.5 h-3.5 text-status-warning-text" />
             <span>{t('pending_offers', 'Bekleyen')}</span>
           </div>
-          <div className="text-xl font-black text-amber-900">
+          <div className="text-xl font-semibold text-status-warning-text">
             {offerStats.pendingOffers || 0}
           </div>
         </div>
 
         {/* Accepted */}
-        <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200/80">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 mb-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+        <div className="p-3.5 bg-background-secondary/70 rounded-md border border-border/80">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-status-success-text mb-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" />
             <span>{t('accepted_offers', 'Kabul Edilen')}</span>
           </div>
-          <div className="text-xl font-black text-emerald-900">
+          <div className="text-xl font-semibold text-status-success-text">
             {offerStats.acceptedOffers || 0}
           </div>
         </div>
 
         {/* Acceptance Rate */}
-        <div className="p-3.5 bg-indigo-50/70 rounded-2xl border border-indigo-200/80">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-800 mb-1">
+        <div className="p-3.5 bg-background-secondary/70 rounded-md border border-border/80">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary mb-1">
             <span>{t('acceptance_rate', 'Kabul Oranı')}</span>
           </div>
-          <div className="text-xl font-black text-indigo-900">
+          <div className="text-xl font-semibold text-text-primary">
             %{offerStats.acceptanceRate || 0}
           </div>
         </div>

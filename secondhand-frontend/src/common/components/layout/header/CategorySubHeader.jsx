@@ -1,7 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { useClickOutside } from '../../../hooks/useClickOutside.js';
 import { useEnums } from '../../../hooks/useEnums.js';
@@ -426,9 +425,9 @@ const CategorySubHeader = () => {
  return (
  <div
  ref={containerRef}
- className="relative z-30 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 text-slate-700 shadow-xs"
+ className="relative z-30 w-full bg-background-primary border-b border-border/80 text-text-secondary"
  >
- <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
+ <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10">
  {/* Main Nav Bar Header Buttons */}
  <div className="flex flex-wrap items-center gap-1 sm:gap-2 py-2">
  {CATEGORIES.map((cat) => {
@@ -439,15 +438,15 @@ const CategorySubHeader = () => {
  <div key={cat.id} className="relative">
  <button
  onClick={() => handleToggleCategory(cat.id)}
- className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+ className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
  isOpen
- ? 'bg-slate-900 text-white shadow-md shadow-slate-900/10'
- : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-transparent'
+ ? 'bg-primary text-white'
+ : 'hover:bg-background-tertiary text-text-secondary hover:text-text-primary border border-transparent'
  }`}
  >
- <Icon className={`w-4 h-4 ${isOpen ? 'text-white' : 'text-slate-900'}`} />
+ <Icon className={`w-4 h-4 ${isOpen ? 'text-white' : 'text-text-primary'}`} />
  <span>{t(cat.labelKey)}</span>
- <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-white' : 'text-slate-400'}`} />
+ <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-white' : 'text-text-muted'}`} />
  </button>
  </div>
  );
@@ -463,37 +462,37 @@ const CategorySubHeader = () => {
  animate={{ opacity: 1, y: 0, scale: 1 }}
  exit={{ opacity: 0, y: 4, scale: 0.99 }}
  transition={{ duration: 0.15, ease: "easeOut" }}
- className="absolute top-full left-0 right-0 bg-white border-b border-slate-200/90 shadow-2xl z-40 p-6"
+ className="absolute top-full left-0 right-0 bg-white border-b border-border/90 shadow-md z-40 p-6"
  >
- <div className="max-w-[1440px] mx-auto space-y-4">
+ <div className="max-w-screen-2xl mx-auto space-y-4">
  {/* Header Action & Selection Breadcrumbs Bar */}
- <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+ <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border-light">
  <div className="flex items-center gap-2 flex-wrap">
- <div className="p-2 rounded-xl bg-slate-100 text-slate-900 font-bold flex items-center gap-1.5 text-xs">
+ <div className="p-2 rounded bg-background-tertiary text-text-primary font-semibold flex items-center gap-1.5 text-xs">
  {React.createElement(currentCatConfig.icon, { className: "w-4 h-4" })}
  <span>{t(currentCatConfig.labelKey)}</span>
  </div>
 
- <ChevronRight className="w-4 h-4 text-slate-300" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
 
  {/* REAL ESTATE STEP 1 (Property Category) */}
  {currentCatConfig.id === 'REAL_ESTATE' ? (
  selectedPropertyCat ? (
- <span className="px-3 py-1 rounded-xl bg-purple-100/80 text-purple-800 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-purple-600" />
+ <span className="px-3 py-1 rounded bg-background-tertiary/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedPropertyCat.name}
  </span>
  ) : (
- <span className="text-xs font-semibold text-slate-400 italic">{t(currentCatConfig.step1Key)}</span>
+ <span className="text-xs font-semibold text-text-muted italic">{t(currentCatConfig.step1Key)}</span>
  )
  ) : (
  selectedType ? (
- <span className="px-3 py-1 rounded-xl bg-slate-200/80 text-slate-900 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-slate-900" />
+ <span className="px-3 py-1 rounded bg-secondary-200/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedType.name}
  </span>
  ) : (
- <span className="text-xs font-semibold text-slate-400 italic">{t(currentCatConfig.step1Key)}</span>
+ <span className="text-xs font-semibold text-text-muted italic">{t(currentCatConfig.step1Key)}</span>
  )
  )}
 
@@ -501,9 +500,9 @@ const CategorySubHeader = () => {
  {currentCatConfig.id === 'REAL_ESTATE' ? (
  selectedType ? (
  <>
- <ChevronRight className="w-4 h-4 text-slate-300" />
- <span className="px-3 py-1 rounded-xl bg-slate-200/80 text-slate-900 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-slate-900" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
+ <span className="px-3 py-1 rounded bg-secondary-200/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedType.name}
  </span>
  </>
@@ -511,9 +510,9 @@ const CategorySubHeader = () => {
  ) : (
  selectedBrand ? (
  <>
- <ChevronRight className="w-4 h-4 text-slate-300" />
- <span className="px-3 py-1 rounded-xl bg-slate-200/80 text-slate-900 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-slate-900" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
+ <span className="px-3 py-1 rounded bg-secondary-200/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedBrand.name}
  </span>
  </>
@@ -524,9 +523,9 @@ const CategorySubHeader = () => {
  {currentCatConfig.id === 'REAL_ESTATE' ? (
  selectedBrand ? (
  <>
- <ChevronRight className="w-4 h-4 text-slate-300" />
- <span className="px-3 py-1 rounded-xl bg-slate-200/80 text-slate-900 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-slate-900" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
+ <span className="px-3 py-1 rounded bg-secondary-200/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedBrand.name}
  </span>
  </>
@@ -534,9 +533,9 @@ const CategorySubHeader = () => {
  ) : (
  selectedModel ? (
  <>
- <ChevronRight className="w-4 h-4 text-slate-300" />
- <span className="px-3 py-1 rounded-xl bg-slate-200/80 text-slate-900 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-slate-900" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
+ <span className="px-3 py-1 rounded bg-secondary-200/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedModel.name}
  </span>
  </>
@@ -546,9 +545,9 @@ const CategorySubHeader = () => {
  {/* STEP 4 BREADCRUMB (REAL ESTATE ONLY) */}
  {currentCatConfig.id === 'REAL_ESTATE' && selectedModel && (
  <>
- <ChevronRight className="w-4 h-4 text-slate-300" />
- <span className="px-3 py-1 rounded-xl bg-blue-100/80 text-blue-800 text-xs font-bold flex items-center gap-1">
- <Check className="w-3 h-3 text-blue-600" />
+ <ChevronRight className="w-4 h-4 text-secondary-300" />
+ <span className="px-3 py-1 rounded bg-background-tertiary/80 text-text-primary text-xs font-semibold flex items-center gap-1">
+ <Check className="w-3 h-3 text-text-primary" />
  {selectedModel.name}
  </span>
  </>
@@ -557,7 +556,7 @@ const CategorySubHeader = () => {
  {(selectedPropertyCat || selectedType || selectedBrand || selectedModel) && (
  <button
  onClick={resetSelections}
- className="text-xs font-bold text-slate-400 hover:text-red-500 ml-2 flex items-center gap-1 transition-colors"
+ className="text-xs font-semibold text-text-muted hover:text-status-error ml-2 flex items-center gap-1 transition-colors"
  title={t('reset_selections')}
  >
  <RotateCcw className="w-3 h-3" />
@@ -569,9 +568,9 @@ const CategorySubHeader = () => {
  {/* Primary Action Execute Search Button */}
  <button
  onClick={() => executeSearch()}
- className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-900 text-white font-extrabold text-xs shadow-md shadow-slate-900/10 hover:shadow-lg transition-all cursor-pointer"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
  >
- <Sparkles className="w-4 h-4 text-indigo-200 animate-pulse" />
+ <Sparkles className="w-4 h-4 text-secondary-200 animate-pulse" />
  <span>
  {selectedModel
  ? t('view_listings_for', { name: selectedModel.name })
@@ -590,18 +589,18 @@ const CategorySubHeader = () => {
  {/* Multi-Step Interactive Selector Grid (4 Columns for REAL ESTATE, 3 Columns for others) */}
  <div className={`grid gap-5 ${currentCatConfig.hasFourSteps ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'}`}>
  {/* STEP 1 COLUMN */}
- <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
- <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
- <span className="flex items-center gap-1.5 text-purple-700">
+ <div className="space-y-2.5 bg-background-secondary/70 p-4 rounded-md border border-border-light">
+ <h5 className="text-xs font-semibold text-text-secondary flex items-center justify-between pb-2 border-b border-border/80">
+ <span className="flex items-center gap-1.5 text-text-primary">
  <Layers className="w-3.5 h-3.5" />
  {t(currentCatConfig.step1Key)}
  </span>
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+ <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-secondary-200/80 text-text-secondary">
  {step1Items.length}
  </span>
  </h5>
 
- <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-purple-400">
+ <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-purple-400">
  {step1Items.map((item) => {
  const isSelected = currentCatConfig.id === 'REAL_ESTATE'
  ? selectedPropertyCat?.id === item.id
@@ -631,15 +630,15 @@ const CategorySubHeader = () => {
  }
  }
  }}
- className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+ className={`w-full text-left px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-between group cursor-pointer ${
  isSelected
- ? 'bg-purple-600 text-white shadow-sm'
- : 'bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-900 border border-slate-100 hover:border-purple-200'
+ ? 'bg-primary text-white'
+ : 'bg-white hover:bg-background-secondary text-text-secondary hover:text-text-primary border border-border-light hover:border-border'
  }`}
  >
  <span className="truncate">{item.name}</span>
- <span className={`text-[10px] font-bold transition-all ${isSelected ? 'text-white' : 'text-slate-300 group-hover:text-purple-600'}`}>
- {isSelected ? '✓' : '→'}
+ <span className={`text-xs font-semibold transition-all ${isSelected ? 'text-white' : 'text-secondary-300 group-hover:text-text-primary'}`}>
+ {isSelected ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </span>
  </button>
  );
@@ -648,18 +647,18 @@ const CategorySubHeader = () => {
  </div>
 
  {/* STEP 2 COLUMN */}
- <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
- <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
- <span className="flex items-center gap-1.5 text-slate-900">
+ <div className="space-y-2.5 bg-background-secondary/70 p-4 rounded-md border border-border-light">
+ <h5 className="text-xs font-semibold text-text-secondary flex items-center justify-between pb-2 border-b border-border/80">
+ <span className="flex items-center gap-1.5 text-text-primary">
  <Layers className="w-3.5 h-3.5" />
  {t(currentCatConfig.step2Key)}
  </span>
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+ <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-secondary-200/80 text-text-secondary">
  {step2Items.length}
  </span>
  </h5>
 
- <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-indigo-400">
+ <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-indigo-400">
  {step2Items.map((item) => {
  const isSelected = currentCatConfig.id === 'REAL_ESTATE'
  ? selectedType?.id === item.id
@@ -689,15 +688,15 @@ const CategorySubHeader = () => {
  }
  }
  }}
- className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+ className={`w-full text-left px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-between group cursor-pointer ${
  isSelected
- ? 'bg-slate-900 text-white shadow-sm'
- : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-100 hover:border-slate-300'
+ ? 'bg-primary text-white'
+ : 'bg-white hover:bg-background-tertiary text-text-secondary hover:text-text-primary border border-border-light hover:border-card-border-hover'
  }`}
  >
  <span className="truncate">{item.name}</span>
- <span className={`text-[10px] font-bold transition-all ${isSelected ? 'text-white' : 'text-slate-300 group-hover:text-slate-900'}`}>
- {isSelected ? '✓' : '→'}
+ <span className={`text-xs font-semibold transition-all ${isSelected ? 'text-white' : 'text-secondary-300 group-hover:text-text-primary'}`}>
+ {isSelected ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </span>
  </button>
  );
@@ -706,18 +705,18 @@ const CategorySubHeader = () => {
  </div>
 
  {/* STEP 3 COLUMN */}
- <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
- <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
- <span className="flex items-center gap-1.5 text-slate-900">
+ <div className="space-y-2.5 bg-background-secondary/70 p-4 rounded-md border border-border-light">
+ <h5 className="text-xs font-semibold text-text-secondary flex items-center justify-between pb-2 border-b border-border/80">
+ <span className="flex items-center gap-1.5 text-text-primary">
  <Layers className="w-3.5 h-3.5" />
  {t(currentCatConfig.step3Key)}
  </span>
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+ <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-secondary-200/80 text-text-secondary">
  {step3Items.length}
  </span>
  </h5>
 
- <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-indigo-400">
+ <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-indigo-400">
  {step3Items.map((item) => {
  const isSelected = currentCatConfig.id === 'REAL_ESTATE'
  ? selectedBrand?.id === item.id
@@ -744,15 +743,15 @@ const CategorySubHeader = () => {
  }
  }
  }}
- className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+ className={`w-full text-left px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-between group cursor-pointer ${
  isSelected
- ? 'bg-slate-900 text-white shadow-sm'
- : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-100 hover:border-slate-300'
+ ? 'bg-primary text-white'
+ : 'bg-white hover:bg-background-tertiary text-text-secondary hover:text-text-primary border border-border-light hover:border-card-border-hover'
  }`}
  >
  <span className="truncate">{item.name}</span>
- <span className={`text-[10px] font-bold transition-all ${isSelected ? 'text-white' : 'text-slate-300 group-hover:text-slate-900'}`}>
- {isSelected ? '✓' : '→'}
+ <span className={`text-xs font-semibold transition-all ${isSelected ? 'text-white' : 'text-secondary-300 group-hover:text-text-primary'}`}>
+ {isSelected ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </span>
  </button>
  );
@@ -762,18 +761,18 @@ const CategorySubHeader = () => {
 
  {/* STEP 4 COLUMN (ONLY FOR 4-STEP CATEGORIES LIKE REAL ESTATE) */}
  {currentCatConfig.hasFourSteps && (
- <div className="space-y-2.5 bg-slate-50/70 p-4 rounded-3xl border border-slate-100">
- <h5 className="text-xs font-extrabold text-slate-600 tracking-wider flex items-center justify-between pb-2 border-b border-slate-200/80">
- <span className="flex items-center gap-1.5 text-blue-700">
+ <div className="space-y-2.5 bg-background-secondary/70 p-4 rounded-md border border-border-light">
+ <h5 className="text-xs font-semibold text-text-secondary flex items-center justify-between pb-2 border-b border-border/80">
+ <span className="flex items-center gap-1.5 text-text-primary">
  <Layers className="w-3.5 h-3.5" />
  {t(currentCatConfig.step4Key)}
  </span>
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600">
+ <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-secondary-200/80 text-text-secondary">
  {step4Items.length}
  </span>
  </h5>
 
- <div className="space-y-1 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-blue-400">
+ <div className="space-y-1 max-h-72 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-200 hover:scrollbar-thumb-blue-400">
  {step4Items.map((item) => {
  const isSelected = selectedModel?.id === item.id;
 
@@ -788,15 +787,15 @@ const CategorySubHeader = () => {
  executeSearch(selectedPropertyCat, selectedType, selectedBrand, item);
  }
  }}
- className={`w-full text-left px-3 py-2 rounded-2xl text-xs font-bold transition-all flex items-center justify-between group cursor-pointer ${
+ className={`w-full text-left px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-between group cursor-pointer ${
  isSelected
- ? 'bg-blue-600 text-white shadow-sm'
- : 'bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-900 border border-slate-100 hover:border-blue-200'
+ ? 'bg-primary text-white'
+ : 'bg-white hover:bg-background-secondary text-text-secondary hover:text-text-primary border border-border-light hover:border-border'
  }`}
  >
  <span className="truncate">{item.name}</span>
- <span className={`text-[10px] font-bold transition-all ${isSelected ? 'text-white' : 'text-slate-300 group-hover:text-blue-600'}`}>
- {isSelected ? '✓' : '→'}
+ <span className={`text-xs font-semibold transition-all ${isSelected ? 'text-white' : 'text-secondary-300 group-hover:text-text-primary'}`}>
+ {isSelected ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
  </span>
  </button>
  );

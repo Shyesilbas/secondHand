@@ -5,28 +5,28 @@ const statusConfig = {
  [USER_ACCOUNT_STATUSES.ACTIVE]: {
  label: 'Active',
  icon: CheckCircle2,
- color: 'text-slate-900',
- bg: 'bg-status-success-bg',
- border: 'border-slate-300',
- dot: 'bg-status-success-bg',
+ color: 'text-text-primary',
+ bg: 'bg-background-secondary',
+ border: 'border-card-border-hover',
+ dot: 'bg-status-success',
  description: 'Your account is active and in good standing.',
  },
  [USER_ACCOUNT_STATUSES.SUSPENDED]: {
  label: 'Suspended',
  icon: XCircle,
  color: 'text-status-error-text',
- bg: 'bg-status-error-bg',
+ bg: 'bg-background-secondary',
  border: 'border-status-error-border',
- dot: 'bg-status-error-bg',
+ dot: 'bg-status-error',
  description: 'Your account has been suspended. Contact support for assistance.',
  },
  [USER_ACCOUNT_STATUSES.PENDING]: {
  label: 'Pending',
  icon: Clock,
- color: 'text-amber-700',
- bg: 'bg-status-warning-bg',
- border: 'border-amber-200',
- dot: 'bg-status-warning-bg',
+ color: 'text-status-warning-text',
+ bg: 'bg-background-secondary',
+ border: 'border-border',
+ dot: 'bg-status-warning',
  description: 'Your account is pending review.',
  },
 };
@@ -37,7 +37,7 @@ const fallbackStatus = {
  color: 'text-text-secondary',
  bg: 'bg-secondary',
  border: 'border-border-light',
- dot: 'bg-gray-400',
+ dot: 'bg-secondary-400',
  description: 'Account status is unknown.',
 };
 
@@ -50,25 +50,25 @@ const ProfileAccountStatus = ({user}) => {
  return (
  <div className="space-y-4">
  {/* Account Status Card */}
- <div className={`flex items-start gap-4 p-5 rounded-xl border ${config.border} ${config.bg}`}>
- <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0`}>
- <StatusIcon className={`w-5 h-5 ${config.color}`} />
+ <div className="flex items-start gap-4 rounded border border-border bg-background-primary p-5">
+ <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+ <StatusIcon className={`h-5 w-5 ${config.color}`} strokeWidth={1.5} aria-hidden />
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
+ <span className={`text-sm font-semibold ${config.color}`}>{config.label}</span>
  <span className={`w-2 h-2 rounded-full ${config.dot}`} />
  </div>
- <p className={`text-sm ${config.color} opacity-80`}>{config.description}</p>
+ <p className="text-sm text-text-secondary">{config.description}</p>
  </div>
  </div>
 
  {/* Email Verification Card */}
- <div className={`flex items-start gap-4 p-5 rounded-xl border ${
- isVerified ? 'border-slate-300 bg-status-success-bg' : 'border-status-error-border bg-status-error-bg'
+ <div className={`flex items-start gap-4 p-5 rounded border ${
+ isVerified ? 'border-card-border-hover bg-background-secondary' : 'border-border bg-background-secondary'
  }`}>
- <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
- isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'
+ <div className={`w-10 h-10 rounded flex items-center justify-center shrink-0 ${
+ isVerified ? 'bg-status-success' : 'bg-status-error'
  }`}>
  {isVerified
  ? <CheckCircle2 className="w-5 h-5 text-status-success" />
@@ -77,10 +77,10 @@ const ProfileAccountStatus = ({user}) => {
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <span className={`text-sm font-bold ${isVerified ? 'text-slate-900' : 'text-status-error-text'}`}>
+ <span className={`text-sm font-semibold ${isVerified ? 'text-text-primary' : 'text-status-error-text'}`}>
  {isVerified ? 'Email Verified' : 'Email Not Verified'}
  </span>
- <span className={`w-2 h-2 rounded-full ${isVerified ? 'bg-status-success-bg' : 'bg-status-error-bg'}`} />
+ <span className={`w-2 h-2 rounded-full ${isVerified ? 'bg-status-success' : 'bg-status-error'}`} />
  </div>
  <p className={`text-sm ${isVerified ? 'text-status-success' : 'text-status-error'} opacity-80`}>
  {isVerified

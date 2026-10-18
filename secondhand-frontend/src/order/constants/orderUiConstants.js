@@ -30,35 +30,6 @@ export const ORDER_STATUS_TAB_FILTER = Object.freeze({
  CANCELLED: ORDER_STATUSES.CANCELLED,
 });
 
-export const ORDER_STATUS_FILTER_OPTIONS = Object.freeze([
- { value: '', label: 'All Statuses' },
- { value: ORDER_STATUSES.PENDING, label: 'Pending' },
- { value: ORDER_STATUSES.CONFIRMED, label: 'Confirmed' },
- { value: ORDER_STATUSES.PROCESSING, label: 'Processing' },
- { value: ORDER_STATUSES.SHIPPED, label: 'Shipped' },
- { value: ORDER_STATUSES.DELIVERED, label: 'Delivered' },
- { value: ORDER_STATUSES.COMPLETED, label: 'Completed' },
- { value: ORDER_STATUSES.CANCELLED, label: 'Cancelled' },
- { value: ORDER_STATUSES.REFUNDED, label: 'Refunded' },
- { value: ORDER_STATUSES.MEETUP_PENDING, label: 'Meetup Pending' },
- { value: ORDER_STATUSES.HANDOVER_CONFIRMED, label: 'Handover Confirmed' },
- { value: ORDER_STATUSES.VERIFICATION_LOCKED, label: 'Verification Locked' },
-]);
-
-export const ORDER_STATUS_ACCENT = Object.freeze({
- [ORDER_STATUSES.COMPLETED]: 'border-l-emerald-400',
- [ORDER_STATUSES.DELIVERED]: 'border-l-blue-400',
- [ORDER_STATUSES.SHIPPED]: 'border-l-indigo-400',
- [ORDER_STATUSES.PROCESSING]: 'border-l-amber-400',
- [ORDER_STATUSES.CONFIRMED]: 'border-l-green-400',
- [ORDER_STATUSES.PENDING]: 'border-l-gray-300',
- [ORDER_STATUSES.CANCELLED]: 'border-l-red-300',
- [ORDER_STATUSES.REFUNDED]: 'border-l-rose-300',
- [ORDER_STATUSES.MEETUP_PENDING]: 'border-l-indigo-500',
- [ORDER_STATUSES.HANDOVER_CONFIRMED]: 'border-l-violet-600',
- [ORDER_STATUSES.VERIFICATION_LOCKED]: 'border-l-purple-700',
-});
-
 export const ORDER_DEFAULTS = Object.freeze({
  INITIAL_PAGE: 0,
  INITIAL_PAGE_SIZE: 5,
@@ -90,8 +61,8 @@ export const ORDER_TIME = Object.freeze({
 
 export const ORDER_MESSAGES = Object.freeze({
  ORDER_NOT_FOUND: 'Order not found. Please check the order number.',
- /** @deprecated use CONFIRM_ORDER_MODAL_TITLE / BODY; kept for any stray references */
- CONFIRM_COMPLETE_ORDER: 'Are you sure you want to complete this order? This action cannot be undone.',
+ RECEIPT_NOT_FOUND: 'The receipt for this payment is not among your recent payments.',
+ RECEIPT_LOAD_FAILED: 'Could not load the receipt. Please try again.',
  CONFIRM_ORDER_MODAL_TITLE: 'Confirm order?',
  CONFIRM_ORDER_MODAL_BODY:
  'You are about to confirm that you have received this order. After you confirm, you will not be able to cancel this order or request a refund from this screen. Make sure you are satisfied with your purchase before continuing.',

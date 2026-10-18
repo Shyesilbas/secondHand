@@ -8,9 +8,9 @@ import {ROUTES} from '../../common/constants/routes.js';
 import {listingService} from '../../listing/services/listingService.js';
 import {Loader2} from 'lucide-react';
 
-const listingFooterClass = 'group/footer w-full rounded-xl border border-border-light bg-background-tertiary px-3 py-2.5 text-left transition-colors hover:border-primary/50 hover:bg-primary/5';
+const listingFooterClass = 'group/footer w-full rounded border border-border-light bg-background-tertiary px-3 py-2.5 text-left transition-colors hover:border-primary/50 hover:bg-primary/5';
 const labelBlock = (review, t) => <>
- <span className="shrink-0 text-caption font-semibold uppercase tracking-wide text-text-muted">{t("listed_item")}</span>
+ <span className="shrink-0 text-xs font-semibold text-text-muted">{t("listed_item")}</span>
  <span className="min-w-0 truncate font-medium text-text-primary">{review.listingTitle || '—'}</span>
  {review.listingNo ? <span className="shrink-0 font-normal tabular-nums text-text-muted">#{review.listingNo}</span> : null}
  </>;
@@ -29,7 +29,7 @@ function ProfileReviewedListingLink({
  const row = <div className="relative flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
  {labelBlock(review, t)}
  <span className="sr-only">{t("open_listing")}</span>
- {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-primary" aria-hidden /> : <span className="pointer-events-none ml-auto text-caption font-semibold uppercase tracking-wide text-primary opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
+ {busy ? <Loader2 className="absolute right-0 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-primary" aria-hidden /> : <span className="pointer-events-none ml-auto text-xs font-semibold text-primary opacity-0 transition-opacity group-hover/footer:opacity-100">{t("view")}</span>}
  </div>;
  if (listingId) {
  return <Link to={ROUTES.LISTING_DETAIL(listingId)} className={`${listingFooterClass} block focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary/40`}>
@@ -37,7 +37,7 @@ function ProfileReviewedListingLink({
  </Link>;
  }
  if (!rawNo) {
- return <div className="rounded-xl border border-border-light bg-background-tertiary px-3 py-2.5">
+ return <div className="rounded border border-border-light bg-background-tertiary px-3 py-2.5">
  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">{labelBlock(review, t)}</div>
  </div>;
  }
@@ -63,11 +63,11 @@ const ReviewCard = ({
  t
  } = useTranslation();
  const isProfile = variant === 'profile';
- const shell = isProfile ? 'rounded-2xl border border-border-light bg-background-primary p-5 shadow-sm transition-all duration-300 hover:border-primary/50 hover:shadow-md' : 'rounded-lg border border-border-light bg-background-primary p-4 shadow-sm';
- const initials = <span className={isProfile ? 'text-sm font-bold text-white' : 'text-sm font-medium text-text-secondary'}>
+ const shell = isProfile ? 'rounded-md border border-border-light bg-background-primary p-5 transition-all duration-300 hover:border-primary/50' : 'rounded border border-border-light bg-background-primary p-4';
+ const initials = <span className={isProfile ? 'text-sm font-semibold text-white' : 'text-sm font-medium text-text-secondary'}>
  {review.reviewerName?.[0]?.toUpperCase() || '?'}
  </span>;
- const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm ring-2 ring-border-light">
+ const avatar = isProfile ? <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-primary text-white ring-2 ring-border-light">
  {initials}
  </div> : <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background-tertiary">{initials}</div>;
  const nameLine = `${review.reviewerName || ''} ${review.reviewerSurname || ''}`.trim() || 'Buyer';
@@ -75,7 +75,7 @@ const ReviewCard = ({
  return <article className={shell}>
  <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
  <div className="flex min-w-0 items-start gap-3">
- {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="shrink-0 rounded-xl focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary/50" title={t("view_reviewer_profile")}>
+ {review.reviewerId && isProfile ? <Link to={ROUTES.USER_PROFILE(review.reviewerId)} className="shrink-0 rounded focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary/50" title={t("view_reviewer_profile")}>
  {avatar}
  </Link> : avatar}
  <div className="min-w-0">
@@ -87,15 +87,15 @@ const ReviewCard = ({
  </time>
  </div>
  </div>
- <div className={isProfile ? 'flex w-fit shrink-0 items-center gap-2 self-start rounded-xl border border-border-light bg-background-secondary px-3 py-2 sm:self-start' : 'flex shrink-0 items-center space-x-1'}>
+ <div className={isProfile ? 'flex w-fit shrink-0 items-center gap-2 self-start rounded border border-border-light bg-background-secondary px-3 py-2 sm:self-start' : 'flex shrink-0 items-center space-x-1'}>
  <RatingStarsDisplay value={review.rating} iconClassName="h-4 w-4" mode="ceil" />
- <span className="ml-1 text-xs font-bold tabular-nums text-text-primary">
+ <span className="ml-1 text-xs font-semibold tabular-nums text-text-primary">
  {review.rating}/{REVIEW_LIMITS.MAX_RATING}
  </span>
  </div>
  </div>
 
- {review.comment ? <p className={isProfile ? 'mb-5 border-l-[3px] border-primary pl-4 text-sm leading-relaxed text-text-primary bg-background-secondary/50 rounded-r-lg py-2 pr-4' : 'mb-3 text-sm leading-relaxed text-text-secondary'}>
+ {review.comment ? <p className={isProfile ? 'mb-5 border-l-2 border-border pl-4 text-sm leading-relaxed text-text-primary' : 'mb-3 text-sm leading-relaxed text-text-secondary'}>
  {review.comment}
  </p> : null}
 

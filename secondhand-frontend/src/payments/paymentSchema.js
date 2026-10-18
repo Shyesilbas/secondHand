@@ -1,6 +1,5 @@
 import { normalizeArrayResponse } from '../common/utils/normalizeArrayResponse.js';
 import { OTP_CODE_LENGTH as COMMON_OTP_CODE_LENGTH } from '../common/constants/otp.js';
-import { cleanObject } from '../common/formatters.js';
 
 export const DEFAULT_PAYMENT_FILTERS = Object.freeze({
  seller: '',
@@ -120,10 +119,6 @@ export const PaymentDto = (data) => ({
  status: data.status || (data.isSuccess ? 'COMPLETED' : 'FAILED')
 });
 
-export const PAYMENT_TYPE_LABELS = {
- [PAYMENT_TYPES.EWALLET]: 'E-Wallet'
-};
-
 export const TRANSACTION_TYPE_LABELS = {
  [PAYMENT_TRANSACTION_TYPES.LISTING_CREATION]: 'Listing Fee',
  [PAYMENT_TRANSACTION_TYPES.ITEM_PURCHASE]: 'Product Purchase',
@@ -133,47 +128,6 @@ export const TRANSACTION_TYPE_LABELS = {
  [PAYMENT_TRANSACTION_TYPES.EWALLET_PAYMENT_RECEIVED]: 'E-Wallet Payment Received',
  [PAYMENT_TRANSACTION_TYPES.SHOWCASE_PAYMENT]: 'Showcase Payment',
  [PAYMENT_TRANSACTION_TYPES.MEMBERSHIP_PAYMENT]: 'Membership Payment'
-};
-
-export const PAYMENT_STATUS_LABELS = {
- [PAYMENT_STATUSES.PENDING]: 'Pending',
- [PAYMENT_STATUSES.PAID]: 'Paid',
- [PAYMENT_STATUSES.ESCROW]: 'In Escrow',
- [PAYMENT_STATUSES.COMPLETED]: 'Completed',
- [PAYMENT_STATUSES.FAILED]: 'Failed',
- [PAYMENT_STATUSES.REFUNDED]: 'Refunded',
- [PAYMENT_STATUSES.PARTIALLY_REFUNDED]: 'Partially Refunded',
- [PAYMENT_STATUSES.DISPUTED]: 'Disputed',
- [PAYMENT_STATUSES.CANCELLED]: 'Cancelled'
-};
-
-export const PAYMENT_DIRECTION_LABELS = {
- [PAYMENT_DIRECTIONS.INCOMING]: 'Incoming',
- [PAYMENT_DIRECTIONS.OUTGOING]: 'Outgoing'
-};
-
-export const createPaymentRequest = (data) => {
- return cleanObject({
- amount: parseFloat(data.amount) || 0,
- currency: data.currency || 'TRY',
- description: data.description?.trim() || '',
- listingId: data.listingId || undefined,
- paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
- agreementsAccepted: data.agreementsAccepted || false,
- acceptedAgreementIds: data.acceptedAgreementIds || [],
- fromUserId: data.fromUserId || undefined,
- toUserId: data.toUserId || undefined,
- receiverName: data.receiverName || undefined,
- receiverSurname: data.receiverSurname || undefined,
- orderItemId: data.orderItemId || undefined,
- listingTitle: data.listingTitle || undefined,
- listingNo: data.listingNo || undefined,
- transactionType: data.transactionType || undefined,
- paymentDirection: data.paymentDirection || undefined,
- verificationCode: data.verificationCode || undefined,
- status: data.status || undefined,
- orderId: data.orderId || undefined,
- });
 };
 
 export const createListingFeePaymentRequest = (data) => {

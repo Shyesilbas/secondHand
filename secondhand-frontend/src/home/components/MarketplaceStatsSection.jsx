@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useListingStatistics } from '../../listing/hooks/useListingStatistics.js';
 import { Layers, Car, Laptop, Building2 } from 'lucide-react';
 import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
@@ -27,7 +27,7 @@ const MarketplaceStatsSection = () => {
  value: totalActive.toLocaleString('tr-TR'),
  desc: 'Live items ready for trade',
  icon: Layers,
- color: 'text-status-success bg-status-success-bg border-status-success-border'
+ color: 'text-status-success-text bg-background-secondary border-border'
  },
  {
  label: 'Vehicles',
@@ -48,7 +48,7 @@ const MarketplaceStatsSection = () => {
  value: realEstate.toLocaleString('tr-TR'),
  desc: 'Apartments, villas & offices',
  icon: Building2,
- color: 'text-status-warning bg-status-warning-bg border-status-warning-border'
+ color: 'text-status-warning-text bg-background-secondary border-border'
  }
  ];
  }, [statistics]);
@@ -75,18 +75,18 @@ const MarketplaceStatsSection = () => {
  return (
  <div
  key={metric.label}
- className="bg-background-primary border border-border-light rounded-xl p-5 shadow-sm transition-all hover:border-border"
+ className="bg-background-primary border border-border-light rounded p-5 transition-all hover:border-border"
  >
  <div className="flex items-center gap-3">
  <div className={`w-9 h-9 rounded-md flex items-center justify-center border ${metric.color}`}>
  <Icon className="w-4.5 h-4.5 shrink-0" />
  </div>
  <div>
- <span className="text-caption font-bold text-text-muted uppercase tracking-wider">{metric.label}</span>
+ <span className="text-xs font-semibold text-text-muted">{metric.label}</span>
  <h3 className="text-sm font-medium text-text-primary tracking-tight mt-0.5">{metric.value}</h3>
  </div>
  </div>
- <p className="text-caption text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
+ <p className="text-xs text-text-secondary font-medium mt-3 border-t border-border-light pt-2 leading-relaxed">
  {metric.desc}
  </p>
  </div>

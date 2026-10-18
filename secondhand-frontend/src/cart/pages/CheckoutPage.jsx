@@ -25,6 +25,8 @@ import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendin
 import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency } from '../../common/formatters.js';
 import logger from '../../common/utils/logger.js';
+import Alert from '../../common/components/ui/Alert.jsx';
+import Button from '../../common/components/ui/Button.jsx';
 
 const CheckoutPage = () => {
   const { t } = useTranslation();
@@ -55,8 +57,10 @@ const CheckoutPage = () => {
     return 900;
   });
 
-  useEffect(() => {
-    // Initiate Redis stock reservation and synchronize exact remaining TTL
+  // The reservation gates checkout: if the backend refuses it (e.g. stock ran out) the user must not continue.
+  const [reservationError, setReservationError] = useState(null);
+  const reserveStock = useCallback(() => {
+    setReservationError(null);
     orderService.initiateCheckoutReservation().then(res => {
       const remaining = res?.data?.remainingTtlSeconds ?? res?.remainingTtlSeconds;
       if (typeof remaining === 'number' && remaining > 0) {
@@ -68,9 +72,16 @@ const CheckoutPage = () => {
         }
       }
     }).catch(err => {
-      logger.warn("Could not initiate stock reservation in Redis:", err);
+      logger.warn('Could not initiate stock reservation:', err);
+      setReservationError(err?.response?.data?.message || CART_MESSAGES.RESERVATION_FAILED);
     });
+  }, []);
 
+  useEffect(() => {
+    reserveStock();
+  }, [reserveStock]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -134,7 +145,7 @@ const CheckoutPage = () => {
   }, [cartItems, offerContext]);
 
   // Fetch pricing preview using useQuery
-  const { data: pricingQueryData } = useQuery({
+  const { data: pricingQueryData, isError: pricingFailed, refetch: refetchPricing } = useQuery({
     queryKey: ['checkoutPreview', cartKey, appliedCouponCode, offerId],
     queryFn: async () => {
       const requested = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
@@ -154,6 +165,9 @@ const CheckoutPage = () => {
   });
 
   const pricing = pricingQueryData?.data || null;
+  const couponError = pricingQueryData?.success === false
+    ? pricingQueryData.error?.response?.data?.message || CART_MESSAGES.COUPON_NOT_APPLIED
+    : null;
 
   const calculateTotal = useCallback(() => {
     if (pricing?.total != null) {
@@ -196,21 +210,19 @@ const CheckoutPage = () => {
 
   if (!offerId && cartCount === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50/60 px-4 antialiased">
-        <div className="w-full max-w-md text-center bg-white p-10 rounded-3xl border border-slate-200/80 shadow-xl">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200 text-slate-400">
-            <ShoppingCart className="h-8 w-8" strokeWidth={1.75} />
-          </div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tight">
+      <div className="flex min-h-screen items-center justify-center bg-background-secondary/60 px-4 antialiased">
+        <div className="w-full max-w-md text-center bg-white p-10 rounded-md border border-border/80">
+          <ShoppingCart className="mx-auto mb-6 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+          <h1 className="text-xl font-semibold text-text-primary tracking-tight">
             {CART_MESSAGES.EMPTY_CART_TITLE}
           </h1>
-          <p className="mt-2 text-xs text-slate-500 font-medium leading-relaxed max-w-xs mx-auto">
+          <p className="mt-2 text-xs text-text-tertiary font-medium leading-relaxed max-w-xs mx-auto">
             {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
           </p>
           <button 
             type="button" 
             onClick={() => navigate(ROUTES.LISTINGS)} 
-            className="mt-8 inline-flex items-center justify-center gap-2 w-full rounded-2xl bg-slate-900 py-4 text-xs font-black uppercase tracking-wider text-white hover:bg-slate-800 shadow-md shadow-slate-900/10 active:scale-[0.98] transition-all"
+            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-8 w-full"
           >
             <Sparkles className="h-4 w-4" />
             <span>{t("browse_listings", "İlanları Keşfet")}</span>
@@ -223,9 +235,9 @@ const CheckoutPage = () => {
   /* ── Main checkout experience ────────────────────────────── */
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 antialiased selection:bg-slate-900 selection:text-white">
+    <div className="min-h-screen bg-background-secondary text-text-primary antialiased selection:bg-primary selection:text-white">
       {/* ── Sticky Top Header ───────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-md shadow-xs">
+      <header className="sticky top-0 z-30 border-b border-border/80 bg-background-primary">
         <PageContainer className="py-3 sm:py-3.5">
           <div className="flex items-center justify-between gap-4">
             {/* Back Button */}
@@ -233,15 +245,15 @@ const CheckoutPage = () => {
               <button 
                 type="button" 
                 onClick={() => navigate(ROUTES.SHOPPING_CART)} 
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs" 
+                className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 w-10" 
                 aria-label={t("back_to_cart", "Sepete Dön")}
               >
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
               </button>
 
-              <div className="hidden lg:flex items-center gap-2 border-l border-slate-200 pl-3">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+              <div className="hidden lg:flex items-center gap-2 border-l border-border pl-3">
+                <ShieldCheck className="h-4 w-4 text-status-success-text" />
+                <span className="text-xs font-semibold text-text-secondary">
                   Güvenli Ödeme
                 </span>
               </div>
@@ -260,22 +272,22 @@ const CheckoutPage = () => {
       </header>
 
       {/* ── Live Stock Reservation Status Bar ────────────────────── */}
-      <div className="bg-amber-50/80 border-b border-amber-200/70 px-4 py-2 text-xs backdrop-blur-xs">
+      <div className="bg-background-secondary border-b border-border/70 px-4 py-2 text-xs">
         <PageContainer>
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-amber-950 font-medium">
+            <div className="flex items-center gap-2 text-status-warning-text font-medium">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+                <span className="absolute inline-flex h-full w-full rounded-full bg-status-warning opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-status-warning"></span>
               </span>
               <span className="text-xs font-semibold">
                 {t('cart_items_reserved_for_you', 'Sepetinizdeki ürünler adınıza geçici olarak rezerve edildi.')}
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 font-bold text-amber-900 bg-white/90 px-3 py-1 rounded-xl border border-amber-200 shadow-xs">
-              <Clock className="h-3.5 w-3.5 text-amber-600" />
-              <span className="text-[10px] uppercase tracking-wider text-amber-700">Kalan:</span>
+            <div className="flex items-center gap-1.5 font-semibold text-status-warning-text bg-white/90 px-3 py-1 rounded border border-border">
+              <Clock className="h-3.5 w-3.5 text-status-warning-text" />
+              <span className="text-xs text-status-warning-text">Kalan:</span>
               <span className="font-mono text-xs">{formatTimer(timeLeft)}</span>
             </div>
           </div>
@@ -283,24 +295,24 @@ const CheckoutPage = () => {
       </div>
 
       {/* ── Mobile Collapsible Concise Order Summary Bar ─────────── */}
-      <div className="bg-white border-b border-slate-200 lg:hidden px-4 py-3 shadow-xs">
+      <div className="bg-white border-b border-border lg:hidden px-4 py-3">
         <button 
           type="button" 
           onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} 
-          className="flex w-full items-center justify-between text-xs font-bold select-none"
+          className="flex w-full items-center justify-between text-xs font-semibold select-none"
         >
-          <span className="flex items-center gap-2 text-slate-900">
-            <ShoppingCart className="h-4 w-4 text-slate-900" />
+          <span className="flex items-center gap-2 text-text-primary">
+            <ShoppingCart className="h-4 w-4 text-text-primary" />
             <span>{isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}</span>
-            <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`h-4 w-4 text-text-tertiary transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
           </span>
-          <span className="font-black text-slate-900 text-sm">
+          <span className="font-semibold text-text-primary text-sm">
             {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
           </span>
         </button>
 
         {isOrderSummaryExpanded && (
-          <div className="mt-3 pt-3 border-t border-slate-100 overflow-hidden animate-in fade-in duration-200">
+          <div className="mt-3 pt-3 border-t border-border-light overflow-hidden duration-200">
             <CheckoutOrderSummary 
               cartItems={displayCartItems} 
               calculateTotal={calculateTotal} 
@@ -315,42 +327,33 @@ const CheckoutPage = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
           {/* Main Checkout Step Flow */}
           <div className="lg:col-span-8">
-            <CheckoutStep 
-              step={currentStep} 
-              cartItems={displayCartItems} 
-              calculateTotal={calculateTotal} 
-              addresses={checkout.addresses} 
-              selectedShippingAddressId={checkout.selectedShippingAddressId} 
-              setSelectedShippingAddressId={checkout.setSelectedShippingAddressId} 
-              selectedBillingAddressId={checkout.selectedBillingAddressId} 
-              setSelectedBillingAddressId={checkout.setSelectedBillingAddressId} 
-              selectedPaymentType={checkout.selectedPaymentType} 
-              setSelectedPaymentType={checkout.setSelectedPaymentType} 
-              eWallet={checkout.eWallet} 
-              paymentVerificationCode={checkout.paymentVerificationCode} 
-              setPaymentVerificationCode={checkout.setPaymentVerificationCode} 
-              paymentVerificationExpiresAtMs={checkout.paymentVerificationExpiresAtMs} 
-              notes={checkout.notes} 
-              setNotes={checkout.setNotes} 
-              orderName={checkout.orderName} 
-              setOrderName={checkout.setOrderName} 
-              deliveryMethod={checkout.deliveryMethod} 
-              setDeliveryMethod={checkout.setDeliveryMethod} 
-              meetupLocation={checkout.meetupLocation} 
-              setMeetupLocation={checkout.setMeetupLocation} 
-              emails={checkout.emails} 
-              fetchEmails={checkout.fetchEmails} 
-              onBack={handleBack} 
-              onNext={handleNext} 
-              onCheckout={checkout.handleCheckout} 
-              proceedDisabled={checkout.proceedDisabled} 
-              isCheckingOut={checkout.isCheckingOut} 
-              sendVerificationCode={checkout.sendVerificationCode} 
-              acceptedAgreements={checkout.acceptedAgreements} 
-              onAgreementToggle={checkout.onAgreementToggle} 
-              onRequiredAgreementsChange={checkout.onRequiredAgreementsChange} 
-              areAllAgreementsAccepted={checkout.areAllAgreementsAccepted} 
-            />
+            {reservationError ? (
+              <Alert
+                type="error"
+                message={reservationError}
+                action={
+                  <div className="flex gap-2">
+                    <Button variant="secondary" size="sm" onClick={() => navigate(ROUTES.SHOPPING_CART)}>{t("back_to_cart", "Sepete Dön")}</Button>
+                    <Button size="sm" onClick={reserveStock}>{t("try_again")}</Button>
+                  </div>
+                }
+              />
+            ) : (
+              <div className="space-y-4">
+                {pricingFailed && (
+                  <Alert type="warning" message={CART_MESSAGES.PRICING_PREVIEW_FAILED} action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t("try_again")}</Button>} />
+                )}
+                {couponError && <Alert type="warning" message={couponError} />}
+                <CheckoutStep
+                  step={currentStep}
+                  checkout={checkout}
+                  cartItems={displayCartItems}
+                  calculateTotal={calculateTotal}
+                  onBack={handleBack}
+                  onNext={handleNext}
+                />
+              </div>
+            )}
           </div>
 
           {/* Desktop Sticky Concise Order Summary Sidebar */}

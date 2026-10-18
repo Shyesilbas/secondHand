@@ -148,11 +148,13 @@ public class PaymentProcessor {
                 result);
         payment = paymentRepository.save(payment);
 
-        if (result.success()) {
-            paymentOutboxService.enqueuePaymentCompleted(payment);
-        }
-
         evictUserPaymentStatsCache(userId);
+
+        if (!result.success()) {
+            return Result.error(result.errorMessage() != null ? result.errorMessage() : "Payment failed.",
+                    PaymentErrorCodes.PAYMENT_ERROR.toString());
+        }
+        paymentOutboxService.enqueuePaymentCompleted(payment);
 
         return Result.success(paymentMapper.toDto(payment));
     }

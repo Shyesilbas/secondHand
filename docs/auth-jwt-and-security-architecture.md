@@ -46,7 +46,7 @@ Uygulama tamamen **Stateless** çalışır (`SessionCreationPolicy.STATELESS`); 
 ---
 
 ### B. Refresh Token Rotation (RTR) & Otomatik İhlal Tespiti (Reuse Detection)
-OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refresh Token Rotation (RTR)** ve **Token Family** mimarisi uygulanmıştır ([`LoginService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/auth/application/LoginService.java) & [`TokenService.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/auth/application/TokenService.java)):
+OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refresh Token Rotation (RTR)** ve **Token Family** mimarisi uygulanmıştır ([`LoginService.java`](../src/main/java/com/serhat/secondhand/auth/application/LoginService.java) & [`TokenService.java`](../src/main/java/com/serhat/secondhand/auth/application/TokenService.java)):
 
 ```
 [İstemci] ──(POST /api/auth/refresh-token)──► [LoginService]
@@ -82,7 +82,7 @@ OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refre
 
 ---
 
-### C. Google OAuth2 Social Login & SSO Boru Hattı ([`OAuth2LoginSuccessHandler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/OAuth2LoginSuccessHandler.java))
+### C. Google OAuth2 Social Login & SSO Boru Hattı ([`OAuth2LoginSuccessHandler.java`](../src/main/java/com/serhat/secondhand/core/config/OAuth2LoginSuccessHandler.java))
 1. Kullanıcı `/oauth2/authorization/google` üzerinden Google'a yönlendirilir.
 2. Başarılı girişte `OAuth2LoginSuccessHandler` tetiklenir:
    - Kullanıcının e-postası sistemde varsa hesap eşleştirilir (`Account Linking`).
@@ -91,7 +91,7 @@ OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refre
 
 ---
 
-### D. Üretim Ortamı Güvenlik Muhafızı ([`ProdSecurityGuard.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/ProdSecurityGuard.java))
+### D. Üretim Ortamı Güvenlik Muhafızı ([`ProdSecurityGuard.java`](../src/main/java/com/serhat/secondhand/core/config/ProdSecurityGuard.java))
 Uygulama `prod` profilinde ayağa kalkarken `PostConstruct` aşamasında kritik güvenlik denetimleri yapar; konfigürasyon güvensizse **sunucunun başlamasını engeller**:
 * `jwt.secretKey` tanımlanmamışsa veya **32 karakterden kısaysa** uygulama çökertilir.
 * `app.auth.cookie.secure = true` ve `same-site` zorunludur.
@@ -101,7 +101,7 @@ Uygulama `prod` profilinde ayağa kalkarken `PostConstruct` aşamasında kritik 
 
 ## 3. Web & Ağ Güvenliği (OWASP Standartları)
 
-### A. Güvenlik Başlıkları ([`SecurityHeadersFilter.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/security/SecurityHeadersFilter.java))
+### A. Güvenlik Başlıkları ([`SecurityHeadersFilter.java`](../src/main/java/com/serhat/secondhand/core/security/SecurityHeadersFilter.java))
 Tüm HTTP yanıtlarına en yüksek öncelikle (`HIGHEST_PRECEDENCE`) aşağıdaki OWASP standart başlıkları enjekte edilir:
 
 ```http
@@ -119,7 +119,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 
 ---
 
-### B. Dinamik Public Endpoint Keşfi ([`PublicEndpointRegistry.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/security/PublicEndpointRegistry.java))
+### B. Dinamik Public Endpoint Keşfi ([`PublicEndpointRegistry.java`](../src/main/java/com/serhat/secondhand/core/security/PublicEndpointRegistry.java))
 * Controller'larda `@PublicEndpoint` anatasyonu taşıyan metotlar bootstrap anında taranır ve merkezi beyaz listeye eklenir.
 * Yanlışlıkla korumasız endpoint kalması önlenir; açıkça izin verilmeyen her endpoint varsayılan olarak **Authentication Required** statüsündedir.
 
@@ -128,7 +128,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 ## 4. Yetkilendirme & Erişim Kontrolü (RBAC & IDOR Koruması)
 
 ### A. Role-Based Access Control (RBAC)
-[`SecurityConfig.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/SecurityConfig.java) üzerinde `@EnableMethodSecurity` aktiftir:
+[`SecurityConfig.java`](../src/main/java/com/serhat/secondhand/core/config/SecurityConfig.java) üzerinde `@EnableMethodSecurity` aktiftir:
 * `@PreAuthorize("hasRole('ADMIN')")`: Yalnızca sistem yöneticilerine açık operasyonlar.
 * `@PreAuthorize("hasRole('USER')")`: Standart kullanıcı endpointleri.
 
@@ -159,7 +159,7 @@ Saldırganların URL'deki ID'yi değiştirerek başka kullanıcıların sipariş
 ### B. Safe Meetup OTP Kriptografisi
 * Yüz yüze teslimat için üretilen 6 haneli kod açık metin olarak değil, `SHA-256` hash'i (`meetupVerificationCodeHash`) olarak saklanır.
 
-### C. Jackson RCE / Gadget Attack Koruması ([`CacheConfig.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/core/config/CacheConfig.java))
+### C. Jackson RCE / Gadget Attack Koruması ([`CacheConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java))
 Redis deserialization anında bilinmeyen zararlı Java sınıflarının yüklenmesini (Remote Code Execution) engellemek için `BasicPolymorphicTypeValidator` whitelist'i uygulanmıştır:
 ```java
 BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()

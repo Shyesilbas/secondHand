@@ -1,21 +1,8 @@
 import { get, post } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { PaymentDto, createPaymentRequest } from '../paymentSchema.js';
+import { PaymentDto } from '../paymentSchema.js';
 
 export const paymentService = {
-
- createPayment: async (paymentData) => {
- const paymentRequestData = createPaymentRequest(paymentData);
- const idempotencyKey =
- paymentData.idempotencyKey
- || `pay-${paymentRequestData.listingId || 'general'}-${paymentRequestData.paymentType || 'x'}-${paymentRequestData.amount}`;
- const config = {
- headers: {
- 'Idempotency-Key': idempotencyKey
- }
- };
- return await post(API_ENDPOINTS.PAYMENTS.CREATE, paymentRequestData, config);
- },
 
  createListingFeePayment: async (paymentData) => {
  const { idempotencyKey: explicitKey, ...body } = paymentData;

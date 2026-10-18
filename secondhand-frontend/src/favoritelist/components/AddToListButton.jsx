@@ -27,7 +27,7 @@ const AddToListButton = ({
  md: 'w-4 h-4',
  lg: 'w-5 h-5'
  };
- const defaultClassName = `bg-background-primary/90 backdrop-blur hover:bg-background-primary text-text-secondary hover:text-accent-slate-900 border-none ${sizeClasses[size]} rounded-full shadow-sm flex items-center justify-center transition-colors`;
+ const defaultClassName = `bg-background-primary hover:bg-background-primary text-text-secondary hover:text-accent-slate-900 border-none ${sizeClasses[size]} rounded-full shadow-sm flex items-center justify-center transition-colors`;
  const buttonClassName = className || defaultClassName;
  return <>
  <button type="button" onClick={e => {

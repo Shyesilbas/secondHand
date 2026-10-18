@@ -1,29 +1,7 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, color = 'blue', index = 0, badge }) => {
- const iconColorClasses = {
- blue: 'bg-primary/10 text-primary',
- green: 'bg-status-success-bg/10 text-status-success',
- purple: 'bg-primary/10 text-primary',
- amber: 'bg-status-warning-bg/10 text-status-warning',
- red: 'bg-rose-500/10 text-rose-600',
- gray: 'bg-text-muted/10 text-slate-600',
- pink: 'bg-primary/10 text-primary',
- cyan: 'bg-cyan-500/10 text-cyan-600',
- };
-
- const accentBorder = {
- blue: 'border-l-blue-500',
- green: 'border-l-emerald-500',
- purple: 'border-l-indigo-500',
- amber: 'border-l-amber-500',
- red: 'border-l-rose-500',
- gray: 'border-l-slate-500',
- pink: 'border-l-pink-500',
- cyan: 'border-l-cyan-500',
- };
-
+const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, index = 0, badge }) => {
  const formatValue = (val) => {
  if (typeof val === 'number') {
  if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
@@ -40,9 +18,9 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
  };
 
  const getTrendColor = () => {
- if (trend > 0) return 'text-status-success bg-status-success-bg/10';
- if (trend < 0) return 'text-rose-600 bg-rose-500/10';
- return 'text-slate-500 bg-text-muted/10';
+ if (trend > 0) return 'text-status-success-text bg-background-secondary';
+ if (trend < 0) return 'text-status-error-text bg-status-error/10';
+ return 'text-text-tertiary bg-text-muted/10';
  };
 
  return (
@@ -50,19 +28,15 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
  initial={{ opacity: 0, y: 16 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
- className={`relative bg-background-primary rounded-2xl border border-slate-100 border-l-[3px] ${accentBorder[color] || accentBorder.blue} p-5 shadow-sm hover:shadow-md transition-shadow duration-300 group`}
+ className="relative rounded border border-border bg-background-primary p-5"
  >
  <div className="flex items-center justify-between mb-3">
  <div className="flex items-center gap-2.5">
- {Icon && (
- <div className={`p-2 rounded-xl ${iconColorClasses[color] || iconColorClasses.blue}`}>
- <Icon className="w-4 h-4" />
- </div>
- )}
- <span className="text-caption font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
+ {Icon && <Icon className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />}
+ <span className="text-xs font-semibold text-text-tertiary">{title}</span>
  </div>
  {badge && (
- <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-status-success-bg/10 text-status-success border border-slate-300/50">
+ <span className="text-xs tabular-nums text-status-success-text">
  {badge}
  </span>
  )}
@@ -70,11 +44,11 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
  
  <div>
  <div className="flex items-end gap-2.5 mb-1">
- <span className="text-2xl font-bold text-text-primary tracking-tight leading-none">{formatValue(value)}</span>
+ <span className="text-2xl font-semibold text-text-primary tracking-tight leading-none">{formatValue(value)}</span>
  {trend !== undefined && trend !== null && (
- <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${getTrendColor()} font-bold`}>
+ <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${getTrendColor()} font-semibold`}>
  {getTrendIcon()}
- <span className="text-caption">
+ <span className="text-xs">
  {Math.abs(trend).toFixed(1)}%
  </span>
  </div>
@@ -84,10 +58,10 @@ const MetricCard = ({ title, value, icon: Icon, trend, trendLabel, subtitle, col
  {(subtitle || trendLabel) && (
  <div className="flex flex-col">
  {subtitle && (
- <p className="text-caption text-slate-500 font-medium">{subtitle}</p>
+ <p className="text-xs text-text-tertiary font-medium">{subtitle}</p>
  )}
  {trendLabel && (
- <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{trendLabel}</p>
+ <p className="text-xs text-text-muted font-semibold mt-0.5">{trendLabel}</p>
  )}
  </div>
  )}

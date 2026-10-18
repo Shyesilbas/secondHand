@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import React from 'react';
 const AuthButton = ({
  children,
  type = 'button',
@@ -17,23 +16,23 @@ const AuthButton = ({
  } = useTranslation();
  const baseClasses = `
  w-full inline-flex items-center justify-center gap-2 border
- rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-stone-900/5
+ rounded font-medium focus:outline-none focus:ring-4 focus:ring-primary/5
  transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed
- active:scale-[0.985] text-sm
+ text-sm
  `;
  const variants = {
  primary: `
- text-white bg-stone-900 border-stone-900 hover:bg-stone-850 hover:shadow-sm
- disabled:bg-stone-900 disabled:hover:bg-stone-900
+ text-white bg-primary border-primary hover:bg-primary-hover
+ disabled:bg-primary disabled:hover:bg-primary
  `,
  secondary: `
- text-stone-850 bg-stone-100/80 border-transparent hover:bg-stone-200/60
+ text-text-primary bg-background-tertiary/80 border-transparent hover:bg-secondary-200/60
  `,
  outline: `
- text-stone-800 bg-background-primary border-stone-200 hover:bg-stone-50 hover:border-stone-300
+ text-text-primary bg-background-primary border-border hover:bg-background-secondary hover:border-card-border-hover
  `,
  ghost: `
- text-stone-700 bg-transparent border-transparent hover:bg-stone-100/60
+ text-text-secondary bg-transparent border-transparent hover:bg-background-tertiary/60
  `
  };
  const sizes = {

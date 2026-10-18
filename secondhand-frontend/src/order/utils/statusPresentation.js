@@ -3,20 +3,14 @@ import { PAYMENT_STATUSES } from '../../payments/paymentSchema.js';
 
 const statusUpper = (status) => String(status || '').toUpperCase();
 
-/** Pill/badge row (border + bg + text) — list view */
-export const getOrderStatusBadgeClass = (status) => {
+/** 6px status dot colour (DESIGN.md: dot + text, never a filled pill) */
+export const getOrderStatusDotClass = (status) => {
  const s = statusUpper(status);
- if (s === ORDER_STATUSES.COMPLETED) return 'bg-status-success-bg text-slate-900 border-slate-300';
- if (s === ORDER_STATUSES.DELIVERED) return 'bg-blue-50 text-primary border-primary';
- if (s === ORDER_STATUSES.SHIPPED) return 'bg-slate-100 text-primary border-primary';
- if (s === ORDER_STATUSES.PROCESSING) return 'bg-status-warning-bg text-amber-900 border-amber-200';
- if (s === ORDER_STATUSES.CONFIRMED) return 'bg-status-success-bg text-status-success-text border-status-success-border';
- if (s === ORDER_STATUSES.PENDING) return 'bg-slate-100 text-slate-700 border-border-light';
- if (s === ORDER_STATUSES.CANCELLED || s === ORDER_STATUSES.REFUNDED) return 'bg-rose-50 text-rose-800 border-rose-200';
- if (s === ORDER_STATUSES.MEETUP_PENDING) return 'bg-slate-100 text-primary border-primary';
- if (s === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-primary text-violet-800 border-violet-200';
- if (s === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-purple-50 text-primary border-primary-200';
- return 'bg-slate-50 text-slate-700 border-border-light';
+ if ([ORDER_STATUSES.COMPLETED, ORDER_STATUSES.DELIVERED, ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.HANDOVER_CONFIRMED].includes(s)) return 'bg-status-success';
+ if ([ORDER_STATUSES.SHIPPED, ORDER_STATUSES.VERIFICATION_LOCKED].includes(s)) return 'bg-primary';
+ if ([ORDER_STATUSES.PROCESSING, ORDER_STATUSES.MEETUP_PENDING].includes(s)) return 'bg-status-warning';
+ if ([ORDER_STATUSES.CANCELLED, ORDER_STATUSES.REFUNDED].includes(s)) return 'bg-status-error';
+ return 'bg-secondary-400';
 };
 
 /** Inline text color — modal label, links */
@@ -28,42 +22,30 @@ export const getOrderStatusTextClass = (status) => {
  if (value === ORDER_STATUSES.SHIPPED) return 'text-primary';
  if (value === ORDER_STATUSES.PROCESSING) return 'text-status-warning';
  if (value === ORDER_STATUSES.CONFIRMED) return 'text-status-success';
- if (value === ORDER_STATUSES.PENDING) return 'text-slate-600';
+ if (value === ORDER_STATUSES.PENDING) return 'text-text-secondary';
  if (value === ORDER_STATUSES.MEETUP_PENDING) return 'text-primary';
- if (value === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'text-violet-600';
+ if (value === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'text-text-primary';
  if (value === ORDER_STATUSES.VERIFICATION_LOCKED) return 'text-primary';
- if (value === ORDER_STATUSES.REFUNDED) return 'text-rose-600';
- if (value === ORDER_STATUSES.CANCELLED) return 'text-rose-600';
+ if (value === ORDER_STATUSES.REFUNDED) return 'text-status-error-text';
+ if (value === ORDER_STATUSES.CANCELLED) return 'text-status-error-text';
 
- return 'text-slate-600';
-};
-
-export const getOrderStatusIndicatorClass = (status) => {
- if (status === ORDER_STATUSES.COMPLETED) return 'bg-status-success-bg';
- if (status === ORDER_STATUSES.DELIVERED) return 'bg-primary';
- if (status === ORDER_STATUSES.SHIPPED) return 'bg-primary';
- if (status === ORDER_STATUSES.PROCESSING) return 'bg-status-warning-bg';
- if (status === ORDER_STATUSES.CONFIRMED) return 'bg-status-success-bg';
- if (status === ORDER_STATUSES.MEETUP_PENDING) return 'bg-primary';
- if (status === ORDER_STATUSES.HANDOVER_CONFIRMED) return 'bg-primary';
- if (status === ORDER_STATUSES.VERIFICATION_LOCKED) return 'bg-primary';
- return 'bg-gray-400';
+ return 'text-text-secondary';
 };
 
 export const getPaymentStatusIndicatorClass = (status) => {
  const s = String(status || '').toUpperCase();
- if (s === PAYMENT_STATUSES.PAID) return 'bg-status-success-bg';
- if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'bg-status-warning-bg';
- if (s === PAYMENT_STATUSES.REFUNDED) return 'bg-rose-400';
+ if (s === PAYMENT_STATUSES.PAID) return 'bg-status-success';
+ if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'bg-status-warning';
+ if (s === PAYMENT_STATUSES.REFUNDED) return 'bg-status-error';
  if (s === PAYMENT_STATUSES.PENDING) return 'bg-text-muted';
- return 'bg-status-error-bg';
+ return 'bg-status-error';
 };
 
 export const getPaymentStatusTextClass = (status) => {
  const s = String(status || '').toUpperCase();
- if (s === PAYMENT_STATUSES.PAID) return 'text-slate-600';
- if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'text-amber-400';
- if (s === PAYMENT_STATUSES.REFUNDED) return 'text-rose-400';
- if (s === PAYMENT_STATUSES.PENDING) return 'text-slate-400';
+ if (s === PAYMENT_STATUSES.PAID) return 'text-text-secondary';
+ if (s === PAYMENT_STATUSES.PARTIALLY_REFUNDED) return 'text-status-warning';
+ if (s === PAYMENT_STATUSES.REFUNDED) return 'text-status-error';
+ if (s === PAYMENT_STATUSES.PENDING) return 'text-text-muted';
  return 'text-status-error';
 };

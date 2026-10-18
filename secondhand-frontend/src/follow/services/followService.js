@@ -34,10 +34,6 @@ export const followService = {
  return get(API_ENDPOINTS.FOLLOW.STATS(userId));
  },
 
- checkFollowing: async (userId) => {
- return get(API_ENDPOINTS.FOLLOW.CHECK(userId));
- },
-
  getUserFollowers: async (userId, params = {}) => {
  const query = new URLSearchParams({
  page: params.page ?? 0,

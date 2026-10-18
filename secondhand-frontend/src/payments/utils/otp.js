@@ -65,10 +65,6 @@ export const extractOtpFromEmailRecord = (email, { expectedEmailType } = {}) => 
  return extractSixDigitFromNormalizedText(norm);
 };
 
-/** @deprecated Use extractOtpFromEmailRecord — kept for callers using old name */
-export const extractVerificationCodeFromEmail = (email, expectedEmailType) =>
- extractOtpFromEmailRecord(email, { expectedEmailType: expectedEmailType || undefined });
-
 /**
  * Newest matching emails first; returns first OTP found among up to maxScan candidates.
  */

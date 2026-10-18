@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -37,30 +36,30 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  switch (status) {
  case 'ACCEPTED':
  return {
- bg: 'bg-slate-100 border-slate-300 dark:bg-slate-950/40 dark:border-slate-900',
- badge: 'bg-slate-800 text-white',
- icon: <FiCheckCircle className="w-4 h-4 text-slate-900 dark:text-slate-600" />,
+ bg: 'bg-background-tertiary border-card-border-hover',
+ badge: 'bg-primary-hover text-white',
+ icon: <FiCheckCircle className="w-4 h-4 text-text-primary" />,
  label: t("status_accepted")
  };
  case 'REJECTED':
  return {
- bg: 'bg-rose-50 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800',
- badge: 'bg-rose-500 text-white',
- icon: <FiXCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
+ bg: 'bg-background-secondary border-border',
+ badge: 'bg-status-error text-white',
+ icon: <FiXCircle className="w-4 h-4 text-status-error-text" />,
  label: t("status_rejected")
  };
  case 'EXPIRED':
  return {
- bg: 'bg-slate-50 border-slate-200 dark:bg-slate-900/60 dark:border-slate-700',
- badge: 'bg-slate-500 text-white',
- icon: <FiClock className="w-4 h-4 text-slate-500" />,
+ bg: 'bg-background-secondary border-border',
+ badge: 'bg-secondary-500 text-white',
+ icon: <FiClock className="w-4 h-4 text-text-tertiary" />,
  label: t("status_expired")
  };
  default:
  return {
- bg: 'bg-slate-100/80 border-slate-300 dark:bg-slate-950/40 dark:border-slate-900/60',
- badge: 'bg-slate-900 text-white',
- icon: <FiTag className="w-4 h-4 text-slate-900 dark:text-slate-600" />,
+ bg: 'bg-background-tertiary/80 border-card-border-hover',
+ badge: 'bg-primary text-white',
+ icon: <FiTag className="w-4 h-4 text-text-primary" />,
  label: t("status_pending")
  };
  }
@@ -69,16 +68,16 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  const statusConfig = getStatusConfig();
 
  return (
- <div className={`my-2 p-4 rounded-2xl border shadow-sm max-w-sm w-full transition-all duration-200 ${statusConfig.bg}`}>
+ <div className={`my-2 p-4 rounded-md border shadow-sm max-w-sm w-full transition-all duration-200 ${statusConfig.bg}`}>
  {/* Header / Badge */}
- <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-200/60 dark:border-slate-700/50">
+ <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border/60">
  <div className="flex items-center gap-2">
  {statusConfig.icon}
- <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+ <span className="text-xs font-semibold text-text-secondary">
  {t("in_chat_offer_label")}
  </span>
  </div>
- <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${statusConfig.badge}`}>
+ <span className={`text-xs font-semibold px-2 py-0.5 rounded-sm ${statusConfig.badge}`}>
  {statusConfig.label}
  </span>
  </div>
@@ -86,15 +85,15 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  {/* Content Details */}
  <div className="space-y-1.5 mb-3">
  {title && (
- <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+ <p className="text-xs font-medium text-text-tertiary truncate">
  {title}
  </p>
  )}
  <div className="flex items-baseline justify-between">
- <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+ <span className="text-xs text-text-secondary font-medium">
  {t("offered_price")}:
  </span>
- <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+ <span className="text-lg font-semibold text-text-primary tracking-tight">
  ₺{price ? Number(price).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '0.00'}
  </span>
  </div>
@@ -106,7 +105,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  <button
  onClick={() => offerId && acceptMutation.mutate(offerId)}
  disabled={acceptMutation.isPending || !offerId}
- className="flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-900 hover:bg-slate-900 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-slate-900/10 transition-all disabled:opacity-50"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
  >
  <FiCheckCircle className="w-3.5 h-3.5" />
  {acceptMutation.isPending ? t("processing") : t("accept")}
@@ -115,7 +114,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  <button
  onClick={() => offerId && rejectMutation.mutate(offerId)}
  disabled={rejectMutation.isPending || !offerId}
- className="flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-500/20 transition-all disabled:opacity-50"
+ className="flex items-center justify-center gap-1.5 px-3 py-2 bg-status-error hover:bg-status-error text-white rounded text-xs font-semibold transition-all disabled:opacity-50"
  >
  <FiXCircle className="w-3.5 h-3.5" />
  {rejectMutation.isPending ? t("processing") : t("reject")}
@@ -127,7 +126,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  <div className="pt-1">
  <button
  onClick={() => navigate(`/checkout?offerId=${offerId}`)}
- className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r bg-slate-900 hover:from-indigo-700 hover:to-violet-700 active:scale-[0.98] text-white rounded-xl text-xs font-extrabold shadow-lg shadow-slate-900/10 transition-all"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-full"
  >
  <FiShoppingBag className="w-4 h-4" />
  <span>{t("proceed_to_checkout")}</span>

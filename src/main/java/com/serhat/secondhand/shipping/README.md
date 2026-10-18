@@ -5,7 +5,7 @@ The `shipping` domain isolates the logistical tracking and carrier management fr
 
 ## Architecture Overview
 - **Modular Separation:** Shipping state transitions are handled independently of payment and checkout.
-- **Carrier Management:** Managed via enum structures (`Carrier`) allowing Open/Closed extension.
+- **Carrier Management:** Each cargo provider is a `CargoProviderPort` adapter (only `JetKargo` today). `GET /api/v1/enums` lists their `providerName()` values as `carriers`.
 
 ## Business Invariants & Constraints
 - **State Progression:** PENDING -> IN_TRANSIT -> DELIVERED (or CANCELLED).
@@ -16,7 +16,4 @@ The `shipping` domain isolates the logistical tracking and carrier management fr
 - **Outgoing:** Provides delivery status back to `order` and `escrow` to trigger fund releases.
 
 ## Public APIs
-- `PUT /api/v1/orders/{orderId}/ship`
-
-## Related Knowledge
-- *(No specific runbooks extracted; modifications usually require updating Carrier enums and state transitions)*
+- `PUT /api/v1/orders/{orderId}/ship` with `{ "providerName": "<carrier>" }`; the provider assigns the tracking number.

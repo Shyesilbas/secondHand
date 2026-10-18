@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
@@ -21,24 +21,17 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Clock,
   Eye,
   Flame,
-  FileText,
-  HandCoins,
   Heart,
-  Layers,
   MapPin,
   Package,
   Share2,
-  Shield,
   ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Star,
-  Tag,
-  Settings
+  Sparkles
 } from 'lucide-react';
+import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { useCart } from '../../cart/hooks/useCart.js';
 import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
@@ -66,71 +59,58 @@ const discountPercent = (original, sale) => {
 
 /* ── Sub-components ──────────────────────────────────────── */
 
-/** High-fidelity skeleton loader */
+const CARD = 'rounded border border-border bg-background-primary';
+
 const DetailSkeleton = () => (
-  <div className="min-h-screen bg-slate-50/60 font-sans pb-24">
-    <div className="h-14 bg-white/80 border-b border-slate-200/80 animate-pulse" />
-    <PageContainer className="max-w-[1360px] pt-6 sm:pt-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
-        {/* Left Column Skeleton */}
-        <div className="lg:col-span-7 xl:col-span-7 space-y-6">
-          <div className="aspect-[4/3] sm:aspect-[16/11] bg-slate-200/70 rounded-[28px] animate-pulse" />
+  <div className="min-h-screen bg-background-secondary pb-24">
+    <div className="h-14 border-b border-border bg-background-primary" />
+    <PageContainer className="pt-6 sm:pt-8">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 xl:gap-12">
+        <div className="space-y-6 lg:col-span-7">
+          <Skeleton className="aspect-4/3 w-full sm:aspect-16/11" />
           <div className="flex gap-3">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-20 w-24 bg-slate-200/60 rounded-2xl animate-pulse shrink-0" />
-            ))}
+            {['a', 'b', 'c', 'd'].map(k => <Skeleton key={k} className="h-16 w-20 shrink-0" />)}
           </div>
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/70 animate-pulse space-y-3">
-            <div className="h-5 w-40 bg-slate-200 rounded-lg" />
-            <div className="h-4 w-full bg-slate-100 rounded-md" />
-            <div className="h-4 w-4/5 bg-slate-100 rounded-md" />
-          </div>
+          <Skeleton className="h-40 w-full" />
         </div>
-        {/* Right Column Skeleton */}
-        <div className="lg:col-span-5 xl:col-span-5">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 animate-pulse space-y-5">
-            <div className="flex gap-2">
-              <div className="h-5 w-20 bg-slate-200 rounded-md" />
-              <div className="h-5 w-24 bg-slate-100 rounded-md" />
-            </div>
-            <div className="h-8 w-4/5 bg-slate-200 rounded-xl" />
-            <div className="h-4 w-1/2 bg-slate-100 rounded-md" />
-            <div className="h-24 bg-slate-50 rounded-2xl border border-slate-100" />
-            <div className="h-12 w-full bg-slate-900/10 rounded-2xl" />
-            <div className="h-10 w-full bg-slate-100 rounded-2xl" />
-          </div>
+        <div className="space-y-4 lg:col-span-5">
+          <Skeleton className="h-8 w-4/5" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
       </div>
     </PageContainer>
   </div>
 );
 
-/** Modern Error state */
 const DetailError = ({ error }) => {
   const { t } = useTranslation();
   return (
-    <div className="min-h-screen bg-slate-50/50 flex items-center justify-center p-4 font-sans">
-      <div className="text-center max-w-md w-full rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-lg shadow-slate-900/5">
-        <div className="w-16 h-16 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-500 shadow-xs">
-          <AlertTriangle className="w-8 h-8 stroke-[1.75]" />
-        </div>
-        <h3 className="text-lg font-black text-slate-900 mb-2 tracking-tight">
+    <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4">
+      <div className={`${CARD} w-full max-w-md p-8 text-center`}>
+        <AlertTriangle className="mx-auto mb-4 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
+        <h1 className="mb-2 text-lg font-semibold text-text-primary">
           {t("listing_unavailable", "İlan Bulunamadı")}
-        </h3>
-        <p className="text-slate-500 text-xs font-medium mb-6 leading-relaxed">
+        </h1>
+        <p className="mb-6 text-sm text-text-secondary">
           {error || t("listing_unavailable_desc", "Bu ilan yayından kaldırılmış, satılmış veya silinmiş olabilir.")}
         </p>
-        <Link
-          to={ROUTES.LISTINGS}
-          className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
+        <Link to={ROUTES.LISTINGS} className={`${buttonClasses()} w-full`}>
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           <span>{t("back_to_listings", "İlanlara Dön")}</span>
         </Link>
       </div>
     </div>
   );
 };
+
+const SectionCard = ({ title, children }) => (
+  <section className={`${CARD} p-5`}>
+    <h2 className="mb-4 border-b border-border-light pb-3 text-lg font-semibold text-text-primary">{title}</h2>
+    {children}
+  </section>
+);
 
 /* ── Main Page ───────────────────────────────────────────── */
 
@@ -173,19 +153,18 @@ const ListingDetailPage = () => {
     if (cartReservations > 0) {
       list.push({
         id: 'cart',
-        icon: <Flame className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0 animate-pulse" />,
-        text: `Şu an ${cartReservations} kişinin sepetinde / satın alma adımında`,
-        badge: 'Yüksek Talep',
-        bg: 'bg-amber-500/10 text-amber-950 border-amber-300/80 shadow-xs'
+        text: `Şu an ${cartReservations} kişinin sepetinde`,
+        subtext: 'Satın alma adımı başlatıldı',
+        badge: 'Yüksek talep'
       });
     }
     if (activeViewers > 0) {
+      const isSuperHot = activeViewers >= 10;
       list.push({
         id: 'viewers',
-        icon: <Eye className="w-4 h-4 text-slate-700 shrink-0" />,
-        text: `Son 24 saatte ${activeViewers} kişi bu ilanı inceledi`,
-        badge: 'Popüler',
-        bg: 'bg-slate-100/90 text-slate-900 border-slate-200/90 shadow-2xs'
+        text: `Son 24 saatte ${activeViewers} kişi inceledi`,
+        subtext: isSuperHot ? 'Yoğun ilgi görüyor' : 'Popüler ilan',
+        badge: isSuperHot ? 'Yoğun ilgi' : 'Popüler'
       });
     }
     return list;
@@ -320,572 +299,359 @@ const ListingDetailPage = () => {
   if (error) return <DetailError error={error} />;
   if (!listing) return null;
 
+  const stockCount = Number(listing.quantity);
+  const stock = stockCount === 0
+    ? { dot: 'bg-secondary-400', label: 'Tükendi' }
+    : isLowStock
+    ? { dot: 'bg-status-error', label: `Son ${stockCount} adet` }
+    : { dot: 'bg-status-success', label: `Stokta (${stockCount} adet)` };
+  const cartLabel = isAddingToCart
+    ? t("adding_to_cart", "Ekleniyor...")
+    : itemIsInCart ? t("in_cart", "Sepette (Sepete Git)") : t("add_to_cart", "Sepete Ekle");
+  const handleCartClick = () => (itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id));
+  const openAura = () => navigate(ROUTES.AURA_CHAT, { state: { listing } });
+
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-28 text-slate-900 selection:bg-slate-200 selection:text-slate-900 font-sans">
-      
-      {/* ── Top Navigation & Quick Action Bar ── */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/70 shadow-xs transition-all">
-        <PageContainer className="max-w-[1360px] h-14 sm:h-15 flex items-center justify-between gap-4">
-          
-          {/* Breadcrumb Path */}
-          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0" aria-label="Breadcrumb">
-            <Link
-              to={ROUTES.LISTINGS}
-              className="hover:text-slate-900 transition-colors flex items-center gap-1.5 shrink-0 px-2 py-1 rounded-lg hover:bg-slate-100"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold">{t("all_listings", "İlanlar")}</span>
+    <div className="min-h-screen bg-background-secondary pb-28 text-text-primary">
+      <header className="sticky top-0 z-40 border-b border-border bg-background-primary">
+        <PageContainer className="flex h-14 items-center justify-between gap-4">
+          <nav className="flex min-w-0 items-center gap-2 text-sm text-text-tertiary" aria-label="Breadcrumb">
+            <Link to={ROUTES.LISTINGS} className="flex shrink-0 items-center gap-1.5 rounded px-2 py-1 transition-colors hover:bg-background-secondary hover:text-text-primary">
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t("all_listings", "İlanlar")}</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px] shrink-0 bg-slate-100/90 border border-slate-200/60 px-2.5 py-0.5 rounded-lg">
-              {listing.type}
-            </span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 hidden md:block" />
-            <span className="text-slate-900 font-bold truncate hidden md:inline max-w-[340px]">
-              {listing.title}
-            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+            <span className="shrink-0 text-text-secondary">{listing.type}</span>
+            <ChevronRight className="hidden h-4 w-4 shrink-0 text-text-muted md:block" strokeWidth={1.5} aria-hidden />
+            <span className="hidden max-w-xs truncate text-text-primary md:inline">{listing.title}</span>
           </nav>
 
-          {/* Quick Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Aura AI Chat Button */}
-            <button
-              onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 hover:from-amber-500/20 hover:to-purple-500/20 text-slate-900 border border-indigo-200/70 rounded-xl text-xs font-extrabold transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95"
-              title={t("ask_aura_tip", "Bu ilan hakkında Aura AI ile konuş")}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+          <div className="flex shrink-0 items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={openAura} title={t("ask_aura_tip", "Bu ilan hakkında Aura AI ile konuş")}>
+              <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>{t("ask_aura", "Aura AI")}</span>
-            </button>
-
-            {/* Compare Button */}
+            </Button>
             {!isOwner && <CompareButton listing={listing} size="md" className="hidden sm:flex" />}
-
-            {/* Favorite Button */}
             {!isOwner && (
               <FavoriteButton
                 listingId={listing.id}
                 listing={listing}
                 size="md"
                 showCount={false}
-                className="p-2 border border-slate-200/90 bg-white text-slate-600 hover:text-rose-600 rounded-xl transition-all hover:bg-rose-50/60 hover:border-rose-200 shadow-2xs cursor-pointer active:scale-95"
+                className="rounded border border-border bg-background-primary p-2 text-text-secondary transition-colors hover:bg-background-secondary hover:text-status-error-text"
               />
             )}
-
-            {/* Share Button with Copied State Feedback */}
             <button
+              type="button"
               onClick={handleShare}
-              className={`p-2 rounded-xl transition-all border shadow-2xs cursor-pointer active:scale-95 flex items-center gap-1.5 text-xs font-bold ${
-                copiedLink
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 border-slate-200/90'
-              }`}
+              className="flex items-center gap-1.5 rounded border border-border bg-background-primary p-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
               aria-label={t("share", "Paylaş")}
-              title={copiedLink ? t("link_copied", "Bağlantı kopyalandı!") : t("share", "Paylaş")}
+              title={copiedLink ? t("link_copied", "Bağlantı kopyalandı") : t("share", "Paylaş")}
             >
               {copiedLink ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-600 animate-in zoom-in-50" />
-                  <span className="hidden sm:inline text-[11px] text-emerald-700">{t("copied", "Kopyalandı!")}</span>
+                  <Check className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden />
+                  <span className="hidden sm:inline">{t("copied", "Kopyalandı")}</span>
                 </>
               ) : (
-                <Share2 className="w-4 h-4" />
+                <Share2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               )}
             </button>
-
-            {/* Owner Listing Actions */}
             {isOwner && <ListingCardActions listing={listing} onChanged={fetchListing} />}
           </div>
-
         </PageContainer>
       </header>
 
-      {/* Offer Modal */}
       <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
 
-      {/* ── Main Stage (2 Columns: Left Storyline, Right Floating Buy Box) ── */}
-      <PageContainer className="max-w-[1360px] pt-6 sm:pt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-start">
-
-          {/* ══════════════════════════════════════════════════════════════
-              LEFT COLUMN: Media Gallery + Rich Storyline Content (7 Cols)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-7">
-            
-            {/* 1. Media Gallery Stage */}
-            <div className="space-y-3.5">
-              <div 
-                ref={galleryRef} 
-                className="w-full aspect-[4/3] sm:aspect-[16/11] bg-gradient-to-b from-white to-slate-50/60 rounded-[28px] overflow-hidden relative group border border-slate-200/80 shadow-xs flex items-center justify-center transition-all"
-              >
+      <PageContainer className="pt-6 sm:pt-8">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 xl:gap-12">
+          <div className="space-y-6 lg:col-span-7">
+            <div className="space-y-3">
+              <div ref={galleryRef} className={`${CARD} group relative flex aspect-4/3 w-full items-center justify-center overflow-hidden sm:aspect-16/11`}>
                 {selectedImage && !imageError ? (
                   <img
                     key={selectedImage}
                     src={optimizeCloudinaryUrl(selectedImage, { width: 1400 })}
                     onError={() => setImageError(true)}
                     alt={`${listing.title} - ${selectedImageIndex + 1}`}
-                    className="w-full h-full object-contain p-4 sm:p-6 transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                    className="h-full w-full object-contain p-4 sm:p-6"
                     fetchpriority="high"
                     decoding="async"
                     loading="eager"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-3 text-slate-400">
-                      <Package className="w-8 h-8 stroke-[1.5]" />
-                    </div>
-                    <p className="text-xs font-bold text-slate-500">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{t("seller_no_upload", "Satıcı bu ilan için görsel eklemedi.")}</p>
+                  <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+                    <Package className="mb-3 h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
+                    <p className="text-sm font-medium text-text-secondary">{t("no_image_available", "Fotoğraf bulunmuyor")}</p>
+                    <p className="mt-1 text-sm text-text-tertiary">{t("seller_no_upload", "Satıcı bu ilan için görsel eklemedi.")}</p>
                   </div>
                 )}
 
-                {/* Gallery Navigation Floating Controls */}
                 {images.length > 1 && (
                   <>
                     <button
+                      type="button"
                       onClick={showPreviousImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200/80 cursor-pointer hover:scale-105 active:scale-95"
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 absolute left-4 top-1/2 w-11"
                       aria-label={t("previous", "Önceki")}
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
                     </button>
                     <button
+                      type="button"
                       onClick={showNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/95 hover:bg-white text-slate-900 shadow-md flex items-center justify-center transition-all opacity-90 sm:opacity-0 sm:group-hover:opacity-100 border border-slate-200/80 cursor-pointer hover:scale-105 active:scale-95"
+                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 absolute right-4 top-1/2 w-11"
                       aria-label={t("next", "Sonraki")}
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
                     </button>
-
-                    {/* Image Counter Badge */}
-                    <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1.5 rounded-full shadow-xs border border-white/10 flex items-center gap-1">
-                      <span>{selectedImageIndex + 1}</span>
-                      <span className="opacity-50">/</span>
-                      <span>{images.length}</span>
+                    <div className="absolute bottom-4 right-4 rounded-sm bg-primary/80 px-2 py-1 text-xs font-medium tabular-nums text-white">
+                      {selectedImageIndex + 1} / {images.length}
                     </div>
                   </>
                 )}
               </div>
 
-              {/* Thumbnail Strip */}
               {images.length > 1 && (
-                <div className="flex gap-2.5 overflow-x-auto py-1 px-0.5 scrollbar-none">
+                <div className="flex gap-2 overflow-x-auto py-1">
                   {images.map((imgUrl, idx) => (
                     <button
+                      type="button"
                       key={`${imgUrl}-${idx}`}
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`h-16 w-20 sm:h-18 sm:w-22 shrink-0 overflow-hidden rounded-2xl border-2 transition-all cursor-pointer bg-white ${
-                        selectedImageIndex === idx
-                          ? 'border-slate-900 ring-2 ring-slate-900/10 shadow-xs scale-100'
-                          : 'border-slate-200/80 opacity-60 hover:opacity-100 hover:border-slate-400 scale-95'
-                      }`}
+                      className={`h-16 w-20 shrink-0 overflow-hidden rounded border bg-background-primary transition-colors duration-150 ${selectedImageIndex === idx ? 'border-primary' : 'border-border opacity-60 hover:opacity-100'}`}
                       aria-label={`Görsel ${idx + 1}`}
+                      aria-current={selectedImageIndex === idx ? 'true' : undefined}
                     >
-                      <img
-                        src={optimizeCloudinaryUrl(imgUrl, { width: 180 })}
-                        alt=""
-                        className="h-full w-full object-contain p-1"
-                        loading="lazy"
-                      />
+                      <img src={optimizeCloudinaryUrl(imgUrl, { width: 180 })} alt="" className="h-full w-full object-contain p-1" loading="lazy" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* 2. Aura AI Smart Insights Highlight Card */}
-            <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-amber-50/50 rounded-3xl border border-indigo-100/90 p-6 sm:p-7 shadow-xs relative overflow-hidden">
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-xs">
-                    <Sparkles className="w-4 h-4 fill-amber-300 text-amber-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                      Aura AI İlan Analizi
-                    </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Yapay zeka destekli piyasa ve satıcı değerlendirmesi
-                    </p>
-                  </div>
+            <section className={`${CARD} p-5`}>
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-text-primary">Aura AI İlan Analizi</h2>
+                  <p className="mt-1 text-sm text-text-secondary">Yapay zeka destekli piyasa ve satıcı değerlendirmesi</p>
                 </div>
-                <button
-                  onClick={() => navigate(ROUTES.AURA_CHAT, { state: { listing } })}
-                  className="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-white/90 hover:bg-white border border-indigo-200/80 px-3.5 py-1.5 rounded-xl transition-all shadow-2xs hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0"
-                >
-                  Soru Sor →
-                </button>
+                <Button variant="secondary" size="sm" className="shrink-0" onClick={openAura}>Soru Sor</Button>
               </div>
-
-              {/* AI Summary Content */}
-              <div className="text-xs leading-relaxed text-slate-700 font-medium bg-white/80 backdrop-blur-xs rounded-2xl p-4 sm:p-5 border border-indigo-100/70 shadow-2xs">
+              <div className="rounded border border-border-light bg-background-secondary p-4 text-sm leading-relaxed text-text-secondary">
                 <AuraSummary type="listing" id={listing?.id} listing={listing} />
               </div>
-            </div>
+            </section>
 
-            {/* 3. Description Section */}
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
-              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                <FileText className="w-4 h-4 text-slate-400" />
-                <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
-                  {t("about_this_item", "Ürün Açıklaması")}
-                </h2>
-              </div>
-              <div className={`text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-medium ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-[160px] overflow-hidden relative' : ''}`}>
+            <SectionCard title={t("about_this_item", "Ürün Açıklaması")}>
+              <div className={`whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${!isDescriptionExpanded && shouldClampDescription ? 'relative max-h-40 overflow-hidden' : ''}`}>
                 {listing.description || t("no_description_provided", "Bu ilan için detaylı açıklama girilmemiş.")}
                 {!isDescriptionExpanded && shouldClampDescription && (
-                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                  <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-background-primary/90" />
                 )}
               </div>
               {shouldClampDescription && (
                 <button
+                  type="button"
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="mt-3.5 inline-flex items-center gap-1.5 text-slate-900 font-black text-xs uppercase tracking-wider hover:underline cursor-pointer"
+                  aria-expanded={isDescriptionExpanded}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-text-primary hover:underline"
                 >
-                  {isDescriptionExpanded ? (
-                    <>
-                      <ChevronUp className="w-4 h-4" />
-                      <span>{t("show_less", "Daha Az Göster")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" />
-                      <span>{t("read_more", "Devamını Oku")}</span>
-                    </>
-                  )}
+                  {isDescriptionExpanded ? <ChevronUp className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <ChevronDown className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
+                  <span>{isDescriptionExpanded ? t("show_less", "Daha Az Göster") : t("read_more", "Devamını Oku")}</span>
                 </button>
               )}
-            </div>
+            </SectionCard>
 
-            {/* 4. Structured Technical Specifications */}
             {DetailsComponent && (
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                  <Tag className="w-4 h-4 text-slate-400" />
-                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
-                    {t("specifications", "Teknik Özellikler & Detaylar")}
-                  </h2>
-                </div>
+              <SectionCard title={t("specifications", "Teknik Özellikler & Detaylar")}>
                 <DetailsComponent listing={listing} flat={true} />
-              </div>
+              </SectionCard>
             )}
 
-            {/* 5. Safe Meetup & Escrow Protection Hub */}
             <SafeMeetupPanel listing={listing} />
 
-            {/* 6. Verified Reviews & Community Feedback */}
             {hasReviews && (
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
-                <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-100">
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-                  <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest">
-                    {t("reviews", "Kullanıcı Değerlendirmeleri")}
-                  </h2>
-                </div>
+              <SectionCard title={t("reviews", "Kullanıcı Değerlendirmeleri")}>
                 <ListingReviewsSection listing={listing} />
-              </div>
+              </SectionCard>
             )}
-
           </div>
 
-          {/* ══════════════════════════════════════════════════════════════
-              RIGHT COLUMN: Floating Sticky Buy Box & Trust Hub (5 Cols)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-5 xl:col-span-5 space-y-6 lg:sticky lg:top-20">
-            
-            {/* Unified Floating Buy Box */}
-            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-sm space-y-5">
-              
-              {/* Product Header & Meta Badges */}
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center rounded-lg bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white uppercase tracking-wider">
-                    {listing.type}
-                  </span>
+          <div className="space-y-6 lg:sticky lg:top-20 lg:col-span-5">
+            <div className={`${CARD} space-y-5 p-5`}>
+              <div className="space-y-2">
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-tertiary">
+                  <span>{listing.type}</span>
                   {hasCampaign && (
-                    <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-900 border border-amber-200">
-                      <Tag className="w-3 h-3 text-amber-600" />
-                      {listing.campaignName || 'İndirim'}
-                      {discount && <span>−%{discount}</span>}
+                    <span className="text-status-warning-text">
+                      {listing.campaignName || 'İndirim'}{discount ? ` −%${discount}` : ''}
                     </span>
                   )}
-                  {listing.status !== LISTING_STATUS.ACTIVE && (
-                    <span className="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500 uppercase">
-                      {listing.status}
+                  {listing.status !== LISTING_STATUS.ACTIVE && <span>{listing.status}</span>}
+                </p>
+
+                <h1 className="text-2xl font-semibold leading-snug text-text-primary">{listing.title}</h1>
+
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-text-tertiary">
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                    {locationLabel}
+                  </span>
+                  <span className="inline-flex items-center gap-1 tabular-nums">
+                    <Calendar className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                    {formatDateTime(listing.createdAt)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 tabular-nums">
+                    <Heart className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                    {favoriteCount} {t("favorites", "favori")}
+                  </span>
+                  {activeViewers > 0 && (
+                    <span className="inline-flex items-center gap-1 tabular-nums text-status-warning-text">
+                      <Flame className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                      {activeViewers >= 10 ? 'Yoğun ilgi' : 'Popüler'} ({activeViewers} kişi inceliyor)
                     </span>
                   )}
-                </div>
-
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-                  {listing.title}
-                </h1>
-
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-semibold text-slate-500 pt-0.5">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{locationLabel}</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>{formatDateTime(listing.createdAt)}</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-1 text-slate-600">
-                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                    <span>{favoriteCount} {t("favorites", "favori")}</span>
-                  </div>
                   {isOwner && (
-                    <>
-                      <span>•</span>
-                      <div className="inline-flex items-center gap-1 text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80 text-[11px]" title="Sadece satıcıya özel görüntülenme verisi">
-                        <Eye className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{listing.viewCount ?? listing.viewStats?.totalViews ?? 0} {t("views", "görüntülenme")}</span>
-                      </div>
-                    </>
+                    <span className="inline-flex items-center gap-1 tabular-nums" title="Sadece satıcıya özel görüntülenme verisi">
+                      <Eye className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                      {listing.viewCount ?? listing.viewStats?.totalViews ?? 0} {t("views", "görüntülenme")}
+                    </span>
                   )}
                 </div>
               </div>
 
-              {/* ── Price & Stock Availability Card ── */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-slate-50/80 border border-slate-200/90 shadow-2xs space-y-3.5">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
-                  {/* Price Block */}
-                  <div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-base font-extrabold text-slate-400 select-none">
-                        {listing.currency === 'TRY' ? '₺' : listing.currency === 'USD' ? '$' : listing.currency === 'EUR' ? '€' : listing.currency}
+              <div className="flex flex-wrap items-start justify-between gap-4 border-y border-border-light py-4">
+                <div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base font-medium text-text-tertiary">
+                      {listing.currency === 'TRY' ? '₺' : listing.currency === 'USD' ? '$' : listing.currency === 'EUR' ? '€' : listing.currency}
+                    </span>
+                    <span className="text-3xl font-semibold tabular-nums text-text-primary">
+                      {formatPrice(displayPrice, { decimals: 0 })}
+                    </span>
+                    {Number(displayPrice) % 1 !== 0 && (
+                      <span className="text-base font-medium tabular-nums text-text-tertiary">
+                        ,{String(Number(displayPrice).toFixed(2)).split('.')[1]}
                       </span>
-                      <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
-                        {formatPrice(displayPrice, { decimals: 0 })}
-                      </span>
-                      {Number(displayPrice) % 1 !== 0 && (
-                        <span className="text-base font-extrabold text-slate-400 tabular-nums">
-                          ,{String(Number(displayPrice).toFixed(2)).split('.')[1]}
-                        </span>
-                      )}
-                    </div>
+                    )}
+                  </div>
+                  {hasCampaign && (
+                    <p className="mt-1 flex items-center gap-2 text-sm tabular-nums">
+                      <span className="text-text-muted line-through">{formatCurrency(listing.price, listing.currency)}</span>
+                      {discount && <span className="text-status-success-text">−%{discount} İndirim</span>}
+                    </p>
+                  )}
+                </div>
+                {hasStockInfo && (
+                  <p className="inline-flex items-center gap-1.5 pt-1 text-sm tabular-nums text-text-secondary">
+                    <span className={`h-1.5 w-1.5 rounded-full ${stock.dot}`} aria-hidden />
+                    {stock.label}
+                  </p>
+                )}
+              </div>
 
-                    {hasCampaign && (
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-xs text-slate-400 line-through font-bold tabular-nums">
-                          {formatCurrency(listing.price, listing.currency)}
-                        </span>
-                        {discount && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-black tracking-tight border border-emerald-200">
-                            −%{discount} İndirim
-                          </span>
-                        )}
+              {currentDetailStory && (
+                <div key={currentDetailStory.id} className="flex items-center justify-between gap-3 rounded border border-border-light px-4 py-3" aria-live="polite">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Flame className="h-4 w-4 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-text-primary">{currentDetailStory.text}</p>
+                      {currentDetailStory.subtext && <p className="text-sm text-text-secondary">{currentDetailStory.subtext}</p>}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {currentDetailStory.badge && <span className="text-sm text-status-warning-text">{currentDetailStory.badge}</span>}
+                    {detailStoryItems.length > 1 && (
+                      <div className="flex gap-1">
+                        {detailStoryItems.map(item => (
+                          <span
+                            key={item.id}
+                            className={`h-1.5 w-1.5 rounded-full ${item.id === currentDetailStory.id ? 'bg-status-warning' : 'bg-secondary-200'}`}
+                          />
+                        ))}
                       </div>
                     )}
                   </div>
-
-                  {/* Stock Availability Badge */}
-                  {hasStockInfo && (
-                    <div className="flex flex-col items-end gap-1 pt-0.5">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
-                        Number(listing.quantity) === 0
-                          ? 'bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs'
-                          : isLowStock
-                          ? 'bg-rose-50 text-rose-700 border border-rose-200 ring-2 ring-rose-500/10 shadow-2xs'
-                          : 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs'
-                      }`}>
-                        {Number(listing.quantity) === 0 ? (
-                          <>
-                            <span className="w-2 h-2 rounded-full bg-slate-400" />
-                            <span>Tükendi</span>
-                          </>
-                        ) : isLowStock ? (
-                          <>
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                            </span>
-                            <span>Son {Number(listing.quantity)} Adet!</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-xs" />
-                            <span>Stokta ({Number(listing.quantity)} Adet)</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Live Urgency / Social Proof Trigger Banner (Directly motivating the CTA) */}
-              {currentDetailStory && (
-                <div 
-                  key={currentDetailStory.id}
-                  className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 animate-in fade-in slide-in-from-bottom-1 ${currentDetailStory.bg}`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {currentDetailStory.icon}
-                    <span>{currentDetailStory.text}</span>
-                  </div>
-                  {currentDetailStory.badge && (
-                    <span className="text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded-md bg-white/80 border border-current/20 shrink-0">
-                      {currentDetailStory.badge}
-                    </span>
-                  )}
                 </div>
               )}
 
-              {/* Action Buttons: Buyer Actions vs. Seller Management */}
               {isOwner ? (
-                <div className="space-y-2.5 pt-1">
-                  <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/80 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
-                        <Settings className="w-3.5 h-3.5 text-indigo-600" />
-                        {t('seller_controls', 'İlan Sahibi Yönetim Paneli')}
-                      </span>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800">
-                        {t('your_listing', 'Senin İlanın')}
-                      </span>
-                    </div>
-                    <p className="text-xs text-indigo-950/80 font-medium">
-                      {t('seller_controls_desc', 'Fiyatını kır, stok güncelle, vitrine çıkar veya ilan durumunu değiştir.')}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <ListingCardActions listing={listing} onChanged={fetchListing} variant="button" />
-                    </div>
+                <div className="space-y-3 rounded border border-border-light p-4">
+                  <h2 className="text-sm font-medium text-text-primary">{t('seller_controls', 'İlan Sahibi Yönetim Paneli')}</h2>
+                  <p className="text-sm text-text-secondary">
+                    {t('seller_controls_desc', 'Fiyatını kır, stok güncelle, vitrine çıkar veya ilan durumunu değiştir.')}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <ListingCardActions listing={listing} onChanged={fetchListing} variant="button" />
                   </div>
                 </div>
               ) : (canAddToCart || canMakeOffer) ? (
-                <div className="space-y-2.5 pt-1">
+                <div className="space-y-2">
                   {canAddToCart && (
-                    <button
-                      onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
-                      disabled={isAddingToCart}
-                      className={`w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer active:scale-[0.99] ${
-                        itemIsInCart
-                          ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
-                          : 'bg-slate-900 hover:bg-slate-800 text-white shadow-md shadow-slate-900/10 hover:shadow-lg'
-                      }`}
-                    >
-                      {isAddingToCart ? (
-                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      ) : itemIsInCart ? (
-                        <>
-                          <Check className="w-4 h-4 text-white" />
-                          <span>{t("in_cart", "Sepette (Sepete Git)")}</span>
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingBag className="w-4 h-4" />
-                          <span>{t("add_to_cart", "Sepete Ekle")}</span>
-                        </>
-                      )}
-                    </button>
+                    <Button className="w-full" onClick={handleCartClick} disabled={isAddingToCart}>
+                      {itemIsInCart && !isAddingToCart ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : null}
+                      <span>{cartLabel}</span>
+                    </Button>
                   )}
                   {canMakeOffer && (
-                    <button
-                      onClick={() => setIsOfferModalOpen(true)}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-5 bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer active:scale-[0.99] shadow-2xs"
-                    >
-                      <HandCoins className="w-4 h-4 text-slate-600" />
-                      <span>{t("make_an_offer", "Teklif Ver")}</span>
-                    </button>
+                    <Button variant="secondary" className="w-full" onClick={() => setIsOfferModalOpen(true)}>
+                      {t("make_an_offer", "Teklif Ver")}
+                    </Button>
                   )}
                 </div>
               ) : null}
 
-              {/* Trust Badge Guarantee */}
-              <div className="flex items-center gap-2.5 py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200/60 text-xs font-bold text-slate-700">
-                <ShieldCheck className="w-4 h-4 text-slate-900 shrink-0" />
+              <p className="flex items-center gap-2 text-sm text-text-secondary">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                 <span>{t("escrow_guarantee_text", "Escrow Güvenceli Ödeme & Güvenli Teslimat")}</span>
-              </div>
+              </p>
 
-              {/* Integrated Seller Profile */}
-              <div className="pt-4 border-t border-slate-100">
+              <div className="border-t border-border-light pt-4">
                 <ListingTrustPanel listing={listing} isOwner={isOwner} onShowcaseSuccess={fetchListing} flat={true} />
               </div>
             </div>
 
-            {/* Market Insights & Analytics Card */}
             <ListingAnalyticsPanel listing={listing} isOwner={isOwner} displayPrice={displayPrice} />
-
           </div>
-
         </div>
 
-        {/* ── Bottom Section: Similar & Recently Viewed Listings ── */}
         <div className="mt-14 space-y-12">
-          {/* Similar Listings Carousel */}
-          <div>
-            <SimilarListings currentListing={listing} />
-          </div>
-
-          {/* Recently Viewed Listings */}
-          <div>
-            <RecentlyViewedSection currentListingId={listing?.id} />
-          </div>
+          <SimilarListings currentListing={listing} />
+          <RecentlyViewedSection currentListingId={listing?.id} />
         </div>
-
       </PageContainer>
 
-      {/* ── Mobile Sticky Bottom Bar ── */}
       {(canAddToCart || canMakeOffer || !isOwner) && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 py-3 pb-safe shadow-2xl">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background-primary px-4 py-3 lg:hidden">
           <div className="flex items-center justify-between gap-3">
-            {/* Price */}
-            <div className="flex-1 min-w-0">
-              <p className="text-lg font-extrabold tabular-nums tracking-tight leading-none mb-0.5 text-slate-900">
+            <div className="min-w-0 flex-1">
+              <p className="text-lg font-semibold tabular-nums leading-none text-text-primary">
                 {formatCurrency(displayPrice, listing.currency)}
               </p>
               {hasCampaign ? (
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-slate-400 line-through font-bold tabular-nums">{formatCurrency(listing.price, listing.currency)}</p>
-                  {discount && <span className="text-xs font-black text-slate-900">−%{discount}</span>}
-                </div>
+                <p className="mt-1 flex items-center gap-2 text-sm tabular-nums">
+                  <span className="text-text-muted line-through">{formatCurrency(listing.price, listing.currency)}</span>
+                  {discount && <span className="text-text-primary">−%{discount}</span>}
+                </p>
               ) : (
-                <p className="text-xs text-slate-500 font-bold truncate">{locationLabel}</p>
+                <p className="mt-1 truncate text-sm text-text-tertiary">{locationLabel}</p>
               )}
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 flex-1 justify-end">
+            <div className="flex flex-1 items-center justify-end gap-2">
               {!isOwner && (
-                <ContactSellerButton
-                  listing={listing}
-                  className="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors"
-                />
+                <ContactSellerButton listing={listing} className={buttonClasses('secondary')} />
               )}
               {canMakeOffer && (
-                <button
-                  onClick={() => setIsOfferModalOpen(true)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-900 text-xs font-extrabold uppercase tracking-wider hover:bg-slate-200 transition-colors cursor-pointer"
-                >
+                <Button variant="secondary" className="flex-1" onClick={() => setIsOfferModalOpen(true)}>
                   {t('make_offer', 'Teklif')}
-                </button>
+                </Button>
               )}
               {canAddToCart && (
-                <button
-                  onClick={() => itemIsInCart ? navigate(ROUTES.SHOPPING_CART) : addToCart(listing.id)}
-                  disabled={isAddingToCart}
-                  className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider disabled:opacity-50 transition-all cursor-pointer ${
-                    itemIsInCart
-                      ? 'bg-slate-100 text-slate-900 border border-slate-400'
-                      : 'bg-slate-900 text-white shadow-xs'
-                  }`}
-                >
-                  {isAddingToCart ? (
-                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  ) : itemIsInCart ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>{t("in_cart", "Sepette")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>{t("cart", "Sepet")}</span>
-                    </>
-                  )}
-                </button>
+                <Button className="flex-1" onClick={handleCartClick} disabled={isAddingToCart}>
+                  {isAddingToCart ? t("adding_to_cart", "Ekleniyor...") : itemIsInCart ? t("in_cart", "Sepette") : t("cart", "Sepet")}
+                </Button>
               )}
             </div>
           </div>

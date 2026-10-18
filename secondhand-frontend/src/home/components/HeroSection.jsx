@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
@@ -39,35 +39,33 @@ const HeroSection = () => {
  }
  return cards;
  }, [showcases]);
- return <section className="relative overflow-hidden bg-gradient-to-b from-white via-slate-50 to-slate-100/60 border-b border-slate-200/80 text-slate-900">
+ return <section className="relative overflow-hidden bg-background-primary border-b border-border/80 text-text-primary">
  {/* Decorative Light Background Glowing Accents */}
- <div className="absolute top-0 left-1/4 w-96 h-96 bg-slate-800/10 rounded-full blur-3xl pointer-events-none" />
- <div className="absolute bottom-0 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
  <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16 lg:py-20">
  <div className="grid lg:grid-cols-[minmax(0,1fr)_540px] lg:items-center gap-10 lg:gap-12">
  <div className="max-w-2xl">
  <div className="flex flex-wrap items-center gap-2.5 mb-6">
- <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-300 text-xs font-extrabold text-slate-900 uppercase tracking-wider shadow-sm">
- <Sparkles className="w-3.5 h-3.5 text-slate-900" />{t("curated_marketplace")}</span>
- <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm">
- <BadgeCheck className="w-3.5 h-3.5 text-slate-900" />{t("verified_trade")}</span>
+ <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-background-tertiary border border-card-border-hover text-xs font-semibold text-text-primary">
+ <Sparkles className="w-3.5 h-3.5 text-text-primary" />{t("curated_marketplace")}</span>
+ <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-white border border-border text-xs font-semibold text-text-secondary">
+ <BadgeCheck className="w-3.5 h-3.5 text-text-primary" />{t("verified_trade")}</span>
  </div>
 
- <h1 className="text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl tracking-tight leading-[1.08]">
+ <h1 className="text-3xl font-semibold text-text-primary sm:text-4xl lg:text-5xl tracking-tight leading-tight">
  {t("find_better_deals_from_sellers_you_can_t")}
  </h1>
- <p className="mt-5 text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl font-medium">
+ <p className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl font-medium">
  {t("browse_vetted_listings_compare_real_pric")}
  </p>
 
  <div className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl">
- <Link to={ROUTES.LISTINGS_PREFILTER} className="group flex min-w-0 flex-1 items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-600 border border-slate-200 shadow-sm hover:border-slate-700 hover:text-slate-900 transition-all">
- <Search className="w-5 h-5 text-slate-900 shrink-0" />
+ <Link to={ROUTES.LISTINGS_PREFILTER} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 group min-w-0 flex-1">
+ <Search className="w-5 h-5 text-text-primary shrink-0" />
  <span className="truncate">{t("search_cars_phones_homes_fashion")}</span>
- <ArrowRight className="ml-auto w-4 h-4 text-slate-900 transition-transform group-hover:translate-x-1 shrink-0" />
+ <ArrowRight className="ml-auto w-4 h-4 text-text-primary transition-transform shrink-0" />
  </Link>
- <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center justify-center rounded-2xl bg-slate-900 hover:bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-md shadow-slate-900/10 transition-all transform hover:-translate-y-0.5 active:translate-y-0 shrink-0">
+ <Link to={ROUTES.LISTINGS_PREFILTER_CREATE} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 shrink-0">
  + {t("start_selling")}
  </Link>
  </div>
@@ -87,33 +85,31 @@ const HeroSection = () => {
  text: 'Instant offer feature'
  }].map((item) => {
  const Icon = item.icon;
- return <div key={item.title} className="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
- <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-900 flex items-center justify-center shrink-0">
- <Icon className="w-5 h-5" />
- </div>
+ return <div key={item.title} className="flex items-center gap-3 rounded-md border border-border/80 bg-white p-3.5 hover:border-card-border-hover transition-all">
+ <Icon className="shrink-0 h-5 w-5 text-text-primary" strokeWidth={1.5} aria-hidden />
  <div className="min-w-0">
- <p className="text-xs font-bold text-slate-900 truncate">{item.title}</p>
- <p className="text-[11px] font-medium text-slate-500 truncate">{item.text}</p>
+ <p className="text-xs font-semibold text-text-primary truncate">{item.title}</p>
+ <p className="text-xs font-medium text-text-tertiary truncate">{item.text}</p>
  </div>
  </div>;
  })}
  </div>
  </div>
 
- <div className="relative flex items-center justify-center min-h-[350px] lg:h-[440px]">
- <div className="absolute inset-x-2 bottom-2 top-8 rounded-3xl bg-gradient-to-tr from-slate-900 via-slate-800 to-indigo-950 border border-slate-800 shadow-2xl backdrop-blur-xl" />
+ <div className="relative flex items-center justify-center min-h-80 lg:h-[440px]">
+ <div className="absolute inset-x-2 bottom-2 top-8 rounded-md bg-primary border border-primary-hover shadow-md" />
  
- <div className="absolute left-6 top-4 rounded-2xl border border-slate-700/30 bg-slate-900/90 px-4 py-2.5 backdrop-blur-md shadow-lg shadow-slate-900/10 z-30">
- <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-600">{t("live_picks")}</p>
- <p className="mt-0.5 text-xl font-black text-white">{featuredCards.length || 3} İlan</p>
+ <div className="absolute left-6 top-4 rounded-md border border-secondary-700/30 bg-primary/90 px-4 py-2.5 shadow-md z-30">
+ <p className="text-xs font-semibold text-text-secondary">{t("live_picks")}</p>
+ <p className="mt-0.5 text-xl font-semibold text-white">{featuredCards.length || 3} İlan</p>
  </div>
  
- <div className="absolute right-6 bottom-6 rounded-2xl border border-slate-700/30 bg-slate-900/90 px-4 py-2.5 backdrop-blur-md shadow-lg z-30">
- <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-600">{t("safer_deals")}</p>
- <p className="mt-0.5 text-xs font-bold text-slate-200">{t("chat_checkout")}</p>
+ <div className="absolute right-6 bottom-6 rounded-md border border-secondary-700/30 bg-primary/90 px-4 py-2.5 shadow-md z-30">
+ <p className="text-xs font-semibold text-text-secondary">{t("safer_deals")}</p>
+ <p className="mt-0.5 text-xs font-semibold text-secondary-200">{t("chat_checkout")}</p>
  </div>
 
- <div className="relative flex items-center justify-center w-full h-[330px] lg:h-[390px]">
+ <div className="relative flex items-center justify-center w-full h-80 lg:h-96">
  {featuredCards.length > 0 ? featuredCards.map((listing, index) => {
  const rotations = [-5, 4, -1];
  const translationsX = [-70, 56, 0];
@@ -123,9 +119,9 @@ const HeroSection = () => {
  transform: `rotate(${rotations[index % 3]}deg) translate(${translationsX[index % 3]}px, ${translationsY[index % 3]}px)`,
  zIndex: 10 + index
  };
- return <HeroListingCard key={listing.id} listing={listing} style={style} className="wizard-card-lift scale-[0.78] sm:scale-[0.86] lg:scale-100" />;
- }) : <div className="w-80 h-52 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-center p-6 shadow-xl backdrop-blur-md">
- <div className="text-slate-400 text-xs font-bold tracking-wide animate-pulse">{t("loading_showcase")}</div>
+ return <HeroListingCard key={listing.id} listing={listing} style={style} className="scale-75 sm:scale-90 lg:scale-100" />;
+ }) : <div className="w-80 h-52 rounded-md bg-primary/80 border border-primary-hover flex items-center justify-center p-6 shadow-md">
+ <div className="text-text-muted text-xs font-semibold tracking-wide animate-pulse">{t("loading_showcase")}</div>
  </div>}
  </div>
  </div>

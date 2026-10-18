@@ -5,7 +5,7 @@ import Pagination from '../../common/components/ui/Pagination.jsx';
 import FilterStatus from './FilterStatus.jsx';
 import ListingsSkeleton from './ListingsSkeleton.jsx';
 import { EmptyState } from '../../common/components/ui/index.js';
-import { PackageSearch, SlidersHorizontal, RefreshCw } from 'lucide-react';
+import { PackageSearch } from 'lucide-react';
 const ListingsContent = React.memo(({
  isLoading,
  filteredListings,
@@ -33,7 +33,7 @@ const ListingsContent = React.memo(({
  <FilterStatus totalElements={totalElements} filters={filters} getListingTypeLabel={getListingTypeLabel} onResetFilters={onResetFilters} updateFilters={updateFilters} />
  </div>}
 
- {isLoading ? <ListingsSkeleton /> : filteredListings && filteredListings.length === 0 ? <div className="flex items-center justify-center min-h-[380px] py-8">
+ {isLoading ? <ListingsSkeleton /> : filteredListings && filteredListings.length === 0 ? <div className="flex items-center justify-center min-h-96 py-8">
  <div className="max-w-md w-full">
  <EmptyState
  icon={PackageSearch}
@@ -49,7 +49,7 @@ const ListingsContent = React.memo(({
  </div> : <ListingGrid listings={filteredListings} isLoading={isLoading} error={error} onDeleted={onListingChanged} isSelectable={isSelectable} selectedIds={selectedIds} onSelectToggle={onToggleSelect} />}
  
  {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && <div className="mt-10 flex justify-center">
- <div className="bg-background-primary border border-border-light rounded-2xl shadow-sm p-1.5">
+ <div className="bg-background-primary border border-border-light rounded-md p-1.5">
  <Pagination page={currentPage || 0} totalPages={totalPages || 0} onPageChange={onPageChange} />
  </div>
  </div>}

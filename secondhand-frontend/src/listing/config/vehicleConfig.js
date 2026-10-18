@@ -1,6 +1,5 @@
-import { lazy } from 'react';
+import { Car } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const VehicleCreateForm = lazy(() => import('../../vehicle/components/VehicleCreateForm.jsx'));
 import { vehicleService } from '../../vehicle/services/vehicleService.js';
 import { VehicleCreateRequestDTO } from '../../vehicle/vehicles.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
@@ -60,7 +59,7 @@ const onEnginePicked = ({ value, ctx }) => {
 
 export const vehicleConfig = {
  label: 'Vehicle',
- icon: '🚗',
+ icon: Car,
  description: 'Cars, motorcycles, bicycles and other vehicles',
 
  detailsComponent: GenericListingDetails,
@@ -125,7 +124,6 @@ export const vehicleConfig = {
  },
  ],
  },
- createComponent: VehicleCreateForm,
  formSchema: {
  initialData: {
  ...VehicleCreateRequestDTO,
@@ -428,6 +426,7 @@ export const vehicleConfig = {
  },
  },
  service: {
+ create: (payload) => vehicleService.createVehicleListing(payload),
  getById: (id) => vehicleService.getVehicleById(id),
  update: (id, payload) => vehicleService.updateVehicleListing(id, payload),
  },
@@ -543,13 +542,5 @@ export const vehicleConfig = {
  { value: 'price', label: 'Price' },
  { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) =>
- [
- { label: listing.brand?.label || listing.brand?.name || listing.brand, icon: '🚗', show: !!listing.brand },
- { label: listing.generation?.name || listing.generation?.label, icon: '🏷️', show: !!(listing.generation?.name || listing.generation?.label) },
- { label: listing.year, icon: '📅', show: !!listing.year },
- { label: listing.mileage ? `${listing.mileage.toLocaleString('tr-TR')} km` : null, icon: '🛣️', show: !!listing.mileage },
- { label: listing.fuelType, icon: '⛽', show: !!listing.fuelType },
- ].filter((badge) => badge.show),
  defaultFilters: { minYear: 1980, maxYear: new Date().getFullYear() },
 };

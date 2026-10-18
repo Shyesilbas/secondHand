@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,7 @@ public class AgreementController {
         return ResponseEntity.ok(agreementDtos);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/initialize")
     @Operation(summary = "Initialize agreements", description = "Creates default agreements and required agreement-group mappings")
     public ResponseEntity<List<AgreementDto>> initializeAgreements() {

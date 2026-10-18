@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from '../../common/formatters.js';
-import { 
-  Trash2, 
-  ShoppingBag, 
-  CreditCard, 
-  Tag, 
-  ShieldCheck, 
-  Sparkles, 
-  Mail, 
-  FileText,
-  Bell
-} from 'lucide-react';
+import { Trash2, ShoppingBag, CreditCard, Tag, ShieldCheck, Sparkles, Mail, FileText } from 'lucide-react';
 import { EMAIL_TYPES } from '../emails.js';
 
 const getCategoryIconAndStyle = (type) => {
@@ -23,14 +13,14 @@ const getCategoryIconAndStyle = (type) => {
     case EMAIL_TYPES.SALE_NOTIFICATION:
       return {
         icon: ShoppingBag,
-        bg: 'bg-blue-50 text-blue-600 border-blue-200'
+        bg: 'bg-background-secondary text-text-primary border-border'
       };
     case EMAIL_TYPES.PAYMENT_VERIFICATION:
     case EMAIL_TYPES.PAYMENT_SUCCESS:
     case EMAIL_TYPES.PAYMENT_RECEIPT:
       return {
         icon: CreditCard,
-        bg: 'bg-emerald-50 text-emerald-600 border-emerald-200'
+        bg: 'bg-background-secondary text-status-success-text border-border'
       };
     case EMAIL_TYPES.OFFER_RECEIVED:
     case EMAIL_TYPES.OFFER_COUNTER_RECEIVED:
@@ -40,7 +30,7 @@ const getCategoryIconAndStyle = (type) => {
     case EMAIL_TYPES.OFFER_COMPLETED:
       return {
         icon: Tag,
-        bg: 'bg-indigo-50 text-indigo-600 border-indigo-200'
+        bg: 'bg-background-secondary text-text-primary border-border'
       };
     case EMAIL_TYPES.VERIFICATION:
     case EMAIL_TYPES.VERIFICATION_CODE:
@@ -49,25 +39,25 @@ const getCategoryIconAndStyle = (type) => {
     case EMAIL_TYPES.AUDIT_ALERT:
       return {
         icon: ShieldCheck,
-        bg: 'bg-amber-50 text-amber-600 border-amber-200'
+        bg: 'bg-background-secondary text-status-warning-text border-border'
       };
     case EMAIL_TYPES.MEMBERSHIP_ACTIVATED:
     case EMAIL_TYPES.MEMBERSHIP_UPGRADE:
     case EMAIL_TYPES.GREAT_SELLER:
       return {
         icon: Sparkles,
-        bg: 'bg-purple-50 text-purple-600 border-purple-200'
+        bg: 'bg-background-secondary text-text-primary border-border'
       };
     case EMAIL_TYPES.AGREEMENT_UPDATE:
     case EMAIL_TYPES.AGREEMENT_UPDATED:
       return {
         icon: FileText,
-        bg: 'bg-slate-100 text-slate-700 border-slate-200'
+        bg: 'bg-background-tertiary text-text-secondary border-border'
       };
     default:
       return {
         icon: Mail,
-        bg: 'bg-slate-100 text-slate-600 border-slate-200'
+        bg: 'bg-background-tertiary text-text-secondary border-border'
       };
   }
 };
@@ -126,12 +116,12 @@ const EmailListItem = ({
           onSelect(email);
         }
       }}
-      className={`group relative cursor-pointer border-b border-slate-100 transition-all duration-150 ${
+      className={`group relative cursor-pointer border-b border-border-light transition-all duration-150 ${
         isSelected
-          ? 'bg-indigo-50/70 border-l-[3px] border-l-indigo-600'
+          ? 'bg-background-secondary/70 border-l-2 border-l-primary'
           : isUnread
-          ? 'bg-white hover:bg-slate-50/80 border-l-[3px] border-l-transparent font-medium'
-          : 'bg-slate-50/30 hover:bg-slate-50 border-l-[3px] border-l-transparent opacity-90'
+          ? 'bg-white hover:bg-background-secondary/80 border-l-2 border-l-transparent font-medium'
+          : 'bg-background-secondary/30 hover:bg-background-secondary border-l-2 border-l-transparent opacity-90'
       }`}
       onClick={() => onSelect(email)}
       onMouseEnter={() => setIsHovered(true)}
@@ -139,7 +129,7 @@ const EmailListItem = ({
     >
       <div className="flex items-start gap-3.5 px-4 py-3.5">
         {/* Category Icon */}
-        <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${category.bg} shadow-2xs`}>
+        <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border ${category.bg}`}>
           <Icon className="w-4.5 h-4.5" />
         </div>
 
@@ -148,24 +138,24 @@ const EmailListItem = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
               {isUnread && (
-                <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" title="Okunmadı" />
+                <span className="w-2 h-2 rounded-full bg-primary shrink-0" title="Okunmadı" />
               )}
-              <h4 className={`truncate text-xs sm:text-sm tracking-tight ${isUnread ? 'font-black text-slate-900' : 'font-semibold text-slate-700'}`}>
+              <h4 className={`truncate text-xs sm:text-sm tracking-tight ${isUnread ? 'font-semibold text-text-primary' : 'font-semibold text-text-secondary'}`}>
                 {email.subject || '(Başlıksız)'}
               </h4>
             </div>
 
-            <span className="shrink-0 text-[11px] font-semibold tabular-nums text-slate-400">
+            <span className="shrink-0 text-xs font-semibold tabular-nums text-text-muted">
               {formatShort(email.sentAt)}
             </span>
           </div>
 
-          <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500">
+          <p className="mt-0.5 truncate text-xs font-medium text-text-tertiary">
             {email.senderEmail}
           </p>
 
           {previewText && (
-            <p className="mt-1 line-clamp-1 text-xs text-slate-500 font-normal leading-relaxed">
+            <p className="mt-1 line-clamp-1 text-xs text-text-tertiary font-normal leading-relaxed">
               {previewText}
             </p>
           )}
@@ -179,7 +169,7 @@ const EmailListItem = ({
             onDelete(email.id, email.subject);
           }}
           disabled={isDeleting}
-          className={`mt-0.5 shrink-0 rounded-xl p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all ${
+          className={`mt-0.5 shrink-0 rounded p-1.5 text-text-muted hover:text-status-error-text hover:bg-background-secondary transition-all ${
             isHovered ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           }`}
           title={t("delete", "Sil")}

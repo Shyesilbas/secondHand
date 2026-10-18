@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { aiChatService } from '../services/aiChatService';
-import { User, ShieldAlert, Sparkles, Plus, X, Check, BrainCircuit } from 'lucide-react';
+import { Plus, X, BrainCircuit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AuraMemoryProfileHub() {
@@ -139,30 +139,30 @@ export default function AuraMemoryProfileHub() {
  };
 
  return (
- <div className="space-y-5 p-4 rounded-xl border border-border-light bg-background-primary shadow-sm text-left">
+ <div className="space-y-5 p-4 rounded border border-border-light bg-background-primary text-left">
  <div className="flex items-center gap-2 pb-3 border-b border-border-light">
  <BrainCircuit className="w-5 h-5 text-primary shrink-0" />
  <div>
- <h3 className="text-xs font-bold text-text-primary">{t("aura_brain_hub")}</h3>
- <p className="text-[10px] text-text-muted leading-tight mt-0.5">{t("aura_remembers_your_chats")}</p>
+ <h3 className="text-xs font-semibold text-text-primary">{t("aura_brain_hub")}</h3>
+ <p className="text-xs text-text-muted leading-tight mt-0.5">{t("aura_remembers_your_chats")}</p>
  </div>
  </div>
 
  {/* Name & Tone */}
  <div className="grid grid-cols-2 gap-3">
  <div>
- <label className="text-[10px] font-bold text-text-muted block mb-1">{t("how_to_address_you")}</label>
+ <label className="text-xs font-semibold text-text-muted block mb-1">{t("how_to_address_you")}</label>
  <input 
  type="text" 
  value={userName} 
  onChange={(e) => setUserName(e.target.value)}
  onBlur={handleSaveField}
  placeholder={t("name_placeholder")}
- className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
+ className="w-full text-xs bg-background-secondary border border-border-light rounded px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
  />
  </div>
  <div>
- <label className="text-[10px] font-bold text-text-muted block mb-1">{t("conversation_tone")}</label>
+ <label className="text-xs font-semibold text-text-muted block mb-1">{t("conversation_tone")}</label>
  <select 
  value={preferredTone} 
  onChange={(e) => {
@@ -185,7 +185,7 @@ export default function AuraMemoryProfileHub() {
  secondHandProfile: updatedProfile
  });
  }}
- className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
+ className="w-full text-xs bg-background-secondary border border-border-light rounded px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary font-semibold"
  >
  <option value="Friendly">{t("tone_friendly")}</option>
  <option value="Formal">{t("tone_formal")}</option>
@@ -197,18 +197,18 @@ export default function AuraMemoryProfileHub() {
 
  {/* Interests Section */}
  <div className="space-y-2">
- <label className="text-[10px] font-bold text-text-muted block">{t("interests_label")}</label>
+ <label className="text-xs font-semibold text-text-muted block">{t("interests_label")}</label>
  <div className="flex flex-wrap gap-1.5">
  {memory?.permanentInterests?.map(interest => (
- <span key={interest} className="inline-flex items-center gap-1 text-[10px] font-bold bg-secondary-light border border-border-light px-2 py-0.5 rounded-full text-text-secondary">
+ <span key={interest} className="inline-flex items-center gap-1 text-xs font-semibold bg-secondary-light border border-border-light px-2 py-0.5 rounded-sm text-text-secondary">
  {interest}
- <button type="button" onClick={() => handleRemoveInterest(interest)} className="hover:text-rose-500 transition-colors">
+ <button type="button" onClick={() => handleRemoveInterest(interest)} className="hover:text-status-error transition-colors">
  <X className="w-2.5 h-2.5" />
  </button>
  </span>
  ))}
  {(!memory?.permanentInterests || memory.permanentInterests.length === 0) && (
- <span className="text-[10px] text-text-muted font-medium italic">{t("no_saved_interests")}</span>
+ <span className="text-xs text-text-muted font-medium italic">{t("no_saved_interests")}</span>
  )}
  </div>
  <form onSubmit={handleAddInterest} className="flex gap-2">
@@ -217,9 +217,9 @@ export default function AuraMemoryProfileHub() {
  value={newInterest} 
  onChange={(e) => setNewInterest(e.target.value)} 
  placeholder={t("add_interest_placeholder")}
- className="flex-1 text-[11px] bg-background-secondary border border-border-light rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
+ className="flex-1 text-xs bg-background-secondary border border-border-light rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
  />
- <button type="submit" className="px-2.5 py-1 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all">
+ <button type="submit" className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  <Plus className="w-3.5 h-3.5" />
  </button>
  </form>
@@ -227,18 +227,18 @@ export default function AuraMemoryProfileHub() {
 
  {/* Brands Section */}
  <div className="space-y-2">
- <label className="text-[10px] font-bold text-text-muted block">{t("preferred_brands")}</label>
+ <label className="text-xs font-semibold text-text-muted block">{t("preferred_brands")}</label>
  <div className="flex flex-wrap gap-1.5">
  {memory?.secondHandProfile?.brands?.map(brand => (
- <span key={brand} className="inline-flex items-center gap-1 text-[10px] font-bold bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full text-primary">
+ <span key={brand} className="inline-flex items-center gap-1 text-xs font-semibold bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-sm text-primary">
  {brand}
- <button type="button" onClick={() => handleRemoveBrand(brand)} className="hover:text-rose-500 transition-colors">
+ <button type="button" onClick={() => handleRemoveBrand(brand)} className="hover:text-status-error transition-colors">
  <X className="w-2.5 h-2.5" />
  </button>
  </span>
  ))}
  {(!memory?.secondHandProfile?.brands || memory.secondHandProfile.brands.length === 0) && (
- <span className="text-[10px] text-text-muted font-medium italic">{t("no_saved_brands")}</span>
+ <span className="text-xs text-text-muted font-medium italic">{t("no_saved_brands")}</span>
  )}
  </div>
  <form onSubmit={handleAddBrand} className="flex gap-2">
@@ -247,9 +247,9 @@ export default function AuraMemoryProfileHub() {
  value={newBrand} 
  onChange={(e) => setNewBrand(e.target.value)} 
  placeholder={t("add_brand_placeholder")}
- className="flex-1 text-[11px] bg-background-secondary border border-border-light rounded-lg px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
+ className="flex-1 text-xs bg-background-secondary border border-border-light rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
  />
- <button type="submit" className="px-2.5 py-1 bg-primary text-white rounded-lg hover:bg-primary-hover active:scale-95 transition-all">
+ <button type="submit" className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  <Plus className="w-3.5 h-3.5" />
  </button>
  </form>
@@ -257,7 +257,7 @@ export default function AuraMemoryProfileHub() {
 
  {/* Budget Preferences */}
  <div className="space-y-2">
- <label className="text-[10px] font-bold text-text-muted block">{t("budget_preference")}</label>
+ <label className="text-xs font-semibold text-text-muted block">{t("budget_preference")}</label>
  <div className="flex gap-2 items-center">
  <input 
  type="number" 
@@ -265,7 +265,7 @@ export default function AuraMemoryProfileHub() {
  value={budgetMin}
  onChange={(e) => setBudgetMin(e.target.value)}
  onBlur={handleSaveField}
- className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
+ className="w-full text-xs bg-background-secondary border border-border-light rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
  />
  <span className="text-text-muted text-xs">-</span>
  <input 
@@ -274,7 +274,7 @@ export default function AuraMemoryProfileHub() {
  value={budgetMax}
  onChange={(e) => setBudgetMax(e.target.value)}
  onBlur={handleSaveField}
- className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
+ className="w-full text-xs bg-background-secondary border border-border-light rounded px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary"
  />
  <select
  value={budgetCurrency}
@@ -298,7 +298,7 @@ export default function AuraMemoryProfileHub() {
  secondHandProfile: updatedProfile
  });
  }}
- className="text-xs bg-background-secondary border border-border-light rounded-lg px-2 py-1.5 focus:outline-none text-text-primary"
+ className="text-xs bg-background-secondary border border-border-light rounded px-2 py-1.5 focus:outline-none text-text-primary"
  >
  <option value="TRY">TRY</option>
  <option value="USD">USD</option>
@@ -309,20 +309,20 @@ export default function AuraMemoryProfileHub() {
 
  {/* User Notes */}
  <div>
- <label className="text-[10px] font-bold text-text-muted block mb-1">{t("auras_special_notes")}</label>
+ <label className="text-xs font-semibold text-text-muted block mb-1">{t("auras_special_notes")}</label>
  <textarea 
  value={userNotes} 
  onChange={(e) => setUserNotes(e.target.value)}
  onBlur={handleSaveField}
  placeholder={t("special_notes_placeholder")}
  rows={3}
- className="w-full text-xs bg-background-secondary border border-border-light rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary resize-none"
+ className="w-full text-xs bg-background-secondary border border-border-light rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary text-text-primary resize-none"
  />
  </div>
 
  {updateMutation.isPending && (
- <div className="flex items-center gap-1.5 text-[9px] text-primary font-bold">
- <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+ <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
+ <div className="w-2 h-2 rounded-full bg-primary" />
  {t("saving")}
  </div>
  )}

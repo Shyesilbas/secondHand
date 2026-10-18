@@ -19,37 +19,35 @@ const ViewStatisticsCard = ({
  label: 'Total Views',
  value: totalViews || 0,
  color: 'text-primary',
- bg: 'bg-slate-100'
+ bg: 'bg-background-tertiary'
  }, {
  icon: Users,
  label: 'Unique Visitors',
  value: uniqueViews || 0,
  color: 'text-status-success',
- bg: 'bg-status-success-bg'
+ bg: 'bg-background-secondary'
  }, {
  icon: TrendingUp,
  label: 'Avg. Views/User',
  value: engagementRate,
  color: 'text-status-warning',
- bg: 'bg-status-warning-bg'
+ bg: 'bg-background-secondary'
  }];
- return <div className="rounded-2xl border border-slate-100 bg-background-primary overflow-hidden shadow-sm mb-5">
+ return <div className="rounded-md border border-border-light bg-background-primary overflow-hidden mb-5">
  {/* Header */}
- <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/60">
+ <div className="flex items-center justify-between px-4 py-3 border-b border-border-light bg-background-secondary/60">
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-xl bg-primary-50 flex items-center justify-center">
- <Eye className="w-3.5 h-3.5 text-primary" />
+ <Eye className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
+ <span className="text-sm font-semibold text-text-secondary">{t("view_statistics")}</span>
  </div>
- <span className="text-sm font-semibold text-slate-700">{t("view_statistics")}</span>
- </div>
- <div className="flex items-center gap-1 text-caption text-slate-400">
+ <div className="flex items-center gap-1 text-xs text-text-muted">
  <Calendar className="w-3 h-3" />
  <span>{t("last")}{periodDays || 7}{t("days")}</span>
  </div>
  </div>
 
  {/* Stats grid */}
- <div className="grid grid-cols-3 divide-x divide-slate-100">
+ <div className="grid grid-cols-3 divide-x divide-border-light">
  {stats.map(({
  icon: Icon,
  label,
@@ -57,18 +55,18 @@ const ViewStatisticsCard = ({
  color,
  bg
  }) => <div key={label} className="flex flex-col items-center justify-center py-4 px-2 gap-1.5">
- <div className={`w-8 h-8 rounded-xl ${bg} flex items-center justify-center`}>
+ <div className={`w-8 h-8 rounded ${bg} flex items-center justify-center`}>
  <Icon className={`w-4 h-4 ${color}`} />
  </div>
- <span className={`text-xl font-bold tracking-tight ${color}`}>{value}</span>
- <span className="text-caption text-slate-400 font-medium text-center leading-tight">{label}</span>
+ <span className={`text-xl font-semibold tracking-tight ${color}`}>{value}</span>
+ <span className="text-xs text-text-muted font-medium text-center leading-tight">{label}</span>
  </div>)}
  </div>
 
  {/* Footer note */}
- {repeatViews > 0 && <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
- <p className="text-caption text-slate-400 text-center">
- <span className="font-semibold text-slate-600">{repeatViews}</span>{t("repeat_visit")}{repeatViews !== 1 ? 's' : ''}{t("recorded")}</p>
+ {repeatViews > 0 && <div className="px-4 py-2.5 border-t border-border-light bg-background-secondary/40">
+ <p className="text-xs text-text-muted text-center">
+ <span className="font-semibold text-text-secondary">{repeatViews}</span>{t("repeat_visit")}{repeatViews !== 1 ? 's' : ''}{t("recorded")}</p>
  </div>}
  </div>;
 };

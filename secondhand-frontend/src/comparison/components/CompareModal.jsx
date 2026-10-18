@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
-import React, { useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { X, Scale, ExternalLink, Image as ImageIcon, Award, TrendingDown, Check } from 'lucide-react';
+import { X, ExternalLink, Image as ImageIcon, Award, TrendingDown, Check } from 'lucide-react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { useComparison } from '../hooks/useComparison.js';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { formatCurrency, formatDate, parsePrice } from '../../common/formatters.js';
 import { getFieldsForCategory, calculateHighlights, HIGHLIGHT_RULES } from '../config/comparisonFieldsConfig.js';
 import { ROUTES } from '../../common/constants/routes.js';
-const emptyCell = <span className="text-slate-400">—</span>;
+const emptyCell = <span className="text-text-muted">—</span>;
 
 /** Safe display for text fields and nested label-like API objects. */
 const toDisplayString = value => {
@@ -87,8 +88,8 @@ const CompareModal = memo(() => {
  case 'boolean':
  {
  const boolVal = field.invert ? !rawValue : rawValue;
- return boolVal ? <span className="inline-flex items-center gap-1 text-slate-900">
- <Check className="w-3.5 h-3.5" />{t("yes")}</span> : <span className="text-slate-500">{t("no")}</span>;
+ return boolVal ? <span className="inline-flex items-center gap-1 text-text-primary">
+ <Check className="w-3.5 h-3.5" />{t("yes")}</span> : <span className="text-text-tertiary">{t("no")}</span>;
  }
  case 'date':
  return formatDate(rawValue);
@@ -116,64 +117,46 @@ const CompareModal = memo(() => {
  }
  return null;
  };
- if (!isModalOpen) return null;
- return <div className="fixed inset-0 z-[100] overflow-hidden">
- <div className="absolute inset-0 bg-slate-900/55 backdrop-blur-sm" onClick={closeModal} aria-hidden />
-
- <div className="absolute inset-3 sm:inset-6 lg:inset-10 flex items-center justify-center p-2">
- <div role="dialog" aria-modal="true" className="relative w-full max-w-7xl max-h-[min(92vh,900px)] bg-background-primary rounded-2xl shadow-2xl shadow-slate-900/20 flex flex-col overflow-hidden border border-border-light/90 ring-1 ring-slate-900/5">
- <div className="flex-shrink-0 px-5 py-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50/80 via-white to-white">
- <div className="flex items-center justify-between gap-3">
- <div className="flex items-center gap-3 min-w-0">
- <div className="p-2.5 bg-primary rounded-xl shadow-md shadow-slate-900/10 shrink-0">
- <Scale className="w-5 h-5 text-white" />
- </div>
- <div className="min-w-0">
- <h2 className="text-lg font-semibold text-text-primary truncate">{t("compare")} ({getListingTypeLabel(category)})
- </h2>
- <p className="text-sm text-slate-500">
- {items.length} {t("items_selected")}</p>
- </div>
- </div>
- <button type="button" onClick={closeModal} className="p-2 text-slate-500 hover:text-text-primary hover:bg-slate-100 rounded-xl transition-colors shrink-0" aria-label={t("close")}>
- <X className="w-5 h-5" />
- </button>
- </div>
- </div>
-
- <div className="flex-1 overflow-auto min-h-0">
+ return <Modal isOpen={isModalOpen} onClose={closeModal} title={`${t("compare")} (${getListingTypeLabel(category)}) · ${items.length} ${t("items_selected")}`} size="2xl" footer={<>
+ <p className="mr-auto flex flex-wrap items-center gap-x-4 gap-y-1 self-center text-xs text-text-tertiary">
+ <span className="inline-flex items-center gap-1"><Award className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden />{t("highest_best")}</span>
+ <span className="inline-flex items-center gap-1"><TrendingDown className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden />{t("lowest_better")}</span>
+ </p>
+ <Button variant="secondary" onClick={closeModal}>{t("close")}</Button>
+ </>}>
+ <div className="-mx-5 -my-4">
  <table className="w-full border-collapse text-sm">
- <thead className="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-sm border-b border-border-light">
+ <thead className="sticky top-0 z-10 bg-background-secondary border-b border-border-light">
  <tr>
  <th className="w-44 lg:w-52 p-3 sm:p-4 text-left align-bottom">
- <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{t("specification")}</span>
+ <span className="text-xs font-semibold text-text-tertiary">{t("specification")}</span>
  </th>
- {items.map(item => <th key={item.id} className="min-w-[180px] p-3 sm:p-4 border-l border-slate-100 align-bottom">
+ {items.map(item => <th key={item.id} className="min-w-44 p-3 sm:p-4 border-l border-border-light align-bottom">
  <div className="flex flex-col items-center gap-2">
- <div className="relative group w-full max-w-[7.5rem]">
- <div className="aspect-square rounded-xl overflow-hidden border border-border-light bg-slate-100 shadow-sm group-hover:border-primary transition-colors">
+ <div className="relative group w-full max-w-28">
+ <div className="aspect-square overflow-hidden rounded border border-border-light bg-background-tertiary">
  {item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
- <ImageIcon className="w-8 h-8 text-slate-300" />
+ <ImageIcon className="h-5 w-5 text-text-muted" strokeWidth={1.5} />
  </div>}
  </div>
- <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-rose-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-rose-700" aria-label={t("remove_from_comparison")}>
- <X className="w-3.5 h-3.5" />
+ <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute right-1 top-1 rounded border border-border bg-background-primary p-1 text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus" aria-label={t("remove_from_comparison")}>
+ <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
  <h3 className="text-sm font-medium text-text-primary line-clamp-2 w-full" title={item.title}>
  {item.title}
  </h3>
- <Link to={ROUTES.LISTING_DETAIL(item.id)} onClick={closeModal} className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary">{t("view_details")}<ExternalLink className="w-3 h-3" />
+ <Link to={ROUTES.LISTING_DETAIL(item.id)} onClick={closeModal} className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary hover:text-text-primary">{t("view_details")}<ExternalLink className="h-4 w-4" strokeWidth={1.5} />
  </Link>
  </div>
  </th>)}
  </tr>
  </thead>
- <tbody className="divide-y divide-slate-100">
- {fields.map(field => <tr key={field.key} className="bg-background-primary even:bg-slate-50/40">
+ <tbody className="divide-y divide-border-light">
+ {fields.map(field => <tr key={field.key}>
  <td className="p-3 sm:p-4 align-middle">
  <div className="flex items-center gap-2">
- <span className="font-medium text-slate-600">{field.label}</span>
+ <span className="font-medium text-text-secondary">{field.label}</span>
  {field.highlight !== HIGHLIGHT_RULES.NONE && <span className="opacity-70">{getHighlightIcon(field)}</span>}
  </div>
  </td>
@@ -181,14 +164,12 @@ const CompareModal = memo(() => {
  const highlighted = isHighlighted(field, item.id);
  const content = formatValue(field, item);
  const showAward = highlighted && field.highlight !== HIGHLIGHT_RULES.BOOLEAN_TRUE;
- return <td key={item.id} className={`p-3 sm:p-4 text-center align-middle border-l border-slate-100
- ${highlighted ? 'bg-status-success-bg/80' : ''}
- `}>
- <div className={`${highlighted ? 'font-semibold text-slate-900' : 'text-slate-800'}
- ${field.key === 'price' ? 'text-base font-bold text-text-primary' : ''}
+ return <td key={item.id} className="p-3 sm:p-4 text-center align-middle border-l border-border-light">
+ <div className={`${highlighted ? 'font-semibold text-text-primary' : 'text-text-primary'}
+ ${field.key === 'price' ? 'text-base font-semibold text-text-primary' : ''}
  `}>
  {showAward ? <span className="inline-flex items-center justify-center gap-1.5 flex-wrap">
- <Award className="w-3.5 h-3.5 shrink-0 text-status-success" />
+ <Award className="h-4 w-4 shrink-0 text-status-success" strokeWidth={1.5} aria-label={t("highest_best")} />
  <span className="min-w-0">{content}</span>
  </span> : content}
  </div>
@@ -198,29 +179,7 @@ const CompareModal = memo(() => {
  </tbody>
  </table>
  </div>
-
- <div className="flex-shrink-0 px-5 py-3 border-t border-slate-100 bg-slate-50/80">
- <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
- <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
- <div className="flex items-center gap-1.5">
- <div className="w-3 h-3 rounded bg-status-success-bg border border-slate-300/80" />
- <span>{t("best_value_highlighted")}</span>
- </div>
- <div className="flex items-center gap-1">
- <Award className="w-3.5 h-3.5 text-status-success" />
- <span>{t("highest_best")}</span>
- </div>
- <div className="flex items-center gap-1">
- <TrendingDown className="w-3.5 h-3.5 text-status-success" />
- <span>{t("lowest_better")}</span>
- </div>
- </div>
- <button type="button" onClick={closeModal} className="self-end sm:self-auto px-4 py-2 text-sm font-medium text-slate-700 hover:text-text-primary bg-background-primary border border-border-light hover:bg-slate-50 rounded-xl transition-colors">{t("close")}</button>
- </div>
- </div>
- </div>
- </div>
- </div>;
+ </Modal>;
 });
 CompareModal.displayName = 'CompareModal';
 export default CompareModal;

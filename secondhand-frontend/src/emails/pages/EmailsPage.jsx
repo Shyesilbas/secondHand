@@ -1,24 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft as ArrowLeftIcon, 
-  Bell, 
-  CreditCard, 
-  MailOpen, 
-  ShoppingBag, 
-  RefreshCw, 
-  Search as MagnifyingGlassIcon, 
-  ShieldCheck, 
-  Tag, 
-  Trash2, 
-  Inbox,
-  FileText,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import { ArrowLeft as ArrowLeftIcon, Bell, CreditCard, MailOpen, ShoppingBag, RefreshCw, Search as MagnifyingGlassIcon, ShieldCheck, Tag, Trash2, Inbox, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { emailService } from '../services/emailService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { handleError, parseError } from '../../common/errorHandler.js';
@@ -83,8 +67,8 @@ const EmailsPageLoader = () => {
   const { t } = useTranslation();
   return (
     <div className="h-full flex items-center justify-center bg-white">
-      <div className="flex flex-col items-center text-slate-400 gap-3">
-        <MailOpen className="w-8 h-8 animate-pulse text-indigo-600" />
+      <div className="flex flex-col items-center text-text-muted gap-3">
+        <MailOpen className="w-8 h-8 animate-pulse text-text-primary" />
         <span className="text-xs font-semibold">{t("loading_mailbox", "Posta kutusu yükleniyor...")}</span>
       </div>
     </div>
@@ -92,27 +76,24 @@ const EmailsPageLoader = () => {
 };
 
 const EmailsPageFeedback = ({ error, emails, filterType }) => {
-  const { t } = useTranslation();
 
   if (error) {
     return (
-      <div className="m-4 bg-rose-50 border border-rose-200 rounded-2xl p-4">
-        <h3 className="text-xs font-bold text-rose-900">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
-        <p className="text-xs text-rose-600 mt-1">{error}</p>
+      <div className="m-4 bg-background-secondary border border-border rounded-md p-4">
+        <h3 className="text-xs font-semibold text-status-error-text">{EMAIL_MESSAGES.LOAD_ERROR_TITLE}</h3>
+        <p className="text-xs text-status-error-text mt-1">{error}</p>
       </div>
     );
   }
 
   if (!emails.length) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[300px]">
-        <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3 text-slate-400">
-          <Inbox className="w-6 h-6" />
-        </div>
-        <h3 className="text-sm font-bold text-slate-900 mb-1">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-72">
+        <Inbox className="mb-3 h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+        <h3 className="text-sm font-semibold text-text-primary mb-1">
           {EMAIL_MESSAGES.NO_EMAILS_TITLE}
         </h3>
-        <p className="text-xs text-slate-500 max-w-xs">
+        <p className="text-xs text-text-tertiary max-w-xs">
           {filterType === EMAIL_FILTERS.ALL
             ? EMAIL_MESSAGES.NO_EMAILS_ALL
             : 'Bu klasörde henüz bir e-posta bulunmuyor.'}
@@ -286,8 +267,8 @@ const EmailsPage = ({ embedded = false }) => {
 
   if (isLoading) {
     return embedded ? (
-      <div className="p-16 text-center text-sm text-slate-400">
-        <MailOpen className="w-8 h-8 animate-pulse text-indigo-600 mx-auto mb-2" />
+      <div className="p-16 text-center text-sm text-text-muted">
+        <MailOpen className="w-8 h-8 animate-pulse text-text-primary mx-auto mb-2" />
         <span>{t("loading_mail", "E-postalar yükleniyor...")}</span>
       </div>
     ) : (
@@ -299,29 +280,29 @@ const EmailsPage = ({ embedded = false }) => {
     <div
       className={
         embedded
-          ? 'min-h-0 h-full w-full bg-white border border-slate-200/90 rounded-3xl flex flex-col overflow-hidden shadow-xs'
-          : 'min-h-0 h-[min(100dvh,100vh)] flex flex-col bg-slate-50 overflow-hidden'
+          ? 'min-h-0 h-full w-full bg-white border border-border/90 rounded-md flex flex-col overflow-hidden'
+          : 'min-h-0 h-dvh flex flex-col bg-background-secondary overflow-hidden'
       }
     >
       {/* Header Bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200/90 bg-white px-4 sm:px-6">
+      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border/90 bg-white px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {!embedded && (
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="shrink-0 rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              className="shrink-0 rounded p-2 text-text-tertiary hover:bg-background-tertiary hover:text-text-primary transition-colors"
               aria-label={t("back", "Geri")}
             >
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
           )}
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-black text-slate-900 tracking-tight">
+            <h1 className="text-base font-semibold text-text-primary tracking-tight">
               {t("mailbox", "Posta Kutusu")}
             </h1>
             {globalUnreadCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold border border-indigo-200">
+              <span className="px-2 py-0.5 rounded-sm bg-background-secondary text-text-primary text-xs font-semibold border border-border">
                 {globalUnreadCount} okunmamış
               </span>
             )}
@@ -337,9 +318,9 @@ const EmailsPage = ({ embedded = false }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder={t("search_mail", "E-postalarda ara...")}
-              className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+              className="h-9 w-full rounded border border-border bg-background-secondary/70 pl-9 pr-3 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
             />
-            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
           </div>
         </div>
 
@@ -348,7 +329,7 @@ const EmailsPage = ({ embedded = false }) => {
           <button
             type="button"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['emails', 'my', user?.id] })}
-            className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="rounded p-2 text-text-muted hover:bg-background-tertiary hover:text-text-primary transition-colors"
             title={t("refresh", "Yenile")}
           >
             <RefreshCw className="h-4 w-4" />
@@ -357,7 +338,7 @@ const EmailsPage = ({ embedded = false }) => {
             type="button"
             onClick={handleDeleteAllEmails}
             disabled={isDeleting || filteredEmails.length === 0}
-            className="rounded-xl p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-30 transition-colors"
+            className="rounded p-2 text-text-muted hover:bg-background-secondary hover:text-status-error-text disabled:opacity-30 transition-colors"
             title={t("delete_all", "Tümünü Sil")}
           >
             <Trash2 className="h-4 w-4" />
@@ -369,7 +350,7 @@ const EmailsPage = ({ embedded = false }) => {
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[240px_minmax(300px,420px)_minmax(0,1fr)]">
         
         {/* 1. Folders Sidebar */}
-        <aside className="hidden min-h-0 w-full min-w-0 flex-col border-r border-slate-200/90 bg-slate-50/50 lg:flex">
+        <aside className="hidden min-h-0 w-full min-w-0 flex-col border-r border-border/90 bg-background-secondary/50 lg:flex">
           <div className="flex-1 space-y-1 overflow-y-auto p-3">
             {folderItems.map((item) => {
               const Icon = item.icon;
@@ -379,14 +360,14 @@ const EmailsPage = ({ embedded = false }) => {
                   key={item.id}
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
-                  className={`flex w-full items-center justify-between gap-2.5 rounded-2xl px-3.5 py-2.5 text-left text-xs transition-all ${
+                  className={`flex w-full items-center justify-between gap-2.5 rounded-md px-3.5 py-2.5 text-left text-xs transition-all ${
                     active
-                      ? 'bg-slate-900 font-bold text-white shadow-xs'
-                      : 'text-slate-600 font-medium hover:bg-slate-100/80 hover:text-slate-900'
+                      ? 'bg-primary font-semibold text-white'
+                      : 'text-text-secondary font-medium hover:bg-background-tertiary/80 hover:text-text-primary'
                   }`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                    <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-text-muted'}`} />
                     <span className="truncate">{item.label}</span>
                   </span>
                 </button>
@@ -397,13 +378,13 @@ const EmailsPage = ({ embedded = false }) => {
 
         {/* 2. Message List */}
         <section
-          className={`flex min-h-0 w-full min-w-0 flex-col border-r border-slate-200/90 bg-white ${
+          className={`flex min-h-0 w-full min-w-0 flex-col border-r border-border/90 bg-white ${
             selectedEmail ? 'hidden lg:flex' : 'flex'
           }`}
         >
           {/* Subheader: Folder Title & Pagination */}
-          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/60 px-4 py-2.5">
-            <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider truncate">
+          <div className="flex shrink-0 items-center justify-between border-b border-border-light bg-background-secondary/60 px-4 py-2.5">
+            <h2 className="text-xs font-semibold text-text-primary truncate">
               {selectedFolderLabel}
             </h2>
 
@@ -412,19 +393,19 @@ const EmailsPage = ({ embedded = false }) => {
                 type="button"
                 onClick={() => setPage((p) => p - 1)}
                 disabled={pageInfo.page === 0}
-                className="rounded-lg p-1 text-slate-500 hover:bg-slate-200/60 disabled:opacity-30"
+                className="rounded p-1 text-text-tertiary hover:bg-secondary-200/60 disabled:opacity-30"
                 aria-label="Önceki Sayfa"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
-              <span className="px-1 text-[11px] font-bold tabular-nums text-slate-500">
+              <span className="px-1 text-xs font-semibold tabular-nums text-text-tertiary">
                 {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
               </span>
               <button
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={pageInfo.page + 1 >= pageInfo.totalPages}
-                className="rounded-lg p-1 text-slate-500 hover:bg-slate-200/60 disabled:opacity-30"
+                className="rounded p-1 text-text-tertiary hover:bg-secondary-200/60 disabled:opacity-30"
                 aria-label="Sonraki Sayfa"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -433,17 +414,17 @@ const EmailsPage = ({ embedded = false }) => {
           </div>
 
           {/* Mobile Folder Chips Scroll */}
-          <div className="lg:hidden shrink-0 border-b border-slate-200/80 bg-slate-50 px-3 py-2">
+          <div className="lg:hidden shrink-0 border-b border-border/80 bg-background-secondary px-3 py-2">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
               {folderItems.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
-                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                  className={`shrink-0 rounded px-3 py-1.5 text-xs font-semibold transition-all ${
                     filterType === item.id
-                      ? 'bg-slate-900 text-white shadow-2xs'
-                      : 'border border-slate-200 bg-white text-slate-700'
+                      ? 'bg-primary text-white'
+                      : 'border border-border bg-white text-text-secondary'
                   }`}
                 >
                   {item.label}
@@ -481,11 +462,11 @@ const EmailsPage = ({ embedded = false }) => {
           {selectedEmail ? (
             <>
               {/* Mobile Back to List Button */}
-              <div className="flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-slate-50 px-4 py-2.5 lg:hidden">
+              <div className="flex shrink-0 items-center justify-between border-b border-border/80 bg-background-secondary px-4 py-2.5 lg:hidden">
                 <button
                   type="button"
                   onClick={() => setSelectedEmail(null)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-indigo-600"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-text-primary"
                 >
                   <ArrowLeftIcon className="h-4 w-4" />
                   <span>{t("list", "Mesaj Listesine Dön")}</span>
@@ -501,14 +482,12 @@ const EmailsPage = ({ embedded = false }) => {
               </div>
             </>
           ) : (
-            <div className="flex min-h-[300px] flex-1 flex-col items-center justify-center gap-3 p-10 text-center text-slate-400">
-              <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-300">
-                <MailOpen className="h-8 w-8" />
-              </div>
-              <h3 className="text-sm font-bold text-slate-900">
+            <div className="flex min-h-72 flex-1 flex-col items-center justify-center gap-3 p-10 text-center text-text-muted">
+              <MailOpen className="h-5 w-5 shrink-0 text-secondary-300" strokeWidth={1.5} aria-hidden />
+              <h3 className="text-sm font-semibold text-text-primary">
                 {t("select_an_item_to_read", "Okumak İçin Bir E-Posta Seçin")}
               </h3>
-              <p className="max-w-xs text-xs text-slate-500">
+              <p className="max-w-xs text-xs text-text-tertiary">
                 {t("nothing_is_selected_choose_a_message_in_", "Sol taraftaki listeden görüntülemek istediğiniz e-postaya tıklayın.")}
               </p>
             </div>

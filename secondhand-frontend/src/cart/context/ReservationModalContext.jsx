@@ -1,6 +1,4 @@
-import React, {createContext, useContext} from 'react';
+import { createContext } from 'react';
 
 export const ReservationModalContext = createContext({ showReservationModal: () => {} });
-
-export const useReservationModal = () => useContext(ReservationModalContext);
 

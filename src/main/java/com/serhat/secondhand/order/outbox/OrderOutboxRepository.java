@@ -15,6 +15,9 @@ import org.springframework.data.jpa.repository.Modifying;
 
 public interface OrderOutboxRepository extends JpaRepository<OrderOutboxEvent, UUID> {
 
+    // SKIP LOCKED (-2): rows claimed by another instance are skipped
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.QueryHints(@jakarta.persistence.QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2"))
     @Query("SELECT e FROM OrderOutboxEvent e " +
            "WHERE e.status IN :statuses AND e.nextAttemptAt <= :now " +
            "ORDER BY e.createdAt ASC")

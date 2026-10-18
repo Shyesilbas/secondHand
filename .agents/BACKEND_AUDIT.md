@@ -1,133 +1,147 @@
-# Backend Kod Kalite & Mimari Audit Raporu
-_Tarih: 2026-06-20_
+# Backend Güvenlik ve Mimari Denetim Raporu
 
-## 1. Genel Mimari Değerlendirme
-Projede katmanlı mimari (Controller -> Service -> Repository) sıkı sıkıya uygulanmıştır. Genellikle büyük modüllerde (örneğin `listing`, `order`, `payment`) Domain-Driven Design (DDD) yaklaşımlarının temel bileşenlerine rastlanmaktadır. Interface'ler (`IUserService`, `IPaymentVerificationService`) ve Strategy tasarım deseni aktif şekilde kullanılmıştır. Genel paket yapısı sorumlulukların ayrılması prensibine (SRP) uygundur.
+> **Ortam / Altyapı Bilgisi:**
+> - Redis, Kafka ve PostgreSQL Docker üzerinde çalışmaktadır.
+> - Database kullanıcı adı: `postgres`, parola: `postgres`
 
-## 2. Paket Bazlı Yapı Haritası
-| Paket | Controller | Service(ler) | Repository | Validator/Policy | Mapper | Event/Listener | Risk |
-|-------|-----------|--------------|------------|-----------------|--------|----------------|------|
-| favoritelist | FavoriteListController | FavoriteListService | FavoriteListLikeRepository<br>FavoriteListItemRepository<br>FavoriteListRepository | | FavoriteListMapper | | 🟢 |
-| order | OrderController | 13 adet Service (OrderEscrowQueryService, OrderShippingService vb.) | OrderRepository<br>OrderItemRefundRepository<br>OrderItemRepository<br>OrderItemCancelRepository | OrderRefundPolicy<br>OrderCancellationPolicy<br>OrderCompletionPolicy | OrderMapper | 7 adet Event/Listener (OrderNotificationListener vb.) | 🟡 |
-| offer | OfferController | OfferService<br>IOfferService<br>OfferEmailNotificationService | OfferRepository | OfferValidator | OfferMapper | | 🟢 |
-| exchange | ExchangeRateController | ExchangeRateService | | | | | 🟢 |
-| core | 4 adet Controller | VerificationService<br>IVerificationService<br>AuditLogService<br>EnumReadService | VerificationRepository<br>AuditLogRepository | | AuditLogMapper | | 🟢 |
-| ewallet | EWalletController | IEWalletService<br>EWalletService | EWalletRepository | EWalletValidator | EWalletMapper | | 🟢 |
-| chat | ChatWebSocketController<br>ChatRestController | ChatNotificationService<br>ChatService<br>ChatAuthorizationService | MessageRepository<br>ChatRoomRepository | | ChatMessageMapper<br>ChatRoomMapper | | 🟢 |
-| auth | PasswordController<br>AuthController | PasswordService<br>AuthService<br>IAuthService<br>TokenService<br>UserDetailsServiceImpl | TokenRepository | | | | 🟡 |
-| notification | NotificationController | 3 adet Service | 4 adet Repository | | NotificationMapper | 4 adet Event/Listener | 🟢 |
-| payment | PaymentController | 8 adet Service (PaymentOutboxService, PaymentPreCheckService vb.) | PaymentOutboxRepository<br>PaymentRepository | PaymentValidator | PaymentMapper | PaymentOutboxEvent<br>PaymentCompletedEvent<br>PaymentCompletedEventListener | 🟡 |
-| follow | SellerFollowController | SellerFollowService | SellerFollowRepository | | SellerFollowMapper | NewListingNotificationListener | 🟢 |
-| cloudinary | ImageController | CloudinaryService | | | | | 🟢 |
-| agreements | AgreementController | 5 adet Service | 4 adet Repository | | AgreementMapper<br>UserAgreementMapper | AgreementUpdateEvent | 🟢 |
-| favorite | FavoriteController | FavoriteStatsService<br>ListingAccessService<br>FavoriteService | FavoriteRepository | | FavoriteMapper | | 🟢 |
-| user | UserBadgesController<br>AddressController<br>UserController | 7 adet Service (IUserService, GreatSellerService vb.) | AddressRepository<br>UserRepository | GreatSellerPolicy | UserMapper<br>AddressMapper | GreatSellerEligibilityEventListener<br>UserRegisteredEvent<br>SellerEligibilityRecheckEvent | 🟢 |
-| shipping | | ShippingService<br>ShippingServiceImpl | ShippingRepository | | ShippingMapper | | 🟢 |
-| coupon | CouponController<br>AdminCouponController | CouponService | CouponRedemptionRepository<br>CouponRepository | CouponValidator | CouponMapper | | 🟢 |
-| checkout | | CheckoutStockReservationService | | | | | 🟢 |
-| dashboard | DashboardController | DashboardService<br>IDashboardService | | | DashboardMapper | | 🟢 |
-| complaint | ComplaintController | IComplaintService<br>ComplaintService | ComplaintRepository | ComplaintValidator | ComplaintMapper | | 🟢 |
-| forum | ForumController | ForumService | 4 adet Repository | ForumValidator | ForumThreadMapper<br>ForumCommentMapper | | 🟢 |
-| ai | 4 adet Controller (AgentController, GeminiController vb.) | MemoryConversationService<br>MemoryService<br>AgentQueryService<br>AiSummaryService<br>GeminiAiService | UserMemoryRepository<br>ChatMessageRepository | | | | 🟢 |
-| review | ReviewController | ReviewService<br>IReviewService | ReviewRepository | ReviewValidator | ReviewMapper | | 🟢 |
-| campaign | CampaignController<br>PublicCampaignController | CampaignService<br>ICampaignService | CampaignRepository | CampaignValidator | CampaignMapper | | 🟢 |
-| cart | CartController | CartService | CartRepository | CartValidator | CartMapper | | 🟢 |
-| escrow | | EscrowService | EscrowRepository | | | | 🟢 |
-| listing | 11 adet Controller | 20 adet Service | 33 adet Repository | 31 adet Validator/Policy | ListingMapper<br>PriceHistoryMapper | PriceDropNotificationListener<br>PriceDroppedEvent<br>NewListingCreatedEvent | 🔴 |
-| showcase | ShowcaseController | IShowcaseService<br>ShowcaseService | ShowcaseRepository | ShowcaseValidator | ShowcaseMapper | | 🟢 |
-| pricing | | PricingService<br>IPricingService | | | PricingMapper | | 🟢 |
-| email | EmailController | EmailService | EmailRepository | | EmailMapper | | 🟢 |
+**Tarih:** 2026-10-18  
+**Kapsam:** `src/main/java/com/serhat/secondhand/` altındaki backend modülleri (31 modül, 946 dosya)
 
-## 3. Katman Analizi
+---
 
-### 3.1 Controller Katmanı
-Controller sınıfları genel olarak makul sayıda endpoint içermekte. REST standartlarına uygun olarak GET, POST, PUT, DELETE, PATCH anotasyonları doğru eşleştirilmiş. Sınıfların içerisine iş mantığı sızmadığı ve her şeyin ilgili servislere devredildiği görülüyor. Toplam 34 civarı Controller ile dış dünya bağlantısı sağlanıyor.
+## 1. Adım: Yapı ve Çekirdek Akış
 
-### 3.2 Service Katmanı
-Servis ayrımı başarılı. Özellikle `order`, `payment` ve `listing` paketlerinde `God Object` (her işi yapan dev sınıf) oluşumu engellenmiş. İş kuralları `QueryService`, `ValidationService`, `CommandService`, `Scheduler` ve `Strategy` alt başlıklarına kadar parçalanmış durumda. 
+31 modül ve 946 dosya bulunmaktadır. Riskin yoğunlaştığı çekirdek bileşenler:
+- **Para akışı:** `checkout` → `order` → `payment` → `escrow` → `ewallet`. Tek ödeme sağlayıcısı: `EWALLET`.
+- **Stok:** `inventory`. Rezervasyon Redis'te Lua script ile yapılıyor, PostgreSQL'e Kafka üzerinden senkronlanıyor.
+- **Kuyruk / Outbox:** 3 outbox worker (`payment`, `order`, `escrow`) Kafka'ya yazıyor; 4 consumer okuyor.
+- **Güvenlik:** JWT filtresi (Bearer veya cookie), bellek içi rate limit, CSRF cookie ve STOMP interceptor.
 
-### 3.3 Validasyon Katmanı
-Sistem, input validasyonlarından öte, karmaşık domain kuralları için güçlü bir Policy/Validator mekanizmasına sahip. `listing` modülü altında alt tiplere özel onlarca validator (örn. `LandValidator`, `SmartphoneValidator`) mevcut. `order` ve `user` modüllerinde ise Policy sınıfları yer alıyor.
+---
 
-### 3.4 Repository Katmanı
-Spring Data JPA standartlarına uygun interface yapısı tüm projede geçerli. Ancak `listing` modülü içerisinde 33 adet repository bulunması (örneğin `HeatingTypeRepository`, `CarBrandRepository`), veri okuma aşamasında "N+1 Problem" riskinin yüksek olabileceğini gösteriyor.
+## Kritik Bulgular (Para Kaybı veya Güvenlik Açığı)
 
-### 3.5 Mapper Katmanı
-Model ile Entity veya DTO arasındaki geçişler için birer Mapper interface'i tahsis edilmiş. Proje `pom.xml` dosyasından `MapStruct` kullanıldığı tespit edildi, bu da manuel dönüşüm hatalarının önlendiğini ve tutarlılığın korunduğunu kanıtlıyor.
+### 1. Ödeme akışında kalan açıklar *(ana hata giderildi: başarısız ödeme artık `Result.error` dönüyor)*
+- **Yarış Durumu:** Bakiye kontrolü kilitsiz okuyor (`PaymentProcessor.java:140`), kilit ise sonradan alınıyor (`EWalletService.java:205`). Kullanıcı aradaki pencerede paralel bir çekim (`withdraw`) ile bakiyeyi boşaltırsa Premium, vitrin ve ilan ücretini ödemeden hak kazanabilir.
+- **Sepet / Rollback:** `CheckoutOrchestrator.java:112-117` üzerinde: Çok satıcılı bir sepette bir ödeme başarısız olursa genel bir rollback yapılmıyor. Başarılı kalemlerin parası düşülüyor, sipariş siliniyor ve işlem commit ediliyor.
 
-### 3.6 Event & Async Yapı
-Modüller arası coupling (bağımlılık) minimuma indirilmek istenmiş. Bu sebeple Spring Events kullanılarak asenkron `Listener` ve `Event` akışları yaygınlaştırılmış (`OrderCompletedEvent`, `PaymentCompletedEvent` vb.). Projede Redis kullanılarak asenkron task senkronizasyonlarının ve arka plan işlerinin de ayrıştırıldığı anlaşılıyor.
+---
 
-### 3.7 AOP Kullanımı
-Sistemin cross-cutting concern (yatay kesen ilgiler) yönetimi `OrderLogAspect`, `AuditAspect` ve `PriceHistoryAspect` sınıfları üzerinden başarıyla uygulanıyor. Fiyat değişimi ve denetim (audit) logları Aspect tabanlı yapılandırılmış.
+## Yüksek Öncelikli Bulgular
 
-## 4. Güvenlik Katmanı
-`core/security` altında güçlü bir koruma kalkanı var. JWT tabanlı kimlik doğrulama (`jjwt`), OAuth2 desteği (Resource Server & Client), Rate Limiting (filtre seviyesinde), ve CSRF koruması sağlanıyor. `TokenCleanupScheduler` sayesinde auth yapısı kendi kendini temizliyor.
+### 7. Temiz bir veritabanında uygulama açılmıyor
+- **Dosya / Satır:** `db/migration/V1__baseline.sql:526-544`
+- **Detay:**
+  - `escrows` tablosunda `order_item_id` yok ve `order_id` kolonu `UNIQUE` tanımlı (her kalem için ayrı escrow açıldığından çok kalemli siparişleri bozar).
+  - `carts.user_id` kolonu `UNIQUE`, oysa entity kullanıcı başına birden çok satır tutuyor.
+  - `users.password_hash` sütunu entity'deki `password` alanı ile eşleşmiyor.
+  - `ddl-auto: validate` ayarıyla uygulama yalnızca Hibernate'in daha önce oluşturduğu eski şemalı DB'de çalışabilir durumda.
 
-## 5. Cache Mimarisi
-Çok katmanlı bir Cache mimarisi uygulanmış:
-- **L1 (Caffeine)**: Local in-memory cache olarak, hızlı okuma gerektiren değişmez/az değişen veriler için.
-- **L2 (Redis)**: Dağıtık cache ve session senaryoları için (örn. `PaymentRedisIdempotencyService`).
-Ayrıca `CacheErrorHandlerConfig` ile cache kopmalarının sistemi durdurmasını engelleyecek fallback mekanizmaları öngörülmüş.
+### 8. Çok satıcılı SAFE_MEETUP siparişinde tek satıcı herkesin parasını açıyor
+- **Dosya / Satır:** `OrderCompletionService.java:129`, `OrderCreationService.java:211`, `EscrowService.java`
+- **Detay:** `confirmHandoverCompletion` → `EscrowService.release(order)` çağrısı siparişteki tüm escrow'ları serbest bırakıyor. `OrderCreationService.java:211` ise meetup siparişini tek satıcıyla sınırlamıyor.
 
-## 6. Kritik Domain Analizi
+### 9. Üretim akışında demo kodları bulunuyor
+- **Dosya / Satır:** `OrderCompletionScheduler.java:34, 58`, `EWalletService.java:94`
+- **Detay:**
+  - `OrderCompletionScheduler.java:34` her 5 dakikada siparişleri otomatik ilerletiyor, sahte "ARAS" takip numarası üretiyor (`:58`) ve 72 saat sonra escrow'u satıcıya serbest bırakıyor.
+  - `EWalletService.java:94` deposit ("Mock top-up") herkese kontrolsüz bakiye yüklüyor.
+  - Her iki akışta da profil (örn. `@Profile("!prod")`) koruması bulunmuyor.
 
-### payment & escrow
-Dış sistemlerle haberleşen payment paketi, Outbox Pattern (`PaymentOutboxService`) ve Idempotency (`PaymentRedisIdempotencyService`) kullanılarak distributed transaction senaryolarında veri bütünlüğünü koruyacak şekilde mükemmel dizayn edilmiş.
+### 10. Rezervasyonda adet kontrol edilmiyor
+- **Dosya / Satır:** `resources/scripts/reserve_stock_with_ttl.lua:14-19`
+- **Detay:** Mevcut bir rezervasyon varsa istenen yeni adede bakılmaksızın başarı dönüyor. Kullanıcı 1 adet rezerve edip sepette adedi 3'e çıkardığında checkout kontrolü bypass ediliyor.
 
-### auth
-OAuth2 Client / Resource Server mimarisinde oluşturulan oturum yönetimi, token geri çekme ve rotation işlemleri iyi bir standartla sağlanmış.
+---
 
-### listing
-Çok karmaşık (33 repo, 20 servis, 31 validator). Veritabanı okuma performansının sürekli izlenmesi gerekiyor. Kategori yapısı için iyi bir abstraction kurulmuş fakat sayısal çoğalma kod karmaşasını artırıyor.
+## Orta Öncelikli Bulgular
 
-### ai (Aura)
-Gelişmiş prompt ve rate limit mekanizmalarıyla Gemini entegre edilmiş. AI agent aramaları için `AgentQueryService` ve hafıza için `MemoryConversationService` sınıfları tasarlanmış.
+### 11. Checkout aşamasında ilan durumu yeniden kontrol edilmiyor
+- **Dosya:** `CheckoutPricingContextFactory`, `OrderCreationService.createOrder`
+- **Detay:** Sepete eklendikten sonra `INACTIVE` veya `SOLD` olmuş bir ilan sipariş tamamlama aşamasında tekrar doğrulanmadığı için satın alınabiliyor.
 
-## 7. Teknik Borç Tespiti
-| Alan | Sorun | Risk | Öneri |
-|------|-------|------|-------|
-| `listing` paketi | İç içe geçmiş onlarca spesifik repository (örneğin VehicleEngineRepository). Modül aşırı büyümüş. | 🔴 | Alt modüllere ayrılması veya bazı tiplerin JSON/NoSQL yapıya çekilmesi değerlendirilebilir. |
-| Cache | Multi-layer cache kullanımı invalidation sürecini karmaşıklaştırır. | 🟡 | TTL ve Eviction policy'leri çok iyi belgelenmelidir. |
+### 12. Stok uzlaştırıcısında yarış durumu (Race Condition) ve Redis bloklama
+- **Dosya / Satır:** `InventoryRedisReservationService.java:28, 87`
+- **Detay:**
+  - `:87` rezervasyon anahtarını hemen siliyor, ancak veritabanı düşümü asenkron yürüyor. Arada uzlaştırıcı çalışırsa Redis eski değere dönüyor.
+  - `:28` satırındaki `KEYS` komutu her ilan için tekrar çağrılıyor ($O(N^2)$) ve Redis event loop'unu blokluyor.
 
-## 8. Paket Bazlı README Durumu
-| Paket | README var mı? |
-|-------|---------------|
-| agreements | Evet |
-| ai | Evet |
-| auth | Evet |
-| campaign | Evet |
-| cart | Evet |
-| chat | Evet |
-| escrow | Evet |
-| ewallet | Evet |
-| favorite | Evet |
-| favoritelist | Evet |
-| listing | Evet |
-| offer | Evet |
-| order | Evet |
-| payment | Evet |
-| review | Evet |
-| shipping | Evet |
-| showcase | Evet |
-*(Diğer modüllerin README belgesi eksiktir.)*
+### 13. İptal ve iadede stok yalnızca veritabanına dönüyor, Redis'e senkronlanmıyor
+- **Dosya / Satır:** `OrderCompensationPersistenceService.java:59`, `ListingCommandService.java:143`
+- **Detay:**
+  - `OrderCompensationPersistenceService.java:59` içindeki `restoreStock`, hatayı transaction içinde `catch (Exception ignored)` ile yutuyor. İçteki `@Transactional` işlemi rollback'e işaretlediği için tüm iptal `UnexpectedRollbackException` ile 500 hatası veriyor.
+  - Satıcının stok güncellemesi de (`ListingCommandService.java:143`) Redis'e yansıtılmıyor; `syncStockToRedis` hiç çağrılmıyor.
 
-## 9. Eksik Mimari Pattern'ler
-Global Exception Handler mevcuttur. CQRS tam uygulanmamış olsa da asenkron outbox eventler ile Saga hissi uyandırılmış. Eksik olarak "Circuit Breaker" yapıları (örn. Resilience4j) açık bir şekilde isimlendirilen sınıflar arasında gözlemlenmedi.
+### 14. Meetup zamanlayıcısı takılıyor
+- **Dosya / Satır:** `OrderCompletionScheduler.java:137`
+- **Detay:** Kısmen iptal edilmiş bir siparişte escrow iptali sürekli başarısız oluyor; sipariş sonsuza kadar bekliyor ve kalan para iade edilmiyor.
+- `VERIFICATION_LOCKED` durumundaki siparişleri hiçbir adım işlemiyor.
+- Zamanlayıcının tamamı tek transaction'da koşuyor: Tek bir hata tüm toplu işlemi geri alır. Çoklu instance ortamında aynı anda çalışmayı önleyen dağıtık kilit mekanizması da bulunmuyor.
 
-## 10. Öncelik Sırası
-1. **[En kritik]**: `listing` modülü. Projenin devasa bir bölümünü tek başına omuzluyor. N+1 sorgularına karşı JPA logları detaylı incelenmeli.
-2. `payment` outbox worker'ının production senaryoları için yük testi yapılması.
-3. README eksikliği olan diğer modüller için (core, user vb.) dokümantasyon eklenmesi.
+### 15. Outbox'larda yeniden deneme limiti etkisiz
+- **Dosya / Satır:** `EscrowOutboxWorker.java:79`, `PaymentOutboxWorker.java:74`, `OrderOutboxWorker.java:62`
+- **Detay:** Limit dolunca kaydı `FAILED` yapıyor; ancak worker sorgusu `FAILED` kayıtları da tekrar çekiyor. Hatalı bir mesaj sonsuz döngüye giriyor. Çoklu instance desteği için `SKIP LOCKED` eksik.
 
-## 11. Genel Skor
-| Kategori | Puan (1-5) | Yorum |
-|----------|-----------|-------|
-| Katman Ayrımı | 5 | Service ve Policy bölümleri çok iyi kurgulanmış |
-| Transaction Yönetimi | 4 | Payment için Outbox pattern ile başarılı yönetilmiş |
-| Validasyon Tutarlılığı | 5 | Polimorfik validatörler ve merkezi policy'ler gayet yeterli |
-| Cache Mimarisi | 4 | Redis + Caffeine L1/L2 kurgusu mükemmel |
-| Güvenlik | 5 | JWT, OAuth2, Rate limiting ve CSRF entegre |
-| Event/Async Kullanımı | 5 | Gevşek bağlı (loosely coupled) modüller Spring Events ile kurulmuş |
-| Kod Tekrarı | 4 | AOP ve MapStruct ile yüksek oranda engellenmiş |
-| **Genel Ortalama** | 4.5 | Genel olarak üst düzey, kurumsal bir yazılım kalitesine sahip |
+### 16. İdempotency kayıtları erken siliniyor
+- **Dosya / Satır:** `OutboxHousekeepingScheduler.java:32`
+- **Detay:** Tekrar korumasını (idempotency) 3 gün tutuyor. Oysa Kafka 7 gün saklıyor ve tüketici en baştan okuyacak şekilde yapılandırılmış. Offset sıfırlanırsa eski escrow kredileri mükerrer yazılabilir.
+
+### 17. Ödeme, commit'ten önce "tamamlandı" olarak işaretleniyor
+- **Dosya / Satır:** `PaymentProcessor.java:83, 89`
+- **Detay:** Redis'teki kaydı checkout işlemi commit olmadan tamamlandı olarak işaretliyor. Ayrıca `:89` üzerindeki iyimser kilit yeniden deneme döngüsü ölü kod niteliğinde.
+
+### 18. Kupon kullanım hakkı boşa yanıyor
+- **Dosya / Satır:** `CouponService.java:123`
+- **Detay:** Redis sayacını veritabanı doğrulamasından önce artırıyor ve rollback durumunda geri almıyor; başarısız checkout işlemleri limiti tüketiyor. Veritabanı zaten pesimistik kilit kullandığı için Redis sınırlayıcısı gereksiz yük ve risk oluşturuyor.
+
+### 19. Herkes istediği hesabı kilitleyebilir (DoS)
+- **Dosya / Satır:** `LoginAttemptService.java:15`
+- **Detay:** Sayaç bellek içi, instance başına ve sınırsız büyüyor. Anahtar olarak e-postanın kendisi kullanılıyor; büyük/küçük harf değiştirilerek kilit atlatılabiliyor veya rastgele kullanıcıların hesapları kilitlenebiliyor.
+
+### 20. PublicEndpointRegistry değişkenli path'leri kaydetmiyor
+- **Dosya / Satır:** `PublicEndpointRegistry.java:76`
+- **Detay:** Spring Boot 3.5'te `getDirectPaths()` bu path'ler için null yerine boş küme dönüyor. Bu yüzden `{id}` içeren public endpoint'ler registry'ye public olarak eklenemiyor ve misafir kullanıcılar 401 alıyor. Kayıt ayrıca HTTP metodundan bağımsız. *(Uygulama çalıştırılarak doğrulanmalı)*.
+
+### 21. Yönetim ve maliyet uçları yetkilendirilmemiş
+- **Dosya / Satır:** `AgreementController.java:46` (`POST /initialize`), `GeminiController.java:30` (`POST /ask`)
+- **Detay:** Herhangi bir kullanıcı yönetimsel ilklendirme endpoint'ini veya LLM maliyetine yol açan AI endpoint'ini kısıtlama olmaksızın tetikleyebiliyor.
+
+### 22. WebSocket bağlantısı iptal edilmiş token'ı kabul ediyor
+- **Dosya / Satır:** `WebSocketSecurityConfig.java:92`
+- **Detay:** Bağlantı esnasında refresh token kabul edilebiliyor ve iptal (revocation) kontrolü yapılmıyor; iptal edilmiş 30 günlük token dahi bağlantı sağlayabiliyor.
+
+### 23. Token yenilemede eşzamanlılık kilidi yok
+- **Dosya / Satır:** `LoginService.java:112` (`refreshToken`)
+- **Detay:** Eski token'ı kilitlemiyor. Çoklu sekmede eşzamanlı token yenileme isteği geldiğinde ya iki geçerli token üretilir ya da yarış nedeniyle kullanıcı sistemden düşürülür.
+
+---
+
+## Düşük Öncelikli / Kod Temizliği (Dead Code)
+
+- **Hata Argümanları Sırası Ters:** `Result.error(mesaj, kod)` çağrıları `CheckoutOrchestrator.java:70, 78, 90, 116` ve `CouponService.java:78, 84, 101, 107` sınıflarında ters argümanlarla verilmiş; istemci mesaj yerine hata kodunu görüyor.
+- **Ölü Kodlar:**
+  - Redis teklif kilidi işlevsiz: `OfferService.java:132` `lockAcceptedOffer` sonucunu yoksayıyor, `releaseAcceptedOffer` hiç çağrılmıyor.
+  - `EscrowService.java:259` `creditWalletQuietly` metodu hiçbir yerden çağrılmıyor.
+  - `reserveStock` ve `syncStockToRedis` metotları kullanılmıyor.
+  - `ORDER_CANCELLED` ve `ORDER_REFUNDED` topic'lerini tüketen bir consumer yok.
+  - `PAYMENT_FAILED` ve `PAYMENT_REFUNDED` topic'lerine yazan bir producer yok.
+- **WebSocket Bildirimleri:** `NotificationWebSocketService.java:18` adresi `/user/{id}` ile kuruyor, oysa Spring kullanıcıyı e-postasından (Principal) çözüyor. *(Doğrulanmalı)*.
+- **Kafka Deserialize Güvenliği:** `KafkaConfig.java:41` tüm paketlere güveniyor (`"*"`). Kafka'ya mesaj yazabilen bir aktör rastgele sınıf deserialization zafiyeti tetikleyebilir.
+- **"Sepette N kişi" Metrik Şişmesi:** `CheckoutOrchestrator.java:170` sepeti temizlerken bu metriği düşürmüyor.
+- **Çift Bildirim Gönderimi:** `EscrowService.java:139` ve Kafka consumer aynı ödeme için iki kez "ödeme başarılı" bildirimi gönderiyor.
+
+---
+
+## Önerilen Çözüm Sırası
+
+1. **Adım 1 (Acil / En Yüksek Risk - Düşük Efor):** `1` (kalan yarış durumu ve sepet rollback'u).
+3. **Adım 3 (Veritabanı & Migration Sağlığı):** `7` (`V1__baseline.sql` düzeltmeleri ve entity senkronizasyonu).
+4. **Adım 4 (İş Kuralı ve Mimari Kararlar):** `8, 9` (Çok satıcılı sipariş akışı ve demo / mock kodların profil koruması altına alınması).
+5. **Adım 5 (Dayanıklılık ve Temizlik):** Geriye kalan orta ve düşük öncelikli bulgular.
+
+---
+
+## Ek Notlar ve Doğrulama Durumu
+
+- **Doğrulama İhtiyacı:** `listing` modülünde (150 dosya) yalnızca temel sahiplik kontrolleri taranmıştır; forum, review, notification, ai, dashboard ve follow servisleri derinlemesine analiz edilmemiştir.
+- **Çalışma Zamanı Doğrulaması:** 20. bulgu (`PublicEndpointRegistry` Boot 3.5 davranış uyumu) ve WebSocket bildirimlerinin adresi (`NotificationWebSocketService`) çalışan uygulama üzerinde doğrulanmalıdır.

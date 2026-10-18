@@ -16,16 +16,10 @@ export const aiChatService = {
  deleteHistory: async () => {
  return del('/v1/ai/chats/history', { timeout: 10000 });
  },
- deleteMemory: async () => {
- return del('/v1/ai/memories', { timeout: 10000 });
- },
  getMemory: async () => {
  return get('/v1/ai/memories', { timeout: 10000 });
  },
  updateMemory: async (dto) => {
  return put('/v1/ai/memories', dto, { timeout: 10000 });
- },
- deleteInterest: async (interest) => {
- return del(`/v1/ai/memories/interests?interest=${encodeURIComponent(interest)}`, { timeout: 10000 });
  }
 };

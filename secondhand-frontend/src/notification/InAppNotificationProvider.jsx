@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useInAppNotifications } from './hooks/useInAppNotifications.js';
 import { InAppNotificationContext } from './InAppNotificationContext.jsx';
 

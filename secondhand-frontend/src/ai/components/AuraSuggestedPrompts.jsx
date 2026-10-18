@@ -1,15 +1,4 @@
-import React from 'react';
-import { 
-  TrendingDown, 
-  ShieldCheck, 
-  MessageSquare, 
-  Search, 
-  Sparkles, 
-  ArrowUpRight,
-  Zap,
-  HelpCircle,
-  ShoppingBag
-} from 'lucide-react';
+import { TrendingDown, ShieldCheck, MessageSquare, Search, ArrowUpRight, Zap } from 'lucide-react';
 
 const AURA_CAPABILITY_PROMPTS = [
   {
@@ -19,7 +8,7 @@ const AURA_CAPABILITY_PROMPTS = [
     message: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün gerçek piyasa değerini ve fırsat olup olmadığını nasıl belirleyebilirim?',
     icon: TrendingDown,
     badge: 'Akıllı Analiz',
-    gradient: 'from-emerald-500/10 to-teal-500/10 text-emerald-700 border-emerald-200/60'
+    gradient: 'bg-background-tertiary text-status-success-text border-border/60'
   },
   {
     id: 'negotiation-strategy',
@@ -28,7 +17,7 @@ const AURA_CAPABILITY_PROMPTS = [
     message: 'Bir ilana teklif verirken satıcıyı ikna edecek, piyasaya uygun ve saygılı bir pazarlık mesajı taslağı hazırlar mısın?',
     icon: MessageSquare,
     badge: 'Teklif Botu',
-    gradient: 'from-blue-500/10 to-indigo-500/10 text-blue-700 border-blue-200/60'
+    gradient: 'bg-background-tertiary text-text-primary border-border/60'
   },
   {
     id: 'escrow-safety',
@@ -37,7 +26,7 @@ const AURA_CAPABILITY_PROMPTS = [
     message: 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu (Escrow) sistemi nasıl çalışır?',
     icon: ShieldCheck,
     badge: 'Maksimum Güvenlik',
-    gradient: 'from-amber-500/10 to-orange-500/10 text-amber-700 border-amber-200/60'
+    gradient: 'bg-background-tertiary text-status-warning-text border-border/60'
   },
   {
     id: 'listing-discovery',
@@ -46,7 +35,7 @@ const AURA_CAPABILITY_PROMPTS = [
     message: 'SecondHand platformunda bütçeme ve kriterlerime en uygun popüler teknoloji ve ikinci el ilanlarını nasıl bulabilirim?',
     icon: Search,
     badge: 'Doğal Dil Arama',
-    gradient: 'from-purple-500/10 to-pink-500/10 text-purple-700 border-purple-200/60'
+    gradient: 'bg-background-tertiary text-text-primary border-border/60'
   },
 ];
 
@@ -66,37 +55,37 @@ export default function AuraSuggestedPrompts({
             type="button"
             disabled={disabled}
             onClick={() => onPick(p.message)}
-            className="group relative flex flex-col justify-between text-left rounded-2xl border border-zinc-200/90 bg-white p-4 transition-all duration-200 hover:border-zinc-900 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            className="group relative flex flex-col justify-between text-left rounded-md border border-border/90 bg-white p-4 transition-all duration-200 hover:border-primary disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2.5">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-xl border bg-gradient-to-br ${p.gradient}`}>
+                <div className={`flex h-8 w-8 items-center justify-center rounded border ${p.gradient}`}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200/60">
+                  <span className="text-xs font-semibold text-text-tertiary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border/60">
                     {p.badge}
                   </span>
-                  <div className="h-6 w-6 rounded-full flex items-center justify-center text-zinc-400 group-hover:text-zinc-900 group-hover:bg-zinc-100 transition-colors">
+                  <div className="h-6 w-6 rounded flex items-center justify-center text-text-muted group-hover:text-text-primary group-hover:bg-background-tertiary transition-colors">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
               </div>
 
-              <h3 className="text-xs sm:text-sm font-bold text-zinc-900 group-hover:text-black">
+              <h3 className="text-xs sm:text-sm font-semibold text-text-primary group-hover:text-black">
                 {p.label}
               </h3>
-              <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2 leading-relaxed font-normal">
+              <p className="text-xs text-text-tertiary mt-1 line-clamp-2 leading-relaxed font-normal">
                 {p.subtitle}
               </p>
             </div>
 
-            <div className="mt-3 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[10px] font-semibold text-zinc-400 group-hover:text-zinc-800 transition-colors">
+            <div className="mt-3 pt-2.5 border-t border-border-light flex items-center justify-between text-xs font-semibold text-text-muted group-hover:text-text-primary transition-colors">
               <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-amber-500" />
+                <Zap className="w-3 h-3 text-status-warning" />
                 <span>Tek tıkla sor</span>
               </span>
-              <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                 Çalıştır ↵
               </span>
             </div>

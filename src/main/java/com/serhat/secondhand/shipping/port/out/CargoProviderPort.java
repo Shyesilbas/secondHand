@@ -6,6 +6,11 @@ import com.serhat.secondhand.shipping.port.out.dto.CargoTrackingStatus;
 
 public interface CargoProviderPort {
     /**
+     * The provider name clients send as {@code providerName} when shipping an order.
+     */
+    String providerName();
+
+    /**
      * Determines if this provider implementation handles the given providerName.
      * @param providerName The name of the cargo provider (e.g. "JetKargo")
      * @return true if it supports it

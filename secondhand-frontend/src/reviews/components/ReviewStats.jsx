@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Star } from 'lucide-react';
 import { REVIEW_MESSAGES } from '../reviewConstants.js';
 import { RatingStarsDisplay } from './RatingStarsDisplay.jsx';
 const ReviewStats = ({
@@ -15,7 +16,7 @@ const ReviewStats = ({
  return 'text-status-error';
  };
  if (loading) {
- return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
+ return <div className="bg-background-primary rounded-md border border-border-light p-6">
  <div className="animate-pulse">
  <div className="h-4 bg-background-tertiary rounded w-1/4 mb-4"></div>
  <div className="space-y-3">
@@ -26,7 +27,7 @@ const ReviewStats = ({
  </div>;
  }
  if (!stats) {
- return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
+ return <div className="bg-background-primary rounded-md border border-border-light p-6">
  <p className="text-text-muted">{REVIEW_MESSAGES.NO_REVIEW_INFO}</p>
  </div>;
  }
@@ -49,15 +50,15 @@ const ReviewStats = ({
  stars: 0,
  count: stats.zeroStarReviews || 0
  }];
- return <div className="bg-background-primary rounded-2xl shadow-sm border border-border-light p-6">
- <h3 className="text-lg font-bold text-text-primary tracking-tight mb-6">{t("review_stats")}</h3>
+ return <div className="bg-background-primary rounded-md border border-border-light p-6">
+ <h3 className="text-lg font-semibold text-text-primary tracking-tight mb-6">{t("review_stats")}</h3>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="text-center flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border-light pb-6 md:pb-0 md:pr-6">
  <div className="flex items-center justify-center mb-3">
  <RatingStarsDisplay value={stats.averageRating || 0} iconClassName="w-5 h-5" />
  </div>
- <div className={`text-4xl font-bold mb-1 ${getRatingColor(stats.averageRating || 0)}`}>
+ <div className={`text-4xl font-semibold mb-1 ${getRatingColor(stats.averageRating || 0)}`}>
  {(stats.averageRating || 0).toFixed(1)}
  </div>
  <p className="text-sm font-medium text-text-muted">
@@ -72,7 +73,7 @@ const ReviewStats = ({
  const percentage = stats.totalReviews > 0 ? count / stats.totalReviews * 100 : 0;
  return <div key={stars} className="flex items-center space-x-3">
  <span className="text-sm font-medium text-text-secondary w-6 flex items-center justify-end">
- {stars === 0 ? '0' : stars} <span className="text-status-warning ml-0.5 text-xs">★</span>
+ {stars === 0 ? '0' : stars} <Star className="ml-0.5 h-3 w-3 text-text-muted" strokeWidth={1.5} aria-hidden />
  </span>
  <div className="flex-1 bg-background-secondary rounded-full h-2.5 overflow-hidden">
  <div className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out" style={{

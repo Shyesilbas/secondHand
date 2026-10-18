@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingEngine } from '../hooks/useListingEngine.js';
 import { useLocation } from 'react-router-dom';

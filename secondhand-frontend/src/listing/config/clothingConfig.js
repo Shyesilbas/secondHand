@@ -1,12 +1,11 @@
-import { lazy } from 'react';
+import { Shirt } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
-const ClothingCreateForm = lazy(() => import('../../clothing/components/ClothingCreateForm.jsx'));
 import {clothingService} from '../../clothing/services/clothingService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 
 export const clothingConfig = {
  label: 'Clothing',
- icon: '👕',
+ icon: Shirt,
  description: 'Clothing, shoes and fashion accessories',
 
  detailsComponent: GenericListingDetails,
@@ -22,7 +21,6 @@ export const clothingConfig = {
  { label: 'Purchase Year', key: 'purchaseDate', format: (_listing, v) => (v ? String(new Date(v).getFullYear()) : null) },
  ],
  },
- createComponent: ClothingCreateForm,
  formSchema: {
  initialData: {
  title: '', description: '', price: '', currency: 'TRY', quantity: 1,
@@ -92,6 +90,7 @@ export const clothingConfig = {
  },
  },
  service: {
+ create: (payload) => clothingService.createClothingListing(payload),
  getById: (id) => clothingService.getClothingDetails(id),
  update: (id, payload) => clothingService.updateClothingListing(id, payload),
  },
@@ -146,31 +145,6 @@ export const clothingConfig = {
  { value: 'clothingCategory', label: 'Clothing Category' }, { value: 'purchaseDate', label: 'Purchase Date' },
  { value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
  ],
- compactBadges: (listing) => {
- const resolveLabel = (v) => {
- if (!v) return null;
- if (typeof v === 'string') return v;
- if (typeof v === 'object') return v.label || v.name || v.value || null;
- return null;
- };
-
- const brandLabel = resolveLabel(listing.brand);
- const typeLabel = resolveLabel(listing.clothingType);
- const colorLabel = resolveLabel(listing.color);
- const conditionLabel = resolveLabel(listing.condition);
- const genderLabel = resolveLabel(listing.clothingGender);
- const categoryLabel = resolveLabel(listing.clothingCategory);
-
- return [
- { label: brandLabel, icon: '🏷️', show: !!brandLabel },
- { label: typeLabel, icon: '👕', show: !!typeLabel },
- { label: colorLabel, icon: '🎨', show: !!colorLabel },
- { label: conditionLabel, icon: '⭐', show: !!conditionLabel },
- { label: genderLabel, icon: '👤', show: !!genderLabel },
- { label: categoryLabel, icon: '👶', show: !!categoryLabel },
- { label: listing.purchaseDate ? String(new Date(listing.purchaseDate).getFullYear()) : null, icon: '📅', show: !!listing.purchaseDate },
- ].filter(badge => badge.show);
- },
  defaultFilters: {},
 };
 

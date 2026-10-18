@@ -27,11 +27,9 @@ const GreatSellerRulesCallout = ({
 }) => {
  const { t } = useTranslation();
  const rules = getRules(t);
- return <div className={`bg-background-primary border border-border-light rounded-xl p-6 sm:p-8 ${className}`}>
+ return <div className={`bg-background-primary border border-border-light rounded p-6 sm:p-8 ${className}`}>
  <div className="flex items-center gap-3 mb-8">
- <div className="w-10 h-10 rounded-full bg-background-secondary flex items-center justify-center">
- <Info className="w-5 h-5 text-text-muted" />
- </div>
+ <Info className="h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
  <div>
  <h3 className="text-sm font-medium text-text-primary">{t("platform_recognition_standards")}</h3>
  <p className="text-xs text-text-muted font-medium">{t("automatic_eligibility_based_on_60_day_pe")}</p>
@@ -43,10 +41,10 @@ const GreatSellerRulesCallout = ({
  const Icon = rule.icon;
  return <div key={rule.key} className="group relative">
  <div className="flex items-center gap-3 mb-3">
- <div className="p-2 rounded-lg bg-background-secondary text-text-muted group-hover:bg-primary-light group-hover:text-primary transition-colors">
+ <div className="p-2 rounded bg-background-secondary text-text-muted group-hover:bg-primary-light group-hover:text-primary transition-colors">
  <Icon className="w-4 h-4" aria-hidden />
  </div>
- <p className="text-xs font-bold text-text-primary uppercase tracking-wider">{rule.title}</p>
+ <p className="text-xs font-semibold text-text-primary">{rule.title}</p>
  </div>
  <p className="text-body text-text-secondary leading-relaxed font-medium">{rule.body}</p>
  </div>;
@@ -54,7 +52,7 @@ const GreatSellerRulesCallout = ({
  </div>
 
  <div className="mt-8 pt-6 border-t border-border-light text-center">
- <p className="text-caption text-text-muted font-medium tracking-wide italic">{t("sellers_who_meet_all_four_criteria_simul")}</p>
+ <p className="text-xs text-text-muted font-medium tracking-wide italic">{t("sellers_who_meet_all_four_criteria_simul")}</p>
  </div>
  </div>;
 };

@@ -18,6 +18,11 @@ public class JetKargoAdapter implements CargoProviderPort {
     private static final String PROVIDER_NAME = "JetKargo";
 
     @Override
+    public String providerName() {
+        return PROVIDER_NAME;
+    }
+
+    @Override
     public boolean supports(String providerName) {
         return PROVIDER_NAME.equalsIgnoreCase(providerName);
     }

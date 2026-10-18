@@ -1,5 +1,3 @@
-import { ListingDTO } from '../listing/types/index.js';
-
 
 export const RealEstateCreateRequestDTO = {
  title: '',
@@ -22,54 +20,6 @@ export const RealEstateCreateRequestDTO = {
  furnished: false,
  zoningStatus: '',
  _realEstateTypeName: '',
-};
-
-export const RealEstateListingDTO = {
- ...ListingDTO,
- imageUrl: '',
- adType: null,
- realEstateType: null,
- heatingType: null,
- ownerType: null,
- squareMeters: 0,
- roomCount: 0,
- bathroomCount: 0,
- floor: 0,
- buildingAge: 0,
- furnished: false,
- zoningStatus: '',
-};
-
-export const RealEstateSearchFiltersDTO = {
- listingType: 'REAL_ESTATE',
- status: 'ACTIVE',
- city: '',
- district: '',
- minPrice: 0,
- maxPrice: 0,
- currency: 'TRY',
-
- adTypeId: '',
- realEstateTypeIds: [],
- heatingTypeIds: [],
- ownerTypeId: '',
- minSquareMeters: 0,
- maxSquareMeters: 0,
- minRoomCount: 0,
- maxRoomCount: 0,
- minBathroomCount: 0,
- maxBathroomCount: 0,
- floor: 0,
- minBuildingAge: 0,
- maxBuildingAge: 0,
- furnished: false,
- zoningStatus: '',
-
- sortBy: 'createdAt',
- sortDirection: 'DESC',
-
- page: 0,
- size: 20,
 };
 
 export const createRealEstateCreateRequest = (data) => {

@@ -1,10 +1,10 @@
 const Skeleton = ({ className = '' }) => (
- <div className={`animate-pulse bg-slate-100 rounded-lg ${className}`} />
+ <div className={`animate-pulse bg-background-tertiary rounded ${className}`} />
 );
 
 export const SkeletonCard = () => (
- <div className="bg-background-primary border border-border-light rounded-xl p-4 space-y-3">
- <Skeleton className="h-48 w-full rounded-lg" />
+ <div className="bg-background-primary border border-border-light rounded p-4 space-y-3">
+ <Skeleton className="h-48 w-full rounded" />
  <Skeleton className="h-4 w-3/4" />
  <Skeleton className="h-4 w-1/2" />
  <div className="flex justify-between items-center pt-1">
@@ -15,7 +15,7 @@ export const SkeletonCard = () => (
 );
 
 export const SkeletonList = () => (
- <div className="bg-background-primary border border-border-light rounded-xl p-4 space-y-3">
+ <div className="bg-background-primary border border-border-light rounded p-4 space-y-3">
  <div className="flex items-center gap-3">
  <Skeleton className="h-12 w-12 rounded-full" />
  <div className="flex-1 space-y-2">
@@ -25,17 +25,6 @@ export const SkeletonList = () => (
  </div>
  <Skeleton className="h-3 w-full" />
  <Skeleton className="h-3 w-4/5" />
- </div>
-);
-
-export const SkeletonText = ({ lines = 3 }) => (
- <div className="space-y-2">
- {Array.from({ length: lines }).map((_, i) => (
- <Skeleton
- key={`skeleton-text-${i}`}
- className={`h-4 ${i === lines - 1 ? 'w-2/3' : 'w-full'}`}
- />
- ))}
  </div>
 );
 

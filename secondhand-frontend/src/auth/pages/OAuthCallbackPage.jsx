@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';

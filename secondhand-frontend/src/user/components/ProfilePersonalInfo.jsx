@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {UpdatePhoneRequestDTO} from '../users.js';
 import {formatPhoneForDisplay} from '../../common/utils/phoneFormatter.js';
+import {formatDate as formatDateShared} from '../../common/formatters.js';
 import PhoneUpdateModal from '../../common/components/modals/PhoneUpdateModal.jsx';
 import {Pencil} from 'lucide-react';
 
-const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
+const ProfilePersonalInfo = ({user, onPhoneUpdate, isUpdatingPhone}) => {
  const [showPhoneModal, setShowPhoneModal] = useState(false);
  const [phoneFormData, setPhoneFormData] = useState({...UpdatePhoneRequestDTO});
 
@@ -16,30 +17,7 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
  }
  };
 
- const formatDate = (dateString) => {
- if (!dateString) return 'Not provided';
- try {
- let d;
- if (typeof dateString === 'number') {
- d = new Date(dateString);
- } else if (typeof dateString === 'string') {
- const trimmed = dateString.trim();
- if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
- d = new Date(trimmed);
- } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
- const [day, month, year] = trimmed.split('/').map(Number);
- d = new Date(year, month - 1, day);
- } else {
- const ts = Date.parse(trimmed);
- d = isNaN(ts) ? null : new Date(ts);
- }
- }
- if (!d || isNaN(d.getTime())) return 'Not provided';
- return d.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
- } catch {
- return 'Not provided';
- }
- };
+ const formatDate = (dateString) => formatDateShared(dateString) || 'Not provided';
 
  const fields = [
  {label: 'Full Name', value: `${user?.name || 'Not provided'} ${user?.surname || ''}`.trim()},
@@ -66,12 +44,12 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
  {fields.map((field, i) => (
  <div
  key={field.label}
- className={`flex items-center justify-between px-4 py-4 rounded-xl hover:bg-secondary transition-colors duration-150 group ${
- i < fields.length - 1 ? 'border-b border-gray-100' : ''
+ className={`flex items-center justify-between px-4 py-4 rounded hover:bg-secondary transition-colors duration-150 group ${
+ i < fields.length - 1 ? 'border-b border-border-light' : ''
  }`}
  >
  <div className="min-w-0">
- <div className="text-xs font-medium text-text-muted uppercase tracking-wider mb-0.5">{field.label}</div>
+ <div className="text-xs font-medium text-text-muted mb-0.5">{field.label}</div>
  <div className={`text-sm font-semibold ${
  field.value === 'Not provided' || field.value === 'Not specified'
  ? 'text-text-muted italic'
@@ -83,7 +61,7 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
  {field.action && (
  <button
  onClick={field.action.onClick}
- className="opacity-0 group-hover:opacity-100 p-2 text-text-muted hover:text-text-secondary hover:bg-tertiary rounded-lg transition-all duration-200"
+ className="opacity-0 group-hover:opacity-100 p-2 text-text-muted hover:text-text-secondary hover:bg-tertiary rounded transition-all duration-200"
  title={field.action.title || 'Edit'}
  >
  <Pencil className="w-3.5 h-3.5" />
@@ -103,7 +81,7 @@ const ProfilePersonalInfo = ({user, onPhoneUpdate}) => {
  }
  submit={handlePhoneUpdate}
  closeModal={() => setShowPhoneModal(false)}
- isUpdating={false}
+ isUpdating={isUpdatingPhone}
  />
  )}
  </>

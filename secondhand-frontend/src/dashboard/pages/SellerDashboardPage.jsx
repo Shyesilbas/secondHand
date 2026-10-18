@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useState, lazy, Suspense, useMemo } from 'react';
+import { useState, lazy, Suspense, useMemo } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
 import { useQuery } from '@tanstack/react-query';
 import { orderService } from '../../order/services/orderService.js';
@@ -30,8 +30,8 @@ const ChartCard = ({
 }} transition={{
  delay,
  duration: 0.4
-}} className="bg-background-primary rounded-2xl border border-border-light p-5 shadow-sm">
- {title && <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider mb-4">{title}</h3>}
+}} className="bg-background-primary rounded-md border border-border-light p-5">
+ {title && <h3 className="text-sm font-medium text-text-primary mb-4">{title}</h3>}
  {children}
  </motion.div>;
 const SellerDashboardPage = () => {
@@ -80,12 +80,10 @@ const SellerDashboardPage = () => {
  }} animate={{
  opacity: 1
  }} className="min-h-screen bg-background-secondary flex items-center justify-center">
- <div className="text-center p-8 bg-background-primary rounded-2xl border border-border-light shadow-sm max-w-sm">
- <div className="w-14 h-14 bg-status-error-bg text-status-error rounded-xl flex items-center justify-center mx-auto mb-4">
- <Package className="w-7 h-7" />
- </div>
- <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
- <p className="text-slate-400 text-sm">{error.message}</p>
+ <div className="text-center p-8 bg-background-primary rounded-md border border-border-light max-w-sm">
+ <Package className="mx-auto mb-4 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
+ <p className="text-lg font-semibold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
+ <p className="text-text-muted text-sm">{error.message}</p>
  </div>
  </motion.div>;
  }
@@ -102,7 +100,7 @@ const SellerDashboardPage = () => {
  opacity: 1,
  x: 0
  }}>
- <h1 className="text-2xl font-semibold text-white tracking-tight">{t("seller_dashboard")}</h1>
+ <h1 className="text-2xl font-semibold text-text-primary">{t("seller_dashboard")}</h1>
  <p className="text-xs text-text-muted font-medium mt-0.5">{t("analytics_insights_for_your_sales")}</p>
  </motion.div>
  <motion.div initial={{
@@ -122,16 +120,16 @@ const SellerDashboardPage = () => {
  <PageContainer className="py-6 px-6 space-y-6">
  {/* Primary KPIs — 4 columns */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
- <MetricCard index={0} title={t("revenue")} value={formatCurrency(dashboard.totalRevenue || 0, 'TRY')} icon={DollarSign} trend={dashboard.revenueGrowth ? parseFloat(dashboard.revenueGrowth) : null} trendLabel="vs previous period" color="green" />
- <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} color="blue" />
- <MetricCard index={2} title={t("active_listings")} value={dashboard.activeListings || 0} icon={Package} subtitle={`${dashboard.totalListings || 0} total`} color="purple" badge="Live" />
- <MetricCard index={3} title={t("rating")} value={dashboard.averageRating ? dashboard.averageRating.toFixed(1) + ' ★' : 'N/A'} icon={Star} subtitle={`${dashboard.totalReviews || 0} reviews`} color="amber" />
+ <MetricCard index={0} title={t("revenue")} value={formatCurrency(dashboard.totalRevenue || 0, 'TRY')} icon={DollarSign} trend={dashboard.revenueGrowth ? parseFloat(dashboard.revenueGrowth) : null} trendLabel="vs previous period" />
+ <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} />
+ <MetricCard index={2} title={t("active_listings")} value={dashboard.activeListings || 0} icon={Package} subtitle={`${dashboard.totalListings || 0} total`} badge="Live" />
+ <MetricCard index={3} title={t("rating")} value={dashboard.averageRating ? dashboard.averageRating.toFixed(1) : 'N/A'} icon={Star} subtitle={`${dashboard.totalReviews || 0} reviews`} />
  </div>
 
  {/* Secondary KPIs — 2 columns */}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
- <MetricCard index={4} title={t("conversion_rate")} value={conversionRate !== null ? conversionRate + '%' : '—'} icon={Percent} subtitle={`${dashboard.totalViews || 0} views → ${dashboard.totalOrders || 0} orders`} color="cyan" />
- <MetricCard index={5} title={t("pending_escrow")} value={formatCurrency(pendingEscrow, 'TRY')} icon={Wallet} subtitle="Awaiting order completion" color="amber" />
+ <MetricCard index={4} title={t("conversion_rate")} value={conversionRate !== null ? conversionRate + '%' : '—'} icon={Percent} subtitle={`${dashboard.totalViews || 0} views → ${dashboard.totalOrders || 0} orders`} />
+ <MetricCard index={5} title={t("pending_escrow")} value={formatCurrency(pendingEscrow, 'TRY')} icon={Wallet} subtitle="Awaiting order completion" />
  </div>
 
  {/* Conversion Funnel */}
@@ -150,7 +148,7 @@ const SellerDashboardPage = () => {
 
  {/* Charts Row 1 */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-border-light" />}>
+ <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-md border border-border-light" />}>
  <ChartCard title={t("revenue_trend")} delay={0.2}>
  <RevenueChart data={dashboard.revenueTrend || []} title={t("revenue_trend")} label={t("revenue")} />
  </ChartCard>

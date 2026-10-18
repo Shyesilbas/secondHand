@@ -17,6 +17,3 @@ The `pricing` domain acts as the central Pricing Engine, dynamically calculating
 
 ## Public APIs
 - None exposed directly; utilized as an internal service.
-
-## Related Knowledge
-- *(No runbooks extracted; modifications involve adjusting the PriceCalculationEngine sequence)*

@@ -9,7 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255),
+    password VARCHAR(255),
     name VARCHAR(100),
     surname VARCHAR(100),
     username VARCHAR(100),
@@ -525,11 +525,18 @@ CREATE TABLE IF NOT EXISTS ewallet (
 -- ─── Escrow (Long/BIGSERIAL) ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS escrows (
     id BIGSERIAL PRIMARY KEY,
-    order_id BIGINT UNIQUE REFERENCES orders (id),
-    buyer_id BIGINT REFERENCES users (id),
-    seller_id BIGINT REFERENCES users (id),
+    order_id BIGINT NOT NULL REFERENCES orders (id),
+    order_item_id BIGINT NOT NULL UNIQUE REFERENCES order_items (id),
+    buyer_id BIGINT NOT NULL REFERENCES users (id),
+    seller_id BIGINT NOT NULL REFERENCES users (id),
     amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'HOLDING',
+    status VARCHAR(50) NOT NULL DEFAULT 'ESCROW',
+    listing_title VARCHAR(255),
+    listing_no VARCHAR(255),
+    listing_id UUID,
+    blocked_at TIMESTAMP,
+    released_at TIMESTAMP,
+    refunded_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -537,10 +544,17 @@ CREATE TABLE IF NOT EXISTS escrows (
 -- ─── Carts (Long/BIGSERIAL) ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS carts (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT UNIQUE NOT NULL REFERENCES users (id),
+    user_id BIGINT NOT NULL REFERENCES users (id),
+    listing_id UUID NOT NULL REFERENCES listings (id),
+    quantity INTEGER NOT NULL DEFAULT 1,
+    notes VARCHAR(500),
+    reserved_at TIMESTAMP,
+    reservation_end_time TIMESTAMP,
+    is_reserved BOOLEAN NOT NULL DEFAULT FALSE,
     version BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, listing_id)
 );
 
 -- ─── Offers (UUID) ────────────────────────────────────────────────────────────

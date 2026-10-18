@@ -1,16 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState, memo } from 'react';
-import { 
-  Lock, 
-  ShieldCheck, 
-  ArrowLeft, 
-  RotateCw, 
-  Clock, 
-  CheckCircle2, 
-  KeyRound, 
-  MailCheck, 
-  Sparkles 
-} from 'lucide-react';
+import { Lock, ShieldCheck, ArrowLeft, RotateCw, Clock, KeyRound } from 'lucide-react';
 import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../../common/constants/otp.js';
 import { findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
 import OtpDigitInputGroup from '../../../payments/components/verification/OtpDigitInputGroup.jsx';
@@ -103,27 +93,25 @@ const CheckoutVerificationStep = ({
       {/* ── Security Vault Vault Card ───────────────────────────── */}
       <div className="mx-auto max-w-md text-center">
         {/* Animated Vault Icon */}
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-900 text-white shadow-lg shadow-slate-900/10 ring-4 ring-slate-900/5">
-          <KeyRound className="h-7 w-7" strokeWidth={2.2} />
-        </div>
+        <KeyRound className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
 
-        <h2 className="text-xl font-black text-slate-900 tracking-tight">
+        <h2 className="text-xl font-semibold text-text-primary tracking-tight">
           {t("verify_your_purchase", "Ödeme Güvenlik Doğrulaması")}
         </h2>
-        <p className="mt-2 text-xs text-slate-500 font-medium leading-relaxed">
+        <p className="mt-2 text-xs text-text-tertiary font-medium leading-relaxed">
           Kayıtlı e-posta adresinize tek kullanımlık <strong>{OTP_CODE_LENGTH} haneli</strong> güvenlik doğrulama kodu gönderildi.
         </p>
 
         {/* TTL Countdown Pill */}
         {ttlActive && (
           <div className="mt-4 flex items-center justify-center">
-            <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+            <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
               ttlExpired
-                ? 'bg-rose-50 text-rose-700 border-rose-200'
-                : 'bg-amber-50 text-amber-800 border-amber-200/80 shadow-xs'
+                ? 'bg-background-secondary text-status-error-text border-border'
+                : 'bg-background-secondary text-status-warning-text border-border/80'
             }`}>
               <Clock className="h-3.5 w-3.5 shrink-0" />
-              <span>{ttlExpired ? '⚠️ Doğrulama kodunun süresi doldu — Yeni kod isteyin' : `Kalan Geçerlilik Süresi: ${ttlFormatted}`}</span>
+              <span>{ttlExpired ? 'Doğrulama kodunun süresi doldu — Yeni kod isteyin' : `Kalan Geçerlilik Süresi: ${ttlFormatted}`}</span>
             </span>
           </div>
         )}
@@ -131,7 +119,7 @@ const CheckoutVerificationStep = ({
 
       {/* ── OTP Suggestion Banner (Inbox sync) ───────────────────── */}
       {suggestedFromInbox && (
-        <div className="mx-auto max-w-md animate-in fade-in slide-in-from-top-2 duration-300">
+        <div className="mx-auto max-w-md duration-300">
           <OtpSuggestionBanner 
             suggestedCode={suggestedFromInbox} 
             sourceEmail={sourceEmail} 
@@ -142,7 +130,7 @@ const CheckoutVerificationStep = ({
 
       {/* ── OTP Input Cells ─────────────────────────────────────── */}
       <div className="mx-auto max-w-md space-y-6">
-        <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-6 shadow-xs">
+        <div className="bg-background-secondary/70 border border-border/90 rounded-md p-6">
           <OtpDigitInputGroup
             value={paymentVerificationCode}
             onChange={setPaymentVerificationCode}
@@ -156,10 +144,10 @@ const CheckoutVerificationStep = ({
               type="button"
               onClick={handleResendCode}
               disabled={!canResend || isResending}
-              className={`inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`inline-flex items-center gap-2 text-xs font-semibold transition-colors ${
                 canResend && !isResending
-                  ? 'text-slate-900 hover:underline cursor-pointer'
-                  : 'cursor-not-allowed text-slate-400'
+                  ? 'text-text-primary hover:underline cursor-pointer'
+                  : 'cursor-not-allowed text-text-muted'
               }`}
             >
               <RotateCw className={`h-3.5 w-3.5 ${isResending ? 'animate-spin' : ''}`} />
@@ -175,7 +163,7 @@ const CheckoutVerificationStep = ({
           type="button"
           onClick={onCheckout}
           disabled={proceedDisabled || isCheckingOut || !isCodeComplete || ttlExpired}
-          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-slate-900 py-4 text-xs font-extrabold uppercase tracking-wider text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all"
+          className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-full"
         >
           {isCheckingOut ? (
             <>
@@ -191,27 +179,27 @@ const CheckoutVerificationStep = ({
         </button>
 
         {/* Security Seals */}
-        <div className="flex items-center justify-center gap-4 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-t border-slate-100 pt-5">
-          <span className="flex items-center gap-1.5 text-slate-600">
-            <Lock className="h-3.5 w-3.5 text-slate-900" />
+        <div className="flex items-center justify-center gap-4 text-xs font-semibold text-text-muted border-t border-border-light pt-5">
+          <span className="flex items-center gap-1.5 text-text-secondary">
+            <Lock className="h-3.5 w-3.5 text-text-primary" />
             256-Bit SSL
           </span>
           <span>·</span>
-          <span className="flex items-center gap-1.5 text-slate-600">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+          <span className="flex items-center gap-1.5 text-text-secondary">
+            <ShieldCheck className="h-3.5 w-3.5 text-status-success-text" />
             Escrow Güvencesi
           </span>
           <span>·</span>
-          <span className="text-slate-600">KVKK Uyumlu</span>
+          <span className="text-text-secondary">KVKK Uyumlu</span>
         </div>
       </div>
 
       {/* ── Back button ─────────────────────────────────────────── */}
-      <div className="border-t border-slate-100 pt-6">
+      <div className="border-t border-border-light pt-6">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />
           <span>{t("back", "Sipariş Özetine Dön")}</span>

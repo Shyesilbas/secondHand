@@ -62,7 +62,7 @@ const useWebSocket = (userId, options = {}) => {
  }
  },
  (error) => {
- logger.error('❌ WebSocket connection error:', error);
+ logger.error('WebSocket connection error:', error);
  setIsConnected(false);
 
  if (reconnectAttempt.current < MAX_RECONNECT_ATTEMPTS) {

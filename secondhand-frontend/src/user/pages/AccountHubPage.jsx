@@ -1,35 +1,27 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
  AlertTriangle,
  ArrowRight,
  ChevronDown,
  ChevronRight,
- Clock,
- Crown,
- ExternalLink,
  Heart,
- HelpCircle,
- Layers,
- MapPin,
  MessageSquare,
  Package,
  Plus,
- RotateCcw,
- ShieldCheck,
  ShoppingBag,
  Sparkles,
- TrendingUp,
  Truck,
- UserCheck,
- Wallet,
- Zap
+ Wallet
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { usePlan } from '@/common/hooks/usePlan';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+import Button, { buttonClasses } from '@/common/components/ui/Button';
+import Modal from '@/common/components/ui/Modal';
+import Skeleton from '@/common/components/ui/Skeleton';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
 import { USER_DEFAULTS } from '../userConstants.js';
@@ -52,12 +44,68 @@ const getInitials = (name) => {
 
 const isRouteActive = (pathname, route) => pathname === route;
 
+const CARD = 'rounded border border-border bg-background-primary';
+
+const ORDER_STATUS_DOT = {
+ COMPLETED: 'bg-status-success',
+ DELIVERED: 'bg-status-success',
+ SHIPPED: 'bg-primary',
+ IN_TRANSIT: 'bg-primary',
+ PROCESSING: 'bg-status-warning',
+ CANCELLED: 'bg-status-error',
+};
+
+const MetricCard = ({ to, icon: Icon, label, value, hint }) => (
+ <Link to={to} className={`${CARD} flex flex-col gap-3 p-5 transition-colors duration-150 ease-out hover:border-card-border-hover`}>
+ <div className="flex items-center justify-between">
+ <span className="text-sm text-text-secondary">{label}</span>
+ <Icon className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+ </div>
+ <div className="text-2xl font-semibold tabular-nums text-text-primary">{value}</div>
+ <p className="flex items-center justify-between text-sm text-text-tertiary">
+ <span className="truncate">{hint}</span>
+ <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+ </p>
+ </Link>
+);
+
+const UtilityLink = ({ to, icon: Icon, title, hint }) => (
+ <Link to={to} className={`${CARD} flex items-center gap-4 p-5 transition-colors duration-150 ease-out hover:border-card-border-hover`}>
+ <Icon className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+ <div className="min-w-0 flex-1">
+ <h3 className="truncate text-sm font-medium text-text-primary">{title}</h3>
+ <p className="truncate text-sm text-text-tertiary">{hint}</p>
+ </div>
+ <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+ </Link>
+);
+
+const DetailRow = ({ label, value }) => (
+ <div className="flex items-center justify-between gap-4 py-2 text-sm">
+ <span className="text-text-secondary">{label}</span>
+ <span className="text-right font-medium tabular-nums text-text-primary">{value}</span>
+ </div>
+);
+
+const QuotaBar = ({ label, used, limit }) => (
+ <div className="space-y-2">
+ <div className="flex justify-between text-sm">
+ <span className="text-text-secondary">{label}</span>
+ <span className="font-medium tabular-nums text-text-primary">{used} / {limit}</span>
+ </div>
+ <div className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary">
+ <div className="h-full bg-primary transition-all duration-200 ease-out" style={{ width: `${Math.min(100, (used / limit) * 100)}%` }} />
+ </div>
+ </div>
+);
+
 const AccountHubPage = () => {
  const { t, i18n } = useTranslation();
  const { user } = useAuthState();
  const { pathname } = useLocation();
  const [openGroups, setOpenGroups] = useState(() => new Set(['overview', 'selling', 'buying']));
  const [showUpgrade, setShowUpgrade] = useState(false);
+ const [confirmCancel, setConfirmCancel] = useState(false);
 
  const navGroups = useMemo(() => {
  const id = user?.id;
@@ -129,9 +177,7 @@ const AccountHubPage = () => {
  isTogglingAutoRenew,
  orderProcessingSpeed,
  premiumMaxShowcaseSlots,
- premiumDailyAuraLimit,
- premiumEstimatedShippingDays,
- premiumOrderProcessingSpeed
+ premiumEstimatedShippingDays
  } = usePlan();
 
  const { showcases } = useMyShowcases(user?.id);
@@ -147,126 +193,86 @@ const AccountHubPage = () => {
  return days > 0 && days <= 3;
  }, [isPremium, expirationDate]);
 
- const handleCancelSubscription = () => {
- if (window.confirm(t('confirm_cancel_subscription', 'Aboneliğinizi iptal etmek istediğinize emin misiniz? Gelecek dönem için otomatik yenileme kapatılacaktır.'))) {
- cancelSubscription();
- }
- };
+ const fullName = user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User';
 
  if (!user) {
  return (
- <div className="min-h-[70vh] flex flex-col items-center justify-center">
- <div className="relative flex items-center justify-center">
- <div className="w-12 h-12 rounded-full border-2 border-slate-900/20 border-t-slate-900 animate-spin" />
- <Sparkles className="w-5 h-5 text-slate-900 absolute" />
+ <PageContainer className="max-w-5xl py-8">
+ <Skeleton className="h-8 w-64" />
+ <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+ {['a', 'b', 'c', 'd'].map(k => <Skeleton key={k} className="h-32" />)}
  </div>
- </div>
+ </PageContainer>
  );
  }
 
  return (
- <div className="min-h-screen bg-slate-50/50 flex flex-col lg:flex-row font-sans">
- {/* ── Left Sidebar Navigation ── */}
- <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 flex flex-col p-4 sm:p-6 lg:py-8 lg:pl-8 lg:pr-4 select-none">
- {/* User Card Profile Summary */}
- <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs mb-6 transition-all hover:border-slate-300">
- <div className="flex items-center gap-3.5">
- <div className="relative">
- <div className="h-12 w-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-sm shadow-xs overflow-hidden">
+ <div className="flex min-h-screen flex-col bg-background-secondary lg:flex-row">
+ <aside className="flex w-full flex-shrink-0 flex-col p-4 sm:p-6 lg:w-72 lg:py-8 lg:pl-8 lg:pr-4 xl:w-80">
+ <div className={`${CARD} mb-6 p-4`}>
+ <div className="flex items-center gap-3">
+ <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-background-tertiary text-sm font-medium text-text-secondary">
  {user?.profilePicture ? (
  <img src={user.profilePicture} alt="" className="h-full w-full object-cover" />
  ) : (
  getInitials(`${user?.name || ''} ${user?.surname || ''}`)
  )}
  </div>
- {isPremium && (
- <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center shadow-xs border-2 border-white">
- <Crown className="w-3 h-3 fill-current" />
+ <div className="min-w-0 flex-1">
+ <h2 className="truncate text-sm font-medium text-text-primary">{fullName}</h2>
+ <p className="truncate text-sm text-text-tertiary">{user?.email || ''}</p>
  </div>
- )}
  </div>
- <div className="overflow-hidden min-w-0 flex-1">
- <div className="flex items-center gap-1.5">
- <h2 className="text-sm font-extrabold text-slate-900 truncate">
- {user?.name ? `${user.name}${user.surname ? ` ${user.surname}` : ''}` : 'User'}
- </h2>
- </div>
- <p className="text-xs text-slate-400 truncate mt-0.5 font-medium">{user?.email || ''}</p>
- <div className="mt-1.5 flex items-center gap-1.5">
- <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider ${
- isPremium 
- ? 'bg-amber-50 text-amber-800 border border-amber-200/60' 
- : 'bg-slate-100 text-slate-900 border border-slate-300/60'
- }`}>
- <span className={`w-1.5 h-1.5 rounded-full ${isPremium ? 'bg-amber-500' : 'bg-slate-900'}`} />
+ <div className="mt-3 flex items-center justify-between text-sm">
+ <span className="inline-flex items-center gap-1.5 text-text-secondary">
+ <span className={`h-1.5 w-1.5 rounded-full ${isPremium ? 'bg-status-warning' : 'bg-secondary-400'}`} aria-hidden />
  {isPremium ? (plan || 'Premium') : t('standard_plan', 'Standart')}
  </span>
- <Link 
- to={ROUTES.PROFILE} 
- className="text-[10px] font-bold text-slate-400 hover:text-slate-900 underline underline-offset-2 transition-colors ml-auto"
- >
+ <Link to={ROUTES.PROFILE} className="text-text-secondary underline-offset-2 transition-colors hover:text-text-primary hover:underline">
  {t('edit', 'Düzenle')}
  </Link>
  </div>
  </div>
- </div>
- </div>
 
- {/* Mobile Horizontal Navigation Tabs */}
- <nav className="flex lg:hidden overflow-x-auto gap-2 pb-4 scrollbar-none -mx-4 px-4">
- {navGroups.map(group => {
- return group.items.map(item => {
+ <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-4 lg:hidden">
+ {navGroups.map(group => group.items.map(item => {
  const active = isRouteActive(pathname, item.route);
  const ItemIcon = item.icon;
  return (
  <Link
  key={`mobile-${group.id}-${item.route}`}
  to={item.route}
- className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
- active
- ? 'bg-slate-900 text-white shadow-xs'
- : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
- }`}
+ aria-current={active ? 'page' : undefined}
+ className={`flex h-11 shrink-0 items-center gap-2 rounded px-3 text-sm transition-colors duration-150 ${active ? 'bg-primary text-white' : 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary'}`}
  >
- <ItemIcon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+ <ItemIcon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{t(item.nameKey || item.name)}</span>
  </Link>
  );
- });
- })}
+ }))}
  </nav>
 
- {/* Desktop Navigation Accordion Groups */}
- <nav className="hidden lg:flex flex-col gap-1.5">
- <div className="flex items-center justify-between px-3 py-1 mb-1">
- <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
- {t("navigation", "Navigasyon")}
- </span>
- </div>
+ <nav className="hidden flex-col gap-1 lg:flex" aria-label={t("navigation", "Navigasyon")}>
  {navGroups.map(group => {
  const GroupIcon = group.icon;
  const isOpen = openGroups.has(group.id);
  const hasActiveChild = group.items.some(item => isRouteActive(pathname, item.route));
-
  return (
- <div key={group.id} className="mb-0.5">
+ <div key={group.id}>
  <button
  type="button"
  onClick={() => toggleGroup(group.id)}
- className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-bold transition-colors ${
- hasActiveChild 
- ? 'text-slate-900 bg-slate-100/80' 
- : 'text-slate-600 hover:bg-slate-100/60 hover:text-slate-900'
- }`}
+ aria-expanded={isOpen}
+ className={`flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm font-medium transition-colors duration-150 ${hasActiveChild ? 'text-text-primary' : 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}
  >
- <div className="flex items-center gap-2.5 min-w-0">
- <GroupIcon className={`h-4 w-4 shrink-0 ${hasActiveChild ? 'text-slate-900' : 'text-slate-400'}`} strokeWidth={2} />
- <span className="truncate uppercase tracking-wider text-[11px]">{t(group.labelKey || group.label)}</span>
- </div>
- <ChevronDown className={`h-3.5 w-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`} />
+ <span className="flex min-w-0 items-center gap-2.5">
+ <GroupIcon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+ <span className="truncate">{t(group.labelKey || group.label)}</span>
+ </span>
+ <ChevronDown className={`h-4 w-4 shrink-0 text-text-muted transition-transform duration-150 ${isOpen ? '' : '-rotate-90'}`} strokeWidth={1.5} aria-hidden />
  </button>
  {isOpen && (
- <div className="mt-1 ml-3.5 pl-3 border-l-2 border-slate-200/80 space-y-0.5">
+ <div className="ml-5 mt-1 space-y-0.5 border-l border-border pl-3">
  {group.items.map(item => {
  const ItemIcon = item.icon;
  const active = isRouteActive(pathname, item.route);
@@ -274,13 +280,10 @@ const AccountHubPage = () => {
  <Link
  key={`${group.id}-${item.route}`}
  to={item.route}
- className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs transition-all ${
- active
- ? 'bg-slate-900 text-white font-bold shadow-xs'
- : 'text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900'
- }`}
+ aria-current={active ? 'page' : undefined}
+ className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${active ? 'bg-primary font-medium text-white' : 'text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}
  >
- <ItemIcon className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} strokeWidth={active ? 2.5 : 2} />
+ <ItemIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
  <span className="truncate">{t(item.nameKey || item.name)}</span>
  </Link>
  );
@@ -293,551 +296,223 @@ const AccountHubPage = () => {
  </nav>
  </aside>
 
- {/* ── Main Dashboard Workspace ── */}
- <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:pl-2 overflow-y-auto">
+ <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 lg:pl-2">
  <PageContainer className="max-w-5xl">
- 
- {/* Expiration Warning Alert */}
  {isExpiringSoon && (
- <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-3 shadow-xs">
- <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
- <div className="flex-1 min-w-0">
- <h4 className="text-xs font-bold uppercase tracking-wider text-amber-800">{t("your_membership_expires_soon", "Üyeliğiniz Yakında Sona Eriyor")}</h4>
- <p className="text-xs mt-0.5 text-amber-900/90 font-medium">
+ <div className={`${CARD} mb-6 flex items-start gap-3 p-4`}>
+ <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
+ <div className="min-w-0 flex-1">
+ <h2 className="text-sm font-medium text-text-primary">{t("your_membership_expires_soon", "Üyeliğiniz Yakında Sona Eriyor")}</h2>
+ <p className="mt-1 text-sm text-text-secondary">
  {t('expires_on', { date: new Date(expirationDate).toLocaleDateString(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US') })}
  {!autoRenew && ` • ${t("auto_renew_off_warning", "Otomatik yenileme kapalı.")}`}
  </p>
  </div>
- <button
- onClick={() => setShowUpgrade(true)}
- className="shrink-0 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
- >
- {t('renew_now', 'Yenile')}
- </button>
+ <Button variant="secondary" size="sm" onClick={() => setShowUpgrade(true)}>{t('renew_now', 'Yenile')}</Button>
  </div>
  )}
 
- {/* ── Welcome Header & Context Banner ── */}
- <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+ <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
  <div>
- <div className="flex items-center gap-2">
- <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+ <h1 className="text-2xl font-semibold text-text-primary">
  {t("welcome", "Hoş Geldiniz, ")} {user?.name?.split(' ')[0] || 'Kullanıcı'}
  </h1>
- <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600 border border-slate-200 uppercase">
- v2.4
- </span>
- </div>
- <p className="mt-1 text-xs text-slate-500 font-medium">
+ <p className="mt-1 text-sm text-text-secondary">
  {t("your_personal_secondhand_space", "İlanlarınızı, siparişlerinizi, bakiye hareketlerinizi ve ayrıcalıklarınızı buradan takip edin.")}
  </p>
  </div>
-
- <div className="flex items-center gap-2 shrink-0">
- <Link
- to={ROUTES.CREATE_LISTING}
- className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-900 text-white text-xs font-bold uppercase tracking-wider shadow-xs hover:shadow-sm transition-all active:scale-[0.98]"
- >
- <Plus className="w-4 h-4" strokeWidth={2.5} />
+ <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses()} shrink-0`}>
+ <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{t("sell_item", "Yeni İlan Ver")}</span>
  </Link>
  </div>
+
+ <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+ <MetricCard to={ROUTES.MY_LISTINGS} icon={Package} label={t('active', 'Aktif')} value={activeListingsCount} hint={t('active_listings_sub', 'Yayında olan ilanlar')} />
+ <MetricCard to={ROUTES.MY_ORDERS} icon={Truck} label={t('in_transit_tab', 'Süreçte')} value={inTransitOrdersCount} hint={t('in_transit_orders_sub', 'Devam eden teslimatlar')} />
+ <MetricCard to={ROUTES.MY_ORDERS} icon={ShoppingBag} label={t('all_orders', 'Siparişler')} value={totalOrdersCount} hint={t('all_orders_sub', 'Toplam alışveriş sayısı')} />
+ <MetricCard to={ROUTES.AURA_CHAT} icon={Sparkles} label="Aura AI" value={`${dailyAuraUsage} / ${dailyAuraLimit || 8}`} hint={t('aura_quota_sub', 'Günlük mesaj kotası')} />
  </div>
 
- {/* ── 4-Column Operational Bento Metrics ── */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
- 
- {/* Widget 1: Active Listings */}
- <Link
- to={ROUTES.MY_LISTINGS}
- className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all group flex flex-col justify-between"
- >
- <div className="flex items-center justify-between mb-3">
- <div className="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 group-hover:scale-105 transition-transform">
- <Package className="w-5 h-5" />
- </div>
- <span className="text-[10px] font-extrabold text-slate-900 bg-slate-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-slate-300/50">
- {t('active', 'Aktif')}
- </span>
- </div>
- <div>
- <div className="text-2xl font-extrabold text-slate-900 tracking-tight">
- {activeListingsCount}
- </div>
- <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center justify-between">
- <span>{t('active_listings_sub', 'Yayında olan ilanlar')}</span>
- <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
- </p>
- </div>
- </Link>
-
- {/* Widget 2: In-Transit / Active Orders */}
- <Link
- to={ROUTES.MY_ORDERS}
- className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all group flex flex-col justify-between"
- >
- <div className="flex items-center justify-between mb-3">
- <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 group-hover:scale-105 transition-transform">
- <Truck className="w-5 h-5" />
- </div>
- <span className="text-[10px] font-extrabold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-blue-200/50">
- {t('in_transit_tab', 'Süreçte')}
- </span>
- </div>
- <div>
- <div className="text-2xl font-extrabold text-slate-900 tracking-tight">
- {inTransitOrdersCount}
- </div>
- <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center justify-between">
- <span>{t('in_transit_orders_sub', 'Devam eden teslimatlar')}</span>
- <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
- </p>
- </div>
- </Link>
-
- {/* Widget 3: Total Orders */}
- <Link
- to={ROUTES.MY_ORDERS}
- className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all group flex flex-col justify-between"
- >
- <div className="flex items-center justify-between mb-3">
- <div className="w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 group-hover:scale-105 transition-transform">
- <ShoppingBag className="w-5 h-5" />
- </div>
- <span className="text-[10px] font-extrabold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-slate-200">
- {t('all_orders', 'Siparişler')}
- </span>
- </div>
- <div>
- <div className="text-2xl font-extrabold text-slate-900 tracking-tight">
- {totalOrdersCount}
- </div>
- <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center justify-between">
- <span>{t('all_orders_sub', 'Toplam alışveriş sayısı')}</span>
- <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
- </p>
- </div>
- </Link>
-
- {/* Widget 4: Aura AI Usage */}
- <Link
- to={ROUTES.AURA_CHAT}
- className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:border-slate-300 hover:shadow-sm transition-all group flex flex-col justify-between"
- >
- <div className="flex items-center justify-between mb-3">
- <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-105 transition-transform">
- <Sparkles className="w-5 h-5" />
- </div>
- <span className="text-[10px] font-extrabold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-amber-200/60">
- Aura AI
- </span>
- </div>
- <div>
- <div className="flex items-baseline gap-1 text-2xl font-extrabold text-slate-900 tracking-tight">
- <span>{dailyAuraUsage}</span>
- <span className="text-xs font-medium text-slate-400 font-sans">/ {dailyAuraLimit || 8}</span>
- </div>
- <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center justify-between">
- <span>{t('aura_quota_sub', 'Günlük mesaj kotası')}</span>
- <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
- </p>
- </div>
- </Link>
- </div>
-
- {/* ── Membership & Privileges Showcase Bento Card ── */}
- <div className="mb-8 bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 lg:p-7">
- <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
- <div className="flex items-center gap-2.5">
- <div className={`p-2 rounded-xl ${isPremium ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
- <Crown className="w-4 h-4" />
- </div>
- <div>
- <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">
- {t("membership_and_privileges", "Üyelik ve Ayrıcalıklar")}
- </h2>
- <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+ <section className={`${CARD} mb-8 p-5`}>
+ <div className="mb-5 border-b border-border-light pb-4">
+ <h2 className="text-lg font-semibold text-text-primary">{t("membership_and_privileges", "Üyelik ve Ayrıcalıklar")}</h2>
+ <p className="mt-1 text-sm text-text-secondary">
  {isPremium ? t('premium_status_desc', 'Premium üyeliğinize ait limitler ve teslimat öncelikleri') : t('standard_status_desc', 'Standart plan ve premium avantaj karşılaştırması')}
  </p>
  </div>
- </div>
-
- {!isPremium && (
- <button
- onClick={() => setShowUpgrade(true)}
- className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer shadow-xs active:scale-95"
- >
- <Zap className="w-3.5 h-3.5 fill-current" />
- <span>{t('upgrade_btn', 'Yükselt')}</span>
- </button>
- )}
- </div>
 
  {isPremium ? (
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
- {/* Left: Perks & Quota Usage */}
- <div className="lg:col-span-2 space-y-5">
- <div className="flex items-center gap-3">
- <div className="h-10 w-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200 shrink-0">
- <Crown className="h-5 w-5" />
- </div>
+ <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+ <div className="space-y-5 lg:col-span-2">
  <div>
- <div className="flex items-center gap-2">
- <h3 className="text-sm font-extrabold text-slate-900">{t("premium_membership_active", "Premium Üyelik Aktif")}</h3>
- <span className="text-[10px] font-extrabold text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
- {plan || 'PRO'}
- </span>
+ <h3 className="text-sm font-medium text-text-primary">
+ {t("premium_membership_active", "Premium Üyelik Aktif")} <span className="text-text-tertiary">· {plan || 'PRO'}</span>
+ </h3>
+ <p className="mt-1 text-sm text-text-secondary">{t("enjoy_premium_perks", "Öncelikli kargo, ek vitrin slotları ve genişletilmiş AI desteği aktif.")}</p>
  </div>
- <p className="text-xs text-slate-500 mt-0.5 font-medium">{t("enjoy_premium_perks", "Öncelikli kargo, ek vitrin slotları ve genişletilmiş AI desteği aktif.")}</p>
- </div>
- </div>
-
- {/* Aura AI Quota Visual Bar */}
- <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
- <div className="flex justify-between text-xs font-bold text-slate-700">
- <span className="flex items-center gap-1.5">
- <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
- {t("aura_ai_message", "Aura AI Günlük Kullanım")}
- </span>
- <span className="text-slate-900 font-extrabold">
- {dailyAuraUsage} / {dailyAuraLimit}
- </span>
- </div>
- <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
- <div 
- className="h-full bg-amber-500 rounded-full transition-all duration-500" 
- style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 8)) * 100)}%` }} 
- />
+ <QuotaBar label={t("aura_ai_message", "Aura AI Günlük Kullanım")} used={dailyAuraUsage} limit={dailyAuraLimit || 8} />
+ <div className="divide-y divide-border-light">
+ <DetailRow label={t("fast_shipping", "Teslimat Süresi")} value={`${estimatedShippingDays} ${t('days_priority', 'Gün (Öncelikli)')}`} />
+ <DetailRow label={t("shipping_process", "İşleme Hızı")} value={orderProcessingSpeed || 'Aynı Gün'} />
+ <DetailRow label={t("aura_ai_message_limit", "Aura AI Limiti")} value={`${dailyAuraLimit} ${t('messages_daily', 'Mesaj / Gün')}`} />
+ <DetailRow label={t("showcase_slot", "Vitrin Slotu")} value={`${activeShowcasesCount} / ${maxShowcaseSlots} ${t('slot_active', 'Slot')}`} />
  </div>
  </div>
-
- {/* 4 Feature Micro-Cards */}
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
- <div>
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("fast_shipping", "Teslimat Süresi")}</div>
- <span className="text-xs font-extrabold text-slate-900 mt-0.5 block">{estimatedShippingDays} {t('days_priority', 'Gün (Öncelikli)')}</span>
+ <div className="flex flex-col justify-between rounded border border-border-light p-4">
+ <div className="divide-y divide-border-light">
+ <h3 className="pb-2 text-sm font-medium text-text-primary">{t('subscription_details', 'Abonelik Bilgileri')}</h3>
+ {purchaseDate && <DetailRow label={t("start_date", "Başlangıç")} value={formatDate(purchaseDate)} />}
+ {expirationDate && <DetailRow label={t("end_date", "Bitiş")} value={formatDate(expirationDate)} />}
+ <DetailRow label={t("auto_renew", "Otomatik Yenileme")} value={autoRenew ? t("enabled_default", "Açık") : t("disabled", "Kapalı")} />
  </div>
- <Truck className="w-4 h-4 text-slate-900 shrink-0" />
- </div>
-
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
- <div>
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("shipping_process", "İşleme Hızı")}</div>
- <span className="text-xs font-extrabold text-slate-900 mt-0.5 block">{orderProcessingSpeed || 'Aynı Gün'}</span>
- </div>
- <Zap className="w-4 h-4 text-amber-500 shrink-0" />
- </div>
-
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
- <div>
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("aura_ai_message_limit", "Aura AI Limiti")}</div>
- <span className="text-xs font-extrabold text-slate-900 mt-0.5 block">{dailyAuraLimit} {t('messages_daily', 'Mesaj / Gün')}</span>
- </div>
- <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
- </div>
-
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
- <div>
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("showcase_slot", "Vitrin Slotu")}</div>
- <span className="text-xs font-extrabold text-slate-900 mt-0.5 block">{activeShowcasesCount} / {maxShowcaseSlots} {t('slot_active', 'Slot')}</span>
- </div>
- <Layers className="w-4 h-4 text-slate-500 shrink-0" />
- </div>
- </div>
- </div>
-
- {/* Right: Subscription Actions Card */}
- <div className="bg-slate-50 border border-slate-200/80 p-5 rounded-2xl flex flex-col justify-between">
- <div className="space-y-3">
- <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
- {t('subscription_details', 'Abonelik Bilgileri')}
- </span>
- 
- {purchaseDate && (
- <div className="flex items-center justify-between text-xs">
- <span className="text-slate-500 font-medium">{t("start_date", "Başlangıç")}</span>
- <span className="font-bold text-slate-900 ">{formatDate(purchaseDate)}</span>
- </div>
- )}
-
- {expirationDate && (
- <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60">
- <span className="text-slate-500 font-medium">{t("end_date", "Bitiş")}</span>
- <span className="font-bold text-slate-900 ">{formatDate(expirationDate)}</span>
- </div>
- )}
-
- <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60">
- <span className="text-slate-500 font-medium">{t("auto_renew", "Otomatik Yenileme")}</span>
- <span className={`font-bold ${autoRenew ? 'text-slate-900' : 'text-slate-500'}`}>
- {autoRenew ? t("enabled_default", "Açık") : t("disabled", "Kapalı")}
- </span>
- </div>
- </div>
-
- <div className="mt-5 pt-3 border-t border-slate-200/80">
  {autoRenew ? (
- <button 
- onClick={handleCancelSubscription}
- disabled={isCancelling}
- className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs active:scale-[0.98]"
- >
+ <Button variant="danger" className="mt-4 w-full" onClick={() => setConfirmCancel(true)} disabled={isCancelling}>
  {isCancelling ? t("processing_progress", "İşleniyor...") : t("cancel_subscription", "Yenilemeyi Kapat")}
- </button>
+ </Button>
  ) : (
- <button 
- onClick={() => toggleAutoRenew(true)}
- disabled={isTogglingAutoRenew}
- className="w-full py-2.5 bg-slate-900 hover:bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-xs active:scale-[0.98]"
- >
+ <Button variant="secondary" className="mt-4 w-full" onClick={() => toggleAutoRenew(true)} disabled={isTogglingAutoRenew}>
  {isTogglingAutoRenew ? t("enabling", "Açılıyor...") : t("reactivate", "Tekrar Aç")}
- </button>
+ </Button>
  )}
  </div>
  </div>
- </div>
  ) : (
- <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
- {/* Left: Standard limits overview */}
- <div className="lg:col-span-2 space-y-4">
- <div className="flex items-center gap-3">
- <div className="h-10 w-10 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200 shrink-0">
- <UserCheck className="h-5 w-5" />
- </div>
+ <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+ <div className="space-y-5 lg:col-span-2">
  <div>
- <div className="flex items-center gap-2">
- <h3 className="text-sm font-extrabold text-slate-900">{t('current_plan_standard', 'Mevcut Plan: Standart (Ücretsiz)')}</h3>
- <span className="text-[10px] font-extrabold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md uppercase tracking-wider">
- STANDART
- </span>
+ <h3 className="text-sm font-medium text-text-primary">{t('current_plan_standard', 'Mevcut Plan: Standart (Ücretsiz)')}</h3>
+ <p className="mt-1 text-sm text-text-secondary">{t('standard_limits_summary', 'Temel alım-satım, güvenli ödeme ve kargo özellikleri devrededir.')}</p>
  </div>
- <p className="text-xs text-slate-500 mt-0.5 font-medium">{t('standard_limits_summary', 'Temel alım-satım, güvenli ödeme ve kargo özellikleri devrededir.')}</p>
- </div>
- </div>
-
- {/* Standard Quota Progress */}
- <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
- <div className="flex justify-between text-xs font-bold text-slate-700">
- <span className="flex items-center gap-1.5">
- <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
- {t('aura_ai_daily_limit', 'Aura AI Mesaj Kotası')}
- </span>
- <span className="text-slate-900 font-extrabold">{dailyAuraUsage} / {dailyAuraLimit || 2}</span>
- </div>
- <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
- <div 
- className="h-full bg-slate-500 rounded-full transition-all duration-500" 
- style={{ width: `${Math.min(100, (dailyAuraUsage / (dailyAuraLimit || 2)) * 100)}%` }} 
- />
+ <QuotaBar label={t('aura_ai_daily_limit', 'Aura AI Mesaj Kotası')} used={dailyAuraUsage} limit={dailyAuraLimit || 2} />
+ <div className="divide-y divide-border-light">
+ <DetailRow label={t('delivery_time', 'Teslimat Süresi')} value={`${estimatedShippingDays} ${t('days', 'Gün')} (${t('with_premium', 'Premium ile')} ${premiumEstimatedShippingDays} ${t('days', 'Gün')})`} />
+ <DetailRow label={t('showcase_slot_limit', 'Vitrin Slot Limiti')} value={`${maxShowcaseSlots} ${t('slot', 'Slot')} (${t('with_premium', 'Premium ile')} ${premiumMaxShowcaseSlots} ${t('slot', 'Slot')})`} />
  </div>
  </div>
-
- {/* Standard vs Premium comparison items */}
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('delivery_time', 'Teslimat Süresi')}</div>
- <div className="text-xs font-bold text-slate-700 mt-0.5">
- {estimatedShippingDays} {t('days', 'Gün')} <span className="text-slate-900 font-extrabold">({t('with_premium', 'Premium ile')} {premiumEstimatedShippingDays} {t('days', 'Gün')})</span>
- </div>
- </div>
-
- <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
- <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('showcase_slot_limit', 'Vitrin Slot Limiti')}</div>
- <div className="text-xs font-bold text-slate-700 mt-0.5">
- {maxShowcaseSlots} {t('slot', 'Slot')} <span className="text-slate-900 font-extrabold">({t('with_premium', 'Premium ile')} {premiumMaxShowcaseSlots} {t('slot', 'Slot')})</span>
- </div>
- </div>
- </div>
- </div>
-
- {/* Right: Premium Callout Box */}
- <div className="bg-gradient-to-b from-slate-900 to-slate-950 text-white p-6 rounded-3xl flex flex-col justify-between shadow-sm relative overflow-hidden">
- <div className="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 bg-slate-800/10 rounded-full blur-xl pointer-events-none" />
- 
- <div className="space-y-3 relative z-10">
- <div className="inline-flex p-2.5 bg-slate-800/20 text-slate-600 rounded-2xl border border-slate-700/30">
- <Crown className="w-5 h-5 fill-current" />
- </div>
+ <div className="flex flex-col justify-between rounded border border-border-light p-4">
  <div>
- <h4 className="text-xs font-extrabold text-slate-600 uppercase tracking-wider">{t('why_upgrade_premium', 'Neden Premium?')}</h4>
- <p className="text-xs text-slate-300 mt-1 font-medium leading-relaxed">
+ <h3 className="text-sm font-medium text-text-primary">{t('why_upgrade_premium', 'Neden Premium?')}</h3>
+ <p className="mt-1 text-sm text-text-secondary">
  {t('premium_benefit_highlight', 'İlanlarınız %40 daha hızlı alıcı bulsun. Öncelikli kargo, ekstra vitrin slotları ve sınırsız Aura AI desteği kazanın.')}
  </p>
  </div>
- </div>
-
- <button
- onClick={() => setShowUpgrade(true)}
- className="w-full py-3 rounded-2xl bg-slate-800 hover:bg-slate-600 text-slate-950 font-extrabold uppercase tracking-wider text-xs shadow-sm transition-all cursor-pointer mt-5 active:scale-[0.98]"
- >
+ <Button variant="secondary" className="mt-4 w-full" onClick={() => setShowUpgrade(true)}>
  {t('upgrade_to_premium', 'Premium\'a Yükselt')}
- </button>
+ </Button>
  </div>
  </div>
  )}
- </div>
+ </section>
 
- <PremiumUpgradeModal
- isOpen={showUpgrade}
- onClose={() => setShowUpgrade(false)}
- />
+ <PremiumUpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
- {/* ── Quick Utility Tiles ── */}
- <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
- <Link 
- to={ROUTES.EWALLET} 
- className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-4 transition-all hover:border-slate-300 hover:shadow-xs group"
+ <Modal
+ isOpen={confirmCancel}
+ onClose={() => setConfirmCancel(false)}
+ title={t("cancel_subscription", "Yenilemeyi Kapat")}
+ size="sm"
+ footer={<>
+ <Button variant="secondary" onClick={() => setConfirmCancel(false)}>{t("cancel")}</Button>
+ <Button variant="danger" onClick={() => { setConfirmCancel(false); cancelSubscription(); }}>{t("cancel_subscription", "Yenilemeyi Kapat")}</Button>
+ </>}
  >
- <div className="h-11 w-11 shrink-0 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 group-hover:scale-105 transition-transform">
- <Wallet className="w-5 h-5" strokeWidth={2} />
- </div>
- <div className="min-w-0 flex-1">
- <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">{t("finance", "Finans")}</span>
- <h3 className="text-xs font-extrabold text-slate-900 mt-0.5 truncate">{t("my_wallet", "Cüzdan & Bakiye")}</h3>
- <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">{t("wallet_sub", "Escrow ve bakiye hareketleri")}</p>
- </div>
- <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
- </Link>
+ <p className="text-sm text-text-secondary">
+ {t('confirm_cancel_subscription', 'Aboneliğinizi iptal etmek istediğinize emin misiniz? Gelecek dönem için otomatik yenileme kapatılacaktır.')}
+ </p>
+ </Modal>
 
- <Link 
- to={ROUTES.FAVORITES} 
- className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-4 transition-all hover:border-slate-300 hover:shadow-xs group"
- >
- <div className="h-11 w-11 shrink-0 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 group-hover:scale-105 transition-transform">
- <Heart className="w-5 h-5" strokeWidth={2} />
- </div>
- <div className="min-w-0 flex-1">
- <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">{t("saved", "Kaydedilenler")}</span>
- <h3 className="text-xs font-extrabold text-slate-900 mt-0.5 truncate">{t("my_favorites", "Favorilerim")}</h3>
- <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">{t("favorites_sub", "Takip ettiğiniz ürünler")}</p>
- </div>
- <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
- </Link>
-
- <Link 
- to={ROUTES.INBOX} 
- className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-4 transition-all hover:border-slate-300 hover:shadow-xs group"
- >
- <div className="h-11 w-11 shrink-0 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 group-hover:scale-105 transition-transform">
- <MessageSquare className="w-5 h-5" strokeWidth={2} />
- </div>
- <div className="min-w-0 flex-1">
- <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">{t("communication", "İletişim")}</span>
- <h3 className="text-xs font-extrabold text-slate-900 mt-0.5 truncate">{t("inbox", "Mesajlar & Teklifler")}</h3>
- <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">{t("inbox_sub", "Alıcı ve satıcı görüşmeleri")}</p>
- </div>
- <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
- </Link>
+ <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+ <UtilityLink to={ROUTES.EWALLET} icon={Wallet} title={t("my_wallet", "Cüzdan & Bakiye")} hint={t("wallet_sub", "Escrow ve bakiye hareketleri")} />
+ <UtilityLink to={ROUTES.FAVORITES} icon={Heart} title={t("my_favorites", "Favorilerim")} hint={t("favorites_sub", "Takip ettiğiniz ürünler")} />
+ <UtilityLink to={ROUTES.INBOX} icon={MessageSquare} title={t("inbox", "Mesajlar & Teklifler")} hint={t("inbox_sub", "Alıcı ve satıcı görüşmeleri")} />
  </div>
 
- {/* ── Recent Orders Stream Bento Box ── */}
- <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 lg:p-7 mb-8">
- <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+ <section className={`${CARD} mb-8 p-5`}>
+ <div className="mb-4 flex items-center justify-between gap-4">
  <div>
- <h2 className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">{t("recent_orders", "Son Siparişler")}</h2>
- <p className="text-[11px] text-slate-500 font-medium mt-0.5">{t("recent_orders_desc", "Son alışverişleriniz ve anlık kargo durumları")}</p>
+ <h2 className="text-lg font-semibold text-text-primary">{t("recent_orders", "Son Siparişler")}</h2>
+ <p className="mt-1 text-sm text-text-secondary">{t("recent_orders_desc", "Son alışverişleriniz ve anlık kargo durumları")}</p>
  </div>
- <Link 
- to={ROUTES.MY_ORDERS} 
- className="text-xs font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-1 hover:text-slate-900 transition-colors"
- >
+ <Link to={ROUTES.MY_ORDERS} className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary">
  <span>{t("view_all", "Tümünü Gör")}</span>
- <ArrowRight className="w-4 h-4" strokeWidth={2} />
+ <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  </Link>
  </div>
 
  {ordersLoading ? (
  <div className="space-y-3">
- {[1, 2, 3].map(i => (
- <div key={i} className="h-20 rounded-2xl bg-slate-100 animate-pulse" />
- ))}
+ {['a', 'b', 'c'].map(k => <Skeleton key={k} className="h-16" />)}
  </div>
  ) : recentOrders.length === 0 ? (
- <div className="text-center py-12 select-none">
- <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 border border-slate-200">
- <ShoppingBag className="w-5 h-5 text-slate-400" />
- </div>
- <h3 className="text-sm font-extrabold text-slate-900">{t("your_shopping_bag_is_waiting", "Henüz bir siparişiniz bulunmuyor")}</h3>
- <p className="text-xs text-slate-500 mt-1 font-medium max-w-sm mx-auto">
+ <div className="py-10 text-center">
+ <h3 className="text-sm font-medium text-text-primary">{t("your_shopping_bag_is_waiting", "Henüz bir siparişiniz bulunmuyor")}</h3>
+ <p className="mx-auto mt-1 max-w-sm text-sm text-text-secondary">
  {t("explore_our_second_hand_listings_to_find", "Avantajlı ikinci el ürünleri ve fırsatları keşfetmeye hemen başlayın.")}
  </p>
- <Link 
- to={ROUTES.LISTINGS} 
- className="mt-5 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider text-white hover:bg-slate-900 transition-all shadow-xs"
- >
+ <Link to={ROUTES.LISTINGS} className={`${buttonClasses('secondary')} mt-5`}>
  {t("explore_listings", "İlanları Keşfet")}
  </Link>
  </div>
  ) : (
- <div className="space-y-3">
+ <ul className="divide-y divide-border-light">
  {recentOrders.map(order => {
  const items = order.orderItems || order.items || [];
  const firstItem = items[0];
  const listing = firstItem?.listing;
  const thumbUrl = listing?.imageUrl || firstItem?.imageUrl;
  const lineTitle = listing?.title || firstItem?.title;
- 
- const statusConfig = {
- COMPLETED: { label: t('status_completed', 'Teslim Edildi'), style: 'bg-slate-100 text-slate-900 border-slate-300/60' },
- DELIVERED: { label: t('status_delivered', 'Teslim Edildi'), style: 'bg-slate-100 text-slate-900 border-slate-300/60' },
- SHIPPED: { label: t('status_shipped', 'Kargoya Verildi'), style: 'bg-blue-50 text-blue-800 border-blue-200/60' },
- IN_TRANSIT: { label: t('status_in_transit', 'Kargoda'), style: 'bg-blue-50 text-blue-800 border-blue-200/60' },
- PROCESSING: { label: t('status_processing', 'Hazırlanıyor'), style: 'bg-amber-50 text-amber-800 border-amber-200/60' },
- CANCELLED: { label: t('status_cancelled', 'İptal Edildi'), style: 'bg-rose-50 text-rose-800 border-rose-200/60' },
- }[order.status] || { label: order.status?.replace(/_/g, ' '), style: 'bg-slate-100 text-slate-700 border-slate-200' };
+ const statusLabel = {
+ COMPLETED: t('status_completed', 'Teslim Edildi'),
+ DELIVERED: t('status_delivered', 'Teslim Edildi'),
+ SHIPPED: t('status_shipped', 'Kargoya Verildi'),
+ IN_TRANSIT: t('status_in_transit', 'Kargoda'),
+ PROCESSING: t('status_processing', 'Hazırlanıyor'),
+ CANCELLED: t('status_cancelled', 'İptal Edildi'),
+ }[order.status] || order.status?.replace(/_/g, ' ');
 
  return (
- <Link
- key={order.id}
- to={ROUTES.MY_ORDERS}
- className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs transition-all duration-200 group"
- >
- <div className="flex items-center gap-3.5 min-w-0">
- <div className="w-12 h-12 rounded-xl bg-slate-50 overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-200 group-hover:scale-[1.02] transition-transform">
+ <li key={order.id}>
+ <Link to={ROUTES.MY_ORDERS} className="-mx-2 flex items-center justify-between gap-4 rounded px-2 py-3 transition-colors duration-150 hover:bg-background-secondary">
+ <div className="flex min-w-0 items-center gap-3">
+ <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
  {thumbUrl ? (
- <img src={thumbUrl} alt="" className="w-full h-full object-cover" />
+ <img src={thumbUrl} alt="" className="h-full w-full object-cover" />
  ) : (
- <ShoppingBag className="w-5 h-5 text-slate-400" />
+ <ShoppingBag className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
  )}
  </div>
  <div className="min-w-0">
- <h3 className="text-xs font-extrabold text-slate-900 truncate">
+ <h3 className="truncate text-sm font-medium text-text-primary">
  {order.name || lineTitle || `Order #${order.orderNumber}`}
  </h3>
- <div className="flex items-center gap-2 mt-1">
- <span className="text-[11px] text-slate-400 font-bold">#{order.orderNumber}</span>
- <span className="text-slate-300">•</span>
- <span className="text-[11px] text-slate-500 font-medium">
- {order.createdAt ? formatDate(order.createdAt) : ''}
- </span>
- </div>
- <div className="mt-1.5">
- <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${statusConfig.style}`}>
- {statusConfig.label}
- </span>
+ <p className="mt-0.5 flex items-center gap-2 text-sm text-text-tertiary">
+ <span className="tabular-nums">#{order.orderNumber}</span>
+ {order.createdAt ? <span className="tabular-nums">{formatDate(order.createdAt)}</span> : null}
+ </p>
+ <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-text-secondary">
+ <span className={`h-1.5 w-1.5 rounded-full ${ORDER_STATUS_DOT[order.status] || 'bg-secondary-400'}`} aria-hidden />
+ {statusLabel}
+ </p>
  </div>
  </div>
- </div>
-
- <div className="text-right shrink-0 ml-3">
- <p className="text-sm font-extrabold text-slate-900 tracking-tight">
+ <div className="shrink-0 text-right">
+ <p className="text-sm font-semibold tabular-nums text-text-primary">
  {formatCurrency(order.totalAmount ?? order.total ?? 0, order.currency || 'TRY')}
  </p>
- <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mt-0.5">
+ <p className="text-sm tabular-nums text-text-tertiary">
  {items.length} {items.length > 1 ? t('items', 'Ürün') : t('item', 'Ürün')}
- </span>
+ </p>
  </div>
  </Link>
+ </li>
  );
  })}
- </div>
+ </ul>
  )}
- </div>
+ </section>
 
- {/* ── Active Showcases & Promotions Panel ── */}
  <MyShowcasesPanel userId={user?.id} />
-
  </PageContainer>
  </main>
  </div>

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import ShowcaseModal from '../../showcase/components/ShowcaseModal.jsx';
 import CreateCampaignModal from '../../campaign/components/CreateCampaignModal.jsx';
 import { useListingActionContext } from '../context/ListingActionContext.jsx';

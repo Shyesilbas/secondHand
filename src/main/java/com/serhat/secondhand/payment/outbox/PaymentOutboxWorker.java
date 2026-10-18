@@ -33,11 +33,10 @@ public class PaymentOutboxWorker {
             fixedDelayString = "${app.payment.outbox.fixed-delay-ms:5000}",
             initialDelayString = "${app.payment.outbox.initial-delay-ms:5000}"
     )
-    @Transactional
     public void processPendingEvents() {
         List<PaymentOutboxEvent> events = paymentOutboxRepository
                 .findByStatusInAndNextAttemptAtLessThanEqualOrderByCreatedAtAsc(
-                        List.of(OutboxStatus.PENDING, OutboxStatus.FAILED),
+                        List.of(OutboxStatus.PENDING),
                         LocalDateTime.now(),
                         PageRequest.of(0, 50)
                 );
@@ -49,7 +48,7 @@ public class PaymentOutboxWorker {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processEvent(UUID eventId) {
-        PaymentOutboxEvent event = paymentOutboxRepository.findById(eventId).orElse(null);
+        PaymentOutboxEvent event = paymentOutboxRepository.findByIdForUpdate(eventId).orElse(null);
         if (event == null || event.getStatus() == OutboxStatus.PROCESSED) {
             return;
         }

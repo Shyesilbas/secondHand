@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { CANCEL_REFUND_REASON_LABELS } from '../../common/enums/cancelRefundReasons.js';
 import { ORDER_MESSAGES } from '../constants/orderUiConstants.js';
 const CancelRefundModal = ({
@@ -72,43 +72,32 @@ const CancelRefundModal = ({
  onClose();
  };
  const allItemsSelected = selectedItems.length === order.orderItems?.length;
- return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4" onClick={handleClose}>
- <div className="w-full max-w-2xl bg-background-primary rounded-xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
- <div className="px-6 py-4 border-b border-border-light bg-slate-50">
- <div className="flex items-center justify-between">
- <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
- <button className="p-1 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" onClick={handleClose}>
- <X className="w-5 h-5" />
- </button>
- </div>
- </div>
-
- <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
- {order.orderItems && order.orderItems.length > 0 && <div className="space-y-3">
- <div className="flex items-center justify-between">
- <label className="text-sm font-semibold text-slate-700">{t("select_items")} ({selectedItems.length} {t("of")} {order.orderItems.length} {t("selected")})</label>
- {order.orderItems.length > 1 && <button type="button" onClick={handleSelectAll} className="text-xs font-medium text-primary hover:text-primary">
- {allItemsSelected ? 'Deselect All' : 'Select All'}
+ return <Modal isOpen={isOpen} onClose={isSubmitting ? () => {} : handleClose} title={title} size="lg" footer={<>
+ <Button variant="secondary" onClick={handleClose} disabled={isSubmitting}>{t("cancel")}</Button>
+ <Button type="submit" form="cancel-refund-form" disabled={isSubmitting || !reason}>{isSubmitting ? 'Processing...' : submitLabel}</Button>
+ </>}>
+ <form id="cancel-refund-form" onSubmit={handleSubmit} noValidate className="space-y-5">
+ {order.orderItems && order.orderItems.length > 0 && <fieldset>
+ <div className="mb-2 flex items-center justify-between">
+ <legend className="text-sm font-medium text-text-primary">{t("select_items")} <span className="tabular-nums text-text-tertiary">({selectedItems.length} {t("of")} {order.orderItems.length} {t("selected")})</span></legend>
+ {order.orderItems.length > 1 && <button type="button" onClick={handleSelectAll} className="text-sm text-text-secondary underline-offset-2 hover:text-text-primary hover:underline">
+ {allItemsSelected ? 'Deselect all' : 'Select all'}
  </button>}
  </div>
- <div className="border border-border-light rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
- {order.orderItems.map(item => <label key={item.id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded cursor-pointer">
- <input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemToggle(item.id)} className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary" />
- <div className="flex-1">
- <p className="text-sm font-medium text-text-primary">
- {item.listing?.title || item.listing?.listingNo}
- </p>
- <p className="text-xs text-slate-500">{t("qty")}{item.quantity} • {item.totalPrice} {order.currency}
- </p>
- </div>
+ <div className="max-h-48 divide-y divide-border-light overflow-y-auto rounded border border-border">
+ {order.orderItems.map(item => <label key={item.id} className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-background-secondary">
+ <input type="checkbox" checked={selectedItems.includes(item.id)} onChange={() => handleItemToggle(item.id)} className="h-4 w-4 rounded-sm border-border text-primary focus:ring-border-focus" />
+ <span className="min-w-0 flex-1">
+ <span className="block truncate text-sm text-text-primary">{item.listing?.title || item.listing?.listingNo}</span>
+ <span className="block text-xs tabular-nums text-text-tertiary">{t("qty")}{item.quantity} · {item.totalPrice} {order.currency}</span>
+ </span>
  </label>)}
  </div>
- </div>}
+ </fieldset>}
 
  <div>
- <label className="block text-sm font-semibold text-slate-700 mb-2">{t("reason")}<span className="text-status-error">*</span>
- </label>
- <select value={reason} onChange={e => setReason(e.target.value)} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm" required>
+ <label htmlFor="cancel-refund-reason" className="mb-1 block text-sm font-medium text-text-primary">{t("reason")}</label>
+ <select id="cancel-refund-reason" value={reason} onChange={e => setReason(e.target.value)} className="h-10 w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" required>
  <option value="">{t("select_a_reason")}</option>
  {Object.entries(CANCEL_REFUND_REASON_LABELS).map(([value, label]) => <option key={value} value={value}>
  {label}
@@ -117,22 +106,12 @@ const CancelRefundModal = ({
  </div>
 
  <div>
- <label className="block text-sm font-semibold text-slate-700 mb-2">{t("additional_details_optional")}</label>
- <textarea value={reasonText} onChange={e => setReasonText(e.target.value)} rows={4} className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm resize-none" placeholder={t("please_provide_more_details_about_your_r")} />
+ <label htmlFor="cancel-refund-details" className="mb-1 block text-sm font-medium text-text-primary">{t("additional_details_optional")}</label>
+ <textarea id="cancel-refund-details" value={reasonText} onChange={e => setReasonText(e.target.value)} rows={4} className="resize-none py-2 w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" placeholder={t("please_provide_more_details_about_your_r")} />
  </div>
 
- {error && <div className="bg-status-error-bg border border-status-error-border rounded-lg p-3">
- <p className="text-sm text-status-error-text">{error}</p>
- </div>}
-
- <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-light">
- <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-text-primary hover:bg-slate-100 rounded-lg transition-colors" disabled={isSubmitting}>{t("cancel")}</button>
- <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={isSubmitting || !reason}>
- {isSubmitting ? 'Processing...' : submitLabel}
- </button>
- </div>
+ {error && <p role="alert" className="text-sm text-status-error-text">{error}</p>}
  </form>
- </div>
- </div>;
+ </Modal>;
 };
 export default CancelRefundModal;

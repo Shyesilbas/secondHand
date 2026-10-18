@@ -249,20 +249,20 @@ const FilterStatus = ({
 
  const FilterBadge = () => hasActive && activeCount > 0 ? (
  <div className="flex flex-wrap items-center gap-1.5">
- <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-100 text-slate-900 border border-slate-300 shadow-xs">
- <SlidersHorizontal className="w-3 h-3 text-slate-900" />
+ <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold bg-background-tertiary text-text-primary border border-card-border-hover">
+ <SlidersHorizontal className="w-3 h-3 text-text-primary" />
  {activeCount} {t("filter")}
  </span>
 
  {activeTags.map((tag, idx) => (
- <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/80 shadow-xs">
+ <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold bg-background-tertiary text-text-secondary border border-border/80">
  {tag}
  </span>
  ))}
 
  <button
  onClick={onResetFilters}
- className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1 cursor-pointer"
+ className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold text-text-tertiary hover:text-status-error-text hover:bg-background-secondary transition-colors ml-1 cursor-pointer"
  >
  <X className="w-3.5 h-3.5" />
  {t("clear_all")}
@@ -275,13 +275,13 @@ const FilterStatus = ({
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 py-1">
  <div className="flex flex-wrap items-center gap-2.5">
  <div className="flex items-center gap-1.5">
- <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
- <span className="text-sm font-extrabold text-slate-800">{t("no_listings_found")}</span>
- {categoryLabel && <span className="text-sm font-medium text-slate-500">({categoryLabel})</span>}
+ <span className="w-2 h-2 rounded-full bg-secondary-300 inline-block" />
+ <span className="text-sm font-semibold text-text-primary">{t("no_listings_found")}</span>
+ {categoryLabel && <span className="text-sm font-medium text-text-tertiary">({categoryLabel})</span>}
  </div>
  <FilterBadge />
  </div>
- <p className="text-xs text-slate-500 font-medium">{t("try_changing_filters_or_category_to_see_")}</p>
+ <p className="text-xs text-text-tertiary font-medium">{t("try_changing_filters_or_category_to_see_")}</p>
  </div>
  );
  }
@@ -290,22 +290,22 @@ const FilterStatus = ({
  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
  <div className="flex flex-wrap items-center gap-2.5">
  <div className="flex items-center gap-1.5">
- <span className="w-2 h-2 rounded-full bg-slate-800 inline-block" />
- <span className="text-sm font-black text-slate-900">
+ <span className="w-2 h-2 rounded-full bg-primary-hover inline-block" />
+ <span className="text-sm font-semibold text-text-primary">
  {totalElements} {t("listing")}
  </span>
- {categoryLabel && <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">({categoryLabel})</span>}
+ {categoryLabel && <span className="text-xs font-semibold text-text-tertiary bg-background-tertiary px-2 py-0.5 rounded-md">({categoryLabel})</span>}
  </div>
  <FilterBadge />
  </div>
 
  {/* Sort toggle */}
  <div className="flex items-center gap-2 shrink-0">
- <div className="flex items-center gap-1 text-xs font-bold text-slate-500">
+ <div className="flex items-center gap-1 text-xs font-semibold text-text-tertiary">
  <ArrowUpDown className="w-3.5 h-3.5" />
  <span>{t("sort")}:</span>
  </div>
- <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-0.5 border border-slate-200/80">
+ <div className="flex items-center bg-background-tertiary rounded p-1 gap-0.5 border border-border/80">
  {[
  { key: LISTING_SORT_FIELDS.DATE, label: t("sort_date") },
  { key: LISTING_SORT_FIELDS.PRICE, label: t("sort_price") }
@@ -316,8 +316,8 @@ const FilterStatus = ({
  sortBy: key,
  sortDirection: LISTING_DEFAULTS.SORT_DIRECTION
  })}
- className={`px-3 py-1 rounded-lg text-xs font-extrabold transition-all duration-200 cursor-pointer ${
- filters.sortBy === key ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-700'
+ className={`px-3 py-1 rounded text-xs font-semibold transition-all duration-200 cursor-pointer ${
+ filters.sortBy === key ? 'bg-white text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
  }`}
  >
  {label}

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight as ArrowRightIcon, Calendar as CalendarIcon, Eye as EyeIcon, EyeOff as EyeSlashIcon, Lock as LockClosedIcon, Mail as EnvelopeIcon, Phone as PhoneIcon, User as UserIcon, ArrowLeft as ArrowLeftIcon } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
@@ -50,7 +50,7 @@ export const RegisterForm = ({
  } else if (formData.password.length < 8) {
  step1Errors.password = 'Password must be at least 8 characters';
  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]).*/.test(formData.password)) {
- step1Errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit and one special character';
+ step1Errors.password = 'Password must contain at least one letter, one lowercase letter, one digit and one special character';
  }
  if (formData.password !== formData.confirmPassword) {
  step1Errors.confirmPassword = 'Passwords do not match';
@@ -70,8 +70,8 @@ export const RegisterForm = ({
  {/* Header / Stepper Progress */}
  <div className="mb-8">
  <div className="flex items-center gap-3 mb-3">
- <span className="text-caption font-semibold tracking-widest text-text-muted uppercase">{t("step")}{step}{t("of_2")}</span>
- <div className="flex gap-1.5 items-center flex-1 max-w-[100px]">
+ <span className="text-xs font-semibold text-text-muted">{t("step")}{step}{t("of_2")}</span>
+ <div className="flex gap-1.5 items-center flex-1 max-w-24">
  <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-primary' : 'bg-border-light'}`} />
  <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary' : 'bg-border-light'}`} />
  </div>
@@ -98,23 +98,23 @@ export const RegisterForm = ({
  </div>
 
  {/* Password Requirements Helper */}
- <div className="bg-background-secondary border border-border-light rounded-xl p-3.5 text-xs text-text-secondary flex flex-col gap-1.5">
+ <div className="bg-background-secondary border border-border-light rounded p-3.5 text-xs text-text-secondary flex flex-col gap-1.5">
  <span className="font-semibold text-text-primary mb-0.5">Password Requirements:</span>
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px]">
+ <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
  <span className={`flex items-center gap-1.5 ${formData.password.length >= 8 ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span>{formData.password.length >= 8 ? '✓' : '•'}</span> At least 8 characters
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${formData.password.length >= 8 ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> At least 8 characters
  </span>
  <span className={`flex items-center gap-1.5 ${/[A-Z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span>{/[A-Z]/.test(formData.password) ? '✓' : '•'}</span> One uppercase letter
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[A-Z]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One letter
  </span>
  <span className={`flex items-center gap-1.5 ${/[a-z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span>{/[a-z]/.test(formData.password) ? '✓' : '•'}</span> One lowercase letter
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[a-z]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One lowercase letter
  </span>
  <span className={`flex items-center gap-1.5 ${/\d/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span>{/\d/.test(formData.password) ? '✓' : '•'}</span> One digit
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/\d/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One digit
  </span>
  <span className={`flex items-center gap-1.5 ${/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span>{/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? '✓' : '•'}</span> One special character
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One special character
  </span>
  </div>
  </div>
@@ -134,9 +134,9 @@ export const RegisterForm = ({
 
  {/* Gender selection full width */}
  <div className="flex flex-col gap-2.5">
- <label className="block text-caption font-semibold tracking-widest uppercase text-text-secondary">{t("gender")}<span className="text-status-error font-normal">*</span>
+ <label className="block text-xs font-semibold text-text-secondary">{t("gender")}<span className="text-status-error font-normal">*</span>
  </label>
- {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-border-light rounded-xl bg-background-secondary">
+ {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-border-light rounded bg-background-secondary">
  <LoadingIndicator size="h-4 w-4" />
  </div> : <div className="flex gap-2.5">
  {genderOptions.map(g => <button key={g.value} type="button" onClick={() => handleChange({
@@ -144,7 +144,7 @@ export const RegisterForm = ({
  name: 'gender',
  value: g.value
  }
- })} className={`flex-1 py-3 px-5 rounded-xl border text-caption font-semibold tracking-wider uppercase transition-all duration-300 ${formData.gender === g.value ? 'border-primary bg-primary text-primary-content shadow-sm' : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}>
+ })} className={`flex-1 py-3 px-5 rounded border text-xs font-semibold transition-all duration-300 ${formData.gender === g.value ? 'border-primary bg-primary text-primary-content' : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}>
  {g.label}
  </button>)}
  </div>}
@@ -156,30 +156,30 @@ export const RegisterForm = ({
  <LoadingIndicator size="h-3.5 w-3.5" />
  <span>{t("loading_legal_agreements")}</span>
  </div>}
- {!agreementsLoading && <div className="rounded-xl border border-border-light bg-background-secondary p-5">
+ {!agreementsLoading && <div className="rounded border border-border-light bg-background-secondary p-5">
  <AgreementsSection agreements={agreements} acceptedAgreements={acceptedAgreements} onToggle={onToggleAgreement} onRead={onReadAgreement} error={errors.agreements} />
  </div>}
 
- {errors.submit && <div className="rounded-xl bg-status-error-bg border border-status-error-border p-4 text-xs text-status-error">
+ {errors.submit && <div className="rounded bg-background-secondary border border-border p-4 text-xs text-status-error-text">
  {errors.submit}
  </div>}
 
  {/* Navigation / Actions */}
  <div className="flex gap-4 mt-3">
  <AuthButton type="button" variant="secondary" onClick={handlePrevStep} className="flex-1" leftIcon={<ArrowLeftIcon className="h-4 w-4" />}>{t("back")}</AuthButton>
- <AuthButton type="submit" isLoading={isLoading} className="flex-[2]" rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}>{t("create_account")}</AuthButton>
+ <AuthButton type="submit" isLoading={isLoading} className="flex-1" rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}>{t("create_account")}</AuthButton>
  </div>
  </div>}
 
  {/* Silent Divider */}
  <div className="relative flex items-center my-3">
  <div className="flex-1 border-t border-border-light"></div>
- <span className="px-3 text-caption tracking-widest text-text-muted uppercase font-medium">{t("or_continue_with")}</span>
+ <span className="px-3 text-xs text-text-muted font-medium">{t("or_continue_with")}</span>
  <div className="flex-1 border-t border-border-light"></div>
  </div>
 
  {/* Google SSO */}
- <a href={`${API_BASE_URL}/v1/auth/oauth2/google`} className="w-full inline-flex items-center justify-center gap-3 py-3.5 border border-border-light hover:border-border-DEFAULT rounded-xl bg-background-primary text-sm font-medium text-text-secondary hover:bg-background-secondary active:scale-[0.985] transition-all duration-300">
+ <a href={`${API_BASE_URL}/v1/auth/oauth2/google`} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 w-full">
  <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
  <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4" />
  <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853" />

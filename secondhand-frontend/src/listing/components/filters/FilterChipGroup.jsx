@@ -31,14 +31,14 @@ const FilterChipGroup = ({
  if (!list?.length) return null;
  return <div className="space-y-2">
  <div className="flex items-center justify-between gap-2">
- <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{label}</label>
- {selectedIds.length > 0 && <button type="button" onClick={handleClear} className="text-xs text-slate-500 hover:text-slate-700 font-medium transition-colors">{t("clear")}</button>}
+ <label className="text-xs font-semibold text-text-secondary">{label}</label>
+ {selectedIds.length > 0 && <button type="button" onClick={handleClear} className="text-xs text-text-tertiary hover:text-text-secondary font-medium transition-colors">{t("clear")}</button>}
  </div>
  <div className="flex flex-wrap gap-1.5">
  {list.slice(0, maxChips).map(opt => {
  const id = getOptionValue(opt);
  const isSelected = selectedIds.includes(id);
- return <button key={id} type="button" onClick={() => handleToggle(id)} className={`inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${isSelected ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'}`}>
+ return <button key={id} type="button" onClick={() => handleToggle(id)} className={`inline-flex items-center px-2.5 py-1.5 rounded text-xs font-medium transition-all duration-150 ${isSelected ? 'bg-primary text-white' : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200 hover:text-text-primary'}`}>
  {getOptionLabel(opt)}
  </button>;
  })}

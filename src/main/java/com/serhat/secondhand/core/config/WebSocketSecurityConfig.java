@@ -1,6 +1,8 @@
 package com.serhat.secondhand.core.config;
 
+import com.serhat.secondhand.chat.application.ChatAuthorizationService;
 import com.serhat.secondhand.core.jwt.JwtUtils;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +35,11 @@ import java.util.Map;
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer {
 
+    private static final String CHAT_TOPIC_PREFIX = "/topic/chat/";
+
     private final JwtUtils jwtUtils;
     private final UserDetailsService userDetailsService;
+    private final ChatAuthorizationService chatAuthorizationService;
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -63,9 +68,32 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                     throw new MessageDeliveryException("WebSocket authentication required");
                 }
 
+                if (StompCommand.SUBSCRIBE.equals(command)) {
+                    authorizeChatSubscription(accessor);
+                }
+
                 return message;
             }
         });
+    }
+
+    // /topic/chat/{roomId} yalnızca oda katılımcılarına açıktır.
+    private void authorizeChatSubscription(StompHeaderAccessor accessor) {
+        String destination = accessor.getDestination();
+        if (destination == null || !destination.startsWith(CHAT_TOPIC_PREFIX)) {
+            return;
+        }
+        try {
+            Long roomId = Long.valueOf(destination.substring(CHAT_TOPIC_PREFIX.length()));
+            Long userId = ((User) ((UsernamePasswordAuthenticationToken) accessor.getUser()).getPrincipal()).getId();
+            if (chatAuthorizationService.validateRoomParticipant(roomId, userId).isError()) {
+                throw new MessageDeliveryException("Not a participant of chat room");
+            }
+        } catch (MessageDeliveryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MessageDeliveryException("Invalid chat subscription");
+        }
     }
 
     private boolean isAuthorizationRequired(StompCommand command) {

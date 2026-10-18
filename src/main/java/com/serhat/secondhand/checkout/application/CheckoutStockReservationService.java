@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.inventory.application.InventoryRedisReservationService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,11 @@ public class CheckoutStockReservationService {
             if (listingId == null) {
                 releaseReservedStock(userId, reserved);
                 return Result.error(ListingErrorCodes.LISTING_NOT_FOUND.toString(), "Listing Not Found.");
+            }
+
+            if (item.getListing().getStatus() != ListingStatus.ACTIVE) {
+                releaseReservedStock(userId, reserved);
+                return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
             }
 
             int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;

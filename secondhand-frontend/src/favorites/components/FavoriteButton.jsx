@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
+import { useState} from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { favoriteService } from '../services/favoriteService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { FavoriteStatsDTO } from '../favorites.js';
-import { ROUTES } from '../../common/constants/routes.js';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { FAVORITE_MESSAGES } from '../favoriteConstants.js';
+import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 
 const FavoriteButton = ({
  listingId,
@@ -22,10 +21,8 @@ const FavoriteButton = ({
 
  const queryClient = useQueryClient();
  const { isAuthenticated, user } = useAuthState();
- const { showSuccess, showError, addNotification } = useNotification();
- const location = useLocation();
- const navigate = useNavigate();
- const notificationShown = useRef(false);
+ const { showSuccess, showError } = useNotification();
+ const promptLogin = useLoginPrompt();
  const [isFavorited, setIsFavorited] = useState(
  listing?.favoriteStats?.isFavorited ?? listing?.favoriteStats?.favorited ?? initialIsFavorited
  );
@@ -52,36 +49,7 @@ const FavoriteButton = ({
  event.stopPropagation();
 
  if (!isAuthenticated) {
- if (!notificationShown.current) {
- notificationShown.current = true;
- addNotification({
- type: 'info',
- title: 'Authentication Required',
- message: 'Please Log In',
- autoClose: false,
- showCloseButton: false,
- actions: [
- {
- label: 'Cancel',
- primary: false,
- onClick: () => {
- notificationShown.current = false;
- }
- },
- {
- label: 'OK',
- primary: true,
- onClick: () => {
- navigate(ROUTES.LOGIN, { 
- state: { from: location },
- replace: true 
- });
- notificationShown.current = false;
- }
- }
- ]
- });
- }
+ promptLogin();
  return;
  }
 
@@ -121,7 +89,7 @@ const FavoriteButton = ({
  };
 
  const defaultButtonClass = size === 'sm' 
- ? `bg-background-primary/90 backdrop-blur hover:bg-background-primary border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center transition-colors ${
+ ? `bg-background-primary hover:bg-background-primary border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center transition-colors ${
  isFavorited 
  ? 'text-status-error-DEFAULT hover:text-status-error-600' 
  : 'text-text-secondary hover:text-status-error-DEFAULT'

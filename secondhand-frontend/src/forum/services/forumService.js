@@ -32,9 +32,6 @@ export const forumService = {
  publishThread: async (payload) => {
  return await post(API_ENDPOINTS.FORUM.THREADS, payload);
  },
- modifyThreadContent: async (threadId, payload) => {
- return await patch(API_ENDPOINTS.FORUM.THREAD_BY_ID(threadId), payload);
- },
  changeThreadStatus: async (threadId, payload) => {
  return await patch(API_ENDPOINTS.FORUM.THREAD_STATUS(threadId), payload);
  },
@@ -56,9 +53,6 @@ export const forumService = {
  },
  deleteThread: async (threadId) => {
  return await del(API_ENDPOINTS.FORUM.THREAD_BY_ID(threadId));
- },
- deleteComment: async (threadId, commentId) => {
- return await del(API_ENDPOINTS.FORUM.COMMENT_BY_ID(threadId, commentId));
  }
 };
 

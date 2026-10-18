@@ -59,7 +59,7 @@ const validateField = (field, ctx) => {
 
  if (required) {
  if (field.type === 'toggle') {
- if (!Boolean(value)) return `${field.label} is required`;
+ if (!value) return `${field.label} is required`;
  } else if (isEmpty(value)) {
  return `${field.label} is required`;
  }

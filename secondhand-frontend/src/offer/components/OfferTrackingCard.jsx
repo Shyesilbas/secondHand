@@ -1,23 +1,22 @@
 import { useTranslation } from "react-i18next";
-import React from 'react';
-import { ArrowUpRight, CheckCircle2, Clock, ImageOff, ShoppingCart, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, ImageOff, ShoppingCart, XCircle } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { OFFER_DEFAULTS, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
 
 const statusPresentation = {
  [OFFER_STATUSES.PENDING]: {
  label: 'Pending',
- badge: 'bg-status-warning-bg text-status-warning-text border-status-warning-border',
+ badge: 'bg-background-secondary text-status-warning-text border-border',
  icon: Clock
  },
  [OFFER_STATUSES.ACCEPTED]: {
  label: 'Accepted',
- badge: 'bg-status-success-bg text-status-success border-status-success-border',
+ badge: 'bg-background-secondary text-status-success-text border-border',
  icon: CheckCircle2
  },
  [OFFER_STATUSES.REJECTED]: {
  label: 'Rejected',
- badge: 'bg-status-error-bg text-status-error-text border-status-error-border',
+ badge: 'bg-background-secondary text-status-error-text border-border',
  icon: XCircle
  },
  [OFFER_STATUSES.EXPIRED]: {
@@ -67,16 +66,16 @@ const OfferTrackingCard = ({
  const StatusIcon = pres.icon;
  const timeLeft = !isExpired && o.expiresAt ? formatTimeLeft(o.expiresAt) : null;
 
- return <article className={`group flex items-center gap-4 rounded-xl border bg-card-bg p-4 shadow-sm hover:shadow-md transition-all ${isExpired ? 'opacity-60' : ''} ${needsAttention ? 'border-status-warning-border' : 'border-border-light'}`}>
+ return <article className={`group flex items-center gap-4 rounded border bg-card-bg p-4 shadow-sm transition-all ${isExpired ? 'opacity-60' : ''} ${needsAttention ? 'border-status-warning-border' : 'border-border-light'}`}>
  <button
  type="button"
  onClick={() => o.listingId && onOpenListing?.(o.listingId)}
  disabled={!o.listingId}
- className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-background-secondary disabled:cursor-default"
+ className="h-20 w-20 shrink-0 overflow-hidden rounded bg-background-secondary disabled:cursor-default"
  title={o.listingId ? 'View listing' : undefined}
  >
  {o.listingImageUrl ? (
- <img src={o.listingImageUrl} alt="" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+ <img src={o.listingImageUrl} alt="" className="h-full w-full object-cover transition-transform duration-300" />
  ) : (
  <div className="flex h-full w-full items-center justify-center text-text-muted">
  <ImageOff className="h-6 w-6" />
@@ -103,7 +102,7 @@ const OfferTrackingCard = ({
  <span className="font-medium text-text-secondary">{roleLabel}:</span> {personName}
  </p>
 
- <div className="mt-2 text-xl font-bold text-primary">
+ <div className="mt-2 text-xl font-semibold text-primary">
  {formatCurrency(o.totalPrice, currency)}
  </div>
 
@@ -121,7 +120,7 @@ const OfferTrackingCard = ({
  </div>
 
  <div className="flex flex-col items-end gap-2 shrink-0">
- <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${pres.badge}`}>
+ <span className={`inline-flex w-fit shrink-0 items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-semibold ${pres.badge}`}>
  <StatusIcon className="h-3.5 w-3.5" />
  {pres.label}
  </span>
@@ -132,7 +131,7 @@ const OfferTrackingCard = ({
  <button
  type="button"
  onClick={() => onCheckout(o.id)}
- className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-hover transition"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
  >
  <ShoppingCart className="h-3.5 w-3.5" />
  {t("checkout")}
@@ -142,7 +141,7 @@ const OfferTrackingCard = ({
  <button
  type="button"
  onClick={() => onAccept(o.id)}
- className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-hover transition"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
  >
  <CheckCircle2 className="h-3.5 w-3.5" />
  {t("accept")}
@@ -150,21 +149,21 @@ const OfferTrackingCard = ({
  <button
  type="button"
  onClick={() => onCounter(o)}
- className="inline-flex items-center gap-1.5 rounded-lg border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition"
+ className="inline-flex items-center gap-1.5 rounded border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition"
  >
  {t("counter")}
  </button>
  <button
  type="button"
  onClick={() => onReject(o.id)}
- className="inline-flex items-center gap-1.5 rounded-lg border border-border-light px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-status-error-border hover:text-status-error-text transition"
+ className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
  >
  <XCircle className="h-3.5 w-3.5" />
  {t("reject")}
  </button>
  </>
  ) : (
- <p className="text-right text-caption leading-relaxed text-text-muted">
+ <p className="text-right text-xs leading-relaxed text-text-muted">
  {activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.PENDING
  ? 'Waiting for the seller to respond.'
  : 'No action required.'}

@@ -1,28 +1,3 @@
-export const BooksListingDTO = {
- id: '',
- listingNo: '',
- title: '',
- description: '',
- price: 0,
- currency: '',
- status: '',
- city: '',
- district: '',
- createdAt: '',
- updatedAt: '',
- sellerName: '',
- sellerSurname: '',
- sellerId: 0,
- type: '',
- author: '',
- bookType: null,
- genre: null,
- publicationYear: '',
- pageCount: 0,
- language: null,
- format: null,
- condition: null
-};
 
 export const createBooksCreateRequest = (data) => ({
  base: {
@@ -79,36 +54,6 @@ export const createBooksUpdateRequest = (data) => {
  return updateData;
 };
 
-export const createBooksListingDto = (data) => ({
- id: data.id,
- listingNo: data.listingNo,
- title: data.title,
- description: data.description,
- price: data.price,
- currency: data.currency,
- status: data.status,
- listingFeePaid: data.listingFeePaid,
- city: data.city,
- district: data.district,
- createdAt: data.createdAt,
- updatedAt: data.updatedAt,
- sellerName: data.sellerName,
- sellerSurname: data.sellerSurname,
- sellerId: data.sellerId,
- type: data.type,
- author: data.author,
- bookType: data.bookType,
- genre: data.genre,
- language: data.language,
- publicationYear: data.publicationYear,
- pageCount: data.pageCount,
- format: data.format,
- condition: data.condition,
- isbn: data.isbn,
- imageUrl: data.imageUrl,
-});
-
-
 export const createBooksFilterRequest = (data) => ({
  type: 'BOOKS',
  listingType: 'BOOKS',
@@ -132,5 +77,4 @@ export const createBooksFilterRequest = (data) => ({
  page: parseInt(data.page) || 0,
  size: parseInt(data.size) || 20,
 });
-
 

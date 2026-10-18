@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { DEFAULT_PAYMENT_FILTERS } from '../paymentSchema.js';
 import { usePaymentsQuery } from './queries.js';
@@ -10,17 +10,11 @@ export const usePayments = () => {
  const [filters, setFilters] = useState(DEFAULT_PAYMENT_FILTERS);
  const [showFilters, setShowFilters] = useState(false);
  const [selectedPayment, setSelectedPayment] = useState(null);
- const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
  const hasActiveFilters = useMemo(
  () => Object.values(filters).some((value) => value !== ''),
  [filters]
  );
-
- const resetPagination = useCallback(() => {
- setCurrentPage(0);
- setPageSize(5);
- }, []);
 
  const handleFilterChange = useCallback((key, value) => {
  setFilters((prev) => ({ ...prev, [key]: value }));
@@ -30,20 +24,7 @@ export const usePayments = () => {
  setFilters(DEFAULT_PAYMENT_FILTERS);
  }, []);
 
- const showReceipt = useCallback((payment) => {
- setSelectedPayment(payment);
- setIsReceiptModalOpen(true);
- }, []);
-
- const closeReceipt = useCallback(() => {
- setIsReceiptModalOpen(false);
- setSelectedPayment(null);
- }, []);
-
- const resetReceiptState = useCallback(() => {
- setIsReceiptModalOpen(false);
- setSelectedPayment(null);
- }, []);
+ const closeReceipt = useCallback(() => setSelectedPayment(null), []);
 
  const handlePageChange = useCallback((page) => {
  setCurrentPage(page);
@@ -54,12 +35,6 @@ export const usePayments = () => {
  setPageSize(newPageSize);
  }, []);
 
- useEffect(() => {
- resetPagination();
- resetReceiptState();
- setFilters(DEFAULT_PAYMENT_FILTERS);
- }, [user?.id]);
-
  const { data, isLoading, error: queryError, refetch } = usePaymentsQuery({
  userId: user?.id,
  currentPage,
@@ -67,33 +42,26 @@ export const usePayments = () => {
  filters,
  });
 
- const allPayments = useMemo(() => data?.payments || [], [data]);
+ const payments = useMemo(() => data?.payments || [], [data]);
  const error = queryError?.response?.data?.message || queryError?.message || null;
-
- const filteredPayments = allPayments;
- const paginatedPayments = allPayments;
  const totalFilteredPages = data?.pagination?.totalPages || 0;
  const shouldShowPagination = totalFilteredPages > 1;
 
- const fetchPayments = refetch;
-
  return {
- payments: paginatedPayments,
- allPayments,
- filteredPayments,
+ payments,
  isLoading,
  error,
+ refetch,
  currentPage,
  pageSize,
  totalPages: totalFilteredPages,
  totalElements: data?.pagination?.totalElements || 0,
  selectedPayment,
- isReceiptModalOpen,
+ isReceiptModalOpen: !!selectedPayment,
  filters,
  showFilters,
  hasActiveFilters,
  shouldShowPagination,
- fetchPayments,
  handleFilterChange: (key, value) => {
  handleFilterChange(key, value);
  setCurrentPage(0);
@@ -102,7 +70,7 @@ export const usePayments = () => {
  clearFilters();
  setCurrentPage(0);
  },
- showReceipt,
+ showReceipt: setSelectedPayment,
  closeReceipt,
  handlePageChange,
  handlePageSizeChange,

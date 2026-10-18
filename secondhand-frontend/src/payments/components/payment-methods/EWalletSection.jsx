@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import { useEWallet } from '../../../ewallet/hooks/useEWallet.js';
 import { usePaymentStatisticsQuery } from '../../hooks/queries.js';
@@ -40,12 +40,12 @@ const EWalletSection = () => {
  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
  <div>
  <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("ewallet")}</h2>
- <p className="text-sm text-slate-500 mt-1">{t("manage_your_wallet_balance_limits_and_tr")}</p>
+ <p className="text-sm text-text-tertiary mt-1">{t("manage_your_wallet_balance_limits_and_tr")}</p>
  </div>
  {eWallet && <EWalletActions eWallet={eWallet} loading={loading} onCreateEWallet={createEWallet} onUpdateLimits={updateLimits} onUpdateSpendingWarningLimit={updateSpendingWarningLimit} onDeposit={deposit} onWithdraw={withdraw} />}
  </div>
 
- {error && <div className="mb-6 p-3 bg-status-error-bg border border-status-error-border rounded-xl text-sm text-status-error">
+ {error && <div className="mb-6 p-3 bg-background-secondary border border-border rounded text-sm text-status-error-text">
  {error}
  </div>}
 

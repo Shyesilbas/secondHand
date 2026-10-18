@@ -20,20 +20,25 @@ The `order` domain manages the end-to-end lifecycle of a purchase: order creatio
 ## State Machine
 ```mermaid
 stateDiagram-v2
-    [*] --> CREATED: Checkout Orchestration
-    CREATED --> CONFIRMED: Payment Success
-    CONFIRMED --> SHIPPED: Seller Ships Item
-    SHIPPED --> DELIVERED: Buyer Receives
-    DELIVERED --> COMPLETED: Escrow Released (Manual/Auto)
-    
-    CREATED --> CANCELLED: Pre-shipment Cancel
-    CONFIRMED --> CANCELLED: Pre-shipment Cancel
-    
-    SHIPPED --> REFUND_REQUESTED: Post-shipment Problem
-    DELIVERED --> REFUND_REQUESTED: Post-shipment Problem
-    REFUND_REQUESTED --> REFUNDED: Refund Approved
-    REFUND_REQUESTED --> COMPLETED: Refund Denied
+    [*] --> PENDING: Shipping order created
+    [*] --> MEETUP_PENDING: Safe Meetup order created
+    PENDING --> CONFIRMED: Payment success
+    CONFIRMED --> PROCESSING: Seller prepares
+    PROCESSING --> SHIPPED: Seller ships
+    SHIPPED --> DELIVERED: Delivery confirmed
+    DELIVERED --> COMPLETED: Buyer confirms / auto after 72h
+    DELIVERED --> REFUNDED: Refund within 48h of delivery
+
+    PENDING --> CANCELLED
+    CONFIRMED --> CANCELLED
+    MEETUP_PENDING --> CANCELLED
+
+    MEETUP_PENDING --> HANDOVER_CONFIRMED: OTP / QR verified
+    MEETUP_PENDING --> VERIFICATION_LOCKED: 3 failed attempts (15 min lock)
+    VERIFICATION_LOCKED --> MEETUP_PENDING: Lock expired
+    HANDOVER_CONFIRMED --> COMPLETED: Buyer confirms / auto after 24h
 ```
+Authoritative rules: `Order` entity methods, `OrderStatus` (cancellable / refundable / completable sets), the `policy` classes and `OrderCompletionScheduler`. Safe Meetup details: `docs/safe-meetup-delivery-and-verification.md`.
 
 ## Integration Points
 - **Incoming:** Checkout Domain (triggers order creation).
@@ -52,6 +57,3 @@ stateDiagram-v2
 
 - **Order Feature Development**
   -> `.docs/runbooks/order-feature-runbook.md`
-
-- **Order Testing Guidelines**
-  -> `.docs/runbooks/order-testing-guidelines.md`

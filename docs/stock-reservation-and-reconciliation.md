@@ -40,7 +40,7 @@ flowchart TD
 
 ## 3. Bileşen Analizi ve Kod İncelemesi
 
-### A. [`StockReservationReconciliationScheduler.java`](file:///Users/serhat/IdeaProjects/secondHand/src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java)
+### A. [`StockReservationReconciliationScheduler.java`](../src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java)
 
 Bu servis, arka planda periyodik olarak çalışan bir **Watchdog / Healer** mekanizmasıdır.
 
@@ -99,13 +99,3 @@ public void reconcileOrphanedStockReservations() {
 | **4. Manuel DB Müdahalesi** | Yönetici panelinden ürün stoğu veritabanında güncellendi. | Redis: Eski Değer, DB: Yeni Değer. | Scheduler en geç 5 dakika içinde Redis anahtarını DB'deki yeni miktara çeker. |
 
 ---
-
-## 6. Operasyonel ve Performans Tavsiyeleri
-
-1. **Çok Yüksek Veri Hacminde `SCAN` Kullanımı:**
-   * Küçük/orta ölçekte `keys("stock:*")` yeterli ve pratiktir. Milyonlarca aktif anahtarın bulunduğu devasa cluster yapılarında Redis'i bloklamamak için `SCAN` cursor komutuna geçiş yapılabilir.
-2. **Yapılandırma Parametreleri ([`application-core.yml`](file:///Users/serhat/IdeaProjects/secondHand/src/main/resources/config/application-core.yml)):**
-   * `app.inventory.reconciliation.fixed-delay-ms: 300000` (Varsayılan 5 dakika; ihtiyaca göre 1-10 dakika arasına ayarlanabilir).
-   * `initialDelay: 60000` (Uygulama açıldıktan 1 dakika sonra ilk mutabakatı yapar).
-3. **Log & Metrik Takibi:**
-   * Kibana veya Grafana üzerinden `⚡ [STOCK RECONCILIATION]` logları izlenerek hangi ürünlerde ne sıklıkla drift yaşandığı raporlanabilir.

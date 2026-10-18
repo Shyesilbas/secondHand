@@ -1,29 +1,13 @@
 # Order UI Module
 
-## Purpose
-The `order` UI module manages the display of seller and buyer orders, handling complex state interactions such as order searches, pagination, modal actions, and status presentation.
+Buyer/seller order lists, search, modal actions and status presentation. Used by `MyOrdersPage` and `ISoldPage`; calls the backend through `orderService.js`.
 
-## Architecture Overview
-- **useOrderFlow:** Handles list fetching, mode switching (buyer/seller), and search state coordination.
-- **useOrderDetailActions:** Encapsulates the mutation logic executed inside modals (e.g. canceling, saving notes, completing delivery).
-- **statusPresentation.js:** Acts as the single source of truth for rendering status colors, badges, and textual representations.
+## Architecture
+- `useOrderFlow`: list query, buyer/seller mode, filters and modal state; composes `useOrderSearch` (order-number search driven by the `q` URL param) and `useOrderItemReviews` (reviews keyed by order-item id, shared with `OrderDetailsModal`).
+- `useOrderDetailActions`: modal mutations (cancel, notes, complete delivery).
+- `utils/statusPresentation.js`: single source for status colors/badges. Adding a status means updating `getOrderStatusDotClass` and `getOrderStatusTextClass` together; never hardcode status colors in components.
 
-## Business Invariants & Constraints
-- **State Cleanup:** Clearing an active order search must guarantee the cleanup of the search result state.
-- **Race Condition Prevention:** Modal request fetching utilizes a `requestRef` to ensure late-arriving responses from old requests do not overwrite the current view state.
-- **Cache Integrity:** Refreshing an order list should invalidate existing React Query cache keys rather than sending duplicate standalone fetch requests.
-
-## Integration Points
-- **Incoming:** Renders within the `MyOrdersPage` and `ISoldPage` components.
-- **Outgoing:** Calls the backend `order` domain APIs via `orderService.js`.
-
-## Knowledge Routing
-- For procedural changes or troubleshooting, refer to KIs in `src/.docs/order/`.
-
-## Source of Truth
-- **Business Rules:** Domain READMEs
-- **UI Rules:** Frontend UX KIs (`src/.docs/`)
-- **React Query:** `react-query-ownership.md`
-- **API:** Backend OpenAPI & Tests
-- **Validated Behaviour:** Unit Tests
-- **Architecture:** `GEMINI.md`
+## Invariants
+- Clearing the search removes the `q` param; search result and error are derived from that query.
+- `OrderDetailsModal` loads its own detail (`useOrderDetails`); the flow only holds the clicked row.
+- After an action, invalidate the `ORDER_QUERY_KEYS` queries instead of issuing standalone fetches; list, detail, search and item reviews all sit under `ORDER_QUERY_KEYS.orders`.

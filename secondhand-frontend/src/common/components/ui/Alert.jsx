@@ -1,5 +1,6 @@
 
-const Alert = ({ type = 'error', message }) => {
+// `action` (e.g. a retry button) renders on the right of the message.
+const Alert = ({ type = 'error', message, action }) => {
  if (!message) return null;
 
  const colors = {
@@ -11,8 +12,8 @@ const Alert = ({ type = 'error', message }) => {
  const c = colors[type];
 
  return (
- <div className={`${c.bg} ${c.border} border rounded-md p-4`}>
- <div className="flex">
+ <div role="alert" className={`${c.bg} ${c.border} border rounded p-4`}>
+ <div className="flex items-start">
  <div className="flex-shrink-0">
  <svg className={`h-5 w-5 ${c.icon}`} viewBox="0 0 20 20" fill="currentColor">
  {type === 'error' && (
@@ -26,8 +27,9 @@ const Alert = ({ type = 'error', message }) => {
  )}
  </svg>
  </div>
- <div className="ml-3">
+ <div className="ml-3 flex flex-1 flex-wrap items-center justify-between gap-3">
  <p className={`text-sm font-medium ${c.text}`}>{message}</p>
+ {action}
  </div>
  </div>
  </div>

@@ -27,7 +27,7 @@ public class OrderOutboxWorker {
     @Transactional
     public void processOutboxEvents() {
         List<OrderOutboxEvent> pendingEvents = orderOutboxRepository.findPendingEvents(
-                List.of(OutboxStatus.PENDING, OutboxStatus.FAILED),
+                List.of(OutboxStatus.PENDING),
                 LocalDateTime.now(),
                 PageRequest.of(0, 50)
         );

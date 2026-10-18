@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Loader2, Save } from 'lucide-react';
 import { PREFLOW_WIZARD_VARIANT } from '../config/prefilterFlowUi.js';
@@ -47,8 +46,8 @@ const stepVariants = {
 };
 
 /* ── Shared chrome classes (theme tokens only) ── */
-const secondaryBtn = 'inline-flex items-center gap-2 rounded-lg border border-border bg-background-primary px-4 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50';
-const primaryBtn = 'inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-text-inverse shadow-sm transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50';
+const secondaryBtn = 'inline-flex items-center gap-2 rounded border border-border bg-background-primary px-4 py-2.5 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50';
+const primaryBtn = 'inline-flex items-center gap-2 rounded bg-primary px-6 py-2.5 text-sm font-semibold text-text-inverse transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50';
 const ListingWizard = ({
  title,
  subtitle,
@@ -203,9 +202,9 @@ const ListingWizard = ({
  <button
  type="button"
  onClick={onBack}
- className="group inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
+ className="group inline-flex items-center gap-2 rounded px-2 py-2 text-sm font-semibold text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
  >
- <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+ <ArrowLeft className="h-4 w-4 transition-transform" />
  <span>{t("cancel") || "Cancel"}</span>
  </button>
 
@@ -217,7 +216,7 @@ const ListingWizard = ({
  return (
  <div key={step.id} className="flex shrink-0 items-center gap-1.5 sm:gap-2">
  <div
- className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
+ className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 ${
  isActive
  ? 'bg-primary text-text-inverse ring-4 ring-primary/15'
  : isCompleted
@@ -243,7 +242,7 @@ const ListingWizard = ({
  })}
  </div>
 
- <span className="hidden shrink-0 items-center rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-bold text-primary-700 sm:inline-flex">
+ <span className="hidden shrink-0 items-center rounded-sm border border-primary-200 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 sm:inline-flex">
  {t("step") || "Step"} {activeStep} / {stepsList.length}
  </span>
  </div>
@@ -263,13 +262,13 @@ const ListingWizard = ({
  <div className="grid flex-1 grid-cols-1 items-start gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-8">
  {/* ── Step rail (desktop) ── */}
  <aside className="hidden lg:block">
- <div className="sticky top-20 rounded-2xl border border-border-light bg-background-primary p-4 shadow-sm">
+ <div className="sticky top-20 rounded-md border border-border-light bg-background-primary p-4 shadow-sm">
  {headerEyebrow ? (
- <span className="mb-3 inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1 text-caption font-bold uppercase tracking-wider text-primary-700">
+ <span className="mb-3 inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">
  {headerEyebrow}
  </span>
  ) : null}
- <p className="px-3 pb-2 text-caption font-bold uppercase tracking-wider text-text-muted">
+ <p className="px-3 pb-2 text-xs font-semibold text-text-muted">
  {t("steps") || "Steps"}
  </p>
  <nav className="space-y-1" aria-label={t("form_steps")}>
@@ -279,7 +278,7 @@ const ListingWizard = ({
  const goBackHere = typeof onStepPick === 'function' && step.id < activeStep;
  const rowInner = (
  <>
- <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold transition-colors duration-200 ${
+ <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-semibold transition-colors duration-200 ${
  isActive
  ? 'bg-primary text-text-inverse'
  : isCompleted
@@ -295,7 +294,7 @@ const ListingWizard = ({
  {step.title}
  </p>
  {step.description ? (
- <p className="mt-0.5 line-clamp-2 text-caption text-text-muted">
+ <p className="mt-0.5 line-clamp-2 text-xs text-text-muted">
  {step.description}
  </p>
  ) : null}
@@ -308,7 +307,7 @@ const ListingWizard = ({
  key={step.id}
  type="button"
  onClick={() => onStepPick(step.id)}
- className="flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-background-secondary"
+ className="flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-background-secondary"
  >
  {rowInner}
  </button>
@@ -317,7 +316,7 @@ const ListingWizard = ({
  return (
  <div
  key={step.id}
- className={`flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors ${
+ className={`flex items-start gap-3 rounded px-3 py-2.5 transition-colors ${
  isActive ? 'border border-border-light bg-background-secondary' : ''
  }`}
  >
@@ -330,14 +329,14 @@ const ListingWizard = ({
  </aside>
 
  {/* ── Step panel ── */}
- <section className="flex min-w-0 flex-col rounded-2xl border border-border-light bg-background-primary shadow-sm">
+ <section className="flex min-w-0 flex-col rounded-md border border-border-light bg-background-primary">
  <header className="border-b border-border-light px-5 py-5 sm:px-8 sm:py-6">
  <div className="flex items-center gap-2 lg:hidden">
- <span className="text-caption font-bold uppercase tracking-wider text-text-muted">
+ <span className="text-xs font-semibold text-text-muted">
  {t("step") || "Step"} {activeStep} / {stepsList.length}
  </span>
  </div>
- <h1 className="mt-1 text-xl font-bold tracking-tight text-text-primary sm:text-2xl lg:mt-0">
+ <h1 className="mt-1 text-xl font-semibold tracking-tight text-text-primary sm:text-2xl lg:mt-0">
  {currentStepInfo?.title || title}
  </h1>
  {(currentStepInfo?.description || subtitle) && (

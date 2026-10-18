@@ -3,11 +3,16 @@ package com.serhat.secondhand.inventory.application;
 import com.serhat.secondhand.inventory.domain.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -25,31 +30,22 @@ public class StockReservationReconciliationScheduler {
     @Scheduled(fixedDelayString = "${app.inventory.reconciliation.fixed-delay-ms:300000}", initialDelay = 60000)
     public void reconcileOrphanedStockReservations() {
         try {
-            Set<String> stockKeys = redisTemplate.keys("v4:inventory:stock:*");
-            if (stockKeys == null || stockKeys.isEmpty()) {
-                return;
+            // SCAN instead of KEYS (KEYS blocks Redis); reservations are summed per listing in one pass
+            Map<String, Integer> reservedByListing = new HashMap<>();
+            for (String resKey : scan("v4:inventory:reservation:*")) {
+                String val = redisTemplate.opsForValue().get(resKey);
+                if (val != null) {
+                    reservedByListing.merge(resKey.substring(resKey.lastIndexOf(':') + 1), Integer.parseInt(val), Integer::sum);
+                }
             }
 
-            for (String stockKey : stockKeys) {
+            for (String stockKey : scan("v4:inventory:stock:*")) {
                 String listingIdStr = stockKey.replace("v4:inventory:stock:", "");
                 try {
                     UUID listingId = UUID.fromString(listingIdStr);
 
-                    // Find all active reservation keys for this listing
-                    Set<String> activeReservations = redisTemplate.keys("v4:inventory:reservation:*:" + listingIdStr);
-                    int totalReservedInRedis = 0;
-                    if (activeReservations != null) {
-                        for (String resKey : activeReservations) {
-                            String val = redisTemplate.opsForValue().get(resKey);
-                            if (val != null) {
-                                totalReservedInRedis += Integer.parseInt(val);
-                            }
-                        }
-                    }
-
-                    // If NO active reservations exist for this listing in Redis,
-                    // Redis stock must strictly match PostgreSQL DB availableQuantity!
-                    if (totalReservedInRedis == 0) {
+                    // With no active reservations, Redis stock must match the DB availableQuantity
+                    if (reservedByListing.getOrDefault(listingIdStr, 0) == 0) {
                         inventoryRepository.findByListingId(listingId).ifPresent(inventory -> {
                             int dbStock = inventory.getAvailableQuantity();
                             String currentRedisVal = redisTemplate.opsForValue().get(stockKey);
@@ -67,5 +63,13 @@ public class StockReservationReconciliationScheduler {
         } catch (Exception ex) {
             log.error("Error during stock reservation reconciliation", ex);
         }
+    }
+
+    private List<String> scan(String pattern) {
+        List<String> keys = new ArrayList<>();
+        try (Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match(pattern).count(500).build())) {
+            cursor.forEachRemaining(keys::add);
+        }
+        return keys;
     }
 }

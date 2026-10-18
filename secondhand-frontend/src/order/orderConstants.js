@@ -26,6 +26,8 @@ export const ORDER_QUERY_KEYS = Object.freeze({
 
  orderShipment: (scope, orderId) => ['orderShipment', scope, orderId],
  detail: (orderId, isSellerView) => ['orders', 'detail', { orderId, isSellerView }],
+ byNumber: (orderNumber) => ['orders', 'byNumber', orderNumber],
+ itemReviews: (orderItemIds) => ['orders', 'itemReviews', orderItemIds],
 });
 
 export const getLastUpdateInfo = (order) => {

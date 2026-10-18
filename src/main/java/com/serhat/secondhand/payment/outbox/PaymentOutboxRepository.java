@@ -18,6 +18,12 @@ public interface PaymentOutboxRepository extends JpaRepository<PaymentOutboxEven
             Pageable pageable
     );
 
+    // SKIP LOCKED (-2): another instance already claimed this row
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.QueryHints(@jakarta.persistence.QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2"))
+    @org.springframework.data.jpa.repository.Query("SELECT e FROM PaymentOutboxEvent e WHERE e.id = :id")
+    java.util.Optional<PaymentOutboxEvent> findByIdForUpdate(@org.springframework.data.repository.query.Param("id") UUID id);
+
     @Modifying
     @Query("DELETE FROM PaymentOutboxEvent e WHERE e.status = :status AND e.processedAt < :cutoff")
     int deleteByStatusAndProcessedAtBefore(@Param("status") OutboxStatus status, @Param("cutoff") LocalDateTime cutoff);

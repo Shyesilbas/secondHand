@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
@@ -38,7 +38,7 @@ const ListingCardActions = ({
             e.stopPropagation();
             setIsModalOpen(true);
           }}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold uppercase tracking-wider transition-all cursor-pointer shadow-sm hover:shadow active:scale-[0.99]"
+          className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-full"
         >
           <Settings className="w-4 h-4" />
           <span>{t("open_management_panel", "Hızlı İşlemleri Aç (Fiyat, Stok, Vitrin)")}</span>
@@ -50,7 +50,7 @@ const ListingCardActions = ({
             e.stopPropagation();
             setIsModalOpen(true);
           }} 
-          className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all border border-slate-200 cursor-pointer active:scale-95" 
+          className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 w-8" 
           title={t("manage_listing", "İlanı Yönet")}
         >
           <Settings className="w-4 h-4" />

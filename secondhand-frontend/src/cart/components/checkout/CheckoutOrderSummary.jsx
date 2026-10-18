@@ -23,22 +23,22 @@ const CheckoutOrderSummary = ({
 
   return (
     <aside className="sticky top-24">
-      <div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300">
+      <div className="overflow-hidden rounded-md border border-border/90 bg-white transition-all duration-300">
         {/* ── Header ─────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 bg-slate-50/60">
+        <div className="flex items-center justify-between border-b border-border-light px-5 py-4 bg-background-secondary/60">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="h-4 w-4 text-slate-900" />
-            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+            <ShoppingBag className="h-4 w-4 text-text-primary" />
+            <h3 className="text-xs font-semibold text-text-primary">
               {t("order_summary", "Sipariş Özeti")}
             </h3>
           </div>
-          <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-xs">
+          <span className="text-xs font-semibold text-text-secondary bg-white px-2.5 py-0.5 rounded-sm border border-border">
             {cartCount} {cartCount === 1 ? 'Ürün' : 'Ürün'}
           </span>
         </div>
 
         {/* ── Ürün - Fiyat - Satıcı Listesi ───────────────────────── */}
-        <div className="max-h-[min(380px,45vh)] overflow-y-auto divide-y divide-slate-100 px-5">
+        <div className="max-h-[min(380px,45vh)] overflow-y-auto divide-y divide-border-light px-5">
           {cartItems.map((item) => {
             const isOffer = !!item.isOffer;
             const hasCampaign = !isOffer && item.listing?.campaignId && item.listing?.campaignPrice != null && parseFloat(item.listing?.campaignPrice) < parseFloat(item.listing?.price);
@@ -53,7 +53,7 @@ const CheckoutOrderSummary = ({
                 {/* Ürün & Fiyat Üst Sıra */}
                 <div className="flex items-start gap-3">
                   {/* Thumbnail */}
-                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center">
+                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded border border-border bg-background-secondary flex items-center justify-center">
                     {item.listing?.imageUrl ? (
                       <img
                         src={item.listing?.imageUrl}
@@ -65,18 +65,18 @@ const CheckoutOrderSummary = ({
                         }}
                       />
                     ) : null}
-                    <span className={`text-xs font-bold text-slate-400 ${item.listing?.imageUrl ? 'hidden' : 'flex'}`}>
+                    <span className={`text-xs font-semibold text-text-muted ${item.listing?.imageUrl ? 'hidden' : 'flex'}`}>
                       {item.listing?.title ? item.listing.title.charAt(0).toUpperCase() : 'P'}
                     </span>
                   </div>
 
                   {/* Title & Quantity */}
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-xs font-bold text-slate-900 leading-snug">
+                    <p className="line-clamp-2 text-xs font-semibold text-text-primary leading-snug">
                       {item.listing?.title}
                     </p>
                     {isOffer && (
-                      <span className="inline-block mt-0.5 text-[9px] font-extrabold uppercase tracking-wider text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                      <span className="inline-block mt-0.5 text-xs font-semibold text-text-primary bg-background-tertiary px-1.5 py-0.5 rounded border border-border">
                         {t("offer", "Özel Teklif")}
                       </span>
                     )}
@@ -84,24 +84,24 @@ const CheckoutOrderSummary = ({
 
                   {/* Fiyat (Line total) */}
                   <div className="shrink-0 text-right">
-                    <span className="block text-xs font-black text-slate-900">
+                    <span className="block text-xs font-semibold text-text-primary">
                       {formatCurrency(lineTotal, item.listing?.currency || currency)}
                     </span>
-                    <span className="block text-[11px] text-slate-400 font-medium">
+                    <span className="block text-xs text-text-muted font-medium">
                       {item.quantity} × {formatCurrency(unitPrice, item.listing?.currency || currency)}
                     </span>
                   </div>
                 </div>
 
                 {/* Satıcı Bilgisi (Seller Pill) */}
-                <div className="flex items-center justify-between text-[11px] bg-slate-50 border border-slate-100 rounded-lg px-2.5 py-1">
-                  <div className="flex items-center gap-1.5 text-slate-600 truncate">
-                    <Store className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                    <span className="text-slate-400">Satıcı:</span>
-                    <strong className="text-slate-800 font-semibold truncate">{sellerFullName}</strong>
+                <div className="flex items-center justify-between text-xs bg-background-secondary border border-border-light rounded px-2.5 py-1">
+                  <div className="flex items-center gap-1.5 text-text-secondary truncate">
+                    <Store className="h-3.5 w-3.5 text-text-tertiary shrink-0" />
+                    <span className="text-text-muted">Satıcı:</span>
+                    <strong className="text-text-primary font-semibold truncate">{sellerFullName}</strong>
                   </div>
                   {item.listing?.city && (
-                    <span className="text-slate-400 font-medium text-[10px] shrink-0">
+                    <span className="text-text-muted font-medium text-xs shrink-0">
                       {item.listing.city}
                     </span>
                   )}
@@ -112,53 +112,53 @@ const CheckoutOrderSummary = ({
         </div>
 
         {/* ── Özet Fiyat Kırılımı ─────────────────────────────────── */}
-        <div className="border-t border-slate-100 bg-slate-50/40 p-5 space-y-3 text-xs">
-          <div className="flex justify-between items-center text-slate-600 font-medium">
+        <div className="border-t border-border-light bg-background-secondary/40 p-5 space-y-3 text-xs">
+          <div className="flex justify-between items-center text-text-secondary font-medium">
             <span>{t("subtotal", "Ara Toplam")}</span>
-            <span className="font-bold text-slate-900">
+            <span className="font-semibold text-text-primary">
               {formatCurrency(originalSubtotal != null ? originalSubtotal : subtotal, currency)}
             </span>
           </div>
 
           {totalDiscounts > 0 && (
-            <div className="flex justify-between items-center text-emerald-700 font-semibold bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-100">
+            <div className="flex justify-between items-center text-status-success-text font-semibold bg-background-secondary/80 px-2.5 py-1 rounded border border-border">
               <span className="flex items-center gap-1">
                 <Tag className="h-3 w-3" />
                 <span>Toplam İndirim</span>
               </span>
-              <span className="font-black">
+              <span className="font-semibold">
                 −{formatCurrency(totalDiscounts, currency)}
               </span>
             </div>
           )}
 
-          <div className="flex justify-between items-center text-slate-600 font-medium">
+          <div className="flex justify-between items-center text-text-secondary font-medium">
             <span>{t("shipping", "Kargo Bedeli")}</span>
-            <span className="font-bold text-emerald-700">{t("free", "Ücretsiz")}</span>
+            <span className="font-semibold text-status-success-text">{t("free", "Ücretsiz")}</span>
           </div>
 
-          <div className="flex justify-between items-center text-slate-600 font-medium">
+          <div className="flex justify-between items-center text-text-secondary font-medium">
             <span>{t("tax", "KDV & Hizmet Bedeli")}</span>
-            <span className="font-bold text-slate-900">Dahil</span>
+            <span className="font-semibold text-text-primary">Dahil</span>
           </div>
 
           {/* Toplam Tutar */}
-          <div className="border-t border-slate-200 pt-3 flex items-baseline justify-between gap-4">
+          <div className="border-t border-border pt-3 flex items-baseline justify-between gap-4">
             <div>
-              <span className="text-xs font-black uppercase tracking-wider text-slate-900 block">
+              <span className="text-xs font-semibold text-text-primary block">
                 {t("total", "Toplam Tutar")}
               </span>
-              <span className="text-[10px] text-slate-400 font-medium">Vergiler Dahil</span>
+              <span className="text-xs text-text-muted font-medium">Vergiler Dahil</span>
             </div>
-            <span className="text-xl font-black text-slate-900">
+            <span className="text-xl font-semibold text-text-primary">
               {formatCurrency(total, currency)}
             </span>
           </div>
         </div>
 
         {/* ── Güvenlik Mührü ─────────────────────────────────────── */}
-        <div className="border-t border-slate-100 bg-slate-50/50 px-5 py-2.5 text-center flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+        <div className="border-t border-border-light bg-background-secondary/50 px-5 py-2.5 text-center flex items-center justify-center gap-2 text-xs font-semibold text-text-tertiary">
+          <ShieldCheck className="h-3.5 w-3.5 text-status-success-text" />
           <span>256-Bit SSL · Escrow Güvenli Havuz</span>
         </div>
       </div>

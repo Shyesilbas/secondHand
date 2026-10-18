@@ -28,10 +28,6 @@ export const chatService = {
  return put(API_ENDPOINTS.CHAT.MARK_READ(chatRoomId));
  },
 
- getAllUserMessages: async (page = CHAT_DEFAULTS.MESSAGE_PAGE, size = CHAT_DEFAULTS.MESSAGE_PAGE_SIZE) => {
- return get(API_ENDPOINTS.CHAT.ALL_USER_MESSAGES, { params: { page, size } });
- },
-
  getTotalUnreadMessageCount: async () => {
  return get(API_ENDPOINTS.CHAT.TOTAL_UNREAD_COUNT);
  },
@@ -42,10 +38,6 @@ export const chatService = {
 
  deleteMessage: async (messageId) => {
  return del(API_ENDPOINTS.CHAT.DELETE_MESSAGE(messageId));
- },
-
- sendInChatOffer: async (chatRoomId, offerData) => {
- return post(`/api/v1/chats/rooms/${chatRoomId}/offers`, offerData);
  }
 
 };

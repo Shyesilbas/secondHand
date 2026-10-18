@@ -4,7 +4,6 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {AuthProvider} from './auth/AuthProvider.jsx';
 import {NotificationProvider} from './notification/NotificationProvider.jsx';
 import {InAppNotificationProvider} from './notification/InAppNotificationProvider.jsx';
-import {EnumProvider} from './common/contexts/EnumProvider.jsx';
 import {ComparisonProvider} from './comparison/contexts/ComparisonProvider.jsx';
 import {ReservationModalProvider} from './cart/context/ReservationModalProvider.jsx';
 import ErrorBoundary from './common/components/ErrorBoundary.jsx';
@@ -12,11 +11,6 @@ import AppRoutes from './common/routes/AppRoutes';
 
 const CompareFloatingBar = lazy(() => import('./comparison/components/CompareFloatingBar.jsx'));
 const CompareModal = lazy(() => import('./comparison/components/CompareModal.jsx'));
-const SafeMeetupOnboardingModal = lazy(() =>
- import('./order/components/shared/SafeMeetupOnboardingModal.jsx').then((m) => ({
- default: m.SafeMeetupOnboardingModal,
- }))
-);
 
 
 const queryClient = new QueryClient({
@@ -37,7 +31,6 @@ function App() {
  <QueryClientProvider client={queryClient}>
  <Router>
  <AuthProvider>
- <EnumProvider>
  <NotificationProvider>
  <InAppNotificationProvider>
  <ComparisonProvider>
@@ -47,14 +40,12 @@ function App() {
  <Suspense fallback={null}>
  <CompareFloatingBar />
  <CompareModal />
- <SafeMeetupOnboardingModal />
  </Suspense>
  </div>
  </ReservationModalProvider>
  </ComparisonProvider>
  </InAppNotificationProvider>
  </NotificationProvider>
- </EnumProvider>
  </AuthProvider>
  </Router>
  </QueryClientProvider>

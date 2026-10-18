@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useMemo, useRef, useEffect, memo } from 'react';
+import { useState, useMemo, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
@@ -53,25 +53,25 @@ const ListingCard = ({
    if (activeViewers > 0) {
      list.push({
        id: 'viewers',
-       icon: <Eye className="w-2.5 h-2.5 text-amber-400" />,
+       icon: <Eye className="w-2.5 h-2.5 text-status-warning" />,
        text: `${activeViewers} kişi inceledi`,
-       bg: 'bg-slate-900/90 text-white'
+       bg: 'bg-primary/90 text-white'
      });
    }
    if (cardFavoriteCount > 0) {
      list.push({
        id: 'favorites',
-       icon: <Heart className="w-2.5 h-2.5 text-rose-400 fill-rose-400" />,
+       icon: <Heart className="w-2.5 h-2.5 text-status-error fill-status-error" />,
        text: `${cardFavoriteCount} kişi favoriledi`,
-       bg: 'bg-rose-900/90 text-white'
+       bg: 'bg-status-error/90 text-white'
      });
    }
    if (cartReservations > 0) {
      list.push({
        id: 'cart',
-       icon: <Flame className="w-2.5 h-2.5 text-amber-300 fill-amber-300" />,
+       icon: <Flame className="w-2.5 h-2.5 text-status-warning fill-status-warning" />,
        text: `${cartReservations} kişi sepete ekledi`,
-       bg: 'bg-amber-600/95 text-white animate-pulse'
+       bg: 'bg-status-warning/95 text-white animate-pulse'
      });
    }
    return list;
@@ -119,22 +119,22 @@ const ListingCard = ({
  switch (status) {
  case LISTING_STATUS.ACTIVE:
  return {
- cls: 'bg-slate-900 text-white font-bold shadow-xs',
+ cls: 'bg-primary text-white font-semibold',
  label: 'Active'
  };
  case LISTING_STATUS.SOLD:
  return {
- cls: 'bg-status-error-bg text-status-error font-bold',
+ cls: 'bg-background-secondary text-status-error-text font-semibold',
  label: 'Sold'
  };
  case LISTING_STATUS.PENDING:
  return {
- cls: 'bg-status-warning-bg text-status-warning font-bold',
+ cls: 'bg-background-secondary text-status-warning-text font-semibold',
  label: 'Pending'
  };
  default:
  return {
- cls: 'bg-slate-100 text-slate-700 font-bold',
+ cls: 'bg-background-tertiary text-text-secondary font-semibold',
  label: status
  };
  }
@@ -171,12 +171,12 @@ const ListingCard = ({
   onMouseEnter={handleCardMouseEnter}
   onMouseLeave={handleCardMouseLeave}
   className={`group relative flex flex-col h-full
- bg-background-primary rounded-2xl
- border transition-[transform,box-shadow,border-color] duration-200 ease-out
- hover:shadow-xl hover:-translate-y-1
+ bg-background-primary rounded-md
+ border transition duration-200 ease-out
+
  ${isOutOfStock ? 'opacity-55' : ''}
- ${isSelectable && isInShowcase ? 'opacity-40 grayscale-[0.5] cursor-not-allowed' : ''}
- ${isSelected ? 'border-primary ring-2 ring-primary/20 shadow-lg shadow-indigo-100' : isInCompare ? 'border-primary shadow-md shadow-indigo-100 ring-2 ring-primary-200' : 'border-border-light/80 shadow-sm hover:border-slate-300'}
+ ${isSelectable && isInShowcase ? 'opacity-40 grayscale cursor-not-allowed' : ''}
+ ${isSelected ? 'border-primary ring-2 ring-primary/20' : isInCompare ? 'border-primary ring-2 ring-primary-200' : 'border-border-light/80 hover:border-card-border-hover'}
  `}>
  {isSelectable && <div className="absolute inset-0 z-40 cursor-pointer" onClick={e => {
  e.preventDefault();
@@ -185,7 +185,7 @@ const ListingCard = ({
  }} />}
 
  {/* Top-right action buttons */}
- <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2 md:group-hover:translate-x-0">
+ <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2">
  {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
  <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} size="sm" showCount={false} />
  {canAddToCart && <button onClick={e => {
@@ -194,10 +194,10 @@ const ListingCard = ({
  if (!itemIsInCart) {
  addToCart(listing.id);
  }
- }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded-full backdrop-blur shadow-sm flex items-center justify-center transition-colors ${
+ }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-colors ${
  itemIsInCart
- ? 'bg-status-success-bg/20 text-status-success cursor-default'
- : 'bg-background-primary/90 text-slate-500 hover:text-primary hover:bg-background-primary'
+ ? 'bg-background-secondary text-status-success-text cursor-default'
+ : 'bg-background-primary/90 text-text-tertiary hover:text-primary hover:bg-background-primary'
  }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
  {isAddingToCart ? (
  <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -211,7 +211,7 @@ const ListingCard = ({
  e.preventDefault();
  e.stopPropagation();
  setIsOfferModalOpen(true);
- }} className="w-8 h-8 rounded-full bg-background-primary/90 backdrop-blur shadow-sm flex items-center justify-center text-slate-500 hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
+ }} className="w-8 h-8 rounded bg-background-primary shadow-sm flex items-center justify-center text-text-tertiary hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
  <HandCoins className="w-3.5 h-3.5" />
  </button>}
  <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
@@ -219,31 +219,31 @@ const ListingCard = ({
  </div>
 
  {/* Image */}
- <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden rounded-t-2xl">
+ <div className="relative aspect-4/3 bg-background-tertiary overflow-hidden rounded-t-md">
  {listing.imageUrl ? <img src={optimizeCloudinaryUrl(listing.imageUrl, {
  width: 400,
  height: 300
- })} alt={listing.title} loading={priorityImage ? 'eager' : 'lazy'} fetchPriority={priorityImage ? 'high' : 'auto'} decoding="async" className="w-full h-full object-cover transition-transform duration-200 ease-out motion-reduce:transition-none motion-reduce:group-hover:scale-100 group-hover:scale-105" onError={e => {
+ })} alt={listing.title} loading={priorityImage ? 'eager' : 'lazy'} fetchPriority={priorityImage ? 'high' : 'auto'} decoding="async" className="w-full h-full object-cover transition-transform duration-200 ease-out motion-reduce:transition-none" onError={e => {
  e.target.style.display = 'none';
  e.target.nextSibling.style.display = 'flex';
  }} /> : null}
- <div className={`w-full h-full flex flex-col items-center justify-center text-slate-300 bg-slate-100 ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+ <div className={`w-full h-full flex flex-col items-center justify-center text-secondary-300 bg-background-tertiary ${listing.imageUrl ? 'hidden' : 'flex'}`}>
  <ImageIcon className="w-8 h-8" />
  </div>
 
  {/* Gradient overlay */}
- <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+ <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
   {/* Top-left badges */}
   <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 items-start">
-  {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-full text-caption font-bold uppercase tracking-wide ${statusConfig.cls}`}>
+  {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-semibold ${statusConfig.cls}`}>
   {statusConfig.label}
   </span>}
-  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md">
+  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-status-warning text-white">
   <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
-  {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm">
-  <Award className="w-3 h-3 shrink-0 text-amber-600" />{t("great_seller")}</span>}
-  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500 text-white shadow-sm ">
+  {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-status-warning-text border border-border">
+  <Award className="w-3 h-3 shrink-0 text-status-warning-text" />{t("great_seller")}</span>}
+  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-status-error text-white ">
   <TrendingDown className="w-3 h-3" />
   -{discountPct}%
   </span>}
@@ -254,7 +254,7 @@ const ListingCard = ({
   e.preventDefault();
   e.stopPropagation();
   setShowInfo(true);
-  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-background-primary/95 backdrop-blur text-caption font-semibold text-slate-700 shadow-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-slate-900 hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded bg-background-primary text-xs font-semibold text-text-secondary shadow-md opacity-0 group-hover:opacity-100 translate-y-2 transition-all duration-300 hover:bg-primary hover:text-white flex items-center gap-1.5 whitespace-nowrap">
   <Eye className="w-3 h-3" />{t("quick_view")}</button>
   </div>
 
@@ -267,42 +267,42 @@ const ListingCard = ({
   </h3>
 
   {/* Reviews: en az bir değerlendirme veya puan varsa göster */}
-  {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-[18px]">
+  {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-4">
   <div className="flex shrink-0" aria-hidden>
-  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-amber-400 fill-current' : 'text-slate-200'}`} />)}
+  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-status-warning fill-current' : 'text-secondary-200'}`} />)}
   </div>
-  <span className="text-caption text-slate-500 tabular-nums leading-none">
-  <span className="font-medium text-slate-600">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
-  {reviewCount > 0 && <span className="text-slate-400"> ({reviewCount})</span>}
+  <span className="text-xs text-text-tertiary tabular-nums leading-none">
+  <span className="font-medium text-text-secondary">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
+  {reviewCount > 0 && <span className="text-text-muted"> ({reviewCount})</span>}
   </span>
   </div>}
 
   {/* Price row */}
   <div className="flex items-end gap-2 flex-wrap mb-1">
-  <span className={`text-base font-bold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-slate-400' : ''}`}>
+  <span className={`text-base font-semibold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-text-muted' : ''}`}>
   {formatCurrency(displayPrice, listing.currency)}
   </span>
-  {hasCampaign && <span className="text-caption text-slate-400 line-through font-medium">
+  {hasCampaign && <span className="text-xs text-text-muted line-through font-medium">
   {formatCurrency(listing.price, listing.currency)}
   </span>}
   </div>
 
   {/* Campaign tag */}
-  {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-caption font-semibold border border-rose-100 mb-1.5">
+  {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-sm bg-background-secondary text-status-error-text text-xs font-semibold border border-border mb-1.5">
   {listing.campaignName || 'Campaign'}
   </span>}
 
   {/* Stock badge & Sequential Social Proof Micro-Story */}
-  <div className="flex flex-wrap items-center gap-1.5 mb-1.5 min-h-[22px]">
-    {hasStockInfo && <span className={`self-start inline-flex items-center rounded-full px-2 py-0.5 text-caption font-semibold shrink-0 ${isOutOfStock ? 'bg-rose-50 text-rose-600 border border-rose-100' : isLowStock ? 'bg-status-warning-bg text-amber-700 border border-amber-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
-      {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `🔥 Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
+  <div className="flex flex-wrap items-center gap-1.5 mb-1.5 min-h-5">
+    {hasStockInfo && <span className={`self-start inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-semibold shrink-0 ${isOutOfStock ? 'bg-background-secondary text-status-error-text border border-border' : isLowStock ? 'bg-background-secondary text-status-warning-text border border-border' : 'bg-background-secondary text-text-tertiary border border-border-light'}`}>
+      {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
     </span>}
 
     {/* Dynamic Sequential Micro-Story Ticker */}
     {currentStory && (
       <span
         key={currentStory.id}
-        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-xs transition-all duration-300 transform scale-100 ${currentStory.bg}`}
+        className={`inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold transition-all duration-300 transform scale-100 ${currentStory.bg}`}
       >
         {currentStory.icon}
         <span>{currentStory.text}</span>
@@ -311,27 +311,27 @@ const ListingCard = ({
   </div>
 
  {/* Description */}
- {listing.description && <p className="text-caption text-slate-400 line-clamp-2 leading-relaxed mb-2">
+ {listing.description && <p className="text-xs text-text-muted line-clamp-2 leading-relaxed mb-2">
  {listing.description}
  </p>}
 
  {/* Footer */}
- <div className="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+ <div className="mt-auto pt-2.5 border-t border-border-light flex items-center justify-between gap-2">
  {listing.sellerName ? <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
- <div className="w-5 h-5 shrink-0 rounded-full bg-primary-50 flex items-center justify-center text-[9px] font-bold text-primary">
+ <div className="w-5 h-5 shrink-0 rounded bg-primary-50 flex items-center justify-center text-xs font-semibold text-primary">
  {listing.sellerName[0]?.toUpperCase()}
  </div>
- <span className="text-caption font-medium text-slate-500 truncate max-w-[88px]" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
+ <span className="text-xs font-medium text-text-tertiary truncate max-w-20" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
  {listing.sellerName}
  </span>
  {isGreatSeller && <Award className="w-3 h-3 text-status-warning shrink-0" aria-label={t("great_seller")} />}
  </div> : <div />}
  <div className="flex items-center gap-2.5 ml-auto">
- {listing.city && <div className="flex items-center gap-0.5 text-caption text-slate-400">
+ {listing.city && <div className="flex items-center gap-0.5 text-xs text-text-muted">
  <MapPin className="w-2.5 h-2.5 shrink-0" />
- <span className="truncate max-w-[56px]">{listing.city}</span>
+ <span className="truncate max-w-14">{listing.city}</span>
  </div>}
- <div className="flex items-center gap-0.5 text-caption text-slate-400">
+ <div className="flex items-center gap-0.5 text-xs text-text-muted">
  <Heart className="w-2.5 h-2.5 shrink-0 fill-current" />
  <span>{cardFavoriteCount}</span>
  </div>

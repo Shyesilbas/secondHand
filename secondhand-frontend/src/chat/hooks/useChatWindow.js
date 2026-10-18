@@ -42,7 +42,6 @@ export const useChatWindow = ({ selectedChatRoom, onSendMessage }) => {
  };
 };
 
-export default useChatWindow;
 
 
 

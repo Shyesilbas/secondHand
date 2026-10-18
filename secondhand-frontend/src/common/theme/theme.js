@@ -219,25 +219,3 @@ export const theme = {
  },
 };
 
-export const getThemeColor = (path) => {
- const keys = path.split('.');
- let value = theme;
- 
- for (const key of keys) {
- value = value?.[key];
- if (value === undefined) return null;
- }
- 
- return value;
-};
-
-export const getColorClass = (colorPath, type = 'bg') => {
- const color = getThemeColor(colorPath);
- if (!color) return '';
- 
- if (typeof color === 'string') {
- return `${type}-[${color}]`;
- }
- 
- return `${type}-${color.DEFAULT || color}`;
-};

@@ -1,6 +1,16 @@
 import { useTranslation } from "react-i18next";
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
+import { Button, Modal } from '../common/components/ui/index.js';
+
+const TYPE_ICON = {
+ success: [CheckCircle2, 'text-status-success'],
+ error: [XCircle, 'text-status-error'],
+ warning: [AlertTriangle, 'text-status-warning'],
+ info: [Info, 'text-text-tertiary']
+};
+
+// Without a close button the dialog only closes through its actions (e.g. a confirm that must reset caller state).
 const NotificationModal = ({
  isOpen,
  onClose,
@@ -17,163 +27,34 @@ const NotificationModal = ({
  const {
  t
  } = useTranslation();
- const [isVisible, setIsVisible] = useState(false);
- const [isLeaving, setIsLeaving] = useState(false);
- const [progressKey, setProgressKey] = useState(0);
- const handleClose = useCallback(() => {
- setIsLeaving(true);
- setTimeout(() => {
- setIsVisible(false);
- onClose?.();
- }, 300);
- }, [onClose]);
  useEffect(() => {
- if (isOpen) {
- setIsVisible(true);
- setIsLeaving(false);
- setProgressKey(prev => prev + 1);
- if (autoClose && autoCloseDelay > 0) {
- const timer = setTimeout(() => {
- handleClose();
- }, autoCloseDelay);
+ if (!isOpen || !autoClose || autoCloseDelay <= 0) return undefined;
+ const timer = setTimeout(() => onClose?.(), autoCloseDelay);
  return () => clearTimeout(timer);
- }
- }
- }, [isOpen, autoClose, autoCloseDelay, handleClose]);
- const handleBackdropClick = e => {
- if (e.target === e.currentTarget) {
- handleClose();
- }
- };
- const config = useMemo(() => {
- switch (type) {
- case 'success':
- return {
- icon: CheckCircle2,
- iconWrap: 'bg-status-success-bg text-status-success',
- heading: 'text-text-primary',
- text: 'text-slate-500',
- primaryButton: 'bg-status-success-bg hover:bg-status-success-bg text-white',
- secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
- progress: 'bg-status-success-bg'
- };
- case 'error':
- return {
- icon: XCircle,
- iconWrap: 'bg-rose-100 text-rose-600',
- heading: 'text-text-primary',
- text: 'text-slate-500',
- primaryButton: 'bg-rose-600 hover:bg-rose-700 text-white',
- secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
- progress: 'bg-rose-500'
- };
- case 'warning':
- return {
- icon: AlertTriangle,
- iconWrap: 'bg-status-warning-bg text-status-warning',
- heading: 'text-text-primary',
- text: 'text-slate-500',
- primaryButton: 'bg-status-warning-bg hover:bg-status-warning-bg text-white',
- secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
- progress: 'bg-status-warning-bg'
- };
- case 'info':
- default:
- return {
- icon: Info,
- iconWrap: 'bg-primary-50 text-primary',
- heading: 'text-text-primary',
- text: 'text-slate-500',
- primaryButton: 'bg-primary hover:bg-primary text-white',
- secondaryButton: 'bg-slate-100 hover:bg-slate-200 text-slate-700',
- progress: 'bg-primary'
- };
- }
- }, [type]);
- const IconComponent = config.icon;
- const getSizeClasses = () => {
- switch (size) {
- case 'sm':
- return 'max-w-md';
- case 'lg':
- return 'max-w-2xl';
- case 'xl':
- return 'max-w-4xl';
- case 'md':
- default:
- return 'max-w-lg';
- }
- };
- if (!isOpen && !isVisible) return null;
- return <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center z-[80] p-4" onClick={handleBackdropClick}>
- <div className={`relative bg-background-primary rounded-2xl border border-border-light shadow-2xl ${getSizeClasses()} w-full transform transition-all duration-300 overflow-hidden ${isLeaving ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
- {/* Close button */}
- {showCloseButton && <div className="absolute right-4 top-4 z-10">
- <button type="button" className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center" onClick={handleClose}>
- <span className="sr-only">{t("close")}</span>
- <X className="h-4 w-4" aria-hidden="true" />
- </button>
- </div>}
-
- {/* Content */}
- <div className="p-6 sm:p-7">
- <div className="flex items-start gap-4">
- {/* Icon */}
- <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${config.iconWrap}`}>
- <IconComponent className="w-6 h-6" />
- </div>
- 
- {/* Text content */}
- <div className="flex-1">
- {title && <h3 className={`text-sm font-medium text-text-primary ${config.heading} mb-1.5 pr-10`}>
- {title}
- </h3>}
- {message && <div className={`text-sm leading-relaxed ${config.text} mb-4`}>
- <p>{message}</p>
- </div>}
- {details && <details className="mt-3">
- <summary className={`cursor-pointer text-sm font-semibold ${config.heading} hover:underline`}>{t("show_details")}</summary>
- <div className="mt-2 p-3 bg-slate-50 rounded-xl border border-border-light">
- <pre className="text-xs text-slate-600 whitespace-pre-wrap ">
- {typeof details === 'object' ? JSON.stringify(details, null, 2) : details}
- </pre>
- </div>
- </details>}
- </div>
- </div>
- </div>
-
- {/* Actions */}
- {(actions.length > 0 || !autoClose) && <div className="px-6 sm:px-7 py-4 bg-slate-50 border-t border-slate-100 flex flex-row-reverse gap-2.5">
- {actions.map((action, index) => <button key={`action-${action.label || ''}-${index}`} type="button" className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${action.primary ? config.primaryButton : config.secondaryButton}`} onClick={() => {
+ }, [isOpen, autoClose, autoCloseDelay, onClose]);
+ const close = () => onClose?.();
+ const [Icon, iconColor] = TYPE_ICON[type] || TYPE_ICON.info;
+ const header = <header className="flex items-start gap-3 border-b border-border-light px-5 py-4">
+ <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} strokeWidth={1.5} aria-hidden />
+ <h2 className="flex-1 text-base font-semibold text-text-primary">{title}</h2>
+ {showCloseButton && <button type="button" onClick={close} aria-label={t("close")} className="rounded p-1 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+ <X className="h-4 w-4" strokeWidth={1.5} />
+ </button>}
+ </header>;
+ const footer = actions.length > 0 ? actions.map((action, index) => <Button key={`action-${action.label || ''}-${index}`} variant={action.primary ? 'primary' : 'secondary'} onClick={() => {
  action.onClick?.();
- if (action.closeOnClick !== false) {
- handleClose();
- }
+ if (action.closeOnClick !== false) close();
  }}>
  {action.label}
- </button>)}
- {!autoClose && actions.length === 0 && <button type="button" className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${config.primaryButton}`} onClick={handleClose}>{t("okay")}</button>}
- </div>}
-
- {/* Auto-close progress bar */}
- {autoClose && autoCloseDelay > 0 && <div className="h-1.5 bg-slate-100">
- <div key={progressKey} className={`h-full ${config.progress}`} style={{
- animation: `notification-shrink ${autoCloseDelay}ms linear forwards`
- }} />
- </div>}
- </div>
- </div>;
+ </Button>) : !autoClose ? <Button onClick={close}>{t("okay")}</Button> : null;
+ return <Modal isOpen={isOpen} onClose={showCloseButton ? close : () => {}} title={title || type} header={header} footer={footer} size={size}>
+ {message && <p className="text-sm leading-relaxed text-text-secondary">{message}</p>}
+ {details && <details className="mt-3">
+ <summary className="cursor-pointer text-sm font-medium text-text-primary hover:underline">{t("show_details")}</summary>
+ <pre className="mt-2 whitespace-pre-wrap rounded border border-border-light bg-background-secondary p-3 text-xs text-text-secondary">
+ {typeof details === 'object' ? JSON.stringify(details, null, 2) : details}
+ </pre>
+ </details>}
+ </Modal>;
 };
-const style = document.createElement('style');
-style.textContent = `
- @keyframes notification-shrink {
- from { width: 100%; }
- to { width: 0%; }
- }
-`;
-if (!document.head.querySelector('style[data-notification-animations]')) {
- style.setAttribute('data-notification-animations', 'true');
- document.head.appendChild(style);
-}
 export default NotificationModal;

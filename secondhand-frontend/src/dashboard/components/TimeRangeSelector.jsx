@@ -36,15 +36,15 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
 
  return (
  <div className="flex items-center gap-3 flex-wrap">
- <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
+ <div className="flex items-center gap-1 bg-background-tertiary rounded p-1">
  {PRESETS.map((preset) => (
  <button
  key={preset.days}
  onClick={() => handlePresetClick(preset.days)}
- className={`px-3 py-1.5 text-caption font-bold rounded-md transition-all duration-200 ${
+ className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
  activePreset === preset.days
- ? 'bg-background-primary text-text-primary shadow-sm'
- : 'text-slate-500 hover:text-slate-700'
+ ? 'bg-background-primary text-text-primary'
+ : 'text-text-tertiary hover:text-text-secondary'
  }`}
  >
  {preset.label}
@@ -52,10 +52,10 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
  ))}
  </div>
  
- <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+ <div className="h-5 w-px bg-secondary-200 hidden sm:block" />
  
  <div className="flex items-center gap-2">
- <Calendar className="w-3.5 h-3.5 text-slate-400" />
+ <Calendar className="w-3.5 h-3.5 text-text-muted" />
  <input
  type="date"
  value={startDate ? startDate.toISOString().split('T')[0] : ''}
@@ -63,9 +63,9 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
  const date = e.target.value ? new Date(e.target.value) : null;
  onStartDateChange(date);
  }}
- className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
+ className="px-2 py-1.5 text-xs text-text-secondary border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
  />
- <span className="text-caption text-slate-400 font-bold">→</span>
+ <span className="text-xs text-text-muted font-semibold">→</span>
  <input
  type="date"
  value={endDate ? endDate.toISOString().split('T')[0] : ''}
@@ -74,7 +74,7 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
  onEndDateChange(date);
  }}
  max={new Date().toISOString().split('T')[0]}
- className="px-2 py-1.5 text-caption text-slate-600 border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
+ className="px-2 py-1.5 text-xs text-text-secondary border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary bg-background-primary font-medium"
  />
  </div>
  </div>

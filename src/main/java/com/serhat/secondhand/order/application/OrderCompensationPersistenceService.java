@@ -13,12 +13,17 @@ import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.inventory.application.InventoryService;
+import com.serhat.secondhand.inventory.application.InventoryRedisReservationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderCompensationPersistenceService {
@@ -29,6 +34,7 @@ public class OrderCompensationPersistenceService {
     private final OrderRepository orderRepository;
     private final OrderLogService orderLog;
     private final InventoryService inventoryService;
+    private final InventoryRedisReservationService redisReservationService;
 
     public void persistCancellationRecordsAndRestoreStock(List<OrderItemCancel> cancelRecords) {
         orderItemCancelRepository.saveAll(cancelRecords);
@@ -63,11 +69,20 @@ public class OrderCompensationPersistenceService {
         ListingType type = item.getListingType();
         if (type == ListingType.REAL_ESTATE || type == ListingType.VEHICLE) return;
         
-        try {
-            inventoryService.restoreQuantity(listing.getId(), delta);
-            orderLog.logStockRestored(listing.getId(), delta);
-        } catch (Exception ignored) {
-            // Ignored, fallback
-        }
+        // No catch: swallowing here marks the surrounding tx rollback-only and surfaces as UnexpectedRollbackException
+        inventoryService.restoreQuantity(listing.getId(), delta);
+        orderLog.logStockRestored(listing.getId(), delta);
+        UUID listingId = listing.getId();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    redisReservationService.releaseStock(listingId, delta);
+                } catch (Exception e) {
+                    // reconciliation scheduler heals Redis drift
+                    log.warn("Redis stock restore failed for listing {}", listingId, e);
+                }
+            }
+        });
     }
 }

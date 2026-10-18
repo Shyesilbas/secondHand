@@ -72,21 +72,3 @@ export const ERROR_MESSAGES = {
  FORM_VALIDATION_ERROR: 'Please check the form fields',
 };
 
-export const ListingDTO = Object.freeze({
- id: '',
- listingNo: '',
- title: '',
- description: '',
- price: 0,
- currency: '',
- status: '',
- city: '',
- district: '',
- sellerName: '',
- sellerSurname: '',
- sellerId: 0,
- sellerGreatSellerEligible: false,
- type: '',
- createdAt: '',
- updatedAt: '',
-});

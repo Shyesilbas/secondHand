@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { useState, useEffect } from 'react';
+import { Button, Modal } from '../../common/components/ui/index.js';
 import { REVIEW_DEFAULTS, REVIEW_LIMITS, REVIEW_MESSAGES } from '../reviewConstants.js';
 import { useReviewSubmission } from '../hooks/useReviewSubmission.js';
 import { InteractiveStarRating } from './InteractiveStarRating.jsx';
@@ -29,12 +29,6 @@ const ReviewModal = ({
  clearError();
  }
  }, [isOpen, clearError]);
- useEffect(() => {
- document.body.style.overflow = isOpen ? 'hidden' : '';
- return () => {
- document.body.style.overflow = '';
- };
- }, [isOpen]);
  const handleSubmit = async e => {
  e.preventDefault();
  await submitReview({
@@ -48,64 +42,37 @@ const ReviewModal = ({
  }
  });
  };
- if (!isOpen) return null;
- const modalContent = <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4" onClick={onClose} role="presentation">
- <div className="bg-background-primary rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
- <div className="flex items-center justify-between p-6 border-b">
- <h2 className="text-lg font-semibold text-text-primary">{t("product_review")}</h2>
- <button type="button" onClick={onClose} className="text-text-muted hover:text-text-secondary transition-colors">
- <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
- </svg>
- </button>
- </div>
-
- <div className="p-6">
- <div className="mb-6 p-4 bg-secondary-light rounded-lg">
- <h3 className="text-sm font-medium text-text-primary mb-1">
+ return <Modal isOpen={isOpen} onClose={onClose} title={t("product_review")} size="sm" footer={<>
+ <Button variant="secondary" onClick={onClose}>{t("cancel")}</Button>
+ <Button type="submit" form="review-form" disabled={loading || rating < REVIEW_LIMITS.MIN_RATING}>
+ {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
+ </Button>
+ </>}>
+ <div className="mb-5 border-b border-border-light pb-4">
+ <p className="text-sm font-medium text-text-primary">
  {orderItem?.listing?.title || orderItem?.listing?.listingNo || 'Product'}
- </h3>
- <p className="text-sm text-text-secondary">{t("order_no")}{orderItem?.orderId}
  </p>
+ <p className="text-sm tabular-nums text-text-secondary">{t("order_no")}{orderItem?.orderId}</p>
  </div>
 
- <form onSubmit={handleSubmit} className="space-y-6">
- <div>
- <label className="block text-sm font-medium text-text-secondary mb-3">{t("your_rate")}</label>
- <div className="flex items-center justify-center mb-2">
- <InteractiveStarRating value={rating} onChange={setRating} variant="modal" allowDeselect className="justify-center gap-2" />
- </div>
- <p className="text-center text-sm text-text-secondary">
+ <form id="review-form" onSubmit={handleSubmit} className="space-y-5">
+ <fieldset>
+ <legend className="mb-2 text-sm font-medium text-text-primary">{t("your_rate")}</legend>
+ <InteractiveStarRating value={rating} onChange={setRating} variant="modal" allowDeselect className="gap-2" />
+ <p className="mt-1 text-sm tabular-nums text-text-secondary">
  {rating === REVIEW_DEFAULTS.INITIAL_RATING ? 'Click the stars for rating' : `${rating}/${REVIEW_LIMITS.MAX_RATING} stars`}
  </p>
- </div>
+ </fieldset>
 
  <div>
- <label htmlFor="comment" className="block text-sm font-medium text-text-secondary mb-2">{t("comment")}</label>
- <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="w-full px-4 py-3 border border-border-DEFAULT rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder={t("share_your_thoughts_about_this_product")} />
- <p className="text-xs text-text-muted mt-1 text-right">
+ <label htmlFor="review-comment" className="mb-1 block text-sm font-medium text-text-primary">{t("comment")}</label>
+ <textarea id="review-comment" value={comment} onChange={e => setComment(e.target.value)} rows={4} maxLength={REVIEW_LIMITS.MAX_COMMENT_LENGTH} className="resize-none py-2 w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" placeholder={t("share_your_thoughts_about_this_product")} />
+ <p className="mt-1 text-right text-xs tabular-nums text-text-tertiary">
  {comment.length}/{REVIEW_LIMITS.MAX_COMMENT_LENGTH}{t("characters")}</p>
  </div>
 
- {error && <div className="bg-status-error-bg border border-status-error-border rounded-lg p-4">
- <div className="flex">
- <svg className="w-5 h-5 text-status-error mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
- <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
- </svg>
- <p className="text-sm text-status-error">{error}</p>
- </div>
- </div>}
-
- <div className="flex space-x-3 pt-4">
- <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-text-secondary bg-secondary-light rounded-lg hover:bg-secondary-light/80 transition-colors font-medium">{t("cancel")}</button>
- <button type="submit" disabled={loading || rating < REVIEW_LIMITS.MIN_RATING} className="flex-1 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium">
- {loading ? REVIEW_MESSAGES.SENDING : REVIEW_MESSAGES.SEND_REVIEW}
- </button>
- </div>
+ {error && <p role="alert" className="text-sm text-status-error-text">{error}</p>}
  </form>
- </div>
- </div>
- </div>;
- return createPortal(modalContent, document.body);
+ </Modal>;
 };
 export default ReviewModal;

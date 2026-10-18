@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useBuyerDashboard } from '../hooks/useDashboard.js';
 import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
 import MetricCard from '../components/MetricCard.jsx';
@@ -30,9 +30,9 @@ const ChartCard = ({
 }} transition={{
  delay,
  duration: 0.4
-}} className="bg-background-primary rounded-2xl border border-border-light p-5 shadow-sm">
+}} className="bg-background-primary rounded-md border border-border-light p-5">
  {title && <div className="mb-4 flex items-center justify-between gap-3">
-   <h3 className="text-sm font-medium text-text-primary uppercase tracking-wider">{title}</h3>
+   <h3 className="text-sm font-medium text-text-primary">{title}</h3>
    {action}
  </div>}
  {children}
@@ -67,12 +67,10 @@ const BuyerDashboardPage = () => {
  }} animate={{
  opacity: 1
  }} className="min-h-screen bg-background-secondary flex items-center justify-center">
- <div className="text-center p-8 bg-background-primary rounded-2xl border border-border-light shadow-sm max-w-sm">
- <div className="w-14 h-14 bg-status-error-bg text-status-error rounded-xl flex items-center justify-center mx-auto mb-4">
- <ShoppingBag className="w-7 h-7" />
- </div>
- <p className="text-lg font-bold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
- <p className="text-slate-400 text-sm">{error.message}</p>
+ <div className="text-center p-8 bg-background-primary rounded-md border border-border-light max-w-sm">
+ <ShoppingBag className="mx-auto mb-4 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
+ <p className="text-lg font-semibold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
+ <p className="text-text-muted text-sm">{error.message}</p>
  </div>
  </motion.div>;
  }
@@ -89,14 +87,14 @@ const BuyerDashboardPage = () => {
  opacity: 1,
  x: 0
  }}>
- <h1 className="text-2xl font-semibold text-white tracking-tight">{t("my_purchases")}</h1>
+ <h1 className="text-2xl font-semibold text-text-primary">{t("my_purchases")}</h1>
  <div className="flex items-center gap-3 mt-0.5">
  <p className="text-xs text-text-muted font-medium">{t("track_your_spending_orders")}</p>
  {dashboard.totalFavorites > 0 && <>
  <span className="text-text-muted">·</span>
  <div className="flex items-center gap-1">
  <Heart className="w-3 h-3 text-text-muted" />
- <span className="text-caption text-text-muted font-medium">{dashboard.totalFavorites} {t("favorites_saved")}</span>
+ <span className="text-xs text-text-muted font-medium">{dashboard.totalFavorites} {t("favorites_saved")}</span>
  </div>
  </>}
  </div>
@@ -124,29 +122,27 @@ const BuyerDashboardPage = () => {
 
  {/* Primary KPIs — 4 columns */}
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
- <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" color="blue" />
- <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} color="green" />
- <MetricCard index={2} title={t("avg_order_value")} value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')} icon={TrendingUp} subtitle="Per order" color="purple" />
- <MetricCard index={3} title={t("smart_savings", "Akıllı Tasarruf")} value={formatCurrency(dashboard.totalSavings || 0, 'TRY')} icon={Sparkles} subtitle="İndirim & İkinci El Kazancı" color="amber" />
+ <MetricCard index={0} title={t("total_spending")} value={formatCurrency(dashboard.totalSpending || 0, 'TRY')} icon={DollarSign} trend={dashboard.spendingGrowth ? parseFloat(dashboard.spendingGrowth) : null} trendLabel="vs previous period" />
+ <MetricCard index={1} title={t("orders")} value={dashboard.totalOrders || 0} icon={ShoppingBag} subtitle={`${dashboard.completedOrders || 0} completed`} />
+ <MetricCard index={2} title={t("avg_order_value")} value={formatCurrency(dashboard.averageOrderValue || 0, 'TRY')} icon={TrendingUp} subtitle="Per order" />
+ <MetricCard index={3} title={t("smart_savings", "Akıllı Tasarruf")} value={formatCurrency(dashboard.totalSavings || 0, 'TRY')} icon={Sparkles} subtitle="İndirim & İkinci El Kazancı" />
  </div>
 
  {/* Outgoing Offers & Quick Actions Hub */}
  {dashboard.offerStats && (
-   <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+   <div className="bg-white rounded-md border border-border/90 p-5 flex items-center justify-between flex-wrap gap-4">
      <div className="flex items-center gap-3">
-       <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center border border-indigo-200">
-         <Tag className="w-5 h-5" />
-       </div>
+       <Tag className="h-5 w-5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden />
        <div>
-         <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">{t("my_sent_offers", "Yaptığınız Pazarlık Teklifleri")}</h4>
-         <p className="text-xs text-slate-500 mt-0.5">
-           {dashboard.offerStats.totalOffersSent || 0} teklif gönderildi · <span className="font-bold text-amber-600">{dashboard.offerStats.pendingOffers || 0} bekliyor</span> · <span className="font-bold text-emerald-600">{dashboard.offerStats.acceptedOffers || 0} kabul edildi</span>
+         <h4 className="text-xs font-semibold text-text-primary">{t("my_sent_offers", "Yaptığınız Pazarlık Teklifleri")}</h4>
+         <p className="text-xs text-text-tertiary mt-0.5">
+           {dashboard.offerStats.totalOffersSent || 0} teklif gönderildi · <span className="font-semibold text-status-warning-text">{dashboard.offerStats.pendingOffers || 0} bekliyor</span> · <span className="font-semibold text-status-success-text">{dashboard.offerStats.acceptedOffers || 0} kabul edildi</span>
          </p>
        </div>
      </div>
      <Link
        to={ROUTES.OFFERS}
-       className="inline-flex items-center gap-1 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-2xs"
+       className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
      >
        <span>{t("view_my_offers", "Tekliflerimi Gör")}</span>
        <ArrowUpRight className="w-3.5 h-3.5" />
@@ -164,7 +160,7 @@ const BuyerDashboardPage = () => {
 
  {/* Charts Row */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
- <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-2xl border border-border-light" />}>
+ <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded-md border border-border-light" />}>
  <ChartCard title={t("spending_trend")} delay={0.2}>
  <RevenueChart data={dashboard.spendingTrend || []} title={t("spending_trend")} label={t("spending")} />
  </ChartCard>
@@ -178,7 +174,7 @@ const BuyerDashboardPage = () => {
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
  <ChartCard
    title={t("orders_by_status")}
-   action={<Link to={ROUTES.MY_ORDERS} className="inline-flex items-center rounded-lg border border-border-light px-3 py-2 text-xs font-semibold text-text-primary transition-colors hover:border-primary/30 hover:text-primary">{t("my_orders")}</Link>}
+   action={<Link to={ROUTES.MY_ORDERS} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">{t("my_orders")}</Link>}
    delay={0.3}
  >
  <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
