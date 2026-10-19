@@ -5,15 +5,20 @@ import { VehicleCreateRequestDTO } from '../../vehicle/vehicles.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
 import {
  applyEngineCatalogDefaults,
+ applyGenerationCatalogDefaults,
  bodyTypeOptions,
  brandIdsForType,
  clearVehicleHierarchy,
  enginesForGeneration,
  filterModels,
  findEngine,
+ findGeneration,
  generationsForModel,
  getVehicleTypeName,
+ hasBodyType,
  isCarVehicle,
+ isCommercialVehicle,
+ isMotorcycleVehicle,
  showEngineFields,
  showGenerationFields,
  showTrimFields,
@@ -216,6 +221,8 @@ export const vehicleConfig = {
  ctx.setValue('vehicleGenerationId', value);
  ctx.setValue('vehicleEngineId', '');
  ctx.setValue('vehicleTrimId', '');
+ const gen = findGeneration(ctx.enums, value);
+ applyGenerationCatalogDefaults(gen, ctx.setValue, ctx.formData?.year);
  },
  },
  {
@@ -255,7 +262,7 @@ export const vehicleConfig = {
  label: 'Door Count',
  type: 'enum',
  enumKey: 'doors',
- visibleWhen: (ctx) => isCarVehicle(ctx),
+      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
  },
  {
  name: 'gearbox',
@@ -263,21 +270,21 @@ export const vehicleConfig = {
  type: 'enum',
  enumKey: 'gearTypes',
  required: true,
- visibleWhen: (ctx) => isCarVehicle(ctx),
+      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx) || isMotorcycleVehicle(ctx),
  },
  {
  name: 'seatCount',
  label: 'Seat Count',
  type: 'enum',
  enumKey: 'seatCounts',
- visibleWhen: (ctx) => isCarVehicle(ctx),
+      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
  },
  {
  name: 'drivetrain',
  label: 'Drivetrain',
  type: 'enum',
  enumKey: 'drivetrains',
- visibleWhen: (ctx) => isCarVehicle(ctx),
+      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
  },
  {
  name: 'bodyType',
@@ -285,7 +292,7 @@ export const vehicleConfig = {
  type: 'enum',
  enumKey: 'bodyTypes',
  required: true,
- visibleWhen: (ctx) => isCarVehicle(ctx),
+      visibleWhen: (ctx) => hasBodyType(ctx),
  },
  ],
  },
@@ -465,7 +472,7 @@ export const vehicleConfig = {
  kind: 'grid',
  dependsOn: ['brandId', 'vehicleTypeId'],
  paramKey: 'bodyType',
- visibleWhen: (ctx) => isCarVehicle(ctx),
+        visibleWhen: (ctx) => hasBodyType(ctx),
  getOptions: ({ enums, selection }) => bodyTypeOptions(enums, selection?.brandId),
  },
  {
@@ -481,7 +488,7 @@ export const vehicleConfig = {
  filterModels(enums?.vehicleModels || [], {
  brandId: selection?.brandId,
  typeId: selection?.vehicleTypeId,
- bodyType: isCarVehicle({ enums, selection }) ? selection?.bodyType : undefined,
+ bodyType: hasBodyType({ enums, selection }) ? selection?.bodyType : undefined,
  }),
  ),
  },

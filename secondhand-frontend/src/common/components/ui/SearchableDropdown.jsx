@@ -56,7 +56,12 @@ const SearchableDropdown = ({
  const searchInputRef = useRef(null);
  const getOptionValue = o => o?.id ?? o?.value ?? o?.name;
  const getOptionLabel = o => o?.label ?? o?.name ?? String(getOptionValue(o) ?? '');
- const filteredOptions = options.filter(o => getOptionLabel(o).toLowerCase().includes(searchTerm.toLowerCase()));
+ const filteredOptions = options.filter(o => {
+  const term = searchTerm.toLowerCase();
+  if (getOptionLabel(o).toLowerCase().includes(term)) return true;
+  if (Array.isArray(o?.aliases) && o.aliases.some(a => String(a).toLowerCase().includes(term))) return true;
+  return false;
+ });
  const toggleDropdown = e => {
  if (disabled) return;
  if (e && e.stopPropagation) e.stopPropagation();

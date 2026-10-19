@@ -20,19 +20,19 @@ import { formatDateTime } from '../../common/formatters.js';
 
 const renderEventIcon = (eventType, eventStatus) => {
   if (eventStatus === 'FAILURE' || eventType === 'LOGIN_FAILURE') {
-    return <ShieldAlert className="w-5 h-5 text-status-error-text" />;
+    return <ShieldAlert className="w-5 h-5 text-status-error-text" strokeWidth={1.5} />;
   }
   switch (eventType) {
     case 'LOGIN_SUCCESS':
-      return <LogIn className="w-5 h-5 text-status-success-text" />;
+      return <LogIn className="w-5 h-5 text-status-success-text" strokeWidth={1.5} />;
     case 'LOGOUT':
-      return <LogOut className="w-5 h-5 text-text-secondary" />;
+      return <LogOut className="w-5 h-5 text-text-secondary" strokeWidth={1.5} />;
     case 'PASSWORD_CHANGE_SUCCESS':
-      return <Key className="w-5 h-5 text-text-primary" />;
+      return <Key className="w-5 h-5 text-text-primary" strokeWidth={1.5} />;
     case 'PASSWORD_CHANGE_FAILURE':
-      return <KeyRound className="w-5 h-5 text-status-error-text" />;
+      return <KeyRound className="w-5 h-5 text-status-error-text" strokeWidth={1.5} />;
     default:
-      return <Shield className="w-5 h-5 text-text-primary" />;
+      return <Shield className="w-5 h-5 text-text-primary" strokeWidth={1.5} />;
   }
 };
 
@@ -41,15 +41,15 @@ const renderEventIcon = (eventType, eventStatus) => {
 const renderDeviceIcon = (userAgent = '') => {
   const ua = userAgent.toLowerCase();
   if (ua.includes('iphone') || ua.includes('android')) {
-    return <Smartphone className="w-3.5 h-3.5 text-text-muted" />;
+    return <Smartphone className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />;
   }
   if (ua.includes('ipad') || ua.includes('tablet')) {
-    return <Tablet className="w-3.5 h-3.5 text-text-muted" />;
+    return <Tablet className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />;
   }
   if (ua.includes('macintosh') || ua.includes('mac os')) {
-    return <Laptop className="w-3.5 h-3.5 text-text-muted" />;
+    return <Laptop className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />;
   }
-  return <Monitor className="w-3.5 h-3.5 text-text-muted" />;
+  return <Monitor className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />;
 };
 
 /* ── Helper: Status Badge Styling ─────────────────────────── */
@@ -90,7 +90,7 @@ const SecurityActivityList = ({
 
   if (!auditLogs || auditLogs.length === 0) {
     return (
-      <div className="p-12 text-center bg-white flex flex-col items-center justify-center">
+      <div className="p-12 text-center bg-background-primary flex flex-col items-center justify-center">
         <ShieldCheck className="mb-4 h-5 w-5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden />
         <h3 className="text-base font-semibold text-text-primary mb-1">
           {t("no_security_events_found", "Güvenlik Olayı Bulunamadı")}
@@ -103,7 +103,7 @@ const SecurityActivityList = ({
   }
 
   return (
-    <div className="divide-y divide-border-light bg-white">
+    <div className="divide-y divide-border-light bg-background-primary">
       {auditLogs.map((log, index) => {
         const statusBadge = getStatusBadge(log.eventStatus);
         const isFailure = log.eventStatus === 'FAILURE' || log.eventType?.includes('FAILURE');
@@ -122,17 +122,13 @@ const SecurityActivityList = ({
                 setSelectedLog(log);
               }
             }}
-            className={`group p-4 sm:p-5 hover:bg-background-secondary/80 transition-all cursor-pointer flex items-start gap-4 focus:outline-none focus-visible:bg-background-secondary ${
+            className={`group p-4 sm:p-5 hover:bg-background-secondary/80 transition-colors cursor-pointer flex items-start gap-4 focus:outline-none focus-visible:bg-background-secondary ${
               isFailure ? 'bg-background-secondary/20' : ''
             }`}
           >
-            {/* Event Icon Bubble */}
+            {/* Event Icon */}
             <div
-              className={`w-11 h-11 rounded-md flex items-center justify-center shrink-0 border transition-transform ${
-                isFailure
-                  ? 'bg-background-secondary border-border'
-                  : 'bg-background-secondary border-border/80'
-              }`}
+              className="w-10 h-10 rounded flex items-center justify-center shrink-0 border border-border bg-background-secondary"
             >
               {renderEventIcon(log.eventType, log.eventStatus)}
             </div>
@@ -146,13 +142,13 @@ const SecurityActivityList = ({
                     {getEventTypeDisplay(log.eventType)}
                   </h4>
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold border ${statusBadge.className}`}
+                    className={`inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium border ${statusBadge.className}`}
                   >
                     {statusBadge.label}
                   </span>
                 </div>
 
-                <span className="text-xs font-semibold text-text-muted tabular-nums shrink-0">
+                <span className="text-xs font-medium text-text-muted tabular-nums shrink-0">
                   {formatDateTime(log.createdAt)}
                 </span>
               </div>
@@ -167,14 +163,14 @@ const SecurityActivityList = ({
               {/* Device & Network Meta Chips */}
               <div className="flex items-center flex-wrap gap-2 text-xs text-text-tertiary font-medium pt-0.5">
                 {/* Device & Browser */}
-                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-background-tertiary text-text-secondary text-xs font-medium border border-border/60 max-w-72 truncate">
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-background-tertiary text-text-secondary text-xs font-medium border border-border max-w-72 truncate">
                   {renderDeviceIcon(log.userAgent)}
                   <span className="truncate">{browserDetails}</span>
                 </div>
 
                 {/* IP & Location */}
                 {locationDetails && (
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-background-tertiary text-text-secondary text-xs font-mono border border-border/60">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-background-tertiary text-text-secondary text-xs font-mono border border-border">
                     <MapPin className="w-3 h-3 text-text-muted shrink-0" />
                     <span>{locationDetails}</span>
                   </div>
@@ -183,7 +179,7 @@ const SecurityActivityList = ({
             </div>
 
             {/* Right Action Chevron */}
-            <div className="self-center pl-2 text-secondary-300 group-hover:text-text-secondary transition-all shrink-0">
+            <div className="self-center pl-2 text-text-muted group-hover:text-text-primary transition-colors shrink-0">
               <ChevronRight className="w-4 h-4" />
             </div>
           </div>

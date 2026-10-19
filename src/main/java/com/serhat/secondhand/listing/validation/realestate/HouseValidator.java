@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.validation.realestate;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,8 @@ public class HouseValidator implements RealEstateSpecValidator {
             return Result.error("Square meters must be greater than 0", "REAL_ESTATE_SQUARE_METERS_REQUIRED");
         }
 
-        if (listing.getRoomCount() == null || listing.getRoomCount() <= 0) {
+        if ((listing.getRoomCount() == null || listing.getRoomCount() <= 0)
+                && (listing.getRoomConfigKey() == null || listing.getRoomConfigKey().isBlank())) {
             return Result.error("Room count must be greater than 0", "REAL_ESTATE_ROOM_COUNT_REQUIRED");
         }
 
@@ -45,6 +47,10 @@ public class HouseValidator implements RealEstateSpecValidator {
     public void cleanup(RealEstateListing listing) {
         if (isHouseLike(listing)) {
             listing.setZoningStatus(null);
+            listing.setZoningStatusKey(null);
+            listing.setParcelNo(null);
+            listing.setBlockNo(null);
+            listing.setSheetNo(null);
         }
     }
 
@@ -56,8 +62,7 @@ public class HouseValidator implements RealEstateSpecValidator {
         if (type == null || type.getName() == null) {
             return false;
         }
-        String name = type.getName();
-        return !("LAND".equalsIgnoreCase(name) || "FARM".equalsIgnoreCase(name));
+        RealEstateCategory category = RealEstateCategory.fromTypeName(type.getName());
+        return category == RealEstateCategory.RESIDENTIAL || category == RealEstateCategory.COMMERCIAL;
     }
 }
-

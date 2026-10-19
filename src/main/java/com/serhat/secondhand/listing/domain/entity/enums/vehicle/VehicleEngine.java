@@ -49,6 +49,12 @@ public class VehicleEngine implements Labelable, Persistable<UUID> {
     @Column(name = "fuel_type", length = 50)
     private FuelType fuelType;
 
+    @Column(name = "horse_power")
+    private Integer horsePower;
+
+    @Column(name = "engine_capacity")
+    private Integer engineCapacity;
+
     @Override
     public String getLabel() {
         return name;

@@ -4,14 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum ClothingCategory {
-    BOY_CHILD("Boy Child"),
-    GIRL_CHILD("Girl Child"),
-    BOY_BABY("Boy Baby"),
-    GIRL_BABY("Girl Baby"),
-    BOY_YOUTH("Boy Youth"),
-    GIRL_YOUTH("Girl Youth"),
-    MALE_ADULT("Male Adult"),
-    FEMALE_ADULT("Female Adult"),
+    BOY_CHILD("Erkek Çocuk"),
+    GIRL_CHILD("Kız Çocuk"),
+    BOY_BABY("Erkek Bebek"),
+    GIRL_BABY("Kız Bebek"),
+    BOY_YOUTH("Genç Erkek"),
+    GIRL_YOUTH("Genç Kız"),
+    MALE_ADULT("Yetişkin Erkek"),
+    FEMALE_ADULT("Yetişkin Kadın"),
     UNISEX("Unisex");
 
     private final String label;

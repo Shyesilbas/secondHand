@@ -73,7 +73,7 @@ export const electronicsConfig = {
  return allModels
  .filter((m) => (!brandId || String(m?.brandId ?? m?.brand_id ?? '') === String(brandId)))
  .filter((m) => (!typeId || String(m?.typeId ?? m?.type_id ?? '') === String(typeId)))
- .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? '') }))
+ .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? ''), releaseYear: m?.releaseYear, isLegacy: m?.isLegacy, aliases: m?.aliases || [] }))
  .filter((o) => o.id && o.label);
  },
  },
@@ -149,6 +149,10 @@ export const electronicsConfig = {
  if (!mId) return;
  const m = (ctx.enums?.electronicModels || []).find((x) => String(x?.id ?? '') === String(mId));
  if (!m) return;
+
+ if (m.releaseYear && !ctx.formData?.year) {
+  ctx.setValue('year', m.releaseYear);
+ }
 
  const modelName = String(m?.name || '');
  if (modelName.includes(' > ')) {
@@ -248,7 +252,7 @@ export const electronicsConfig = {
  return allModels
  .filter((m) => (!brandId || String(m?.brandId ?? m?.brand_id ?? '') === String(brandId)))
  .filter((m) => (!typeId || String(m?.typeId ?? m?.type_id ?? '') === String(typeId)))
- .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? '') }))
+ .map((m) => ({ id: String(m?.id ?? ''), label: String(m?.name ?? ''), releaseYear: m?.releaseYear, isLegacy: m?.isLegacy, aliases: m?.aliases || [] }))
  .filter((o) => o.id && o.label);
  },
  },

@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum ClothingCondition {
-    EXCELLENT("Excellent"),
-    GOOD("Good"),
-    FAIR("Fair"),
-    WORN("Worn"),
-    DAMAGED("Damaged");
+    EXCELLENT("Mükemmel"),
+    GOOD("İyi"),
+    FAIR("Orta"),
+    WORN("Yıpranmış"),
+    DAMAGED("Hasarlı");
 
     private final String label;
 

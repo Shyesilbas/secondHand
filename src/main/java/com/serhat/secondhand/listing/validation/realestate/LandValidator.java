@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.validation.realestate;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,8 @@ public class LandValidator implements RealEstateSpecValidator {
         }
 
         String zoningStatus = listing.getZoningStatus();
-        if (zoningStatus == null || zoningStatus.isBlank()) {
+        String zoningStatusKey = listing.getZoningStatusKey();
+        if ((zoningStatus == null || zoningStatus.isBlank()) && (zoningStatusKey == null || zoningStatusKey.isBlank())) {
             return Result.error("Zoning status is required for land listings", "LAND_ZONING_STATUS_REQUIRED");
         }
 
@@ -38,6 +40,12 @@ public class LandValidator implements RealEstateSpecValidator {
         listing.setFloor(null);
         listing.setBuildingAge(null);
         listing.setFurnished(false);
+        listing.setRoomConfigKey(null);
+        listing.setFloorNumber(null);
+        listing.setTotalFloors(null);
+        listing.setHasBalcony(false);
+        listing.setHasElevator(false);
+        listing.setHasParking(false);
     }
 
     private boolean isLandLike(RealEstateListing listing) {
@@ -48,8 +56,6 @@ public class LandValidator implements RealEstateSpecValidator {
         if (type == null || type.getName() == null) {
             return false;
         }
-        String name = type.getName();
-        return "LAND".equalsIgnoreCase(name) || "FARM".equalsIgnoreCase(name);
+        return RealEstateCategory.fromTypeName(type.getName()) == RealEstateCategory.LAND;
     }
 }
-

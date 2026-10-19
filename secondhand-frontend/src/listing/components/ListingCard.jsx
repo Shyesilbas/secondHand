@@ -53,25 +53,22 @@ const ListingCard = ({
    if (activeViewers > 0) {
      list.push({
        id: 'viewers',
-       icon: <Eye className="w-2.5 h-2.5 text-status-warning" />,
+       icon: <Eye className="w-4 h-4" />,
        text: `${activeViewers} kişi inceledi`,
-       bg: 'bg-primary/90 text-white'
      });
    }
    if (cardFavoriteCount > 0) {
      list.push({
        id: 'favorites',
-       icon: <Heart className="w-2.5 h-2.5 text-status-error fill-status-error" />,
+       icon: <Heart className="w-4 h-4" />,
        text: `${cardFavoriteCount} kişi favoriledi`,
-       bg: 'bg-status-error/90 text-white'
      });
    }
    if (cartReservations > 0) {
      list.push({
        id: 'cart',
-       icon: <Flame className="w-2.5 h-2.5 text-status-warning fill-status-warning" />,
+       icon: <Flame className="w-4 h-4" />,
        text: `${cartReservations} kişi sepete ekledi`,
-       bg: 'bg-status-warning/95 text-white animate-pulse'
      });
    }
    return list;
@@ -171,7 +168,7 @@ const ListingCard = ({
   onMouseEnter={handleCardMouseEnter}
   onMouseLeave={handleCardMouseLeave}
   className={`group relative flex flex-col h-full
- bg-background-primary rounded-md
+ bg-background-primary rounded
  border transition duration-200 ease-out
 
  ${isOutOfStock ? 'opacity-55' : ''}
@@ -185,7 +182,7 @@ const ListingCard = ({
  }} />}
 
  {/* Top-right action buttons */}
- <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 opacity-100 transition-all duration-200 md:translate-x-2">
+ <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 opacity-100 transition duration-200 motion-reduce:transition-none md:translate-x-2">
  {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
  <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} size="sm" showCount={false} />
  {canAddToCart && <button onClick={e => {
@@ -194,7 +191,7 @@ const ListingCard = ({
  if (!itemIsInCart) {
  addToCart(listing.id);
  }
- }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-colors ${
+ }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded border border-border flex items-center justify-center transition-colors ${
  itemIsInCart
  ? 'bg-background-secondary text-status-success-text cursor-default'
  : 'bg-background-primary/90 text-text-tertiary hover:text-primary hover:bg-background-primary'
@@ -211,7 +208,7 @@ const ListingCard = ({
  e.preventDefault();
  e.stopPropagation();
  setIsOfferModalOpen(true);
- }} className="w-8 h-8 rounded bg-background-primary shadow-sm flex items-center justify-center text-text-tertiary hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
+ }} className="w-8 h-8 rounded bg-background-primary border border-border flex items-center justify-center text-text-tertiary hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
  <HandCoins className="w-3.5 h-3.5" />
  </button>}
  <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
@@ -219,7 +216,7 @@ const ListingCard = ({
  </div>
 
  {/* Image */}
- <div className="relative aspect-4/3 bg-background-tertiary overflow-hidden rounded-t-md">
+ <div className="relative aspect-4/3 bg-background-tertiary overflow-hidden rounded-t">
  {listing.imageUrl ? <img src={optimizeCloudinaryUrl(listing.imageUrl, {
  width: 400,
  height: 300
@@ -231,19 +228,19 @@ const ListingCard = ({
  <ImageIcon className="w-8 h-8" />
  </div>
 
- {/* Gradient overlay */}
- <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+ 
+ 
 
   {/* Top-left badges */}
   <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 items-start">
   {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-semibold ${statusConfig.cls}`}>
   {statusConfig.label}
   </span>}
-  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-status-warning text-white">
-  <Zap className="w-3 h-3 fill-current text-white" />{t("featured")}</span>}
+  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-text-primary border border-border">
+  <Zap className="w-3 h-3" />{t("featured")}</span>}
   {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-status-warning-text border border-border">
   <Award className="w-3 h-3 shrink-0 text-status-warning-text" />{t("great_seller")}</span>}
-  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-status-error text-white ">
+  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-status-error-text border border-border">
   <TrendingDown className="w-3 h-3" />
   -{discountPct}%
   </span>}
@@ -254,7 +251,7 @@ const ListingCard = ({
   e.preventDefault();
   e.stopPropagation();
   setShowInfo(true);
-  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded bg-background-primary text-xs font-semibold text-text-secondary shadow-md opacity-0 group-hover:opacity-100 translate-y-2 transition-all duration-300 hover:bg-primary hover:text-white flex items-center gap-1.5 whitespace-nowrap">
+  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded bg-background-primary text-xs font-semibold text-text-secondary border border-border opacity-0 group-hover:opacity-100 translate-y-2 transition duration-200 motion-reduce:transition-none hover:bg-primary hover:text-white flex items-center gap-1.5 whitespace-nowrap">
   <Eye className="w-3 h-3" />{t("quick_view")}</button>
   </div>
 
@@ -262,7 +259,7 @@ const ListingCard = ({
   <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-3.5">
 
   {/* Title */}
-  <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 group- transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
+  <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
   {listing.title}
   </h3>
 
@@ -302,7 +299,7 @@ const ListingCard = ({
     {currentStory && (
       <span
         key={currentStory.id}
-        className={`inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold transition-all duration-300 transform scale-100 ${currentStory.bg}`}
+        className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary transition-opacity duration-200 motion-reduce:transition-none"
       >
         {currentStory.icon}
         <span>{currentStory.text}</span>

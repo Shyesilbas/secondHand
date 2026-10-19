@@ -45,6 +45,12 @@ public class VehicleGeneration implements Labelable, Persistable<UUID> {
     @JoinColumn(name = "vehicle_model_id", nullable = false)
     private VehicleModel model;
 
+    @Column(name = "start_year")
+    private Integer startYear;
+
+    @Column(name = "end_year")
+    private Integer endYear;
+
     @Override
     public String getLabel() {
         return name;

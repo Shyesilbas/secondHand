@@ -1,4 +1,4 @@
-import { Tag, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function AuraPriceAdvisorGauge({
@@ -37,10 +37,10 @@ export default function AuraPriceAdvisorGauge({
   const isHigh = status.toLowerCase().includes('high') || status.toLowerCase().includes('yüksek') || status.toLowerCase().includes('pahalı');
 
   return (
-    <div className="my-3 rounded-md border border-border/90 bg-background-secondary p-4 transition-all">
+    <div className="my-3 rounded border border-border bg-background-secondary p-4">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <Tag className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+          <Tag className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
           <div>
             <span className="text-xs font-semibold text-text-primary block">
               Piyasa Değerlemesi & Fiyat Aralığı
@@ -49,29 +49,31 @@ export default function AuraPriceAdvisorGauge({
           </div>
         </div>
 
-        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${
-          isGoodDeal 
-            ? 'bg-background-secondary text-status-success-text border-border' 
-            : isHigh 
-            ? 'bg-background-secondary text-status-warning-text border-border' 
-            : 'bg-background-tertiary text-text-primary border-border'
-        }`}>
-          {isGoodDeal && <CheckCircle className="w-3 h-3 text-status-success-text" />}
-          {isHigh && <AlertTriangle className="w-3 h-3 text-status-warning-text" />}
-          {status}
+        {/* Status: a 6px dot plus text, not a filled pill (DESIGN.md line 55) */}
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              isGoodDeal
+                ? 'bg-status-success'
+                : isHigh
+                ? 'bg-status-warning'
+                : 'bg-text-tertiary'
+            }`}
+          />
+          <span>{status}</span>
         </span>
       </div>
 
       {/* Progress Bar Container */}
       <div className="relative pt-4 pb-2 px-1">
         {/* Track Bar */}
-        <div className="h-2.5 w-full bg-secondary-200/80 rounded-full overflow-hidden relative shadow-inner">
+        <div className="h-2 w-full bg-background-tertiary rounded-full overflow-hidden relative border border-border-light">
           <div
-            className="h-full bg-status-success rounded-full opacity-90"
+            className="h-full bg-status-success rounded-full opacity-80"
           />
           {/* Indicator Dot on the bar */}
           <div
-            className="absolute top-0 bottom-0 w-3 -ml-1.5 bg-white border-2 border-primary rounded-full shadow-md transition-all duration-300"
+            className="absolute top-0 bottom-0 w-2.5 -ml-1 bg-primary rounded-full transition-all duration-300"
             style={{ left: `${currentPct}%` }}
           />
         </div>
@@ -82,8 +84,8 @@ export default function AuraPriceAdvisorGauge({
             className="absolute top-0.5 -ml-2.5 flex flex-col items-center pointer-events-none"
             style={{ left: `${avgPct}%` }}
           >
-            <div className="w-1.5 h-2 bg-secondary-400 rounded-xs" />
-            <span className="text-xs font-semibold text-text-muted mt-2.5 whitespace-nowrap">
+            <div className="w-1 h-2 bg-text-tertiary rounded-sm" />
+            <span className="text-xs font-medium text-text-muted mt-2.5 whitespace-nowrap">
               Ortalama
             </span>
           </div>
@@ -91,17 +93,17 @@ export default function AuraPriceAdvisorGauge({
       </div>
 
       {/* Price Labels */}
-      <div className="grid grid-cols-3 gap-2 text-xs font-semibold mt-3 pt-2.5 border-t border-border-light">
+      <div className="grid grid-cols-3 gap-2 text-xs mt-3 pt-2.5 border-t border-border-light tabular-nums">
         <div>
-          <span className="block text-xs text-text-muted font-semibold">En Düşük</span>
+          <span className="block text-xs text-text-muted">En Düşük</span>
           <span className="text-text-secondary font-medium">{formatPrice(minNum)}</span>
         </div>
         <div className="text-center">
-          <span className="block text-xs text-text-tertiary font-semibold">Bu İlan</span>
-          <span className="font-semibold text-text-primary text-xs">{formatPrice(currentNum)}</span>
+          <span className="block text-xs text-text-tertiary">Bu İlan</span>
+          <span className="font-semibold text-text-primary">{formatPrice(currentNum)}</span>
         </div>
         <div className="text-right">
-          <span className="block text-xs text-text-muted font-semibold">En Yüksek</span>
+          <span className="block text-xs text-text-muted">En Yüksek</span>
           <span className="text-text-secondary font-medium">{formatPrice(maxNum)}</span>
         </div>
       </div>

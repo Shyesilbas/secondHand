@@ -3,6 +3,26 @@ import GenericListingDetails from '../components/details/GenericListingDetails.j
 import {clothingService} from '../../clothing/services/clothingService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
 
+const FOOTWEAR_TYPES = new Set(['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'SLIPPERS', 'HEELS', 'FLATS', 'LOAFERS']);
+const ACCESSORY_TYPES = new Set([
+ 'BAG', 'BACKPACK', 'HANDBAG', 'CROSSBODY_BAG', 'CLUTCH', 'SUITCASE',
+ 'WALLET', 'WATCH', 'SUNGLASSES', 'JEWELRY', 'NECKLACE', 'BRACELET',
+ 'EARRINGS', 'RING', 'BELT', 'HAT', 'CAP', 'BEANIE', 'SCARF',
+ 'GLOVES', 'TIE', 'BOW_TIE', 'OTHER'
+]);
+
+export const getClothingGroup = (ctx) => {
+ const typeId = ctx?.formData?.clothingTypeId || ctx?.selection?.clothingTypeId;
+ const rawName = ctx?.formData?._clothingTypeName || (typeId && ctx?.getName ? ctx.getName('clothingTypes', typeId) : '');
+ const t = String(rawName || '').toUpperCase();
+ const enumsList = ctx?.enums?.clothingTypes || [];
+ const found = enumsList.find((x) => (typeId && String(x.id) === String(typeId)) || String(x.name || '').toUpperCase() === t);
+ if (found?.group) return String(found.group).toUpperCase();
+ if (FOOTWEAR_TYPES.has(t)) return 'FOOTWEAR';
+ if (ACCESSORY_TYPES.has(t)) return 'ACCESSORY';
+ return t ? 'APPAREL' : '';
+};
+
 export const clothingConfig = {
  label: 'Clothing',
  icon: Shirt,
@@ -51,16 +71,11 @@ export const clothingConfig = {
  { name: 'clothingCategory', label: 'Clothing Category', type: 'enum', enumKey: 'clothingCategories', required: true },
  {
  name: 'size', label: 'Size', type: 'enum', enumKey: 'clothingSizes', required: true,
- visibleWhen: (ctx) => {
- const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
- const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
- const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
- return Boolean(t) && !footwear && !accessory;
- },
+ visibleWhen: (ctx) => getClothingGroup(ctx) === 'APPAREL',
  },
  {
  name: 'shoeSizeEu', label: 'Shoe Size (EU)', type: 'number', required: true, min: 20, max: 55,
- visibleWhen: (ctx) => ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(String(ctx.formData?._clothingTypeName || '').toUpperCase()),
+ visibleWhen: (ctx) => getClothingGroup(ctx) === 'FOOTWEAR',
  },
  { name: 'material', label: 'Material', type: 'text' },
  { name: 'purchaseYear', label: 'Purchase Year', type: 'number', required: true, min: 1900, max: new Date().getFullYear() },
@@ -73,13 +88,13 @@ export const clothingConfig = {
  derivedFields: [{ sourceField: 'clothingTypeId', enumKey: 'clothingTypes', targetField: '_clothingTypeName', uppercase: true }],
  effects: [
  (ctx) => {
- const t = String(ctx.formData?._clothingTypeName || '').toUpperCase();
- const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
- const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
- const apparel = Boolean(t) && !footwear && !accessory;
- if (footwear && ctx.formData?.size) ctx.setValue('size', '');
- if (apparel && ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', '');
- if (accessory) { if (ctx.formData?.size) ctx.setValue('size', ''); if (ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', ''); }
+ const group = getClothingGroup(ctx);
+ if (group === 'FOOTWEAR' && ctx.formData?.size) ctx.setValue('size', '');
+ if (group === 'APPAREL' && ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', '');
+ if (group === 'ACCESSORY') {
+ if (ctx.formData?.size) ctx.setValue('size', '');
+ if (ctx.formData?.shoeSizeEu) ctx.setValue('shoeSizeEu', '');
+ }
  },
  ],
  getTitle: ({ isEdit }) => (isEdit ? 'Edit Clothing Listing' : 'Create Clothing Listing'),
@@ -129,12 +144,7 @@ export const clothingConfig = {
  { enumKey: 'clothingCategories', initialDataKey: 'clothingCategory', title: 'Choose clothing category', description: 'Select a clothing category to tailor the form fields.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false },
  {
  enumKey: 'clothingSizes', initialDataKey: 'size', title: 'Choose size', description: 'Select size of the item.', kind: 'grid', dependsOn: ['clothingTypeId'], prefilter: false,
- visibleWhen: (ctx) => {
- const t = String(ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId ? ctx.getName('clothingTypes', ctx.formData?.clothingTypeId || ctx.selection?.clothingTypeId) : '').toUpperCase();
- const footwear = ['SHOES', 'SNEAKERS', 'BOOTS', 'SANDALS', 'HEELS', 'FLATS'].includes(t);
- const accessory = ['HAT', 'CAP', 'SCARF', 'GLOVES', 'BELT', 'TIE', 'BAG'].includes(t);
- return Boolean(t) && !footwear && !accessory;
- }
+ visibleWhen: (ctx) => getClothingGroup(ctx) === 'APPAREL'
  },
  ],
  },

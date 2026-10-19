@@ -42,13 +42,8 @@ public class FootwearValidator implements ClothingSpecValidator {
         if (type == null || type.getName() == null) {
             return false;
         }
-        String name = type.getName();
-        return "SHOES".equalsIgnoreCase(name)
-                || "SNEAKERS".equalsIgnoreCase(name)
-                || "BOOTS".equalsIgnoreCase(name)
-                || "SANDALS".equalsIgnoreCase(name)
-                || "HEELS".equalsIgnoreCase(name)
-                || "FLATS".equalsIgnoreCase(name);
+        return com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.fromTypeName(type.getName())
+                == com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.FOOTWEAR;
     }
 }
 

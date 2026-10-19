@@ -35,7 +35,7 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
   };
 
   return (
-    <div className="bg-white rounded-md border border-border/90 p-5 sm:p-6 space-y-4">
+    <div className="bg-background-primary rounded border border-border p-5 sm:p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Truck className="h-5 w-5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden />
@@ -50,7 +50,7 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
         </div>
 
         <Link
-          to={ROUTES.ORDERS}
+          to={ROUTES.MY_ORDERS}
           className="text-xs font-semibold text-text-secondary hover:text-text-primary flex items-center gap-1 transition-colors"
         >
           <span>{t('all_orders', 'Tüm Siparişler')}</span>
@@ -68,14 +68,14 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.08 }}
-              className="p-4 rounded-md bg-background-secondary/70 hover:bg-background-secondary border border-border/80 transition-all flex items-center justify-between gap-4"
+              className="p-4 rounded bg-background-secondary/70 hover:bg-background-secondary border border-border transition-all flex items-center justify-between gap-4"
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 {delivery.listingImageUrl ? (
                   <img
                     src={optimizeCloudinaryUrl(delivery.listingImageUrl, { width: 120, height: 120, crop: 'fill' })}
                     alt={delivery.listingTitle}
-                    className="w-13 h-13 rounded object-cover border border-border/80 shrink-0"
+                    className="w-13 h-13 rounded object-cover border border-border shrink-0"
                   />
                 ) : (
                   <Package className="shrink-0 h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
@@ -83,7 +83,7 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border ${badge.bg}`}>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium border ${badge.bg}`}>
                       <BadgeIcon className="w-3 h-3" />
                       <span>{badge.label}</span>
                     </span>
@@ -104,8 +104,8 @@ const ActiveDeliveriesTracker = ({ activeDeliveries = [] }) => {
               </div>
 
               <Link
-                to={ROUTES.ORDERS}
-                className="shrink-0 p-2 text-text-muted hover:text-text-primary hover:bg-white rounded border border-transparent hover:border-border transition-all"
+                to={delivery.orderId ? ROUTES.PROFILE_ORDER_SHIPMENT(delivery.orderId) : ROUTES.MY_ORDERS}
+                className="shrink-0 p-2 text-text-muted hover:text-text-primary hover:bg-background-tertiary rounded border border-transparent hover:border-border transition-all"
                 title="Sipariş Detayı"
               >
                 <ExternalLink className="w-4 h-4" />

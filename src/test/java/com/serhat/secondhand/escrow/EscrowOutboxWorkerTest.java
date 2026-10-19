@@ -26,6 +26,7 @@ class EscrowOutboxWorkerTest {
         UUID id = UUID.randomUUID();
         EscrowOutboxEvent e = EscrowOutboxEvent.builder().id(id).status(OutboxStatus.PENDING)
                 .payload("{\"escrowId\":1}").build();
+        when(repo.findByIdForUpdate(id)).thenReturn(Optional.of(e));
         when(repo.findById(id)).thenReturn(Optional.of(e));
         return e;
     }
@@ -33,6 +34,7 @@ class EscrowOutboxWorkerTest {
     @Test
     void kafkaFailureKeepsEventRetryableAndCountsAttempt() {
         EscrowOutboxEvent e = pending();
+        e.setMaxAttempts(1);
         when(producer.sendEscrowReleased(any())).thenReturn(CompletableFuture.failedFuture(new RuntimeException("broker down")));
 
         worker.processEvent(e.getId());

@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum StorageType {
     HDD("HDD"),
     SSD("SSD"),
-    HYBRID("Hybrid"),
+    HYBRID("Hibrit"),
     EMMC("eMMC"),
     NVME("NVMe");
 

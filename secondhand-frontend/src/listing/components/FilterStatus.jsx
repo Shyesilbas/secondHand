@@ -229,104 +229,95 @@ const mapGroupToTag = (group, filters, enums) => {
 };
 
 const FilterStatus = ({
- totalElements,
- filters,
- getListingTypeLabel,
- onResetFilters,
- hasActiveFilters,
- getActiveFilterCount,
- updateFilters
+  totalElements,
+  filters,
+  getListingTypeLabel,
+  onResetFilters,
+  hasActiveFilters,
+  getActiveFilterCount,
+  updateFilters
 }) => {
- const { t } = useTranslation();
- const { enums } = useEnums();
+  const { t } = useTranslation();
+  const { enums } = useEnums();
 
- const resolvedCount = typeof getActiveFilterCount === 'function' ? getActiveFilterCount(filters) : computeActiveFilterCount(filters);
- const hasResults = Number(totalElements) > 0;
- const activeCount = resolvedCount;
- const hasActive = typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0;
- const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
- const activeTags = GROUPED_FILTERS.map(group => mapGroupToTag(group, filters, enums)).filter(tag => tag !== null);
+  const resolvedCount = typeof getActiveFilterCount === 'function' ? getActiveFilterCount(filters) : computeActiveFilterCount(filters);
+  const hasResults = Number(totalElements) > 0;
+  const activeCount = resolvedCount;
+  const hasActive = typeof hasActiveFilters === 'boolean' ? hasActiveFilters : activeCount > 0;
+  const categoryLabel = filters.listingType ? getListingTypeLabel(filters.listingType) : null;
+  const activeTags = GROUPED_FILTERS.map(group => mapGroupToTag(group, filters, enums)).filter(tag => tag !== null);
 
- const FilterBadge = () => hasActive && activeCount > 0 ? (
- <div className="flex flex-wrap items-center gap-1.5">
- <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold bg-background-tertiary text-text-primary border border-card-border-hover">
- <SlidersHorizontal className="w-3 h-3 text-text-primary" />
- {activeCount} {t("filter")}
- </span>
+  const FilterBadge = () => hasActive && activeCount > 0 ? (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium bg-background-tertiary text-text-primary border border-border-light">
+        <SlidersHorizontal className="w-3 h-3 text-text-primary" strokeWidth={1.5} />
+        {activeCount} {t("filter", "filtre")}
+      </span>
 
- {activeTags.map((tag, idx) => (
- <span key={idx} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold bg-background-tertiary text-text-secondary border border-border/80">
- {tag}
- </span>
- ))}
+      {activeTags.map((tag, i) => (
+        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-medium bg-background-tertiary text-text-secondary border border-border-light">
+          {tag}
+        </span>
+      ))}
 
- <button
- onClick={onResetFilters}
- className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-semibold text-text-tertiary hover:text-status-error-text hover:bg-background-secondary transition-colors ml-1 cursor-pointer"
- >
- <X className="w-3.5 h-3.5" />
- {t("clear_all")}
- </button>
- </div>
- ) : null;
+      <button
+        type="button"
+        onClick={onResetFilters}
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium text-text-muted hover:text-text-primary hover:bg-background-tertiary transition-colors ml-1 cursor-pointer"
+      >
+        <X className="w-3.5 h-3.5" strokeWidth={1.5} />
+        {t("clear_all", "Temizle")}
+      </button>
+    </div>
+  ) : null;
 
- if (!hasResults) {
- return (
- <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 py-1">
- <div className="flex flex-wrap items-center gap-2.5">
- <div className="flex items-center gap-1.5">
- <span className="w-2 h-2 rounded-full bg-secondary-300 inline-block" />
- <span className="text-sm font-semibold text-text-primary">{t("no_listings_found")}</span>
- {categoryLabel && <span className="text-sm font-medium text-text-tertiary">({categoryLabel})</span>}
- </div>
- <FilterBadge />
- </div>
- <p className="text-xs text-text-tertiary font-medium">{t("try_changing_filters_or_category_to_see_")}</p>
- </div>
- );
- }
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-1">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className={`w-1.5 h-1.5 rounded-full inline-block shrink-0 ${hasResults ? 'bg-primary' : 'bg-text-muted'}`} />
+          <span className="text-sm font-semibold text-text-primary tabular-nums">
+            {totalElements || 0} {t("listing", "İlan")}
+          </span>
+          {categoryLabel && (
+            <span className="text-xs font-medium text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border-light">
+              {categoryLabel}
+            </span>
+          )}
+        </div>
+        <FilterBadge />
+      </div>
 
- return (
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
- <div className="flex flex-wrap items-center gap-2.5">
- <div className="flex items-center gap-1.5">
- <span className="w-2 h-2 rounded-full bg-primary-hover inline-block" />
- <span className="text-sm font-semibold text-text-primary">
- {totalElements} {t("listing")}
- </span>
- {categoryLabel && <span className="text-xs font-semibold text-text-tertiary bg-background-tertiary px-2 py-0.5 rounded-md">({categoryLabel})</span>}
- </div>
- <FilterBadge />
- </div>
-
- {/* Sort toggle */}
- <div className="flex items-center gap-2 shrink-0">
- <div className="flex items-center gap-1 text-xs font-semibold text-text-tertiary">
- <ArrowUpDown className="w-3.5 h-3.5" />
- <span>{t("sort")}:</span>
- </div>
- <div className="flex items-center bg-background-tertiary rounded p-1 gap-0.5 border border-border/80">
- {[
- { key: LISTING_SORT_FIELDS.DATE, label: t("sort_date") },
- { key: LISTING_SORT_FIELDS.PRICE, label: t("sort_price") }
- ].map(({ key, label }) => (
- <button
- key={key}
- onClick={() => updateFilters({
- sortBy: key,
- sortDirection: LISTING_DEFAULTS.SORT_DIRECTION
- })}
- className={`px-3 py-1 rounded text-xs font-semibold transition-all duration-200 cursor-pointer ${
- filters.sortBy === key ? 'bg-white text-text-primary' : 'text-text-tertiary hover:text-text-secondary'
- }`}
- >
- {label}
- </button>
- ))}
- </div>
- </div>
- </div>
- );
+      {hasResults && (
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 text-xs font-medium text-text-tertiary">
+            <ArrowUpDown className="w-3.5 h-3.5" strokeWidth={1.5} />
+            <span>{t("sort", "Sırala")}:</span>
+          </div>
+          <div className="flex items-center bg-background-tertiary rounded p-0.5 gap-0.5 border border-border-light">
+            {[
+              { key: LISTING_SORT_FIELDS.DATE, label: t("sort_date", "Tarih") },
+              { key: LISTING_SORT_FIELDS.PRICE, label: t("sort_price", "Fiyat") }
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => updateFilters({
+                  sortBy: key,
+                  sortDirection: LISTING_DEFAULTS.SORT_DIRECTION
+                })}
+                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+                  filters.sortBy === key ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default FilterStatus;

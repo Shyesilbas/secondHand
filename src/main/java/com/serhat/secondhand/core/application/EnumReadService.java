@@ -17,6 +17,7 @@ import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepo
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
@@ -63,12 +64,21 @@ public class EnumReadService {
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
 
-    private List<Map<String, Object>> deduplicateByName(List<Map<String, Object>> items) {
+    private String normalizeName(Map<String, Object> item) {
+        Object val = item.get("name") != null ? item.get("name") : item.get("label");
+        if (val == null) return "";
+        String s = String.valueOf(val).trim().toUpperCase(Locale.ROOT);
+        return "NULL".equals(s) ? "" : s;
+    }
+
+    private List<Map<String, Object>> deduplicateBy(
+            List<Map<String, Object>> items,
+            java.util.function.Function<Map<String, Object>, String> keyExtractor) {
         if (items == null || items.isEmpty()) return Collections.emptyList();
         Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
         for (Map<String, Object> item : items) {
-            String key = String.valueOf(item.get("name") != null ? item.get("name") : item.get("label")).trim().toUpperCase(Locale.ROOT);
-            if (key.isBlank() || "NULL".equals(key)) continue;
+            String key = keyExtractor.apply(item);
+            if (key == null || key.isBlank() || "NULL".equalsIgnoreCase(key)) continue;
 
             if (!uniqueMap.containsKey(key)) {
                 uniqueMap.put(key, item);
@@ -77,12 +87,17 @@ public class EnumReadService {
                 Map<String, Object> existing = uniqueMap.get(key);
                 String existingLabel = String.valueOf(existing.get("label"));
                 String newLabel = String.valueOf(item.get("label"));
-                if (existingLabel.equals(key) && !newLabel.equals(key)) {
+                String rawName = normalizeName(item);
+                if (existingLabel.equalsIgnoreCase(rawName) && !newLabel.equalsIgnoreCase(rawName)) {
                     uniqueMap.put(key, item);
                 }
             }
         }
         return new ArrayList<>(uniqueMap.values());
+    }
+
+    private List<Map<String, Object>> deduplicateByName(List<Map<String, Object>> items) {
+        return deduplicateBy(items, this::normalizeName);
     }
 
     public List<Map<String, Object>> getCarBrands() {
@@ -112,7 +127,10 @@ public class EnumReadService {
                     return modelMap;
                 })
                 .toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("brandId") + ":" + item.get("typeId") + ":" + name;
+        });
     }
 
     public List<Map<String, Object>> getVehicleTypes() {
@@ -161,9 +179,15 @@ public class EnumReadService {
                     map.put("name", model.getName());
                     map.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
                     map.put("typeId", model.getType() != null ? model.getType().getId() : null);
+                    map.put("releaseYear", model.getReleaseYear());
+                    map.put("isLegacy", Boolean.TRUE.equals(model.getIsLegacy()));
+                    map.put("aliases", model.getAliases() != null ? model.getAliases() : List.of());
                     return map;
                 }).toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("brandId") + ":" + item.get("typeId") + ":" + name;
+        });
     }
 
     public List<Map<String, Object>> getRealEstateTypes() {
@@ -174,6 +198,7 @@ public class EnumReadService {
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
+                    map.put("category", RealEstateCategory.fromTypeName(type.getName()).name());
                     return map;
                 })
                 .toList();
@@ -241,6 +266,7 @@ public class EnumReadService {
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
+                    map.put("group", com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.fromTypeName(type.getName()).name());
                     return map;
                 }).toList();
         return deduplicateByName(raw);
@@ -274,7 +300,10 @@ public class EnumReadService {
                     return map;
                 })
                 .toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("bookTypeId") + ":" + name;
+        });
     }
 
     public List<Map<String, Object>> getBookLanguages() {
@@ -346,6 +375,7 @@ public class EnumReadService {
                     map.put("id", v.getId());
                     map.put("name", v.getName());
                     map.put("label", Optional.ofNullable(v.getLabel()).filter(l -> !l.isBlank()).orElse(v.getName()));
+                    map.put("disciplineId", v.getDiscipline() != null ? v.getDiscipline().getId() : null);
                     return map;
                 })
                 .toList();
@@ -375,10 +405,15 @@ public class EnumReadService {
                     map.put("id", gen.getId());
                     map.put("name", gen.getName());
                     map.put("modelId", gen.getModel() != null ? gen.getModel().getId() : null);
+                    map.put("startYear", gen.getStartYear());
+                    map.put("endYear", gen.getEndYear());
                     return map;
                 })
                 .toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("modelId") + ":" + name;
+        });
     }
 
     public List<Map<String, Object>> getVehicleEngines() {
@@ -390,10 +425,15 @@ public class EnumReadService {
                     map.put("name", eng.getName());
                     map.put("generationId", eng.getGeneration() != null ? eng.getGeneration().getId() : null);
                     map.put("fuelType", eng.getFuelType() != null ? eng.getFuelType().name() : null);
+                    map.put("horsePower", eng.getHorsePower());
+                    map.put("engineCapacity", eng.getEngineCapacity());
                     return map;
                 })
                 .toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("generationId") + ":" + name + ":" + item.get("fuelType");
+        });
     }
 
     public List<Map<String, Object>> getVehicleTrims() {
@@ -407,6 +447,9 @@ public class EnumReadService {
                     return map;
                 })
                 .toList();
-        return deduplicateByName(raw);
+        return deduplicateBy(raw, item -> {
+            String name = normalizeName(item);
+            return name.isBlank() ? "" : item.get("generationId") + ":" + name;
+        });
     }
 }

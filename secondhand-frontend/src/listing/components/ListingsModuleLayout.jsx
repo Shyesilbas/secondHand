@@ -64,6 +64,7 @@ const ListingsModuleLayout = ({
  getListingTypeLabel={getListingTypeLabel}
  onResetFilters={engine.resetFilters}
  updateFilters={engine.updateFilters}
+ hasActiveFilters={engine.hasActiveFilters}
  searchTerm={searchTerm}
  searchMode={searchMode}
  onListingChanged={handleListingChanged}

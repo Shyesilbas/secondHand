@@ -8,7 +8,6 @@ import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal.jsx';
 import { AlertTriangle, ArrowLeft, Check, Heart, ShoppingBag } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
-import { formatCurrency } from '../../common/formatters.js';
 import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
@@ -219,16 +218,6 @@ const ShoppingCartPage = () => {
  return total + price * item.quantity;
  }, 0);
  };
- const calculateOriginalTotal = () => {
- return cartItems.reduce((total, item) => {
- const price = parseFloat(item.listing.price) || 0;
- return total + price * item.quantity;
- }, 0);
- };
- const currency = cartItems.length > 0 ? cartItems[0].listing.currency : 'TRY';
- const originalTotal = pricing?.originalSubtotal != null ? parseFloat(pricing.originalSubtotal) : calculateOriginalTotal();
- const discountedTotal = pricing?.total != null ? parseFloat(pricing.total) : calculateTotal();
- const campaignDiscount = pricing?.campaignDiscount != null ? parseFloat(pricing.campaignDiscount) : Math.max(0, (originalTotal || 0) - (discountedTotal || 0));
  const favoriteListings = useMemo(() => favorites.map(fav => {
     const listing = fav?.listing;
     if (!listing) return null;
@@ -261,201 +250,334 @@ const ShoppingCartPage = () => {
  clearCart();
  setShowClearModal(false);
  };
- if (isLoading) {
- return <div className="min-h-screen bg-background-secondary">
- <div className="mx-auto max-w-7xl space-y-3 px-4 py-8" aria-busy="true">
- <Skeleton className="h-8 w-40" />
- {['a', 'b', 'c'].map(k => <Skeleton key={k} className="h-28 w-full" />)}
- </div>
- </div>;
- }
- return <div className={`min-h-screen bg-background-secondary`}>
- <header className="sticky top-0 z-30 border-b border-border-light bg-background-primary">
- <PageContainer className="flex h-14 items-center justify-between py-0">
- <div className="flex min-w-0 items-center gap-2 sm:gap-3">
- <button type="button" onClick={() => navigate(-1)} className="-ml-2 rounded p-2 text-text-secondary transition hover:bg-black/[0.04] hover:text-text-primary" aria-label={t("back")}>
- <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
- </button>
- <h1 className="text-2xl font-semibold text-text-primary truncate">{t("shopping_cart")}</h1>
- {cartCount > 0 ? <span className="shrink-0 rounded-sm border border-border-light bg-background-primary px-2.5 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
- {cartCount} {cartCount === 1 ? 'item' : 'items'}
- </span> : <span className="text-xs font-medium text-text-muted">{t("empty")}</span>}
- </div>
- {cartCount > 0 && <div className="text-right">
- <p className="text-sm font-semibold tabular-nums text-text-primary sm:text-base">
- {formatCurrency(discountedTotal, currency)}
- </p>
- {campaignDiscount > 0 && <p className="text-xs tabular-nums text-text-secondary">
- <span className="line-through">{formatCurrency(originalTotal, currency)}</span>
- <span className="ml-1.5 text-status-success font-semibold">
- −{formatCurrency(campaignDiscount, currency)}
- </span>
- </p>}
- </div>}
- </PageContainer>
- </header>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background-secondary">
+        <PageContainer className="space-y-4 py-8" aria-busy="true">
+          <Skeleton className="h-8 w-48" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-8 space-y-3">
+              {['a', 'b', 'c'].map((k) => (
+                <Skeleton key={k} className="h-32 w-full" />
+              ))}
+            </div>
+            <div className="lg:col-span-4">
+              <Skeleton className="h-80 w-full" />
+            </div>
+          </div>
+        </PageContainer>
+      </div>
+    );
+  }
 
- <PageContainer className="py-6 sm:py-8">
- {cartCount === 0 ? <div className="space-y-8 pb-12">
- <div className="overflow-hidden rounded border border-border bg-background-primary">
- <EmptyState
- icon={ShoppingBag}
- title={CART_MESSAGES.EMPTY_CART_TITLE}
- description={CART_MESSAGES.EMPTY_CART_DESCRIPTION}
- >
- <div className="mt-8 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center">
- <Button onClick={() => navigate(ROUTES.LISTINGS)}>{t("browse_listings")}</Button>
- {isAuthenticated ? <Link to={ROUTES.FAVORITES} className={buttonClasses('secondary')}>
- <span className="inline-flex items-center justify-center gap-2">
- <Heart className="h-4 w-4 text-text-secondary" strokeWidth={1.75} />{t("favorites")}</span>
- </Link> : <Link to={ROUTES.LOGIN} className={buttonClasses('secondary')}>
- {CART_MESSAGES.EMPTY_CART_SIGN_IN}
- </Link>}
- </div>
- </EmptyState>
- </div>
+  return (
+    <div className="min-h-screen bg-background-secondary">
+      <PageContainer className="py-6 sm:py-8">
+        {/* Page Header */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition mb-2"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>{t("continue_shopping", "Alışverişe Devam Et")}</span>
+            </button>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-semibold text-text-primary">
+                {t("shopping_cart", "Alışveriş Sepeti")}
+              </h1>
+              {cartCount > 0 && (
+                <span className="rounded-sm border border-border-light bg-background-primary px-2.5 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+                  {cartCount} {cartCount === 1 ? t("item", "ürün") : t("items", "ürün")}
+                </span>
+              )}
+            </div>
+          </div>
 
- {isAuthenticated ? <section className={`overflow-hidden rounded border border-border bg-background-primary p-5 sm:p-6`}>
- <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
- <div>
- <h3 className="text-sm font-medium text-text-primary">
- {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
- </h3>
- <p className="mt-1 text-sm text-text-secondary">
- {CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}
- </p>
- </div>
- <Link to={ROUTES.FAVORITES} className="text-sm font-medium text-primary hover:underline">
- {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES}
- </Link>
- </div>
- {favoritesLoading ? <SkeletonGrid count={4} columns="grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4" /> : favoriteListings.length > 0 ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
- {favoriteListings.map((listing, index) => <div key={listing.id} className="min-w-0 max-w-full">
- <ListingCard listing={listing} isOwner={user?.id === listing.sellerId} currentUserId={user?.id} priorityImage={index < 4} />
- </div>)}
- </div> : <p className="rounded border border-dashed border-border-light py-8 text-center text-sm text-text-secondary">{t("no_favorites_yet_tap_the_heart_on_a_list")}</p>}
- </section> : <div className={`overflow-hidden rounded border border-border bg-background-primary flex flex-col gap-4 px-5 py-6 sm:flex-row sm:items-center sm:justify-between`}>
- <p className="text-sm text-text-secondary">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
- <Link to={ROUTES.LOGIN} className={`${buttonClasses()} shrink-0`}>
- {CART_MESSAGES.EMPTY_CART_SIGN_IN}
- </Link>
- </div>}
- </div> : <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
- <div className="space-y-4 lg:col-span-8">
+          {cartCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowClearModal(true)}
+              className="text-xs font-medium text-text-secondary hover:text-status-error transition self-start sm:self-auto"
+            >
+              {t("clear_all", "Sepeti Temizle")}
+            </button>
+          )}
+        </div>
 
- {(hasExpiredReservations || hasExpiringReservations) && <div className={`flex gap-2.5 rounded border-l-4 px-3 py-2.5 text-sm ${hasExpiredReservations ? 'border-border bg-background-secondary text-status-error-text' : 'border-border bg-background-secondary text-status-warning-text'}`}>
- <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'}`} />
- <div>
- <p className="font-medium text-text-primary">
- {hasExpiredReservations ? 'Some reservations have expired' : 'Reservations expiring soon'}
- </p>
- <p className="mt-0.5 text-text-secondary">
- {hasExpiredReservations ? 'Update quantities or proceed to checkout now.' : 'Complete your purchase within the next few minutes to hold these items.'}
- </p>
- </div>
- </div>}
+        {cartCount === 0 ? (
+          <div className="space-y-8 pb-12">
+            <div className="overflow-hidden rounded border border-border bg-background-primary p-6">
+              <EmptyState
+                icon={ShoppingBag}
+                title={CART_MESSAGES.EMPTY_CART_TITLE}
+                description={CART_MESSAGES.EMPTY_CART_DESCRIPTION}
+              >
+                <div className="mt-6 flex flex-col items-stretch justify-center gap-2 sm:flex-row sm:items-center">
+                  <Button onClick={() => navigate(ROUTES.LISTINGS)}>{t("browse_listings")}</Button>
+                  {isAuthenticated ? (
+                    <Link to={ROUTES.FAVORITES} className={buttonClasses('secondary')}>
+                      <span className="inline-flex items-center justify-center gap-1.5">
+                        <Heart className="h-4 w-4 text-text-secondary" strokeWidth={1.75} />
+                        {t("favorites")}
+                      </span>
+                    </Link>
+                  ) : (
+                    <Link to={ROUTES.LOGIN} className={buttonClasses('secondary')}>
+                      {CART_MESSAGES.EMPTY_CART_SIGN_IN}
+                    </Link>
+                  )}
+                </div>
+              </EmptyState>
+            </div>
 
- {/* Applied Bundles (Success) */}
- {bundleInfo.applied.length > 0 && <div className="mb-6 space-y-3">
- {bundleInfo.applied.map((a, idx) => <div key={idx} className="flex items-center gap-4 p-4 bg-background-secondary border border-border rounded-md duration-500">
- <Check className="shrink-0 h-5 w-5 text-status-success" strokeWidth={1.5} aria-hidden />
- <div className="flex-1">
- <p className="text-sm font-semibold text-status-success">{t("bundle_unlocked")}</p>
- <p className="text-xs text-status-success mt-0.5">{t("you_ve_earned_a")}<b>{a.discountValue}{a.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</b>{t("from")}<button onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))} className="font-semibold underline hover:text-status-success transition-colors">{a.sellerName}</button>{t("for_buying")}{a.quantity}{t("items")}</p>
- </div>
- </div>)}
- </div>}
+            {isAuthenticated ? (
+              <section className="overflow-hidden rounded border border-border bg-background-primary p-5 sm:p-6">
+                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h2 className="text-sm font-semibold text-text-primary">
+                      {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
+                    </h2>
+                    <p className="mt-0.5 text-xs text-text-secondary">
+                      {CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}
+                    </p>
+                  </div>
+                  <Link to={ROUTES.FAVORITES} className="text-xs font-medium text-text-primary hover:underline">
+                    {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES} →
+                  </Link>
+                </div>
+                {favoritesLoading ? (
+                  <SkeletonGrid count={4} columns="grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4" />
+                ) : favoriteListings.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-4">
+                    {favoriteListings.map((listing, index) => (
+                      <div key={listing.id} className="min-w-0 max-w-full">
+                        <ListingCard
+                          listing={listing}
+                          isOwner={user?.id === listing.sellerId}
+                          currentUserId={user?.id}
+                          priorityImage={index < 4}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded border border-dashed border-border-light py-8 text-center text-xs text-text-secondary">
+                    {t("no_favorites_yet_tap_the_heart_on_a_list")}
+                  </p>
+                )}
+              </section>
+            ) : (
+              <div className="overflow-hidden rounded border border-border bg-background-primary flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-text-secondary">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
+                <Link to={ROUTES.LOGIN} className={`${buttonClasses()} shrink-0`}>
+                  {CART_MESSAGES.EMPTY_CART_SIGN_IN}
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+            {/* Left Column: Cart Items & Alerts */}
+            <div className="space-y-4 lg:col-span-8">
+              {/* Expired / Expiring Reservations */}
+              {(hasExpiredReservations || hasExpiringReservations) && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-3 rounded border border-border bg-background-primary p-3.5 text-xs text-text-secondary"
+                >
+                  <AlertTriangle
+                    className={`h-4 w-4 shrink-0 mt-0.5 ${
+                      hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
+                    }`}
+                  />
+                  <div>
+                    <p className="font-semibold text-text-primary">
+                      {hasExpiredReservations
+                        ? 'Bazı ürün rezervasyonlarının süresi doldu'
+                        : 'Rezervasyon süresi yakında doluyor'}
+                    </p>
+                    <p className="mt-0.5 text-text-secondary">
+                      {hasExpiredReservations
+                        ? 'Stok durumunu güncellemek veya alışverişi tamamlamak için hemen ödeme adımına geçin.'
+                        : 'Ürünlerinizi ayırmak ve kaçırmamak için alışverişinizi birkaç dakika içinde tamamlayın.'}
+                    </p>
+                  </div>
+                </div>
+              )}
 
- {/* Bundle Suggestions (Potential) */}
- {bundleInfo.suggestions.length > 0 && <div className="mb-8 space-y-4">
- {bundleInfo.suggestions.map((s, idx) => {
- const currentQty = s.minQuantity - s.remaining;
- const progress = currentQty / s.minQuantity * 100;
- return <div key={idx} className="group relative overflow-hidden bg-background-primary border-2 border-primary rounded-md p-5 transition-all">
- <div className="absolute top-0 left-0 w-1 bg-primary h-full" />
- 
- <div className="flex flex-col sm:flex-row sm:items-center gap-6">
- <div className="flex-1">
- <div className="flex items-center gap-2 mb-1">
- <span className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-primary">
- <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
- <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
- </svg>
- </span>
- <h4 className="text-sm font-semibold text-text-primary">{t("exclusive_bundle_from")}<button onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))} className="underline hover:text-primary transition-colors">{s.sellerName}</button>
- </h4>
- </div>
- 
- <p className="text-xs text-text-secondary mb-4">{t("add")}<span className="font-semibold text-primary">{s.remaining}{t("more_item")}{s.remaining > 1 ? 's' : ''}</span>{t("to_unlock_a")}<span className="px-1.5 py-0.5 rounded bg-background-secondary text-status-success-text font-semibold">{s.discountValue}{s.discountKind === 'PERCENT' ? '%' : ''}{t("discount")}</span>{t("on_your_entire_bundle")}</p>
- 
- <div className="relative w-full h-2 bg-border-light rounded-full overflow-hidden">
- <div className="absolute top-0 left-0 h-full bg-primary transition-all duration-1000 ease-out" style={{
- width: `${progress}%`
- }} />
- </div>
- <div className="flex justify-between mt-2 text-xs font-semibold text-text-muted">
- <span>{currentQty}{t("items_in_cart")}</span>
- <span>{t("target")}{s.minQuantity}{t("items")}</span>
- </div>
- </div>
- 
- <button onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 shrink-0">
- <ShoppingBag className="w-4 h-4" />{t("complete_bundle")}</button>
- </div>
- </div>;
- })}
- </div>}
+              {/* Applied Bundles (Success) */}
+              {bundleInfo.applied.length > 0 && (
+                <div className="space-y-2.5">
+                  {bundleInfo.applied.map((a, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between gap-3 rounded border border-border bg-background-primary p-3.5 text-xs"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Check className="h-4 w-4 text-status-success shrink-0" strokeWidth={2} />
+                        <div className="min-w-0">
+                          <span className="font-semibold text-text-primary mr-1">
+                            {a.sellerName} {t("bundle_unlocked", "Paket İndirimi")}:
+                          </span>
+                          <span className="text-text-secondary">
+                            {a.quantity} ürün için %{a.discountValue} indirim uygulandı.
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))}
+                        className="text-xs font-medium text-text-secondary hover:text-text-primary hover:underline shrink-0"
+                      >
+                        {t("view_seller", "Satıcıyı Gör")}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
- <div className="overflow-hidden rounded border border-border bg-background-primary">
- <div className="flex items-center justify-between border-b px-4 py-3 sm:px-5 border-border-light bg-background-primary">
- <h2 className="text-lg font-semibold text-text-primary">{t("your_items")}</h2>
- <button type="button" onClick={() => setShowClearModal(true)} className="text-xs font-medium text-text-secondary underline-offset-2 hover:text-primary hover:underline">{t("clear_all")}</button>
- </div>
- <div className="divide-y divide-border-light">
- {cartItems.map(item => <CartItemCard key={item.id} item={item} onQuantityChange={handleQuantityChange} onRemoveItem={handleRemoveItem} isUpdating={isUpdatingCart} isRemoving={isRemovingFromCart} />)}
- </div>
- </div>
- </div>
+              {/* Bundle Suggestions (Potential) */}
+              {bundleInfo.suggestions.length > 0 && (
+                <div className="space-y-3">
+                  {bundleInfo.suggestions.map((s, idx) => {
+                    const currentQty = s.minQuantity - s.remaining;
+                    const progress = (currentQty / s.minQuantity) * 100;
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded border border-border bg-background-primary p-4 sm:p-5"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                                {t("exclusive_bundle_from", "Özel Satıcı Paketi:")}{' '}
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
+                                  className="text-text-primary hover:underline font-semibold"
+                                >
+                                  {s.sellerName}
+                                </button>
+                              </span>
+                            </div>
 
-  <div className="lg:col-span-4">
-    <OrderSummary
-      cartItems={cartItems}
-      cartCount={cartCount}
-      calculateTotal={calculateTotal}
-      pricing={pricing}
-      onCheckout={() => navigate(ROUTES.CHECKOUT, { state: { couponCode: appliedCouponCode } })}
-      disabled={cartCount === 0 || hasExpiredReservations}
-      couponInput={couponInput}
-      setCouponInput={setCouponInput}
-      appliedCouponCode={appliedCouponCode}
-      couponError={couponError}
-      isPreviewLoading={isPreviewLoading}
-      onApplyCoupon={onApplyCoupon}
-      onRemoveCoupon={onRemoveCoupon}
-      onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
-      isPremium={isPremium}
-      onOpenPremiumModal={() => setIsPremiumModalOpen(true)}
-    />
-  </div>
-  </div>}
+                            <p className="mt-1.5 text-xs text-text-secondary">
+                              {t("add", "Ekle:")}{' '}
+                              <strong className="text-text-primary">
+                                {s.remaining} {t("more_item", "ürün daha")}
+                              </strong>{' '}
+                              → sepette{' '}
+                              <span className="font-semibold text-status-success">
+                                %{s.discountValue} indirim
+                              </span>{' '}
+                              kazanın.
+                            </p>
 
-  <ClearCartModal isOpen={showClearModal} onClose={() => setShowClearModal(false)} onConfirm={handleClearCart} isClearing={isClearingCart} />
-  <ActiveCouponsModal 
-    isOpen={isCouponsModalOpen} 
-    onClose={() => setIsCouponsModalOpen(false)} 
-    onApply={code => {
-      const c = typeof code === 'string' ? code.trim() : '';
-      setCouponInput(c);
-      setIsCouponsModalOpen(false);
-      setAppliedCouponCode(c ? c.toUpperCase() : null);
-    }} 
-  />
-  <PremiumUpgradeModal 
-    isOpen={isPremiumModalOpen} 
-    onClose={() => setIsPremiumModalOpen(false)} 
-    featureHint="Öncelikli Kargo" 
-  />
-  </PageContainer>
-  </div>;
+                            <div className="mt-2.5 space-y-1">
+                              <div className="h-1.5 w-full overflow-hidden rounded-sm bg-background-tertiary">
+                                <div
+                                  className="h-full bg-primary transition-all duration-300"
+                                  style={{ width: `${Math.min(100, progress)}%` }}
+                                />
+                              </div>
+                              <div className="flex justify-between text-xs text-text-muted tabular-nums">
+                                <span>{currentQty} {t("items_in_cart", "ürün sepette")}</span>
+                                <span>Hedef: {s.minQuantity} {t("items", "ürün")}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
+                            className="inline-flex items-center justify-center gap-1.5 rounded border border-border bg-background-primary px-3.5 py-2 text-xs font-semibold text-text-primary transition hover:bg-background-secondary shrink-0 self-start sm:self-center"
+                          >
+                            <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" />
+                            <span>{t("complete_bundle", "Paketi Tamamla")}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Items Card */}
+              <div className="overflow-hidden rounded border border-border bg-background-primary">
+                <div className="flex items-center justify-between border-b border-border-light px-5 py-3.5 bg-background-primary">
+                  <h2 className="text-sm font-semibold text-text-primary">
+                    {t("your_items", "Ürünleriniz")} ({cartCount})
+                  </h2>
+                  <span className="text-xs text-text-muted">
+                    Güvenli rezervasyon
+                  </span>
+                </div>
+                <div className="divide-y divide-border-light">
+                  {cartItems.map((item) => (
+                    <CartItemCard
+                      key={item.id}
+                      item={item}
+                      onQuantityChange={handleQuantityChange}
+                      onRemoveItem={handleRemoveItem}
+                      isUpdating={isUpdatingCart}
+                      isRemoving={isRemovingFromCart}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Order Summary */}
+            <div className="lg:col-span-4">
+              <OrderSummary
+                cartItems={cartItems}
+                cartCount={cartCount}
+                calculateTotal={calculateTotal}
+                pricing={pricing}
+                onCheckout={() => navigate(ROUTES.CHECKOUT, { state: { couponCode: appliedCouponCode } })}
+                disabled={cartCount === 0 || hasExpiredReservations}
+                couponInput={couponInput}
+                setCouponInput={setCouponInput}
+                appliedCouponCode={appliedCouponCode}
+                couponError={couponError}
+                isPreviewLoading={isPreviewLoading}
+                onApplyCoupon={onApplyCoupon}
+                onRemoveCoupon={onRemoveCoupon}
+                onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
+                isPremium={isPremium}
+                onOpenPremiumModal={() => setIsPremiumModalOpen(true)}
+              />
+            </div>
+          </div>
+        )}
+
+        <ClearCartModal
+          isOpen={showClearModal}
+          onClose={() => setShowClearModal(false)}
+          onConfirm={handleClearCart}
+          isClearing={isClearingCart}
+        />
+        <ActiveCouponsModal
+          isOpen={isCouponsModalOpen}
+          onClose={() => setIsCouponsModalOpen(false)}
+          onApply={(code) => {
+            const c = typeof code === 'string' ? code.trim() : '';
+            setCouponInput(c);
+            setIsCouponsModalOpen(false);
+            setAppliedCouponCode(c ? c.toUpperCase() : null);
+          }}
+        />
+        <PremiumUpgradeModal
+          isOpen={isPremiumModalOpen}
+          onClose={() => setIsPremiumModalOpen(false)}
+          featureHint="Öncelikli Kargo"
+        />
+      </PageContainer>
+    </div>
+  );
 };
 export default ShoppingCartPage;

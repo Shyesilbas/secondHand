@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState, useMemo, useEffect, memo } from 'react';
-import { ChevronDown, Plus, ArrowLeft, ArrowRight, Truck, Users, MapPin, CheckCircle2, Home, FileText, Sparkles, ShieldCheck, AlertCircle, Pencil } from 'lucide-react';
+import { ChevronDown, Plus, ArrowLeft, ArrowRight, Truck, Users, MapPin, Check, Home, FileText, ShieldCheck, AlertCircle, Pencil } from 'lucide-react';
 import AddressForm from '../../../user/components/address/AddressForm.jsx';
 import useAddresses from '../../../user/hooks/useAddresses.js';
 
@@ -108,29 +108,29 @@ const CheckoutAddressStep = ({
   const warning = getValidationWarning();
 
   return (
-    <div className="p-6 sm:p-8 space-y-8">
+    <div className="p-5 sm:p-6 space-y-6">
       {/* ── Section 1: Delivery Method ──────────────────────────── */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3.5">
           <div>
-            <h3 className="text-sm font-semibold text-text-primary tracking-tight">
-              {t("teslimat_y_ntemi", "Teslimat Yöntemi Seçin")}
-            </h3>
-            <p className="text-xs text-text-tertiary font-medium mt-0.5">
+            <h2 className="text-sm font-semibold text-text-primary">
+              {t("teslimat_y_ntemi", "Teslimat Yöntemi")}
+            </h2>
+            <p className="text-xs text-text-secondary mt-0.5">
               Ürününüzü nasıl teslim almak istediğinizi belirleyin.
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-semibold bg-background-tertiary text-text-secondary border border-border">
+          <span className="rounded-sm border border-border-light bg-background-tertiary px-2 py-0.5 text-xs font-medium text-text-secondary">
             {deliveryMethod === 'CARGO' ? 'Standart Gönderim' : 'Elden Teslimat'}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {/* Cargo Option */}
-          <label className={`group relative flex cursor-pointer items-start gap-4 rounded-md border-2 p-5 transition-all duration-200 ${
+          <label className={`group relative flex cursor-pointer items-start gap-3.5 rounded border p-4 transition-colors ${
             deliveryMethod === 'CARGO'
-              ? 'border-primary bg-background-secondary ring-2'
-              : 'border-border/80 bg-white hover:border-card-border-hover'
+              ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
+              : 'border-border bg-background-primary hover:border-card-border-hover'
           }`}>
             <input 
               type="radio" 
@@ -141,12 +141,12 @@ const CheckoutAddressStep = ({
               className="sr-only" 
             />
             
-            <div className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded border transition-colors ${
+            <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border transition-colors ${
               deliveryMethod === 'CARGO' 
-                ? 'bg-primary text-white border-primary' 
-                : 'bg-background-tertiary text-text-secondary border-border group-hover:bg-secondary-200/60'
+                ? 'bg-primary text-text-inverse border-primary' 
+                : 'bg-background-tertiary text-text-secondary border-border-light'
             }`}>
-              <Truck className="h-5 w-5" />
+              <Truck className="h-4 w-4" />
             </div>
 
             <div className="min-w-0 flex-1">
@@ -155,26 +155,25 @@ const CheckoutAddressStep = ({
                   {t("kargo_ile_g_nderim", "Adrese Kargo Teslimatı")}
                 </span>
                 {deliveryMethod === 'CARGO' && (
-                  <CheckCircle2 className="h-4 w-4 text-text-primary shrink-0" />
+                  <Check className="h-4 w-4 text-primary shrink-0" strokeWidth={2.5} />
                 )}
               </div>
-              <span className="mt-1 block text-xs text-text-tertiary font-medium leading-relaxed">
+              <span className="mt-1 block text-xs text-text-secondary leading-relaxed">
                 {t("standart_kargo_irketi_arac_l_yla_adrese_", "Anlaşmalı kargo firmaları ile kapınıza kadar sigortalı teslimat.")}
               </span>
-              <div className="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-status-success-text bg-background-secondary w-fit px-2 py-0.5 rounded-md border border-border">
-                <Sparkles className="h-3 w-3" />
+              <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-status-success">
                 <span>Ücretsiz & Takip Numaralı</span>
               </div>
             </div>
           </label>
 
           {/* Safe Meetup Option */}
-          <label className={`group relative flex cursor-pointer items-start gap-4 rounded-md border-2 p-5 transition-all duration-200 ${
+          <label className={`group relative flex cursor-pointer items-start gap-3.5 rounded border p-4 transition-colors ${
             !canMeetup
-              ? 'opacity-50 cursor-not-allowed border-border bg-background-secondary/70'
+              ? 'opacity-40 cursor-not-allowed border-border bg-background-secondary'
               : deliveryMethod === 'SAFE_MEETUP'
-              ? 'border-primary bg-background-secondary ring-2'
-              : 'border-border/80 bg-white hover:border-card-border-hover'
+              ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
+              : 'border-border bg-background-primary hover:border-card-border-hover'
           }`}>
             <input 
               type="radio" 
@@ -186,12 +185,12 @@ const CheckoutAddressStep = ({
               className="sr-only" 
             />
 
-            <div className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded border transition-colors ${
+            <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border transition-colors ${
               deliveryMethod === 'SAFE_MEETUP' 
-                ? 'bg-primary text-white border-primary' 
-                : 'bg-background-tertiary text-text-secondary border-border group-hover:bg-secondary-200/60'
+                ? 'bg-primary text-text-inverse border-primary' 
+                : 'bg-background-tertiary text-text-secondary border-border-light'
             }`}>
-              <Users className="h-5 w-5" />
+              <Users className="h-4 w-4" />
             </div>
 
             <div className="min-w-0 flex-1">
@@ -200,11 +199,11 @@ const CheckoutAddressStep = ({
                   {t("elden_g_venli_teslimat", "Elden Güvenli Buluşma")}
                 </span>
                 {deliveryMethod === 'SAFE_MEETUP' && (
-                  <CheckCircle2 className="h-4 w-4 text-text-primary shrink-0" />
+                  <Check className="h-4 w-4 text-primary shrink-0" strokeWidth={2.5} />
                 )}
               </div>
 
-              <span className="mt-1 block text-xs text-text-tertiary font-medium leading-relaxed">
+              <span className="mt-1 block text-xs text-text-secondary leading-relaxed">
                 {!canMeetup 
                   ? 'Sepetteki ürünlerden bazıları elden teslimatı desteklemiyor.' 
                   : 'Ortak güvenli noktada 6 haneli PIN ile yüz yüze kontrol ve teslimat.'
@@ -212,8 +211,8 @@ const CheckoutAddressStep = ({
               </span>
 
               {canMeetup && sellerLocations.length > 0 && (
-                <div className="mt-2.5 inline-flex items-center gap-1 text-xs text-text-secondary font-semibold bg-background-tertiary px-2 py-0.5 rounded-md border border-border">
-                  <MapPin className="h-3 w-3 text-text-secondary" />
+                <div className="mt-2 inline-flex items-center gap-1 text-xs text-text-secondary">
+                  <MapPin className="h-3 w-3 text-text-tertiary" />
                   <span>Satıcı Konumu: <strong className="text-text-primary">{sellerLocations.join(', ')}</strong></span>
                 </div>
               )}
@@ -223,15 +222,15 @@ const CheckoutAddressStep = ({
 
         {/* Meetup Location Selector Sub-panel */}
         {deliveryMethod === 'SAFE_MEETUP' && (
-          <div className="mt-4 rounded-md border border-border/90 bg-background-secondary/50 p-5 transition-all duration-200">
+          <div className="mt-3.5 rounded border border-border bg-background-secondary p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-status-warning-text" />
-                <h4 className="text-xs font-semibold text-status-warning-text">
+                <MapPin className="h-4 w-4 text-text-secondary" />
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                   {t("bulu_ma_noktas_se_in", "Buluşma Noktası Belirleyin")}
-                </h4>
+                </h3>
               </div>
-              <span className="text-xs text-status-warning-text font-medium">Önerilen Güvenli Noktalar</span>
+              <span className="text-xs text-text-muted">Önerilen Güvenli Noktalar</span>
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3">
@@ -245,13 +244,13 @@ const CheckoutAddressStep = ({
                       setMeetupLocation(hub);
                       setCustomLocationActive(false);
                     }}
-                    className={`flex items-center gap-2 rounded border px-3.5 py-2.5 text-left text-xs font-semibold transition-all ${
+                    className={`flex items-center gap-2 rounded border px-3 py-2 text-left text-xs font-medium transition-colors ${
                       isSelected
-                        ? 'border-primary bg-primary text-white'
-                        : 'border-border/70 bg-white text-text-secondary hover:border-card-border-hover hover:bg-background-secondary/30'
+                        ? 'border-primary bg-primary text-text-inverse'
+                        : 'border-border bg-background-primary text-text-secondary hover:border-border-dark'
                     }`}
                   >
-                    <MapPin className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{hub}</span>
                   </button>
                 );
@@ -265,32 +264,32 @@ const CheckoutAddressStep = ({
                     setMeetupLocation('');
                   }
                 }}
-                className={`flex items-center justify-center gap-1.5 rounded border px-3.5 py-2.5 text-xs font-semibold transition-all ${
+                className={`flex items-center justify-center gap-1.5 rounded border px-3 py-2 text-xs font-medium transition-colors ${
                   customLocationActive || (!PREDEFINED_HUBS.includes(meetupLocation) && meetupLocation)
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-border/70 bg-white text-text-secondary hover:border-card-border-hover'
+                    ? 'border-primary bg-primary text-text-inverse'
+                    : 'border-border bg-background-primary text-text-secondary hover:border-border-dark'
                 }`}
               >
-                <Pencil className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                <span>Farklı / Özel Konum Gir</span>
+                <Pencil className="h-3.5 w-3.5" />
+                <span>Farklı Konum Gir</span>
               </button>
             </div>
 
             {(customLocationActive || (!PREDEFINED_HUBS.includes(meetupLocation) && meetupLocation)) && (
-              <div className="mt-3">
+              <div className="mt-2.5">
                 <input
                   type="text"
                   value={meetupLocation || ''}
                   onChange={e => setMeetupLocation(e.target.value)}
-                  className="w-full rounded border border-card-border-hover bg-white px-4 py-2.5 text-sm text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 placeholder:text-text-muted"
+                  className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition focus:border-border-focus placeholder:text-text-muted"
                   placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k", "Örn: Kadıköy Boğa Heykeli önü veya Levent Metro çıkışı")}
                 />
               </div>
             )}
 
             {meetupLocation && (
-              <div className="mt-3 flex items-center gap-2 text-xs text-status-warning-text bg-background-secondary/60 px-3 py-2 rounded border border-border">
-                <ShieldCheck className="h-4 w-4 text-status-warning-text shrink-0" />
+              <div className="mt-2.5 flex items-center gap-2 text-xs text-text-secondary rounded border border-border-light bg-background-primary px-3 py-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-text-secondary shrink-0" />
                 <span>Belirlenen Nokta: <strong className="text-text-primary">{meetupLocation}</strong></span>
               </div>
             )}
@@ -299,13 +298,13 @@ const CheckoutAddressStep = ({
       </div>
 
       {/* ── Section 2: Shipping Addresses ───────────────────────── */}
-      <div className="border-t border-border-light pt-7">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="border-t border-border-light pt-6">
+        <div className="mb-3.5 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-text-primary tracking-tight">
+            <h2 className="text-sm font-semibold text-text-primary">
               {deliveryMethod === 'SAFE_MEETUP' ? 'Yasal Fatura Adresi' : 'Teslimat Adresi'}
-            </h3>
-            <p className="text-xs text-text-tertiary font-medium mt-0.5">
+            </h2>
+            <p className="text-xs text-text-secondary mt-0.5">
               {deliveryMethod === 'SAFE_MEETUP' 
                 ? 'Elden teslimatlarda mevzuat gereği fatura düzenlenecek kayıtlı adresiniz.' 
                 : 'Siparişinizin güvenle gönderileceği kayıtlı adresinizi seçin.'}
@@ -315,42 +314,42 @@ const CheckoutAddressStep = ({
           <button
             type="button"
             onClick={() => setIsAddAddressModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
+            className="inline-flex items-center justify-center gap-1.5 rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:bg-background-secondary hover:text-text-primary shrink-0"
           >
-            <Plus className="h-3.5 w-3.5 text-text-primary" strokeWidth={2.5} />
-            {t("add_address", "Yeni Adres")}
+            <Plus className="h-3.5 w-3.5" />
+            <span>{t("add_address", "Yeni Adres")}</span>
           </button>
         </div>
 
         {!hasAddresses ? (
-          <div className="rounded-md border-2 border-dashed border-border bg-background-secondary/70 p-8 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-md bg-white border border-border text-text-muted">
-              <Home className="h-6 w-6" />
+          <div className="rounded border border-dashed border-border bg-background-secondary/60 p-6 text-center">
+            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded border border-border bg-background-primary text-text-muted">
+              <Home className="h-5 w-5" />
             </div>
             <p className="text-sm font-semibold text-text-primary">{t("no_saved_addresses", "Henüz kayıtlı bir adresiniz bulunmuyor")}</p>
-            <p className="text-xs text-text-tertiary mt-1 max-w-sm mx-auto">
+            <p className="text-xs text-text-secondary mt-0.5 max-w-sm mx-auto">
               Siparişinizi tamamlamak için teslimat adresinizi ekleyerek başlayabilirsiniz.
             </p>
             <button
               type="button"
               onClick={() => setIsAddAddressModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 mt-4"
+              className="inline-flex items-center justify-center gap-1.5 rounded bg-primary px-3.5 py-2 text-xs font-semibold text-text-inverse transition hover:bg-primary-hover mt-3.5"
             >
               <Plus className="h-3.5 w-3.5" />
-              {t("add_address", "Yeni Adres Ekle")}
+              <span>{t("add_address", "Yeni Adres Ekle")}</span>
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {addresses.map(address => {
               const isSelected = String(selectedShippingAddressId) === String(address.id);
               return (
                 <label
                   key={address.id}
-                  className={`relative flex flex-col justify-between cursor-pointer rounded-md border-2 p-5 transition-all duration-200 ${
+                  className={`relative flex flex-col justify-between cursor-pointer rounded border p-4 transition-colors ${
                     isSelected
-                      ? 'border-primary bg-background-secondary ring-2'
-                      : 'border-border/80 bg-white hover:border-card-border-hover'
+                      ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
+                      : 'border-border bg-background-primary hover:border-card-border-hover'
                   }`}
                 >
                   <input
@@ -362,12 +361,12 @@ const CheckoutAddressStep = ({
                     className="sr-only"
                   />
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                          isSelected ? 'border-primary bg-white' : 'border-card-border-hover bg-white'
+                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                          isSelected ? 'border-primary bg-primary' : 'border-border-dark bg-background-primary'
                         }`}>
-                          {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                          {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-background-primary" />}
                         </span>
                         <span className="text-sm font-semibold text-text-primary truncate">
                           {address.title || 'Adres'}
@@ -375,35 +374,35 @@ const CheckoutAddressStep = ({
                       </div>
 
                       {address.mainAddress && (
-                        <span className="rounded-md bg-background-tertiary border border-border px-2 py-0.5 text-xs font-semibold text-text-secondary">
+                        <span className="rounded-sm border border-border-light bg-background-tertiary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
                           {t("default", "Varsayılan")}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs text-text-secondary font-medium leading-relaxed mt-2 line-clamp-2">
+                    <p className="text-xs text-text-secondary leading-relaxed mt-1 line-clamp-2">
                       {address.addressLine}
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-border-light flex items-center justify-between text-xs text-text-tertiary font-semibold">
+                  <div className="mt-3 pt-2.5 border-t border-border-light flex items-center justify-between text-xs text-text-tertiary">
                     <span>{address.city}{address.state ? ` / ${address.state}` : ''}</span>
-                    <span>{address.postalCode}</span>
+                    <span className="tabular-nums">{address.postalCode}</span>
                   </div>
                 </label>
               );
             })}
 
-            {/* Quick Add Address card directly in grid */}
+            {/* Quick Add Address card */}
             <button
               type="button"
               onClick={() => setIsAddAddressModalOpen(true)}
-              className="flex flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-border bg-background-secondary/50 p-5 hover:border-secondary-400 hover:bg-background-secondary transition-all text-text-tertiary hover:text-text-primary min-h-36"
+              className="flex flex-col items-center justify-center gap-2 rounded border border-dashed border-border bg-background-primary p-4 hover:border-border-dark transition-colors text-text-secondary hover:text-text-primary min-h-28"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded bg-white border border-border">
-                <Plus className="h-4 w-4" />
+              <div className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-tertiary">
+                <Plus className="h-4 w-4 text-text-secondary" />
               </div>
-              <span className="text-xs font-semibold">Farklı Adres Ekle</span>
+              <span className="text-xs font-medium">Farklı Adres Ekle</span>
             </button>
           </div>
         )}
@@ -411,16 +410,16 @@ const CheckoutAddressStep = ({
 
       {/* ── Section 3: Billing Address Toggle (Cargo Mode) ─────────── */}
       {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && (
-        <div className="rounded-md border border-border/90 bg-background-secondary/60 p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <label className="flex cursor-pointer select-none items-center gap-3">
+        <div className="rounded border border-border bg-background-secondary p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <label className="flex cursor-pointer select-none items-center gap-2.5">
               <input
                 type="checkbox"
                 checked={billingSameAsShipping}
                 onChange={handleBillingToggle}
-                className="h-4 w-4 rounded border-card-border-hover text-text-primary focus:ring-primary"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-0"
               />
-              <span className="text-xs font-semibold text-text-primary">
+              <span className="text-xs font-medium text-text-primary">
                 {t("billing_same_as_shipping", "Fatura adresi teslimat adresiyle aynı")}
               </span>
             </label>
@@ -430,7 +429,7 @@ const CheckoutAddressStep = ({
                 <select
                   value={selectedBillingAddressId || ''}
                   onChange={e => setSelectedBillingAddressId(Number(e.target.value))}
-                  className="w-full appearance-none rounded border border-card-border-hover bg-white px-4 py-2.5 pr-10 text-xs font-semibold text-text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                  className="w-full appearance-none rounded border border-border bg-background-primary px-3 py-1.5 pr-8 text-xs font-medium text-text-primary outline-none transition focus:border-border-focus"
                 >
                   <option value="">{t("choose_billing_address", "Fatura Adresi Seçin")}</option>
                   {addresses.map(a => (
@@ -439,7 +438,7 @@ const CheckoutAddressStep = ({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
               </div>
             )}
           </div>
@@ -447,24 +446,24 @@ const CheckoutAddressStep = ({
       )}
 
       {/* ── Section 4: Order Name & Delivery Notes ───────────────── */}
-      <div className="border-t border-border-light pt-7">
-        <h3 className="text-sm font-semibold text-text-primary tracking-tight mb-4">
-          Sipariş Özelleştirme & Notlar
-        </h3>
+      <div className="border-t border-border-light pt-6">
+        <h2 className="text-sm font-semibold text-text-primary mb-3">
+          Sipariş Detayları & Notlar
+        </h2>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-text-tertiary">
+            <label className="mb-1 flex items-center justify-between text-xs font-medium text-text-secondary">
               <span className="flex items-center gap-1.5">
-                <FileText className="h-3.5 w-3.5 text-text-muted" />
+                <FileText className="h-3.5 w-3.5 text-text-tertiary" />
                 {t("order_name", "Sipariş Başlığı")}
               </span>
-              <span className="font-normal text-text-muted text-xs lowercase">({t("optional", "isteğe bağlı")})</span>
+              <span className="text-text-muted lowercase">({t("optional", "isteğe bağlı")})</span>
             </label>
             <input
               type="text"
-              className="w-full rounded border border-border bg-white px-4 py-3 text-sm text-text-primary outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
-              placeholder={t("e_g_birthday_gift", "Örn: Kendime Doğum Günü Hediyesi")}
+              className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
+              placeholder={t("e_g_birthday_gift", "Örn: Doğum Günü Hediyesi")}
               value={orderName || ''}
               onChange={e => setOrderName(e.target.value)}
               maxLength={100}
@@ -472,17 +471,17 @@ const CheckoutAddressStep = ({
           </div>
 
           <div>
-            <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-text-tertiary">
+            <label className="mb-1 flex items-center justify-between text-xs font-medium text-text-secondary">
               <span className="flex items-center gap-1.5">
-                <Truck className="h-3.5 w-3.5 text-text-muted" />
-                {t("notes", "Teslimat / Kurye Notu")}
+                <Truck className="h-3.5 w-3.5 text-text-tertiary" />
+                {t("notes", "Teslimat Notu")}
               </span>
-              <span className="font-normal text-text-muted text-xs lowercase">({t("optional", "isteğe bağlı")})</span>
+              <span className="text-text-muted lowercase">({t("optional", "isteğe bağlı")})</span>
             </label>
             <input
               type="text"
-              className="w-full rounded border border-border bg-white px-4 py-3 text-sm text-text-primary outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/10"
-              placeholder={t("delivery_notes", "Örn: Zil çalışmıyor, kapıda bırakabilirsiniz.")}
+              className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
+              placeholder={t("delivery_notes", "Örn: Zil çalınmasın")}
               value={notes || ''}
               onChange={e => setNotes(e.target.value)}
             />
@@ -491,10 +490,10 @@ const CheckoutAddressStep = ({
       </div>
 
       {/* ── Navigation: Desktop & Mobile ────────────────────────── */}
-      <div className="border-t border-border-light pt-6">
+      <div className="border-t border-border-light pt-5">
         {warning && (
-          <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-status-warning-text bg-background-secondary border border-border px-4 py-2.5 rounded">
-            <AlertCircle className="h-4 w-4 text-status-warning-text shrink-0" />
+          <div className="mb-3.5 flex items-center gap-2 text-xs font-medium text-status-warning rounded border border-border-light bg-background-secondary p-3">
+            <AlertCircle className="h-4 w-4 text-status-warning shrink-0" />
             <span>{warning}</span>
           </div>
         )}
@@ -503,20 +502,20 @@ const CheckoutAddressStep = ({
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4"
+            className="inline-flex items-center justify-center gap-2 rounded border border-border bg-background-primary px-4 text-xs font-medium text-text-primary transition hover:bg-background-secondary h-10"
           >
-            <ArrowLeft className="h-4 w-4" strokeWidth={2} />
-            {t("back", "Sepete Dön")}
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>{t("back", "Sepete Dön")}</span>
           </button>
 
           <button
             type="button"
             onClick={onNext}
             disabled={!isStepValid}
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4"
+            className="inline-flex items-center justify-center gap-2 rounded bg-primary px-5 text-xs font-semibold text-text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 h-10"
           >
-            {t("continue", "Ödeme Adımına Geç")}
-            <ArrowRight className="h-4 w-4" strokeWidth={2} />
+            <span>{t("continue", "Ödeme Adımına Geç")}</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>

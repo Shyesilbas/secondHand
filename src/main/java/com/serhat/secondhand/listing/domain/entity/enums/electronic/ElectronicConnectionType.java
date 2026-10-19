@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 @Getter
 public enum ElectronicConnectionType {
-    WIRED("Wired"),
+    WIRED("Kablolu"),
     BLUETOOTH("Bluetooth"),
     HDMI_USB("HDMI/USB"),
-    BOTH("Both");
+    BOTH("Her İkisi");
 
     private final String label;
 

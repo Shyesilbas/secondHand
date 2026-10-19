@@ -9,7 +9,7 @@ public enum Processor {
     APPLE_SILICON("Apple Silicon"),
     QUALCOMM("Qualcomm"),
     MEDIATEK("MediaTek"),
-    OTHER("Other");
+    OTHER("Diğer");
 
     private final String label;
 

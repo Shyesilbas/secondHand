@@ -1,9 +1,10 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { orderService } from '../services/orderService.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
 import OrderSuccessModal from '../components/OrderSuccessModal.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
 
 const resolveOrderId = payload => payload?.id || payload?.orderId || null;
 const resolveOrderNumber = payload => payload?.orderNumber || payload?.orderNo || null;
@@ -21,19 +22,22 @@ const OrderSuccessPage = () => {
     enabled: !!(navOrderId || navOrderNumber) && !Array.isArray(navOrder?.orderItems),
   });
 
-  const order = fetchedOrder || navOrder;
+  // Opened directly or after a refresh there is no checkout state: nothing true to show, so leave.
+  if (!state) return <Navigate to={ROUTES.MY_ORDERS} replace />;
+
+  const order = fetchedOrder || navOrder || (navOrderId ? { id: navOrderId } : null);
   const orderNumber = resolveOrderNumber(order) || navOrderNumber;
   const currency = order?.currency || 'TRY';
-  const totalAmount = Number(order?.totalAmount ?? state?.totalAmount ?? 0);
-  const orderDate = order?.createdAt || state?.createdAt || new Date().toISOString();
+  const totalAmount = order?.totalAmount ?? state?.totalAmount ?? null;
+  const orderDate = order?.createdAt || state?.createdAt || null;
   const shippingAddress = order?.shippingAddress || state?.shippingAddress || null;
-  const deliveryMethod = order?.deliveryMethod || state?.deliveryMethod || 'CARGO';
+  const deliveryMethod = order?.deliveryMethod || state?.deliveryMethod || null;
   const meetupLocation = order?.meetupLocation || state?.meetupLocation || '';
   const orderItems = order?.orderItems || [];
 
   return (
     <div className="min-h-screen bg-background-secondary py-10">
-      <PageContainer className="max-w-3xl mx-auto">
+      <PageContainer narrow>
         <OrderSuccessModal
           order={order}
           orderNumber={orderNumber}
@@ -45,7 +49,6 @@ const OrderSuccessPage = () => {
           meetupLocation={meetupLocation}
           orderItems={orderItems}
           itemsLoading={isLoading}
-          isModal={false}
         />
       </PageContainer>
     </div>

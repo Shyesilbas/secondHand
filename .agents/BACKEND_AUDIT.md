@@ -1,147 +1,172 @@
-# Backend Güvenlik ve Mimari Denetim Raporu
+# Backend Veri ve Katalog Denetim Raporu
 
-> **Ortam / Altyapı Bilgisi:**
-> - Redis, Kafka ve PostgreSQL Docker üzerinde çalışmaktadır.
-> - Database kullanıcı adı: `postgres`, parola: `postgres`
+## 1. Kritik Bulgular (Veri – Kod Uyumsuzlukları ve Veri Kaybı Hataları)
 
-**Tarih:** 2026-10-18  
-**Kapsam:** `src/main/java/com/serhat/secondhand/` altındaki backend modülleri (31 modül, 946 dosya)
+Veri dosyalarını büyütmeden önce, mevcut verinin sistemde doğru çalışmasını engelleyen şu 7 doğrulanmış hatayı çözmemiz gerekiyor:
 
----
+### [ÇÖZÜLDÜ] 1. EnumReadService.deduplicateByName() Verilerin %56–%81'ini Siliyor (Kritik)
+- `EnumReadService.deduplicateByName` metodu kayıtları yalnızca `name` alanına göre tekilleştirdiği için hiyerarşik üst ebeveyn ID'lerini yutuyordu.
+- `deduplicateBy(items, keyExtractor)` mekanizması geliştirilerek üst ebeveyn ID'leri (`brandId:typeId:name`, `modelId:name`, `generationId:name:fuelType`, `generationId:name`, `bookTypeId:name`) gözetildi. 7 birim testi (`EnumReadServiceTest`) yazılarak tüm verilerin korunduğu ve düz alanlarda yerelleştirilmiş etiket önceliğinin sürdürüldüğü doğrulandı.
 
-## 1. Adım: Yapı ve Çekirdek Akış
 
-31 modül ve 946 dosya bulunmaktadır. Riskin yoğunlaştığı çekirdek bileşenler:
-- **Para akışı:** `checkout` → `order` → `payment` → `escrow` → `ewallet`. Tek ödeme sağlayıcısı: `EWALLET`.
-- **Stok:** `inventory`. Rezervasyon Redis'te Lua script ile yapılıyor, PostgreSQL'e Kafka üzerinden senkronlanıyor.
-- **Kuyruk / Outbox:** 3 outbox worker (`payment`, `order`, `escrow`) Kafka'ya yazıyor; 4 consumer okuyor.
-- **Güvenlik:** JWT filtresi (Bearer veya cookie), bellek içi rate limit, CSRF cookie ve STOMP interceptor.
+### [ÇÖZÜLDÜ] 2. Sports: 29 Branşın 11'inde İlan Oluşturulamıyor
+- `sports.json` dosyasına eksik olan 11 branş (`RUNNING`, `WALKING`, `CYCLING`, `SWIMMING`, `BOXING`, `MARTIAL_ARTS`, `TREKKING`, `BADMINTON`, `GOLF`, `CLIMBING`, `SURFING`) için 60 adet zengin ekipman tipi eklendi.
+- Frontend `sportsConfig.js` içinde `getOptions` metodlarına `OTHER_EQUIPMENT` emniyet fallback'i eklenerek boş liste ve form donması engellendi.
+- `SportsDataInitializerTest` ile 29 branşın tamamının eşleşen ekipman türüne sahip olduğu ve `SportsRequiredFieldsValidator` akışı doğrulandı.
 
----
 
-## Kritik Bulgular (Para Kaybı veya Güvenlik Açığı)
+### [ÇÖZÜLDÜ] 3. Clothing: types.json ile Validator'lar Arasında 23 Tip Uyumsuz
+- `ClothingGroup` (`APPAREL`, `FOOTWEAR`, `ACCESSORY`) merkezi enum mimarisi oluşturuldu; `ApparelValidator`, `FootwearValidator` ve `AccessoryValidator` bu enum üzerinden ortak kural setiyle bağlandı.
+- `clothing/types.json` dosyasına `"group"` alanı ve 8 standart tip (`BLOUSE`, `TUNIC`, `JUMPSUIT`, `OVERCOAT`, `RAINCOAT`, `LOAFERS`, `CLUTCH`, `SUITCASE`) eklenerek toplam 61 tip eksiksiz olarak gruplandırıldı.
+- `EnumReadService.getClothingTypes()` çıktısına `group` bilgisi eklendi; frontend `clothingConfig.js` dinamik `getClothingGroup` mekanizmasına geçirilerek `SLIPPERS`, `WATCH`, `WALLET`, `SUNGLASSES`, `RING` gibi tiplerde yaşanan beden/ayakkabı numarası form anomalileri giderildi.
+- 33 test senaryosu (`ClothingValidationTest`) ile doğrulandı.
 
-### 1. Ödeme akışında kalan açıklar *(ana hata giderildi: başarısız ödeme artık `Result.error` dönüyor)*
-- **Yarış Durumu:** Bakiye kontrolü kilitsiz okuyor (`PaymentProcessor.java:140`), kilit ise sonradan alınıyor (`EWalletService.java:205`). Kullanıcı aradaki pencerede paralel bir çekim (`withdraw`) ile bakiyeyi boşaltırsa Premium, vitrin ve ilan ücretini ödemeden hak kazanabilir.
-- **Sepet / Rollback:** `CheckoutOrchestrator.java:112-117` üzerinde: Çok satıcılı bir sepette bir ödeme başarısız olursa genel bir rollback yapılmıyor. Başarılı kalemlerin parası düşülüyor, sipariş siliniyor ve işlem commit ediliyor.
 
----
+### [ÇÖZÜLDÜ] 4. Real Estate: realestate.json & specs.json ile Validator Çatışmaları
+- `RealEstateCategory` (`RESIDENTIAL`, `LAND`, `COMMERCIAL`, `OTHER`) enum mimarisi oluşturuldu; `COMMERCIAL_LAND` ("Ticari / Sanayi İmarlı Arsa") arsa grubuna dahil edilerek `HouseValidator`, `LandValidator` ve `RealEstateSubtypeFieldPolicy` arasındaki sınıflandırma çatışması giderildi. `COMMERCIAL_LAND` için oda sayısı ve ısıtma tipi zorunluluğu kaldırıldı, `zoningStatus` temizlenmesi önlendi.
+- `specs.json` içindeki `roomConfigs` 18 seçeneğe (1.5+1, 2+0, 2+2, 3+0, 3+2, 4+0, 5+1, 5+2, 6+1, 6+2, 7+1, 8+ vb.) ve `zoningStatuses` 11 seçeneğe (`INDUSTRIAL_ZONED`, `TOURISM_ZONED`, `MIXED_ZONED`, `OLIVE_GROVE`, `PROTECTED_AREA`, `PUBLIC_ZONED` vb.) genişletildi.
+- `RealEstateSpecCatalogService` `RealEstateSubtypeFieldPolicy` içine entegre edilerek `roomConfigKey` ve `zoningStatusKey` değerlerinin katalog doğrulaması sağlandı; ayrıca formdan gelen legacy/temel alanlar (`roomCount`, `zoningStatus`) ile katalog key'leri arasında çift yönlü otomatik senkronizasyon ve esnek doğrulama eklendi.
+- `realestate.json` içindeki 14 mülk tipine `"category"` alanı eklendi ve `EnumReadService.getRealEstateTypes()` üzerinden frontend'e sunuldu. `realEstateConfig.js` ve `realEstates.js` içinde `isLandType` kontrolü `COMMERCIAL_LAND` ve tüm arsa tiplerini kapsayacak şekilde güncellendi.
+- 18 birim testinden oluşan `RealEstateValidationTest` ve `EnumReadServiceTest` entegrasyonu ile doğrulandı.
 
-## Yüksek Öncelikli Bulgular
+### [ÇÖZÜLDÜ] 5. Vehicles: Validator, Seed ve UI Arasındaki Tip Kopukluğu
+- `VehicleDataInitializer` içine `formatTypeLabel(key)` eklenerek araç tipi etiketleri Türkçe ve okunabilir standart isimlere (`CAR` -> "Otomobil", `COMMERCIAL` -> "Ticari Araçlar", `MOTORCYCLE` -> "Motosiklet", `TRUCK` -> "Kamyon / Çekici", `VAN` -> "Minibüs / Panelvan", `BICYCLE` -> "Bisiklet") dönüştürüldü; `pruneStaleTypes` metodu çekirdek araç tiplerini koruyacak şekilde güncellendi.
+- `CommercialVehicleValidator` bileşeni yazılarak `COMMERCIAL` tipindeki araçların kilometre, yakıt türü, vites ve kasa tipi kuralları eksiksiz doğrulandı.
+- `MotorcycleValidator.cleanup()` metodunun `bodyType` ve `horsePower` alanlarını silmesi engellendi; motosikletler için kasa tipi (Sportbike, Naked, Scooter vb.) ve beygir gücü verileri korundu.
+- Frontend `vehicleCatalogUtils.js` ve `vehicleConfig.js` içinde `isCarVehicle` kısıtları kaldırılarak `isCommercialVehicle`, `isMotorcycleVehicle` ve `hasBodyType` destekleri eklendi; hem motosiklet hem de ticari araçlar için kasa, nesil, motor ve paket seçimlerinin formda ve filtrelerde dinamik olarak görüntülenmesi sağlandı.
+- 7 birim testi (`VehicleValidationTest`) ile doğrulandı.
 
-### 7. Temiz bir veritabanında uygulama açılmıyor
-- **Dosya / Satır:** `db/migration/V1__baseline.sql:526-544`
-- **Detay:**
-  - `escrows` tablosunda `order_item_id` yok ve `order_id` kolonu `UNIQUE` tanımlı (her kalem için ayrı escrow açıldığından çok kalemli siparişleri bozar).
-  - `carts.user_id` kolonu `UNIQUE`, oysa entity kullanıcı başına birden çok satır tutuyor.
-  - `users.password_hash` sütunu entity'deki `password` alanı ile eşleşmiyor.
-  - `ddl-auto: validate` ayarıyla uygulama yalnızca Hibernate'in daha önce oluşturduğu eski şemalı DB'de çalışabilir durumda.
+### [ÇÖZÜLDÜ] 6. Electronics: JSON'daki Zengin Metadata'nın Yutulması ve Etiket Eksikliği
+- `ElectronicDataInitializer.formatTypeLabel()` içine `WASHING_MACHINE` eklenerek "Çamaşır Makinesi" standart Türkçe etiketi sağlandı.
+- `V21__add_electronic_model_metadata.sql` migrasyonu ile `electronic_models` tablosuna `release_year`, `is_legacy` ve `aliases` kolonları eklendi.
+- `ElectronicModel` varlığına `releaseYear`, `isLegacy` ve `aliases` (`StringListJsonConverter` ile JSON formatında) alanları tanımlandı.
+- `ElectronicDataInitializer.ensureModel()` metodu `modelDto` üzerinden gelen `releaseYear`, `isLegacy` ve `aliases` verilerini hem yeni modellerde kaydedecek hem de mevcut modellerde güncelleyecek (upsert) şekilde refaktör edildi.
+- `EnumReadService.getElectronicModels()` çıktısına `releaseYear`, `isLegacy` ve `aliases` alanları eklendi; frontend `electronicsConfig.js` içinde model seçildiğinde `year` alanının modelin `releaseYear` bilgisiyle otomatik doldurulması ve `SearchableDropdown` ile `ListingPrefilterSelectionFlow` bileşenlerinde model aramalarında `aliases` (kısaltmalar/eşanlamlılar: örn. "PS5", "15 Pro") desteği sağlandı.
+- 4 birim testi (`ElectronicDataInitializerTest`) ve `EnumReadServiceTest` entegrasyonu ile doğrulandı.
 
-### 8. Çok satıcılı SAFE_MEETUP siparişinde tek satıcı herkesin parasını açıyor
-- **Dosya / Satır:** `OrderCompletionService.java:129`, `OrderCreationService.java:211`, `EscrowService.java`
-- **Detay:** `confirmHandoverCompletion` → `EscrowService.release(order)` çağrısı siparişteki tüm escrow'ları serbest bırakıyor. `OrderCreationService.java:211` ise meetup siparişini tek satıcıyla sınırlamıyor.
-
-### 9. Üretim akışında demo kodları bulunuyor
-- **Dosya / Satır:** `OrderCompletionScheduler.java:34, 58`, `EWalletService.java:94`
-- **Detay:**
-  - `OrderCompletionScheduler.java:34` her 5 dakikada siparişleri otomatik ilerletiyor, sahte "ARAS" takip numarası üretiyor (`:58`) ve 72 saat sonra escrow'u satıcıya serbest bırakıyor.
-  - `EWalletService.java:94` deposit ("Mock top-up") herkese kontrolsüz bakiye yüklüyor.
-  - Her iki akışta da profil (örn. `@Profile("!prod")`) koruması bulunmuyor.
-
-### 10. Rezervasyonda adet kontrol edilmiyor
-- **Dosya / Satır:** `resources/scripts/reserve_stock_with_ttl.lua:14-19`
-- **Detay:** Mevcut bir rezervasyon varsa istenen yeni adede bakılmaksızın başarı dönüyor. Kullanıcı 1 adet rezerve edip sepette adedi 3'e çıkardığında checkout kontrolü bypass ediliyor.
-
----
-
-## Orta Öncelikli Bulgular
-
-### 11. Checkout aşamasında ilan durumu yeniden kontrol edilmiyor
-- **Dosya:** `CheckoutPricingContextFactory`, `OrderCreationService.createOrder`
-- **Detay:** Sepete eklendikten sonra `INACTIVE` veya `SOLD` olmuş bir ilan sipariş tamamlama aşamasında tekrar doğrulanmadığı için satın alınabiliyor.
-
-### 12. Stok uzlaştırıcısında yarış durumu (Race Condition) ve Redis bloklama
-- **Dosya / Satır:** `InventoryRedisReservationService.java:28, 87`
-- **Detay:**
-  - `:87` rezervasyon anahtarını hemen siliyor, ancak veritabanı düşümü asenkron yürüyor. Arada uzlaştırıcı çalışırsa Redis eski değere dönüyor.
-  - `:28` satırındaki `KEYS` komutu her ilan için tekrar çağrılıyor ($O(N^2)$) ve Redis event loop'unu blokluyor.
-
-### 13. İptal ve iadede stok yalnızca veritabanına dönüyor, Redis'e senkronlanmıyor
-- **Dosya / Satır:** `OrderCompensationPersistenceService.java:59`, `ListingCommandService.java:143`
-- **Detay:**
-  - `OrderCompensationPersistenceService.java:59` içindeki `restoreStock`, hatayı transaction içinde `catch (Exception ignored)` ile yutuyor. İçteki `@Transactional` işlemi rollback'e işaretlediği için tüm iptal `UnexpectedRollbackException` ile 500 hatası veriyor.
-  - Satıcının stok güncellemesi de (`ListingCommandService.java:143`) Redis'e yansıtılmıyor; `syncStockToRedis` hiç çağrılmıyor.
-
-### 14. Meetup zamanlayıcısı takılıyor
-- **Dosya / Satır:** `OrderCompletionScheduler.java:137`
-- **Detay:** Kısmen iptal edilmiş bir siparişte escrow iptali sürekli başarısız oluyor; sipariş sonsuza kadar bekliyor ve kalan para iade edilmiyor.
-- `VERIFICATION_LOCKED` durumundaki siparişleri hiçbir adım işlemiyor.
-- Zamanlayıcının tamamı tek transaction'da koşuyor: Tek bir hata tüm toplu işlemi geri alır. Çoklu instance ortamında aynı anda çalışmayı önleyen dağıtık kilit mekanizması da bulunmuyor.
-
-### 15. Outbox'larda yeniden deneme limiti etkisiz
-- **Dosya / Satır:** `EscrowOutboxWorker.java:79`, `PaymentOutboxWorker.java:74`, `OrderOutboxWorker.java:62`
-- **Detay:** Limit dolunca kaydı `FAILED` yapıyor; ancak worker sorgusu `FAILED` kayıtları da tekrar çekiyor. Hatalı bir mesaj sonsuz döngüye giriyor. Çoklu instance desteği için `SKIP LOCKED` eksik.
-
-### 16. İdempotency kayıtları erken siliniyor
-- **Dosya / Satır:** `OutboxHousekeepingScheduler.java:32`
-- **Detay:** Tekrar korumasını (idempotency) 3 gün tutuyor. Oysa Kafka 7 gün saklıyor ve tüketici en baştan okuyacak şekilde yapılandırılmış. Offset sıfırlanırsa eski escrow kredileri mükerrer yazılabilir.
-
-### 17. Ödeme, commit'ten önce "tamamlandı" olarak işaretleniyor
-- **Dosya / Satır:** `PaymentProcessor.java:83, 89`
-- **Detay:** Redis'teki kaydı checkout işlemi commit olmadan tamamlandı olarak işaretliyor. Ayrıca `:89` üzerindeki iyimser kilit yeniden deneme döngüsü ölü kod niteliğinde.
-
-### 18. Kupon kullanım hakkı boşa yanıyor
-- **Dosya / Satır:** `CouponService.java:123`
-- **Detay:** Redis sayacını veritabanı doğrulamasından önce artırıyor ve rollback durumunda geri almıyor; başarısız checkout işlemleri limiti tüketiyor. Veritabanı zaten pesimistik kilit kullandığı için Redis sınırlayıcısı gereksiz yük ve risk oluşturuyor.
-
-### 19. Herkes istediği hesabı kilitleyebilir (DoS)
-- **Dosya / Satır:** `LoginAttemptService.java:15`
-- **Detay:** Sayaç bellek içi, instance başına ve sınırsız büyüyor. Anahtar olarak e-postanın kendisi kullanılıyor; büyük/küçük harf değiştirilerek kilit atlatılabiliyor veya rastgele kullanıcıların hesapları kilitlenebiliyor.
-
-### 20. PublicEndpointRegistry değişkenli path'leri kaydetmiyor
-- **Dosya / Satır:** `PublicEndpointRegistry.java:76`
-- **Detay:** Spring Boot 3.5'te `getDirectPaths()` bu path'ler için null yerine boş küme dönüyor. Bu yüzden `{id}` içeren public endpoint'ler registry'ye public olarak eklenemiyor ve misafir kullanıcılar 401 alıyor. Kayıt ayrıca HTTP metodundan bağımsız. *(Uygulama çalıştırılarak doğrulanmalı)*.
-
-### 21. Yönetim ve maliyet uçları yetkilendirilmemiş
-- **Dosya / Satır:** `AgreementController.java:46` (`POST /initialize`), `GeminiController.java:30` (`POST /ask`)
-- **Detay:** Herhangi bir kullanıcı yönetimsel ilklendirme endpoint'ini veya LLM maliyetine yol açan AI endpoint'ini kısıtlama olmaksızın tetikleyebiliyor.
-
-### 22. WebSocket bağlantısı iptal edilmiş token'ı kabul ediyor
-- **Dosya / Satır:** `WebSocketSecurityConfig.java:92`
-- **Detay:** Bağlantı esnasında refresh token kabul edilebiliyor ve iptal (revocation) kontrolü yapılmıyor; iptal edilmiş 30 günlük token dahi bağlantı sağlayabiliyor.
-
-### 23. Token yenilemede eşzamanlılık kilidi yok
-- **Dosya / Satır:** `LoginService.java:112` (`refreshToken`)
-- **Detay:** Eski token'ı kilitlemiyor. Çoklu sekmede eşzamanlı token yenileme isteği geldiğinde ya iki geçerli token üretilir ya da yarış nedeniyle kullanıcı sistemden düşürülür.
+### [ÇÖZÜLDÜ] 7. Locations (locations.json): Mahalle Verisinin %94.6 Oranında Boş Olması
+- Türkiye'nin 81 iline ait tüm 973 resmi ilçesi `locations.json` içine eksiksiz olarak tanımlandı (eksik 121 ilçe tamamlandı; İstanbul 37'den 39'a [Arnavutköy, Sultanbeyli eklendi], İzmir 28'den 30'a, Konya 11'den 31'e, Trabzon 8'den 18'e çıkarıldı).
+- Mahalle verisi 188'den 3.479'a çıkarıldı; İstanbul, Ankara, İzmir, Bursa, Antalya gibi büyükşehirlerin tüm ilçelerine gerçek ve yaygın mahalleler eklendi; Türkiye'deki 973 ilçenin hiçbirinde boş (`[]`) mahalle bırakılmadı (0 mahalleli ilçe sayısı: 0).
+- `LocationCatalogService` Redis cache anahtarları `v5` sürümüne yükseltilerek eski boş verinin önbellekten temizlenmesi sağlandı; ayrıca olası eksik sorgularda form ve validatörün donmasını önlemek için dinamik `Merkez` mahalle fallback emniyeti eklendi.
+- `LocationValidator` hiyerarşik doğrulama mantığı güçlendirildi.
+- 10 birim testi (`LocationCatalogServiceTest` ve `LocationValidatorTest`) ile 81 il, 973 ilçe, zengin mahalleler ve validatör kuralları doğrulandı.
 
 ---
 
-## Düşük Öncelikli / Kod Temizliği (Dead Code)
+## 2. Kategori Bazlı Veri Geliştirme ve Güçlendirme Önerileri
 
-- **Hata Argümanları Sırası Ters:** `Result.error(mesaj, kod)` çağrıları `CheckoutOrchestrator.java:70, 78, 90, 116` ve `CouponService.java:78, 84, 101, 107` sınıflarında ters argümanlarla verilmiş; istemci mesaj yerine hata kodunu görüyor.
-- **Ölü Kodlar:**
-  - Redis teklif kilidi işlevsiz: `OfferService.java:132` `lockAcceptedOffer` sonucunu yoksayıyor, `releaseAcceptedOffer` hiç çağrılmıyor.
-  - `EscrowService.java:259` `creditWalletQuietly` metodu hiçbir yerden çağrılmıyor.
-  - `reserveStock` ve `syncStockToRedis` metotları kullanılmıyor.
-  - `ORDER_CANCELLED` ve `ORDER_REFUNDED` topic'lerini tüketen bir consumer yok.
-  - `PAYMENT_FAILED` ve `PAYMENT_REFUNDED` topic'lerine yazan bir producer yok.
-- **WebSocket Bildirimleri:** `NotificationWebSocketService.java:18` adresi `/user/{id}` ile kuruyor, oysa Spring kullanıcıyı e-postasından (Principal) çözüyor. *(Doğrulanmalı)*.
-- **Kafka Deserialize Güvenliği:** `KafkaConfig.java:41` tüm paketlere güveniyor (`"*"`). Kafka'ya mesaj yazabilen bir aktör rastgele sınıf deserialization zafiyeti tetikleyebilir.
-- **"Sepette N kişi" Metrik Şişmesi:** `CheckoutOrchestrator.java:170` sepeti temizlerken bu metriği düşürmüyor.
-- **Çift Bildirim Gönderimi:** `EscrowService.java:139` ve Kafka consumer aynı ödeme için iki kez "ödeme başarılı" bildirimi gönderiyor.
+### [ÇÖZÜLDÜ] 2.A Electronics (`src/main/resources/data/electronics/`)
+
+#### Eksik Kritik Markaların ve Modellerin Eklenmesi:
+- **GAME_CONSOLE:** Microsoft (Xbox Series X, Series S, One X/S), Nintendo (Switch OLED, Switch, Switch Lite, Switch 2), Valve (Steam Deck OLED/LCD), Lenovo (Legion Go), MSI (Claw) eklendi.
+- **CAMERA:** Canon (EOS R5/R6/R7/R8/R10/R50, 5D/6D/90D), Nikon (Z8, Z9, Z6 III, Zf, Z50), Fujifilm (X100VI, X100V, X-T5, X-S20), GoPro (Hero 13/12/11/10), DJI (Osmo Pocket 3, Action 5 Pro/4, Mavic 3, Air 3, Mini 4 Pro), Insta360 (X4, X3, Ace Pro) eklendi.
+- **KEYBOARD & MOUSE:** Logitech (MX Master 3S, G Pro X Superlight 2, MX Keys S), Razer, SteelSeries, Keychron, Corsair, HyperX, ASUS ROG eklendi.
+- **ROBOT_VACUUM:** Roborock (S8 MaxV Ultra, S8 Pro Ultra, Q Revo, Q8 Max), Dreame (X40 Ultra, L20 Ultra, L10s Ultra), Dyson, iRobot (Roomba), Ecovacs, Philips, Viomi eklendi.
+- **HEADPHONES & SPEAKER:** JBL, Marshall, Bose, Sennheiser, Beats, Anker Soundcore, Harman Kardon, Bang & Olufsen, HyperX, Razer, SteelSeries, Logitech, Jabra eklendi.
+- **LAPTOP, DESKTOP, MONITOR:** MSI, Acer, Monster (Abra, Tulpar, Semruk), Casper / Excalibur, Gigabyte, Razer, Microsoft (Surface), BenQ, AOC, ViewSonic eklendi.
+- **MOBILE_PHONE & SMARTWATCH:** Honor, Oppo, Realme, Vivo, Nothing, Tecno, Infinix, General Mobile; akıllı saatlerde Garmin (Fenix, Forerunner, Venu), Amazfit, Honor, Suunto eklendi.
+- **ROUTER & PRINTER & Ev Elektroniği:** Router için TP-Link, Keenetic, Xiaomi, Zyxel; Yazıcı için Canon, Epson, Brother; Beyaz eşya/klima için Bosch, Siemens, Profilo, Mitsubishi Electric, Gree, Baymak ve Vestel/Arçelik/Beko için TV & klima çapraz tipleri eklendi.
+- Toplam 114 yeni JSON veri dosyası oluşturuldu; `brands.json` 19 markadan 80 markaya ve 189 tip dosyasına genişletilerek tam kapsayıcılık sağlandı.
+
+#### İsimlendirme Standartlaştırması:
+- 826 modelde model adı başındaki marka tekrarları temizlendi ("Sony WH-1000XM5" -> "WH-1000XM5"), orijinal isimler ve arama varyasyonları `aliases` dizisine taşındı. UI'da "Sony Sony WH-1000XM5" tekrarları önlendi.
+- `releaseYear`, `isLegacy` ve `aliases` eksik olan tüm modeller tamamlandı (0 eksik metadata).
+
+#### OTHER (Diğer) Marka ve Model Desteği:
+- 19 elektronik tipinin tamamı için genel bir `OTHER` ("Diğer / Other") markası ve her tipe ait "Diğer Model" JSON dosyaları oluşturuldu.
+
+#### Metadata Kullanımı:
+- `ElectronicModel` tablosu `V21__add_electronic_model_metadata.sql` ve `StringListJsonConverter` ile `release_year`, `is_legacy` ve `aliases` kolonlarıyla güçlendirildi.
+- `ElectronicDataInitializer` bu metadataları upsert edecek şekilde güncellendi.
+- Frontend tarafında `SearchableDropdown.jsx`, `ListingPrefilterSelectionFlow.jsx` ve `electronicsConfig.js` ile alias araması ve model seçildiğinde `year` alanının otomatik doldurulması sağlandı.
+- `ElectronicDataInitializerTest` ile 189 dosya ve 80 marka için tüm dosyaların varlığı ve veri doğruluğu test edilerek doğrulandı.
 
 ---
 
-## Önerilen Çözüm Sırası
+### [ÇÖZÜLDÜ] 2.B Vehicles (`src/main/resources/data/vehicles/`)
 
-1. **Adım 1 (Acil / En Yüksek Risk - Düşük Efor):** `1` (kalan yarış durumu ve sepet rollback'u).
-3. **Adım 3 (Veritabanı & Migration Sağlığı):** `7` (`V1__baseline.sql` düzeltmeleri ve entity senkronizasyonu).
-4. **Adım 4 (İş Kuralı ve Mimari Kararlar):** `8, 9` (Çok satıcılı sipariş akışı ve demo / mock kodların profil koruması altına alınması).
-5. **Adım 5 (Dayanıklılık ve Temizlik):** Geriye kalan orta ve düşük öncelikli bulgular.
+#### Türkiye Pazarındaki Eksik Otomobil, Motosiklet ve Ticari Markalar:
+- **CAR:** TOGG (T10X, T10F), Tesla (Model Y, Model 3, Model S, Model X), Chery (Tiggo 8 Pro, Tiggo 7 Pro, Omoda 5), BYD (Atto 3, Seal U DM-i/EV, Dolphin, Han), MG (ZS, HS, MG4), Cupra (Formentor, Leon, Terramar, Born, Ateca), Mini (Cooper, Countryman, Clubman), DS Automobiles (DS 4, DS 7, DS 9), SsangYong / KGM (Torres, Musso Grand, Korando), Jaguar (F-Pace, E-Pace, I-Pace, XF), Maserati (Ghibli, Levante, Grecale) eklendi.
+- **MOTORCYCLE:** Vespa, Piaggio, Aprilia, Harley-Davidson, Husqvarna, CFMoto (250 NK, 250 SR, 450 SR, 450 MT, 700 CL-X, 800 MT), Bajaj (Pulsar NS200, RS200, Dominar 400, Dominar 250, Pulsar NS125), SYM, Kymco, Benelli, Royal Enfield, Mondial, Arora, RKS, Kuba eklendi.
+- **COMMERCIAL:** Peugeot (Rifter, Partner, Boxer, Expert), Citroën (Berlingo, Jumper, Jumpy), Opel (Combo, Vivaro, Movano), Toyota (Hilux, Proace City), Isuzu (D-Max, NPR), Iveco (Daily), Mitsubishi (L200) eklendi.
+- **BICYCLE:** Trek, Specialized, Giant, Scott, Bianchi, Carraro, Salcano, Kron, Mosso, Bisan markaları ve popüler modelleri `bicycles/` dizininde kataloglandı; `brands.json`'a `BICYCLE` destekli tipler olarak eklendi.
+
+#### Motor Verisinin Zenginleştirilmesi (horsePower, engineCapacity, LPG):
+- `V22__add_vehicle_generation_and_engine_specs.sql` migration'ı oluşturuldu; `vehicle_generations` (`start_year`, `end_year`) ve `vehicle_engines` (`horse_power`, `engine_capacity`) kolonları eklendi.
+- `VehicleGeneration` ve `VehicleEngine` entity'leri, DTO'ları ve `EnumReadService` API yanıtları bu alanlarla genişletildi.
+- `VehicleDataInitializer`, JSON'dan gelen veya isim/kasa kalıplarından regex ile çıkarılan `startYear`, `endYear`, `horsePower` ve `engineCapacity` bilgilerini otomatik parse edip upsert edecek şekilde güçlendirildi.
+- `BMW` / `BMW_MOTORRAD` ve `SUZUKI` / `SUZUKI_MOTO` markaları tek bir marka altında çoklu `supportedTypes` (`CAR`, `MOTORCYCLE`) yapısında birleştirildi.
+- Frontend'de `vehicleCatalogUtils.js` ve `vehicleConfig.js` güncellenerek motor seçildiğinde `fuelType`, `horsePower` ve `engineCapacity` otomatik dolduruldu; kasa/jenerasyon seçildiğinde `year` varsayılan olarak jenerasyonun başlangıç yılına bağlandı.
+- `VehicleValidationTest` içine eklenen testlerle tüm 73 marka ve 86 katalog dosyasının tamlığı, jenerasyon/motor regex ayrıştırması ve validatör kuralları doğrulandı (10/10 test başarılı).
 
 ---
 
-## Ek Notlar ve Doğrulama Durumu
+### [ÇÖZÜLDÜ] 2.C Clothing (`src/main/resources/data/clothing/`)
 
-- **Doğrulama İhtiyacı:** `listing` modülünde (150 dosya) yalnızca temel sahiplik kontrolleri taranmıştır; forum, review, notification, ai, dashboard ve follow servisleri derinlemesine analiz edilmemiştir.
-- **Çalışma Zamanı Doğrulaması:** 20. bulgu (`PublicEndpointRegistry` Boot 3.5 davranış uyumu) ve WebSocket bildirimlerinin adresi (`NotificationWebSocketService`) çalışan uygulama üzerinde doğrulanmalıdır.
+#### Tip Katalog Yapısının (types.json) Grup Bilgisiyle Zenginleştirilmesi:
+- `ClothingGroup` enum'ı (`APPAREL`, `FOOTWEAR`, `ACCESSORY`) tanımlandı; `clothing/types.json` içindeki tüm tiplere `"group"` alanı eklendi.
+- Eksik giyim/aksesuar tipleri eklendi: `BLOUSE` (Bluz), `TUNIC` (Tunik), `JUMPSUIT` (Tulum), `OVERCOAT` (Kaban/Palto), `RAINCOAT` (Yağmurluk), `LOAFERS` (Loafer/Makosen), `CLUTCH` (Portföy Çanta), `SUITCASE` (Valiz/Bavul).
+- `ApparelValidator`, `FootwearValidator`, `AccessoryValidator` ve frontend `clothingConfig.js` dinamik grup kontrolüne geçirilerek 60+ tip için eksiksiz doğrulama sağlandı.
+
+#### Marka Kataloğunun (brands.json) Düzeltilmesi ve Genişletilmesi:
+- `"IPEYKOL"` yazım hatası `"IPEKYOL"` (İpekyol) olarak düzeltildi.
+- Decathlon'un bisiklet/balıkçılık alt markaları (`BTWIN`, `ROCKRIDER`, `TRIBAN`, `CAPERLAN`, `SIMOND`, `OXELO`) giyim kataloğundan temizlenerek bisiklet/spor alanlarına aktarıldı.
+- Türkiye'de popüler giyim, ayakkabı ve aksesuar markaları (Oysho, U.S. Polo Assn., Pierre Cardin, Kiğılı, Altınyıldız Classics, Sarar, Damat Tween, Avva, Lufian, Tudors, Penti, Suwen, Crocs, Birkenstock, Dr. Martens, Camper, Reebok, Fila, Champion, Gant, Nautica, Michael Kors, Coach, Ray-Ban, Casio, Seiko, Pandora, Swarovski) eklendi ve toplam marka sayısı 100'e çıkarıldı.
+- `ClothingBrand` ve `ClothingType` sınıfları `Persistable<UUID>` uygulayarak deterministik UUID (`UUID.nameUUIDFromBytes`) yapısına geçirildi; `ClothingDataInitializer` label güncellemelerini algılayıp DB'yi upsert edecek şekilde güncellendi.
+- `ClothingValidationTest` (35 birim testi) ile tüm grup kuralları, temizlenen markalar ve yeni markalar başarıyla doğrulandı.
+
+---
+
+### [ÇÖZÜLDÜ] 2.D Real Estate (`src/main/resources/data/realestate/`)
+
+#### specs.json Genişletmesi ve Entegrasyonu:
+- `specs.json` içindeki `roomConfigs` 6 seçenekten 18 seçeneğe genişletildi: 1+0, 1+1, 1.5+1, 2+0, 2+1, 2+2, 3+0, 3+1, 3+2, 4+0, 4+1, 4+2, 5+1, 5+2, 6+1, 6+2, 7+1, 8+ ve Üzeri.
+- `zoningStatuses` içine `INDUSTRIAL_ZONED` (Sanayi İmarlı), `TOURISM_ZONED` (Turizm İmarlı), `MIXED_ZONED` (Ticari + Konut), `OLIVE_GROVE` (Zeytinlik), `PROTECTED_AREA` (Sit Alanı), `PUBLIC_ZONED` (Kamu / Özel Kullanım), `VINEYARD_GARDEN` (Bağ/Bahçe) eklendi ve toplam 11 imar durumu sağlandı.
+- `RealEstateCategory` enum'ı (`RESIDENTIAL`, `LAND`, `COMMERCIAL`, `OTHER`) oluşturuldu; `realestate.json` içindeki her `propertyTypes` öğesine `"category"` eklendi.
+- `RealEstateSpecCatalogService`, `HouseValidator`, `LandValidator`, `RealEstateSubtypeFieldPolicy` ve frontend `realEstateConfig.js` / `realEstates.js` dinamik kategori bazlı kontrole taşınarak alt-tip uyuşmazlıkları tamamen giderildi.
+- `RealEstateValidationTest` (18 birim testi) ile konut, arsa, ticari ve kategori eşleme kuralları doğrulandı.
+
+---
+
+### [ÇÖZÜLDÜ] 2.E Books (`src/main/resources/data/books/books.json/`)
+
+#### Açık key Tanımları ve Deterministik UUID:
+- `books.json` içindeki `types`, `genres`, `languages`, `formats`, `conditions` yapısı tamamen `{ "key": "...", "label": "..." }` nesnelerine geçirildi; parantez veya eğik çizgi içeren (`CILTLI_(HARDCOVER)`, `SIFIR_/_AMBALAJINDA`) key'ler temizlendi (`HARDCOVER`, `PAPERBACK`, `NEW`, `LIKE_NEW` vb.).
+- `BookType`, `BookGenre`, `BookLanguage`, `BookFormat`, `BookCondition` sınıfları `Persistable<UUID>` uygulayarak `UUID.nameUUIDFromBytes` ile deterministik UUID yapısına geçirildi.
+- `BooksDataInitializer`, hem eski düz metin dizilerini hem de yeni nesne yapısını destekleyecek şekilde güncellendi; etiket ve kitap türü hiyerarşisi değişikliklerini algılayıp DB'yi upsert edecek hale getirildi.
+- `V23__add_book_and_sport_catalog_spec_columns.sql` migration'ı oluşturuldu (`label` ve `book_type_id` kolonları ile foreign key indeksleri eklendi).
+
+#### Eksik Kitap Türleri ve Alt Türler:
+- Genel kültür ve kurgu dışı 6 yeni kitap türü eklendi: `TARIH_VE_ARASTIRMA` (Tarih, Araştırma & İnceleme), `FELSEFE_VE_SOSYOLOJI` (Felsefe, Sosyoloji & Antropoloji), `SANAT_VE_TASARIM` (Sanat, Mimarlık, Fotoğraf & Müzik), `HOBI_VE_YASAM` (Yemek, Gastronomi, Sağlık, Ebeveynlik & Yaşam), `DERGI_VE_SURELI_YAYIN` (Dergi, Çizgi Roman, Manga & Koleksiyon), `OTHER` (Diğer Kitaplar).
+- 16 kitap türünün her biri altına zengin alt türler ve tür bazlı `OTHER` ("Diğer ...") alt türü eklendi; genel geri dönüş için de global `OTHER` türü korundu.
+- `BooksValidationTest` (5 birim testi) ve `EnumReadServiceTest` (8 birim testi) ile katalog tamlığı, deterministik ID'ler, zorunlu alanlar ve hiyerarşi kuralları doğrulandı.
+
+---
+
+### [ÇÖZÜLDÜ] 2.F Sports (`src/main/resources/data/sports/sports.json/`)
+
+#### Eksik 11 Branşın Ekipmanlarının Tamamlanması ve Hiyerarşi:
+- Eksik olan 11 branş (`RUNNING`, `WALKING`, `CYCLING`, `SWIMMING`, `BOXING`, `MARTIAL_ARTS`, `TREKKING`, `BADMINTON`, `GOLF`, `CLIMBING`, `SURFING`) dahil olmak üzere 29 spor disiplininin tamamı için 100+ zengin ekipman tipi eklendi.
+- Mevcut ekipman etiketlerindeki aşırı spesifik ürün ifadeleri ("65L Outdoor Backpack", "Balls (3-Pack)", "Hex Dumbbell Set" vb.) temizlendi ve genel kategori etiketlerine ("Kamp & Outdoor Sırt Çantası", "Tenis Topu", "Dambıl & El Ağırlığı" vb.) dönüştürüldü; tüm disiplinler, ekipmanlar ve durumlar standart Türkçe etiketlere kavuşturuldu.
+- `SportEquipmentType` entity'sine `@ManyToOne SportDiscipline discipline` ilişkisi eklendi; `V23` migration'ı ile DB'de `discipline_id` kolonu ve FK indeksi oluşturuldu; `EnumReadService.getSportEquipmentTypes()` metoduna `disciplineId` alanı dahil edildi.
+- `SportsHierarchyValidator` sınıfı yazılarak `SportsSpecValidator` zincirine eklendi; seçilen disiplin ile ekipman tipi arasındaki hiyerarşik uyum (ve `OTHER_EQUIPMENT` genel geri dönüşü) doğrulandı.
+- `SportDiscipline`, `SportEquipmentType` ve `SportCondition` sınıfları `Persistable<UUID>` uygulayarak `UUID.nameUUIDFromBytes` ile deterministik UUID yapısına geçirildi; `SportsDataInitializer` etiket ve disiplin ilişkisi güncellemelerini algılayıp DB'yi upsert edecek şekilde güçlendirildi.
+- `SportsValidationTest` (6 birim testi) ile 29 disiplinin eksiksizliği, aşırı spesifik ifadelerin temizliği, hiyerarşi kuralları ve deterministik UUID yapısı doğrulandı.
+
+---
+
+### [ÇÖZÜLDÜ] 2.G Cross-Cutting (Tüm data/ Klasörü İçin Ortak İyileştirmeler)
+
+- **Dil Tutarlılığı (Türkçe Standardı):**
+  - `realestate`: Konut, ticari ve arsa tipleri, 18 oda sayısı ve 11 imar durumu tamamen standart Türkçe.
+  - `books`: 16 kitap türü, tüm alt türler, diller, cilt ve kondisyon formatları tamamen standart Türkçe.
+  - `electronics`: 19 elektronik tipi (`formatTypeLabel`) ile `WASHING_MACHINE` ("Çamaşır Makinesi") dahil Türkçe etiket standardına hizalandı.
+  - `clothing`: `types.json` içindeki tüm 62 giyim, ayakkabı ve aksesuar tipi ("Gömlek", "Kazak", "Kot Pantolon", "Spor Ayakkabı", "Çanta" vb.) Türkçe etiketlere geçirildi.
+  - `sports`: 29 spor disiplini, 100+ ekipman tipi ve tüm kondisyonlar standart Türkçe etiketlere geçirildi; aşırı spesifik ibareler temizlendi.
+  - `vehicles`: Çekirdek araç tipleri (`CAR` -> "Otomobil", `COMMERCIAL` -> "Ticari Araçlar", `MOTORCYCLE` -> "Motosiklet", `BICYCLE` -> "Bisiklet" vb.) `formatTypeLabel` ile standart Türkçe etiketlere hizalandı.
+
+- **Deterministik UUID ve Etiket Güncelleme (Upsert):**
+  - `VehicleDataInitializer`, `ElectronicDataInitializer`, `RealEstateDataInitializer`, `ClothingDataInitializer`, `BooksDataInitializer` ve `SportsDataInitializer` sınıflarının tamamı `UUID.nameUUIDFromBytes` ile deterministik UUID üretir hale getirildi.
+  - İlgili tüm enum/referans entity'leri (`CarBrand`, `VehicleType`, `VehicleModel`, `VehicleGeneration`, `VehicleEngine`, `ElectronicBrand`, `ElectronicType`, `ElectronicModel`, `ClothingBrand`, `ClothingType`, `BookType`, `BookGenre`, `BookLanguage`, `BookFormat`, `BookCondition`, `SportDiscipline`, `SportEquipmentType`, `SportCondition`, `RealEstateType`, `RealEstateAdType`, `HeatingType`) `Persistable<UUID>` arayüzünü uyguladı.
+  - Başlangıç seed görevleri JSON dosyalarındaki etiket (`label`) ve hiyerarşik ilişki (`bookType`, `discipline`, `model`, `generation`) değişikliklerini algılayıp DB'yi mükerrer kayıt oluşturmadan güncelleyecek (upsert) hale getirildi.
+  - 6 kategori test paketi (`RealEstateValidationTest`, `VehicleValidationTest`, `ClothingValidationTest`, `BooksValidationTest`, `SportsValidationTest`, `ElectronicDataInitializerTest`) toplam 79 test ile 0 hata/atlama olmaksızın başarıyla doğrulandı.

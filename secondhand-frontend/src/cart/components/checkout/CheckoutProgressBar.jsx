@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { memo } from 'react';
-import { Check, MapPin, CreditCard, PackageCheck, ShieldCheck } from 'lucide-react';
+import { Check, MapPin, CreditCard, PackageCheck, ShieldCheck, ChevronRight } from 'lucide-react';
 
 const STEP_ICONS = {
   1: MapPin,
@@ -21,85 +21,83 @@ const CheckoutProgressBar = ({
   return (
     <nav className="w-full" aria-label={t("checkout_progress", "Sipariş Aşamaları")}>
       {/* Desktop Stepper */}
-      <div className="hidden md:flex items-center justify-between relative bg-background-primary rounded-md border border-border/90 p-2">
-        {/* Background Connecting Progress Track */}
-        <div className="absolute left-10 right-10 top-1/2 -translate-y-1/2 h-1 bg-background-tertiary rounded-full -z-0 pointer-events-none">
-          <div 
-            className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-
-        {steps.map((step) => {
+      <div className="hidden md:flex items-center justify-between rounded border border-border bg-background-primary p-2">
+        {steps.map((step, idx) => {
           const isCompleted = currentStep > step.id;
           const isCurrent = currentStep === step.id;
           const isClickable = currentStep > step.id;
           const IconComponent = STEP_ICONS[step.id] || MapPin;
 
           return (
-            <button
-              key={step.id}
-              type="button"
-              onClick={() => isClickable && onStepChange(step.id)}
-              disabled={!isClickable}
-              aria-current={isCurrent ? 'step' : undefined}
-              className={`relative z-10 flex items-center gap-2.5 py-2 px-3.5 rounded transition-all duration-300 outline-none select-none ${
-                isCurrent
-                  ? 'bg-primary text-white ring-4'
-                  : isCompleted
-                  ? 'bg-white text-text-primary hover:bg-background-secondary cursor-pointer border border-border/80'
-                  : 'bg-white/90 text-text-muted cursor-default border border-border-light opacity-75'
-              }`}
-            >
-              {/* Step Icon Node */}
-              <span
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded text-xs font-semibold transition-all duration-300 ${
+            <div key={step.id} className="flex items-center flex-1 last:flex-none">
+              <button
+                type="button"
+                onClick={() => isClickable && onStepChange(step.id)}
+                disabled={!isClickable}
+                aria-current={isCurrent ? 'step' : undefined}
+                className={`flex items-center gap-2.5 py-1.5 px-3 rounded text-left transition-colors outline-none select-none ${
                   isCurrent
-                    ? 'bg-white/20 text-white'
+                    ? 'bg-background-tertiary text-text-primary'
                     : isCompleted
-                    ? 'bg-background-secondary text-status-success-text border border-border'
-                    : 'bg-background-tertiary text-text-muted'
+                    ? 'text-text-secondary hover:text-text-primary cursor-pointer'
+                    : 'text-text-muted cursor-default'
                 }`}
               >
-                {isCompleted ? (
-                  <Check className="h-4 w-4 text-status-success-text" strokeWidth={3} />
-                ) : (
-                  <IconComponent className="h-3.5 w-3.5" />
-                )}
-              </span>
+                {/* Step Icon Node */}
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
+                    isCurrent
+                      ? 'bg-primary text-text-inverse'
+                      : isCompleted
+                      ? 'bg-primary text-text-inverse'
+                      : 'bg-background-tertiary text-text-muted'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                  ) : (
+                    <IconComponent className="h-3 w-3" strokeWidth={2} />
+                  )}
+                </span>
 
-              {/* Step Title & Subtitle */}
-              <div className="text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-xs font-semibold ${
-                    isCurrent ? 'text-secondary-300' : isCompleted ? 'text-status-success-text' : 'text-text-muted'
-                  }`}>
+                {/* Step Title */}
+                <div>
+                  <span className="block text-xs font-medium text-text-tertiary">
                     {t("step", "Adım")} {step.id}
                   </span>
-                  {isCompleted && (
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-status-success" />
-                  )}
+                  <span
+                    className={`block text-xs font-semibold leading-tight ${
+                      isCurrent
+                        ? 'text-text-primary'
+                        : isCompleted
+                        ? 'text-text-secondary'
+                        : 'text-text-muted'
+                    }`}
+                  >
+                    {step.title}
+                  </span>
                 </div>
-                <span className={`text-xs font-semibold block tracking-tight leading-tight ${
-                  isCurrent ? 'text-white' : isCompleted ? 'text-text-primary' : 'text-text-muted'
-                }`}>
-                  {step.title}
-                </span>
-              </div>
-            </button>
+              </button>
+
+              {idx < steps.length - 1 && (
+                <div className="flex-1 flex justify-center px-1">
+                  <ChevronRight className="h-4 w-4 text-border shrink-0" />
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
 
       {/* Mobile-first compact Stepper indicator */}
-      <div className="flex flex-col gap-2 sm:hidden w-full bg-background-primary rounded-md border border-border/80 p-3">
+      <div className="flex flex-col gap-2 md:hidden w-full bg-background-primary rounded border border-border p-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-primary text-white text-xs font-semibold">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-text-inverse text-xs font-semibold">
               {currentStep}
             </span>
             <div>
-              <span className="text-xs font-semibold text-text-muted block">
+              <span className="text-xs text-text-muted block">
                 {t("step", "Adım")} {currentStep} / {steps.length}
               </span>
               <span className="text-xs font-semibold text-text-primary">
@@ -108,15 +106,15 @@ const CheckoutProgressBar = ({
             </div>
           </div>
 
-          <span className="text-xs font-semibold text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border">
-            %{progressPercent} Tamamlandı
+          <span className="text-xs font-medium tabular-nums text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border-light">
+            %{progressPercent}
           </span>
         </div>
 
         {/* Linear mini progress bar */}
-        <div className="w-full bg-background-tertiary rounded-full h-1.5 overflow-hidden">
+        <div className="w-full bg-background-tertiary rounded-sm h-1 overflow-hidden">
           <div
-            className="bg-primary h-full rounded-full transition-all duration-300 ease-out"
+            className="bg-primary h-full transition-all duration-300 ease-out"
             style={{ width: `${Math.max(15, progressPercent)}%` }}
           />
         </div>

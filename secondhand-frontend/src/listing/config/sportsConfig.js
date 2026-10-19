@@ -3,6 +3,15 @@ import GenericListingDetails from '../components/details/GenericListingDetails.j
 import { sportsService } from '../../sports/services/sportsService.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
 
+// Equipment belongs to a discipline via disciplineId; OTHER_EQUIPMENT is the shared fallback.
+const getEquipmentOptions = (enums, disciplineId) => {
+ const allEquip = enums?.sportEquipmentTypes || [];
+ if (!disciplineId) return allEquip;
+ const matched = allEquip.filter((eq) => String(eq.disciplineId ?? '') === String(disciplineId));
+ const list = matched.length > 0 ? matched : allEquip.filter((eq) => String(eq.name || '').toUpperCase() === 'OTHER_EQUIPMENT');
+ return list.map((eq) => ({ ...eq, label: String(eq.label ?? eq.name ?? ''), name: String(eq.label ?? eq.name ?? '') }));
+};
+
 export const sportsConfig = {
  label: 'Sports',
  icon: Dumbbell,
@@ -38,21 +47,7 @@ export const sportsConfig = {
  {
  name: 'equipmentTypeId', label: 'Equipment Type', type: 'enum', enumKey: 'sportEquipmentTypes', required: true,
  disabledWhen: (ctx) => !ctx.formData?.disciplineId,
- getOptions: (ctx) => {
- const discId = ctx.formData?.disciplineId;
- const allEquip = ctx.enums?.sportEquipmentTypes || [];
- if (!discId) return allEquip;
- const disc = (ctx.enums?.sportDisciplines || []).find((d) => String(d.id) === String(discId));
- if (!disc) return allEquip;
- const discKey = String(disc.name || '').toUpperCase();
- return allEquip
- .filter((eq) => String(eq.name || '').toUpperCase().startsWith(discKey + '_'))
- .map((eq) => ({
- ...eq,
- label: String(eq.label ?? eq.name ?? ''),
- name: String(eq.label ?? eq.name ?? '')
- }));
- }
+ getOptions: (ctx) => getEquipmentOptions(ctx.enums, ctx.formData?.disciplineId)
  },
  { name: 'conditionId', label: 'Condition', type: 'enum', enumKey: 'sportConditions', required: true },
  ],
@@ -78,21 +73,7 @@ export const sportsConfig = {
  preFormSelectors: [
  {
  enumKey: 'sportEquipmentTypes', initialDataKey: 'equipmentTypeId', title: 'Choose equipment type', description: 'Select an equipment type to tailor the form fields.', kind: 'grid', dependsOn: ['disciplineId'], paramKey: 'equipmentTypeIds',
- getOptions: ({ enums, selection }) => {
- const disciplineId = selection?.disciplineId;
- const allEquip = enums?.sportEquipmentTypes || [];
- if (!disciplineId) return allEquip;
- const disc = (enums?.sportDisciplines || []).find((d) => String(d.id) === String(disciplineId));
- if (!disc) return allEquip;
- const discKey = String(disc.name || '').toUpperCase();
- return allEquip
- .filter((eq) => String(eq.name || '').toUpperCase().startsWith(discKey + '_'))
- .map((eq) => ({
- ...eq,
- label: String(eq.label ?? eq.name ?? ''),
- name: String(eq.label ?? eq.name ?? '')
- }));
- }
+ getOptions: ({ enums, selection }) => getEquipmentOptions(enums, selection?.disciplineId)
  },
  { enumKey: 'sportConditions', initialDataKey: 'conditionId', title: 'Choose condition', description: 'Select a condition to tailor the form fields.', kind: 'grid', dependsOn: ['disciplineId'], paramKey: 'conditionIds' },
  ],

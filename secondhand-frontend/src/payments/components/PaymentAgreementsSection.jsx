@@ -45,41 +45,38 @@ const PaymentAgreementsSection = ({
  }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {agreements.map(agreement => {
         const isChecked = acceptedAgreements.has(agreement.agreementId);
         const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
         return (
           <div
             key={agreement.agreementId}
-            className={`flex items-center justify-between gap-3 px-3 py-2 rounded border transition-all text-xs ${
-              isChecked
-                ? 'bg-background-secondary border-card-border-hover text-text-primary'
-                : 'bg-white border-border text-text-secondary hover:border-card-border-hover'
-            }`}
+            className="flex items-center gap-2 text-xs"
           >
+            <input
+              id={`agreement-${agreement.agreementId}`}
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => handleAgreementToggle(agreement.agreementId)}
+              className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer accent-primary shrink-0"
+            />
             <label 
               htmlFor={`agreement-${agreement.agreementId}`}
-              className="flex items-center gap-2.5 cursor-pointer select-none flex-1 min-w-0"
+              className="cursor-pointer select-none text-text-secondary"
             >
-              <input
-                id={`agreement-${agreement.agreementId}`}
-                type="checkbox"
-                checked={isChecked}
-                onChange={() => handleAgreementToggle(agreement.agreementId)}
-                className="w-4 h-4 rounded border-card-border-hover text-text-primary focus:ring-primary cursor-pointer accent-primary shrink-0"
-              />
-              <span className="font-medium truncate text-xs text-text-secondary">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAgreementClick(agreement);
+                }}
+                className="underline hover:text-text-primary text-xs cursor-pointer mr-1 font-medium text-text-primary"
+              >
                 {agreementName}
-              </span>
+              </button>
+              <span>{t("kosullarini_kabul_ediyorum", "metnini okudum, onaylıyorum.")}</span>
             </label>
-            <button
-              type="button"
-              onClick={() => handleAgreementClick(agreement)}
-              className="text-xs font-semibold text-text-tertiary hover:text-text-primary underline shrink-0 cursor-pointer transition-colors"
-            >
-              {t("read_full_agreement")}
-            </button>
           </div>
         );
       })}

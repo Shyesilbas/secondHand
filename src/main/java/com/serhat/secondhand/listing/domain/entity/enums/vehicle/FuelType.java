@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum FuelType {
-    HYBRID("Hybrid"),
-    DIESEL("Diesel"),
-    GASOLINE("Gasoline"),
-    ELECTRIC("Electric"),
+    HYBRID("Hibrit"),
+    DIESEL("Dizel"),
+    GASOLINE("Benzin"),
+    ELECTRIC("Elektrikli"),
     LPG("LPG");
 
     private final String label;

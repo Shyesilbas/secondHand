@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.idempotency.ProcessedKafkaEventRepository;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.payment.contract.PaymentCompletedKafkaEvent;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,6 +29,13 @@ public class InventoryKafkaConsumer {
     public void consumePaymentCompleted(PaymentCompletedKafkaEvent event) {
         if (event.listingId() == null) {
             log.debug("PaymentCompletedKafkaEvent {} has no listingId, skipping inventory deduction.", event.paymentId());
+            return;
+        }
+
+        // Only purchases consume stock; listing fees, showcase and other payments carry a listingId too.
+        if (!PaymentTransactionType.ITEM_PURCHASE.name().equals(event.transactionType())) {
+            log.debug("PaymentCompletedKafkaEvent {} has transactionType {}, skipping inventory deduction.",
+                    event.paymentId(), event.transactionType());
             return;
         }
 

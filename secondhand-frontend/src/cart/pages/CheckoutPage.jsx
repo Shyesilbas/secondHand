@@ -210,23 +210,25 @@ const CheckoutPage = () => {
 
   if (!offerId && cartCount === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background-secondary/60 px-4 antialiased">
-        <div className="w-full max-w-md text-center bg-white p-10 rounded-md border border-border/80">
-          <ShoppingCart className="mx-auto mb-6 block h-5 w-5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
-          <h1 className="text-xl font-semibold text-text-primary tracking-tight">
-            {CART_MESSAGES.EMPTY_CART_TITLE}
-          </h1>
-          <p className="mt-2 text-xs text-text-tertiary font-medium leading-relaxed max-w-xs mx-auto">
-            {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
-          </p>
-          <button 
-            type="button" 
+      <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4 antialiased">
+        <div className="w-full max-w-sm text-center bg-background-primary p-8 rounded border border-border space-y-4">
+          <ShoppingCart className="mx-auto h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
+          <div className="space-y-1">
+            <h1 className="text-sm font-semibold text-text-primary">
+              {CART_MESSAGES.EMPTY_CART_TITLE}
+            </h1>
+            <p className="text-xs text-text-tertiary max-w-xs mx-auto">
+              {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
+            </p>
+          </div>
+          <Button 
+            variant="primary"
             onClick={() => navigate(ROUTES.LISTINGS)} 
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-8 w-full"
+            className="w-full"
           >
             <Sparkles className="h-4 w-4" />
             <span>{t("browse_listings", "İlanları Keşfet")}</span>
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -235,27 +237,37 @@ const CheckoutPage = () => {
   /* ── Main checkout experience ────────────────────────────── */
 
   return (
-    <div className="min-h-screen bg-background-secondary text-text-primary antialiased selection:bg-primary selection:text-white">
+    <div className="min-h-screen bg-background-secondary text-text-primary antialiased">
       {/* ── Sticky Top Header ───────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-border/80 bg-background-primary">
-        <PageContainer className="py-3 sm:py-3.5">
+      <header className="sticky top-0 z-30 border-b border-border bg-background-primary">
+        <PageContainer className="py-2.5 sm:py-3">
           <div className="flex items-center justify-between gap-4">
-            {/* Back Button */}
+            {/* Back Button & Trust/Timer badges */}
             <div className="flex items-center gap-3 shrink-0">
-              <button 
-                type="button" 
+              <Button 
+                variant="secondary"
+                size="sm"
                 onClick={() => navigate(ROUTES.SHOPPING_CART)} 
-                className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 w-10" 
                 aria-label={t("back_to_cart", "Sepete Dön")}
+                className="w-8 h-8 !p-0"
               >
-                <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
-              </button>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
 
-              <div className="hidden lg:flex items-center gap-2 border-l border-border pl-3">
-                <ShieldCheck className="h-4 w-4 text-status-success-text" />
-                <span className="text-xs font-semibold text-text-secondary">
-                  Güvenli Ödeme
-                </span>
+              <div className="hidden lg:flex items-center gap-3 border-l border-border pl-3">
+                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
+                  <ShieldCheck className="h-4 w-4 text-text-primary" />
+                  <span className="font-medium">Güvenli Ödeme</span>
+                </div>
+
+                <span className="text-border">·</span>
+
+                {/* Stock reservation countdown */}
+                <div className="flex items-center gap-1.5 text-2xs text-text-secondary" title={t('cart_items_reserved_for_you', 'Sepetinizdeki ürünler adınıza geçici olarak rezerve edildi.')}>
+                  <Clock className="h-3.5 w-3.5 text-text-tertiary" />
+                  <span className="text-text-tertiary">Rezervasyon:</span>
+                  <span className="font-mono tabular-nums font-semibold text-text-primary">{formatTimer(timeLeft)}</span>
+                </div>
               </div>
             </div>
 
@@ -267,66 +279,51 @@ const CheckoutPage = () => {
                 onStepChange={handleStepChange} 
               />
             </div>
+
+            {/* Mobile Timer Badge */}
+            <div className="flex lg:hidden items-center gap-1 text-2xs text-text-secondary shrink-0">
+              <Clock className="h-3 w-3 text-text-tertiary" />
+              <span className="font-mono tabular-nums font-semibold text-text-primary">{formatTimer(timeLeft)}</span>
+            </div>
           </div>
         </PageContainer>
       </header>
 
-      {/* ── Live Stock Reservation Status Bar ────────────────────── */}
-      <div className="bg-background-secondary border-b border-border/70 px-4 py-2 text-xs">
-        <PageContainer>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-status-warning-text font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-status-warning opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-status-warning"></span>
-              </span>
-              <span className="text-xs font-semibold">
-                {t('cart_items_reserved_for_you', 'Sepetinizdeki ürünler adınıza geçici olarak rezerve edildi.')}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 font-semibold text-status-warning-text bg-white/90 px-3 py-1 rounded border border-border">
-              <Clock className="h-3.5 w-3.5 text-status-warning-text" />
-              <span className="text-xs text-status-warning-text">Kalan:</span>
-              <span className="font-mono text-xs">{formatTimer(timeLeft)}</span>
-            </div>
-          </div>
-        </PageContainer>
-      </div>
-
       {/* ── Mobile Collapsible Concise Order Summary Bar ─────────── */}
-      <div className="bg-white border-b border-border lg:hidden px-4 py-3">
-        <button 
-          type="button" 
-          onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} 
-          className="flex w-full items-center justify-between text-xs font-semibold select-none"
-        >
-          <span className="flex items-center gap-2 text-text-primary">
-            <ShoppingCart className="h-4 w-4 text-text-primary" />
-            <span>{isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}</span>
-            <ChevronDown className={`h-4 w-4 text-text-tertiary transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
-          </span>
-          <span className="font-semibold text-text-primary text-sm">
-            {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
-          </span>
-        </button>
+      {currentStep !== 3 && (
+        <div className="bg-background-primary border-b border-border lg:hidden px-4 py-2.5">
+          <button 
+            type="button" 
+            onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} 
+            className="flex w-full items-center justify-between text-xs font-medium select-none"
+          >
+            <span className="flex items-center gap-2 text-text-primary">
+              <ShoppingCart className="h-3.5 w-3.5 text-text-primary" />
+              <span>{isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}</span>
+              <ChevronDown className={`h-3.5 w-3.5 text-text-tertiary transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
+            </span>
+            <span className="font-semibold text-text-primary tabular-nums">
+              {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
+            </span>
+          </button>
 
-        {isOrderSummaryExpanded && (
-          <div className="mt-3 pt-3 border-t border-border-light overflow-hidden duration-200">
-            <CheckoutOrderSummary 
-              cartItems={displayCartItems} 
-              calculateTotal={calculateTotal} 
-              pricing={pricing} 
-            />
-          </div>
-        )}
-      </div>
+          {isOrderSummaryExpanded && (
+            <div className="mt-3 pt-3 border-t border-border-light">
+              <CheckoutOrderSummary 
+                cartItems={displayCartItems} 
+                calculateTotal={calculateTotal} 
+                pricing={pricing} 
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Main Layout: Steps + Concise Order Summary ──────────── */}
-      <PageContainer className="py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
+      <PageContainer className="py-6 sm:py-8">
+        <div className={`grid grid-cols-1 gap-6 sm:gap-8 ${currentStep === 3 ? 'max-w-4xl mx-auto' : 'lg:grid-cols-12 lg:items-start'}`}>
           {/* Main Checkout Step Flow */}
-          <div className="lg:col-span-8">
+          <div className={currentStep === 3 ? 'w-full' : 'lg:col-span-8'}>
             {reservationError ? (
               <Alert
                 type="error"
@@ -356,14 +353,16 @@ const CheckoutPage = () => {
             )}
           </div>
 
-          {/* Desktop Sticky Concise Order Summary Sidebar */}
-          <div className="hidden lg:block lg:col-span-4">
-            <CheckoutOrderSummary 
-              cartItems={displayCartItems} 
-              calculateTotal={calculateTotal} 
-              pricing={pricing} 
-            />
-          </div>
+          {/* Desktop Sticky Concise Order Summary Sidebar (Hidden on Step 3) */}
+          {currentStep !== 3 && (
+            <div className="hidden lg:block lg:col-span-4">
+              <CheckoutOrderSummary 
+                cartItems={displayCartItems} 
+                calculateTotal={calculateTotal} 
+                pricing={pricing} 
+              />
+            </div>
+          )}
         </div>
       </PageContainer>
 

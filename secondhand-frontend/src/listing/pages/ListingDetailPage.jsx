@@ -1,14 +1,15 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useListingData } from '../hooks/useListingData.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from '../components/ListingCardActions.jsx';
-import { listingTypeRegistry } from '../config/listingConfig.js';
+import { getListingTypeOptions, listingTypeRegistry } from '../config/listingConfig.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import { listingStatusLabel } from '../../ai/utils/auraListingContext.js';
 import { trackView } from '../services/listingAddonService.js';
 import { getOrCreateSessionId } from '../../common/utils/sessionId.js';
 import { getListingFavoriteCount } from '../../favorites/favorites.js';
@@ -27,7 +28,6 @@ import {
   MapPin,
   Package,
   Share2,
-  ShieldCheck,
   Sparkles
 } from 'lucide-react';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
@@ -37,7 +37,7 @@ import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import ListingTrustPanel from '../components/ListingTrustPanel.jsx';
 import ListingAnalyticsPanel from '../components/ListingAnalyticsPanel.jsx';
-import { formatCurrency, formatPrice, formatDateTime } from '../../common/formatters.js';
+import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import AuraSummary from '../../common/components/AuraSummary.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import SimilarListings from '../components/SimilarListings.jsx';
@@ -147,45 +147,10 @@ const ListingDetailPage = () => {
   const discount = hasCampaign ? discountPercent(listing?.price, listing?.campaignPrice) : null;
   const favoriteCount = getListingFavoriteCount(listing);
 
-  // ── Live Urgency & Social Proof Story Ticker ──
-  const detailStoryItems = useMemo(() => {
-    const list = [];
-    if (cartReservations > 0) {
-      list.push({
-        id: 'cart',
-        text: `Şu an ${cartReservations} kişinin sepetinde`,
-        subtext: 'Satın alma adımı başlatıldı',
-        badge: 'Yüksek talep'
-      });
-    }
-    if (activeViewers > 0) {
-      const isSuperHot = activeViewers >= 10;
-      list.push({
-        id: 'viewers',
-        text: `Son 24 saatte ${activeViewers} kişi inceledi`,
-        subtext: isSuperHot ? 'Yoğun ilgi görüyor' : 'Popüler ilan',
-        badge: isSuperHot ? 'Yoğun ilgi' : 'Popüler'
-      });
-    }
-    return list;
-  }, [activeViewers, cartReservations]);
-
-  const [detailStoryIndex, setDetailStoryIndex] = useState(0);
-
-  // Soft loop rotation if multiple signals exist
-  useEffect(() => {
-    if (detailStoryItems.length <= 1) return;
-
-    const timer = setInterval(() => {
-      setDetailStoryIndex(prev => (prev + 1) % detailStoryItems.length);
-    }, 3500);
-
-    return () => clearInterval(timer);
-  }, [detailStoryItems.length]);
-
-  const currentDetailStory = detailStoryItems.length > 0
-    ? detailStoryItems[detailStoryIndex % detailStoryItems.length]
-    : null;
+  const socialProof = [
+    cartReservations > 0 && `Şu an ${cartReservations} kişinin sepetinde`,
+    activeViewers > 0 && `Son 24 saatte ${activeViewers} kişi inceledi`
+  ].filter(Boolean);
 
   /* Reset image on listing change */
   useEffect(() => {
@@ -217,6 +182,7 @@ const ListingDetailPage = () => {
   /* SEO */
   useEffect(() => {
     if (!listing) return;
+    const prevTitle = document.title;
     document.title = `${listing.title} - ${formatCurrency(displayPrice, listing.currency)} | SecondHand`;
     const schemaId = 'listing-structured-data';
     let scriptEl = document.getElementById(schemaId);
@@ -239,7 +205,10 @@ const ListingDetailPage = () => {
         "availability": listing.status === 'ACTIVE' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
       }
     });
-    return () => document.getElementById(schemaId)?.remove();
+    return () => {
+      document.title = prevTitle;
+      document.getElementById(schemaId)?.remove();
+    };
   }, [listing, displayPrice]);
 
   /* Share */
@@ -275,6 +244,7 @@ const ListingDetailPage = () => {
   /* Keyboard nav for gallery */
   useEffect(() => {
     const handler = e => {
+      if (e.target.closest?.('input, textarea, select, [contenteditable], [role="dialog"]')) return;
       if (e.key === 'ArrowLeft') showPreviousImage();
       if (e.key === 'ArrowRight') showNextImage();
     };
@@ -299,6 +269,7 @@ const ListingDetailPage = () => {
   if (error) return <DetailError error={error} />;
   if (!listing) return null;
 
+  const typeLabel = getListingTypeOptions().find(o => o.value === listing.type)?.label ?? listing.type;
   const stockCount = Number(listing.quantity);
   const stock = stockCount === 0
     ? { dot: 'bg-secondary-400', label: 'Tükendi' }
@@ -321,7 +292,7 @@ const ListingDetailPage = () => {
               <span>{t("all_listings", "İlanlar")}</span>
             </Link>
             <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
-            <span className="shrink-0 text-text-secondary">{listing.type}</span>
+            <span className="shrink-0 text-text-secondary">{typeLabel}</span>
             <ChevronRight className="hidden h-4 w-4 shrink-0 text-text-muted md:block" strokeWidth={1.5} aria-hidden />
             <span className="hidden max-w-xs truncate text-text-primary md:inline">{listing.title}</span>
           </nav>
@@ -344,7 +315,7 @@ const ListingDetailPage = () => {
             <button
               type="button"
               onClick={handleShare}
-              className="flex items-center gap-1.5 rounded border border-border bg-background-primary p-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
+              className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded border border-border bg-background-primary px-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
               aria-label={t("share", "Paylaş")}
               title={copiedLink ? t("link_copied", "Bağlantı kopyalandı") : t("share", "Paylaş")}
             >
@@ -376,7 +347,7 @@ const ListingDetailPage = () => {
                     onError={() => setImageError(true)}
                     alt={`${listing.title} - ${selectedImageIndex + 1}`}
                     className="h-full w-full object-contain p-4 sm:p-6"
-                    fetchpriority="high"
+                    fetchPriority="high"
                     decoding="async"
                     loading="eager"
                   />
@@ -390,23 +361,23 @@ const ListingDetailPage = () => {
 
                 {images.length > 1 && (
                   <>
-                    <button
-                      type="button"
+                    <Button
+                      variant="secondary"
                       onClick={showPreviousImage}
-                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 absolute left-4 top-1/2 w-11"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 !px-0 w-11"
                       aria-label={t("previous", "Önceki")}
                     >
-                      <ChevronLeft className="h-5 w-5" strokeWidth={1.5} />
-                    </button>
-                    <button
-                      type="button"
+                      <ChevronLeft className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={showNextImage}
-                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 absolute right-4 top-1/2 w-11"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 !px-0 w-11"
                       aria-label={t("next", "Sonraki")}
                     >
-                      <ChevronRight className="h-5 w-5" strokeWidth={1.5} />
-                    </button>
-                    <div className="absolute bottom-4 right-4 rounded-sm bg-primary/80 px-2 py-1 text-xs font-medium tabular-nums text-white">
+                      <ChevronRight className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+                    </Button>
+                    <div className="absolute bottom-4 right-4 rounded-sm border border-border bg-background-primary px-2 py-1 text-xs font-medium tabular-nums text-text-primary">
                       {selectedImageIndex + 1} / {images.length}
                     </div>
                   </>
@@ -431,25 +402,9 @@ const ListingDetailPage = () => {
               )}
             </div>
 
-            <section className={`${CARD} p-5`}>
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-text-primary">Aura AI İlan Analizi</h2>
-                  <p className="mt-1 text-sm text-text-secondary">Yapay zeka destekli piyasa ve satıcı değerlendirmesi</p>
-                </div>
-                <Button variant="secondary" size="sm" className="shrink-0" onClick={openAura}>Soru Sor</Button>
-              </div>
-              <div className="rounded border border-border-light bg-background-secondary p-4 text-sm leading-relaxed text-text-secondary">
-                <AuraSummary type="listing" id={listing?.id} listing={listing} />
-              </div>
-            </section>
-
             <SectionCard title={t("about_this_item", "Ürün Açıklaması")}>
-              <div className={`whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${!isDescriptionExpanded && shouldClampDescription ? 'relative max-h-40 overflow-hidden' : ''}`}>
+              <div className={`whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${!isDescriptionExpanded && shouldClampDescription ? 'max-h-40 overflow-hidden' : ''}`}>
                 {listing.description || t("no_description_provided", "Bu ilan için detaylı açıklama girilmemiş.")}
-                {!isDescriptionExpanded && shouldClampDescription && (
-                  <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-background-primary/90" />
-                )}
               </div>
               {shouldClampDescription && (
                 <button
@@ -470,6 +425,19 @@ const ListingDetailPage = () => {
               </SectionCard>
             )}
 
+            <section className={`${CARD} p-5`}>
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-text-primary">Aura AI İlan Analizi</h2>
+                  <p className="mt-1 text-sm text-text-secondary">Yapay zeka destekli piyasa ve satıcı değerlendirmesi</p>
+                </div>
+                <Button variant="secondary" size="sm" className="shrink-0" onClick={openAura}>Soru Sor</Button>
+              </div>
+              <div className="rounded border border-border-light bg-background-secondary p-4 text-sm leading-relaxed text-text-secondary">
+                <AuraSummary type="listing" id={listing?.id} listing={listing} />
+              </div>
+            </section>
+
             <SafeMeetupPanel listing={listing} />
 
             {hasReviews && (
@@ -483,13 +451,13 @@ const ListingDetailPage = () => {
             <div className={`${CARD} space-y-5 p-5`}>
               <div className="space-y-2">
                 <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-tertiary">
-                  <span>{listing.type}</span>
+                  <span>{typeLabel}</span>
                   {hasCampaign && (
-                    <span className="text-status-warning-text">
+                    <span className="text-status-error-text">
                       {listing.campaignName || 'İndirim'}{discount ? ` −%${discount}` : ''}
                     </span>
                   )}
-                  {listing.status !== LISTING_STATUS.ACTIVE && <span>{listing.status}</span>}
+                  {listing.status !== LISTING_STATUS.ACTIVE && <span>{listingStatusLabel(listing.status)}</span>}
                 </p>
 
                 <h1 className="text-2xl font-semibold leading-snug text-text-primary">{listing.title}</h1>
@@ -507,12 +475,6 @@ const ListingDetailPage = () => {
                     <Heart className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
                     {favoriteCount} {t("favorites", "favori")}
                   </span>
-                  {activeViewers > 0 && (
-                    <span className="inline-flex items-center gap-1 tabular-nums text-status-warning-text">
-                      <Flame className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                      {activeViewers >= 10 ? 'Yoğun ilgi' : 'Popüler'} ({activeViewers} kişi inceliyor)
-                    </span>
-                  )}
                   {isOwner && (
                     <span className="inline-flex items-center gap-1 tabular-nums" title="Sadece satıcıya özel görüntülenme verisi">
                       <Eye className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
@@ -524,23 +486,13 @@ const ListingDetailPage = () => {
 
               <div className="flex flex-wrap items-start justify-between gap-4 border-y border-border-light py-4">
                 <div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-base font-medium text-text-tertiary">
-                      {listing.currency === 'TRY' ? '₺' : listing.currency === 'USD' ? '$' : listing.currency === 'EUR' ? '€' : listing.currency}
-                    </span>
-                    <span className="text-3xl font-semibold tabular-nums text-text-primary">
-                      {formatPrice(displayPrice, { decimals: 0 })}
-                    </span>
-                    {Number(displayPrice) % 1 !== 0 && (
-                      <span className="text-base font-medium tabular-nums text-text-tertiary">
-                        ,{String(Number(displayPrice).toFixed(2)).split('.')[1]}
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-2xl font-semibold tabular-nums text-text-primary">
+                    {formatCurrency(displayPrice, listing.currency)}
+                  </span>
                   {hasCampaign && (
                     <p className="mt-1 flex items-center gap-2 text-sm tabular-nums">
                       <span className="text-text-muted line-through">{formatCurrency(listing.price, listing.currency)}</span>
-                      {discount && <span className="text-status-success-text">−%{discount} İndirim</span>}
+                      {discount && <span className="text-status-error-text">−%{discount} İndirim</span>}
                     </p>
                   )}
                 </div>
@@ -552,29 +504,15 @@ const ListingDetailPage = () => {
                 )}
               </div>
 
-              {currentDetailStory && (
-                <div key={currentDetailStory.id} className="flex items-center justify-between gap-3 rounded border border-border-light px-4 py-3" aria-live="polite">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <Flame className="h-4 w-4 shrink-0 text-status-warning" strokeWidth={1.5} aria-hidden />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-text-primary">{currentDetailStory.text}</p>
-                      {currentDetailStory.subtext && <p className="text-sm text-text-secondary">{currentDetailStory.subtext}</p>}
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    {currentDetailStory.badge && <span className="text-sm text-status-warning-text">{currentDetailStory.badge}</span>}
-                    {detailStoryItems.length > 1 && (
-                      <div className="flex gap-1">
-                        {detailStoryItems.map(item => (
-                          <span
-                            key={item.id}
-                            className={`h-1.5 w-1.5 rounded-full ${item.id === currentDetailStory.id ? 'bg-status-warning' : 'bg-secondary-200'}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {socialProof.length > 0 && (
+                <ul className="space-y-1 text-sm text-text-secondary">
+                  {socialProof.map(line => (
+                    <li key={line} className="flex items-center gap-2">
+                      <Flame className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                      {line}
+                    </li>
+                  ))}
+                </ul>
               )}
 
               {isOwner ? (
@@ -602,11 +540,6 @@ const ListingDetailPage = () => {
                   )}
                 </div>
               ) : null}
-
-              <p className="flex items-center gap-2 text-sm text-text-secondary">
-                <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                <span>{t("escrow_guarantee_text", "Escrow Güvenceli Ödeme & Güvenli Teslimat")}</span>
-              </p>
 
               <div className="border-t border-border-light pt-4">
                 <ListingTrustPanel listing={listing} isOwner={isOwner} onShowcaseSuccess={fetchListing} flat={true} />

@@ -77,7 +77,7 @@ public class ElectronicDataInitializer implements SeedTask {
 
                         List<ElectronicSeedModelDto> models = loadBrandModelsFile(fullPath);
                         for (ElectronicSeedModelDto modelDto : models) {
-                            ensureModel(brandCatalog.getBrand(), typeFile.getType(), modelDto.getName());
+                            ensureModel(brandCatalog.getBrand(), typeFile.getType(), modelDto);
                         }
                     }
                 }
@@ -146,7 +146,7 @@ public class ElectronicDataInitializer implements SeedTask {
         if (existing.isPresent()) {
             ElectronicType type = existing.get();
             type.setNew(false);
-            if (type.getLabel() == null || type.getLabel().isBlank()) {
+            if (!label.equals(type.getLabel())) {
                 type.setLabel(label);
                 typeRepository.save(type);
             }
@@ -161,13 +161,14 @@ public class ElectronicDataInitializer implements SeedTask {
 
     // ── Model Seeding ───────────────────────────────────────────────────
 
-    private void ensureModel(String brandKey, String typeKey, String modelName) {
-        if (brandKey == null || typeKey == null || modelName == null || modelName.isBlank()) return;
+    private void ensureModel(String brandKey, String typeKey, ElectronicSeedModelDto modelDto) {
+        if (brandKey == null || typeKey == null || modelDto == null || modelDto.getName() == null || modelDto.getName().isBlank()) return;
 
         ElectronicBrand brand = getBrand(brandKey);
         ElectronicType type = getType(typeKey);
         if (brand == null || type == null) return;
 
+        String modelName = modelDto.getName();
         String normalizedBrand = brandKey.trim().toUpperCase(Locale.ROOT);
         String normalizedType = typeKey.trim().toUpperCase(Locale.ROOT);
         String normalizedModel = modelName.trim().toUpperCase(Locale.ROOT);
@@ -176,7 +177,24 @@ public class ElectronicDataInitializer implements SeedTask {
                 brand.getId(), type.getId(), modelName);
 
         if (existing.isPresent()) {
-            existing.get().setNew(false);
+            ElectronicModel model = existing.get();
+            model.setNew(false);
+            boolean updated = false;
+            if (modelDto.getReleaseYear() != null && !java.util.Objects.equals(model.getReleaseYear(), modelDto.getReleaseYear())) {
+                model.setReleaseYear(modelDto.getReleaseYear());
+                updated = true;
+            }
+            if (modelDto.getIsLegacy() != null && !java.util.Objects.equals(model.getIsLegacy(), modelDto.getIsLegacy())) {
+                model.setIsLegacy(modelDto.getIsLegacy());
+                updated = true;
+            }
+            if (modelDto.getAliases() != null && !java.util.Objects.equals(model.getAliases(), modelDto.getAliases())) {
+                model.setAliases(new java.util.ArrayList<>(modelDto.getAliases()));
+                updated = true;
+            }
+            if (updated) {
+                modelRepository.save(model);
+            }
             return;
         }
 
@@ -188,6 +206,9 @@ public class ElectronicDataInitializer implements SeedTask {
         created.setBrand(brand);
         created.setType(type);
         created.setName(modelName);
+        created.setReleaseYear(modelDto.getReleaseYear());
+        created.setIsLegacy(Boolean.TRUE.equals(modelDto.getIsLegacy()));
+        created.setAliases(modelDto.getAliases() != null ? new java.util.ArrayList<>(modelDto.getAliases()) : new java.util.ArrayList<>());
         modelRepository.save(created);
     }
 
@@ -201,7 +222,7 @@ public class ElectronicDataInitializer implements SeedTask {
         return name == null ? null : typeRepository.findByNameIgnoreCase(name).orElse(null);
     }
 
-    private String formatTypeLabel(String key) {
+    String formatTypeLabel(String key) {
         if (key == null) return "";
         String upper = key.trim().toUpperCase(Locale.ROOT);
         return switch (upper) {
@@ -218,6 +239,7 @@ public class ElectronicDataInitializer implements SeedTask {
             case "TV" -> "Televizyon";
             case "TV_STB" -> "TV & Ev Elektroniği";
             case "ROBOT_VACUUM" -> "Robot Süpürge";
+            case "WASHING_MACHINE" -> "Çamaşır Makinesi";
             case "PRINTER" -> "Yazıcı & Tarayıcı";
             case "AIR_CONDITIONER" -> "Klima";
             case "ROUTER" -> "Modem & Router";

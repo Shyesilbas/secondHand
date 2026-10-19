@@ -53,4 +53,14 @@ public class ElectronicModel implements Persistable<UUID> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
     private ElectronicType type;
+
+    @Column(name = "release_year")
+    private Integer releaseYear;
+
+    @Column(name = "is_legacy")
+    private Boolean isLegacy = false;
+
+    @jakarta.persistence.Convert(converter = com.serhat.secondhand.core.converter.StringListJsonConverter.class)
+    @Column(name = "aliases", columnDefinition = "TEXT")
+    private java.util.List<String> aliases = new java.util.ArrayList<>();
 }

@@ -40,7 +40,8 @@ public class PaymentKafkaProducer {
                 payment.getOrderItemId(),
                 quantity,
                 payment.getStatus() != null ? payment.getStatus().name() : "COMPLETED",
-                payment.getProcessedAt() != null ? payment.getProcessedAt() : LocalDateTime.now()
+                payment.getProcessedAt() != null ? payment.getProcessedAt() : LocalDateTime.now(),
+                payment.getTransactionType() != null ? payment.getTransactionType().name() : null
         );
 
         log.info("Publishing PaymentCompletedKafkaEvent to Kafka topic: {} with key: {}", KafkaConfig.PAYMENT_COMPLETED_TOPIC, key);

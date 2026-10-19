@@ -3,7 +3,8 @@ import { memo, useId, useState } from 'react';
 import { formatCurrency } from '../../../common/formatters.js';
 import { useUserReviewStats } from '../../../reviews/hooks/useReviews.js';
 import { StarIcon, STAR_SHAPE_PATH } from '../../../reviews/components/StarIcon.jsx';
-import { ArrowLeft, ArrowRight, MapPin, Wallet, Loader2, PackageCheck, ShieldCheck, Truck, Users, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Wallet, Loader2, Truck, Users, Lock } from 'lucide-react';
+import Button from '../../../common/components/ui/Button.jsx';
 
 /* ── Seller inline rating ─────────────────────────────────── */
 
@@ -25,11 +26,11 @@ const SellerRating = ({ sellerId }) => {
     const hasHalfStar = capped % 1 !== 0;
 
     for (let i = 0; i < fullStars; i += 1) {
-      stars.push(<StarIcon key={`f-${i}`} className="h-3 w-3 shrink-0 text-status-warning" />);
+      stars.push(<StarIcon key={`f-${i}`} className="h-3 w-3 shrink-0 text-text-primary" />);
     }
     if (hasHalfStar) {
       stars.push(
-        <svg key="half" className="h-3 w-3 shrink-0 text-status-warning" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+        <svg key="half" className="h-3 w-3 shrink-0 text-text-primary" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
           <defs>
             <linearGradient id={halfStarGradientId}>
               <stop offset="50%" stopColor="currentColor" />
@@ -42,16 +43,16 @@ const SellerRating = ({ sellerId }) => {
     }
     const emptyStars = 5 - Math.ceil(capped);
     for (let i = 0; i < emptyStars; i += 1) {
-      stars.push(<StarIcon key={`e-${i}`} className="h-3 w-3 shrink-0 text-secondary-200" />);
+      stars.push(<StarIcon key={`e-${i}`} className="h-3 w-3 shrink-0 text-border" />);
     }
     return stars;
   };
 
   return (
-    <div className="inline-flex items-center gap-1.5 bg-background-secondary border border-border/80 px-2 py-0.5 rounded">
+    <div className="inline-flex items-center gap-1.5 bg-background-secondary border border-border px-1.5 py-0.5 rounded">
       <div className="flex items-center">{renderStars(safeAvg)}</div>
-      <span className="text-xs font-semibold text-status-warning-text">
-        {safeAvg.toFixed(1)} <span className="text-status-warning-text font-normal">({total})</span>
+      <span className="text-2xs font-semibold text-text-secondary tabular-nums">
+        {safeAvg.toFixed(1)} <span className="text-text-tertiary font-normal">({total})</span>
       </span>
     </div>
   );
@@ -90,31 +91,26 @@ const CheckoutReviewStep = ({
   };
 
   return (
-    <div className="p-6 sm:p-8 space-y-8">
-      {/* ── Header ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between border-b border-border-light pb-5">
+    <div className="p-6 sm:p-8 space-y-6">
+      {/* Header */}
+      <div className="border-b border-border-light pb-4">
         <div>
-          <h2 className="text-base font-semibold text-text-primary tracking-tight">
+          <h2 className="text-sm font-semibold text-text-primary">
             {t("review_your_order", "Sipariş Özeti & Onay")}
           </h2>
-          <p className="mt-0.5 text-xs text-text-tertiary font-medium">
+          <p className="mt-0.5 text-xs text-text-tertiary">
             {t("double_check_details_before_finishing_yo", "Lütfen sipariş bilgilerinizi son kez kontrol edin ve güvenlik kodunu isteyin.")}
           </p>
         </div>
-
-        <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-text-primary bg-background-tertiary px-3.5 py-1.5 rounded border border-border">
-          <PackageCheck className="h-4 w-4 text-text-primary" />
-          {cartItems.length} Ürün Listelendi
-        </span>
       </div>
 
-      {/* ── Products List Manifest ──────────────────────────────── */}
+      {/* Products List Manifest */}
       <div>
-        <h4 className="text-xs font-semibold text-text-muted mb-3">
+        <h4 className="text-2xs font-semibold uppercase tracking-wider text-text-tertiary mb-2.5">
           Sepet İçeriği
         </h4>
 
-        <div className="rounded-md border border-border/90 bg-background-secondary/50 divide-y divide-border-light overflow-hidden">
+        <div className="rounded border border-border bg-background-primary divide-y divide-border-light overflow-hidden">
           {cartItems.map(item => {
             const isOffer = !!item.isOffer;
             const hasCampaign = !isOffer && item.listing.campaignId && item.listing.campaignPrice != null && parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price);
@@ -124,13 +120,13 @@ const CheckoutReviewStep = ({
             const lineTotal = isOffer ? parseFloat(item.offerTotalPrice) || 0 : parseFloat(unitPrice) * item.quantity;
 
             return (
-              <div key={item.id} className="flex items-center gap-4 p-4 hover:bg-white transition-colors">
+              <div key={item.id} className="flex items-center gap-3.5 p-3.5 hover:bg-background-secondary/30 transition-colors">
                 {/* Product Thumbnail */}
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-white">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background-secondary">
                   {item.listing.imageUrl ? (
                     <img src={item.listing.imageUrl} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <span className="text-base font-semibold text-text-muted">
+                    <span className="text-xs font-semibold text-text-muted">
                       {item.listing.title.charAt(0).toUpperCase()}
                     </span>
                   )}
@@ -139,22 +135,22 @@ const CheckoutReviewStep = ({
                 {/* Product Details */}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold text-text-primary truncate">
+                    <h3 className="text-xs font-semibold text-text-primary truncate">
                       {item.listing.title}
                     </h3>
                     {isOffer && (
-                      <span className="rounded-md border border-card-border-hover bg-background-tertiary px-2 py-0.5 text-xs font-semibold text-text-primary">
+                      <span className="rounded border border-border bg-background-secondary px-1.5 py-0.5 text-2xs font-medium text-text-secondary">
                         {t("offer", "Özel Teklif")}
                       </span>
                     )}
                   </div>
 
-                  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-tertiary font-medium">
-                    <span className="text-text-secondary font-semibold">{item.listing.city}</span>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-tertiary">
+                    <span className="text-text-secondary font-medium">{item.listing.city}</span>
                     {(item.listing.sellerName || item.listing.sellerSurname) && (
                       <>
-                        <span className="text-secondary-300">·</span>
-                        <span>Satıcı: <strong className="text-text-primary">{item.listing.sellerName} {item.listing.sellerSurname}</strong></span>
+                        <span className="text-text-muted">·</span>
+                        <span>Satıcı: <strong className="text-text-primary font-medium">{item.listing.sellerName} {item.listing.sellerSurname}</strong></span>
                         <SellerRating sellerId={item.listing.sellerId} />
                       </>
                     )}
@@ -163,10 +159,10 @@ const CheckoutReviewStep = ({
 
                 {/* Price column */}
                 <div className="shrink-0 text-right">
-                  <div className="text-sm font-semibold text-text-primary">
+                  <div className="text-xs font-semibold text-text-primary tabular-nums">
                     {formatCurrency(lineTotal, item.listing.currency)}
                   </div>
-                  <div className="mt-0.5 text-xs text-text-tertiary font-medium">
+                  <div className="mt-0.5 text-2xs text-text-tertiary tabular-nums">
                     {item.quantity} adet × {formatCurrency(unitPrice, item.listing.currency)}
                   </div>
                 </div>
@@ -176,99 +172,77 @@ const CheckoutReviewStep = ({
         </div>
       </div>
 
-      {/* ── Summary Bento Cards (Shipping & Payment) ─────────────── */}
+      {/* Summary Bento Cards (Shipping & Payment) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {/* Delivery / Meetup Bento Card */}
-        <div className="rounded-md border border-border/90 bg-white p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-text-tertiary">
-              {deliveryMethod === 'SAFE_MEETUP' ? <Users className="h-4 w-4 text-text-primary" /> : <Truck className="h-4 w-4 text-text-primary" />}
+        <div className="rounded border border-border bg-background-primary p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-text-tertiary">
+              {deliveryMethod === 'SAFE_MEETUP' ? <Users className="h-3.5 w-3.5 text-text-primary" /> : <Truck className="h-3.5 w-3.5 text-text-primary" />}
               <span>{deliveryMethod === 'SAFE_MEETUP' ? 'Elden Güvenli Teslimat' : 'Teslimat & Kargo Adresi'}</span>
             </div>
-            <span className="text-xs font-semibold text-status-success-text bg-background-secondary px-2 py-0.5 rounded border border-border">
-              Seçildi
-            </span>
           </div>
 
           {deliveryMethod === 'SAFE_MEETUP' ? (
-            <div className="text-xs space-y-2">
-              <p className="font-semibold text-text-primary text-sm flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-status-warning-text shrink-0" />
+            <div className="text-xs space-y-1">
+              <p className="font-semibold text-text-primary flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-text-secondary shrink-0" />
                 <span>{meetupLocation || 'Belirtilmemiş'}</span>
               </p>
-              <p className="text-text-tertiary font-medium leading-relaxed">
+              <p className="text-text-tertiary text-2xs leading-relaxed">
                 Satıcı ile buluştuğunuzda ürünü inceleyip 6 haneli güvenli PIN kodunu vererek işlemi onaylayabilirsiniz.
               </p>
             </div>
           ) : shippingAddress ? (
             <div className="text-xs space-y-1">
-              <p className="font-semibold text-text-primary text-sm">{shippingAddress.title || 'Teslimat Adresi'}</p>
-              <p className="text-text-secondary font-medium leading-relaxed">{shippingAddress.addressLine}</p>
-              <p className="text-text-tertiary font-medium">
+              <p className="font-semibold text-text-primary">{shippingAddress.title || 'Teslimat Adresi'}</p>
+              <p className="text-text-secondary">{shippingAddress.addressLine}</p>
+              <p className="text-text-tertiary text-2xs">
                 {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}
               </p>
             </div>
           ) : (
-            <p className="text-xs text-text-muted font-medium">{t("no_shipping_address_chosen", "Adres seçilmedi.")}</p>
+            <p className="text-xs text-text-muted">{t("no_shipping_address_chosen", "Adres seçilmedi.")}</p>
           )}
         </div>
 
         {/* Payment & Escrow Bento Card */}
-        <div className="rounded-md border border-border/90 bg-white p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-text-tertiary">
-              <Wallet className="h-4 w-4 text-text-primary" />
+        <div className="rounded border border-border bg-background-primary p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider text-text-tertiary">
+              <Wallet className="h-3.5 w-3.5 text-text-primary" />
               <span>{t("payment_method", "Ödeme Yöntemi")}</span>
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-status-success-text bg-background-secondary px-2 py-0.5 rounded border border-border">
-              <ShieldCheck className="h-3 w-3" />
-              Escrow Güvencesi
-            </span>
           </div>
 
-          <div className="text-xs space-y-1.5">
-            <p className="font-semibold text-text-primary text-sm">SecondHand Cüzdan</p>
-            <p className="text-text-secondary font-medium">
-              Tahsil Edilecek Tutar: <strong className="text-text-primary font-semibold">{formatCurrency(totalAmount, currency)}</strong>
+          <div className="text-xs space-y-1">
+            <p className="font-semibold text-text-primary">SecondHand Cüzdan</p>
+            <p className="text-text-secondary">
+              Tahsil Edilecek Tutar: <strong className="text-text-primary font-semibold tabular-nums">{formatCurrency(totalAmount, currency)}</strong>
             </p>
-            <p className="text-xs text-text-tertiary leading-relaxed pt-1 border-t border-border-light">
+            <p className="text-2xs text-text-tertiary leading-relaxed pt-1 border-t border-border-light">
               Tutar güvenli havuz hesabına alınır, ürün onayınıza dek satıcıya aktarılmaz.
             </p>
           </div>
         </div>
       </div>
 
-      {/* ── Subtotal Bar ────────────────────────────────────────── */}
-      <div className="flex items-baseline justify-between rounded-md bg-background-secondary border border-border/80 p-5">
-        <div>
-          <span className="text-xs font-semibold text-text-muted block">
-            {t("subtotal", "Toplam Tutar")}
-          </span>
-          <span className="text-xs text-text-tertiary font-medium">Kargo ve KDV dahil</span>
-        </div>
-        <span className="text-2xl font-semibold text-text-primary">
-          {formatCurrency(totalAmount, currency)}
-        </span>
-      </div>
-
-      {/* ── Navigation ──────────────────────────────────────────── */}
-      <div className="border-t border-border-light pt-6">
+      {/* Navigation */}
+      <div className="border-t border-border-light pt-4">
         <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={onBack}
             disabled={isSendingCode}
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4"
           >
-            <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+            <ArrowLeft className="h-4 w-4" />
             {t("back", "Ödeme Adımına Dön")}
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={handleNextClick}
             disabled={isSendingCode}
-            className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4"
           >
             {isSendingCode ? (
               <>
@@ -279,10 +253,10 @@ const CheckoutReviewStep = ({
               <>
                 <Lock className="h-4 w-4" />
                 <span>{t("confirm_send_code", "Onayla & Doğrulama Kodunu İste")}</span>
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

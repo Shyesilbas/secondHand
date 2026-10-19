@@ -18,5 +18,6 @@ public record PaymentCompletedKafkaEvent(
         Long orderItemId,
         Integer quantity,
         String status,
-        LocalDateTime completedAt
+        LocalDateTime completedAt,
+        String transactionType
 ) {}

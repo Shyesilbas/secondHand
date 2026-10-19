@@ -26,7 +26,7 @@ const ReviewButton = ({
  if (existingReview) {
  return <div className="text-sm">
  <div className="flex items-center gap-1 text-text-secondary">
- <Star className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ <Star className="h-4 w-4 fill-current text-status-warning-text" strokeWidth={1.5} aria-hidden />
  <span className="tabular-nums">{t("reviewed")} ({existingReview.rating}/5)</span>
  </div>
  {existingReview.comment && <p className="mt-1 line-clamp-2 max-w-xs text-xs text-text-secondary">{existingReview.comment}</p>}

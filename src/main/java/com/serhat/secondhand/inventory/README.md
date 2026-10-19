@@ -82,3 +82,5 @@ sequenceDiagram
 2. **Anti-Hoarding / TTL Expiration:** In-memory holds automatically expire after 15 minutes, freeing the item for other buyers if checkout is abandoned.
 3. **At-Least-Once Delivery & Idempotent Consumption:** Kafka delivers events with at-least-once semantics. Consumer utilizes `ProcessedKafkaEvent` (`INSERT ON CONFLICT DO NOTHING`) to guarantee strictly exactly-once stock deductions.
 4. **Automatic Sold-Out Transition:** If stock reaches `0` after DB deduction, the listing status is automatically flipped to `ListingStatus.SOLD`.
+
+- **Stock deduction filter:** `InventoryKafkaConsumer` deducts stock only for `PaymentCompletedKafkaEvent.transactionType == ITEM_PURCHASE`. Listing fee (`LISTING_CREATION`), showcase and other payments also carry a `listingId` but never touch inventory.

@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.clothing;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.CatalogLegacyPruner;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
@@ -14,7 +15,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Seeds clothing reference data (brands, types) from
@@ -34,6 +37,10 @@ public class ClothingDataInitializer implements SeedTask {
     private final ClothingBrandRepository brandRepository;
     private final ClothingTypeRepository typeRepository;
     private final ObjectMapper objectMapper;
+    private final CatalogLegacyPruner legacyPruner;
+
+    private final Set<String> seenBrands = new HashSet<>();
+    private final Set<String> seenTypes = new HashSet<>();
 
     @Override
     public String key() {
@@ -43,8 +50,12 @@ public class ClothingDataInitializer implements SeedTask {
     @Override
     public Result<Void> run() {
         try {
+            seenBrands.clear();
+            seenTypes.clear();
             seedBrands(loadJson(BRANDS_PATH));
             seedTypes(loadJson(TYPES_PATH));
+            legacyPruner.prune("clothing_brands", seenBrands);
+            legacyPruner.prune("clothing_types", seenTypes);
             log.info("Clothing seed completed successfully");
             return Result.success();
         } catch (Exception e) {
@@ -70,20 +81,29 @@ public class ClothingDataInitializer implements SeedTask {
         }
     }
 
+    private java.util.UUID generateStableUuid(String key) {
+        return java.util.UUID.nameUUIDFromBytes(key.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
     private void upsertBrand(String key, String label) {
-        Optional<ClothingBrand> existing = brandRepository.findByNameIgnoreCase(key);
+        String normalizedKey = key.trim().toUpperCase(java.util.Locale.ROOT);
+        seenBrands.add(normalizedKey);
+        Optional<ClothingBrand> existing = brandRepository.findByNameIgnoreCase(normalizedKey);
+        ClothingBrand brand;
         if (existing.isPresent()) {
-            ClothingBrand brand = existing.get();
-            if (brand.getLabel() == null || brand.getLabel().isBlank()) {
-                brand.setLabel(label);
-                brandRepository.save(brand);
-            }
-            return;
+            brand = existing.get();
+            brand.setNew(false);
+        } else {
+            brand = new ClothingBrand();
+            brand.setId(generateStableUuid("clothing-brand:" + normalizedKey));
+            brand.setName(normalizedKey);
         }
-        ClothingBrand brand = new ClothingBrand();
-        brand.setName(key);
-        brand.setLabel(label);
-        brandRepository.save(brand);
+        if (!java.util.Objects.equals(brand.getLabel(), label)) {
+            brand.setLabel(label);
+            brandRepository.save(brand);
+        } else if (brand.isNew()) {
+            brandRepository.save(brand);
+        }
     }
 
     // ── Type Seeding ────────────────────────────────────────────────────
@@ -96,18 +116,23 @@ public class ClothingDataInitializer implements SeedTask {
     }
 
     private void upsertType(String key, String label) {
-        Optional<ClothingType> existing = typeRepository.findByNameIgnoreCase(key);
+        String normalizedKey = key.trim().toUpperCase(java.util.Locale.ROOT);
+        seenTypes.add(normalizedKey);
+        Optional<ClothingType> existing = typeRepository.findByNameIgnoreCase(normalizedKey);
+        ClothingType type;
         if (existing.isPresent()) {
-            ClothingType type = existing.get();
-            if (type.getLabel() == null || type.getLabel().isBlank()) {
-                type.setLabel(label);
-                typeRepository.save(type);
-            }
-            return;
+            type = existing.get();
+            type.setNew(false);
+        } else {
+            type = new ClothingType();
+            type.setId(generateStableUuid("clothing-type:" + normalizedKey));
+            type.setName(normalizedKey);
         }
-        ClothingType type = new ClothingType();
-        type.setName(key);
-        type.setLabel(label);
-        typeRepository.save(type);
+        if (!java.util.Objects.equals(type.getLabel(), label)) {
+            type.setLabel(label);
+            typeRepository.save(type);
+        } else if (type.isNew()) {
+            typeRepository.save(type);
+        }
     }
 }

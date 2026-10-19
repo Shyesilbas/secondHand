@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ORDER_QUERY_KEYS } from '../../orderConstants.js';
@@ -26,61 +26,57 @@ import Skeleton from '../../../common/components/ui/Skeleton.jsx';
 import {
  BarChart3,
  Check,
+ ChevronDown,
  ChevronRight,
  CircleCheck,
- Info,
  Package,
  Pencil,
  RefreshCw,
  Search,
- SlidersHorizontal,
  Star,
  Truck,
  X
 } from 'lucide-react';
 
-const mergeUiCopy = partial => ({
- ...DEFAULT_UI_COPY,
- ...partial
-});
+// Header and list share one column width so the title lines up with the cards.
+const LIST_WIDTH = 'max-w-4xl';
 
-const DEFAULT_UI_COPY = {
- locale: 'tr-TR',
- searchPlaceholder: 'Sipariş no ile ara…',
- searchSubmit: 'Ara',
- clear: 'Temizle',
- openFilters: 'Filtreler',
- pageSizeHint: 'Sayfa başı',
- tabAll: 'Tümü',
- tabPreparing: 'Hazırlanıyor',
- tabShipped: 'Kargoda',
- tabDelivered: 'Teslim Edildi',
- tabCancelled: 'İptal Edildi',
- totalLabel: 'Toplam Tutar',
- orderLabel: 'Sipariş',
- orderNumberPrefix: '#',
- orderCardTitleFallback: 'Siparişiniz',
- reviewDone: 'Değerlendirildi',
- reviewLabel: 'Değerlendirmeniz',
- reviewNow: 'Değerlendir',
- progressLabel: 'Sipariş Durumu',
- detail: 'Detaylar',
- trackShipment: 'Kargoyu Takip Et',
- reorder: 'Tekrar Satın Al',
- confirmReceipt: 'Teslim Alındı Onayla',
- qtyLabel: 'Adet',
- itemsSummary: n => n === 1 ? '1 ürün' : `${n} ürün`,
- nameBannerTitle: 'Siparişlerinizi İsimlendirin',
- nameBannerBody: 'Kalem simgesini kullanarak siparişlerinize hatırlatıcı isimler verebilirsiniz.',
- nameBannerOk: 'Anladım',
- escrowLabel: 'Güvence Havuzu (Escrow)',
- escrowHintPending: 'Sipariş tamamlandığında cüzdanınıza aktarılır',
- escrowHintEmpty: 'Bekleyen güvence bakiyesi yok',
- escrowByOrder: 'Sipariş Bazında',
- paginationShowing: (from, to, total) => `${total} siparişten ${from}–${to} arası gösteriliyor`,
- paginationPerPage: n => `${n} / sayfa`,
- emptyShopping: 'Alışverişe Başla',
- startShopping: 'Alışverişe Başla'
+const useOrdersCopy = () => {
+ const { t, i18n } = useTranslation();
+ return useMemo(() => ({
+ locale: i18n.language?.startsWith('tr') ? 'tr-TR' : 'en-US',
+ searchPlaceholder: t('orders_ui_search_placeholder', 'Sipariş no ile ara…'),
+ searchSubmit: t('orders_ui_search_submit', 'Ara'),
+ clear: t('orders_ui_clear', 'Temizle'),
+ tabAll: t('orders_ui_tab_all', 'Tümü'),
+ tabPreparing: t('orders_ui_tab_preparing', 'Hazırlanıyor'),
+ tabShipped: t('orders_ui_tab_shipped', 'Kargoda'),
+ tabDelivered: t('orders_ui_tab_delivered', 'Teslim Edildi'),
+ tabCancelled: t('orders_ui_tab_cancelled', 'İptal Edildi'),
+ deliveryLabel: t('orders_ui_delivery_label', 'Teslimat yöntemi'),
+ deliveryAll: t('orders_ui_delivery_all', 'Tüm teslimatlar'),
+ deliveryCargo: t('orders_ui_delivery_cargo', 'Kargo'),
+ deliveryMeetup: t('orders_ui_delivery_meetup', 'Güvenli buluşma'),
+ totalLabel: t('orders_ui_total', 'Toplam tutar'),
+ orderCardTitleFallback: t('orders_ui_title_fallback', 'Siparişiniz'),
+ reviewNow: t('orders_ui_review_now', 'Değerlendir'),
+ detail: t('orders_ui_detail', 'Detaylar'),
+ trackShipment: t('orders_ui_track_shipment', 'Kargoyu takip et'),
+ confirmReceipt: t('orders_ui_confirm_receipt', 'Teslim alındı onayla'),
+ nameBannerTitle: t('orders_ui_name_banner', 'Kalem simgesiyle siparişlerinize hatırlatıcı isimler verebilirsiniz.'),
+ nameBannerOk: t('orders_ui_name_banner_ok', 'Anladım'),
+ escrowLabel: t('orders_ui_escrow_label', 'Güvence havuzu (escrow)'),
+ escrowHintPending: t('orders_ui_escrow_pending', 'Sipariş tamamlandığında cüzdanınıza aktarılır'),
+ escrowHintEmpty: t('orders_ui_escrow_empty', 'Bekleyen güvence bakiyesi yok'),
+ escrowByOrder: t('orders_ui_escrow_by_order', 'Sipariş bazında'),
+ escrowAwaitingDelivery: t('orders_ui_escrow_awaiting_delivery', 'Teslimattan 72 saat sonra onaylanır.'),
+ escrowReleased: t('orders_ui_escrow_released', 'Otomatik aktarıldı.'),
+ escrowReleasesIn: hours => t('orders_ui_escrow_releases_in', { defaultValue: '~{{hours}} saat içinde aktarılacak.', hours }),
+ startShopping: t('orders_ui_start_shopping', 'Alışverişe başla'),
+ filteredEmptyTitle: t('orders_ui_filtered_empty_title', 'Bu filtreyle eşleşen sipariş yok'),
+ filteredEmptyBody: t('orders_ui_filtered_empty_body', 'Başka bir durum ya da teslimat yöntemi deneyin.'),
+ clearFilters: t('orders_ui_clear_filters', 'Filtreleri temizle')
+ }), [t, i18n.language]);
 };
 
 const formatLongDate = (iso, locale) => {
@@ -154,7 +150,7 @@ const Header = React.memo(({
  }
  return (
  <div className="sticky top-0 z-30 border-b border-border bg-background-primary">
- <PageContainer className="py-4">{headerContent}</PageContainer>
+ <PageContainer className={`py-4 ${LIST_WIDTH}`}>{headerContent}</PageContainer>
  </div>
  );
 });
@@ -174,7 +170,7 @@ const StatusTabs = React.memo(({
  ], [uiCopy]);
 
  return (
- <div className="flex w-full flex-wrap gap-1 rounded bg-background-tertiary p-1 lg:w-auto" role="tablist" aria-label={t("order_status_filters", "Sipariş durum filtreleri")}>
+ <div className="-mb-px flex overflow-x-auto" role="tablist" aria-label={t("order_status_filters", "Sipariş durumu filtreleri")}>
  {tabs.map(tab => {
  const active = (statusFilter || '') === (tab.value || '');
  return (
@@ -185,10 +181,10 @@ const StatusTabs = React.memo(({
  aria-selected={active}
  id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`}
  onClick={() => setStatusFilter?.(tab.value)}
- className={`flex-1 rounded px-3 py-1.5 text-sm transition-colors duration-150 sm:flex-none ${
+ className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors duration-150 ${
  active
- ? 'bg-background-primary font-medium text-text-primary'
- : 'text-text-secondary hover:text-text-primary'
+ ? 'border-primary font-medium text-text-primary'
+ : 'border-transparent text-text-secondary hover:text-text-primary'
  }`}
  >
  {tab.label}
@@ -199,30 +195,36 @@ const StatusTabs = React.memo(({
  );
 });
 
+const DeliverySelect = ({ value, onChange, uiCopy }) => (
+ <select
+ aria-label={uiCopy.deliveryLabel}
+ value={value}
+ onChange={e => onChange(e.target.value)}
+ className="h-10 shrink-0 rounded border border-border bg-background-primary px-3 text-sm text-text-primary focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus"
+ >
+ <option value="ALL">{uiCopy.deliveryAll}</option>
+ <option value="CARGO">{uiCopy.deliveryCargo}</option>
+ <option value="SAFE_MEETUP">{uiCopy.deliveryMeetup}</option>
+ </select>
+);
+
 const SearchToolbar = React.memo(({
  search,
  onSearch,
  onClearSearch,
- filtersOpen,
- setFiltersOpen,
- uiCopy,
- pagination,
- onPageSizeChange
+ uiCopy
 }) => {
  const { t } = useTranslation();
  const {
  searchTerm,
  setSearchTerm,
  searchLoading,
- searchError,
- isSearchMode
+ searchError
  } = search;
- const filtersPopoverId = 'orders-list-page-size-popover';
 
  return (
- <div className="flex flex-col w-full sm:w-auto relative" role="search" aria-label={t("search_orders", "Sipariş ara")}>
- <div className="flex items-center gap-2 w-full">
- <form onSubmit={onSearch} className="flex items-center relative group w-full sm:w-64 transition-all duration-300 focus-within:w-full sm:focus-within:w-80">
+ <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none" role="search" aria-label={t("search_orders", "Siparişlerde ara")}>
+ <form onSubmit={onSearch} className="relative flex items-center">
  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" strokeWidth={1.5} aria-hidden />
  <input
  type="text"
@@ -239,7 +241,7 @@ const SearchToolbar = React.memo(({
  <button
  type="button"
  onClick={onClearSearch}
- className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-secondary rounded hover:bg-background-tertiary transition-colors cursor-pointer"
+ className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded p-1 text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-secondary"
  aria-label={uiCopy.clear}
  >
  <X className="h-4 w-4" strokeWidth={1.5} />
@@ -247,39 +249,6 @@ const SearchToolbar = React.memo(({
  ) : null}
  <button type="submit" className="sr-only" disabled={searchLoading || !searchTerm.trim()}>{uiCopy.searchSubmit}</button>
  </form>
- <button
- type="button"
- onClick={() => setFiltersOpen(v => !v)}
- aria-expanded={filtersOpen}
- aria-controls={filtersPopoverId}
- className={`flex h-10 w-10 shrink-0 items-center justify-center rounded border transition-colors duration-150 ${
- filtersOpen
- ? 'border-primary text-text-primary'
- : 'border-border bg-background-primary text-text-secondary hover:bg-background-secondary'
- }`}
- title={uiCopy.openFilters}
- aria-label={uiCopy.openFilters}
- >
- <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} />
- </button>
- </div>
- {filtersOpen && !isSearchMode ? (
- <div className="absolute right-0 top-full z-20 mt-2 flex min-w-56 items-center gap-3 rounded border border-border bg-background-primary px-4 py-3 shadow-sm" id={filtersPopoverId} role="region" aria-label={uiCopy.pageSizeHint}>
- <span className="text-sm text-text-secondary">{uiCopy.pageSizeHint}</span>
- <select
- aria-label={uiCopy.pageSizeHint}
- className="h-9 flex-1 rounded border border-border bg-background-primary px-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
- value={pagination?.size ?? ORDER_DEFAULTS.INITIAL_PAGE_SIZE}
- onChange={e => onPageSizeChange(Number(e.target.value))}
- >
- {ORDER_DEFAULTS.PAGE_SIZE_OPTIONS.map(option => (
- <option key={option} value={option}>
- {uiCopy.paginationPerPage(option)}
- </option>
- ))}
- </select>
- </div>
- ) : null}
  {searchError ? (
  <div id="orders-search-error" role="status" aria-live="polite" className="absolute right-0 top-full z-20 mt-2 max-w-xs rounded border border-border bg-background-primary px-4 py-2.5 text-sm text-status-error-text shadow-sm">
  {searchError}
@@ -333,7 +302,8 @@ const UnifiedOrderItem = React.memo(({
  onCancelEditName,
  onSaveOrderName,
  uiCopy,
- isReviewed
+ isReviewed,
+ highlighted
 }) => {
  const queryClient = useQueryClient();
  const handleMouseEnter = () => {
@@ -370,7 +340,7 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onOpenOrder(order);
  }}
- className={buttonClasses('primary', 'sm')}
+ className={buttonClasses('secondary', 'sm')}
  >
  <Truck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{uiCopy.trackShipment}</span>
@@ -384,7 +354,7 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onCompleteOrder(order.id, e);
  }}
- className={buttonClasses('primary', 'sm')}
+ className={buttonClasses('secondary', 'sm')}
  >
  <CircleCheck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  <span>{uiCopy.confirmReceipt}</span>
@@ -421,7 +391,7 @@ const UnifiedOrderItem = React.memo(({
  }
  }}
  aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`}
- className="group relative flex cursor-pointer flex-col items-start gap-4 overflow-hidden rounded border border-border bg-background-primary p-5 transition-colors duration-150 hover:border-card-border-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:flex-row sm:gap-6"
+ className={`group relative flex cursor-pointer flex-col items-start gap-4 overflow-hidden rounded border bg-background-primary p-5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:flex-row sm:gap-6 ${highlighted ? 'border-primary' : 'border-border hover:border-card-border-hover'}`}
  >
  {/* Thumbnails */}
  <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-0.5">
@@ -463,38 +433,34 @@ const UnifiedOrderItem = React.memo(({
  maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
  autoFocus
  />
- <button
- type="button"
+ <Button
+ size="sm"
+ className="w-9"
  onClick={e => {
  e.stopPropagation();
  onSaveOrderName(order.id, e);
  }}
- className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-9"
  aria-label={t("save", "Kaydet")}
  >
  <Check className="h-4 w-4" strokeWidth={1.5} />
- </button>
- <button
- type="button"
+ </Button>
+ <Button
+ variant="secondary"
+ size="sm"
+ className="w-9"
  onClick={e => {
  e.stopPropagation();
  onCancelEditName();
  }}
- className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 w-9"
  aria-label={t("cancel", "İptal")}
  >
  <X className="h-4 w-4" strokeWidth={1.5} />
- </button>
+ </Button>
  </div>
  ) : (
  <div className="flex flex-wrap items-center gap-2">
  <span className="max-w-xs truncate text-sm font-medium text-text-primary">
  {order.name || items[0]?.listing?.title || uiCopy.orderCardTitleFallback}
- </span>
-
- <span className="inline-flex items-center gap-1.5 text-sm text-text-secondary">
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
- {statusLabel}
  </span>
 
  {isBuyer ? (
@@ -504,7 +470,7 @@ const UnifiedOrderItem = React.memo(({
  e.stopPropagation();
  onStartEditName(order, e);
  }}
- className="rounded p-1 text-text-muted opacity-0 transition-opacity duration-150 hover:text-text-primary focus-visible:opacity-100 group-hover:opacity-100"
+ className="-m-2.5 rounded p-2.5 text-text-muted transition-colors duration-150 hover:text-text-primary"
  aria-label={t("rename_order", "Siparişi İsimlendir")}
  >
  <Pencil className="h-4 w-4" strokeWidth={1.5} />
@@ -513,21 +479,27 @@ const UnifiedOrderItem = React.memo(({
  </div>
  )}
 
+ <div className="flex flex-wrap items-center gap-x-2 text-sm">
+ <span className="inline-flex items-center gap-1.5 text-text-secondary">
+ <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
+ {statusLabel}
+ </span>
  {order.createdAt ? (
- <time
- dateTime={order.createdAt}
- className="text-sm tabular-nums text-text-tertiary"
- >
+ <>
+ <span className="text-text-muted" aria-hidden>·</span>
+ <time dateTime={order.createdAt} className="tabular-nums text-text-tertiary">
  {formatLongDate(order.createdAt, uiCopy.locale)}
  </time>
+ </>
  ) : null}
+ </div>
  </div>
 
  {/* Right: Price & Actions */}
  <div className="shrink-0 flex z-10 mt-1 sm:mt-0 w-full sm:w-auto flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3">
  <div className="flex flex-col items-start sm:items-end">
- <span className="text-sm text-text-tertiary">{uiCopy.totalLabel}</span>
- <span className="mt-0.5 text-lg font-semibold tabular-nums text-text-primary">
+ <span className="sr-only">{uiCopy.totalLabel}</span>
+ <span className="text-lg font-semibold tabular-nums text-text-primary">
  {formatCurrency(displayTotal, currency)}
  </span>
  </div>
@@ -560,12 +532,10 @@ const OrdersListLayout = ({
  viewMode,
  emptyText,
  emptyAction,
- uiCopy: uiCopyProp,
  highlightOrderId
 }) => {
  const { t } = useTranslation();
- const uiCopy = useMemo(() => mergeUiCopy(uiCopyProp || {}), [uiCopyProp]);
- const [filtersOpen, setFiltersOpen] = useState(false);
+ const uiCopy = useOrdersCopy();
  const deliveryMethodFilter = flow.deliveryMethodFilter;
  const setDeliveryMethodFilter = flow.setDeliveryMethodFilter;
  const navigate = useNavigate();
@@ -579,6 +549,11 @@ const OrdersListLayout = ({
  };
  const isBuyerView = viewMode === ORDER_VIEW_MODES.BUYER;
  const isSellerView = viewMode === ORDER_VIEW_MODES.SELLER;
+ const hasActiveFilter = Boolean(flow.search.statusFilter) || deliveryMethodFilter !== 'ALL';
+ const clearFilters = () => {
+ flow.search.setStatusFilter(ORDER_STATUS_TAB_FILTER.ALL);
+ setDeliveryMethodFilter('ALL');
+ };
 
  useEffect(() => {
  if (!highlightOrderId || !flow.orders?.length || flow.loading) return;
@@ -596,68 +571,55 @@ const OrdersListLayout = ({
  if (listingId) navigate(ROUTES.LISTING_DETAIL(listingId));
  };
  const banner = isBuyerView && flow.ui.showNameBanner;
- 
- const topListSummarySlice = useMemo(() => {
- if (!flow.search || flow.loading || flow.search?.isSearchMode || !flow.orders?.length) return null;
- return getListPaginationSlice(flow.pagination);
- }, [flow.search, flow.loading, flow.orders?.length, flow.pagination]);
 
+ const escrowRows = useMemo(() => (flow.orders || []).filter(order => (parseFloat(order.escrowAmount) || 0) > 0), [flow.orders]);
+ const escrowHint = order => {
+ const deliveredAt = order.shipping?.deliveredAt;
+ if (!deliveredAt) return uiCopy.escrowAwaitingDelivery;
+ const releaseAt = new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS;
+ const diffMs = releaseAt - Date.now();
+ if (diffMs <= 0) return uiCopy.escrowReleased;
+ return uiCopy.escrowReleasesIn(Math.ceil(diffMs / (60 * 60 * 1000)));
+ };
+
+ const pendingEscrow = flow.escrow.pendingEscrowAmount;
  const topSlot = isSellerView && !flow.escrow.isLoading ? (
  <div className="rounded border border-border bg-background-primary p-5">
- <div>
- <div className="min-w-0">
- <div className="flex items-baseline gap-2 mb-0.5">
+ <div className="flex items-baseline gap-2">
  <span className="text-sm text-text-secondary">{uiCopy.escrowLabel}</span>
- <span className={`text-xl font-semibold tabular-nums ${flow.escrow.pendingEscrowAmount > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
- {formatCurrency(flow.escrow.pendingEscrowAmount)}
+ <span className={`text-xl font-semibold tabular-nums ${pendingEscrow > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
+ {formatCurrency(pendingEscrow)}
  </span>
  </div>
- <p className="text-sm text-text-tertiary">
- {flow.escrow.pendingEscrowAmount > 0 ? uiCopy.escrowHintPending : uiCopy.escrowHintEmpty}
+ <p className="mt-0.5 text-sm text-text-tertiary">
+ {pendingEscrow > 0 ? uiCopy.escrowHintPending : uiCopy.escrowHintEmpty}
  </p>
 
- {flow.escrow.pendingEscrowAmount > 0 && flow.orders.length > 0 ? (
- <div className="mt-4 pt-3 border-t border-border-light space-y-2">
- <div className="text-sm text-text-secondary">{uiCopy.escrowByOrder}</div>
- {flow.orders.filter(order => (parseFloat(order.escrowAmount) || 0) > 0).map(order => {
- const escrowAmt = parseFloat(order.escrowAmount) || 0;
- const deliveredAt = order.shipping?.deliveredAt;
- const autoReleaseDate = deliveredAt ? new Date(new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS) : null;
- const now = new Date();
- const isAutoReleased = autoReleaseDate && now >= autoReleaseDate;
- let tooltipText;
- if (!deliveredAt) tooltipText = 'Teslimattan 72 saat sonra onaylanır.';
- else if (isAutoReleased) tooltipText = 'Otomatik aktarıldı.';
- else {
- const diffMs = autoReleaseDate - now;
- const h = Math.ceil(diffMs / (60 * 60 * 1000));
- tooltipText = `~${h} saat içinde aktarılacak.`;
- }
- return (
- <div key={order.id} className="flex items-center justify-between text-sm">
- <div className="flex items-center gap-1.5">
+ {pendingEscrow > 0 && escrowRows.length > 0 ? (
+ <details className="group mt-4 border-t border-border-light pt-3">
+ <summary className="flex cursor-pointer list-none items-center justify-between text-sm text-text-secondary hover:text-text-primary">
+ <span>{uiCopy.escrowByOrder} ({escrowRows.length})</span>
+ <ChevronDown className="h-4 w-4 transition-transform duration-150 group-open:rotate-180" strokeWidth={1.5} aria-hidden />
+ </summary>
+ <ul className="mt-3 space-y-3">
+ {escrowRows.map(order => (
+ <li key={order.id} className="flex items-start justify-between gap-4 text-sm">
+ <div className="min-w-0">
  <button
  type="button"
  onClick={() => flow.modal.openOrderModal(order)}
- className="max-w-56 truncate text-left text-text-secondary hover:text-text-primary"
+ className="block max-w-full truncate text-left text-text-secondary hover:text-text-primary"
  >
  {order.name || uiCopy.orderCardTitleFallback}
  </button>
- <div className="relative group">
- <Info className="h-4 w-4 cursor-help text-text-muted" strokeWidth={1.5} aria-label={tooltipText} />
- <div className="invisible absolute bottom-full left-0 z-50 mb-2 w-48 rounded bg-primary p-2 text-xs text-white opacity-0 shadow-sm group-hover:visible group-hover:opacity-100">
- {tooltipText}
+ <p className="text-text-tertiary">{escrowHint(order)}</p>
  </div>
- </div>
- </div>
- <span className="font-medium tabular-nums text-text-primary">{formatCurrency(escrowAmt, order.currency)}</span>
- </div>
- );
- })}
- </div>
+ <span className="shrink-0 font-medium tabular-nums text-text-primary">{formatCurrency(parseFloat(order.escrowAmount) || 0, order.currency)}</span>
+ </li>
+ ))}
+ </ul>
+ </details>
  ) : null}
- </div>
- </div>
  </div>
  ) : null;
 
@@ -674,7 +636,7 @@ const OrdersListLayout = ({
  sticky={stickyHeader}
  />
 
- <PageContainer className={containerClassName || 'py-6'}>
+ <PageContainer className={containerClassName || `py-6 ${LIST_WIDTH}`}>
  {banner ? (
  <div className="mb-5 flex items-center gap-2 text-sm text-text-secondary">
  <span>{uiCopy.nameBannerTitle}</span>
@@ -691,57 +653,18 @@ const OrdersListLayout = ({
  
  {topSlot ? <div className="mb-6">{topSlot}</div> : null}
 
- {/* Segmented Delivery Method Switcher */}
- <div className="mb-6 flex max-w-md rounded bg-background-tertiary p-1">
- {['ALL', 'CARGO', 'SAFE_MEETUP'].map(method => {
- const isActive = deliveryMethodFilter === method;
- const label = {
- ALL: t("all_orders_tab", "Tüm Siparişler"),
- CARGO: t("shipping_orders_tab", "Kargo Teslimatı"),
- SAFE_MEETUP: t("safe_meetup_orders_tab", "Güvenli Buluşma")
- }[method];
- return (
- <button
- key={method}
- type="button"
- onClick={() => setDeliveryMethodFilter(method)}
- aria-pressed={isActive}
- className={`flex-1 rounded py-2 text-sm transition-colors duration-150 ${
- isActive
- ? 'bg-background-primary font-medium text-text-primary'
- : 'text-text-secondary hover:text-text-primary'
- }`}
- >
- {label}
- </button>
- );
- })}
- </div>
-
- {flow.search ? (
- <>
- <div className="mb-6 flex flex-col items-stretch justify-between gap-3 rounded border border-border bg-background-primary p-3 lg:flex-row lg:items-center">
+ <div className="mb-6 flex flex-col gap-3 border-b border-border-light lg:flex-row lg:items-end lg:justify-between">
  <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
+ <div className="flex items-center gap-2 pb-3">
+ <DeliverySelect value={deliveryMethodFilter} onChange={setDeliveryMethodFilter} uiCopy={uiCopy} />
  <SearchToolbar
  search={flow.search}
  onSearch={flow.search.handleSearch}
  onClearSearch={flow.search.clearSearch}
- filtersOpen={filtersOpen}
- setFiltersOpen={setFiltersOpen}
  uiCopy={uiCopy}
- pagination={flow.pagination}
- onPageSizeChange={onPageSizeChange}
  />
  </div>
- {topListSummarySlice ? (
- <div className="flex justify-end -mt-3 mb-4 px-2">
- <p className="text-sm tabular-nums text-text-tertiary">
- {uiCopy.paginationShowing(topListSummarySlice.startItem, topListSummarySlice.endItem, topListSummarySlice.totalElements)}
- </p>
  </div>
- ) : null}
- </>
- ) : null}
 
  {flow.loading ? (
  <div className="space-y-3.5">
@@ -752,14 +675,24 @@ const OrdersListLayout = ({
  <p className="text-sm text-status-error-text">{flow.error}</p>
  <Button variant="secondary" size="sm" onClick={flow.refreshAll}>{t("try_again", "Try again")}</Button>
  </div>
- ) : !displayedOrders?.length && !flow.search?.isSearchMode ? (
+ ) : !displayedOrders.length ? (
+ hasActiveFilter ? (
+ <EmptyState
+ icon={Search}
+ title={uiCopy.filteredEmptyTitle}
+ description={uiCopy.filteredEmptyBody}
+ primaryAction={{ label: uiCopy.clearFilters, onClick: clearFilters }}
+ className="py-16"
+ />
+ ) : (
  <EmptyState
  icon={Package}
- title={emptyText || (isSellerView ? 'Henüz satışınız yok' : 'Henüz siparişiniz bulunmuyor')}
- description={isSellerView ? 'Satışa çıkardığınız ürünler alıcı bulduğunda burada listelenecektir.' : 'Binlerce avantajlı ikinci el ilanı keşfedin ve ilk siparişinizi oluşturun.'}
+ title={emptyText}
+ description={isSellerView ? t('orders_ui_empty_seller_body', 'Satışa çıkardığınız ürünler alıcı bulduğunda burada listelenecektir.') : t('orders_ui_empty_buyer_body', 'Binlerce avantajlı ikinci el ilanı keşfedin ve ilk siparişinizi oluşturun.')}
  primaryAction={isBuyerView && emptyAction ? { label: uiCopy.startShopping, onClick: emptyAction } : undefined}
  className="py-16"
  />
+ )
  ) : (
  <div className="space-y-3.5">
  {(displayedOrders || []).map(order => (
@@ -780,6 +713,7 @@ const OrdersListLayout = ({
  onSaveOrderName={flow.actions.saveOrderName}
  uiCopy={uiCopy}
  isReviewed={Boolean(flow.reviews.reviewedOrderSummaries[order.id])}
+ highlighted={highlightOrderId != null && String(order.id) === String(highlightOrderId)}
  />
  </div>
  ))}

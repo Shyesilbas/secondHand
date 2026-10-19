@@ -36,10 +36,10 @@ import java.util.*;
 public class LocationCatalogService {
 
     private static final String CATALOG_PATH = "data/common/locations.json";
-    private static final String CITIES_KEY = "v4:catalog:locations:cities";
-    private static final String DISTRICTS_HASH_KEY = "v4:catalog:locations:districts";
-    private static final String NEIGHBORHOODS_HASH_KEY = "v4:catalog:locations:neighborhoods";
-    private static final String SENTINEL_KEY = "v4:catalog:locations:sentinel";
+    private static final String CITIES_KEY = "v5:catalog:locations:cities";
+    private static final String DISTRICTS_HASH_KEY = "v5:catalog:locations:districts";
+    private static final String NEIGHBORHOODS_HASH_KEY = "v5:catalog:locations:neighborhoods";
+    private static final String SENTINEL_KEY = "v5:catalog:locations:sentinel";
     private static final Duration CATALOG_TTL = Duration.ofDays(7);
     private static final Duration SENTINEL_TTL = Duration.ofDays(8);
 
@@ -123,10 +123,11 @@ public class LocationCatalogService {
             log.warn("[LocationCatalog] getNeighborhoods Redis okuma hatası: {} | {}", normalizedKey, e.getMessage());
         }
         List<NeighborhoodDto> fallback = loadNeighborhoodsFromJson(normalizedKey);
-        if (!fallback.isEmpty()) {
-            redisTemplate.opsForHash().put(NEIGHBORHOODS_HASH_KEY, normalizedKey, fallback);
-            redisTemplate.expire(NEIGHBORHOODS_HASH_KEY, CATALOG_TTL);
+        if (fallback.isEmpty()) {
+            fallback = List.of(new NeighborhoodDto(normalizedKey + "_MERKEZ", "Merkez"));
         }
+        redisTemplate.opsForHash().put(NEIGHBORHOODS_HASH_KEY, normalizedKey, fallback);
+        redisTemplate.expire(NEIGHBORHOODS_HASH_KEY, CATALOG_TTL);
         return fallback;
     }
 
@@ -186,6 +187,9 @@ public class LocationCatalogService {
                                 String nbLabel = neighborhoodNode.get("label").asText();
                                 neighborhoods.add(new NeighborhoodDto(nbKey, nbLabel));
                             }
+                        }
+                        if (neighborhoods.isEmpty()) {
+                            neighborhoods.add(new NeighborhoodDto(districtKey + "_MERKEZ", "Merkez"));
                         }
                         neighborhoodsMap.put(districtKey, neighborhoods);
                     }

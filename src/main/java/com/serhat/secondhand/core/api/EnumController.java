@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.application.EnumReadService;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
+import com.serhat.secondhand.listing.application.realestate.RealEstateSpecCatalogService;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
@@ -26,12 +27,14 @@ import com.serhat.secondhand.user.domain.entity.enums.Gender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/enums")
@@ -43,6 +46,7 @@ public class EnumController {
     private final ListingFeePaymentService listingFeePaymentService;
     private final ShowcaseService showcaseService;
     private final EnumReadService enumReadService;
+    private final RealEstateSpecCatalogService realEstateSpecCatalogService;
     private final List<CargoProviderPort> cargoProviders;
 
     private ResponseEntity<List<Map<String, Object>>> getListingTypes() {
@@ -254,6 +258,18 @@ public class EnumController {
         return ResponseEntity.ok(enumReadService.getOwnerTypes());
     }
 
+
+    private List<Map<String, Object>> toSpecOptions(List<RealEstateSpecCatalogService.SpecDto> specs) {
+        return specs.stream()
+                .map(spec -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("value", spec.getKey());
+                    map.put("label", spec.getLabel());
+                    map.put("rooms", spec.getRooms());
+                    return map;
+                })
+                .toList();
+    }
 
     private ResponseEntity<List<Map<String, Object>>> getShippingStatuses() {
         List<Map<String, Object>> list = Arrays.stream(ShippingStatus.values())
@@ -534,6 +550,8 @@ public class EnumController {
         allEnums.put("realEstateTypes", getRealEstateTypes().getBody());
         allEnums.put("realEstateAdTypes", getRealEstateAdTypes().getBody());
         allEnums.put("heatingTypes", getHeatingTypes().getBody());
+        allEnums.put("roomConfigs", toSpecOptions(realEstateSpecCatalogService.getRoomConfigs()));
+        allEnums.put("zoningStatuses", toSpecOptions(realEstateSpecCatalogService.getZoningStatuses()));
         allEnums.put("ownerTypes", getOwnerTypes().getBody());
         allEnums.put("clothingBrands", getClothingBrands().getBody());
         allEnums.put("clothingTypes", getClothingTypes().getBody());
@@ -564,6 +582,9 @@ public class EnumController {
         allEnums.put("listingFeeConfig", getListingFeeConfig().getBody());
         allEnums.put("showcasePricingConfig", getShowcasePricingConfig().getBody());
         
-        return ResponseEntity.ok(allEnums);
+        // Short browser cache; the client also keeps it in React Query for a day.
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES).cachePublic())
+                .body(allEnums);
     }
 }

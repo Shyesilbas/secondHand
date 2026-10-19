@@ -1,114 +1,158 @@
 import { useTranslation } from "react-i18next";
 import React from 'react';
-import { FileText, MapPin, Receipt, Save } from 'lucide-react';
+import Button from '../../../common/components/ui/Button.jsx';
+import { inputNormal } from '../../../common/components/forms/inputStyles.js';
 import { ORDER_LIMITS } from '../../constants/orderUiConstants.js';
+
+const AddressText = ({ address, fallback }) => {
+  if (!address) return <p className="mt-1 text-sm text-text-tertiary">{fallback}</p>;
+  return (
+    <>
+      <p className="mt-1 text-sm font-medium text-text-primary">{address.addressLine}</p>
+      <p className="text-sm text-text-secondary">{[address.city, address.postalCode].filter(Boolean).join(', ')}</p>
+    </>
+  );
+};
+
+const AddressSelect = ({ label, value, onChange, addresses, emptyLabel }) => (
+  <div>
+    <label className="mb-1.5 block text-sm text-text-secondary">{label}</label>
+    <select value={value || ''} onChange={onChange} className={`${inputNormal} h-10`}>
+      <option value="">{emptyLabel}</option>
+      {addresses.map(addr => (
+        <option key={addr.id} value={addr.id}>{addr.addressLine} — {addr.city}, {addr.postalCode}</option>
+      ))}
+    </select>
+  </div>
+);
+
+// Shipping and billing address share one card; billing falls back to "same as shipping" when absent.
 export const AddressSection = React.memo(({
- CardComponent,
- isEditingAddress,
- addressesLoading,
- addresses,
- selectedShippingAddressId,
- selectedBillingAddressId,
- setSelectedShippingAddressId,
- setSelectedBillingAddressId,
- handleSaveAddress,
- handleCancelEditAddress,
- handleStartEditAddress,
- isSavingAddress,
- selectedOrder,
- isModifiable
+  CardComponent: Card,
+  isEditingAddress,
+  addressesLoading,
+  addresses,
+  selectedShippingAddressId,
+  selectedBillingAddressId,
+  setSelectedShippingAddressId,
+  setSelectedBillingAddressId,
+  handleSaveAddress,
+  handleCancelEditAddress,
+  handleStartEditAddress,
+  isSavingAddress,
+  selectedOrder,
+  isModifiable
 }) => {
- const { t } = useTranslation();
- if (isEditingAddress) {
- return <CardComponent className="p-5">
- <h4 className="text-xs font-semibold text-text-muted mb-4 flex items-center gap-1.5">
- <MapPin className="w-3 h-3" />{t("edit_addresses")}</h4>
- {addressesLoading ? <p className="text-xs text-text-tertiary">{t("loading_addresses")}</p> : <div className="space-y-3.5">
- <div>
- <label className="text-xs font-semibold text-text-tertiary mb-1.5 block">{t("shipping_address")}</label>
- <select value={selectedShippingAddressId || ''} onChange={e => setSelectedShippingAddressId(Number(e.target.value))} className="w-full px-3 py-2.5 text-xs font-medium border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary bg-background-primary transition-all">
- <option value="">{t("select_address")}</option>
- {addresses.map(addr => <option key={addr.id} value={addr.id}>
- {addr.addressLine} — {addr.city}, {addr.postalCode}
- </option>)}
- </select>
- </div>
- <div>
- <label className="text-xs font-semibold text-text-tertiary mb-1.5 block">{t("billing_address_optional")}</label>
- <select value={selectedBillingAddressId || ''} onChange={e => setSelectedBillingAddressId(e.target.value ? Number(e.target.value) : null)} className="w-full px-3 py-2.5 text-xs font-medium border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary bg-background-primary transition-all">
- <option value="">{t("same_as_shipping")}</option>
- {addresses.map(addr => <option key={addr.id} value={addr.id}>
- {addr.addressLine} — {addr.city}, {addr.postalCode}
- </option>)}
- </select>
- </div>
- <div className="flex items-center gap-2 pt-1">
- <button onClick={handleSaveAddress} disabled={isSavingAddress || addressesLoading} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
- <Save className="w-3.5 h-3.5" />{t("save_address")}</button>
- <button onClick={handleCancelEditAddress} disabled={isSavingAddress} className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-text-secondary bg-background-tertiary hover:bg-secondary-200 rounded transition-all disabled:opacity-50">{t("cancel")}</button>
- </div>
- </div>}
- </CardComponent>;
- }
- return <>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
- <CardComponent className="p-4">
- <h4 className="text-xs font-semibold text-text-muted mb-3 flex items-center gap-1.5">
- <MapPin className="w-3 h-3" />{t("shipping_address")}</h4>
- <p className="text-sm font-semibold text-text-primary">{selectedOrder.shippingAddress?.addressLine}</p>
- <p className="text-body text-text-tertiary mt-1">
- {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}
- </p>
- </CardComponent>
- <CardComponent className="p-4">
- <h4 className="text-xs font-semibold text-text-muted mb-3 flex items-center gap-1.5">
- <Receipt className="w-3 h-3" />{t("billing_details")}</h4>
- <p className="text-sm font-semibold text-text-primary">{selectedOrder.billingAddress?.addressLine || 'Same as shipping'}</p>
- <p className="text-body text-text-tertiary mt-1">{t("tr_vat")}{selectedOrder.orderNumber}</p>
- </CardComponent>
- </div>
- {isModifiable ? <button onClick={handleStartEditAddress} className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-primary bg-background-tertiary border border-primary/60 hover:bg-primary-50 rounded transition-all">
- <MapPin className="w-3.5 h-3.5" />{t("change_address")}</button> : null}
- </>;
+  const { t } = useTranslation();
+
+  if (isEditingAddress) {
+    return (
+      <Card>
+        <h3 className="mb-4 text-lg font-semibold text-text-primary">{t("edit_addresses")}</h3>
+        {addressesLoading ? (
+          <p className="text-sm text-text-tertiary">{t("loading_addresses")}</p>
+        ) : (
+          <div className="space-y-4">
+            <AddressSelect
+              label={t("shipping_address")}
+              value={selectedShippingAddressId}
+              onChange={e => setSelectedShippingAddressId(Number(e.target.value))}
+              addresses={addresses}
+              emptyLabel={t("select_address")}
+            />
+            <AddressSelect
+              label={t("billing_address_optional")}
+              value={selectedBillingAddressId}
+              onChange={e => setSelectedBillingAddressId(e.target.value ? Number(e.target.value) : null)}
+              addresses={addresses}
+              emptyLabel={t("same_as_shipping")}
+            />
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="secondary" size="sm" onClick={handleCancelEditAddress} disabled={isSavingAddress}>{t("cancel")}</Button>
+              <Button size="sm" onClick={handleSaveAddress} disabled={isSavingAddress || addressesLoading}>{t("save_address")}</Button>
+            </div>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h3 className="text-lg font-semibold text-text-primary">{t("od_addresses", "Adresler")}</h3>
+        {isModifiable ? <Button variant="ghost" size="sm" onClick={handleStartEditAddress}>{t("change_address")}</Button> : null}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="min-w-0">
+          <p className="text-sm text-text-secondary">{t("shipping_address")}</p>
+          <AddressText address={selectedOrder.shippingAddress} fallback="—" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm text-text-secondary">{t("od_billing_address", "Fatura adresi")}</p>
+          <AddressText address={selectedOrder.billingAddress} fallback={t("same_as_shipping")} />
+        </div>
+      </div>
+    </Card>
+  );
 });
 AddressSection.displayName = 'AddressSection';
+
+// Hidden when the order has no note; a modifiable order keeps a text button to add one.
 export const NotesSection = React.memo(({
- CardComponent,
- isEditingNotes,
- orderNotes,
- setOrderNotes,
- handleSaveNotes,
- handleCancelEditNotes,
- handleStartEditNotes,
- isSavingNotes,
- selectedOrder,
- isModifiable
+  CardComponent: Card,
+  isEditingNotes,
+  orderNotes,
+  setOrderNotes,
+  handleSaveNotes,
+  handleCancelEditNotes,
+  handleStartEditNotes,
+  isSavingNotes,
+  selectedOrder,
+  isModifiable
 }) => {
- const { t } = useTranslation();
- if (isEditingNotes) {
- return <CardComponent className="p-5">
- <h4 className="text-xs font-semibold text-text-muted mb-3 flex items-center gap-1.5">
- <FileText className="w-3 h-3" />{t("edit_order_notes")}</h4>
- <textarea value={orderNotes} onChange={e => setOrderNotes(e.target.value)} maxLength={ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH} rows={3} className="w-full px-3 py-2.5 text-xs font-medium border border-border-light rounded focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary bg-background-primary resize-none transition-all" placeholder={t("add_a_note_to_your_order")} />
- <div className="flex items-center justify-between mt-2.5">
- <p className="text-xs text-text-muted">
- {orderNotes.length}/{ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH}
- </p>
- <div className="flex items-center gap-2">
- <button onClick={handleSaveNotes} disabled={isSavingNotes} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
- <Save className="w-3.5 h-3.5" />{t("save_notes")}</button>
- <button onClick={handleCancelEditNotes} disabled={isSavingNotes} className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-text-secondary bg-background-tertiary hover:bg-secondary-200 rounded transition-all disabled:opacity-50">{t("cancel")}</button>
- </div>
- </div>
- </CardComponent>;
- }
- return <CardComponent className="p-5">
- <h4 className="text-xs font-semibold text-text-muted mb-3 flex items-center gap-1.5">
- <FileText className="w-3 h-3" />{t("order_notes")}</h4>
- {selectedOrder.notes ? <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap mb-4">{selectedOrder.notes}</p> : <p className="text-xs text-text-muted italic mb-4">{t("no_notes_added_yet")}</p>}
- {isModifiable ? <button onClick={handleStartEditNotes} className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-primary bg-background-tertiary border border-primary/60 hover:bg-primary-50 rounded transition-all">
- <FileText className="w-3.5 h-3.5" /> {selectedOrder.notes ? 'Edit Notes' : 'Add Note'}
- </button> : null}
- </CardComponent>;
+  const { t } = useTranslation();
+
+  if (isEditingNotes) {
+    return (
+      <Card>
+        <h3 className="mb-4 text-lg font-semibold text-text-primary">{t("edit_order_notes")}</h3>
+        <textarea
+          value={orderNotes}
+          onChange={e => setOrderNotes(e.target.value)}
+          maxLength={ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH}
+          rows={3}
+          aria-label={t("order_notes")}
+          className={`${inputNormal} resize-none`}
+          placeholder={t("add_a_note_to_your_order")}
+        />
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <p className="text-sm tabular-nums text-text-tertiary">{orderNotes.length}/{ORDER_LIMITS.ORDER_NOTES_MAX_LENGTH}</p>
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" size="sm" onClick={handleCancelEditNotes} disabled={isSavingNotes}>{t("cancel")}</Button>
+            <Button size="sm" onClick={handleSaveNotes} disabled={isSavingNotes}>{t("save_notes")}</Button>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!selectedOrder.notes) {
+    return isModifiable ? (
+      <div>
+        <Button variant="ghost" size="sm" onClick={handleStartEditNotes}>{t("od_add_note", "Not ekle")}</Button>
+      </div>
+    ) : null;
+  }
+
+  return (
+    <Card>
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <h3 className="text-lg font-semibold text-text-primary">{t("order_notes")}</h3>
+        {isModifiable ? <Button variant="ghost" size="sm" onClick={handleStartEditNotes}>{t("od_edit_note", "Notu düzenle")}</Button> : null}
+      </div>
+      <p className="whitespace-pre-wrap text-sm text-text-primary">{selectedOrder.notes}</p>
+    </Card>
+  );
 });
 NotesSection.displayName = 'NotesSection';

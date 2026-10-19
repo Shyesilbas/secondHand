@@ -20,6 +20,6 @@ const MyOrdersPage = () => {
  const navigate = useNavigate();
  const [searchParams] = useSearchParams();
  const highlightOrderId = searchParams.get('orderId');
- return <OrdersListLayout title={t("orders")} subtitle="Track your purchases and delivery progress" stickyHeader onAnalytics={() => navigate(ROUTES.BUYER_DASHBOARD)} analyticsLabel="Analytics" highlightOrderId={highlightOrderId} flow={flow} enums={enums} viewMode={ORDER_VIEW_MODES.BUYER} emptyText="No orders yet" emptyAction={() => navigate(ROUTES.LISTINGS)} />;
+ return <OrdersListLayout title={t("orders")} subtitle={t("orders_page_subtitle")} stickyHeader onAnalytics={() => navigate(ROUTES.BUYER_DASHBOARD)} analyticsLabel={t("orders_analytics")} highlightOrderId={highlightOrderId} flow={flow} enums={enums} viewMode={ORDER_VIEW_MODES.BUYER} emptyText={t("orders_empty_title")} emptyAction={() => navigate(ROUTES.LISTINGS)} />;
 };
 export default MyOrdersPage;

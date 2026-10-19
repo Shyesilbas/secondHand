@@ -6,4 +6,6 @@ import lombok.Data;
 public class VehicleEngineDto {
     private String name;
     private String fuelType;
+    private Integer horsePower;
+    private Integer engineCapacity;
 }

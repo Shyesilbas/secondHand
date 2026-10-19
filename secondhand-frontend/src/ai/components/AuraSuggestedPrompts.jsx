@@ -1,23 +1,19 @@
-import { TrendingDown, ShieldCheck, MessageSquare, Search, ArrowUpRight, Zap } from 'lucide-react';
+import { TrendingDown, ShieldCheck, MessageSquare, Search } from 'lucide-react';
 
 const AURA_CAPABILITY_PROMPTS = [
   {
     id: 'price-advisor',
     label: 'Piyasa Fiyat Değerlemesi',
-    subtitle: 'İlanın fiyatının piyasa ortalamasına göre fırsat mı pahalı mı olduğunu analiz et.',
+    subtitle: 'İlan fiyatının piyasa ortalamasına göre fırsat mı yüksek mi olduğunu analiz edin.',
     message: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün gerçek piyasa değerini ve fırsat olup olmadığını nasıl belirleyebilirim?',
     icon: TrendingDown,
-    badge: 'Akıllı Analiz',
-    gradient: 'bg-background-tertiary text-status-success-text border-border/60'
   },
   {
     id: 'negotiation-strategy',
     label: 'Pazarlık & Teklif Stratejisi',
-    subtitle: 'Satıcıya gönderilecek mantıklı, nazik ve kabul görme şansı yüksek bir teklif mesajı hazırla.',
+    subtitle: 'Satıcıya iletilecek piyasaya uygun, saygılı ve sonuç odaklı teklif metni oluşturun.',
     message: 'Bir ilana teklif verirken satıcıyı ikna edecek, piyasaya uygun ve saygılı bir pazarlık mesajı taslağı hazırlar mısın?',
     icon: MessageSquare,
-    badge: 'Teklif Botu',
-    gradient: 'bg-background-tertiary text-text-primary border-border/60'
   },
   {
     id: 'escrow-safety',
@@ -25,8 +21,6 @@ const AURA_CAPABILITY_PROMPTS = [
     subtitle: 'Havuz hesabı, kargo onay süreci ve dolandırıcılıktan korunma adımlarını öğrenin.',
     message: 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu (Escrow) sistemi nasıl çalışır?',
     icon: ShieldCheck,
-    badge: 'Maksimum Güvenlik',
-    gradient: 'bg-background-tertiary text-status-warning-text border-border/60'
   },
   {
     id: 'listing-discovery',
@@ -34,8 +28,6 @@ const AURA_CAPABILITY_PROMPTS = [
     subtitle: 'Bütçenize, şehrinize ve aradığınız teknik özelliklere en uygun ürünleri bulun.',
     message: 'SecondHand platformunda bütçeme ve kriterlerime en uygun popüler teknoloji ve ikinci el ilanlarını nasıl bulabilirim?',
     icon: Search,
-    badge: 'Doğal Dil Arama',
-    gradient: 'bg-background-tertiary text-text-primary border-border/60'
   },
 ];
 
@@ -55,39 +47,18 @@ export default function AuraSuggestedPrompts({
             type="button"
             disabled={disabled}
             onClick={() => onPick(p.message)}
-            className="group relative flex flex-col justify-between text-left rounded-md border border-border/90 bg-white p-4 transition-all duration-200 hover:border-primary disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+            className="flex flex-col justify-between rounded border border-border bg-background-primary p-4 text-left transition-colors duration-150 ease-out hover:border-card-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div>
-              <div className="flex items-center justify-between gap-2 mb-2.5">
-                <div className={`flex h-8 w-8 items-center justify-center rounded border ${p.gradient}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-text-tertiary bg-background-tertiary px-2 py-0.5 rounded-sm border border-border/60">
-                    {p.badge}
-                  </span>
-                  <div className="h-6 w-6 rounded flex items-center justify-center text-text-muted group-hover:text-text-primary group-hover:bg-background-tertiary transition-colors">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </div>
-                </div>
+              <div className="mb-2 flex items-center justify-between">
+                <Icon className="h-5 w-5 text-text-secondary" strokeWidth={1.5} aria-hidden />
               </div>
-
-              <h3 className="text-xs sm:text-sm font-semibold text-text-primary group-hover:text-black">
+              <h3 className="text-sm font-semibold text-text-primary">
                 {p.label}
               </h3>
-              <p className="text-xs text-text-tertiary mt-1 line-clamp-2 leading-relaxed font-normal">
+              <p className="mt-1 text-xs text-text-secondary leading-relaxed">
                 {p.subtitle}
               </p>
-            </div>
-
-            <div className="mt-3 pt-2.5 border-t border-border-light flex items-center justify-between text-xs font-semibold text-text-muted group-hover:text-text-primary transition-colors">
-              <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-status-warning" />
-                <span>Tek tıkla sor</span>
-              </span>
-              <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                Çalıştır ↵
-              </span>
             </div>
           </button>
         );

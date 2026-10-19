@@ -38,14 +38,8 @@ public class AccessoryValidator implements ClothingSpecValidator {
         if (type == null || type.getName() == null) {
             return false;
         }
-        String name = type.getName();
-        return "HAT".equalsIgnoreCase(name)
-                || "CAP".equalsIgnoreCase(name)
-                || "SCARF".equalsIgnoreCase(name)
-                || "GLOVES".equalsIgnoreCase(name)
-                || "BELT".equalsIgnoreCase(name)
-                || "TIE".equalsIgnoreCase(name)
-                || "BAG".equalsIgnoreCase(name);
+        return com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.fromTypeName(type.getName())
+                == com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.ACCESSORY;
     }
 }
 

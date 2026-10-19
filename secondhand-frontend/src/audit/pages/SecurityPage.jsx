@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuditLogsPagination } from '../hooks/useAuditLogsPagination.js';
-import { useAuthState } from '../../auth/AuthContext.jsx';
+import { useAuth, useAuthState } from '../../auth/AuthContext.jsx';
 import { authService } from '../../auth/services/authService.js';
 import {
   ArrowLeft,
@@ -19,12 +19,15 @@ import SecurityActivityList from '../components/SecurityActivityList.jsx';
 import PaginationControls from '../components/PaginationControls.jsx';
 import LogDetailModal from '../components/LogDetailModal.jsx';
 import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
+import Button from '../../common/components/ui/Button.jsx';
 import logger from '../../common/utils/logger.js';
+import { ROUTES } from '@/common/constants/routes';
 
 const SecurityPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthState();
+  const { logout } = useAuth();
   const [selectedLog, setSelectedLog] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showRevokeModal, setShowRevokeModal] = useState(false);
@@ -60,7 +63,8 @@ const SecurityPage = () => {
     try {
       await authService.revokeAllSessions();
       setShowRevokeModal(false);
-      window.location.href = '/login';
+      await logout();
+      navigate(ROUTES.LOGIN);
     } catch (err) {
       logger.error('Failed to revoke sessions:', err);
     } finally {
@@ -71,10 +75,10 @@ const SecurityPage = () => {
   if (isLoading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-background-secondary/60 pb-24 text-text-primary font-sans selection:bg-secondary-200">
+    <div className="min-h-screen bg-background-secondary/60 pb-24 text-text-primary font-sans">
       
       {/* ── Top Navigation Bar ── */}
-      <header className="sticky top-0 z-30 bg-background-primary border-b border-border/80">
+      <header className="sticky top-0 z-30 bg-background-primary border-b border-border">
         <PageContainer className="max-w-7xl h-14 flex items-center justify-between gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -84,11 +88,8 @@ const SecurityPage = () => {
             <span>{t("back", "Geri Dön")}</span>
           </button>
 
-          <div className="flex items-center gap-2 px-3 py-1 rounded-sm bg-background-secondary border border-border/80 text-status-success-text text-xs font-semibold">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
-            </span>
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-sm bg-background-secondary border border-border text-status-success-text text-xs font-medium">
+            <span className="inline-flex h-2 w-2 rounded-full bg-status-success" />
             <span className="text-xs">{t("system_secure", "Sistem Koruması Aktif")}</span>
           </div>
         </PageContainer>
@@ -100,14 +101,14 @@ const SecurityPage = () => {
         {/* Header Hero Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-background-secondary border border-border-light text-text-primary text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-background-secondary border border-border text-text-primary text-xs font-medium">
+              <ShieldCheck className="w-4 h-4 text-text-primary" strokeWidth={1.5} />
               <span>{t("privacy_protection", "Güvenlik & Gizlilik Merkezi")}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-text-primary tracking-tight">
               {t("security_privacy", "Hesap Güvenliği & Denetim Günlüğü")}
             </h1>
-            <p className="text-xs sm:text-sm text-text-tertiary max-w-2xl font-medium leading-relaxed">
+            <p className="text-xs sm:text-sm text-text-tertiary max-w-2xl font-normal leading-relaxed">
               {t(
                 "keep_track_of_where_you_ve_signed_in_and",
                 "Hesabınıza gerçekleştirilen tüm oturum açma, parola değişikliği ve güvenlik aktivitelerini anlık takip edin."
@@ -116,19 +117,21 @@ const SecurityPage = () => {
           </div>
 
           {/* Revoke All Sessions Primary Button */}
-          <button
+          <Button
+            variant="danger"
+            size="sm"
             onClick={() => setShowRevokeModal(true)}
-            className="inline-flex items-center justify-center gap-2 bg-white border border-border text-status-error-text hover:bg-background-secondary hover:border-border px-4.5 py-2.5 rounded-md font-semibold text-xs transition-all cursor-pointer shrink-0"
+            className="shrink-0"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4" strokeWidth={1.5} />
             <span>{t("revoke_all_sessions", "Tüm Oturumları Kapat")}</span>
-          </button>
+          </Button>
         </div>
 
         {/* Global Error Banner (if any) */}
         {error && (
-          <div className="mb-6 p-4 bg-background-secondary border border-border rounded-md flex items-center gap-3 text-status-error-text text-xs font-semibold">
-            <ShieldAlert className="w-5 h-5 text-status-error-text shrink-0" />
+          <div className="mb-6 p-4 bg-background-secondary border border-border rounded flex items-center gap-3 text-status-error-text text-xs font-medium">
+            <ShieldAlert className="w-5 h-5 text-status-error-text shrink-0" strokeWidth={1.5} />
             <p>{error}</p>
           </div>
         )}
@@ -137,17 +140,17 @@ const SecurityPage = () => {
         <SecuritySummary totalElements={totalElements} auditLogs={auditLogs} />
 
         {/* ── Main Activity Feed Container ── */}
-        <div className="bg-white rounded-md border border-border/90 overflow-hidden">
+        <div className="bg-background-primary rounded border border-border overflow-hidden">
           
           {/* Card Controls Header */}
-          <div className="px-6 py-4.5 border-b border-border-light flex items-center justify-between gap-4 flex-wrap bg-white">
+          <div className="px-6 py-4.5 border-b border-border-light flex items-center justify-between gap-4 flex-wrap bg-background-primary">
             <div className="flex items-center gap-2.5">
               <Activity className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-text-primary tracking-tight">
                   {t("login_activity", "Güvenlik Hareketleri")}
                 </h2>
-                <span className="px-2 py-0.5 rounded-sm bg-background-tertiary text-text-secondary text-xs font-semibold tabular-nums border border-border/60">
+                <span className="px-2 py-0.5 rounded-sm bg-background-tertiary text-text-secondary text-xs font-medium tabular-nums border border-border">
                   {totalElements} {t("events", "kayıt")}
                 </span>
               </div>
@@ -157,16 +160,16 @@ const SecurityPage = () => {
             <button
               type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded text-xs font-semibold transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
                 showFilters || hasActiveFilters
                   ? 'bg-primary text-white'
-                  : 'bg-background-tertiary text-text-secondary hover:bg-secondary-200 border border-border/60'
+                  : 'bg-background-tertiary text-text-secondary hover:text-text-primary hover:bg-background-secondary border border-border'
               }`}
             >
-              <Settings2 className="w-4 h-4" />
+              <Settings2 className="w-3.5 h-3.5" strokeWidth={1.5} />
               <span>{showFilters ? t("hide_filters", "Filtreleri Gizle") : t("filter_activity", "Filtrele")}</span>
               {hasActiveFilters && (
-                <span className="w-2 h-2 rounded-full bg-secondary-300 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
               )}
             </button>
           </div>
@@ -195,7 +198,7 @@ const SecurityPage = () => {
 
           {/* Pagination Controls */}
           {shouldShowPagination && (
-            <div className="p-5 border-t border-border-light bg-background-secondary/50">
+            <div className="p-4 border-t border-border-light bg-background-secondary/50">
               <PaginationControls
                 shouldShowPagination={shouldShowPagination}
                 currentPage={currentPage}
@@ -236,14 +239,14 @@ const SecurityPage = () => {
 const LoadingSkeleton = () => (
   <div className="min-h-screen bg-background-secondary/60 p-6 sm:p-12 font-sans">
     <PageContainer className="max-w-7xl space-y-8 animate-pulse">
-      <div className="h-6 w-32 bg-secondary-200 rounded" />
-      <div className="h-10 w-2/5 bg-secondary-200 rounded" />
+      <div className="h-6 w-32 bg-background-tertiary rounded" />
+      <div className="h-10 w-2/5 bg-background-tertiary rounded" />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-28 bg-white border border-border/80 rounded-md" />
+          <div key={i} className="h-28 bg-background-primary border border-border rounded" />
         ))}
       </div>
-      <div className="h-96 bg-white border border-border/80 rounded-md" />
+      <div className="h-96 bg-background-primary border border-border rounded" />
     </PageContainer>
   </div>
 );

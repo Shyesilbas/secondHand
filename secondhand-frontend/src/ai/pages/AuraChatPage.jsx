@@ -8,7 +8,6 @@ import {
   ArrowUp,
   BrainCircuit,
   Check,
-  ChevronDown,
   Copy,
   ExternalLink,
   MessageSquare,
@@ -42,7 +41,7 @@ import Modal from '@/common/components/ui/Modal';
 import { cacheService } from '../../common/services/cacheService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 
-// Shared by the sidebar shortcuts and the composer's quick-tools menu.
+// Sidebar capability shortcuts
 const AURA_CAPABILITIES = [
   {
     icon: TrendingDown,
@@ -66,13 +65,6 @@ const AURA_CAPABILITIES = [
   },
 ];
 
-const DISCOVERY_PROMPTS = [
-  'iPhone 14 piyasa fiyatı nedir?',
-  'MacBook Air M2 pazarlık payı',
-  'Güvenli Havuz (Escrow) nasıl işler?',
-  'Kamera alırken nelere bakılmalı?',
-];
-
 const ICON_BUTTON = 'inline-flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary disabled:opacity-50';
 
 export const AuraChatPage = () => {
@@ -92,8 +84,7 @@ export const AuraChatPage = () => {
   const [upgradeHint, setUpgradeHint] = useState('');
   const [showMemoryHub, setShowMemoryHub] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showQuickTools, setShowQuickTools] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => (typeof window !== 'undefined' ? window.innerWidth >= 1024 : true));
   const [feedbackGiven, setFeedbackGiven] = useState({});
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -274,29 +265,29 @@ export const AuraChatPage = () => {
   const quickListingActions = [
     {
       icon: TrendingDown,
-      label: 'Fiyat Analizi',
-      prompt: `Bu ürünün (${activeListing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre nasıl? Fiyat analizi yapabilir misin?`,
+      label: 'Fiyat Değerlemesi',
+      prompt: `Bu ürünün (${activeListing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre fırsat mı? Fiyat analizi yapabilir misin?`,
     },
     {
       icon: MessageSquare,
       label: 'Pazarlık Teklifi',
-      prompt: `Bu ürün için satıcıyı ikna edecek nazik ve gerçekçi bir pazarlık mesajı taslağı oluşturur musun?`,
+      prompt: `Bu ürün için satıcıyı ikna edecek nazik ve piyasaya uygun bir pazarlık mesajı taslağı oluşturur musun?`,
     },
     {
       icon: ShieldCheck,
-      label: 'Güvenlik & Escrow',
-      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu nasıl işliyor?`,
+      label: 'Güvenli Alışveriş (Escrow)',
+      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu süreci nasıl işler?`,
     },
     {
       icon: Wand2,
-      label: 'Artı & Eksi Analizi',
-      prompt: `Bu ürünün teknik özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?`,
+      label: 'Avantaj & Risk Analizi',
+      prompt: `Bu ürünün özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?`,
     },
   ];
 
   const textareaRef = useRef(null);
 
-  // Grow the composer with its content, up to five lines.
+  // Auto-grow textarea up to 120px
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -304,52 +295,94 @@ export const AuraChatPage = () => {
     }
   }, [input]);
 
-  const isHeroState = messages.length <= 1;
   const send = (text) => sendMessage({ text });
+
+  // A chat is fresh if the user hasn't asked anything yet
+  const hasUserMessages = useMemo(() => messages.some((m) => m.role === 'user'), [messages]);
 
   return (
     <div className="flex h-[calc(100dvh-70px)] w-full overflow-hidden bg-background-secondary text-text-primary">
-      <aside className={`z-20 flex shrink-0 flex-col border-r border-border bg-background-primary ${sidebarOpen ? 'w-72 sm:w-80' : 'hidden'}`}>
+      {/* Mobile Backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-border bg-background-primary transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-72 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'
+        }`}
+      >
         <div className="flex h-full flex-col overflow-hidden p-3">
           <div className="flex items-center gap-2 border-b border-border-light pb-3">
-            <Button className="flex-1 justify-start" onClick={handleNewChat} disabled={isSending}>
+            <Button
+              variant="secondary"
+              className="flex-1 justify-start"
+              onClick={() => {
+                handleNewChat();
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              disabled={isSending}
+            >
               <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>Yeni Sohbet</span>
             </Button>
-            <button type="button" onClick={() => setSidebarOpen(false)} aria-label="Paneli Kapat" className={ICON_BUTTON}>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Paneli Kapat"
+              className={ICON_BUTTON}
+            >
               <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </div>
 
           {activeListing && (
-            <div className="mt-3 rounded border border-border-light p-3">
-              <div className="mb-2 flex items-center justify-between gap-2 text-sm">
-                <span className="text-text-tertiary">Aktif İlan Bağlantısı</span>
-                <button type="button" onClick={() => setDetachedListingId(activeListing.id)} className="text-text-secondary transition-colors hover:text-status-error-text">
+            <div className="mt-3 rounded border border-border-light bg-background-secondary p-3">
+              <div className="mb-2 flex items-center justify-between gap-2 text-xs">
+                <span className="text-text-tertiary font-medium">Aktif İlan</span>
+                <button
+                  type="button"
+                  onClick={() => setDetachedListingId(activeListing.id)}
+                  className="text-text-muted transition-colors hover:text-status-error text-xs"
+                >
                   Kaldır
                 </button>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
-                  {activeListing.imageUrl ? <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" /> : <Tag className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />}
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
+                  {activeListing.imageUrl ? (
+                    <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <Tag className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-text-primary">{activeListing.title}</p>
-                  <p className="text-sm tabular-nums text-text-secondary">{formatListingPriceLabel(activeListing.price, activeListing.currency)}</p>
+                  <p className="truncate text-xs font-semibold text-text-primary">{activeListing.title}</p>
+                  <p className="text-xs tabular-nums text-text-secondary">
+                    {formatListingPriceLabel(activeListing.price, activeListing.currency)}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
           <div className="mt-4 flex-1 space-y-1 overflow-y-auto">
-            <p className="px-2 pb-1 text-sm text-text-tertiary">Aura Yetenekleri</p>
+            <p className="px-2 pb-1 text-xs font-medium text-text-tertiary">Önerilen Konular</p>
             {AURA_CAPABILITIES.map(({ icon: Icon, label, prompt }) => (
               <button
                 key={label}
                 type="button"
                 disabled={isSending}
-                onClick={() => send(prompt)}
-                className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-50"
+                onClick={() => {
+                  send(prompt);
+                  if (window.innerWidth < 1024) setSidebarOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-50"
               >
                 <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                 <span className="truncate">{label}</span>
@@ -360,9 +393,11 @@ export const AuraChatPage = () => {
           <div className="space-y-1 border-t border-border-light pt-3">
             <button
               type="button"
-              onClick={() => setShowMemoryHub(prev => !prev)}
-              aria-expanded={showMemoryHub}
-              className="flex w-full items-center gap-2 rounded px-2 py-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
+              onClick={() => {
+                setShowMemoryHub(true);
+                if (window.innerWidth < 1024) setSidebarOpen(false);
+              }}
+              className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
             >
               <BrainCircuit className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
               <span>Aura Hafıza Profili</span>
@@ -371,7 +406,7 @@ export const AuraChatPage = () => {
               type="button"
               onClick={() => setConfirmClear(true)}
               disabled={isSending || userId == null}
-              className="flex w-full items-center gap-2 rounded px-2 py-2 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-status-error-text disabled:opacity-50"
+              className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-status-error disabled:opacity-50"
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span>Sohbet Geçmişini Temizle</span>
@@ -380,215 +415,250 @@ export const AuraChatPage = () => {
         </div>
       </aside>
 
+      {/* Main Conversation Column */}
       <main className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background-primary">
-        <header className="z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            {!sidebarOpen && (
-              <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Paneli Aç" className={ICON_BUTTON}>
+        {/* Header */}
+        <header className="z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background-primary px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              aria-label={sidebarOpen ? "Paneli Kapat" : "Paneli Aç"}
+              className={ICON_BUTTON}
+            >
+              {sidebarOpen ? (
+                <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
+              ) : (
                 <PanelLeftOpen className="h-4 w-4" strokeWidth={1.5} />
-              </button>
-            )}
+              )}
+            </button>
             <div className="min-w-0">
-              <h1 className="text-sm font-semibold text-text-primary">Aura AI</h1>
-              <p className="hidden truncate text-sm text-text-tertiary sm:block">İkinci El Alışveriş & Analiz Motoru</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-sm font-semibold text-text-primary">Aura AI</h1>
+                <span className="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
+              </div>
             </div>
           </div>
+
           <div className="flex items-center gap-2">
             {activeListing && (
-              <Link
-                to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 hidden md:inline-flex"
-              >
-                <span className="max-w-xs truncate">{activeListing.title}</span>
-                <ExternalLink className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
-              </Link>
+              <div className="hidden md:flex items-center gap-1.5 rounded border border-border bg-background-secondary px-2.5 py-1 text-xs">
+                <Tag className="h-3.5 w-3.5 text-text-muted shrink-0" strokeWidth={1.5} aria-hidden />
+                <Link
+                  to={ROUTES.LISTING_DETAIL(activeListing.id)}
+                  className="max-w-[180px] truncate font-medium text-text-primary hover:underline"
+                >
+                  {activeListing.title}
+                </Link>
+                <span className="tabular-nums text-text-tertiary">
+                  ({formatListingPriceLabel(activeListing.price, activeListing.currency)})
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setDetachedListingId(activeListing.id)}
+                  title="Bağlantıyı kaldır"
+                  aria-label="İlan bağlantısını kaldır"
+                  className="ml-1 text-text-muted hover:text-status-error transition-colors"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
             )}
-            <Button variant={showMemoryHub ? 'primary' : 'secondary'} size="sm" onClick={() => setShowMemoryHub(prev => !prev)} aria-expanded={showMemoryHub}>
+            <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(true)}>
               <BrainCircuit className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               <span className="hidden sm:inline">Hafıza</span>
             </Button>
-            <button type="button" onClick={handleNewChat} disabled={isSending} aria-label="Yeni Oturum" className={ICON_BUTTON}>
+            <button
+              type="button"
+              onClick={handleNewChat}
+              disabled={isSending}
+              aria-label="Yeni Sohbet"
+              title="Yeni Sohbet"
+              className={ICON_BUTTON}
+            >
               <RotateCcw className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </div>
         </header>
 
-        {showMemoryHub && (
-          <div className="absolute inset-x-0 top-14 z-30 max-h-[80vh] overflow-y-auto border-b border-border bg-background-primary p-4 shadow-sm sm:p-6">
-            <div className="mx-auto max-w-2xl">
-              <div className="mb-4 flex items-start justify-between gap-4 border-b border-border-light pb-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-text-primary">Aura AI Bellek & Tercih Paneli</h2>
-                  <p className="mt-1 text-sm text-text-secondary">Aura bu bilgileri sohbetlerinizde kişiselleştirilmiş yanıtlar için hatırlar.</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(false)}>Kapat</Button>
-              </div>
-              <AuraMemoryProfileHub />
-            </div>
-          </div>
-        )}
-
-        <div ref={listRef} className="w-full flex-1 overflow-y-auto px-3 py-6 sm:px-6">
+        {/* Scrollable Chat Area */}
+        <div ref={listRef} className="w-full flex-1 overflow-y-auto px-4 py-6 sm:px-6">
           <div className="mx-auto max-w-3xl space-y-6">
-            {isHeroState && (
-              <div className="flex flex-col items-center py-6 text-center sm:py-10">
-                <h2 className="text-2xl font-semibold text-text-primary">Nasıl yardımcı olabilirim?</h2>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-text-secondary">
-                  Piyasa fiyat değerlemesi, pazarlık teklif metinleri, satıcı güvenlik kontrolleri veya aradığınız ilanlar için hazırım.
-                </p>
-                <div className="mt-6 w-full text-left">
-                  <AuraSuggestedPrompts disabled={isSending} onPick={send} />
-                </div>
-                <div className="mt-5 flex max-w-xl flex-wrap items-center justify-center gap-2">
-                  {DISCOVERY_PROMPTS.map(prompt => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      disabled={isSending}
-                      onClick={() => send(prompt)}
-                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeListing && (
-              <div className="rounded border border-border p-4">
-                <div className="flex items-center justify-between gap-3 border-b border-border-light pb-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
-                      {activeListing.imageUrl ? <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" /> : <Tag className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="flex flex-wrap items-center gap-x-2 text-sm text-text-tertiary">
-                        <span>İncelenen İlan</span>
-                        {activeListing.type && <span>{listingTypeLabel(activeListing.type)}</span>}
-                        <span className="tabular-nums text-text-secondary">{formatListingPriceLabel(activeListing.price, activeListing.currency)}</span>
-                      </p>
-                      <h3 className="mt-0.5 truncate text-sm font-medium text-text-primary">{activeListing.title}</h3>
-                    </div>
+            {/* Tranquil Empty / Hero State */}
+            {!hasUserMessages && (
+              <div className="py-8 sm:py-12">
+                <div className="mx-auto max-w-lg text-center">
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background-secondary text-text-secondary">
+                    <Sparkles className="h-5 w-5" strokeWidth={1.5} />
                   </div>
-                  <Link
-                    to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                    className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 shrink-0"
-                  >
-                    <span>İlan Sayfası</span>
-                    <ExternalLink className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                  </Link>
+                  <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
+                    Nasıl yardımcı olabilirim?
+                  </h2>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    İkinci el ürün değerlemesi, satıcı pazarlık stratejileri ve güvenli Escrow süreci hakkında sorularınızı yanıtlayabilirim.
+                  </p>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {quickListingActions.map(({ icon: Icon, label, prompt }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      disabled={isSending}
-                      onClick={() => send(prompt)}
-                      className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3"
-                    >
-                      <Icon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-                      <span className="truncate">{label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
-            {messages.map((m) => {
-              const isUser = m.role === 'user';
-              return (
-                <div key={m.id} className={`group flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${isUser ? 'bg-primary text-white' : 'border border-border bg-background-secondary text-text-secondary'}`}>
-                    {isUser ? <UserRound className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
-                  </div>
-                  <div className={`min-w-0 max-w-full sm:max-w-xl ${isUser ? 'text-right' : 'text-left'}`}>
-                    <div className={`mb-1 flex items-center gap-2 text-sm text-text-tertiary ${isUser ? 'justify-end' : 'justify-start'}`}>
-                      <span className="text-text-secondary">{isUser ? 'Siz' : 'Aura AI'}</span>
-                      {m.createdAt && (
-                        <span className="tabular-nums">{new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      )}
-                    </div>
-                    <div className={`rounded-md p-4 text-left ${isUser ? 'bg-primary text-white' : 'border border-border bg-background-primary text-text-primary'}`}>
-                      {m.typing ? (
-                        <p className="text-sm text-text-secondary motion-safe:animate-pulse">Aura piyasa verilerini ve ilan geçmişini analiz ediyor...</p>
-                      ) : (
-                        <>
-                          <AuraMessageContent content={m.content} isUser={isUser} />
-                          {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
-                            <div className="mt-4 border-t border-border-light pt-3">
-                              <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
-                            </div>
+                {activeListing ? (
+                  <div className="mt-8 rounded border border-border bg-background-primary p-4 sm:p-5">
+                    <div className="flex items-center justify-between gap-3 border-b border-border-light pb-4">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background-secondary">
+                          {activeListing.imageUrl ? (
+                            <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <Tag className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
                           )}
-                        </>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="flex flex-wrap items-center gap-x-2 text-xs text-text-tertiary">
+                            <span>İncelenen İlan</span>
+                            {activeListing.type && <span>· {listingTypeLabel(activeListing.type)}</span>}
+                          </p>
+                          <h3 className="truncate text-sm font-semibold text-text-primary">
+                            {activeListing.title}
+                          </h3>
+                          <p className="text-sm font-medium tabular-nums text-text-secondary">
+                            {formatListingPriceLabel(activeListing.price, activeListing.currency)}
+                          </p>
+                        </div>
+                      </div>
+                      <Link
+                        to={ROUTES.LISTING_DETAIL(activeListing.id)}
+                        className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-card-border-hover hover:text-text-primary transition-colors shrink-0"
+                      >
+                        <span>İlanı İncele</span>
+                        <ExternalLink className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.5} />
+                      </Link>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {quickListingActions.map(({ icon: Icon, label, prompt }) => (
+                        <button
+                          key={label}
+                          type="button"
+                          disabled={isSending}
+                          onClick={() => send(prompt)}
+                          className="flex items-center gap-2.5 rounded border border-border bg-background-primary p-3 text-left transition-colors duration-150 ease-out hover:border-card-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50"
+                        >
+                          <Icon className="h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />
+                          <span className="text-sm font-medium text-text-primary truncate">{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-8">
+                    <AuraSuggestedPrompts disabled={isSending} onPick={send} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Active Conversation Messages */}
+            {hasUserMessages &&
+              messages.map((m) => {
+                const isUser = m.role === 'user';
+                return (
+                  <div
+                    key={m.id}
+                    className={`group flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+                  >
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium border mt-0.5 ${
+                        isUser
+                          ? 'border-border bg-background-tertiary text-text-secondary'
+                          : 'border-border bg-background-primary text-text-secondary'
+                      }`}
+                    >
+                      {isUser ? (
+                        <UserRound className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                      ) : (
+                        <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
                       )}
                     </div>
 
-                    {!isUser && !m.typing && m.content && (
-                      <div className="mt-1.5 flex items-center gap-1 pl-1">
-                        <button
-                          type="button"
-                          onClick={() => copyToClipboard(m.id, m.content)}
-                          className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
-                        >
-                          {copiedId === m.id ? <Check className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden /> : <Copy className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
-                          <span>{copiedId === m.id ? 'Kopyalandı' : 'Kopyala'}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleFeedback(m.id, 'up')}
-                          aria-pressed={feedbackGiven[m.id] === 'up'}
-                          aria-label="Faydalı Yanıt"
-                          className={`rounded p-1.5 transition-colors hover:bg-background-secondary ${feedbackGiven[m.id] === 'up' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}
-                        >
-                          <ThumbsUp className="h-4 w-4" strokeWidth={1.5} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleFeedback(m.id, 'down')}
-                          aria-pressed={feedbackGiven[m.id] === 'down'}
-                          aria-label="Yetersiz Yanıt"
-                          className={`rounded p-1.5 transition-colors hover:bg-background-secondary ${feedbackGiven[m.id] === 'down' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'}`}
-                        >
-                          <ThumbsDown className="h-4 w-4" strokeWidth={1.5} />
-                        </button>
+                    <div className={`min-w-0 max-w-[85%] sm:max-w-xl ${isUser ? 'text-right' : 'text-left'}`}>
+                      <div className={`mb-1 flex items-center gap-2 text-xs text-text-tertiary ${isUser ? 'justify-end' : 'justify-start'}`}>
+                        <span className="font-medium text-text-secondary">{isUser ? 'Siz' : 'Aura AI'}</span>
+                        {m.createdAt && (
+                          <span className="tabular-nums">
+                            {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
                       </div>
-                    )}
+
+                      <div
+                        className={`rounded p-4 text-left ${
+                          isUser
+                            ? 'bg-background-tertiary border border-border-light text-text-primary'
+                            : 'border border-border bg-background-primary text-text-primary'
+                        }`}
+                      >
+                        {m.typing ? (
+                          <p className="text-sm text-text-secondary motion-safe:animate-pulse">
+                            Aura piyasa verilerini ve ilan geçmişini analiz ediyor...
+                          </p>
+                        ) : (
+                          <>
+                            <AuraMessageContent content={m.content} isUser={isUser} />
+                            {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
+                              <div className="mt-4 border-t border-border-light pt-3">
+                                <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {!isUser && !m.typing && m.content && (
+                        <div className="mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(m.id, m.content)}
+                            className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
+                          >
+                            {copiedId === m.id ? (
+                              <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} aria-hidden />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                            )}
+                            <span>{copiedId === m.id ? 'Kopyalandı' : 'Kopyala'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleFeedback(m.id, 'up')}
+                            aria-pressed={feedbackGiven[m.id] === 'up'}
+                            aria-label="Faydalı Yanıt"
+                            className={`rounded p-1 transition-colors hover:bg-background-secondary ${
+                              feedbackGiven[m.id] === 'up' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'
+                            }`}
+                          >
+                            <ThumbsUp className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleFeedback(m.id, 'down')}
+                            aria-pressed={feedbackGiven[m.id] === 'down'}
+                            aria-label="Yetersiz Yanıt"
+                            className={`rounded p-1 transition-colors hover:bg-background-secondary ${
+                              feedbackGiven[m.id] === 'down' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'
+                            }`}
+                          >
+                            <ThumbsDown className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
 
-        <div className="shrink-0 bg-background-primary p-3 sm:p-5">
-          <div className="relative mx-auto max-w-3xl">
-            {showQuickTools && (
-              <div className="absolute bottom-full left-0 right-0 z-30 mb-3 rounded border border-border bg-background-primary p-2 shadow-sm sm:right-auto sm:w-96">
-                <div className="mb-1 flex items-center justify-between border-b border-border-light px-2 pb-2">
-                  <span className="text-sm text-text-tertiary">Hızlı Yapay Zeka Araçları</span>
-                  <button type="button" onClick={() => setShowQuickTools(false)} aria-label="Kapat" className="rounded p-1 text-text-muted transition-colors hover:text-text-primary">
-                    <X className="h-4 w-4" strokeWidth={1.5} />
-                  </button>
-                </div>
-                {AURA_CAPABILITIES.map(({ icon: Icon, label, prompt }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => {
-                      send(prompt);
-                      setShowQuickTools(false);
-                    }}
-                    className="flex w-full items-center gap-2.5 rounded px-2 py-2 text-left text-sm text-text-primary transition-colors hover:bg-background-secondary"
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                    <span className="flex-1 truncate">{label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-
+        {/* Composer */}
+        <div className="shrink-0 bg-background-primary p-3 sm:p-4 border-t border-border">
+          <div className="mx-auto max-w-3xl">
             <div className="flex flex-col rounded border border-border bg-background-primary p-2 transition-colors focus-within:border-border-focus">
               <textarea
                 ref={textareaRef}
@@ -599,30 +669,28 @@ export const AuraChatPage = () => {
                 placeholder={
                   activeListing
                     ? `"${activeListing.title?.slice(0, 30)}..." hakkında fiyat, pazarlık veya güvenlik sorusu sorun...`
-                    : "Aura'ya ikinci el piyasası, fiyat analizi veya ürünler hakkında soru sorun..."
+                    : "İkinci el piyasası, fiyat analizi veya ürünler hakkında soru sorun..."
                 }
                 rows={1}
-                className="w-full resize-none bg-transparent px-3 py-2 text-sm leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none"
+                className="w-full resize-none bg-transparent px-2.5 py-1.5 text-sm leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none"
               />
-              <div className="mt-1 flex items-center justify-between border-t border-border-light px-1 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowQuickTools(prev => !prev)}
-                  aria-expanded={showQuickTools}
-                  className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-text-secondary transition-colors hover:bg-background-secondary"
-                >
-                  <Wand2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                  <span>Hızlı Araçlar</span>
-                  <ChevronDown className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
-                </button>
+              <div className="mt-1 flex items-center justify-between border-t border-border-light px-1 pt-1.5">
+                <div className="min-w-0 flex items-center gap-2">
+                  {activeListing && (
+                    <span className="inline-flex items-center gap-1 text-xs text-text-tertiary px-1.5 py-0.5 rounded-sm bg-background-secondary border border-border-light max-w-[200px] sm:max-w-xs truncate">
+                      <Tag className="h-3 w-3 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+                      <span className="truncate">{activeListing.title}</span>
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="hidden text-sm text-text-muted sm:inline">Enter ile gönderin</span>
+                  <span className="hidden text-xs text-text-muted sm:inline">Enter ile gönder</span>
                   <button
                     type="button"
                     onClick={() => sendMessage()}
                     disabled={isSending || !input.trim()}
                     aria-label="Gönder"
-                    className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-9 shrink-0"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded bg-primary text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors shrink-0"
                   >
                     <ArrowUp className="h-4 w-4" strokeWidth={1.5} />
                   </button>
@@ -631,21 +699,39 @@ export const AuraChatPage = () => {
             </div>
 
             <p className="mt-2 text-center text-xs text-text-muted">
-              Aura AI hata yapabilir. Önemli alışveriş ve ödeme adımlarında ilan ve satıcı detaylarını teyit ediniz.
+              Aura AI hata yapabilir. Önemli alışveriş ve ödeme adımlarında satıcı ve ilan detaylarını teyit ediniz.
             </p>
           </div>
         </div>
       </main>
 
+      {/* Premium Upgrade Modal */}
       <PremiumUpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} featureHint={upgradeHint} />
 
+      {/* Memory Profile Modal */}
+      <Modal
+        isOpen={showMemoryHub}
+        onClose={() => setShowMemoryHub(false)}
+        title="Aura AI Hafıza & Tercih Profili"
+        description="Aura, sohbetlerinizde kişiselleştirilmiş yanıtlar vermek için bu tercihleri hatırlar."
+        size="lg"
+        footer={
+          <Button variant="secondary" onClick={() => setShowMemoryHub(false)}>
+            Kapat
+          </Button>
+        }
+      >
+        <AuraMemoryProfileHub />
+      </Modal>
+
+      {/* Confirm Clear Modal */}
       <Modal
         isOpen={confirmClear}
         onClose={() => setConfirmClear(false)}
         title="Sohbet Geçmişini Temizle"
         size="sm"
         footer={<>
-          <Button variant="secondary" onClick={() => setConfirmClear(false)}>{t("cancel")}</Button>
+          <Button variant="secondary" onClick={() => setConfirmClear(false)}>{t("cancel", "İptal")}</Button>
           <Button variant="danger" onClick={handleClearHistory}>Temizle</Button>
         </>}
       >

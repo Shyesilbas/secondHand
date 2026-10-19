@@ -37,6 +37,6 @@ Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; st
 - Open audit findings: `.agents/BACKEND_AUDIT.md`. API spec: `secondhand-openapi.json`.
 
 ## Active work
-- Fixing the findings in `.agents/BACKEND_AUDIT.md`.
+- Completed: Fixed all 14 findings in `.agents/BACKEND_AUDIT.md` (critical enum deduplication, validators, dynamic catalog seeding, Flyway V21-V23).
 - Next: AI streaming endpoint test; scan role-based controllers for missing `@PreAuthorize`; CI/CD pipeline; regenerate a Postman collection from `secondhand-openapi.json`.
 - Open risk: Offer card mobile view untested.

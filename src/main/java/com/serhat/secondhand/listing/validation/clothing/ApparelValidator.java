@@ -41,24 +41,8 @@ public class ApparelValidator implements ClothingSpecValidator {
         if (type == null || type.getName() == null) {
             return false;
         }
-        String name = type.getName();
-        return "T_SHIRT".equalsIgnoreCase(name)
-                || "SHIRT".equalsIgnoreCase(name)
-                || "PANTS".equalsIgnoreCase(name)
-                || "JEANS".equalsIgnoreCase(name)
-                || "SHORTS".equalsIgnoreCase(name)
-                || "DRESS".equalsIgnoreCase(name)
-                || "SKIRT".equalsIgnoreCase(name)
-                || "JACKET".equalsIgnoreCase(name)
-                || "COAT".equalsIgnoreCase(name)
-                || "SWEATER".equalsIgnoreCase(name)
-                || "HOODIE".equalsIgnoreCase(name)
-                || "SWEATSHIRT".equalsIgnoreCase(name)
-                || "SUIT".equalsIgnoreCase(name)
-                || "BLAZER".equalsIgnoreCase(name)
-                || "VEST".equalsIgnoreCase(name)
-                || "UNDERWEAR".equalsIgnoreCase(name)
-                || "SOCKS".equalsIgnoreCase(name);
+        return com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.fromTypeName(type.getName())
+                == com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.APPAREL;
     }
 }
 

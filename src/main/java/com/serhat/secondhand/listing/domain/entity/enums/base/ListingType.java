@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public enum ListingType {
-    VEHICLE("Vehicle"),
-    ELECTRONICS("Electronics"), 
-    REAL_ESTATE("Real Estate"),
-    CLOTHING("Clothing"),
-    BOOKS("Books"),
-    SPORTS("Sports"),
-    OTHER("Other");
+    VEHICLE("Vasıta"),
+    ELECTRONICS("Elektronik"), 
+    REAL_ESTATE("Emlak"),
+    CLOTHING("Giyim"),
+    BOOKS("Kitap"),
+    SPORTS("Spor"),
+    OTHER("Diğer");
 
     private final String label;
 

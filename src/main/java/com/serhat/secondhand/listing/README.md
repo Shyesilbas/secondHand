@@ -40,6 +40,12 @@ stateDiagram-v2
 - View Tracking & Aggregated Statistics
 - Price History Queries
 
+## Catalog Seeds
+- Run with `APP_SEED=<key[,key]|listing|all>`; seeds are idempotent upserts from `src/main/resources/data/**`.
+- `CatalogLegacyPruner` deletes rows missing from the JSON only if no foreign key references them. Real estate seeds also realign `name` to the JSON key (rows are matched by id).
+- After all seeds `CatalogSeedStartupRunner` clears the `catalog:*` caches; `GET /api/v1/enums/all` (gzip, 5 min browser cache) also serves `roomConfigs` and `zoningStatuses`.
+- The frontend derives land/residential behavior from `realEstateTypes[].category` and equipment options from `sportEquipmentTypes[].disciplineId`; do not hardcode type names.
+
 ## Related Knowledge
 - **Listing Data Flows**
   -> `.docs/knowledge/listing-data-flows.md`

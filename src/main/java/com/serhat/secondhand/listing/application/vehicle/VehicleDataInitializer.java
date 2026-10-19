@@ -36,6 +36,7 @@ public class VehicleDataInitializer implements SeedTask {
     private final VehicleListingRepository vehicleListingRepository;
     private final ObjectMapper objectMapper;
     private final CacheManager cacheManager;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Override
     public String key() {
@@ -72,7 +73,6 @@ public class VehicleDataInitializer implements SeedTask {
                 }
             }
 
-            pruneStaleBrands(catalogBrandKeys);
             pruneStaleTypes(catalogTypeKeys);
 
             log.info("Seeding brand labels and types...");
@@ -80,9 +80,12 @@ public class VehicleDataInitializer implements SeedTask {
                 upsertBrand(brandCatalog.getBrand(), brandCatalog.getDisplayName());
                 if (brandCatalog.getSupportedTypes() != null) {
                     for (VehicleBrandTypeFileDto typeFile : brandCatalog.getSupportedTypes()) {
-                        upsertType(typeFile.getType(), typeFile.getType());
+                        upsertType(typeFile.getType(), formatTypeLabel(typeFile.getType()));
                     }
                 }
+            }
+            for (String coreType : CORE_VEHICLE_TYPES) {
+                upsertType(coreType, formatTypeLabel(coreType));
             }
 
             int dataFilesRead = 0;
@@ -110,6 +113,7 @@ public class VehicleDataInitializer implements SeedTask {
                 }
             }
 
+            pruneStaleModelsAndBrands(catalogBrandKeys);
             evictVehicleCaches();
             log.info(
                     "Vehicle seed successfully completed: {} brands cataloged, {} data files read, {} total models seeded",
@@ -232,8 +236,20 @@ public class VehicleDataInitializer implements SeedTask {
                     generation.setId(genId);
                     generation.setName(genDto.getName());
                     generation.setModel(model);
-                    generation = generationRepository.save(generation);
                 }
+
+                Integer startYear = genDto.getStartYear();
+                Integer endYear = genDto.getEndYear();
+                if (startYear == null) {
+                    int[] parsedYears = parseYearsFromName(genDto.getName());
+                    if (parsedYears != null) {
+                        startYear = parsedYears[0];
+                        endYear = parsedYears[1] != -1 ? parsedYears[1] : null;
+                    }
+                }
+                generation.setStartYear(startYear);
+                generation.setEndYear(endYear);
+                generation = generationRepository.save(generation);
 
                 if (genDto.getEngines() != null) {
                     for (VehicleEngineDto engDto : genDto.getEngines()) {
@@ -273,6 +289,22 @@ public class VehicleDataInitializer implements SeedTask {
                                     "Invalid fuel type '%s' for engine '%s' in file %s",
                                     engDto.getFuelType(), engDto.getName(), sourceFile), e);
                         }
+
+                        Integer hp = engDto.getHorsePower();
+                        Integer capacity = engDto.getEngineCapacity();
+                        if (hp == null || capacity == null) {
+                            int[] parsedSpecs = parseEngineSpecsFromName(engDto.getName());
+                            if (parsedSpecs != null) {
+                                if (hp == null && parsedSpecs[0] != -1) {
+                                    hp = parsedSpecs[0];
+                                }
+                                if (capacity == null && parsedSpecs[1] != -1) {
+                                    capacity = parsedSpecs[1];
+                                }
+                            }
+                        }
+                        engine.setHorsePower(hp);
+                        engine.setEngineCapacity(capacity);
                         engineRepository.save(engine);
                     }
                 }
@@ -306,18 +338,66 @@ public class VehicleDataInitializer implements SeedTask {
         }
     }
 
-    private void pruneStaleBrands(Set<String> catalogBrandKeys) {
-        brandRepository.findAll().stream()
-                .filter(b -> !catalogBrandKeys.contains(normalizeKey(b.getName())))
-                .forEach(b -> {
-                    brandRepository.delete(b);
-                    log.debug("Removed stale car brand: {}", b.getName());
-                });
+    /**
+     * Removes models that no longer belong to the catalog (brand dropped from brands.json, or an orphan
+     * without brand/type) together with their generations, engines and trims, and then the brands left
+     * without models. Anything a listing points at is kept.
+     */
+    private void pruneStaleModelsAndBrands(Set<String> catalogBrandKeys) {
+        Object[] keys = catalogBrandKeys.stream().map(k -> k.toUpperCase(java.util.Locale.ROOT)).toArray();
+        String in = String.join(",", java.util.Collections.nCopies(keys.length, "?"));
+        String staleModels = "SELECT m.id FROM vehicle_models m LEFT JOIN car_brands b ON b.id = m.car_brand_id"
+                + " WHERE (m.car_brand_id IS NULL OR m.vehicle_type_id IS NULL OR UPPER(b.name) NOT IN (" + in + "))"
+                + " AND NOT EXISTS (SELECT 1 FROM vehicle_listings v WHERE v.vehicle_model_id = m.id)"
+                + " AND NOT EXISTS (SELECT 1 FROM vehicle_listings v JOIN vehicle_generations g ON g.id = v.vehicle_generation_id"
+                + "                 WHERE g.vehicle_model_id = m.id)";
+        String staleGenerations = "SELECT id FROM vehicle_generations WHERE vehicle_model_id IN (" + staleModels + ")";
+
+        jdbcTemplate.update("DELETE FROM vehicle_engines WHERE vehicle_generation_id IN (" + staleGenerations + ")", keys);
+        jdbcTemplate.update("DELETE FROM vehicle_trims WHERE vehicle_generation_id IN (" + staleGenerations + ")", keys);
+        jdbcTemplate.update("DELETE FROM vehicle_model_body_types WHERE vehicle_model_id IN (" + staleModels + ")", keys);
+        jdbcTemplate.update("DELETE FROM vehicle_generations WHERE vehicle_model_id IN (" + staleModels + ")", keys);
+        int models = jdbcTemplate.update("DELETE FROM vehicle_models WHERE id IN (" + staleModels + ")", keys);
+        int brands = jdbcTemplate.update("DELETE FROM car_brands b WHERE UPPER(b.name) NOT IN (" + in + ")"
+                + " AND NOT EXISTS (SELECT 1 FROM vehicle_models m WHERE m.car_brand_id = b.id)"
+                + " AND NOT EXISTS (SELECT 1 FROM vehicle_listings v WHERE v.car_brand_id = b.id)", keys);
+        log.info("Pruned {} stale vehicle model(s) and {} stale brand(s)", models, brands);
+    }
+
+    private static final Set<String> CORE_VEHICLE_TYPES = Set.of(
+            "CAR", "COMMERCIAL", "MOTORCYCLE", "TRUCK", "VAN", "BICYCLE"
+    );
+
+    public String formatTypeLabel(String key) {
+        if (key == null) return "";
+        String upper = key.trim().toUpperCase(Locale.ROOT);
+        return switch (upper) {
+            case "CAR" -> "Otomobil";
+            case "COMMERCIAL" -> "Ticari Araçlar";
+            case "MOTORCYCLE" -> "Motosiklet";
+            case "TRUCK" -> "Kamyon / Çekici";
+            case "VAN" -> "Minibüs / Panelvan";
+            case "BICYCLE" -> "Bisiklet";
+            default -> {
+                String[] parts = upper.toLowerCase(Locale.ROOT).split("_");
+                StringBuilder sb = new StringBuilder();
+                for (String part : parts) {
+                    if (!part.isEmpty()) {
+                        sb.append(Character.toUpperCase(part.charAt(0)))
+                                .append(part.substring(1))
+                                .append(" ");
+                    }
+                }
+                yield sb.toString().trim();
+            }
+        };
     }
 
     private void pruneStaleTypes(Set<String> catalogTypeKeys) {
+        Set<String> keepKeys = new HashSet<>(catalogTypeKeys);
+        keepKeys.addAll(CORE_VEHICLE_TYPES);
         typeRepository.findAll().stream()
-                .filter(t -> !catalogTypeKeys.contains(normalizeKey(t.getName())))
+                .filter(t -> !keepKeys.contains(normalizeKey(t.getName())))
                 .forEach(t -> {
                     typeRepository.delete(t);
                     log.debug("Removed stale vehicle type: {}", t.getName());
@@ -326,33 +406,86 @@ public class VehicleDataInitializer implements SeedTask {
 
     private void upsertBrand(String key, String label) {
         String normalizedKey = normalizeKey(key);
-        CarBrand brand = brandRepository.findByNameIgnoreCase(normalizedKey)
-                .orElseGet(() -> {
-                    CarBrand created = new CarBrand();
-                    created.setId(generateStableUuid("vehicle-brand:" + normalizedKey));
-                    created.setName(normalizedKey);
-                    return created;
-                });
+        Optional<CarBrand> existing = brandRepository.findByNameIgnoreCase(normalizedKey);
+        CarBrand brand;
+        if (existing.isPresent()) {
+            brand = existing.get();
+            brand.setNew(false);
+        } else {
+            brand = new CarBrand();
+            brand.setId(generateStableUuid("vehicle-brand:" + normalizedKey));
+            brand.setName(normalizedKey);
+        }
         brand.setLabel(label);
         brandRepository.save(brand);
     }
 
     private void upsertType(String key, String label) {
         String normalizedKey = normalizeKey(key);
-        VehicleType type = typeRepository.findByNameIgnoreCase(normalizedKey)
-                .orElseGet(() -> {
-                    VehicleType created = new VehicleType();
-                    created.setId(generateStableUuid("vehicle-type:" + normalizedKey));
-                    created.setName(normalizedKey);
-                    return created;
-                });
+        Optional<VehicleType> existing = typeRepository.findByNameIgnoreCase(normalizedKey);
+        VehicleType type;
+        if (existing.isPresent()) {
+            type = existing.get();
+            type.setNew(false);
+        } else {
+            type = new VehicleType();
+            type.setId(generateStableUuid("vehicle-type:" + normalizedKey));
+            type.setName(normalizedKey);
+        }
         type.setLabel(label);
         typeRepository.save(type);
     }
 
     private void evictVehicleCaches() {
-        Optional.ofNullable(cacheManager.getCache("brands")).ifPresent(cache -> cache.clear());
-        Optional.ofNullable(cacheManager.getCache("vehicleTypes")).ifPresent(cache -> cache.clear());
+        Optional.ofNullable(cacheManager.getCache("catalog:brands")).ifPresent(cache -> cache.clear());
+        Optional.ofNullable(cacheManager.getCache("catalog:vehicleTypes")).ifPresent(cache -> cache.clear());
+    }
+
+    public static int[] parseYearsFromName(String name) {
+        if (name == null) return null;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "\\b(19\\d\\d|20\\d\\d)\\s*[-–—]\\s*(19\\d\\d|20\\d\\d)?").matcher(name);
+        if (m.find()) {
+            int start = Integer.parseInt(m.group(1));
+            Integer end = (m.group(2) != null && !m.group(2).isBlank()) ? Integer.parseInt(m.group(2)) : null;
+            return new int[]{start, end != null ? end : -1};
+        }
+        return null;
+    }
+
+    public static int[] parseEngineSpecsFromName(String name) {
+        if (name == null) return null;
+        int hp = -1;
+        int capacity = -1;
+
+        java.util.regex.Matcher hpMatcher = java.util.regex.Pattern.compile(
+                "\\b(\\d{2,4})\\s*(?:hp|bg|ps|bhp)\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(name);
+        if (hpMatcher.find()) {
+            hp = Integer.parseInt(hpMatcher.group(1));
+        }
+
+        java.util.regex.Matcher ccMatcher = java.util.regex.Pattern.compile(
+                "\\b(\\d{2,4})\\s*cc\\b", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(name);
+        if (ccMatcher.find()) {
+            capacity = Integer.parseInt(ccMatcher.group(1));
+        } else {
+            java.util.regex.Matcher literMatcher = java.util.regex.Pattern.compile(
+                    "\\b([1-6]\\.[0-9])\\b").matcher(name);
+            if (literMatcher.find()) {
+                double liters = Double.parseDouble(literMatcher.group(1));
+                capacity = (int) Math.round(liters * 1000);
+            }
+        }
+
+        if (hp == -1) {
+            java.util.regex.Matcher trailingHp = java.util.regex.Pattern.compile(
+                    "(?:TDI|TSI|TFSI|CDTI|dCi|EcoBoost|D-4D|BlueHDi|PureTech|VTEC|CRDi|T-GDI|TwinPower)\\s+(\\d{2,3})\\b").matcher(name);
+            if (trailingHp.find()) {
+                hp = Integer.parseInt(trailingHp.group(1));
+            }
+        }
+
+        return new int[]{hp, capacity};
     }
 
     private static String normalizeKey(String key) {

@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum Doors {
-    TWO("2 Doors"),
-    FOUR("4 Doors");
+    TWO("2 Kapı"),
+    FOUR("4 Kapı");
 
     private final String label;
 

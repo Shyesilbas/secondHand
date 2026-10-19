@@ -75,7 +75,7 @@ const ConversionFunnel = ({ funnel }) => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1, duration: 0.3 }}
-              className="relative p-4 rounded-md bg-white border border-border/80 transition-shadow flex flex-col justify-between"
+              className="relative p-4 rounded bg-background-primary border border-border flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -87,7 +87,7 @@ const ConversionFunnel = ({ funnel }) => {
                   </span>
                 </div>
 
-                <div className="text-2xl font-semibold text-text-primary tracking-tight">
+                <div className="text-2xl font-semibold text-text-primary tracking-tight tabular-nums">
                   {step.value.toLocaleString()}
                 </div>
                 <div className="text-xs font-semibold text-text-secondary mt-0.5">

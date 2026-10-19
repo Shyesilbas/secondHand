@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.realestate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.CatalogLegacyPruner;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
@@ -14,12 +15,20 @@ import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTy
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Seeds real estate reference data (property types, ad types, heating types,
@@ -47,6 +56,7 @@ public class RealEstateDataInitializer implements SeedTask {
     private final HeatingTypeRepository heatingTypeRepository;
     private final ListingOwnerTypeRepository listingOwnerTypeRepository;
     private final ObjectMapper objectMapper;
+    private final CatalogLegacyPruner legacyPruner;
 
     @Override
     public String key() {
@@ -57,10 +67,24 @@ public class RealEstateDataInitializer implements SeedTask {
     public Result<Void> run() {
         try {
             JsonNode root = loadCatalog();
+            alignNames(realEstateTypeRepository, root.get("propertyTypes"), RealEstateType::getId, RealEstateType::getName,
+                    (t, n) -> { t.setName(n); t.markNotNew(); });
+            alignNames(realEstateAdTypeRepository, root.get("adTypes"), RealEstateAdType::getId, RealEstateAdType::getName,
+                    (t, n) -> { t.setName(n); t.markNotNew(); });
+            alignNames(heatingTypeRepository, root.get("heatingTypes"), HeatingType::getId, HeatingType::getName,
+                    (t, n) -> { t.setName(n); t.markNotNew(); });
+            alignNames(listingOwnerTypeRepository, root.get("ownerTypes"), ListingOwnerType::getId, ListingOwnerType::getName,
+                    (t, n) -> { t.setName(n); t.markNotNew(); });
+
             seedPropertyTypes(root.get("propertyTypes"));
             seedAdTypes(root.get("adTypes"));
             seedHeatingTypes(root.get("heatingTypes"));
             seedOwnerTypes(root.get("ownerTypes"));
+
+            legacyPruner.prune("real_estate_types", keys(root.get("propertyTypes")));
+            legacyPruner.prune("real_estate_ad_types", keys(root.get("adTypes")));
+            legacyPruner.prune("heating_types", keys(root.get("heatingTypes")));
+            legacyPruner.prune("listing_owner_types", keys(root.get("ownerTypes")));
             log.info("Real estate seed completed successfully");
             return Result.success();
         } catch (Exception e) {
@@ -75,6 +99,33 @@ public class RealEstateDataInitializer implements SeedTask {
         try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
             return objectMapper.readTree(is);
         }
+    }
+
+    private Set<String> keys(JsonNode nodes) {
+        return StreamSupport.stream(nodes.spliterator(), false)
+                .map(n -> n.get("key").asText())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Rows are matched by the JSON id, so a row seeded earlier under a different key keeps its old
+     * {@code name} while only the label changes (name and label drift apart). Names are unique, so
+     * before the upserts rename every row that holds a key it should not: ids of this catalog get
+     * freed to be renamed to their JSON key, legacy rows are parked under {@code LEGACY_<id>}.
+     */
+    private <T> void alignNames(JpaRepository<T, UUID> repository, JsonNode nodes,
+                                Function<T, UUID> idOf, Function<T, String> nameOf, BiConsumer<T, String> rename) {
+        Map<UUID, String> keyById = new HashMap<>();
+        nodes.forEach(n -> keyById.put(UUID.fromString(n.get("id").asText()), n.get("key").asText()));
+        Set<String> keys = Set.copyOf(keyById.values());
+        for (T row : repository.findAll()) {
+            String name = nameOf.apply(row);
+            if (keys.contains(name) && !name.equals(keyById.get(idOf.apply(row)))) {
+                rename.accept(row, "LEGACY_" + idOf.apply(row));
+                repository.save(row);
+            }
+        }
+        repository.flush();
     }
 
     // ── Property Type Seeding ───────────────────────────────────────────
@@ -94,6 +145,7 @@ public class RealEstateDataInitializer implements SeedTask {
         Optional<RealEstateType> existing = realEstateTypeRepository.findById(id);
         if (existing.isPresent()) {
             RealEstateType type = existing.get();
+            type.setName(key);
             type.setLabel(label);
             type.markNotNew();
             realEstateTypeRepository.save(type);
@@ -124,6 +176,7 @@ public class RealEstateDataInitializer implements SeedTask {
         Optional<RealEstateAdType> existing = realEstateAdTypeRepository.findById(id);
         if (existing.isPresent()) {
             RealEstateAdType type = existing.get();
+            type.setName(key);
             type.setLabel(label);
             type.markNotNew();
             realEstateAdTypeRepository.save(type);
@@ -153,6 +206,7 @@ public class RealEstateDataInitializer implements SeedTask {
         Optional<HeatingType> existing = heatingTypeRepository.findById(id);
         if (existing.isPresent()) {
             HeatingType type = existing.get();
+            type.setName(key);
             type.setLabel(label);
             type.markNotNew();
             heatingTypeRepository.save(type);
@@ -182,6 +236,7 @@ public class RealEstateDataInitializer implements SeedTask {
         Optional<ListingOwnerType> existing = listingOwnerTypeRepository.findById(id);
         if (existing.isPresent()) {
             ListingOwnerType type = existing.get();
+            type.setName(key);
             type.setLabel(label);
             type.markNotNew();
             listingOwnerTypeRepository.save(type);

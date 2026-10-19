@@ -336,7 +336,9 @@ const ListingPrefilterSelectionFlow = ({
  const qf = (gridOptionFilter || '').trim().toLowerCase();
  const filtered = qf.length > 0 ? options.filter(opt => {
  const label = String(opt.label || opt.name || opt.id || opt.value || '').toLowerCase();
- return label.includes(qf);
+ if (label.includes(qf)) return true;
+ if (Array.isArray(opt.aliases) && opt.aliases.some(a => String(a).toLowerCase().includes(qf))) return true;
+ return false;
  }) : options;
  const showGridSearch = options.length > 6;
  const searchIconClass = 'text-text-muted';

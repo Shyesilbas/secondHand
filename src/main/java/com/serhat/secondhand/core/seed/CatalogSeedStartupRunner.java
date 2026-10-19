@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -42,6 +43,7 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
     );
 
     private final List<SeedTask> seedTasks;
+    private final CacheManager cacheManager;
 
     @Value("${app.seed:${APP_SEED:}}")
     private String requestedSeeds;
@@ -82,6 +84,17 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
             }
             log.info("Catalog seed completed: {}", key);
         }
+        evictCatalogCaches();
+    }
+
+    /** Seeds read cached lookups (findAll) before writing; drop them so /enums/all serves the fresh catalog. */
+    private void evictCatalogCaches() {
+        cacheManager.getCacheNames().stream()
+                .filter(name -> name.startsWith("catalog:"))
+                .forEach(name -> {
+                    var cache = cacheManager.getCache(name);
+                    if (cache != null) cache.clear();
+                });
     }
 
     private Set<String> parseRequestedSeeds(String raw) {

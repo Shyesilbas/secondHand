@@ -18,6 +18,6 @@ const ISoldPage = () => {
  initialSize: ORDER_DEFAULTS.INITIAL_PAGE_SIZE
  });
  const navigate = useNavigate();
- return <OrdersListLayout title={t("i_sold")} subtitle="Monitor your sales lifecycle and escrow status" stickyHeader onAnalytics={() => navigate(ROUTES.SELLER_DASHBOARD)} analyticsLabel="Analytics" flow={flow} enums={enums} viewMode={ORDER_VIEW_MODES.SELLER} emptyText="No sales yet" />;
+ return <OrdersListLayout title={t("i_sold")} subtitle={t("sold_page_subtitle")} stickyHeader onAnalytics={() => navigate(ROUTES.SELLER_DASHBOARD)} analyticsLabel={t("orders_analytics")} flow={flow} enums={enums} viewMode={ORDER_VIEW_MODES.SELLER} emptyText={t("sold_empty_title")} />;
 };
 export default ISoldPage;

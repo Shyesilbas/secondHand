@@ -29,12 +29,10 @@ public class MotorcycleValidator implements VehicleSpecValidator {
         if (isType(listing, "MOTORCYCLE")) {
             listing.setDoors(null);
             listing.setSeatCount(null);
-            listing.setBodyType(null);
             listing.setDrivetrain(null);
             listing.setKilometersPerLiter(null);
             listing.setFuelConsumption(null);
             listing.setFuelCapacity(null);
-            listing.setHorsePower(null);
             listing.setInspectionValidUntil(null);
             return;
         }

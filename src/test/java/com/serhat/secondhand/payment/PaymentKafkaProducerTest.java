@@ -24,12 +24,16 @@ class PaymentKafkaProducerTest {
     private final OrderItemRepository items = mock(OrderItemRepository.class);
     private final PaymentKafkaProducer producer = new PaymentKafkaProducer(template, items);
 
-    private int sentQuantity(Payment p) {
+    private PaymentCompletedKafkaEvent sent(Payment p) {
         when(template.send(anyString(), anyString(), any())).thenReturn(new CompletableFuture<>());
         producer.sendPaymentCompleted(p);
         ArgumentCaptor<Object> c = ArgumentCaptor.forClass(Object.class);
         verify(template).send(anyString(), anyString(), c.capture());
-        return ((PaymentCompletedKafkaEvent) c.getValue()).quantity();
+        return (PaymentCompletedKafkaEvent) c.getValue();
+    }
+
+    private int sentQuantity(Payment p) {
+        return sent(p).quantity();
     }
 
     @Test
@@ -44,5 +48,12 @@ class PaymentKafkaProducerTest {
     void defaultsToOneWhenItemMissingOrAbsent() {
         when(items.findById(8L)).thenReturn(Optional.empty());
         assertEquals(1, sentQuantity(Payment.builder().id(UUID.randomUUID()).orderItemId(8L).build()));
+    }
+
+    @Test
+    void carriesTransactionType() {
+        Payment p = Payment.builder().id(UUID.randomUUID())
+                .transactionType(com.serhat.secondhand.payment.entity.PaymentTransactionType.LISTING_CREATION).build();
+        assertEquals("LISTING_CREATION", sent(p).transactionType());
     }
 }

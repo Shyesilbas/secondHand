@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Drivetrain {
-    FWD("Front-Wheel Drive"),
-    RWD("Rear-Wheel Drive"),
-    AWD("All-Wheel Drive"),
+    FWD("Önden Çekişli"),
+    RWD("Arkadan İtişli"),
+    AWD("Dört Tekerlekten Çekişli (AWD)"),
     FOUR_X_FOUR("4x4");
 
     private final String label;

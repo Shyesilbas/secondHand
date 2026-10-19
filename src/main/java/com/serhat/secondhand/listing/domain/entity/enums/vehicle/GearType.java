@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum GearType {
     MANUAL("Manuel"),
-    AUTOMATIC("Automatic"),
-    SEMI_AUTOMATIC("Semi Automatic"),
+    AUTOMATIC("Otomatik"),
+    SEMI_AUTOMATIC("Yarı Otomatik"),
     CVT("CVT");
 
     private final String label;
