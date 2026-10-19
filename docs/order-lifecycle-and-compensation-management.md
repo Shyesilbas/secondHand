@@ -49,16 +49,16 @@ stateDiagram-v2
 
 | Durum | Açıklama | İptal Edilebilir (`isCancellable`) | İade Edilebilir (`isRefundable`) | Adres/Not Değişebilir (`isModifiable`) | Tamamlanabilir (`isCompletable`) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **`PENDING`** | Ödeme bekleniyor | ✅ | ❌ | ✅ | ❌ |
-| **`CONFIRMED`** | Ödeme alındı, Escrow'da bloke | ✅ | ❌ | ✅ | ❌ |
-| **`PROCESSING`** | Satıcı siparişi paketliyor | ❌ | ❌ | ❌ | ❌ |
-| **`SHIPPED`** | Kargoya verildi, yolda | ❌ | ❌ | ❌ | ❌ |
-| **`DELIVERED`** | Alıcıya teslim edildi (İnceleme süresi) | ❌ | ✅ | ❌ | ✅ |
-| **`MEETUP_PENDING`** | Güvenli buluşma bekleniyor | ✅ | ❌ | ❌ | ❌ |
-| **`HANDOVER_CONFIRMED`** | Buluşmada ürün elden teslim edildi | ❌ | ❌ | ❌ | ✅ |
-| **`COMPLETED`** | Onaylandı; para satıcıya aktarıldı | ❌ | ❌ | ❌ | ❌ |
-| **`CANCELLED`** | Kargolanmadan iptal edildi; para alıcıda | ❌ | ❌ | ❌ | ❌ |
-| **`REFUNDED`** | İade onaylandı; para alıcıya döndü | ❌ | ❌ | ❌ | ❌ |
+| **`PENDING`** | Ödeme bekleniyor | Evet | Hayır | Evet | Hayır |
+| **`CONFIRMED`** | Ödeme alındı, Escrow'da bloke | Evet | Hayır | Evet | Hayır |
+| **`PROCESSING`** | Satıcı siparişi paketliyor | Hayır | Hayır | Hayır | Hayır |
+| **`SHIPPED`** | Kargoya verildi, yolda | Hayır | Hayır | Hayır | Hayır |
+| **`DELIVERED`** | Alıcıya teslim edildi (İnceleme süresi) | Hayır | Evet | Hayır | Evet |
+| **`MEETUP_PENDING`** | Güvenli buluşma bekleniyor | Evet | Hayır | Hayır | Hayır |
+| **`HANDOVER_CONFIRMED`** | Buluşmada ürün elden teslim edildi | Hayır | Hayır | Hayır | Evet |
+| **`COMPLETED`** | Onaylandı; para satıcıya aktarıldı | Hayır | Hayır | Hayır | Hayır |
+| **`CANCELLED`** | Kargolanmadan iptal edildi; para alıcıda | Hayır | Hayır | Hayır | Hayır |
+| **`REFUNDED`** | İade onaylandı; para alıcıya döndü | Hayır | Hayır | Hayır | Hayır |
 
 ---
 

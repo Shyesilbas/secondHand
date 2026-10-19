@@ -32,7 +32,7 @@ flowchart TD
     FetchDB --> Compare{Redis Stoğu == DB Stoğu?}
     Compare -- "Eşit (Tutarlı)" --> CleanNext[Sonraki İlana Geç]
     Compare -- "Farklı (Drift / Stale Tespit Edildi!)" --> LogDrift[UYARI LOGU: Drift Detayı & Listing ID]
-    LogDrift --> AutoHeal[⚡ AUTO-HEALING: Redis Stoğunu DB Stoğuna Eşitle]
+    LogDrift --> AutoHeal[AUTO-HEALING: Redis Stoğunu DB Stoğuna Eşitle]
     AutoHeal --> CleanNext
 ```
 
@@ -58,14 +58,14 @@ public void reconcileOrphanedStockReservations() {
         int totalReservedInRedis = calculateTotalReservations(activeReservations);
 
         // 3. Eğer ürüne ait hiçbir aktif sepet/rezervasyon kalmamışsa:
-        // Redis'teki stok KESİNLİKLE PostgreSQL availableQuantity'ye eşit olmalıdır!
+        // Redis'teki stok PostgreSQL availableQuantity ile eşit olmalıdır
         if (totalReservedInRedis == 0) {
             inventoryRepository.findByListingId(listingId).ifPresent(inventory -> {
                 int dbStock = inventory.getAvailableQuantity();
                 String currentRedisVal = redisTemplate.opsForValue().get(stockKey);
                 
                 if (currentRedisVal != null && Integer.parseInt(currentRedisVal) != dbStock) {
-                    log.warn("⚡ [STOCK RECONCILIATION] Listing {} stock drift detected! Redis: {}, DB: {}. Auto-healing Redis stock.",
+                    log.warn("[STOCK RECONCILIATION] Listing {} stock drift detected! Redis: {}, DB: {}. Auto-healing Redis stock.",
                             listingId, currentRedisVal, dbStock);
                     
                     // 4. Redis'teki bayat veriyi DB gerçeği ile güncelle

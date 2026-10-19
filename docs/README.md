@@ -4,7 +4,7 @@ Bu dizin, secondHand platformunun yüksek performanslı, olay güdümlü ve fina
 
 ---
 
-## 📚 Doküman Haritası
+## Doküman Haritası
 
 | Doküman | Kapsam ve Açıklama |
 | :--- | :--- |
@@ -23,7 +23,7 @@ Bu dizin, secondHand platformunun yüksek performanslı, olay güdümlü ve fina
 
 ---
 
-## 🏗️ Temel Mimari Prensipler Özeti
+## Temel Mimari Prensipler Özeti
 
 1. **In-Memory Atomic Operations (Redis 7 Lua Scripting):**
    * *Nerede kullanılır?* Stok rezervasyonu (`reserve_stock_with_ttl.lua`), kupon kota kontrolü (`apply_coupon_with_limit.lua`), terk edilen sepet iadesi (`cancel_user_reservation.lua`).

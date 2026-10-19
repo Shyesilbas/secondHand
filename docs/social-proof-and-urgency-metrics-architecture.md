@@ -12,10 +12,10 @@ This document outlines the end-to-end multi-tier caching, Redis presence trackin
 
 | Metric | Source of Truth | Sliding Window / TTL | Frontend Caching | Display Location | UI Representation |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Active Viewers** | Redis ZSET (`v4:listing:active_viewers:{id}`) | **24 Hours** (ZSET TTL: 26h) | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `🔥 Son 24 saatte X kişi inceledi`<br>`👁 X inceliyor` |
-| **Cart / Checkout Intent** | PostgreSQL `Cart` + Redis Lua Reservation | **Active Cart / 15-min TTL** | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `🔥 Şu an X kişinin sepetinde / satın alma adımında.`<br>`🔥 X sepette` |
-| **Total Favorites** | PostgreSQL `favorites` + Redis (`user:stats:favorites`) | **12 Hours** (Redis Cache TTL) | Page Mount + Optimistic Toggle | `ListingDetailPage`, `ListingCard` | `📍 Konum • 📅 Tarih • ❤️ X favori` |
-| **Checkout Stock Reservation** | Redis Atomic Lua Script (`v4:inventory:reservation:...`) | **15 Minutes** (900s TTL) | Real-time countdown + `sessionStorage` | `CheckoutPage` | `⏳ Kalan Süre: 14:59` (Refreshte sıfırlanmaz) |
+| **Active Viewers** | Redis ZSET (`v4:listing:active_viewers:{id}`) | **24 Hours** (ZSET TTL: 26h) | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `Son 24 saatte X kişi inceledi`<br>`X inceliyor` |
+| **Cart / Checkout Intent** | PostgreSQL `Cart` + Redis Lua Reservation | **Active Cart / 15-min TTL** | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `Şu an X kişinin sepetinde / satın alma adımında.`<br>`X sepette` |
+| **Total Favorites** | PostgreSQL `favorites` + Redis (`user:stats:favorites`) | **12 Hours** (Redis Cache TTL) | Page Mount + Optimistic Toggle | `ListingDetailPage`, `ListingCard` | `Konum • Tarih • X favori` |
+| **Checkout Stock Reservation** | Redis Atomic Lua Script (`v4:inventory:reservation:...`) | **15 Minutes** (900s TTL) | Real-time countdown + `sessionStorage` | `CheckoutPage` | `Kalan Süre: 14:59` (Refreshte sıfırlanmaz) |
 
 ---
 
@@ -65,7 +65,7 @@ When any user (authenticated or anonymous) views a listing, `POST /api/v1/listin
 2. **Frontend Header Placement (`ListingDetailPage.jsx`):**
    * Positioned cleanly in the metadata row right below the listing title:
      ```
-     📍 Kadıköy, İstanbul  •  📅 25 Ağustos 2026  •  ❤️ 18 favori
+     Kadıköy, İstanbul  •  25 Ağustos 2026  •  18 favori
      ```
 3. **Zero-Lag Optimistic Updates:**
    * Clicking the favorite button optimistically toggles the heart icon and increments/decrements the count instantly (`0 ms UI latency`).
@@ -79,13 +79,13 @@ To prevent the **N+1 Polling Antipattern** where multiple cards on a grid bombar
 1. **`ListingCard.jsx` (Grid / Showcase / Search):**
    * `enablePolling: false` (Background polling is completely disabled).
    * `staleTime: 10 * 60 * 1000` (10 minutes in-memory cache via React Query).
-   * Renders static/cached social badges (`🔥 X sepette` or `👁 X inceliyor`).
+   * Renders static/cached social badges (`X sepette` or `X inceliyor`).
 2. **`ListingDetailPage.jsx` (Active Listing):**
    * `enablePolling: true`, `pollInterval: 10 * 60 * 1000` (refreshes at most once every 10 minutes).
    * `refetchOnWindowFocus: false` to avoid spike loads on tab switches.
 3. **Urgency Banner Hierarchy:**
-   * **Priority 1 (Cart/Checkout):** `🔥 Şu an X kişinin sepetinde / satın alma adımında.`
-   * **Priority 2 (24h Viewers):** `🔥 Son 24 saatte X kişi bu ilanı inceledi.`
+   * **Priority 1 (Cart/Checkout):** `Şu an X kişinin sepetinde / satın alma adımında.`
+   * **Priority 2 (24h Viewers):** `Son 24 saatte X kişi bu ilanı inceledi.`
 
 ---
 

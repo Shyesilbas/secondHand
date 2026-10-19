@@ -4,7 +4,7 @@ Bu doküman, secondHand backend mimarisinde uygulanan **Redis 7 Lua Scripting**,
 
 ---
 
-## 🎯 Test Edilen Sistem & Metodoloji
+## Test Edilen Sistem & Metodoloji
 
 Tüm testler `src/test/java/com/serhat/secondhand/concurrency/ConcurrentStockAndPaymentIntegrationTest.java` sınıfında, gerçek veritabanı (PostgreSQL), Redis ve Kafka container'ları üzerinde **CountDownLatch** eşzamanlılık kontrolü ile yürütülmüştür.
 
@@ -13,12 +13,12 @@ Tüm testler `src/test/java/com/serhat/secondhand/concurrency/ConcurrentStockAnd
 | **Test Sınıfı** | `ConcurrentStockAndPaymentIntegrationTest` |
 | **Toplam Test Sayısı** | **4 Senaryo** |
 | **Test Başarı Oranı** | **4 / 4 (%100 BUILD SUCCESS)** |
-| **Eşzamanlılık Yöntemi** | `CountDownLatch` (Thread'lerin aynı nanosaniyede ateşlenmesi) |
+| **Eşzamanlılık Yöntemi** | `CountDownLatch` (Thread'lerin eşzamanlı başlatılması) |
 | **Toplam Koşum Süresi** | 38.30 saniye |
 
 ---
 
-## 🔬 1. Test: Flash-Sale Stok Çarpışması (3 Stok vs 5 Eşzamanlı Kullanıcı)
+## 1. Test: Flash-Sale Stok Çarpışması (3 Stok vs 5 Eşzamanlı Kullanıcı)
 
 ### Senaryo ve Amaç:
 Stoğu yalnızca **3 adet** olan popüler bir kitaba (`Akıllı Yatırımcı kitabı`), 5 farklı kullanıcı (`User-1` .. `User-5`) tam aynı anda hücum ettiğinde:
@@ -27,24 +27,24 @@ Stoğu yalnızca **3 adet** olan popüler bir kitaba (`Akıllı Yatırımcı kit
 
 ### Canlı Log Çıktısı:
 ```log
-[18:54:36.762] 🚦 5 Thread kapıda hazır bekliyor... 3.. 2.. 1.. FIRE! 💥
-[18:54:36.763] ⚡ [User-2] -> Satın alma isteği ateşlendi!
-[18:54:36.763] ⚡ [User-5] -> Satın alma isteği ateşlendi!
-[18:54:36.763] ⚡ [User-1] -> Satın alma isteği ateşlendi!
-[18:54:36.763] ⚡ [User-3] -> Satın alma isteği ateşlendi!
-[18:54:36.763] ⚡ [User-4] -> Satın alma isteği ateşlendi!
+[18:54:36.762] 5 Thread eszamanli istek gonderiyor...
+[18:54:36.763] [User-2] -> Satin alma istegi gonderildi.
+[18:54:36.763] [User-5] -> Satin alma istegi gonderildi.
+[18:54:36.763] [User-1] -> Satin alma istegi gonderildi.
+[18:54:36.763] [User-3] -> Satin alma istegi gonderildi.
+[18:54:36.763] [User-4] -> Satin alma istegi gonderildi.
 
---- REDIS LUA ATOMİK KARARLARI ---
-[18:54:36.778] 🟢 [User-5] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 2
-[18:54:36.781] 🟢 [User-4] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 1
-[18:54:36.783] 🟢 [User-1] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 0 (TÜKENDİ)
+--- REDIS LUA ATOMIK KARARLARI ---
+[18:54:36.778] [User-5] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 2
+[18:54:36.781] [User-4] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 1
+[18:54:36.783] [User-1] -> Successfully reserved 1 items (TTL: 900s). Kalan Stok: 0 (TUKENDI)
 
---- ANINDA BLOKE EDİLEN İSTEKLER (SIFIR DB YÜKÜ) ---
-[18:54:36.784] 🔴 [User-3] -> Insufficient stock in Redis. (Reddedildi - Süre: 23 ms)
-[18:54:36.785] 🔴 [User-2] -> Insufficient stock in Redis. (Reddedildi - Süre: 23 ms)
+--- ANINDA BLOKE EDILEN ISTEKLER (SIFIR DB YUKU) ---
+[18:54:36.784] [User-3] -> Insufficient stock in Redis. (Reddedildi - Sure: 23 ms)
+[18:54:36.785] [User-2] -> Insufficient stock in Redis. (Reddedildi - Sure: 23 ms)
 
---- BAŞARILI KULLANICILARIN DB & OUTBOX COMMIT'İ ---
-[18:54:36.816] 📬 [User-4, User-1, User-5] -> Payment ve Outbox Event DB'ye ACID ile kaydedildi!
+--- BASARILI KULLANICILARIN DB & OUTBOX COMMIT'I ---
+[18:54:36.816] [User-4, User-1, User-5] -> Payment ve Outbox Event DB'ye ACID ile kaydedildi.
 ```
 
 ### Çıkarılan Kazanımlar:
@@ -54,20 +54,20 @@ Stoğu yalnızca **3 adet** olan popüler bir kitaba (`Akıllı Yatırımcı kit
 
 ---
 
-## 🎟️ 2. Test: Flash-Sale Kupon Limiti (2 Limit vs 5 Kullanıcı)
+## 2. Test: Flash-Sale Kupon Limiti (2 Limit vs 5 Kullanıcı)
 
 ### Senaryo ve Amaç:
 Pazarlama kampanyasında *"İlk 2 kişiye indirim"* kuponu tanımlandı. 5 kullanıcı aynı nanosaniyede kuponu girmeye çalıştığında kota aşılıyor mu?
 
 ### Canlı Log Çıktısı:
 ```log
-[18:54:36.645] 🎟️ [COUPON FLASH-SALE CONCURRENCY SIMULATION STARTED]
-[18:54:36.645] 🔖 Kupon Kodu: FLASH_TEST_1771775676645 | Global Limit: 2
-[18:54:36.646] ✅ [CouponUser-5] -> KUPON BAŞARIYLA ALINDI! (Redis Sıra No: 1)
-[18:54:36.646] ✅ [CouponUser-2] -> KUPON BAŞARIYLA ALINDI! (Redis Sıra No: 2)
-[18:54:36.646] ❌ [CouponUser-4] -> KUPON LİMİTİ DOLDU (Sonuç Kodu: -1)
-[18:54:36.646] ❌ [CouponUser-1] -> KUPON LİMİTİ DOLDU (Sonuç Kodu: -1)
-[18:54:36.646] ❌ [CouponUser-3] -> KUPON LİMİTİ DOLDU (Sonuç Kodu: -1)
+[18:54:36.645] [COUPON FLASH-SALE CONCURRENCY SIMULATION STARTED]
+[18:54:36.645] Kupon Kodu: FLASH_TEST_1771775676645 | Global Limit: 2
+[18:54:36.646] [CouponUser-5] -> Kupon alindi (Redis Sira No: 1)
+[18:54:36.646] [CouponUser-2] -> Kupon alindi (Redis Sira No: 2)
+[18:54:36.646] [CouponUser-4] -> Kupon limiti doldu (Sonuc Kodu: -1)
+[18:54:36.646] [CouponUser-1] -> Kupon limiti doldu (Sonuc Kodu: -1)
+[18:54:36.646] [CouponUser-3] -> Kupon limiti doldu (Sonuc Kodu: -1)
 ```
 
 ### Çıkarılan Kazanımlar:
@@ -76,7 +76,7 @@ Pazarlama kampanyasında *"İlk 2 kişiye indirim"* kuponu tanımlandı. 5 kulla
 
 ---
 
-## 🤝 3. Test: Escrow Release & Transactional Outbox Bütünlüğü
+## 3. Test: Escrow Release & Transactional Outbox Bütünlüğü
 
 ### Senaryo ve Amaç:
 Alıcı siparişi teslim aldığında `Escrow` durumu `COMPLETED` olurken, satıcının cüzdanına bakiye aktarımı için `escrow_outbox_events` tablosuna aynı transaction içinde kayıt atılıyor mu?
@@ -89,7 +89,7 @@ Alıcı siparişi teslim aldığında `Escrow` durumu `COMPLETED` olurken, satı
 
 ---
 
-## ⏳ 4. Test: Stok Rezervasyon İptali ve Otomatik İade
+## 4. Test: Stok Rezervasyon İptali ve Otomatik İade
 
 ### Senaryo ve Amaç:
 Kullanıcı son 1 adet ürünü rezerve etti (stok 0 oldu), ardından sepetten ürünü sildi veya sayfayı terk etti.
@@ -101,11 +101,11 @@ Kullanıcı son 1 adet ürünü rezerve etti (stok 0 oldu), ardından sepetten �
 
 ---
 
-## 📊 Genel Mimari Performans Karşılaştırması
+## Genel Mimari Performans Karşılaştırması
 
 | Kriter | Eski Mimari (Senkron DB Lock) | Yeni Mimari (Redis + Outbox + Kafka) | İyileşme Oranı |
 | :--- | :---: | :---: | :---: |
-| **Stok Karar Süresi** | ~2.500 ms (DB Lock) | **20.4 ms** (Redis RAM) | **~120 Kat Daha Hızlı** 🚀 |
-| **Çift Satış Riski** | Yüksek Yükte Mümkün | **%0 (Matematiksel İmkansız)** | **%100 Güvenli** 🛡️ |
-| **Flash-Sale Kota Aşımı** | Concurrency'de Aşılabilir | **%0 (Atomik Limit Kontrolü)** | **Kusursuz** 🎯 |
-| **Veri Kaybı Riski (Dual-Write)** | Çökmede Olay Kaybı | **%0 (Transactional Outbox)** | **ACID Garantili** 📦 |
+| **Stok Karar Süresi** | ~2.500 ms (DB Lock) | **20.4 ms** (Redis RAM) | **~120 Kat Daha Hızlı** |
+| **Çift Satış Riski** | Yüksek Yükte Mümkün | **%0 (Matematiksel İmkansız)** | **Engellendi** |
+| **Flash-Sale Kota Aşımı** | Concurrency'de Aşılabilir | **%0 (Atomik Limit Kontrolü)** | **Aşım Yok** |
+| **Veri Kaybı Riski (Dual-Write)** | Çökmede Olay Kaybı | **%0 (Transactional Outbox)** | **ACID Garantili** |

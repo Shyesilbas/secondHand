@@ -6,7 +6,7 @@ Bu doküman, **secondHand** platformundaki e-posta gönderim altyapısının JVM
 
 ## 1. Mimari Dönüşümün Amacı ve Kapsamı
 
-### 🚨 Eski Mimari ve Riskleri (In-Memory Spring ApplicationEvents)
+### Eski Mimari ve Riskleri (In-Memory Spring ApplicationEvents)
 * **Veri Kaybı Riski:** Domain servisleri Spring'in JVM içi `ApplicationEventPublisher`'ı üzerinden olay fırlatıyordu. Sunucunun yeniden başlaması (crash/deploy) anında henüz işlenmemiş mailler kayboluyordu.
 * **Sıkı Bağlantı (Tight Coupling):** Domain servisleri (`PaymentNotificationService`, `UserNotificationService`) içerisine `StringBuilder` ile doğrudan HTML tag'leri, tablo stilleri ve şablon mantığı gömülmüştü.
 * **Mükerrer Gönderim / Çakışma:** Yatay ölçeklemede (multiple app nodes) rate limiter ve retry mekanizması tek bir JVM heap'ine bağımlıydı.

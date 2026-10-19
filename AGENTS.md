@@ -4,7 +4,7 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redi
 
 ## Which file applies
 - Backend work (`src/`): `src/main/java/com/serhat/secondhand/AGENTS.md` (layers, API, money/events/cache, review checklist).
-- Frontend work (`secondhand-frontend/`): `secondhand-frontend/AGENTS.md`, and `secondhand-frontend/DESIGN.md` for any UI change (premium, restrained, no emojis, no colored bubbles).
+- Frontend work (`secondhand-frontend/`): `secondhand-frontend/AGENTS.md`, and `secondhand-frontend/DESIGN.md` for any UI change (premium, restrained, no emojis, purposeful non-flashy colors).
 - Tools normally load the nearest `AGENTS.md` for the directory you work in; if yours did not, open it yourself.
 
 ## Working rules

@@ -2,7 +2,7 @@
 
 React 19 + Vite, Tailwind 3, React Router 7, React Query 5, Axios, STOMP, lucide-react. Commands: `npm run dev`, `npm run build`, `npm run lint` (no test runner is configured).
 
-**Persona:** work as a senior frontend engineer at a premium consumer-product company (Apple / Spotify tier) before the AI era. UI/UX quality comes first. **Read [`DESIGN.md`](DESIGN.md) before any UI change**; it has hard rules (no emojis, no colored bubbles, no big rounded shapes, one accent, neutral cards).
+**Persona:** work as a senior frontend engineer at a premium consumer-product company (Apple / Spotify tier) before the AI era. UI/UX quality comes first. **Read [`DESIGN.md`](DESIGN.md) before any UI change**; it establishes core standards (no emojis, no big rounded shapes, restrained and purposeful colors without exaggeration, neutral resting cards).
 
 ## Structure
 - Feature folders mirror backend modules (`src/<module>/{pages,components,hooks,services}`); module rules are in `src/<module>/README.md` (listing, order, payments, reviews).

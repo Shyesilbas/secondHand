@@ -53,7 +53,7 @@ OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refre
                                                      │
                              ┌───────────────────────┴───────────────────────┐
                              ▼ (Geçerli Token)                               ▼ (İptal Edilmiş / Bayat Token)
-               [Yeni Access & Refresh Token Üret]             [🚨 REUSE DETECTION (İHLAL TESPİTİ)!]
+               [Yeni Access & Refresh Token Üret]             [REUSE DETECTION (İHLAL TESPİTİ)!]
                ├── Eski Token'ı REVOKED yap                   ├── Saldırgan veya sızdırılmış token kullanıldı!
                ├── Yeni Token'a familyId & parentId bağla     ├── tokenService.revokeTokenFamily(familyId)
                └── Yeni çerezi istemciye dön                  └── BÜTÜN Token Ailesi (Aktif Tüm Oturumlar) İptal Edilir!
@@ -70,7 +70,7 @@ OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refre
          tokenService.findByToken(refreshTokenValue).ifPresent(token -> {
              if (token.getFamilyId() != null) {
                  tokenService.revokeTokenFamily(token.getFamilyId());
-                 log.warn("🚨 REUSE DETECTION: Revoked token was used! Revoked all tokens in family: {}", token.getFamilyId());
+                 log.warn("Security Alert: Token reuse detected for user {}. Revoking token family.", username);
              }
          });
          throw InvalidRefreshTokenException.revoked();

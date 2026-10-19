@@ -9,7 +9,7 @@ Bu doküman, **secondHand** platformundaki ödeme altyapısının **Hexagonal Ar
 Monolitik veya kötü tasarlanmış ödeme sistemlerinde genellikle `PaymentService` içinde devasa `switch-case` veya `if-else` blokları bulunur:
 
 ```java
-// ❌ KÖTÜ YAKLAŞIM (Anti-Pattern - OCP İhlali)
+// Kötü Yaklaşım (Anti-Pattern - OCP İhlali)
 if ("EWALLET".equals(provider)) {
     processWallet();
 } else if ("CREDIT_CARD".equals(provider)) {
@@ -163,7 +163,7 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
 }
 ```
 
-### Adım 2: Bitti! 🎉
+### Adım 2: Entegrasyonun Tamamlanması
 * **`PaymentProcessor` veya başka hiçbir sınıfı değiştirmenize gerek yoktur.**
 * `@Component` anatasyonu sayesinde Spring bu adapter'ı otomatik olarak `List<PaymentProviderPort>` listesine ekler.
 * İstemci `providerName: "IYZICO"` gönderdiği andan itibaren tüm ödeme akışı bu yeni adapter üzerinden akar.
