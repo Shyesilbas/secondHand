@@ -12,4 +12,4 @@ Shopping cart management, item selection, coupon application, Redis stock reserv
 - **Stock Reservation Sync:** When navigating to `CheckoutPage`, the initiation endpoint holds inventory in Redis. Navigating away or canceling calls `DELETE /api/checkout/reservation/{listingId}`.
 - **Refresh Safety:** If the user refreshes `CheckoutPage`, the timer continues from the remaining backend TTL rather than restarting from 15:00.
 - **Coupon Invalidation:** Applying or removing a coupon recalculates totals client-side and refreshes cart query keys immediately.
-- **Design Tokens:** Strict adherence to `DESIGN.md`: no emojis in countdown alerts, neutral order summary cards, and hairline borders.
+- **Design Tokens:** Strict adherence to `.agents/skills/restrained-ui-design-standard/SKILL.md`: no emojis in countdown alerts, neutral order summary cards, and hairline borders.

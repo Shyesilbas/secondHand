@@ -11,5 +11,5 @@ User interface for the platform's Aura AI assistant, conversational search, memo
 
 ## Invariants
 - **UI Context Injection:** Every message dispatches `uiContext` containing the current pathname, active `listingId`, and filter query parameters to enable contextual answers.
-- **Restrained Styling:** Strict compliance with `DESIGN.md`: no neon glowing bubbles or looping animations; messages use neutral surfaces and clean hairline dividers.
+- **Restrained Styling:** Strict compliance with `.agents/skills/restrained-ui-design-standard/SKILL.md`: no neon glowing bubbles or looping animations; messages use neutral surfaces and clean hairline dividers.
 - **Graceful Fallback:** If the AI backend is rate-limited or unavailable, the UI falls back to standard keyword catalog search without breaking view state.

@@ -1,6 +1,6 @@
 # SecondHand Frontend
 
-React SPA for the SecondHand platform. Conventions and design rules: `AGENTS.md` and `DESIGN.md`.
+React SPA for the SecondHand platform. Conventions and design rules: `AGENTS.md` and `../.agents/skills/restrained-ui-design-standard/SKILL.md`.
 
 ## Architecture
 - Routing: React Router.

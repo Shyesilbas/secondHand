@@ -29,25 +29,53 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+### VS Code & AI Editors ###
 .vscode/
+.ai/
+.cursor/
+.claude/
 
-# Yerel sırlar (spring.config.import optional)
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node & Frontend Build Artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+stats.html
+**/stats.html
+.eslintcache
+.turbo/
+
+# Yerel sırlar ve ortam değişkenleri
 config/application-local-secret.yml
 .env
 **/.env
+.env.local
+**/.env.local
+**/.env.*.local
 src/main/resources/application-local.yml
+!.env.template
 
 # Tek seferlik geliştirici scriptleri (repoya gitmez)
 secondhand-frontend/fix-*.cjs
 secondhand-frontend/i18n-codemod.js
 
-# macOS metadata
+# OS metadata & swap files
 .DS_Store
 **/.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+*~
 
 # Veritabanı dump'ları repoda tutulmaz (PII / finansal veri sızıntı riski).
-# Mevcut secondhand_dump.sql bilinçli olarak history'den filter-repo ile kaldırılmıştır.
 secondhand_dump.sql
 *.dump
 *.sql.gz

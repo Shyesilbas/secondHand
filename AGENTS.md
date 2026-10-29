@@ -1,13 +1,18 @@
 # secondHand — Agent Guide
 
-C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redis, Kafka) and a React 19 frontend in `secondhand-frontend/`. This file holds only cross-cutting rules; stack-specific rules load from the files below.
+C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redis, Kafka) and a React 19 frontend in `secondhand-frontend/`. This file holds cross-cutting rules; detailed domain standards live in `.agents/skills/` and stack-specific guides below.
 
-## Which file applies
-- Backend work (`src/`): `src/main/java/com/serhat/secondhand/AGENTS.md` (layers, API, money/events/cache, review checklist).
-- Frontend work (`secondhand-frontend/`): `secondhand-frontend/AGENTS.md`, and `secondhand-frontend/DESIGN.md` for any UI change (premium, restrained, no emojis, purposeful non-flashy colors).
-- Tools normally load the nearest `AGENTS.md` for the directory you work in; if yours did not, open it yourself.
+## Specialized Agent Skills (`.agents/skills/`)
+Activate the relevant skill before modifying code:
+- **`transactional-outbox-and-redis-concurrency`** (`.agents/skills/transactional-outbox-and-redis-concurrency/SKILL.md`): Money flows (`checkout`, `order`, `payment`, `escrow`, `ewallet`), Transactional Outbox + Kafka consumer idempotency (`processed_kafka_events`), Redis 7 Lua stock/coupon reservations, TTL locks, and multi-tier Redis cache eviction.
+- **`polymorphic-catalog-and-layered-api`** (`.agents/skills/polymorphic-catalog-and-layered-api/SKILL.md`): Layered Spring Boot API (`controller -> service -> validator/policy -> repository -> mapper`), `ResultResponses`, security filter chain (`@PublicEndpoint`, `@PreAuthorize`, IDOR), Flyway migrations, 6-vertical polymorphic catalog, deterministic UUID JSON seeding, and React Query contract.
+- **`restrained-ui-design-standard`** (`.agents/skills/restrained-ui-design-standard/SKILL.md`): Apple/Spotify-tier frontend UI design rules, semantic tokens, purposeful non-flashy color balance, radius ceiling (`rounded-md`), 4-state data discipline, and mandatory pre-completion regex/lint checks.
 
-## Working rules
+## Sub-Directory Guides
+- Backend (`src/`): `src/main/java/com/serhat/secondhand/AGENTS.md`
+- Frontend (`secondhand-frontend/`): `secondhand-frontend/AGENTS.md`
+
+## Working Rules
 - Start from the symptom and follow the execution path (entry point -> call chain -> dependencies). Source code and tests are the truth; docs describe intent. Don't assume Kafka/Redis/async behavior unless the code on that path shows it.
 - Load the minimum context: the source files involved, then the module `README.md` only if business rules are unclear. Don't read docs "just in case".
 - Keep diffs minimal; one change solves one problem; stay inside the affected chain.
@@ -15,9 +20,9 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redi
 - Report findings as facts only after verifying them in code; separate facts, hypotheses and what still needs verification.
 - Audit/review requests: answer in chat, don't create report files, ask before applying fixes.
 - New feature across the stack: define the API contract first, then backend, then frontend; for larger or high-risk features write a short plan (affected modules, DB/backend/frontend changes, risks, verification) and get approval.
-- After code changes update only the affected module README or doc section, delete conflicting old text, don't duplicate content across docs. Commits follow `.github/git-commit-instructions.md`.
+- After code changes update only the affected module README or doc section, delete conflicting old text, don't duplicate content across docs.
 
-## Project map (`src/main/java/com/serhat/secondhand/`)
+## Project Map (`src/main/java/com/serhat/secondhand/`)
 | Group | Modules | Risk |
 |---|---|---|
 | Money | `checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing` | High |
@@ -30,13 +35,8 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redi
 
 Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; stock is reserved in Redis, then decremented in PostgreSQL via Kafka consumers.
 
-## Where to look (on demand)
+## Where to Look (On Demand)
 - Module business rules: `src/main/java/com/serhat/secondhand/<module>/README.md`; frontend: `secondhand-frontend/src/<module>/README.md`.
-- Backend task how-tos: `<module>/.docs/runbooks/`.
-- Architecture deep dives: `docs/README.md` (payments, escrow, stock, Redis/Kafka, auth, cache, offers, social proof).
-- Open audit findings: `.agents/BACKEND_AUDIT.md`. API spec: `secondhand-openapi.json`.
-
-## Active work
-- Completed: Fixed all 14 findings in `.agents/BACKEND_AUDIT.md` (critical enum deduplication, validators, dynamic catalog seeding, Flyway V21-V23).
-- Next: AI streaming endpoint test; scan role-based controllers for missing `@PreAuthorize`; CI/CD pipeline; regenerate a Postman collection from `secondhand-openapi.json`.
-- Open risk: Offer card mobile view untested.
+- Backend task how-tos: `src/main/java/com/serhat/secondhand/<module>/.docs/runbooks/` and `listing/.docs/knowledge/`.
+- Architecture deep dives: `docs/README.md` (payments, escrow, stock, Redis/Kafka, auth, cache, offers, social proof, Aura AI).
+- API endpoint parity check: `python3 scripts/check_api_endpoints.py`.

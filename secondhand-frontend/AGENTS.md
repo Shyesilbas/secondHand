@@ -1,24 +1,15 @@
-# Frontend (secondhand-frontend)
+# Frontend (`secondhand-frontend`)
 
-React 19 + Vite, Tailwind 3, React Router 7, React Query 5, Axios, STOMP, lucide-react. Commands: `npm run dev`, `npm run build`, `npm run lint` (no test runner is configured).
+React 19 + Vite, Tailwind 3, React Router 7, React Query 5, Axios, STOMP, `lucide-react`.
+- Commands: `npm run dev`, `npm run build`, `npm run lint` (no test runner is configured).
 
-**Persona:** work as a senior frontend engineer at a premium consumer-product company (Apple / Spotify tier) before the AI era. UI/UX quality comes first. **Read [`DESIGN.md`](DESIGN.md) before any UI change**; it establishes core standards (no emojis, no big rounded shapes, restrained and purposeful colors without exaggeration, neutral resting cards).
+## Required Skills
+Before modifying frontend code or UI, load the relevant skill from `.agents/skills/`:
+- **`restrained-ui-design-standard`** (`../.agents/skills/restrained-ui-design-standard/SKILL.md`): **Mandatory before any UI change.** Enforces Apple/Spotify-tier restraint, zero emojis, purposeful non-flashy color balance, `rounded-md` ceiling, `theme.js` tokens, 4 data states (`Skeleton`, `EmptyState`, `Alert`, `Disabled`), and pre-completion regex/lint checks.
+- **`polymorphic-catalog-and-layered-api`** (`../.agents/skills/polymorphic-catalog-and-layered-api/SKILL.md`): Enforces React Query state discipline (`useQuery`/`useMutation` only, `request.js`, query key arrays, `useEnums`, and dynamic catalog metadata).
 
-## Structure
-- Feature folders mirror backend modules (`src/<module>/{pages,components,hooks,services}`); module rules are in `src/<module>/README.md` (listing, order, payments, reviews).
-- Shared: `common/components/ui` (`Button` + `buttonClasses` for links, `Modal` with `title`/`description`/`footer`, `Skeleton`, `EmptyState`, `Alert` with an optional `action`, `DataPagination`, ...); use them instead of hand-rolled buttons and modal shells. Form fields use `common/components/forms/{FormPrimitives.jsx,inputStyles.js}`. Enums come from `common/hooks/useEnums.js` (one cached query); location options from `useLocationOptions`; debounced input from `useDebouncedValue`; the sign-in prompt for guest actions from `auth/hooks/useLoginPrompt.js`. `common/components/layout` (`PageContainer`, `Header`, ...), `common/theme/theme.js`, `common/services/api/{request,interceptors}.js`.
-- Pages are wrapped in `PageContainer`. Split a file once it holds more than one concern; compose instead of prop-drilling.
-
-## Data and state
-- Server state is React Query (`useQuery` / `useMutation`). Never `fetch`/`axios` in `useEffect`; never copy query data into `useState` or Context.
-- All HTTP goes through `common/services/api/request.js`. Success responses are the DTO itself (`response.data`, never `response.data.data`); errors are `{ error, message }`.
-- Query keys are arrays defined once per domain (e.g. `ORDER_QUERY_KEYS` in `order/orderConstants.js`). After a mutation use `setQueryData` when the response is the updated object, otherwise `invalidateQueries` for the detail and list keys.
-- Derive values with `useMemo`; no cascading `useEffect` chains. Memoize only after measuring. `staleTime: Infinity` for static data instead of manual `localStorage`.
-- Clean up STOMP/WebSocket clients and global listeners in `useEffect`. Stable list keys, never the array index. Lazy-load heavy routes behind `Suspense`.
-- User feedback goes through `NotificationContext`; no native `alert()` / `confirm()`.
-
-## UX behavior
-- Every data view handles loading, empty, error (with retry) and success; see `DESIGN.md` "States".
-- Forms: sections when over 12 fields, validate on blur/submit, keep user input on error.
-- Role-based hiding is cosmetic; the backend enforces access (`@PreAuthorize`).
-- Accessible by default: labels, keyboard operation, focus management in dialogs.
+## Structure & Shared Primitives
+- Feature folders mirror backend modules (`src/<module>/{pages,components,hooks,services}`); module rules are in `src/<module>/README.md` (ai, auth, cart, chat, ewallet, listing, offer, order, payments, reviews).
+- Shared UI: `common/components/ui` (`Button` + `buttonClasses`, `Modal`, `Skeleton`, `EmptyState`, `Alert`, `DataPagination`); forms: `common/components/forms/{FormPrimitives.jsx,inputStyles.js}`; layout: `common/components/layout` (`PageContainer`, `Header`).
+- Hooks: `common/hooks/useEnums.js`, `useLocationOptions`, `useDebouncedValue`, `auth/hooks/useLoginPrompt.js`.
+- Clean up STOMP/WebSocket clients and global listeners in `useEffect`. Use stable list keys (never array index) and lazy-load heavy routes behind `Suspense`.
