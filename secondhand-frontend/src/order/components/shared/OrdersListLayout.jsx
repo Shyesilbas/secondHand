@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ORDER_QUERY_KEYS } from '../../orderConstants.js';
 import { orderService } from '../../services/orderService.js';
-import { formatCurrency, resolveEnumLabel } from '../../../common/formatters.js';
+import { formatCurrency, formatLongDate, resolveEnumLabel } from '../../../common/formatters.js';
 import { ROUTES } from '../../../common/constants/routes.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
@@ -77,19 +77,6 @@ const useOrdersCopy = () => {
  filteredEmptyBody: t('orders_ui_filtered_empty_body', 'Başka bir durum ya da teslimat yöntemi deneyin.'),
  clearFilters: t('orders_ui_clear_filters', 'Filtreleri temizle')
  }), [t, i18n.language]);
-};
-
-const formatLongDate = (iso, locale) => {
- if (!iso) return '';
- try {
- return new Date(iso).toLocaleDateString(locale || 'tr-TR', {
- day: 'numeric',
- month: 'long',
- year: 'numeric'
- });
- } catch {
- return '';
- }
 };
 
 const getListPaginationSlice = (pagination, pageSizeFallback = ORDER_DEFAULTS.INITIAL_PAGE_SIZE) => {

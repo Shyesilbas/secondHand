@@ -16,7 +16,8 @@ const ListingCardActions = ({
   const { user } = useAuthState();
   const { showSuccess, showError } = useNotification();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isInShowcase } = useShowcaseQueries();
+  const isOwner = Boolean(user?.id && user.id === listing?.sellerId);
+  const { isInShowcase } = useShowcaseQueries({ enabled: isOwner && isModalOpen });
 
   const actions = useListingActions({
     listing,
@@ -24,10 +25,9 @@ const ListingCardActions = ({
     onCloseMenu: () => setIsModalOpen(false)
   });
 
-  const isOwner = user?.id === listing?.sellerId;
   if (!isOwner) return null;
 
-  const listingInShowcase = isInShowcase(listing.id);
+  const listingInShowcase = isModalOpen ? isInShowcase(listing.id) : false;
 
   return (
     <>
@@ -60,16 +60,18 @@ const ListingCardActions = ({
         </button>
       )}
 
-      <ListingQuickActionsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        listing={listing}
-        actions={actions}
-        listingInShowcase={listingInShowcase}
-        onChanged={onChanged}
-        showSuccess={showSuccess}
-        showError={showError}
-      />
+      {isModalOpen && (
+        <ListingQuickActionsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          listing={listing}
+          actions={actions}
+          listingInShowcase={listingInShowcase}
+          onChanged={onChanged}
+          showSuccess={showSuccess}
+          showError={showError}
+        />
+      )}
     </>
   );
 };

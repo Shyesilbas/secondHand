@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { memo, useState, useRef, useLayoutEffect } from 'react';
 import { Trash2 as TrashIcon } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { formatRelativeTime } from '../../common/utils/dateFormat.js';
 import { sameChatId } from '../chatIdUtils.js';
 import { InChatOfferCard } from './InChatOfferCard.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
@@ -32,10 +31,7 @@ const MessageBubble = memo(({
  <p className="text-sm break-words leading-relaxed tracking-tight">{message.content}</p>
  <div className="flex items-center justify-between mt-2">
  <p className={`text-xs tracking-tight ${isOwnMessage ? 'text-secondary-300' : 'text-text-tertiary'}`}>
- {formatDistanceToNow(new Date(message.createdAt), {
- addSuffix: true,
- locale: enUS
- })}
+ {formatRelativeTime(message.createdAt)}
  </p>
  {isOwnMessage && <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-secondary-300' : 'bg-text-muted'}`}></div>}
  </div>

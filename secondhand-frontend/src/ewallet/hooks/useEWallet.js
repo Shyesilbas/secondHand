@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ewalletService } from '../services/ewalletService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 const EWALLET_KEYS = {
  wallet: ['ewallet'],
@@ -9,6 +10,7 @@ const EWALLET_KEYS = {
 
 export const useEWallet = (options = {}) => {
  const { showSuccess, showError } = useNotification();
+ const { user } = useAuthState();
  const queryClient = useQueryClient();
  const enabled = options.enabled ?? true;
 
@@ -19,9 +21,9 @@ export const useEWallet = (options = {}) => {
  error: walletError,
  refetch: refreshWallet,
  } = useQuery({
- queryKey: EWALLET_KEYS.wallet,
+ queryKey: [...EWALLET_KEYS.wallet, user?.id],
  queryFn: ewalletService.getEWallet,
- enabled,
+ enabled: Boolean(user?.id) && enabled,
  staleTime: 5 * 60 * 1000,
  gcTime: 15 * 60 * 1000,
  refetchOnWindowFocus: false,

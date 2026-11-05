@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { useCallback, useState } from 'react';
+import { useCallback, useState, lazy, Suspense } from 'react';
 import { BarChart3, ChevronRight, Eye, RefreshCw, TrendingUp } from 'lucide-react';
-import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
+
+const ListingInfoModal = lazy(() => import('./ListingInfoModal.jsx'));
 
 const ListingAnalyticsPanel = ({
  listing,
@@ -60,7 +61,11 @@ const ListingAnalyticsPanel = ({
  </div>
  </button>
 
+ {isInfoOpen && (
+ <Suspense fallback={null}>
  <ListingInfoModal isOpen={isInfoOpen} onClose={closeInfo} listing={listing} displayPrice={displayPrice} isOwner={isOwner} />
+ </Suspense>
+ )}
  </div>
  );
 };

@@ -1,12 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../services/userService.js';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 export const ADDRESSES_QUERY_KEYS = {
  all: ['addresses'],
+ byUser: (userId) => ['addresses', userId],
 };
 
 const useAddresses = (options = {}) => {
  const queryClient = useQueryClient();
+ const { user } = useAuthState();
  const enabled = options.enabled ?? true;
 
  const {
@@ -15,9 +18,9 @@ const useAddresses = (options = {}) => {
  error,
  refetch: fetchAddresses,
  } = useQuery({
- queryKey: ADDRESSES_QUERY_KEYS.all,
+ queryKey: ADDRESSES_QUERY_KEYS.byUser(user?.id),
  queryFn: userService.getAddresses,
- enabled,
+ enabled: Boolean(user?.id) && enabled,
  staleTime: 10 * 60 * 1000, // 10 minutes
  gcTime: 30 * 60 * 1000,
  refetchOnWindowFocus: false,

@@ -77,12 +77,12 @@ const UserProfileHeader = ({
                 {fullName}
               </h1>
               {isOwnProfile && (
-                <span className="px-1.5 py-0.2 bg-background-secondary text-text-muted border border-border text-[11px] font-medium rounded-sm">
+                <span className="px-1.5 py-0.5 bg-background-secondary text-text-muted border border-border text-xs font-medium rounded-sm">
                   {t('you', 'Siz')}
                 </span>
               )}
               {greatSellerEligible && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 bg-background-secondary text-text-secondary border border-border text-[11px] font-semibold rounded-sm">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-background-secondary text-text-secondary border border-border text-xs font-semibold rounded-sm">
                   <Award className="w-3 h-3 text-status-warning" strokeWidth={1.5} />
                   <span>{t('great_seller', 'Harika Satıcı')}</span>
                 </span>
@@ -120,7 +120,7 @@ const UserProfileHeader = ({
             </div>
 
             {/* Badges line */}
-            <div className="flex items-center gap-2 mt-1.5 text-[11px]">
+            <div className="flex items-center gap-2 mt-1.5 text-xs">
               <span className="inline-flex items-center gap-1 text-text-secondary font-medium">
                 <ShieldCheck className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} />
                 <span>{t('verified_profile', 'Doğrulanmış Profil')}</span>
@@ -169,12 +169,12 @@ const UserProfileHeader = ({
                   {t("great_seller_milestones", "Harika Satıcı Kriterleri")}
                 </span>
                 {greatSeller.eligible ? (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-status-success bg-background-secondary px-1.5 py-0.2 rounded-sm border border-border">
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-status-success bg-background-secondary px-1.5 py-0.5 rounded-sm border border-border">
                     <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
                     <span>{t("completed", "Tamamlandı")}</span>
                   </span>
                 ) : (
-                  <span className="text-[11px] text-text-muted">
+                  <span className="text-xs text-text-muted">
                     ({days} {t("days_window", "günlük pencere")})
                   </span>
                 )}
@@ -187,7 +187,7 @@ const UserProfileHeader = ({
                   className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0"
                   title={`${t("completed_checkout_try_lines_with_unit_p", "Min. birim tutarı:")} ₺${minTry.toLocaleString('tr-TR')}`}
                 >
-                  <div className="flex items-center justify-between gap-1 text-[11px]">
+                  <div className="flex items-center justify-between gap-1 text-xs">
                     <span className="text-text-muted truncate">{t("sales", "Satış")}</span>
                     <span className="font-semibold text-text-primary tabular-nums shrink-0">
                       {greatSeller.qualifyingSalesLastWindow}/{greatSeller.qualifyingSalesTarget}
@@ -203,7 +203,7 @@ const UserProfileHeader = ({
 
                 {/* Yorum */}
                 <div className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0">
-                  <div className="flex items-center justify-between gap-1 text-[11px]">
+                  <div className="flex items-center justify-between gap-1 text-xs">
                     <span className="text-text-muted truncate">{t("reviews", "Yorum")}</span>
                     <span className="font-semibold text-text-primary tabular-nums shrink-0">
                       {greatSeller.distinctReviewerCount}/{greatSeller.distinctReviewerTarget}
@@ -219,7 +219,7 @@ const UserProfileHeader = ({
 
                 {/* Puan */}
                 <div className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0">
-                  <div className="flex items-center justify-between gap-1 text-[11px]">
+                  <div className="flex items-center justify-between gap-1 text-xs">
                     <span className="text-text-muted truncate">{t("rating", "Puan")}</span>
                     <span className="font-semibold text-text-primary tabular-nums shrink-0">
                       {(avg ?? 0).toFixed(1)}/{minRating.toFixed(1)}

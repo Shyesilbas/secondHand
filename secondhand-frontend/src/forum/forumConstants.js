@@ -4,7 +4,7 @@ export const FORUM_CATEGORIES = Object.freeze({
  COMPLAINTS: 'COMPLAINTS',
 });
 
-export const FORUM_SORTS = Object.freeze({
+const FORUM_SORTS = Object.freeze({
  NEW: 'NEW',
  TOP: 'TOP',
 });

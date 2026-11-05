@@ -1,18 +1,18 @@
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
-import { aiChatService } from '../services/aiChatService.js';
 import { Bot, MessageCircle, Send, Sparkles, UserRound, X } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useAuraChat } from '../hooks/useAuraChat.js';
-import { createChatMessage } from '../utils/auraChatUtils.js';
+import { createChatMessage, sendAuraRequest } from '../utils/auraChatUtils.js';
 import { buildAuraWidgetUiContext } from '../utils/auraWidgetContext.js';
 
 import AuraSuggestedListingChips from './AuraSuggestedListingChips.jsx';
 import { cacheService } from '../../common/services/cacheService.js';
-import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
+
+const PremiumUpgradeModal = lazy(() => import('@/common/components/ui/PremiumUpgradeModal'));
 // The full-page chat replaces the widget; a separate component keeps hook order stable across routes.
 const AuraChatWidget = () => {
  const location = useLocation();
@@ -40,32 +40,16 @@ const AuraChatWidgetPanel = () => {
  agentMode,
  uiContext: buildAuraWidgetUiContext()
  });
- const sendApi = async payload => {
- const message = typeof payload === 'object' && payload != null ? payload.message : payload;
- const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
- const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
- try {
- if (AI_AGENT_MODE_ENABLED && agentMode) {
- return await aiChatService.agentQuery({
- message,
- context,
- uiContext,
- agentMode: true
- });
- }
- return await aiChatService.chat({
- message,
- context
- });
- } catch (error) {
- if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED') {
+ const sendApi = payload =>
+ sendAuraRequest({
+ payload,
+ agentMode,
+ fallbackToChat: false,
+ onLimitExceeded: () => {
  setShowUpgradeModal(true);
  setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
- throw error;
  }
- throw error;
- }
- };
+ });
  const {
  storageKey,
  messages,
@@ -208,11 +192,15 @@ const AuraChatWidgetPanel = () => {
  {isOpen ? <X className="w-6 h-6 relative z-10" /> : <MessageCircle className="w-6 h-6 relative z-10" />}
  </button>
 
+ {showUpgradeModal && (
+ <Suspense fallback={null}>
  <PremiumUpgradeModal
  isOpen={showUpgradeModal}
  onClose={() => setShowUpgradeModal(false)}
  featureHint={upgradeHint}
  />
+ </Suspense>
+ )}
  </div>;
 };
 export default AuraChatWidget;

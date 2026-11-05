@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 /** Geri sayım gösterimi (mm:ss); saniye için null/NaN ise em dash */
-export function formatOtpValidityMmSs(seconds) {
+function formatOtpValidityMmSs(seconds) {
  if (seconds === null || seconds === undefined || Number.isNaN(seconds)) return '—';
  const capped = Math.max(0, Math.floor(seconds));
  const mm = String(Math.floor(capped / 60)).padStart(2, '0');

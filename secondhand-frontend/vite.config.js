@@ -37,18 +37,6 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          if (id.includes('/src/order/')) {
-            return 'order-module';
-          }
-          if (id.includes('/src/payments/')) {
-            return 'payments-module';
-          }
-          if (id.includes('/src/listing/')) {
-            return 'listing-module';
-          }
-          if (id.includes('/src/cart/')) {
-            return 'cart-module';
-          }
         },
       },
     },

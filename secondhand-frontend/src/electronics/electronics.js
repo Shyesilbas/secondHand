@@ -1,4 +1,6 @@
 
+import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+
 export const ElectronicCreateRequestDTO = {
  title: '',
  description: '',
@@ -49,19 +51,7 @@ export const ElectronicCreateRequestDTO = {
 
 export const createElectronicCreateRequest = (data) => {
  return {
- base: {
- title: (data.title || '').trim(),
- description: (data.description || '').trim(),
- price: parseFloat(data.price) || 0,
- currency: data.currency || 'TRY',
- city: (data.city || '').trim(),
- district: (data.district || '').trim(),
- cityKey: data.cityKey || '',
- districtKey: data.districtKey || '',
- neighborhoodKey: data.neighborhoodKey || undefined,
- imageUrl: data.imageUrl || undefined,
- allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
- },
+ base: createListingBaseCreatePayload(data),
  quantity: parseInt(data.quantity) || 1,
 
  electronicTypeId: data.electronicTypeId || null,
@@ -105,18 +95,8 @@ export const createElectronicCreateRequest = (data) => {
 
 export const createElectronicUpdateRequest = (data) => {
  const updateData = {};
- const base = {};
- if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
- if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
- if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
- if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
+ const base = createListingBaseUpdatePayload(data);
  if (data.quantity !== undefined && data.quantity !== '') updateData.quantity = parseInt(data.quantity);
- if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
- if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
- if (data.cityKey !== undefined) base.cityKey = data.cityKey;
- if (data.districtKey !== undefined) base.districtKey = data.districtKey;
- if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
- if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
  if (data.electronicTypeId !== undefined && data.electronicTypeId !== '') updateData.electronicTypeId = data.electronicTypeId;
  if (data.electronicBrandId !== undefined && data.electronicBrandId !== '') updateData.electronicBrandId = data.electronicBrandId;
  if (data.electronicModelId !== undefined && data.electronicModelId !== '') updateData.electronicModelId = data.electronicModelId;
@@ -125,7 +105,6 @@ export const createElectronicUpdateRequest = (data) => {
  if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year);
  if (data.color !== undefined && data.color !== '') updateData.color = data.color;
  if (data.condition !== undefined && data.condition !== '') updateData.condition = data.condition;
- if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
  if (data.ram !== undefined && data.ram !== '') updateData.ram = parseInt(data.ram);
  if (data.storage !== undefined && data.storage !== '') updateData.storage = parseInt(data.storage);
  if (data.storageType !== undefined && data.storageType !== '') updateData.storageType = data.storageType;

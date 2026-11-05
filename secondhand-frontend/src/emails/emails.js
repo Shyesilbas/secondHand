@@ -112,13 +112,6 @@ export const EMAIL_TYPE_DOT_COLORS = {
   [EMAIL_TYPES.AUDIT_ALERT]: 'bg-status-error'
 };
 
-export const EMAIL_TYPE_BADGE_COLORS = Object.fromEntries(
-  Object.values(EMAIL_TYPES).map((type) => [
-    type,
-    'bg-background-secondary text-text-secondary border-border'
-  ])
-);
-
 const EMOJI_STRIP_RE = /(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]|\u{FE0F}|\u{200D})/gu;
 
 export const stripEmailEmojis = (text) => {

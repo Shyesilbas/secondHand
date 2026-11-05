@@ -1,4 +1,6 @@
 
+import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+
 export const VehicleCreateRequestDTO = Object.freeze({
  title: '',
  description: '',
@@ -44,19 +46,7 @@ const toUuidOrNull = (value) => {
 };
 
 export const createVehicleCreateRequest = (data) => ({
- base: {
- title: (data.title || '').trim(),
- description: (data.description || '').trim(),
- price: parseFloat(data.price) || 0,
- currency: data.currency || 'TRY',
- city: (data.city || '').trim(),
- district: (data.district || '').trim(),
- cityKey: data.cityKey || '',
- districtKey: data.districtKey || '',
- neighborhoodKey: data.neighborhoodKey || undefined,
- imageUrl: data.imageUrl || undefined,
- allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
- },
+ base: createListingBaseCreatePayload(data),
 
  vehicleTypeId: toUuidOrNull(data.vehicleTypeId),
  brandId: toUuidOrNull(data.brandId),
@@ -87,18 +77,7 @@ export const createVehicleCreateRequest = (data) => ({
 
 export const createVehicleUpdateRequest = (data) => {
  const updateData = {};
-
- const base = {};
- if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
- if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
- if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
- if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
- if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
- if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
- if (data.cityKey !== undefined) base.cityKey = data.cityKey;
- if (data.districtKey !== undefined) base.districtKey = data.districtKey;
- if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
- if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
+ const base = createListingBaseUpdatePayload(data);
 
  if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') {
  updateData.vehicleTypeId = data.vehicleTypeId;
@@ -140,7 +119,6 @@ export const createVehicleUpdateRequest = (data) => {
  }
  if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
  if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
- if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
  if (data.accidentHistory !== undefined) updateData.accidentHistory = Boolean(data.accidentHistory);
  if (data.accidentDetails !== undefined) updateData.accidentDetails = (data.accidentDetails || '').trim();
  if (data.inspectionValidUntil !== undefined && data.inspectionValidUntil !== '') {

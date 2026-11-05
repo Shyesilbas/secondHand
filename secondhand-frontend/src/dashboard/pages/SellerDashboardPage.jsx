@@ -2,8 +2,7 @@ import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { useState, lazy, Suspense, useMemo } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
-import { useQuery } from '@tanstack/react-query';
-import { orderService } from '../../order/services/orderService.js';
+import { usePendingEscrowAmount } from '../../order/hooks/useOrderFlow.js';
 import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
 import MetricCard from '../components/MetricCard.jsx';
 import TopListingsTable from '../components/TopListingsTable.jsx';
@@ -48,12 +47,7 @@ const SellerDashboardPage = () => {
     error
   } = useSellerDashboard(startDate, endDate);
 
-  const { data: escrowData } = useQuery({
-    queryKey: ['pendingEscrow'],
-    queryFn: () => orderService.getPendingEscrowAmount(),
-    staleTime: 2 * 60 * 1000,
-    refetchOnWindowFocus: false
-  });
+  const { pendingEscrowAmount: pendingEscrow } = usePendingEscrowAmount();
 
   const handlePresetSelect = (start, end) => {
     setStartDate(start);
@@ -67,8 +61,6 @@ const SellerDashboardPage = () => {
     if (views === 0) return 0;
     return ((orders / views) * 100).toFixed(1);
   }, [dashboard]);
-
-  const pendingEscrow = escrowData?.amount || 0;
 
   if (isLoading) {
     return (

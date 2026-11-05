@@ -152,7 +152,7 @@ const UserProfilePage = () => {
       />
 
       {/* ── Tab Bar (clean segmented navigation) ────────────────────── */}
-      <div className="sticky top-0 z-10 border-b border-border bg-background-primary/95 backdrop-blur-xs">
+      <div className="sticky top-0 z-10 border-b border-border bg-background-primary">
         <PageContainer>
           <nav className="flex items-center gap-1.5 overflow-x-auto py-2.5 [scrollbar-width:none]">
             {TABS.map((tab) => {

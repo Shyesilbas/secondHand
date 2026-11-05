@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useInAppNotifications } from './hooks/useInAppNotifications.js';
 import { InAppNotificationContext } from './InAppNotificationContext.jsx';
 
@@ -25,7 +25,7 @@ export const InAppNotificationProvider = ({ children }) => {
  setNewNotifications([]);
  }, []);
 
- const value = {
+ const value = useMemo(() => ({
  notifications,
  newNotifications,
  totalElements,
@@ -37,7 +37,19 @@ export const InAppNotificationProvider = ({ children }) => {
  refetch,
  loadMore,
  clearNewNotifications,
- };
+ }), [
+ notifications,
+ newNotifications,
+ totalElements,
+ totalPages,
+ isLoading,
+ unreadCount,
+ markAsRead,
+ markAllAsRead,
+ refetch,
+ loadMore,
+ clearNewNotifications,
+ ]);
 
  return (
  <InAppNotificationContext.Provider value={value}>

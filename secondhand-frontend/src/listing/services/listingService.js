@@ -170,7 +170,7 @@ export const listingService = {
  const sortBy = filters.sortBy || 'createdAt';
  const sortDir = (filters.sortDirection || 'DESC').toLowerCase();
  
- const url = `/v1/listings/status/${status}?page=${page}&size=${size}&sort=${sortBy},${sortDir}`;
+ const url = `${API_ENDPOINTS.LISTINGS.BY_STATUS(status)}?page=${page}&size=${size}&sort=${sortBy},${sortDir}`;
  return get(url);
  }
 

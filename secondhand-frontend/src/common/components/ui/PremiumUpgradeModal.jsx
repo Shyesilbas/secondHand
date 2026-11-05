@@ -80,7 +80,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
 
   const { emails, fetchEmails } = useEmails();
   const { eWallet, refreshWallet } = useEWallet({ enabled: isOpen });
-  const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT');
+  const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT', { enabled: isOpen });
 
   const {
     acceptedAgreements,

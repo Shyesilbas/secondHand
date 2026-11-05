@@ -1,27 +1,18 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { showcaseService } from '../services/showcaseService.js';
-import { SHOWCASE_QUERY_KEYS } from './queries.js';
+import { SHOWCASE_QUERY_KEYS, useShowcaseQueries } from './queries.js';
 
 export const useShowcase = () => {
  const [error, setError] = useState(null);
  const queryClient = useQueryClient();
 
  const {
- data: showcasePage,
- isLoading: loading,
+ showcases,
+ loading,
  error: queryError,
  refetch: fetchShowcases
- } = useQuery({
- queryKey: SHOWCASE_QUERY_KEYS.active(0, 12),
- queryFn: () => showcaseService.getActiveShowcases({ page: 0, size: 12 }),
- staleTime: 5 * 60 * 1000,
- gcTime: 10 * 60 * 1000,
- refetchOnWindowFocus: false,
- refetchOnMount: false,
- onError: (err) => setError(err.message)
- });
- const showcases = Array.isArray(showcasePage?.content) ? showcasePage.content : [];
+ } = useShowcaseQueries({ page: 0, size: 12 });
 
  const createShowcaseMutation = useMutation({
  mutationFn: ({ listingId, days, paymentType }) =>
@@ -63,9 +54,9 @@ export const useShowcase = () => {
 
  return {
  showcases,
- loading: loading || createShowcaseMutation.isLoading ||
- extendShowcaseMutation.isLoading || cancelShowcaseMutation.isLoading,
- error: error || queryError?.message,
+ loading: loading || createShowcaseMutation.isPending ||
+ extendShowcaseMutation.isPending || cancelShowcaseMutation.isPending,
+ error: error || queryError,
  fetchShowcases,
  createShowcase,
  extendShowcase,

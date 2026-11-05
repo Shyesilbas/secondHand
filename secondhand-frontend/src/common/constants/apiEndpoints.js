@@ -33,7 +33,6 @@ export const API_ENDPOINTS = {
  },
  USER: {
  ME: '/v1/users/me',
- UPDATE_EMAIL: '/v1/users/email',
  UPDATE_PHONE: '/v1/users/phone',
  VERIFY: '/v1/users/verification/verify',
  SEND_VERIFICATION: '/v1/users/verification/send',
@@ -45,13 +44,10 @@ export const API_ENDPOINTS = {
  BADGES: '/v1/user/badges', // Aggregated endpoint for badge counts
  },
  LISTINGS: {
- ALL: '/v1/listings/search',
  MY_LISTINGS: '/v1/listings/my',
  BY_ID: (id) => `/v1/listings/${id}`,
- BULK: '/v1/listings/bulks',
  BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
  SEARCH: '/v1/listings/search',
- CREATE: '/v1/listings',
  DELETE: (id) => `/v1/listings/${id}`,
  MARK_SOLD: (id) => `/v1/listings/${id}/mark-sold`,
  UPDATE_QUANTITY: (id) => `/v1/listings/${id}/quantity`,
@@ -65,15 +61,11 @@ export const API_ENDPOINTS = {
  BY_USER: (userId) => `/v1/users/${userId}/listings`,
  FILTER: '/v1/listings/filter',
  TRACK_VIEW: (id) => `/v1/listings/${id}/view`,
- ACTIVE_VIEWERS: (id) => `/v1/listings/${id}/active-viewers`,
  SOCIAL_PROOF: (id) => `/v1/listings/${id}/social-proof`,
- VIEW_STATS: (id) => `/v1/listings/${id}/view-stats`,
- MY_LISTINGS_VIEW_STATS: '/v1/listings/my/view-stats',
+ BY_STATUS: (status) => `/v1/listings/status/${status}`,
  },
  PAYMENTS: {
- CREATE: '/v1/payments/pay',
  LISTING_FEE_PAYMENT: '/v1/listings/pay-fee',
- LISTING_FEE_CONFIG: '/v1/listings/fee-config',
  MY_PAYMENTS: '/v1/payments/my',
  STATISTICS: '/v1/payments/statistics',
  INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
@@ -84,7 +76,6 @@ export const API_ENDPOINTS = {
  LIST_SELLER_ORDERS: '/v1/orders/seller',
  GET_SELLER_ORDER_DETAILS: (id) => `/v1/orders/seller/${id}`,
  GET_PENDING_ESCROW_AMOUNT: '/v1/orders/seller/pending-escrow-amount',
- PENDING_COMPLETION: '/v1/orders/pending-completion',
  GET_BY_ORDER_NUMBER: (orderNumber) => `/v1/orders?orderNumber=${encodeURIComponent(orderNumber)}`,
  GET_ORDER_DETAILS: (id) => `/v1/orders/${id}`,
  CANCEL_ORDER: (id) => `/v1/orders/${id}/cancel`,
@@ -100,9 +91,7 @@ export const API_ENDPOINTS = {
  REGENERATE_MEETUP_CODE: (orderNumber) => `/v1/orders/${orderNumber}/regenerate-meetup-code`,
  },
  CHECKOUT: {
- EXECUTE: '/v1/orders/checkout',
  INITIATE: '/checkout/initiate',
- CANCEL_RESERVATION: (listingId) => `/checkout/reservation/${listingId}`,
  },
  DASHBOARD: {
  SELLER: '/v1/dashboards/seller', // GET - Seller dashboard
@@ -111,7 +100,6 @@ export const API_ENDPOINTS = {
  COMPLAINTS: {
  CREATE: '/v1/complaints',
  MY_COMPLAINTS: '/v1/users/me/complaints',
- ABOUT_ME: '/v1/users/me/complaints/received',
  },
  EMAILS: {
  MY_EMAILS: '/v1/emails/my-emails',
@@ -127,67 +115,44 @@ export const API_ENDPOINTS = {
  CREATE: '/v1/vehicles/create-listing',
  BY_ID: (id) => `/v1/vehicles/${id}`,
  UPDATE: (id) => `/v1/vehicles/${id}`,
- BY_BRAND_MODEL: (brandId, modelId) => `/v1/vehicles/brand/${brandId}/model/${modelId}`,
- BRANDS: '/v1/vehicles/brands',
- FILTER: '/v1/vehicles/filter',
  },
  ELECTRONICS: {
  CREATE: '/v1/electronics/create-listing',
  BY_ID: (id) => `/v1/electronics/${id}`,
  UPDATE: (id) => `/v1/electronics/${id}`,
- BY_TYPE: (electronicType) => `/v1/electronics/electronicType/${electronicType}`,
- FILTER: '/v1/electronics/filter',
  },
  REAL_ESTATES: {
  CREATE: '/v1/real-estates/create-listing',
  BY_ID: (id) => `/v1/real-estates/${id}`,
  UPDATE: (id) => `/v1/real-estates/${id}`,
- FILTER: '/v1/real-estates/filter',
  },
  CLOTHING: {
  CREATE: '/v1/clothing/create-listing',
  BY_ID: (id) => `/v1/clothing/${id}`,
  UPDATE: (id) => `/v1/clothing/${id}`,
- BY_BRAND_TYPE: (brand, clothingType) => `/v1/clothing/brand/${brand}/type/${clothingType}`,
- FILTER: '/v1/clothing/filter',
  },
  BOOKS: {
  CREATE: '/v1/books/create-listing',
  BY_ID: (id) => `/v1/books/${id}`,
  UPDATE: (id) => `/v1/books/${id}`,
- FILTER: '/v1/books/filter',
  },
  SPORTS: {
  CREATE: '/v1/sports/create-listing',
  BY_ID: (id) => `/v1/sports/${id}`,
  UPDATE: (id) => `/v1/sports/${id}`,
- FILTER: '/v1/sports/filter',
  },
  FAVORITES: {
- ADD: '/v1/favorites',
  TOGGLE: '/v1/favorites/toggle',
  MY_FAVORITES: '/v1/favorites',
  CHECK: (listingId) => `/v1/favorites/check/${listingId}`,
- TOP: '/v1/favorites/top',
- TOP_LISTINGS: '/v1/favorites/top-listings',
  },
  AGREEMENTS: {
- INITIALIZE: '/v1/agreements/initialize',
  ALL: '/v1/agreements',
  REQUIRED: '/v1/agreements/required',
- BY_TYPE: (agreementType) => `/v1/agreements/${agreementType}`,
- CREATE: '/v1/agreements',
- UPDATE_BY_ID: (agreementId) => `/v1/agreements/${agreementId}`,
- UPDATE_BY_TYPE: (agreementType) => `/v1/agreements/type/${agreementType}`,
  ACCEPT: '/v1/agreements/accept',
  USER_AGREEMENTS: '/v1/agreements/user/agreements',
- USER_STATUS_ALL: '/v1/agreements/user/status',
- USER_STATUS_BY_TYPE: (agreementType) => `/v1/agreements/user/status/${agreementType}`,
- USER_ACCEPTANCE_HISTORY: (agreementId) => `/v1/agreements/user/acceptance-history/${agreementId}`,
- ADMIN_ACCEPT_ALL: '/v1/agreements/admin/accept-all-users',
  },
  CHAT: {
- CREATE_ROOM: '/v1/chats/rooms',
  USER_ROOMS: '/v1/chats/rooms/user',
  DIRECT_ROOM: '/v1/chats/rooms/direct',
  CREATE_LISTING_ROOM: (listingId) => `/v1/chats/rooms/listing/${listingId}`,
@@ -195,9 +160,6 @@ export const API_ENDPOINTS = {
  SEND_MESSAGE: '/v1/chats/messages',
  ROOM_MESSAGES: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}/messages`,
  MARK_READ: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}/messages/read`,
-
- ALL_USER_MESSAGES: '/v1/chats/messages/user',
- TOTAL_UNREAD_COUNT: `/v1/chats/messages/unread-count`,
 
  DELETE_CONVERSATION: (chatRoomId) => `/v1/chats/rooms/${chatRoomId}`,
  DELETE_MESSAGE: (messageId) => `/v1/chats/messages/${messageId}`,
@@ -212,28 +174,13 @@ export const API_ENDPOINTS = {
  PRICE_HISTORY: {
  BY_LISTING: (listingId) => `/v1/price-history/listing/${listingId}`,
  },
- AUDIT_LOGS: {
- USER_BY_EMAIL: (userEmail) => `/v1/admin/audit-logs/user/${userEmail}`,
- USER_BY_ID: (userId) => `/v1/admin/audit-logs/user/id/${userId}`,
- BY_EVENT_TYPE: (eventType) => `/v1/admin/audit-logs/event-type/${eventType}`,
- BY_DATE_RANGE: '/v1/admin/audit-logs/date-range',
- FAILED_ATTEMPTS_BY_USER: (userEmail) => `/v1/admin/audit-logs/failed-attempts/user/${userEmail}`,
- FAILED_ATTEMPTS_BY_IP: (ipAddress) => `/v1/admin/audit-logs/failed-attempts/ip/${ipAddress}`,
- },
- AUDIT_ENUMS: {
- EVENT_TYPES: '/v1/audit/enums/event-types',
- EVENT_STATUSES: '/v1/audit/enums/event-statuses',
- ALL: '/v1/audit/enums/all',
- },
  CART: {
  GET_ITEMS: '/v1/cart',
  ADD_ITEM: '/v1/cart/items',
  UPDATE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
  REMOVE_ITEM: (listingId) => `/v1/cart/items/${listingId}`,
  CLEAR_CART: '/v1/cart/items',
- GET_COUNT: '/v1/cart/count',
  CHECK_ITEM: (listingId) => `/v1/cart/check/${listingId}`,
- RESERVATIONS_COUNT: (listingId) => `/v1/cart/reservations/count/${listingId}`,
  },
  COUPONS: {
  PREVIEW: '/v1/coupons/preview',
@@ -266,8 +213,6 @@ export const API_ENDPOINTS = {
  GET_REVIEWS_WRITTEN_BY: (userId) => `/v1/users/${userId}/reviews/written`,
  GET_USER_REVIEW_STATS: (userId) => `/v1/users/${userId}/review-stats`,
  GET_REVIEWS_BY_ORDER_ITEMS: '/v1/reviews',
- GET_REVIEWS_FOR_LISTING: (listingId) => `/v1/listings/${listingId}/reviews`,
- GET_LISTING_REVIEW_STATS: (listingId) => `/v1/listings/${listingId}/review-stats`,
  },
  EWALLET: {
  CREATE: '/v1/e-wallets',
@@ -283,28 +228,22 @@ export const API_ENDPOINTS = {
  },
  SHOWCASES: {
  CREATE: '/v1/showcases',
- BULK: '/v1/showcases/bulks',
  ACTIVE: '/v1/showcases/active',
  MY_SHOWCASES: '/v1/showcases/my',
  EXTEND: (id) => `/v1/showcases/${id}/extend`,
  CANCEL: (id) => `/v1/showcases/${id}/cancel`,
- PRICING_CONFIG: '/v1/showcases/pricing-config',
  },
  EXCHANGE: {
  RATE: (from, to) => `/v1/exchange-rates/${from}/${to}`,
  },
  IMAGES: {
  UPLOAD: '/v1/images/upload',
- DELETE: '/v1/images/delete',
  },
  FOLLOW: {
  FOLLOW: (userId) => `/v1/follows/${userId}`,
  UNFOLLOW: (userId) => `/v1/follows/${userId}`,
  TOGGLE_NOTIFICATIONS: (userId) => `/v1/follows/${userId}/notifications`,
- FOLLOWING: '/v1/follows/following',
- FOLLOWERS: '/v1/follows/followers',
  STATS: (userId) => `/v1/follows/stats/${userId}`,
- CHECK: (userId) => `/v1/follows/check/${userId}`,
  USER_FOLLOWERS: (userId) => `/v1/follows/user/${userId}/followers`,
  USER_FOLLOWING: (userId) => `/v1/follows/user/${userId}/following`,
  },
@@ -312,7 +251,6 @@ export const API_ENDPOINTS = {
  CREATE: '/v1/favorite-lists',
  MY_LISTS: '/v1/favorite-lists/my',
  USER_LISTS: (userId) => `/v1/favorite-lists/user/${userId}`,
- POPULAR: '/v1/favorite-lists/popular',
  BY_ID: (listId) => `/v1/favorite-lists/${listId}`,
  UPDATE: (listId) => `/v1/favorite-lists/${listId}`,
  DELETE: (listId) => `/v1/favorite-lists/${listId}`,
@@ -334,7 +272,6 @@ export const API_ENDPOINTS = {
  THREAD_STATUS: (threadId) => `/v1/forums/threads/${threadId}/status`,
  THREAD_REACTION: (threadId) => `/v1/forums/threads/${threadId}/reaction`,
  THREAD_COMMENTS: (threadId) => `/v1/forums/threads/${threadId}/comments`,
- COMMENT_BY_ID: (threadId, commentId) => `/v1/forums/threads/${threadId}/comments/${commentId}`,
  COMMENT_REACTION: (threadId, commentId) => `/v1/forums/threads/${threadId}/comments/${commentId}/reaction`,
  },
  CATALOG: {
@@ -345,7 +282,12 @@ export const API_ENDPOINTS = {
  }
  },
  AI: {
- SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`
+ SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`,
+ CHATS: '/v1/ai/chats',
+ NEW_CHAT: '/v1/ai/chats/new',
+ CHAT_HISTORY: '/v1/ai/chats/history',
+ AGENT_QUERY: '/v1/ai/agents/query',
+ MEMORIES: '/v1/ai/memories',
  },
  MEMBERSHIP: {
  STATUS: '/v1/memberships/status',

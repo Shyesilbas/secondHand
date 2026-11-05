@@ -3,7 +3,7 @@ import apiClient from '../../common/services/api/interceptors.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
 export const useActiveReservationCount = (listingId, options = {}) => {
-  const { enablePolling = false, pollInterval = 10 * 60 * 1000 } = options;
+  const { enabled = true, enablePolling = false, pollInterval = 10 * 60 * 1000 } = options;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['listing', 'social-proof', listingId],
@@ -28,7 +28,7 @@ export const useActiveReservationCount = (listingId, options = {}) => {
         return { cartReservations: 0, inCartCount: 0, activeViewers: 0, favoriteCount: 0, count: 0, urgencyType: null };
       }
     },
-    enabled: Boolean(listingId),
+    enabled: Boolean(listingId) && enabled,
     refetchInterval: enablePolling ? pollInterval : false,
     staleTime: 30 * 1000, // 30 seconds cache
     refetchOnWindowFocus: true,

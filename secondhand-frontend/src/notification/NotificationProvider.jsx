@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import NotificationModal from './NotificationModal.jsx';
 import Toast from './components/Toast.jsx';
 import { NotificationContext } from './NotificationContext.jsx';
@@ -133,7 +133,7 @@ export const NotificationProvider = ({ children }) => {
  );
  }, [showError]);
 
- const value = {
+ const value = useMemo(() => ({
  notifications,
  addNotification,
  removeNotification,
@@ -145,7 +145,19 @@ export const NotificationProvider = ({ children }) => {
  showNotification,
  showConfirmation,
  showDetailedError
- };
+ }), [
+ notifications,
+ addNotification,
+ removeNotification,
+ removeAllNotifications,
+ showSuccess,
+ showError,
+ showWarning,
+ showInfo,
+ showNotification,
+ showConfirmation,
+ showDetailedError
+ ]);
 
  return (
  <NotificationContext.Provider value={value}>

@@ -2,13 +2,15 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {membershipService} from '../services/membershipService';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 
-export const usePlan = () => {
+export const usePlan = (options = {}) => {
  const queryClient = useQueryClient();
  const { user } = useAuthState();
+ const enabled = options.enabled ?? true;
 
  const { data, isLoading, refetch } = useQuery({
- queryKey: ['membership', 'status'],
+ queryKey: ['membership', 'status', user?.id],
  queryFn: membershipService.getStatus,
+ enabled: Boolean(user?.id) && enabled,
  placeholderData: user?.plan ? { 
  plan: user.plan, 
  planExpiry: user.planExpiry,

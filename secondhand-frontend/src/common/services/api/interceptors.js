@@ -79,7 +79,8 @@ apiClient.interceptors.response.use(
  }
 
  const AUTH = API_ENDPOINTS.AUTH;
- const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
+ // OAUTH_COMPLETE answers 401 for an expired registration token; that is not a session to refresh.
+ const isAuthEndpoint = [AUTH.LOGIN, AUTH.REGISTER, AUTH.OAUTH_COMPLETE, AUTH.FORGOT_PASSWORD, AUTH.RESET_PASSWORD, AUTH.REFRESH]
  .some(path => originalRequest.url?.includes(path));
 
  if (isAuthEndpoint) {
@@ -129,9 +130,9 @@ apiClient.interceptors.response.use(
  }
  );
 
- const newAccessToken = response.data?.data?.accessToken;
- if (newAccessToken && authContextRef?.handleTokenRefreshSuccess) {
- authContextRef.handleTokenRefreshSuccess(newAccessToken);
+ const refreshData = response.data?.data;
+ if (refreshData && authContextRef?.handleTokenRefreshSuccess) {
+ authContextRef.handleTokenRefreshSuccess(refreshData);
  }
 
  processQueue(null, 'cookie-based');

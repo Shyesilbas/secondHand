@@ -6,14 +6,7 @@ import { userService } from '../../user/services/userService.js';
 import { ArrowRight, Award, Star, CalendarDays } from 'lucide-react';
 import GreatSellerRulesCallout from './GreatSellerRulesCallout.jsx';
 import { SkeletonCard } from '../../common/components/ui/Skeleton.jsx';
-const formatDate = dateStr => {
- if (!dateStr) return '';
- const date = new Date(dateStr);
- return date.toLocaleDateString('tr-TR', {
- month: 'long',
- year: 'numeric'
- });
-};
+import { formatMonthYear } from '../../common/formatters.js';
 const HeaderBlock = () => {
  const { t } = useTranslation();
  return (
@@ -65,7 +58,7 @@ const SellerCard = ({
  {/* Join Date */}
  <div className="flex items-center gap-1 text-text-muted">
  <CalendarDays className="w-3 h-3" />
- <span className="text-xs font-medium">{formatDate(s.createdAt)}</span>
+ <span className="text-xs font-medium">{formatMonthYear(s.createdAt)}</span>
  </div>
  </div>
  </div>

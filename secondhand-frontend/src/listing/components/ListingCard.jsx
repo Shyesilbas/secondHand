@@ -1,21 +1,23 @@
 import { useTranslation } from "react-i18next";
-import { useState, useMemo, useRef, useEffect, memo } from 'react';
+import { useState, useMemo, useRef, useEffect, memo, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
-import ListingInfoModal from './ListingInfoModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
 import { MapPin, Image as ImageIcon, Star, Eye, Heart, ShoppingBag, HandCoins, Zap, TrendingDown, Award, Check, Flame } from 'lucide-react';
 import { useCart } from '../../cart/hooks/useCart.js';
 import { useActiveReservationCount } from '../../cart/hooks/useActiveReservationCount.js';
-import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import { useComparison } from '../../comparison/hooks/useComparison.js';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
 import { getListingFavoriteCount } from '../../favorites/favorites.js';
+
+const ListingInfoModal = lazy(() => import('./ListingInfoModal.jsx'));
+const MakeOfferModal = lazy(() => import('../../offer/components/MakeOfferModal.jsx'));
+
 const ListingCard = ({
  listing,
  onDeleted,
@@ -33,18 +35,24 @@ const ListingCard = ({
  } = useTranslation();
  const [showInfo, setShowInfo] = useState(false);
  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+ const [isCardHovered, setIsCardHovered] = useState(false);
+ const isOutOfStock = listing?.quantity != null && Number(listing.quantity) === 0;
+ const canAddToCart = Boolean(currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing?.type) && listing?.status === LISTING_STATUS.ACTIVE && !isOutOfStock);
+ const canMakeOffer = Boolean(currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing?.type) && listing?.status === LISTING_STATUS.ACTIVE);
  const {
  addToCart,
  isAddingToCart,
  isInCart
  } = useCart({
- loadCartItems: true
+ loadCartItems: canAddToCart
  });
- const itemIsInCart = isInCart(listing?.id);
+ const itemIsInCart = canAddToCart && isInCart(listing?.id);
  const {
  isInComparison
  } = useComparison();
- const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id);
+ const { cartReservations, activeViewers } = useActiveReservationCount(listing?.id, {
+   enabled: isCardHovered
+ });
  const cardFavoriteCount = getListingFavoriteCount(listing);
 
  // ── Sequential Micro-Story Social Proof Ticker ──
@@ -79,15 +87,23 @@ const ListingCard = ({
  const storyTimerRef = useRef(null);
 
  const handleCardMouseEnter = () => {
+   setIsCardHovered(true);
    if (storyPlayed || storyItems.length === 0) return;
    setStoryIndex(0);
  };
 
  const handleCardMouseLeave = () => {
+   setIsCardHovered(false);
    if (storyTimerRef.current) clearTimeout(storyTimerRef.current);
    setStoryIndex(-1);
    setStoryPlayed(false);
  };
+
+ useEffect(() => {
+   if (isCardHovered && !storyPlayed && storyIndex === -1 && storyItems.length > 0) {
+     setStoryIndex(0);
+   }
+ }, [isCardHovered, storyPlayed, storyIndex, storyItems.length]);
 
  useEffect(() => {
    if (storyIndex >= 0 && storyIndex < storyItems.length) {
@@ -109,9 +125,6 @@ const ListingCard = ({
 
  const isGreatSeller = Boolean(listing.sellerGreatSellerEligible);
  const isInCompare = isInComparison(listing.id);
- const isOutOfStock = listing.quantity != null && Number(listing.quantity) === 0;
- const canAddToCart = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE && !isOutOfStock;
- const canMakeOffer = currentUserId && !isOwner && !NON_PURCHASABLE_TYPES.includes(listing.type) && listing.status === LISTING_STATUS.ACTIVE;
  const getStatusConfig = status => {
  switch (status) {
  case LISTING_STATUS.ACTIVE:
@@ -336,9 +349,17 @@ const ListingCard = ({
  </div>
  </Link>
 
- <ListingInfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} listing={listing} displayPrice={displayPrice} isOwner={isOwner} isInShowcase={isInShowcase} />
+ {showInfo && (
+   <Suspense fallback={null}>
+     <ListingInfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} listing={listing} displayPrice={displayPrice} isOwner={isOwner} isInShowcase={isInShowcase} />
+   </Suspense>
+ )}
 
- <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
+ {isOfferModalOpen && (
+   <Suspense fallback={null}>
+     <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
+   </Suspense>
+ )}
  </div>;
 };
 ListingCard.displayName = 'ListingCard';

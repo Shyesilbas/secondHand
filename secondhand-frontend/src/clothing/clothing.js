@@ -1,25 +1,7 @@
-const normalizeClothingGendersForFilter = (clothingGenders) => {
- const selected = Array.isArray(clothingGenders) ? clothingGenders.filter(Boolean) : [];
- if (selected.includes('MALE') || selected.includes('FEMALE')) {
- return Array.from(new Set([...selected, 'UNISEX']));
- }
- return selected;
-};
+import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
 
 export const createClothingCreateRequest = (data) => ({
- base: {
- title: (data.title || '').trim(),
- description: (data.description || '').trim(),
- price: data.price,
- currency: data.currency || 'TRY',
- city: (data.city || '').trim(),
- district: (data.district || '').trim(),
- cityKey: data.cityKey || '',
- districtKey: data.districtKey || '',
- neighborhoodKey: data.neighborhoodKey || undefined,
- imageUrl: data.imageUrl || undefined,
- allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false
- },
+ base: createListingBaseCreatePayload(data),
  quantity: parseInt(data.quantity) || 1,
  brandId: data.brandId,
  clothingTypeId: data.clothingTypeId,
@@ -35,18 +17,7 @@ export const createClothingCreateRequest = (data) => ({
 
 export const createClothingUpdateRequest = (data) => {
  const updateData = {};
- const base = {};
- if (data.title !== undefined && data.title !== '') base.title = data.title;
- if (data.description !== undefined && data.description !== '') base.description = data.description;
- if (data.price !== undefined && data.price !== '') base.price = data.price;
- if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
- if (data.city !== undefined && data.city !== '') base.city = data.city;
- if (data.district !== undefined && data.district !== '') base.district = data.district;
- if (data.cityKey !== undefined) base.cityKey = data.cityKey;
- if (data.districtKey !== undefined) base.districtKey = data.districtKey;
- if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
- if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
- if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
+ const base = createListingBaseUpdatePayload(data);
  if (Object.keys(base).length > 0) updateData.base = base;
 
  updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;
@@ -62,29 +33,3 @@ export const createClothingUpdateRequest = (data) => {
  updateData.clothingCategory = data.clothingCategory ? data.clothingCategory : undefined;
  return updateData;
 };
-
-export const createClothingFilterRequest = (data) => ({
- type: 'CLOTHING',
- listingType: 'CLOTHING',
- status: data.status || 'ACTIVE',
- city: data.city?.trim() || '',
- district: data.district?.trim() || '',
- minPrice: parseFloat(data.minPrice) || null,
- maxPrice: parseFloat(data.maxPrice) || null,
- currency: data.currency || 'TRY',
- 
- brands: Array.isArray(data.brands) ? data.brands : [],
- types: Array.isArray(data.types) ? data.types : [],
- colors: Array.isArray(data.colors) ? data.colors : [],
- conditions: Array.isArray(data.conditions) ? data.conditions : [],
- clothingGenders: normalizeClothingGendersForFilter(data.clothingGenders),
- clothingCategories: Array.isArray(data.clothingCategories) ? data.clothingCategories : [],
- minPurchaseDate: data.minPurchaseDate || null,
- maxPurchaseDate: data.maxPurchaseDate || null,
- 
- sortBy: data.sortBy || 'createdAt',
- sortDirection: data.sortDirection || 'DESC',
- 
- page: parseInt(data.page) || 0,
- size: parseInt(data.size) || 20,
-});

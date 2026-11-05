@@ -27,7 +27,7 @@ import { USER_DEFAULTS } from '../userConstants.js';
 import { getAccountHubNavGroups } from '../utils/accountHubSections.js';
 import { isAdminUser } from '../../common/utils/admin.js';
 import { orderService } from '../../order/services/orderService.js';
-import { formatCurrency, formatDate } from '../../common/formatters.js';
+import { formatCurrency, formatDate, formatLongDate } from '../../common/formatters.js';
 import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
 import { useMyShowcases } from '../../showcase/hooks/useMyShowcases.js';
 
@@ -47,27 +47,6 @@ const formatGroupLabel = (text, isTr) => {
   const locale = isTr ? 'tr-TR' : 'en-US';
   const lower = text.toLocaleLowerCase(locale);
   return lower.charAt(0).toLocaleUpperCase(locale) + lower.slice(1);
-};
-
-const formatOrderDate = (dateString) => {
-  if (!dateString) return '';
-  try {
-    let date;
-    if (typeof dateString === 'string' && dateString.includes('/')) {
-      const [day, month, year] = dateString.split('/');
-      date = new Date(year, month - 1, day);
-    } else {
-      date = new Date(dateString);
-    }
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch {
-    return '';
-  }
 };
 
 const CARD = 'rounded border border-border bg-background-primary';
@@ -515,7 +494,7 @@ const AccountHubPage = () => {
                                     dateTime={order.createdAt}
                                     className="mt-0.5 block text-xs tabular-nums text-text-tertiary"
                                   >
-                                    {formatOrderDate(order.createdAt)}
+                                    {formatLongDate(order.createdAt)}
                                   </time>
                                 ) : null}
                               </div>

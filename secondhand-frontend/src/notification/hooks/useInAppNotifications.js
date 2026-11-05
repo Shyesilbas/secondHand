@@ -80,13 +80,16 @@ export const useInAppNotifications = (onNewNotification) => {
 
  useNotificationWebSocket(handleNotificationReceived);
 
+ const { mutate: mutateMarkAsRead } = markAsReadMutation;
+ const { mutate: mutateMarkAllAsRead } = markAllAsReadMutation;
+
  const markAsRead = useCallback((notificationId) => {
- markAsReadMutation.mutate(notificationId);
- }, [markAsReadMutation]);
+ mutateMarkAsRead(notificationId);
+ }, [mutateMarkAsRead]);
 
  const markAllAsRead = useCallback(() => {
- markAllAsReadMutation.mutate();
- }, [markAllAsReadMutation]);
+ mutateMarkAllAsRead();
+ }, [mutateMarkAllAsRead]);
 
  const loadMore = useCallback((page) => {
  return notificationService.getNotifications(page, 20);

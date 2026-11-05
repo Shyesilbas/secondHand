@@ -1,6 +1,6 @@
 import { get, post, put } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { createClothingCreateRequest, createClothingUpdateRequest, createClothingFilterRequest } from '../clothing.js';
+import { createClothingCreateRequest, createClothingUpdateRequest } from '../clothing.js';
 
 export const clothingService = {
  createClothingListing: async (clothingData) => {
@@ -14,12 +14,4 @@ export const clothingService = {
  },
 
  getClothingDetails: async (id) => get(API_ENDPOINTS.CLOTHING.BY_ID(id)),
-
- findByBrandAndClothingType: async (brandId, clothingTypeId) => get(API_ENDPOINTS.CLOTHING.BY_BRAND_TYPE(brandId, clothingTypeId)),
-
- filterClothing: async (filters) => {
- const filterData = createClothingFilterRequest(filters);
- return post(API_ENDPOINTS.CLOTHING.FILTER, filterData);
- },
-
 };

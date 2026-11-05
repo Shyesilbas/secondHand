@@ -1,5 +1,5 @@
 import { Tag } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../../common/formatters.js';
 
 export default function AuraPriceAdvisorGauge({
   min,
@@ -9,7 +9,6 @@ export default function AuraPriceAdvisorGauge({
   currency = 'TRY',
   status = 'Good Deal'
 }) {
-  const { i18n } = useTranslation();
   const currentNum = Number(current);
   const minNum = Number(min);
   const maxNum = Number(max);
@@ -24,14 +23,7 @@ export default function AuraPriceAdvisorGauge({
   const currentPct = totalRange > 0 ? Math.min(Math.max(((currentNum - minNum) / totalRange) * 100, 0), 100) : 50;
   const avgPct = totalRange > 0 ? Math.min(Math.max(((avgNum - minNum) / totalRange) * 100, 0), 100) : 50;
 
-  // Format currencies
-  const formatPrice = (val) => {
-    return new Intl.NumberFormat(i18n?.language?.startsWith('tr') ? 'tr-TR' : 'en-US', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+  const formatPrice = (val) => formatCurrency(val, currency, { maximumFractionDigits: 0 });
 
   const isGoodDeal = status.toLowerCase().includes('good') || status.toLowerCase().includes('iyi') || status.toLowerCase().includes('fırsat');
   const isHigh = status.toLowerCase().includes('high') || status.toLowerCase().includes('yüksek') || status.toLowerCase().includes('pahalı');

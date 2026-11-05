@@ -6,10 +6,6 @@ export const agreementService = {
  return get(API_ENDPOINTS.AGREEMENTS.ALL);
  },
 
- getAgreementByType: async (agreementType) => {
- return get(API_ENDPOINTS.AGREEMENTS.BY_TYPE(agreementType));
- },
-
  getRequiredAgreementsForRegister: async () => {
  return get(`${API_ENDPOINTS.AGREEMENTS.REQUIRED}?agreementGroup=REGISTER`);
  },

@@ -61,31 +61,17 @@ export const formatCurrencyCompact = (value, currency = 'TRY') => {
  }
 };
 
-export const formatDateTime = (dateString, locale = 'tr-TR') => {
- if (!dateString) return '';
- const date = new Date(dateString);
- return date.toLocaleDateString(locale, {
- day: 'numeric',
- month: 'short',
- year: 'numeric',
- hour: '2-digit',
- minute: '2-digit',
- hour12: false,
- timeZone: 'Europe/Istanbul'
- });
-};
-
-export const formatDate = (dateString) => {
- if (!dateString) return '';
- 
- if (typeof dateString === 'string' && dateString.includes('/')) {
- const [day, month, year] = dateString.split('/');
- const date = new Date(year, month - 1, day); return date.toLocaleDateString('tr-TR');
- }
- 
- const date = new Date(dateString);
- return date.toLocaleDateString('tr-TR');
-};
+export {
+ formatDate,
+ formatDateTime,
+ formatShortDate,
+ formatShortDateTime,
+ formatLongDate,
+ formatMonthYear,
+ formatSmartEmailDate,
+ formatBirthdateInput,
+ formatRelativeTime,
+} from './utils/dateFormat.js';
 
 export const cleanObject = (obj) => {
  return Object.entries(obj || {}).reduce((acc, [key, value]) => {

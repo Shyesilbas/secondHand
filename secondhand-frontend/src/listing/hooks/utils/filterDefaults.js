@@ -5,7 +5,7 @@ import { LISTING_DEFAULTS } from '../../types/index.js';
 /**
  * Builds default filter values from listing config fields
  */
-export const buildDefaultsFromFilterConfig = (config) => {
+const buildDefaultsFromFilterConfig = (config) => {
  const fields = config?.getFields?.() || [];
  const defaults = {};
 

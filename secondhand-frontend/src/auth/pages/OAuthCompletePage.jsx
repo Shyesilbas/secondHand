@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight as ArrowRightIcon, Calendar as CalendarIcon, Phone as PhoneIcon } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useAuth } from '../AuthContext.jsx';
@@ -11,11 +11,19 @@ import AuthButton from '../../common/components/ui/AuthButton.jsx';
 import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
 import { formatBirthdateInput } from '../../common/utils/dateFormat.js';
 import { formatPhoneNumber } from '../../common/utils/phoneFormatter.js';
+import { useRegisterAgreements } from '../../agreements/hooks/useRegisterAgreements.js';
+import AgreementsSection from '../../agreements/components/AgreementsSection.jsx';
+import AgreementModal from '../../agreements/components/AgreementModal.jsx';
+
+// The backend puts the token in the URL fragment so it never reaches server logs or Referer headers.
+const readRegistrationTokenFromHash = () => {
+ const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash;
+ return new URLSearchParams(hash).get('registrationToken') || '';
+};
 const OAuthCompletePage = () => {
  const {
  t
  } = useTranslation();
- const [params] = useSearchParams();
  const navigate = useNavigate();
  const {
  login
@@ -31,7 +39,23 @@ const OAuthCompletePage = () => {
  });
  const [submitting, setSubmitting] = useState(false);
  const [errors, setErrors] = useState({});
- const registrationToken = params.get('registrationToken') || '';
+ const [registrationToken] = useState(readRegistrationTokenFromHash);
+ const {
+ agreements,
+ agreementsLoading,
+ acceptedAgreements,
+ selectedAgreement,
+ showAgreementModal,
+ handleAgreementToggle,
+ handleAgreementClick,
+ handleCloseModal
+ } = useRegisterAgreements();
+
+ useEffect(() => {
+ if (window.location.hash) {
+ window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+ }
+ }, []);
 
  const tokenClaims = useMemo(() => {
  if (!registrationToken) return {};
@@ -53,11 +77,11 @@ const OAuthCompletePage = () => {
 
  const baseInfo = useMemo(() => ({
  registrationToken,
- email: tokenClaims.email || params.get('email') || '',
- name: tokenClaims.name || params.get('name') || '',
- surname: tokenClaims.surname || params.get('surname') || '',
- picture: tokenClaims.picture || params.get('picture') || ''
- }), [registrationToken, tokenClaims, params]);
+ email: tokenClaims.email || '',
+ name: tokenClaims.name || '',
+ surname: tokenClaims.surname || '',
+ picture: tokenClaims.picture || ''
+ }), [registrationToken, tokenClaims]);
  const initials = [baseInfo.name?.[0], baseInfo.surname?.[0]].filter(Boolean).join('').toUpperCase();
  const handleChange = e => {
  const {
@@ -84,6 +108,9 @@ const OAuthCompletePage = () => {
  if (!form.phone.trim()) next.phone = 'Phone number is required';
  if (!form.gender) next.gender = 'Gender is required';
  if (!form.birthdate.trim()) next.birthdate = 'Birth date is required';
+ if (agreementsLoading || agreements.some(a => !acceptedAgreements.has(a.agreementId))) {
+ next.agreements = t("you_must_accept_all_agreements_below_to_");
+ }
  setErrors(next);
  return Object.keys(next).length === 0;
  };
@@ -111,7 +138,8 @@ const OAuthCompletePage = () => {
  email: baseInfo.email,
  phoneNumber: form.phone,
  gender: form.gender,
- birthdate: form.birthdate
+ birthdate: form.birthdate,
+ acceptedAgreementIds: Array.from(acceptedAgreements)
  };
  const loginResponse = await authService.completeOAuth(payload);
  await login(loginResponse);
@@ -199,10 +227,22 @@ const OAuthCompletePage = () => {
  </div>
  </div>
 
+ <div className="border-t border-border-light pt-4">
+ <AgreementsSection agreements={agreements} acceptedAgreements={acceptedAgreements} onToggle={id => {
+ handleAgreementToggle(id);
+ if (errors.agreements) setErrors(prev => ({
+ ...prev,
+ agreements: ''
+ }));
+ }} onRead={handleAgreementClick} error={errors.agreements} />
+ </div>
+
  <AuthButton type="submit" isLoading={submitting} size="lg" className="rounded mt-1" rightIcon={!submitting ? <ArrowRightIcon className="h-4 w-4" /> : null}>
  {submitting ? 'Saving...' : 'Save and Continue'}
  </AuthButton>
  </form>
+
+ <AgreementModal agreement={selectedAgreement} open={showAgreementModal} onClose={handleCloseModal} />
  </div>;
 };
 export default OAuthCompletePage;

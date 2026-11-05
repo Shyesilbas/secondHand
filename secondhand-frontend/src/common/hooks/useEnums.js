@@ -6,10 +6,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const NO_ENUMS = {};
 
 // The backend returns every enum in one flat object; React Query caches it app-wide.
-export const useEnums = () => {
+export const useEnums = (options = {}) => {
+ const enabled = options.enabled ?? true;
  const { data: enums = NO_ENUMS, isLoading, error } = useQuery({
  queryKey: ['enums'],
  queryFn: enumService.getAllEnums,
+ enabled,
  staleTime: DAY_MS,
  gcTime: DAY_MS,
  refetchOnWindowFocus: false,

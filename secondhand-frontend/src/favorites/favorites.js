@@ -1,6 +1,6 @@
 
 
-export const FavoriteRequestDTO = {
+const FavoriteRequestDTO = {
  listingId: '',
 };
 

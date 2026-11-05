@@ -1,6 +1,6 @@
 import { FilterConfig } from './FilterConfig';
 
-export const createVehicleFilterConfig = () => {
+const createVehicleFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('vehicleTypeIds', 'Vehicle Type', 'vehicleTypes', { displayAs: 'chips' })
  .addEnumField('brandIds', 'Brand', 'carBrands')
@@ -42,7 +42,7 @@ const getSelectedTypeNames = (filters, enums) => {
  return matchedNames;
 };
 
-export const createElectronicsFilterConfig = () => {
+const createElectronicsFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('electronicTypeIds', 'Type / Cihaz Tipi', 'electronicTypes', { displayAs: 'chips' })
  .addEnumField('electronicBrandIds', 'Brand / Marka', 'electronicBrands')
@@ -160,7 +160,7 @@ export const createElectronicsFilterConfig = () => {
  .addBooleanField('hasInvoice', 'Has Invoice / Faturalı');
 };
 
-export const createRealEstateFilterConfig = () => {
+const createRealEstateFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('realEstateTypeIds', 'Property Type / Mülk Tipi', 'realEstateTypes', { displayAs: 'chips', multiple: true })
  .addEnumField('adTypeId', 'Ad Type / İlan Tipi', 'realEstateAdTypes', { multiple: false })
@@ -175,7 +175,7 @@ export const createRealEstateFilterConfig = () => {
  .addTextField('zoningStatus', 'Zoning Status / İmar Durumu', { placeholder: 'e.g. Konut İmarlı, Ticari' });
 };
 
-export const createClothingFilterConfig = () => {
+const createClothingFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('types', 'Type / Giyim Türü', 'clothingTypes', { displayAs: 'chips', multiple: true })
  .addEnumField('clothingGenders', 'Gender / Cinsiyet', 'clothingGenders', { displayAs: 'chips', multiple: true })
@@ -188,7 +188,7 @@ export const createClothingFilterConfig = () => {
  .addTextField('material', 'Material / Kumaş', { placeholder: 'Örn: Pamuk, Deri, Keten' });
 };
 
-export const createBooksFilterConfig = () => {
+const createBooksFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('bookTypeIds', 'Type / Kitap Türü', 'bookTypes', { displayAs: 'chips', multiple: true })
  .addEnumField('genreIds', 'Genre / Alt Tür & Konu', 'bookGenres')
@@ -199,7 +199,7 @@ export const createBooksFilterConfig = () => {
  .addNumericRangeField('pageCount', 'Page Count / Sayfa Sayısı', { min: 1, placeholder: '250' });
 };
 
-export const createSportsFilterConfig = () => {
+const createSportsFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('disciplineIds', 'Discipline', 'sportDisciplines')
  .addEnumField('equipmentTypeIds', 'Equipment Type', 'sportEquipmentTypes')

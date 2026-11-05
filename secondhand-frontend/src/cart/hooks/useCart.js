@@ -15,7 +15,9 @@ export const useCart = (options = {}) => {
 
  const syncCartCount = (nextCount) => {
  const safeCount = Math.max(0, Number(nextCount) || 0);
- cacheService.set('cartCount', safeCount.toString());
+ const nextRaw = safeCount.toString();
+ if (cacheService.get('cartCount') === nextRaw) return;
+ cacheService.set('cartCount', nextRaw);
  window.dispatchEvent(new CustomEvent('cartCountChanged', { detail: safeCount }));
  };
 

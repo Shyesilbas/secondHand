@@ -28,10 +28,6 @@ export const chatService = {
  return put(API_ENDPOINTS.CHAT.MARK_READ(chatRoomId));
  },
 
- getTotalUnreadMessageCount: async () => {
- return get(API_ENDPOINTS.CHAT.TOTAL_UNREAD_COUNT);
- },
-
  deleteConversation: async (chatRoomId) => {
  return del(API_ENDPOINTS.CHAT.DELETE_CONVERSATION(chatRoomId));
  },

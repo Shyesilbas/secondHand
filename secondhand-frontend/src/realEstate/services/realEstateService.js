@@ -14,8 +14,4 @@ export const realEstateService = {
  },
 
  getRealEstateById: async (id) => get(API_ENDPOINTS.REAL_ESTATES.BY_ID(id)),
-
- filterRealEstates: async (filters) => {
- return post(API_ENDPOINTS.REAL_ESTATES.FILTER, filters);
- },
 };

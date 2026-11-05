@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UpdatePhoneRequestDTO } from '../users.js';
 import { formatPhoneForDisplay } from '../../common/utils/phoneFormatter.js';
-import { formatDate as formatDateShared } from '../../common/formatters.js';
+import { formatDate } from '../../common/formatters.js';
 import PhoneUpdateModal from '../../common/components/modals/PhoneUpdateModal.jsx';
 import { Pencil } from 'lucide-react';
 
@@ -18,8 +18,6 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate, isUpdatingPhone }) => {
       setPhoneFormData({ ...UpdatePhoneRequestDTO });
     }
   };
-
-  const formatDate = (dateString) => formatDateShared(dateString) || t('not_provided', 'Belirtilmedi');
 
   const getGenderLabel = (g) => {
     if (!g) return t('not_specified', 'Belirtilmedi');
@@ -56,11 +54,11 @@ const ProfilePersonalInfo = ({ user, onPhoneUpdate, isUpdatingPhone }) => {
     },
     {
       label: t('birth_date', 'Doğum Tarihi'),
-      value: formatDate(user?.birthdate)
+      value: formatDate(user?.birthdate) || t('not_provided', 'Belirtilmedi')
     },
     {
       label: t('member_since', 'Üyelik Tarihi'),
-      value: formatDate(user?.accountCreationDate)
+      value: formatDate(user?.accountCreationDate) || t('not_provided', 'Belirtilmedi')
     }
   ];
 

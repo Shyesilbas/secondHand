@@ -10,7 +10,6 @@ import { UserDTO } from '../user/users.js';
 import logger from '../common/utils/logger.js';
 import { AuthContext } from './AuthContext.jsx';
 import { setAuthContextRef } from '../common/services/api/interceptors.js';
-import { decodeJwtPayload } from '../common/utils/jwtDecode.js';
 
 export const AuthProvider = ({ children }) => {
  const queryClient = useQueryClient();
@@ -72,17 +71,10 @@ export const AuthProvider = ({ children }) => {
  }, []);
 
  const login = useCallback(async (loginResponse) => {
- const { userId, email, accessToken } = loginResponse;
-
- let plan = 'FREE';
- let planExpiry = null;
- if (accessToken) {
- const decoded = decodeJwtPayload(accessToken);
- if (decoded) {
- plan = decoded.plan || 'FREE';
- planExpiry = decoded.planExpiry || null;
- }
- }
+ // Tokens live only in httpOnly cookies; the body carries the plan fields.
+ const { userId, email } = loginResponse;
+ const plan = loginResponse.plan || 'FREE';
+ const planExpiry = loginResponse.planExpiry || null;
 
  try {
  const userProfile = await authService.getCurrentUser();
@@ -118,11 +110,12 @@ export const AuthProvider = ({ children }) => {
  // Ignore error since backend logout might fail if token is already expired
  } finally {
  clearUser();
+ queryClient.clear();
  setAuthState({ user: null, isAuthenticated: false, isLoading: false });
  isAuthInitialized.current = false;
  isAuthInitializing.current = false;
  }
- }, []);
+ }, [queryClient]);
 
  const updateUser = useCallback((updatedUserData) => {
  setAuthState(prev => {
@@ -134,18 +127,16 @@ export const AuthProvider = ({ children }) => {
 
  const handleTokenRefreshFailure = useCallback(() => {
  clearUser();
+ queryClient.clear();
  setAuthState({ user: null, isAuthenticated: false, isLoading: false });
  isAuthInitialized.current = false;
  isAuthInitializing.current = false;
- }, []);
+ }, [queryClient]);
 
- const handleTokenRefreshSuccess = useCallback((newAccessToken) => {
- if (!newAccessToken) return;
- try {
- const decoded = decodeJwtPayload(newAccessToken);
- if (decoded) {
- const plan = decoded.plan || 'FREE';
- const planExpiry = decoded.planExpiry || null;
+ const handleTokenRefreshSuccess = useCallback((refreshResponse) => {
+ if (!refreshResponse) return;
+ const plan = refreshResponse.plan || 'FREE';
+ const planExpiry = refreshResponse.planExpiry || null;
  setAuthState(prev => {
  if (!prev.user) return prev;
  const newUserData = { ...prev.user, plan, planExpiry };
@@ -153,10 +144,6 @@ export const AuthProvider = ({ children }) => {
  return { ...prev, user: newUserData };
  });
  queryClient.invalidateQueries({ queryKey: ['membership'] });
- }
- } catch (error) {
- logger.error('Failed to decode refreshed token:', error);
- }
  }, [queryClient]);
 
  const value = useMemo(() => ({

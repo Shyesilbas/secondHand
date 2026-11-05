@@ -69,7 +69,7 @@ export const enginesForGeneration = (enums, generationId) =>
 export const trimsForGeneration = (enums, generationId) =>
 	(enums?.vehicleTrims || []).filter((t) => normalizeId(t?.generationId) === normalizeId(generationId));
 
-export const modelHasGenerations = (enums, modelId) => generationsForModel(enums, modelId).length > 0;
+const modelHasGenerations = (enums, modelId) => generationsForModel(enums, modelId).length > 0;
 
 export const showGenerationFields = (ctx) => {
 	const modelId = ctx?.formData?.vehicleModelId ?? ctx?.selection?.vehicleModelId;
@@ -89,7 +89,7 @@ export const showTrimFields = (ctx) => {
 	return trimsForGeneration(ctx?.enums, genId).length > 0;
 };
 
-export const supportedBodyTypesForBrand = (enums, brandId) => {
+const supportedBodyTypesForBrand = (enums, brandId) => {
 	const supported = new Set();
 	filterModels(enums?.vehicleModels || [], { brandId }).forEach((m) => {
 		(m?.supportedBodyTypes || []).forEach((bt) => supported.add(String(bt).toUpperCase()));

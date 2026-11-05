@@ -1,3 +1,5 @@
+import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+
 export const RealEstateCreateRequestDTO = {
 	title: '',
 	description: '',
@@ -25,19 +27,7 @@ export const RealEstateCreateRequestDTO = {
 
 export const createRealEstateCreateRequest = (data) => {
 	return {
-		base: {
-			title: (data.title || '').trim(),
-			description: (data.description || '').trim(),
-			price: parseFloat(data.price) || 0,
-			currency: data.currency || 'TRY',
-			city: (data.city || '').trim(),
-			district: (data.district || '').trim(),
-			cityKey: data.cityKey || '',
-			districtKey: data.districtKey || '',
-			neighborhoodKey: data.neighborhoodKey || undefined,
-			imageUrl: data.imageUrl || undefined,
-			allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
-		},
+		base: createListingBaseCreatePayload(data),
 
 		adTypeId: data.adTypeId || null,
 		realEstateTypeId: data.realEstateTypeId || null,
@@ -58,17 +48,7 @@ export const createRealEstateCreateRequest = (data) => {
 export const createRealEstateUpdateRequest = (data) => {
 	const updateData = {};
 
-	const base = {};
-	if (data.title !== undefined && data.title !== '') base.title = data.title.trim();
-	if (data.description !== undefined && data.description !== '') base.description = data.description.trim();
-	if (data.price !== undefined && data.price !== '') base.price = parseFloat(data.price);
-	if (data.currency !== undefined && data.currency !== '') base.currency = data.currency;
-	if (data.city !== undefined && data.city !== '') base.city = data.city.trim();
-	if (data.district !== undefined && data.district !== '') base.district = data.district.trim();
-	if (data.cityKey !== undefined) base.cityKey = data.cityKey;
-	if (data.districtKey !== undefined) base.districtKey = data.districtKey;
-	if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
-	if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
+	const base = createListingBaseUpdatePayload(data);
 	if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
 	if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
 	if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;
@@ -79,7 +59,6 @@ export const createRealEstateUpdateRequest = (data) => {
 	if (data.floor !== undefined && data.floor !== '') updateData.floor = parseInt(data.floor);
 	if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
 	if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
-	if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
 	if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
 	if (data.zoningStatusKey !== undefined && data.zoningStatusKey !== '') updateData.zoningStatusKey = data.zoningStatusKey.trim();
 	if (data.roomConfigKey !== undefined && data.roomConfigKey !== '') updateData.roomConfigKey = data.roomConfigKey.trim();

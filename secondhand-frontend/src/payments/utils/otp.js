@@ -28,7 +28,7 @@ const CODE_AFTER_LABEL_RE =
 /**
  * Strip tags and collapse whitespace for regex scan (no DOM).
  */
-export const normalizeOtpScanText = (raw) => {
+const normalizeOtpScanText = (raw) => {
  if (raw == null || typeof raw !== 'string') return '';
  let t = raw
  .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '')
@@ -44,7 +44,7 @@ export const normalizeOtpScanText = (raw) => {
  return t;
 };
 
-export const extractSixDigitFromNormalizedText = (normalizedText) => {
+const extractSixDigitFromNormalizedText = (normalizedText) => {
  if (!normalizedText) return null;
  const m2 = normalizedText.match(CODE_AFTER_LABEL_RE);
  if (m2?.[1] && m2[1].length === OTP_CODE_LENGTH) return m2[1];

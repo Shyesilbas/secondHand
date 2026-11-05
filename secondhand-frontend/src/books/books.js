@@ -1,18 +1,8 @@
 
+import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+
 export const createBooksCreateRequest = (data) => ({
- base: {
- title: (data.title || '').trim(),
- description: (data.description || '').trim(),
- price: data.price,
- currency: data.currency || 'TRY',
- city: (data.city || '').trim(),
- district: (data.district || '').trim(),
- cityKey: data.cityKey || '',
- districtKey: data.districtKey || '',
- neighborhoodKey: data.neighborhoodKey || undefined,
- imageUrl: data.imageUrl || undefined,
- allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
- },
+ base: createListingBaseCreatePayload(data),
  quantity: parseInt(data.quantity) || 1,
  author: (data.author || '').trim(),
  bookTypeId: data.bookTypeId,
@@ -27,18 +17,7 @@ export const createBooksCreateRequest = (data) => ({
 
 export const createBooksUpdateRequest = (data) => {
  const updateData = {};
- const base = {};
- if (data.title !== undefined) base.title = data.title;
- if (data.description !== undefined) base.description = data.description;
- if (data.price !== undefined) base.price = data.price;
- if (data.currency !== undefined) base.currency = data.currency;
- if (data.city !== undefined) base.city = data.city;
- if (data.district !== undefined) base.district = data.district;
- if (data.cityKey !== undefined) base.cityKey = data.cityKey;
- if (data.districtKey !== undefined) base.districtKey = data.districtKey;
- if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
- if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl;
- if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
+ const base = createListingBaseUpdatePayload(data);
  if (Object.keys(base).length > 0) updateData.base = base;
 
  updateData.quantity = data.quantity !== undefined && data.quantity !== '' ? parseInt(data.quantity) : undefined;
@@ -53,28 +32,4 @@ export const createBooksUpdateRequest = (data) => {
  updateData.isbn = data.isbn ?? undefined;
  return updateData;
 };
-
-export const createBooksFilterRequest = (data) => ({
- type: 'BOOKS',
- listingType: 'BOOKS',
- status: data.status || 'ACTIVE',
- city: data.city?.trim() || '',
- district: data.district?.trim() || '',
- minPrice: parseFloat(data.minPrice) || null,
- maxPrice: parseFloat(data.maxPrice) || null,
- currency: data.currency || 'TRY',
- bookTypeIds: Array.isArray(data.bookTypeIds) ? data.bookTypeIds : [],
- genreIds: Array.isArray(data.genreIds) ? data.genreIds : [],
- languageIds: Array.isArray(data.languageIds) ? data.languageIds : [],
- formatIds: Array.isArray(data.formatIds) ? data.formatIds : [],
- conditionIds: Array.isArray(data.conditionIds) ? data.conditionIds : [],
- minYear: parseInt(data.minYear) || null,
- maxYear: parseInt(data.maxYear) || null,
- minPageCount: parseInt(data.minPageCount) || null,
- maxPageCount: parseInt(data.maxPageCount) || null,
- sortBy: data.sortBy || 'createdAt',
- sortDirection: data.sortDirection || 'DESC',
- page: parseInt(data.page) || 0,
- size: parseInt(data.size) || 20,
-});
 

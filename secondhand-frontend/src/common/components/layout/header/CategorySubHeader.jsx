@@ -218,8 +218,8 @@ const dedupeItems = (items) => {
 const CategorySubHeader = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { enums } = useEnums();
   const [activeCategory, setActiveCategory] = useState(null);
+  const { enums } = useEnums({ enabled: Boolean(activeCategory) });
 
   // Cascading step selections per active category
   const [selectedPropertyCat, setSelectedPropertyCat] = useState(null);
@@ -395,26 +395,14 @@ const CategorySubHeader = () => {
     const queryParams = new URLSearchParams();
     queryParams.set('category', currentCatConfig.id);
 
-    if (currentCatConfig.id === 'REAL_ESTATE') {
-      if (overrideType && currentCatConfig.typeParamKey) {
-        queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
-      }
-      if (overrideBrand && currentCatConfig.brandParamKey) {
-        queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
-      }
-      if (overrideModel && currentCatConfig.modelParamKey) {
-        queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
-      }
-    } else {
-      if (overrideType && currentCatConfig.typeParamKey) {
-        queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
-      }
-      if (overrideBrand && currentCatConfig.brandParamKey) {
-        queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
-      }
-      if (overrideModel && currentCatConfig.modelParamKey) {
-        queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
-      }
+    if (overrideType && currentCatConfig.typeParamKey) {
+      queryParams.set(currentCatConfig.typeParamKey, overrideType.id);
+    }
+    if (overrideBrand && currentCatConfig.brandParamKey) {
+      queryParams.set(currentCatConfig.brandParamKey, overrideBrand.id);
+    }
+    if (overrideModel && currentCatConfig.modelParamKey) {
+      queryParams.set(currentCatConfig.modelParamKey, overrideModel.id);
     }
 
     navigate(`${ROUTES.LISTINGS}?${queryParams.toString()}`);
@@ -748,7 +736,7 @@ const CategorySubHeader = () => {
                                 setSelectedModel(null);
                               } else {
                                 setSelectedModel(item);
-                                executeSearch(selectedPropertyCat, selectedType, selectedBrand, item);
+                                executeSearch(selectedType, selectedBrand, item);
                               }
                             }
                           }}
@@ -794,7 +782,7 @@ const CategorySubHeader = () => {
                                 setSelectedModel(null);
                               } else {
                                 setSelectedModel(item);
-                                executeSearch(selectedPropertyCat, selectedType, selectedBrand, item);
+                                executeSearch(selectedType, selectedBrand, item);
                               }
                             }}
                             className={`w-full text-left px-3 py-2 rounded text-sm font-medium transition-colors flex items-center justify-between group cursor-pointer ${

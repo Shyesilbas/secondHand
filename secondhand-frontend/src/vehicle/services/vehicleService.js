@@ -1,6 +1,5 @@
 import { get, post, put } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
-import { listingService } from '../../listing/services/listingService.js';
 import { createVehicleCreateRequest, createVehicleUpdateRequest } from '../vehicles.js';
 
 export const vehicleService = {
@@ -15,13 +14,4 @@ export const vehicleService = {
  },
 
  getVehicleById: async (id) => get(API_ENDPOINTS.VEHICLES.BY_ID(id)),
-
-
-
- findVehiclesByBrandAndModel: async (brand, model) => get(API_ENDPOINTS.VEHICLES.BY_BRAND_MODEL(brand, model)),
-
- getCarBrands: async () => get(API_ENDPOINTS.VEHICLES.BRANDS),
-
- searchVehicles: async (filters) =>
- listingService.filterListings({ ...filters, listingType: 'VEHICLE' }),
 };

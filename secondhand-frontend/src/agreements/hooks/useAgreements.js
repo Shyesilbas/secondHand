@@ -20,7 +20,7 @@ export const useAgreements = (options = {}) => {
  queryFn: agreementService.getAllAgreements,
  enabled: options.enabled ?? true,
  staleTime: 60 * 60 * 1000, // 1 hour
- cacheTime: 2 * 60 * 60 * 1000, // 2 hours
+ gcTime: 2 * 60 * 60 * 1000, // 2 hours
  refetchOnWindowFocus: false,
  refetchOnMount: false,
  refetchInterval: false,
@@ -48,7 +48,7 @@ export const useUserAgreements = () => {
  queryFn: agreementService.getUserAgreements,
  enabled: !!(isAuthenticated && user?.id),
  staleTime: 30 * 60 * 1000,
- cacheTime: 60 * 60 * 1000,
+ gcTime: 60 * 60 * 1000,
  refetchOnWindowFocus: false,
  refetchOnMount: false,
  retry: 1,
@@ -62,7 +62,8 @@ export const useUserAgreements = () => {
  };
 };
 
-export const useRequiredAgreements = (group) => {
+export const useRequiredAgreements = (group, options = {}) => {
+ const enabled = options.enabled ?? true;
  const {
  data: requiredAgreements = [],
  isLoading,
@@ -75,7 +76,7 @@ export const useRequiredAgreements = (group) => {
  if (group === 'ONLINE_PAYMENT') return agreementService.getRequiredAgreementsForPayment();
  return [];
  },
- enabled: !!group,
+ enabled: Boolean(group) && enabled,
  staleTime: 60 * 60 * 1000, // 1 hour
  gcTime: 2 * 60 * 60 * 1000, // 2 hours
  refetchOnWindowFocus: false,

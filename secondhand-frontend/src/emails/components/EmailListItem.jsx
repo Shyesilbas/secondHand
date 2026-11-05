@@ -1,34 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { formatDateTime } from '../../common/formatters.js';
+import { formatDateTime, formatSmartEmailDate } from '../../common/formatters.js';
 import { Trash2 } from 'lucide-react';
 import { EMAIL_TYPE_LABELS, extractEmailPreview, stripEmailEmojis } from '../emails.js';
-
-const formatShortDate = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const d = new Date(dateString);
-    if (Number.isNaN(d.getTime())) return formatDateTime(dateString);
-    const now = new Date();
-    const sameDay =
-      d.getFullYear() === now.getFullYear() &&
-      d.getMonth() === now.getMonth() &&
-      d.getDate() === now.getDate();
-    if (sameDay) {
-      return d.toLocaleTimeString('tr-TR', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-    const sameYear = d.getFullYear() === now.getFullYear();
-    return d.toLocaleDateString('tr-TR', {
-      day: 'numeric',
-      month: 'short',
-      ...(sameYear ? {} : { year: 'numeric' })
-    });
-  } catch {
-    return formatDateTime(dateString);
-  }
-};
 
 const EmailListItem = ({
   email,
@@ -88,7 +61,7 @@ const EmailListItem = ({
               isUnread ? 'font-semibold text-text-primary' : 'font-normal text-text-muted'
             }`}
           >
-            {formatShortDate(email.sentAt)}
+            {formatSmartEmailDate(email.sentAt) || formatDateTime(email.sentAt)}
           </time>
           <button
             type="button"

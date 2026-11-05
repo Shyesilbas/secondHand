@@ -29,7 +29,7 @@ export const PAYMENT_FLOW_DEFAULTS = Object.freeze({
 /**
  * İstatistik API alan adı sapmalarına karşı tek yerden okuma (PaymentsPage vb.)
  */
-export const PAYMENT_STATISTICS_FIELD_KEYS = Object.freeze({
+const PAYMENT_STATISTICS_FIELD_KEYS = Object.freeze({
  totalVolume: ['totalAmount', 'totalVolume', 'total'],
  incomingVolume: ['incomingAmount', 'totalIncomingAmount', 'incomingTotal'],
  outgoingVolume: ['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'],

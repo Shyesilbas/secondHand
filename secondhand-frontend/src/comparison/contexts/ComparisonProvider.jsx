@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import logger from '../../common/utils/logger.js';
 import { ComparisonContext } from './ComparisonContext.jsx';
 import { cacheService } from '../../common/services/cacheService.js';
@@ -30,15 +30,10 @@ const saveToStorage = (items) => {
 };
 
 export const ComparisonProvider = ({ children }) => {
- const [items, setItems] = useState([]);
- const [category, setCategory] = useState(null);
+ const [initialStorage] = useState(loadFromStorage);
+ const [items, setItems] = useState(initialStorage.items);
+ const [category, setCategory] = useState(initialStorage.category);
  const [isModalOpen, setIsModalOpen] = useState(false);
-
- useEffect(() => {
- const { items: storedItems, category: storedCategory } = loadFromStorage();
- setItems(storedItems);
- setCategory(storedCategory);
- }, []);
 
  useEffect(() => {
  saveToStorage(items);
@@ -117,7 +112,7 @@ export const ComparisonProvider = ({ children }) => {
  setIsModalOpen(false);
  }, []);
 
- const value = {
+ const value = useMemo(() => ({
  items,
  category,
  itemCount: items.length,
@@ -130,7 +125,18 @@ export const ComparisonProvider = ({ children }) => {
  canAddToComparison,
  openModal,
  closeModal
- };
+ }), [
+ items,
+ category,
+ isModalOpen,
+ addToComparison,
+ removeFromComparison,
+ clearComparison,
+ isInComparison,
+ canAddToComparison,
+ openModal,
+ closeModal
+ ]);
 
  return (
  <ComparisonContext.Provider value={value}>

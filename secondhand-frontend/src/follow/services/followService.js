@@ -14,22 +14,6 @@ export const followService = {
  return patch(API_ENDPOINTS.FOLLOW.TOGGLE_NOTIFICATIONS(userId));
  },
 
- getFollowing: async (params = {}) => {
- const query = new URLSearchParams({
- page: params.page ?? 0,
- size: params.size ?? 20,
- }).toString();
- return get(`${API_ENDPOINTS.FOLLOW.FOLLOWING}?${query}`);
- },
-
- getFollowers: async (params = {}) => {
- const query = new URLSearchParams({
- page: params.page ?? 0,
- size: params.size ?? 20,
- }).toString();
- return get(`${API_ENDPOINTS.FOLLOW.FOLLOWERS}?${query}`);
- },
-
  getFollowStats: async (userId) => {
  return get(API_ENDPOINTS.FOLLOW.STATS(userId));
  },

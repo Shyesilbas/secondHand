@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import Modal from '../../common/components/ui/Modal.jsx';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { Link } from 'react-router-dom';
@@ -9,10 +9,11 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { LISTING_STATUS } from '../types/index.js';
 import ExchangeRatesTab from './ExchangeRatesTab.jsx';
 import ViewStatisticsCard from './ViewStatisticsCard.jsx';
-import PriceHistoryTab from './PriceHistoryTab.jsx';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
 import { MapPin, Hash, ExternalLink, TrendingUp, RefreshCw, Eye, Image as ImageIcon, Zap, ShieldCheck, Star } from 'lucide-react';
+
+const PriceHistoryTab = lazy(() => import('./PriceHistoryTab.jsx'));
 
 const INSIGHT_TABS = [{
  id: 'history',
@@ -248,7 +249,9 @@ const ListingInfoModal = ({
  {/* Chart Content Area (Borderless) */}
  <div className="mt-4 flex-1 min-h-64 bg-background-primary rounded border border-border-light p-4 sm:p-5">
  {activeInsight === 'history' && (
+ <Suspense fallback={null}>
  <PriceHistoryTab priceHistory={priceHistory} loading={historyLoading} error={historyError} currency={currency} />
+ </Suspense>
  )}
  {activeInsight === 'exchange' && (
  <ExchangeRatesTab key={`${listingId}-${currency}-${price}`} price={price} currency={currency} />

@@ -63,9 +63,9 @@ const ShowcaseModal = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useAuthState();
-  const { plan, maxShowcaseSlots } = usePlan();
-  const { showcases, isLoading: isCheckingLimit, refresh: refreshShowcases } = useMyShowcases(user?.id);
-  const { eWallet, refreshWallet } = useEWallet();
+  const { plan, maxShowcaseSlots } = usePlan({ enabled: isOpen });
+  const { showcases, isLoading: isCheckingLimit, refresh: refreshShowcases } = useMyShowcases(user?.id, { enabled: isOpen });
+  const { eWallet, refreshWallet } = useEWallet({ enabled: isOpen });
   const { emails, fetchEmails } = useEmails();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -87,7 +87,7 @@ const ShowcaseModal = ({
   );
   const limitExceeded = !isExtension && activeShowcaseCount >= maxShowcaseSlots;
 
-  const { enums } = useEnums();
+  const { enums } = useEnums({ enabled: isOpen });
   const {
     acceptedAgreements,
     onAgreementToggle,
@@ -499,11 +499,13 @@ const ShowcaseModal = ({
           listingImage={listing?.images?.[0] || null}
         />
       )}
-      <PremiumUpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureHint={upgradeHint}
-      />
+      {showUpgradeModal && (
+        <PremiumUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          featureHint={upgradeHint}
+        />
+      )}
     </>
   );
 

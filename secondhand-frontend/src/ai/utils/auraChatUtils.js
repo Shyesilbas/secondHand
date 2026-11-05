@@ -1,4 +1,6 @@
 import { cacheService } from '../../common/services/cacheService.js';
+import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
+import { aiChatService } from '../services/aiChatService.js';
 
 export const getAuraChatStorageKey = (userId) =>
  userId != null ? `aura.chat.started.${userId}` : 'aura.chat.started.anonymous';
@@ -7,7 +9,7 @@ export const getAuraChatStorageKey = (userId) =>
 export const getAuraChatMessagesStorageKey = (userId, surface) =>
  userId != null ? `aura.chat.messages.${surface}.${userId}` : `aura.chat.messages.${surface}.anonymous`;
 
-export const clearAuraPersistedMessages = (userId, surface) => {
+const clearAuraPersistedMessages = (userId, surface) => {
  try {
  cacheService.remove(getAuraChatMessagesStorageKey(userId, surface));
  } catch {
@@ -34,3 +36,37 @@ export const createChatMessage = ({ role, content, typing = false, meta = undefi
  meta,
  createdAt: Date.now(),
 });
+
+export const sendAuraRequest = async ({ payload, agentMode, fallbackToChat = false, onLimitExceeded }) => {
+ const message = typeof payload === 'object' && payload != null ? payload.message : payload;
+ const context = typeof payload === 'object' && payload != null ? payload.context : undefined;
+ const uiContext = typeof payload === 'object' && payload != null ? payload.uiContext : undefined;
+
+ try {
+ if (AI_AGENT_MODE_ENABLED && agentMode) {
+ try {
+ return await aiChatService.agentQuery({
+ message,
+ context,
+ uiContext,
+ agentMode: true,
+ });
+ } catch (agentErr) {
+ if (!fallbackToChat) throw agentErr;
+ return await aiChatService.chat({
+ message,
+ context,
+ });
+ }
+ }
+ return await aiChatService.chat({
+ message,
+ context,
+ });
+ } catch (error) {
+ if (error.response?.data?.error === 'AURA_DAILY_LIMIT_EXCEEDED' || error.errorCode === 'AURA_LIMIT_EXCEEDED') {
+ onLimitExceeded?.();
+ }
+ throw error;
+ }
+};

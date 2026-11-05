@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ComplaintReason } from '../types/complaintTypes.js';
-import { formatDate as formatDateCommon } from '../../common/formatters.js';
+import { formatDate } from '../../common/formatters.js';
 const COMPLAINT_REASONS = {
  [ComplaintReason.INAPPROPRIATE_CONTENT]: 'Inappropriate Content',
  [ComplaintReason.HARASSMENT]: 'Harassment',
@@ -19,17 +19,13 @@ const ComplaintCard = ({
  if (!complaint) return null;
  const getReasonLabel = reason => COMPLAINT_REASONS[reason] || reason || 'UNKNOWN REASON';
  const getStatusText = resolvedAt => resolvedAt ? 'Resolved' : 'Under Review';
- const formatDate = dateString => {
- const formatted = formatDateCommon(dateString);
- return formatted || 'N/A';
- };
  return <div className="relative flex h-full overflow-hidden rounded border border-border bg-background-primary">
  <div className="px-6 pt-5 pb-5 flex-1">
  <div className="flex items-start justify-between">
  <div className="flex items-center gap-3">
  <div>
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("complaint")}</h3>
- <p className="text-xs text-text-tertiary leading-relaxed">{formatDate(complaint.createdAt)}</p>
+ <p className="text-xs text-text-tertiary leading-relaxed">{formatDate(complaint.createdAt) || 'N/A'}</p>
  </div>
  </div>
  <span className="inline-flex items-center gap-1.5 text-xs text-text-secondary">
@@ -63,11 +59,11 @@ const ComplaintCard = ({
  </div>}
  {complaint.updatedAt && complaint.updatedAt !== complaint.createdAt && <div className="flex items-center justify-between">
  <span className="text-text-tertiary">{t("last_updated")}</span>
- <span className="font-medium text-text-primary">{formatDate(complaint.updatedAt)}</span>
+ <span className="font-medium text-text-primary">{formatDate(complaint.updatedAt) || 'N/A'}</span>
  </div>}
  {complaint.resolvedAt && <div className="flex items-center justify-between">
  <span className="text-text-tertiary">{t("resolved")}</span>
- <span className="font-medium text-text-primary">{formatDate(complaint.resolvedAt)}</span>
+ <span className="font-medium text-text-primary">{formatDate(complaint.resolvedAt) || 'N/A'}</span>
  </div>}
  </div>
  </div>

@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { showcaseService } from '../services/showcaseService.js';
 
-export const useMyShowcases = (userId) => {
+export const useMyShowcases = (userId, options = {}) => {
  const queryClient = useQueryClient();
+ const enabled = options.enabled ?? true;
 
  const {
  data: showcases = [],
@@ -11,7 +12,7 @@ export const useMyShowcases = (userId) => {
  } = useQuery({
  queryKey: ['myShowcases', userId],
  queryFn: showcaseService.getUserShowcases,
- enabled: Boolean(userId),
+ enabled: Boolean(userId) && enabled,
  staleTime: 60 * 1000,
  gcTime: 10 * 60 * 1000,
  refetchOnWindowFocus: false,

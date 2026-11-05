@@ -14,8 +14,6 @@ export const electronicService = {
  },
 
  getElectronicById: async (id) => get(API_ENDPOINTS.ELECTRONICS.BY_ID(id)),
-
- findByElectronicType: async (electronicType) => get(API_ENDPOINTS.ELECTRONICS.BY_TYPE(electronicType)),
 };
 
 
