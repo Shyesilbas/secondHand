@@ -70,6 +70,19 @@ import java.util.UUID;
     int bulkUpdateTokenFamilyStatus(@Param("familyId") UUID familyId,
                                     @Param("newStatus") TokenStatus newStatus);
 
+    /**
+     * Conditional revoke used to claim a refresh token for rotation. Concurrent callers serialize on
+     * the row lock; only the first sees ACTIVE and gets 1, the rest get 0.
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Token t
+            SET t.tokenStatus = com.serhat.secondhand.auth.domain.entity.enums.TokenStatus.REVOKED
+            WHERE t.id = :id
+              AND t.tokenStatus = com.serhat.secondhand.auth.domain.entity.enums.TokenStatus.ACTIVE
+            """)
+    int revokeIfActive(@Param("id") UUID id);
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Token t WHERE t.expiresAt < :cutoff")
     int deleteExpiredBefore(@Param("cutoff") LocalDateTime cutoff);

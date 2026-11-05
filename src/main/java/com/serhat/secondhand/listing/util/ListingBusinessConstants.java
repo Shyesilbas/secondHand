@@ -29,6 +29,24 @@ public final class ListingBusinessConstants {
     /** Property name used when sorting listings by creation time (newest first). */
     public static final String LISTING_SORT_PROPERTY_CREATED_AT = "createdAt";
 
+    /** Secondary tie-breaker property name used for deterministic pagination order. */
+    public static final String LISTING_SORT_PROPERTY_ID = "id";
+
+    /** Minimum search token length. Tokens under 3 chars cannot use the pg_trgm index but still filter the rows matched by longer tokens. */
+    public static final int MIN_GLOBAL_SEARCH_TOKEN_LENGTH = 2;
+
+    /** Default page size for global listing search when caller provides an invalid size. */
+    public static final int DEFAULT_GLOBAL_SEARCH_PAGE_SIZE = 8;
+
+    /** Maximum page size allowed for global listing search to prevent DoS queries. */
+    public static final int MAX_GLOBAL_SEARCH_PAGE_SIZE = 50;
+
+    /** Maximum character length evaluated from a global search query. */
+    public static final int MAX_GLOBAL_SEARCH_QUERY_LENGTH = 200;
+
+    /** Maximum number of tokenized search terms applied to a single global search query. */
+    public static final int MAX_GLOBAL_SEARCH_TOKENS = 8;
+
     /**
      * Listing types that do not load inline reviews on the listing DTO
      * (handled elsewhere or not applicable).

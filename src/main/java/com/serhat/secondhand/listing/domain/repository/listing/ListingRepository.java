@@ -93,16 +93,6 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
                                            @Param("title") String title,
                                            Pageable pageable);
 
-    @EntityGraph(attributePaths = {"seller"})
-    @Query("SELECT l FROM Listing l " +
-            "WHERE (LOWER(l.title) LIKE LOWER(CONCAT('%', :title, '%')) " +
-            "OR LOWER(l.listingNo) LIKE LOWER(CONCAT('%', :listingNo, '%'))) " +
-            "AND l.status = :status")
-    Page<Listing> findBySearch(@Param("title") String title,
-                               @Param("listingNo") String listingNo,
-                               @Param("status") ListingStatus status,
-                               Pageable pageable);
-
     @org.springframework.cache.annotation.Cacheable(value = "listingStats", key = "'totalCount'")
     @Query("SELECT COUNT(l) FROM Listing l")
     long getTotalListingCount();
@@ -147,7 +137,4 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     long countBySellerIdAndStatus(Long sellerId, ListingStatus status);
 
     long countBySellerId(Long sellerId);
-
-    @EntityGraph(attributePaths = {"seller"})
-    List<Listing> findByStatus(ListingStatus status);
 }

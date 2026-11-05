@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.UUID;
 
 @Component
@@ -26,6 +28,10 @@ public class EscrowOutboxWorker {
     private final EscrowOutboxRepository escrowOutboxRepository;
     private final EscrowKafkaProducer escrowKafkaProducer;
     private final ObjectMapper objectMapper;
+
+    /** Upper bound for waiting on a broker acknowledgement; a timeout counts as a failed attempt. */
+    @Value("${app.outbox.publish-timeout-seconds:15}")
+    private long publishTimeoutSeconds;
 
     @Lazy
     @Autowired
@@ -60,7 +66,7 @@ public class EscrowOutboxWorker {
             escrowOutboxRepository.save(event);
 
             EscrowReleasedKafkaEvent releasedEvent = objectMapper.readValue(event.getPayload(), EscrowReleasedKafkaEvent.class);
-            escrowKafkaProducer.sendEscrowReleased(releasedEvent).join();
+            escrowKafkaProducer.sendEscrowReleased(releasedEvent).get(publishTimeoutSeconds, TimeUnit.SECONDS);
 
             event.setStatus(OutboxStatus.PROCESSED);
             event.setProcessedAt(LocalDateTime.now());

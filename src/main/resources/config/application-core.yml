@@ -13,6 +13,11 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         spring.json.add.type.headers: true
+        # Bound how long a send can block or stay unacknowledged, so an outbox worker never waits
+        # forever on a broker that is down (delivery.timeout >= linger + request.timeout).
+        max.block.ms: 10000
+        request.timeout.ms: 10000
+        delivery.timeout.ms: 20000
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP:secondhand-group}
       auto-offset-reset: earliest
@@ -23,6 +28,11 @@ spring:
         spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
         spring.json.trusted.packages: "*"
         spring.json.use.type.headers: true
+  task:
+    scheduling:
+      # Default is a single thread shared by every @Scheduled job; one stuck job used to stop all.
+      pool:
+        size: ${SCHEDULING_POOL_SIZE:4}
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}

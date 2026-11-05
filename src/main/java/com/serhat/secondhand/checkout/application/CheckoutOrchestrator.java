@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 import java.util.Map;
@@ -67,15 +68,16 @@ public class CheckoutOrchestrator {
 
         Result<Map<UUID, Integer>> reservedResult = checkoutStockReservationService.reserveStock(userId, effectiveCartItems);
         if (reservedResult.isError()) {
-            return Result.error(reservedResult.getErrorCode(), reservedResult.getMessage());
+            return Result.error(reservedResult.getMessage(), reservedResult.getErrorCode());
         }
 
         Map<UUID, Integer> reserved = reservedResult.getData();
 
         Result<Order> orderResult = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
         if (orderResult.isError()) {
+            rollbackCheckout();
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
-            return Result.error(orderResult.getErrorCode(), orderResult.getMessage());
+            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
         }
 
         Order order = orderResult.getData();
@@ -85,9 +87,9 @@ public class CheckoutOrchestrator {
                     user, order, request, order.getOrderNumber(), pricing, order.getExternalId());
 
             if (paymentResult.isError()) {
-                cleanupFailedOrder(order);
+                rollbackCheckout();
                 checkoutStockReservationService.releaseReservedStock(userId, reserved);
-                return Result.error(paymentResult.getErrorCode(), paymentResult.getMessage());
+                return Result.error(paymentResult.getMessage(), paymentResult.getErrorCode());
             }
 
             List<PaymentDto> paymentResults = paymentResult.getData();
@@ -107,10 +109,12 @@ public class CheckoutOrchestrator {
                             + order.getOrderNumber() + ": " + successResult.getMessage());
                 }
                 checkoutStockReservationService.consumeReservationsOnSuccess(userId, order);
+                // If the commit itself fails, give the held units back now instead of after the TTL.
+                checkoutStockReservationService.releaseReservedStockOnRollback(userId, reserved);
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {
-                cleanupFailedOrder(order);
+                rollbackCheckout();
                 checkoutStockReservationService.releaseReservedStock(userId, reserved);
                 log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
                 return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
@@ -119,7 +123,6 @@ public class CheckoutOrchestrator {
             return Result.success(orderMapper.toDto(order));
 
         } catch (Exception e) {
-            cleanupFailedOrder(order);
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
             log.error("Critical exception during checkout for order: {}", order.getOrderNumber(), e);
             throw e;
@@ -146,15 +149,14 @@ public class CheckoutOrchestrator {
                 order.getOrderNumber(), order.getPaymentStatus(), order.getPaymentProviderName());
     }
 
-    private void cleanupFailedOrder(Order order) {
-        if (order != null && order.getId() != null) {
-            try {
-                orderRepository.delete(order);
-                log.info("Cleaned up uncompleted order {} after payment failure/cancellation", order.getOrderNumber());
-            } catch (Exception e) {
-                log.warn("Failed to delete uncompleted order {}: {}", order.getOrderNumber(), e.getMessage());
-            }
-        }
+    /**
+     * Rolls back everything this checkout wrote (order, any payments already taken) while still
+     * returning a business error. Marking the outer transaction rollback-only makes the commit a
+     * silent rollback; without it a payment step that already marked the shared transaction would
+     * turn the response into an UnexpectedRollbackException (500).
+     */
+    private void rollbackCheckout() {
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
     }
 
     private Result<Void> handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {

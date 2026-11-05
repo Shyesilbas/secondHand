@@ -8,12 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.UUID;
 
 @Component
@@ -24,6 +26,10 @@ public class PaymentOutboxWorker {
     private final PaymentOutboxRepository paymentOutboxRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentKafkaProducer paymentKafkaProducer;
+
+    /** Upper bound for waiting on a broker acknowledgement; a timeout counts as a failed attempt. */
+    @Value("${app.outbox.publish-timeout-seconds:15}")
+    private long publishTimeoutSeconds;
 
     @Lazy
     @Autowired
@@ -59,7 +65,7 @@ public class PaymentOutboxWorker {
 
             UUID paymentId = UUID.fromString(event.getPayload());
             Payment payment = paymentRepository.findById(paymentId).orElseThrow();
-            paymentKafkaProducer.sendPaymentCompleted(payment).join();
+            paymentKafkaProducer.sendPaymentCompleted(payment).get(publishTimeoutSeconds, TimeUnit.SECONDS);
 
             event.setStatus(OutboxStatus.PROCESSED);
             event.setProcessedAt(LocalDateTime.now());

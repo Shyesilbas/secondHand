@@ -30,7 +30,7 @@ public class ListingFeePaymentService {
 
         Result<Void> validationResult = listingFeePaymentValidation.validate(request, userId);
         if (validationResult.isError()) {
-            return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
         BigDecimal totalFee = listingCommandService.calculateTotalListingFee();

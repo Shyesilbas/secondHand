@@ -11,13 +11,16 @@ import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.application.UserNotificationService;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
-import com.serhat.secondhand.user.util.UserErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,12 @@ public class PasswordService {
     private final PasswordEncoder passwordEncoder;
     private final IVerificationService verificationService;
     private final UserNotificationService userNotificationService;
+    private final StringRedisTemplate redisTemplate;
+
+    /** Reset codes one email may receive per window; each code has its own 3 attempts. */
+    static final int MAX_RESET_CODES_PER_WINDOW = 3;
+    static final Duration RESET_CODE_WINDOW = Duration.ofHours(1);
+    static final String RESET_REQUEST_KEY_PREFIX = "auth:pwreset:requests:";
 
     private Result<User> getActiveUser(String email) {
         Result<User> userResult = userService.findByEmail(email);
@@ -78,6 +87,13 @@ public class PasswordService {
         // Hash log: PII korumak ve kullanıcı varlığını sızdırmamak için sadece hash'ten ilk 8 karakter loglanır.
         log.info("Password reset requested (email-hash={})", emailFingerprint(request.getEmail()));
 
+        // Counted per email whether or not an account exists, so the limit itself reveals nothing.
+        // Over the limit the response is unchanged and no code or email is produced.
+        if (!tryConsumeResetRequest(request.getEmail())) {
+            log.warn("Password reset request limit reached (email-hash={})", emailFingerprint(request.getEmail()));
+            return Result.success(GENERIC_RESET_RESPONSE_MESSAGE);
+        }
+
         userService.findOptionalByEmail(request.getEmail())
                 .filter(user -> user.getAccountStatus().equals(AccountStatus.ACTIVE))
                 .ifPresent(user -> {
@@ -89,6 +105,30 @@ public class PasswordService {
 
         // Enumeration önlemek için kullanıcı varlığından bağımsız aynı yanıt döner.
         return Result.success(GENERIC_RESET_RESPONSE_MESSAGE);
+    }
+
+    private boolean tryConsumeResetRequest(String email) {
+        String key = RESET_REQUEST_KEY_PREFIX + sha256Hex(email == null ? "" : email.trim().toLowerCase(Locale.ROOT));
+        Long count = redisTemplate.opsForValue().increment(key);
+        if (count == null) {
+            throw new IllegalStateException("Redis INCR returned null for password reset limiter");
+        }
+        if (count == 1L) {
+            redisTemplate.expire(key, RESET_CODE_WINDOW);
+        }
+        return count <= MAX_RESET_CODES_PER_WINDOW;
+    }
+
+    private static String sha256Hex(String value) {
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(value.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(digest.length * 2);
+            for (byte b : digest) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 
     private String emailFingerprint(String email) {
@@ -105,38 +145,30 @@ public class PasswordService {
     }
     
     public Result<String> resetPassword(ResetPasswordRequest request) {
-        log.info("Password reset attempt with verification code for email: {}", request.getEmail());
+        log.info("Password reset attempt (email-hash={})", emailFingerprint(request.getEmail()));
 
+        // Unknown email, inactive account, no code, wrong code and spent attempts all return the same
+        // error, so this endpoint cannot be used to find out whether an account exists.
         Result<User> userResult = getActiveUser(request.getEmail());
         if (userResult.isError()) {
-            return Result.error(userResult.getMessage(), userResult.getErrorCode());
+            return Result.error(AuthErrorCodes.INVALID_OR_EXPIRED_RESET_CODE);
         }
 
         User user = userResult.getData();
 
         var verificationOpt = verificationService.findLatestActiveVerification(user, CodeType.PASSWORD_RESET);
-        
         if (verificationOpt.isEmpty()) {
-            return Result.error(UserErrorCodes.NO_ACTIVE_VERIFICATION_CODE);
+            return Result.error(AuthErrorCodes.INVALID_OR_EXPIRED_RESET_CODE);
         }
 
         var verification = verificationOpt.get();
-
         if (verification.getVerificationAttemptLeft() <= 0) {
-            return Result.error(AuthErrorCodes.TOO_MANY_VERIFICATION_ATTEMPTS);
+            return Result.error(AuthErrorCodes.INVALID_OR_EXPIRED_RESET_CODE);
         }
-        
+
         if (!request.getVerificationCode().equals(verification.getCode())) {
             verificationService.decrementVerificationAttempts(verification);
-            int attemptsLeft = verification.getVerificationAttemptLeft();
-            
-            if (attemptsLeft <= 0) {
-                return Result.error(AuthErrorCodes.TOO_MANY_VERIFICATION_ATTEMPTS);
-            }
-            
-            return Result.error(
-                    String.format(UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getMessage(), attemptsLeft),
-                    UserErrorCodes.INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS.getCode());
+            return Result.error(AuthErrorCodes.INVALID_OR_EXPIRED_RESET_CODE);
         }
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {

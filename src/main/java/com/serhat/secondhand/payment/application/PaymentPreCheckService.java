@@ -22,7 +22,7 @@ public class PaymentPreCheckService {
     public Result<PreCheckContext> preCheck(Long userId, PaymentRequest paymentRequest) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
-            return Result.error(userResult.getErrorCode(), userResult.getMessage());
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
 
         User fromUser = userResult.getData();
@@ -34,7 +34,7 @@ public class PaymentPreCheckService {
         if (!isAutoRenewal) {
             Result<Void> agreementsResult = paymentValidator.validatePaymentAgreements(paymentRequest);
             if (agreementsResult.isError()) {
-                return Result.error(agreementsResult.getErrorCode(), agreementsResult.getMessage());
+                return Result.error(agreementsResult.getMessage(), agreementsResult.getErrorCode());
             }
 
             if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
@@ -44,13 +44,13 @@ public class PaymentPreCheckService {
 
             Result<Void> verificationResult = paymentVerificationService.validateCode(fromUser, paymentRequest.verificationCode());
             if (verificationResult.isError()) {
-                return Result.error(verificationResult.getErrorCode(), verificationResult.getMessage());
+                return Result.error(verificationResult.getMessage(), verificationResult.getErrorCode());
             }
         }
 
         Result<Void> requestValidationResult = paymentValidationHelper.validatePaymentRequest(paymentRequest, fromUser, toUser);
         if (requestValidationResult.isError()) {
-            return Result.error(requestValidationResult.getErrorCode(), requestValidationResult.getMessage());
+            return Result.error(requestValidationResult.getMessage(), requestValidationResult.getErrorCode());
         }
 
         return Result.success(new PreCheckContext(fromUser, toUser));

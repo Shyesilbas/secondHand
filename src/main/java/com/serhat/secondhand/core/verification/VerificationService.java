@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.verification;
 
+import com.serhat.secondhand.auth.application.AccessRevocationService;
 import com.serhat.secondhand.core.verification.repository.VerificationRepository;
 import com.serhat.secondhand.core.config.VerificationConfig;
 import com.serhat.secondhand.core.exception.VerificationLockedException;
@@ -29,6 +30,7 @@ public class VerificationService implements IVerificationService {
     private final VerificationRepository verificationRepository;
     private final UserNotificationService userNotificationService;
     private final IUserService userService;
+    private final AccessRevocationService accessRevocationService;
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int CODE_LENGTH = 6;
@@ -135,6 +137,7 @@ public class VerificationService implements IVerificationService {
             if (verificationAttemptLeft <= 0) {
                 user.setAccountStatus(AccountStatus.BLOCKED);
                 userService.update(user);
+                accessRevocationService.revokeAllAccess(user);
                 throw new VerificationLockedException("Too many failed attempts. Your account has been blocked.");
             }
             return Result.error(

@@ -12,6 +12,7 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -31,6 +32,10 @@ public class CheckoutStockReservationService {
     private final InventoryRedisReservationService redisReservationService;
     private final com.serhat.secondhand.cart.repository.CartRepository cartRepository;
 
+    /** How long a checkout holds stock for the buyer (anti-hoarding window). */
+    @Value("${app.checkout.reservation-ttl-seconds:900}")
+    private long reservationTtlSeconds;
+
     public Result<Map<UUID, Integer>> reserveUserCartStock(Long userId) {
         List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
         if (cartItems.isEmpty()) {
@@ -41,7 +46,7 @@ public class CheckoutStockReservationService {
 
     public long getRemainingTtlForUser(Long userId) {
         List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
-        long minTtl = 900L;
+        long minTtl = reservationTtlSeconds;
         boolean found = false;
         for (Cart item : cartItems) {
             if (item.getListing() != null) {
@@ -54,7 +59,7 @@ public class CheckoutStockReservationService {
                 }
             }
         }
-        return found ? minTtl : 900L;
+        return found ? minTtl : reservationTtlSeconds;
     }
 
     public Result<Map<UUID, Integer>> reserveStock(Long userId, List<Cart> cartItems) {
@@ -73,8 +78,8 @@ public class CheckoutStockReservationService {
 
             int requestedQty = item.getQuantity() != null ? item.getQuantity() : 1;
             try {
-                // High-performance atomic stock reservation via Redis Lua Script with 15-min TTL
-                redisReservationService.reserveStockWithTtl(userId, listingId, requestedQty, 900L);
+                // Atomic stock reservation via Redis Lua script, held for reservationTtlSeconds
+                redisReservationService.reserveStockWithTtl(userId, listingId, requestedQty, reservationTtlSeconds);
                 reserved.merge(listingId, requestedQty, Integer::sum);
             } catch (BusinessException e) {
                 log.warn("Stock reservation failed for listingId {} by user {}: {}", listingId, userId, e.getMessage());
@@ -102,6 +107,25 @@ public class CheckoutStockReservationService {
                 }
             } catch (Exception ex) {
                 log.error("Failed to release stock in Redis for listingId {} user {}", listingId, userId, ex);
+            }
+        });
+    }
+
+    /**
+     * Releases the reservations if the surrounding transaction rolls back (for example when the
+     * checkout commit fails after every step succeeded). Without a transaction this does nothing.
+     */
+    public void releaseReservedStockOnRollback(Long userId, Map<UUID, Integer> reserved) {
+        if (reserved == null || reserved.isEmpty() || !TransactionSynchronizationManager.isSynchronizationActive()) {
+            return;
+        }
+        Map<UUID, Integer> snapshot = Map.copyOf(reserved);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    releaseReservedStock(userId, snapshot);
+                }
             }
         });
     }

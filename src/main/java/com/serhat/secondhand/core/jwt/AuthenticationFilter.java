@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.jwt;
 
+import com.serhat.secondhand.auth.application.AccessRevocationService;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenStatus;
 import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.core.security.PublicEndpointRegistry;
@@ -40,6 +41,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
     private final PublicEndpointRegistry publicEndpointRegistry;
+    private final AccessRevocationService accessRevocationService;
 
     /**
      * Non-controller system paths that are always bypassed by prefix match.
@@ -108,6 +110,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 }
                 if (claims.getExpiration() == null || claims.getExpiration().before(new Date())) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
+                    return;
+                }
+                // Blocked accounts and revoked sessions: the token is still validly signed, so check Redis.
+                if (accessRevocationService.isRevoked(userId, claims.getIssuedAt())) {
+                    sendTokenError(response, request, TokenStatus.REVOKED);
                     return;
                 }
                 List<SimpleGrantedAuthority> authorities = JwtUtils.rolesFrom(claims).stream()

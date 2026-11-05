@@ -1,14 +1,13 @@
 package com.serhat.secondhand.core.config;
 
 import com.serhat.secondhand.auth.application.TokenService;
-import com.serhat.secondhand.auth.domain.entity.Token;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
 import com.serhat.secondhand.auth.domain.entity.enums.TokenType;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.user.domain.entity.User;
-import com.serhat.secondhand.user.domain.entity.enums.Provider;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,24 +49,36 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             log.info("OAuth2 login attempt for email: {}", email);
 
+            // Google must vouch for the address before it is matched against an account.
+            if (email == null || !isEmailVerified(oAuth2User)) {
+                log.warn("OAuth2 login rejected: email missing or not verified by Google");
+                handleErrorResponse(response, "Your Google email address is not verified.");
+                return;
+            }
+
             Optional<User> existingUserOpt = userService.findOptionalByEmail(email);
 
             if (existingUserOpt.isPresent()) {
                 User user = existingUserOpt.get();
+                if (user.getAccountStatus() != AccountStatus.ACTIVE) {
+                    log.warn("OAuth2 login rejected for non-active account id {} (status: {})",
+                            user.getId(), user.getAccountStatus());
+                    handleErrorResponse(response, "Your account is not active.");
+                    return;
+                }
+                // The account keeps its own provider: switching a LOCAL account to GOOGLE here would
+                // change how it signs in without the owner asking for it.
                 user.setLastLoginDate(LocalDateTime.now());
-                user.setProvider(Provider.GOOGLE);
                 userService.update(user);
-
-                Optional<Token> oldRefreshToken = tokenService.findByUserAndType(user, TokenType.REFRESH_TOKEN);
 
                 String accessToken = jwtUtils.generateAccessToken(user);
                 String refreshToken = jwtUtils.generateRefreshToken(user, false);
 
-                tokenService.revokeUserRefreshTokens(user);
-
+                // New session with its own token family; sessions on other devices stay signed in,
+                // the same as a password login.
                 tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
                         LocalDateTime.now().plusSeconds(jwtUtils.getRefreshTokenExpiration() / 1000),
-                        oldRefreshToken.orElse(null), false);
+                        null, false);
 
                 auditLogService.logLoginViaGoogle(
                         user.getEmail(),
@@ -98,6 +109,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     }
 
 
+    private static boolean isEmailVerified(OAuth2User oAuth2User) {
+        Object verified = oAuth2User.getAttribute("email_verified");
+        return Boolean.TRUE.equals(verified) || "true".equalsIgnoreCase(String.valueOf(verified));
+    }
+
     private String urlEncode(String value) {
         try {
             return value == null ? "" : java.net.URLEncoder.encode(value, java.nio.charset.StandardCharsets.UTF_8);
@@ -113,6 +129,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     }
 
     private void handleErrorResponse(HttpServletResponse response, String message) throws IOException {
-        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/auth/error?message=" + message);
+        response.sendRedirect(appConfigProperties.getFrontendUrl() + "/auth/error?message=" + urlEncode(message));
     }
 }

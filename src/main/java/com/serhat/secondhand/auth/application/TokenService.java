@@ -83,6 +83,15 @@ public class TokenService {
                 });
     }
 
+    /**
+     * Atomically revokes an ACTIVE refresh token so it can be rotated exactly once.
+     * Returns false when another request already rotated or revoked it.
+     */
+    @Transactional
+    public boolean claimForRotation(Token token) {
+        return tokenRepository.revokeIfActive(token.getId()) == 1;
+    }
+
     @Transactional
     public void revokeAllUserTokens(User user) {
         int revokedCount = tokenRepository.bulkUpdateUserTokensByStatus(

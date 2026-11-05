@@ -28,7 +28,7 @@ Detailed documentation of the internal execution paths and data flows for listin
 `ListingController` -> `ListingCommandService.publish()` -> `Listing.publish()` [Rich Domain] -> `ListingRepository.save()` -> `ApplicationEventPublisher` -> `Follow Module Listener`
 
 ### 3. İlan Arama ve Filtreleme
-- Global Search uses `ListingSearchService.globalSearch()` with N+1 prevention (`JOIN FETCH l.seller`).
+- Global Search uses `ListingSearchService.globalSearch()` with JPA Criteria database-level token filtering (`title`, `description`, `listingNo` backed by `pg_trgm` GIN indexes; tokens shorter than 2 chars are dropped, 2-char tokens are matched but cannot use the trigram index), deterministic `ORDER BY createdAt DESC, id DESC`, DB pagination, and N+1 prevention (`LEFT JOIN FETCH seller`).
 - Category filtering uses `GenericListingFilterService.filter()` with JPA Criteria API and dynamic fetching.
 - Enrichment runs asynchronously via `CompletableFuture` to fetch reviews, campaigns, and favorites.
 

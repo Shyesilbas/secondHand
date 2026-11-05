@@ -65,8 +65,22 @@ class LoginServiceRefreshTest {
         when(jwtUtils.generateAccessToken(user)).thenReturn("access");
         when(jwtUtils.generateRefreshToken(user, false)).thenReturn("new-refresh");
 
+        when(tokenService.claimForRotation(any())).thenReturn(true);
+
         assertThat(service.refreshToken(REFRESH).getAccessToken()).isEqualTo("access");
-        verify(tokenService).revokeToken(any());
+        verify(tokenService).claimForRotation(any());
+        verify(tokenService).saveToken(any(), any(), any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    void refresh_losingConcurrentRotation_isRejectedWithoutIssuingTokens() {
+        user.setAccountStatus(AccountStatus.ACTIVE);
+        when(tokenService.claimForRotation(any())).thenReturn(false);
+
+        assertThatThrownBy(() -> service.refreshToken(REFRESH))
+                .isInstanceOf(InvalidRefreshTokenException.class);
+        verify(jwtUtils, never()).generateAccessToken(any());
+        verify(tokenService, never()).saveToken(any(), any(), any(), any(), any(), anyBoolean());
     }
 
     @Test

@@ -57,7 +57,7 @@ public class ReviewService implements IReviewService {
         log.info("Creating review for order item {} by user {}", request.getOrderItemId(), reviewerId);
 
         var userResult = userService.findById(reviewerId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
         User reviewer = userResult.getData();
 
         OrderItem orderItem = orderItemRepository.findById(request.getOrderItemId()).orElse(null);
@@ -118,7 +118,7 @@ public class ReviewService implements IReviewService {
         log.info("Getting review statistics for user: {}", userId);
 
         var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
         User user = userResult.getData();
 
         ReviewStatsDto stats = reviewMapper.mapToReviewStatsDto(reviewRepository.getUserReviewStats(userId));

@@ -38,7 +38,7 @@ public class AddressService {
         var userResult = userService.findById(userId);
 
         if (userResult.isError()) {
-            return Result.error(userResult.getErrorCode(), userResult.getMessage());
+            return Result.error(userResult.getMessage(), userResult.getErrorCode());
         }
 
         User user = userResult.getData();

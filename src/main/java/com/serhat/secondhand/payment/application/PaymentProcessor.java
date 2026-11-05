@@ -19,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -72,42 +75,73 @@ public class PaymentProcessor {
                             PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT.toString()));
         }
 
-        int maxRetries = PaymentProcessingConstants.MAX_OPTIMISTIC_LOCK_RETRIES;
-        int attempt = 0;
-        boolean completed = false;
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            return executeInCallerTransaction(userId, requestWithIdempotency, idempotencyKey, fingerprint);
+        }
+        return executeWithRetry(userId, requestWithIdempotency, idempotencyKey, fingerprint);
+    }
 
-        while (attempt < maxRetries) {
-            try {
-                Result<PaymentDto> result = self.executePaymentWithTransaction(userId, requestWithIdempotency);
-                if (result.isSuccess()) {
+    /**
+     * Most callers (checkout, showcase, membership, listing fee) already run in a transaction, so the
+     * payment row is only durable once that transaction commits. The Redis marker therefore follows the
+     * outcome of the caller's transaction instead of being set before the commit. An optimistic lock
+     * conflict cannot be retried here because the shared transaction is already marked rollback-only,
+     * so it propagates to the caller.
+     */
+    private Result<PaymentDto> executeInCallerTransaction(Long userId, PaymentRequest request,
+                                                          String idempotencyKey, String fingerprint) {
+        boolean[] succeeded = { false };
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_COMMITTED && succeeded[0]) {
                     paymentRedisIdempotencyService.markCompleted(idempotencyKey, fingerprint);
-                    completed = true;
+                } else if (status == STATUS_UNKNOWN) {
+                    log.warn("Payment transaction outcome unknown for idempotency key {}; marker kept until TTL",
+                            idempotencyKey);
                 } else {
                     paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
                 }
-                return result;
-            } catch (OptimisticLockException e) {
-                attempt++;
-                log.warn("Optimistic lock exception during payment, attempt {}/{}", attempt, maxRetries);
+            }
+        });
+        Result<PaymentDto> result = self.executePaymentWithTransaction(userId, request);
+        succeeded[0] = result.isSuccess();
+        return result;
+    }
 
-                if (attempt >= maxRetries) {
-                    return Result.error("Concurrent Update", PaymentErrorCodes.CONCURRENT_UPDATE.toString());
-                }
-
+    private Result<PaymentDto> executeWithRetry(Long userId, PaymentRequest request,
+                                                String idempotencyKey, String fingerprint) {
+        int maxRetries = PaymentProcessingConstants.MAX_OPTIMISTIC_LOCK_RETRIES;
+        int attempt = 0;
+        try {
+            while (true) {
                 try {
+                    // Commits before returning, so the marker below reflects a committed payment.
+                    Result<PaymentDto> result = self.executePaymentWithTransaction(userId, request);
+                    if (result.isSuccess()) {
+                        paymentRedisIdempotencyService.markCompleted(idempotencyKey, fingerprint);
+                    } else {
+                        paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+                    }
+                    return result;
+                } catch (OptimisticLockingFailureException | OptimisticLockException e) {
+                    attempt++;
+                    log.warn("Optimistic lock conflict during payment, attempt {}/{}", attempt, maxRetries);
+                    if (attempt >= maxRetries) {
+                        paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+                        return Result.error("Concurrent Update", PaymentErrorCodes.CONCURRENT_UPDATE.toString());
+                    }
                     sleepBeforeRetry(attempt);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    return Result.error("Processing payment interrupted.", PaymentErrorCodes.PAYMENT_ERROR.toString());
                 }
             }
-        }
-
-        if (!completed) {
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
             paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+            return Result.error("Processing payment interrupted.", PaymentErrorCodes.PAYMENT_ERROR.toString());
+        } catch (RuntimeException e) {
+            paymentRedisIdempotencyService.releaseIfPending(idempotencyKey, fingerprint);
+            throw e;
         }
-        return Result.error("Unexpected error occurred during payment processing.",
-                PaymentErrorCodes.PAYMENT_ERROR.toString());
     }
 
     @Transactional

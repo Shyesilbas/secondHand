@@ -11,9 +11,15 @@ import com.serhat.secondhand.listing.domain.dto.response.listing.*;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
-import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -21,8 +27,12 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,7 +42,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ListingSearchService {
 
-    private final ListingRepository listingRepository;
+    private static final char LIKE_ESCAPE_CHAR = '\\';
+    private static final Set<String> STOP_WORDS = Set.of(
+            "var", "mi", "mı", "mu", "mü", "arıyorum", "istiyorum", "bul", "göster",
+            "öner", "lütfen", "bir", "ve", "veya", "en", "en son", "son", "yeni"
+    );
+
+    private final EntityManager entityManager;
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService enrichmentService;
 
@@ -71,71 +87,130 @@ public class ListingSearchService {
     }
 
     public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
-        log.info("ListingSearchService.globalSearch query='{}', page={}, size={}", query, page, size);
-        if (query == null || query.trim().isEmpty()) return emptySearchPage(page, size);
+        int safePage = Math.max(0, page);
+        int safeSize = normalizePageSize(size);
+        log.debug("ListingSearchService.globalSearch query='{}', page={}, size={}", query, safePage, safeSize);
+        if (query == null || query.trim().isEmpty()) return emptySearchPage(safePage, safeSize);
 
-        String searchTerm = query.trim().toLowerCase(java.util.Locale.ROOT);
-        
-        // Clean and tokenize the search term
+        List<String> activeTokens = tokenizeSearchQuery(query);
+        log.debug("ListingSearchService active search tokens: {}", activeTokens);
+        if (activeTokens.isEmpty()) {
+            return emptySearchPage(safePage, safeSize);
+        }
+
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(
+                        Sort.Direction.DESC,
+                        ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT,
+                        ListingBusinessConstants.LISTING_SORT_PROPERTY_ID
+                )
+        );
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<Listing> dataQuery = cb.createQuery(Listing.class);
+        Root<Listing> dataRoot = dataQuery.from(Listing.class);
+        dataRoot.fetch("seller", JoinType.LEFT);
+
+        List<Predicate> dataPredicates = buildSearchPredicates(cb, dataRoot, activeTokens);
+        dataQuery.select(dataRoot)
+                .where(dataPredicates.toArray(new Predicate[0]))
+                .orderBy(
+                        cb.desc(dataRoot.get(ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT)),
+                        cb.desc(dataRoot.get(ListingBusinessConstants.LISTING_SORT_PROPERTY_ID))
+                );
+
+        TypedQuery<Listing> typedQuery = entityManager.createQuery(dataQuery);
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<Listing> paginated = typedQuery.getResultList();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Listing> countRoot = countQuery.from(Listing.class);
+        List<Predicate> countPredicates = buildSearchPredicates(cb, countRoot, activeTokens);
+        countQuery.select(cb.count(countRoot))
+                .where(countPredicates.toArray(new Predicate[0]));
+        long totalMatches = entityManager.createQuery(countQuery).getSingleResult();
+
+        log.debug("ListingSearchService DB token search returned {} page items out of {} total matches",
+                paginated.size(), totalMatches);
+
+        List<ListingDto> dtos = paginated.stream()
+                .map(listingMapper::toDynamicDto)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, totalMatches);
+    }
+
+    static List<String> tokenizeSearchQuery(String query) {
+        String trimmed = query.trim();
+        if (trimmed.length() > ListingBusinessConstants.MAX_GLOBAL_SEARCH_QUERY_LENGTH) {
+            trimmed = trimmed.substring(0, ListingBusinessConstants.MAX_GLOBAL_SEARCH_QUERY_LENGTH);
+        }
+        // Locale.ROOT lowercases "İ" to "i" + U+0307 (combining dot); PostgreSQL lower() yields a plain "i".
+        String searchTerm = trimmed.toLowerCase(Locale.ROOT).replace("̇", "");
         String cleaned = searchTerm.replaceAll("[.,;:!?\"'()\\-]", " ");
         String[] queryTokens = cleaned.split("\\s+");
-        List<String> stopWords = List.of(
-            "var", "mi", "mı", "mu", "mü", "arıyorum", "istiyorum", "bul", "göster", 
-            "öner", "lütfen", "bir", "ve", "veya", "en", "en son", "son", "yeni"
-        );
-        List<String> activeTokens = java.util.Arrays.stream(queryTokens)
+
+        return Arrays.stream(queryTokens)
                 .map(String::trim)
-                .filter(t -> t.length() >= 2 && !stopWords.contains(t))
+                .filter(t -> t.length() >= ListingBusinessConstants.MIN_GLOBAL_SEARCH_TOKEN_LENGTH && !STOP_WORDS.contains(t))
                 .map(t -> {
                     if (t.endsWith("sı") || t.endsWith("si") || t.endsWith("su") || t.endsWith("sü")) return t.substring(0, t.length() - 2);
                     if (t.endsWith("lar") || t.endsWith("ler")) return t.substring(0, t.length() - 3);
                     if (t.endsWith("ı") || t.endsWith("i") || t.endsWith("u") || t.endsWith("ü")) return t.substring(0, t.length() - 1);
                     return t;
                 })
-                .filter(t -> !t.isEmpty())
+                .filter(t -> t.length() >= ListingBusinessConstants.MIN_GLOBAL_SEARCH_TOKEN_LENGTH)
+                .distinct()
+                .limit(ListingBusinessConstants.MAX_GLOBAL_SEARCH_TOKENS)
                 .toList();
+    }
 
-        log.info("ListingSearchService active search tokens: {}", activeTokens);
-        if (activeTokens.isEmpty()) {
-            return emptySearchPage(page, size);
+    private static List<Predicate> buildSearchPredicates(CriteriaBuilder cb, Root<Listing> root, List<String> tokens) {
+        List<Predicate> predicates = new ArrayList<>(tokens.size() + 1);
+        predicates.add(cb.equal(root.get("status"), ListingStatus.ACTIVE));
+
+        for (String token : tokens) {
+            String pattern = "%" + escapeLikeWildcards(token) + "%";
+            Predicate titleMatch = cb.like(cb.lower(root.get("title")), pattern, LIKE_ESCAPE_CHAR);
+            Predicate descMatch = cb.like(cb.lower(root.get("description")), pattern, LIKE_ESCAPE_CHAR);
+            Predicate listingNoMatch = cb.like(cb.lower(root.get("listingNo")), pattern, LIKE_ESCAPE_CHAR);
+            predicates.add(cb.or(titleMatch, descMatch, listingNoMatch));
         }
+        return predicates;
+    }
 
-        // Fetch all active listings to perform token-based matching in Java
-        List<Listing> allActive = listingRepository.findByStatus(ListingStatus.ACTIVE);
-        
-        List<Listing> matchedListings = allActive.stream()
-                .filter(listing -> {
-                    String title = (listing.getTitle() == null ? "" : listing.getTitle()).toLowerCase(java.util.Locale.ROOT);
-                    String desc = (listing.getDescription() == null ? "" : listing.getDescription()).toLowerCase(java.util.Locale.ROOT);
-                    String listingNo = (listing.getListingNo() == null ? "" : listing.getListingNo()).toLowerCase(java.util.Locale.ROOT);
-                    
-                    // The listing must contain ALL active search tokens in any order
-                    return activeTokens.stream().allMatch(token -> 
-                        title.contains(token) || desc.contains(token) || listingNo.contains(token)
-                    );
-                })
-                .collect(Collectors.toList());
+    private static String escapeLikeWildcards(String token) {
+        StringBuilder sb = new StringBuilder(token.length());
+        for (int i = 0; i < token.length(); i++) {
+            char c = token.charAt(i);
+            if (c == '%' || c == '_' || c == LIKE_ESCAPE_CHAR) {
+                sb.append(LIKE_ESCAPE_CHAR);
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
 
-        log.info("ListingSearchService token-based search found {} matches out of {} active listings", matchedListings.size(), allActive.size());
-
-        // Paginate results
-        int start = Math.min(page * size, matchedListings.size());
-        int end = Math.min(start + size, matchedListings.size());
-        List<Listing> paginated = matchedListings.subList(start, end);
-
-        List<ListingDto> dtos = paginated.stream()
-                .map(listingMapper::toDynamicDto)
-                .collect(Collectors.toList());
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
-        return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, matchedListings.size());
+    private static int normalizePageSize(int size) {
+        if (size < 1) {
+            return ListingBusinessConstants.DEFAULT_GLOBAL_SEARCH_PAGE_SIZE;
+        }
+        return Math.min(size, ListingBusinessConstants.MAX_GLOBAL_SEARCH_PAGE_SIZE);
     }
 
     // Page.empty() is unpaged and Jackson cannot serialize Unpaged (getOffset throws), so the
     // empty result carries the requested page like a normal search result.
     private static Page<ListingDto> emptySearchPage(int page, int size) {
         return Page.empty(PageRequest.of(page, size,
-                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT)));
+                Sort.by(
+                        Sort.Direction.DESC,
+                        ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT,
+                        ListingBusinessConstants.LISTING_SORT_PROPERTY_ID
+                )));
     }
 
     private Page<ListingDto> enrichPage(Page<ListingDto> page, Long userId) {

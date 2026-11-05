@@ -90,7 +90,9 @@ public class User implements UserDetails {
     @Builder.Default
     private UserRole role = UserRole.USER;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Listings, payments and other financial records outlive the user (accounts are deactivated,
+    // not deleted), so these collections are read-only views without cascade or orphan removal.
+    @OneToMany(mappedBy = "seller")
     @Builder.Default
     @org.hibernate.annotations.BatchSize(size = 20)
     private List<Listing> listings = new ArrayList<>();
@@ -111,11 +113,11 @@ public class User implements UserDetails {
     @Builder.Default
     private List<Verification> verifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fromUser")
     @Builder.Default
     private List<Payment> fromPayments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "toUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "toUser")
     @Builder.Default
     private List<Payment> toPayments = new ArrayList<>();
 

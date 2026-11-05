@@ -60,6 +60,16 @@ public class LoginService {
         return new TokenRotationResult(accessToken, refreshToken);
     }
 
+    // The old token was already revoked by claimForRotation; only the new pair is issued.
+    private TokenRotationResult rotateTokens(User user, boolean rememberMe, Token oldRefreshToken) {
+        String accessToken = jwtUtils.generateAccessToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user, rememberMe);
+        long refreshExpirationMs = rememberMe ? jwtUtils.getRememberMeExpiration() : jwtUtils.getRefreshTokenExpiration();
+        tokenService.saveToken(refreshToken, TokenType.REFRESH_TOKEN, user,
+                LocalDateTime.now().plusSeconds(refreshExpirationMs / 1000), oldRefreshToken, rememberMe);
+        return new TokenRotationResult(accessToken, refreshToken);
+    }
+
     public LoginResponse login(LoginRequest request) {
         log.info("Login attempt: {}", request.email());
 
@@ -145,7 +155,15 @@ public class LoginService {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
         }
 
-        TokenRotationResult tokens = issueTokens(user, oldRefreshToken.isRememberMe(), oldRefreshToken);
+        // Two concurrent refreshes with the same token both pass the checks above; only the one that
+        // wins this conditional update may rotate. The loser is rejected without revoking the family,
+        // since a legitimate client (two tabs) can race itself.
+        if (!tokenService.claimForRotation(oldRefreshToken)) {
+            log.warn("Concurrent refresh rejected for user {}: token already rotated", username);
+            throw InvalidRefreshTokenException.revoked();
+        }
+
+        TokenRotationResult tokens = rotateTokens(user, oldRefreshToken.isRememberMe(), oldRefreshToken);
 
         log.info("Tokens rotated successfully for user: {}", username);
         return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe());

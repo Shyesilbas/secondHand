@@ -37,7 +37,7 @@ public class OrderShippingServiceImpl implements OrderShippingService {
                 .map(order -> {
                     Result<Void> shippingValidation = validateSellerCanShip(order, seller);
                     if (shippingValidation.isError()) {
-                        return Result.<OrderDto>error(shippingValidation.getErrorCode(), shippingValidation.getMessage());
+                        return Result.<OrderDto>error(shippingValidation.getMessage(), shippingValidation.getErrorCode());
                     }
 
                     try {
@@ -48,7 +48,7 @@ public class OrderShippingServiceImpl implements OrderShippingService {
                         // Delegate shipment creation to ShippingService
                         Result<ShippingDto> shipmentResult = shippingService.createShipmentForOrder(order.getShipping().getId(), request.getProviderName());
                         if (shipmentResult.isError()) {
-                            return Result.<OrderDto>error(shipmentResult.getErrorCode(), shipmentResult.getMessage());
+                            return Result.<OrderDto>error(shipmentResult.getMessage(), shipmentResult.getErrorCode());
                         }
 
                         ShippingDto shipment = shipmentResult.getData();

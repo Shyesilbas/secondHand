@@ -25,6 +25,8 @@ import com.serhat.secondhand.user.domain.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -75,13 +77,13 @@ public class CouponService {
 
         Result<Set<ListingType>> normalizeResult = normalizeEligibleTypes(coupon.getEligibleTypes());
         if (normalizeResult.isError()) {
-            return Result.error(normalizeResult.getErrorCode(), normalizeResult.getMessage());
+            return Result.error(normalizeResult.getMessage(), normalizeResult.getErrorCode());
         }
         coupon.setEligibleTypes(normalizeResult.getData());
 
         Result<Void> validationResult = couponValidator.validateForCreateOrUpdate(coupon);
         if (validationResult.isError()) {
-            return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
         return Result.success(couponMapper.toDto(couponRepository.save(coupon)));
@@ -98,13 +100,13 @@ public class CouponService {
         normalizeCouponAudience(coupon);
         Result<Set<ListingType>> normalizeResult = normalizeEligibleTypes(coupon.getEligibleTypes());
         if (normalizeResult.isError()) {
-            return Result.error(normalizeResult.getErrorCode(), normalizeResult.getMessage());
+            return Result.error(normalizeResult.getMessage(), normalizeResult.getErrorCode());
         }
 
         coupon.setEligibleTypes(normalizeResult.getData());
         Result<Void> validationResult = couponValidator.validateForCreateOrUpdate(coupon);
         if (validationResult.isError()) {
-            return Result.error(validationResult.getErrorCode(), validationResult.getMessage());
+            return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
 
         return Result.success(couponMapper.toDto(couponRepository.save(coupon)));
@@ -114,7 +116,7 @@ public class CouponService {
         if (code == null || code.isBlank()) return Result.success();
 
         var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
 
         return couponRepository.findByCodeIgnoreCaseForUpdate(normalizeCode(code))
                 .<Result<Void>>map(coupon -> {
@@ -133,6 +135,9 @@ public class CouponService {
                     } else if (limitAcquire == -2) {
                         return Result.error(CouponErrorCodes.COUPON_USAGE_LIMIT_REACHED);
                     }
+                    if (limitAcquire > 0) {
+                        releaseUsageUnlessCommitted(coupon.getCode(), userId);
+                    }
 
                     // 2. Standard Domain Validation
                     Result<Void> usableResult = couponValidator.validateUsable(coupon, userResult.getData());
@@ -149,6 +154,22 @@ public class CouponService {
                     return Result.success();
                 })
                 .orElseGet(() -> Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
+    }
+
+    /**
+     * The Redis counter is incremented before the redemption row is written. If this transaction
+     * (the checkout) does not commit, for example a failed validation or a later checkout step,
+     * the usage is given back so the counter does not drift above the real redemptions.
+     */
+    private void releaseUsageUnlessCommitted(String couponCode, Long userId) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) {
+                    couponRedisLimiterService.releaseCouponUsage(couponCode, userId);
+                }
+            }
+        });
     }
 
     @Transactional
@@ -255,10 +276,10 @@ public class CouponService {
     
     private Result<Coupon> validateCoupon(Coupon coupon, Long userId, Set<ListingType> cartTypes, java.math.BigDecimal eligibleSubtotal) {
         var userResult = userService.findById(userId);
-        if (userResult.isError()) return Result.error(userResult.getErrorCode(), userResult.getMessage());
+        if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
 
         Result<Void> usableResult = couponValidator.validateUsable(coupon, userResult.getData());
-        if (usableResult.isError()) return Result.error(usableResult.getErrorCode(), usableResult.getMessage());
+        if (usableResult.isError()) return Result.error(usableResult.getMessage(), usableResult.getErrorCode());
 
         Set<ListingType> effectiveEligibleTypes = (coupon.getEligibleTypes() == null || coupon.getEligibleTypes().isEmpty())
                 ? defaultEligibleTypes() : coupon.getEligibleTypes();
