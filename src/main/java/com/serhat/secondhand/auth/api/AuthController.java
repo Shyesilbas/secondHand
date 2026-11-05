@@ -13,6 +13,7 @@ import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
+import com.serhat.secondhand.core.security.ClientIpResolver;
 import com.serhat.secondhand.core.security.CookieUtils;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +42,7 @@ public class AuthController {
     private final OAuthService oauthService;
     private final CookieUtils cookieUtils;
     private final AccessRevocationService accessRevocationService;
+    private final ClientIpResolver clientIpResolver;
 
     @PublicEndpoint
     @PostMapping("/register")
@@ -53,9 +55,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
         log.info("Login request for email: {}", request.email());
-        LoginResponse response = loginService.login(request);
+        LoginResponse response = loginService.login(request, clientIpResolver.resolve(httpRequest));
 
         setAuthCookies(httpResponse, response);
 

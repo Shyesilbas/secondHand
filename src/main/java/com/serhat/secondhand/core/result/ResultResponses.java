@@ -14,7 +14,8 @@ public final class ResultResponses {
     private ResultResponses() {}
 
     /**
-     * Returns 200 OK with data on success, or errorStatus with error details on failure.
+     * Returns 200 OK with data on success. On failure the status comes from the error code
+     * (see {@link #buildErrorResponse}), 400 when the code declares none.
      */
     public static <T> ResponseEntity<?> ok(Result<T> result) {
         return of(result, HttpStatus.OK);
@@ -87,9 +88,16 @@ public final class ResultResponses {
 
     // ---- Internal ----
 
-    private static ResponseEntity<?> buildErrorResponse(Result<?> result, HttpStatus status) {
+    /**
+     * The status declared on the error code wins (404, 403, 409, ...); {@code fallback} is used only
+     * for codes no {@code ErrorCode} enum declares, such as ad-hoc {@code Result.error(message)}.
+     */
+    private static ResponseEntity<?> buildErrorResponse(Result<?> result, HttpStatus fallback) {
         String code = result.getErrorCode() != null ? result.getErrorCode() : "ERROR";
         String msg = result.getMessage() != null ? result.getMessage() : "An error occurred";
+        HttpStatus status = ErrorCodeStatuses.of(result.getErrorCode())
+                .filter(HttpStatus::isError)
+                .orElse(fallback);
         return ResponseEntity.status(status).body(Map.of("error", code, "message", msg));
     }
 }

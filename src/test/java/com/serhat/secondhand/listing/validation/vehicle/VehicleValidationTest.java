@@ -24,7 +24,7 @@ class VehicleValidationTest {
         motorcycleValidator = new MotorcycleValidator();
         commercialVehicleValidator = new CommercialVehicleValidator();
         vehicleDataInitializer = new VehicleDataInitializer(
-                null, null, null, null, null, null, null, null, null, null
+                null, null, null, null, null, null, null, null, null, null, null
         );
     }
 

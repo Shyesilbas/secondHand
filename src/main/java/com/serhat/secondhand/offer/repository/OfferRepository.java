@@ -21,6 +21,15 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
 
     Optional<Offer> findByIdAndBuyerId(UUID id, Long buyerId);
 
+    /** Completes the offer only if it is still ACCEPTED at the version checkout read; returns rows changed. */
+    @org.springframework.data.jpa.repository.Modifying(flushAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE Offer o SET o.status = com.serhat.secondhand.offer.entity.OfferStatus.COMPLETED,"
+            + " o.version = o.version + 1, o.updatedAt = :now"
+            + " WHERE o.id = :id AND o.version = :version AND o.status = com.serhat.secondhand.offer.entity.OfferStatus.ACCEPTED")
+    int completeIfAccepted(@org.springframework.data.repository.query.Param("id") UUID id,
+                           @org.springframework.data.repository.query.Param("version") Long version,
+                           @org.springframework.data.repository.query.Param("now") LocalDateTime now);
+
     boolean existsByListingAndStatusAndIdNot(Listing listing, OfferStatus status, UUID id);
 
     @EntityGraph(attributePaths = {"listing", "buyer", "seller"})

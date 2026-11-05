@@ -1,42 +1,71 @@
 package com.serhat.secondhand.auth.application;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 
+/**
+ * Login throttling, shared by all instances through Redis.
+ *
+ * <p>Failures are counted per account and client IP, so an attacker can only lock their own IP out of an
+ * account, never the real owner on another IP. A second counter per IP across all accounts stops one
+ * client from trying many accounts. Each counter expires {@link #WINDOW} after its first failure.
+ */
 @Service
+@RequiredArgsConstructor
 public class LoginAttemptService {
 
-    private static final int MAX_ATTEMPT = 5;
-    private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    static final int MAX_FAILURES_PER_ACCOUNT_AND_IP = 5;
+    static final int MAX_FAILURES_PER_IP = 20;
+    static final Duration WINDOW = Duration.ofMinutes(15);
+    static final String ACCOUNT_KEY_PREFIX = "auth:login-fail:account:";
+    static final String IP_KEY_PREFIX = "auth:login-fail:ip:";
 
-    // Bounded and self-expiring: entries disappear LOCK_DURATION after the last failure
-    private final Cache<String, Integer> attempts = Caffeine.newBuilder()
-            .maximumSize(100_000)
-            .expireAfterWrite(LOCK_DURATION)
-            .build();
+    private final StringRedisTemplate redisTemplate;
 
-    public void loginSucceeded(String key) {
-        String k = normalize(key);
-        if (k != null) attempts.invalidate(k);
+    public boolean isBlocked(String email, String clientIp) {
+        List<String> counts = redisTemplate.opsForValue().multiGet(List.of(accountKey(email, clientIp), ipKey(clientIp)));
+        if (counts == null) {
+            return false;
+        }
+        return atLeast(counts.get(0), MAX_FAILURES_PER_ACCOUNT_AND_IP) || atLeast(counts.get(1), MAX_FAILURES_PER_IP);
     }
 
-    public void loginFailed(String key) {
-        String k = normalize(key);
-        if (k != null) attempts.asMap().merge(k, 1, Integer::sum);
+    public void loginFailed(String email, String clientIp) {
+        increment(accountKey(email, clientIp));
+        increment(ipKey(clientIp));
     }
 
-    public boolean isBlocked(String key) {
-        String k = normalize(key);
-        Integer count = k == null ? null : attempts.getIfPresent(k);
-        return count != null && count >= MAX_ATTEMPT;
+    /** Clears only this account's counter; the IP counter stays, so one valid login cannot reset it. */
+    public void loginSucceeded(String email, String clientIp) {
+        redisTemplate.delete(accountKey(email, clientIp));
     }
 
-    // Case/whitespace variants of the same account must share one counter
-    private static String normalize(String key) {
-        return key == null ? null : key.trim().toLowerCase(Locale.ROOT);
+    // SET NX with the TTL first, then INCR (which keeps the TTL): a counter never lives without an expiry.
+    private void increment(String key) {
+        redisTemplate.opsForValue().setIfAbsent(key, "0", WINDOW);
+        redisTemplate.opsForValue().increment(key);
+    }
+
+    private static boolean atLeast(String value, int limit) {
+        return value != null && Long.parseLong(value) >= limit;
+    }
+
+    // Case/whitespace variants of the same account share one counter.
+    private static String accountKey(String email, String clientIp) {
+        String normalized = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+        return ACCOUNT_KEY_PREFIX + normalized + ":" + ip(clientIp);
+    }
+
+    private static String ipKey(String clientIp) {
+        return IP_KEY_PREFIX + ip(clientIp);
+    }
+
+    private static String ip(String clientIp) {
+        return clientIp == null || clientIp.isBlank() ? "unknown" : clientIp;
     }
 }

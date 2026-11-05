@@ -22,7 +22,8 @@ import static org.mockito.Mockito.when;
 class CatalogLegacyPrunerTest {
 
     private final JdbcTemplate jdbc = mock(JdbcTemplate.class);
-    private final CatalogLegacyPruner pruner = new CatalogLegacyPruner(jdbc);
+    private final CatalogLegacyPruner pruner = new CatalogLegacyPruner(jdbc, false);
+    private final CatalogLegacyPruner mergingPruner = new CatalogLegacyPruner(jdbc, true);
 
     private final UUID kept = UUID.randomUUID();
     private final UUID unused = UUID.randomUUID();
@@ -65,10 +66,27 @@ class CatalogLegacyPrunerTest {
         when(jdbc.update(anyString(), any(Object.class))).thenReturn(1);
         when(jdbc.update(anyString(), any(Object.class), any(Object.class))).thenReturn(1);
 
-        assertEquals(1, pruner.prune("book_languages", Set.of("TURKISH")));
+        assertEquals(1, mergingPruner.prune("book_languages", Set.of("TURKISH")));
 
         verify(jdbc).update("UPDATE book_listings SET \"language_id\" = ? WHERE \"language_id\" = ?", kept, legacy);
         verify(jdbc).update("DELETE FROM book_languages WHERE id = ?", legacy);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void keepsReferencedLegacyRowUnlessMergeIsEnabled() {
+        UUID legacy = UUID.randomUUID();
+        when(jdbc.queryForList(anyString(), eq("book_languages")))
+                .thenReturn(List.of(Map.of("tbl", "book_listings", "col", "language_id")));
+        when(jdbc.queryForList("SELECT id, name, label FROM book_languages")).thenReturn(List.of(
+                Map.of("id", kept, "name", "TURKISH", "label", "Türkçe"),
+                Map.of("id", legacy, "name", "TURKCE", "label", "Türkçe")));
+        when(jdbc.query(anyString(), any(ResultSetExtractor.class), eq(legacy))).thenReturn(1);
+
+        assertEquals(0, pruner.prune("book_languages", Set.of("TURKISH")));
+
+        verify(jdbc, never()).update(anyString(), any(Object.class), any(Object.class));
+        verify(jdbc, never()).update("DELETE FROM book_languages WHERE id = ?", legacy);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.CatalogLegacyPruner;
+import com.serhat.secondhand.core.seed.SeedKeyNormalizer;
 import com.serhat.secondhand.core.seed.SeedTask;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
@@ -86,7 +87,7 @@ public class ClothingDataInitializer implements SeedTask {
     }
 
     private void upsertBrand(String key, String label) {
-        String normalizedKey = key.trim().toUpperCase(java.util.Locale.ROOT);
+        String normalizedKey = SeedKeyNormalizer.toKey(key);
         seenBrands.add(normalizedKey);
         Optional<ClothingBrand> existing = brandRepository.findByNameIgnoreCase(normalizedKey);
         ClothingBrand brand;
@@ -116,7 +117,7 @@ public class ClothingDataInitializer implements SeedTask {
     }
 
     private void upsertType(String key, String label) {
-        String normalizedKey = key.trim().toUpperCase(java.util.Locale.ROOT);
+        String normalizedKey = SeedKeyNormalizer.toKey(key);
         seenTypes.add(normalizedKey);
         Optional<ClothingType> existing = typeRepository.findByNameIgnoreCase(normalizedKey);
         ClothingType type;

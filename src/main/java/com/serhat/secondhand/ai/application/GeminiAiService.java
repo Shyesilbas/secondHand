@@ -47,7 +47,7 @@ public class GeminiAiService {
             return AiResponse.success(answer, geminiClient.model());
         } catch (Exception e) {
             log.error("Error while processing question: ", e);
-            return AiResponse.error("Failed to get response: " + e.getMessage());
+            return AiResponse.error(clientErrorMessage(e));
         }
     }
 
@@ -77,7 +77,7 @@ public class GeminiAiService {
         } catch (Exception e) {
             releaseAuraSlot(userId, reservedOn);
             log.error("Error while processing memory-aware question: ", e);
-            return AiResponse.error("Failed to get response: " + e.getMessage());
+            return AiResponse.error(clientErrorMessage(e));
         }
     }
 
@@ -113,8 +113,16 @@ public class GeminiAiService {
         } catch (Exception e) {
             releaseAuraSlot(userId, reservedOn);
             log.error("Error while processing agent-mode question: ", e);
-            return AiResponse.error("Failed to get response: " + e.getMessage());
+            return AiResponse.error(clientErrorMessage(e));
         }
+    }
+
+    // Business rule messages (daily limit) are meant for the user; anything else stays in the log.
+    private static String clientErrorMessage(Exception e) {
+        if (e instanceof com.serhat.secondhand.core.exception.BusinessException) {
+            return "Failed to get response: " + e.getMessage();
+        }
+        return "Failed to get response. Please try again shortly.";
     }
 
     // Counts the question before the Gemini call with one conditional UPDATE, so concurrent requests

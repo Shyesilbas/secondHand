@@ -9,6 +9,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
@@ -23,7 +25,8 @@ public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHan
 
         log.error("OAuth2 authentication failed", exception);
 
-        String errorMessage = exception.getMessage();
+        // The exception text can carry provider internals; the details stay in the log.
+        String errorMessage = URLEncoder.encode("Sign-in with the provider failed. Please try again.", StandardCharsets.UTF_8);
         response.sendRedirect(appConfigProperties.getFrontendUrl() + "/auth/error?message=" + errorMessage);
     }
 }

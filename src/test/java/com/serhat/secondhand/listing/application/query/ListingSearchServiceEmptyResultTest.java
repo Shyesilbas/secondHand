@@ -14,6 +14,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -92,6 +93,9 @@ class ListingSearchServiceEmptyResultTest {
         Order createdAtDescOrder = mock(Order.class);
         Order idDescOrder = mock(Order.class);
 
+        Query planModeQuery = mock(Query.class);
+        when(entityManager.createNativeQuery("SELECT set_config('plan_cache_mode', 'force_custom_plan', true)"))
+                .thenReturn(planModeQuery);
         when(entityManager.getCriteriaBuilder()).thenReturn(cb);
         when(cb.createQuery(Listing.class)).thenReturn(dataQuery);
         when(cb.createQuery(Long.class)).thenReturn(countQuery);
@@ -142,6 +146,7 @@ class ListingSearchServiceEmptyResultTest {
         assertThat(result.getTotalElements()).isEqualTo(1L);
         assertThat(result.getContent()).containsExactly(dto);
 
+        verify(planModeQuery).getSingleResult();
         verify(dataRoot).fetch("seller", JoinType.LEFT);
         verify(dataQuery).orderBy(createdAtDescOrder, idDescOrder);
         verify(typedDataQuery).setFirstResult(0);

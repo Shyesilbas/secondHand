@@ -28,7 +28,7 @@ public interface IOfferService {
     
     Result<Offer> getAcceptedOfferForCheckout(Long buyerId, UUID offerId);
     
-    void markCompleted(Offer offer);
+    Result<Void> markCompleted(Offer offer);
 
     Result<OfferDto> createSellerOffer(Long sellerId, Long buyerId, UUID listingId, java.math.BigDecimal price, int expirationHours);
 }

@@ -105,8 +105,11 @@ public class CheckoutOrchestrator {
                 
                 Result<Void> successResult = handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
                 if (successResult.isError()) {
-                    throw new IllegalStateException("Checkout finalization failed for order "
-                            + order.getOrderNumber() + ": " + successResult.getMessage());
+                    // Coupon already used or offer completed by a concurrent checkout: undo payments and order.
+                    rollbackCheckout();
+                    checkoutStockReservationService.releaseReservedStock(userId, reserved);
+                    log.warn("Checkout finalization failed for order {}: {}", order.getOrderNumber(), successResult.getErrorCode());
+                    return Result.error(successResult.getMessage(), successResult.getErrorCode());
                 }
                 checkoutStockReservationService.consumeReservationsOnSuccess(userId, order);
                 // If the commit itself fails, give the held units back now instead of after the TTL.
@@ -167,7 +170,10 @@ public class CheckoutOrchestrator {
             }
         }
         if (acceptedOffer != null) {
-            offerService.markCompleted(acceptedOffer);
+            Result<Void> offerResult = offerService.markCompleted(acceptedOffer);
+            if (offerResult.isError()) {
+                return offerResult;
+            }
         }
         cartRepository.deleteByUserId(userId);
         return Result.success();

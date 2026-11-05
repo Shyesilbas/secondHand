@@ -2,7 +2,6 @@ package com.serhat.secondhand.core.security;
 
 import com.serhat.secondhand.core.config.RateLimitConfig;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,60 +10,47 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.lang.NonNull;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * Per-IP, per-category request limit. Counters live in Redis (fixed window), so every instance shares them.
+ * If Redis cannot be reached the request is rejected with 503 instead of passing unlimited.
+ */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 @RequiredArgsConstructor
 public class RateLimitingFilter extends OncePerRequestFilter {
 
-    private final RateLimitConfig rateLimitConfig;
+    private static final String KEY_PREFIX = "ratelimit:";
 
-    private final ConcurrentHashMap<String, RateLimitData> rateLimitMap = new ConcurrentHashMap<>();
-    private ScheduledExecutorService cleanupExecutor;
+    private final RateLimitConfig rateLimitConfig;
+    private final ClientIpResolver clientIpResolver;
+    private final StringRedisTemplate redisTemplate;
+
+    private DefaultRedisScript<Long> windowScript;
 
     @PostConstruct
     public void init() {
-        cleanupExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread t = new Thread(r, "rate-limit-cleanup");
-            t.setDaemon(true);
-            return t;
-        });
-        cleanupExecutor.scheduleAtFixedRate(this::cleanupOldEntries, 60, 60, TimeUnit.SECONDS);
-        
+        windowScript = new DefaultRedisScript<>();
+        windowScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/rate_limit_window.lua")));
+        windowScript.setResultType(Long.class);
+
         log.info("RateLimitingFilter initialized - Enabled: {}, Auth: {}/s, Payment: {}/s, General: {}/s, Window: {}s",
-                rateLimitConfig.isEnabled(), rateLimitConfig.getAuth().getRequestsPerSecond(), 
+                rateLimitConfig.isEnabled(), rateLimitConfig.getAuth().getRequestsPerSecond(),
                 rateLimitConfig.getPayment().getRequestsPerSecond(), rateLimitConfig.getGeneral().getRequestsPerSecond(),
                 rateLimitConfig.getWindowSizeSeconds());
-    }
-
-    @PreDestroy
-    public void destroy() {
-        if (cleanupExecutor != null && !cleanupExecutor.isShutdown()) {
-            cleanupExecutor.shutdown();
-            try {
-                if (!cleanupExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    cleanupExecutor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                cleanupExecutor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-        log.info("RateLimitingFilter destroyed");
     }
 
     @Override
@@ -79,15 +65,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
 
         String uri = request.getRequestURI();
-        if (uri.startsWith("/swagger-ui") ||
-            uri.startsWith("/api-docs") ||
-            uri.startsWith("/v3/api-docs") ||
-            uri.startsWith("/ws/") ||
-            uri.startsWith("/actuator/")) {
-            return true;
-        }
-        
-        return false;
+        return uri.startsWith("/swagger-ui") ||
+                uri.startsWith("/api-docs") ||
+                uri.startsWith("/v3/api-docs") ||
+                uri.startsWith("/ws/") ||
+                uri.startsWith("/actuator/");
     }
 
     @Override
@@ -96,180 +78,115 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String clientIp = getClientIpAddress(request);
+        String clientIp = clientIpResolver.resolve(request);
         String requestURI = request.getRequestURI();
+        Category category = categorize(requestURI);
 
-        int requestsPerSecond = determineRateLimit(requestURI);
-        int maxRequestsPerWindow = requestsPerSecond * rateLimitConfig.getWindowSizeSeconds();
+        int requestsPerSecond = category.requestsPerSecond(rateLimitConfig);
+        int windowSeconds = rateLimitConfig.getWindowSizeSeconds();
+        int maxRequestsPerWindow = requestsPerSecond * windowSeconds;
 
-        String rateLimitKey = clientIp + ":" + getRateLimitCategory(requestURI);
+        long windowMillis = windowSeconds * 1000L;
+        long now = System.currentTimeMillis();
+        long windowIndex = now / windowMillis;
+        long resetAt = (windowIndex + 1) * windowMillis;
+        String key = KEY_PREFIX + category.name + ":" + clientIp + ":" + windowIndex;
 
-        if (isRateLimited(rateLimitKey, maxRequestsPerWindow)) {
-            handleRateLimitExceeded(response, clientIp, requestURI, requestsPerSecond);
+        long count;
+        try {
+            Long result = redisTemplate.execute(windowScript, List.of(key), String.valueOf(windowMillis));
+            if (result == null) {
+                throw new IllegalStateException("Rate limit script returned no count");
+            }
+            count = result;
+        } catch (DataAccessException | IllegalStateException e) {
+            log.error("Rate limiter unavailable, rejecting request - URI: {}, error: {}", requestURI, e.getMessage());
+            writeError(response, 503, "Service Unavailable", "Rate limiter is unavailable. Please retry shortly.", requestURI, null);
             return;
         }
 
-        addRateLimitHeaders(response, rateLimitKey, maxRequestsPerWindow, requestsPerSecond);
+        if (count > maxRequestsPerWindow) {
+            long retryAfterSeconds = Math.max(1, (resetAt - now + 999) / 1000);
+            response.setHeader("X-RateLimit-Limit", String.valueOf(maxRequestsPerWindow));
+            response.setHeader("X-RateLimit-Remaining", "0");
+            response.setHeader("X-RateLimit-Reset", String.valueOf(resetAt));
+            response.setHeader("Retry-After", String.valueOf(retryAfterSeconds));
+            writeError(response, 429, "Too Many Requests",
+                    String.format("Rate limit exceeded. Maximum %d requests per %d seconds allowed for this endpoint type.",
+                            maxRequestsPerWindow, windowSeconds),
+                    requestURI, retryAfterSeconds);
+            log.warn("Rate limit exceeded - IP: {}, URI: {}, Limit: {}/{}s", clientIp, requestURI, maxRequestsPerWindow, windowSeconds);
+            return;
+        }
+
+        response.setHeader("X-RateLimit-Limit", String.valueOf(maxRequestsPerWindow));
+        response.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, maxRequestsPerWindow - count)));
+        response.setHeader("X-RateLimit-Reset", String.valueOf(resetAt));
         filterChain.doFilter(request, response);
     }
 
-    private int determineRateLimit(String requestURI) {
-        if (requestURI.startsWith("/api/auth/") || requestURI.startsWith("/api/v1/auth/")) {
-            return rateLimitConfig.getAuth().getRequestsPerSecond();
-        } else if (requestURI.startsWith("/api/ai/") || requestURI.startsWith("/api/v1/ai/")) {
-            return rateLimitConfig.getAi().getRequestsPerSecond();
-        } else if (requestURI.startsWith("/api/payment/") || 
-                   requestURI.startsWith("/api/v1/payments/") || 
-                   requestURI.contains("payment")) {
-            return rateLimitConfig.getPayment().getRequestsPerSecond();
-        } else {
-            return rateLimitConfig.getGeneral().getRequestsPerSecond();
+    static Category categorize(String uri) {
+        if (uri.startsWith("/api/auth/") || uri.startsWith("/api/v1/auth/")) {
+            return Category.AUTH;
         }
+        if (uri.startsWith("/api/ai/") || uri.startsWith("/api/v1/ai/")) {
+            return Category.AI;
+        }
+        if (isUnder(uri, "/api/payment") || isUnder(uri, "/api/v1/payments")
+                || isUnder(uri, "/api/v1/test/rate-limits/payment")) {
+            return Category.PAYMENT;
+        }
+        return Category.GENERAL;
     }
 
-    private String getRateLimitCategory(String requestURI) {
-        if (requestURI.startsWith("/api/auth/") || requestURI.startsWith("/api/v1/auth/")) {
-            return "auth";
-        } else if (requestURI.startsWith("/api/ai/") || requestURI.startsWith("/api/v1/ai/")) {
-            return "ai";
-        } else if (requestURI.startsWith("/api/payment/") || 
-                   requestURI.startsWith("/api/v1/payments/") || 
-                   requestURI.contains("payment")) {
-            return "payment";
-        } else {
-            return "general";
-        }
+    private static boolean isUnder(String uri, String prefix) {
+        return uri.equals(prefix) || uri.startsWith(prefix + "/");
     }
 
-    private boolean isRateLimited(String key, int maxRequestsPerWindow) {
-        LocalDateTime now = LocalDateTime.now();
-        
-        RateLimitData rateLimitData = rateLimitMap.computeIfAbsent(key, k -> new RateLimitData());
-
-        synchronized (rateLimitData) {
-            evictExpired(rateLimitData.requests, now);
-
-            if (rateLimitData.requests.size() >= maxRequestsPerWindow) {
-                rateLimitData.lastRateLimitTime = now;
-                log.debug("Rate limit check - Key: {}, Requests: {}, Max: {}, BLOCKED", 
-                        key, rateLimitData.requests.size(), maxRequestsPerWindow);
-                return true;
-            }
-
-            rateLimitData.requests.add(now);
-            log.trace("Rate limit check - Key: {}, Requests: {}, Max: {}, ALLOWED", 
-                    key, rateLimitData.requests.size(), maxRequestsPerWindow);
-            return false;
-        }
-    }
-
-    private void handleRateLimitExceeded(HttpServletResponse response, String clientIp,
-                                         String requestURI, int requestsPerSecond) throws IOException {
-        response.setStatus(429);
+    private void writeError(HttpServletResponse response, int status, String error, String message,
+                            String path, Long retryAfterSeconds) throws IOException {
+        response.setStatus(status);
         response.setContentType("application/json;charset=UTF-8");
-
-        int windowSize = rateLimitConfig.getWindowSizeSeconds();
-        response.setHeader("X-RateLimit-Limit", String.valueOf(requestsPerSecond * windowSize));
-        response.setHeader("X-RateLimit-Remaining", "0");
-        response.setHeader("X-RateLimit-Reset", String.valueOf(System.currentTimeMillis() + (windowSize * 1000L)));
-        response.setHeader("Retry-After", String.valueOf(windowSize));
-
-        String errorResponse = String.format(
-                """
-                {
-                    "timestamp": "%s",
-                    "status": 429,
-                    "error": "Too Many Requests",
-                    "message": "Rate limit exceeded. Maximum %d requests per %d seconds allowed for this endpoint type.",
-                    "path": "%s",
-                    "retryAfter": %d
-                }
-                """,
-                LocalDateTime.now(),
-                requestsPerSecond * windowSize,
-                windowSize,
-                requestURI,
-                windowSize
-        );
-
-        response.getWriter().write(errorResponse);
-        log.warn("Rate limit exceeded - IP: {}, URI: {}, Limit: {}/{}s",
-                clientIp, requestURI, requestsPerSecond * windowSize, windowSize);
+        String retry = retryAfterSeconds == null ? "" : ",\n    \"retryAfter\": " + retryAfterSeconds;
+        response.getWriter().write(String.format(
+                "{\n    \"timestamp\": \"%s\",\n    \"status\": %d,\n    \"error\": \"%s\",\n    \"message\": \"%s\",\n    \"path\": \"%s\"%s\n}\n",
+                LocalDateTime.now(), status, error, message, jsonEscape(path), retry));
     }
 
-    private void addRateLimitHeaders(HttpServletResponse response, String key,
-                                     int maxRequestsPerWindow, int requestsPerSecond) {
-        RateLimitData rateLimitData = rateLimitMap.get(key);
-        if (rateLimitData != null) {
-            synchronized (rateLimitData) {
-                int remaining = Math.max(0, maxRequestsPerWindow - rateLimitData.requests.size());
-                long resetTime = System.currentTimeMillis() + (rateLimitConfig.getWindowSizeSeconds() * 1000L);
-
-                response.setHeader("X-RateLimit-Limit", String.valueOf(maxRequestsPerWindow));
-                response.setHeader("X-RateLimit-Remaining", String.valueOf(remaining));
-                response.setHeader("X-RateLimit-Reset", String.valueOf(resetTime));
-            }
-        }
-    }
-
-    private String getClientIpAddress(HttpServletRequest request) {
-        if (!rateLimitConfig.isTrustForwardedHeaders()) {
-            return request.getRemoteAddr();
-        }
-
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-            return xRealIp;
-        }
-
-        String proxyClientIp = request.getHeader("Proxy-Client-IP");
-        if (proxyClientIp != null && !proxyClientIp.isEmpty() && !"unknown".equalsIgnoreCase(proxyClientIp)) {
-            return proxyClientIp;
-        }
-
-        return request.getRemoteAddr();
-    }
-
-    private void cleanupOldEntries() {
-        LocalDateTime cutoff = LocalDateTime.now().minusSeconds(rateLimitConfig.getWindowSizeSeconds() * 2L);
-        int removedCount = 0;
-
-        var iterator = rateLimitMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var entry = iterator.next();
-            RateLimitData data = entry.getValue();
-            synchronized (data) {
-                evictExpired(data.requests, LocalDateTime.now());
-                
-                if (data.requests.isEmpty() &&
-                        (data.lastRateLimitTime == null || data.lastRateLimitTime.isBefore(cutoff))) {
-                    iterator.remove();
-                    removedCount++;
+    private static String jsonEscape(String value) {
+        StringBuilder sb = new StringBuilder(value.length());
+        for (char c : value.toCharArray()) {
+            switch (c) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                default -> {
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
                 }
             }
         }
-
-        if (removedCount > 0 || !rateLimitMap.isEmpty()) {
-            log.debug("Rate limit cleanup - Removed: {}, Active entries: {}", removedCount, rateLimitMap.size());
-        }
+        return sb.toString();
     }
 
-    // Timestamps are appended in order, so expired ones are always at the head: drop them from the
-    // front and stop at the first one still inside the window, instead of scanning the whole list.
-    private void evictExpired(java.util.ArrayDeque<LocalDateTime> requests, LocalDateTime now) {
-        while (!requests.isEmpty()
-                && ChronoUnit.SECONDS.between(requests.peekFirst(), now) >= rateLimitConfig.getWindowSizeSeconds()) {
-            requests.pollFirst();
-        }
-    }
+    enum Category {
+        AUTH("auth"), AI("ai"), PAYMENT("payment"), GENERAL("general");
 
-    private static class RateLimitData {
-        final java.util.ArrayDeque<LocalDateTime> requests = new java.util.ArrayDeque<>();
-        LocalDateTime lastRateLimitTime;
+        final String name;
+
+        Category(String name) {
+            this.name = name;
+        }
+
+        int requestsPerSecond(RateLimitConfig config) {
+            return switch (this) {
+                case AUTH -> config.getAuth().getRequestsPerSecond();
+                case AI -> config.getAi().getRequestsPerSecond();
+                case PAYMENT -> config.getPayment().getRequestsPerSecond();
+                case GENERAL -> config.getGeneral().getRequestsPerSecond();
+            };
+        }
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import com.serhat.secondhand.core.security.ClientIpResolver;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class AuditLogService {
     private final AuditLogMapper auditLogMapper;
     private final UserRepository userRepository;
     private final EmailEventPublisher emailEventPublisher;
+    private final ClientIpResolver clientIpResolver;
 
     private void sendAuditEmail(String userEmail, String subject, String content, EmailType emailType) {
         if (userEmail == null || userEmail.isBlank()) return;
@@ -295,17 +297,7 @@ public class AuditLogService {
     }
 
     public String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        
-        String xRealIp = request.getHeader("X-Real-IP");
-        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
-            return xRealIp;
-        }
-        
-        return request.getRemoteAddr();
+        return clientIpResolver.resolve(request);
     }
 
     public String getClientUserAgent(HttpServletRequest request) {

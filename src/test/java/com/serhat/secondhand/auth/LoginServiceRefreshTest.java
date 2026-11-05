@@ -41,7 +41,7 @@ class LoginServiceRefreshTest {
         user = new User();
         user.setId(1L);
         user.setEmail(EMAIL);
-        when(jwtUtils.extractUsername(REFRESH)).thenReturn(EMAIL);
+        when(jwtUtils.extractRefreshTokenSubject(REFRESH)).thenReturn(EMAIL);
         when(userService.findByEmail(EMAIL)).thenReturn(Result.success(user));
         when(jwtUtils.isTokenValid(REFRESH, user)).thenReturn(true);
         when(tokenService.isTokenValid(REFRESH)).thenReturn(true);

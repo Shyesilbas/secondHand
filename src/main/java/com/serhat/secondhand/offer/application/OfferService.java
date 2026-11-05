@@ -241,25 +241,25 @@ public class OfferService implements IOfferService {
         return Result.success(offer);
     }
 
+    /**
+     * One conditional UPDATE instead of a managed save: the version check runs now, not at commit,
+     * so a concurrent checkout of the same offer gets a clear 409 instead of a commit-time failure.
+     */
     @Transactional
-    public void markCompleted(Offer offer) {
-        if (offer == null) return;
-        if (offer.getStatus() == OfferStatus.COMPLETED) {
-            return;
-        }
+    public Result<Void> markCompleted(Offer offer) {
+        if (offer == null) return Result.success();
         if (offer.getStatus() != OfferStatus.ACCEPTED) {
-            log.warn("Skipping markCompleted for offer {} with status {}", offer.getId(), offer.getStatus());
-            return;
+            log.warn("Refusing markCompleted for offer {} with status {}", offer.getId(), offer.getStatus());
+            return Result.error(OfferErrorCodes.OFFER_NOT_ACCEPTED);
         }
-        log.info("Marking offer {} as COMPLETED", offer.getId());
-        offer.setStatus(OfferStatus.COMPLETED);
-        try {
-            offerRepository.save(offer);
-        } catch (ObjectOptimisticLockingFailureException ex) {
-            log.warn("Concurrent markCompleted conflict for offer {}", offer.getId(), ex);
+        int updated = offerRepository.completeIfAccepted(offer.getId(), offer.getVersion(), LocalDateTime.now());
+        if (updated == 0) {
+            log.warn("Concurrent markCompleted conflict for offer {}", offer.getId());
+            return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
+        log.info("Marked offer {} as COMPLETED", offer.getId());
+        return Result.success();
     }
-
 
     private Result<Offer> getOfferForAction(Long userId, UUID offerId) {
         Result<User> userResult = findUser(userId);

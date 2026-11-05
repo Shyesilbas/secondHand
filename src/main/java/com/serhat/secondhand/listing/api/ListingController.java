@@ -109,8 +109,8 @@ public class ListingController {
     @GetMapping("/search")
     public ResponseEntity<?> globalSearch(
             @RequestParam String query,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "0") @jakarta.validation.constraints.Min(0) int page,
+            @RequestParam(defaultValue = "8") @jakarta.validation.constraints.Min(1) @jakarta.validation.constraints.Max(100) int size,
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser != null ? currentUser.getId() : null;
         return ResultResponses.ok(Result.success(listingSearchService.globalSearch(query, page, size, userId)));

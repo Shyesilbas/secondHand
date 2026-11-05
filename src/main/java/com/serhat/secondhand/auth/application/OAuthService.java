@@ -1,5 +1,9 @@
 package com.serhat.secondhand.auth.application;
 
+import com.serhat.secondhand.agreements.application.AgreementRequirementService;
+import com.serhat.secondhand.agreements.application.UserAgreementService;
+import com.serhat.secondhand.agreements.dto.request.AcceptAgreementRequest;
+import com.serhat.secondhand.agreements.entity.Agreement;
 import com.serhat.secondhand.auth.domain.dto.request.OAuthCompleteRequest;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
 import com.serhat.secondhand.auth.util.AuthErrorCodes;
@@ -23,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +42,8 @@ public class OAuthService {
     private final AuditLogService auditLogService;
     private final ApplicationEventPublisher eventPublisher;
     private final LoginService loginService;
+    private final AgreementRequirementService agreementRequirementService;
+    private final UserAgreementService userAgreementService;
 
     @Transactional
     public LoginResponse completeOAuthRegistration(OAuthCompleteRequest request, HttpServletRequest httpRequest) {
@@ -76,6 +86,17 @@ public class OAuthService {
                     AuthErrorCodes.OAUTH_ACCOUNT_ALREADY_EXISTS.getCode());
         }
 
+        Set<UUID> requiredIds = agreementRequirementService.getRequiredAgreements("REGISTER").stream()
+                .map(Agreement::getAgreementId)
+                .collect(Collectors.toSet());
+        Set<UUID> acceptedIds = new HashSet<>(request.getAcceptedAgreementIds());
+        if (!acceptedIds.containsAll(requiredIds)) {
+            throw new BusinessException(
+                    AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED.getMessage(),
+                    AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED.getHttpStatus(),
+                    AuthErrorCodes.AGREEMENTS_NOT_ACCEPTED.getCode());
+        }
+
         User user = User.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -95,13 +116,18 @@ public class OAuthService {
         if (saveResult.isError()) {
             throw new BadCredentialsException(saveResult.getMessage());
         }
+        for (UUID agreementId : acceptedIds) {
+            userAgreementService.acceptAgreement(user.getId(), AcceptAgreementRequest.builder()
+                    .agreementId(agreementId)
+                    .build());
+        }
         eventPublisher.publishEvent(new UserRegisteredEvent(user));
 
         LoginService.TokenRotationResult tokens = loginService.issueTokens(user, false, null);
 
         auditOAuthGoogleLogin(user, httpRequest);
 
-        return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), false);
+        return new LoginResponse("OAuth registration completed", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), false).withPlan(user);
     }
 
     private void auditOAuthGoogleLogin(User user, HttpServletRequest httpRequest) {

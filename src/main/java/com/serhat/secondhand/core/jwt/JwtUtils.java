@@ -34,9 +34,20 @@ public class JwtUtils {
 
     private final JwtConfig jwtConfig;
 
+    // Every token names this service as issuer and audience and says what it is for in "typ", so an
+    // access, refresh or OAuth registration token is never accepted in place of another.
+    static final String ISSUER = "secondhand";
+    static final String AUDIENCE = "secondhand-web";
+    static final String CLAIM_TYPE = "typ";
+    static final String TYPE_ACCESS = "access";
+    static final String TYPE_REFRESH = "refresh";
+    static final String TYPE_OAUTH_REGISTRATION = "oauth_registration";
+
     // Decoded once: the secret does not change at runtime.
     private volatile SecretKey signingKey;
+    private volatile SecretKey registrationSigningKey;
     private volatile JwtParser parser;
+    private volatile JwtParser registrationParser;
 
     public long getAccessTokenExpiration() {
         return jwtConfig.getAccessToken().getExpiration();
@@ -87,12 +98,27 @@ public class JwtUtils {
                     .collect(Collectors.toList());
             extraClaims.put("roles", roles);
         }
-        return buildToken(extraClaims, userDetails, getAccessTokenExpiration());
+        return buildToken(extraClaims, userDetails, getAccessTokenExpiration(), TYPE_ACCESS);
     }
 
-    /** Verifies the signature and expiry once and returns all claims; throws JwtException otherwise. */
+    /**
+     * Verifies signature, expiry, issuer, audience and that this is an access token, then returns all
+     * claims; throws JwtException otherwise.
+     */
     public Claims parseClaims(String token) {
-        return extractAllClaims(token);
+        return requireType(extractAllClaims(token), TYPE_ACCESS);
+    }
+
+    /** Subject of a refresh token; throws JwtException for any other kind of token. */
+    public String extractRefreshTokenSubject(String token) {
+        return requireType(extractAllClaims(token), TYPE_REFRESH).getSubject();
+    }
+
+    private static Claims requireType(Claims claims, String expectedType) {
+        if (!expectedType.equals(claims.get(CLAIM_TYPE, String.class))) {
+            throw new JwtException("Token type mismatch: expected " + expectedType);
+        }
+        return claims;
     }
 
     public Long extractUserId(String token) {
@@ -125,15 +151,20 @@ public class JwtUtils {
 
     public String generateRefreshToken(UserDetails userDetails, boolean rememberMe) {
         long expiration = rememberMe ? getRememberMeExpiration() : getRefreshTokenExpiration();
-        return buildToken(new HashMap<>(), userDetails, expiration);
+        return buildToken(new HashMap<>(), userDetails, expiration, TYPE_REFRESH);
     }
 
-    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration, String type) {
+        long now = System.currentTimeMillis();
         return Jwts.builder()
                 .claims(extraClaims)
+                .claim(CLAIM_TYPE, type)
+                .issuer(ISSUER)
+                .audience().add(AUDIENCE).and()
                 .subject(userDetails.getUsername())
-                .id(UUID.randomUUID().toString())                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .id(UUID.randomUUID().toString())
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -172,7 +203,11 @@ public class JwtUtils {
     private Claims extractAllClaims(String token) {
         JwtParser current = parser;
         if (current == null) {
-            current = Jwts.parser().verifyWith(getSigningKey()).build();
+            current = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .requireIssuer(ISSUER)
+                    .requireAudience(AUDIENCE)
+                    .build();
             parser = current;
         }
         return current.parseSignedClaims(token).getPayload();
@@ -187,12 +222,28 @@ public class JwtUtils {
         return current;
     }
 
+    // Registration tokens are signed with their own key derived from the secret (HMAC-SHA256 over a fixed
+    // label), so a leaked or misrouted registration token can never verify as a session token.
+    private SecretKey getRegistrationSigningKey() {
+        SecretKey current = registrationSigningKey;
+        if (current == null) {
+            try {
+                javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+                mac.init(getSigningKey());
+                byte[] derived = mac.doFinal("secondhand:oauth-registration-token:v1".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                current = Keys.hmacShaKeyFor(derived);
+            } catch (java.security.GeneralSecurityException e) {
+                throw new IllegalStateException("Cannot derive OAuth registration signing key", e);
+            }
+            registrationSigningKey = current;
+        }
+        return current;
+    }
+
     // OAuth completion akışı için kısa ömürlü, tek amaçlı imzalı token.
     // Frontend, OAuth2 provider başarılı olduktan sonra bu token'ı sunucuya geri verir;
     // sunucu da email/sub bilgisini güvenilir biçimde token claim'lerinden alır.
-    private static final String OAUTH_REG_TOKEN_PURPOSE = "oauth_registration";
     private static final Duration OAUTH_REG_TOKEN_TTL = Duration.ofMinutes(10);
-    private static final String CLAIM_PURPOSE = "purpose";
     private static final String CLAIM_GOOGLE_SUB = "google_sub";
     private static final String CLAIM_EMAIL = "email";
     private static final String CLAIM_NAME = "name";
@@ -201,7 +252,7 @@ public class JwtUtils {
 
     public String generateOAuthRegistrationToken(String email, String googleSub, String name, String surname, String picture) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_PURPOSE, OAUTH_REG_TOKEN_PURPOSE);
+        claims.put(CLAIM_TYPE, TYPE_OAUTH_REGISTRATION);
         if (googleSub != null) claims.put(CLAIM_GOOGLE_SUB, googleSub);
         if (email != null) claims.put(CLAIM_EMAIL, email);
         if (name != null) claims.put(CLAIM_NAME, name);
@@ -211,20 +262,27 @@ public class JwtUtils {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .claims(claims)
+                .issuer(ISSUER)
+                .audience().add(AUDIENCE).and()
                 .subject(email != null ? email : "oauth-pending")
                 .id(UUID.randomUUID().toString())
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + OAUTH_REG_TOKEN_TTL.toMillis()))
-                .signWith(getSigningKey())
+                .signWith(getRegistrationSigningKey())
                 .compact();
     }
 
     public Claims parseOAuthRegistrationToken(String token) {
-        Claims claims = extractAllClaims(token);
-        if (!OAUTH_REG_TOKEN_PURPOSE.equals(claims.get(CLAIM_PURPOSE))) {
-            throw new JwtException("Token purpose mismatch");
+        JwtParser current = registrationParser;
+        if (current == null) {
+            current = Jwts.parser()
+                    .verifyWith(getRegistrationSigningKey())
+                    .requireIssuer(ISSUER)
+                    .requireAudience(AUDIENCE)
+                    .build();
+            registrationParser = current;
         }
-        return claims;
+        return requireType(current.parseSignedClaims(token).getPayload(), TYPE_OAUTH_REGISTRATION);
     }
 
 }

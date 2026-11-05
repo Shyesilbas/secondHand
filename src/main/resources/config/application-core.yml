@@ -39,7 +39,8 @@ spring:
     password: ${DB_PASSWORD}
   jackson:
     date-format: dd/MM/yyyy HH:mm
-    time-zone: GMT+3
+    # Named zone instead of a fixed offset so DST rule changes are picked up from tzdata.
+    time-zone: Europe/Istanbul
     locale: tr_TR
     serialization:
       fail-on-empty-beans: false

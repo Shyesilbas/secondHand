@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -43,6 +45,10 @@ public class OAuthCompleteRequest {
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Past
     private LocalDate birthdate;
+
+    // Same rule as password registration: every required REGISTER agreement must be accepted.
+    @NotNull
+    private List<UUID> acceptedAgreementIds;
 }
 
 

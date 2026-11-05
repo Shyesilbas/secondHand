@@ -8,6 +8,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -44,6 +46,7 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
 
     private final List<SeedTask> seedTasks;
     private final CacheManager cacheManager;
+    private final PlatformTransactionManager transactionManager;
 
     @Value("${app.seed:${APP_SEED:}}")
     private String requestedSeeds;
@@ -76,7 +79,7 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
         for (String key : requested) {
             SeedTask task = tasksByKey.get(key);
             log.info("Running catalog seed: {}", key);
-            Result<Void> result = task.run();
+            Result<Void> result = runInTransaction(task);
             if (result == null || result.isError()) {
                 String message = result != null ? result.getMessage() : "Seed returned null result";
                 String code = result != null ? result.getErrorCode() : "SEED_RESULT_MISSING";
@@ -85,6 +88,20 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
             log.info("Catalog seed completed: {}", key);
         }
         evictCatalogCaches();
+    }
+
+    /**
+     * Every seed (upserts and pruning) commits or rolls back as one unit, so a failure never
+     * leaves references half-moved. An error result rolls back too, not only an exception.
+     */
+    private Result<Void> runInTransaction(SeedTask task) {
+        return new TransactionTemplate(transactionManager).execute(status -> {
+            Result<Void> result = task.run();
+            if (result == null || result.isError()) {
+                status.setRollbackOnly();
+            }
+            return result;
+        });
     }
 
     /** Seeds read cached lookups (findAll) before writing; drop them so /enums/all serves the fresh catalog. */

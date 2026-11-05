@@ -164,7 +164,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             HttpMessageNotReadableException.class,
             MissingServletRequestParameterException.class,
-            MethodArgumentTypeMismatchException.class
+            MethodArgumentTypeMismatchException.class,
+            org.springframework.web.method.annotation.HandlerMethodValidationException.class
     })
     public ResponseEntity<ProblemDetail> handleMalformedRequest(
             Exception ex,
@@ -175,6 +176,11 @@ public class GlobalExceptionHandler {
             detail = "Required parameter '" + missing.getParameterName() + "' is missing";
         } else if (ex instanceof MethodArgumentTypeMismatchException mismatch) {
             detail = "Invalid value for parameter '" + mismatch.getName() + "'";
+        } else if (ex instanceof org.springframework.web.method.annotation.HandlerMethodValidationException validation) {
+            detail = validation.getParameterValidationResults().stream()
+                    .findFirst()
+                    .map(r -> "Invalid value for parameter '" + r.getMethodParameter().getParameterName() + "'")
+                    .orElse("Invalid request parameter");
         } else {
             detail = "Malformed request body";
         }

@@ -70,10 +70,10 @@ public class LoginService {
         return new TokenRotationResult(accessToken, refreshToken);
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, String clientIp) {
         log.info("Login attempt: {}", request.email());
 
-        if (loginAttemptService.isBlocked(request.email())) {
+        if (loginAttemptService.isBlocked(request.email(), clientIp)) {
             throw new BusinessException("Too many login attempts. Please try again later.", HttpStatus.TOO_MANY_REQUESTS, "ACCOUNT_LOCKED");
         }
 
@@ -82,7 +82,7 @@ public class LoginService {
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
             );
         } catch (BadCredentialsException e) {
-            loginAttemptService.loginFailed(request.email());
+            loginAttemptService.loginFailed(request.email(), clientIp);
             throw new BadCredentialsException("Invalid username or password.");
         }
 
@@ -93,7 +93,7 @@ public class LoginService {
             throw AccountNotActiveException.withStatus(user.getAccountStatus());
         }
 
-        loginAttemptService.loginSucceeded(request.email());
+        loginAttemptService.loginSucceeded(request.email(), clientIp);
 
         user.setLastLoginDate(LocalDateTime.now());
         userService.update(user);
@@ -101,7 +101,7 @@ public class LoginService {
         TokenRotationResult tokens = issueTokens(user, request.rememberMe(), null);
 
         log.info("User logged in successfully: {}", user.getEmail());
-        return new LoginResponse("Login success", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), request.rememberMe());
+        return new LoginResponse("Login success", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), request.rememberMe()).withPlan(user);
     }
 
     public String logoutToken(String username, String refreshToken) {
@@ -128,7 +128,7 @@ public class LoginService {
             throw InvalidRefreshTokenException.notFound();
         }
 
-        String username = jwtUtils.extractUsername(refreshTokenValue);
+        String username = jwtUtils.extractRefreshTokenSubject(refreshTokenValue);
         User user = userService.findByEmail(username)
                 .orElseThrow(InvalidRefreshTokenException::invalid);
 
@@ -166,7 +166,7 @@ public class LoginService {
         TokenRotationResult tokens = rotateTokens(user, oldRefreshToken.isRememberMe(), oldRefreshToken);
 
         log.info("Tokens rotated successfully for user: {}", username);
-        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe());
+        return new LoginResponse("Refresh successful", user.getId(), user.getEmail(), tokens.accessToken(), tokens.refreshToken(), oldRefreshToken.isRememberMe()).withPlan(user);
     }
 
     public Map<String, Object> validateToken(Authentication authentication) {

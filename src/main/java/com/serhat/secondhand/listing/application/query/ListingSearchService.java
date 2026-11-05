@@ -108,6 +108,8 @@ public class ListingSearchService {
                 )
         );
 
+        forceCustomPlanForThisTransaction();
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<Listing> dataQuery = cb.createQuery(Listing.class);
@@ -142,6 +144,15 @@ public class ListingSearchService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, totalMatches);
+    }
+
+    // After a few executions of the same server-side prepared statement PostgreSQL may switch to a
+    // generic plan that ignores the LIKE pattern, skips the trigram indexes and scans every active
+    // listing in created_at order (~0.9 s for a rare term at 200k listings vs ~10 ms with a custom plan).
+    // is_local = true limits the setting to the current transaction.
+    private void forceCustomPlanForThisTransaction() {
+        entityManager.createNativeQuery("SELECT set_config('plan_cache_mode', 'force_custom_plan', true)")
+                .getSingleResult();
     }
 
     static List<String> tokenizeSearchQuery(String query) {

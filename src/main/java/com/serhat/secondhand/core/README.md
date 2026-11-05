@@ -12,6 +12,7 @@ The `core` domain provides cross-cutting infrastructural services, including glo
 
 ## Business Invariants & Constraints
 - **Response Format:** All API responses must be wrapped in `Result<T>` and handled via `ResultResponses`.
+- **Error Status:** `ResultResponses` takes the HTTP status of an error from the `ErrorCode` enum that declares its code (404, 403, 409, ...), even after the error was passed on as `Result.error(message, code)`. Codes no enum declares return 400. Two enums declaring one code with different statuses fail on first use (`core/result/ErrorCodeStatuses`).
 - **Public Routing:** New unprotected endpoints must be explicitly annotated with `@PublicEndpoint`.
 - **Statelessness:** JWT token validation is stateless but relies on refresh token rotation (RTR) managed in `auth`.
 

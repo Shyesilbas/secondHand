@@ -95,7 +95,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 String registrationToken = jwtUtils.generateOAuthRegistrationToken(
                         email, googleSub, name, surname, picture);
                 String redirectUrl = String.format(
-                        "%s/auth/complete?registrationToken=%s",
+                        // URL fragment, not query: browsers never send it to a server or in Referer,
+                        // so the token stays out of access logs and third-party requests.
+                        "%s/auth/complete#registrationToken=%s",
                         appConfigProperties.getFrontendUrl(),
                         urlEncode(registrationToken)
                 );
