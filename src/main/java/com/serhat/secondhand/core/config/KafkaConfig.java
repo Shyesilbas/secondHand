@@ -41,7 +41,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>(Object.class);
-        jsonDeserializer.addTrustedPackages("com.serhat.secondhand.*", "*");
+        jsonDeserializer.addTrustedPackages("com.serhat.secondhand.*");
         jsonDeserializer.setUseTypeHeaders(true);
 
         ErrorHandlingDeserializer<Object> errorHandlingValueDeserializer =

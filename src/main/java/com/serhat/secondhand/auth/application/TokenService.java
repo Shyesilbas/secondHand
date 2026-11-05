@@ -30,7 +30,7 @@ public class TokenService {
             rememberMe = false;
         }
         Token token = new Token();
-        token.setToken(tokenValue);
+        token.setToken(hash(tokenValue));
         token.setTokenType(tokenType);
         token.setTokenStatus(TokenStatus.ACTIVE);
         token.setUser(user);
@@ -75,12 +75,14 @@ public class TokenService {
 
     @Transactional
     public void revokeToken(String tokenValue) {
-        tokenRepository.findByToken(tokenValue)
-                .ifPresent(token -> {
-                    token.setTokenStatus(TokenStatus.REVOKED);
-                    tokenRepository.save(token);
-                    log.info("Token revoked - Type: {}, User: {}", token.getTokenType(), token.getUser().getUsername());
-                });
+        tokenRepository.findByToken(hash(tokenValue)).ifPresent(this::revokeStoredToken);
+    }
+
+    @Transactional
+    public void revokeStoredToken(Token token) {
+        token.setTokenStatus(TokenStatus.REVOKED);
+        tokenRepository.save(token);
+        log.info("Token revoked - Type: {}, User: {}", token.getTokenType(), token.getUser().getUsername());
     }
 
     /**
@@ -139,13 +141,13 @@ public class TokenService {
     }
 
     public boolean isTokenValid(String tokenValue) {
-        return tokenRepository.findByTokenAndTokenStatus(tokenValue, TokenStatus.ACTIVE)
+        return tokenRepository.findByTokenAndTokenStatus(hash(tokenValue), TokenStatus.ACTIVE)
                 .map(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
                 .orElse(false);
     }
 
     public Optional<Token> findByToken(String tokenValue) {
-        return tokenRepository.findByToken(tokenValue);
+        return tokenRepository.findByToken(hash(tokenValue));
     }
 
     public Optional<Token> findByUserAndType(User user, TokenType tokenType) {
@@ -155,6 +157,23 @@ public class TokenService {
 
 
     public Optional<TokenStatus> getTokenStatus(String tokenValue) {
-        return tokenRepository.findByToken(tokenValue).map(Token::getTokenStatus);
+        return tokenRepository.findByToken(hash(tokenValue)).map(Token::getTokenStatus);
+    }
+
+    /**
+     * Only the SHA-256 of a token is stored, so a leaked tokens table cannot be replayed. Tokens are
+     * signed JWTs with enough entropy that an unsalted hash is sufficient (V38 hashed the old rows).
+     */
+    static String hash(String tokenValue) {
+        if (tokenValue == null) {
+            return null;
+        }
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(tokenValue.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(digest);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 }

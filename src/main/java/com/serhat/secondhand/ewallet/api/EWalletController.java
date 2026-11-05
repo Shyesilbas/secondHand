@@ -67,18 +67,20 @@ public class EWalletController {
 
     @PostMapping("/deposit")
     public ResponseEntity<?> deposit(
-            @RequestBody DepositRequest request) {
+            @RequestBody DepositRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
-        eWalletService.deposit(request);
+        eWalletService.deposit(request, idempotencyKey);
 
         return ResultResponses.ok(Result.success("Deposit successful"));
     }
 
     @PostMapping("/withdraw")
     public ResponseEntity<?> withdraw(
-            @RequestBody WithdrawRequest request) {
+            @RequestBody WithdrawRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         log.info("Processing withdrawal for authenticated user");
-        eWalletService.withdraw( request);
+        eWalletService.withdraw(request, idempotencyKey);
         return ResultResponses.ok(Result.success("Withdrawal successful"));
     }
 

@@ -30,6 +30,7 @@ public enum PaymentErrorCodes implements ErrorCode {
     REQUIRED_AGREEMENTS_NOT_ACCEPTED("REQUIRED_AGREEMENTS_NOT_ACCEPTED", "Required payment agreements are not accepted", HttpStatus.BAD_REQUEST),
     PAYMENT_ERROR("PAYMENT_ERROR","There is a problem with your payment method." , HttpStatus.BAD_REQUEST ),
     LISTING_FEE_PAYMENT_NOT_ALLOWED_FOR_STATUS("LISTING_FEE_PAYMENT_NOT_ALLOWED", "Listing fee payment is not allowed for this listing status", HttpStatus.BAD_REQUEST),
+    IDEMPOTENCY_KEY_REQUIRED("IDEMPOTENCY_KEY_REQUIRED", "Idempotency-Key header is required (max 255 characters)", HttpStatus.BAD_REQUEST),
     IDEMPOTENCY_KEY_CONFLICT("IDEMPOTENCY_KEY_CONFLICT", "Idempotency key conflict: same key used with different payment parameters", HttpStatus.CONFLICT),
     CONCURRENT_UPDATE("CONCURRENT_UPDATE", "Payment processing failed due to concurrent update. Please try again", HttpStatus.CONFLICT),
     ESCROW_RELEASE_EVENT_INVALID("ESCROW_RELEASE_EVENT_INVALID", "Escrow release event is missing escrowId, sellerId or amount", HttpStatus.INTERNAL_SERVER_ERROR),

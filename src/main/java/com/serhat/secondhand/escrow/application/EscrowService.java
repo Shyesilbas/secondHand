@@ -42,7 +42,7 @@ public class EscrowService {
     private final com.serhat.secondhand.escrow.outbox.EscrowOutboxService escrowOutboxService;
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> hold(Order order) {
         log.info("Creating escrows for order: {}", order.getOrderNumber());
         
@@ -106,7 +106,7 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> release(Order order) {
         log.info("Releasing escrows for order: {}", order.getOrderNumber());
         List<Escrow> escrows = escrowRepository.findByOrderIdAndStatusForUpdate(order.getId(), PaymentStatus.ESCROW);
@@ -148,7 +148,7 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> cancel(Order order, List<OrderItem> itemsToCancel) {
         log.info("Cancelling escrows for {} items in order: {}", itemsToCancel.size(), order.getOrderNumber());
         
@@ -179,7 +179,7 @@ public class EscrowService {
     }
 
     @Transactional
-    @org.springframework.cache.annotation.CacheEvict(value = "paymentStats", allEntries = true)
+    @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> refund(Order order, List<OrderItem> itemsToRefund) {
         log.info("Refunding escrows for {} items in order: {}", itemsToRefund.size(), order.getOrderNumber());
         

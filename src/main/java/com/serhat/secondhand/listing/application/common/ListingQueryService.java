@@ -95,15 +95,21 @@ public class ListingQueryService {
         CompletableFuture<Void> enrichTask = CompletableFuture.runAsync(() ->
                 enrichmentService.enrichInPlace(dto, userId), taskExecutor);
 
-        CompletableFuture<ListingViewStatsDto> statsTask = CompletableFuture.supplyAsync(() ->
-                listingViewService.getViewStatistics(id,
-                        LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
-                        LocalDateTime.now()), taskExecutor);
+        // View statistics are visible to the listing owner only.
+        boolean isOwner = currentUserId != null && currentUserId.equals(dto.getSellerId());
+        CompletableFuture<ListingViewStatsDto> statsTask = isOwner
+                ? CompletableFuture.supplyAsync(() ->
+                        listingViewService.getViewStatistics(id,
+                                LocalDateTime.now().minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS),
+                                LocalDateTime.now()), taskExecutor)
+                : CompletableFuture.completedFuture(null);
 
         CompletableFuture.allOf(enrichTask, statsTask).join();
         ListingViewStatsDto stats = statsTask.join();
-        dto.setViewStats(stats);
-        dto.setViewCount(stats != null && stats.getTotalViews() != null ? stats.getTotalViews() : 0L);
+        if (isOwner) {
+            dto.setViewStats(stats);
+            dto.setViewCount(stats != null && stats.getTotalViews() != null ? stats.getTotalViews() : 0L);
+        }
 
         if (dto.getType() != null
                 && !ListingBusinessConstants.LISTING_TYPES_EXCLUDED_FROM_INLINE_REVIEWS.contains(dto.getType())) {

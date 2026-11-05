@@ -1,5 +1,6 @@
 package com.serhat.secondhand.auth.api;
 
+import com.serhat.secondhand.auth.application.AccessRevocationService;
 import com.serhat.secondhand.auth.application.LoginService;
 import com.serhat.secondhand.auth.application.OAuthService;
 import com.serhat.secondhand.auth.application.RegistrationService;
@@ -39,6 +40,7 @@ public class AuthController {
     private final RegistrationService registrationService;
     private final OAuthService oauthService;
     private final CookieUtils cookieUtils;
+    private final AccessRevocationService accessRevocationService;
 
     @PublicEndpoint
     @PostMapping("/register")
@@ -84,6 +86,12 @@ public class AuthController {
         
         String refreshToken = cookieUtils.getRefreshTokenFromCookies(request).orElse(null);
         AuthMessageResponse response = loginService.logout(authentication, refreshToken);
+        // The access token used for this request stops working now instead of at its expiry.
+        String authHeader = request.getHeader("Authorization");
+        String accessToken = authHeader != null && authHeader.startsWith("Bearer ")
+                ? authHeader.substring(7)
+                : cookieUtils.getAccessTokenFromCookies(request).orElse(null);
+        accessRevocationService.revokeAccessToken(accessToken);
 
         cookieUtils.clearAuthCookies(httpResponse);
 

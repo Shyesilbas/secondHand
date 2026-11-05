@@ -18,9 +18,9 @@ public interface IEWalletService {
     
     void removeSpendingWarningLimit();
     
-    void deposit(DepositRequest request);
+    void deposit(DepositRequest request, String idempotencyKey);
     
-    void withdraw(WithdrawRequest request);
+    void withdraw(WithdrawRequest request, String idempotencyKey);
     
     EWalletDto updateLimits(UpdateLimitRequest request);
     

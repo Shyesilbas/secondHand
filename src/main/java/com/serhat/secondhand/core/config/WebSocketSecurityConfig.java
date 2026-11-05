@@ -1,5 +1,9 @@
 package com.serhat.secondhand.core.config;
 
+import com.serhat.secondhand.auth.application.AccessRevocationService;
+import io.jsonwebtoken.Claims;
+import java.util.Date;
+
 import com.serhat.secondhand.chat.application.ChatAuthorizationService;
 import com.serhat.secondhand.core.jwt.JwtUtils;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -43,6 +47,11 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
     private final JwtUtils jwtUtils;
     private final UserDetailsService userDetailsService;
     private final ChatAuthorizationService chatAuthorizationService;
+    private final AccessRevocationService accessRevocationService;
+
+    private static final String SESSION_USER_ID = "ws_auth_user_id";
+    private static final String SESSION_ISSUED_AT = "ws_auth_issued_at";
+    private static final String SESSION_TOKEN_ID = "ws_auth_token_id";
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -69,6 +78,10 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                     log.warn("Rejecting unauthenticated WebSocket {} for destination {}",
                             command, accessor.getDestination());
                     throw new MessageDeliveryException("WebSocket authentication required");
+                }
+
+                if (isAuthorizationRequired(command)) {
+                    rejectIfRevoked(accessor);
                 }
 
                 if (StompCommand.SUBSCRIBE.equals(command)) {
@@ -142,6 +155,24 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         throw new MessageDeliveryException("WebSocket authentication required");
     }
 
+    // The connection outlives the CONNECT check, so a ban (all access revoked) or a logout of the token
+    // used at CONNECT must also stop SUBSCRIBE/SEND on an already open connection.
+    private void rejectIfRevoked(StompHeaderAccessor accessor) {
+        Map<String, Object> sessionAttrs = accessor.getSessionAttributes();
+        Object userId = sessionAttrs != null ? sessionAttrs.get(SESSION_USER_ID) : null;
+        if (!(userId instanceof Long id)) {
+            throw new MessageDeliveryException("WebSocket authentication required");
+        }
+        Object issuedAt = sessionAttrs.get(SESSION_ISSUED_AT);
+        Object tokenId = sessionAttrs.get(SESSION_TOKEN_ID);
+        if (accessRevocationService.isRevoked(id,
+                issuedAt instanceof Date date ? date : null,
+                tokenId instanceof String jti ? jti : null)) {
+            log.warn("Rejecting WebSocket {} for user {}: access revoked", accessor.getCommand(), id);
+            throw new MessageDeliveryException("WebSocket token revoked");
+        }
+    }
+
     private boolean containsPatternOrTraversal(String destination) {
         return destination.contains("*")
                 || destination.contains("?")
@@ -174,6 +205,18 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             if (!jwtUtils.isTokenValid(token, userDetails)) {
                 log.warn("Invalid JWT token for WebSocket connection");
                 throw new MessageDeliveryException("Invalid JWT token");
+            }
+            Claims claims = jwtUtils.parseClaims(token);
+            Long userId = JwtUtils.userIdFrom(claims);
+            if (userId == null || accessRevocationService.isRevoked(userId, claims.getIssuedAt(), claims.getId())) {
+                log.warn("Rejecting WebSocket CONNECT with revoked token for {}", username);
+                throw new MessageDeliveryException("WebSocket token revoked");
+            }
+            Map<String, Object> sessionAttrs = accessor.getSessionAttributes();
+            if (sessionAttrs != null) {
+                sessionAttrs.put(SESSION_USER_ID, userId);
+                sessionAttrs.put(SESSION_ISSUED_AT, claims.getIssuedAt());
+                sessionAttrs.put(SESSION_TOKEN_ID, claims.getId());
             }
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

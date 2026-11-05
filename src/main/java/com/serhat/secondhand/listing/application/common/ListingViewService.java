@@ -140,6 +140,18 @@ public class ListingViewService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "listing:views:listing", key = "#listingId")
+    public ListingViewStatsDto getViewStatisticsForOwner(UUID listingId, Long requesterId,
+                                                        LocalDateTime startDate, LocalDateTime endDate) {
+        Long sellerId = listingRepository.findSellerIdById(listingId)
+                .orElseThrow(() -> new com.serhat.secondhand.core.exception.BusinessException(
+                        com.serhat.secondhand.listing.util.ListingErrorCodes.LISTING_NOT_FOUND));
+        if (requesterId == null || !requesterId.equals(sellerId)) {
+            throw new com.serhat.secondhand.core.exception.BusinessException(
+                    com.serhat.secondhand.listing.util.ListingErrorCodes.NOT_LISTING_OWNER);
+        }
+        return getViewStatistics(listingId, startDate, endDate);
+    }
+
     public ListingViewStatsDto getViewStatistics(UUID listingId, LocalDateTime startDate, LocalDateTime endDate) {
         if (!listingRepository.existsById(listingId)) {
             throw new com.serhat.secondhand.core.exception.BusinessException(

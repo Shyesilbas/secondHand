@@ -64,7 +64,7 @@ public class ListingViewController {
         if (endDate == null) endDate = LocalDateTime.now();
         if (startDate == null) startDate = endDate.minusDays(ListingBusinessConstants.DEFAULT_VIEW_STATS_WINDOW_DAYS);
 
-        ListingViewStatsDto stats = listingViewService.getViewStatistics(id, startDate, endDate);
+        ListingViewStatsDto stats = listingViewService.getViewStatisticsForOwner(id, currentUser.getId(), startDate, endDate);
         return ResultResponses.ok(Result.success(stats));
     }
 

@@ -113,7 +113,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
                 // Blocked accounts and revoked sessions: the token is still validly signed, so check Redis.
-                if (accessRevocationService.isRevoked(userId, claims.getIssuedAt())) {
+                if (accessRevocationService.isRevoked(userId, claims.getIssuedAt(), claims.getId())) {
                     sendTokenError(response, request, TokenStatus.REVOKED);
                     return;
                 }

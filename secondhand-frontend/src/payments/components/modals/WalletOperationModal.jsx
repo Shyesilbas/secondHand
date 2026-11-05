@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Modal from '../../../common/components/ui/Modal.jsx';
 import Button from '../../../common/components/ui/Button.jsx';
 import { formatCurrency } from '../../../common/formatters.js';
@@ -17,6 +17,12 @@ const WalletOperationModal = ({
  } = useTranslation();
  const [amount, setAmount] = useState('');
  const [error, setError] = useState('');
+ // One key per intended operation: a retry or double submit of the same amount reuses it, so the
+ // backend applies a deposit/withdrawal once. A new dialog or a changed amount gets a new key.
+ const idempotencyKeyRef = useRef(null);
+ useEffect(() => {
+ idempotencyKeyRef.current = null;
+ }, [isOpen, amount, mode]);
  useEffect(() => {
  if (!isOpen) return;
  setAmount('');
@@ -77,7 +83,8 @@ const WalletOperationModal = ({
  return;
  }
  try {
- await onSubmit(numericAmount);
+ if (!idempotencyKeyRef.current) idempotencyKeyRef.current = crypto.randomUUID();
+ await onSubmit(numericAmount, idempotencyKeyRef.current);
  onClose();
  } catch {
  // The wallet mutation already shows the error toast; keep the dialog open so the amount can be corrected.

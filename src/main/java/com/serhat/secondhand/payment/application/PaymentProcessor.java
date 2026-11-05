@@ -225,12 +225,11 @@ public class PaymentProcessor {
     }
 
     private void evictUserPaymentStatsCache(Long userId) {
-        org.springframework.cache.Cache cache = cacheManager.getCache("paymentStats");
+        // Stats are cached per user and provider filter, and a payment changes both the payer's and the
+        // recipient's numbers, so clear the whole cache like the escrow and e-wallet paths do.
+        org.springframework.cache.Cache cache = cacheManager.getCache("payment:stats");
         if (cache != null) {
-            cache.evict(userId + "_null");
-            // Since PaymentType enum is removed, we invalidate everything
-            // Or better: cache.clear() if supported, but typically we evict known keys
-            cache.evict(userId + "_EWALLET");
+            cache.clear();
         }
     }
 }

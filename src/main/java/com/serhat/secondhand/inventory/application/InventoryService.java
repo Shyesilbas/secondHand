@@ -1,7 +1,9 @@
 package com.serhat.secondhand.inventory.application;
 
 import com.serhat.secondhand.inventory.domain.entity.Inventory;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.inventory.domain.repository.InventoryRepository;
+import com.serhat.secondhand.inventory.util.InventoryErrorCodes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,10 +50,17 @@ public class InventoryService {
 
     @Transactional
     public void reserveQuantity(UUID listingId, int quantity) {
+        if (quantity < 1) {
+            throw new BusinessException(InventoryErrorCodes.INVALID_QUANTITY);
+        }
         Inventory inventory = getOrCreateInventory(listingId, 1);
-        inventory.reserveQuantity(quantity);
-        inventoryRepository.save(inventory);
-        log.info("Reserved {} items for listing {}. Remaining: {}", quantity, listingId, inventory.getAvailableQuantity());
+        if (inventory.getAvailableQuantity() == null) {
+            return; // no stock tracking for this listing, same as Inventory.reserveQuantity
+        }
+        if (inventoryRepository.deductIfAvailable(listingId, quantity) == 0) {
+            throw new BusinessException(InventoryErrorCodes.INSUFFICIENT_STOCK);
+        }
+        log.info("Reserved {} items for listing {}.", quantity, listingId);
     }
 
     @Transactional

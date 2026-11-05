@@ -31,6 +31,9 @@ public interface ListingRepository extends JpaRepository<Listing, UUID> {
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE l.id = :id")
     Optional<Listing> findByIdWithSeller(@Param("id") UUID id);
 
+    @Query("SELECT l.seller.id FROM Listing l WHERE l.id = :id")
+    Optional<Long> findSellerIdById(@Param("id") UUID id);
+
     @Query("SELECT l FROM Listing l JOIN FETCH l.seller WHERE LOWER(l.listingNo) = LOWER(:listingNo)")
     Optional<Listing> findByListingNoWithSeller(@Param("listingNo") String listingNo);
 

@@ -8,9 +8,10 @@ import com.serhat.secondhand.notification.entity.enums.NotificationType;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class PriceDropNotificationListener {
     private final FavoriteRepository favoriteRepository;
     private final INotificationService notificationService;
 
-    @EventListener
+    // Notify only after the publishing transaction commits; run immediately when there is no transaction.
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     @Async("notificationExecutor")
     public void handlePriceDroppedEvent(PriceDroppedEvent event) {
         log.info("Handling PriceDroppedEvent for listing: {}", event.getListingId());

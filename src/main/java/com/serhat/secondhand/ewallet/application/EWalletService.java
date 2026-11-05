@@ -13,6 +13,7 @@ import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
 import com.serhat.secondhand.payment.entity.*;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
+import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -91,9 +92,14 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     @CacheEvict(value = "payment:stats", allEntries = true)
-    public void deposit(DepositRequest request) {
+    public void deposit(DepositRequest request, String idempotencyKey) {
+        requireIdempotencyKey(idempotencyKey);
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
+        // Checked under the wallet row lock, so a concurrent request with the same key waits and sees this one.
+        if (alreadyApplied(user, idempotencyKey, PaymentTransactionType.EWALLET_DEPOSIT, request.getAmount())) {
+            return;
+        }
 
         ensureValid(eWalletValidator.validateDeposit(eWallet, request.getAmount()));
 
@@ -101,6 +107,7 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         Payment payment = eWalletPaymentFactory.buildDepositPayment(user, request.getAmount());
+        payment.setIdempotencyKey(idempotencyKey);
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
         log.info("Mock eWallet top-up successful for user: {} amount: {}", user.getEmail(), request.getAmount());
@@ -108,9 +115,14 @@ public class EWalletService implements IEWalletService {
 
     @Transactional
     @CacheEvict(value = "payment:stats", allEntries = true)
-    public void withdraw(WithdrawRequest request) {
+    public void withdraw(WithdrawRequest request, String idempotencyKey) {
+        requireIdempotencyKey(idempotencyKey);
         User user = getAuthenticatedUser();
         EWallet eWallet = getEWalletOrThrowWithLock(user);
+        // Checked under the wallet row lock, so a concurrent request with the same key waits and sees this one.
+        if (alreadyApplied(user, idempotencyKey, PaymentTransactionType.EWALLET_WITHDRAWAL, request.getAmount())) {
+            return;
+        }
 
         ensureValid(eWalletValidator.validateWithdraw(eWallet, request.getAmount()));
 
@@ -118,6 +130,7 @@ public class EWalletService implements IEWalletService {
         eWalletRepository.save(eWallet);
 
         Payment payment = eWalletPaymentFactory.buildWithdrawalPayment(user, request.getAmount());
+        payment.setIdempotencyKey(idempotencyKey);
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new com.serhat.secondhand.payment.entity.events.PaymentCompletedEvent(this, payment));
         log.info("eWallet withdrawal successful for user: {} amount: {}", user.getEmail(), request.getAmount());
@@ -316,6 +329,28 @@ public class EWalletService implements IEWalletService {
     private EWallet getEWalletOrThrowWithLock(User user) {
         return eWalletRepository.findByUserWithLock(user)
                 .orElseThrow(() -> new BusinessException(PaymentErrorCodes.EWALLET_NOT_FOUND));
+    }
+
+    private void requireIdempotencyKey(String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.isBlank() || idempotencyKey.length() > 255) {
+            throw new BusinessException(PaymentErrorCodes.IDEMPOTENCY_KEY_REQUIRED);
+        }
+    }
+
+    // A repeated key returns without changing the balance; the same key with another amount or operation is rejected.
+    private boolean alreadyApplied(User user, String idempotencyKey, PaymentTransactionType type, BigDecimal amount) {
+        return paymentRepository.findByIdempotencyKeyAndFromUserId(idempotencyKey, user.getId())
+                .map(existing -> {
+                    boolean same = existing.getTransactionType() == type
+                            && amount != null && existing.getAmount() != null
+                            && existing.getAmount().compareTo(amount) == 0;
+                    if (!same) {
+                        throw new BusinessException(PaymentErrorCodes.IDEMPOTENCY_KEY_CONFLICT);
+                    }
+                    log.info("eWallet {} with idempotency key already applied for user {}", type, user.getId());
+                    return true;
+                })
+                .orElse(false);
     }
 
     private void ensureValid(Result<Void> result) {

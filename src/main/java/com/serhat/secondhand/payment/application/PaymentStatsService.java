@@ -27,7 +27,7 @@ public class PaymentStatsService {
     private final PaymentMapper paymentMapper;
     private final PaymentContextResolver paymentContextResolver;
 
-    @Cacheable(value = "payment:stats", key = "#userId + '_' + #filterType")
+    @Cacheable(value = "payment:stats", key = "#userId + '_' + #providerName")
     public Map<String, Object> getPaymentStatistics(Long userId, String providerName) {
         log.info("[CACHE MISS] payment:stats for userId: {}", userId);
 

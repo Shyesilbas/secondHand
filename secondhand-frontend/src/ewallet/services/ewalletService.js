@@ -22,20 +22,22 @@ export const ewalletService = {
  return del(API_ENDPOINTS.EWALLET.REMOVE_SPENDING_WARNING);
  },
 
- deposit: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
- return post(API_ENDPOINTS.EWALLET.DEPOSIT, { 
- amount, 
- agreementsAccepted, 
- acceptedAgreementIds 
- });
+ // idempotencyKey is required: the backend applies a repeated key only once.
+ deposit: async (amount, idempotencyKey, agreementsAccepted = false, acceptedAgreementIds = []) => {
+ return post(API_ENDPOINTS.EWALLET.DEPOSIT, {
+ amount,
+ agreementsAccepted,
+ acceptedAgreementIds
+ }, { headers: { 'Idempotency-Key': idempotencyKey } });
  },
 
- withdraw: async (amount, agreementsAccepted = false, acceptedAgreementIds = []) => {
- return post(API_ENDPOINTS.EWALLET.WITHDRAW, { 
- amount, 
- agreementsAccepted, 
- acceptedAgreementIds 
- });
+ // idempotencyKey is required: the backend applies a repeated key only once.
+ withdraw: async (amount, idempotencyKey, agreementsAccepted = false, acceptedAgreementIds = []) => {
+ return post(API_ENDPOINTS.EWALLET.WITHDRAW, {
+ amount,
+ agreementsAccepted,
+ acceptedAgreementIds
+ }, { headers: { 'Idempotency-Key': idempotencyKey } });
  },
 
  getTransactions: async (page = 0, size = 10) => {

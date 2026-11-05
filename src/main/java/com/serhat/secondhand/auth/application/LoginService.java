@@ -42,7 +42,7 @@ public class LoginService {
 
     public TokenRotationResult issueTokens(User user, boolean rememberMe, Token oldRefreshToken) {
         if (oldRefreshToken != null) {
-            tokenService.revokeToken(oldRefreshToken.getToken());
+            tokenService.revokeStoredToken(oldRefreshToken);
         }
 
         String accessToken = jwtUtils.generateAccessToken(user);

@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Cuts off a user's access immediately, without waiting for already issued access tokens to expire.
@@ -24,6 +26,7 @@ import java.util.Date;
 public class AccessRevocationService {
 
     static final String KEY_PREFIX = "auth:access-revoked:";
+    static final String TOKEN_KEY_PREFIX = "auth:access-token-revoked:";
 
     private final StringRedisTemplate redisTemplate;
     private final TokenService tokenService;
@@ -38,9 +41,42 @@ public class AccessRevocationService {
         log.warn("All access revoked for user id {}", user.getId());
     }
 
-    /** True when the token was issued at or before the user's last access revocation. */
-    public boolean isRevoked(Long userId, Date issuedAt) {
-        String revokedAt = redisTemplate.opsForValue().get(KEY_PREFIX + userId);
+    /**
+     * Revokes one access token (logout). Other sessions of the user keep working. The entry lives only
+     * until the token would have expired anyway. Unparseable or already expired tokens need no entry.
+     */
+    public void revokeAccessToken(String accessToken) {
+        if (accessToken == null || accessToken.isBlank()) {
+            return;
+        }
+        Claims claims;
+        try {
+            claims = jwtUtils.parseClaims(accessToken);
+        } catch (Exception e) {
+            return;
+        }
+        if (claims == null || claims.getId() == null || claims.getExpiration() == null) {
+            return;
+        }
+        long ttlMillis = claims.getExpiration().getTime() - System.currentTimeMillis();
+        if (ttlMillis > 0) {
+            redisTemplate.opsForValue().set(TOKEN_KEY_PREFIX + claims.getId(), "1", Duration.ofMillis(ttlMillis));
+        }
+    }
+
+    /**
+     * True when the token was issued at or before the user's last access revocation, or this token
+     * itself was revoked by logout. Both keys are read in one round trip.
+     */
+    public boolean isRevoked(Long userId, Date issuedAt, String tokenId) {
+        List<String> values = redisTemplate.opsForValue().multiGet(List.of(
+                KEY_PREFIX + userId,
+                TOKEN_KEY_PREFIX + (tokenId != null ? tokenId : "")));
+        String revokedAt = values != null ? values.get(0) : null;
+        String tokenRevoked = values != null ? values.get(1) : null;
+        if (tokenId != null && tokenRevoked != null) {
+            return true;
+        }
         if (revokedAt == null) {
             return false;
         }
