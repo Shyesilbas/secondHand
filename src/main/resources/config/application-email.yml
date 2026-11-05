@@ -1,22 +1,5 @@
-# E-posta altyapı ve bağlantı ayarları. İçerik ve metinler messages.properties içerisindedir.
-spring:
-  mail:
-    host: "${SMTP_HOST:localhost}"
-    port: "${SMTP_PORT:2525}"
-    username: "${SMTP_USERNAME:}"
-    password: "${SMTP_PASSWORD:}"
-    properties:
-      mail:
-        smtp:
-          auth: "${SMTP_AUTH:false}"
-          starttls:
-            enable: "${SMTP_STARTTLS:false}"
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-
+# E-posta ayarları. E-postalar SMTP ile gönderilmez; kullanıcının uygulama içi gelen kutusuna (emails tablosu) yazılır.
+# İçerik ve metinler messages.properties içerisindedir.
 app:
   email:
-    mock: "${EMAIL_MOCK:true}"
     sender: "${EMAIL_SENDER:secondhand@noreply.com}"
-

@@ -67,4 +67,60 @@ class WebSocketSecurityConfigTest {
         assertThatThrownBy(() -> interceptor.preSend(subscribe("/topic/chat/abc"), null))
                 .isInstanceOf(MessageDeliveryException.class);
     }
+
+    @Test
+    void user_canSubscribeToOwnUserDestinations() {
+        Message<byte[]> notifications = subscribe("/user/7/notifications");
+        Message<byte[]> messages = subscribe("/user/7/queue/messages");
+
+        assertThat(interceptor.preSend(notifications, null)).isSameAs(notifications);
+        assertThat(interceptor.preSend(messages, null)).isSameAs(messages);
+    }
+
+    @Test
+    void user_cannotSubscribeToAnotherUsersNotifications() {
+        assertThatThrownBy(() -> interceptor.preSend(subscribe("/user/8/notifications"), null))
+                .isInstanceOf(MessageDeliveryException.class);
+        assertThatThrownBy(() -> interceptor.preSend(subscribe("/user/70/notifications"), null))
+                .isInstanceOf(MessageDeliveryException.class);
+    }
+
+    @Test
+    void wildcardAndTraversalSubscriptions_areRejected() {
+        for (String destination : new String[]{"/user/**", "/topic/**", "/topic/chat/*", "/user/7/../8/notifications"}) {
+            assertThatThrownBy(() -> interceptor.preSend(subscribe(destination), null))
+                    .as(destination)
+                    .isInstanceOf(MessageDeliveryException.class);
+        }
+        verifyNoInteractions(chatAuth);
+    }
+
+    @Test
+    void broadcastTopic_isAllowed_andUnknownDestinations_areRejected() {
+        Message<byte[]> broadcast = subscribe("/topic/notifications");
+
+        assertThat(interceptor.preSend(broadcast, null)).isSameAs(broadcast);
+        assertThatThrownBy(() -> interceptor.preSend(subscribe("/queue/messages"), null))
+                .isInstanceOf(MessageDeliveryException.class);
+    }
+
+    @Test
+    void send_isOnlyAllowedToApplicationDestinations() {
+        Message<byte[]> appMessage = send("/app/chat.sendMessage");
+
+        assertThat(interceptor.preSend(appMessage, null)).isSameAs(appMessage);
+        assertThatThrownBy(() -> interceptor.preSend(send("/topic/chat/105"), null))
+                .isInstanceOf(MessageDeliveryException.class);
+        assertThatThrownBy(() -> interceptor.preSend(send("/user/8/notifications"), null))
+                .isInstanceOf(MessageDeliveryException.class);
+    }
+
+    private Message<byte[]> send(String destination) {
+        User user = new User();
+        user.setId(7L);
+        StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SEND);
+        accessor.setDestination(destination);
+        accessor.setUser(new UsernamePasswordAuthenticationToken(user, null));
+        return MessageBuilder.createMessage(new byte[0], accessor.getMessageHeaders());
+    }
 }

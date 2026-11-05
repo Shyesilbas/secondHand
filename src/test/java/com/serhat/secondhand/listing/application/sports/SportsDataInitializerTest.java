@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.sports;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.core.seed.CatalogLegacyPruner;
 import com.serhat.secondhand.listing.domain.entity.SportsListing;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
@@ -112,7 +113,8 @@ class SportsDataInitializerTest {
                 sportDisciplineRepository,
                 sportEquipmentTypeRepository,
                 sportConditionRepository,
-                objectMapper
+                objectMapper,
+                mock(CatalogLegacyPruner.class)
         );
 
         when(sportDisciplineRepository.findByNameIgnoreCase(any())).thenReturn(Optional.empty());

@@ -36,6 +36,9 @@ import java.util.Map;
 public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final String CHAT_TOPIC_PREFIX = "/topic/chat/";
+    private static final String BROADCAST_NOTIFICATIONS_TOPIC = "/topic/notifications";
+    private static final String USER_DESTINATION_PREFIX = "/user/";
+    private static final String APP_DESTINATION_PREFIX = "/app/";
 
     private final JwtUtils jwtUtils;
     private final UserDetailsService userDetailsService;
@@ -69,7 +72,11 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                 }
 
                 if (StompCommand.SUBSCRIBE.equals(command)) {
-                    authorizeChatSubscription(accessor);
+                    authorizeSubscription(accessor);
+                }
+
+                if (StompCommand.SEND.equals(command)) {
+                    authorizeSend(accessor);
                 }
 
                 return message;
@@ -77,23 +84,70 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         });
     }
 
-    // /topic/chat/{roomId} yalnızca oda katılımcılarına açıktır.
-    private void authorizeChatSubscription(StompHeaderAccessor accessor) {
+    // Abonelik izin listesi: /topic/notifications, katılımcısı olunan /topic/chat/{roomId}
+    // ve yalnızca kullanıcının kendi /user/{userId}/... hedefleri. Simple broker abonelik
+    // hedeflerini Ant pattern olarak eşlediği için "/user/**" gibi joker karakterler reddedilir.
+    private void authorizeSubscription(StompHeaderAccessor accessor) {
         String destination = accessor.getDestination();
-        if (destination == null || !destination.startsWith(CHAT_TOPIC_PREFIX)) {
+        if (destination == null || containsPatternOrTraversal(destination)) {
+            log.warn("Rejecting WebSocket SUBSCRIBE to invalid destination {}", destination);
+            throw new MessageDeliveryException("Invalid subscription destination");
+        }
+        if (BROADCAST_NOTIFICATIONS_TOPIC.equals(destination)) {
             return;
         }
+
+        Long userId = currentUserId(accessor);
+        if (destination.startsWith(CHAT_TOPIC_PREFIX)) {
+            authorizeChatSubscription(destination, userId);
+            return;
+        }
+        if (destination.startsWith(USER_DESTINATION_PREFIX + userId + "/")) {
+            return;
+        }
+
+        log.warn("Rejecting WebSocket SUBSCRIBE by user {} to destination {}", userId, destination);
+        throw new MessageDeliveryException("Subscription destination not allowed");
+    }
+
+    // /topic/chat/{roomId} yalnızca oda katılımcılarına açıktır.
+    private void authorizeChatSubscription(String destination, Long userId) {
+        Long roomId;
         try {
-            Long roomId = Long.valueOf(destination.substring(CHAT_TOPIC_PREFIX.length()));
-            Long userId = ((User) ((UsernamePasswordAuthenticationToken) accessor.getUser()).getPrincipal()).getId();
-            if (chatAuthorizationService.validateRoomParticipant(roomId, userId).isError()) {
-                throw new MessageDeliveryException("Not a participant of chat room");
-            }
-        } catch (MessageDeliveryException e) {
-            throw e;
-        } catch (Exception e) {
+            roomId = Long.valueOf(destination.substring(CHAT_TOPIC_PREFIX.length()));
+        } catch (NumberFormatException e) {
             throw new MessageDeliveryException("Invalid chat subscription");
         }
+        if (chatAuthorizationService.validateRoomParticipant(roomId, userId).isError()) {
+            throw new MessageDeliveryException("Not a participant of chat room");
+        }
+    }
+
+    // İstemci yalnızca @MessageMapping uçlarına (/app/...) mesaj gönderebilir; broker hedeflerine
+    // (/topic, /queue, /user) doğrudan SEND başka kullanıcılara sahte bildirim veya sohbet mesajı iletir.
+    private void authorizeSend(StompHeaderAccessor accessor) {
+        String destination = accessor.getDestination();
+        if (destination == null || !destination.startsWith(APP_DESTINATION_PREFIX)) {
+            log.warn("Rejecting WebSocket SEND to non-application destination {}", destination);
+            throw new MessageDeliveryException("SEND is only allowed to application destinations");
+        }
+    }
+
+    private Long currentUserId(StompHeaderAccessor accessor) {
+        if (accessor.getUser() instanceof UsernamePasswordAuthenticationToken authentication
+                && authentication.getPrincipal() instanceof User user
+                && user.getId() != null) {
+            return user.getId();
+        }
+        throw new MessageDeliveryException("WebSocket authentication required");
+    }
+
+    private boolean containsPatternOrTraversal(String destination) {
+        return destination.contains("*")
+                || destination.contains("?")
+                || destination.contains("{")
+                || destination.contains("}")
+                || destination.contains("..");
     }
 
     private boolean isAuthorizationRequired(StompCommand command) {

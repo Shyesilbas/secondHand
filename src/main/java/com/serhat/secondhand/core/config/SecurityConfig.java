@@ -3,6 +3,7 @@ package com.serhat.secondhand.core.config;
 import com.serhat.secondhand.core.jwt.AuthenticationFilter;
 import com.serhat.secondhand.core.security.CsrfCookieFilter;
 import com.serhat.secondhand.core.security.PublicEndpointRegistry;
+import com.serhat.secondhand.core.security.PublicRouteRequestMatcher;
 import com.serhat.secondhand.core.security.RateLimitingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,17 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 @EnableWebSecurity
@@ -56,9 +62,9 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName(null);
 
-        Set<String> dynamicPublicEndpoints = publicEndpointRegistry.getPublicEndpoints();
-        log.info("Applying security to {} dynamically discovered public endpoints", dynamicPublicEndpoints.size());
-        
+        Set<PublicEndpointRegistry.Route> routes = publicEndpointRegistry.getRoutes();
+        log.info("Applying security to {} dynamically discovered controller routes", routes.size());
+
         // Add additional non-controller public paths (wildcards)
         // /actuator/prometheus kasıtlı olarak listede DEĞİL: prod'da metrik scrape'ı için
         // ayrı management.server.port kullanılmalı veya gateway/network politikasıyla erişim
@@ -75,21 +81,20 @@ public class SecurityConfig {
                 "/actuator/info"
         ));
         
-        Set<String> allPublicEndpoints = new java.util.HashSet<>(dynamicPublicEndpoints);
-        allPublicEndpoints.addAll(additionalPublicPaths);
+        RequestMatcher publicRequests = buildPublicRequestMatcher(routes, additionalPublicPaths);
 
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(requestHandler)
-                        .ignoringRequestMatchers(allPublicEndpoints.toArray(new String[0]))
+                        .ignoringRequestMatchers(publicRequests)
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(allPublicEndpoints.toArray(new String[0])).permitAll()
+                        .requestMatchers(publicRequests).permitAll()
                         .requestMatchers("/api/images/upload").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -111,6 +116,20 @@ public class SecurityConfig {
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // Bir istek, Spring MVC'nin seçeceği handler @PublicEndpoint ise public sayılır (en özgül
+    // pattern, sonra HTTP metodu). Böylece GET /{id} public iken GET /my veya PUT /{id} gibi
+    // korumalı handler'lar permitAll veya CSRF muafiyeti almaz.
+    static RequestMatcher buildPublicRequestMatcher(Set<PublicEndpointRegistry.Route> routes,
+                                                    Set<String> infrastructurePaths) {
+        PathPatternRequestMatcher.Builder builder = PathPatternRequestMatcher.withDefaults();
+        List<RequestMatcher> matchers = new ArrayList<>();
+        matchers.add(new PublicRouteRequestMatcher(routes));
+        for (String path : infrastructurePaths) {
+            matchers.add(builder.matcher(path));
+        }
+        return new OrRequestMatcher(matchers);
     }
 
     @Bean

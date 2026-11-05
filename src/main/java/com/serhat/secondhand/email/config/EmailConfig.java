@@ -16,7 +16,6 @@ import java.util.Locale;
 @ConfigurationProperties(prefix = "app.email")
 public class EmailConfig {
 
-    private boolean mock = true;
     private String sender = "secondhand@noreply.com";
 
     @Autowired

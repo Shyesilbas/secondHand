@@ -8,10 +8,15 @@ import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
+import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,16 +106,49 @@ public class CheckoutStockReservationService {
         });
     }
 
-    public void consumeReservationsOnSuccess(Long userId, Map<UUID, Integer> reserved) {
-        if (reserved == null || reserved.isEmpty()) {
+    /**
+     * Converts the buyer's reservations into pending-purchase markers once the checkout transaction commits.
+     * Before the commit the reservations keep the units held; if the transaction rolls back they stay
+     * reservations and are cancelled by the caller or expire with their TTL.
+     */
+    public void consumeReservationsOnSuccess(Long userId, Order order) {
+        if (order == null || order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
             return;
         }
-        reserved.keySet().forEach(listingId -> {
+        List<PurchasedLine> lines = new ArrayList<>();
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getListing() == null || item.getId() == null) {
+                log.warn("Order {} item without listing or id; its reservation is left to expire", order.getOrderNumber());
+                continue;
+            }
+            int quantity = item.getQuantity() != null && item.getQuantity() > 0 ? item.getQuantity() : 1;
+            lines.add(new PurchasedLine(item.getListing().getId(), item.getId(), quantity));
+        }
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    consumeLines(userId, lines);
+                }
+            });
+        } else {
+            consumeLines(userId, lines);
+        }
+    }
+
+    private void consumeLines(Long userId, List<PurchasedLine> lines) {
+        lines.forEach(line -> {
             try {
-                redisReservationService.consumeReservationOnPurchase(userId, listingId);
+                redisReservationService.consumeReservationOnPurchase(userId, line.listingId(), line.orderItemId(), line.quantity());
             } catch (Exception ex) {
-                log.warn("Could not delete reservation key for user {} on listing {}", userId, listingId, ex);
+                // Reservation key stays and expires with its TTL; until then the units remain held (no oversell).
+                log.warn("Could not convert reservation of user {} on listing {} to a pending purchase",
+                        userId, line.listingId(), ex);
             }
         });
+    }
+
+    private record PurchasedLine(UUID listingId, Long orderItemId, int quantity) {
     }
 }

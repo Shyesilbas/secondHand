@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -20,6 +22,7 @@ public class InventoryKafkaConsumer {
     private final InventoryService inventoryService;
     private final ListingRepository listingRepository;
     private final ProcessedKafkaEventRepository processedKafkaEventRepository;
+    private final InventoryRedisReservationService redisReservationService;
 
     @KafkaListener(
             topics = KafkaConfig.PAYMENT_COMPLETED_TOPIC,
@@ -38,6 +41,10 @@ public class InventoryKafkaConsumer {
                     event.paymentId(), event.transactionType());
             return;
         }
+
+        // Checkout'un bıraktığı pending işareti yalnızca bu transaction commit olursa silinir: düşüm yapıldı,
+        // daha önce yapılmıştı (duplicate) ya da ilan artık yok. Rollback'te işaret kalır ve stok tutulmaya devam eder.
+        clearPendingPurchaseAfterCommit(event);
 
         // Atomic DB-Level Idempotency Check: INSERT ON CONFLICT DO NOTHING within the same ACID Transaction
         String dedupeKey = "inventory:payment:" + event.paymentId();
@@ -79,6 +86,31 @@ public class InventoryKafkaConsumer {
             log.error("Failed to deduct inventory for listingId: {} on paymentId: {}",
                     event.listingId(), event.paymentId(), e);
             throw e; // Allows Kafka retry / DLQ mechanisms
+        }
+    }
+
+    private void clearPendingPurchaseAfterCommit(PaymentCompletedKafkaEvent event) {
+        if (event.orderItemId() == null) {
+            return;
+        }
+        Runnable clear = () -> {
+            try {
+                redisReservationService.clearPendingPurchase(event.listingId(), event.orderItemId());
+            } catch (Exception ex) {
+                // Marker expires with its TTL; until then Redis keeps the units taken (no oversell).
+                log.warn("Could not clear pending purchase marker for listing {} order item {}",
+                        event.listingId(), event.orderItemId(), ex);
+            }
+        };
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    clear.run();
+                }
+            });
+        } else {
+            clear.run();
         }
     }
 }

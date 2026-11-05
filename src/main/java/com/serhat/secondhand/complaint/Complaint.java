@@ -38,7 +38,7 @@ public class Complaint {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "listing_id",
-            foreignKey = @ForeignKey(name = "fk_complaint_complained_user"))
+            foreignKey = @ForeignKey(name = "fk_complaint_listing"))
     private Listing listing;
 
     @Column(name = "description", length = 1000)

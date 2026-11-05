@@ -72,7 +72,7 @@ public class ListingSearchService {
 
     public Page<ListingDto> globalSearch(String query, int page, int size, Long userId) {
         log.info("ListingSearchService.globalSearch query='{}', page={}, size={}", query, page, size);
-        if (query == null || query.trim().isEmpty()) return Page.empty();
+        if (query == null || query.trim().isEmpty()) return emptySearchPage(page, size);
 
         String searchTerm = query.trim().toLowerCase(java.util.Locale.ROOT);
         
@@ -97,7 +97,7 @@ public class ListingSearchService {
 
         log.info("ListingSearchService active search tokens: {}", activeTokens);
         if (activeTokens.isEmpty()) {
-            return Page.empty();
+            return emptySearchPage(page, size);
         }
 
         // Fetch all active listings to perform token-based matching in Java
@@ -129,6 +129,13 @@ public class ListingSearchService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT));
         return new PageImpl<>(enrichmentService.enrich(dtos, userId), pageable, matchedListings.size());
+    }
+
+    // Page.empty() is unpaged and Jackson cannot serialize Unpaged (getOffset throws), so the
+    // empty result carries the requested page like a normal search result.
+    private static Page<ListingDto> emptySearchPage(int page, int size) {
+        return Page.empty(PageRequest.of(page, size,
+                Sort.by(Sort.Direction.DESC, ListingBusinessConstants.LISTING_SORT_PROPERTY_CREATED_AT)));
     }
 
     private Page<ListingDto> enrichPage(Page<ListingDto> page, Long userId) {

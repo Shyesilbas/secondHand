@@ -31,10 +31,11 @@ sequenceDiagram
     alt Payment Succeeded
         Buyer->>Payment: Process Payment
         Payment->>Payment: Commit Payment + Write Outbox Event (ACID)
-        Checkout->>Redis: consumeReservationOnPurchase(userId, listingId)
+        Checkout->>Redis: after commit: consumeReservationOnPurchase (reservation -> pending marker)
         Worker->>Kafka: Publish PaymentCompletedKafkaEvent
         Kafka->>InvConsumer: Consume Event (Idempotent check)
         InvConsumer->>Postgres: Deduct DB Inventory (reserveQuantity)
+        InvConsumer->>Redis: after commit: clearPendingPurchase
         opt Stock reaches 0
             InvConsumer->>Postgres: Set Listing Status = SOLD
         end
@@ -56,22 +57,25 @@ sequenceDiagram
    - Performs DB-level idempotency via `ProcessedKafkaEventRepository`.
    - Finalizes stock deduction in PostgreSQL and transitions listings to `SOLD` if stock hits zero.
 4. **[StockReservationReconciliationScheduler](application/StockReservationReconciliationScheduler.java):**
-   - Scheduled watchdog that syncs Redis caches with PostgreSQL ground-truth inventory to heal anomalies from unexpected server restarts.
+   - Scheduled watchdog (every 5 minutes) that heals Redis stock drift, mainly units of reservations that expired without purchase or cancellation.
+   - Expected Redis stock = PostgreSQL `availableQuantity` − active reservations − pending purchases. It reads the stock value first, then reservations, pending markers and PostgreSQL, and writes with `compare_and_set_stock.lua`, so a reservation made during the run is never overwritten.
 
 ---
 
 ## 3. Redis Key Structure & Lua Scripts
 
 ### Key Namespaces
-- **Stock Counter:** `stock:{listingId}` — Stores the currently unreserved available stock in Redis.
-- **User Reservation:** `reservation:{userId}:{listingId}` — Stores the quantity reserved by a specific user with an explicit TTL (default 15 minutes / 900s).
+- **Stock Counter:** `v4:inventory:stock:{listingId}` — Stores the currently unreserved available stock in Redis.
+- **User Reservation:** `v4:inventory:reservation:{userId}:{listingId}` — Stores the quantity reserved by a specific user with an explicit TTL (default 15 minutes / 900s).
+- **Pending Purchase:** `v4:inventory:pending:{orderItemId}:{listingId}` — Quantity paid but not yet deducted in PostgreSQL. Written after the checkout commit (before the reservation is deleted), removed by `InventoryKafkaConsumer` after its deduction commits. 24h TTL only as a safety net for a lost removal; an event stuck in `payment.completed.v1.DLT` longer than that needs manual stock correction.
 
 ### Lua Scripts ([src/main/resources/scripts/](../../../../../resources/scripts/))
 | Script | Purpose | Arguments / Logic |
 | :--- | :--- | :--- |
 | `reserve_stock_with_ttl.lua` | Atomically verifies stock $\ge$ requested quantity. Initializes from DB fallback if Redis key is missing. Decrements `stock:{listingId}` and writes `reservation:{userId}:{listingId}` with `EXPIRE`. | Returns remaining stock or `-1` if insufficient. |
-| `cancel_user_reservation.lua` | Reads reserved quantity from `reservation:{userId}:{listingId}`, deletes the key, and atomically increments `stock:{listingId}` back. | Returns restored amount or `0`. |
-| `release_stock.lua` | Simple atomic increment of `stock:{listingId}` for general release. | Returns new stock count. |
+| `cancel_user_reservation.lua` | Reads reserved quantity from `reservation:{userId}:{listingId}`, deletes the key, and atomically increments `stock:{listingId}` back. A missing stock key is not recreated. | Returns `1` if a reservation was removed, else `0`. |
+| `release_stock.lua` | Atomic increment of `stock:{listingId}` (order cancel/refund). A missing stock key is not created; the next reservation loads it from PostgreSQL. | Returns new stock count or `-1` if the key is absent. |
+| `compare_and_set_stock.lua` | Reconciliation write: sets the stock only if it still holds the value observed by the job. | Returns `1` if written, `0` if the stock changed concurrently. |
 | `reserve_stock.lua` | Simple non-TTL reservation fallback. | Returns remaining stock or `-1`. |
 
 ---

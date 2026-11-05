@@ -108,7 +108,9 @@ public class LoginService {
         return "Logout successful";
     }
 
-    @org.springframework.transaction.annotation.Transactional
+    // Token yeniden kullanımında aile iptali, ardından fırlatılan InvalidRefreshTokenException
+    // transaction'ı geri almasın diye noRollbackFor ile commit edilir.
+    @org.springframework.transaction.annotation.Transactional(noRollbackFor = InvalidRefreshTokenException.class)
     public LoginResponse refreshToken(String refreshTokenValue) {
         log.info("Token refresh request");
 
@@ -136,6 +138,12 @@ public class LoginService {
 
         Token oldRefreshToken = tokenService.findByToken(refreshTokenValue)
                 .orElseThrow(InvalidRefreshTokenException::invalid);
+
+        // Engellenen veya kapatılan hesap, geçerli refresh token'ıyla yeni access token alamaz.
+        if (user.getAccountStatus() != AccountStatus.ACTIVE) {
+            log.warn("Token refresh rejected for non-active account {} (status: {})", username, user.getAccountStatus());
+            throw AccountNotActiveException.withStatus(user.getAccountStatus());
+        }
 
         TokenRotationResult tokens = issueTokens(user, oldRefreshToken.isRememberMe(), oldRefreshToken);
 

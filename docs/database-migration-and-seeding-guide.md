@@ -10,7 +10,9 @@ Veritabanı değişiklikleri yalnızca [`src/main/resources/db/migration/`](../s
 
 ### Katı Kurallar:
 1. **Asla Mevcut Migrasyonu Düzenleme:** Yayınlanmış veya merge edilmiş hiçbir `V<N>__*.sql` dosyası değiştirilemez veya silinemez. Değişiklik ihtiyacı olduğunda her zaman yeni bir `V<N+1>__aciklama.sql` dosyası oluşturulur.
-2. **İsimlendirme Formatı:** `V{Sürüm}__{açıklama_yılan_yazımı}.sql` (örneğin: `V24__add_user_reputation_score.sql`). İki adet alt çizgi (`__`) zorunludur.
+2. **İsimlendirme Formatı:** `V{Sürüm}__{açıklama_yılan_yazımı}.sql` (örneğin: `V35__add_user_reputation_score.sql`). İki adet alt çizgi (`__`) zorunludur.
+   - Silinmiş migration'ların kullandığı numaralar (V2–V9, V11–V13, V24–V32) eski veritabanı geçmişlerinde duruyor; tekrar kullanılmaz. Yeni dosya her zaman en büyük numaranın üstüne gelir.
+   - Maven, kaynakta silinen veya yeniden adlandırılan dosyayı `target/classes/db/migration/` içinden kaldırmaz ve Flyway classpath'ten okuduğu için eski kopyayı uygular. Bir migration'ı sildikten veya yeniden adlandırdıktan sonra uygulamayı başlatmadan önce `./mvnw clean` çalıştırın.
 3. **Idempotent ve Geriye Dönük Uyumluluk:**
    - Tablo oluştururken: `CREATE TABLE IF NOT EXISTS ...`
    - Kolon eklerken: `ADD COLUMN IF NOT EXISTS ...`
@@ -19,6 +21,15 @@ Veritabanı değişiklikleri yalnızca [`src/main/resources/db/migration/`](../s
    - Birincil anahtarlar: `UUID` veya `BIGINT GENERATED ALWAYS AS IDENTITY`.
    - Para miktarları: Kesinlikle `DECIMAL(19, 4)` veya `NUMERIC(15, 2)`. Float/Double yasaktır.
    - Zaman damgaları: `TIMESTAMP WITH TIME ZONE` veya `TIMESTAMP`.
+
+### Boş Veritabanı ve Mevcut Veritabanları
+- Boş bir veritabanı V1 → V1.1 → V10 … → V34 zinciriyle kurulur ve `ddl-auto: validate`'i geçer. V1.1, V10'un kullandığı `users.gender` kolonunu ekler; V34 şemayı entity modeliyle hizalar (eksik kolonlar, kısıtlar, `payment.order_id` tipi).
+- `local` profilinde checksum doğrulaması açıktır ve `out-of-order: true`'dur. Uygulandıktan sonra düzenlenen bir migration başlangıçta hata verir.
+- **Tek seferlik onarım:** V1 ve V18 uygulandıktan sonra düzenlendiği için, bu tarihten önce kurulmuş veritabanlarında ilk başlatma checksum hatasıyla durur. Bir kez şu komutu çalıştırın, sonra uygulamayı normal başlatın (V1.1, V33 ve V34 uygulanır; mevcut şemada V34 yalnızca `chk_users_gender` CHECK'ini kaldırır):
+  ```bash
+  ./mvnw org.flywaydb:flyway-maven-plugin:11.7.2:repair -Dflyway.url=jdbc:postgresql://localhost:5433/secondhand -Dflyway.user=postgres -Dflyway.password=postgres -Dflyway.locations=filesystem:src/main/resources/db/migration
+  ```
+- `prod` profilinde `out-of-order` kapalıdır. Geçmişi V1.1'in ötesinde olan bir prod veritabanında Flyway, V1.1'i "ignored" olarak raporlar ve validate hatasıyla durur. Repair'den sonra bir kez `SPRING_FLYWAY_OUT_OF_ORDER=true` ile başlatın.
 
 ---
 

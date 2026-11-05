@@ -8,7 +8,9 @@ import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.mapper.ListingMapper;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
+import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
+import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.review.application.IReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +35,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(readOnly = true)
 public class ListingQueryService {
+
+    private static final EnumSet<ListingStatus> PUBLIC_BROWSABLE_STATUSES =
+            EnumSet.of(ListingStatus.ACTIVE, ListingStatus.SOLD);
 
     private final ListingRepository listingRepository;
     private final ListingMapper listingMapper;
@@ -173,9 +179,13 @@ public class ListingQueryService {
         return getMyListings(userId, page, size, status, null, null);
     }
 
-    public Page<ListingDto> findByStatusAsDto(ListingStatus status, Pageable pageable) {
+    /** Public uç: taslak, pasif, rezerve ve silinmiş ilanlar sahibi dışında listelenemez. */
+    public Result<Page<ListingDto>> findByStatusAsDto(ListingStatus status, Pageable pageable) {
+        if (!PUBLIC_BROWSABLE_STATUSES.contains(status)) {
+            return Result.error(ListingErrorCodes.INVALID_LISTING_STATUS);
+        }
         Page<Listing> listingsPage = listingRepository.findByStatus(status, pageable);
-        return enrichPage(listingsPage.map(listingMapper::toDynamicDto), null);
+        return Result.success(enrichPage(listingsPage.map(listingMapper::toDynamicDto), null));
     }
 
     private List<ListingDto> enrichList(List<ListingDto> dtos, Long userId) {

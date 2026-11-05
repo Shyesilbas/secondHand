@@ -40,15 +40,15 @@ Bu doküman, **secondHand** platformundaki e-posta gönderim altyapısının JVM
        └────────────────┬────────────────────────┘
                         │
                         ▼
-                [ Email Entity ] (Status: PENDING)
-                        │
-                        ▼
-             [ RateLimitedEmailSender ]
+                [ EmailSender ]
                         │
        ┌────────────────┴────────────────────────┐
        ▼                                         ▼
-[ SMTP / MailGun / SES Delivery ]      [ Retry / Dead Letter Queue ]
+[ emails tablosu (SENT) ]               [ Kafka retry / DLT ]
+(uygulama içi gelen kutusu)
 ```
+
+SMTP gönderimi yoktur: e-postalar yalnızca kullanıcının uygulama içi gelen kutusuna yazılır (`/api/v1/emails/my-emails`).
 
 ---
 
@@ -78,7 +78,7 @@ public record MailDispatchKafkaEvent(
 ### C. Atomik Tüketici (`EmailKafkaConsumer.java`)
 * `processed_kafka_events` tablosunda `mail:dispatch:{eventId}` anahtarı ile atomik `INSERT ON CONFLICT DO NOTHING` idempotency denetimi yapar.
 * Şablon değişkenlerini (`templateVariables`) Thymeleaf motoruna (`EmailTemplateService`) aktararak saf ve zengin HTML çıktısı üretir.
-* Gönderim öncesinde `emails` tablosuna `PENDING` statüsüyle kaydeder; ardından `EmailSender` üzerinden iletimi gerçekleştirir ve durumu `SENT` olarak günceller.
+* `EmailSender` e-postayı `emails` tablosuna `SENT` statüsüyle kaydeder. Kayıt başarısız olursa hata yeniden fırlatılır; Kafka olayı tekrar dener, sonra DLT'ye gönderir.
 
 ---
 

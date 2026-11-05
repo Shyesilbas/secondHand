@@ -120,8 +120,9 @@ Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'
 ---
 
 ### B. Dinamik Public Endpoint Keşfi ([`PublicEndpointRegistry.java`](../src/main/java/com/serhat/secondhand/core/security/PublicEndpointRegistry.java))
-* Controller'larda `@PublicEndpoint` anatasyonu taşıyan metotlar bootstrap anında taranır ve merkezi beyaz listeye eklenir.
-* Yanlışlıkla korumasız endpoint kalması önlenir; açıkça izin verilmeyen her endpoint varsayılan olarak **Authentication Required** statüsündedir.
+* Bootstrap anında tüm controller route'ları (HTTP metodu + path pattern) taranır; `@PublicEndpoint` taşıyanlar public olarak işaretlenir.
+* [`PublicRouteRequestMatcher`](../src/main/java/com/serhat/secondhand/core/security/PublicRouteRequestMatcher.java), Spring MVC'nin seçeceği route'u seçer (önce en özgül pattern, sonra metodu belirtilmiş route) ve isteği yalnızca o route public ise açık sayar. Bu yüzden public `GET /api/v1/listings/{id}`, korumalı `GET /api/v1/listings/my` ya da `PUT /api/v1/listings/{id}` route'larını açmaz. Public ile korumalı bir route eşit özgüllükteyse istek korumalı kalır.
+* Aynı matcher hem `permitAll` hem CSRF muafiyeti için kullanılır; açıkça izin verilmeyen her endpoint varsayılan olarak **Authentication Required** statüsündedir.
 
 ---
 

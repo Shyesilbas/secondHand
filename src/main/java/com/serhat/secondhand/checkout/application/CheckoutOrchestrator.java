@@ -106,7 +106,7 @@ public class CheckoutOrchestrator {
                     throw new IllegalStateException("Checkout finalization failed for order "
                             + order.getOrderNumber() + ": " + successResult.getMessage());
                 }
-                checkoutStockReservationService.consumeReservationsOnSuccess(userId, reserved);
+                checkoutStockReservationService.consumeReservationsOnSuccess(userId, order);
                 eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
                 log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
             } else {

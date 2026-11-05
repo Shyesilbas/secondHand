@@ -20,7 +20,6 @@ graph TD
     Consumers --> PG
     Backend --> Gemini["Gemini API"]
     Backend --> Cloudinary["Cloudinary"]
-    Backend --> Mail["SMTP"]
 ```
 
 Most backend modules have a matching folder under `secondhand-frontend/src/`. Business rules live in each module's `README.md`.

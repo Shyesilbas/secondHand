@@ -242,7 +242,7 @@ public class ListingController {
     public ResponseEntity<?> getListingsByStatus(
             @PathVariable ListingStatus status,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResultResponses.ok(Result.success(listingQueryService.findByStatusAsDto(status, pageable)));
+        return ResultResponses.ok(listingQueryService.findByStatusAsDto(status, pageable));
     }
 
     @PostMapping("/pay-fee")

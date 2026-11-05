@@ -8,13 +8,16 @@ import com.serhat.secondhand.cart.exception.ReservationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -154,6 +157,36 @@ public class GlobalExceptionHandler {
         );
 
         log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    // Malformed client requests. Without this the generic handler below turns them into 500s.
+    @ExceptionHandler({
+            HttpMessageNotReadableException.class,
+            MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class
+    })
+    public ResponseEntity<ProblemDetail> handleMalformedRequest(
+            Exception ex,
+            HttpServletRequest request) {
+
+        String detail;
+        if (ex instanceof MissingServletRequestParameterException missing) {
+            detail = "Required parameter '" + missing.getParameterName() + "' is missing";
+        } else if (ex instanceof MethodArgumentTypeMismatchException mismatch) {
+            detail = "Invalid value for parameter '" + mismatch.getName() + "'";
+        } else {
+            detail = "Malformed request body";
+        }
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                detail,
+                request.getRequestURI()
+        );
+
+        log.warn("Malformed request at {}: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 

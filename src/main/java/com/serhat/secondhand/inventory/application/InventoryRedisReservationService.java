@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +28,17 @@ public class InventoryRedisReservationService {
     private DefaultRedisScript<Long> releaseScript;
     private DefaultRedisScript<Long> reserveWithTtlScript;
     private DefaultRedisScript<Long> cancelUserReservationScript;
+    private DefaultRedisScript<Long> compareAndSetStockScript;
 
     private static final long DEFAULT_RESERVATION_TTL_SECONDS = 900; // 15 minutes
+
+    public static final String STOCK_KEY_PREFIX = "v4:inventory:stock:";
+    public static final String RESERVATION_KEY_PREFIX = "v4:inventory:reservation:";
+    public static final String PENDING_PURCHASE_KEY_PREFIX = "v4:inventory:pending:";
+
+    // Satın alınmış ama PostgreSQL stoğundan henüz düşülmemiş miktar bu süre boyunca tutulur.
+    // InventoryKafkaConsumer düşümü commit ettikten sonra işareti siler; süre yalnızca kaybolan silmeler için emniyettir.
+    static final Duration PENDING_PURCHASE_TTL = Duration.ofHours(24);
 
     @PostConstruct
     public void init() {
@@ -47,6 +57,10 @@ public class InventoryRedisReservationService {
         cancelUserReservationScript = new DefaultRedisScript<>();
         cancelUserReservationScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/cancel_user_reservation.lua")));
         cancelUserReservationScript.setResultType(Long.class);
+
+        compareAndSetStockScript = new DefaultRedisScript<>();
+        compareAndSetStockScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/compare_and_set_stock.lua")));
+        compareAndSetStockScript.setResultType(Long.class);
     }
 
     public void reserveStockWithTtl(Long userId, UUID listingId, int quantity, Long ttlSeconds) {
@@ -84,10 +98,38 @@ public class InventoryRedisReservationService {
         log.info("Cancelled reservation for user {} on listing {}. Restored: {}", userId, listingId, result != null && result > 0);
     }
 
-    public void consumeReservationOnPurchase(Long userId, UUID listingId) {
+    /**
+     * Turns the buyer's reservation into a pending-purchase marker. Redis stock is not changed: the units stay
+     * taken until InventoryKafkaConsumer deducts them in PostgreSQL and calls {@link #clearPendingPurchase}.
+     * The marker is written before the reservation is deleted, so the reconciliation job never sees neither.
+     */
+    public void consumeReservationOnPurchase(Long userId, UUID listingId, Long orderItemId, int quantity) {
         String reservationKey = getReservationKey(userId, listingId);
+        String pendingKey = getPendingPurchaseKey(orderItemId, listingId);
+        stringRedisTemplate.opsForValue().set(pendingKey, String.valueOf(quantity), PENDING_PURCHASE_TTL);
         stringRedisTemplate.delete(reservationKey);
-        log.info("Consumed reservation key {} upon successful purchase by user {}", reservationKey, userId);
+        log.info("Consumed reservation key {} upon successful purchase by user {}; pending deduction {} = {}",
+                reservationKey, userId, pendingKey, quantity);
+    }
+
+    public void clearPendingPurchase(UUID listingId, Long orderItemId) {
+        String pendingKey = getPendingPurchaseKey(orderItemId, listingId);
+        stringRedisTemplate.delete(pendingKey);
+        log.info("Cleared pending purchase marker {} after PostgreSQL stock deduction", pendingKey);
+    }
+
+    /**
+     * Sets the Redis stock to {@code correctedStock} only if it still equals {@code observedStock}.
+     * @return true when the correction was written, false when the stock changed concurrently
+     */
+    public boolean compareAndSetStock(UUID listingId, String observedStock, int correctedStock) {
+        Long result = stringRedisTemplate.execute(
+                compareAndSetStockScript,
+                Collections.singletonList(getStockKey(listingId)),
+                observedStock,
+                String.valueOf(correctedStock)
+        );
+        return result != null && result == 1L;
     }
 
     public Long getReservationRemainingTtl(Long userId, UUID listingId) {
@@ -125,6 +167,11 @@ public class InventoryRedisReservationService {
                 String.valueOf(quantity)
         );
 
+        if (result != null && result < 0) {
+            log.info("Redis stock key for listing {} is absent; release of {} skipped, next reservation loads it from PostgreSQL",
+                    listingId, quantity);
+            return;
+        }
         log.info("Released {} items in Redis for listing {}. New Redis stock: {}", quantity, listingId, result);
     }
 
@@ -135,10 +182,15 @@ public class InventoryRedisReservationService {
     }
 
     private String getStockKey(UUID listingId) {
-        return "v4:inventory:stock:" + listingId;
+        return STOCK_KEY_PREFIX + listingId;
     }
 
     private String getReservationKey(Long userId, UUID listingId) {
-        return "v4:inventory:reservation:" + userId + ":" + listingId;
+        return RESERVATION_KEY_PREFIX + userId + ":" + listingId;
+    }
+
+    // listingId is the last segment, like reservation keys, so both are summed per listing the same way
+    private String getPendingPurchaseKey(Long orderItemId, UUID listingId) {
+        return PENDING_PURCHASE_KEY_PREFIX + orderItemId + ":" + listingId;
     }
 }
