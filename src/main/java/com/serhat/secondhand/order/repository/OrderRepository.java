@@ -26,7 +26,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderNumberWithItemsAndSellers(@Param("orderNumber") String orderNumber);
 
     long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
-    @Query("SELECT DISTINCT o FROM Order o " +
+    // Order.shipping is the inverse side of a one-to-one and is always loaded; fetch it in the page query
+    // instead of one extra select per order (PF-07). To-one fetch joins are safe with pagination.
+    @Query(value = "SELECT DISTINCT o FROM Order o " +
+           "LEFT JOIN FETCH o.shipping " +
+           "WHERE o.user.id = :userId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)",
+           countQuery = "SELECT COUNT(o) FROM Order o " +
            "WHERE o.user.id = :userId " +
            "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)")
     Page<Order> findByUserIdAndDeliveryMethod(
@@ -47,8 +53,30 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.orderItems oi JOIN FETCH oi.listing l WHERE o.id = :orderId AND l.seller.id = :sellerId")
     Optional<Order> findByIdForSeller(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
 
-    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping WHERE o.status = :status ORDER BY o.updatedAt ASC")
-    List<Order> findByStatusWithShipping(@Param("status") OrderStatus status);
+    // ── Status scheduler: due-order id queries (coarse DB prefilter, exact check runs per order) ──
+
+    @Query("SELECT o.id FROM Order o WHERE o.status = :status AND COALESCE(o.updatedAt, o.createdAt) <= :cutoff ORDER BY o.id")
+    List<Long> findIdsByStatusTouchedBefore(@Param("status") OrderStatus status,
+                                            @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
+
+    @Query("SELECT o.id FROM Order o LEFT JOIN o.shipping s WHERE o.status = :status AND COALESCE(s.inTransitAt, o.updatedAt) <= :cutoff ORDER BY o.id")
+    List<Long> findIdsByStatusInTransitBefore(@Param("status") OrderStatus status,
+                                              @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
+
+    @Query("SELECT o.id FROM Order o JOIN o.shipping s WHERE o.status = :status AND s.deliveredAt <= :cutoff ORDER BY o.id")
+    List<Long> findIdsByStatusDeliveredBefore(@Param("status") OrderStatus status,
+                                              @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
+
+    @Query("SELECT o.id FROM Order o WHERE o.status = :status AND o.deliveryMethod = :method AND o.meetupVerifiedAt <= :cutoff ORDER BY o.id")
+    List<Long> findIdsByStatusMeetupVerifiedBefore(@Param("status") OrderStatus status, @Param("method") DeliveryMethod method,
+                                                   @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
+
+    @Query("SELECT o.id FROM Order o WHERE o.status = :status AND o.deliveryMethod = :method AND o.createdAt <= :cutoff ORDER BY o.id")
+    List<Long> findIdsByStatusCreatedBefore(@Param("status") OrderStatus status, @Param("method") DeliveryMethod method,
+                                            @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
+
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping LEFT JOIN FETCH o.user WHERE o.id = :id")
+    Optional<Order> findByIdWithShippingAndUser(@Param("id") Long id);
 
 
     // Dashboard Queries
@@ -61,12 +89,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.user.id = :userId AND o.createdAt BETWEEN :startDate AND :endDate AND o.paymentStatus = 'COMPLETED' AND o.status != 'CANCELLED' AND o.status != 'REFUNDED'")
     BigDecimal sumTotalAmountByUserIdAndDateRange(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT DISTINCT o FROM Order o " +
+    @Query(value = "SELECT DISTINCT o FROM Order o " +
            "JOIN o.orderItems oi " +
            "JOIN FETCH o.user u " +
+           "LEFT JOIN FETCH o.shipping " +
            "WHERE oi.listing.seller.id = :sellerId " +
            "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
-           "ORDER BY o.createdAt DESC")
+           "ORDER BY o.createdAt DESC",
+           countQuery = "SELECT COUNT(DISTINCT o) FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "WHERE oi.listing.seller.id = :sellerId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)")
     Page<Order> findOrdersBySellerIdAndDeliveryMethod(
             @Param("sellerId") Long sellerId,
             @Param("deliveryMethod") DeliveryMethod deliveryMethod,
@@ -76,6 +109,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "JOIN FETCH o.orderItems oi " +
            "JOIN FETCH oi.listing l " +
            "LEFT JOIN FETCH oi.seller s " +
+           "LEFT JOIN FETCH o.shipping " +
            "WHERE o.user.id = :userId " +
            "AND o.status IN :statuses " +
            "ORDER BY o.createdAt DESC")

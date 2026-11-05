@@ -20,6 +20,8 @@ import java.util.UUID;
 @Slf4j
 public class TokenService {
 
+    private static final java.time.Duration EXPIRED_TOKEN_RETENTION = java.time.Duration.ofDays(7);
+
     private final TokenRepository tokenRepository;
 
     @Transactional
@@ -117,6 +119,13 @@ public class TokenService {
             log.info("Cleaned up {} expired tokens", expiredCount);
         } else {
             log.debug("No expired tokens found to cleanup");
+        }
+
+        // A token past its expiry can no longer be used or replayed, so after the retention window
+        // the row (any status, including REVOKED ones kept for reuse detection) is deleted.
+        int deletedCount = tokenRepository.deleteExpiredBefore(now.minus(EXPIRED_TOKEN_RETENTION));
+        if (deletedCount > 0) {
+            log.info("Deleted {} tokens expired for more than {}", deletedCount, EXPIRED_TOKEN_RETENTION);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.serhat.secondhand.inventory.application;
 
+import com.serhat.secondhand.inventory.domain.entity.Inventory;
 import com.serhat.secondhand.inventory.domain.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,8 @@ import static com.serhat.secondhand.inventory.application.InventoryRedisReservat
 @RequiredArgsConstructor
 @Slf4j
 public class StockReservationReconciliationScheduler {
+
+    private static final int INVENTORY_BATCH_SIZE = 500;
 
     private final StringRedisTemplate redisTemplate;
     private final InventoryRepository inventoryRepository;
@@ -60,20 +63,40 @@ public class StockReservationReconciliationScheduler {
             sumByListing(scan(RESERVATION_KEY_PREFIX + "*"), heldByListing, unreadableListings);
             sumByListing(scan(PENDING_PURCHASE_KEY_PREFIX + "*"), heldByListing, unreadableListings);
 
+            Map<UUID, Inventory> inventoryByListing = loadInventories(observedStock.keySet());
             observedStock.forEach((listingIdStr, observed) -> {
                 if (unreadableListings.contains(listingIdStr)) {
                     // An unreadable hold cannot be counted; correcting without it could hand out held units
                     log.warn("[STOCK RECONCILIATION] Listing {} has a non-numeric hold; skipped", listingIdStr);
                     return;
                 }
-                reconcileListing(listingIdStr, observed, heldByListing);
+                reconcileListing(listingIdStr, observed, heldByListing, inventoryByListing);
             });
         } catch (Exception ex) {
             log.error("Error during stock reservation reconciliation", ex);
         }
     }
 
-    private void reconcileListing(String listingIdStr, String observed, Map<String, Integer> heldByListing) {
+    // One IN query per batch instead of one query per stock key.
+    private Map<UUID, Inventory> loadInventories(Set<String> listingIdStrs) {
+        List<UUID> ids = new ArrayList<>();
+        for (String idStr : listingIdStrs) {
+            try {
+                ids.add(UUID.fromString(idStr));
+            } catch (IllegalArgumentException ignored) {
+                // malformed key; reconcileListing logs and skips it
+            }
+        }
+        Map<UUID, Inventory> result = new HashMap<>();
+        for (int from = 0; from < ids.size(); from += INVENTORY_BATCH_SIZE) {
+            List<UUID> batch = ids.subList(from, Math.min(from + INVENTORY_BATCH_SIZE, ids.size()));
+            inventoryRepository.findByListingIdIn(batch).forEach(inv -> result.put(inv.getListingId(), inv));
+        }
+        return result;
+    }
+
+    private void reconcileListing(String listingIdStr, String observed, Map<String, Integer> heldByListing,
+                                  Map<UUID, Inventory> inventoryByListing) {
         UUID listingId;
         int observedStock;
         try {
@@ -84,7 +107,7 @@ public class StockReservationReconciliationScheduler {
             return;
         }
 
-        inventoryRepository.findByListingId(listingId).ifPresent(inventory -> {
+        java.util.Optional.ofNullable(inventoryByListing.get(listingId)).ifPresent(inventory -> {
             int held = heldByListing.getOrDefault(listingIdStr, 0);
             int expected = inventory.getAvailableQuantity() - held;
             if (expected < 0) {

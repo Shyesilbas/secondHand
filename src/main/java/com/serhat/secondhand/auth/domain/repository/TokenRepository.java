@@ -69,4 +69,8 @@ import java.util.UUID;
             """)
     int bulkUpdateTokenFamilyStatus(@Param("familyId") UUID familyId,
                                     @Param("newStatus") TokenStatus newStatus);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("DELETE FROM Token t WHERE t.expiresAt < :cutoff")
+    int deleteExpiredBefore(@Param("cutoff") LocalDateTime cutoff);
 }

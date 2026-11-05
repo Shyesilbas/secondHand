@@ -50,6 +50,12 @@ public class UserService implements IUserService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AuthenticationNotFoundException("Authentication not found", HttpStatus.UNAUTHORIZED.toString());
         }
+        // The JWT principal carries the user id: a primary-key lookup is served from the persistence
+        // context when called again in the same transaction, unlike the email query.
+        if (authentication.getPrincipal() instanceof User principal && principal.getId() != null) {
+            return userRepository.findById(principal.getId())
+                    .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));
+        }
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(UserErrorCodes.USER_NOT_FOUND_BY_EMAIL));

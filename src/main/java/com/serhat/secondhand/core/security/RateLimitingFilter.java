@@ -147,8 +147,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         RateLimitData rateLimitData = rateLimitMap.computeIfAbsent(key, k -> new RateLimitData());
 
         synchronized (rateLimitData) {
-            rateLimitData.requests.removeIf(timestamp ->
-                    ChronoUnit.SECONDS.between(timestamp, now) >= rateLimitConfig.getWindowSizeSeconds());
+            evictExpired(rateLimitData.requests, now);
 
             if (rateLimitData.requests.size() >= maxRequestsPerWindow) {
                 rateLimitData.lastRateLimitTime = now;
@@ -245,8 +244,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             var entry = iterator.next();
             RateLimitData data = entry.getValue();
             synchronized (data) {
-                data.requests.removeIf(timestamp ->
-                        ChronoUnit.SECONDS.between(timestamp, LocalDateTime.now()) >= rateLimitConfig.getWindowSizeSeconds());
+                evictExpired(data.requests, LocalDateTime.now());
                 
                 if (data.requests.isEmpty() &&
                         (data.lastRateLimitTime == null || data.lastRateLimitTime.isBefore(cutoff))) {
@@ -261,8 +259,17 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         }
     }
 
+    // Timestamps are appended in order, so expired ones are always at the head: drop them from the
+    // front and stop at the first one still inside the window, instead of scanning the whole list.
+    private void evictExpired(java.util.ArrayDeque<LocalDateTime> requests, LocalDateTime now) {
+        while (!requests.isEmpty()
+                && ChronoUnit.SECONDS.between(requests.peekFirst(), now) >= rateLimitConfig.getWindowSizeSeconds()) {
+            requests.pollFirst();
+        }
+    }
+
     private static class RateLimitData {
-        final List<LocalDateTime> requests = new ArrayList<>();
+        final java.util.ArrayDeque<LocalDateTime> requests = new java.util.ArrayDeque<>();
         LocalDateTime lastRateLimitTime;
     }
 }

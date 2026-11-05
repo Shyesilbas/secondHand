@@ -92,6 +92,7 @@ Sipariş durum geçişleri ve zaman aşımı mutabakatları arka planda periyodi
 * **Kargo Simülasyonu & Durum İlerletme:** Test ortamında `CONFIRMED` $\rightarrow$ `PROCESSING` $\rightarrow$ `SHIPPED` $\rightarrow$ `DELIVERED` geçişleri zaman damgalarına göre otomatik ilerletilir.
 * **3 Günlük Kargo Otomatik Tamamlama:** `DELIVERED` statüsündeki siparişler 3 gün boyunca alıcı tarafından uyuşmazlık bildirilmezse `escrowService.release(order)` tetiklenerek otomatik `COMPLETED` yapılır.
 * **24 Saatlik Güvenli Buluşma Tamamlama:** `HANDOVER_CONFIRMED` statüsündeki siparişler 24 saat sonra otomatik tamamlanır.
+* **Çalışma şekli:** Her adım önce vadesi gelmiş olabilecek sipariş id'lerini DB'de zaman filtresiyle çeker (adım başına en fazla 200, `OrderRepository.findIdsByStatus*`). Ardından her sipariş kendi transaction'ında yeniden yüklenir, durum ve süre kuralı tekrar kontrol edilir. Bir siparişteki hata yalnızca o siparişi geri alır, kalanlar işlenmeye devam eder ve hatalı sipariş sonraki çalışmada tekrar denenir. Çok instance'lı çalışmada aynı anda tek çalıştırma garantisi (ShedLock vb.) yoktur.
 
 ---
 

@@ -25,8 +25,8 @@ import java.util.*;
  *       kullanılarak anahtar kalabalığı ve bellek ayak izi minimize edilmiştir.</li>
  *   <li><b>getCities / getDistricts / getNeighborhoods</b> → Redis Hash (HGET / GET) üzerinden O(1) okunur.</li>
  *   <li><b>Validation metodları</b> → doğrudan aynı Redis yapısı üzerinden doğrular.</li>
- *   <li><b>Restart-safe:</b> {@code @PostConstruct} içinde önce sentinel key kontrol edilir;
- *       veri varsa JSON parse atlanır.</li>
+ *   <li><b>Restart-safe:</b> {@code @PostConstruct} içinde üç katalog anahtarı kontrol edilir;
+ *       hepsi varsa JSON parse atlanır, biri eksikse (TTL dolmuş) ilk okumada katalog yeniden yüklenir.</li>
  *   <li><b>TTL:</b> 7 gün.</li>
  * </ul>
  */
@@ -39,9 +39,7 @@ public class LocationCatalogService {
     private static final String CITIES_KEY = "v5:catalog:locations:cities";
     private static final String DISTRICTS_HASH_KEY = "v5:catalog:locations:districts";
     private static final String NEIGHBORHOODS_HASH_KEY = "v5:catalog:locations:neighborhoods";
-    private static final String SENTINEL_KEY = "v5:catalog:locations:sentinel";
     private static final Duration CATALOG_TTL = Duration.ofDays(7);
-    private static final Duration SENTINEL_TTL = Duration.ofDays(8);
 
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -49,26 +47,17 @@ public class LocationCatalogService {
     // ── Başlatma ────────────────────────────────────────────────────────
 
     /**
-     * Uygulama ayağa kalkarken çalışır.
-     * Redis'te sentinel key varsa hiçbir şey yapmaz (restart-safe).
-     * Yoksa JSON'dan parse edip Redis Hash yapılarına yazar; JVM heap'te veri tutulmaz.
+     * Uygulama ayağa kalkarken çalışır. Katalog Redis'te varsa hiçbir şey yapmaz (restart-safe),
+     * yoksa JSON'dan bir kez parse edip Redis Hash yapılarına yazar.
      */
     @PostConstruct
     public void init() {
-        Boolean exists = redisTemplate.hasKey(SENTINEL_KEY);
-        if (Boolean.TRUE.equals(exists)) {
+        if (catalogPresent()) {
             log.info("[LocationCatalog] Redis cache mevcut — JSON parse atlandı (restart-safe).");
             return;
         }
         log.info("[LocationCatalog] Redis'te veri yok, locations.json yükleniyor...");
-        try {
-            loadAndPopulateRedis();
-            redisTemplate.opsForValue().set(SENTINEL_KEY, "1", SENTINEL_TTL);
-            log.info("[LocationCatalog] Yükleme tamamlandı.");
-        } catch (Exception e) {
-            log.error("[LocationCatalog] locations.json yuklenemedi: {}", CATALOG_PATH, e);
-            throw new RuntimeException("Locations catalog initialization failed", e);
-        }
+        reloadCatalog();
     }
 
     // ── Public API — Redis Hash / Value Access ───────────────────────────
@@ -80,14 +69,13 @@ public class LocationCatalogService {
             if (cached instanceof List<?>) {
                 return (List<CityDto>) cached;
             }
+            reloadCatalog();
+            cached = redisTemplate.opsForValue().get(CITIES_KEY);
+            return cached instanceof List<?> ? (List<CityDto>) cached : Collections.emptyList();
         } catch (Exception e) {
             log.warn("[LocationCatalog] getCities Redis okuma hatası, JSON fallback devreye giriyor: {}", e.getMessage());
+            return loadCitiesFromJson();
         }
-        List<CityDto> fallback = loadCitiesFromJson();
-        if (!fallback.isEmpty()) {
-            redisTemplate.opsForValue().set(CITIES_KEY, fallback, CATALOG_TTL);
-        }
-        return fallback;
     }
 
     @SuppressWarnings("unchecked")
@@ -95,40 +83,57 @@ public class LocationCatalogService {
         if (cityKey == null || cityKey.isBlank()) return Collections.emptyList();
         String normalizedKey = cityKey.trim().toUpperCase(Locale.ENGLISH);
         try {
-            Object cached = redisTemplate.opsForHash().get(DISTRICTS_HASH_KEY, normalizedKey);
-            if (cached instanceof List<?>) {
-                return (List<DistrictDto>) cached;
-            }
+            Object cached = readHashField(DISTRICTS_HASH_KEY, normalizedKey);
+            return cached instanceof List<?> ? (List<DistrictDto>) cached : Collections.emptyList();
         } catch (Exception e) {
             log.warn("[LocationCatalog] getDistricts Redis okuma hatası: {} | {}", normalizedKey, e.getMessage());
+            return loadDistrictsFromJson(normalizedKey);
         }
-        List<DistrictDto> fallback = loadDistrictsFromJson(normalizedKey);
-        if (!fallback.isEmpty()) {
-            redisTemplate.opsForHash().put(DISTRICTS_HASH_KEY, normalizedKey, fallback);
-            redisTemplate.expire(DISTRICTS_HASH_KEY, CATALOG_TTL);
-        }
-        return fallback;
     }
 
     @SuppressWarnings("unchecked")
     public List<NeighborhoodDto> getNeighborhoods(String districtKey) {
         if (districtKey == null || districtKey.isBlank()) return Collections.emptyList();
         String normalizedKey = districtKey.trim().toUpperCase(Locale.ENGLISH);
+        List<NeighborhoodDto> result;
         try {
-            Object cached = redisTemplate.opsForHash().get(NEIGHBORHOODS_HASH_KEY, normalizedKey);
-            if (cached instanceof List<?>) {
-                return (List<NeighborhoodDto>) cached;
-            }
+            Object cached = readHashField(NEIGHBORHOODS_HASH_KEY, normalizedKey);
+            result = cached instanceof List<?> ? (List<NeighborhoodDto>) cached : Collections.emptyList();
         } catch (Exception e) {
             log.warn("[LocationCatalog] getNeighborhoods Redis okuma hatası: {} | {}", normalizedKey, e.getMessage());
+            result = loadNeighborhoodsFromJson(normalizedKey);
         }
-        List<NeighborhoodDto> fallback = loadNeighborhoodsFromJson(normalizedKey);
-        if (fallback.isEmpty()) {
-            fallback = List.of(new NeighborhoodDto(normalizedKey + "_MERKEZ", "Merkez"));
+        return result.isEmpty() ? List.of(new NeighborhoodDto(normalizedKey + "_MERKEZ", "Merkez")) : result;
+    }
+
+    /**
+     * Reads one field of a catalog hash. A missing field in a present hash means the key is unknown,
+     * so it returns null without touching the JSON; only a missing (expired) hash reloads the catalog.
+     */
+    private Object readHashField(String hashKey, String field) {
+        Object cached = redisTemplate.opsForHash().get(hashKey, field);
+        if (cached != null || Boolean.TRUE.equals(redisTemplate.hasKey(hashKey))) {
+            return cached;
         }
-        redisTemplate.opsForHash().put(NEIGHBORHOODS_HASH_KEY, normalizedKey, fallback);
-        redisTemplate.expire(NEIGHBORHOODS_HASH_KEY, CATALOG_TTL);
-        return fallback;
+        reloadCatalog();
+        return redisTemplate.opsForHash().get(hashKey, field);
+    }
+
+    private boolean catalogPresent() {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(CITIES_KEY))
+                && Boolean.TRUE.equals(redisTemplate.hasKey(DISTRICTS_HASH_KEY))
+                && Boolean.TRUE.equals(redisTemplate.hasKey(NEIGHBORHOODS_HASH_KEY));
+    }
+
+    private synchronized void reloadCatalog() {
+        if (catalogPresent()) return;
+        try {
+            loadAndPopulateRedis();
+            log.info("[LocationCatalog] Yükleme tamamlandı.");
+        } catch (Exception e) {
+            log.error("[LocationCatalog] locations.json yuklenemedi: {}", CATALOG_PATH, e);
+            throw new IllegalStateException("Locations catalog initialization failed", e);
+        }
     }
 
     // ── Validation Helpers (cache uzerinden) ────────────────────────────

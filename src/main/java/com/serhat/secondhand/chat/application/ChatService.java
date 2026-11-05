@@ -19,6 +19,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.offer.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +45,21 @@ public class ChatService {
     private final com.serhat.secondhand.offer.repository.OfferRepository offerRepository;
 
     @Transactional(readOnly = true)
-    public List<ChatRoomDto> getUserChatRooms(Long userId) {
+    public Page<ChatRoomDto> getUserChatRooms(Long userId, Pageable pageable) {
 
-        List<ChatRoom> rooms =
-                chatRoomRepository.findByParticipantIdOrderByLastMessageTimeDesc(userId);
+        Page<Long> idPage = chatRoomRepository.findRoomIdPageByParticipantId(userId, pageable);
+        if (idPage.isEmpty()) {
+            return new PageImpl<>(List.of(), idPage.getPageable(), idPage.getTotalElements());
+        }
+        Map<Long, ChatRoom> roomsById =
+                chatRoomRepository.findAllWithParticipantsByIdIn(idPage.getContent())
+                        .stream()
+                        .collect(Collectors.toMap(ChatRoom::getId, r -> r));
+        // Keep the page order; a room deleted between the two queries is skipped.
+        List<ChatRoom> rooms = idPage.getContent().stream()
+                .map(roomsById::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         Set<Long> userIds =
                 rooms.stream()
@@ -83,7 +95,7 @@ public class ChatService {
         ChatEnrichmentContext context =
                 new ChatEnrichmentContext(userMap, unreadCountMap, listingMap);
 
-        return rooms.stream()
+        List<ChatRoomDto> dtos = rooms.stream()
                 .map(room -> {
                     ChatRoomDto dto = chatRoomMapper.toDto(room);
 
@@ -97,6 +109,7 @@ public class ChatService {
                     return chatRoomEnricher.enrich(room, userId, context, dto);
                 })
                 .collect(Collectors.toList());
+        return new PageImpl<>(dtos, idPage.getPageable(), idPage.getTotalElements());
     }
 
     /** Tek oda için liste endpoint'i ile aynı enrich (isim, listing başlığı, unread). */

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +21,9 @@ public interface EscrowRepository extends JpaRepository<Escrow, Long> {
     Optional<Escrow> findByOrderItemId(Long orderItemId);
     List<Escrow> findByOrderIdAndStatus(Long orderId, PaymentStatus status);
     List<Escrow> findByOrderItemIdIn(List<Long> orderItemIds);
+    @Query("select coalesce(sum(e.amount), 0) from Escrow e where e.seller.id = :sellerId and e.status = :status")
+    BigDecimal sumAmountBySellerIdAndStatus(@Param("sellerId") Long sellerId, @Param("status") PaymentStatus status);
+
     List<Escrow> findByOrderIdInAndSellerIdAndStatus(List<Long> orderIds, Long sellerId, PaymentStatus status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

@@ -14,7 +14,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -52,8 +51,8 @@ class StockReservationReconciliationSchedulerTest {
     }
 
     private void givenDbAvailable(int available) {
-        when(inventoryRepository.findByListingId(LISTING))
-                .thenReturn(Optional.of(Inventory.builder().availableQuantity(available).build()));
+        when(inventoryRepository.findByListingIdIn(List.of(LISTING)))
+                .thenReturn(List.of(Inventory.builder().listingId(LISTING).availableQuantity(available).build()));
     }
 
     @SuppressWarnings("unchecked")

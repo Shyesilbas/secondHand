@@ -3,7 +3,7 @@
 Direct user-to-user messaging, chat room management, in-chat offer cards, and STOMP WebSocket communication.
 
 ## Architecture
-- `useChat`: Manages active chat room state, historical message pagination, STOMP message sending (`/app/chat.sendMessage`), and room subscriptions (`/topic/chat/{roomId}`).
+- `useChat`: Manages active chat room state, the paged room list (`GET /v1/chats/rooms/user?page&size`, 20 per page, "Load more" in `ChatList`; search filters only loaded rooms), historical message pagination, STOMP message sending (`/app/chat.sendMessage`), and room subscriptions (`/topic/chat/{roomId}`).
 - `useUnreadCount`: Tracks aggregated unread message counts for navigation bar badges.
 - `InChatOfferCard`: Renders contextual offer status and action buttons (Accept/Reject) directly inside the message timeline.
 - `ChatRoomListItem`: Presents room summary with attached listing snippet, latest message preview, and unread dot indicator.

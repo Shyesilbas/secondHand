@@ -5,6 +5,7 @@ import com.serhat.secondhand.user.domain.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
@@ -32,6 +33,10 @@ import java.util.stream.Collectors;
 public class JwtUtils {
 
     private final JwtConfig jwtConfig;
+
+    // Decoded once: the secret does not change at runtime.
+    private volatile SecretKey signingKey;
+    private volatile JwtParser parser;
 
     public long getAccessTokenExpiration() {
         return jwtConfig.getAccessToken().getExpiration();
@@ -85,8 +90,17 @@ public class JwtUtils {
         return buildToken(extraClaims, userDetails, getAccessTokenExpiration());
     }
 
+    /** Verifies the signature and expiry once and returns all claims; throws JwtException otherwise. */
+    public Claims parseClaims(String token) {
+        return extractAllClaims(token);
+    }
+
     public Long extractUserId(String token) {
-        Object userId = extractClaim(token, claims -> claims.get("userId"));
+        return userIdFrom(extractAllClaims(token));
+    }
+
+    public static Long userIdFrom(Claims claims) {
+        Object userId = claims.get("userId");
         if (userId == null) return null;
         if (userId instanceof Number n) return n.longValue();
         if (userId instanceof String s) return Long.parseLong(s);
@@ -94,7 +108,11 @@ public class JwtUtils {
     }
 
     public List<String> extractRoles(String token) {
-        Object roles = extractClaim(token, claims -> claims.get("roles"));
+        return rolesFrom(extractAllClaims(token));
+    }
+
+    public static List<String> rolesFrom(Claims claims) {
+        Object roles = claims.get("roles");
         if (roles == null) return List.of("ROLE_USER");
         if (roles instanceof List<?> list) {
             return list.stream()
@@ -152,16 +170,21 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        JwtParser current = parser;
+        if (current == null) {
+            current = Jwts.parser().verifyWith(getSigningKey()).build();
+            parser = current;
+        }
+        return current.parseSignedClaims(token).getPayload();
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
-        return Keys.hmacShaKeyFor(keyBytes);
+        SecretKey current = signingKey;
+        if (current == null) {
+            current = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtConfig.getSecretKey()));
+            signingKey = current;
+        }
+        return current;
     }
 
     // OAuth completion akışı için kısa ömürlü, tek amaçlı imzalı token.

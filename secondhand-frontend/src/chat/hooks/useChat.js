@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { chatService } from '../services/chatService.js';
 import useWebSocket from '../../common/hooks/useWebSocket.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -26,13 +26,17 @@ export const useChat = (userId, options = {}) => {
  } = useWebSocket(user?.id, { enabled: connectWebSocket });
 
  const {
- data: chatRooms = [],
+ data: chatRoomsData,
  isLoading: isLoadingRooms,
  error: roomsError,
- refetch: refetchRooms
- } = useQuery({
+ refetch: refetchRooms,
+ fetchNextPage: fetchMoreRooms,
+ hasNextPage: hasMoreRooms,
+ isFetchingNextPage: isFetchingMoreRooms
+ } = useInfiniteQuery({
  queryKey: ['chatRooms', user?.id],
- queryFn: () => chatService.getUserChatRooms(),
+ queryFn: ({ pageParam = 0 }) => chatService.getUserChatRooms(pageParam),
+ getNextPageParam: (lastPage, allPages) => (lastPage?.last ? undefined : allPages.length),
  enabled: !!user?.id && enableChatRoomsFetch,
  staleTime: CHAT_DEFAULTS.ROOM_STALE_TIME_MS,
  cacheTime: CHAT_DEFAULTS.ROOM_CACHE_TIME_MS,
@@ -207,6 +211,19 @@ export const useChat = (userId, options = {}) => {
  setMessages([]);
  }, [selectedChatRoom?.id]);
 
+ // A room can move to an earlier page between fetches; keep the first copy only.
+ const chatRooms = useMemo(() => {
+ const seen = new Set();
+ return (chatRoomsData?.pages || [])
+ .flatMap(page => page?.content || [])
+ .filter(room => {
+ if (seen.has(room.id)) return false;
+ seen.add(room.id);
+ return true;
+ });
+ }, [chatRoomsData]);
+ const totalRooms = chatRoomsData?.pages?.[0]?.totalElements ?? chatRooms.length;
+
  useEffect(() => {
  if (chatMessagesData?.pages) {
  const allMessages = chatMessagesData.pages
@@ -217,7 +234,11 @@ export const useChat = (userId, options = {}) => {
  }, [chatMessagesData]);
 
  return {
- chatRooms: chatRooms || [],
+ chatRooms,
+ totalRooms,
+ hasMoreRooms: !!hasMoreRooms,
+ isFetchingMoreRooms,
+ fetchMoreRooms,
  selectedChatRoom,
  messages,
  isConnected,

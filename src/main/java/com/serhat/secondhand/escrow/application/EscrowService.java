@@ -91,10 +91,7 @@ public class EscrowService {
 
     @Transactional(readOnly = true)
     public BigDecimal getPendingEscrowAmount(User seller) {
-        return escrowRepository.findBySellerId(seller.getId()).stream()
-                .filter(escrow -> escrow.getStatus() == PaymentStatus.ESCROW)
-                .map(Escrow::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return escrowRepository.sumAmountBySellerIdAndStatus(seller.getId(), PaymentStatus.ESCROW);
     }
 
     @Transactional(readOnly = true)

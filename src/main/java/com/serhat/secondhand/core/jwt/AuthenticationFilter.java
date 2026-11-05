@@ -6,6 +6,7 @@ import com.serhat.secondhand.core.security.PublicEndpointRegistry;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import com.serhat.secondhand.user.domain.entity.enums.Gender;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -26,6 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.serhat.secondhand.user.domain.entity.enums.MembershipPlan;
@@ -79,14 +81,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 jwt = authHeader.substring(7);
-                userEmail = jwtUtils.extractUsername(jwt);
                 log.debug("Token extracted from Authorization header");
             } else {
                 jwt = cookieUtils.getAccessTokenFromCookies(request).orElse(null);
                 if (jwt != null) {
-                    userEmail = jwtUtils.extractUsername(jwt);
                     log.debug("Token extracted from cookie");
                 }
+            }
+
+            // One signature check and parse per request; every claim below is read from it.
+            Claims claims = jwt != null ? jwtUtils.parseClaims(jwt) : null;
+            if (claims != null) {
+                userEmail = claims.getSubject();
             }
 
             if (jwt == null || userEmail == null) {
@@ -95,20 +101,20 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             }
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                Long userId = jwtUtils.extractUserId(jwt);
+                Long userId = JwtUtils.userIdFrom(claims);
                 if (userId == null) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
                     return;
                 }
-                if (!jwtUtils.isTokenValid(jwt)) {
+                if (claims.getExpiration() == null || claims.getExpiration().before(new Date())) {
                     sendTokenError(response, request, TokenStatus.EXPIRED);
                     return;
                 }
-                List<SimpleGrantedAuthority> authorities = jwtUtils.extractRoles(jwt).stream()
+                List<SimpleGrantedAuthority> authorities = JwtUtils.rolesFrom(claims).stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-                String planStr = jwtUtils.extractClaim(jwt, claims -> claims.get("plan", String.class));
-                String planExpiryStr = jwtUtils.extractClaim(jwt, claims -> claims.get("planExpiry", String.class));
+                String planStr = claims.get("plan", String.class);
+                String planExpiryStr = claims.get("planExpiry", String.class);
                 MembershipPlan plan = planStr != null ? MembershipPlan.valueOf(planStr) : MembershipPlan.FREE;
                 LocalDateTime planExpiry = planExpiryStr != null ? LocalDateTime.parse(planExpiryStr) : null;
 

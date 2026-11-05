@@ -25,6 +25,10 @@ const ChatPage = ({
  const notification = useNotification();
  const {
  chatRooms,
+ totalRooms,
+ hasMoreRooms,
+ isFetchingMoreRooms,
+ fetchMoreRooms,
  selectedChatRoom,
  messages,
  isConnected,
@@ -125,7 +129,7 @@ const ChatPage = ({
  <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light/60 bg-background-primary shadow-sm`}>
  {/* Chat Rooms List */}
  <div className="lg:col-span-4 border-r border-border-light/60 h-full flex flex-col overflow-hidden">
- <ChatList chatRooms={chatRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
+ <ChatList chatRooms={chatRooms} totalRooms={totalRooms} hasMoreRooms={hasMoreRooms} isFetchingMoreRooms={isFetchingMoreRooms} onLoadMoreRooms={fetchMoreRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
  </div>
 
 

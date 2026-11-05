@@ -28,11 +28,17 @@ public class ChatRestController {
     
 
 
+    private static final int MAX_ROOM_PAGE_SIZE = 50;
+
     @GetMapping("/rooms/user")
-    public ResponseEntity<List<ChatRoomDto>> getUserChatRooms(@AuthenticationPrincipal User currentUser) {
-        log.debug("Getting chat rooms for user: {}", currentUser.getId());
-        List<ChatRoomDto> chatRooms = chatService.getUserChatRooms(currentUser.getId());
-        log.debug("Returning {} chat rooms for user {}", chatRooms.size(), currentUser.getId());
+    public ResponseEntity<Page<ChatRoomDto>> getUserChatRooms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal User currentUser) {
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_ROOM_PAGE_SIZE));
+        Page<ChatRoomDto> chatRooms = chatService.getUserChatRooms(currentUser.getId(), pageable);
+        log.debug("Returning {} of {} chat rooms for user {}", chatRooms.getNumberOfElements(),
+                chatRooms.getTotalElements(), currentUser.getId());
         return ResponseEntity.ok(chatRooms);
     }
 

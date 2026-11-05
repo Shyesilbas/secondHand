@@ -3,10 +3,14 @@ import { useState } from 'react';
 import { MessageCircle, Search } from 'lucide-react';
 import ChatRoomListItem from './ChatRoomListItem.jsx';
 import { CHAT_MESSAGES } from '../chatConstants.js';
-import { SkeletonList } from '../../common/components/ui/index.js';
+import { Button, SkeletonList } from '../../common/components/ui/index.js';
 
 const ChatList = ({
  chatRooms,
+ totalRooms,
+ hasMoreRooms,
+ isFetchingMoreRooms,
+ onLoadMoreRooms,
  isLoadingRooms,
  selectedChatRoom,
  userId,
@@ -30,7 +34,7 @@ const ChatList = ({
  <div className="flex items-center justify-between mb-5">
  <div>
  <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("conversations")}</h2>
- <p className="text-xs text-text-tertiary mt-1 tracking-tight">{filteredChatRooms.length}{t("active_chats")}</p>
+ <p className="text-xs text-text-tertiary mt-1 tracking-tight tabular-nums">{searchTerm ? filteredChatRooms.length : totalRooms ?? chatRooms.length}{t("active_chats")}</p>
  </div>
  <div className="flex items-center space-x-2">
  <div className="flex items-center space-x-1.5 bg-background-tertiary rounded px-3 py-1.5">
@@ -70,6 +74,11 @@ const ChatList = ({
  <h3 className="text-sm font-medium text-text-primary mb-2 tracking-tight">{t("no_conversations_found")}</h3>
  <p className="text-sm text-text-tertiary tracking-tight">{t("try_adjusting_your_search_terms")}</p>
  </div> : filteredChatRooms.map(room => <ChatRoomListItem key={room.id} room={room} userId={userId} isSelected={selectedChatRoom?.id === room.id} onClick={() => onChatRoomSelect(room)} onListingClick={onListingClick} onDeleteConversation={onDeleteConversation} />)}
+ {!isLoadingRooms && hasMoreRooms && <div className="flex justify-center px-4 py-4">
+ <Button variant="secondary" size="sm" onClick={() => onLoadMoreRooms?.()} disabled={isFetchingMoreRooms}>
+ {isFetchingMoreRooms ? t("loading_conversations") : t("load_more_conversations")}
+ </Button>
+ </div>}
  </div>
  </div>;
 };

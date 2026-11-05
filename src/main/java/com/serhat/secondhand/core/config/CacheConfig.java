@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.BatchStrategies;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -97,7 +99,12 @@ public class CacheConfig {
 
         log.info("Redis cache manager initialized | typing=As.PROPERTY EVERYTHING | keyPrefix={}:", CACHE_VERSION);
 
-        return RedisCacheManager.builder(redisConnectionFactory)
+        // allEntries evictions (e.g. payment:stats on every wallet operation) must not run KEYS,
+        // which blocks Redis; SCAN deletes the cache's keys in batches instead.
+        RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(
+                redisConnectionFactory, BatchStrategies.scan(1000));
+
+        return RedisCacheManager.builder(cacheWriter)
                 .cacheDefaults(defaultConfig)
 
                 // Tier 0b — AI Yorum Özetleri (3 gün)

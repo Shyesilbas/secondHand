@@ -4,8 +4,8 @@ import { CHAT_DEFAULTS } from '../chatConstants.js';
 
 export const chatService = {
 
- getUserChatRooms: async () => {
- return get(API_ENDPOINTS.CHAT.USER_ROOMS);
+ getUserChatRooms: async (page = 0, size = CHAT_DEFAULTS.ROOM_PAGE_SIZE) => {
+ return get(API_ENDPOINTS.CHAT.USER_ROOMS, { params: { page, size } });
  },
 
  createOrGetDirectChat: async (otherUserId) => {

@@ -1,20 +1,32 @@
 package com.serhat.secondhand.chat.repository;
 
 import com.serhat.secondhand.chat.entity.ChatRoom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     
+    /**
+     * One page of the user's room ids, newest activity first. Ids only, so the page is limited in SQL;
+     * fetching the participantIds collection here would make Hibernate paginate in memory.
+     */
+    @Query(value = "SELECT cr.id FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds " +
+            "ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC, cr.id DESC",
+            countQuery = "SELECT COUNT(cr) FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds")
+    Page<Long> findRoomIdPageByParticipantId(@Param("userId") Long userId, Pageable pageable);
+
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"participantIds"})
-    @Query("SELECT cr FROM ChatRoom cr WHERE :userId MEMBER OF cr.participantIds ORDER BY cr.lastMessageTime DESC NULLS LAST, cr.updatedAt DESC")
-    List<ChatRoom> findByParticipantIdOrderByLastMessageTimeDesc(@Param("userId") Long userId);
+    @Query("SELECT cr FROM ChatRoom cr WHERE cr.id IN :ids")
+    List<ChatRoom> findAllWithParticipantsByIdIn(@Param("ids") Collection<Long> ids);
     
     @Query("SELECT cr FROM ChatRoom cr WHERE cr.roomType = 'DIRECT' AND :userId1 MEMBER OF cr.participantIds AND :userId2 MEMBER OF cr.participantIds ORDER BY cr.createdAt ASC")
     List<ChatRoom> findDirectChatRooms(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
