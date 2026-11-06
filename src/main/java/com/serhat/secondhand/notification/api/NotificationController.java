@@ -38,10 +38,11 @@ public class NotificationController {
     public ResponseEntity<Page<NotificationDto>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "false") boolean unreadOnly,
             @AuthenticationPrincipal User currentUser) {
         log.info("API request to get notifications for user: {}, page: {}, size: {}", currentUser.getEmail(), page, size);
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(notificationService.getUserNotifications(currentUser.getId(), pageable));
+        return ResponseEntity.ok(notificationService.getUserNotifications(currentUser.getId(), unreadOnly, pageable));
     }
 
     @GetMapping("/unread-count")

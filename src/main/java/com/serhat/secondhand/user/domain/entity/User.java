@@ -169,6 +169,17 @@ public class User implements UserDetails {
         return plan == MembershipPlan.PREMIUM && expirationDate != null && !LocalDateTime.now().isAfter(expirationDate);
     }
 
+    /**
+     * Aura questions used on {@code day}. The stored counter is only reset by the next question,
+     * so a value left from an earlier day means nothing has been used yet on {@code day}.
+     */
+    public int getDailyAuraUsageOn(LocalDate day) {
+        if (dailyAuraUsage == null || dailyAuraResetDate == null || !dailyAuraResetDate.equals(day)) {
+            return 0;
+        }
+        return dailyAuraUsage;
+    }
+
     public MembershipPlan getEffectivePlan() {
         return isPremium() ? MembershipPlan.PREMIUM : MembershipPlan.FREE;
     }

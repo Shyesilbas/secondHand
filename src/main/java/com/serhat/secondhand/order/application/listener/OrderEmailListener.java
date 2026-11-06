@@ -7,6 +7,7 @@ import com.serhat.secondhand.email.application.event.model.OrderConfirmationEmai
 import com.serhat.secondhand.email.config.EmailConfig;
 import com.serhat.secondhand.order.application.OrderLogService;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
@@ -66,7 +67,16 @@ public class OrderEmailListener {
     public void onOrderCancelled(OrderCancelledEvent event) {
         try {
             Order order = event.order();
-            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iptal edilmiştir.";
+            String displayName = getOrderDisplayName(order.getName(), order.getOrderNumber());
+            // For a missed ship deadline the requester is the refunded buyer and the others are the seller(s).
+            String content = event.shipDeadlineMissed()
+                    ? "Siparişiniz (" + displayName + ") satıcı " + OrderBusinessConstants.SHIP_DEADLINE_HOURS
+                        + " saat içinde kargoya vermediği için iptal edildi ve ödemeniz iade edildi."
+                    : "Siparişiniz (" + displayName + ") iptal edilmiştir.";
+            String counterpartyMessage = event.shipDeadlineMissed()
+                    ? "Sipariş " + displayName + " " + OrderBusinessConstants.SHIP_DEADLINE_HOURS
+                        + " saat içinde kargoya verilmediği için otomatik olarak iptal edildi."
+                    : "Sipariş " + displayName + " karşı taraf tarafından iptal edildi.";
 
             var data1 = GenericEmailData.builder()
                     .userName(event.requester().getName())
@@ -97,7 +107,7 @@ public class OrderEmailListener {
                 var data = GenericEmailData.builder()
                         .userName(counterparty.getName())
                         .headerTitle("Sipariş İptali")
-                        .message("Sipariş " + getOrderDisplayName(order.getName(), order.getOrderNumber()) + " karşı taraf tarafından iptal edildi.")
+                        .message(counterpartyMessage)
                         .build();
                 emailEventPublisher.publish(new OrderCancelledEmailEvent(counterparty, emailConfig.getOrder().getCancelledSubject(), data));
             }

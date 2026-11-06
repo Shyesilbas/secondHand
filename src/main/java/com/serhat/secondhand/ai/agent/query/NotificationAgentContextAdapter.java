@@ -26,7 +26,7 @@ public class NotificationAgentContextAdapter implements AgentContextAdapter {
         try {
             Long unreadCount = notificationService.getUnreadCount(userId);
             List<NotificationDto> notifications = notificationService
-                    .getUserNotifications(userId, PageRequest.of(0, MAX_ITEMS))
+                    .getUserNotifications(userId, false, PageRequest.of(0, MAX_ITEMS))
                     .getContent();
 
             String titles = notifications.stream()

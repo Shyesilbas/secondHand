@@ -98,9 +98,9 @@ public class NotificationService implements INotificationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<NotificationDto> getUserNotifications(Long userId, Pageable pageable) {
+    public Page<NotificationDto> getUserNotifications(Long userId, boolean unreadOnly, Pageable pageable) {
         log.info("Fetching notifications for user: {}, page: {}, size: {}", userId, pageable.getPageNumber(), pageable.getPageSize());
-        Page<NotificationFeedRow> page = notificationFeedRepository.findFeed(userId, pageable);
+        Page<NotificationFeedRow> page = notificationFeedRepository.findFeed(userId, unreadOnly, pageable);
         return page.map(this::toDto);
     }
 

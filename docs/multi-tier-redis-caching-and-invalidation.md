@@ -74,6 +74,7 @@ Veri güncellendiğinde veya silindiğinde önbelleğin tutarlı kalması için 
 | **Vitrin Paketi Satın Alındı** | `ShowcaseService` | `activeShowcases` |
 | **Kullanıcı Bilgisi Değişti** | `UserService` | `userProfile::[userId]`, `userBadges::[userId]` |
 | **Yeni İlan Eklendi / Silindi** | `ListingCommandService` | `userListings::[sellerId]` |
+| **Kampanya Oluşturuldu / Güncellendi / Silindi** | `CampaignService` | `listing:userListings` (all entries; kampanya fiyatı DTO'ya gömülü). Planlı başlangıç/bitiş tahliye tetiklemez, 10 dk TTL ile yenilenir. |
 
 ---
 

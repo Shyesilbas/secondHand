@@ -1,5 +1,6 @@
 package com.serhat.secondhand.user.application;
 
+import com.serhat.secondhand.user.domain.dto.PublicUserProfileDto;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
@@ -33,6 +34,9 @@ public interface IUserService {
     Result<User> findById(Long id);
     
     Result<UserDto> getById(Long id);
+
+    /** Public profile of another user: no contact or personal data. */
+    Result<PublicUserProfileDto> getPublicProfile(Long id);
     
     List<User> getAllUsers();
     

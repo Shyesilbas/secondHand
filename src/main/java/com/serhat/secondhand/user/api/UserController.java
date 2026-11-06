@@ -10,6 +10,7 @@ import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.verification.VerificationService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.offer.application.IOfferService;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.application.GreatSellerService;
@@ -143,13 +144,15 @@ public class UserController {
     public ResponseEntity<Page<ListingDto>> getListingsByUser(
             @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(listingService.getMyListings(userId, pageable.getPageNumber(), pageable.getPageSize()));
+        // Public profile: only listings that are live for buyers (no drafts, inactive or sold ones).
+        return ResponseEntity.ok(listingService.getMyListingsByStatus(
+                userId, ListingStatus.ACTIVE, pageable.getPageNumber(), pageable.getPageSize()));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        return ResultResponses.ok(userService.getById(id));
+        return ResultResponses.ok(userService.getPublicProfile(id));
     }
 
 

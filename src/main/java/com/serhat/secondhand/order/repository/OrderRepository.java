@@ -1,5 +1,6 @@
 package com.serhat.secondhand.order.repository;
 
+import com.serhat.secondhand.order.dto.OrderStatusCountDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,17 +30,32 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     long countByUser_IdAndPaymentStatus(Long userId, PaymentStatus paymentStatus);
     // Order.shipping is the inverse side of a one-to-one and is always loaded; fetch it in the page query
     // instead of one extra select per order (PF-07). To-one fetch joins are safe with pagination.
+    // `statuses` must never be empty: callers pass every status when no filter is requested (OrderListFilter.statusesOrAll).
     @Query(value = "SELECT DISTINCT o FROM Order o " +
            "LEFT JOIN FETCH o.shipping " +
            "WHERE o.user.id = :userId " +
-           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)",
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "AND o.status IN :statuses " +
+           "AND (:orderNumber IS NULL OR o.orderNumber = :orderNumber)",
            countQuery = "SELECT COUNT(o) FROM Order o " +
            "WHERE o.user.id = :userId " +
-           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)")
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "AND o.status IN :statuses " +
+           "AND (:orderNumber IS NULL OR o.orderNumber = :orderNumber)")
     Page<Order> findByUserIdAndDeliveryMethod(
             @Param("userId") Long userId,
             @Param("deliveryMethod") DeliveryMethod deliveryMethod,
+            @Param("statuses") Collection<OrderStatus> statuses,
+            @Param("orderNumber") String orderNumber,
             Pageable pageable);
+
+    @Query("SELECT new com.serhat.secondhand.order.dto.OrderStatusCountDto(o.status, COUNT(o)) FROM Order o " +
+           "WHERE o.user.id = :userId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "GROUP BY o.status")
+    List<OrderStatusCountDto> countUserOrdersByStatus(
+            @Param("userId") Long userId,
+            @Param("deliveryMethod") DeliveryMethod deliveryMethod);
 
 
     long countByUserIdAndStatus(Long userId, OrderStatus status);
@@ -95,15 +112,30 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "LEFT JOIN FETCH o.shipping " +
            "WHERE oi.listing.seller.id = :sellerId " +
            "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "AND o.status IN :statuses " +
+           "AND (:orderNumber IS NULL OR o.orderNumber = :orderNumber) " +
            "ORDER BY o.createdAt DESC",
            countQuery = "SELECT COUNT(DISTINCT o) FROM Order o " +
            "JOIN o.orderItems oi " +
            "WHERE oi.listing.seller.id = :sellerId " +
-           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod)")
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "AND o.status IN :statuses " +
+           "AND (:orderNumber IS NULL OR o.orderNumber = :orderNumber)")
     Page<Order> findOrdersBySellerIdAndDeliveryMethod(
             @Param("sellerId") Long sellerId,
             @Param("deliveryMethod") DeliveryMethod deliveryMethod,
+            @Param("statuses") Collection<OrderStatus> statuses,
+            @Param("orderNumber") String orderNumber,
             Pageable pageable);
+
+    @Query("SELECT new com.serhat.secondhand.order.dto.OrderStatusCountDto(o.status, COUNT(DISTINCT o)) FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "WHERE oi.listing.seller.id = :sellerId " +
+           "AND (:deliveryMethod IS NULL OR o.deliveryMethod = :deliveryMethod) " +
+           "GROUP BY o.status")
+    List<OrderStatusCountDto> countSellerOrdersByStatus(
+            @Param("sellerId") Long sellerId,
+            @Param("deliveryMethod") DeliveryMethod deliveryMethod);
 
     @Query("SELECT DISTINCT o FROM Order o " +
            "JOIN FETCH o.orderItems oi " +

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,17 +42,20 @@ public class OrderCompletionScheduler {
 
     private final OrderRepository orderRepository;
     private final EscrowService escrowService;
+    private final OrderCancellationService orderCancellationService;
     private final OrderLogService orderLog;
     private final ApplicationEventPublisher eventPublisher;
     private final TransactionTemplate transactionTemplate;
 
     public OrderCompletionScheduler(OrderRepository orderRepository,
                                     EscrowService escrowService,
+                                    OrderCancellationService orderCancellationService,
                                     OrderLogService orderLog,
                                     ApplicationEventPublisher eventPublisher,
                                     PlatformTransactionManager transactionManager) {
         this.orderRepository = orderRepository;
         this.escrowService = escrowService;
+        this.orderCancellationService = orderCancellationService;
         this.orderLog = orderLog;
         this.eventPublisher = eventPublisher;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -69,9 +71,15 @@ public class OrderCompletionScheduler {
         updatedCount += processEach(
                 orderRepository.findIdsByStatusTouchedBefore(OrderStatus.CONFIRMED, intervalCutoff, FIRST_BATCH),
                 OrderStatus.CONFIRMED, this::toProcessing, now);
+        // Shipping is the seller's action (OrderShippingService); a paid cargo order left unshipped
+        // past the deadline is cancelled and refunded to the buyer.
+        LocalDateTime shipDeadline = now.minusHours(OrderBusinessConstants.SHIP_DEADLINE_HOURS);
         updatedCount += processEach(
-                orderRepository.findIdsByStatusTouchedBefore(OrderStatus.PROCESSING, intervalCutoff, FIRST_BATCH),
-                OrderStatus.PROCESSING, this::toShipped, now);
+                orderRepository.findIdsByStatusCreatedBefore(OrderStatus.CONFIRMED, DeliveryMethod.CARGO, shipDeadline, FIRST_BATCH),
+                OrderStatus.CONFIRMED, this::cancelUnshipped, now);
+        updatedCount += processEach(
+                orderRepository.findIdsByStatusCreatedBefore(OrderStatus.PROCESSING, DeliveryMethod.CARGO, shipDeadline, FIRST_BATCH),
+                OrderStatus.PROCESSING, this::cancelUnshipped, now);
         updatedCount += processEach(
                 orderRepository.findIdsByStatusInTransitBefore(OrderStatus.SHIPPED, intervalCutoff, FIRST_BATCH),
                 OrderStatus.SHIPPED, this::toDelivered, now);
@@ -125,17 +133,16 @@ public class OrderCompletionScheduler {
         return true;
     }
 
-    private boolean toShipped(Order order, LocalDateTime now) {
-        if (!shouldUpdateToShipped(order, now)) {
+    private boolean cancelUnshipped(Order order, LocalDateTime now) {
+        if (order.getDeliveryMethod() != DeliveryMethod.CARGO || order.getCreatedAt() == null
+                || Duration.between(order.getCreatedAt(), now).toHours() < OrderBusinessConstants.SHIP_DEADLINE_HOURS) {
             return false;
         }
-        OrderStatus oldStatus = order.getStatus();
-        // Simulation: Use ARAS carrier and a random tracking number
-        String trackingNumber = "TRK" + System.currentTimeMillis();
-        order.markAsShipped("ARAS", trackingNumber, null, "SIM-" + trackingNumber, null, BigDecimal.ZERO);
-        orderRepository.save(order);
-        eventPublisher.publishEvent(new OrderStatusChangedEvent(order, oldStatus.name(), OrderStatus.SHIPPED.name()));
-        orderLog.logStatusChanged(order.getOrderNumber(), oldStatus.name(), "SHIPPED (Tracking: " + trackingNumber + ")");
+        var result = orderCancellationService.cancelUnshippedOrder(order.getId());
+        if (result.isError()) {
+            log.warn("Unshipped order {} could not be cancelled: {}", order.getOrderNumber(), result.getErrorCode());
+            return false;
+        }
         return true;
     }
 
@@ -231,16 +238,6 @@ public class OrderCompletionScheduler {
             Duration duration = Duration.between(order.getCreatedAt(), now);
             return duration.toMinutes() >= interval;
         }
-        Duration duration = Duration.between(order.getUpdatedAt(), now);
-        return duration.toMinutes() >= interval;
-    }
-
-    private boolean shouldUpdateToShipped(Order order, LocalDateTime now) {
-        if (order.getUpdatedAt() == null) {
-            orderLog.logDataWarning("Order {} has null updatedAt, cannot update to SHIPPED", order.getOrderNumber());
-            return false;
-        }
-        int interval = getEffectiveInterval(order);
         Duration duration = Duration.between(order.getUpdatedAt(), now);
         return duration.toMinutes() >= interval;
     }

@@ -16,7 +16,7 @@ public interface INotificationService {
     
     Result<NotificationDto> createBroadcast(NotificationRequest request);
     
-    Page<NotificationDto> getUserNotifications(Long userId, Pageable pageable);
+    Page<NotificationDto> getUserNotifications(Long userId, boolean unreadOnly, Pageable pageable);
     
     Long getUnreadCount(Long userId);
     

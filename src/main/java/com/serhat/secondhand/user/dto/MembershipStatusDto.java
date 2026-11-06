@@ -51,7 +51,7 @@ public record MembershipStatusDto(
             user.getPrice(),
             effectivePlan.getBenefits(),
             subscriptionStatus,
-            user.getDailyAuraUsage(),
+            user.getDailyAuraUsageOn(java.time.LocalDate.now()),
             effectivePlan.getDailyAuraLimit(),
             effectivePlan.getMaxShowcaseSlots(),
             effectivePlan.getEstimatedShippingDays(),

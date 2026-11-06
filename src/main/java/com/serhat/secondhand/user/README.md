@@ -11,6 +11,7 @@ The `user` domain manages user profiles, delivery/billing addresses, user badges
 ## Business Invariants & Constraints
 - **Unique Identifiers:** Email and phone numbers must be strictly unique across the system.
 - **Main Address:** Only one address per user can be marked as the main address at any given time.
+- **Public Profile:** `GET /api/v1/users/{id}` returns `PublicUserProfileDto` (id, name, surname, accountCreationDate, accountVerified) only; never expose email, phone, birthdate, gender, role or account status there. `GET /api/v1/users/{id}/listings` returns only `ACTIVE` listings.
 - **Badge Eligibility:** Great Seller status is resolved via `GreatSellerPolicy` using historical aggregate data, triggered asynchronously.
 
 ## State Machines

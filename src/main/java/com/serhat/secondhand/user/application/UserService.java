@@ -1,5 +1,6 @@
 package com.serhat.secondhand.user.application;
 
+import com.serhat.secondhand.user.domain.dto.PublicUserProfileDto;
 import com.serhat.secondhand.core.exception.AuthenticationNotFoundException;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
@@ -152,6 +153,15 @@ public class UserService implements IUserService {
             return Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID);
         }
         return Result.success(userDto);
+    }
+
+    @Override
+    public Result<PublicUserProfileDto> getPublicProfile(Long id) {
+        UserDto userDto = self.getCachedUserDto(id);
+        if (userDto == null) {
+            return Result.error(UserErrorCodes.USER_NOT_FOUND_BY_ID);
+        }
+        return Result.success(PublicUserProfileDto.from(userDto));
     }
 
     @Cacheable(value = "user:profile", key = "#id")

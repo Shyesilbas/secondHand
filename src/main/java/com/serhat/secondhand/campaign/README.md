@@ -12,6 +12,7 @@ The `campaign` domain allows sellers to create, manage, and apply discount campa
 - **Discount Integrity:** A `PERCENT` campaign value must be <= 100. Any campaign value must be > 0. Date constraints (`startsAt < endsAt`) are strictly enforced.
 - **Category Prohibition:** Campaigns cannot be applied to `REAL_ESTATE` or `VEHICLE` listings.
 - **Ownership:** A seller can only apply campaigns to listings they explicitly own.
+- **Scope (`ListingCampaignPricingUtil.isApplicable`):** Picked listings → only those listings; listing types → any listing of those types, including ones created later; no filter → all campaignable listings. `applyToFutureListings` never widens a picked-listings campaign.
 
 ## State Machines
 - **Campaign State:** Active -> Inactive (Expired / Deactivated).

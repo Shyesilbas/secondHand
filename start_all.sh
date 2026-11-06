@@ -3,6 +3,22 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRONTEND_DIR="$ROOT_DIR/secondhand-frontend"
+SEED_ARG=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --seed)
+            SEED_ARG="all"
+            ;;
+        --seed=*)
+            SEED_ARG="${arg#*=}"
+            ;;
+        *)
+            echo "Usage: ./start_all.sh [--seed | --seed=<key[,key]|listing|all>]"
+            exit 1
+            ;;
+    esac
+done
 
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
@@ -46,23 +62,74 @@ else
     echo -e "${YELLOW}[WARN]${NC} .env file not found in project root. Run 'cp .env.template .env' if backend fails to start."
 fi
 
-# 2. Ensure frontend dependencies are installed
+# 2. Start Docker containers (PostgreSQL, Redis, Kafka) and wait for readiness
+if ! command -v docker >/dev/null 2>&1; then
+    echo -e "${RED}[ERROR]${NC} Docker is not installed or not in PATH."
+    exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+    echo -e "${RED}[ERROR]${NC} Docker daemon is not running. Please start Docker Desktop first."
+    exit 1
+fi
+
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE_CMD=(docker compose)
+elif command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE_CMD=(docker-compose)
+else
+    echo -e "${RED}[ERROR]${NC} Neither 'docker compose' nor 'docker-compose' was found."
+    exit 1
+fi
+
+echo -e "${GREEN}[START]${NC} Starting Docker containers (PostgreSQL :5433, Redis :6379, Kafka :9092)..."
+"${COMPOSE_CMD[@]}" up -d
+
+echo -e "${BLUE}[INFO]${NC} Waiting for PostgreSQL and Redis to become ready..."
+for i in {1..30}; do
+    if docker exec secondhand_postgres_dev pg_isready -U "${DB_USER:-postgres}" -d secondhand >/dev/null 2>&1; then
+        break
+    fi
+    if [[ $i -eq 30 ]]; then
+        echo -e "${RED}[ERROR]${NC} PostgreSQL did not become ready in time."
+        exit 1
+    fi
+    sleep 1
+done
+
+for i in {1..30}; do
+    if docker exec secondhand_redis_dev redis-cli ping 2>/dev/null | grep -q PONG; then
+        break
+    fi
+    if [[ $i -eq 30 ]]; then
+        echo -e "${RED}[ERROR]${NC} Redis did not become ready in time."
+        exit 1
+    fi
+    sleep 1
+done
+echo -e "${GREEN}[OK]${NC} Docker infrastructure is ready."
+
+# 3. Ensure frontend dependencies are installed
 if [[ ! -d "$FRONTEND_DIR/node_modules" ]]; then
     echo -e "${BLUE}[INFO]${NC} Installing frontend dependencies..."
     (cd "$FRONTEND_DIR" && npm install)
 fi
 
-# 3. Start Backend (Spring Boot)
+# 4. Start Backend (Spring Boot)
+if [[ -n "$SEED_ARG" ]]; then
+    export APP_SEED="$SEED_ARG"
+    echo -e "${BLUE}[INFO]${NC} Catalog seeding enabled (APP_SEED=$APP_SEED)"
+fi
 echo -e "${GREEN}[START]${NC} Starting Backend on http://localhost:8080 ..."
 ./mvnw spring-boot:run > >(sed "s/^/$(printf "${BLUE}[BACKEND]${NC} ")/") 2>&1 &
 BACKEND_PID=$!
 
-# 4. Start Frontend (Vite)
+# 5. Start Frontend (Vite)
 echo -e "${GREEN}[START]${NC} Starting Frontend on http://localhost:5173 ..."
 (cd "$FRONTEND_DIR" && npm run dev) > >(sed "s/^/$(printf "${GREEN}[FRONTEND]${NC} ")/") 2>&1 &
 FRONTEND_PID=$!
 
-echo -e "${BLUE}[INFO]${NC} Both services launched. Press Ctrl+C to stop all."
+echo -e "${BLUE}[INFO]${NC} Docker, Backend, and Frontend launched. Press Ctrl+C to stop Backend & Frontend (run '${COMPOSE_CMD[*]} down' to stop containers)."
 
 # Wait for both processes
 wait "$BACKEND_PID" "$FRONTEND_PID"

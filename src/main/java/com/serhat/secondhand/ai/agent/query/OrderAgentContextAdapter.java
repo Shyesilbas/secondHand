@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ai.agent.query;
 
+import com.serhat.secondhand.order.dto.OrderListFilter;
 import com.serhat.secondhand.ai.agent.dto.AgentUiContextRequest;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.application.OrderQueryService;
@@ -26,7 +27,7 @@ public class OrderAgentContextAdapter implements AgentContextAdapter {
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {
         try {
-            var orderResult = orderQueryService.getUserOrders(userId, null, PageRequest.of(0, MAX_ITEMS));
+            var orderResult = orderQueryService.getUserOrders(userId, OrderListFilter.NONE, PageRequest.of(0, MAX_ITEMS));
             if (orderResult.isError() || orderResult.getData() == null) {
                 return new AgentContextSection(SOURCE, "No orders found for this user.", "ok");
             }

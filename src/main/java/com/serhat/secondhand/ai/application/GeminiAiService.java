@@ -61,10 +61,11 @@ public class GeminiAiService {
             return AiResponse.error("Question cannot be empty");
         }
 
-        java.time.LocalDate reservedOn = null;
+        // Reserved outside the try: a reached daily limit must reach the client as a 403
+        // AURA_LIMIT_EXCEEDED error, not as a failed answer with HTTP 200.
+        User user = userRepository.findById(userId).orElseThrow();
+        java.time.LocalDate reservedOn = reserveAuraSlot(user);
         try {
-            User user = userRepository.findById(userId).orElseThrow();
-            reservedOn = reserveAuraSlot(user);
 
             UserMemory memory = memoryService.getOrCreate(userId);
             String recent = memoryService.buildRecentConversationBlock(userId);
@@ -97,10 +98,11 @@ public class GeminiAiService {
             return AiResponse.error("Question cannot be empty");
         }
 
-        java.time.LocalDate reservedOn = null;
+        // Reserved outside the try: a reached daily limit must reach the client as a 403
+        // AURA_LIMIT_EXCEEDED error, not as a failed answer with HTTP 200.
+        User user = userRepository.findById(userId).orElseThrow();
+        java.time.LocalDate reservedOn = reserveAuraSlot(user);
         try {
-            User user = userRepository.findById(userId).orElseThrow();
-            reservedOn = reserveAuraSlot(user);
 
             String recent = memoryService.buildRecentConversationBlock(userId);
             String live = liveSearchResults == null ? "" : liveSearchResults;

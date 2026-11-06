@@ -2,9 +2,11 @@ package com.serhat.secondhand.order;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.escrow.application.EscrowService;
+import com.serhat.secondhand.order.application.OrderCancellationService;
 import com.serhat.secondhand.order.application.OrderCompletionScheduler;
 import com.serhat.secondhand.order.application.OrderLogService;
 import com.serhat.secondhand.order.entity.Order;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.shipping.entity.Shipping;
@@ -27,13 +29,14 @@ class OrderCompletionSchedulerTest {
 
     private final OrderRepository orderRepository = mock(OrderRepository.class);
     private final EscrowService escrowService = mock(EscrowService.class);
+    private final OrderCancellationService cancellationService = mock(OrderCancellationService.class);
     private final OrderLogService orderLog = mock(OrderLogService.class);
     private final ApplicationEventPublisher events = mock(ApplicationEventPublisher.class);
     private final PlatformTransactionManager txManager = mock(PlatformTransactionManager.class);
     private final TransactionStatus txStatus = mock(TransactionStatus.class);
 
     private final OrderCompletionScheduler scheduler =
-            new OrderCompletionScheduler(orderRepository, escrowService, orderLog, events, txManager);
+            new OrderCompletionScheduler(orderRepository, escrowService, cancellationService, orderLog, events, txManager);
 
     @BeforeEach
     void setUp() {
@@ -129,5 +132,35 @@ class OrderCompletionSchedulerTest {
 
         assertThat(delivered.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         verify(orderLog).logOrderCompleted("ORD-5", true);
+    }
+
+    @Test
+    void processingOrderPastShipDeadline_isCancelledBySystem() {
+        Order late = order(7L, OrderStatus.PROCESSING, LocalDateTime.now().minusHours(73));
+        late.setDeliveryMethod(DeliveryMethod.CARGO);
+        when(orderRepository.findIdsByStatusCreatedBefore(eq(OrderStatus.PROCESSING), eq(DeliveryMethod.CARGO), any(), any()))
+                .thenReturn(List.of(7L));
+        when(orderRepository.findByIdWithShippingAndUser(7L)).thenReturn(Optional.of(late));
+        when(cancellationService.cancelUnshippedOrder(7L)).thenReturn(Result.success());
+
+        scheduler.autoUpdateOrderStatus();
+
+        verify(cancellationService).cancelUnshippedOrder(7L);
+        verify(orderLog).logSchedulerCompleted(1);
+    }
+
+    @Test
+    void processingOrderInsideShipDeadline_isNeitherShippedNorCancelled() {
+        Order recent = order(8L, OrderStatus.PROCESSING, LocalDateTime.now().minusHours(10));
+        recent.setDeliveryMethod(DeliveryMethod.CARGO);
+        when(orderRepository.findIdsByStatusCreatedBefore(eq(OrderStatus.PROCESSING), eq(DeliveryMethod.CARGO), any(), any()))
+                .thenReturn(List.of(8L));
+        when(orderRepository.findByIdWithShippingAndUser(8L)).thenReturn(Optional.of(recent));
+
+        scheduler.autoUpdateOrderStatus();
+
+        assertThat(recent.getStatus()).isEqualTo(OrderStatus.PROCESSING);
+        verify(cancellationService, never()).cancelUnshippedOrder(any());
+        verify(orderRepository, never()).save(any());
     }
 }

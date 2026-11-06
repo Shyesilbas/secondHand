@@ -10,6 +10,7 @@ import com.serhat.secondhand.offer.entity.Offer;
 import com.serhat.secondhand.order.application.OrderCreationService;
 import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.dto.CheckoutRequest;
+import com.serhat.secondhand.order.dto.CheckoutResultDto;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
@@ -29,9 +30,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -50,8 +53,12 @@ public class CheckoutOrchestrator {
     private final CheckoutStockReservationService checkoutStockReservationService;
     private final ApplicationEventPublisher eventPublisher;
 
+    /**
+     * Places one order per seller in a single transaction. Every order is paid and put in escrow
+     * before anything is finalized; if any order fails, the whole checkout is rolled back.
+     */
     @Transactional
-    public Result<OrderDto> executeCheckout(Long userId, CheckoutRequest request) {
+    public Result<CheckoutResultDto> executeCheckout(Long userId, CheckoutRequest request) {
         log.info("Executing checkout for userId: {}", userId);
 
         Result<CheckoutPricingContextFactory.CheckoutPricingContext> pricingContextResult =
@@ -73,61 +80,71 @@ public class CheckoutOrchestrator {
 
         Map<UUID, Integer> reserved = reservedResult.getData();
 
-        Result<Order> orderResult = orderCreationService.createOrder(user, effectiveCartItems, request, pricing);
-        if (orderResult.isError()) {
+        Result<List<Order>> ordersResult = orderCreationService.createOrders(user, effectiveCartItems, request, pricing);
+        if (ordersResult.isError()) {
             rollbackCheckout();
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
-            return Result.error(orderResult.getMessage(), orderResult.getErrorCode());
+            return Result.error(ordersResult.getMessage(), ordersResult.getErrorCode());
         }
 
-        Order order = orderResult.getData();
+        List<Order> orders = ordersResult.getData();
+        String orderNumbers = orders.stream().map(Order::getOrderNumber).collect(Collectors.joining(","));
 
         try {
-            Result<List<PaymentDto>> paymentResult = orderPaymentService.processPaymentsForOrder(
-                    user, order, request, order.getOrderNumber(), pricing, order.getExternalId());
+            for (Order order : orders) {
+                Result<List<PaymentDto>> paymentResult = orderPaymentService.processPaymentsForOrder(
+                        user, order, request, order.getOrderNumber(), pricing, order.getExternalId());
 
-            if (paymentResult.isError()) {
-                rollbackCheckout();
-                checkoutStockReservationService.releaseReservedStock(userId, reserved);
-                return Result.error(paymentResult.getMessage(), paymentResult.getErrorCode());
-            }
+                if (paymentResult.isError()) {
+                    rollbackCheckout();
+                    checkoutStockReservationService.releaseReservedStock(userId, reserved);
+                    return Result.error(paymentResult.getMessage(), paymentResult.getErrorCode());
+                }
 
-            List<PaymentDto> paymentResults = paymentResult.getData();
-            boolean allSuccessful = paymentResults.stream().allMatch(PaymentDto::isSuccess);
+                List<PaymentDto> paymentResults = paymentResult.getData();
+                if (!paymentResults.stream().allMatch(PaymentDto::isSuccess)) {
+                    rollbackCheckout();
+                    checkoutStockReservationService.releaseReservedStock(userId, reserved);
+                    log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
+                    return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
+                }
 
-            if (allSuccessful) {
                 applyPaymentResultToOrder(order, paymentResults, true, request.getProviderName());
                 Result<Void> escrowResult = escrowService.hold(order);
                 if (escrowResult.isError()) {
                     throw new IllegalStateException("Escrow creation failed for order "
                             + order.getOrderNumber() + ": " + escrowResult.getMessage());
                 }
-                
-                Result<Void> successResult = handleSuccessfulCheckout(userId, order, pricing, acceptedOffer);
-                if (successResult.isError()) {
-                    // Coupon already used or offer completed by a concurrent checkout: undo payments and order.
-                    rollbackCheckout();
-                    checkoutStockReservationService.releaseReservedStock(userId, reserved);
-                    log.warn("Checkout finalization failed for order {}: {}", order.getOrderNumber(), successResult.getErrorCode());
-                    return Result.error(successResult.getMessage(), successResult.getErrorCode());
-                }
-                checkoutStockReservationService.consumeReservationsOnSuccess(userId, order);
-                // If the commit itself fails, give the held units back now instead of after the TTL.
-                checkoutStockReservationService.releaseReservedStockOnRollback(userId, reserved);
-                eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
-                log.info("Checkout completed successfully for order: {}", order.getOrderNumber());
-            } else {
-                rollbackCheckout();
-                checkoutStockReservationService.releaseReservedStock(userId, reserved);
-                log.warn("Checkout payment failed for order: {}", order.getOrderNumber());
-                return Result.error("PAYMENT_FAILED", "Error occurred during checkout payment. Please try again later.");
             }
 
-            return Result.success(orderMapper.toDto(order));
+            Result<Void> successResult = handleSuccessfulCheckout(userId, orders, pricing, acceptedOffer);
+            if (successResult.isError()) {
+                // Coupon already used or offer completed by a concurrent checkout: undo payments and orders.
+                rollbackCheckout();
+                checkoutStockReservationService.releaseReservedStock(userId, reserved);
+                log.warn("Checkout finalization failed for orders {}: {}", orderNumbers, successResult.getErrorCode());
+                return Result.error(successResult.getMessage(), successResult.getErrorCode());
+            }
+            for (Order order : orders) {
+                checkoutStockReservationService.consumeReservationsOnSuccess(userId, order);
+            }
+            // If the commit itself fails, give the held units back now instead of after the TTL.
+            checkoutStockReservationService.releaseReservedStockOnRollback(userId, reserved);
+            for (Order order : orders) {
+                eventPublisher.publishEvent(new OrderCreatedEvent(order, user, true));
+            }
+            log.info("Checkout completed successfully for orders: {}", orderNumbers);
+
+            List<OrderDto> orderDtos = orders.stream().map(orderMapper::toDto).toList();
+            BigDecimal totalAmount = orders.stream()
+                    .map(Order::getTotalAmount)
+                    .filter(java.util.Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            return Result.success(new CheckoutResultDto(orderDtos, totalAmount));
 
         } catch (Exception e) {
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
-            log.error("Critical exception during checkout for order: {}", order.getOrderNumber(), e);
+            log.error("Critical exception during checkout for orders: {}", orderNumbers, e);
             throw e;
         }
     }
@@ -162,9 +179,14 @@ public class CheckoutOrchestrator {
         TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
     }
 
-    private Result<Void> handleSuccessfulCheckout(Long userId, Order order, PricingResultDto pricing, Offer acceptedOffer) {
+    // A coupon is redeemed once per checkout, linked to the first order that received part of its discount.
+    private Result<Void> handleSuccessfulCheckout(Long userId, List<Order> orders, PricingResultDto pricing, Offer acceptedOffer) {
         if (pricing.getCouponCode() != null) {
-            Result<Void> redeemResult = couponService.redeem(pricing.getCouponCode(), userId, order);
+            Order couponOrder = orders.stream()
+                    .filter(o -> o.getCouponCode() != null)
+                    .findFirst()
+                    .orElse(orders.get(0));
+            Result<Void> redeemResult = couponService.redeem(pricing.getCouponCode(), userId, couponOrder);
             if (redeemResult.isError()) {
                 return redeemResult;
             }

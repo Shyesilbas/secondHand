@@ -25,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,7 +42,12 @@ public class OrderCreationService {
     private final AddressService addressService;
     private final OrderLogService orderLog;
 
-    public Result<Order> createOrder(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
+    /**
+     * Creates one order per seller. Shipping, status and escrow are per order, so an order must never
+     * mix sellers: each seller ships, cancels and gets paid for their own order. Amounts come from the
+     * checkout pricing per item, so the orders together charge exactly the priced total.
+     */
+    public Result<List<Order>> createOrders(User user, List<Cart> cartItems, CheckoutRequest request, PricingResultDto pricing) {
         Result<Void> cartValidationResult = validateCartItems(cartItems);
         if (cartValidationResult.isError()) return cartValidationResult.propagateError();
 
@@ -49,40 +57,83 @@ public class OrderCreationService {
         Result<Void> addressValidationResult = validateAddresses(user, shippingAddress, billingAddress);
         if (addressValidationResult.isError()) return addressValidationResult.propagateError();
 
-        BigDecimal totalAmount = pricing != null && pricing.getTotal() != null ? pricing.getTotal() : calculateTotalAmount(cartItems);
-        BigDecimal subtotal = pricing != null ? pricing.getSubtotalAfterCampaigns() : null;
-        BigDecimal campaignDiscount = pricing != null ? pricing.getCampaignDiscount() : null;
-        BigDecimal couponDiscount = pricing != null ? pricing.getCouponDiscount() : null;
-        BigDecimal discountTotal = pricing != null ? pricing.getDiscountTotal() : null;
-        String couponCode = pricing != null ? pricing.getCouponCode() : null;
-        String orderNumber = generateOrderNumber();
-
-        Order order = buildOrder(user, shippingAddress, billingAddress, totalAmount, orderNumber, request);
-        order.setSubtotal(subtotal);
-        order.setCampaignDiscount(campaignDiscount);
-        order.setCouponCode(couponCode);
-        order.setCouponDiscount(couponDiscount);
-        order.setDiscountTotal(discountTotal);
-
-        if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP) {
-            Shipping shipping = buildShipping(order);
-            order.setShipping(shipping);
+        Map<Long, List<Cart>> cartBySeller = new LinkedHashMap<>();
+        for (Cart cart : cartItems) {
+            Listing listing = cart.getListing();
+            if (listing == null || listing.getSeller() == null || listing.getSeller().getId() == null) {
+                return Result.error(OrderErrorCodes.ORDER_ITEM_MISSING_SELLER);
+            }
+            cartBySeller.computeIfAbsent(listing.getSeller().getId(), id -> new ArrayList<>()).add(cart);
         }
 
+        Map<UUID, PricedCartItemDto> pricedByListingId = buildPricedItemsByListingId(pricing);
         Map<UUID, BigDecimal> unitPriceByListingId = buildUnitPriceByListingId(pricing);
         Map<UUID, BigDecimal> lineSubtotalByListingId = buildLineSubtotalByListingId(pricing);
-        
-        try {
-            populateOrderItems(cartItems, order, unitPriceByListingId, lineSubtotalByListingId);
-        } catch (IllegalStateException e) {
-            return Result.error(e.getMessage(), OrderErrorCodes.ORDER_ITEM_MISSING_SELLER.getCode());
+
+        List<Order> orders = new ArrayList<>();
+        for (List<Cart> sellerCart : cartBySeller.values()) {
+            SellerAmounts amounts = sellerAmounts(sellerCart, pricedByListingId);
+            String orderNumber = generateOrderNumber();
+
+            Order order = buildOrder(user, shippingAddress, billingAddress, amounts.total(), orderNumber, request);
+            if (order.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP) {
+                order.setShipping(buildShipping(order));
+            }
+
+            try {
+                populateOrderItems(sellerCart, order, unitPriceByListingId, lineSubtotalByListingId);
+            } catch (IllegalStateException e) {
+                return Result.error(e.getMessage(), OrderErrorCodes.ORDER_ITEM_MISSING_SELLER.getCode());
+            }
+
+            // Set after the items: Order.addItem recalculates totals from item prices, which are already
+            // net of the coupon share, and would subtract the coupon a second time.
+            order.setTotalAmount(amounts.total());
+            order.setSubtotal(amounts.subtotal());
+            order.setCampaignDiscount(amounts.campaignDiscount());
+            order.setCouponDiscount(amounts.couponDiscount());
+            order.setCouponCode(amounts.couponDiscount().signum() > 0 && pricing != null ? pricing.getCouponCode() : null);
+            order.setDiscountTotal(amounts.campaignDiscount().add(amounts.couponDiscount()));
+
+            Order savedOrder = orderRepository.save(order);
+            orderLog.logOrderCreated(orderNumber, savedOrder.getId(), user.getEmail());
+            orders.add(savedOrder);
         }
 
-        Order savedOrder = orderRepository.save(order);
-        orderLog.logOrderCreated(orderNumber, savedOrder.getId(), user.getEmail());
-
-        return Result.success(savedOrder);
+        return Result.success(orders);
     }
+
+    // Sums the priced lines of one seller; a line missing from pricing falls back to the listing price.
+    private SellerAmounts sellerAmounts(List<Cart> sellerCart, Map<UUID, PricedCartItemDto> pricedByListingId) {
+        BigDecimal subtotal = BigDecimal.ZERO;
+        BigDecimal campaignDiscount = BigDecimal.ZERO;
+        BigDecimal couponDiscount = BigDecimal.ZERO;
+        BigDecimal total = BigDecimal.ZERO;
+        for (Cart cart : sellerCart) {
+            BigDecimal quantity = BigDecimal.valueOf(cart.getQuantity());
+            PricedCartItemDto priced = pricedByListingId.get(cart.getListing().getId());
+            if (priced == null || priced.getLineSubtotal() == null) {
+                BigDecimal line = cart.getListing().getPrice().multiply(quantity);
+                subtotal = subtotal.add(line);
+                total = total.add(line);
+                continue;
+            }
+            BigDecimal line = priced.getLineSubtotal();
+            BigDecimal original = priced.getOriginalUnitPrice() != null ? priced.getOriginalUnitPrice().multiply(quantity) : line;
+            BigDecimal coupon = priced.getCouponDiscount() != null ? priced.getCouponDiscount() : BigDecimal.ZERO;
+            subtotal = subtotal.add(line);
+            campaignDiscount = campaignDiscount.add(original.subtract(line).max(BigDecimal.ZERO));
+            couponDiscount = couponDiscount.add(coupon);
+            total = total.add(priced.getNetLineTotal() != null ? priced.getNetLineTotal() : line.subtract(coupon));
+        }
+        return new SellerAmounts(scale(subtotal), scale(campaignDiscount), scale(couponDiscount), scale(total));
+    }
+
+    private static BigDecimal scale(BigDecimal value) {
+        return value.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private record SellerAmounts(BigDecimal subtotal, BigDecimal campaignDiscount, BigDecimal couponDiscount, BigDecimal total) {}
 
     private Result<Void> validateCartItems(List<Cart> cartItems) {
         if (cartItems == null || cartItems.isEmpty()) {
@@ -111,12 +162,6 @@ public class OrderCreationService {
         }
 
         return Result.success();
-    }
-
-    private BigDecimal calculateTotalAmount(List<Cart> cartItems) {
-        return cartItems.stream()
-                .map(cart -> cart.getListing().getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void populateOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
@@ -158,6 +203,19 @@ public class OrderCreationService {
                 .build();
         
         return item;
+    }
+
+    private Map<UUID, PricedCartItemDto> buildPricedItemsByListingId(PricingResultDto pricing) {
+        if (pricing == null || pricing.getItems() == null) {
+            return Map.of();
+        }
+        Map<UUID, PricedCartItemDto> map = new HashMap<>();
+        for (PricedCartItemDto item : pricing.getItems()) {
+            if (item.getListingId() != null) {
+                map.put(item.getListingId(), item);
+            }
+        }
+        return map;
     }
 
     private Map<UUID, BigDecimal> buildUnitPriceByListingId(PricingResultDto pricing) {

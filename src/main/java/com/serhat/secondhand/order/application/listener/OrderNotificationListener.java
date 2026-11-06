@@ -4,6 +4,7 @@ import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.application.OrderLogService;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
 import com.serhat.secondhand.order.application.event.OrderCreatedEvent;
 import com.serhat.secondhand.order.application.event.OrderRefundedEvent;
@@ -58,6 +59,10 @@ public class OrderNotificationListener {
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCancelled(OrderCancelledEvent event) {
+        if (event.shipDeadlineMissed()) {
+            notifyShipDeadlineCancellation(event);
+            return;
+        }
         try {
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderCancelled(
@@ -151,6 +156,26 @@ public class OrderNotificationListener {
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────
+
+    // Nobody "cancelled" this order: the buyer is told about the refund, each seller about the missed deadline.
+    private void notifyShipDeadlineCancellation(OrderCancelledEvent event) {
+        String orderNumber = event.order().getOrderNumber();
+        try {
+            Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
+            Long buyerId = order.getUser() != null ? order.getUser().getId() : null;
+            for (Long uid : collectOrderParticipantIds(order)) {
+                var result = notificationService.createAndSend(
+                        notificationTemplateCatalog.orderCancelledShipDeadline(
+                                uid, order.getId(), orderNumber,
+                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, !uid.equals(buyerId)));
+                if (result.isError()) {
+                    orderLog.logNotificationFailed("orderShipDeadlineCancelledInApp", orderNumber, result.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            orderLog.logNotificationFailed("orderShipDeadlineCancelledInApp", orderNumber, e.getMessage());
+        }
+    }
 
     private static Set<Long> collectOrderParticipantIds(Order order) {
         Set<Long> ids = new LinkedHashSet<>();

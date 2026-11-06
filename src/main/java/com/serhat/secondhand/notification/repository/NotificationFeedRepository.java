@@ -28,6 +28,7 @@ public interface NotificationFeedRepository extends Repository<com.serhat.second
                     from notifications n
                     where n.user_id = :userId
                       and n.type <> 'AGREEMENT_UPDATED'
+                      and (cast(:unreadOnly as boolean) = false or n.is_read = false)
                     
                     union all
                     
@@ -46,16 +47,23 @@ public interface NotificationFeedRepository extends Repository<com.serhat.second
                     left join notification_event_reads r
                       on r.event_id = e.id and r.user_id = :userId
                     where e.type <> 'AGREEMENT_UPDATED'
+                      and (cast(:unreadOnly as boolean) = false or r.user_id is null)
                     
                     order by createdAt desc
                     """,
             countQuery = """
                     select
-                      (select count(*) from notifications n where n.user_id = :userId and n.type <> 'AGREEMENT_UPDATED') +
-                      (select count(*) from notification_events e where e.type <> 'AGREEMENT_UPDATED')
+                      (select count(*) from notifications n
+                        where n.user_id = :userId and n.type <> 'AGREEMENT_UPDATED'
+                          and (cast(:unreadOnly as boolean) = false or n.is_read = false)) +
+                      (select count(*) from notification_events e
+                        where e.type <> 'AGREEMENT_UPDATED'
+                          and (cast(:unreadOnly as boolean) = false or not exists (
+                            select 1 from notification_event_reads r where r.event_id = e.id and r.user_id = :userId)))
                     """,
             nativeQuery = true
     )
-    Page<NotificationFeedRow> findFeed(@Param("userId") Long userId, Pageable pageable);
+    /** {@code unreadOnly} keeps only personal notifications and broadcast events the user has not read. */
+    Page<NotificationFeedRow> findFeed(@Param("userId") Long userId, @Param("unreadOnly") boolean unreadOnly, Pageable pageable);
 }
 

@@ -153,12 +153,10 @@ public class ListingCampaignPricingUtil {
             return false;
         }
 
+        // Scope is decided by the filters alone. A type or "all listings" scope already covers listings
+        // created later; applyToFutureListings must never widen a picked-listings campaign to every listing.
         boolean hasListingFilter = hasFilter(campaign.getEligibleListingIds());
         boolean hasTypeFilter = hasFilter(campaign.getEligibleTypes());
-
-        if (campaign.isApplyToFutureListings()) {
-            return !hasTypeFilter || campaign.getEligibleTypes().contains(type);
-        }
 
         if (hasListingFilter && campaign.getEligibleListingIds().contains(listingId)) {
             return true;

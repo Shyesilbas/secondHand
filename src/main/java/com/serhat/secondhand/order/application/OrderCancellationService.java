@@ -8,6 +8,9 @@ import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.entity.OrderItemCancel;
+import com.serhat.secondhand.order.entity.enums.CancelRefundReason;
+import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -28,6 +31,8 @@ import java.util.List;
 public class OrderCancellationService {
 
     private static final String REFUND_FAILED_MESSAGE = "Failed to process refund. Please contact support.";
+    static final String SHIP_DEADLINE_REASON = "Not shipped within "
+            + com.serhat.secondhand.order.util.OrderBusinessConstants.SHIP_DEADLINE_HOURS + " hours";
 
     private final OrderItemCompensationPlanner compensationPlanner;
     private final OrderCancellationValidationService validationService;
@@ -71,7 +76,52 @@ public class OrderCancellationService {
             return reloadedOrderResult.propagateError();
         }
 
-        return finalizeCancellation(reloadedOrderResult.getData(), user);
+        return finalizeCancellation(reloadedOrderResult.getData(), user, false, "User requested cancellation");
+    }
+
+    /**
+     * System cancellation of a paid cargo order the seller did not ship within
+     * {@link com.serhat.secondhand.order.util.OrderBusinessConstants#SHIP_DEADLINE_HOURS}. Runs the same
+     * compensation as a buyer cancellation (stock restore, escrow refund, events, outbox) for every item.
+     * Must run inside the caller's transaction; a failed refund marks it rollback-only.
+     */
+    public Result<OrderDto> cancelUnshippedOrder(Long orderId) {
+        Result<Order> orderResult = compensationPersistenceService.reloadOrderWithItems(orderId);
+        if (orderResult.isError()) {
+            return orderResult.propagateError();
+        }
+        Order order = orderResult.getData();
+        boolean unshipped = order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PROCESSING;
+        if (!unshipped || order.getDeliveryMethod() != DeliveryMethod.CARGO) {
+            return Result.error(OrderErrorCodes.ORDER_CANNOT_BE_CANCELLED);
+        }
+
+        List<OrderItem> items = order.getOrderItems();
+        Result<Void> itemsValidation = compensationPlanner.validateCancellableItems(items);
+        if (itemsValidation.isError()) {
+            return itemsValidation.propagateError();
+        }
+
+        OrderCancelRequest request = new OrderCancelRequest();
+        request.setReason(CancelRefundReason.DELAYED_DELIVERY);
+        request.setReasonText(SHIP_DEADLINE_REASON);
+        OrderItemCompensationPlanner.CancellationPlan plan = compensationPlanner.buildCancellationPlan(items, request);
+        if (plan.records().isEmpty()) {
+            return Result.error(OrderErrorCodes.ORDER_ITEM_ALREADY_CANCELLED);
+        }
+
+        compensationPersistenceService.persistCancellationRecordsAndRestoreStock(plan.records());
+
+        Result<Void> refundResult = processRefund(plan.records(), plan.totalRefundAmount(), order);
+        if (refundResult.isError()) {
+            return refundResult.propagateError();
+        }
+
+        Result<Order> reloaded = compensationPersistenceService.reloadOrderWithItems(order.getId());
+        if (reloaded.isError()) {
+            return reloaded.propagateError();
+        }
+        return finalizeCancellation(reloaded.getData(), reloaded.getData().getUser(), true, SHIP_DEADLINE_REASON);
     }
 
     private Result<Void> processRefund(List<OrderItemCancel> cancelRecords, BigDecimal totalRefundAmount, Order order) {
@@ -88,7 +138,7 @@ public class OrderCancellationService {
         return Result.success();
     }
 
-    private Result<OrderDto> finalizeCancellation(Order order, User user) {
+    private Result<OrderDto> finalizeCancellation(Order order, User user, boolean shipDeadlineMissed, String reason) {
         boolean allItemsCancelled = compensationPlanner.areAllItemsCancelled(order);
         order.applyCancellation(allItemsCancelled);
 
@@ -98,7 +148,7 @@ public class OrderCancellationService {
         }
 
         Order finalOrder = savedOrderResult.getData();
-        eventPublisher.publishEvent(new OrderCancelledEvent(finalOrder, user));
+        eventPublisher.publishEvent(new OrderCancelledEvent(finalOrder, user, shipDeadlineMissed));
         
         // Enqueue Transactional Outbox Event for Kafka
         List<com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail> itemDetails =
@@ -115,10 +165,10 @@ public class OrderCancellationService {
                 finalOrder.getUser() != null ? finalOrder.getUser().getId() : null,
                 finalOrder.getTotalAmount(),
                 itemDetails,
-                "User requested cancellation"
+                reason
         ));
 
-        orderLog.logOrderCancelled(order.getOrderNumber(), !allItemsCancelled, user.getEmail());
+        orderLog.logOrderCancelled(order.getOrderNumber(), !allItemsCancelled, shipDeadlineMissed ? "SYSTEM" : user.getEmail());
         return Result.success(orderMapper.toDto(finalOrder));
     }
 }

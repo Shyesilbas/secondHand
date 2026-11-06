@@ -13,6 +13,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,8 @@ public class CampaignService implements ICampaignService {
     private final CampaignValidator campaignValidator;
     private final CampaignMapper campaignMapper;
 
+    // Seller listing pages are cached with campaign prices already applied (listing:userListings).
+    @CacheEvict(value = "listing:userListings", allEntries = true)
     public Result<CampaignDto> create(Long userId, CreateCampaignRequest request) {
         Result<User> sellerResult = findSellerById(userId);
         if (sellerResult.isError()) return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());
@@ -50,6 +53,8 @@ public class CampaignService implements ICampaignService {
         return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
+    // Seller listing pages are cached with campaign prices already applied (listing:userListings).
+    @CacheEvict(value = "listing:userListings", allEntries = true)
     public Result<CampaignDto> update(Long userId, UUID id, UpdateCampaignRequest request) {
         Result<User> sellerResult = findSellerById(userId);
         if (sellerResult.isError()) return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());
@@ -69,6 +74,8 @@ public class CampaignService implements ICampaignService {
         return Result.success(campaignMapper.toDto(campaignRepository.save(campaign)));
     }
 
+    // Seller listing pages are cached with campaign prices already applied (listing:userListings).
+    @CacheEvict(value = "listing:userListings", allEntries = true)
     public Result<Void> delete(Long userId, UUID id) {
         Result<User> sellerResult = findSellerById(userId);
         if (sellerResult.isError()) return Result.error(sellerResult.getMessage(), sellerResult.getErrorCode());

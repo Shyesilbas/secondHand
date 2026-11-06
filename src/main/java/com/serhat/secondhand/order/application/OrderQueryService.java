@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.order.dto.OrderDto;
 import com.serhat.secondhand.escrow.application.EscrowService;
 import com.serhat.secondhand.order.dto.OrderItemDto;
+import com.serhat.secondhand.order.dto.OrderListFilter;
+import com.serhat.secondhand.order.dto.OrderStatusCountDto;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
@@ -63,9 +65,10 @@ public class OrderQueryService {
         this.self = self;
     }
 
-    public Result<Page<OrderDto>> getUserOrders(Long userId, DeliveryMethod deliveryMethod, Pageable pageable) {
+    public Result<Page<OrderDto>> getUserOrders(Long userId, OrderListFilter filter, Pageable pageable) {
         Pageable finalPageable = ensureSort(pageable);
-        Page<Order> orders = orderRepository.findByUserIdAndDeliveryMethod(userId, deliveryMethod, finalPageable);
+        Page<Order> orders = orderRepository.findByUserIdAndDeliveryMethod(
+                userId, filter.deliveryMethod(), filter.statusesOrAll(), filter.orderNumber(), finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {
@@ -128,12 +131,13 @@ public class OrderQueryService {
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
     }
 
-    public Result<Page<OrderDto>> getSellerOrders(Long sellerId, DeliveryMethod deliveryMethod, Pageable pageable) {
+    public Result<Page<OrderDto>> getSellerOrders(Long sellerId, OrderListFilter filter, Pageable pageable) {
         var userResult = userService.findById(sellerId);
         if (userResult.isError()) return Result.error(userResult.getMessage(), userResult.getErrorCode());
 
         Pageable finalPageable = ensureSort(pageable);
-        Page<Order> orders = orderRepository.findOrdersBySellerIdAndDeliveryMethod(sellerId, deliveryMethod, finalPageable);
+        Page<Order> orders = orderRepository.findOrdersBySellerIdAndDeliveryMethod(
+                sellerId, filter.deliveryMethod(), filter.statusesOrAll(), filter.orderNumber(), finalPageable);
         
         List<Order> orderList = orders.getContent();
         if (orderList.isEmpty()) {
@@ -233,6 +237,14 @@ public class OrderQueryService {
     }
 
 
+
+    public Result<List<OrderStatusCountDto>> getUserOrderStatusCounts(Long userId, DeliveryMethod deliveryMethod) {
+        return Result.success(orderRepository.countUserOrdersByStatus(userId, deliveryMethod));
+    }
+
+    public Result<List<OrderStatusCountDto>> getSellerOrderStatusCounts(Long sellerId, DeliveryMethod deliveryMethod) {
+        return Result.success(orderRepository.countSellerOrdersByStatus(sellerId, deliveryMethod));
+    }
 
     private Pageable ensureSort(Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {

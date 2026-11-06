@@ -303,7 +303,7 @@ public class NotificationTemplateCatalog {
                 NotificationType.PAYMENT_SUCCESS,
                 title,
                 "Your payment" + listingPart + " was successful (" + safe(amountText) + " " + safe(currency) + ").",
-                "/profile/wallet",
+                "/ewallet",
                 toJson(payload));
     }
 
@@ -330,6 +330,24 @@ public class NotificationTemplateCatalog {
                 toJson(Map.of(
                         NotificationMetadataKeys.ORDER_ID, safeId(orderId),
                         NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
+                )));
+    }
+
+    /** The system cancelled an order its seller did not ship in time; the buyer is refunded. */
+    public NotificationRequest orderCancelledShipDeadline(Long userId, Long orderId, String orderNumber, int deadlineHours, boolean sellerSide) {
+        String message = sellerSide
+                ? "Order #" + safe(orderNumber) + " was cancelled because it was not shipped within " + deadlineHours + " hours."
+                : "Order #" + safe(orderNumber) + " was cancelled because the seller did not ship it within " + deadlineHours + " hours. Your payment was refunded.";
+        return NotificationRequest.of(
+                userId,
+                NotificationType.ORDER_CANCELLED,
+                "Order cancelled",
+                message,
+                sellerSide ? "/profile/i-sold" : "/profile/orders",
+                toJson(Map.of(
+                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
+                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber),
+                        NotificationMetadataKeys.REASON, "SHIP_DEADLINE_MISSED"
                 )));
     }
 

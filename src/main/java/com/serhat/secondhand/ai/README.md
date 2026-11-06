@@ -11,6 +11,7 @@ The `ai` domain orchestrates interactions with the "Aura" AI assistant, translat
 ## Business Invariants & Constraints
 - **Context Security:** Context adapters MUST ensure that a user's prompt is never injected with data belonging to another user.
 - **Token Limits:** Large data dumps (like complete order histories) must be aggressively summarized before injection to prevent HTTP 429 or Token Limit errors.
+- **Daily Aura Quota:** Only `/api/v1/ai/chats` and `/api/v1/ai/agents/query` count questions (`GeminiAiService.reserveAuraSlot`, one conditional UPDATE before the Gemini call; released if the answer fails). A reached limit is thrown as `403 AURA_LIMIT_EXCEEDED`. The stored counter resets on the next question, so `MembershipStatusDto` reports usage only when `daily_aura_reset_date` is today (`User.getDailyAuraUsageOn`). Summary endpoints do not count.
 - **Latency Handling:** AI endpoints are inherently slow; front-end consumers must be prepared for delayed, asynchronous responses.
 
 ## Integration Points

@@ -10,6 +10,8 @@ public final class NotificationMetadataKeys {
 
     public static final String ORDER_ID = "orderId";
     public static final String ORDER_NUMBER = "orderNumber";
+    /** Why a notification was sent when the type alone does not say it, e.g. {@code SHIP_DEADLINE_MISSED}. */
+    public static final String REASON = "reason";
     public static final String OLD_STATUS = "oldStatus";
     public static final String NEW_STATUS = "newStatus";
 

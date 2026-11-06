@@ -6,6 +6,7 @@ import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.order.application.*;
 import com.serhat.secondhand.order.dto.*;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
+import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -57,30 +59,39 @@ public class OrderController {
     }
 
     @GetMapping
-    @Operation(summary = "Get user orders or order by order number", description = "Retrieve paginated list of user's orders, or a single order when orderNumber is provided")
+    @Operation(summary = "Get user orders", description = "Paginated list of the current buyer's orders, filterable by delivery method, statuses and exact order number")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Orders or single order retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "404", description = "Order not found when querying by orderNumber")
+        @ApiResponse(responseCode = "400", description = "Unknown order status"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserOrders(
             @AuthenticationPrincipal User currentUser,
             @RequestParam(required = false) String deliveryMethod,
-            @PageableDefault(size = 5,sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        DeliveryMethod method = null;
-        if (deliveryMethod != null && !deliveryMethod.isBlank() && !"ALL".equalsIgnoreCase(deliveryMethod)) {
-            try {
-                method = DeliveryMethod.valueOf(deliveryMethod.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                // Ignore invalid values
-            }
-        }
-        return ResultResponses.ok(orderQueryService.getUserOrders(currentUser.getId(), method, pageable));
+            @RequestParam(required = false) Set<OrderStatus> statuses,
+            @RequestParam(required = false) String orderNumber,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResultResponses.ok(orderQueryService.getUserOrders(
+                currentUser.getId(), new OrderListFilter(parseDeliveryMethod(deliveryMethod), statuses, orderNumber), pageable));
+    }
+
+    @GetMapping("/status-counts")
+    @Operation(summary = "Count buyer orders by status", description = "Order count per status for the current buyer, optionally limited to one delivery method")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Status counts retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUserOrderStatusCounts(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(required = false) String deliveryMethod) {
+        return ResultResponses.ok(orderQueryService.getUserOrderStatusCounts(
+                currentUser.getId(), parseDeliveryMethod(deliveryMethod)));
     }
 
     @GetMapping("/seller")
-    @Operation(summary = "Get seller orders", description = "Retrieve paginated list of orders where current user is a seller")
+    @Operation(summary = "Get seller orders", description = "Paginated list of orders containing the current user's items, filterable by delivery method, statuses and exact order number")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Seller orders retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -89,16 +100,25 @@ public class OrderController {
     public ResponseEntity<?> getSellerOrders(
             @AuthenticationPrincipal User currentUser,
             @RequestParam(required = false) String deliveryMethod,
-            @PageableDefault(size = 5) Pageable pageable) {
-        DeliveryMethod method = null;
-        if (deliveryMethod != null && !deliveryMethod.isBlank() && !"ALL".equalsIgnoreCase(deliveryMethod)) {
-            try {
-                method = DeliveryMethod.valueOf(deliveryMethod.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                // Ignore invalid values
-            }
-        }
-        return ResultResponses.ok(orderQueryService.getSellerOrders(currentUser.getId(), method, pageable));
+            @RequestParam(required = false) Set<OrderStatus> statuses,
+            @RequestParam(required = false) String orderNumber,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResultResponses.ok(orderQueryService.getSellerOrders(
+                currentUser.getId(), new OrderListFilter(parseDeliveryMethod(deliveryMethod), statuses, orderNumber), pageable));
+    }
+
+    @GetMapping("/seller/status-counts")
+    @Operation(summary = "Count seller orders by status", description = "Order count per status for orders containing the current user's items")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Status counts retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getSellerOrderStatusCounts(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(required = false) String deliveryMethod) {
+        return ResultResponses.ok(orderQueryService.getSellerOrderStatusCounts(
+                currentUser.getId(), parseDeliveryMethod(deliveryMethod)));
     }
 
     @GetMapping("/seller/{order-id}")
@@ -309,5 +329,17 @@ public class OrderController {
             @PathVariable("order-number") String orderNumber,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(orderCompletionService.regenerateMeetupCode(orderNumber, currentUser));
+    }
+
+    // Unknown or "ALL" delivery methods mean no delivery filter (existing list behaviour).
+    private static DeliveryMethod parseDeliveryMethod(String deliveryMethod) {
+        if (deliveryMethod == null || deliveryMethod.isBlank() || "ALL".equalsIgnoreCase(deliveryMethod)) {
+            return null;
+        }
+        try {
+            return DeliveryMethod.valueOf(deliveryMethod.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
