@@ -44,13 +44,12 @@ export default function AuraPriceAdvisorGauge({
         {/* Status: a 6px dot plus text, not a filled pill (DESIGN.md line 55) */}
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary">
           <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              isGoodDeal
+            className={`h-1.5 w-1.5 rounded-full ${isGoodDeal
                 ? 'bg-status-success'
                 : isHigh
-                ? 'bg-status-warning'
-                : 'bg-text-tertiary'
-            }`}
+                  ? 'bg-status-warning'
+                  : 'bg-text-tertiary'
+              }`}
           />
           <span>{status}</span>
         </span>

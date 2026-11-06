@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import { campaignService } from '../../listing/services/campaignService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
+import { refreshCampaignAffectedQueries } from '../campaignQueries.js';
 const defaultForm = {
  name: '',
  active: true,
@@ -63,6 +64,7 @@ const CreateCampaignModal = ({
  showError,
  showSuccess
  } = useNotification();
+ const queryClient = useQueryClient();
  const [form, setForm] = useState(defaultForm);
  const [isSaving, setIsSaving] = useState(false);
  const { data: myListings = [] } = useQuery({
@@ -124,6 +126,8 @@ const CreateCampaignModal = ({
  await campaignService.create(payload);
  showSuccess('Campaign created', 'Your campaign has been created.');
  }
+ // Listing prices change with the campaign wherever the modal was opened from.
+ refreshCampaignAffectedQueries(queryClient);
  onSuccess?.();
  onClose?.();
  } catch (e) {

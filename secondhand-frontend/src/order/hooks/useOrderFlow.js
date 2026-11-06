@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { orderService } from '../services/orderService.js';
@@ -10,31 +10,32 @@ import { useOrderSearch } from './useOrderSearch.js';
 import {
  ORDER_DEFAULTS,
  ORDER_MESSAGES,
+ ORDER_LIST_TABS,
  ORDER_STATUSES,
- ORDER_STATUS_TAB_FILTER,
  ORDER_TIME,
  ORDER_VIEW_MODES,
+ getOrderTabStatuses,
 } from '../constants/orderUiConstants.js';
 
 const REVIEWABLE_STATUSES = [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED];
 
-const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod }) => {
+const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod, statuses, orderNumber }) => {
  const { user } = useAuthState();
  const queryClient = useQueryClient();
+ const isSeller = mode === ORDER_VIEW_MODES.SELLER;
 
- const queryKey = useMemo(() => {
- if (mode === ORDER_VIEW_MODES.SELLER) {
- return ORDER_QUERY_KEYS.sellerOrdersList(user?.id, page, size, sort, direction, deliveryMethod);
- }
- return ORDER_QUERY_KEYS.myOrders(user?.id, page, size, sort, direction, deliveryMethod);
- }, [mode, user?.id, page, size, sort, direction, deliveryMethod]);
+ const queryKey = useMemo(() => (
+ isSeller
+ ? ORDER_QUERY_KEYS.sellerOrdersList(user?.id, page, size, sort, direction, deliveryMethod, statuses, orderNumber)
+ : ORDER_QUERY_KEYS.myOrders(user?.id, page, size, sort, direction, deliveryMethod, statuses, orderNumber)
+ ), [isSeller, user?.id, page, size, sort, direction, deliveryMethod, statuses, orderNumber]);
 
- const queryFn = useCallback(async () => {
- if (mode === ORDER_VIEW_MODES.SELLER) {
- return await orderService.sellerOrders(page, size, sort, direction, deliveryMethod);
- }
- return await orderService.myOrders(page, size, sort, direction, deliveryMethod);
- }, [mode, page, size, sort, direction, deliveryMethod]);
+ const queryFn = useCallback(() => {
+ const filters = { statuses, orderNumber };
+ return isSeller
+ ? orderService.sellerOrders(page, size, sort, direction, deliveryMethod, filters)
+ : orderService.myOrders(page, size, sort, direction, deliveryMethod, filters);
+ }, [isSeller, page, size, sort, direction, deliveryMethod, statuses, orderNumber]);
 
  const { data, isLoading, error } = useQuery({
  queryKey,
@@ -44,7 +45,28 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod 
  gcTime: ORDER_TIME.ORDERS_QUERY_GC_MS,
  refetchOnWindowFocus: false,
  refetchOnMount: 'always',
+ placeholderData: keepPreviousData,
  });
+
+ const countsQuery = useQuery({
+ queryKey: isSeller
+ ? ORDER_QUERY_KEYS.sellerStatusCounts(user?.id, deliveryMethod)
+ : ORDER_QUERY_KEYS.myStatusCounts(user?.id, deliveryMethod),
+ queryFn: () => (isSeller
+ ? orderService.sellerOrderStatusCounts(deliveryMethod)
+ : orderService.myOrderStatusCounts(deliveryMethod)),
+ enabled: !!user?.id,
+ staleTime: ORDER_TIME.ORDERS_LIST_STALE_MS,
+ refetchOnWindowFocus: false,
+ });
+
+ const statusCounts = useMemo(() => {
+ const counts = {};
+ (countsQuery.data || []).forEach(({ status, count }) => {
+ counts[status] = Number(count) || 0;
+ });
+ return counts;
+ }, [countsQuery.data]);
 
  const refresh = useCallback(() => {
  queryClient.invalidateQueries({
@@ -57,6 +79,9 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod 
  loading: isLoading,
  error,
  refresh,
+ statusCounts,
+ countsLoaded: countsQuery.isSuccess,
+ countsError: countsQuery.isError,
  };
 };
 
@@ -103,24 +128,27 @@ export const useOrderFlow = ({
  const [sortField, setSortField] = useState(initialSortField);
  const [sortDirection, setSortDirection] = useState(initialSortDirection);
  const [deliveryMethodFilter, setDeliveryMethod] = useState('ALL');
- const [statusFilter, setStatusFilter] = useState('');
+ const [activeTab, setActiveTabState] = useState(ORDER_LIST_TABS.ALL);
 
  const [selectedOrder, setSelectedOrder] = useState(null);
  const [receiptPayment, setReceiptPayment] = useState(null);
  const [quickReviewTarget, setQuickReviewTarget] = useState(null);
 
- const [editingOrderId, setEditingOrderId] = useState(null);
- const [editingOrderName, setEditingOrderName] = useState('');
- const [showNameBanner, setShowNameBanner] = useState(true);
-
  const search = useOrderSearch();
- const { data, loading, error, refresh } = useOrdersListQuery({
+ // A number search looks across every status, so the tab filter is ignored while it is active.
+ const tabStatuses = useMemo(
+ () => (search.isSearchMode ? [] : getOrderTabStatuses(activeTab, mode)),
+ [activeTab, mode, search.isSearchMode]
+ );
+ const { data, loading, error, refresh, statusCounts, countsLoaded, countsError } = useOrdersListQuery({
  mode,
  page,
  size,
  sort: sortField,
  direction: sortDirection,
  deliveryMethod: deliveryMethodFilter,
+ statuses: tabStatuses,
+ orderNumber: search.orderNumber,
  });
  const escrow = usePendingEscrowAmount({ enabled: !isBuyer });
 
@@ -129,18 +157,20 @@ export const useOrderFlow = ({
  setPage(0);
  }, []);
 
- const ordersRaw = useMemo(() => data?.content || [], [data]);
- const orders = useMemo(() => {
- const list = search.searchResult ? [search.searchResult] : ordersRaw;
- if (!statusFilter) return list;
- if (statusFilter === ORDER_STATUS_TAB_FILTER.PREPARING) {
- return list.filter((o) => [ORDER_STATUSES.PENDING, ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.PROCESSING].includes(o.status));
- }
- if (statusFilter === ORDER_STATUS_TAB_FILTER.DELIVERED_GROUP) {
- return list.filter((o) => REVIEWABLE_STATUSES.includes(o.status));
- }
- return list.filter((o) => o.status === statusFilter);
- }, [ordersRaw, search.searchResult, statusFilter]);
+ const setActiveTab = useCallback((tab) => {
+ setActiveTabState(tab);
+ setPage(0);
+ }, []);
+
+ const orders = useMemo(() => data?.content || [], [data]);
+
+ /** Order count for a tab, summed from the per-status counts; null until counts load. */
+ const getTabCount = useCallback((tab) => {
+ if (!countsLoaded) return null;
+ const statuses = getOrderTabStatuses(tab, mode);
+ const keys = statuses.length ? statuses : Object.keys(statusCounts);
+ return keys.reduce((sum, status) => sum + (statusCounts[status] || 0), 0);
+ }, [countsLoaded, statusCounts, mode]);
 
  // Buyer list: which delivered orders already carry a review (first reviewed item is the summary).
  const reviewableOrders = useMemo(
@@ -172,9 +202,12 @@ export const useOrderFlow = ({
  [data, page, size]
  );
 
- const loadPage = useCallback((newPage) => {
- if (!search.isSearchMode) setPage(newPage);
- }, [search.isSearchMode]);
+ const loadPage = useCallback((newPage) => setPage(newPage), []);
+
+ // A new order-number search starts from the first page.
+ useEffect(() => {
+ setPage(0);
+ }, [search.orderNumber]);
 
  const fetchOrders = useCallback((newPage, newSize, newSort, newDirection) => {
  setPage(newPage);
@@ -221,28 +254,6 @@ export const useOrderFlow = ({
  handleReviewSuccess();
  }, [handleReviewSuccess, notification]);
 
- const startEditOrderName = useCallback((order, e) => {
- e?.stopPropagation?.();
- setEditingOrderId(order.id);
- setEditingOrderName(order.name || '');
- }, []);
-
- const cancelEditOrderName = useCallback(() => {
- setEditingOrderId(null);
- setEditingOrderName('');
- }, []);
-
- const saveOrderName = useCallback(async (orderId, e) => {
- e?.stopPropagation?.();
- try {
- await orderService.updateOrderName(orderId, editingOrderName);
- cancelEditOrderName();
- refresh();
- } catch (err) {
- notification.showError('Error', err?.response?.data?.message || ORDER_MESSAGES.UPDATE_NAME_FAILED);
- }
- }, [editingOrderName, cancelEditOrderName, refresh, notification]);
-
  const completeOrder = useCallback((orderId, e) => {
  e?.stopPropagation?.();
  notification.showConfirmation(
@@ -278,7 +289,8 @@ export const useOrderFlow = ({
  loadPage,
  fetchOrders,
  refreshAll,
- search: { ...search, statusFilter, setStatusFilter },
+ search,
+ tabs: { activeTab, setActiveTab, getTabCount, statusCounts, countsError },
  modal: {
  selectedOrder,
  orderModalOpen: !!selectedOrder,
@@ -299,18 +311,8 @@ export const useOrderFlow = ({
  close: closeQuickReview,
  onReviewCreated: handleQuickReviewCreated,
  },
- ui: {
- editingOrderId,
- editingOrderName,
- setEditingOrderName,
- showNameBanner,
- dismissNameBanner: () => setShowNameBanner(false),
- },
  actions: {
  handleReviewSuccess,
- startEditOrderName,
- cancelEditOrderName,
- saveOrderName,
  completeOrder,
  },
  escrow,

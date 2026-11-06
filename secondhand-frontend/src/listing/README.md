@@ -11,4 +11,5 @@ Catalog presentation: filtering, grid, pagination and multi-mode search.
 - Adding a filter: add it to `filters/filterConfigs.js`, then to `serializeFilters` (and `hooks/utils/filterDefaults.js` if it needs a default). A filter missing from `serializeFilters` is silently ignored.
 - Never coerce undefined filter values to defaults like `0`.
 - New sort options extend `LISTING_SORT_FIELDS` in `types/index.js` and must match the backend. Use `LISTING_DEFAULTS` instead of magic numbers.
+- Listing form last step: a new listing, and an edited `DRAFT` listing (e.g. the copy made by "Tekrar yayınla" / relist), offer "Taslak olarak kaydet" and "Şimdi yayınla". Publishing saves, then opens the listing fee page with `?listingId=`. Editing a non-draft listing only offers "Değişiklikleri kaydet". `EditListingPage` passes `isDraft` and leaves toasts and navigation to the form.
 - `ListingCard` uses a strict memo comparator: new props must be added to it. Heavy per-listing computation (e.g. showcase checks) is done in `ListingGrid` and passed down as plain props.

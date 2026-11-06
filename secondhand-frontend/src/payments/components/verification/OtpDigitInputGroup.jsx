@@ -69,14 +69,9 @@ const OtpDigitInputGroup = ({
  [emit, selector]
  );
 
- const filledCount = codeArray.filter((c) => c !== '').length;
-
  return (
- <div className="text-center">
- <div className="flex justify-center gap-2.5">
- {codeArray.map((digit, index) => {
- const hasValue = Boolean(digit);
- return (
+ <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label={`${OTP_CODE_LENGTH} haneli doğrulama kodu`}>
+ {codeArray.map((digit, index) => (
  <input
  key={`${dataSlotPrefix}-${index}`}
  type="text"
@@ -86,28 +81,16 @@ const OtpDigitInputGroup = ({
  onChange={(e) => handleChange(index, e.target.value)}
  onKeyDown={(e) => handleKeyDown(index, e)}
  onPaste={handlePaste}
- aria-label={`Verification digit ${index + 1} of ${OTP_CODE_LENGTH}`}
- className={`w-11 h-12 text-center text-base rounded transition-all duration-150 focus:outline-none ${
- disabled ? 'opacity-50 cursor-not-allowed border border-border-light bg-background-secondary text-text-muted' :
- hasValue
- ? 'border-primary bg-primary text-white border'
- : 'border border-border-light bg-background-primary text-text-primary focus:border-primary focus:ring-4 focus:ring-primary-200'
+ onFocus={(e) => e.target.select()}
+ aria-label={`${index + 1}. hane`}
+ className={`h-14 w-11 rounded border bg-background-primary text-center text-xl font-semibold tabular-nums text-text-primary transition-colors duration-150 focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted sm:w-12 ${
+ digit ? 'border-border-dark' : 'border-border'
  }`}
  maxLength={1}
  data-otp-slot={`${dataSlotPrefix}-${index}`}
  autoComplete="one-time-code"
  />
- );
- })}
- </div>
- <div className="mt-2.5 flex items-center justify-center gap-1">
- {Array.from({length: OTP_CODE_LENGTH}, (_, i) => (
- <div
- key={i}
- className={`w-1 h-1 rounded-full transition-colors ${i < filledCount ? 'bg-primary' : 'bg-tertiary'}`}
- />
  ))}
- </div>
  </div>
  );
 };

@@ -1,4 +1,5 @@
 import { getListingConfig } from '../config/listingConfig.js';
+import { fieldLabel } from '../config/listingFormCopy.js';
 
 const toErrorsObject = (value) => {
  if (!value) return {};
@@ -21,18 +22,18 @@ const buildValidationCtx = (formData, enums = null) => ({
 
 const validateBaseStep1 = (formData) => {
  const errors = {};
- if (!formData?.title || !String(formData.title).trim()) errors.title = 'Title is required';
- if (!formData?.description || !String(formData.description).trim()) errors.description = 'Description is required';
+ if (!formData?.title || !String(formData.title).trim()) errors.title = 'Başlık zorunlu.';
+ if (!formData?.description || !String(formData.description).trim()) errors.description = 'Açıklama zorunlu.';
  const price = toNumber(formData?.price);
- if (!price || price <= 0) errors.price = 'Valid price is required';
- if (!formData?.currency) errors.currency = 'Currency is required';
+ if (!price || price <= 0) errors.price = 'Geçerli bir fiyat gir.';
+ if (!formData?.currency) errors.currency = 'Para birimi seç.';
  return errors;
 };
 
 const validateBaseStepLocation = (formData) => {
  const errors = {};
- if (!formData?.city || !String(formData.city).trim()) errors.city = 'City is required';
- if (!formData?.district || !String(formData.district).trim()) errors.district = 'District is required';
+ if (!formData?.city || !String(formData.city).trim()) errors.city = 'Şehir seç.';
+ if (!formData?.district || !String(formData.district).trim()) errors.district = 'İlçe seç.';
  return errors;
 };
 
@@ -59,9 +60,9 @@ const validateField = (field, ctx) => {
 
  if (required) {
  if (field.type === 'toggle') {
- if (!value) return `${field.label} is required`;
+ if (!value) return `${fieldLabel(field)} zorunlu.`;
  } else if (isEmpty(value)) {
- return `${field.label} is required`;
+ return `${fieldLabel(field)} zorunlu.`;
  }
  }
 
@@ -69,9 +70,9 @@ const validateField = (field, ctx) => {
 
  if (field.type === 'number') {
  const n = toNumber(value);
- if (n === null) return `${field.label} must be a valid number`;
- if (field.min !== undefined && field.min !== null && n < Number(field.min)) return `${field.label} must be at least ${field.min}`;
- if (field.max !== undefined && field.max !== null && n > Number(field.max)) return `${field.label} must be at most ${field.max}`;
+ if (n === null) return `${fieldLabel(field)} geçerli bir sayı olmalı.`;
+ if (field.min !== undefined && field.min !== null && n < Number(field.min)) return `${fieldLabel(field)} en az ${field.min} olmalı.`;
+ if (field.max !== undefined && field.max !== null && n > Number(field.max)) return `${fieldLabel(field)} en fazla ${field.max} olmalı.`;
  }
 
  if (typeof field.validate === 'function') {

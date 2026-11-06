@@ -10,11 +10,14 @@ import GlobalActionModal from '../../../listing/components/GlobalActionModal.jsx
 const MainLayout = () => {
  const { pathname } = useLocation();
  const pageName = getPageName(pathname);
- const fullHeightWizard = pathname === ROUTES.CREATE_LISTING || pathname === ROUTES.AURA_CHAT || pathname === '/aura';
+ // Aura and the inbox scroll their own panes; the shell is locked to the viewport so composers and
+ // lists end at the screen edge whatever the header height is (verification bar, mobile search row).
+ const lockViewport = pathname === ROUTES.AURA_CHAT || pathname === ROUTES.INBOX;
+ const fullHeightWizard = lockViewport || pathname === ROUTES.CREATE_LISTING;
  return (
  <ListingActionProvider>
  <div
- className="flex min-h-screen flex-col bg-main-bg"
+ className={`flex flex-col bg-main-bg ${lockViewport ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}
  data-page={pageName ?? undefined}
  data-path={pathname}
  >

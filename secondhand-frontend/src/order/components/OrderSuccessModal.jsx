@@ -25,7 +25,8 @@ const OrderSuccessModal = ({
   deliveryMethod,
   meetupLocation,
   orderItems = [],
-  itemsLoading = false
+  itemsLoading = false,
+  sellerOrderCount = 1
 }) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
@@ -59,6 +60,14 @@ const OrderSuccessModal = ({
         <CheckCircle2 className="mx-auto mb-4 block h-5 w-5 text-status-success" strokeWidth={1.5} aria-hidden />
         <h1 className="text-2xl font-semibold text-text-primary">{heading}</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">{description}</p>
+        {sellerOrderCount > 1 && (
+          <p className="mx-auto mt-3 max-w-md text-sm text-text-secondary">
+            {t('order_success_split_note', {
+              defaultValue: 'Ürünler {{count}} farklı satıcıdan olduğu için {{count}} ayrı sipariş oluşturuldu. Her satıcı kendi siparişini ayrı kargolar.',
+              count: sellerOrderCount
+            })}
+          </p>
+        )}
 
         {orderNumber && (
           <div className="mt-5 inline-flex items-center gap-2 rounded border border-border px-3 py-1.5 text-sm">

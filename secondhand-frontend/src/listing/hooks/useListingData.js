@@ -11,10 +11,11 @@ export const useListingData = (listingId, autoFetch = true) => {
  queryKey: LISTING_KEYS.detail(listingId),
  queryFn: () => listingService.getListingById(listingId),
  enabled: Boolean(autoFetch && listingId),
- staleTime: Infinity,
+ // Price (campaigns), stock and status change on the server, so a cached detail goes stale after a minute
+ // and is refetched the next time the page mounts.
+ staleTime: 60 * 1000,
  gcTime: 30 * 60 * 1000,
  refetchOnWindowFocus: false,
- refetchOnMount: false,
  refetchOnReconnect: false,
  retry: 1,
  retryDelay: 1000,

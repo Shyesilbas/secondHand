@@ -18,11 +18,11 @@ const ListingBasics = ({
 
   return (
     <div className="space-y-8">
-      <SectionCard title={t("general_information", "General Information")} description={t("basic_listing_details", "Basic listing details")} icon={Type}>
+      <SectionCard title={t("general_information", "Genel bilgiler")} description={t("basic_listing_details", "Alıcının ilk göreceği bilgiler.")} icon={Type}>
         <div className="space-y-4">
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <label htmlFor="listing-title" className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label htmlFor="listing-title" className="text-sm font-medium text-text-primary">
                 {t("listing_title", "Listing Title")} <span className="text-status-error">*</span>
               </label>
               <span className="text-xs tabular-nums text-text-muted">
@@ -44,7 +44,7 @@ const ListingBasics = ({
 
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <label htmlFor="listing-description" className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label htmlFor="listing-description" className="text-sm font-medium text-text-primary">
                 {t("description", "Description")} <span className="text-status-error">*</span>
               </label>
               <span className="text-xs tabular-nums text-text-muted">
@@ -65,10 +65,10 @@ const ListingBasics = ({
         </div>
       </SectionCard>
 
-      <SectionCard title={t("pricing", "Pricing")} description={t("set_price_and_quantity", "Set the price and quantity")} icon={DollarSign}>
+      <SectionCard title={t("pricing", "Fiyat")} description={t("set_price_and_quantity", "Satış fiyatı ve stok adedi.")} icon={DollarSign}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label className="mb-1.5 block text-sm font-medium text-text-primary">
               {t("price", "Price")} <span className="text-status-error">*</span>
             </label>
             <div className="flex rounded border border-border-light bg-background-primary transition-colors focus-within:border-border-focus focus-within:ring-2 focus-within:ring-border-focus">
@@ -88,7 +88,7 @@ const ListingBasics = ({
                   name="currency"
                   value={formData.currency || 'TRY'}
                   onChange={onInputChange}
-                  aria-label="Currency"
+                  aria-label={t("currency", "Para birimi")}
                   className="h-full cursor-pointer bg-transparent py-0 pl-2.5 pr-6 text-xs font-semibold text-text-secondary transition-colors hover:text-text-primary focus:outline-none"
                 >
                   {enums.currencies?.map(currency => (
@@ -112,7 +112,7 @@ const ListingBasics = ({
 
           {showQuantity && (
             <div>
-              <label htmlFor="listing-quantity" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              <label htmlFor="listing-quantity" className="mb-1.5 block text-sm font-medium text-text-primary">
                 {t("quantity", "Quantity")} <span className="text-status-error">*</span>
               </label>
               <input

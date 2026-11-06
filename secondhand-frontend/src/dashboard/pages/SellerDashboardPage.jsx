@@ -1,227 +1,138 @@
-import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
-import { useState, lazy, Suspense, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useState, lazy, Suspense } from 'react';
 import { useSellerDashboard } from '../hooks/useDashboard.js';
 import { usePendingEscrowAmount } from '../../order/hooks/useOrderFlow.js';
-import TimeRangeSelector from '../components/TimeRangeSelector.jsx';
+import { useSellerToShipCount } from '../../order/hooks/useSellerToShipCount.js';
+import { ROUTES } from '../../common/constants/routes.js';
+import { formatCurrency } from '../../common/formatters.js';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import MetricCard from '../components/MetricCard.jsx';
 import TopListingsTable from '../components/TopListingsTable.jsx';
 import RatingDistribution from '../components/RatingDistribution.jsx';
-import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
-import { motion } from 'framer-motion';
-const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
 import CategoryBreakdown from '../components/CategoryBreakdown.jsx';
 import OrderStatusBreakdown from '../components/OrderStatusBreakdown.jsx';
 import ConversionFunnel from '../components/ConversionFunnel.jsx';
 import OfferAnalyticsCard from '../components/OfferAnalyticsCard.jsx';
-import { DollarSign, ShoppingBag, Package, Star, Percent, Wallet } from 'lucide-react';
-import { formatCurrency } from '../../common/formatters.js';
+import {
+  CardLink, DashboardCard, DashboardError, DashboardShell, DashboardSkeleton
+} from '../components/DashboardUi.jsx';
+import { DASHBOARD_CURRENCY } from '../dashboardConstants.js';
 
-const ChartCard = ({
-  children,
-  title,
-  delay = 0
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 16 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.4 }}
-    className="bg-background-primary rounded border border-border p-5"
-  >
-    {title && <h3 className="text-sm font-medium text-text-primary mb-4">{title}</h3>}
-    {children}
-  </motion.div>
-);
+const RevenueChart = lazy(() => import('../components/RevenueChart.jsx'));
+
+const daysAgo = (days) => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date;
+};
 
 const SellerDashboardPage = () => {
   const { t } = useTranslation();
-  const [startDate, setStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(date.getDate() - 30);
-    return date;
-  });
-  const [endDate, setEndDate] = useState(new Date());
-  const {
-    data: dashboard,
-    isLoading,
-    error
-  } = useSellerDashboard(startDate, endDate);
+  const [startDate, setStartDate] = useState(() => daysAgo(30));
+  const [endDate, setEndDate] = useState(() => new Date());
+  const { data: dashboard, isLoading, isError, refetch } = useSellerDashboard(startDate, endDate);
+  const { pendingEscrowAmount } = usePendingEscrowAmount();
+  const toShipCount = useSellerToShipCount();
 
-  const { pendingEscrowAmount: pendingEscrow } = usePendingEscrowAmount();
-
-  const handlePresetSelect = (start, end) => {
-    setStartDate(start);
-    setEndDate(end);
+  const range = {
+    startDate,
+    endDate,
+    onStartDateChange: setStartDate,
+    onEndDateChange: setEndDate,
+    onPresetSelect: (start, end) => { setStartDate(start); setEndDate(end); }
   };
 
-  const conversionRate = useMemo(() => {
-    if (!dashboard) return null;
-    const views = dashboard.totalViews || 0;
-    const orders = dashboard.totalOrders || 0;
-    if (views === 0) return 0;
-    return ((orders / views) * 100).toFixed(1);
-  }, [dashboard]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background-secondary flex items-center justify-center">
-        <LoadingIndicator />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="min-h-screen bg-background-secondary flex items-center justify-center p-4"
-      >
-        <div className="text-center p-8 bg-background-primary rounded border border-border max-w-sm">
-          <Package className="mx-auto mb-4 block h-5 w-5 shrink-0 text-status-error-text" strokeWidth={1.5} aria-hidden />
-          <p className="text-lg font-semibold text-text-primary mb-1">{t("error_loading_dashboard")}</p>
-          <p className="text-text-muted text-sm">{error.message}</p>
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (!dashboard) return null;
-
-  return (
-    <div className="min-h-screen bg-background-secondary">
-      {/* Header */}
-      <div className="bg-background-primary border-b border-border">
-        <PageContainer className="py-6 px-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <h1 className="text-2xl font-semibold text-text-primary">{t("seller_dashboard")}</h1>
-              <p className="text-xs text-text-muted font-medium mt-0.5">{t("analytics_insights_for_your_sales")}</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <TimeRangeSelector
-                startDate={startDate}
-                endDate={endDate}
-                onStartDateChange={setStartDate}
-                onEndDateChange={setEndDate}
-                onPresetSelect={handlePresetSelect}
-              />
-            </motion.div>
-          </div>
-        </PageContainer>
-      </div>
-
-      {/* Content */}
-      <PageContainer className="py-6 px-6 space-y-6">
-        {/* Primary KPIs — 4 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  let content;
+  if (isLoading) content = <DashboardSkeleton />;
+  else if (isError || !dashboard) content = <DashboardError onRetry={refetch} />;
+  else {
+    const revenueTrend = dashboard.revenueGrowth != null ? parseFloat(dashboard.revenueGrowth) : null;
+    content = (
+      <>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <MetricCard
-            index={0}
-            title={t("revenue")}
-            value={formatCurrency(dashboard.totalRevenue || 0, 'TRY')}
-            icon={DollarSign}
-            trend={dashboard.revenueGrowth ? parseFloat(dashboard.revenueGrowth) : null}
-            trendLabel="vs previous period"
+            title={t('dash_revenue', 'Gelir')}
+            value={formatCurrency(dashboard.totalRevenue || 0, DASHBOARD_CURRENCY)}
+            trend={revenueTrend}
           />
           <MetricCard
-            index={1}
-            title={t("orders")}
+            title={t('dash_sales', 'Satış')}
             value={dashboard.totalOrders || 0}
-            icon={ShoppingBag}
-            subtitle={`${dashboard.completedOrders || 0} completed`}
+            subtitle={t('dash_completed_count', { defaultValue: '{{count}} tamamlandı', count: dashboard.completedOrders || 0 })}
           />
           <MetricCard
-            index={2}
-            title={t("active_listings")}
-            value={dashboard.activeListings || 0}
-            icon={Package}
-            subtitle={`${dashboard.totalListings || 0} total`}
-            badge="Live"
+            title={t('dash_to_ship', 'Kargolanacak')}
+            value={toShipCount}
+            subtitle={toShipCount > 0 ? t('dash_to_ship_hint', '72 saat içinde kargola') : t('dash_to_ship_none', 'Bekleyen sipariş yok')}
+            emphasis={toShipCount > 0}
+            to={ROUTES.I_SOLD}
           />
           <MetricCard
-            index={3}
-            title={t("rating")}
-            value={dashboard.averageRating ? dashboard.averageRating.toFixed(1) : 'N/A'}
-            icon={Star}
-            subtitle={`${dashboard.totalReviews || 0} reviews`}
+            title={t('dash_pending_escrow', 'Emanette bekleyen')}
+            value={formatCurrency(pendingEscrowAmount || 0, DASHBOARD_CURRENCY)}
+            subtitle={t('dash_pending_escrow_hint', 'Alıcı onayından sonra cüzdana geçer')}
           />
         </div>
 
-        {/* Secondary KPIs — 2 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <MetricCard
-            index={4}
-            title={t("conversion_rate")}
-            value={conversionRate !== null ? conversionRate + '%' : '—'}
-            icon={Percent}
-            subtitle={`${dashboard.totalViews || 0} views → ${dashboard.totalOrders || 0} orders`}
-          />
-          <MetricCard
-            index={5}
-            title={t("pending_escrow")}
-            value={formatCurrency(pendingEscrow, 'TRY')}
-            icon={Wallet}
-            subtitle="Awaiting order completion"
-          />
-        </div>
-
-        {/* Conversion Funnel */}
-        {dashboard.funnel && (
-          <ChartCard delay={0.15}>
-            <ConversionFunnel funnel={dashboard.funnel} />
-          </ChartCard>
-        )}
-
-        {/* Offer Analytics */}
-        {dashboard.offerStats && (
-          <ChartCard delay={0.18}>
-            <OfferAnalyticsCard offerStats={dashboard.offerStats} />
-          </ChartCard>
-        )}
-
-        {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Suspense fallback={<div className="animate-pulse h-80 bg-background-primary rounded border border-border" />}>
-            <ChartCard title={t("revenue_trend")} delay={0.2}>
-              <RevenueChart data={dashboard.revenueTrend || []} title={t("revenue_trend")} label={t("revenue")} />
-            </ChartCard>
+        <DashboardCard title={t('dash_revenue_trend', 'Gelir')}>
+          <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+            <RevenueChart data={dashboard.revenueTrend || []} label={t('dash_revenue', 'Gelir')} />
           </Suspense>
-          <ChartCard title={t("revenue_by_category")} delay={0.25}>
-            <CategoryBreakdown data={dashboard.categoryRevenue || {}} label={t("total_revenue")} />
-          </ChartCard>
+        </DashboardCard>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <DashboardCard title={t('dash_orders_by_status', 'Siparişler')} action={<CardLink to={ROUTES.I_SOLD}>{t('dash_sold_link', 'Sattıklarım')}</CardLink>}>
+            <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
+          </DashboardCard>
+          <DashboardCard title={t('dash_revenue_by_category', 'Kategoriye göre gelir')}>
+            <CategoryBreakdown data={dashboard.categoryRevenue || {}} label={t('dash_total_revenue', 'Toplam gelir')} />
+          </DashboardCard>
         </div>
 
-        {/* Insights Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartCard title={t("orders_by_status")} delay={0.3}>
-            <OrderStatusBreakdown data={dashboard.ordersByStatus || {}} />
-          </ChartCard>
-          <ChartCard title={t("rating_distribution")} delay={0.35}>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {dashboard.funnel && (
+            <DashboardCard
+              title={t('dash_funnel', 'İlanlardan satışa')}
+              description={t('dash_funnel_desc', 'Bu dönemde ilanlarını görenlerin ne kadarı satın aldı.')}
+            >
+              <ConversionFunnel funnel={dashboard.funnel} />
+            </DashboardCard>
+          )}
+          {dashboard.offerStats && (
+            <DashboardCard title={t('dash_offers', 'Teklifler')} action={<CardLink to={ROUTES.OFFERS}>{t('dash_manage_offers', 'Teklifleri yönet')}</CardLink>}>
+              <OfferAnalyticsCard offerStats={dashboard.offerStats} />
+            </DashboardCard>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <DashboardCard title={t('dash_top_listings', 'En çok kazandıran ilanlar')} className="lg:col-span-2">
+            <TopListingsTable listings={dashboard.topListings || []} />
+          </DashboardCard>
+          <DashboardCard title={t('dash_ratings', 'Değerlendirmeler')}>
             <RatingDistribution
               ratingDistribution={dashboard.ratingDistribution || {}}
               averageRating={dashboard.averageRating || 0}
               totalReviews={dashboard.totalReviews || 0}
             />
-          </ChartCard>
+          </DashboardCard>
         </div>
+      </>
+    );
+  }
 
-        {/* Top Listings */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="pb-8"
-        >
-          <TopListingsTable listings={dashboard.topListings || []} title={t("top_10_listings_by_revenue")} />
-        </motion.div>
-      </PageContainer>
-    </div>
+  return (
+    <DashboardShell
+      title={t('dash_seller_title', 'Satış paneli')}
+      subtitle={dashboard ? t('dash_seller_subtitle', {
+        defaultValue: '{{active}} aktif ilan · {{total}} ilan toplam',
+        active: dashboard.activeListings || 0,
+        total: dashboard.totalListings || 0
+      }) : null}
+      range={range}
+    >
+      {content}
+    </DashboardShell>
   );
 };
 

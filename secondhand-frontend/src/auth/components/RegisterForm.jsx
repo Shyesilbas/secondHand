@@ -1,196 +1,187 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight as ArrowRightIcon, Calendar as CalendarIcon, Eye as EyeIcon, EyeOff as EyeSlashIcon, Lock as LockClosedIcon, Mail as EnvelopeIcon, Phone as PhoneIcon, User as UserIcon, ArrowLeft as ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
-import { API_BASE_URL } from '../../common/constants/apiEndpoints.js';
-import AuthInput from '../../common/components/ui/AuthInput.jsx';
-import AuthButton from '../../common/components/ui/AuthButton.jsx';
-import LoadingIndicator from '../../common/components/ui/LoadingIndicator.jsx';
+import Button from '../../common/components/ui/Button.jsx';
+import Alert from '../../common/components/ui/Alert.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import AgreementsSection from '../../agreements/components/AgreementsSection.jsx';
+import { AuthDivider, AuthField, AuthHeader, GoogleButton, PasswordField, PasswordRules } from './AuthPrimitives.jsx';
+import GenderChoice from './GenderChoice.jsx';
+import { validateAccountFields } from '../utils/registerValidator.js';
+
+/**
+ * Two steps: account (email, password) first, then who you are (name, phone, birth date, gender)
+ * with the agreements. Google sign-up sits under step 1 only.
+ */
 export const RegisterForm = ({
- formData,
- errors: parentErrors,
- isLoading,
- genderOptions,
- gendersLoading,
- handleChange,
- onSubmit,
- agreements,
- agreementsLoading,
- acceptedAgreements,
- onToggleAgreement,
- onReadAgreement
+  formData,
+  errors: parentErrors,
+  isLoading,
+  genderOptions,
+  gendersLoading,
+  handleChange,
+  onSubmit,
+  agreements,
+  agreementsLoading,
+  acceptedAgreements,
+  onToggleAgreement,
+  onReadAgreement
 }) => {
- const {
- t
- } = useTranslation();
- const [step, setStep] = useState(1);
- const [localErrors, setLocalErrors] = useState({});
- const [showPassword, setShowPassword] = useState(false);
- const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { t } = useTranslation();
+  const [step, setStep] = useState(1);
+  const [accountErrors, setAccountErrors] = useState({});
+  const errors = { ...parentErrors, ...accountErrors };
 
- // Merge parent errors and local step errors
- const errors = {
- ...parentErrors,
- ...localErrors
- };
- const validateStep1 = () => {
- const step1Errors = {};
- if (!formData.email.trim()) {
- step1Errors.email = 'Email is required';
- } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
- step1Errors.email = 'Please enter a valid email address';
- }
- if (!formData.phone.trim()) {
- step1Errors.phone = 'Phone number is required';
- }
- if (!formData.password) {
- step1Errors.password = 'Password is required';
- } else if (formData.password.length < 8) {
- step1Errors.password = 'Password must be at least 8 characters';
- } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]).*/.test(formData.password)) {
- step1Errors.password = 'Password must contain at least one letter, one lowercase letter, one digit and one special character';
- }
- if (formData.password !== formData.confirmPassword) {
- step1Errors.confirmPassword = 'Passwords do not match';
- }
- setLocalErrors(step1Errors);
- return Object.keys(step1Errors).length === 0;
- };
- const handleNextStep = () => {
- if (validateStep1()) {
- setStep(2);
- }
- };
- const handlePrevStep = () => {
- setStep(1);
- };
- return <div className="flex flex-col gap-1 w-full animate-fade-in">
- {/* Header / Stepper Progress */}
- <div className="mb-8">
- <div className="flex items-center gap-3 mb-3">
- <span className="text-xs font-semibold text-text-muted">{t("step")}{step}{t("of_2")}</span>
- <div className="flex gap-1.5 items-center flex-1 max-w-24">
- <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 1 ? 'bg-primary' : 'bg-border-light'}`} />
- <div className={`h-1 flex-1 rounded-full transition-all duration-300 ${step >= 2 ? 'bg-primary' : 'bg-border-light'}`} />
- </div>
- </div>
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("create_account")}</h1>
- <p className="mt-2.5 text-sm text-text-secondary font-normal leading-relaxed">
- {step === 1 ? 'Set up your credentials and secure your digital space.' : 'Tell us a bit about yourself to complete registration.'}
- </p>
- </div>
+  const onFieldChange = (e) => {
+    if (accountErrors[e.target.name]) setAccountErrors(prev => ({ ...prev, [e.target.name]: '' }));
+    handleChange(e);
+  };
 
- <form onSubmit={onSubmit} className="flex flex-col gap-6">
- {step === 1 && <div className="flex flex-col gap-6 animate-slide-right">
- <AuthInput label={t("email_address")} type="email" name="email" value={formData.email} onChange={handleChange} placeholder={t("name_example_com")} required error={errors.email} leftIcon={<EnvelopeIcon className="h-4 w-4" />} autoComplete="email" />
+  const goToDetails = (e) => {
+    e.preventDefault();
+    const next = validateAccountFields(formData);
+    setAccountErrors(next);
+    if (Object.keys(next).length === 0) setStep(2);
+  };
 
- <AuthInput label={t("phone_number")} type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={t("90_5xx_xxx_xx_xx")} required error={errors.phone} leftIcon={<PhoneIcon className="h-4 w-4" />} autoComplete="tel" />
+  const submit = (e) => {
+    e.preventDefault();
+    const next = validateAccountFields(formData);
+    if (Object.keys(next).length > 0) {
+      setAccountErrors(next);
+      setStep(1);
+      return;
+    }
+    onSubmit(e);
+  };
 
- <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
- <AuthInput label={t("password")} type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required error={errors.password} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-text-muted hover:text-text-primary transition-colors" onClick={() => setShowPassword(!showPassword)}>
- {showPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
- </button>} />
- <AuthInput label={t("confirm_password")} type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="••••••••" required error={errors.confirmPassword} leftIcon={<LockClosedIcon className="h-4 w-4" />} rightElement={<button type="button" className="text-text-muted hover:text-text-primary transition-colors" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
- {showConfirmPassword ? <EyeSlashIcon className="h-4.5 w-4.5" /> : <EyeIcon className="h-4.5 w-4.5" />}
- </button>} />
- </div>
+  return (
+    <div className="flex flex-col">
+      <AuthHeader
+        title={step === 1 ? t('auth_register_title', 'Hesap oluştur') : t('auth_register_details_title', 'Seni tanıyalım')}
+        subtitle={step === 1
+          ? t('auth_register_subtitle', 'E-posta adresin ve bir şifreyle başla.')
+          : t('auth_register_details_subtitle', 'Siparişlerin ve kargo için gereken bilgiler.')}
+      >
+        <p className="mt-4 text-xs tabular-nums text-text-tertiary">
+          {t('auth_register_step', { defaultValue: 'Adım {{step}}/2', step })}
+        </p>
+        <div className="mt-1.5 flex gap-1.5" aria-hidden>
+          <span className="h-1 flex-1 rounded-full bg-primary" />
+          <span className={`h-1 flex-1 rounded-full ${step === 2 ? 'bg-primary' : 'bg-border'}`} />
+        </div>
+      </AuthHeader>
 
- {/* Password Requirements Helper */}
- <div className="bg-background-secondary border border-border-light rounded p-3.5 text-xs text-text-secondary flex flex-col gap-1.5">
- <span className="font-semibold text-text-primary mb-0.5">Password Requirements:</span>
- <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
- <span className={`flex items-center gap-1.5 ${formData.password.length >= 8 ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${formData.password.length >= 8 ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> At least 8 characters
- </span>
- <span className={`flex items-center gap-1.5 ${/[A-Z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[A-Z]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One letter
- </span>
- <span className={`flex items-center gap-1.5 ${/[a-z]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[a-z]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One lowercase letter
- </span>
- <span className={`flex items-center gap-1.5 ${/\d/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/\d/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One digit
- </span>
- <span className={`flex items-center gap-1.5 ${/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? 'text-status-success font-medium' : 'text-text-muted'}`}>
- <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${/[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]/.test(formData.password) ? 'bg-status-success' : 'bg-secondary-300'}`} aria-hidden /> One special character
- </span>
- </div>
- </div>
+      {step === 1 ? (
+        <form onSubmit={goToDetails} noValidate className="space-y-4">
+          <AuthField
+            label={t('auth_email', 'E-posta')}
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={onFieldChange}
+            placeholder="ornek@eposta.com"
+            error={errors.email}
+            autoComplete="email"
+            autoFocus
+          />
+          <div>
+            <PasswordField
+              label={t('auth_password', 'Şifre')}
+              name="password"
+              value={formData.password}
+              onChange={onFieldChange}
+              error={errors.password}
+              autoComplete="new-password"
+            />
+            <div className="mt-2"><PasswordRules password={formData.password} /></div>
+          </div>
+          <PasswordField
+            label={t('auth_password_repeat', 'Şifre tekrar')}
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={onFieldChange}
+            error={errors.confirmPassword}
+            autoComplete="new-password"
+          />
+          <Button type="submit" className="w-full">{t('continue', 'Devam et')}</Button>
+        </form>
+      ) : (
+        <form onSubmit={submit} noValidate className="space-y-4">
+          {errors.submit && <Alert type="error" message={errors.submit} />}
 
- <AuthButton type="button" onClick={handleNextStep} size="lg" className="mt-1" rightIcon={<ArrowRightIcon className="h-4 w-4" />}>{t("continue")}</AuthButton>
- </div>}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <AuthField label={t('auth_name', 'Ad')} name="name" value={formData.name} onChange={onFieldChange} error={errors.name} autoComplete="given-name" autoFocus />
+            <AuthField label={t('auth_surname', 'Soyad')} name="surname" value={formData.surname} onChange={onFieldChange} error={errors.surname} autoComplete="family-name" />
+          </div>
+          <AuthField
+            label={t('auth_phone', 'Telefon')}
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={onFieldChange}
+            placeholder="05XX XXX XX XX"
+            error={errors.phone}
+            autoComplete="tel"
+          />
+          <AuthField
+            label={t('auth_birthdate', 'Doğum tarihi')}
+            name="birthdate"
+            value={formData.birthdate}
+            onChange={onFieldChange}
+            placeholder="GG/AA/YYYY"
+            inputMode="numeric"
+            error={errors.birthdate}
+            autoComplete="bday"
+          />
+          <GenderChoice
+            options={genderOptions}
+            loading={gendersLoading}
+            value={formData.gender}
+            onChange={(value) => onFieldChange({ target: { name: 'gender', value } })}
+            error={errors.gender}
+          />
 
- {step === 2 && <div className="flex flex-col gap-6 animate-slide-left">
- {/* First & Last Name side-by-side */}
- <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
- <AuthInput label={t("first_name")} name="name" value={formData.name} onChange={handleChange} placeholder={t("john")} required error={errors.name} leftIcon={<UserIcon className="h-4 w-4" />} />
- <AuthInput label={t("last_name")} name="surname" value={formData.surname} onChange={handleChange} placeholder={t("doe")} required error={errors.surname} leftIcon={<UserIcon className="h-4 w-4" />} />
- </div>
+          <div className="border-t border-border-light pt-4">
+            {agreementsLoading
+              ? <Skeleton className="h-16 w-full" />
+              : (
+                <AgreementsSection
+                  agreements={agreements}
+                  acceptedAgreements={acceptedAgreements}
+                  onToggle={onToggleAgreement}
+                  onRead={onReadAgreement}
+                  error={errors.agreements}
+                />
+              )}
+          </div>
 
- {/* Birth Date full width */}
- <AuthInput label={t("birth_date")} name="birthdate" value={formData.birthdate} onChange={handleChange} placeholder={t("dd_mm_yyyy")} required error={errors.birthdate} leftIcon={<CalendarIcon className="h-4 w-4" />} />
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
+            <Button variant="ghost" onClick={() => setStep(1)} className="sm:w-auto">
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              {t('back', 'Geri')}
+            </Button>
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+              {isLoading ? t('auth_creating_account', 'Hesap oluşturuluyor…') : t('auth_create_account', 'Hesabı oluştur')}
+            </Button>
+          </div>
+        </form>
+      )}
 
- {/* Gender selection full width */}
- <div className="flex flex-col gap-2.5">
- <label className="block text-xs font-semibold text-text-secondary">{t("gender")}<span className="text-status-error font-normal">*</span>
- </label>
- {gendersLoading ? <div className="flex items-center justify-center py-3.5 px-4 border border-border-light rounded bg-background-secondary">
- <LoadingIndicator size="h-4 w-4" />
- </div> : <div className="flex gap-2.5">
- {genderOptions.map(g => <button key={g.value} type="button" onClick={() => handleChange({
- target: {
- name: 'gender',
- value: g.value
- }
- })} className={`flex-1 py-3 px-5 rounded border text-xs font-semibold transition-all duration-300 ${formData.gender === g.value ? 'border-primary bg-primary text-primary-content' : 'border-border-light bg-background-secondary text-text-secondary hover:bg-background-tertiary hover:text-text-primary'}`}>
- {g.label}
- </button>)}
- </div>}
- {errors.gender && <p className="text-xs text-status-error mt-1">{errors.gender}</p>}
- </div>
+      {step === 1 && (
+        <>
+          <AuthDivider />
+          <GoogleButton />
+        </>
+      )}
 
- {/* Agreements */}
- {agreementsLoading && <div className="flex items-center gap-2.5 py-3 text-xs text-text-secondary">
- <LoadingIndicator size="h-3.5 w-3.5" />
- <span>{t("loading_legal_agreements")}</span>
- </div>}
- {!agreementsLoading && <div className="rounded border border-border-light bg-background-secondary p-5">
- <AgreementsSection agreements={agreements} acceptedAgreements={acceptedAgreements} onToggle={onToggleAgreement} onRead={onReadAgreement} error={errors.agreements} />
- </div>}
-
- {errors.submit && <div className="rounded bg-background-secondary border border-border p-4 text-xs text-status-error-text">
- {errors.submit}
- </div>}
-
- {/* Navigation / Actions */}
- <div className="flex gap-4 mt-3">
- <AuthButton type="button" variant="secondary" onClick={handlePrevStep} className="flex-1" leftIcon={<ArrowLeftIcon className="h-4 w-4" />}>{t("back")}</AuthButton>
- <AuthButton type="submit" isLoading={isLoading} className="flex-1" rightIcon={!isLoading ? <ArrowRightIcon className="h-4 w-4" /> : null}>{t("create_account")}</AuthButton>
- </div>
- </div>}
-
- {/* Silent Divider */}
- <div className="relative flex items-center my-3">
- <div className="flex-1 border-t border-border-light"></div>
- <span className="px-3 text-xs text-text-muted font-medium">{t("or_continue_with")}</span>
- <div className="flex-1 border-t border-border-light"></div>
- </div>
-
- {/* Google SSO */}
- <a href={`${API_BASE_URL}/v1/auth/oauth2/google`} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4 w-full">
- <svg className="w-4 h-4 shrink-0" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
- <path d="M533.5 278.4c0-18.5-1.7-36.4-4.9-53.6H272.1v101.5h147.1c-6.3 34.2-25.5 63.2-54.4 82.6v68h87.7c51.3-47.2 81-116.8 81-198.5z" fill="#4285F4" />
- <path d="M272.1 544.3c73.2 0 134.7-24.2 179.6-65.4l-87.7-68c-24.3 16.3-55.5 26-91.9 26-70.7 0-130.6-47.7-152-111.8h-90.9v70.2c44.7 88.6 136.2 148.9 243 148.9z" fill="#34A853" />
- <path d="M120.1 325.1c-10.2-30.2-10.2-62.9 0-93.1V161.8h-90.9c-38.2 76.3-38.2 168.4 0 244.7l90.9-81.4z" fill="#FBBC05" />
- <path d="M272.1 107.7c39.8-.6 78 14.5 107.3 42.4l80.1-80.1C406.9 24 344.9-.1 272.1 0 165.3 0 73.8 60.2 29.2 148.8l90.9 70.2c21.4-64.1 81.3-111.8 152-111.3z" fill="#EA4335" />
- </svg>{t("continue_with_google")}</a>
-
- {/* Sign in link */}
- <p className="text-center text-xs text-text-secondary mt-4">{t("already_have_an_account")}{' '}
- <Link to={ROUTES.LOGIN} className="font-semibold text-text-primary hover:text-primary hover:underline underline-offset-4 transition-colors">{t("sign_in")}</Link>
- </p>
- </form>
- </div>;
+      <p className="mt-8 text-center text-sm text-text-secondary">
+        {t('auth_have_account', 'Zaten hesabın var mı?')}{' '}
+        <Link to={ROUTES.LOGIN} className="font-medium text-text-primary hover:underline">{t('auth_login_link', 'Giriş yap')}</Link>
+      </p>
+    </div>
+  );
 };

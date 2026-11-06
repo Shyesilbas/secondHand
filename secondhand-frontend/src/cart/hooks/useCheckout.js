@@ -27,7 +27,6 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
  const [selectedPaymentType, setSelectedPaymentType] = useState(CART_PAYMENT_TYPES.EWALLET);
 
- const [showEWalletWarning, setShowEWalletWarning] = useState(false);
  const [paymentVerificationCode, setPaymentVerificationCode] = useState('');
  const [paymentVerificationExpiresAtMs, setPaymentVerificationExpiresAtMs] = useState(null);
  const [notes, setNotes] = useState('');
@@ -52,16 +51,18 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  return addresses.find((address) => String(address.id) === String(id)) || null;
  };
 
+ // Checkout returns { orders, totalAmount }: one order per seller in the cart.
  const navigateToOrderSuccess = (checkoutResult) => {
- const orderId = checkoutResult?.id || checkoutResult?.orderId || null;
- const orderNumber = checkoutResult?.orderNumber || checkoutResult?.orderNo || null;
+ const orders = Array.isArray(checkoutResult?.orders) ? checkoutResult.orders : [];
+ const single = orders.length === 1 ? orders[0] : null;
  const shippingAddress = findAddressById(selectedShippingAddressId);
  navigate(ROUTES.ORDER_SUCCESS, {
  state: {
- order: checkoutResult || null,
- orderId,
- orderNumber,
- totalAmount: calculateTotal(),
+ orders,
+ order: single,
+ orderId: single?.id ?? null,
+ orderNumber: single?.orderNumber ?? null,
+ totalAmount: checkoutResult?.totalAmount ?? calculateTotal(),
  createdAt: new Date().toISOString(),
  itemCount: cartCount,
  shippingAddress,
@@ -102,15 +103,6 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  try {
  logger.info('Initiating checkout process...', { paymentType: selectedPaymentType, offerId });
 
- if (selectedPaymentType === CART_PAYMENT_TYPES.EWALLET && eWallet && eWallet.spendingWarningLimit) {
- const projectedSpent = calculateTotal();
- if (projectedSpent >= eWallet.spendingWarningLimit) {
- setShowEWalletWarning(true);
- setIsCheckingOut(false);
- return;
- }
- }
-
  const payload = {
  shippingAddressId: selectedShippingAddressId,
  billingAddressId: selectedBillingAddressId || selectedShippingAddressId,
@@ -131,7 +123,7 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
  const checkoutResult = await orderService.checkout(payload);
  
- logger.info('Checkout successful', { orderId: checkoutResult?.id });
+ logger.info('Checkout successful', { orderCount: checkoutResult?.orders?.length ?? 0 });
  
  resetCartState?.();
  showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
@@ -175,38 +167,6 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  }
  };
 
- const confirmEWalletWarningAndCheckout = async () => {
- setShowEWalletWarning(false);
- setIsCheckingOut(true);
- try {
- const payload = {
- shippingAddressId: selectedShippingAddressId,
- billingAddressId: selectedBillingAddressId || selectedShippingAddressId,
- notes: String(notes || '').trim() || null,
- name: String(orderName || '').trim() || null,
- paymentType: selectedPaymentType,
- paymentVerificationCode: String(paymentVerificationCode || '').trim() || null,
- agreementsAccepted: true,
- acceptedAgreementIds: getAcceptedAgreementIds(),
- couponCode: String(couponCode || '').trim() || null,
- offerId: offerId || null,
- deliveryMethod: deliveryMethod,
- meetupLocation: deliveryMethod === 'SAFE_MEETUP' ? meetupLocation : null
- };
- const checkoutResult = await orderService.checkout(payload);
- resetCartState?.();
- showSuccess(CART_MESSAGES.ORDER_PLACED_TITLE, CART_MESSAGES.ORDER_PLACED_DESCRIPTION);
- navigateToOrderSuccess(checkoutResult);
- } catch (e) {
- showError(
- CART_MESSAGES.CHECKOUT_FAILED_TITLE,
- getCheckoutErrorMessage(e, CART_MESSAGES.CHECKOUT_FAILED)
- );
- } finally {
- setIsCheckingOut(false);
- }
- };
-
  return {
  isCheckingOut,
 
@@ -233,9 +193,6 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
 
  handleCheckout,
  proceedDisabled,
- showEWalletWarning,
- setShowEWalletWarning,
- confirmEWalletWarningAndCheckout,
  sendVerificationCode,
  emails,
  fetchEmails,

@@ -1,357 +1,313 @@
-import { ShoppingBag, Tag, MessageSquare, Star, CreditCard, Award, Bell, CheckCircle, XCircle, Package, DollarSign, RefreshCw, ShieldCheck } from 'lucide-react';
+import {
+  Award,
+  Bell,
+  CheckCircle,
+  CreditCard,
+  FileText,
+  Heart,
+  MessageSquare,
+  Package,
+  RefreshCw,
+  ShoppingBag,
+  Star,
+  Tag,
+  TrendingDown,
+  XCircle
+} from 'lucide-react';
 import { ROUTES } from '../common/constants/routes.js';
 
-export const NOTIFICATION_FILTERS = Object.freeze({
-  ALL: 'ALL',
-  ORDERS: 'ORDERS',
-  OFFERS: 'OFFERS',
-  CHAT: 'CHAT',
-  LISTINGS: 'LISTINGS',
-  PAYMENTS: 'PAYMENTS',
-  SYSTEM: 'SYSTEM'
+export const NOTIFICATION_PAGE_SIZE = 20;
+
+export const NOTIFICATION_VIEWS = Object.freeze({
+  ALL: 'all',
+  UNREAD: 'unread'
 });
 
-export const NOTIFICATION_CATEGORIES = [
-  { id: NOTIFICATION_FILTERS.ALL, label: 'Tümü', icon: Bell },
-  { id: NOTIFICATION_FILTERS.OFFERS, label: 'Teklifler', icon: Tag },
-  { id: NOTIFICATION_FILTERS.ORDERS, label: 'Siparişler', icon: ShoppingBag },
-  { id: NOTIFICATION_FILTERS.CHAT, label: 'Mesajlar', icon: MessageSquare },
-  { id: NOTIFICATION_FILTERS.LISTINGS, label: 'İlan & Favori', icon: Star },
-  { id: NOTIFICATION_FILTERS.PAYMENTS, label: 'Ödemeler', icon: CreditCard },
-  { id: NOTIFICATION_FILTERS.SYSTEM, label: 'Sistem', icon: Award }
-];
-
-export const NOTIFICATION_CATEGORY_MAP = {
-  // Orders
-  ORDER_CREATED: NOTIFICATION_FILTERS.ORDERS,
-  ORDER_STATUS_CHANGED: NOTIFICATION_FILTERS.ORDERS,
-  ORDER_CANCELLED: NOTIFICATION_FILTERS.ORDERS,
-  ORDER_RECEIVED: NOTIFICATION_FILTERS.ORDERS,
-  ORDER_COMPLETED: NOTIFICATION_FILTERS.ORDERS,
-  ORDER_REFUNDED: NOTIFICATION_FILTERS.ORDERS,
-
-  // Offers
-  OFFER_RECEIVED: NOTIFICATION_FILTERS.OFFERS,
-  OFFER_ACCEPTED: NOTIFICATION_FILTERS.OFFERS,
-  OFFER_REJECTED: NOTIFICATION_FILTERS.OFFERS,
-  OFFER_COUNTERED: NOTIFICATION_FILTERS.OFFERS,
-  OFFER_EXPIRED: NOTIFICATION_FILTERS.OFFERS,
-
-  // Chat
-  CHAT_MESSAGE_RECEIVED: NOTIFICATION_FILTERS.CHAT,
-
-  // Listings
-  LISTING_PRICE_DROPPED: NOTIFICATION_FILTERS.LISTINGS,
-  LISTING_NEW_FROM_FOLLOWED: NOTIFICATION_FILTERS.LISTINGS,
-  LISTING_SOLD: NOTIFICATION_FILTERS.LISTINGS,
-  LISTING_FAVORITED: NOTIFICATION_FILTERS.LISTINGS,
-
-  // Payments
-  PAYMENT_SUCCESS: NOTIFICATION_FILTERS.PAYMENTS,
-  PAYMENT_FAILED: NOTIFICATION_FILTERS.PAYMENTS,
-
-  // System & Achievements
-  REVIEW_RECEIVED: NOTIFICATION_FILTERS.SYSTEM,
-  GREAT_SELLER_ACHIEVED: NOTIFICATION_FILTERS.SYSTEM,
-  AGREEMENT_UPDATED: NOTIFICATION_FILTERS.SYSTEM
+const ICONS = {
+  ORDER_CREATED: ShoppingBag,
+  ORDER_RECEIVED: ShoppingBag,
+  ORDER_STATUS_CHANGED: Package,
+  ORDER_COMPLETED: CheckCircle,
+  ORDER_CANCELLED: XCircle,
+  ORDER_REFUNDED: RefreshCw,
+  LISTING_SOLD: CheckCircle,
+  OFFER_RECEIVED: Tag,
+  OFFER_COUNTERED: Tag,
+  OFFER_ACCEPTED: CheckCircle,
+  OFFER_REJECTED: XCircle,
+  OFFER_EXPIRED: XCircle,
+  LISTING_PRICE_DROPPED: TrendingDown,
+  LISTING_NEW_FROM_FOLLOWED: Tag,
+  LISTING_FAVORITED: Heart,
+  REVIEW_RECEIVED: Star,
+  CHAT_MESSAGE_RECEIVED: MessageSquare,
+  PAYMENT_SUCCESS: CreditCard,
+  PAYMENT_FAILED: CreditCard,
+  AGREEMENT_UPDATED: FileText,
+  GREAT_SELLER_ACHIEVED: Award
 };
 
-export const getNotificationConfig = (type) => {
-  switch (type) {
-    case 'OFFER_RECEIVED':
-    case 'OFFER_COUNTERED':
-      return {
-        icon: Tag,
-        badge: 'Yeni Teklif',
-        badgeClass: 'text-status-warning-text',
-        iconClass: 'text-status-warning-text',
-        actionLabel: 'Teklifi İncele',
-        categoryLabel: 'Pazarlık & Teklif'
-      };
-    case 'OFFER_ACCEPTED':
-      return {
-        icon: CheckCircle,
-        badge: 'Teklif Kabul Edildi',
-        badgeClass: 'text-status-success-text',
-        iconClass: 'text-status-success-text',
-        actionLabel: 'Siparişe Git',
-        categoryLabel: 'Pazarlık & Teklif'
-      };
-    case 'OFFER_REJECTED':
-    case 'OFFER_EXPIRED':
-      return {
-        icon: XCircle,
-        badge: type === 'OFFER_EXPIRED' ? 'Süresi Doldu' : 'Teklif Reddedildi',
-        badgeClass: 'text-text-secondary',
-        iconClass: 'text-text-secondary',
-        actionLabel: 'Teklifleri Gör',
-        categoryLabel: 'Pazarlık & Teklif'
-      };
+export const getNotificationIcon = (type) => ICONS[type] || Bell;
+
+const ORDER_STATUS_LABELS = {
+  PENDING: ['order_status_pending', 'Beklemede'],
+  CONFIRMED: ['order_status_confirmed', 'Onaylandı'],
+  PROCESSING: ['order_status_processing', 'Hazırlanıyor'],
+  SHIPPED: ['order_status_shipped', 'Kargoya verildi'],
+  DELIVERED: ['order_status_delivered', 'Teslim edildi'],
+  COMPLETED: ['order_status_completed', 'Tamamlandı'],
+  CANCELLED: ['order_status_cancelled', 'İptal edildi'],
+  REFUNDED: ['order_status_refunded', 'İade edildi'],
+  MEETUP_PENDING: ['order_status_meetup_pending', 'Buluşma bekleniyor'],
+  HANDOVER_CONFIRMED: ['order_status_handover_confirmed', 'Elden teslim onaylandı'],
+  VERIFICATION_LOCKED: ['order_status_verification_locked', 'Doğrulama kilitlendi']
+};
+
+export const parseNotificationMetadata = (metadata) => {
+  if (!metadata) return {};
+  if (typeof metadata === 'object') return metadata;
+  try {
+    const parsed = JSON.parse(metadata);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const formatAmount = (raw, currency = 'TRY') => {
+  if (raw == null || raw === '') return null;
+  const num = typeof raw === 'number' ? raw : Number.parseFloat(String(raw).replace(',', '.'));
+  if (Number.isNaN(num)) return null;
+  const cur = (currency || 'TRY').toUpperCase();
+  try {
+    return num.toLocaleString('tr-TR', { style: 'currency', currency: cur === 'TL' ? 'TRY' : cur, maximumFractionDigits: 2 });
+  } catch {
+    return `${num.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ${cur}`;
+  }
+};
+
+// Backend fallbacks for chat previews that carry no user content.
+const GENERIC_CHAT_MESSAGE = /^(You received a new message\.|New message from .+\.)$/;
+
+/**
+ * Turkish title and body for a notification, built from its type and metadata so stored English
+ * texts and order numbers never reach the UI. Unknown types fall back to the stored texts.
+ */
+export const describeNotification = (notification, t) => {
+  const meta = parseNotificationMetadata(notification?.metadata);
+  const listing = meta.listingTitle ? `“${meta.listingTitle}”` : null;
+  const fallbackMessage = notification?.message || '';
+  const tr = (key, defaultValue, values = {}) => t(key, { defaultValue, ...values });
+
+  switch (notification?.type) {
     case 'ORDER_CREATED':
+      return {
+        title: tr('notif_order_created_title', 'Siparişin oluşturuldu'),
+        message: tr('notif_order_created_body', 'Siparişini Aldıklarım sayfasından takip edebilirsin.')
+      };
     case 'ORDER_RECEIVED':
       return {
-        icon: ShoppingBag,
-        badge: 'Yeni Sipariş',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'Siparişi Görüntüle',
-        categoryLabel: 'Sipariş'
-      };
-    case 'ORDER_STATUS_CHANGED':
-      return {
-        icon: Package,
-        badge: 'Kargo Güncellemesi',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'Kargo Takibi',
-        categoryLabel: 'Sipariş'
-      };
-    case 'ORDER_COMPLETED':
-      return {
-        icon: CheckCircle,
-        badge: 'Sipariş Tamamlandı',
-        badgeClass: 'text-status-success-text',
-        iconClass: 'text-status-success-text',
-        actionLabel: 'Sipariş Detayı',
-        categoryLabel: 'Sipariş'
+        title: tr('notif_order_received_title', 'Yeni sipariş aldın'),
+        message: listing
+          ? tr('notif_order_received_body', '{{listing}} için sipariş geldi.', { listing })
+          : tr('notif_order_received_body_generic', 'İlanlarından biri için sipariş geldi.')
       };
     case 'ORDER_CANCELLED':
       return {
-        icon: XCircle,
-        badge: 'Sipariş İptal Edildi',
-        badgeClass: 'text-status-error-text',
-        iconClass: 'text-status-error-text',
-        actionLabel: 'Detayları İncele',
-        categoryLabel: 'Sipariş'
+        title: tr('notif_order_cancelled_title', 'Sipariş iptal edildi'),
+        message: meta.reason === 'SHIP_DEADLINE_MISSED'
+          ? (/refunded/i.test(fallbackMessage)
+            ? tr('notif_order_ship_deadline_buyer', 'Satıcı 72 saat içinde kargoya vermediği için sipariş iptal edildi; ödemen iade edildi.')
+            : tr('notif_order_ship_deadline_seller', '72 saat içinde kargoya verilmediği için sipariş otomatik olarak iptal edildi.'))
+          : /other party/i.test(fallbackMessage)
+            ? tr('notif_order_cancelled_by_other', 'Sipariş karşı taraf tarafından iptal edildi.')
+            : tr('notif_order_cancelled_body', 'Sipariş iptal edildi.')
+      };
+    case 'ORDER_STATUS_CHANGED': {
+      const label = ORDER_STATUS_LABELS[meta.newStatus];
+      if (meta.newStatus === 'SHIPPED') {
+        return { title: tr('notif_order_shipped_title', 'Siparişin kargoya verildi'), message: tr('notif_order_shipped_body', 'Kargo takibini sipariş detayından görebilirsin.') };
+      }
+      if (meta.newStatus === 'DELIVERED') {
+        return { title: tr('notif_order_delivered_title', 'Siparişin teslim edildi'), message: tr('notif_order_delivered_body', 'Ürünü kontrol edip siparişi onaylayabilirsin.') };
+      }
+      return {
+        title: tr('notif_order_status_title', 'Sipariş durumu güncellendi'),
+        message: label
+          ? tr('notif_order_status_body', 'Yeni durum: {{status}}', { status: t(label[0], label[1]) })
+          : ''
+      };
+    }
+    case 'ORDER_COMPLETED':
+      return {
+        title: tr('notif_order_completed_title', 'Sipariş tamamlandı'),
+        message: tr('notif_order_completed_body', 'Alışverişin için teşekkürler.')
       };
     case 'ORDER_REFUNDED':
       return {
-        icon: RefreshCw,
-        badge: 'İade Yapıldı',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'İadeyi İncele',
-        categoryLabel: 'Sipariş'
-      };
-    case 'CHAT_MESSAGE_RECEIVED':
-      return {
-        icon: MessageSquare,
-        badge: 'Yeni Mesaj',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'Sohbete Git',
-        categoryLabel: 'Mesajlaşma'
-      };
-    case 'LISTING_PRICE_DROPPED':
-      return {
-        icon: DollarSign,
-        badge: 'Fiyat Düştü',
-        badgeClass: 'text-status-success-text',
-        iconClass: 'text-status-success-text',
-        actionLabel: 'İlanı İncele',
-        categoryLabel: 'İlan & Favori'
-      };
-    case 'LISTING_NEW_FROM_FOLLOWED':
-      return {
-        icon: Star,
-        badge: 'Yeni İlan',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'İlana Git',
-        categoryLabel: 'Takip Ettiklerin'
+        title: tr('notif_order_refunded_title', 'Sipariş iade edildi'),
+        message: tr('notif_order_refunded_body', 'Ödemenin iadesi yapıldı.')
       };
     case 'LISTING_SOLD':
       return {
-        icon: Package,
-        badge: 'İlan Satıldı',
-        badgeClass: 'text-status-success-text',
-        iconClass: 'text-status-success-text',
-        actionLabel: 'Satış Detayı',
-        categoryLabel: 'İlan'
+        title: tr('notif_listing_sold_title', 'İlanın satıldı'),
+        message: listing ? tr('notif_listing_sold_body', '{{listing}} satıldı.', { listing }) : ''
+      };
+    case 'OFFER_RECEIVED':
+      return {
+        title: tr('notif_offer_received_title', 'Yeni teklif aldın'),
+        message: listing ? tr('notif_offer_received_body', '{{listing}} için teklif geldi.', { listing }) : ''
+      };
+    case 'OFFER_COUNTERED':
+      return {
+        title: tr('notif_offer_countered_title', 'Karşı teklif geldi'),
+        message: listing ? tr('notif_offer_countered_body', '{{listing}} için karşı teklif geldi.', { listing }) : ''
+      };
+    case 'OFFER_ACCEPTED':
+      return {
+        title: tr('notif_offer_accepted_title', 'Teklifin kabul edildi'),
+        message: listing ? tr('notif_offer_accepted_body', '{{listing}} için verdiğin teklif kabul edildi.', { listing }) : ''
+      };
+    case 'OFFER_REJECTED':
+      return {
+        title: tr('notif_offer_rejected_title', 'Teklifin reddedildi'),
+        message: listing ? tr('notif_offer_rejected_body', '{{listing}} için verdiğin teklif reddedildi.', { listing }) : ''
+      };
+    case 'OFFER_EXPIRED':
+      return {
+        title: tr('notif_offer_expired_title', 'Teklifin süresi doldu'),
+        message: listing ? tr('notif_offer_expired_body', '{{listing}} için verilen teklifin süresi doldu.', { listing }) : ''
+      };
+    case 'LISTING_PRICE_DROPPED': {
+      const oldPrice = formatAmount(meta.oldPrice);
+      const newPrice = formatAmount(meta.newPrice);
+      const prices = oldPrice && newPrice ? `${oldPrice} → ${newPrice}` : newPrice;
+      return {
+        title: tr('notif_price_dropped_title', 'Fiyat düştü'),
+        message: [listing, prices].filter(Boolean).join(' · ')
+      };
+    }
+    case 'LISTING_NEW_FROM_FOLLOWED':
+      return {
+        title: tr('notif_followed_listing_title', 'Takip ettiğin satıcıdan yeni ilan'),
+        message: listing || ''
       };
     case 'LISTING_FAVORITED':
       return {
-        icon: Star,
-        badge: 'Favoriye Eklendi',
-        badgeClass: 'text-text-primary',
-        iconClass: 'text-text-primary',
-        actionLabel: 'İlanı Gör',
-        categoryLabel: 'İlan & Favori'
+        title: tr('notif_listing_favorited_title', 'İlanın favorilere eklendi'),
+        message: listing ? tr('notif_listing_favorited_body', '{{listing}} bir kullanıcının favorilerinde.', { listing }) : ''
       };
-    case 'REVIEW_RECEIVED':
+    case 'REVIEW_RECEIVED': {
+      const rating = Number(meta.rating);
+      const ratingText = rating > 0 ? tr('notif_review_rating', '{{rating}}/5 puan', { rating }) : null;
       return {
-        icon: Star,
-        badge: 'Yeni Değerlendirme',
-        badgeClass: 'text-status-warning-text',
-        iconClass: 'text-status-warning-text',
-        actionLabel: 'Değerlendirmeleri Gör',
-        categoryLabel: 'Değerlendirme'
+        title: tr('notif_review_received_title', 'Yeni değerlendirme aldın'),
+        message: [listing, ratingText].filter(Boolean).join(' · ')
       };
-    case 'PAYMENT_SUCCESS':
+    }
+    case 'CHAT_MESSAGE_RECEIVED':
       return {
-        icon: CheckCircle,
-        badge: 'Ödeme Başarılı',
-        badgeClass: 'text-status-success-text',
-        iconClass: 'text-status-success-text',
-        actionLabel: 'Cüzdanımı Gör',
-        categoryLabel: 'Ödeme'
+        title: tr('notif_chat_title', 'Yeni mesaj'),
+        message: GENERIC_CHAT_MESSAGE.test(fallbackMessage) ? '' : fallbackMessage
       };
+    case 'PAYMENT_SUCCESS': {
+      const amount = formatAmount(meta.amountText, meta.currency);
+      return {
+        title: tr('notif_payment_success_title', 'Ödemen tamamlandı'),
+        message: [listing, amount].filter(Boolean).join(' · ')
+      };
+    }
     case 'PAYMENT_FAILED':
       return {
-        icon: XCircle,
-        badge: 'Ödeme Başarısız',
-        badgeClass: 'text-status-error-text',
-        iconClass: 'text-status-error-text',
-        actionLabel: 'Ödemeyi Tekrar Dene',
-        categoryLabel: 'Ödeme'
+        title: tr('notif_payment_failed_title', 'Ödemen tamamlanamadı'),
+        message: tr('notif_payment_failed_body', 'Ödeme yöntemini kontrol edip tekrar deneyebilirsin.')
       };
     case 'AGREEMENT_UPDATED':
       return {
-        icon: ShieldCheck,
-        badge: 'Sözleşme Güncellemesi',
-        badgeClass: 'text-text-secondary',
-        iconClass: 'text-text-secondary',
-        actionLabel: 'Sözleşmeyi İncele',
-        categoryLabel: 'Sözleşmeler'
+        title: tr('notif_agreement_title', 'Sözleşme güncellendi'),
+        message: tr('notif_agreement_body', 'Yeni sürümü inceleyip onaylaman gerekiyor.')
       };
     case 'GREAT_SELLER_ACHIEVED':
       return {
-        icon: Award,
-        badge: 'Başarılı Satıcı Rozeti',
-        badgeClass: 'text-status-warning-text',
-        iconClass: 'text-status-warning-text',
-        actionLabel: 'Profili Görüntüle',
-        categoryLabel: 'Başarılar'
+        title: tr('notif_great_seller_title', 'Harika satıcı rozetini kazandın'),
+        message: tr('notif_great_seller_body', 'Rozetin artık profilinde görünüyor.')
       };
     default:
-      return {
-        icon: Bell,
-        badge: 'Bildirim',
-        badgeClass: 'text-text-secondary',
-        iconClass: 'text-text-secondary',
-        actionLabel: 'Detayı Gör',
-        categoryLabel: 'Genel'
-      };
+      return { title: notification?.title || tr('notification', 'Bildirim'), message: fallbackMessage };
   }
 };
+
+// Links stored by older backend versions that no longer exist in the app.
+const LEGACY_ACTION_URLS = {
+  '/profile/wallet': ROUTES.EWALLET
+};
+
+const withOrderId = (base, orderId) => (orderId ? `${base}?orderId=${encodeURIComponent(orderId)}` : base);
 
 export const getNotificationTargetRoute = (notification) => {
   if (!notification) return ROUTES.HOME;
-  if (notification.actionUrl) {
-    return notification.actionUrl;
-  }
+  const meta = parseNotificationMetadata(notification.metadata);
 
-  const { type, relatedEntityId, metadata } = notification;
-  let meta = metadata;
-  if (typeof meta === 'string') {
-    try {
-      meta = JSON.parse(meta);
-    } catch {
-      meta = {};
-    }
-  }
-
-  switch (type) {
-    case 'OFFER_RECEIVED':
-    case 'OFFER_ACCEPTED':
-    case 'OFFER_REJECTED':
-    case 'OFFER_COUNTERED':
-    case 'OFFER_EXPIRED':
-      return ROUTES.OFFERS;
+  switch (notification.type) {
+    // Buyer-side order updates: open the purchases list with the order highlighted.
     case 'ORDER_CREATED':
     case 'ORDER_STATUS_CHANGED':
-    case 'ORDER_CANCELLED':
-    case 'ORDER_RECEIVED':
     case 'ORDER_COMPLETED':
     case 'ORDER_REFUNDED':
-      return relatedEntityId
-        ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(relatedEntityId)}`
-        : ROUTES.MY_ORDERS;
-    case 'CHAT_MESSAGE_RECEIVED': {
-      const cid = meta?.conversationId;
-      return cid
-        ? `${ROUTES.INBOX}?tab=chat&room=${encodeURIComponent(cid)}`
-        : `${ROUTES.INBOX}?tab=chat`;
-    }
-    case 'LISTING_PRICE_DROPPED':
-    case 'LISTING_NEW_FROM_FOLLOWED':
+      return withOrderId(ROUTES.MY_ORDERS, meta.orderId);
+    case 'ORDER_RECEIVED':
     case 'LISTING_SOLD':
-    case 'LISTING_FAVORITED':
-      return relatedEntityId ? ROUTES.LISTING_DETAIL(relatedEntityId) : ROUTES.LISTINGS;
-    case 'REVIEW_RECEIVED':
-    case 'GREAT_SELLER_ACHIEVED':
-      return ROUTES.PROFILE;
+      return ROUTES.I_SOLD;
     case 'PAYMENT_SUCCESS':
     case 'PAYMENT_FAILED':
       return ROUTES.EWALLET;
-    case 'AGREEMENT_UPDATED':
-      return ROUTES.AGREEMENTS;
     default:
-      return ROUTES.HOME;
+      break;
   }
+
+  if (notification.actionUrl) {
+    return LEGACY_ACTION_URLS[notification.actionUrl] || notification.actionUrl;
+  }
+  if (notification.type === 'AGREEMENT_UPDATED') return ROUTES.AGREEMENTS;
+  if (meta.listingId) return ROUTES.LISTING_DETAIL(meta.listingId);
+  return null;
 };
 
 export const formatRelativeTime = (isoString) => {
   if (!isoString) return '';
   const date = new Date(isoString);
-  if (isNaN(date.getTime())) return '';
-  const now = new Date();
-  const diffMs = now - date;
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
+  if (Number.isNaN(date.getTime())) return '';
+  const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffSecs < 45) return 'Az önce';
-  if (diffMins < 60) return `${diffMins} dk önce`;
-  if (diffHours < 24) return `${diffHours} sa önce`;
-  if (diffDays === 1) return 'Dün';
-  if (diffDays < 7) return `${diffDays} gün önce`;
-
-  return date.toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'short'
-  });
+  if (diffMins < 1) return 'Az önce';
+  if (diffMins < 60) return `${diffMins} dk`;
+  if (diffHours < 24) return `${diffHours} sa`;
+  if (diffDays < 7) return `${diffDays} g`;
+  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
 };
 
-export const groupNotificationsByTimeline = (notifications = []) => {
-  const groups = {
-    today: [],
-    yesterday: [],
-    thisWeek: [],
-    earlier: []
-  };
+const DAY_MS = 86400000;
 
+export const groupNotificationsByTimeline = (notifications = []) => {
+  const groups = { today: [], yesterday: [], thisWeek: [], earlier: [] };
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const yesterdayStart = todayStart - 86400000;
-  const oneWeekAgo = todayStart - 86400000 * 7;
 
   notifications.forEach((item) => {
-    if (!item?.createdAt) {
-      groups.earlier.push(item);
-      return;
-    }
-    const itemTime = new Date(item.createdAt).getTime();
-    if (isNaN(itemTime)) {
-      groups.earlier.push(item);
-      return;
-    }
-    if (itemTime >= todayStart) {
-      groups.today.push(item);
-    } else if (itemTime >= yesterdayStart) {
-      groups.yesterday.push(item);
-    } else if (itemTime >= oneWeekAgo) {
-      groups.thisWeek.push(item);
-    } else {
-      groups.earlier.push(item);
-    }
+    const time = item?.createdAt ? new Date(item.createdAt).getTime() : Number.NaN;
+    if (Number.isNaN(time)) groups.earlier.push(item);
+    else if (time >= todayStart) groups.today.push(item);
+    else if (time >= todayStart - DAY_MS) groups.yesterday.push(item);
+    else if (time >= todayStart - DAY_MS * 7) groups.thisWeek.push(item);
+    else groups.earlier.push(item);
   });
 
   return [
-    { key: 'today', title: 'Bugün', items: groups.today },
-    { key: 'yesterday', title: 'Dün', items: groups.yesterday },
-    { key: 'thisWeek', title: 'Bu Hafta', items: groups.thisWeek },
-    { key: 'earlier', title: 'Daha Önce', items: groups.earlier }
+    { key: 'today', labelKey: 'today', defaultLabel: 'Bugün', items: groups.today },
+    { key: 'yesterday', labelKey: 'yesterday', defaultLabel: 'Dün', items: groups.yesterday },
+    { key: 'thisWeek', labelKey: 'this_week', defaultLabel: 'Bu hafta', items: groups.thisWeek },
+    { key: 'earlier', labelKey: 'earlier', defaultLabel: 'Daha önce', items: groups.earlier }
   ].filter((g) => g.items.length > 0);
 };

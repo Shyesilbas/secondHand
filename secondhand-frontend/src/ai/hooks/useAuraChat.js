@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { aiChatService } from '../services/aiChatService.js';
 import {
  createAuraChatId,
@@ -33,6 +34,7 @@ export const useAuraChat = ({
  /** 'widget' | 'page' — persists the last conversation on this device */
  persistMessagesSurface = null,
 }) => {
+ const queryClient = useQueryClient();
  const [messages, setMessages] = useState(() => initialMessages);
  const [input, setInput] = useState('');
  const [isSending, setIsSending] = useState(false);
@@ -133,7 +135,7 @@ export const useAuraChat = ({
  setMessages((prev) => [...prev, createChatMessage({ role: 'user', content: trimmed })]);
  }
  setInput('');
- appendAssistant('Please log in to continue this chat.');
+ appendAssistant('Aura ile sohbet etmek için giriş yapmalısın.');
  return;
  }
 
@@ -173,11 +175,13 @@ export const useAuraChat = ({
  }
  const errorMessage = getApiErrorMessage(
  e,
- 'An error occurred while sending your message. Please try again later.'
+ 'Mesajın gönderilemedi. Lütfen biraz sonra tekrar dene.'
  );
  appendAssistant(errorMessage);
  } finally {
  setIsSending(false);
+ // Every sent question may change the daily Aura usage shown from the membership status.
+ queryClient.invalidateQueries({ queryKey: ['membership', 'status'] });
  }
  },
  [
@@ -188,6 +192,7 @@ export const useAuraChat = ({
  input,
  isAuthenticated,
  isSending,
+ queryClient,
  removeTyping,
  replaceTypingWith,
  sendApi,

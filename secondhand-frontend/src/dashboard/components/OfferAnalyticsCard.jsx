@@ -1,78 +1,38 @@
-import { Tag, CheckCircle2, Clock, ArrowUpRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/common/constants/routes';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Offer numbers as a row of label/value pairs. Seller stats carry `totalOffersReceived` and
+ * `acceptanceRate`; buyer stats carry `totalOffersSent`.
+ */
 const OfferAnalyticsCard = ({ offerStats }) => {
   const { t } = useTranslation();
-
   if (!offerStats) return null;
 
+  const isSeller = offerStats.totalOffersReceived != null;
+  const items = [
+    {
+      id: 'total',
+      label: isSeller ? t('dash_offers_received', 'Gelen') : t('dash_offers_sent', 'Gönderilen'),
+      value: (isSeller ? offerStats.totalOffersReceived : offerStats.totalOffersSent) || 0
+    },
+    { id: 'pending', label: t('dash_offers_pending', 'Yanıt bekleyen'), value: offerStats.pendingOffers || 0, warn: offerStats.pendingOffers > 0 },
+    { id: 'accepted', label: t('dash_offers_accepted', 'Kabul edilen'), value: offerStats.acceptedOffers || 0 },
+  ];
+  if (isSeller) {
+    items.push({ id: 'rate', label: t('dash_offers_rate', 'Kabul oranı'), value: `${offerStats.acceptanceRate || 0}%` });
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-semibold text-text-primary">
-            {t('offer_analytics', 'Teklif Analitiği')}
-          </h3>
-          <p className="text-xs text-text-tertiary mt-0.5">
-            {t('offer_analytics_desc', 'Gelen pazarlık teklifleri ve kabul performansı')}
-          </p>
+    <dl className={`grid grid-cols-2 gap-4 ${isSeller ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
+      {items.map(item => (
+        <div key={item.id}>
+          <dt className="text-xs text-text-tertiary">{item.label}</dt>
+          <dd className={`mt-1 text-xl font-semibold tabular-nums ${item.warn ? 'text-status-warning-text' : 'text-text-primary'}`}>
+            {item.value}
+          </dd>
         </div>
-        <Link
-          to={ROUTES.OFFERS}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-text-primary hover:text-text-primary bg-background-secondary hover:bg-background-tertiary px-3 py-1.5 rounded border border-border-light transition-colors"
-        >
-          <span>{t('manage_offers', 'Teklifleri Yönet')}</span>
-          <ArrowUpRight className="w-3.5 h-3.5" />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {/* Total Received */}
-        <div className="p-3.5 bg-background-secondary rounded border border-border">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-text-tertiary mb-1">
-            <Tag className="w-3.5 h-3.5 text-text-muted" />
-            <span>{t('total_received', 'Toplam Teklif')}</span>
-          </div>
-          <div className="text-xl font-semibold text-text-primary tabular-nums">
-            {offerStats.totalOffersReceived || 0}
-          </div>
-        </div>
-
-        {/* Pending */}
-        <div className="p-3.5 bg-background-secondary/70 rounded border border-border">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-status-warning-text mb-1">
-            <Clock className="w-3.5 h-3.5 text-status-warning-text" />
-            <span>{t('pending_offers', 'Bekleyen')}</span>
-          </div>
-          <div className="text-xl font-semibold text-status-warning-text tabular-nums">
-            {offerStats.pendingOffers || 0}
-          </div>
-        </div>
-
-        {/* Accepted */}
-        <div className="p-3.5 bg-background-secondary/70 rounded border border-border">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-status-success-text mb-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-status-success-text" />
-            <span>{t('accepted_offers', 'Kabul Edilen')}</span>
-          </div>
-          <div className="text-xl font-semibold text-status-success-text tabular-nums">
-            {offerStats.acceptedOffers || 0}
-          </div>
-        </div>
-
-        {/* Acceptance Rate */}
-        <div className="p-3.5 bg-background-secondary/70 rounded border border-border">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary mb-1">
-            <span>{t('acceptance_rate', 'Kabul Oranı')}</span>
-          </div>
-          <div className="text-xl font-semibold text-text-primary tabular-nums">
-            %{offerStats.acceptanceRate || 0}
-          </div>
-        </div>
-      </div>
-    </div>
+      ))}
+    </dl>
   );
 };
 

@@ -11,7 +11,11 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 const ContactSellerButton = ({
  listing,
  className = '',
- isDirectChat = false
+ isDirectChat = false,
+ variant = 'primary',
+ iconOnly = false,
+ label,
+ size = 'md'
 }) => {
  const {
  t
@@ -63,8 +67,8 @@ const ContactSellerButton = ({
  }
  };
  return <>
- <button onClick={handleContactSeller} className={`${buttonClasses('primary')} ${className}`} title={t("contact_seller")}>
- <ChatBubbleLeftRightIcon className="h-4 w-4" strokeWidth={1.5} aria-hidden />{t("contact_seller")}</button>
+ <button type="button" onClick={handleContactSeller} className={`${buttonClasses(variant, size)} ${iconOnly ? '!px-0 w-10' : ''} ${className}`} title={t("contact_seller")} aria-label={iconOnly ? t("contact_seller") : undefined}>
+ <ChatBubbleLeftRightIcon className="h-4 w-4" strokeWidth={1.5} aria-hidden />{iconOnly ? null : label || t("contact_seller")}</button>
 
  {isChatOpen && <ChatWindow isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} selectedChatRoom={selectedChatRoom} messages={messages} onSendMessage={sendMessage} onDeleteMessage={deleteMessage} onDeleteConversation={deleteConversation} onConversationDeleted={() => setIsChatOpen(false)} isLoadingMessages={isLoadingMessages} isConnected={isConnected} />}
  </>;

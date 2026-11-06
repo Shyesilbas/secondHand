@@ -8,11 +8,11 @@ export const CART_CHECKOUT_DEFAULTS = Object.freeze({
  VERIFICATION_TRANSACTION_TYPE: 'ITEM_PURCHASE',
 });
 
+// Payment and review share one step: the wallet is the only payment method, so there is nothing to choose separately.
 export const CART_CHECKOUT_STEPS = Object.freeze([
- { id: 1, title: 'Address & Note', description: 'Shipping and billing' },
- { id: 2, title: 'Payment Method', description: 'Choose payment option' },
- { id: 3, title: 'Review & Confirm', description: 'Review details and confirm' },
- { id: 4, title: 'Verification', description: 'Confirm your purchase' },
+ { id: 1, labelKey: 'checkout_step_delivery', label: 'Teslimat' },
+ { id: 2, labelKey: 'checkout_step_payment', label: 'Ödeme ve onay' },
+ { id: 3, labelKey: 'checkout_step_verification', label: 'Doğrulama' },
 ]);
 
 export const CART_MESSAGES = Object.freeze({

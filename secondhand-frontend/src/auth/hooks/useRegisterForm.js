@@ -1,7 +1,6 @@
 import {useCallback, useMemo, useState} from 'react';
 import {RegisterRequestDTO} from '../auth.js';
 import {authService} from '../services/authService.js';
-import {useNotification} from '../../notification/NotificationContext.jsx';
 import {useNavigate} from 'react-router-dom';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useRegisterAgreements} from '../../agreements/hooks/useRegisterAgreements.js';
@@ -16,7 +15,6 @@ export const useRegisterForm = () => {
  const [isLoading, setIsLoading] = useState(false);
 
  const navigate = useNavigate();
- const notification = useNotification();
 
  const agreementsApi = useRegisterAgreements();
  const { genders: genderOptions, isLoading: gendersLoading } = useGenderEnum();
@@ -62,18 +60,15 @@ export const useRegisterForm = () => {
  acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
  };
  await authService.register(registerData);
-
- notification.showSuccess('Account Created', 'Your account has been created. You can now log in with your credentials.');
- navigate(ROUTES.LOGIN, { state: { message: 'Your account has been created. You can now log in with your credentials.' } });
+ navigate(ROUTES.LOGIN, { state: { message: 'Hesabın oluşturuldu. Şimdi e-posta ve şifrenle giriş yapabilirsin.' } });
  return true;
  } catch (error) {
- const errorMessage = error.response?.data?.message || 'Registration failed';
- notification.showError('Error', errorMessage);
+ setErrors({ submit: error.response?.data?.message || 'Kayıt tamamlanamadı. Lütfen tekrar dene.' });
  return false;
  } finally {
  setIsLoading(false);
  }
- }, [validateForm, formData, agreementsApi.acceptedAgreements, agreementsApi.agreements, notification, navigate]);
+ }, [validateForm, formData, agreementsApi.acceptedAgreements, agreementsApi.agreements, navigate]);
 
  return useMemo(() => ({
  formData,

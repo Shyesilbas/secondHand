@@ -17,9 +17,9 @@ export const SectionCard = ({ title, description, icon: Icon, children, classNam
       <div className="border-b border-border-light pb-2.5">
         <div className="flex items-center gap-2">
           {Icon && <Icon className="h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />}
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">{title}</h3>
+          <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
         </div>
-        {description && <p className="mt-0.5 text-xs text-text-muted">{description}</p>}
+        {description && <p className="mt-0.5 text-sm text-text-tertiary">{description}</p>}
       </div>
     )}
     <div>{children}</div>

@@ -56,7 +56,7 @@ export const useFormSubmission = (config) => {
 
  try {
  const response = await submitFunction(formData);
- notification.showSuccess('Success', successMessage);
+ notification.showSuccess('Success', typeof successMessage === 'function' ? successMessage() : successMessage);
  
  if (onSuccess) {
  onSuccess(response, formData);

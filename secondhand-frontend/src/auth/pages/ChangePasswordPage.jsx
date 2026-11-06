@@ -1,194 +1,108 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import { passwordService } from '../services/passwordService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import logger from '../../common/utils/logger.js';
-import AuthInput from '../../common/components/ui/AuthInput.jsx';
-import AuthButton from '../../common/components/ui/AuthButton.jsx';
 import { ChangePasswordRequestDTO } from '../auth.js';
-import PasswordRequirements from '../components/PasswordRequirements.jsx';
+import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
+import { AuthCard, AuthHeader, PasswordField, PasswordRules } from '../components/AuthPrimitives.jsx';
+import { getPasswordError } from '../utils/passwordRules.js';
+
 const ChangePasswordPage = () => {
- const {
- t
- } = useTranslation();
- const navigate = useNavigate();
- const notification = useNotification();
- const [formData, setFormData] = useState({
- ...ChangePasswordRequestDTO
- });
- const [errors, setErrors] = useState({});
- const [isLoading, setIsLoading] = useState(false);
- const validatePassword = password => ({
- minLength: password.length >= 8,
- hasLowercase: /[a-z]/.test(password),
- hasUppercase: /[A-Z]/.test(password),
- hasNumber: /\d/.test(password),
- hasSpecialChar: /[@$!%*?&.]/.test(password),
- isValid: password.length >= 8 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password) && /[@$!%*?&.]/.test(password)
- });
- const handleInputChange = e => {
- const {
- name,
- value
- } = e.target;
- setFormData(prev => ({
- ...prev,
- [name]: value
- }));
- if (errors[name]) setErrors(prev => ({
- ...prev,
- [name]: ''
- }));
- };
- const validateForm = () => {
- const newErrors = {};
- if (!formData.currentPassword.trim()) {
- newErrors.currentPassword = 'Current password is required';
- }
- if (!formData.newPassword.trim()) {
- newErrors.newPassword = 'New password is required';
- } else if (!validatePassword(formData.newPassword).isValid) {
- newErrors.newPassword = 'Password does not meet security requirements';
- }
- if (!formData.confirmPassword.trim()) {
- newErrors.confirmPassword = 'Please confirm your new password';
- } else if (formData.newPassword !== formData.confirmPassword) {
- newErrors.confirmPassword = 'Passwords do not match';
- }
- if (formData.currentPassword === formData.newPassword && formData.newPassword.trim()) {
- newErrors.newPassword = 'New password must be different from current password';
- }
- setErrors(newErrors);
- return Object.keys(newErrors).length === 0;
- };
- const handleSubmit = async e => {
- e.preventDefault();
- if (!validateForm()) return;
- setIsLoading(true);
- setErrors({});
- try {
- await passwordService.changePassword({
- currentPassword: formData.currentPassword,
- newPassword: formData.newPassword
- });
- notification.showSuccess('Password Updated', 'Your password has been successfully changed!');
- setFormData({
- currentPassword: '',
- newPassword: '',
- confirmPassword: ''
- });
- setErrors({});
- setTimeout(() => navigate(ROUTES.PROFILE), 1500);
- } catch (error) {
- logger.error(error);
- if (error.response?.data?.message) {
- const msg = error.response.data.message.toLowerCase();
- if (msg.includes('current') || msg.includes('wrong')) setErrors({
- currentPassword: error.response.data.message
- });else if (msg.includes('password')) setErrors({
- newPassword: error.response.data.message
- });else setErrors({
- general: error.response.data.message
- });
- } else {
- notification.showError('Error', 'An error occurred while changing your password. Please try again.');
- }
- } finally {
- setIsLoading(false);
- }
- };
- const passwordValidation = validatePassword(formData.newPassword);
- const getPasswordStrength = password => {
- if (!password) return {
- level: 0,
- label: '',
- color: ''
- };
- const validation = validatePassword(password);
- const score = Object.values(validation).filter(Boolean).length - 1;
- if (score <= 2) return {
- level: score,
- label: 'Weak',
- color: 'bg-status-error'
- };
- if (score <= 3) return {
- level: score,
- label: 'Fair',
- color: 'bg-status-warning'
- };
- if (score <= 4) return {
- level: score,
- label: 'Good',
- color: 'bg-primary'
- };
- return {
- level: score,
- label: 'Strong',
- color: 'bg-status-success'
- };
- };
- const passwordStrength = getPasswordStrength(formData.newPassword);
- return <div className="min-h-screen bg-secondary flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
- <div className="max-w-md w-full">
- <div className="bg-background-primary rounded border border-border-light p-6">
- <div className="text-center mb-6">
- <div className="w-10 h-10 bg-background-secondary border border-border-light rounded flex items-center justify-center mx-auto mb-3">
- <svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
- </svg>
- </div>
- <h2 className="text-lg font-semibold text-text-primary mb-1">{t("change_password")}</h2>
- <p className="text-xs text-text-secondary">{t("update_your_account_password")}</p>
- </div>
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const notification = useNotification();
+  const [formData, setFormData] = useState({ ...ChangePasswordRequestDTO });
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
- <Alert type="error" message={errors.general} />
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (submitError) setSubmitError('');
+  };
 
- <form className="space-y-4" onSubmit={handleSubmit}>
- <div className="space-y-3">
- <AuthInput label={t("current_password")} type="password" name="currentPassword" value={formData.currentPassword} onChange={handleInputChange} placeholder={t("enter_current_password")} error={errors.currentPassword} required />
- 
- <AuthInput label={t("new_password")} type="password" name="newPassword" value={formData.newPassword} onChange={handleInputChange} placeholder={t("enter_new_password")} error={errors.newPassword} required />
- 
- {formData.newPassword && <div className="space-y-2">
- <PasswordRequirements validation={passwordValidation} />
- 
- {passwordStrength.level > 0 && <div className="space-y-1">
- <div className="flex items-center justify-between">
- <span className="text-xs font-medium text-text-secondary">{t("strength")}</span>
- <span className={`text-xs font-medium ${passwordStrength.label === 'Weak' ? 'text-status-error' : passwordStrength.label === 'Fair' ? 'text-status-warning' : passwordStrength.label === 'Good' ? 'text-primary' : 'text-status-success'}`}>
- {passwordStrength.label}
- </span>
- </div>
- <div className="w-full bg-background-tertiary rounded-full h-1.5">
- <div className={`h-1.5 rounded-full transition-all duration-300 ${passwordStrength.color}`} style={{
- width: `${passwordStrength.level / 5 * 100}%`
- }}></div>
- </div>
- </div>}
- </div>}
- 
- <AuthInput label={t("confirm_password")} type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} placeholder={t("confirm_new_password")} error={errors.confirmPassword} required />
- </div>
+  const validate = () => {
+    const next = {};
+    if (!formData.currentPassword) next.currentPassword = t('auth_current_password_required', 'Mevcut şifreni gir.');
+    const passwordError = getPasswordError(formData.newPassword);
+    if (passwordError) next.newPassword = passwordError;
+    else if (formData.newPassword === formData.currentPassword) next.newPassword = t('auth_password_same', 'Yeni şifre mevcut şifrenden farklı olmalı.');
+    if (!formData.confirmPassword) next.confirmPassword = t('auth_password_repeat_required', 'Yeni şifreni tekrar gir.');
+    else if (formData.newPassword !== formData.confirmPassword) next.confirmPassword = t('auth_password_mismatch', 'Şifreler eşleşmiyor.');
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
 
- <div className="space-y-2">
- <AuthButton type="submit" isLoading={isLoading} disabled={isLoading || !passwordValidation.isValid || formData.newPassword !== formData.confirmPassword || !formData.currentPassword.trim()}>
- {isLoading ? 'Updating...' : 'Update Password'}
- </AuthButton>
- 
- <button type="button" onClick={() => navigate(ROUTES.PROFILE)} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3 w-full">{t("cancel")}</button>
- </div>
- </form>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setIsLoading(true);
+    try {
+      await passwordService.changePassword({ currentPassword: formData.currentPassword, newPassword: formData.newPassword });
+      notification.showSuccess(t('auth_password_changed_title', 'Şifren güncellendi'), t('auth_password_changed_text', 'Bir sonraki girişte yeni şifreni kullan.'));
+      navigate(ROUTES.PROFILE, { replace: true });
+    } catch (error) {
+      logger.error(error);
+      setSubmitError(error.response?.data?.message || t('auth_password_change_failed', 'Şifre değiştirilemedi. Lütfen tekrar dene.'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
- <div className="mt-4 pt-4 border-t border-border-light">
- <div className="text-center">
- <button onClick={() => navigate(ROUTES.FORGOT_PASSWORD)} className="text-xs text-text-muted hover:text-text-secondary underline">{t("forgot_your_password")}</button>
- </div>
- </div>
- </div>
- </div>
- </div>;
+  return (
+    <AuthCard>
+      <AuthHeader title={t('auth_change_password_title', 'Şifreni değiştir')} subtitle={t('auth_change_password_subtitle', 'Güvenliğin için mevcut şifreni de soruyoruz.')} />
+
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {submitError && <Alert type="error" message={submitError} />}
+        <PasswordField
+          label={t('auth_current_password', 'Mevcut şifre')}
+          name="currentPassword"
+          value={formData.currentPassword}
+          onChange={handleChange}
+          error={errors.currentPassword}
+          autoComplete="current-password"
+          autoFocus
+        />
+        <div>
+          <PasswordField
+            label={t('auth_new_password', 'Yeni şifre')}
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={handleChange}
+            error={errors.newPassword}
+            autoComplete="new-password"
+          />
+          <div className="mt-2"><PasswordRules password={formData.newPassword} /></div>
+        </div>
+        <PasswordField
+          label={t('auth_new_password_repeat', 'Yeni şifre tekrar')}
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+          autoComplete="new-password"
+        />
+
+        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row">
+          <Link to={ROUTES.PROFILE} className="inline-flex h-10 items-center justify-center rounded px-4 text-sm font-medium text-text-secondary hover:bg-background-secondary hover:text-text-primary">
+            {t('cancel', 'Vazgeç')}
+          </Link>
+          <Button type="submit" className="flex-1" disabled={isLoading}>
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+            {isLoading ? t('auth_saving', 'Kaydediliyor…') : t('auth_save_password', 'Şifreyi güncelle')}
+          </Button>
+        </div>
+      </form>
+    </AuthCard>
+  );
 };
+
 export default ChangePasswordPage;

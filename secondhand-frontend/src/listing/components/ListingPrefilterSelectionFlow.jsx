@@ -1,493 +1,387 @@
-import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Search, Check, ChevronRight, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Search } from 'lucide-react';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { createFormRegistry, getCreateFlowSelectorSteps, getListingTypeOptions, getPrefilterSelectors, isCreateSelectionComplete } from '../config/listingConfig.js';
-import { getAuxiliaryUi, getCategoryCardClasses, getGridCheckDotClass, getGridOptionClasses, getGridOptionLabelClass, PREFLOW_WIZARD_VARIANT } from '../config/prefilterFlowUi.js';
+import { PREFILTER_CATEGORY_COPY, PREFILTER_STEP_TITLES } from '../config/prefilterCopy.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 import { findEngine } from '../../vehicle/utils/vehicleCatalogUtils.js';
-import ListingWizard from './ListingWizard.jsx';
+import PageContainer from '../../common/components/layout/PageContainer.jsx';
+import Button from '../../common/components/ui/Button.jsx';
+import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
-const WIZARD_COPY = {
- create: {
- title: 'Start your listing',
- subtitle: 'Choose a category, then a few quick choices — we open the form with the right fields.',
- categoryTitle: 'What are you selling?',
- categoryDescription: 'You will refine details on the next screen; choices here only pre-fill the form.',
- loading: 'Preparing your listing form…',
- loadingSub: 'Loading the right fields for your category.',
- gridFilterPlaceholder: 'Type to filter…',
- sellStepReassurance: 'These answers pre-fill your draft. You can edit everything before you publish.',
- dependentDropdownHint: 'Choose the options above first — then this step unlocks.',
- emptyFilterTitle: 'No matches',
- emptyFilterSubtitle: 'Try a different search term.'
- },
- browse: {
- title: 'Shop by category',
- subtitle: 'Filter active listings—or skip and see everything',
- categoryTitle: 'Browse by category',
- categoryDescription: 'Where should we narrow the results?',
- loading: 'Loading listings…',
- gridFilterPlaceholder: 'Filter options…',
- emptyFilterTitle: 'No matches found',
- emptyFilterSubtitle: 'Try a different search term'
- }
+import { inputNormal } from '../../common/components/forms/inputStyles.js';
+
+const GRID_SEARCH_THRESHOLD = 8;
+
+const makeGetName = (enums) => (enumKey, idOrValue, { upper = false } = {}) => {
+  const list = enums?.[enumKey] || [];
+  const found = list.find(x => String(x?.id ?? x?.value ?? '') === String(idOrValue ?? ''));
+  const name = found?.name || found?.label || '';
+  return upper ? name.toUpperCase() : name;
 };
 
-/* Stagger animation for grid items */
-const gridContainerVariants = {
- hidden: {},
- show: {
- transition: {
- staggerChildren: 0.03
- }
- }
+/** Visible selector steps for a category, given the answers so far. */
+const buildSelectorSteps = (type, mode, selection, enums) => {
+  if (!type) return [];
+  const base = mode === 'create' ? getCreateFlowSelectorSteps(type) : getPrefilterSelectors(type);
+  const ctx = { formData: selection, selection, enums, getName: makeGetName(enums) };
+  return base.filter(s => (typeof s.visibleWhen === 'function' ? Boolean(s.visibleWhen(ctx)) : true));
 };
-const gridItemVariants = {
- hidden: {
- opacity: 0,
- y: 12,
- scale: 0.97
- },
- show: {
- opacity: 1,
- y: 0,
- scale: 1,
- transition: {
- type: 'spring',
- stiffness: 400,
- damping: 28
- }
- }
+
+/** Electronics model names end in "8GB/256GB"-style specs; pre-fill RAM and storage from them. */
+const deriveElectronicsSpecs = (next, enums, modelId) => {
+  const model = (enums?.electronicModels || []).find(x => String(x?.id ?? '') === String(modelId));
+  const name = String(model?.name || '');
+  if (!name.includes(' > ')) return;
+  const spec = name.split(' > ').map(p => p.trim()).pop()?.toLowerCase();
+  if (!spec) return;
+  const toGb = (part) => {
+    const n = parseInt(part.replace('gb', '').replace('tb', '').trim(), 10);
+    if (Number.isNaN(n)) return null;
+    return part.includes('tb') ? n * 1024 : n;
+  };
+  if (spec.includes('/')) {
+    const [ramPart, storagePart] = spec.split('/');
+    const ram = parseInt(ramPart.replace('gb', '').trim(), 10);
+    const storage = toGb(storagePart);
+    if (!Number.isNaN(ram)) next.ram = ram;
+    if (storage != null) next.storage = storage;
+  } else if (spec.endsWith('gb') || spec.endsWith('tb')) {
+    const storage = toGb(spec);
+    if (storage != null) next.storage = storage;
+  }
 };
-const ListingPrefilterSelectionFlow = ({
- mode = 'browse',
- onComplete,
- onCancel
-}) => {
- const {
- t
- } = useTranslation();
- const {
- enums
- } = useEnums();
- const completedRef = useRef(false);
- const autoAdvanceTimeoutRef = useRef(null);
- const flowUiVariant = mode === 'create' ? PREFLOW_WIZARD_VARIANT.SELL : PREFLOW_WIZARD_VARIANT.BROWSE;
- const auxUi = useMemo(() => getAuxiliaryUi(flowUiVariant), [flowUiVariant]);
- const flowCopy = useMemo(() => WIZARD_COPY[mode] || WIZARD_COPY.browse, [mode]);
- const [selectedType, setSelectedType] = useState(null);
- const [selection, setSelection] = useState({});
- const [selectionStep, setSelectionStep] = useState(1);
- const [gridOptionFilter, setGridOptionFilter] = useState('');
- useEffect(() => {
- completedRef.current = false;
- }, [selectedType]);
- useEffect(() => {
- setGridOptionFilter('');
 
- // Clear any pending auto-advance when step changes manually or otherwise
- return () => {
- if (autoAdvanceTimeoutRef.current) {
- clearTimeout(autoAdvanceTimeoutRef.current);
- }
- };
- }, [selectionStep]);
- useEffect(() => {
- return () => {
- if (autoAdvanceTimeoutRef.current) {
- clearTimeout(autoAdvanceTimeoutRef.current);
- }
- };
- }, []);
- const listingTypeOptions = useMemo(() => getListingTypeOptions(), []);
- const selectorSteps = useMemo(() => {
- if (!selectedType) return [];
- const baseSteps = mode === 'create' ? getCreateFlowSelectorSteps(selectedType) : getPrefilterSelectors(selectedType).map(s => ({
- ...s,
- title: s.title || s.label || 'Selection'
- }));
- const ctx = {
- formData: selection,
- selection,
- enums,
- getName: (enumKey, idOrValue, {
- upper = false
- } = {}) => {
- const list = enums?.[enumKey] || [];
- const found = list.find(x => String(x?.id ?? x?.value ?? '') === String(idOrValue ?? ''));
- const name = found?.name || found?.label || '';
- return upper ? name.toUpperCase() : name;
- }
- };
- return baseSteps.filter(s => {
- if (typeof s.visibleWhen === 'function') {
- return Boolean(s.visibleWhen(ctx));
- }
- return true;
- });
- }, [selectedType, mode, selection, enums]);
- const selectionSteps = useMemo(() => {
- const c = WIZARD_COPY[mode] || WIZARD_COPY.browse;
- const base = [{
- id: 1,
- title: c.categoryTitle,
- description: c.categoryDescription
- }];
- const tail = selectorSteps.map((s, idx) => ({
- id: idx + 2,
- title: s.title || 'Selection',
- description: s.description || ''
- }));
- return [...base, ...tail];
- }, [selectorSteps, mode]);
- const handleTypeSelect = useCallback(type => {
- setSelectedType(type);
- setSelection({});
- const steps = mode === 'create' ? getCreateFlowSelectorSteps(type) : getPrefilterSelectors(type).map(s => ({
- ...s,
- title: s.title || s.label || 'Selection'
- }));
+/** New answers after picking `value` for step `index`: later answers are cleared, derived fields filled. */
+const applySelection = (prev, steps, index, key, value, enums) => {
+  const next = { ...(prev || {}), [key]: value };
+  for (let i = index + 1; i < steps.length; i += 1) {
+    const k = steps[i]?.initialDataKey;
+    if (k) next[k] = null;
+  }
+  if (key === 'vehicleEngineId' && value) {
+    const eng = findEngine(enums, value);
+    if (eng?.fuelType) next.fuelType = eng.fuelType;
+  }
+  if (key === 'electronicModelId' && value) deriveElectronicsSpecs(next, enums, value);
+  return next;
+};
 
- // Auto-advance to step 2 after a brief delay to show category selection
- if (steps.length > 0) {
- if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
- autoAdvanceTimeoutRef.current = setTimeout(() => {
- setSelectionStep(2);
- }, 350);
- } else {
- setSelectionStep(1);
- }
- window.scrollTo({
- top: 0,
- behavior: 'smooth'
- });
- }, [mode]);
- const handleBackToSelection = useCallback(() => {
- setSelectedType(null);
- setSelection({});
- setSelectionStep(1);
- window.scrollTo({
- top: 0,
- behavior: 'smooth'
- });
- }, []);
- const partialBrowseSearchEnabled = useMemo(() => {
- if (mode !== 'browse' || !selectedType) return false;
- return true;
- }, [mode, selectedType]);
- const triggerBrowseSearch = useCallback(() => {
- if (mode !== 'browse' || !selectedType) return;
- onComplete({
- listingType: selectedType,
- selection: {
- ...selection
- }
- });
- }, [mode, onComplete, selectedType, selection]);
- const canGoNextSelection = useMemo(() => {
- if (selectionStep === 1) return Boolean(selectedType);
- const idx = selectionStep - 2;
- const selector = selectorSteps[idx];
- if (!selector) return false;
- if (selector.optional) return true;
- return isPrefilterValueFilled(selection?.[selector.initialDataKey]);
- }, [selectedType, selection, selectionStep, selectorSteps]);
- const onSelectionPrev = useCallback(() => {
- if (selectionStep <= 1) {
- handleBackToSelection();
- return;
- }
- setSelectionStep(s => Math.max(s - 1, 1));
- }, [handleBackToSelection, selectionStep]);
- const onSelectionNext = useCallback(() => {
- if (!selectedType) return;
- const maxStep = selectionSteps.length;
- if (selectionStep < maxStep) {
- setSelectionStep(s => Math.min(s + 1, maxStep));
- window.scrollTo({
- top: 0,
- behavior: 'smooth'
- });
- }
- }, [selectedType, selectionStep, selectionSteps.length]);
- const onSelectionBackOrPrev = useCallback(() => {
- if (selectionStep === 1) {
- onCancel();
- return;
- }
- onSelectionPrev();
- }, [onCancel, onSelectionPrev, selectionStep]);
- const setSelectionValue = useCallback((key, value, currentIndex) => {
- setSelection(prev => {
- const next = {
- ...(prev || {}),
- [key]: value
- };
- for (let i = currentIndex + 1; i < selectorSteps.length; i += 1) {
- const k = selectorSteps[i]?.initialDataKey;
- if (k) next[k] = null;
- }
- if (key === 'vehicleEngineId' && value) {
- const eng = findEngine(enums, value);
- if (eng?.fuelType) next.fuelType = eng.fuelType;
- }
+const stepTitle = (step) => PREFILTER_STEP_TITLES[step?.initialDataKey] || step?.title || '';
+const optionId = (opt) => opt?.id ?? opt?.value;
+const optionLabel = (opt) => opt?.label || opt?.name || String(optionId(opt) ?? '');
 
- // Auto-derive electronics attributes in pre-form flow
- if (key === 'electronicModelId' && value) {
- const m = (enums?.electronicModels || []).find(x => String(x?.id ?? '') === String(value));
- if (m) {
- const modelName = String(m?.name || '');
- if (modelName.includes(' > ')) {
- const parts = modelName.split(' > ').map(p => p.trim());
- const specPart = parts[parts.length - 1];
- if (specPart) {
- const specLower = specPart.toLowerCase();
- if (specLower.includes('/')) {
- const specSub = specLower.split('/');
- const ramStr = specSub[0].replace('gb', '').trim();
- let storageStr = specSub[1].replace('gb', '').replace('tb', '').trim();
- const isTB = specSub[1].includes('tb');
- const parsedRam = parseInt(ramStr, 10);
- let parsedStorage = parseInt(storageStr, 10);
- if (isTB) parsedStorage = parsedStorage * 1024;
- if (!isNaN(parsedRam)) next.ram = parsedRam;
- if (!isNaN(parsedStorage)) next.storage = parsedStorage;
- } else if (specLower.endsWith('gb')) {
- const storageVal = parseInt(specLower.replace('gb', '').trim(), 10);
- if (!isNaN(storageVal)) next.storage = storageVal;
- } else if (specLower.endsWith('tb')) {
- const storageVal = parseInt(specLower.replace('tb', '').trim(), 10) * 1024;
- if (!isNaN(storageVal)) next.storage = storageVal;
- }
- }
- }
- }
- }
- return next;
- });
- }, [selectorSteps, enums]);
- const resolveStepOptions = useCallback((selector, selectionState) => {
- if (!selector) return [];
- if (typeof selector.getOptions === 'function') {
- return selector.getOptions({
- enums,
- selection: selectionState || {}
- }) || [];
- }
- if (selector.options) {
- return selector.options;
- }
- return enums?.[selector.enumKey] || [];
- }, [enums]);
- const renderSelectionStep = useCallback(stepId => {
- if (stepId === 1) {
+const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }) => {
+  const { t } = useTranslation();
+  const { enums } = useEnums();
+  const isCreate = mode === 'create';
+  const completedRef = useRef(false);
+  const [selectedType, setSelectedType] = useState(null);
+  const [selection, setSelection] = useState({});
+  // 0 = category, n = selector step n
+  const [stepIndex, setStepIndex] = useState(0);
+  const [optionFilter, setOptionFilter] = useState('');
+
+  const categories = useMemo(() => getListingTypeOptions().map(o => ({
+    ...o,
+    label: PREFILTER_CATEGORY_COPY[o.value]?.label || o.label,
+    description: PREFILTER_CATEGORY_COPY[o.value]?.description || o.description
+  })), []);
+  const selectorSteps = useMemo(() => buildSelectorSteps(selectedType, mode, selection, enums), [selectedType, mode, selection, enums]);
+  const totalSteps = selectorSteps.length + 1;
+  const selector = stepIndex > 0 ? selectorSteps[stepIndex - 1] : null;
+  const isLastStep = stepIndex >= selectorSteps.length;
+
+  const resolveOptions = useCallback((step, state) => {
+    if (!step) return [];
+    if (typeof step.getOptions === 'function') return step.getOptions({ enums, selection: state || {} }) || [];
+    return step.options || enums?.[step.enumKey] || [];
+  }, [enums]);
+
+  const goToStep = useCallback((index) => {
+    setStepIndex(index);
+    setOptionFilter('');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
+  const resetCategory = () => {
+    setSelectedType(null);
+    setSelection({});
+    goToStep(0);
+  };
+
+  const handleTypeSelect = (type) => {
+    completedRef.current = false;
+    setSelectedType(type);
+    setSelection({});
+    goToStep(buildSelectorSteps(type, mode, {}, enums).length > 0 ? 1 : 0);
+  };
+
+  const handleOptionPick = (value) => {
+    const index = stepIndex - 1;
+    const next = applySelection(selection, selectorSteps, index, selector.initialDataKey, value, enums);
+    setSelection(next);
+    if (value == null) return;
+    // The next step list can change with this answer (visibleWhen), so count it from the new answers.
+    const nextSteps = buildSelectorSteps(selectedType, mode, next, enums);
+    if (stepIndex < nextSteps.length) goToStep(stepIndex + 1);
+  };
+
+  const handleBack = () => {
+    if (stepIndex === 0) {
+      onCancel();
+      return;
+    }
+    if (stepIndex === 1) {
+      resetCategory();
+      return;
+    }
+    goToStep(stepIndex - 1);
+  };
+
+  const triggerBrowseSearch = () => {
+    if (isCreate || !selectedType) return;
+    onComplete({ listingType: selectedType, selection: { ...selection } });
+  };
+
+  const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
+  const isReadyToFinish = isCreate && !!SelectedForm && isCreateSelectionComplete(selectedType, selection, enums);
+
+  useLayoutEffect(() => {
+    if (!isReadyToFinish || completedRef.current) return;
+    completedRef.current = true;
+    onComplete({ listingType: selectedType, selection: { ...selection } });
+  }, [isReadyToFinish, onComplete, selectedType, selection]);
+
+  if (isReadyToFinish) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background-secondary px-4" role="status">
+        <div className="text-center">
+          <p className="text-base font-semibold text-text-primary">{t('prefilter_preparing_form', 'İlan formun hazırlanıyor…')}</p>
+          <p className="mt-1 text-sm text-text-secondary">{t('prefilter_preparing_form_desc', 'Kategorine uygun alanlar yükleniyor.')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Breadcrumb of answers so far: each one jumps back to its step ── */
+  const category = categories.find(c => c.value === selectedType);
+  const crumbs = selectedType ? [
+    { index: 0, label: category?.label || selectedType },
+    ...selectorSteps.slice(0, Math.max(stepIndex - 1, 0)).map((step, i) => {
+      const value = selection?.[step.initialDataKey];
+      const opt = resolveOptions(step, selection).find(o => String(optionId(o)) === String(value));
+      return { index: i + 1, label: opt ? optionLabel(opt) : t('prefilter_any', 'Tümü') };
+    })
+  ] : [];
+
+  /* ── Step content ── */
+  let content;
+  if (stepIndex === 0) {
+    content = (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {categories.map(type => {
+          const Icon = type.icon;
+          const selected = selectedType === type.value;
+          return (
+            <button
+              key={type.value}
+              type="button"
+              onClick={() => handleTypeSelect(type.value)}
+              aria-pressed={selected}
+              className={`group flex items-center gap-3 rounded border bg-background-primary px-4 py-3.5 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
+              }`}
+            >
+              {Icon && <Icon className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />}
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium text-text-primary">{type.label}</span>
+                <span className="mt-0.5 block truncate text-sm text-text-tertiary">{type.description}</span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-text-muted transition-colors group-hover:text-text-secondary" strokeWidth={1.5} aria-hidden />
+            </button>
+          );
+        })}
+      </div>
+    );
+  } else if (selector) {
+    const options = resolveOptions(selector, selection);
+    const selectedValue = selection?.[selector.initialDataKey] ?? null;
+    const dependsOn = Array.isArray(selector.dependsOn) ? selector.dependsOn : [];
+    const isEnabled = dependsOn.every(k => isPrefilterValueFilled(selection?.[k]));
+
+    if ((selector.kind || 'grid') === 'grid') {
+      const q = optionFilter.trim().toLowerCase();
+      const filtered = q
+        ? options.filter(opt => optionLabel(opt).toLowerCase().includes(q)
+          || (Array.isArray(opt.aliases) && opt.aliases.some(a => String(a).toLowerCase().includes(q))))
+        : options;
+      content = (
+        <div className="space-y-4">
+          {options.length > GRID_SEARCH_THRESHOLD && (
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" strokeWidth={1.5} aria-hidden />
+              <input
+                type="search"
+                value={optionFilter}
+                onChange={e => setOptionFilter(e.target.value)}
+                placeholder={t('prefilter_filter_options', { defaultValue: '{{title}} ara', title: stepTitle(selector) })}
+                aria-label={t('filter_options', 'Seçenekleri filtrele')}
+                className={`${inputNormal} pl-9`}
+              />
+            </div>
+          )}
+          {filtered.length === 0 ? (
+            <EmptyState
+              size="compact"
+              title={t('prefilter_no_match', 'Eşleşen seçenek yok')}
+              description={t('prefilter_no_match_desc', 'Farklı bir kelime dene.')}
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {filtered.map(opt => {
+                const id = optionId(opt);
+                const selected = String(selectedValue) === String(id);
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleOptionPick(id)}
+                    aria-pressed={selected}
+                    className={`flex items-center justify-between gap-2 rounded border bg-background-primary px-3.5 py-3 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
+                      selected ? 'border-primary font-medium text-text-primary ring-1 ring-primary' : 'border-border text-text-primary hover:border-card-border-hover'
+                    }`}
+                  >
+                    <span className="truncate">{optionLabel(opt)}</span>
+                    {selected
+                      ? <Check className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
+                      : <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    } else {
+      content = (
+        <div>
+          <SearchableDropdown
+            options={options}
+            selectedValues={selectedValue ? [selectedValue] : []}
+            onSelectionChange={vals => handleOptionPick(Array.isArray(vals) ? vals[0] ?? null : null)}
+            label={stepTitle(selector)}
+            placeholder={isEnabled ? t('select', 'Seç…') : t('prefilter_complete_previous', 'Önce önceki adımları tamamla')}
+            multiple={false}
+            disabled={!isEnabled}
+          />
+        </div>
+      );
+    }
+  }
+
+  const heading = stepIndex === 0
+    ? (isCreate ? t('prefilter_create_title', 'Ne satıyorsun?') : t('prefilter_browse_title', 'Hangi kategoride arıyorsun?'))
+    : stepTitle(selector);
+  const subheading = stepIndex === 0
+    ? (isCreate
+      ? t('prefilter_create_desc', 'Kategoriyi seç, birkaç soruyla ilan formunu senin için hazırlayalım.')
+      : t('prefilter_browse_desc', 'Kategori seç, istersen birkaç adımda sonuçları daralt.'))
+    : (isCreate
+      ? t('prefilter_create_step_desc', 'Bu cevaplar formu önceden doldurur, yayınlamadan önce hepsini değiştirebilirsin.')
+      : null);
+
+  const hasValue = selector && isPrefilterValueFilled(selection?.[selector.initialDataKey]);
+  const showContinue = stepIndex > 0 && !isLastStep && (hasValue || selector?.optional);
+  const currentValueLabel = hasValue
+    ? optionLabel(resolveOptions(selector, selection).find(o => String(optionId(o)) === String(selection[selector.initialDataKey])))
+    : null;
+  const resultsScope = currentValueLabel || crumbs[crumbs.length - 1]?.label;
+  const browseHint = !isCreate && stepIndex > 0
+    ? t('prefilter_browse_step_desc', { defaultValue: 'Seç ya da bu adımı atlayıp {{scope}} ilanlarının hepsini gör.', scope: crumbs[crumbs.length - 1]?.label })
+    : null;
+
   return (
-   <motion.div variants={gridContainerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-    {listingTypeOptions.map(type => {
-     const isSelected = selectedType === type.value;
-     const card = getCategoryCardClasses(flowUiVariant, isSelected, type.value);
-     const TypeIcon = type.icon;
-     return (
-      <motion.button
-       key={type.value}
-       variants={gridItemVariants}
-       type="button"
-       onClick={() => handleTypeSelect(type.value)}
-       aria-pressed={isSelected}
-       className={card.wrapper}
-      >
-       {TypeIcon ? <TypeIcon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden /> : null}
-       <div className="min-w-0 flex-1">
-        <h3 className={`text-sm font-semibold text-text-primary transition-colors ${card.title}`}>{type.label}</h3>
-        <p className={`mt-0.5 text-left text-xs transition-colors ${card.desc}`}>{type.description}</p>
-       </div>
-       {isSelected ? (
-        <motion.div
-         initial={{ scale: 0, rotate: -45 }}
-         animate={{ scale: 1, rotate: 0 }}
-         transition={{ type: 'spring', stiffness: 500, damping: 22 }}
-         className={card.checkOuter}
-        >
-         <Check className={card.checkInner} strokeWidth={2.5} />
-        </motion.div>
-       ) : (
-        <ChevronRight className={`${card.chevron} shrink-0 ${card.trailing}`} />
-       )}
-      </motion.button>
-     );
-    })}
-   </motion.div>
-  );
- }
- const selectorIndex = stepId - 2;
- const selector = selectorSteps[selectorIndex];
- if (!selector) return null;
- const valueKey = selector.initialDataKey;
- const selectedValue = selection?.[valueKey] ?? null;
- const dependsOn = Array.isArray(selector.dependsOn) ? selector.dependsOn : [];
- const isEnabled = dependsOn.every(k => isPrefilterValueFilled(selection?.[k]));
- const optionsRaw = resolveStepOptions(selector, selection);
- if ((selector.kind || 'grid') === 'grid') {
- const options = optionsRaw || [];
- const qf = (gridOptionFilter || '').trim().toLowerCase();
- const filtered = qf.length > 0 ? options.filter(opt => {
- const label = String(opt.label || opt.name || opt.id || opt.value || '').toLowerCase();
- if (label.includes(qf)) return true;
- if (Array.isArray(opt.aliases) && opt.aliases.some(a => String(a).toLowerCase().includes(qf))) return true;
- return false;
- }) : options;
- const showGridSearch = options.length > 6;
- const searchIconClass = 'text-text-muted';
- const gridBlock = <div className="space-y-4">
- {mode === 'create' && flowCopy.sellStepReassurance ? <p className="rounded border border-border-light bg-background-secondary px-4 py-3 text-sm leading-relaxed text-text-secondary">{flowCopy.sellStepReassurance}</p> : null}
- {showGridSearch && <div className="relative">
- <Search className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 ${searchIconClass}`} />
- <input type="search" value={gridOptionFilter} onChange={e => setGridOptionFilter(e.target.value)} placeholder={flowCopy.gridFilterPlaceholder} className={auxUi.gridSearchInput} aria-label={t("filter_options")} />
- </div>}
- <motion.div variants={gridContainerVariants} initial="hidden" animate="show" key={`grid-${stepId}-${qf}`} className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
- {filtered.map(opt => {
- const id = opt.id || opt.value;
- const label = opt.label || opt.name;
- const isSelected = String(selectedValue) === String(id);
- return <motion.button key={id} variants={gridItemVariants} whileHover={{
- y: -1,
- boxShadow: '0 2px 12px rgba(0,0,0,0.06)'
- }} whileTap={{
- scale: 0.98
- }} type="button" onClick={() => {
- setSelectionValue(valueKey, id, selectorIndex);
- // Auto-advance logic
- if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
- autoAdvanceTimeoutRef.current = setTimeout(() => {
- onSelectionNext();
- }, 350);
- }} className={getGridOptionClasses(flowUiVariant, isSelected)}>
- <span className={getGridOptionLabelClass(flowUiVariant, isSelected)}>{label}</span>
- {isSelected && <motion.div initial={{
- scale: 0
- }} animate={{
- scale: 1
- }} transition={{
- type: 'spring',
- stiffness: 500,
- damping: 25
- }} className={getGridCheckDotClass(flowUiVariant)}>
- <Check className="h-3 w-3 text-white" strokeWidth={3} />
- </motion.div>}
- </motion.button>;
- })}
- </motion.div>
- {filtered.length === 0 && <motion.div initial={{
- opacity: 0,
- y: 8
- }} animate={{
- opacity: 1,
- y: 0
- }} className={auxUi.emptyFilterBox}>
- <p className={auxUi.emptyFilterTitle}>{flowCopy.emptyFilterTitle}</p>
- <p className={auxUi.emptyFilterSubtitle}>{flowCopy.emptyFilterSubtitle}</p>
- </motion.div>}
- </div>;
- return gridBlock;
- }
- const options = optionsRaw || [];
- const dropdownBlock = <div>
- <div className={auxUi.dropdownCard}>
- <SearchableDropdown options={options} selectedValues={selectedValue ? [selectedValue] : []} onSelectionChange={vals => {
- const nextValue = Array.isArray(vals) ? vals[0] ?? null : null;
- setSelectionValue(valueKey, nextValue, selectorIndex);
+    <div className="min-h-screen bg-background-secondary">
+      <PageContainer narrow className="py-6 sm:py-10">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <Button variant="ghost" size="sm" className="-ml-3" onClick={onCancel}>
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            <span>{t('cancel', 'Vazgeç')}</span>
+          </Button>
+          {!isCreate && (
+            <Link to={ROUTES.LISTINGS} className="inline-flex items-center gap-1 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary">
+              {t('browse_all_listings', 'Tüm ilanlar')}
+              <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            </Link>
+          )}
+        </div>
 
- // Auto-advance logic for dropdown
- if (nextValue !== null) {
- if (autoAdvanceTimeoutRef.current) clearTimeout(autoAdvanceTimeoutRef.current);
- autoAdvanceTimeoutRef.current = setTimeout(() => {
- onSelectionNext();
- }, 400); // Slightly longer for dropdown to ensure selection is registered
- }
- }} label={selector.title || 'Select'} placeholder={isEnabled ? 'Select…' : 'Complete previous steps first'} multiple={false} disabled={!isEnabled} />
- </div>
- {mode === 'create' && !isEnabled ? <p className={auxUi.dependentSelectorHint}>{flowCopy.dependentDropdownHint}</p> : null}
- </div>;
- return dropdownBlock;
- }, [auxUi.dependentSelectorHint, auxUi.dropdownCard, auxUi.emptyFilterBox, auxUi.emptyFilterSubtitle, auxUi.emptyFilterTitle, auxUi.gridSearchInput, flowCopy, flowUiVariant, gridOptionFilter, handleTypeSelect, listingTypeOptions, mode, resolveStepOptions, selection, selectedType, selectorSteps, setSelectionValue, onSelectionNext, t]);
- const SelectedForm = selectedType ? createFormRegistry[selectedType] : null;
- const isReadyToFinish = useMemo(() => {
- if (!selectedType) return false;
- if (mode === 'create') {
- if (!SelectedForm) return false;
- return isCreateSelectionComplete(selectedType, selection, enums);
- }
- return false;
- }, [SelectedForm, enums, mode, selectedType, selection]);
- useLayoutEffect(() => {
- if (mode !== 'create') return;
- if (!isReadyToFinish || !selectedType || completedRef.current) return;
- completedRef.current = true;
- onComplete({
- listingType: selectedType,
- selection: {
- ...selection
- }
- });
- }, [isReadyToFinish, mode, onComplete, selectedType, selection]);
- if (mode === 'create' && isReadyToFinish && selectedType) {
- return <div className="flex min-h-screen items-center justify-center bg-background-secondary px-4">
- <motion.div initial={{
- opacity: 0,
- scale: 0.95
- }} animate={{
- opacity: 1,
- scale: 1
- }} className="w-full max-w-sm bg-background-primary border border-border-light rounded p-8 text-center">
- <h2 className="text-lg font-semibold text-text-primary">{flowCopy.loading}</h2>
- {flowCopy.loadingSub ? <p className="mt-1.5 text-sm text-text-secondary">{flowCopy.loadingSub}</p> : null}
- </motion.div>
- </div>;
- }
- const showBrowseMidSearch = mode === 'browse' && partialBrowseSearchEnabled && selectionStep > 1;
- const browseHeaderExtra = mode === 'browse' ? (
-  <Link
-   to={ROUTES.LISTINGS}
-   className="inline-flex items-center gap-1.5 rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-semibold text-text-secondary transition-colors hover:border-card-border-hover hover:text-text-primary shrink-0"
-  >
-   <span>{t("browse_all_listings", "Tüm İlanlara Bak")}</span>
-   <ArrowRight className="h-3.5 w-3.5" />
-  </Link>
- ) : null;
- const browseFooterExtra = showBrowseMidSearch ? <div className="flex justify-end">
- <button type="button" onClick={triggerBrowseSearch} className={auxUi.midSearchBtn}>
- <Search className="h-4 w-4" />{t("search_listings")}</button>
- </div> : null;
- const browseLastStepAction = mode === 'browse' && selectedType ? {
- label: 'Search listings',
- onClick: triggerBrowseSearch
- } : null;
- return (
- <ListingWizard
- mode={mode}
- wizardVariant={flowUiVariant}
- steps={selectionSteps}
- currentStep={selectionStep}
- title={flowCopy.title}
- subtitle={flowCopy.subtitle}
- onBack={onSelectionBackOrPrev}
- onPrev={onSelectionPrev}
- onNext={onSelectionNext}
- canSubmit={canGoNextSelection}
- onCancel={onCancel}
- isCompleting={isReadyToFinish}
- headerExtra={browseHeaderExtra}
- footerExtra={browseFooterExtra}
- lastStepAction={browseLastStepAction}
- categoryCardCount={listingTypeOptions.length}
- >
- {renderSelectionStep(selectionStep)}
- </ListingWizard>
- );
+        {selectedType && (
+          <nav className="mb-5" aria-label={t('prefilter_progress', 'Seçim adımları')}>
+            <p className="text-sm tabular-nums text-text-tertiary">
+              {t('prefilter_step_of', { defaultValue: 'Adım {{current}}/{{total}}', current: stepIndex + 1, total: totalSteps })}
+            </p>
+            <ol className="mt-2 flex gap-1.5" aria-hidden>
+              {Array.from({ length: totalSteps }, (_, i) => (
+                <li key={i} className={`h-1 flex-1 rounded-full ${i <= stepIndex ? 'bg-primary' : 'bg-border'}`} />
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{heading}</h1>
+        {(subheading || browseHint) && <p className="mt-1.5 text-sm text-text-secondary">{subheading || browseHint}</p>}
+
+        {crumbs.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-text-tertiary">{t('your_selections', 'Seçimlerin')}</span>
+            {crumbs.map(crumb => (
+              <button
+                key={crumb.index}
+                type="button"
+                onClick={() => (crumb.index === 0 ? resetCategory() : goToStep(crumb.index))}
+                title={t('prefilter_change_selection', 'Bu seçimi değiştir')}
+                className="inline-flex items-center rounded border border-border bg-background-primary px-2.5 py-1 text-sm text-text-primary transition-colors duration-150 hover:border-card-border-hover"
+              >
+                {crumb.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className={stepIndex === 0 ? 'mt-6' : 'mt-6 rounded border border-border bg-background-primary p-4 sm:p-5'}>
+          {content}
+        </div>
+
+        {stepIndex > 0 && (
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button variant="ghost" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              {t('back', 'Geri')}
+            </Button>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+              {showContinue && (
+                <Button variant={isCreate ? 'primary' : 'secondary'} onClick={() => goToStep(stepIndex + 1)}>
+                  {hasValue ? t('continue', 'Devam et') : t('skip', 'Atla')}
+                  <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                </Button>
+              )}
+              {!isCreate && (
+                <Button onClick={triggerBrowseSearch}>
+                  <Search className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  {t('prefilter_show_scope_results', { defaultValue: '{{scope}} ilanlarını gör', scope: resultsScope })}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </PageContainer>
+    </div>
+  );
 };
 
 export default ListingPrefilterSelectionFlow;

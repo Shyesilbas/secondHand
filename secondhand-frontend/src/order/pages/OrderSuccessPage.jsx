@@ -11,7 +11,10 @@ const resolveOrderNumber = payload => payload?.orderNumber || payload?.orderNo |
 
 const OrderSuccessPage = () => {
   const { state } = useLocation();
-  const navOrder = state?.order || null;
+  // A cart with several sellers becomes one order per seller; show them as one purchase.
+  const navOrders = Array.isArray(state?.orders) ? state.orders : [];
+  const isSplit = navOrders.length > 1;
+  const navOrder = isSplit ? null : (state?.order || navOrders[0] || null);
   const navOrderId = resolveOrderId(navOrder) || state?.orderId || null;
   const navOrderNumber = resolveOrderNumber(navOrder) || state?.orderNumber || null;
 
@@ -19,16 +22,18 @@ const OrderSuccessPage = () => {
   const { data: fetchedOrder, isLoading } = useQuery({
     queryKey: navOrderId ? ORDER_QUERY_KEYS.detail(navOrderId, false) : ORDER_QUERY_KEYS.byNumber(navOrderNumber),
     queryFn: () => (navOrderId ? orderService.getById(navOrderId) : orderService.getByOrderNumber(navOrderNumber)),
-    enabled: !!(navOrderId || navOrderNumber) && !Array.isArray(navOrder?.orderItems),
+    enabled: !isSplit && !!(navOrderId || navOrderNumber) && !Array.isArray(navOrder?.orderItems),
   });
 
   // Opened directly or after a refresh there is no checkout state: nothing true to show, so leave.
   if (!state) return <Navigate to={ROUTES.MY_ORDERS} replace />;
 
-  const order = fetchedOrder || navOrder || (navOrderId ? { id: navOrderId } : null);
+  const order = isSplit
+    ? { ...navOrders[0], id: null, orderNumber: null, orderItems: navOrders.flatMap((o) => o.orderItems || []) }
+    : fetchedOrder || navOrder || (navOrderId ? { id: navOrderId } : null);
   const orderNumber = resolveOrderNumber(order) || navOrderNumber;
   const currency = order?.currency || 'TRY';
-  const totalAmount = order?.totalAmount ?? state?.totalAmount ?? null;
+  const totalAmount = isSplit ? state?.totalAmount ?? null : order?.totalAmount ?? state?.totalAmount ?? null;
   const orderDate = order?.createdAt || state?.createdAt || null;
   const shippingAddress = order?.shippingAddress || state?.shippingAddress || null;
   const deliveryMethod = order?.deliveryMethod || state?.deliveryMethod || null;
@@ -49,6 +54,7 @@ const OrderSuccessPage = () => {
           meetupLocation={meetupLocation}
           orderItems={orderItems}
           itemsLoading={isLoading}
+          sellerOrderCount={isSplit ? navOrders.length : 1}
         />
       </PageContainer>
     </div>

@@ -1,76 +1,195 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { useTranslation } from "react-i18next";
-import { useLocation, Link } from 'react-router-dom';
-import { useAuthState } from '../../auth/AuthContext.jsx';
-import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
-import { aiChatService } from '../services/aiChatService.js';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowUp,
   BrainCircuit,
   Check,
   Copy,
-  ExternalLink,
   MessageSquare,
-  PanelLeftClose,
-  PanelLeftOpen,
   Plus,
-  RotateCcw,
   Search,
   ShieldCheck,
   Sparkles,
   Tag,
-  ThumbsDown,
-  ThumbsUp,
   Trash2,
   TrendingDown,
-  UserRound,
   Wand2,
   X
 } from 'lucide-react';
+import { useAuthState } from '../../auth/AuthContext.jsx';
+import { AI_AGENT_MODE_ENABLED } from '../config/agentConfig.js';
+import { aiChatService } from '../services/aiChatService.js';
 import { useAuraChat } from '../hooks/useAuraChat.js';
 import { clearAllAuraPersistedMessages, createChatMessage, getApiErrorMessage, sendAuraRequest } from '../utils/auraChatUtils.js';
-import AuraSuggestedPrompts from '../components/AuraSuggestedPrompts.jsx';
 import AuraSuggestedListingChips from '../components/AuraSuggestedListingChips.jsx';
 import AuraMessageContent from '../components/AuraMessageContent.jsx';
 import AuraMemoryProfileHub from '../components/AuraMemoryProfileHub.jsx';
 import { buildAuraListingSessionContext, formatListingPriceLabel, listingTypeLabel } from '../utils/auraListingContext.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
+import { usePlan } from '../../common/hooks/usePlan.js';
 import PremiumUpgradeModal from '@/common/components/ui/PremiumUpgradeModal';
-import Button from '@/common/components/ui/Button';
+import Button, { buttonClasses } from '@/common/components/ui/Button';
 import Modal from '@/common/components/ui/Modal';
 import { cacheService } from '../../common/services/cacheService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 
-// Sidebar capability shortcuts
-const AURA_CAPABILITIES = [
+// Older builds persisted a greeting with this id; it is no longer part of the conversation.
+const LEGACY_WELCOME_ID = 'aura-welcome';
+const TEXTAREA_MAX_HEIGHT = 160;
+
+const ICON_BUTTON = 'inline-flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50';
+
+const buildGeneralPrompts = (t) => [
   {
+    id: 'price',
     icon: TrendingDown,
-    label: 'Piyasa Değerleme & Analiz',
-    prompt: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün fırsat olduğunu nasıl anlarım?',
+    label: t('aura_prompt_general_price', 'Bir ürünün fiyatı uygun mu?'),
+    message: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün gerçek piyasa değerini ve fırsat olup olmadığını nasıl belirleyebilirim?',
   },
   {
+    id: 'offer',
     icon: MessageSquare,
-    label: 'Pazarlık & Teklif Asistanı',
-    prompt: 'İlan satıcısına gönderilecek nazik, piyasaya uygun ve kabul görme şansı yüksek bir pazarlık mesajı taslağı üretir misin?',
+    label: t('aura_prompt_general_offer', 'Teklif mesajı nasıl yazılır?'),
+    message: 'Bir ilana teklif verirken satıcıyı ikna edecek, piyasaya uygun ve saygılı bir pazarlık mesajı taslağı hazırlar mısın?',
   },
   {
+    id: 'safety',
     icon: ShieldCheck,
-    label: 'Güvenli Ödeme & Escrow',
-    prompt: 'İkinci el alışverişte dolandırıcılıktan nasıl korunabilirim? Escrow güvenli havuz hesabı süreci nasıl çalışır?',
+    label: t('aura_prompt_general_safety', 'Güvenli ödeme nasıl çalışır?'),
+    message: 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu (Escrow) sistemi nasıl çalışır?',
   },
   {
+    id: 'search',
     icon: Search,
-    label: 'Akıllı İlan Arama',
-    prompt: 'Platformdaki en son fırsat ve öne çıkan ilanları filtreleme konusunda bana yardımcı olur musun?',
+    label: t('aura_prompt_general_search', 'Bütçeme uygun ilan bul'),
+    message: 'Bütçeme ve kriterlerime en uygun ikinci el ilanları bulmama yardımcı olur musun?',
   },
 ];
 
-const ICON_BUTTON = 'inline-flex h-9 w-9 items-center justify-center rounded text-text-secondary transition-colors duration-150 hover:bg-background-secondary hover:text-text-primary disabled:opacity-50';
+const buildListingPrompts = (t, listing) => [
+  {
+    id: 'price',
+    icon: TrendingDown,
+    label: t('aura_prompt_price', 'Fiyatı piyasaya göre değerlendir'),
+    message: `Bu ürünün (${listing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre fırsat mı? Fiyat analizi yapabilir misin?`,
+  },
+  {
+    id: 'offer',
+    icon: MessageSquare,
+    label: t('aura_prompt_offer', 'Pazarlık mesajı yaz'),
+    message: 'Bu ürün için satıcıyı ikna edecek nazik ve piyasaya uygun bir pazarlık mesajı taslağı oluşturur musun?',
+  },
+  {
+    id: 'safety',
+    icon: ShieldCheck,
+    label: t('aura_prompt_safety', 'Güvenli alışveriş adımları'),
+    message: 'Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu süreci nasıl işler?',
+  },
+  {
+    id: 'pros-cons',
+    icon: Wand2,
+    label: t('aura_prompt_pros_cons', 'Avantaj ve riskleri çıkar'),
+    message: 'Bu ürünün özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?',
+  },
+];
+
+const ListingContextBar = ({ listing, onDetach }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="shrink-0 border-b border-border-light bg-background-secondary">
+      <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-2 sm:px-6">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
+          {listing.imageUrl ? (
+            <img src={listing.imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <Tag className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+          )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-text-tertiary">
+            {t('aura_discussing_listing', 'Bu ilan hakkında konuşuyorsun')}
+            {listing.type ? ` · ${listingTypeLabel(listing.type)}` : ''}
+          </p>
+          <div className="flex min-w-0 items-baseline gap-2">
+            <Link
+              to={ROUTES.LISTING_DETAIL(listing.id)}
+              className="truncate text-sm font-medium text-text-primary hover:underline"
+            >
+              {listing.title}
+            </Link>
+            <span className="shrink-0 text-sm tabular-nums text-text-secondary">
+              {formatListingPriceLabel(listing.price, listing.currency)}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onDetach}
+          className={ICON_BUTTON}
+          aria-label={t('aura_detach_listing', 'İlan bağlantısını kaldır')}
+          title={t('aura_detach_listing', 'İlan bağlantısını kaldır')}
+        >
+          <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const AssistantMessage = ({ message, copied, onCopy }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-start gap-3">
+      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-light bg-background-secondary text-text-secondary">
+        <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="mb-1 text-xs font-medium text-text-tertiary">Aura</p>
+        {message.typing ? (
+          <p className="text-sm text-text-tertiary">{t('aura_preparing_answer', 'Yanıt hazırlanıyor…')}</p>
+        ) : (
+          <>
+            <AuraMessageContent content={message.content} />
+            {Array.isArray(message.meta?.suggestedListings) && message.meta.suggestedListings.length > 0 && (
+              <div className="mt-3">
+                <AuraSuggestedListingChips listings={message.meta.suggestedListings} />
+              </div>
+            )}
+            {message.content && (
+              <button
+                type="button"
+                onClick={() => onCopy(message.id, message.content)}
+                className="mt-1.5 -ml-2 inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} aria-hidden />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                )}
+                {copied ? t('copied', 'Kopyalandı') : t('copy', 'Kopyala')}
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const UserMessage = ({ message }) => (
+  <div className="flex justify-end">
+    <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-md bg-background-tertiary px-4 py-2.5 text-sm leading-relaxed text-text-primary sm:max-w-[75%]">
+      {message.content}
+    </p>
+  </div>
+);
 
 export const AuraChatPage = () => {
   const { t } = useTranslation();
   const { user } = useAuthState();
   const location = useLocation();
+  const userId = user?.id ?? null;
 
   const listingFromState = location?.state?.listing || null;
   const listingIdFromState = location?.state?.listingId || null;
@@ -79,53 +198,35 @@ export const AuraChatPage = () => {
   const sourceListing = listingFromState || fetchedListing || null;
   const activeListing = sourceListing && sourceListing.id !== detachedListingId ? sourceListing : null;
 
-  const [agentMode] = useState(AI_AGENT_MODE_ENABLED);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeHint, setUpgradeHint] = useState('');
-  const [showMemoryHub, setShowMemoryHub] = useState(false);
-  const [copiedId, setCopiedId] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(() => (typeof window !== 'undefined' ? window.innerWidth >= 1024 : true));
-  const [feedbackGiven, setFeedbackGiven] = useState({});
-  const [confirmClear, setConfirmClear] = useState(false);
+  const { dailyAuraUsage, dailyAuraLimit, isPremium, isLoading: planLoading } = usePlan({ enabled: userId != null });
+  const remainingQuestions = Math.max(0, dailyAuraLimit - dailyAuraUsage);
+  const quotaKnown = userId != null && !planLoading;
+  const quotaExhausted = quotaKnown && remainingQuestions === 0;
 
-  const userId = user?.id ?? null;
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showMemoryHub, setShowMemoryHub] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
+  const textareaRef = useRef(null);
+
   const listingContext = useMemo(() => buildAuraListingSessionContext(activeListing), [activeListing]);
 
-  const buildPayload = useMemo(() => {
-    return (text) => {
-      const trimmed = text.trim();
-      return {
-        message: trimmed,
-        context: listingContext || undefined,
-        agentMode,
-        uiContext: {
-          currentPage: 'AuraChatPage',
-          route: location.pathname,
-          listingId: activeListing?.id ? String(activeListing.id) : undefined,
-        },
-      };
-    };
-  }, [agentMode, activeListing?.id, listingContext, location.pathname]);
+  const buildPayload = useMemo(() => (text) => ({
+    message: text.trim(),
+    context: listingContext || undefined,
+    agentMode: AI_AGENT_MODE_ENABLED,
+    uiContext: {
+      currentPage: 'AuraChatPage',
+      route: location.pathname,
+      listingId: activeListing?.id ? String(activeListing.id) : undefined,
+    },
+  }), [activeListing?.id, listingContext, location.pathname]);
 
-  const sendApi = useMemo(() => {
-    return (payload) =>
-      sendAuraRequest({
-        payload,
-        agentMode,
-        fallbackToChat: true,
-        onLimitExceeded: () => {
-          setShowUpgradeModal(true);
-          setUpgradeHint(t("aura_daily_limit_exceeded", "Günlük Aura AI limitinize ulaştınız."));
-        },
-      });
-  }, [agentMode, t]);
-
-  const initialGreeting = useMemo(() => {
-    if (activeListing) {
-      return `Merhaba! **${activeListing.title || 'İlan'}** (${formatListingPriceLabel(activeListing.price, activeListing.currency)}) hakkında piyasa değerlemesi, pazarlık teklifleri ve güvenli alışveriş adımlarında yardımcı olmaya hazırım.`;
-    }
-    return "Merhaba! Ben **Aura AI**. İkinci el ürün arama, piyasa fiyat analizleri, pazarlık stratejileri ve güvenli ödeme havuzu süreçlerinde size rehberlik etmek için buradayım.";
-  }, [activeListing]);
+  const sendApi = useMemo(() => (payload) => sendAuraRequest({
+    payload,
+    agentMode: AI_AGENT_MODE_ENABLED,
+    onLimitExceeded: () => setShowUpgradeModal(true),
+  }), []);
 
   const {
     storageKey,
@@ -138,579 +239,236 @@ export const AuraChatPage = () => {
     listRef,
     sendMessage,
     onKeyDown,
-    scrollToBottom,
   } = useAuraChat({
     userId,
     isAuthenticated: userId != null,
-    initialMessages: [
-      {
-        id: 'aura-welcome',
-        role: 'assistant',
-        content: initialGreeting,
-        createdAt: Date.now(),
-      },
-    ],
+    initialMessages: [],
     withTyping: true,
     buildPayload,
     sendApi,
-    echoUserMessageWhenUnauthed: false,
     persistMessagesSurface: 'page',
   });
 
-  // Copy to clipboard
+  const conversation = useMemo(() => messages.filter((m) => m.id !== LEGACY_WELCOME_ID), [messages]);
+  const hasUserMessages = conversation.some((m) => m.role === 'user');
+  const prompts = useMemo(
+    () => (activeListing ? buildListingPrompts(t, activeListing) : buildGeneralPrompts(t)),
+    [t, activeListing]
+  );
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, TEXTAREA_MAX_HEIGHT)}px`;
+  }, [input]);
+
+  useEffect(() => {
+    if (!copiedId) return undefined;
+    const timer = setTimeout(() => setCopiedId(null), 2000);
+    return () => clearTimeout(timer);
+  }, [copiedId]);
+
   const copyToClipboard = (id, text) => {
-    if (!text) return;
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+    navigator.clipboard?.writeText(text).then(() => setCopiedId(id)).catch(() => {});
   };
 
-  // Handle Feedback
-  const handleFeedback = (id, type) => {
-    setFeedbackGiven(prev => ({
-      ...prev,
-      [id]: prev[id] === type ? null : type
-    }));
+  const send = (text) => sendMessage({ text });
+
+  const resetConversation = () => {
+    clearAllAuraPersistedMessages(userId);
+    cacheService.remove(storageKey);
+    setMessages([]);
   };
 
-  // New Chat
+  const appendError = (error, fallback) => {
+    setMessages((prev) => [...prev, createChatMessage({ role: 'assistant', content: getApiErrorMessage(error, fallback) })]);
+  };
+
   const handleNewChat = async () => {
-    if (userId == null) {
-      setMessages([
-        createChatMessage({
-          role: 'assistant',
-          content: 'Sohbet geçmişinizi kaydetmek için lütfen giriş yapınız.',
-        }),
-      ]);
-      return;
-    }
+    if (userId == null) return;
     setIsSending(true);
     try {
       await aiChatService.newChat();
-      clearAllAuraPersistedMessages(userId);
-      cacheService.remove(storageKey);
-      setMessages([
-        createChatMessage({
-          role: 'assistant',
-          content: activeListing
-            ? `Yeni oturum başlatıldı. **${activeListing.title}** hakkında ne öğrenmek istersiniz?`
-            : 'Yeni sohbet başlatıldı. Hangi konuda analiz yapmak veya ürün incelemek istersiniz?',
-        }),
-      ]);
-      queueMicrotask(scrollToBottom);
+      resetConversation();
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Yeni sohbet oluşturulamadı.');
-      setMessages((prev) => [
-        ...prev,
-        createChatMessage({ role: 'assistant', content: errorMessage }),
-      ]);
+      appendError(e, t('aura_new_chat_failed', 'Yeni sohbet başlatılamadı.'));
     } finally {
       setIsSending(false);
     }
   };
 
-  // Clear History
   const handleClearHistory = async () => {
     setConfirmClear(false);
     if (userId == null) return;
     setIsSending(true);
     try {
       await aiChatService.deleteHistory();
-      clearAllAuraPersistedMessages(userId);
-      cacheService.remove(storageKey);
-      setMessages([
-        createChatMessage({
-          role: 'assistant',
-          content: 'Sohbet geçmişiniz tamamen temizlendi.',
-        }),
-      ]);
-      queueMicrotask(scrollToBottom);
+      resetConversation();
     } catch (e) {
-      const errorMessage = getApiErrorMessage(e, 'Geçmiş silinemedi.');
-      setMessages((prev) => [
-        ...prev,
-        createChatMessage({ role: 'assistant', content: errorMessage }),
-      ]);
+      appendError(e, t('aura_clear_failed', 'Sohbet geçmişi silinemedi.'));
     } finally {
       setIsSending(false);
     }
   };
 
-  const quickListingActions = [
-    {
-      icon: TrendingDown,
-      label: 'Fiyat Değerlemesi',
-      prompt: `Bu ürünün (${activeListing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre fırsat mı? Fiyat analizi yapabilir misin?`,
-    },
-    {
-      icon: MessageSquare,
-      label: 'Pazarlık Teklifi',
-      prompt: `Bu ürün için satıcıyı ikna edecek nazik ve piyasaya uygun bir pazarlık mesajı taslağı oluşturur musun?`,
-    },
-    {
-      icon: ShieldCheck,
-      label: 'Güvenli Alışveriş (Escrow)',
-      prompt: `Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu süreci nasıl işler?`,
-    },
-    {
-      icon: Wand2,
-      label: 'Avantaj & Risk Analizi',
-      prompt: `Bu ürünün özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?`,
-    },
-  ];
-
-  const textareaRef = useRef(null);
-
-  // Auto-grow textarea up to 120px
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
-    }
-  }, [input]);
-
-  const send = (text) => sendMessage({ text });
-
-  // A chat is fresh if the user hasn't asked anything yet
-  const hasUserMessages = useMemo(() => messages.some((m) => m.role === 'user'), [messages]);
-
   return (
-    <div className="flex h-[calc(100dvh-70px)] w-full overflow-hidden bg-background-secondary text-text-primary">
-      {/* Mobile Backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-border bg-background-primary transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-72 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:hidden'
-        }`}
-      >
-        <div className="flex h-full flex-col overflow-hidden p-3">
-          <div className="flex items-center gap-2 border-b border-border-light pb-3">
-            <Button
-              variant="secondary"
-              className="flex-1 justify-start"
-              onClick={() => {
-                handleNewChat();
-                if (window.innerWidth < 1024) setSidebarOpen(false);
-              }}
-              disabled={isSending}
-            >
-              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              <span>Yeni Sohbet</span>
+    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background-primary text-text-primary">
+      <header className="shrink-0 border-b border-border">
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2">
+            <Sparkles className="h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />
+            <h1 className="truncate text-base font-semibold text-text-primary">Aura</h1>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(true)} disabled={userId == null}>
+              <BrainCircuit className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span className="hidden sm:inline">{t('aura_memory', 'Hafıza')}</span>
             </Button>
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(false)}
-              aria-label="Paneli Kapat"
-              className={ICON_BUTTON}
-            >
-              <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-          </div>
-
-          {activeListing && (
-            <div className="mt-3 rounded border border-border-light bg-background-secondary p-3">
-              <div className="mb-2 flex items-center justify-between gap-2 text-xs">
-                <span className="text-text-tertiary font-medium">Aktif İlan</span>
-                <button
-                  type="button"
-                  onClick={() => setDetachedListingId(activeListing.id)}
-                  className="text-text-muted transition-colors hover:text-status-error text-xs"
-                >
-                  Kaldır
-                </button>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
-                  {activeListing.imageUrl ? (
-                    <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <Tag className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-text-primary">{activeListing.title}</p>
-                  <p className="text-xs tabular-nums text-text-secondary">
-                    {formatListingPriceLabel(activeListing.price, activeListing.currency)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 flex-1 space-y-1 overflow-y-auto">
-            <p className="px-2 pb-1 text-xs font-medium text-text-tertiary">Önerilen Konular</p>
-            {AURA_CAPABILITIES.map(({ icon: Icon, label, prompt }) => (
-              <button
-                key={label}
-                type="button"
-                disabled={isSending}
-                onClick={() => {
-                  send(prompt);
-                  if (window.innerWidth < 1024) setSidebarOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-50"
-              >
-                <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-                <span className="truncate">{label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-1 border-t border-border-light pt-3">
-            <button
-              type="button"
-              onClick={() => {
-                setShowMemoryHub(true);
-                if (window.innerWidth < 1024) setSidebarOpen(false);
-              }}
-              className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-sm text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary"
-            >
-              <BrainCircuit className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-              <span>Aura Hafıza Profili</span>
-            </button>
             <button
               type="button"
               onClick={() => setConfirmClear(true)}
-              disabled={isSending || userId == null}
-              className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-sm text-text-tertiary transition-colors hover:bg-background-secondary hover:text-status-error disabled:opacity-50"
+              disabled={isSending || userId == null || conversation.length === 0}
+              className={ICON_BUTTON}
+              aria-label={t('aura_clear_history', 'Sohbet geçmişini temizle')}
+              title={t('aura_clear_history', 'Sohbet geçmişini temizle')}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              <span>Sohbet Geçmişini Temizle</span>
             </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Conversation Column */}
-      <main className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background-primary">
-        {/* Header */}
-        <header className="z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background-primary px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-              aria-label={sidebarOpen ? "Paneli Kapat" : "Paneli Aç"}
-              className={ICON_BUTTON}
-            >
-              {sidebarOpen ? (
-                <PanelLeftClose className="h-4 w-4" strokeWidth={1.5} />
-              ) : (
-                <PanelLeftOpen className="h-4 w-4" strokeWidth={1.5} />
-              )}
-            </button>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-semibold text-text-primary">Aura AI</h1>
-                <span className="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {activeListing && (
-              <div className="hidden md:flex items-center gap-1.5 rounded border border-border bg-background-secondary px-2.5 py-1 text-xs">
-                <Tag className="h-3.5 w-3.5 text-text-muted shrink-0" strokeWidth={1.5} aria-hidden />
-                <Link
-                  to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                  className="max-w-[180px] truncate font-medium text-text-primary hover:underline"
-                >
-                  {activeListing.title}
-                </Link>
-                <span className="tabular-nums text-text-tertiary">
-                  ({formatListingPriceLabel(activeListing.price, activeListing.currency)})
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setDetachedListingId(activeListing.id)}
-                  title="Bağlantıyı kaldır"
-                  aria-label="İlan bağlantısını kaldır"
-                  className="ml-1 text-text-muted hover:text-status-error transition-colors"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-            <Button variant="ghost" size="sm" onClick={() => setShowMemoryHub(true)}>
-              <BrainCircuit className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              <span className="hidden sm:inline">Hafıza</span>
+            <Button variant="secondary" size="sm" onClick={handleNewChat} disabled={isSending || userId == null || conversation.length === 0}>
+              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t('aura_new_chat', 'Yeni sohbet')}</span>
             </Button>
+          </div>
+        </div>
+      </header>
+
+      {activeListing && <ListingContextBar listing={activeListing} onDetach={() => setDetachedListingId(activeListing.id)} />}
+
+      <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+          {!hasUserMessages && (
+            <section className="pb-4 pt-2 sm:pt-8">
+              <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
+                {activeListing
+                  ? t('aura_listing_intro_title', 'Bu ilan hakkında ne öğrenmek istersin?')
+                  : t('aura_intro_title', 'Nasıl yardımcı olabilirim?')}
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
+                {activeListing
+                  ? t('aura_listing_intro_text', 'Fiyatı değerlendirebilir, satıcıya gönderebileceğin bir teklif yazabilir veya dikkat etmen gerekenleri sıralayabilirim.')
+                  : t('aura_intro_text', 'İlan arama, fiyat değerlendirme, pazarlık ve güvenli ödeme konularında sorularını yanıtlayabilirim.')}
+              </p>
+              <ul className="mt-5 divide-y divide-border-light rounded border border-border">
+                {prompts.map(({ id, icon: Icon, label, message }) => (
+                  <li key={id}>
+                    <button
+                      type="button"
+                      disabled={isSending}
+                      onClick={() => send(message)}
+                      className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm text-text-primary transition-colors duration-150 hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+                      <span className="min-w-0 flex-1 truncate">{label}</span>
+                      <ArrowUp className="h-3.5 w-3.5 shrink-0 rotate-45 text-text-muted" strokeWidth={1.5} aria-hidden />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {conversation.length > 0 && (
+            <div className={`space-y-6 ${hasUserMessages ? '' : 'border-t border-border-light pt-6'}`} aria-live="polite">
+              {conversation.map((m) => (m.role === 'user'
+                ? <UserMessage key={m.id} message={m} />
+                : <AssistantMessage key={m.id} message={m} copied={copiedId === m.id} onCopy={copyToClipboard} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="shrink-0 border-t border-border bg-background-primary">
+        <div className="mx-auto max-w-3xl px-4 py-3 sm:px-6">
+          {quotaExhausted && (
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-status-warning-border bg-status-warning-bg px-3 py-2 text-sm text-status-warning-text">
+              <span>{t('aura_quota_exhausted', 'Bugünkü Aura hakkın doldu. Yarın yenilenir.')}</span>
+              {!isPremium && (
+                <button type="button" onClick={() => setShowUpgradeModal(true)} className="font-medium underline-offset-2 hover:underline">
+                  {t('aura_upgrade_for_more', 'Daha fazla hak için Premium')}
+                </button>
+              )}
+            </div>
+          )}
+          <div className="flex items-end gap-2 rounded border border-border bg-background-primary p-2 transition-colors focus-within:border-border-focus">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              rows={1}
+              aria-label={t('aura_message_label', "Aura'ya mesaj")}
+              placeholder={activeListing
+                ? t('aura_listing_placeholder', 'Bu ilan hakkında bir soru sor')
+                : t('aura_placeholder', "Aura'ya bir soru sor")}
+              className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent px-2 py-1.5 text-sm leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none"
+            />
             <button
               type="button"
-              onClick={handleNewChat}
-              disabled={isSending}
-              aria-label="Yeni Sohbet"
-              title="Yeni Sohbet"
-              className={ICON_BUTTON}
+              onClick={() => sendMessage()}
+              disabled={isSending || !input.trim()}
+              aria-label={t('send', 'Gönder')}
+              className={`${buttonClasses('primary', 'sm')} w-9 shrink-0 !px-0`}
             >
-              <RotateCcw className="h-4 w-4" strokeWidth={1.5} />
+              <ArrowUp className="h-4 w-4" strokeWidth={1.5} aria-hidden />
             </button>
           </div>
-        </header>
-
-        {/* Scrollable Chat Area */}
-        <div ref={listRef} className="w-full flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-          <div className="mx-auto max-w-3xl space-y-6">
-            {/* Tranquil Empty / Hero State */}
-            {!hasUserMessages && (
-              <div className="py-8 sm:py-12">
-                <div className="mx-auto max-w-lg text-center">
-                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background-secondary text-text-secondary">
-                    <Sparkles className="h-5 w-5" strokeWidth={1.5} />
-                  </div>
-                  <h2 className="text-xl font-semibold text-text-primary sm:text-2xl">
-                    Nasıl yardımcı olabilirim?
-                  </h2>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    İkinci el ürün değerlemesi, satıcı pazarlık stratejileri ve güvenli Escrow süreci hakkında sorularınızı yanıtlayabilirim.
-                  </p>
-                </div>
-
-                {activeListing ? (
-                  <div className="mt-8 rounded border border-border bg-background-primary p-4 sm:p-5">
-                    <div className="flex items-center justify-between gap-3 border-b border-border-light pb-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background-secondary">
-                          {activeListing.imageUrl ? (
-                            <img src={activeListing.imageUrl} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <Tag className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="flex flex-wrap items-center gap-x-2 text-xs text-text-tertiary">
-                            <span>İncelenen İlan</span>
-                            {activeListing.type && <span>· {listingTypeLabel(activeListing.type)}</span>}
-                          </p>
-                          <h3 className="truncate text-sm font-semibold text-text-primary">
-                            {activeListing.title}
-                          </h3>
-                          <p className="text-sm font-medium tabular-nums text-text-secondary">
-                            {formatListingPriceLabel(activeListing.price, activeListing.currency)}
-                          </p>
-                        </div>
-                      </div>
-                      <Link
-                        to={ROUTES.LISTING_DETAIL(activeListing.id)}
-                        className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-card-border-hover hover:text-text-primary transition-colors shrink-0"
-                      >
-                        <span>İlanı İncele</span>
-                        <ExternalLink className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.5} />
-                      </Link>
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {quickListingActions.map(({ icon: Icon, label, prompt }) => (
-                        <button
-                          key={label}
-                          type="button"
-                          disabled={isSending}
-                          onClick={() => send(prompt)}
-                          className="flex items-center gap-2.5 rounded border border-border bg-background-primary p-3 text-left transition-colors duration-150 ease-out hover:border-card-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50"
-                        >
-                          <Icon className="h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden />
-                          <span className="text-sm font-medium text-text-primary truncate">{label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-8">
-                    <AuraSuggestedPrompts disabled={isSending} onPick={send} />
-                  </div>
-                )}
-              </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-text-tertiary">
+            <span>{t('aura_disclaimer', 'Aura hata yapabilir; ödeme öncesi ilan ve satıcı bilgilerini kontrol et.')}</span>
+            {quotaKnown && (
+              <span className="tabular-nums">
+                {t('aura_quota_remaining', {
+                  defaultValue: 'Bugün kalan: {{remaining}}/{{limit}}',
+                  remaining: remainingQuestions,
+                  limit: dailyAuraLimit,
+                })}
+              </span>
             )}
-
-            {/* Active Conversation Messages */}
-            {hasUserMessages &&
-              messages.map((m) => {
-                const isUser = m.role === 'user';
-                return (
-                  <div
-                    key={m.id}
-                    className={`group flex items-start gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
-                  >
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium border mt-0.5 ${
-                        isUser
-                          ? 'border-border bg-background-tertiary text-text-secondary'
-                          : 'border-border bg-background-primary text-text-secondary'
-                      }`}
-                    >
-                      {isUser ? (
-                        <UserRound className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                      ) : (
-                        <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                      )}
-                    </div>
-
-                    <div className={`min-w-0 max-w-[85%] sm:max-w-xl ${isUser ? 'text-right' : 'text-left'}`}>
-                      <div className={`mb-1 flex items-center gap-2 text-xs text-text-tertiary ${isUser ? 'justify-end' : 'justify-start'}`}>
-                        <span className="font-medium text-text-secondary">{isUser ? 'Siz' : 'Aura AI'}</span>
-                        {m.createdAt && (
-                          <span className="tabular-nums">
-                            {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        )}
-                      </div>
-
-                      <div
-                        className={`rounded p-4 text-left ${
-                          isUser
-                            ? 'bg-background-tertiary border border-border-light text-text-primary'
-                            : 'border border-border bg-background-primary text-text-primary'
-                        }`}
-                      >
-                        {m.typing ? (
-                          <p className="text-sm text-text-secondary motion-safe:animate-pulse">
-                            Aura piyasa verilerini ve ilan geçmişini analiz ediyor...
-                          </p>
-                        ) : (
-                          <>
-                            <AuraMessageContent content={m.content} isUser={isUser} />
-                            {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 && (
-                              <div className="mt-4 border-t border-border-light pt-3">
-                                <AuraSuggestedListingChips listings={m.meta.suggestedListings} />
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-
-                      {!isUser && !m.typing && m.content && (
-                        <div className="mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150">
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(m.id, m.content)}
-                            className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
-                          >
-                            {copiedId === m.id ? (
-                              <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} aria-hidden />
-                            ) : (
-                              <Copy className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
-                            )}
-                            <span>{copiedId === m.id ? 'Kopyalandı' : 'Kopyala'}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleFeedback(m.id, 'up')}
-                            aria-pressed={feedbackGiven[m.id] === 'up'}
-                            aria-label="Faydalı Yanıt"
-                            className={`rounded p-1 transition-colors hover:bg-background-secondary ${
-                              feedbackGiven[m.id] === 'up' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'
-                            }`}
-                          >
-                            <ThumbsUp className="h-3.5 w-3.5" strokeWidth={1.5} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleFeedback(m.id, 'down')}
-                            aria-pressed={feedbackGiven[m.id] === 'down'}
-                            aria-label="Yetersiz Yanıt"
-                            className={`rounded p-1 transition-colors hover:bg-background-secondary ${
-                              feedbackGiven[m.id] === 'down' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'
-                            }`}
-                          >
-                            <ThumbsDown className="h-3.5 w-3.5" strokeWidth={1.5} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
           </div>
         </div>
+      </div>
 
-        {/* Composer */}
-        <div className="shrink-0 bg-background-primary p-3 sm:p-4 border-t border-border">
-          <div className="mx-auto max-w-3xl">
-            <div className="flex flex-col rounded border border-border bg-background-primary p-2 transition-colors focus-within:border-border-focus">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKeyDown}
-                aria-label="Aura'ya mesaj"
-                placeholder={
-                  activeListing
-                    ? `"${activeListing.title?.slice(0, 30)}..." hakkında fiyat, pazarlık veya güvenlik sorusu sorun...`
-                    : "İkinci el piyasası, fiyat analizi veya ürünler hakkında soru sorun..."
-                }
-                rows={1}
-                className="w-full resize-none bg-transparent px-2.5 py-1.5 text-sm leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none"
-              />
-              <div className="mt-1 flex items-center justify-between border-t border-border-light px-1 pt-1.5">
-                <div className="min-w-0 flex items-center gap-2">
-                  {activeListing && (
-                    <span className="inline-flex items-center gap-1 text-xs text-text-tertiary px-1.5 py-0.5 rounded-sm bg-background-secondary border border-border-light max-w-[200px] sm:max-w-xs truncate">
-                      <Tag className="h-3 w-3 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
-                      <span className="truncate">{activeListing.title}</span>
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="hidden text-xs text-text-muted sm:inline">Enter ile gönder</span>
-                  <button
-                    type="button"
-                    onClick={() => sendMessage()}
-                    disabled={isSending || !input.trim()}
-                    aria-label="Gönder"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded bg-primary text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 transition-colors shrink-0"
-                  >
-                    <ArrowUp className="h-4 w-4" strokeWidth={1.5} />
-                  </button>
-                </div>
-              </div>
-            </div>
+      <PremiumUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureHint={t('aura_daily_limit_exceeded', 'Günlük Aura AI limitinize ulaştınız.')}
+      />
 
-            <p className="mt-2 text-center text-xs text-text-muted">
-              Aura AI hata yapabilir. Önemli alışveriş ve ödeme adımlarında satıcı ve ilan detaylarını teyit ediniz.
-            </p>
-          </div>
-        </div>
-      </main>
-
-      {/* Premium Upgrade Modal */}
-      <PremiumUpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} featureHint={upgradeHint} />
-
-      {/* Memory Profile Modal */}
       <Modal
         isOpen={showMemoryHub}
         onClose={() => setShowMemoryHub(false)}
-        title="Aura AI Hafıza & Tercih Profili"
-        description="Aura, sohbetlerinizde kişiselleştirilmiş yanıtlar vermek için bu tercihleri hatırlar."
+        title={t('aura_memory_title', 'Aura hafızası')}
+        description={t('aura_memory_description', 'Aura, yanıtlarını kişiselleştirmek için bu tercihleri hatırlar.')}
         size="lg"
-        footer={
-          <Button variant="secondary" onClick={() => setShowMemoryHub(false)}>
-            Kapat
-          </Button>
-        }
+        footer={<Button variant="secondary" onClick={() => setShowMemoryHub(false)}>{t('close', 'Kapat')}</Button>}
       >
         <AuraMemoryProfileHub />
       </Modal>
 
-      {/* Confirm Clear Modal */}
       <Modal
         isOpen={confirmClear}
         onClose={() => setConfirmClear(false)}
-        title="Sohbet Geçmişini Temizle"
+        title={t('aura_clear_history', 'Sohbet geçmişini temizle')}
         size="sm"
         footer={<>
-          <Button variant="secondary" onClick={() => setConfirmClear(false)}>{t("cancel", "İptal")}</Button>
-          <Button variant="danger" onClick={handleClearHistory}>Temizle</Button>
+          <Button variant="secondary" onClick={() => setConfirmClear(false)}>{t('cancel', 'İptal')}</Button>
+          <Button variant="danger" onClick={handleClearHistory}>{t('clear', 'Temizle')}</Button>
         </>}
       >
-        <p className="text-sm text-text-secondary">Tüm sohbet geçmişiniz silinecek. Bu işlem geri alınamaz.</p>
+        <p className="text-sm text-text-secondary">
+          {t('aura_clear_history_confirm', 'Aura ile tüm sohbet geçmişin silinecek. Bu işlem geri alınamaz.')}
+        </p>
       </Modal>
     </div>
   );

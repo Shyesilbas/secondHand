@@ -1,28 +1,33 @@
 import { useMemo, useCallback } from 'react';
-import { Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PRESETS = [
-  { label: '7D', days: 7 },
-  { label: '30D', days: 30 },
-  { label: '3M', days: 90 },
-  { label: '6M', days: 180 },
-  { label: '1Y', days: 365 },
+  { label: '7 gün', days: 7 },
+  { label: '30 gün', days: 30 },
+  { label: '3 ay', days: 90 },
+  { label: '6 ay', days: 180 },
+  { label: '1 yıl', days: 365 },
 ];
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const toInputValue = (date) => (date ? date.toISOString().split('T')[0] : '');
+
+const dateInputClass = 'h-8 rounded border border-border bg-background-primary px-2 text-xs text-text-secondary focus:border-border-focus focus:outline-none';
+
 const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateChange, onPresetSelect }) => {
-  // Derive active preset from the actual dates rather than internal state
+  const { t } = useTranslation();
+
+  // The active preset follows the dates, so a hand-picked range shows none selected.
   const activePreset = useMemo(() => {
     if (!startDate || !endDate) return null;
     const today = new Date();
     today.setHours(23, 59, 59, 999);
     const endNorm = new Date(endDate);
     endNorm.setHours(23, 59, 59, 999);
-    
-    if (Math.abs(endNorm - today) > 24 * 60 * 60 * 1000) return null;
+    if (Math.abs(endNorm - today) > DAY_MS) return null;
 
-    const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const match = PRESETS.find(p => Math.abs(p.days - diffDays) <= 1);
-    return match?.days || null;
+    const diffDays = Math.round((endDate - startDate) / DAY_MS);
+    return PRESETS.find(p => Math.abs(p.days - diffDays) <= 1)?.days || null;
   }, [startDate, endDate]);
 
   const handlePresetClick = useCallback((days) => {
@@ -33,46 +38,44 @@ const TimeRangeSelector = ({ startDate, endDate, onStartDateChange, onEndDateCha
   }, [onPresetSelect]);
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
-      <div className="flex items-center gap-1 bg-background-tertiary rounded p-1">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset.days}
-            onClick={() => handlePresetClick(preset.days)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200 cursor-pointer ${
-              activePreset === preset.days
-                ? 'bg-background-primary text-text-primary shadow-xs'
-                : 'text-text-tertiary hover:text-text-secondary'
-            }`}
-          >
-            {preset.label}
-          </button>
-        ))}
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="inline-flex rounded border border-border bg-background-primary p-0.5" role="group" aria-label={t('dash_period', 'Dönem')}>
+        {PRESETS.map((preset) => {
+          const active = activePreset === preset.days;
+          return (
+            <button
+              key={preset.days}
+              type="button"
+              aria-pressed={active}
+              onClick={() => handlePresetClick(preset.days)}
+              className={`h-7 rounded-sm px-2.5 text-xs transition-colors duration-150 ${
+                active ? 'bg-background-tertiary font-medium text-text-primary' : 'text-text-tertiary hover:text-text-primary'
+              }`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
       </div>
-      
-      <div className="h-5 w-px bg-border hidden sm:block" />
-      
-      <div className="flex items-center gap-2">
-        <Calendar className="w-3.5 h-3.5 text-text-muted" />
+
+      <div className="flex items-center gap-1.5">
         <input
           type="date"
-          value={startDate ? startDate.toISOString().split('T')[0] : ''}
-          onChange={(e) => {
-            const date = e.target.value ? new Date(e.target.value) : null;
-            onStartDateChange(date);
-          }}
-          className="px-2 py-1.5 text-xs text-text-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-border-focus bg-background-primary font-medium"
+          aria-label={t('dash_start_date', 'Başlangıç')}
+          value={toInputValue(startDate)}
+          max={toInputValue(endDate)}
+          onChange={(e) => onStartDateChange(e.target.value ? new Date(e.target.value) : null)}
+          className={dateInputClass}
         />
-        <span className="text-xs text-text-muted font-semibold">→</span>
+        <span className="text-xs text-text-muted">–</span>
         <input
           type="date"
-          value={endDate ? endDate.toISOString().split('T')[0] : ''}
-          onChange={(e) => {
-            const date = e.target.value ? new Date(e.target.value) : null;
-            onEndDateChange(date);
-          }}
-          max={new Date().toISOString().split('T')[0]}
-          className="px-2 py-1.5 text-xs text-text-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-border-focus bg-background-primary font-medium"
+          aria-label={t('dash_end_date', 'Bitiş')}
+          value={toInputValue(endDate)}
+          min={toInputValue(startDate)}
+          max={toInputValue(new Date())}
+          onChange={(e) => onEndDateChange(e.target.value ? new Date(e.target.value) : null)}
+          className={dateInputClass}
         />
       </div>
     </div>

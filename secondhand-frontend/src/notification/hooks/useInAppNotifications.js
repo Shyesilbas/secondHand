@@ -75,6 +75,9 @@ export const useInAppNotifications = (onNewNotification) => {
  };
  });
 
+ // The inbox feed is paged; refetch it so the new row lands in the right place.
+ queryClient.invalidateQueries({ queryKey: ['notifications', 'feed'] });
+
  onNewNotification?.(notification);
  }, [user?.id, queryClient, onNewNotification]);
 

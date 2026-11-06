@@ -186,7 +186,7 @@ const LocationFields = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {/* City Select */}
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <label className="mb-1.5 block text-sm font-medium text-text-primary">
             {t("city_i_l", "City")}<span className="text-status-error">*</span>
           </label>
           <div className="relative">
@@ -213,7 +213,7 @@ const LocationFields = ({
 
         {/* District Select */}
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <label className="mb-1.5 block text-sm font-medium text-text-primary">
             {t("district_i_l_e", "District")}<span className="text-status-error">*</span>
           </label>
           <div className="relative">
@@ -240,7 +240,7 @@ const LocationFields = ({
 
         {/* Neighborhood Select */}
         <div>
-          <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <label className="mb-1.5 block text-sm font-medium text-text-primary">
             {t("neighborhood_mahalle", "Neighborhood")}{' '}
             <span className="font-normal text-text-muted">({t("optional", "Optional")})</span>
           </label>

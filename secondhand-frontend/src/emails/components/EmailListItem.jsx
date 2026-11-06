@@ -29,13 +29,12 @@ const EmailListItem = ({
         }
       }}
       onClick={() => onSelect(email)}
-      className={`group relative cursor-pointer border-b border-border-light border-l-2 px-4 py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${
-        isSelected
+      className={`group relative cursor-pointer border-b border-border-light border-l-2 px-4 py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus ${isSelected
           ? 'border-l-primary bg-background-secondary'
           : isUnread
-          ? 'border-l-transparent bg-background-primary hover:bg-background-secondary/70'
-          : 'border-l-transparent bg-background-primary hover:bg-background-secondary/50'
-      }`}
+            ? 'border-l-transparent bg-background-primary hover:bg-background-secondary/70'
+            : 'border-l-transparent bg-background-primary hover:bg-background-secondary/50'
+        }`}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -46,9 +45,8 @@ const EmailListItem = ({
             />
           )}
           <span
-            className={`truncate text-xs ${
-              isUnread ? 'font-semibold text-text-primary' : 'font-medium text-text-tertiary'
-            }`}
+            className={`truncate text-xs ${isUnread ? 'font-semibold text-text-primary' : 'font-medium text-text-tertiary'
+              }`}
           >
             {categoryLabel}
           </span>
@@ -57,9 +55,8 @@ const EmailListItem = ({
         <div className="flex shrink-0 items-center gap-1.5">
           <time
             dateTime={email.sentAt || undefined}
-            className={`text-xs tabular-nums ${
-              isUnread ? 'font-semibold text-text-primary' : 'font-normal text-text-muted'
-            }`}
+            className={`text-xs tabular-nums ${isUnread ? 'font-semibold text-text-primary' : 'font-normal text-text-muted'
+              }`}
           >
             {formatSmartEmailDate(email.sentAt) || formatDateTime(email.sentAt)}
           </time>
@@ -80,13 +77,12 @@ const EmailListItem = ({
       </div>
 
       <h3
-        className={`mt-1 line-clamp-1 text-sm leading-snug ${
-          isUnread
+        className={`mt-1 line-clamp-1 text-sm leading-snug ${isUnread
             ? 'font-semibold text-text-primary'
             : isSelected
-            ? 'font-medium text-text-primary'
-            : 'font-medium text-text-secondary'
-        }`}
+              ? 'font-medium text-text-primary'
+              : 'font-medium text-text-secondary'
+          }`}
       >
         {cleanSubject}
       </h3>

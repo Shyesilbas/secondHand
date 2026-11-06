@@ -100,11 +100,9 @@ const EditListingPage = ({
  await activeService.update(id, updatedFields);
  queryClient.invalidateQueries({ queryKey: LISTING_KEYS.detail(id) });
  queryClient.invalidateQueries({ queryKey: ['listings'] });
- notification.showSuccess('Success', 'Listing updated successfully');
- navigate(ROUTES.MY_LISTINGS);
  } catch (err) {
+ // The form shows the error and decides where to go on success (my listings, or the fee page for a draft).
  logger.error('Update failed:', err);
- notification.showError('Update Failed', err.response?.data?.message || err.message || 'Could not update listing');
  throw err;
  }
  };
@@ -122,6 +120,6 @@ const EditListingPage = ({
  if (!EditComponent) {
  return <PageError error={`No editor available for listing type: ${listingType}`} onBack={() => navigate(ROUTES.MY_LISTINGS)} />;
  }
- return <EditComponent initialData={data} isEdit={true} onUpdate={handleUpdate} onBack={() => navigate(-1)} />;
+ return <EditComponent initialData={data} isEdit={true} isDraft={data.status === 'DRAFT'} onUpdate={handleUpdate} onBack={() => navigate(-1)} />;
 };
 export default EditListingPage;

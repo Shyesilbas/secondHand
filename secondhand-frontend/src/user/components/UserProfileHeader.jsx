@@ -1,244 +1,186 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from 'react-router-dom';
-import PageContainer from '@/common/components/layout/PageContainer';
+import { Link } from 'react-router-dom';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import { FollowButton, FollowStats } from '../../follow/index.js';
 import { formatDate } from '../../common/formatters.js';
-import { ArrowLeft, Award, Calendar, ShieldCheck, Star, UserRound } from 'lucide-react';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { ROUTES } from '../../common/constants/routes.js';
+import { Award, Plus, Settings, ShieldCheck, Star } from 'lucide-react';
 
-const UserProfileHeader = ({
-  user,
-  isOwnProfile,
-  reviewStats,
-  greatSeller,
-  greatSellerEligible
-}) => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+const Stat = ({ label, children }) => (
+ <div className="min-w-0 px-4 py-3 first:pl-0 sm:px-5">
+ <p className="truncate text-sm text-text-tertiary">{label}</p>
+ <div className="mt-0.5 truncate text-base font-semibold tabular-nums text-text-primary">{children}</div>
+ </div>
+);
 
-  const name = user?.name || '';
-  const surname = user?.surname || '';
-  const userInitials = `${name?.[0]?.toUpperCase() || ''}${surname?.[0]?.toUpperCase() || ''}` || 'U';
-  const memberSince = formatDate(user?.accountCreationDate);
-  const hasReviews = reviewStats && reviewStats.totalReviews > 0;
-  const fullName = `${name} ${surname}`.trim() || t('marketplace_member', 'Pazar Yeri Üyesi');
+const ProgressRow = ({ label, value, met, pct, hint }) => (
+ <div className="min-w-0" title={hint}>
+ <div className="flex items-baseline justify-between gap-2 text-sm">
+ <span className="truncate text-text-secondary">{label}</span>
+ <span className="shrink-0 tabular-nums text-text-primary">{value}</span>
+ </div>
+ <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-background-tertiary">
+ <div className={`h-full rounded-full ${met ? 'bg-status-success' : 'bg-primary'}`} style={{ width: `${pct}%` }} />
+ </div>
+ </div>
+);
 
-  // Milestone calculations for Great Seller
-  const minTry = Number(greatSeller?.minUnitPriceThreshold ?? 1500);
-  const days = greatSeller?.rollingWindowDays ?? 60;
-  const salesTarget = greatSeller?.qualifyingSalesTarget || 1;
-  const revTarget = greatSeller?.distinctReviewerTarget || 1;
-  const salesPct = Math.min(100, ((greatSeller?.qualifyingSalesLastWindow || 0) / salesTarget) * 100);
-  const revPct = Math.min(100, ((greatSeller?.distinctReviewerCount || 0) / revTarget) * 100);
-  const minRating = greatSeller?.minimumAverageRating ?? 4.7;
-  const avg = greatSeller?.averageRating ?? 0;
-  const ratingPct = greatSeller?.ratingMet ? 100 : Math.min(100, minRating ? (avg / minRating) * 100 : 0);
+// Owner-only progress towards the "Great seller" badge.
+const GreatSellerProgress = ({ greatSeller }) => {
+ const { t } = useTranslation();
+ const pct = (value, target) => Math.min(100, ((value || 0) / (target || 1)) * 100);
+ const minRating = greatSeller.minimumAverageRating ?? 4.7;
+ const avg = greatSeller.averageRating ?? 0;
+ const minTry = Number(greatSeller.minUnitPriceThreshold ?? 1500);
+ return (
+ <div className="mt-5 border-t border-border-light pt-5">
+ <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+ <p className="inline-flex items-center gap-2 text-sm font-medium text-text-primary">
+ <Award className="h-4 w-4 text-status-warning" strokeWidth={1.5} aria-hidden />
+ {t('great_seller_milestones', 'Harika satıcı kriterleri')}
+ </p>
+ <p className="text-sm text-text-tertiary">
+ {greatSeller.eligible
+ ? t('great_seller_earned', 'Rozet kazanıldı')
+ : t('great_seller_window', { defaultValue: 'Son {{days}} gün', days: greatSeller.rollingWindowDays ?? 60 })}
+ </p>
+ </div>
+ <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+ <ProgressRow
+ label={t('sales', 'Satış')}
+ value={`${greatSeller.qualifyingSalesLastWindow ?? 0}/${greatSeller.qualifyingSalesTarget ?? 0}`}
+ met={greatSeller.salesMet}
+ pct={pct(greatSeller.qualifyingSalesLastWindow, greatSeller.qualifyingSalesTarget)}
+ hint={t('great_seller_sales_hint', { defaultValue: 'Birim fiyatı en az {{amount}} TL olan satışlar', amount: minTry.toLocaleString('tr-TR') })}
+ />
+ <ProgressRow
+ label={t('distinct_reviewers', 'Farklı değerlendiren')}
+ value={`${greatSeller.distinctReviewerCount ?? 0}/${greatSeller.distinctReviewerTarget ?? 0}`}
+ met={greatSeller.reviewersMet}
+ pct={pct(greatSeller.distinctReviewerCount, greatSeller.distinctReviewerTarget)}
+ />
+ <ProgressRow
+ label={t('rating', 'Puan')}
+ value={`${avg.toFixed(1)}/${minRating.toFixed(1)}`}
+ met={greatSeller.ratingMet}
+ pct={greatSeller.ratingMet ? 100 : pct(avg, minRating)}
+ />
+ </div>
+ </div>
+ );
+};
 
-  return (
-    <div className="bg-background-primary border-b border-border">
-      <PageContainer className="py-4 sm:py-5">
-        {/* Back navigation */}
-        <div className="mb-3">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted hover:text-text-primary transition-colors duration-150 cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span>{t('back', 'Geri')}</span>
-          </button>
-        </div>
+export const UserProfileHeaderSkeleton = () => (
+ <div className="rounded border border-border bg-background-primary p-5 sm:p-6" aria-hidden>
+ <div className="flex items-start gap-4">
+ <Skeleton className="h-16 w-16 shrink-0 rounded-full" />
+ <div className="flex-1 space-y-2.5 pt-1">
+ <Skeleton className="h-7 w-56 max-w-full" />
+ <Skeleton className="h-4 w-72 max-w-full" />
+ </div>
+ </div>
+ <Skeleton className="mt-5 h-14 w-full" />
+ </div>
+);
 
-        {/* User Identity Section */}
-        <div className="flex items-start gap-3.5 sm:gap-4">
-          {/* Avatar (rounded-full per DESIGN.md) */}
-          <div className="relative shrink-0">
-            <div className="w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-primary text-white flex items-center justify-center select-none ring-2 ring-background-secondary shadow-xs">
-              <span className="text-lg sm:text-xl font-semibold tracking-tight">
-                {userInitials}
-              </span>
-            </div>
-            {greatSellerEligible && (
-              <span
-                className="absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-background-primary text-status-warning border border-border shadow-xs"
-                title={t('great_seller', 'Harika Satıcı')}
-              >
-                <Award className="h-3 w-3" strokeWidth={1.5} />
-              </span>
-            )}
-          </div>
+const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activeListingCount }) => {
+ const { t } = useTranslation();
+ const name = user?.name || '';
+ const surname = user?.surname || '';
+ const initials = `${name[0] || ''}${surname[0] || ''}`.toUpperCase() || 'U';
+ const fullName = `${name} ${surname}`.trim() || t('marketplace_member', 'Pazar yeri üyesi');
+ const memberSince = formatDate(user?.accountCreationDate);
+ const reviewCount = Number(reviewStats?.totalReviews ?? 0);
+ const isGreatSeller = Boolean(greatSeller?.eligible);
 
-          {/* User Meta Information */}
-          <div className="flex-1 min-w-0">
-            {/* Name & Chips */}
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h1 className="text-base sm:text-lg font-semibold text-text-primary tracking-tight truncate">
-                {fullName}
-              </h1>
-              {isOwnProfile && (
-                <span className="px-1.5 py-0.5 bg-background-secondary text-text-muted border border-border text-xs font-medium rounded-sm">
-                  {t('you', 'Siz')}
-                </span>
-              )}
-              {greatSellerEligible && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-background-secondary text-text-secondary border border-border text-xs font-semibold rounded-sm">
-                  <Award className="w-3 h-3 text-status-warning" strokeWidth={1.5} />
-                  <span>{t('great_seller', 'Harika Satıcı')}</span>
-                </span>
-              )}
-            </div>
+ return (
+ <section className="rounded border border-border bg-background-primary p-5 sm:p-6" aria-label={fullName}>
+ <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+ <div className="flex min-w-0 items-start gap-4">
+ <span className="flex h-16 w-16 shrink-0 select-none items-center justify-center rounded-full bg-background-tertiary text-xl font-semibold text-text-primary">
+ {initials}
+ </span>
+ <div className="min-w-0 pt-0.5">
+ <div className="flex flex-wrap items-center gap-2">
+ <h1 className="truncate text-2xl font-semibold text-text-primary">{fullName}</h1>
+ {isOwnProfile && (
+ <span className="rounded-sm bg-background-tertiary px-1.5 py-0.5 text-xs font-medium text-text-secondary">{t('you', 'Sen')}</span>
+ )}
+ </div>
+ <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-text-tertiary">
+ {isGreatSeller && (
+ <span className="inline-flex items-center gap-1 rounded-sm bg-status-warning-bg px-1.5 py-0.5 text-xs font-medium text-status-warning-text">
+ <Award className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+ {t('great_seller', 'Harika satıcı')}
+ </span>
+ )}
+ {user?.accountVerified && (
+ <span className="inline-flex items-center gap-1 text-text-secondary">
+ <ShieldCheck className="h-4 w-4 text-status-success" strokeWidth={1.5} aria-hidden />
+ {t('verified_account', 'Doğrulanmış hesap')}
+ </span>
+ )}
+ <FollowStats userId={user.id} showIcon={false} className="text-sm" />
+ </div>
+ </div>
+ </div>
 
-            {/* Social / Rating info line: bullet-separated and single row */}
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-text-muted">
-              {hasReviews && (
-                <>
-                  <div className="inline-flex items-center gap-1 whitespace-nowrap">
-                    <Star className="w-3.5 h-3.5 text-status-warning fill-status-warning" strokeWidth={1.5} />
-                    <span className="font-semibold text-text-primary tabular-nums">
-                      {(reviewStats.averageRating || 0).toFixed(1)}
-                    </span>
-                    <span className="text-text-muted">
-                      ({reviewStats.totalReviews})
-                    </span>
-                  </div>
-                  <span className="text-border select-none" aria-hidden>•</span>
-                </>
-              )}
-              <div className="inline-flex items-center whitespace-nowrap">
-                <FollowStats userId={user.id} showIcon={false} className="text-xs" />
-              </div>
-              {memberSince && (
-                <>
-                  <span className="text-border select-none" aria-hidden>•</span>
-                  <span className="inline-flex items-center gap-1 text-text-muted whitespace-nowrap">
-                    <Calendar className="w-3.5 h-3.5 text-text-muted" strokeWidth={1.5} />
-                    <span>{t('member_since', 'Üyelik tarihi:')} {memberSince}</span>
-                  </span>
-                </>
-              )}
-            </div>
+ <div className="flex shrink-0 flex-wrap items-center gap-2">
+ {isOwnProfile ? (
+ <>
+ <Link to={ROUTES.PROFILE} className={buttonClasses('secondary', 'sm')}>
+ <Settings className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ {t('account_settings', 'Hesap ayarları')}
+ </Link>
+ <Link to={ROUTES.CREATE_LISTING} className={buttonClasses('primary', 'sm')}>
+ <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ {t('create_listing', 'İlan oluştur')}
+ </Link>
+ </>
+ ) : (
+ <>
+ <ContactSellerButton
+ listing={{
+ id: `user-chat-${user.id}`,
+ title: `${t('chat_with', 'Sohbet:')} ${fullName}`,
+ sellerId: user.id,
+ sellerName: name,
+ sellerSurname: surname
+ }}
+ isDirectChat
+ variant="primary"
+ label={t('send_message', 'Mesaj gönder')}
+ className="h-9 px-3"
+ />
+ <FollowButton userId={user.id} size="sm" />
+ <ComplaintButton targetUserId={user.id} targetUserName={fullName} targetUser={user} variant="ghost" />
+ </>
+ )}
+ </div>
+ </div>
 
-            {/* Badges line */}
-            <div className="flex items-center gap-2 mt-1.5 text-xs">
-              <span className="inline-flex items-center gap-1 text-text-secondary font-medium">
-                <ShieldCheck className="h-3.5 w-3.5 text-status-success" strokeWidth={1.5} />
-                <span>{t('verified_profile', 'Doğrulanmış Profil')}</span>
-              </span>
-              <span className="text-border select-none" aria-hidden>•</span>
-              <span className="inline-flex items-center gap-1 text-text-muted">
-                <UserRound className="h-3 w-3 text-text-muted" strokeWidth={1.5} />
-                <span>{t('seller_profile', 'Satıcı Profili')}</span>
-              </span>
-            </div>
+ <div className="mt-5 grid grid-cols-3 divide-x divide-border-light border-t border-border-light pt-1">
+ <Stat label={t('rating', 'Puan')}>
+ {reviewCount > 0 ? (
+ <span className="inline-flex items-center gap-1">
+ <Star className="h-4 w-4 fill-status-warning text-status-warning" strokeWidth={1.5} aria-hidden />
+ {Number(reviewStats.averageRating || 0).toFixed(1)}
+ <span className="text-sm font-normal text-text-tertiary">({reviewCount})</span>
+ </span>
+ ) : (
+ <span className="text-sm font-normal text-text-tertiary">{t('no_reviews_yet', 'Henüz yok')}</span>
+ )}
+ </Stat>
+ <Stat label={t('active_listings', 'Yayındaki ilan')}>{activeListingCount ?? '—'}</Stat>
+ <Stat label={t('member_since_label', 'Üyelik')}>{memberSince || '—'}</Stat>
+ </div>
 
-            {/* Action buttons (only for visitors) */}
-            {!isOwnProfile && (
-              <div className="flex flex-wrap items-center gap-2 mt-2.5">
-                <FollowButton userId={user.id} size="sm" />
-                <ContactSellerButton
-                  listing={{
-                    id: `user-chat-${user.id}`,
-                    title: `${t('chat_with', 'Sohbet:')} ${fullName}`,
-                    sellerId: user.id,
-                    sellerName: name,
-                    sellerSurname: surname
-                  }}
-                  isDirectChat={true}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded hover:bg-primary-hover transition-colors"
-                />
-                <ComplaintButton
-                  targetUserId={user.id}
-                  targetUserName={fullName}
-                  targetUser={user}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 text-text-muted hover:text-status-error hover:bg-background-secondary rounded text-xs font-medium transition-colors border border-border"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Integrated Great Seller Milestone row (clean, slim, non-breaking) */}
-        {isOwnProfile && greatSeller ? (
-          <div className="mt-3.5 pt-3 border-t border-border">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5">
-              {/* Title & Status */}
-              <div className="flex items-center gap-2 shrink-0">
-                <Award className="h-4 w-4 text-status-warning shrink-0" strokeWidth={1.5} />
-                <span className="text-xs font-semibold text-text-primary tracking-tight">
-                  {t("great_seller_milestones", "Harika Satıcı Kriterleri")}
-                </span>
-                {greatSeller.eligible ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-status-success bg-background-secondary px-1.5 py-0.5 rounded-sm border border-border">
-                    <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
-                    <span>{t("completed", "Tamamlandı")}</span>
-                  </span>
-                ) : (
-                  <span className="text-xs text-text-muted">
-                    ({days} {t("days_window", "günlük pencere")})
-                  </span>
-                )}
-              </div>
-
-              {/* 3 Metric Pills */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-2.5 flex-1 md:max-w-xl md:justify-end">
-                {/* Satış */}
-                <div
-                  className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0"
-                  title={`${t("completed_checkout_try_lines_with_unit_p", "Min. birim tutarı:")} ₺${minTry.toLocaleString('tr-TR')}`}
-                >
-                  <div className="flex items-center justify-between gap-1 text-xs">
-                    <span className="text-text-muted truncate">{t("sales", "Satış")}</span>
-                    <span className="font-semibold text-text-primary tabular-nums shrink-0">
-                      {greatSeller.qualifyingSalesLastWindow}/{greatSeller.qualifyingSalesTarget}
-                    </span>
-                  </div>
-                  <div className="h-1 bg-background-tertiary rounded-full overflow-hidden mt-1">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${greatSeller.salesMet ? 'bg-status-success' : 'bg-primary'}`}
-                      style={{ width: `${salesPct}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Yorum */}
-                <div className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0">
-                  <div className="flex items-center justify-between gap-1 text-xs">
-                    <span className="text-text-muted truncate">{t("reviews", "Yorum")}</span>
-                    <span className="font-semibold text-text-primary tabular-nums shrink-0">
-                      {greatSeller.distinctReviewerCount}/{greatSeller.distinctReviewerTarget}
-                    </span>
-                  </div>
-                  <div className="h-1 bg-background-tertiary rounded-full overflow-hidden mt-1">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${greatSeller.reviewersMet ? 'bg-status-success' : 'bg-primary'}`}
-                      style={{ width: `${revPct}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Puan */}
-                <div className="rounded border border-border bg-background-secondary px-2.5 py-1.5 min-w-0">
-                  <div className="flex items-center justify-between gap-1 text-xs">
-                    <span className="text-text-muted truncate">{t("rating", "Puan")}</span>
-                    <span className="font-semibold text-text-primary tabular-nums shrink-0">
-                      {(avg ?? 0).toFixed(1)}/{minRating.toFixed(1)}
-                    </span>
-                  </div>
-                  <div className="h-1 bg-background-tertiary rounded-full overflow-hidden mt-1">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${greatSeller.ratingMet ? 'bg-status-success' : 'bg-primary'}`}
-                      style={{ width: `${ratingPct}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </PageContainer>
-    </div>
-  );
+ {isOwnProfile && greatSeller ? <GreatSellerProgress greatSeller={greatSeller} /> : null}
+ </section>
+ );
 };
 
 export default UserProfileHeader;

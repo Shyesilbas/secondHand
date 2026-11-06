@@ -3,14 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  ShoppingCart, 
-  Clock, 
-  ShieldCheck, 
-  Sparkles,
-  ChevronDown 
-} from 'lucide-react';
+import { ArrowLeft, ChevronDown, Clock, ShoppingCart } from 'lucide-react';
 import { useCart } from '../hooks/useCart.js';
 import { useCheckout } from '../hooks/useCheckout.js';
 import CheckoutProgressBar from '../components/checkout/CheckoutProgressBar.jsx';
@@ -21,9 +14,9 @@ import { offerService } from '../../offer/services/offerService.js';
 import { listingService } from '../../listing/services/listingService.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
-import EWalletSpendingWarningModal from '../../ewallet/components/EWalletSpendingWarningModal.jsx';
 import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency } from '../../common/formatters.js';
+import { getCheckoutCurrency, getCheckoutLinePricing } from '../utils/checkoutLinePricing.js';
 import logger from '../../common/utils/logger.js';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
@@ -173,13 +166,7 @@ const CheckoutPage = () => {
     if (pricing?.total != null) {
       return parseFloat(pricing.total) || 0;
     }
-    return displayCartItems.reduce((total, item) => {
-      if (item.isOffer && item.offerTotalPrice != null) {
-        return total + (parseFloat(item.offerTotalPrice) || 0);
-      }
-      const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
-      return total + price * item.quantity;
-    }, 0);
+    return displayCartItems.reduce((total, item) => total + getCheckoutLinePricing(item).lineTotal, 0);
   }, [pricing, displayCartItems]);
 
   const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
@@ -191,6 +178,7 @@ const CheckoutPage = () => {
   const handleStepChange = step => {
     setCurrentStep(step);
   };
+  const currency = getCheckoutCurrency(displayCartItems);
 
   const handleBack = () => {
     if (currentStep > 1) {
@@ -201,7 +189,7 @@ const CheckoutPage = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -226,7 +214,6 @@ const CheckoutPage = () => {
             onClick={() => navigate(ROUTES.LISTINGS)} 
             className="w-full"
           >
-            <Sparkles className="h-4 w-4" />
             <span>{t("browse_listings", "İlanları Keşfet")}</span>
           </Button>
         </div>
@@ -236,109 +223,78 @@ const CheckoutPage = () => {
 
   /* ── Main checkout experience ────────────────────────────── */
 
+  const reservationExpired = timeLeft <= 0;
+  const summary = (
+    <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} />
+  );
+
   return (
     <div className="min-h-screen bg-background-secondary text-text-primary antialiased">
-      {/* ── Sticky Top Header ───────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-border bg-background-primary">
-        <PageContainer className="py-2.5 sm:py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Back Button & Trust/Timer badges */}
-            <div className="flex items-center gap-3 shrink-0">
-              <Button 
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate(ROUTES.SHOPPING_CART)} 
-                aria-label={t("back_to_cart", "Sepete Dön")}
-                className="w-8 h-8 !p-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+        <PageContainer className="py-3">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(ROUTES.SHOPPING_CART)}
+              aria-label={t('back_to_cart', 'Sepete dön')}
+              className="shrink-0 !px-2"
+            >
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span className="hidden sm:inline">{t('cart', 'Sepet')}</span>
+            </Button>
 
-              <div className="hidden lg:flex items-center gap-3 border-l border-border pl-3">
-                <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                  <ShieldCheck className="h-4 w-4 text-text-primary" />
-                  <span className="font-medium">Güvenli Ödeme</span>
-                </div>
-
-                <span className="text-border">·</span>
-
-                {/* Stock reservation countdown */}
-                <div className="flex items-center gap-1.5 text-2xs text-text-secondary" title={t('cart_items_reserved_for_you', 'Sepetinizdeki ürünler adınıza geçici olarak rezerve edildi.')}>
-                  <Clock className="h-3.5 w-3.5 text-text-tertiary" />
-                  <span className="text-text-tertiary">Rezervasyon:</span>
-                  <span className="font-mono tabular-nums font-semibold text-text-primary">{formatTimer(timeLeft)}</span>
-                </div>
-              </div>
+            <div className="min-w-0 flex-1">
+              <CheckoutProgressBar currentStep={currentStep} steps={steps} onStepChange={handleStepChange} />
             </div>
 
-            {/* Stepper Pipeline */}
-            <div className="min-w-0 flex-1 max-w-2xl">
-              <CheckoutProgressBar 
-                currentStep={currentStep} 
-                steps={steps} 
-                onStepChange={handleStepChange} 
-              />
-            </div>
-
-            {/* Mobile Timer Badge */}
-            <div className="flex lg:hidden items-center gap-1 text-2xs text-text-secondary shrink-0">
-              <Clock className="h-3 w-3 text-text-tertiary" />
-              <span className="font-mono tabular-nums font-semibold text-text-primary">{formatTimer(timeLeft)}</span>
-            </div>
+            <p
+              className={`flex shrink-0 items-center gap-1.5 text-sm tabular-nums ${reservationExpired ? 'text-status-error-text' : 'text-text-secondary'}`}
+              title={t('cart_items_reserved_for_you', 'Sepetindeki ürünler senin için geçici olarak ayrıldı.')}
+            >
+              <Clock className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+              <span className="sr-only">{t('checkout_reservation', 'Ürünler ayrıldı, kalan süre')}</span>
+              {formatTimer(timeLeft)}
+            </p>
           </div>
         </PageContainer>
       </header>
 
-      {/* ── Mobile Collapsible Concise Order Summary Bar ─────────── */}
-      {currentStep !== 3 && (
-        <div className="bg-background-primary border-b border-border lg:hidden px-4 py-2.5">
-          <button 
-            type="button" 
-            onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)} 
-            className="flex w-full items-center justify-between text-xs font-medium select-none"
-          >
-            <span className="flex items-center gap-2 text-text-primary">
-              <ShoppingCart className="h-3.5 w-3.5 text-text-primary" />
-              <span>{isOrderSummaryExpanded ? t("hide_order_summary", "Sipariş Özetini Gizle") : t("show_order_summary", "Sipariş Özetini Göster")}</span>
-              <ChevronDown className={`h-3.5 w-3.5 text-text-tertiary transition-transform duration-200 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} />
-            </span>
-            <span className="font-semibold text-text-primary tabular-nums">
-              {formatCurrency(calculateTotal(), displayCartItems[0]?.listing?.currency || 'TRY')}
-            </span>
-          </button>
+      {/* Mobile: collapsible summary with the total always visible */}
+      <div className="border-b border-border bg-background-primary px-4 py-3 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setIsOrderSummaryExpanded(!isOrderSummaryExpanded)}
+          aria-expanded={isOrderSummaryExpanded}
+          className="flex w-full items-center justify-between text-sm"
+        >
+          <span className="flex items-center gap-1.5 text-text-secondary">
+            {isOrderSummaryExpanded ? t('hide_order_summary', 'Özeti gizle') : t('show_order_summary', 'Özeti göster')}
+            <ChevronDown className={`h-4 w-4 text-text-tertiary transition-transform duration-150 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} strokeWidth={1.5} aria-hidden />
+          </span>
+          <span className="font-semibold tabular-nums text-text-primary">{formatCurrency(calculateTotal(), currency)}</span>
+        </button>
+        {isOrderSummaryExpanded && <div className="mt-3">{summary}</div>}
+      </div>
 
-          {isOrderSummaryExpanded && (
-            <div className="mt-3 pt-3 border-t border-border-light">
-              <CheckoutOrderSummary 
-                cartItems={displayCartItems} 
-                calculateTotal={calculateTotal} 
-                pricing={pricing} 
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Main Layout: Steps + Concise Order Summary ──────────── */}
       <PageContainer className="py-6 sm:py-8">
-        <div className={`grid grid-cols-1 gap-6 sm:gap-8 ${currentStep === 3 ? 'max-w-4xl mx-auto' : 'lg:grid-cols-12 lg:items-start'}`}>
-          {/* Main Checkout Step Flow */}
-          <div className={currentStep === 3 ? 'w-full' : 'lg:col-span-8'}>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
+          <div className="lg:col-span-8">
             {reservationError ? (
               <Alert
                 type="error"
                 message={reservationError}
                 action={
                   <div className="flex gap-2">
-                    <Button variant="secondary" size="sm" onClick={() => navigate(ROUTES.SHOPPING_CART)}>{t("back_to_cart", "Sepete Dön")}</Button>
-                    <Button size="sm" onClick={reserveStock}>{t("try_again")}</Button>
+                    <Button variant="secondary" size="sm" onClick={() => navigate(ROUTES.SHOPPING_CART)}>{t('back_to_cart', 'Sepete dön')}</Button>
+                    <Button size="sm" onClick={reserveStock}>{t('try_again', 'Tekrar dene')}</Button>
                   </div>
                 }
               />
             ) : (
               <div className="space-y-4">
                 {pricingFailed && (
-                  <Alert type="warning" message={CART_MESSAGES.PRICING_PREVIEW_FAILED} action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t("try_again")}</Button>} />
+                  <Alert type="warning" message={CART_MESSAGES.PRICING_PREVIEW_FAILED} action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t('try_again', 'Tekrar dene')}</Button>} />
                 )}
                 {couponError && <Alert type="warning" message={couponError} />}
                 <CheckoutStep
@@ -348,33 +304,15 @@ const CheckoutPage = () => {
                   calculateTotal={calculateTotal}
                   onBack={handleBack}
                   onNext={handleNext}
+                  onGoToStep={handleStepChange}
                 />
               </div>
             )}
           </div>
 
-          {/* Desktop Sticky Concise Order Summary Sidebar (Hidden on Step 3) */}
-          {currentStep !== 3 && (
-            <div className="hidden lg:block lg:col-span-4">
-              <CheckoutOrderSummary 
-                cartItems={displayCartItems} 
-                calculateTotal={calculateTotal} 
-                pricing={pricing} 
-              />
-            </div>
-          )}
+          <div className="hidden lg:col-span-4 lg:block">{summary}</div>
         </div>
       </PageContainer>
-
-      {/* ── Modals ──────────────────────────────────────────────── */}
-      <EWalletSpendingWarningModal 
-        isOpen={checkout.showEWalletWarning} 
-        onClose={() => checkout.setShowEWalletWarning(false)} 
-        onConfirm={checkout.confirmEWalletWarningAndCheckout} 
-        projectedSpent={calculateTotal()} 
-        warningLimit={checkout.eWallet?.spendingWarningLimit || 0} 
-        currency={displayCartItems[0]?.listing?.currency || 'TRY'} 
-      />
     </div>
   );
 };

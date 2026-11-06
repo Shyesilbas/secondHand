@@ -4,7 +4,7 @@ import { useComparison } from '../hooks/useComparison.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useEnums } from '../../common/hooks/useEnums.js';
 
-const CompareButton = memo(({ listing, size = 'sm', className = '' }) => {
+const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'round' }) => {
  const { addToComparison, removeFromComparison, isInComparison, category, itemCount, maxItems } = useComparison();
  const { showWarning, showInfo } = useNotification();
  const { getListingTypeLabel } = useEnums();
@@ -64,12 +64,17 @@ const CompareButton = memo(({ listing, size = 'sm', className = '' }) => {
 
  return (
  <button
+ type="button"
+ aria-label={isAdded ? 'Remove from comparison' : 'Add to compare'}
+ aria-pressed={isAdded}
  onClick={handleClick}
  disabled={isDisabled || isLimitReached}
- className={`${sizeClasses[size]}
- rounded-full flex items-center justify-center transition-all duration-200
+ className={`${variant === 'square' ? 'h-10 w-10 rounded' : `${sizeClasses[size]} rounded-full`}
+ flex items-center justify-center transition-colors duration-150
  ${isAdded
  ? 'bg-primary text-white'
+ : variant === 'square'
+ ? 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary hover:text-text-primary'
  : 'bg-background-primary border border-border-light hover:border-primary text-text-secondary hover:text-primary'
  }
  ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''}
@@ -85,7 +90,7 @@ const CompareButton = memo(({ listing, size = 'sm', className = '' }) => {
  : 'Add to compare'
  }
  >
- <Scale className={iconSizes[size]} />
+ <Scale className={variant === 'square' ? 'h-4 w-4' : iconSizes[size]} strokeWidth={1.5} aria-hidden />
  </button>
  );
 });

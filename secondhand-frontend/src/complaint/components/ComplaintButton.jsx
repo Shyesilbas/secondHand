@@ -4,6 +4,7 @@ import { AlertTriangle as ExclamationTriangleIcon } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { useComplaints } from '../hooks/useComplaints.js';
 import ComplaintModal from './ComplaintModal.jsx';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
 const ComplaintButton = ({
  targetUserId,
@@ -11,7 +12,8 @@ const ComplaintButton = ({
  targetUser,
  listingId,
  listingTitle,
- className = ""
+ className = "",
+ variant = "solid"
 }) => {
  const {
  t
@@ -52,8 +54,8 @@ const ComplaintButton = ({
  }
  };
  return <>
- <button onClick={handleReportClick} className={`inline-flex items-center gap-2 px-3 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700 transition-colors text-sm ${className}`} title={`Report ${targetUserName}`}>
- <ExclamationTriangleIcon className="w-4 h-4" />{t("report")}</button>
+ <button type="button" onClick={handleReportClick} className={variant === "ghost" ? `${buttonClasses('ghost', 'sm')} ${className}` : `inline-flex items-center gap-2 px-3 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700 transition-colors text-sm ${className}`} title={`Report ${targetUserName}`}>
+ <ExclamationTriangleIcon className="w-4 h-4" strokeWidth={1.5} aria-hidden />{t("report")}</button>
 
  <ComplaintModal isOpen={showModal} onClose={() => setShowModal(false)} onSubmit={handleComplaint} targetUserName={targetUserName} targetUserId={targetUserId} listingId={listingId} listingTitle={listingTitle} isLoading={isSubmitting} />
  </>;

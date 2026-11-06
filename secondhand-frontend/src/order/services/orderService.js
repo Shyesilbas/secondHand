@@ -2,15 +2,25 @@ import {API_ENDPOINTS} from '../../common/constants/apiEndpoints.js';
 import {get, post, put} from '../../common/services/api/request.js';
 import { ORDER_DEFAULTS } from '../constants/orderUiConstants.js';
 
-const buildPagedOrdersUrl = (endpoint, page, size, sort, direction, deliveryMethod) => {
- let url = `${endpoint}?page=${page}&size=${size}`;
- if (sort) {
- url += `&sort=${sort},${direction}`;
- }
- if (deliveryMethod && deliveryMethod !== 'ALL') {
- url += `&deliveryMethod=${encodeURIComponent(deliveryMethod)}`;
- }
- return url;
+const appendDeliveryMethod = (params, deliveryMethod) => {
+ if (deliveryMethod && deliveryMethod !== 'ALL') params.set('deliveryMethod', deliveryMethod);
+};
+
+// `filters.statuses` (array) and `filters.orderNumber` (exact match) are optional list filters.
+const buildPagedOrdersUrl = (endpoint, page, size, sort, direction, deliveryMethod, filters = {}) => {
+ const params = new URLSearchParams({ page: String(page), size: String(size) });
+ if (sort) params.set('sort', `${sort},${direction}`);
+ appendDeliveryMethod(params, deliveryMethod);
+ if (filters.statuses?.length) params.set('statuses', filters.statuses.join(','));
+ if (filters.orderNumber) params.set('orderNumber', filters.orderNumber);
+ return `${endpoint}?${params.toString()}`;
+};
+
+const buildStatusCountsUrl = (endpoint, deliveryMethod) => {
+ const params = new URLSearchParams();
+ appendDeliveryMethod(params, deliveryMethod);
+ const query = params.toString();
+ return query ? `${endpoint}?${query}` : endpoint;
 };
 
 export const orderService = {
@@ -28,12 +38,23 @@ export const orderService = {
  size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
  sort = null,
  direction = ORDER_DEFAULTS.SORT_DIRECTION,
- deliveryMethod = 'ALL'
+ deliveryMethod = 'ALL',
+ filters = {}
  ) => {
- return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, page, size, sort, direction, deliveryMethod));
+ return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, page, size, sort, direction, deliveryMethod, filters));
  },
+ /** Buyer's own order by exact order number; rejects when it does not exist. */
  getByOrderNumber: async (orderNumber) => {
- return get(API_ENDPOINTS.ORDERS.GET_BY_ORDER_NUMBER(orderNumber));
+ const page = await get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_MY_ORDERS, 0, 1, null, null, 'ALL', { orderNumber }));
+ const order = page?.content?.[0];
+ if (!order) throw new Error('ORDER_NOT_FOUND');
+ return order;
+ },
+ myOrderStatusCounts: async (deliveryMethod = 'ALL') => {
+ return get(buildStatusCountsUrl(API_ENDPOINTS.ORDERS.STATUS_COUNTS, deliveryMethod));
+ },
+ sellerOrderStatusCounts: async (deliveryMethod = 'ALL') => {
+ return get(buildStatusCountsUrl(API_ENDPOINTS.ORDERS.SELLER_STATUS_COUNTS, deliveryMethod));
  },
  getById: async (id) => {
  return get(API_ENDPOINTS.ORDERS.GET_ORDER_DETAILS(id));
@@ -64,9 +85,10 @@ export const orderService = {
  size = ORDER_DEFAULTS.INITIAL_PAGE_SIZE,
  sort = null,
  direction = ORDER_DEFAULTS.SORT_DIRECTION,
- deliveryMethod = 'ALL'
+ deliveryMethod = 'ALL',
+ filters = {}
  ) => {
- return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS, page, size, sort, direction, deliveryMethod));
+ return get(buildPagedOrdersUrl(API_ENDPOINTS.ORDERS.LIST_SELLER_ORDERS, page, size, sort, direction, deliveryMethod, filters));
  },
  getPendingEscrowAmount: async () => {
  return get(API_ENDPOINTS.ORDERS.GET_PENDING_ESCROW_AMOUNT);

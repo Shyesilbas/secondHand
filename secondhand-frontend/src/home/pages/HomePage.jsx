@@ -1,47 +1,40 @@
 import { lazy, Suspense } from 'react';
-import { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
+import PageContainer from '../../common/components/layout/PageContainer.jsx';
 import RecentlyViewedSection from '../../listing/components/RecentlyViewedSection.jsx';
 import HeroSection from '../components/HeroSection.jsx';
 import TrustBand from '../components/TrustBand.jsx';
-import SellerCtaSection from '../components/SellerCtaSection.jsx';
+import HomeSection from '../components/HomeSection.jsx';
 
 const ShowcaseSection = lazy(() => import('../components/ShowcaseSection.jsx'));
+const NewListingsSection = lazy(() => import('../components/NewListingsSection.jsx'));
 
-const HomePage = () => {
-  return (
-    <div className="min-h-screen bg-background-primary flex flex-col">
-      {/* 1. Minimal Editorial Hero Section */}
-      <HeroSection />
+// Lazy sections fall back to the same grid skeleton they show while loading, so nothing jumps.
+const SectionFallback = () => (
+  <PageContainer>
+    <HomeSection.Skeleton />
+  </PageContainer>
+);
 
-      {/* 2. Hairline Trust Band */}
-      <TrustBand />
+const HomePage = () => (
+  <div className="flex min-h-screen flex-col bg-background-primary">
+    <HeroSection />
 
-      {/* 3. Main Discovery & Showcase Flow */}
-      <div className="flex flex-col gap-10 py-10">
-        {/* Son Gezilen İlanlar (Eğer gezilen ilan varsa gösterilir) */}
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 w-full">
-          <RecentlyViewedSection />
-        </div>
+    <div className="flex flex-col gap-12 py-10">
+      <PageContainer className="empty:hidden">
+        <RecentlyViewedSection />
+      </PageContainer>
 
-        {/* Vitrin / Featured Showcase Listings */}
-        <Suspense
-          fallback={
-            <div className="max-w-7xl mx-auto px-5 sm:px-8 py-6">
-              <div className="h-6 bg-background-tertiary rounded w-1/4 mb-6" />
-              <SkeletonGrid count={6} columns="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" />
-            </div>
-          }
-        >
-          <ShowcaseSection />
-        </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <ShowcaseSection />
+      </Suspense>
 
-        {/* Satış Yapma Çağrısı (Seller Callout) */}
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 w-full">
-          <SellerCtaSection />
-        </div>
-      </div>
+      <Suspense fallback={<SectionFallback />}>
+        <NewListingsSection />
+      </Suspense>
     </div>
-  );
-};
+
+    <TrustBand />
+  </div>
+);
 
 export default HomePage;

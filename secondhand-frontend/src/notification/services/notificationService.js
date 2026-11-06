@@ -2,9 +2,9 @@ import { get, put } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 
 export const notificationService = {
- getNotifications: async (page = 0, size = 20) => {
+ getNotifications: async (page = 0, size = 20, { unreadOnly = false } = {}) => {
  return get(API_ENDPOINTS.NOTIFICATIONS.ALL, {
- params: { page, size }
+ params: unreadOnly ? { page, size, unreadOnly: true } : { page, size }
  });
  },
 

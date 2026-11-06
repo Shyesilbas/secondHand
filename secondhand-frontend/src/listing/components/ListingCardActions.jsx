@@ -6,6 +6,7 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useListingActions } from '../hooks/useListingActions.js';
 import { ListingQuickActionsModal } from './ListingQuickActionsModal.jsx';
 import { Settings } from 'lucide-react';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 const ListingCardActions = ({
   listing,
@@ -39,10 +40,10 @@ const ListingCardActions = ({
             e.stopPropagation();
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-full cursor-pointer"
+          className={`${buttonClasses()} w-full`}
         >
           <Settings className="w-4 h-4" strokeWidth={1.5} />
-          <span>{t("open_management_panel", "Hızlı İşlemler")}</span>
+          <span>{t("manage_listing", "İlanı yönet")}</span>
         </button>
       ) : (
         <button

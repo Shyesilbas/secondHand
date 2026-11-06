@@ -11,7 +11,7 @@ const InboxPage = () => {
  const activeTab = useMemo(() => normalizeInboxTab(searchParams.get('tab')), [searchParams]);
 
   return (
-    <div className="flex flex-col w-full h-[calc(100vh-70px)] bg-background-secondary overflow-hidden">
+    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-background-secondary">
       <PageContainer className="flex flex-col flex-1 min-h-0 w-full max-w-screen-2xl py-3 sm:py-4">
         {activeTab === INBOX_TABS.EMAILS && <EmailsPage embedded />}
         {activeTab === INBOX_TABS.NOTIFICATIONS && <InboxNotificationsPanel />}

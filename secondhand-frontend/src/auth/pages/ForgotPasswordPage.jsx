@@ -1,167 +1,206 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { authService } from '../services/authService.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import AuthInput from '../../common/components/ui/AuthInput.jsx';
-import AuthButton from '../../common/components/ui/AuthButton.jsx';
-import { ForgotPasswordRequestDTO } from '../auth.js';
-import { useNotification } from '../../notification/NotificationContext.jsx';
-import { Mail as EnvelopeIcon, Key as KeyIcon, Lock as LockClosedIcon, ArrowLeft as ArrowLeftIcon } from 'lucide-react';
+import { OTP_CODE_LENGTH } from '../../common/constants/otp.js';
+import Button from '../../common/components/ui/Button.jsx';
+import Alert from '../../common/components/ui/Alert.jsx';
+import OtpDigitInputGroup from '../../payments/components/verification/OtpDigitInputGroup.jsx';
+import { AuthBrand, AuthField, AuthHeader, PasswordField, PasswordRules } from '../components/AuthPrimitives.jsx';
+import { getPasswordError, isValidEmail } from '../utils/passwordRules.js';
+
+const SubmitLabel = ({ loading, loadingText, children }) => (
+  <>
+    {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+    {loading ? loadingText : children}
+  </>
+);
+
+/**
+ * Step 1 asks for the email and requests a code. Step 2 takes the 6-digit code from the email
+ * and the new password. The backend answers the same whether or not the email exists.
+ */
 const ForgotPasswordPage = () => {
- const {
- t
- } = useTranslation();
- const [formData, setFormData] = useState({
- ...ForgotPasswordRequestDTO
- });
- const [isLoading, setIsLoading] = useState(false);
- const [success, setSuccess] = useState(false);
- const [verificationCode, setVerificationCode] = useState('');
- const [resetForm, setResetForm] = useState({
- email: '',
- verificationCode: '',
- newPassword: '',
- confirmPassword: ''
- });
- const [error, setError] = useState('');
- const notification = useNotification();
- const handleSubmit = async e => {
- e.preventDefault();
- if (!formData.email.trim()) {
- setError('Email address is required');
- return;
- }
- if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
- setError('Please enter a valid email address');
- return;
- }
- setIsLoading(true);
- setError('');
- try {
- const res = await authService.forgotPassword(formData.email);
- if (res?.verificationCode) setVerificationCode(res.verificationCode);
- setResetForm(prev => ({
- ...prev,
- email: formData.email,
- verificationCode: res?.verificationCode || ''
- }));
- setSuccess(true);
- } catch (error) {
- const errorMessage = error.response?.data?.message || 'An error occurred';
- setError(errorMessage);
- } finally {
- setIsLoading(false);
- }
- };
- if (success) {
- return <div className="flex flex-col w-full animate-fade-in">
- {/* Logo Monogram */}
- <div className="flex items-center gap-2 mb-8">
- <div className="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
- <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
- </div>
- <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
- </div>
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
- <div className="text-center mb-8">
- <EnvelopeIcon className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-primary stroke-1.5" strokeWidth={1.5} aria-hidden />
- <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("check_verification_code")}</h2>
- <p className="mt-2 text-xs text-text-secondary font-normal max-w-xs mx-auto leading-relaxed">{t("a_verification_code_has_been_generated_u")}</p>
- </div>
+  const requestCode = async () => {
+    await authService.forgotPassword(email.trim());
+    setCodeSent(true);
+  };
 
- {verificationCode && <div className="mb-6 p-4 rounded border border-border-light bg-background-secondary text-center">
- <div className="text-xs font-semibold text-text-muted mb-1">{t("developer_environment_code")}</div>
- <div className="text-2xl font-semibold text-text-primary">{verificationCode}</div>
- </div>}
+  const handleRequest = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) return setErrors({ email: t('auth_email_required', 'E-posta adresini gir.') });
+    if (!isValidEmail(email)) return setErrors({ email: t('auth_email_invalid', 'Geçerli bir e-posta adresi gir.') });
+    setErrors({});
+    setSubmitError('');
+    setIsLoading(true);
+    try {
+      await requestCode();
+    } catch (error) {
+      setSubmitError(error.response?.data?.message || t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
- <form onSubmit={async e => {
- e.preventDefault();
- if (!resetForm.newPassword || resetForm.newPassword !== resetForm.confirmPassword) {
- return setError('Passwords do not match');
- }
- setIsLoading(true);
- try {
- await authService.resetPassword({
- email: resetForm.email,
- verificationCode: resetForm.verificationCode,
- newPassword: resetForm.newPassword,
- confirmPassword: resetForm.confirmPassword
- });
- setError('');
- notification.showSuccess('Success', 'Your password has been updated. Redirecting to login page...', {
- autoCloseDelay: 1200
- });
- setTimeout(() => {
- window.location.href = ROUTES.LOGIN;
- }, 1200);
- } catch (err) {
- setError(err.response?.data?.message || 'Password reset failed');
- } finally {
- setIsLoading(false);
- }
- }} className="flex flex-col gap-4 text-left">
- <AuthInput label={t("email_address")} value={resetForm.email} onChange={e => setResetForm({
- ...resetForm,
- email: e.target.value
- })} required leftIcon={<EnvelopeIcon className="w-4 h-4" />} />
- <AuthInput label={t("verification_code")} value={resetForm.verificationCode} onChange={e => setResetForm({
- ...resetForm,
- verificationCode: e.target.value
- })} required leftIcon={<KeyIcon className="w-4 h-4" />} />
- <AuthInput label={t("new_password")} type="password" value={resetForm.newPassword} onChange={e => setResetForm({
- ...resetForm,
- newPassword: e.target.value
- })} required leftIcon={<LockClosedIcon className="w-4 h-4" />} />
- <AuthInput label={t("confirm_new_password")} type="password" value={resetForm.confirmPassword} onChange={e => setResetForm({
- ...resetForm,
- confirmPassword: e.target.value
- })} required leftIcon={<LockClosedIcon className="w-4 h-4" />} />
+  const handleResend = async () => {
+    setIsResending(true);
+    setSubmitError('');
+    try {
+      await requestCode();
+    } catch (error) {
+      setSubmitError(error.response?.data?.message || t('auth_reset_request_failed', 'Kod gönderilemedi. Lütfen tekrar dene.'));
+    } finally {
+      setIsResending(false);
+    }
+  };
 
- {error && <div className="p-3.5 rounded bg-background-secondary border border-border text-xs text-status-error-text">
- {error}
- </div>}
+  const handleReset = async (e) => {
+    e.preventDefault();
+    const next = {};
+    if (code.length !== OTP_CODE_LENGTH) next.code = t('auth_code_incomplete', 'E-postandaki 6 haneli kodu gir.');
+    const passwordError = getPasswordError(passwords.newPassword);
+    if (passwordError) next.newPassword = passwordError;
+    if (!passwords.confirmPassword) next.confirmPassword = t('auth_password_repeat_required', 'Yeni şifreni tekrar gir.');
+    else if (passwords.newPassword !== passwords.confirmPassword) next.confirmPassword = t('auth_password_mismatch', 'Şifreler eşleşmiyor.');
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
 
- <AuthButton type="submit" isLoading={isLoading} className="mt-2">{t("save_new_password")}</AuthButton>
- </form>
+    setSubmitError('');
+    setIsLoading(true);
+    try {
+      await authService.resetPassword({ email: email.trim(), verificationCode: code, ...passwords });
+      navigate(ROUTES.LOGIN, {
+        replace: true,
+        state: { message: t('auth_reset_done', 'Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.') }
+      });
+    } catch (error) {
+      setSubmitError(error.response?.data?.message || t('auth_reset_failed', 'Şifre güncellenemedi. Kodu kontrol edip tekrar dene.'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
- <div className="text-center mt-6">
- <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
- <ArrowLeftIcon className="w-3.5 h-3.5" />
- <span>{t("back_to_login")}</span>
- </Link>
- </div>
- </div>;
- }
- return <div className="flex flex-col w-full animate-fade-in">
- {/* Logo Monogram */}
- <div className="flex items-center gap-2 mb-8">
- <div className="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0">
- <span className="text-primary-content text-xs font-semibold leading-none">{t("s")}</span>
- </div>
- <span className="text-sm font-semibold text-text-primary tracking-tight">{t("secondhand")}</span>
- </div>
+  const setPassword = (e) => {
+    const { name, value } = e.target;
+    setPasswords(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+  };
 
- <div className="mb-8">
- <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("recover_password")}</h1>
- <p className="mt-2 text-sm text-text-secondary font-normal">{t("enter_your_email_and_we_ll_start_your_re")}</p>
- </div>
+  const backToLogin = (
+    <Link to={ROUTES.LOGIN} className="mt-8 inline-flex items-center gap-1.5 self-center text-sm text-text-secondary hover:text-text-primary">
+      <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+      {t('auth_back_to_login', 'Girişe dön')}
+    </Link>
+  );
 
- <form onSubmit={handleSubmit} className="flex flex-col gap-5">
- <AuthInput label={t("email_address")} type="email" value={formData.email} onChange={e => setFormData(prev => ({
- ...prev,
- email: e.target.value
- }))} placeholder={t("name_example_com")} error={error} required leftIcon={<EnvelopeIcon className="w-4 h-4" />} />
+  if (!codeSent) {
+    return (
+      <div className="flex flex-col">
+        <AuthBrand />
+        <AuthHeader
+          title={t('auth_forgot_title', 'Şifreni sıfırla')}
+          subtitle={t('auth_forgot_subtitle', 'Hesabının e-posta adresini gir, sana 6 haneli bir kod gönderelim.')}
+        />
+        <form onSubmit={handleRequest} noValidate className="space-y-4">
+          {submitError && <Alert type="error" message={submitError} />}
+          <AuthField
+            label={t('auth_email', 'E-posta')}
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({}); }}
+            placeholder="ornek@eposta.com"
+            error={errors.email}
+            autoComplete="email"
+            autoFocus
+          />
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            <SubmitLabel loading={isLoading} loadingText={t('auth_sending', 'Gönderiliyor…')}>
+              {t('auth_send_code', 'Kod gönder')}
+            </SubmitLabel>
+          </Button>
+        </form>
+        {backToLogin}
+      </div>
+    );
+  }
 
- <AuthButton type="submit" isLoading={isLoading} className="mt-2">{t("send_recovery_code")}</AuthButton>
+  return (
+    <div className="flex flex-col">
+      <AuthBrand />
+      <AuthHeader title={t('auth_reset_title', 'Yeni şifre belirle')}>
+        <p className="mt-2 text-sm text-text-secondary">
+          {t('auth_reset_sent_to', 'Hesabın varsa kodu şu adrese gönderdik:')}{' '}
+          <span className="font-medium text-text-primary">{email.trim()}</span>{' '}
+          <button
+            type="button"
+            onClick={() => { setCodeSent(false); setCode(''); setErrors({}); setSubmitError(''); }}
+            className="text-text-secondary underline hover:text-text-primary"
+          >
+            {t('auth_change', 'Değiştir')}
+          </button>
+        </p>
+      </AuthHeader>
 
- <div className="text-center mt-4">
- <Link to={ROUTES.LOGIN} className="inline-flex items-center justify-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors">
- <ArrowLeftIcon className="w-3.5 h-3.5" />
- <span>{t("back_to_login")}</span>
- </Link>
- </div>
- </form>
- </div>;
+      <form onSubmit={handleReset} noValidate className="space-y-5">
+        {submitError && <Alert type="error" message={submitError} />}
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-text-primary">{t('auth_code', 'Doğrulama kodu')}</p>
+          <OtpDigitInputGroup value={code} onChange={(v) => { setCode(v); if (errors.code) setErrors(prev => ({ ...prev, code: '' })); }} dataSlotPrefix="reset" />
+          {errors.code && <p className="mt-1.5 text-xs text-status-error-text">{errors.code}</p>}
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={isResending}
+            className="mt-2 text-sm text-text-secondary underline hover:text-text-primary disabled:no-underline disabled:opacity-50"
+          >
+            {isResending ? t('auth_sending', 'Gönderiliyor…') : t('auth_resend_code', 'Kodu tekrar gönder')}
+          </button>
+        </div>
+
+        <div>
+          <PasswordField
+            label={t('auth_new_password', 'Yeni şifre')}
+            name="newPassword"
+            value={passwords.newPassword}
+            onChange={setPassword}
+            error={errors.newPassword}
+            autoComplete="new-password"
+          />
+          <div className="mt-2"><PasswordRules password={passwords.newPassword} /></div>
+        </div>
+        <PasswordField
+          label={t('auth_new_password_repeat', 'Yeni şifre tekrar')}
+          name="confirmPassword"
+          value={passwords.confirmPassword}
+          onChange={setPassword}
+          error={errors.confirmPassword}
+          autoComplete="new-password"
+        />
+
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          <SubmitLabel loading={isLoading} loadingText={t('auth_saving', 'Kaydediliyor…')}>
+            {t('auth_save_password', 'Şifreyi güncelle')}
+          </SubmitLabel>
+        </Button>
+      </form>
+      {backToLogin}
+    </div>
+  );
 };
+
 export default ForgotPasswordPage;

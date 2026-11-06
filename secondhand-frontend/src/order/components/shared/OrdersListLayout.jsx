@@ -1,36 +1,37 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { ORDER_QUERY_KEYS } from '../../orderConstants.js';
 import { orderService } from '../../services/orderService.js';
 import { formatCurrency, formatLongDate, resolveEnumLabel } from '../../../common/formatters.js';
 import { ROUTES } from '../../../common/constants/routes.js';
+import { optimizeCloudinaryUrl } from '../../../common/utils/imageOptimizer.js';
 import PaymentReceiptModal from '../../../common/components/modals/PaymentReceiptModal.jsx';
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import ReviewModal from '../../../reviews/components/ReviewModal.jsx';
 import {
  ORDER_DEFAULTS,
- ORDER_LIMITS,
- ORDER_STATUS_TAB_FILTER,
+ ORDER_LIST_TABS,
  ORDER_STATUSES,
  ORDER_TIME,
- ORDER_VIEW_MODES
+ ORDER_VIEW_MODES,
+ SELLER_TO_SHIP_STATUSES
 } from '../../constants/orderUiConstants.js';
 import { getOrderStatusDotClass } from '../../utils/statusPresentation.js';
 import Button, { buttonClasses } from '../../../common/components/ui/Button.jsx';
 import DataPagination from '../../../common/components/ui/DataPagination.jsx';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
 import Skeleton from '../../../common/components/ui/Skeleton.jsx';
+import Alert from '../../../common/components/ui/Alert.jsx';
 import {
  BarChart3,
- Check,
- ChevronDown,
  ChevronRight,
  CircleCheck,
+ Clock,
+ KeyRound,
  Package,
- Pencil,
  RefreshCw,
  Search,
  Star,
@@ -38,149 +39,204 @@ import {
  X
 } from 'lucide-react';
 
-// Header and list share one column width so the title lines up with the cards.
+// Header, summary and list share one column width so everything lines up.
 const LIST_WIDTH = 'max-w-4xl';
 
 const useOrdersCopy = () => {
  const { t, i18n } = useTranslation();
  return useMemo(() => ({
  locale: i18n.language?.startsWith('tr') ? 'tr-TR' : 'en-US',
- searchPlaceholder: t('orders_ui_search_placeholder', 'Sipariş no ile ara…'),
+ bought: t('orders_ui_bought', 'Aldıklarım'),
+ sold: t('orders_ui_sold', 'Sattıklarım'),
+ searchPlaceholder: t('orders_ui_search_placeholder', 'Sipariş no ile ara'),
  searchSubmit: t('orders_ui_search_submit', 'Ara'),
  clear: t('orders_ui_clear', 'Temizle'),
- tabAll: t('orders_ui_tab_all', 'Tümü'),
- tabPreparing: t('orders_ui_tab_preparing', 'Hazırlanıyor'),
- tabShipped: t('orders_ui_tab_shipped', 'Kargoda'),
- tabDelivered: t('orders_ui_tab_delivered', 'Teslim Edildi'),
- tabCancelled: t('orders_ui_tab_cancelled', 'İptal Edildi'),
+ tabs: {
+ [ORDER_LIST_TABS.ALL]: t('orders_ui_tab_all', 'Tümü'),
+ [ORDER_LIST_TABS.ACTION]: t('orders_ui_tab_action', 'Aksiyon bekleyen'),
+ [ORDER_LIST_TABS.PREPARING]: t('orders_ui_tab_preparing', 'Hazırlanıyor'),
+ [ORDER_LIST_TABS.IN_DELIVERY]: t('orders_ui_tab_in_delivery', 'Teslimatta'),
+ [ORDER_LIST_TABS.COMPLETED]: t('orders_ui_tab_completed', 'Teslim edildi'),
+ [ORDER_LIST_TABS.CLOSED]: t('orders_ui_tab_closed', 'İptal ve iade'),
+ },
  deliveryLabel: t('orders_ui_delivery_label', 'Teslimat yöntemi'),
  deliveryAll: t('orders_ui_delivery_all', 'Tüm teslimatlar'),
  deliveryCargo: t('orders_ui_delivery_cargo', 'Kargo'),
  deliveryMeetup: t('orders_ui_delivery_meetup', 'Güvenli buluşma'),
  totalLabel: t('orders_ui_total', 'Toplam tutar'),
- orderCardTitleFallback: t('orders_ui_title_fallback', 'Siparişiniz'),
+ orderCardTitleFallback: t('orders_ui_title_fallback', 'Sipariş'),
+ moreItems: count => t('orders_ui_more_items', { defaultValue: '+{{count}} ürün', count }),
+ sellerPrefix: t('orders_ui_seller_prefix', 'Satıcı'),
+ buyerPrefix: t('orders_ui_buyer_prefix', 'Alıcı'),
  reviewNow: t('orders_ui_review_now', 'Değerlendir'),
  detail: t('orders_ui_detail', 'Detaylar'),
  trackShipment: t('orders_ui_track_shipment', 'Kargoyu takip et'),
- confirmReceipt: t('orders_ui_confirm_receipt', 'Teslim alındı onayla'),
- nameBannerTitle: t('orders_ui_name_banner', 'Kalem simgesiyle siparişlerinize hatırlatıcı isimler verebilirsiniz.'),
- nameBannerOk: t('orders_ui_name_banner_ok', 'Anladım'),
- escrowLabel: t('orders_ui_escrow_label', 'Güvence havuzu (escrow)'),
- escrowHintPending: t('orders_ui_escrow_pending', 'Sipariş tamamlandığında cüzdanınıza aktarılır'),
- escrowHintEmpty: t('orders_ui_escrow_empty', 'Bekleyen güvence bakiyesi yok'),
- escrowByOrder: t('orders_ui_escrow_by_order', 'Sipariş bazında'),
- escrowAwaitingDelivery: t('orders_ui_escrow_awaiting_delivery', 'Teslimattan 72 saat sonra onaylanır.'),
- escrowReleased: t('orders_ui_escrow_released', 'Otomatik aktarıldı.'),
- escrowReleasesIn: hours => t('orders_ui_escrow_releases_in', { defaultValue: '~{{hours}} saat içinde aktarılacak.', hours }),
+ confirmReceipt: t('orders_ui_confirm_receipt', 'Teslim aldım'),
+ meetupCode: t('orders_ui_meetup_code', 'Buluşma kodu'),
+ meetupDetail: t('orders_ui_meetup_detail', 'Buluşma detayı'),
+ shipOrder: t('orders_ui_ship_order', 'Kargoya ver'),
+ summaryToShip: t('orders_ui_summary_to_ship', 'Kargolanacak'),
+ summaryEscrow: t('orders_ui_summary_escrow', 'Güvencede bekleyen'),
+ summaryCompleted: t('orders_ui_summary_completed', 'Tamamlanan satış'),
+ escrowInRow: amount => t('orders_ui_escrow_in_row', { defaultValue: '{{amount}} güvencede', amount }),
+ escrowAwaitingDelivery: t('orders_ui_escrow_awaiting_delivery', 'teslimattan 72 saat sonra aktarılır'),
+ escrowReleased: t('orders_ui_escrow_released', 'otomatik aktarıldı'),
+ escrowReleasesIn: hours => t('orders_ui_escrow_releases_in', { defaultValue: '~{{hours}} saat içinde aktarılır', hours }),
  startShopping: t('orders_ui_start_shopping', 'Alışverişe başla'),
  filteredEmptyTitle: t('orders_ui_filtered_empty_title', 'Bu filtreyle eşleşen sipariş yok'),
- filteredEmptyBody: t('orders_ui_filtered_empty_body', 'Başka bir durum ya da teslimat yöntemi deneyin.'),
- clearFilters: t('orders_ui_clear_filters', 'Filtreleri temizle')
+ filteredEmptyBody: t('orders_ui_filtered_empty_body', 'Başka bir sekme ya da teslimat yöntemi deneyin.'),
+ searchEmptyTitle: q => t('orders_ui_search_empty_title', { defaultValue: '{{q}} numaralı sipariş bulunamadı', q }),
+ searchEmptyBody: t('orders_ui_search_empty_body', 'Sipariş numarasını kontrol edip tekrar deneyin.'),
+ clearSearch: t('orders_ui_clear_search', 'Aramayı temizle'),
+ clearFilters: t('orders_ui_clear_filters', 'Filtreleri temizle'),
+ shipDeadlineNoteTitle: t('orders_ui_ship_deadline_note_title', 'Kargo siparişlerini 72 saat içinde kargolaman gerekir'),
+ shipDeadlineNoteBody: t('orders_ui_ship_deadline_note_body', 'Süre siparişin verildiği andan başlar. 72 saat içinde kargoya verilmeyen siparişler otomatik iptal edilir ve alıcıya ücret iadesi yapılır.'),
+ shipTimeLeft: (hours, minutes) => t('orders_ui_ship_time_left', { defaultValue: 'Kargolamak için kalan süre: {{hours}} sa {{minutes}} dk', hours, minutes }),
+ shipTimeLeftMinutes: minutes => t('orders_ui_ship_time_left_minutes', { defaultValue: 'Kargolamak için kalan süre: {{minutes}} dk', minutes }),
+ shipTimeExpired: t('orders_ui_ship_time_expired', 'Kargolama süresi doldu, sipariş iptal ediliyor')
  }), [t, i18n.language]);
 };
 
-const getListPaginationSlice = (pagination, pageSizeFallback = ORDER_DEFAULTS.INITIAL_PAGE_SIZE) => {
+const TAB_ORDER = [
+ ORDER_LIST_TABS.ALL,
+ ORDER_LIST_TABS.ACTION,
+ ORDER_LIST_TABS.PREPARING,
+ ORDER_LIST_TABS.IN_DELIVERY,
+ ORDER_LIST_TABS.COMPLETED,
+ ORDER_LIST_TABS.CLOSED
+];
+
+const getListPaginationSlice = (pagination) => {
  if (!pagination || pagination.totalPages === 0) return null;
  const currentPage = pagination.number || 0;
- const pageSize = pagination.size || pageSizeFallback;
+ const pageSize = pagination.size;
  const totalElements = pagination.totalElements || 0;
- const startItem = totalElements === 0 ? 0 : currentPage * pageSize + 1;
- const endItem = Math.min((currentPage + 1) * pageSize, totalElements);
  return {
  currentPage,
  totalPages: pagination.totalPages || 1,
  pageSize,
  totalElements,
- startItem,
- endItem
+ startItem: totalElements === 0 ? 0 : currentPage * pageSize + 1,
+ endItem: Math.min((currentPage + 1) * pageSize, totalElements)
  };
 };
 
-const Header = React.memo(({
- title,
- subtitle,
- showIndicator,
- onAnalytics,
- analyticsLabel = 'Analitik',
- onRefresh,
- loading,
- sticky
-}) => {
+/* ── Header ─────────────────────────────────────────────── */
+
+const ViewSwitch = ({ uiCopy }) => {
+ const linkClass = ({ isActive }) =>
+ `inline-flex h-9 items-center rounded px-3 text-sm transition-colors duration-150 ${
+ isActive ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
+ }`;
+ return (
+ <nav className="inline-flex rounded border border-border bg-background-tertiary p-0.5" aria-label={uiCopy.bought + ' / ' + uiCopy.sold}>
+ <NavLink to={ROUTES.MY_ORDERS} className={linkClass} end>{uiCopy.bought}</NavLink>
+ <NavLink to={ROUTES.I_SOLD} className={linkClass} end>{uiCopy.sold}</NavLink>
+ </nav>
+ );
+};
+
+const Header = ({ title, subtitle, onAnalytics, analyticsLabel, onRefresh, loading, uiCopy }) => {
  const { t } = useTranslation();
- const headerContent = (
- <div className="flex flex-row items-center justify-between gap-4">
- <div className="flex flex-col gap-0.5 min-w-0">
- <div className="flex items-center gap-2.5 min-w-0">
- <h1 className="truncate text-2xl font-semibold text-text-primary">{title}</h1>
- {showIndicator ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-status-error" aria-hidden /> : null}
+ return (
+ <div className="mb-6 space-y-4">
+ <div className="flex items-start justify-between gap-4">
+ <div className="min-w-0">
+ <h1 className="text-2xl font-semibold text-text-primary">{title}</h1>
+ {subtitle ? <p className="mt-0.5 text-sm text-text-secondary">{subtitle}</p> : null}
  </div>
- {subtitle ? <p className="truncate text-sm text-text-secondary">{subtitle}</p> : null}
- </div>
- <div className="flex items-center gap-2 shrink-0">
+ <div className="flex shrink-0 items-center gap-2">
  {onAnalytics ? (
  <Button variant="secondary" size="sm" onClick={onAnalytics}>
  <BarChart3 className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
  <span className="hidden sm:inline">{analyticsLabel}</span>
  </Button>
  ) : null}
- {onRefresh ? (
- <Button variant="secondary" size="sm" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
- <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} />
+ <Button variant="secondary" size="sm" className="w-9 !px-0" onClick={onRefresh} disabled={loading} aria-label={t("refresh", "Yenile")}>
+ <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} strokeWidth={1.5} aria-hidden />
  </Button>
- ) : null}
  </div>
+ </div>
+ <ViewSwitch uiCopy={uiCopy} />
  </div>
  );
+};
 
- if (!sticky) {
- return <div className="mb-6">{headerContent}</div>;
- }
+/* ── Seller summary ─────────────────────────────────────── */
+
+const SummaryStat = ({ label, value, loading }) => (
+ <div className="min-w-0 px-4 py-3 sm:px-5 sm:py-4">
+ <p className="truncate text-sm text-text-tertiary">{label}</p>
+ {loading ? (
+ <Skeleton className="mt-1 h-6 w-16" />
+ ) : (
+ <p className="mt-0.5 truncate text-lg font-semibold tabular-nums text-text-primary">{value}</p>
+ )}
+ </div>
+);
+
+const SellerSummary = ({ flow, uiCopy }) => {
+ const { statusCounts, countsError } = flow.tabs;
+ // On a failed count request show a dash instead of an endless skeleton.
+ const countsLoading = !countsError && flow.tabs.getTabCount(ORDER_LIST_TABS.ALL) == null;
+ const toShip = countsError ? '—' : SELLER_TO_SHIP_STATUSES.reduce((sum, s) => sum + (statusCounts[s] || 0), 0);
  return (
- <div className="sticky top-0 z-30 border-b border-border bg-background-primary">
- <PageContainer className={`py-4 ${LIST_WIDTH}`}>{headerContent}</PageContainer>
+ <>
+ <div className="mb-4 flex items-start gap-3 rounded border border-border bg-background-primary p-4" role="note">
+ <Clock className={`mt-0.5 h-5 w-5 shrink-0 ${toShip > 0 ? 'text-status-warning-text' : 'text-text-tertiary'}`} strokeWidth={1.5} aria-hidden />
+ <div className="min-w-0">
+ <p className="text-sm font-medium text-text-primary">{uiCopy.shipDeadlineNoteTitle}</p>
+ <p className="mt-0.5 text-sm text-text-secondary">{uiCopy.shipDeadlineNoteBody}</p>
  </div>
+ </div>
+ <div className="mb-6 grid grid-cols-3 divide-x divide-border-light rounded border border-border bg-background-primary">
+ <SummaryStat label={uiCopy.summaryToShip} value={toShip} loading={countsLoading} />
+ <SummaryStat label={uiCopy.summaryEscrow} value={formatCurrency(flow.escrow.pendingEscrowAmount)} loading={flow.escrow.isLoading} />
+ <SummaryStat label={uiCopy.summaryCompleted} value={countsError ? '—' : statusCounts[ORDER_STATUSES.COMPLETED] || 0} loading={countsLoading} />
+ </div>
+ </>
  );
-});
+};
 
-const StatusTabs = React.memo(({
- statusFilter,
- setStatusFilter,
- uiCopy
-}) => {
+/* ── Filters ─────────────────────────────────────────────── */
+
+const StatusTabs = ({ activeTab, onChange, getTabCount, disabled, uiCopy }) => {
  const { t } = useTranslation();
- const tabs = useMemo(() => [
- { value: ORDER_STATUS_TAB_FILTER.ALL, label: uiCopy.tabAll },
- { value: ORDER_STATUS_TAB_FILTER.PREPARING, label: uiCopy.tabPreparing },
- { value: ORDER_STATUS_TAB_FILTER.SHIPPED, label: uiCopy.tabShipped },
- { value: ORDER_STATUS_TAB_FILTER.DELIVERED_GROUP, label: uiCopy.tabDelivered },
- { value: ORDER_STATUS_TAB_FILTER.CANCELLED, label: uiCopy.tabCancelled }
- ], [uiCopy]);
-
  return (
  <div className="-mb-px flex overflow-x-auto" role="tablist" aria-label={t("order_status_filters", "Sipariş durumu filtreleri")}>
- {tabs.map(tab => {
- const active = (statusFilter || '') === (tab.value || '');
+ {TAB_ORDER.map(tab => {
+ const active = !disabled && activeTab === tab;
+ const count = getTabCount(tab);
+ const highlight = tab === ORDER_LIST_TABS.ACTION && count > 0;
  return (
  <button
- key={tab.value || 'all'}
+ key={tab}
  type="button"
  role="tab"
  aria-selected={active}
- id={`orders-tab-${String(tab.value || 'all').replace(/\W+/g, '-')}`}
- onClick={() => setStatusFilter?.(tab.value)}
- className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors duration-150 ${
+ onClick={() => onChange(tab)}
+ className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm transition-colors duration-150 ${
  active
  ? 'border-primary font-medium text-text-primary'
  : 'border-transparent text-text-secondary hover:text-text-primary'
  }`}
  >
- {tab.label}
+ {uiCopy.tabs[tab]}
+ {count != null && count > 0 && (
+ <span
+ className={`rounded-sm px-1.5 text-xs font-medium tabular-nums ${
+ highlight ? 'bg-status-warning-bg text-status-warning-text' : 'bg-background-tertiary text-text-secondary'
+ }`}
+ >
+ {count}
+ </span>
+ )}
  </button>
  );
  })}
  </div>
  );
-});
+};
 
 const DeliverySelect = ({ value, onChange, uiCopy }) => (
  <select
@@ -195,325 +251,232 @@ const DeliverySelect = ({ value, onChange, uiCopy }) => (
  </select>
 );
 
-const SearchToolbar = React.memo(({
- search,
- onSearch,
- onClearSearch,
- uiCopy
-}) => {
+const SearchBox = ({ search, onSubmit, uiCopy }) => {
  const { t } = useTranslation();
- const {
- searchTerm,
- setSearchTerm,
- searchLoading,
- searchError
- } = search;
-
+ const { searchTerm, setSearchTerm, clearSearch } = search;
  return (
- <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none" role="search" aria-label={t("search_orders", "Siparişlerde ara")}>
- <form onSubmit={onSearch} className="relative flex items-center">
+ <form onSubmit={onSubmit} className="relative min-w-0 flex-1 sm:w-56 sm:flex-none" role="search" aria-label={t("search_orders", "Siparişlerde ara")}>
  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" strokeWidth={1.5} aria-hidden />
  <input
- type="text"
+ type="search"
+ inputMode="search"
  value={searchTerm}
  onChange={e => setSearchTerm(e.target.value)}
  placeholder={uiCopy.searchPlaceholder}
- disabled={searchLoading}
- aria-invalid={Boolean(searchError)}
- aria-describedby={searchError ? 'orders-search-error' : undefined}
  aria-label={uiCopy.searchPlaceholder}
  className="h-10 w-full rounded border border-border bg-background-primary pl-9 pr-9 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus"
  />
  {searchTerm ? (
  <button
  type="button"
- onClick={onClearSearch}
- className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer rounded p-1 text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-secondary"
+ onClick={clearSearch}
+ className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-secondary"
  aria-label={uiCopy.clear}
  >
- <X className="h-4 w-4" strokeWidth={1.5} />
+ <X className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  </button>
  ) : null}
- <button type="submit" className="sr-only" disabled={searchLoading || !searchTerm.trim()}>{uiCopy.searchSubmit}</button>
+ <button type="submit" className="sr-only" disabled={!searchTerm.trim()}>{uiCopy.searchSubmit}</button>
  </form>
- {searchError ? (
- <div id="orders-search-error" role="status" aria-live="polite" className="absolute right-0 top-full z-20 mt-2 max-w-xs rounded border border-border bg-background-primary px-4 py-2.5 text-sm text-status-error-text shadow-sm">
- {searchError}
- </div>
- ) : null}
- </div>
- );
-});
-
-const OrderItemSkeleton = () => (
- <div className="flex items-start gap-4 rounded border border-border bg-background-primary p-5">
- <Skeleton className="h-16 w-16 shrink-0" />
- <div className="flex-1 space-y-3 pt-1">
- <Skeleton className="h-4 w-44 max-w-full" />
- <Skeleton className="h-4 w-32" />
- </div>
- <Skeleton className="h-6 w-24 shrink-0" />
- </div>
-);
-
-const OrdersPagination = ({ pagination, hidden, onPageChange, onPageSizeChange }) => {
- const slice = hidden ? null : getListPaginationSlice(pagination);
- if (!slice) return null;
- return (
- <DataPagination
- shouldShowPagination
- currentPage={slice.currentPage}
- totalPages={slice.totalPages}
- startItem={slice.startItem}
- endItem={slice.endItem}
- totalItems={slice.totalElements}
- pageSize={slice.pageSize}
- pageSizeOptions={ORDER_DEFAULTS.PAGE_SIZE_OPTIONS}
- onPageChange={onPageChange}
- onPageSizeChange={onPageSizeChange}
- />
  );
 };
 
-const UnifiedOrderItem = React.memo(({
- viewMode,
- order,
- enums,
- onOpenOrder,
- onOpenQuickReview,
- onCompleteOrder,
- editingOrderId,
- editingOrderName,
- setEditingOrderName,
- onStartEditName,
- onCancelEditName,
- onSaveOrderName,
- uiCopy,
- isReviewed,
- highlighted
-}) => {
+/* ── Order row ───────────────────────────────────────────── */
+
+const OrderRowSkeleton = () => (
+ <div className="flex items-start gap-4 rounded border border-border bg-background-primary p-4 sm:p-5">
+ <Skeleton className="h-16 w-16 shrink-0" />
+ <div className="flex-1 space-y-2.5 pt-0.5">
+ <Skeleton className="h-4 w-52 max-w-full" />
+ <Skeleton className="h-4 w-64 max-w-full" />
+ <Skeleton className="h-4 w-28" />
+ </div>
+ <Skeleton className="hidden h-9 w-28 shrink-0 sm:block" />
+ </div>
+);
+
+const escrowReleaseHint = (order, uiCopy) => {
+ const deliveredAt = order.shipping?.deliveredAt;
+ if (!deliveredAt) return uiCopy.escrowAwaitingDelivery;
+ const diffMs = new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS - Date.now();
+ if (diffMs <= 0) return uiCopy.escrowReleased;
+ return uiCopy.escrowReleasesIn(Math.ceil(diffMs / ORDER_TIME.MINUTE_MS / 60));
+};
+
+const isAwaitingSellerShipment = order =>
+ order.deliveryMethod === 'CARGO' && SELLER_TO_SHIP_STATUSES.includes(order.status) && !!order.createdAt;
+
+/** Re-renders every minute so the remaining ship time stays current. */
+const useMinuteTick = (enabled) => {
+ const [now, setNow] = useState(() => Date.now());
+ useEffect(() => {
+ if (!enabled) return undefined;
+ const id = setInterval(() => setNow(Date.now()), ORDER_TIME.MINUTE_MS);
+ return () => clearInterval(id);
+ }, [enabled]);
+ return now;
+};
+
+const ShipDeadline = ({ createdAt, uiCopy }) => {
+ const now = useMinuteTick(true);
+ const leftMs = new Date(createdAt).getTime() + ORDER_TIME.SHIP_DEADLINE_MS - now;
+ if (leftMs <= 0) {
+ return (
+ <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-status-error">
+ <Clock className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+ {uiCopy.shipTimeExpired}
+ </p>
+ );
+ }
+ const totalMinutes = Math.floor(leftMs / ORDER_TIME.MINUTE_MS);
+ const hours = Math.floor(totalMinutes / 60);
+ const minutes = totalMinutes % 60;
+ const tone = leftMs <= ORDER_TIME.SHIP_DEADLINE_URGENT_MS ? 'text-status-error' : leftMs <= ORDER_TIME.SHIP_DEADLINE_WARNING_MS ? 'text-status-warning-text' : 'text-text-secondary';
+ return (
+ <p className={`mt-2 inline-flex items-center gap-1.5 text-sm font-medium tabular-nums ${tone}`}>
+ <Clock className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+ {hours > 0 ? uiCopy.shipTimeLeft(hours, minutes) : uiCopy.shipTimeLeftMinutes(minutes)}
+ </p>
+ );
+};
+
+// One next step per status; the most important one for the viewer is the primary button.
+const getRowAction = ({ order, isBuyer, isReviewed, uiCopy, handlers }) => {
+ const s = order.status;
+ if (isBuyer) {
+ if (s === ORDER_STATUSES.DELIVERED || s === ORDER_STATUSES.HANDOVER_CONFIRMED) {
+ return { variant: 'primary', icon: CircleCheck, label: uiCopy.confirmReceipt, onClick: e => handlers.complete(order.id, e) };
+ }
+ if (s === ORDER_STATUSES.MEETUP_PENDING) {
+ return { variant: 'secondary', icon: KeyRound, label: uiCopy.meetupCode, onClick: () => handlers.open(order) };
+ }
+ if (s === ORDER_STATUSES.SHIPPED) {
+ return { variant: 'secondary', icon: Truck, label: uiCopy.trackShipment, onClick: () => handlers.open(order) };
+ }
+ if (s === ORDER_STATUSES.COMPLETED && !isReviewed) {
+ return { variant: 'secondary', icon: Star, label: uiCopy.reviewNow, onClick: () => handlers.review(order) };
+ }
+ return null;
+ }
+ if (SELLER_TO_SHIP_STATUSES.includes(s) && order.deliveryMethod !== 'SAFE_MEETUP') {
+ return { variant: 'primary', icon: Truck, label: uiCopy.shipOrder, onClick: () => handlers.open(order) };
+ }
+ if (s === ORDER_STATUSES.MEETUP_PENDING) {
+ return { variant: 'secondary', icon: KeyRound, label: uiCopy.meetupDetail, onClick: () => handlers.open(order) };
+ }
+ return null;
+};
+
+const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highlighted, handlers }) => {
  const queryClient = useQueryClient();
- const handleMouseEnter = () => {
- const isSeller = viewMode === ORDER_VIEW_MODES.SELLER;
+ const isBuyer = viewMode === ORDER_VIEW_MODES.BUYER;
+ const items = order.orderItems || [];
+ const firstItem = items[0];
+ const imageUrl = firstItem?.listing?.imageUrl;
+ const title = order.name || firstItem?.listing?.title || uiCopy.orderCardTitleFallback;
+ const extraCount = Math.max(items.length - 1, 0);
+ const currency = order.currency || 'TRY';
+ const total = isBuyer
+ ? parseFloat(order.totalAmount)
+ : items.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
+ const statusLabel = resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status;
+ const deliveryLabel = order.deliveryMethod === 'SAFE_MEETUP' ? uiCopy.deliveryMeetup : order.deliveryMethod === 'CARGO' ? uiCopy.deliveryCargo : null;
+ const counterpart = isBuyer
+ ? order.sellerFullName && `${uiCopy.sellerPrefix}: ${order.sellerFullName}`
+ : [order.buyerName, order.buyerSurname].filter(Boolean).join(' ') && `${uiCopy.buyerPrefix}: ${[order.buyerName, order.buyerSurname].filter(Boolean).join(' ')}`;
+ const escrowAmount = !isBuyer ? parseFloat(order.escrowAmount) || 0 : 0;
+ const action = getRowAction({ order, isBuyer, isReviewed, uiCopy, handlers });
+ const meta = [order.createdAt && formatLongDate(order.createdAt, uiCopy.locale), deliveryLabel, counterpart].filter(Boolean);
+
+ const prefetch = () => {
  queryClient.prefetchQuery({
- queryKey: ORDER_QUERY_KEYS.detail(order.id, isSeller),
- queryFn: () => isSeller
- ? orderService.getSellerOrderById(order.id)
- : orderService.getById(order.id),
- staleTime: 30000,
+ queryKey: ORDER_QUERY_KEYS.detail(order.id, !isBuyer),
+ queryFn: () => (isBuyer ? orderService.getById(order.id) : orderService.getSellerOrderById(order.id)),
+ staleTime: 30000
  });
  };
 
- const { t } = useTranslation();
- const items = order.orderItems || [];
- const isBuyer = viewMode === ORDER_VIEW_MODES.BUYER;
- const isCompleted = order.status === ORDER_STATUSES.COMPLETED;
- const isDelivered = order.status === ORDER_STATUSES.DELIVERED || order.status === ORDER_STATUSES.HANDOVER_CONFIRMED;
- const isShipped = order.status === ORDER_STATUSES.SHIPPED;
- const sellerTotalAmount = viewMode === ORDER_VIEW_MODES.SELLER ? items.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0) : null;
- const displayTotal = viewMode === ORDER_VIEW_MODES.SELLER ? sellerTotalAmount : parseFloat(order.totalAmount);
- const currency = order.currency || 'TRY';
- const statusLabel = resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status;
- const displayedItems = items.slice(0, 3);
- const extraCount = items.length > 3 ? items.length - 3 : 0;
-
- let primaryAction = null;
- if (isBuyer) {
- if (isShipped) {
- primaryAction = (
- <button
- type="button"
- onClick={e => {
- e.stopPropagation();
- onOpenOrder(order);
- }}
- className={buttonClasses('secondary', 'sm')}
- >
- <Truck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
- <span>{uiCopy.trackShipment}</span>
- </button>
- );
- } else if (isDelivered) {
- primaryAction = (
- <button
- type="button"
- onClick={e => {
- e.stopPropagation();
- onCompleteOrder(order.id, e);
- }}
- className={buttonClasses('secondary', 'sm')}
- >
- <CircleCheck className="h-4 w-4" strokeWidth={1.5} aria-hidden />
- <span>{uiCopy.confirmReceipt}</span>
- </button>
- );
- } else if (isCompleted && !isReviewed) {
- primaryAction = (
- <button
- type="button"
- onClick={e => {
- e.stopPropagation();
- if (onOpenQuickReview) onOpenQuickReview(order);
- else onOpenOrder(order);
- }}
- className={buttonClasses('secondary', 'sm')}
- >
- <Star className="h-4 w-4" strokeWidth={1.5} aria-hidden />
- <span>{uiCopy.reviewNow}</span>
- </button>
- );
- }
- }
+ const ActionIcon = action?.icon;
 
  return (
  <article
- tabIndex={isBuyer && editingOrderId === order.id ? -1 : 0}
- onClick={() => onOpenOrder(order)}
- onMouseEnter={handleMouseEnter}
+ tabIndex={0}
+ onClick={() => handlers.open(order)}
+ onMouseEnter={prefetch}
  onKeyDown={e => {
  if (e.target !== e.currentTarget) return;
  if (e.key === 'Enter' || e.key === ' ') {
  e.preventDefault();
- onOpenOrder(order);
+ handlers.open(order);
  }
  }}
- aria-label={`${order.name ? `${order.name}, ` : ''}${statusLabel}. ${formatLongDate(order.createdAt, uiCopy.locale)}`}
- className={`group relative flex cursor-pointer flex-col items-start gap-4 overflow-hidden rounded border bg-background-primary p-5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:flex-row sm:gap-6 ${highlighted ? 'border-primary' : 'border-border hover:border-card-border-hover'}`}
+ aria-label={`${title}, ${statusLabel}`}
+ className={`group flex cursor-pointer gap-4 rounded border bg-background-primary p-4 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${
+ highlighted ? 'border-primary' : 'border-border hover:border-card-border-hover'
+ }`}
  >
- {/* Thumbnails */}
- <div className="flex -space-x-3 shrink-0 relative z-10 self-center sm:self-start mt-0.5">
- {displayedItems.map((item, i) => (
- <div
- key={item.id || i}
- className="relative h-14 w-14 overflow-hidden rounded border-2 border-background-primary bg-background-secondary sm:h-16 sm:w-16"
- style={{ zIndex: 30 - i * 10 }}
- >
- {item.listing?.imageUrl ? (
- <img src={item.listing.imageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
+ <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-tertiary">
+ {imageUrl ? (
+ <img src={optimizeCloudinaryUrl(imageUrl, { width: 160 })} alt="" loading="lazy" className="h-full w-full object-cover" />
  ) : (
- <div className="flex h-full w-full items-center justify-center">
  <Package className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
- </div>
- )}
- </div>
- ))}
- {extraCount > 0 && (
- <div className="relative z-0 flex h-14 w-14 items-center justify-center rounded border-2 border-background-primary bg-background-tertiary sm:h-16 sm:w-16">
- <span className="text-sm tabular-nums text-text-secondary">+{extraCount}</span>
- </div>
  )}
  </div>
 
- {/* Middle: Details */}
- <div className="flex-1 min-w-0 w-full relative z-10 flex flex-col gap-1.5">
- {isBuyer && editingOrderId === order.id ? (
- <div className="flex items-center gap-2 flex-wrap" onClick={e => e.stopPropagation()}>
- <input
- type="text"
- value={editingOrderName}
- onChange={e => setEditingOrderName(e.target.value)}
- onClick={e => e.stopPropagation()}
- onKeyDown={e => e.stopPropagation()}
- aria-label={t("order_name", "Sipariş Adı")}
- className="h-9 w-40 rounded border border-border-focus bg-background-primary px-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus sm:w-52"
- placeholder={t("order_name", "Sipariş Adı")}
- maxLength={ORDER_LIMITS.ORDER_NAME_MAX_LENGTH}
- autoFocus
- />
- <Button
- size="sm"
- className="w-9"
- onClick={e => {
- e.stopPropagation();
- onSaveOrderName(order.id, e);
- }}
- aria-label={t("save", "Kaydet")}
- >
- <Check className="h-4 w-4" strokeWidth={1.5} />
- </Button>
- <Button
- variant="secondary"
- size="sm"
- className="w-9"
- onClick={e => {
- e.stopPropagation();
- onCancelEditName();
- }}
- aria-label={t("cancel", "İptal")}
- >
- <X className="h-4 w-4" strokeWidth={1.5} />
- </Button>
+ <div className="min-w-0 flex-1">
+ <div className="flex items-start justify-between gap-4">
+ <div className="min-w-0">
+ <p className="truncate text-sm font-medium text-text-primary">
+ {title}
+ {extraCount > 0 && <span className="ml-1.5 font-normal text-text-tertiary">{uiCopy.moreItems(extraCount)}</span>}
+ </p>
+ <p className="mt-1 truncate text-sm tabular-nums text-text-tertiary">{meta.join(' · ')}</p>
+ {!isBuyer && isAwaitingSellerShipment(order) && <ShipDeadline createdAt={order.createdAt} uiCopy={uiCopy} />}
  </div>
- ) : (
- <div className="flex flex-wrap items-center gap-2">
- <span className="max-w-xs truncate text-sm font-medium text-text-primary">
- {order.name || items[0]?.listing?.title || uiCopy.orderCardTitleFallback}
- </span>
-
- {isBuyer ? (
- <button
- type="button"
- onClick={e => {
- e.stopPropagation();
- onStartEditName(order, e);
- }}
- className="-m-2.5 rounded p-2.5 text-text-muted transition-colors duration-150 hover:text-text-primary"
- aria-label={t("rename_order", "Siparişi İsimlendir")}
- >
- <Pencil className="h-4 w-4" strokeWidth={1.5} />
- </button>
- ) : null}
+ <p className="shrink-0 text-base font-semibold tabular-nums text-text-primary">
+ <span className="sr-only">{uiCopy.totalLabel}: </span>
+ {formatCurrency(total, currency)}
+ </p>
  </div>
- )}
 
- <div className="flex flex-wrap items-center gap-x-2 text-sm">
+ <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+ <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
  <span className="inline-flex items-center gap-1.5 text-text-secondary">
  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
  {statusLabel}
  </span>
- {order.createdAt ? (
- <>
- <span className="text-text-muted" aria-hidden>·</span>
- <time dateTime={order.createdAt} className="tabular-nums text-text-tertiary">
- {formatLongDate(order.createdAt, uiCopy.locale)}
- </time>
- </>
- ) : null}
- </div>
- </div>
-
- {/* Right: Price & Actions */}
- <div className="shrink-0 flex z-10 mt-1 sm:mt-0 w-full sm:w-auto flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3">
- <div className="flex flex-col items-start sm:items-end">
- <span className="sr-only">{uiCopy.totalLabel}</span>
- <span className="text-lg font-semibold tabular-nums text-text-primary">
- {formatCurrency(displayTotal, currency)}
+ {escrowAmount > 0 && (
+ <span className="tabular-nums text-text-tertiary">
+ · {uiCopy.escrowInRow(formatCurrency(escrowAmount, currency))}, {escrowReleaseHint(order, uiCopy)}
  </span>
- </div>
-
+ )}
+ </p>
  <div className="shrink-0" onClick={e => e.stopPropagation()}>
- {primaryAction ? (
- primaryAction
+ {action ? (
+ <button type="button" onClick={action.onClick} className={buttonClasses(action.variant, 'sm')}>
+ <ActionIcon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ <span>{action.label}</span>
+ </button>
  ) : (
- <span className="inline-flex items-center gap-1 text-sm text-text-tertiary transition-colors group-hover:text-text-primary" aria-hidden>
- <span>{uiCopy.detail}</span>
+ <span className="inline-flex items-center gap-0.5 text-sm text-text-tertiary transition-colors group-hover:text-text-primary" aria-hidden>
+ {uiCopy.detail}
  <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
  </span>
  )}
+ </div>
  </div>
  </div>
  </article>
  );
 });
 
+/* ── Layout ──────────────────────────────────────────────── */
+
 const OrdersListLayout = ({
  title,
  subtitle,
- showIndicator,
- stickyHeader = false,
  onAnalytics,
  analyticsLabel,
- containerClassName,
  flow,
  enums,
  viewMode,
@@ -523,147 +486,61 @@ const OrdersListLayout = ({
 }) => {
  const { t } = useTranslation();
  const uiCopy = useOrdersCopy();
- const deliveryMethodFilter = flow.deliveryMethodFilter;
- const setDeliveryMethodFilter = flow.setDeliveryMethodFilter;
- const navigate = useNavigate();
- const displayedOrders = flow.orders || [];
+ const mode = viewMode || flow.viewMode;
+ const isBuyerView = mode === ORDER_VIEW_MODES.BUYER;
+ const orders = flow.orders;
+ const { search, tabs } = flow;
+ const hasActiveFilter = tabs.activeTab !== ORDER_LIST_TABS.ALL || flow.deliveryMethodFilter !== 'ALL';
 
- const onPageChange = page => {
- if (!flow.search?.isSearchMode) flow.loadPage(page);
- };
- const onPageSizeChange = size => {
- flow.fetchOrders(0, size, flow.sortField, flow.sortDirection);
- };
- const isBuyerView = viewMode === ORDER_VIEW_MODES.BUYER;
- const isSellerView = viewMode === ORDER_VIEW_MODES.SELLER;
- const hasActiveFilter = Boolean(flow.search.statusFilter) || deliveryMethodFilter !== 'ALL';
  const clearFilters = () => {
- flow.search.setStatusFilter(ORDER_STATUS_TAB_FILTER.ALL);
- setDeliveryMethodFilter('ALL');
+ tabs.setActiveTab(ORDER_LIST_TABS.ALL);
+ flow.setDeliveryMethodFilter('ALL');
  };
+
+ const openOrder = flow.modal.openOrderModal;
+ const completeOrder = flow.actions.completeOrder;
+ const openQuickReview = flow.reviewQuick?.openForOrder;
+ const handlers = useMemo(() => ({
+ open: openOrder,
+ complete: completeOrder,
+ review: order => (openQuickReview ? openQuickReview(order) : openOrder(order))
+ }), [openOrder, completeOrder, openQuickReview]);
 
  useEffect(() => {
- if (!highlightOrderId || !flow.orders?.length || flow.loading) return;
+ if (!highlightOrderId || !orders.length || flow.loading) return;
  const id = String(highlightOrderId);
  requestAnimationFrame(() => {
- document.getElementById(`order-card-${id}`)?.scrollIntoView({
- behavior: 'smooth',
- block: 'center'
+ document.getElementById(`order-card-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
  });
- });
- }, [highlightOrderId, flow.orders, flow.loading]);
+ }, [highlightOrderId, orders, flow.loading]);
 
- const computedShowIndicator = showIndicator ?? (isBuyerView && (flow.orders || []).some(o => o.status === ORDER_STATUSES.DELIVERED));
- const onReorderListing = listingId => {
- if (listingId) navigate(ROUTES.LISTING_DETAIL(listingId));
- };
- const banner = isBuyerView && flow.ui.showNameBanner;
+ const slice = getListPaginationSlice(flow.pagination);
 
- const escrowRows = useMemo(() => (flow.orders || []).filter(order => (parseFloat(order.escrowAmount) || 0) > 0), [flow.orders]);
- const escrowHint = order => {
- const deliveredAt = order.shipping?.deliveredAt;
- if (!deliveredAt) return uiCopy.escrowAwaitingDelivery;
- const releaseAt = new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS;
- const diffMs = releaseAt - Date.now();
- if (diffMs <= 0) return uiCopy.escrowReleased;
- return uiCopy.escrowReleasesIn(Math.ceil(diffMs / (60 * 60 * 1000)));
- };
-
- const pendingEscrow = flow.escrow.pendingEscrowAmount;
- const topSlot = isSellerView && !flow.escrow.isLoading ? (
- <div className="rounded border border-border bg-background-primary p-5">
- <div className="flex items-baseline gap-2">
- <span className="text-sm text-text-secondary">{uiCopy.escrowLabel}</span>
- <span className={`text-xl font-semibold tabular-nums ${pendingEscrow > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
- {formatCurrency(pendingEscrow)}
- </span>
+ let body;
+ if (flow.loading) {
+ body = (
+ <div className="space-y-3">
+ {['a', 'b', 'c'].map(k => <OrderRowSkeleton key={k} />)}
  </div>
- <p className="mt-0.5 text-sm text-text-tertiary">
- {pendingEscrow > 0 ? uiCopy.escrowHintPending : uiCopy.escrowHintEmpty}
- </p>
-
- {pendingEscrow > 0 && escrowRows.length > 0 ? (
- <details className="group mt-4 border-t border-border-light pt-3">
- <summary className="flex cursor-pointer list-none items-center justify-between text-sm text-text-secondary hover:text-text-primary">
- <span>{uiCopy.escrowByOrder} ({escrowRows.length})</span>
- <ChevronDown className="h-4 w-4 transition-transform duration-150 group-open:rotate-180" strokeWidth={1.5} aria-hidden />
- </summary>
- <ul className="mt-3 space-y-3">
- {escrowRows.map(order => (
- <li key={order.id} className="flex items-start justify-between gap-4 text-sm">
- <div className="min-w-0">
- <button
- type="button"
- onClick={() => flow.modal.openOrderModal(order)}
- className="block max-w-full truncate text-left text-text-secondary hover:text-text-primary"
- >
- {order.name || uiCopy.orderCardTitleFallback}
- </button>
- <p className="text-text-tertiary">{escrowHint(order)}</p>
- </div>
- <span className="shrink-0 font-medium tabular-nums text-text-primary">{formatCurrency(parseFloat(order.escrowAmount) || 0, order.currency)}</span>
- </li>
- ))}
- </ul>
- </details>
- ) : null}
- </div>
- ) : null;
-
- return (
- <div className="relative min-h-screen bg-background-secondary pb-20">
- <Header
- title={title}
- subtitle={subtitle}
- showIndicator={computedShowIndicator}
- onAnalytics={onAnalytics}
- analyticsLabel={analyticsLabel}
- onRefresh={flow.refreshAll}
- loading={flow.loading}
- sticky={stickyHeader}
+ );
+ } else if (flow.error) {
+ body = (
+ <Alert
+ type="error"
+ message={flow.error}
+ action={<Button variant="secondary" size="sm" onClick={flow.refreshAll}>{t("try_again", "Tekrar dene")}</Button>}
  />
-
- <PageContainer className={containerClassName || `py-6 ${LIST_WIDTH}`}>
- {banner ? (
- <div className="mb-5 flex items-center gap-2 text-sm text-text-secondary">
- <span>{uiCopy.nameBannerTitle}</span>
- <button
- type="button"
- onClick={flow.ui.dismissNameBanner}
- aria-label={uiCopy.nameBannerOk}
- className="rounded p-1 text-text-muted transition-colors hover:text-text-primary"
- >
- <X className="h-4 w-4" strokeWidth={1.5} />
- </button>
- </div>
- ) : null}
- 
- {topSlot ? <div className="mb-6">{topSlot}</div> : null}
-
- <div className="mb-6 flex flex-col gap-3 border-b border-border-light lg:flex-row lg:items-end lg:justify-between">
- <StatusTabs statusFilter={flow.search.statusFilter} setStatusFilter={flow.search.setStatusFilter} uiCopy={uiCopy} />
- <div className="flex items-center gap-2 pb-3">
- <DeliverySelect value={deliveryMethodFilter} onChange={setDeliveryMethodFilter} uiCopy={uiCopy} />
- <SearchToolbar
- search={flow.search}
- onSearch={flow.search.handleSearch}
- onClearSearch={flow.search.clearSearch}
- uiCopy={uiCopy}
+ );
+ } else if (!orders.length) {
+ body = search.isSearchMode ? (
+ <EmptyState
+ icon={Search}
+ title={uiCopy.searchEmptyTitle(search.orderNumber)}
+ description={uiCopy.searchEmptyBody}
+ primaryAction={{ label: uiCopy.clearSearch, onClick: search.clearSearch }}
+ className="py-16"
  />
- </div>
- </div>
-
- {flow.loading ? (
- <div className="space-y-3.5">
- {(isSellerView ? ['a', 'b'] : ['a', 'b', 'c']).map(k => <OrderItemSkeleton key={k} />)}
- </div>
- ) : flow.error ? (
- <div role="alert" className="flex flex-col items-start gap-3 rounded border border-border bg-background-primary p-5 sm:flex-row sm:items-center sm:justify-between">
- <p className="text-sm text-status-error-text">{flow.error}</p>
- <Button variant="secondary" size="sm" onClick={flow.refreshAll}>{t("try_again", "Try again")}</Button>
- </div>
- ) : !displayedOrders.length ? (
- hasActiveFilter ? (
+ ) : hasActiveFilter ? (
  <EmptyState
  icon={Search}
  title={uiCopy.filteredEmptyTitle}
@@ -675,44 +552,81 @@ const OrdersListLayout = ({
  <EmptyState
  icon={Package}
  title={emptyText}
- description={isSellerView ? t('orders_ui_empty_seller_body', 'Satışa çıkardığınız ürünler alıcı bulduğunda burada listelenecektir.') : t('orders_ui_empty_buyer_body', 'Binlerce avantajlı ikinci el ilanı keşfedin ve ilk siparişinizi oluşturun.')}
+ description={isBuyerView
+ ? t('orders_ui_empty_buyer_body', 'İkinci el ilanları keşfedip ilk siparişini oluşturabilirsin.')
+ : t('orders_ui_empty_seller_body', 'Satıştaki ürünlerin alıcı bulduğunda burada listelenir.')}
  primaryAction={isBuyerView && emptyAction ? { label: uiCopy.startShopping, onClick: emptyAction } : undefined}
  className="py-16"
  />
- )
- ) : (
- <div className="space-y-3.5">
- {(displayedOrders || []).map(order => (
- <div key={order.id} id={order.id != null ? `order-card-${order.id}` : undefined}>
- <UnifiedOrderItem
- viewMode={viewMode || flow.viewMode}
+ );
+ } else {
+ body = (
+ <ul className="space-y-3">
+ {orders.map(order => (
+ <li key={order.id} id={`order-card-${order.id}`}>
+ <OrderRow
+ viewMode={mode}
  order={order}
  enums={enums}
- onOpenOrder={flow.modal.openOrderModal}
- onOpenQuickReview={flow.reviewQuick?.openForOrder}
- onCompleteOrder={flow.actions.completeOrder}
- onReorder={onReorderListing}
- editingOrderId={flow.ui.editingOrderId}
- editingOrderName={flow.ui.editingOrderName}
- setEditingOrderName={flow.ui.setEditingOrderName}
- onStartEditName={flow.actions.startEditOrderName}
- onCancelEditName={flow.actions.cancelEditOrderName}
- onSaveOrderName={flow.actions.saveOrderName}
  uiCopy={uiCopy}
  isReviewed={Boolean(flow.reviews.reviewedOrderSummaries[order.id])}
  highlighted={highlightOrderId != null && String(order.id) === String(highlightOrderId)}
+ handlers={handlers}
  />
- </div>
+ </li>
  ))}
- </div>
- )}
+ </ul>
+ );
+ }
 
- <OrdersPagination
- pagination={flow.pagination}
- hidden={flow.search?.isSearchMode || flow.loading}
- onPageChange={onPageChange}
- onPageSizeChange={onPageSizeChange}
+ return (
+ <div className="min-h-screen bg-background-secondary pb-20">
+ <PageContainer className={`pt-6 ${LIST_WIDTH}`}>
+ <Header
+ title={title}
+ subtitle={subtitle}
+ onAnalytics={onAnalytics}
+ analyticsLabel={analyticsLabel}
+ onRefresh={flow.refreshAll}
+ loading={flow.loading}
+ uiCopy={uiCopy}
  />
+
+ {!isBuyerView && <SellerSummary flow={flow} uiCopy={uiCopy} />}
+
+ <div className="mb-5 flex flex-col gap-3 border-b border-border-light lg:flex-row lg:items-end lg:justify-between">
+ <StatusTabs
+ activeTab={tabs.activeTab}
+ onChange={tab => {
+ if (search.isSearchMode) search.clearSearch();
+ tabs.setActiveTab(tab);
+ }}
+ getTabCount={tabs.getTabCount}
+ disabled={search.isSearchMode}
+ uiCopy={uiCopy}
+ />
+ <div className="flex items-center gap-2 pb-3">
+ <DeliverySelect value={flow.deliveryMethodFilter} onChange={flow.setDeliveryMethodFilter} uiCopy={uiCopy} />
+ <SearchBox search={search} onSubmit={search.handleSearch} uiCopy={uiCopy} />
+ </div>
+ </div>
+
+ {body}
+
+ {!flow.loading && slice && (
+ <DataPagination
+ shouldShowPagination
+ currentPage={slice.currentPage}
+ totalPages={slice.totalPages}
+ startItem={slice.startItem}
+ endItem={slice.endItem}
+ totalItems={slice.totalElements}
+ pageSize={slice.pageSize}
+ pageSizeOptions={ORDER_DEFAULTS.PAGE_SIZE_OPTIONS}
+ onPageChange={flow.loadPage}
+ onPageSizeChange={size => flow.fetchOrders(0, size, flow.sortField, flow.sortDirection)}
+ />
+ )}
  </PageContainer>
 
  <PaymentReceiptModal
@@ -728,15 +642,15 @@ const OrdersListLayout = ({
  onClose={flow.modal.closeOrderModal}
  onOpenReceipt={flow.receipt.openReceipt}
  onReviewSuccess={flow.actions.handleReviewSuccess}
- viewMode={viewMode || flow.viewMode}
+ viewMode={mode}
  />
 
  <ReviewModal
- isOpen={Boolean(flow?.reviewQuick?.isOpen && flow?.reviewQuick?.target?.orderItem)}
- onClose={() => flow?.reviewQuick?.close?.()}
- orderItem={flow?.reviewQuick?.target?.orderItem}
- fallbackOrderId={flow?.reviewQuick?.target?.orderId}
- onReviewCreated={payload => flow?.reviewQuick?.onReviewCreated?.(payload)}
+ isOpen={Boolean(flow.reviewQuick?.isOpen && flow.reviewQuick?.target?.orderItem)}
+ onClose={() => flow.reviewQuick?.close?.()}
+ orderItem={flow.reviewQuick?.target?.orderItem}
+ fallbackOrderId={flow.reviewQuick?.target?.orderId}
+ onReviewCreated={payload => flow.reviewQuick?.onReviewCreated?.(payload)}
  />
  </div>
  );

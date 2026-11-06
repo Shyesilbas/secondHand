@@ -1,0 +1,40 @@
+// Turkish copy for the category prefilter screen. Config titles stay as fallbacks.
+
+export const PREFILTER_CATEGORY_COPY = {
+  VEHICLE: { label: 'Vasıta', description: 'Otomobil, motosiklet, bisiklet' },
+  ELECTRONICS: { label: 'Elektronik', description: 'Telefon, bilgisayar, televizyon' },
+  REAL_ESTATE: { label: 'Emlak', description: 'Satılık ve kiralık konut, iş yeri' },
+  CLOTHING: { label: 'Giyim', description: 'Kıyafet, ayakkabı, aksesuar' },
+  BOOKS: { label: 'Kitap', description: 'Kitap, dergi, basılı yayın' },
+  SPORTS: { label: 'Spor', description: 'Spor ekipmanı ve aksesuarları' },
+};
+
+export const PREFILTER_STEP_TITLES = {
+  vehicleTypeId: 'Araç tipi',
+  brandId: 'Marka',
+  bodyType: 'Kasa tipi',
+  vehicleModelId: 'Model',
+  vehicleGenerationId: 'Kasa / nesil',
+  vehicleEngineId: 'Motor',
+  electronicTypeId: 'Ürün tipi',
+  electronicBrandId: 'Marka',
+  electronicModelId: 'Model',
+  realEstateCategory: 'Emlak kategorisi',
+  realEstateTypeId: 'Emlak tipi',
+  adTypeId: 'İlan tipi',
+  heatingTypeId: 'Isıtma',
+  ownerTypeId: 'Kimden',
+  clothingTypeId: 'Giyim tipi',
+  clothingGender: 'Cinsiyet',
+  clothingCategory: 'Giyim kategorisi',
+  color: 'Renk',
+  condition: 'Durum',
+  conditionId: 'Durum',
+  size: 'Beden',
+  bookTypeId: 'Kitap tipi',
+  genreId: 'Tür',
+  languageId: 'Dil',
+  formatId: 'Format',
+  disciplineId: 'Spor dalı',
+  equipmentTypeId: 'Ekipman tipi',
+};

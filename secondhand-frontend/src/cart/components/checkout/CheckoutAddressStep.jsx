@@ -1,8 +1,12 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useEffect, memo } from 'react';
-import { ChevronDown, Plus, ArrowLeft, ArrowRight, Truck, Users, MapPin, Check, Home, FileText, ShieldCheck, AlertCircle, Pencil } from 'lucide-react';
+import { ArrowRight, Check, MapPin, Plus } from 'lucide-react';
 import AddressForm from '../../../user/components/address/AddressForm.jsx';
 import useAddresses from '../../../user/hooks/useAddresses.js';
+import Button from '../../../common/components/ui/Button.jsx';
+import { inputNormal } from '../../../common/components/forms/inputStyles.js';
+import CheckoutStepFooter from './CheckoutStepFooter.jsx';
+import logger from '../../../common/utils/logger.js';
 
 const PREDEFINED_HUBS = [
   'Kadıköy İskele Meydanı',
@@ -11,6 +15,32 @@ const PREDEFINED_HUBS = [
   'Kızılay Meydanı (Ankara)',
   'Konak Vapur İskelesi (İzmir)'
 ];
+
+const optionClass = (selected, disabled = false) => {
+  if (disabled) return 'cursor-not-allowed border-border bg-background-secondary opacity-50';
+  return selected
+    ? 'cursor-pointer border-primary ring-1 ring-primary'
+    : 'cursor-pointer border-border hover:border-card-border-hover';
+};
+
+const RadioDot = ({ selected }) => (
+  <span
+    className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${selected ? 'border-primary bg-primary' : 'border-border-dark'}`}
+    aria-hidden
+  >
+    {selected && <span className="h-1.5 w-1.5 rounded-full bg-background-primary" />}
+  </span>
+);
+
+const Section = ({ title, action, children }) => (
+  <section className="px-5 py-5 sm:px-6">
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 className="text-sm font-semibold text-text-primary">{title}</h2>
+      {action}
+    </div>
+    {children}
+  </section>
+);
 
 const CheckoutAddressStep = ({
   addresses,
@@ -37,7 +67,11 @@ const CheckoutAddressStep = ({
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(
     () => !selectedBillingAddressId || selectedBillingAddressId === selectedShippingAddressId
   );
-  const [customLocationActive, setCustomLocationActive] = useState(false);
+  const [customLocationActive, setCustomLocationActive] = useState(
+    () => !!meetupLocation && !PREDEFINED_HUBS.includes(meetupLocation)
+  );
+  const [extrasOpen, setExtrasOpen] = useState(() => !!(orderName || notes));
+  const isMeetup = deliveryMethod === 'SAFE_MEETUP';
 
   const handleAddAddressSubmit = async (newAddress) => {
     try {
@@ -48,13 +82,13 @@ const CheckoutAddressStep = ({
       }
       setIsAddAddressModalOpen(false);
     } catch (e) {
-      console.error('Failed to add address:', e);
+      logger.error('Failed to add address:', e);
     }
   };
 
   const handleShippingChange = (id) => {
     setSelectedShippingAddressId(Number(id));
-    if (billingSameAsShipping || deliveryMethod === 'SAFE_MEETUP') {
+    if (billingSameAsShipping || isMeetup) {
       setSelectedBillingAddressId(Number(id));
     }
   };
@@ -62,13 +96,11 @@ const CheckoutAddressStep = ({
   const handleBillingToggle = () => {
     const next = !billingSameAsShipping;
     setBillingSameAsShipping(next);
-    if (next) {
-      setSelectedBillingAddressId(selectedShippingAddressId);
-    }
+    if (next) setSelectedBillingAddressId(selectedShippingAddressId);
   };
 
   useEffect(() => {
-    if (deliveryMethod === 'SAFE_MEETUP' && hasAddresses) {
+    if (isMeetup && hasAddresses) {
       if (!selectedShippingAddressId) {
         const mainAddress = addresses.find(a => a.mainAddress);
         const defaultId = mainAddress ? mainAddress.id : addresses[0].id;
@@ -78,447 +110,253 @@ const CheckoutAddressStep = ({
         setSelectedBillingAddressId(selectedShippingAddressId);
       }
     }
-  }, [deliveryMethod, selectedShippingAddressId, selectedBillingAddressId, addresses, hasAddresses, setSelectedShippingAddressId, setSelectedBillingAddressId]);
+  }, [isMeetup, selectedShippingAddressId, selectedBillingAddressId, addresses, hasAddresses, setSelectedShippingAddressId, setSelectedBillingAddressId]);
 
   const canMeetup = Array.isArray(cartItems) && cartItems.length > 0 && cartItems.every(item => Boolean(item.listing?.allowMeetup));
   const sellerLocations = useMemo(() => {
     if (!Array.isArray(cartItems)) return [];
-    const locations = cartItems.map(item => {
-      const city = item.listing?.city;
-      const district = item.listing?.district;
-      if (city && district) return `${city} / ${district}`;
-      if (city) return city;
-      return null;
-    }).filter(Boolean);
+    const locations = cartItems
+      .map(item => [item.listing?.city, item.listing?.district].filter(Boolean).join(' / '))
+      .filter(Boolean);
     return Array.from(new Set(locations));
   }, [cartItems]);
 
-  const isStepValid = selectedShippingAddressId && selectedBillingAddressId && (deliveryMethod !== 'SAFE_MEETUP' || (meetupLocation && meetupLocation.trim().length > 0));
+  const hasMeetupLocation = !!meetupLocation?.trim();
+  const isStepValid = selectedShippingAddressId && selectedBillingAddressId && (!isMeetup || hasMeetupLocation);
 
-  const getValidationWarning = () => {
-    if (!hasAddresses) return 'Lütfen devam etmek için en az bir adres ekleyin.';
-    if (!selectedShippingAddressId) return 'Lütfen bir teslimat adresi seçin.';
-    if (!selectedBillingAddressId) return 'Lütfen bir fatura adresi seçin.';
-    if (deliveryMethod === 'SAFE_MEETUP' && (!meetupLocation || !meetupLocation.trim())) {
-      return 'Lütfen güvenli elden teslim için bir buluşma noktası belirleyin.';
+  let hint = null;
+  if (!hasAddresses) hint = t('checkout_hint_add_address', 'Devam etmek için bir adres ekle.');
+  else if (!selectedShippingAddressId) hint = t('checkout_hint_pick_address', 'Bir adres seç.');
+  else if (!selectedBillingAddressId) hint = t('checkout_hint_pick_billing', 'Bir fatura adresi seç.');
+  else if (isMeetup && !hasMeetupLocation) hint = t('checkout_hint_pick_meetup', 'Bir buluşma noktası seç.');
+
+  const deliveryOptions = [
+    {
+      value: 'CARGO',
+      title: t('checkout_cargo', 'Kargo ile gönderim'),
+      body: t('checkout_cargo_desc', 'Ücretsiz, takip numaralı. Satıcı 72 saat içinde kargolar.'),
+      disabled: false
+    },
+    {
+      value: 'SAFE_MEETUP',
+      title: t('checkout_meetup', 'Elden güvenli buluşma'),
+      body: canMeetup
+        ? [t('checkout_meetup_desc', 'Buluşmada ürünü inceleyip PIN kodu ile teslim alırsın.'), sellerLocations.length > 0 ? sellerLocations.join(', ') : null].filter(Boolean).join(' ')
+        : t('checkout_meetup_unavailable', 'Sepetteki bazı ürünler elden teslimatı desteklemiyor.'),
+      disabled: !canMeetup
     }
-    return null;
-  };
+  ];
 
-  const warning = getValidationWarning();
+  const addAddressButton = (
+    <Button variant="ghost" size="sm" onClick={() => setIsAddAddressModalOpen(true)}>
+      <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+      <span>{t('add_address', 'Yeni adres')}</span>
+    </Button>
+  );
 
   return (
-    <div className="p-5 sm:p-6 space-y-6">
-      {/* ── Section 1: Delivery Method ──────────────────────────── */}
-      <div>
-        <div className="flex items-center justify-between mb-3.5">
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">
-              {t("teslimat_y_ntemi", "Teslimat Yöntemi")}
-            </h2>
-            <p className="text-xs text-text-secondary mt-0.5">
-              Ürününüzü nasıl teslim almak istediğinizi belirleyin.
-            </p>
+    <div>
+      <div className="divide-y divide-border-light">
+        <Section title={t('delivery_method', 'Teslimat yöntemi')}>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup">
+            {deliveryOptions.map(option => {
+              const selected = deliveryMethod === option.value;
+              return (
+                <label key={option.value} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected, option.disabled)}`}>
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value={option.value}
+                    checked={selected}
+                    disabled={option.disabled}
+                    onChange={() => setDeliveryMethod(option.value)}
+                    className="sr-only"
+                  />
+                  <RadioDot selected={selected} />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-text-primary">{option.title}</span>
+                    <span className="mt-0.5 block text-sm text-text-secondary">{option.body}</span>
+                  </span>
+                </label>
+              );
+            })}
           </div>
-          <span className="rounded-sm border border-border-light bg-background-tertiary px-2 py-0.5 text-xs font-medium text-text-secondary">
-            {deliveryMethod === 'CARGO' ? 'Standart Gönderim' : 'Elden Teslimat'}
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {/* Cargo Option */}
-          <label className={`group relative flex cursor-pointer items-start gap-3.5 rounded border p-4 transition-colors ${
-            deliveryMethod === 'CARGO'
-              ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
-              : 'border-border bg-background-primary hover:border-card-border-hover'
-          }`}>
-            <input 
-              type="radio" 
-              name="deliveryMethod" 
-              value="CARGO" 
-              checked={deliveryMethod === 'CARGO'} 
-              onChange={() => setDeliveryMethod('CARGO')} 
-              className="sr-only" 
-            />
-            
-            <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border transition-colors ${
-              deliveryMethod === 'CARGO' 
-                ? 'bg-primary text-text-inverse border-primary' 
-                : 'bg-background-tertiary text-text-secondary border-border-light'
-            }`}>
-              <Truck className="h-4 w-4" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="block text-sm font-semibold text-text-primary">
-                  {t("kargo_ile_g_nderim", "Adrese Kargo Teslimatı")}
-                </span>
-                {deliveryMethod === 'CARGO' && (
-                  <Check className="h-4 w-4 text-primary shrink-0" strokeWidth={2.5} />
-                )}
+          {isMeetup && (
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-medium text-text-tertiary">{t('checkout_meetup_point', 'Buluşma noktası')}</p>
+              <div className="flex flex-wrap gap-2">
+                {PREDEFINED_HUBS.map(hub => {
+                  const selected = !customLocationActive && meetupLocation === hub;
+                  return (
+                    <button
+                      key={hub}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => {
+                        setMeetupLocation(hub);
+                        setCustomLocationActive(false);
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                        selected ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                      }`}
+                    >
+                      {selected && <Check className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />}
+                      {hub}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  aria-pressed={customLocationActive}
+                  onClick={() => {
+                    setCustomLocationActive(true);
+                    if (PREDEFINED_HUBS.includes(meetupLocation)) setMeetupLocation('');
+                  }}
+                  className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                    customLocationActive ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
+                  }`}
+                >
+                  <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                  {t('checkout_other_location', 'Başka bir yer')}
+                </button>
               </div>
-              <span className="mt-1 block text-xs text-text-secondary leading-relaxed">
-                {t("standart_kargo_irketi_arac_l_yla_adrese_", "Anlaşmalı kargo firmaları ile kapınıza kadar sigortalı teslimat.")}
-              </span>
-              <div className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-status-success">
-                <span>Ücretsiz & Takip Numaralı</span>
-              </div>
-            </div>
-          </label>
-
-          {/* Safe Meetup Option */}
-          <label className={`group relative flex cursor-pointer items-start gap-3.5 rounded border p-4 transition-colors ${
-            !canMeetup
-              ? 'opacity-40 cursor-not-allowed border-border bg-background-secondary'
-              : deliveryMethod === 'SAFE_MEETUP'
-              ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
-              : 'border-border bg-background-primary hover:border-card-border-hover'
-          }`}>
-            <input 
-              type="radio" 
-              name="deliveryMethod" 
-              value="SAFE_MEETUP" 
-              disabled={!canMeetup} 
-              checked={deliveryMethod === 'SAFE_MEETUP'} 
-              onChange={() => setDeliveryMethod('SAFE_MEETUP')} 
-              className="sr-only" 
-            />
-
-            <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded border transition-colors ${
-              deliveryMethod === 'SAFE_MEETUP' 
-                ? 'bg-primary text-text-inverse border-primary' 
-                : 'bg-background-tertiary text-text-secondary border-border-light'
-            }`}>
-              <Users className="h-4 w-4" />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <span className="block text-sm font-semibold text-text-primary">
-                  {t("elden_g_venli_teslimat", "Elden Güvenli Buluşma")}
-                </span>
-                {deliveryMethod === 'SAFE_MEETUP' && (
-                  <Check className="h-4 w-4 text-primary shrink-0" strokeWidth={2.5} />
-                )}
-              </div>
-
-              <span className="mt-1 block text-xs text-text-secondary leading-relaxed">
-                {!canMeetup 
-                  ? 'Sepetteki ürünlerden bazıları elden teslimatı desteklemiyor.' 
-                  : 'Ortak güvenli noktada 6 haneli PIN ile yüz yüze kontrol ve teslimat.'
-                }
-              </span>
-
-              {canMeetup && sellerLocations.length > 0 && (
-                <div className="mt-2 inline-flex items-center gap-1 text-xs text-text-secondary">
-                  <MapPin className="h-3 w-3 text-text-tertiary" />
-                  <span>Satıcı Konumu: <strong className="text-text-primary">{sellerLocations.join(', ')}</strong></span>
-                </div>
-              )}
-            </div>
-          </label>
-        </div>
-
-        {/* Meetup Location Selector Sub-panel */}
-        {deliveryMethod === 'SAFE_MEETUP' && (
-          <div className="mt-3.5 rounded border border-border bg-background-secondary p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-text-secondary" />
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  {t("bulu_ma_noktas_se_in", "Buluşma Noktası Belirleyin")}
-                </h3>
-              </div>
-              <span className="text-xs text-text-muted">Önerilen Güvenli Noktalar</span>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 mb-3">
-              {PREDEFINED_HUBS.map(hub => {
-                const isSelected = meetupLocation === hub;
-                return (
-                  <button
-                    key={hub}
-                    type="button"
-                    onClick={() => {
-                      setMeetupLocation(hub);
-                      setCustomLocationActive(false);
-                    }}
-                    className={`flex items-center gap-2 rounded border px-3 py-2 text-left text-xs font-medium transition-colors ${
-                      isSelected
-                        ? 'border-primary bg-primary text-text-inverse'
-                        : 'border-border bg-background-primary text-text-secondary hover:border-border-dark'
-                    }`}
-                  >
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{hub}</span>
-                  </button>
-                );
-              })}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setCustomLocationActive(true);
-                  if (PREDEFINED_HUBS.includes(meetupLocation)) {
-                    setMeetupLocation('');
-                  }
-                }}
-                className={`flex items-center justify-center gap-1.5 rounded border px-3 py-2 text-xs font-medium transition-colors ${
-                  customLocationActive || (!PREDEFINED_HUBS.includes(meetupLocation) && meetupLocation)
-                    ? 'border-primary bg-primary text-text-inverse'
-                    : 'border-border bg-background-primary text-text-secondary hover:border-border-dark'
-                }`}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                <span>Farklı Konum Gir</span>
-              </button>
-            </div>
-
-            {(customLocationActive || (!PREDEFINED_HUBS.includes(meetupLocation) && meetupLocation)) && (
-              <div className="mt-2.5">
+              {customLocationActive && (
                 <input
                   type="text"
                   value={meetupLocation || ''}
                   onChange={e => setMeetupLocation(e.target.value)}
-                  className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition focus:border-border-focus placeholder:text-text-muted"
-                  placeholder={t("rn_kad_k_y_bo_a_heykeli_n_metro_k", "Örn: Kadıköy Boğa Heykeli önü veya Levent Metro çıkışı")}
+                  className={`${inputNormal} mt-3`}
+                  placeholder={t('checkout_meetup_placeholder', 'Örn: Levent Metro çıkışı')}
+                  aria-label={t('checkout_meetup_point', 'Buluşma noktası')}
+                  autoFocus
                 />
-              </div>
-            )}
-
-            {meetupLocation && (
-              <div className="mt-2.5 flex items-center gap-2 text-xs text-text-secondary rounded border border-border-light bg-background-primary px-3 py-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-text-secondary shrink-0" />
-                <span>Belirlenen Nokta: <strong className="text-text-primary">{meetupLocation}</strong></span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ── Section 2: Shipping Addresses ───────────────────────── */}
-      <div className="border-t border-border-light pt-6">
-        <div className="mb-3.5 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-semibold text-text-primary">
-              {deliveryMethod === 'SAFE_MEETUP' ? 'Yasal Fatura Adresi' : 'Teslimat Adresi'}
-            </h2>
-            <p className="text-xs text-text-secondary mt-0.5">
-              {deliveryMethod === 'SAFE_MEETUP' 
-                ? 'Elden teslimatlarda mevzuat gereği fatura düzenlenecek kayıtlı adresiniz.' 
-                : 'Siparişinizin güvenle gönderileceği kayıtlı adresinizi seçin.'}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsAddAddressModalOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:bg-background-secondary hover:text-text-primary shrink-0"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>{t("add_address", "Yeni Adres")}</span>
-          </button>
-        </div>
-
-        {!hasAddresses ? (
-          <div className="rounded border border-dashed border-border bg-background-secondary/60 p-6 text-center">
-            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded border border-border bg-background-primary text-text-muted">
-              <Home className="h-5 w-5" />
+              )}
             </div>
-            <p className="text-sm font-semibold text-text-primary">{t("no_saved_addresses", "Henüz kayıtlı bir adresiniz bulunmuyor")}</p>
-            <p className="text-xs text-text-secondary mt-0.5 max-w-sm mx-auto">
-              Siparişinizi tamamlamak için teslimat adresinizi ekleyerek başlayabilirsiniz.
-            </p>
-            <button
-              type="button"
-              onClick={() => setIsAddAddressModalOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded bg-primary px-3.5 py-2 text-xs font-semibold text-text-inverse transition hover:bg-primary-hover mt-3.5"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>{t("add_address", "Yeni Adres Ekle")}</span>
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {addresses.map(address => {
-              const isSelected = String(selectedShippingAddressId) === String(address.id);
-              return (
-                <label
-                  key={address.id}
-                  className={`relative flex flex-col justify-between cursor-pointer rounded border p-4 transition-colors ${
-                    isSelected
-                      ? 'border-primary bg-background-secondary/50 ring-1 ring-primary'
-                      : 'border-border bg-background-primary hover:border-card-border-hover'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value={address.id}
-                    checked={isSelected}
-                    onChange={e => handleShippingChange(e.target.value)}
-                    className="sr-only"
-                  />
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
-                          isSelected ? 'border-primary bg-primary' : 'border-border-dark bg-background-primary'
-                        }`}>
-                          {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-background-primary" />}
+          )}
+        </Section>
+
+        <Section
+          title={isMeetup ? t('billing_address', 'Fatura adresi') : t('shipping_address', 'Teslimat adresi')}
+          action={hasAddresses ? addAddressButton : null}
+        >
+          {!hasAddresses ? (
+            <div className="rounded border border-dashed border-border p-6 text-center">
+              <p className="text-sm font-medium text-text-primary">{t('no_saved_addresses', 'Kayıtlı adresin yok')}</p>
+              <p className="mt-1 text-sm text-text-secondary">{t('checkout_add_first_address', 'Siparişi tamamlamak için bir adres ekle.')}</p>
+              <Button size="sm" className="mt-4" onClick={() => setIsAddAddressModalOpen(true)}>
+                <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span>{t('add_address', 'Adres ekle')}</span>
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2" role="radiogroup">
+                {addresses.map(address => {
+                  const selected = String(selectedShippingAddressId) === String(address.id);
+                  return (
+                    <label key={address.id} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected)}`}>
+                      <input
+                        type="radio"
+                        name="shipping"
+                        value={address.id}
+                        checked={selected}
+                        onChange={e => handleShippingChange(e.target.value)}
+                        className="sr-only"
+                      />
+                      <RadioDot selected={selected} />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="truncate text-sm font-medium text-text-primary">{address.title || t('address', 'Adres')}</span>
+                          {address.mainAddress && <span className="shrink-0 text-xs text-text-tertiary">{t('default', 'Varsayılan')}</span>}
                         </span>
-                        <span className="text-sm font-semibold text-text-primary truncate">
-                          {address.title || 'Adres'}
+                        <span className="mt-0.5 line-clamp-2 block text-sm text-text-secondary">{address.addressLine}</span>
+                        <span className="mt-0.5 block text-xs text-text-tertiary">
+                          {[address.city, address.state].filter(Boolean).join(' / ')} {address.postalCode}
                         </span>
-                      </div>
-
-                      {address.mainAddress && (
-                        <span className="rounded-sm border border-border-light bg-background-tertiary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
-                          {t("default", "Varsayılan")}
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-xs text-text-secondary leading-relaxed mt-1 line-clamp-2">
-                      {address.addressLine}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 pt-2.5 border-t border-border-light flex items-center justify-between text-xs text-text-tertiary">
-                    <span>{address.city}{address.state ? ` / ${address.state}` : ''}</span>
-                    <span className="tabular-nums">{address.postalCode}</span>
-                  </div>
-                </label>
-              );
-            })}
-
-            {/* Quick Add Address card */}
-            <button
-              type="button"
-              onClick={() => setIsAddAddressModalOpen(true)}
-              className="flex flex-col items-center justify-center gap-2 rounded border border-dashed border-border bg-background-primary p-4 hover:border-border-dark transition-colors text-text-secondary hover:text-text-primary min-h-28"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-tertiary">
-                <Plus className="h-4 w-4 text-text-secondary" />
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
-              <span className="text-xs font-medium">Farklı Adres Ekle</span>
-            </button>
-          </div>
-        )}
+
+              {!isMeetup && (
+                <div className="mt-4 space-y-3">
+                  <label className="flex cursor-pointer items-center gap-2.5 text-sm text-text-primary">
+                    <input
+                      type="checkbox"
+                      checked={billingSameAsShipping}
+                      onChange={handleBillingToggle}
+                      className="h-4 w-4 rounded-sm border-border text-primary focus:ring-border-focus"
+                    />
+                    {t('billing_same_as_shipping', 'Fatura adresi teslimat adresiyle aynı')}
+                  </label>
+                  {!billingSameAsShipping && (
+                    <select
+                      value={selectedBillingAddressId || ''}
+                      onChange={e => setSelectedBillingAddressId(Number(e.target.value))}
+                      className={`${inputNormal} sm:max-w-sm`}
+                      aria-label={t('billing_address', 'Fatura adresi')}
+                    >
+                      <option value="">{t('choose_billing_address', 'Fatura adresi seç')}</option>
+                      {addresses.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.title ? `${a.title}: ` : ''}{a.addressLine} ({a.city})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+              {isMeetup && (
+                <p className="mt-3 text-xs text-text-tertiary">
+                  {t('checkout_meetup_billing_note', 'Elden teslimatta fatura bu adrese düzenlenir.')}
+                </p>
+              )}
+            </>
+          )}
+        </Section>
+
+        <section className="px-5 py-4 sm:px-6">
+          {extrasOpen ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-text-tertiary">{t('order_name', 'Sipariş adı')}</span>
+                <input
+                  type="text"
+                  className={inputNormal}
+                  placeholder={t('e_g_birthday_gift', 'Örn: Doğum günü hediyesi')}
+                  value={orderName || ''}
+                  onChange={e => setOrderName(e.target.value)}
+                  maxLength={100}
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-text-tertiary">{t('notes', 'Teslimat notu')}</span>
+                <input
+                  type="text"
+                  className={inputNormal}
+                  placeholder={t('delivery_notes', 'Örn: Zile basmayın')}
+                  value={notes || ''}
+                  onChange={e => setNotes(e.target.value)}
+                />
+              </label>
+            </div>
+          ) : (
+            <Button variant="ghost" size="sm" className="-ml-3" onClick={() => setExtrasOpen(true)}>
+              <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              <span>{t('checkout_add_note', 'Sipariş adı veya not ekle')}</span>
+            </Button>
+          )}
+        </section>
       </div>
 
-      {/* ── Section 3: Billing Address Toggle (Cargo Mode) ─────────── */}
-      {hasAddresses && deliveryMethod !== 'SAFE_MEETUP' && (
-        <div className="rounded border border-border bg-background-secondary p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <label className="flex cursor-pointer select-none items-center gap-2.5">
-              <input
-                type="checkbox"
-                checked={billingSameAsShipping}
-                onChange={handleBillingToggle}
-                className="h-4 w-4 rounded border-border text-primary focus:ring-0"
-              />
-              <span className="text-xs font-medium text-text-primary">
-                {t("billing_same_as_shipping", "Fatura adresi teslimat adresiyle aynı")}
-              </span>
-            </label>
-
-            {!billingSameAsShipping && (
-              <div className="relative w-full sm:w-80">
-                <select
-                  value={selectedBillingAddressId || ''}
-                  onChange={e => setSelectedBillingAddressId(Number(e.target.value))}
-                  className="w-full appearance-none rounded border border-border bg-background-primary px-3 py-1.5 pr-8 text-xs font-medium text-text-primary outline-none transition focus:border-border-focus"
-                >
-                  <option value="">{t("choose_billing_address", "Fatura Adresi Seçin")}</option>
-                  {addresses.map(a => (
-                    <option key={a.id} value={a.id}>
-                      {a.title ? `${a.title}: ` : ''}{a.addressLine} ({a.city})
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted" />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Section 4: Order Name & Delivery Notes ───────────────── */}
-      <div className="border-t border-border-light pt-6">
-        <h2 className="text-sm font-semibold text-text-primary mb-3">
-          Sipariş Detayları & Notlar
-        </h2>
-
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-          <div>
-            <label className="mb-1 flex items-center justify-between text-xs font-medium text-text-secondary">
-              <span className="flex items-center gap-1.5">
-                <FileText className="h-3.5 w-3.5 text-text-tertiary" />
-                {t("order_name", "Sipariş Başlığı")}
-              </span>
-              <span className="text-text-muted lowercase">({t("optional", "isteğe bağlı")})</span>
-            </label>
-            <input
-              type="text"
-              className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
-              placeholder={t("e_g_birthday_gift", "Örn: Doğum Günü Hediyesi")}
-              value={orderName || ''}
-              onChange={e => setOrderName(e.target.value)}
-              maxLength={100}
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 flex items-center justify-between text-xs font-medium text-text-secondary">
-              <span className="flex items-center gap-1.5">
-                <Truck className="h-3.5 w-3.5 text-text-tertiary" />
-                {t("notes", "Teslimat Notu")}
-              </span>
-              <span className="text-text-muted lowercase">({t("optional", "isteğe bağlı")})</span>
-            </label>
-            <input
-              type="text"
-              className="w-full rounded border border-border bg-background-primary px-3 py-2 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
-              placeholder={t("delivery_notes", "Örn: Zil çalınmasın")}
-              value={notes || ''}
-              onChange={e => setNotes(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* ── Navigation: Desktop & Mobile ────────────────────────── */}
-      <div className="border-t border-border-light pt-5">
-        {warning && (
-          <div className="mb-3.5 flex items-center gap-2 text-xs font-medium text-status-warning rounded border border-border-light bg-background-secondary p-3">
-            <AlertCircle className="h-4 w-4 text-status-warning shrink-0" />
-            <span>{warning}</span>
-          </div>
-        )}
-
-        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center justify-center gap-2 rounded border border-border bg-background-primary px-4 text-xs font-medium text-text-primary transition hover:bg-background-secondary h-10"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>{t("back", "Sepete Dön")}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onNext}
-            disabled={!isStepValid}
-            className="inline-flex items-center justify-center gap-2 rounded bg-primary px-5 text-xs font-semibold text-text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 h-10"
-          >
-            <span>{t("continue", "Ödeme Adımına Geç")}</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
+      <CheckoutStepFooter onBack={onBack} backLabel={t('back_to_cart', 'Sepete dön')} hint={isStepValid ? null : hint}>
+        <Button onClick={onNext} disabled={!isStepValid}>
+          <span>{t('checkout_continue_payment', 'Ödemeye geç')}</span>
+          <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        </Button>
+      </CheckoutStepFooter>
 
       <AddressForm
         isOpen={isAddAddressModalOpen}

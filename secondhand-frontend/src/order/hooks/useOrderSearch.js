@@ -1,22 +1,14 @@
 import { useCallback, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { orderService } from '../services/orderService.js';
-import { ORDER_QUERY_KEYS } from '../orderConstants.js';
-import { ORDER_MESSAGES } from '../constants/orderUiConstants.js';
 
-/** Order-number search; the `q` URL param is the source of truth so a search survives reloads and links. */
+/**
+ * Order-number search input state. The `q` URL param is the source of truth so a search survives
+ * reloads and links; the list query sends it to the backend as the exact `orderNumber` filter.
+ */
 export const useOrderSearch = () => {
  const [searchParams, setSearchParams] = useSearchParams();
  const q = (searchParams.get('q') || '').trim();
  const [searchTerm, setSearchTerm] = useState(q);
-
- const { data, isFetching, isError } = useQuery({
- queryKey: ORDER_QUERY_KEYS.byNumber(q),
- queryFn: () => orderService.getByOrderNumber(q),
- enabled: !!q,
- retry: false,
- });
 
  const setQuery = useCallback((value) => {
  setSearchParams((prev) => {
@@ -37,14 +29,11 @@ export const useOrderSearch = () => {
  setQuery('');
  }, [setQuery]);
 
- const searchResult = q && data ? data : null;
  return {
- searchResult,
+ orderNumber: q,
  searchTerm,
  setSearchTerm,
- searchLoading: isFetching,
- searchError: q && !isFetching && (isError || !data) ? ORDER_MESSAGES.ORDER_NOT_FOUND : null,
- isSearchMode: !!searchResult,
+ isSearchMode: Boolean(q),
  handleSearch,
  clearSearch,
  };

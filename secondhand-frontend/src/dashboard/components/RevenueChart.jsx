@@ -2,6 +2,9 @@ import { useTranslation } from "react-i18next";
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { theme } from '../../common/theme/theme.js';
+import { formatCurrency } from '../../common/formatters.js';
+import { CardEmpty } from './DashboardUi.jsx';
+import { DASHBOARD_CURRENCY } from '../dashboardConstants.js';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 const RevenueChart = ({
  data,
@@ -11,14 +14,12 @@ const RevenueChart = ({
  t
  } = useTranslation();
  if (!data || data.length === 0) {
- return <div className="flex items-center justify-center h-64">
- <p className="text-text-muted text-xs font-medium">{t("no_data_available_for_this_period")}</p>
- </div>;
+ return <CardEmpty>{t('dash_no_trend_data', 'Bu dönemde veri yok.')}</CardEmpty>;
  }
  const chartData = {
  labels: data.map(item => {
  const date = new Date(item.date);
- return date.toLocaleDateString('en-US', {
+ return date.toLocaleDateString('tr-TR', {
  month: 'short',
  day: 'numeric'
  });
@@ -27,21 +28,15 @@ const RevenueChart = ({
  label: label,
  data: data.map(item => parseFloat(item.revenue || item.spending || 0)),
  borderColor: 'rgb(15, 23, 42)',
- backgroundColor: context => {
- const ctx = context.chart.ctx;
- const gradient = ctx.createLinearGradient(0, 0, 0, 300);
- gradient.addColorStop(0, 'rgba(15, 23, 42, 0.15)');
- gradient.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
- return gradient;
- },
+ backgroundColor: 'rgba(15, 23, 42, 0.06)',
  fill: true,
- tension: 0.4,
+ tension: 0.3,
  pointRadius: 0,
  pointHoverRadius: 6,
  pointHoverBackgroundColor: 'rgb(15, 23, 42)',
  pointHoverBorderColor: theme.colors.background.primary,
  pointHoverBorderWidth: 2,
- borderWidth: 2.5
+ borderWidth: 2
  }]
  };
  const options = {
@@ -72,16 +67,13 @@ const RevenueChart = ({
  size: 12,
  weight: '700'
  },
- cornerRadius: 10,
+ cornerRadius: 4,
  borderColor: 'rgba(15, 23, 42, 0.2)',
  borderWidth: 1,
  displayColors: false,
  callbacks: {
  label: function (context) {
- return `${label}: ${parseFloat(context.parsed.y).toLocaleString('tr-TR', {
- minimumFractionDigits: 2,
- maximumFractionDigits: 2
- })} TRY`;
+ return `${label}: ${formatCurrency(context.parsed.y, DASHBOARD_CURRENCY)}`;
  }
  }
  }

@@ -1,5 +1,6 @@
 import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
 import {ROUTES} from '../../common/constants/routes.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import {listingService} from '../services/listingService.js';
@@ -11,6 +12,7 @@ export const useListingActions = ({
  onChanged,
  onCloseMenu,
 } = {}) => {
+ const {t} = useTranslation();
  const navigate = useNavigate();
  const notification = useNotification();
  const actionCtx = useListingActionContext();
@@ -51,78 +53,78 @@ export const useListingActions = ({
  if (!listingId) return;
  try {
  await listingService.deactivateListing(listingId);
- notification.showSuccess('Successful', 'Listing deactivated');
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_deactivated', 'İlan pasife alındı.'));
  fireChanged();
  } catch (err) {
- handleApiError('Deactivate Failed', err);
+ handleApiError(t('deactivate_failed', 'İlan pasife alınamadı'), err);
  }
- }, [dismiss, fireChanged, handleApiError, listingId, notification]);
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, t]);
 
  const handleReactivate = useCallback(async (e) => {
  dismiss(e);
  if (!listingId) return;
  try {
  await listingService.activateListing(listingId);
- notification.showSuccess('Successful', 'Listing reactivated');
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_reactivated', 'İlan tekrar yayında.'));
  fireChanged();
  } catch (err) {
- handleApiError('Reactivate Failed', err);
+ handleApiError(t('reactivate_failed', 'İlan yayına alınamadı'), err);
  }
- }, [dismiss, fireChanged, handleApiError, listingId, notification]);
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, t]);
 
  const handleMarkAsSold = useCallback((e) => {
  dismiss(e);
  if (!listingId) return;
  notification.showConfirmation(
- 'Mark As Sold?',
- 'Are you sure you want to mark this listing as sold? This action cannot be reverted.',
+ t('mark_as_sold_confirm_title', 'Satıldı olarak işaretlensin mi?'),
+ t('mark_as_sold_confirm_body', 'İlan satıştan kalkar. Bu işlem geri alınamaz.'),
  async () => {
  try {
  await listingService.markListingSold(listingId);
- notification.showSuccess('Successful', 'Listing marked as sold');
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_marked_sold', 'İlan satıldı olarak işaretlendi.'));
  fireChanged();
  } catch (err) {
- handleApiError('Mark As Sold Failed', err);
+ handleApiError(t('mark_as_sold_failed', 'İlan satıldı olarak işaretlenemedi'), err);
  }
  },
  () => {}
  );
- }, [dismiss, fireChanged, handleApiError, listingId, notification]);
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, t]);
 
  const handleRelist = useCallback(async (e) => {
  dismiss(e);
  if (!listingId) return;
  try {
  const response = await listingService.relistListing(listingId);
- notification.showSuccess('Successful', 'Listing duplicated successfully. You can now edit and publish it.');
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_relisted', 'İlanın kopyası oluşturuldu. Düzenleyip yayınlayabilirsin.'));
  fireChanged();
  const newListingId = response?.data || response;
  if (newListingId) {
  navigate(ROUTES.EDIT_LISTING(newListingId));
  }
  } catch (err) {
- handleApiError('Relist Failed', err);
+ handleApiError(t('relist_failed', 'İlan tekrar yayınlanamadı'), err);
  }
- }, [dismiss, fireChanged, handleApiError, listingId, notification, navigate]);
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, navigate, t]);
 
  const handleDelete = useCallback((e) => {
  dismiss(e);
  if (!listingId) return;
  notification.showConfirmation(
- 'Delete Listing',
- 'Are you sure you want to delete this listing? This action cannot be reverted.',
+ t('delete_listing_confirm_title', 'İlan silinsin mi?'),
+ t('delete_listing_confirm_body', 'İlan kalıcı olarak kaldırılır. Bu işlem geri alınamaz.'),
  async () => {
  try {
  await listingService.deleteListing(listingId);
- notification.showSuccess('Successful', 'Listing deleted');
+ notification.showSuccess(t('success', 'Başarılı'), t('listing_deleted', 'İlan silindi.'));
  fireChanged();
  } catch (err) {
- handleApiError('Delete Failed', err);
+ handleApiError(t('delete_failed', 'İlan silinemedi'), err);
  }
  },
  () => {}
  );
- }, [dismiss, fireChanged, handleApiError, listingId, notification]);
+ }, [dismiss, fireChanged, handleApiError, listingId, notification, t]);
 
  const handleOpenShowcase = useCallback((e) => {
  dismiss(e);

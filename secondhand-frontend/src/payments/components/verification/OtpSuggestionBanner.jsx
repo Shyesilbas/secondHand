@@ -1,88 +1,115 @@
-import { useTranslation } from "react-i18next";
-import { useCallback, useMemo } from 'react';
-import { Copy, CornerDownRight, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useCallback, useRef, useState } from 'react';
+import { Check, ChevronDown, Copy, Mail } from 'lucide-react';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { OTP_CODE_LENGTH } from '../../../common/constants/otp.js';
+import Button from '../../../common/components/ui/Button.jsx';
+
+const looksLikeHtml = (text) => /<\/?[a-z][\s\S]*>/i.test(text);
 
 /**
- * Strip HTML tags, decode common entities, and collapse whitespace
- * so email content is safe to render as plain text.
+ * The email as it was sent. HTML renders in a sandboxed iframe: no scripts, no navigation;
+ * `allow-same-origin` only lets this page read the frame height to size it.
  */
-const sanitizeEmailContent = raw => {
- if (!raw || typeof raw !== 'string') return '';
- let t = raw
- .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, '')
- .replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
- t = t.replace(/<[^>]+>/g, ' ');
- t = t.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
- t = t.replace(/\s+/g, ' ').trim();
- return t;
+const EmailBody = ({ content }) => {
+  const { t } = useTranslation();
+  const frameRef = useRef(null);
+  const [height, setHeight] = useState(240);
+
+  if (!looksLikeHtml(content)) {
+    return <p className="whitespace-pre-line text-sm text-text-secondary">{content}</p>;
+  }
+
+  const fitHeight = () => {
+    const doc = frameRef.current?.contentDocument;
+    if (doc?.body) setHeight(Math.min(Math.max(doc.body.scrollHeight + 16, 160), 560));
+  };
+
+  return (
+    <iframe
+      ref={frameRef}
+      title={t('payment_email_preview', 'Doğrulama e-postası')}
+      srcDoc={content}
+      sandbox="allow-same-origin"
+      referrerPolicy="no-referrer"
+      onLoad={fitHeight}
+      style={{ height }}
+      className="block w-full rounded border border-border-light bg-background-primary"
+    />
+  );
 };
 
-/** Suggested code from latest payment email: shows sanitized email preview, copy or apply to inputs. */
-const OtpSuggestionBanner = ({
- suggestedCode,
- sourceEmail,
- onApply
-}) => {
- const {
- t
- } = useTranslation();
- const notification = useNotification();
- const copy = useCallback(async () => {
- if (!suggestedCode?.length || suggestedCode.length !== OTP_CODE_LENGTH) return;
- try {
- await navigator.clipboard.writeText(suggestedCode);
- notification.showSuccess('Copied', `The ${OTP_CODE_LENGTH}-digit code was copied to your clipboard.`);
- } catch {
- notification.showWarning('Clipboard', 'Could not copy — select the code manually.');
- }
- }, [notification, suggestedCode]);
- const apply = useCallback(() => {
- onApply?.(suggestedCode);
- }, [onApply, suggestedCode]);
- const emailPreview = useMemo(() => {
- if (!sourceEmail) return null;
- const content = sourceEmail.content || sourceEmail.body || '';
- const sanitized = sanitizeEmailContent(content);
- if (!sanitized) return null;
- // Show a reasonable amount — truncate at ~280 chars
- return sanitized.length > 280 ? sanitized.slice(0, 280) + '…' : sanitized;
- }, [sourceEmail]);
- const emailSubject = sourceEmail?.subject || null;
- const emailDate = sourceEmail?.sentAt || sourceEmail?.createdAt || null;
- if (!suggestedCode || String(suggestedCode).length !== OTP_CODE_LENGTH) return null;
- return <div className="overflow-hidden rounded border border-border bg-background-primary">
- {/* Header */}
- <div className="flex items-center gap-2.5 border-b border-border-light bg-background-secondary px-4 py-2.5">
- <Mail className="shrink-0 h-5 w-5 text-text-tertiary" strokeWidth={1.5} aria-hidden />
- <div className="min-w-0 flex-1">
- <p className="text-xs font-semibold text-text-primary">
- {emailSubject || 'Payment Verification'}
- </p>
- {emailDate && <p className="text-xs text-text-muted">
- {new Date(emailDate).toLocaleString()}
- </p>}
- </div>
- </div>
+/** Code found in the latest payment email: one row with the code and "use it", the email itself on demand. */
+const OtpSuggestionBanner = ({ suggestedCode, sourceEmail, onApply, appliedCode }) => {
+  const { t, i18n } = useTranslation();
+  const notification = useNotification();
+  const [emailOpen, setEmailOpen] = useState(false);
+  const code = String(suggestedCode || '');
 
- {/* Email content preview */}
- {emailPreview && <div className="border-b border-border-light px-4 py-3">
- <p className="text-xs leading-relaxed text-text-tertiary">
- {emailPreview}
- </p>
- </div>}
+  const copy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      notification.showSuccess(t('copied', 'Kopyalandı'), t('otp_code_copied', 'Kod panoya kopyalandı.'));
+    } catch {
+      notification.showWarning(t('copy_failed', 'Kopyalanamadı'), t('otp_copy_manually', 'Kodu elle seçip kopyala.'));
+    }
+  }, [code, notification, t]);
 
- {/* Code + actions */}
- <div className="flex flex-wrap items-center gap-2.5 px-4 py-3">
- <span className="inline-flex rounded-md border border-border bg-background-secondary px-3 py-1.5 text-lg font-semibold tabular-nums text-text-primary" aria-label={t("suggested_verification_code")}>
- {String(suggestedCode)}
- </span>
- <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded border border-border-dark bg-secondary-500 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-primary">
- <Copy className="h-3.5 w-3.5 shrink-0" />{t("copy")}</button>
- <button type="button" onClick={apply} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-9 px-3">
- <CornerDownRight className="h-3.5 w-3.5 shrink-0" />{t("fill_inputs")}</button>
- </div>
- </div>;
+  if (code.length !== OTP_CODE_LENGTH) return null;
+
+  const content = sourceEmail?.content || sourceEmail?.body || '';
+  const sentAt = sourceEmail?.sentAt || sourceEmail?.createdAt || null;
+  const sentAtText = sentAt
+    ? new Date(sentAt).toLocaleTimeString(i18n.language?.startsWith('tr') ? 'tr-TR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+    : null;
+  const isApplied = appliedCode === code;
+
+  return (
+    <div className="rounded border border-border bg-background-primary">
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+        <Mail className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-text-tertiary">
+            {[t('otp_code_in_email', 'E-postandaki kod'), sentAtText].filter(Boolean).join(' · ')}
+          </p>
+          <p className="text-lg font-semibold tracking-widest tabular-nums text-text-primary" aria-label={t('suggested_verification_code', 'Önerilen doğrulama kodu')}>
+            {code}
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="sm" onClick={copy} aria-label={t('copy', 'Kopyala')} className="!px-2">
+            <Copy className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Button>
+          <Button variant={isApplied ? 'secondary' : 'primary'} size="sm" onClick={() => onApply?.(code)} disabled={isApplied}>
+            {isApplied && <Check className="h-4 w-4" strokeWidth={2} aria-hidden />}
+            {isApplied ? t('otp_code_applied', 'Kod girildi') : t('otp_use_code', 'Kodu kullan')}
+          </Button>
+        </div>
+      </div>
+
+      {content && (
+        <div className="border-t border-border-light">
+          <button
+            type="button"
+            onClick={() => setEmailOpen(open => !open)}
+            aria-expanded={emailOpen}
+            className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary"
+          >
+            <span className="truncate">
+              {emailOpen ? t('hide_email', 'E-postayı gizle') : t('show_email', 'E-postayı göster')}
+              {sourceEmail?.subject && <span className="text-text-tertiary"> · {sourceEmail.subject}</span>}
+            </span>
+            <ChevronDown className={`h-4 w-4 shrink-0 transition-transform duration-150 ${emailOpen ? 'rotate-180' : ''}`} strokeWidth={1.5} aria-hidden />
+          </button>
+          {emailOpen && (
+            <div className="px-4 pb-4">
+              <EmailBody content={content} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
+
 export default OtpSuggestionBanner;

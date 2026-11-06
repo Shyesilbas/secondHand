@@ -19,20 +19,46 @@ export const ORDER_STATUSES = Object.freeze({
  VERIFICATION_LOCKED: 'VERIFICATION_LOCKED',
 });
 
-/** Tab filters: groups instead of single API status (resolved in useOrderFlow) */
-export const ORDER_STATUS_TAB_FILTER = Object.freeze({
- ALL: '',
- /** PENDING + CONFIRMED + PROCESSING */
- PREPARING: '__TAB_PREPARING__',
- SHIPPED: ORDER_STATUSES.SHIPPED,
- /** DELIVERED + COMPLETED */
- DELIVERED_GROUP: '__TAB_DELIVERED__',
- CANCELLED: ORDER_STATUSES.CANCELLED,
+/** List tabs. Each tab maps to a set of backend statuses; the backend filters with `statuses`. */
+export const ORDER_LIST_TABS = Object.freeze({
+ ALL: 'all',
+ ACTION: 'action',
+ PREPARING: 'preparing',
+ IN_DELIVERY: 'in_delivery',
+ COMPLETED: 'completed',
+ CLOSED: 'closed',
 });
+
+const S = ORDER_STATUSES;
+
+/** Statuses where the viewer has the next step (see order/README.md state machine). */
+const ACTION_STATUSES = Object.freeze({
+ BUYER: [S.DELIVERED, S.HANDOVER_CONFIRMED, S.MEETUP_PENDING],
+ SELLER: [S.CONFIRMED, S.PROCESSING, S.MEETUP_PENDING],
+});
+
+const TAB_STATUSES = Object.freeze({
+ [ORDER_LIST_TABS.ALL]: [],
+ [ORDER_LIST_TABS.PREPARING]: [S.PENDING, S.CONFIRMED, S.PROCESSING],
+ [ORDER_LIST_TABS.IN_DELIVERY]: [S.SHIPPED, S.MEETUP_PENDING, S.VERIFICATION_LOCKED],
+ [ORDER_LIST_TABS.COMPLETED]: [S.DELIVERED, S.HANDOVER_CONFIRMED, S.COMPLETED],
+ [ORDER_LIST_TABS.CLOSED]: [S.CANCELLED, S.REFUNDED],
+});
+
+/** Backend statuses for a tab; an empty array means no status filter. */
+export const getOrderTabStatuses = (tab, viewMode) => {
+ if (tab === ORDER_LIST_TABS.ACTION) {
+ return viewMode === ORDER_VIEW_MODES.SELLER ? ACTION_STATUSES.SELLER : ACTION_STATUSES.BUYER;
+ }
+ return TAB_STATUSES[tab] ?? [];
+};
+
+/** Seller statuses that still need to be shipped. */
+export const SELLER_TO_SHIP_STATUSES = Object.freeze([S.CONFIRMED, S.PROCESSING]);
 
 export const ORDER_DEFAULTS = Object.freeze({
  INITIAL_PAGE: 0,
- INITIAL_PAGE_SIZE: 5,
+ INITIAL_PAGE_SIZE: 10,
  SEARCH_PAYMENT_FETCH_SIZE: 20,
  SORT_DIRECTION: 'desc',
  PAGE_SIZE_OPTIONS: PAGE_SIZE_OPTIONS_5_10_20_50,
@@ -47,6 +73,10 @@ export const ORDER_TIME = Object.freeze({
  SECOND_MS: 1000,
  MINUTE_MS: 60 * 1000,
  DELIVERY_CONFIRMATION_WINDOW_MS: 72 * 60 * 60 * 1000,
+ /** Mirrors backend OrderBusinessConstants.SHIP_DEADLINE_HOURS: unshipped cargo orders are cancelled after this. */
+ SHIP_DEADLINE_MS: 72 * 60 * 60 * 1000,
+ SHIP_DEADLINE_WARNING_MS: 24 * 60 * 60 * 1000,
+ SHIP_DEADLINE_URGENT_MS: 6 * 60 * 60 * 1000,
  REFUND_WINDOW_MS: 48 * 60 * 60 * 1000,
  PENDING_ESCROW_REFRESH_MS: 30 * 1000,
  PENDING_ESCROW_STALE_MS: 30 * 1000,

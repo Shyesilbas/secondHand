@@ -188,11 +188,10 @@ const AccountHubPage = () => {
                 to={item.route}
                 onClick={onItemClick}
                 aria-current={active ? 'page' : undefined}
-                className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${
-                  active
+                className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${active
                     ? 'bg-primary font-medium text-white'
                     : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
-                }`}
+                  }`}
               >
                 <ItemIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
                 <span className="truncate">{t(item.nameKey || item.name)}</span>
@@ -211,17 +210,15 @@ const AccountHubPage = () => {
               type="button"
               onClick={() => toggleGroup(group.id)}
               aria-expanded={isOpen}
-              className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-left text-xs font-semibold transition-colors duration-150 ${
-                hasActiveChild
+              className={`flex w-full items-center justify-between rounded px-3 py-1.5 text-left text-xs font-semibold transition-colors duration-150 ${hasActiveChild
                   ? 'text-text-primary'
                   : 'text-text-tertiary hover:text-text-primary'
-              }`}
+                }`}
             >
               <span className="truncate">{formatGroupLabel(rawGroupLabel, isTr)}</span>
               <ChevronDown
-                className={`h-3.5 w-3.5 shrink-0 text-text-muted transition-transform duration-150 ${
-                  isOpen ? '' : '-rotate-90'
-                }`}
+                className={`h-3.5 w-3.5 shrink-0 text-text-muted transition-transform duration-150 ${isOpen ? '' : '-rotate-90'
+                  }`}
                 strokeWidth={1.5}
                 aria-hidden
               />
@@ -237,11 +234,10 @@ const AccountHubPage = () => {
                       to={item.route}
                       onClick={onItemClick}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${
-                        active
+                      className={`flex items-center gap-2.5 rounded px-3 py-2 text-sm transition-colors duration-150 ${active
                           ? 'bg-primary font-medium text-white'
                           : 'text-text-secondary hover:bg-background-secondary hover:text-text-primary'
-                      }`}
+                        }`}
                     >
                       <ItemIcon
                         className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-text-tertiary'}`}
@@ -283,9 +279,8 @@ const AccountHubPage = () => {
               <div className="mt-3 flex items-center justify-between border-t border-border-light pt-3 text-xs">
                 <span className="inline-flex items-center gap-1.5 font-medium text-text-secondary">
                   <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      isPremium ? 'bg-status-warning' : 'bg-secondary-400'
-                    }`}
+                    className={`h-1.5 w-1.5 rounded-full ${isPremium ? 'bg-status-warning' : 'bg-secondary-400'
+                      }`}
                     aria-hidden
                   />
                   {isPremium ? plan || 'Premium' : t('standard', 'Standard')}
@@ -312,9 +307,8 @@ const AccountHubPage = () => {
                   <span>{t('account_hub', 'Account Hub')}</span>
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 text-text-muted transition-transform duration-150 ${
-                    mobileMenuOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`h-4 w-4 text-text-muted transition-transform duration-150 ${mobileMenuOpen ? 'rotate-180' : ''
+                    }`}
                   strokeWidth={1.5}
                   aria-hidden
                 />
@@ -508,9 +502,8 @@ const AccountHubPage = () => {
                               </p>
                               <p className="mt-0.5 inline-flex items-center justify-end gap-1.5 text-xs text-text-secondary">
                                 <span
-                                  className={`h-1.5 w-1.5 rounded-full ${
-                                    ORDER_STATUS_DOT[order.status] || 'bg-secondary-400'
-                                  }`}
+                                  className={`h-1.5 w-1.5 rounded-full ${ORDER_STATUS_DOT[order.status] || 'bg-secondary-400'
+                                    }`}
                                   aria-hidden
                                 />
                                 <span>{statusLabel}</span>
@@ -540,9 +533,8 @@ const AccountHubPage = () => {
                     </div>
                     <span className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-primary">
                       <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          isPremium ? 'bg-status-warning' : 'bg-secondary-400'
-                        }`}
+                        className={`h-1.5 w-1.5 rounded-full ${isPremium ? 'bg-status-warning' : 'bg-secondary-400'
+                          }`}
                         aria-hidden
                       />
                       {isPremium ? plan || 'PRO' : t('standard', 'Standard')}

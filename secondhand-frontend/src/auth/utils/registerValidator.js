@@ -1,74 +1,59 @@
 import { validatePhoneNumber } from '../../common/utils/phoneFormatter.js';
+import { getPasswordError, isValidEmail } from './passwordRules.js';
 
-export const validateRegisterForm = (formData, acceptedAgreements, agreements) => {
- const errors = {};
+/** Fields on the first register step; the form returns there when one of them fails. */
+export const REGISTER_ACCOUNT_FIELDS = ['email', 'password', 'confirmPassword'];
 
- if (!formData.name?.trim()) {
- errors.name = 'Name is required';
- } else if (formData.name.trim().length < 2) {
- errors.name = 'Name must be at least 2 characters';
- }
+export const validateAccountFields = (formData) => {
+  const errors = {};
+  if (!formData.email?.trim()) errors.email = 'E-posta adresini gir.';
+  else if (!isValidEmail(formData.email)) errors.email = 'Geçerli bir e-posta adresi gir.';
 
- if (!formData.surname?.trim()) {
- errors.surname = 'Surname is required';
- } else if (formData.surname.trim().length < 2) {
- errors.surname = 'Surname must be at least 2 characters';
- }
+  const passwordError = getPasswordError(formData.password);
+  if (passwordError) errors.password = passwordError;
 
- if (!formData.email?.trim()) {
- errors.email = 'E-Mail is required';
- } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
- errors.email = 'Please enter a valid email address';
- }
-
- if (!formData.phone?.trim()) {
- errors.phone = 'Phone number is required';
- } else {
- const phoneValidation = validatePhoneNumber(formData.phone);
- if (!phoneValidation.valid) {
- errors.phone = phoneValidation.error;
- }
- }
-
- if (!formData.gender) {
- errors.gender = 'Gender is required';
- }
-
- if (!formData.birthdate?.trim()) {
- errors.birthdate = 'Birth date is required';
- } else if (!/^\d{2}\/\d{2}\/\d{4}$/.test(formData.birthdate.trim())) {
- errors.birthdate = 'Please enter birth date in DD/MM/YYYY format';
- } else {
- // Validate the date
- const [day, month, year] = formData.birthdate.trim().split('/').map(Number);
- const date = new Date(year, month - 1, day);
- const currentDate = new Date();
- 
- if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
- errors.birthdate = 'Please enter a valid date';
- } else if (date > currentDate) {
- errors.birthdate = 'Birth date cannot be in the future';
- } else if (year < 1900 || year > currentDate.getFullYear() - 13) {
- errors.birthdate = 'Age must be at least 13 years old';
- }
- }
-
- if (!formData.password) {
- errors.password = 'Password is required';
- } else if (formData.password.length < 8) {
- errors.password = 'Password must be at least 8 characters';
- } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#_\-+=[\]{}()|\\/<>:~^`"';,]).*/.test(formData.password)) {
- errors.password = 'Password must contain at least one letter, one lowercase letter, one digit and one special character';
- }
-
- if (formData.password !== formData.confirmPassword) {
- errors.confirmPassword = 'Passwords do not match';
- }
-
- if (acceptedAgreements.size !== agreements.length) {
- errors.agreements = 'You must accept all agreements to register';
- }
-
- return errors;
+  if (!formData.confirmPassword) errors.confirmPassword = 'Şifreni tekrar gir.';
+  else if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Şifreler eşleşmiyor.';
+  return errors;
 };
 
+/** DD/MM/YYYY, a real date, and at least 13 years ago. */
+export const validateBirthdate = (value) => {
+  const text = value?.trim();
+  if (!text) return 'Doğum tarihini gir.';
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(text)) return 'Doğum tarihini GG/AA/YYYY biçiminde gir.';
+  const [day, month, year] = text.split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  const now = new Date();
+  if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) return 'Geçerli bir tarih gir.';
+  if (date > now) return 'Doğum tarihi gelecekte olamaz.';
+  if (year < 1900 || year > now.getFullYear() - 13) return 'Kayıt için en az 13 yaşında olmalısın.';
+  return '';
+};
+
+export const validatePhone = (value) => {
+  if (!value?.trim()) return 'Telefon numaranı gir.';
+  return validatePhoneNumber(value).valid ? '' : 'Geçerli bir telefon numarası gir.';
+};
+
+export const validateRegisterForm = (formData, acceptedAgreements, agreements) => {
+  const errors = validateAccountFields(formData);
+
+  if (!formData.name?.trim()) errors.name = 'Adını gir.';
+  else if (formData.name.trim().length < 2) errors.name = 'Ad en az 2 karakter olmalı.';
+
+  if (!formData.surname?.trim()) errors.surname = 'Soyadını gir.';
+  else if (formData.surname.trim().length < 2) errors.surname = 'Soyad en az 2 karakter olmalı.';
+
+  const phoneError = validatePhone(formData.phone);
+  if (phoneError) errors.phone = phoneError;
+
+  const birthdateError = validateBirthdate(formData.birthdate);
+  if (birthdateError) errors.birthdate = birthdateError;
+
+  if (!formData.gender) errors.gender = 'Cinsiyet seç.';
+
+  if (acceptedAgreements.size !== agreements.length) errors.agreements = 'Devam etmek için sözleşmeleri onaylaman gerekiyor.';
+
+  return errors;
+};

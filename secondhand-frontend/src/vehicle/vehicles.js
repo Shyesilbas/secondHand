@@ -2,132 +2,132 @@
 import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
 
 export const VehicleCreateRequestDTO = Object.freeze({
- title: '',
- description: '',
- price: 0,
- currency: 'TRY',
- city: '',
- district: '',
- imageUrl: '',
+    title: '',
+    description: '',
+    price: 0,
+    currency: 'TRY',
+    city: '',
+    district: '',
+    imageUrl: '',
 
- vehicleTypeId: '',
- _vehicleTypeName: '',
- _modelTypeId: '',
- _modelBrandId: '',
- brandId: '',
- vehicleModelId: '',
- vehicleGenerationId: '',
- vehicleEngineId: '',
- vehicleTrimId: '',
- year: 0,
- mileage: 0,
- engineCapacity: 0,
- gearbox: '',
- seatCount: '',
- doors: '',
- wheels: 0,
- color: '',
- fuelCapacity: 0,
- fuelConsumption: 0,
- horsePower: 0,
- kilometersPerLiter: 0,
- fuelType: '',
- swap: false,
- accidentHistory: false,
- accidentDetails: '',
- inspectionValidUntil: '',
- drivetrain: '',
- bodyType: '',
+    vehicleTypeId: '',
+    _vehicleTypeName: '',
+    _modelTypeId: '',
+    _modelBrandId: '',
+    brandId: '',
+    vehicleModelId: '',
+    vehicleGenerationId: '',
+    vehicleEngineId: '',
+    vehicleTrimId: '',
+    year: 0,
+    mileage: 0,
+    engineCapacity: 0,
+    gearbox: '',
+    seatCount: '',
+    doors: '',
+    wheels: 0,
+    color: '',
+    fuelCapacity: 0,
+    fuelConsumption: 0,
+    horsePower: 0,
+    kilometersPerLiter: 0,
+    fuelType: '',
+    swap: false,
+    accidentHistory: false,
+    accidentDetails: '',
+    inspectionValidUntil: '',
+    drivetrain: '',
+    bodyType: '',
 });
 
 const toUuidOrNull = (value) => {
- const s = value == null ? '' : String(value).trim();
- return s.length > 0 ? s : null;
+    const s = value == null ? '' : String(value).trim();
+    return s.length > 0 ? s : null;
 };
 
 export const createVehicleCreateRequest = (data) => ({
- base: createListingBaseCreatePayload(data),
+    base: createListingBaseCreatePayload(data),
 
- vehicleTypeId: toUuidOrNull(data.vehicleTypeId),
- brandId: toUuidOrNull(data.brandId),
- vehicleModelId: toUuidOrNull(data.vehicleModelId),
- vehicleGenerationId: toUuidOrNull(data.vehicleGenerationId),
- vehicleEngineId: toUuidOrNull(data.vehicleEngineId),
- vehicleTrimId: toUuidOrNull(data.vehicleTrimId),
- year: parseInt(data.year, 10) || 0,
- mileage: parseInt(data.mileage, 10) || 0,
- engineCapacity: parseInt(data.engineCapacity, 10) || 0,
- gearbox: data.gearbox || '',
- seatCount: data.seatCount || '',
- doors: data.doors || '',
- wheels: parseInt(data.wheels, 10) || 0,
- color: data.color || '',
- fuelCapacity: parseInt(data.fuelCapacity, 10) || 0,
- fuelConsumption: parseInt(data.fuelConsumption, 10) || 0,
- horsePower: parseInt(data.horsePower, 10) || 0,
- kilometersPerLiter: parseInt(data.kilometersPerLiter, 10) || 0,
- fuelType: data.fuelType || '',
- swap: Boolean(data.swap),
- accidentHistory: Boolean(data.accidentHistory),
- accidentDetails: (data.accidentDetails || '').trim() || undefined,
- inspectionValidUntil: data.inspectionValidUntil ? String(data.inspectionValidUntil) : undefined,
- drivetrain: data.drivetrain || undefined,
- bodyType: data.bodyType || undefined,
+    vehicleTypeId: toUuidOrNull(data.vehicleTypeId),
+    brandId: toUuidOrNull(data.brandId),
+    vehicleModelId: toUuidOrNull(data.vehicleModelId),
+    vehicleGenerationId: toUuidOrNull(data.vehicleGenerationId),
+    vehicleEngineId: toUuidOrNull(data.vehicleEngineId),
+    vehicleTrimId: toUuidOrNull(data.vehicleTrimId),
+    year: parseInt(data.year, 10) || 0,
+    mileage: parseInt(data.mileage, 10) || 0,
+    engineCapacity: parseInt(data.engineCapacity, 10) || 0,
+    gearbox: data.gearbox || '',
+    seatCount: data.seatCount || '',
+    doors: data.doors || '',
+    wheels: parseInt(data.wheels, 10) || 0,
+    color: data.color || '',
+    fuelCapacity: parseInt(data.fuelCapacity, 10) || 0,
+    fuelConsumption: parseInt(data.fuelConsumption, 10) || 0,
+    horsePower: parseInt(data.horsePower, 10) || 0,
+    kilometersPerLiter: parseInt(data.kilometersPerLiter, 10) || 0,
+    fuelType: data.fuelType || '',
+    swap: Boolean(data.swap),
+    accidentHistory: Boolean(data.accidentHistory),
+    accidentDetails: (data.accidentDetails || '').trim() || undefined,
+    inspectionValidUntil: data.inspectionValidUntil ? String(data.inspectionValidUntil) : undefined,
+    drivetrain: data.drivetrain || undefined,
+    bodyType: data.bodyType || undefined,
 });
 
 export const createVehicleUpdateRequest = (data) => {
- const updateData = {};
- const base = createListingBaseUpdatePayload(data);
+    const updateData = {};
+    const base = createListingBaseUpdatePayload(data);
 
- if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') {
- updateData.vehicleTypeId = data.vehicleTypeId;
- }
- if (data.brandId !== undefined && data.brandId !== '') updateData.brandId = data.brandId;
- if (data.vehicleModelId !== undefined && data.vehicleModelId !== '') {
- updateData.vehicleModelId = data.vehicleModelId;
- }
- if (data.vehicleGenerationId !== undefined) {
- updateData.vehicleGenerationId = toUuidOrNull(data.vehicleGenerationId);
- }
- if (data.vehicleEngineId !== undefined) {
- updateData.vehicleEngineId = toUuidOrNull(data.vehicleEngineId);
- }
- if (data.vehicleTrimId !== undefined) {
- updateData.vehicleTrimId = toUuidOrNull(data.vehicleTrimId);
- }
- if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year, 10);
- if (data.mileage !== undefined && data.mileage !== '') updateData.mileage = parseInt(data.mileage, 10);
- if (data.engineCapacity !== undefined && data.engineCapacity !== '') {
- updateData.engineCapacity = parseInt(data.engineCapacity, 10);
- }
- if (data.gearbox !== undefined && data.gearbox !== '') updateData.gearbox = data.gearbox;
- if (data.seatCount !== undefined && data.seatCount !== '') updateData.seatCount = data.seatCount;
- if (data.doors !== undefined && data.doors !== '') updateData.doors = data.doors;
- if (data.wheels !== undefined && data.wheels !== '') updateData.wheels = parseInt(data.wheels, 10);
- if (data.color !== undefined && data.color !== '') updateData.color = data.color;
- if (data.fuelCapacity !== undefined && data.fuelCapacity !== '') {
- updateData.fuelCapacity = parseInt(data.fuelCapacity, 10);
- }
- if (data.fuelConsumption !== undefined && data.fuelConsumption !== '') {
- updateData.fuelConsumption = parseInt(data.fuelConsumption, 10);
- }
- if (data.horsePower !== undefined && data.horsePower !== '') {
- updateData.horsePower = parseInt(data.horsePower, 10);
- }
- if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') {
- updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter, 10);
- }
- if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
- if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
- if (data.accidentHistory !== undefined) updateData.accidentHistory = Boolean(data.accidentHistory);
- if (data.accidentDetails !== undefined) updateData.accidentDetails = (data.accidentDetails || '').trim();
- if (data.inspectionValidUntil !== undefined && data.inspectionValidUntil !== '') {
- updateData.inspectionValidUntil = String(data.inspectionValidUntil);
- }
- if (data.drivetrain !== undefined && data.drivetrain !== '') updateData.drivetrain = data.drivetrain;
- if (data.bodyType !== undefined && data.bodyType !== '') updateData.bodyType = data.bodyType;
+    if (data.vehicleTypeId !== undefined && data.vehicleTypeId !== '') {
+        updateData.vehicleTypeId = data.vehicleTypeId;
+    }
+    if (data.brandId !== undefined && data.brandId !== '') updateData.brandId = data.brandId;
+    if (data.vehicleModelId !== undefined && data.vehicleModelId !== '') {
+        updateData.vehicleModelId = data.vehicleModelId;
+    }
+    if (data.vehicleGenerationId !== undefined) {
+        updateData.vehicleGenerationId = toUuidOrNull(data.vehicleGenerationId);
+    }
+    if (data.vehicleEngineId !== undefined) {
+        updateData.vehicleEngineId = toUuidOrNull(data.vehicleEngineId);
+    }
+    if (data.vehicleTrimId !== undefined) {
+        updateData.vehicleTrimId = toUuidOrNull(data.vehicleTrimId);
+    }
+    if (data.year !== undefined && data.year !== '') updateData.year = parseInt(data.year, 10);
+    if (data.mileage !== undefined && data.mileage !== '') updateData.mileage = parseInt(data.mileage, 10);
+    if (data.engineCapacity !== undefined && data.engineCapacity !== '') {
+        updateData.engineCapacity = parseInt(data.engineCapacity, 10);
+    }
+    if (data.gearbox !== undefined && data.gearbox !== '') updateData.gearbox = data.gearbox;
+    if (data.seatCount !== undefined && data.seatCount !== '') updateData.seatCount = data.seatCount;
+    if (data.doors !== undefined && data.doors !== '') updateData.doors = data.doors;
+    if (data.wheels !== undefined && data.wheels !== '') updateData.wheels = parseInt(data.wheels, 10);
+    if (data.color !== undefined && data.color !== '') updateData.color = data.color;
+    if (data.fuelCapacity !== undefined && data.fuelCapacity !== '') {
+        updateData.fuelCapacity = parseInt(data.fuelCapacity, 10);
+    }
+    if (data.fuelConsumption !== undefined && data.fuelConsumption !== '') {
+        updateData.fuelConsumption = parseInt(data.fuelConsumption, 10);
+    }
+    if (data.horsePower !== undefined && data.horsePower !== '') {
+        updateData.horsePower = parseInt(data.horsePower, 10);
+    }
+    if (data.kilometersPerLiter !== undefined && data.kilometersPerLiter !== '') {
+        updateData.kilometersPerLiter = parseInt(data.kilometersPerLiter, 10);
+    }
+    if (data.fuelType !== undefined && data.fuelType !== '') updateData.fuelType = data.fuelType;
+    if (data.swap !== undefined) updateData.swap = Boolean(data.swap);
+    if (data.accidentHistory !== undefined) updateData.accidentHistory = Boolean(data.accidentHistory);
+    if (data.accidentDetails !== undefined) updateData.accidentDetails = (data.accidentDetails || '').trim();
+    if (data.inspectionValidUntil !== undefined && data.inspectionValidUntil !== '') {
+        updateData.inspectionValidUntil = String(data.inspectionValidUntil);
+    }
+    if (data.drivetrain !== undefined && data.drivetrain !== '') updateData.drivetrain = data.drivetrain;
+    if (data.bodyType !== undefined && data.bodyType !== '') updateData.bodyType = data.bodyType;
 
- if (Object.keys(base).length > 0) updateData.base = base;
+    if (Object.keys(base).length > 0) updateData.base = base;
 
- return updateData;
+    return updateData;
 };

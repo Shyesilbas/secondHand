@@ -1,19 +1,26 @@
-import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Alert from '../../common/components/ui/Alert.jsx';
+import { AuthBrand, AuthHeader } from '../components/AuthPrimitives.jsx';
+
+/**
+ * Google sign-in failed. The text is fixed on purpose: a `message` from the URL could be
+ * written by anyone who sends the link, so it is never shown.
+ */
 const OAuthErrorPage = () => {
- const {
- t
- } = useTranslation();
- const [params] = useSearchParams();
- const navigate = useNavigate();
- const message = params.get('message') || 'Authentication failed. Please try again.';
- return <div className="flex items-center justify-center min-h-screen">
- <div className="max-w-md w-full bg-background-primary rounded p-6 text-center">
- <h1 className="text-2xl font-semibold text-text-primary mb-2">{t("authentication_error")}</h1>
- <p className="text-text-secondary mb-6">{message}</p>
- <button className="px-4 py-2 bg-primary text-primary-content rounded hover:opacity-90 transition-opacity font-medium" onClick={() => navigate(ROUTES.LOGIN)}>{t("back_to_login")}</button>
- </div>
- </div>;
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col">
+      <AuthBrand />
+      <AuthHeader title={t('auth_oauth_error_title', 'Google ile giriş yapılamadı')} />
+      <Alert type="error" message={t('auth_oauth_error_text', 'Giriş tamamlanamadı. Tekrar dene ya da e-posta ve şifrenle giriş yap.')} />
+      <Link to={ROUTES.LOGIN} className={`${buttonClasses('primary')} mt-6 w-full`}>
+        {t('auth_back_to_login', 'Girişe dön')}
+      </Link>
+    </div>
+  );
 };
+
 export default OAuthErrorPage;

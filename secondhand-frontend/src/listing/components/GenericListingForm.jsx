@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useFormState } from '../../common/forms/hooks/useFormState.js';
 import { useFormSubmission } from '../../common/forms/hooks/useFormSubmission.js';
@@ -13,11 +12,15 @@ import LocationFields from '../../common/components/forms/LocationFields.jsx';
 import ImageUpload from '../../common/components/ImageUpload.jsx';
 import EnumDropdown from '../../common/components/ui/EnumDropdown.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
-import { getListingConfig } from '../config/listingConfig.js';
+import { getCreateFlowSelectorSteps, getListingConfig } from '../config/listingConfig.js';
+import { fieldLabel, formText } from '../config/listingFormCopy.js';
+import { PREFILTER_CATEGORY_COPY } from '../config/prefilterCopy.js';
+import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
+import Button from '../../common/components/ui/Button.jsx';
 import { validationRegistry } from '../validation/ValidationRegistry.js';
 import { resolveEnumLabel, toDisplayText } from '../utils/listingDisplayFormat.js';
 import { ROUTES } from '../../common/constants/routes.js';
-import { ImageIcon, MapPin, Package, FileText, CheckCircle2, Check } from 'lucide-react';
+import { ImageIcon, MapPin, Package, FileText, Check } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
 import { FieldError, SectionCard } from '../../common/components/forms/FormPrimitives.jsx';
 import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
@@ -66,11 +69,11 @@ const ToggleCardField = ({
       className="sr-only"
     />
     <div className="min-w-0 flex-1">
-      <label htmlFor={name} className="block cursor-pointer text-xs font-semibold text-text-primary">
+      <label htmlFor={name} className="block cursor-pointer text-sm font-medium text-text-primary">
         {label}
       </label>
       {description && (
-        <p className="mt-0.5 text-xs text-text-secondary leading-relaxed">
+        <p className="mt-0.5 text-sm text-text-secondary">
           {description}
         </p>
       )}
@@ -88,6 +91,7 @@ const GenericListingForm = ({
  onBack,
  initialData = null,
  isEdit = false,
+ isDraft = false,
  onUpdate = null,
  redirectRoute
 }) => {
@@ -110,13 +114,21 @@ const GenericListingForm = ({
  if (!steps.length) return steps;
  const maxId = Math.max(...steps.map(s => Number(s?.id ?? 0)));
  const summaryId = Number.isFinite(maxId) ? maxId + 1 : steps.length + 1;
- return [...steps, {
+ const localized = steps.map(s => ({ ...s, title: formText(s.title), description: formText(s.description) }));
+ return [...localized, {
  id: summaryId,
- title: 'Review',
- description: 'Check the summary, then publish or save as draft.',
+ title: t('listing_review_title', 'Kontrol et ve yayınla'),
+ description: t('listing_review_desc', 'Bilgileri son kez gözden geçir; yayınla ya da taslak olarak kaydet.'),
  kind: 'summary'
  }];
- }, [formSchema?.steps]);
+ }, [formSchema?.steps, t]);
+ // Answers given on the category screen (/listings/prefilter) are shown once as a summary, not asked again.
+ const lockedFieldNames = useMemo(() => {
+ if (isEdit || !initialData) return new Set();
+ return new Set(getCreateFlowSelectorSteps(listingType)
+ .map(step => step.initialDataKey)
+ .filter(key => key && isPrefilterValueFilled(initialData?.[key])));
+ }, [isEdit, initialData, listingType]);
  const normalizedInitialData = useMemo(() => {
  if (!formSchema) return initialData || null;
  if (typeof formSchema.normalizeInitialData !== 'function') return initialData || null;
@@ -162,17 +174,24 @@ const GenericListingForm = ({
  } = useFormSubmission({
  submitFunction: isEdit && onUpdate ? onUpdate : createMutation.mutateAsync,
  formState,
- successMessage: (isEdit ? 'Listing updated successfully!' : submitIntentRef.current === 'DRAFT' ? 'Listing saved as draft!' : 'Listing created! Redirecting to payment...'),
- errorMessage: (isEdit ? 'Failed to update listing' : 'Failed to save listing'),
+ // A getter: the message must follow the button that was just pressed, not the last render.
+ successMessage: () => {
+ if (submitIntentRef.current === 'DRAFT') return t('listing_saved_draft', 'İlan taslak olarak kaydedildi.');
+ if (isEdit && !isDraft) return t('listing_updated', 'İlan güncellendi.');
+ return t('listing_saved_to_payment', 'İlan kaydedildi, ödeme sayfasına yönlendiriliyorsun.');
+ },
+ errorMessage: (isEdit ? t('listing_update_failed', 'İlan güncellenemedi.') : t('listing_save_failed', 'İlan kaydedilemedi.')),
  onSuccess: response => {
  if (!isEdit) {
  cacheService.remove(draftKey);
  cacheService.remove(`${draftKey}_step`);
  }
- if (isEdit || submitIntentRef.current === 'DRAFT') {
+ // Publishing a new listing or a draft (e.g. a copy) continues to the listing fee payment.
+ const publishing = submitIntentRef.current === 'PUBLISH' && (!isEdit || isDraft);
+ if (!publishing) {
  navigate(redirectRoute || ROUTES.MY_LISTINGS);
  } else {
- const id = response?.id || response?.data?.id;
+ const id = isEdit ? initialData?.id : response?.id || response?.data?.id;
  if (id) {
  navigate(`${ROUTES.PAY_LISTING_FEE}?listingId=${id}`);
  } else {
@@ -272,12 +291,15 @@ const GenericListingForm = ({
 
  /* ── Field Renderer ────────────────────────────────────── */
 
+ const isFieldShown = field => {
+ if (lockedFieldNames.has(field.name)) return false;
+ return typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
+ };
  const renderField = field => {
- const isVisible = typeof field.visibleWhen === 'function' ? field.visibleWhen(ctx) : true;
- if (!isVisible) return null;
+ if (!isFieldShown(field)) return null;
  const value = formData?.[field.name];
  const isRequired = Boolean(field.required) || (typeof field.requiredWhen === 'function' ? Boolean(field.requiredWhen(ctx)) : false);
- const label = isRequired ? `${field.label} *` : field.label;
+ const label = isRequired ? `${fieldLabel(field)} *` : fieldLabel(field);
  const error = errors?.[field.name];
  if (field.type === 'enum') {
  const options = typeof field.getOptions === 'function' ? field.getOptions(ctx) : null;
@@ -299,7 +321,7 @@ const GenericListingForm = ({
     disabled={disabled}
     usePortal={true}
    />
-   {field.description && <p className="mt-1 text-xs text-text-muted">{field.description}</p>}
+   {field.description && <p className="mt-1 text-xs text-text-tertiary">{formText(field.description)}</p>}
    <FieldError error={error} />
   </div>
  );
@@ -336,8 +358,8 @@ const GenericListingForm = ({
   <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
    <ToggleCardField
     name={field.name}
-    label={field.label}
-    description={field.description}
+    label={fieldLabel(field)}
+    description={formText(field.description)}
     value={Boolean(value)}
     onToggle={() => {
      const next = !value;
@@ -355,7 +377,7 @@ const GenericListingForm = ({
  if (field.type === 'textarea') {
  return (
   <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined} className={field.fullWidth ? 'md:col-span-2 lg:col-span-3' : undefined}>
-   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</label>
+   <label className="mb-1.5 block text-sm font-medium text-text-primary">{label}</label>
    <textarea
     name={field.name}
     value={value || ''}
@@ -371,7 +393,7 @@ const GenericListingForm = ({
  const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
  return (
   <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
-   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</label>
+   <label className="mb-1.5 block text-sm font-medium text-text-primary">{label}</label>
    <input
     type={inputType}
     name={field.name}
@@ -390,15 +412,37 @@ const GenericListingForm = ({
 
  /* ── Step Renderers ────────────────────────────────────── */
 
+ const optionLabelFor = (field, value) => {
+ const options = (typeof field.getOptions === 'function' ? field.getOptions(ctx) : null) || enums?.[field.enumKey] || [];
+ const opt = options.find(o => String(o?.id ?? o?.value ?? '') === String(value));
+ return opt?.label || opt?.name || resolveEnumLabel(enums, field.enumKey, value) || String(value);
+ };
+ const renderLockedSummary = step => {
+ const fields = (step?.sections || []).flatMap(section => section.fields || []).filter(f => lockedFieldNames.has(f.name));
+ if (!fields.length) return null;
+ return (
+  <div className="flex items-start justify-between gap-4 rounded border border-border-light bg-background-secondary px-4 py-3">
+   <div className="min-w-0">
+    <p className="text-xs font-medium text-text-tertiary">{t('your_selections', 'Seçimlerin')}</p>
+    <p className="mt-0.5 text-sm text-text-primary">
+     {fields.map(f => optionLabelFor(f, formData?.[f.name])).filter(Boolean).join(' · ')}
+    </p>
+   </div>
+   <Button variant="ghost" size="sm" onClick={onBack} className="shrink-0">{t('change', 'Değiştir')}</Button>
+  </div>
+ );
+ };
  const renderDetailsStep = step => {
  const sections = step?.sections || [];
  return (
   <div className="space-y-8">
+   {renderLockedSummary(step)}
    {sections.map(section => {
     const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
     if (!isVisible) return null;
+    if (!(section.fields || []).some(isFieldShown)) return null;
     return (
-     <SectionCard key={section.id || section.title} title={section.title} description={section.description}>
+     <SectionCard key={section.id || section.title} title={formText(section.title)} description={formText(section.description)}>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
        {(section.fields || []).map(renderField)}
       </div>
@@ -411,7 +455,7 @@ const GenericListingForm = ({
  const renderMediaLocationStep = () => {
  return (
   <div className="space-y-8">
-   <SectionCard title={t("photos", "Görseller")} description={t("photos_description", "Ürününüzün fotoğraflarını ekleyin")} icon={ImageIcon}>
+   <SectionCard title={t("photos", "Görseller")} description={t("photos_description", "Net ve iyi ışıklı bir fotoğraf ekle.")} icon={ImageIcon}>
     <ImageUpload onImageUpload={imageUrl => ctx.setValue('imageUrl', imageUrl)} onImageRemove={() => ctx.setValue('imageUrl', '')} imageUrl={formData?.imageUrl} disabled={false} />
    </SectionCard>
    <SectionCard title={t("location", "Konum")} description={t("location_description", "Ürün nerede bulunuyor?")} icon={MapPin}>
@@ -460,13 +504,13 @@ const GenericListingForm = ({
    const value = formatSummaryValue(field, formData?.[field.name]);
    if (!value) return;
    detailFields.push({
-    label: field.label || field.name,
+    label: fieldLabel(field),
     value
    });
   });
  });
  });
- const typeLabel = listingConfig?.label || listingType;
+ const typeLabel = PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType;
  return (
   <div className="space-y-6">
    {/* Hero preview card */}
@@ -476,7 +520,7 @@ const GenericListingForm = ({
       {typeLabel}
      </span>
      <h2 className="mt-2 text-base font-semibold text-text-primary">
-      {formData?.title || t("untitled_listing", "İsimsiz İlan")}
+      {formData?.title || t("untitled_listing", "Başlıksız ilan")}
      </h2>
      {formData?.description && (
       <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-text-secondary">
@@ -526,7 +570,7 @@ const GenericListingForm = ({
  nextStep();
  return;
  }
- notification.showError('Missing Information', 'Please check the highlighted fields and try again.');
+ notification.showError(t('missing_information', 'Eksik bilgi'), t('check_highlighted_fields', 'İşaretli alanları kontrol edip tekrar dene.'));
  const firstErrorKey = Object.keys(errors || {})[0];
  if (firstErrorKey) {
  const el = document.querySelector(`[data-field="${CSS.escape(firstErrorKey)}"]`);
@@ -546,19 +590,30 @@ const GenericListingForm = ({
  return true;
  }, [wizardSteps, currentStep, formData?.city, formData?.district]);
  if (!formSchema) return null;
- return <ListingWizard title={typeof formSchema.getTitle === 'function' ? formSchema.getTitle({
- isEdit,
- listingType
- }) : isEdit ? 'Edit Listing' : 'Create Listing'} subtitle={typeof formSchema.getSubtitle === 'function' ? formSchema.getSubtitle({
- isEdit,
- listingType
- }) : isEdit ? 'Update your listing details' : undefined} steps={wizardSteps} currentStep={currentStep} onBack={onBack || (() => navigate(-1))} onNext={handleNext} onPrev={prevStep} onSubmit={e => {
- submitIntentRef.current = 'PUBLISH';
- handleSubmit(e);
- }} onSaveDraft={!isEdit ? e => {
- submitIntentRef.current = 'DRAFT';
- handleSubmit(e);
- } : undefined} isLoading={createMutation.isPending} canSubmit={canGoForward} renderStep={renderStep} wizardVariant={undefined} layoutViewportLocked={false} onStepPick={isEdit ? undefined : stepId => goToStep(stepId)} continueLabel="Continue" />;
+ const categoryLabel = PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType;
+ return (
+  <ListingWizard
+   title={isEdit ? t('edit_listing_title', 'İlanı düzenle') : t('new_listing_in_category', { defaultValue: 'Yeni ilan · {{category}}', category: categoryLabel })}
+   steps={wizardSteps}
+   currentStep={currentStep}
+   onBack={onBack || (() => navigate(-1))}
+   onNext={handleNext}
+   onPrev={prevStep}
+   onSubmit={e => {
+    submitIntentRef.current = 'PUBLISH';
+    handleSubmit(e);
+   }}
+   onSaveDraft={!isEdit || isDraft ? e => {
+    submitIntentRef.current = 'DRAFT';
+    handleSubmit(e);
+   } : undefined}
+   submitLabel={isEdit && !isDraft ? t('save_changes', 'Değişiklikleri kaydet') : t('publish_now', 'Şimdi yayınla')}
+   isLoading={createMutation.isPending}
+   canSubmit={canGoForward}
+   renderStep={renderStep}
+   onStepPick={isEdit ? undefined : stepId => goToStep(stepId)}
+  />
+ );
 };
 
 /* ── Summary Section ────────────────────────────────────────── */
@@ -570,13 +625,13 @@ const SummarySection = ({
 }) => {
  return (
   <div className="rounded border border-border-light bg-background-primary overflow-hidden">
-   <div className="border-b border-border-light bg-background-secondary/40 px-4 py-2.5 flex items-center gap-2">
-    {Icon && <Icon className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.5} />}
-    <h4 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">{title}</h4>
+   <div className="flex items-center gap-2 border-b border-border-light px-4 py-2.5">
+    {Icon && <Icon className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />}
+    <h4 className="text-sm font-medium text-text-primary">{title}</h4>
    </div>
    <div className="divide-y divide-border-light">
     {rows.map((row) => (
-     <div key={`${row.label}-${row.value}`} className="flex items-start justify-between gap-4 px-4 py-2 text-xs">
+     <div key={`${row.label}-${row.value}`} className="flex items-start justify-between gap-4 px-4 py-2 text-sm">
       <span className="text-text-secondary">{row.label}</span>
       <span className="text-right font-medium tabular-nums text-text-primary">{row.value}</span>
      </div>
