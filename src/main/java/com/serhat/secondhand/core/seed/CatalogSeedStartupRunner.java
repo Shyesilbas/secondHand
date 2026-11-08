@@ -45,6 +45,9 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
             "attributes"
     );
 
+    /** Seeds that write non-catalog data; they run only when named, never through `all`. */
+    private static final Set<String> EXPLICIT_ONLY = Set.of("listings-generate", "listings-clean");
+
     private final List<SeedTask> seedTasks;
     private final CacheManager cacheManager;
     private final PlatformTransactionManager transactionManager;
@@ -133,7 +136,7 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
         java.util.LinkedHashSet<String> expanded = new java.util.LinkedHashSet<>();
         for (String seed : requested) {
             if (ALL.equals(seed)) {
-                expanded.addAll(availableSeeds);
+                availableSeeds.stream().filter(key -> !EXPLICIT_ONLY.contains(key)).forEach(expanded::add);
             } else if (LISTING.equals(seed)) {
                 expanded.addAll(LISTING_SEEDS);
             } else {

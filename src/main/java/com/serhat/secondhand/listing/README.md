@@ -70,6 +70,14 @@ stateDiagram-v2
 - Lookups: `GET /api/v1/catalog/electronics/models/{id}` (specs, colors, variants) and `/attributes?typeId=` (public). `/api/v1/enums/all` `electronicModels[]` also carry `specs`, `colors`, `variants` and `catalogSource`, so the form works synchronously.
 - Listing form (`secondhand-frontend/src/listing/config/electronicsConfig.js`): fields follow the type rules, catalog values are read-only (catalog toggles are hidden), a model with official colors offers those instead of the generic list.
 
+## Listing Generator (local profile only)
+- `--app.seed=listings-generate` creates published vehicle and electronics listings for every ACTIVE user whose email is not `@example.test`, round-robin. Counts and randomness: `app.listing-generator.vehicles` / `.electronics` (default 200 each), `.seed` (42). Never part of `all`.
+- Prices come from `data/listing-generator/prices.json` (git-ignored, `claude-draft` estimates in TRY): vehicles per generation for an `anchorYear`, electronics per model for the cheapest variant (TVs: 55"). Unknown brand/model/generation names fail the run.
+- Listings go through `createListing` (validation, catalog snapshot, inventory), then fee-paid + `publish()` without `ListingPaymentHandler` or `NewListingCreatedEvent`, so no payment, notification or e-mail. `created_at` is spread over the last 120 days.
+- Photos come from `data/listing-generator/photos.json` (git-ignored; Wikimedia Commons photos already uploaded to Cloudinary `secondhand-generated/`), keyed by generation name or `TYPE|brand|model`. The photo sets the listing color; models without photos get `imageUrl = null`.
+- Vehicles use only generations with a body type and versions with fuel and gearbox; others are skipped with a warning (today: light commercials, motorcycles and some cars).
+- Every id is stored in `generated_listings` (V43). `--app.seed=listings-clean` hard-deletes generated listings nobody touched and soft-deletes (`DELETED`) those with carts, favorites, offers, chats, orders, payments, complaints or showcases.
+
 ## Related Knowledge
 - **Listing Data Flows**
   -> `.docs/knowledge/listing-data-flows.md`
