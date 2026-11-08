@@ -4,29 +4,21 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.vehicle.VehicleDataInitializer;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class VehicleValidationTest {
 
-    private MotorcycleValidator motorcycleValidator;
-    private CommercialVehicleValidator commercialVehicleValidator;
-    private VehicleDataInitializer vehicleDataInitializer;
-
-    @BeforeEach
-    void setUp() {
-        motorcycleValidator = new MotorcycleValidator();
-        commercialVehicleValidator = new CommercialVehicleValidator();
-        vehicleDataInitializer = new VehicleDataInitializer(
-                null, null, null, null, null, null, null, null, null, null, null
-        );
-    }
+    private final VehicleTypeRulesValidator rulesValidator = new VehicleTypeRulesValidator();
 
     private VehicleType createType(String name) {
         VehicleType type = new VehicleType();
@@ -36,14 +28,38 @@ class VehicleValidationTest {
         return type;
     }
 
+    /** A type whose rules mirror data/vehicles/types.json for the given type. */
+    private VehicleType typeWithRules(String name, List<BodyType> bodyTypes, List<String> required, List<String> hidden) {
+        VehicleType type = createType(name);
+        type.setBodyTypes(new ArrayList<>(bodyTypes));
+        Map<String, VehicleFieldRule> rules = new LinkedHashMap<>();
+        VehicleSpecFields.ALL.keySet().forEach(field -> rules.put(field,
+                required.contains(field) ? VehicleFieldRule.REQUIRED
+                        : hidden.contains(field) ? VehicleFieldRule.HIDDEN : VehicleFieldRule.OPTIONAL));
+        type.setFieldRules(rules);
+        return type;
+    }
+
+    private VehicleType motorcycle() {
+        return typeWithRules("MOTORCYCLE", List.of(BodyType.SPORTBIKE, BodyType.NAKED),
+                List.of("engineCapacity", "fuelType", "bodyType"),
+                List.of("doors", "seatCount", "drivetrain", "fuelCapacity", "fuelConsumption",
+                        "kilometersPerLiter", "inspectionValidUntil"));
+    }
+
+    private VehicleType commercial() {
+        return typeWithRules("COMMERCIAL", List.of(BodyType.VAN, BodyType.PICKUP),
+                List.of("mileage", "fuelType", "gearbox", "bodyType"), List.of());
+    }
+
     @Nested
-    @DisplayName("MotorcycleValidator cleanup & preservation tests")
-    class MotorcycleTests {
+    @DisplayName("VehicleTypeRulesValidator")
+    class TypeRulesTests {
 
         @Test
-        void shouldPreserveBodyTypeAndHorsePowerOnCleanup() {
+        void clearsHiddenFieldsAndKeepsTheRest() {
             VehicleListing listing = VehicleListing.builder()
-                    .vehicleType(createType("MOTORCYCLE"))
+                    .vehicleType(motorcycle())
                     .engineCapacity(600)
                     .fuelType(FuelType.GASOLINE)
                     .bodyType(BodyType.SPORTBIKE)
@@ -53,114 +69,59 @@ class VehicleValidationTest {
                     .drivetrain(Drivetrain.RWD)
                     .build();
 
-            motorcycleValidator.cleanup(listing);
+            rulesValidator.cleanup(listing);
 
-            // Verified: bodyType and horsePower MUST NOT be erased!
             assertThat(listing.getBodyType()).isEqualTo(BodyType.SPORTBIKE);
             assertThat(listing.getHorsePower()).isEqualTo(120);
-
-            // Irrelevant fields for motorcycles should be nulled out
             assertThat(listing.getDoors()).isNull();
             assertThat(listing.getSeatCount()).isNull();
             assertThat(listing.getDrivetrain()).isNull();
-
-            Result<Void> result = motorcycleValidator.validate(listing);
-            assertThat(result.isSuccess()).isTrue();
+            assertThat(rulesValidator.validate(listing).isSuccess()).isTrue();
         }
 
         @Test
-        void shouldRequireEngineCapacityAndFuelType() {
-            VehicleListing listing = VehicleListing.builder()
-                    .vehicleType(createType("MOTORCYCLE"))
-                    .build();
+        void requiresTheTypesRequiredFieldsInOrder() {
+            VehicleListing listing = VehicleListing.builder().vehicleType(commercial()).build();
 
-            Result<Void> result = motorcycleValidator.validate(listing);
-            assertThat(result.isError()).isTrue();
-            assertThat(result.getErrorCode()).isEqualTo("MOTORCYCLE_ENGINE_CAPACITY_REQUIRED");
-
-            listing.setEngineCapacity(250);
-            result = motorcycleValidator.validate(listing);
-            assertThat(result.isError()).isTrue();
-            assertThat(result.getErrorCode()).isEqualTo("MOTORCYCLE_FUEL_TYPE_REQUIRED");
-        }
-    }
-
-    @Nested
-    @DisplayName("CommercialVehicleValidator tests")
-    class CommercialVehicleTests {
-
-        @Test
-        void shouldValidateCommercialVehicleSuccessfully() {
-            VehicleListing listing = VehicleListing.builder()
-                    .vehicleType(createType("COMMERCIAL"))
-                    .mileage(120000)
-                    .fuelType(FuelType.DIESEL)
-                    .gearbox(GearType.MANUAL)
-                    .bodyType(BodyType.VAN)
-                    .wheels(4)
-                    .build();
-
-            commercialVehicleValidator.cleanup(listing);
-            Result<Void> result = commercialVehicleValidator.validate(listing);
-
-            assertThat(result.isSuccess()).isTrue();
-            assertThat(listing.getWheels()).isEqualTo(4);
-        }
-
-        @Test
-        void shouldEnforceRequiredCommercialFields() {
-            VehicleListing listing = VehicleListing.builder()
-                    .vehicleType(createType("COMMERCIAL"))
-                    .build();
-
-            Result<Void> res = commercialVehicleValidator.validate(listing);
-            assertThat(res.getErrorCode()).isEqualTo("COMMERCIAL_MILEAGE_REQUIRED");
-
-            listing.setMileage(50000);
-            res = commercialVehicleValidator.validate(listing);
-            assertThat(res.getErrorCode()).isEqualTo("COMMERCIAL_FUEL_TYPE_REQUIRED");
-
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_MILEAGE_REQUIRED");
+            listing.setMileage(0);
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_FUEL_TYPE_REQUIRED");
             listing.setFuelType(FuelType.DIESEL);
-            res = commercialVehicleValidator.validate(listing);
-            assertThat(res.getErrorCode()).isEqualTo("COMMERCIAL_GEAR_TYPE_REQUIRED");
-
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_GEAR_TYPE_REQUIRED");
             listing.setGearbox(GearType.MANUAL);
-            res = commercialVehicleValidator.validate(listing);
-            assertThat(res.getErrorCode()).isEqualTo("COMMERCIAL_BODY_TYPE_REQUIRED");
-
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_BODY_TYPE_REQUIRED");
             listing.setBodyType(BodyType.VAN);
-            res = commercialVehicleValidator.validate(listing);
-            assertThat(res.isSuccess()).isTrue();
+            assertThat(rulesValidator.validate(listing).isSuccess()).isTrue();
         }
 
         @Test
-        void shouldIgnoreNonCommercialListing() {
+        void rejectsNonPositiveRequiredEngineCapacity() {
             VehicleListing listing = VehicleListing.builder()
-                    .vehicleType(createType("CAR"))
+                    .vehicleType(motorcycle()).engineCapacity(0).fuelType(FuelType.GASOLINE).bodyType(BodyType.NAKED)
                     .build();
-
-            Result<Void> result = commercialVehicleValidator.validate(listing);
-            assertThat(result.isSuccess()).isTrue();
-        }
-    }
-
-    @Nested
-    @DisplayName("VehicleDataInitializer label formatting tests")
-    class LabelFormattingTests {
-
-        @Test
-        void shouldFormatKnownVehicleTypeLabelsInTurkish() {
-            assertThat(vehicleDataInitializer.formatTypeLabel("CAR")).isEqualTo("Otomobil");
-            assertThat(vehicleDataInitializer.formatTypeLabel("COMMERCIAL")).isEqualTo("Ticari Araçlar");
-            assertThat(vehicleDataInitializer.formatTypeLabel("MOTORCYCLE")).isEqualTo("Motosiklet");
-            assertThat(vehicleDataInitializer.formatTypeLabel("TRUCK")).isEqualTo("Kamyon / Çekici");
-            assertThat(vehicleDataInitializer.formatTypeLabel("VAN")).isEqualTo("Minibüs / Panelvan");
-            assertThat(vehicleDataInitializer.formatTypeLabel("BICYCLE")).isEqualTo("Bisiklet");
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_ENGINE_CAPACITY_REQUIRED");
         }
 
         @Test
-        void shouldFormatCustomTypeLabelsNicely() {
-            assertThat(vehicleDataInitializer.formatTypeLabel("ELECTRIC_SCOOTER")).isEqualTo("Electric Scooter");
+        void rejectsBodyTypeTheTypeDoesNotAllow() {
+            VehicleListing listing = VehicleListing.builder()
+                    .vehicleType(commercial()).mileage(1000).fuelType(FuelType.DIESEL).gearbox(GearType.MANUAL)
+                    .bodyType(BodyType.SEDAN)
+                    .build();
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_BODY_TYPE_NOT_ALLOWED");
+        }
+
+        @Test
+        void failsClearlyWhenTheTypeHasNoRules() {
+            VehicleListing listing = VehicleListing.builder().vehicleType(createType("CAR")).build();
+            assertThat(rulesValidator.validate(listing).getErrorCode()).isEqualTo("VEHICLE_TYPE_RULES_MISSING");
+        }
+
+        @Test
+        void clearsNonPositiveWheels() {
+            VehicleListing listing = VehicleListing.builder().vehicleType(commercial()).wheels(0).build();
+            rulesValidator.cleanup(listing);
+            assertThat(listing.getWheels()).isNull();
         }
     }
 
@@ -206,7 +167,19 @@ class VehicleValidationTest {
                 root = mapper.readTree(is);
             }
 
-            assertThat(root.size()).isGreaterThanOrEqualTo(70);
+            assertThat(root.size()).isGreaterThanOrEqualTo(60);
+
+            // Every type brands.json uses is defined in types.json; model body types are allowed by their type.
+            java.util.Map<String, java.util.Set<String>> typeBodies = new java.util.HashMap<>();
+            try (java.io.InputStream is = new org.springframework.core.io.ClassPathResource("data/vehicles/types.json").getInputStream()) {
+                for (com.fasterxml.jackson.databind.JsonNode t : mapper.readTree(is)) {
+                    java.util.Set<String> bodies = new java.util.HashSet<>();
+                    t.get("bodyTypes").forEach(b -> bodies.add(b.asText()));
+                    typeBodies.put(t.get("type").asText(), bodies);
+                    assertThat(t.get("fields").size()).isEqualTo(VehicleSpecFields.ALL.size());
+                }
+            }
+            assertThat(typeBodies.keySet()).containsExactlyInAnyOrder("CAR", "COMMERCIAL", "TRUCK", "MOTORCYCLE");
 
             java.util.Map<String, java.util.Set<String>> brandTypes = new java.util.HashMap<>();
             int totalModelsChecked = 0;
@@ -237,6 +210,11 @@ class VehicleValidationTest {
                             assertThat(m.getBrand()).isEqualTo(brand);
                             assertThat(m.getType()).isEqualTo(type);
                             assertThat(m.getName()).isNotBlank();
+                            if (m.getSupportedBodyTypes() != null) {
+                                assertThat(typeBodies.get(type))
+                                        .as("Body types of %s %s", brand, m.getName())
+                                        .containsAll(m.getSupportedBodyTypes());
+                            }
                             totalModelsChecked++;
                         }
                     }
@@ -256,10 +234,109 @@ class VehicleValidationTest {
             assertThat(brandTypes).containsKey("VESPA");
             assertThat(brandTypes).containsKey("CFMOTO");
             assertThat(brandTypes).containsKey("BAJAJ");
-            assertThat(brandTypes).containsKey("TREK");
-            assertThat(brandTypes).containsKey("CARRARO");
+            assertThat(brandTypes.get("OTHER")).contains("CAR", "COMMERCIAL", "TRUCK");
 
             assertThat(totalModelsChecked).isGreaterThan(500);
+        }
+    }
+
+    @Nested
+    @DisplayName("VehicleHierarchyValidator version rules")
+    class VersionHierarchyTests {
+
+        private final VehicleHierarchyValidator hierarchyValidator = new VehicleHierarchyValidator();
+
+        private VehicleListing listingWith(VehicleGeneration listingGeneration, VehicleVersion version, Integer year) {
+            VehicleType type = createType("CAR");
+            CarBrand brand = new CarBrand();
+            brand.setId(UUID.randomUUID());
+            VehicleModel model = new VehicleModel();
+            model.setId(UUID.randomUUID());
+            model.setBrand(brand);
+            model.setType(type);
+            if (listingGeneration != null) {
+                listingGeneration.setModel(model);
+            }
+            return VehicleListing.builder()
+                    .vehicleType(type)
+                    .brand(brand)
+                    .model(model)
+                    .generation(listingGeneration)
+                    .vehicleVersion(version)
+                    .year(year)
+                    .build();
+        }
+
+        private VehicleGeneration generation(Integer start, Integer end) {
+            VehicleGeneration g = new VehicleGeneration();
+            g.setId(UUID.randomUUID());
+            g.setStartYear(start);
+            g.setEndYear(end);
+            return g;
+        }
+
+        private VehicleVersion version(VehicleGeneration g, Integer start, Integer end) {
+            VehicleVersion v = new VehicleVersion();
+            v.setId(UUID.randomUUID());
+            v.setGeneration(g);
+            v.setStartYear(start);
+            v.setEndYear(end);
+            return v;
+        }
+
+        @Test
+        void acceptsVersionOfSelectedGenerationInsideYears() {
+            VehicleGeneration g = generation(2020, null);
+            Result<Void> result = hierarchyValidator.validate(listingWith(g, version(g, null, null), 2022));
+            assertThat(result.isSuccess()).isTrue();
+        }
+
+        @Test
+        void requiresGenerationForVersion() {
+            Result<Void> result = hierarchyValidator.validate(listingWith(null, version(generation(2020, null), null, null), 2022));
+            assertThat(result.getErrorCode()).isEqualTo("VERSION_REQUIRES_GENERATION");
+        }
+
+        @Test
+        void rejectsVersionOfAnotherGeneration() {
+            VehicleGeneration selected = generation(2020, null);
+            VehicleVersion other = version(generation(2012, 2019), null, null);
+            Result<Void> result = hierarchyValidator.validate(listingWith(selected, other, 2022));
+            assertThat(result.getErrorCode()).isEqualTo("VERSION_GENERATION_MISMATCH");
+        }
+
+        @Test
+        void rejectsYearOutsideVersionYears() {
+            VehicleGeneration g = generation(2020, null);
+            Result<Void> result = hierarchyValidator.validate(listingWith(g, version(g, 2021, 2023), 2024));
+            assertThat(result.getErrorCode()).isEqualTo("VEHICLE_YEAR_OUT_OF_VERSION_RANGE");
+        }
+
+        @Test
+        void usesGenerationYearsWhenVersionHasNone() {
+            VehicleGeneration g = generation(2020, null);
+            Result<Void> result = hierarchyValidator.validate(listingWith(g, version(g, null, null), 2019));
+            assertThat(result.getErrorCode()).isEqualTo("VEHICLE_YEAR_OUT_OF_VERSION_RANGE");
+        }
+
+        @Test
+        void rejectsTrimNotOfferedWithVersion() {
+            VehicleGeneration g = generation(2020, null);
+            VehicleVersion v = version(g, null, null);
+            VehicleTrim offered = new VehicleTrim();
+            offered.setId(UUID.randomUUID());
+            offered.setGeneration(g);
+            v.getTrims().add(offered);
+            VehicleTrim other = new VehicleTrim();
+            other.setId(UUID.randomUUID());
+            other.setGeneration(g);
+
+            VehicleListing listing = listingWith(g, v, 2022);
+            listing.setTrim(other);
+            assertThat(hierarchyValidator.validate(listing).getErrorCode()).isEqualTo("TRIM_VERSION_MISMATCH");
+
+            listing.setTrim(offered);
+            assertThat(hierarchyValidator.validate(listing).isSuccess()).isTrue();
         }
     }
 }

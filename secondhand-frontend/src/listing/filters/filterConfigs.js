@@ -1,21 +1,67 @@
 import { FilterConfig } from './FilterConfig';
 
+// Vehicle filters follow the selected types' rules (`vehicleTypes[].fieldRules` / `bodyTypes`, backend types.json).
+const selectedVehicleTypes = (filters, enums) => {
+ const ids = (Array.isArray(filters?.vehicleTypeIds) ? filters.vehicleTypeIds : [filters?.vehicleTypeIds])
+  .filter(Boolean).map(String);
+ return (enums?.vehicleTypes || []).filter((t) => ids.includes(String(t?.id)));
+};
+
+const shownForVehicleTypes = (field) => (filters, enums) => {
+ const types = selectedVehicleTypes(filters, enums);
+ return types.length === 0 || types.some((t) => (t?.fieldRules?.[field] ?? 'HIDDEN') !== 'HIDDEN');
+};
+
+const asList = (value) => (Array.isArray(value) ? value : value ? [value] : []).map(String);
+const optionId = (o) => String(o?.id ?? o?.value ?? o?.name ?? '');
+
+// Keeps options the user already picked, so a selection that no longer fits can still be removed.
+const keepSelected = (all, allowed, selected) => all.filter((o) => allowed.has(optionId(o)) || selected.includes(optionId(o)));
+
+const vehicleBodyTypeOptions = (filters, enums) => {
+ const types = selectedVehicleTypes(filters, enums);
+ if (!types.length) return null;
+ const allowed = new Set(types.flatMap((t) => t?.bodyTypes || []).map(String));
+ return keepSelected(enums?.bodyTypes || [], allowed, asList(filters?.bodyTypes));
+};
+
+const vehicleBrandOptions = (filters, enums) => {
+ const typeIds = selectedVehicleTypes(filters, enums).map((t) => String(t.id));
+ if (!typeIds.length) return null;
+ const allowed = new Set((enums?.vehicleModels || [])
+  .filter((m) => typeIds.includes(String(m?.typeId ?? '')))
+  .map((m) => String(m?.brandId ?? '')));
+ return keepSelected(enums?.carBrands || [], allowed, asList(filters?.brandIds));
+};
+
+const vehicleModelOptions = (filters, enums) => {
+ const typeIds = selectedVehicleTypes(filters, enums).map((t) => String(t.id));
+ const brandIds = asList(filters?.brandIds);
+ if (!typeIds.length && !brandIds.length) return null;
+ const models = enums?.vehicleModels || [];
+ const allowed = new Set(models
+  .filter((m) => (!typeIds.length || typeIds.includes(String(m?.typeId ?? '')))
+   && (!brandIds.length || brandIds.includes(String(m?.brandId ?? ''))))
+  .map(optionId));
+ return keepSelected(models, allowed, asList(filters?.vehicleModelIds));
+};
+
 const createVehicleFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('vehicleTypeIds', 'Vehicle Type', 'vehicleTypes', { displayAs: 'chips' })
- .addEnumField('brandIds', 'Brand', 'carBrands')
- .addEnumField('vehicleModelIds', 'Model', 'vehicleModels')
- .addEnumField('bodyTypes', 'Body Type / Kasa', 'bodyTypes', { displayAs: 'chips', multiple: true })
- .addEnumField('drivetrains', 'Drivetrain / Çekiş', 'drivetrains', { displayAs: 'chips', multiple: true })
- .addEnumField('fuelTypes', 'Fuel Type / Yakıt', 'fuelTypes', { displayAs: 'chips', multiple: true })
- .addEnumField('gearTypes', 'Gear Type / Vites', 'gearTypes', { displayAs: 'chips', multiple: true })
- .addEnumField('doors', 'Doors / Kapı', 'doors', { displayAs: 'chips' })
- .addEnumField('seatCounts', 'Seat Count / Koltuk', 'seatCounts', { displayAs: 'chips' })
+ .addEnumField('brandIds', 'Brand', 'carBrands', { getOptions: vehicleBrandOptions })
+ .addEnumField('vehicleModelIds', 'Model', 'vehicleModels', { getOptions: vehicleModelOptions })
+ .addEnumField('bodyTypes', 'Body Type / Kasa', 'bodyTypes', { displayAs: 'chips', multiple: true, getOptions: vehicleBodyTypeOptions })
+ .addEnumField('drivetrains', 'Drivetrain / Çekiş', 'drivetrains', { displayAs: 'chips', multiple: true, visibleWhen: shownForVehicleTypes('drivetrain') })
+ .addEnumField('fuelTypes', 'Fuel Type / Yakıt', 'fuelTypes', { displayAs: 'chips', multiple: true, visibleWhen: shownForVehicleTypes('fuelType') })
+ .addEnumField('gearTypes', 'Gear Type / Vites', 'gearTypes', { displayAs: 'chips', multiple: true, visibleWhen: shownForVehicleTypes('gearbox') })
+ .addEnumField('doors', 'Doors / Kapı', 'doors', { displayAs: 'chips', visibleWhen: shownForVehicleTypes('doors') })
+ .addEnumField('seatCounts', 'Seat Count / Koltuk', 'seatCounts', { displayAs: 'chips', visibleWhen: shownForVehicleTypes('seatCount') })
  .addEnumField('colors', 'Color / Renk', 'colors')
  .addNumericRangeField('year', 'Year / Yıl', { min: 1950, max: new Date().getFullYear() + 1, placeholder: '2020' })
- .addNumericRangeField('mileage', 'Mileage (km)', { min: 0, placeholder: '150000' })
- .addNumericRangeField('engineCapacity', 'Engine Capacity (cc)', { min: 0, placeholder: '1600' })
- .addNumericRangeField('horsePower', 'Horse Power (HP)', { min: 0, placeholder: '150' })
+ .addNumericRangeField('mileage', 'Mileage (km)', { min: 0, placeholder: '150000', visibleWhen: shownForVehicleTypes('mileage') })
+ .addNumericRangeField('engineCapacity', 'Engine Capacity (cc)', { min: 0, placeholder: '1600', visibleWhen: shownForVehicleTypes('engineCapacity') })
+ .addNumericRangeField('horsePower', 'Horse Power (HP)', { min: 0, placeholder: '150', visibleWhen: shownForVehicleTypes('horsePower') })
  .addBooleanField('swap', 'Open To Swap / Takaslı')
  .addBooleanField('accidentHistory', 'Has Accident History / Hasarlı');
 };

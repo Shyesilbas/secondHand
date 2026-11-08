@@ -281,7 +281,10 @@ export const API_ENDPOINTS = {
             CITIES: '/v1/catalog/locations/cities',
             DISTRICTS: (cityKey) => `/v1/catalog/locations/districts?cityKey=${encodeURIComponent(cityKey)}`,
             NEIGHBORHOODS: (districtKey) => `/v1/catalog/locations/neighborhoods?districtKey=${encodeURIComponent(districtKey)}`,
-        }
+        },
+        VEHICLE: {
+            ATTRIBUTES: (typeId) => `/v1/catalog/vehicle/attributes?typeId=${encodeURIComponent(typeId)}`,
+        },
     },
     AI: {
         SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`,

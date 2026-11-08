@@ -14,6 +14,7 @@ public class ListingValidationEngine {
 
     private final LocationValidator locationValidator;
     private final ListingLocationPolicy listingLocationPolicy;
+    private final ListingAttributeValidator attributeValidator;
 
     public <T extends Listing> Result<Void> cleanupAndValidate(T listing, List<? extends CategorySpecValidator<T>> validators) {
         if (listing == null) {
@@ -32,17 +33,15 @@ public class ListingValidationEngine {
             return policyResult;
         }
 
-        if (validators == null || validators.isEmpty()) {
-            return Result.success();
-        }
+        List<? extends CategorySpecValidator<T>> specValidators = validators != null ? validators : List.of();
 
-        for (CategorySpecValidator<T> v : validators) {
+        for (CategorySpecValidator<T> v : specValidators) {
             if (v != null) {
                 v.cleanup(listing);
             }
         }
 
-        for (CategorySpecValidator<T> v : validators) {
+        for (CategorySpecValidator<T> v : specValidators) {
             if (v == null) {
                 continue;
             }
@@ -52,7 +51,8 @@ public class ListingValidationEngine {
             }
         }
 
-        return Result.success();
+        attributeValidator.cleanup(listing);
+        return attributeValidator.validate(listing);
     }
 
     public <T extends Listing> Result<List<String>> cleanupAndValidateCollectErrors(
@@ -82,17 +82,15 @@ public class ListingValidationEngine {
             return Result.success(errors);
         }
 
-        if (validators == null || validators.isEmpty()) {
-            return Result.success(errors);
-        }
+        List<? extends CategorySpecValidator<T>> specValidators = validators != null ? validators : List.of();
 
-        for (CategorySpecValidator<T> v : validators) {
+        for (CategorySpecValidator<T> v : specValidators) {
             if (v != null) {
                 v.cleanup(listing);
             }
         }
 
-        for (CategorySpecValidator<T> v : validators) {
+        for (CategorySpecValidator<T> v : specValidators) {
             if (v == null) {
                 continue;
             }
@@ -102,6 +100,12 @@ public class ListingValidationEngine {
                 String message = r.getMessage() != null ? r.getMessage() : "Validation error";
                 errors.add(code + "|" + message);
             }
+        }
+
+        attributeValidator.cleanup(listing);
+        Result<Void> attributeResult = attributeValidator.validate(listing);
+        if (attributeResult.isError()) {
+            errors.add(attributeResult.getErrorCode() + "|" + attributeResult.getMessage());
         }
 
         return Result.success(errors);

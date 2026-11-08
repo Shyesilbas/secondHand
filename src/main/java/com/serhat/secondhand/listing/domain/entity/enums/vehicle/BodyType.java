@@ -11,10 +11,19 @@ public enum BodyType {
     COUPE("Coupe"),
     CONVERTIBLE("Cabrio"),
     WAGON("Station Wagon"),
-    PICKUP("Pick-up"),
-    VAN("Van"),
     MPV("MPV"),
     OTHER("Diğer"),
+    // Light commercial body types
+    VAN("Panelvan"),
+    COMBI("Kombi"),
+    MINIBUS("Minibüs"),
+    PICKUP("Pick-up"),
+    LIGHT_TRUCK("Kamyonet"),
+    // Heavy vehicle body types
+    TRUCK("Kamyon"),
+    TRACTOR("Çekici"),
+    TIPPER("Damperli"),
+    BUS("Otobüs"),
     // Motorcycle body types
     SPORTBIKE("Spor Motosiklet"),
     NAKED("Naked"),

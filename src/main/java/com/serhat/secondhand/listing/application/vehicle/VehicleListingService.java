@@ -36,6 +36,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
     private final VehicleFilterPredicateBuilder predicateBuilder;
     private final List<VehicleSpecValidator> vehicleSpecValidators;
     private final VehicleListingResolver vehicleListingResolver;
+    private final VehicleSpecSnapshotter vehicleSpecSnapshotter;
 
     public VehicleListingService(
             VehicleListingRepository vehicleRepository,
@@ -47,6 +48,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
             ListingValidationEngine listingValidationEngine,
             List<VehicleSpecValidator> vehicleSpecValidators,
             VehicleListingResolver vehicleListingResolver,
+            VehicleSpecSnapshotter vehicleSpecSnapshotter,
             InventoryService inventoryService) {
         super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.vehicleRepository = vehicleRepository;
@@ -54,6 +56,7 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         this.predicateBuilder = predicateBuilder;
         this.vehicleSpecValidators = vehicleSpecValidators;
         this.vehicleListingResolver = vehicleListingResolver;
+        this.vehicleSpecSnapshotter = vehicleSpecSnapshotter;
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
@@ -79,7 +82,8 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
                 request.vehicleModelId(),
                 request.vehicleGenerationId(),
                 request.vehicleEngineId(),
-                request.vehicleTrimId()
+                request.vehicleTrimId(),
+                request.vehicleVersionId()
         );
     }
 
@@ -92,6 +96,14 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
         entity.setGeneration(res.generation());
         entity.setEngine(res.engine());
         entity.setTrim(res.trim());
+        entity.setVehicleVersion(res.version());
+    }
+
+    /** Specs of a picked catalog version win over what the client sent. */
+    @Override
+    protected Result<Void> preProcess(VehicleListing entity, VehicleCreateRequest request) {
+        vehicleSpecSnapshotter.apply(entity);
+        return Result.success();
     }
 
     @Override
@@ -134,11 +146,13 @@ public class VehicleListingService extends AbstractListingService<VehicleListing
                 request.vehicleModelId(),
                 request.vehicleGenerationId(),
                 request.vehicleEngineId(),
-                request.vehicleTrimId()
+                request.vehicleTrimId(),
+                request.vehicleVersionId()
         );
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
 
         listingMapper.updateVehicle(existing, request);
+        vehicleSpecSnapshotter.apply(existing);
 
         Result<Void> specResult = listingValidationEngine.cleanupAndValidate(existing, vehicleSpecValidators);
         if (specResult.isError()) return Result.error(specResult.getMessage(), specResult.getErrorCode());

@@ -22,6 +22,8 @@ public class VehicleListingDto extends ListingDto {
     private LookupDto generation;
     private LookupDto engine;
     private LookupDto trim;
+    /** Catalog version the specs were copied from; null = seller-declared specs, not checked against the catalog. */
+    private LookupDto vehicleVersion;
     private Integer year;
     private Integer mileage;
     private Integer engineCapacity;

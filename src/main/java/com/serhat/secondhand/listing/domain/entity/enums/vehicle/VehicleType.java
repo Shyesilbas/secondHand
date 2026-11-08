@@ -6,7 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import org.springframework.data.domain.Persistable;
 import jakarta.persistence.Transient;
@@ -43,5 +50,19 @@ public class VehicleType implements Labelable, Persistable<UUID> {
 
     @Column(nullable = false, length = 120)
     private String label;
+
+    /** Order of the type picker. */
+    @Column(name = "sort_order", nullable = false)
+    private int sortOrder;
+
+    /** Body types a listing of this type may use. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "body_types", nullable = false, columnDefinition = "jsonb")
+    private List<BodyType> bodyTypes = new ArrayList<>();
+
+    /** Spec field name -> rule; see {@link VehicleFieldRule}. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "field_rules", nullable = false, columnDefinition = "jsonb")
+    private Map<String, VehicleFieldRule> fieldRules = new LinkedHashMap<>();
 }
 

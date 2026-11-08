@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.domain.repository.vehicle;
 
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
+
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +12,11 @@ import java.util.UUID;
 
 public interface VehicleModelRepository extends JpaRepository<VehicleModel, UUID> {
     List<VehicleModel> findByBrand_Id(UUID brandId);
+
+    List<VehicleModel> findByBrand_IdAndType_IdOrderByNameAsc(UUID brandId, UUID typeId);
+
+    @Query("select distinct m.brand from VehicleModel m where m.type.id = :typeId")
+    List<CarBrand> findBrandsByTypeId(@org.springframework.data.repository.query.Param("typeId") UUID typeId);
     Optional<VehicleModel> findFirstByBrand_IdAndType_IdAndNameIgnoreCase(UUID brandId, UUID typeId, String name);
     List<VehicleModel> findAllByBrand_IdAndType_IdAndNameIgnoreCase(UUID brandId, UUID typeId, String name);
     List<VehicleModel> findAllByBrand_IdAndNameIgnoreCase(UUID brandId, String name);

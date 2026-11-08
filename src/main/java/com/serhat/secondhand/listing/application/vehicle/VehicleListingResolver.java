@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.vehicle;
 
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleVersionRepository;
+
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
 import com.serhat.secondhand.listing.domain.repository.vehicle.*;
@@ -18,10 +20,11 @@ public class VehicleListingResolver {
     private final VehicleGenerationRepository vehicleGenerationRepository;
     private final VehicleEngineRepository vehicleEngineRepository;
     private final VehicleTrimRepository vehicleTrimRepository;
+    private final VehicleVersionRepository vehicleVersionRepository;
 
     public Result<VehicleResolution> resolve(
             UUID vehicleTypeId, UUID brandId, UUID modelId,
-            UUID generationId, UUID engineId, UUID trimId) {
+            UUID generationId, UUID engineId, UUID trimId, UUID versionId) {
         if (vehicleTypeId == null) {
             return Result.error("Vehicle type is required", "VEHICLE_TYPE_REQUIRED");
         }
@@ -66,7 +69,12 @@ public class VehicleListingResolver {
             return Result.error("Vehicle trim not found", "VEHICLE_TRIM_NOT_FOUND");
         }
 
-        return Result.success(new VehicleResolution(type, brand, model, generation, engine, trim));
+        var version = versionId != null ? vehicleVersionRepository.findById(versionId).orElse(null) : null;
+        if (versionId != null && version == null) {
+            return Result.error("Vehicle version not found", "VEHICLE_VERSION_NOT_FOUND");
+        }
+
+        return Result.success(new VehicleResolution(type, brand, model, generation, engine, trim, version));
     }
 
     public Result<Void> apply(
@@ -76,7 +84,8 @@ public class VehicleListingResolver {
             Optional<UUID> modelId,
             Optional<UUID> generationId,
             Optional<UUID> engineId,
-            Optional<UUID> trimId) {
+            Optional<UUID> trimId,
+            Optional<UUID> versionId) {
         if (listing == null) {
             return Result.error("Listing is required", "LISTING_REQUIRED");
         }
@@ -138,6 +147,18 @@ public class VehicleListingResolver {
                 listing.setTrim(trim);
             } else {
                 listing.setTrim(null);
+            }
+        }
+
+        if (versionId != null) {
+            if (versionId.isPresent()) {
+                var version = vehicleVersionRepository.findById(versionId.get()).orElse(null);
+                if (version == null) {
+                    return Result.error("Vehicle version not found", "VEHICLE_VERSION_NOT_FOUND");
+                }
+                listing.setVehicleVersion(version);
+            } else {
+                listing.setVehicleVersion(null);
             }
         }
 

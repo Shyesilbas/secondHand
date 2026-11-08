@@ -65,6 +65,33 @@ public class VehicleHierarchyValidator implements VehicleSpecValidator {
             }
         }
 
+        var version = listing.getVehicleVersion();
+        if (version != null) {
+            if (listing.getGeneration() == null) {
+                return Result.error("Vehicle generation is required when version is selected", "VERSION_REQUIRES_GENERATION");
+            }
+            var versionGenerationId = version.getGeneration() != null ? version.getGeneration().getId() : null;
+            if (versionGenerationId == null || !versionGenerationId.equals(listing.getGeneration().getId())) {
+                return Result.error("Vehicle version does not belong to the selected generation", "VERSION_GENERATION_MISMATCH");
+            }
+
+            Integer year = listing.getYear();
+            Integer from = version.effectiveStartYear();
+            Integer to = version.effectiveEndYear();
+            if (year != null && ((from != null && year < from) || (to != null && year > to))) {
+                return Result.error("Model year " + year + " is outside the selected version's years ("
+                        + (from != null ? from : "?") + "-" + (to != null ? to : "") + ")", "VEHICLE_YEAR_OUT_OF_VERSION_RANGE");
+            }
+
+            if (listing.getTrim() != null && !version.getTrims().isEmpty()) {
+                var trimId = listing.getTrim().getId();
+                boolean offered = version.getTrims().stream().anyMatch(t -> t.getId().equals(trimId));
+                if (!offered) {
+                    return Result.error("Vehicle trim is not offered with the selected version", "TRIM_VERSION_MISMATCH");
+                }
+            }
+        }
+
         return Result.success();
     }
 

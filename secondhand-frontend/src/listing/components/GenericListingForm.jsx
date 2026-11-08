@@ -23,6 +23,8 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { ImageIcon, MapPin, Package, FileText, Check } from 'lucide-react';
 import { cacheService } from '../../common/services/cacheService.js';
 import { FieldError, SectionCard } from '../../common/components/forms/FormPrimitives.jsx';
+import ListingAttributeSection from './attributes/ListingAttributeSection.jsx';
+import ListingAttributeSummary from './attributes/ListingAttributeSummary.jsx';
 import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
 import { formatCurrency, parsePrice } from '../../common/formatters.js';
 
@@ -295,6 +297,8 @@ const GenericListingForm = ({
  if (lockedFieldNames.has(field.name)) return false;
  return typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
  };
+ // A field's hint: static `description`, or `getDescription(ctx)` for hints that depend on the form state.
+ const fieldHint = field => (typeof field.getDescription === 'function' ? field.getDescription(ctx) : null) || field.description;
  const renderField = field => {
  if (!isFieldShown(field)) return null;
  const value = formData?.[field.name];
@@ -321,7 +325,7 @@ const GenericListingForm = ({
     disabled={disabled}
     usePortal={true}
    />
-   {field.description && <p className="mt-1 text-xs text-text-tertiary">{formText(field.description)}</p>}
+   {fieldHint(field) && <p className="mt-1 text-xs text-text-tertiary">{formText(fieldHint(field))}</p>}
    <FieldError error={error} />
   </div>
  );
@@ -391,6 +395,7 @@ const GenericListingForm = ({
  );
  }
  const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text';
+ const inputDisabled = typeof field.disabledWhen === 'function' ? Boolean(field.disabledWhen(ctx)) : Boolean(field.disabled);
  return (
   <div key={field.name} data-field={field.name} data-has-error={Boolean(error) || undefined}>
    <label className="mb-1.5 block text-sm font-medium text-text-primary">{label}</label>
@@ -403,8 +408,10 @@ const GenericListingForm = ({
     max={field.max}
     step={field.step}
     placeholder={field.placeholder || ''}
-    className={error ? inputError : inputNormal}
+    disabled={inputDisabled}
+    className={`${error ? inputError : inputNormal}${inputDisabled ? ' cursor-not-allowed opacity-60' : ''}`}
    />
+   {fieldHint(field) && <p className="mt-1 text-xs text-text-tertiary">{formText(fieldHint(field))}</p>}
    <FieldError error={error} />
   </div>
  );
@@ -440,6 +447,9 @@ const GenericListingForm = ({
    {sections.map(section => {
     const isVisible = typeof section.visibleWhen === 'function' ? section.visibleWhen(ctx) : true;
     if (!isVisible) return null;
+    if (section.kind === 'attributes') {
+     return <ListingAttributeSection key={section.id} section={section} ctx={ctx} title={formText(section.title)} description={formText(section.description)} />;
+    }
     if (!(section.fields || []).some(isFieldShown)) return null;
     return (
      <SectionCard key={section.id || section.title} title={formText(section.title)} description={formText(section.description)}>
@@ -493,11 +503,16 @@ const GenericListingForm = ({
  ].filter(x => String(x.value || '').trim());
 
  const detailFields = [];
+ const attributeSections = [];
  (formSchema?.steps || []).forEach(step => {
  if (step?.kind !== 'details') return;
  (step?.sections || []).forEach(section => {
   const sectionVisible = typeof section.visibleWhen === 'function' ? Boolean(section.visibleWhen(ctx)) : true;
   if (!sectionVisible) return;
+  if (section.kind === 'attributes') {
+   attributeSections.push(section);
+   return;
+  }
   (section.fields || []).forEach(field => {
    const visible = typeof field.visibleWhen === 'function' ? Boolean(field.visibleWhen(ctx)) : true;
    if (!visible) return;
@@ -543,6 +558,15 @@ const GenericListingForm = ({
    {basics.length > 0 && <SummarySection title={t("basics", "Temel Bilgiler")} icon={Package} rows={basics} />}
    {location.length > 0 && <SummarySection title={t("location", "Konum")} icon={MapPin} rows={location} />}
    {detailFields.length > 0 && <SummarySection title={t("details", "Detaylar")} icon={FileText} rows={detailFields} />}
+   {attributeSections.map(section => (
+    <ListingAttributeSummary
+     key={section.id}
+     section={section}
+     ctx={ctx}
+     attributes={formData?.attributes}
+     render={rows => <SummarySection title={formText(section.title)} icon={FileText} rows={rows} />}
+    />
+   ))}
 
    {/* Ready indicator */}
    <div className="flex items-center gap-2 rounded border border-border-light bg-background-secondary px-3.5 py-2.5">

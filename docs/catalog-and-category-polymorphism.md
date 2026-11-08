@@ -42,7 +42,7 @@ Ortak oluşturma ve güncelleme akışı üst sınıfta sabittir:
 İlan kaydedilmeden önce doğrulama kuralları sıralı zincir üzerinden işletilir:
 - **`ApparelValidator` / `FootwearValidator` / `AccessoryValidator`:** Giyim grubuna göre doğru beden/numara kurallarını denetler. Saat, çanta veya cüzdan tiplerine ayakkabı numarası girilmesini engeller.
 - **`HouseValidator` / `LandValidator` / `CommercialLandValidator`:** Arsa ilanlarında oda sayısı ve ısıtma tipi zorunluluğunu kaldırır; konutlarda imar durumu alanını temizler.
-- **`CommercialVehicleValidator` / `MotorcycleValidator`:** Motosikletlerde kasa tipi ve beygir gücü alanlarını korur; ticari araçlarda kilometre ve yakıt kurallarını uygular.
+- **`VehicleTypeRulesValidator`:** Araç tipinin `data/vehicles/types.json` kurallarını uygular (zorunlu alanlar, gizli alanların temizlenmesi, izinli kasa tipleri); tip adına bakan kod yoktur.
 
 ---
 

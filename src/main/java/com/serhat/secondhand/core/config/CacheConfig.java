@@ -116,6 +116,8 @@ public class CacheConfig {
                 .withCacheConfiguration("catalog:electronicTypes", lookupConfig)
                 .withCacheConfiguration("catalog:bookGenres", lookupConfig)
                 .withCacheConfiguration("catalog:clothingTypes", lookupConfig)
+                .withCacheConfiguration("catalog:attributeDefinitions", lookupConfig)
+                .withCacheConfiguration("catalog:vehicle", lookupConfig)
 
                 // Tier 2 — Tamamlanmış işlemler (2 saat)
                 .withCacheConfiguration("order:completed", completedConfig)

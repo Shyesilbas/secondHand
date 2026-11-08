@@ -22,12 +22,16 @@ const FilterRenderer = ({
  const renderField = field => {
  switch (field.type) {
  case 'enum':
+ {
+ // Optional `getOptions(filters, enums)` narrows the enum list (e.g. body types of the selected vehicle types).
+ const options = typeof field.getOptions === 'function' ? field.getOptions(filters, enums) : null;
  if (field.displayAs === 'chips') {
- return <FilterChipGroup key={field.key} label={field.label} enumKey={field.enumKey} value={filters[field.key] || []} onChange={v => onChange(field.key, v)} multiple={field.multiple} />;
+ return <FilterChipGroup key={field.key} label={field.label} enumKey={field.enumKey} options={options} value={filters[field.key] || []} onChange={v => onChange(field.key, v)} multiple={field.multiple} />;
  }
  return <div key={field.key} className="space-y-1.5">
- <EnumDropdown label={field.label} enumKey={field.enumKey} value={filters[field.key] || []} onChange={v => onChange(field.key, v)} multiple={field.multiple} placeholder={`Select ${field.label.toLowerCase()}...`} searchPlaceholder={`Search ${field.label.toLowerCase()}...`} className="w-full" usePortal={true} />
+ <EnumDropdown label={field.label} enumKey={field.enumKey} options={options} value={filters[field.key] || []} onChange={v => onChange(field.key, v)} multiple={field.multiple} placeholder={`Select ${field.label.toLowerCase()}...`} searchPlaceholder={`Search ${field.label.toLowerCase()}...`} className="w-full" usePortal={true} />
  </div>;
+ }
  case 'numericRange':
  {
  const minKey = getMinKey(field.key);

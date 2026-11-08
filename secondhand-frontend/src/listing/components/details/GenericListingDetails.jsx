@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
+import ListingAttributeDetails from '../attributes/ListingAttributeDetails.jsx';
 
 const getValueByPath = (obj, path) => {
  if (!obj || !path) return undefined;
@@ -30,10 +31,12 @@ const GenericListingDetails = ({ listing, flat = false }) => {
 
   const sections = useMemo(() => {
     if (!schema) return [];
-    if (Array.isArray(schema.sections)) return schema.sections;
+    // An attributes tab is shown only when the seller answered something.
+    const hasAttributes = Object.keys(listing?.attributes || {}).length > 0;
+    if (Array.isArray(schema.sections)) return schema.sections.filter((s) => s.kind !== 'attributes' || hasAttributes);
     if (Array.isArray(schema.fields)) return [{ id: 'details', label: 'Genel', fields: schema.fields }];
     return [];
-  }, [schema]);
+  }, [schema, listing?.attributes]);
 
   const [activeSection, setActiveSection] = useState(sections[0]?.id || 'details');
 
@@ -72,7 +75,13 @@ const GenericListingDetails = ({ listing, flat = false }) => {
         </div>
       )}
 
-      {visibleFields.length === 0 ? (
+      {active?.kind === 'attributes' ? (
+        <ListingAttributeDetails
+          section={active}
+          listing={listing}
+          renderRow={(row) => <DetailRow key={row.key} label={row.label} value={row.value} />}
+        />
+      ) : visibleFields.length === 0 ? (
         <p className="text-sm text-text-muted py-3">Belirtilmiş özellik bulunmuyor.</p>
       ) : (
         <dl className="grid grid-cols-1 md:grid-cols-2 md:gap-x-12">

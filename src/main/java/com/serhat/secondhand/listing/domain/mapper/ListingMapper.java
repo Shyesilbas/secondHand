@@ -422,6 +422,10 @@ public abstract class ListingMapper {
         if (request.inspectionValidUntil() != null) request.inspectionValidUntil().ifPresent(entity::setInspectionValidUntil);
         if (request.drivetrain() != null) request.drivetrain().ifPresent(entity::setDrivetrain);
         if (request.bodyType() != null) request.bodyType().ifPresent(entity::setBodyType);
+        if (request.attributes() != null) {
+            entity.getAttributes().clear();
+            request.attributes().ifPresent(entity.getAttributes()::putAll);
+        }
     }
 
     private void applyBase(Listing entity, BaseListingUpdateRequest base) {

@@ -15,6 +15,7 @@ public record VehicleUpdateRequest(
     Optional<UUID> vehicleGenerationId,
     Optional<UUID> vehicleEngineId,
     Optional<UUID> vehicleTrimId,
+    Optional<UUID> vehicleVersionId,
     Optional<Integer> year,
     Optional<Integer> mileage,
     Optional<Integer> engineCapacity,
@@ -33,5 +34,6 @@ public record VehicleUpdateRequest(
     Optional<String> accidentDetails,
     Optional<java.time.LocalDate> inspectionValidUntil,
     Optional<Drivetrain> drivetrain,
-    Optional<BodyType> bodyType
+    Optional<BodyType> bodyType,
+    Optional<java.util.Map<String, Object>> attributes
 ) {} 

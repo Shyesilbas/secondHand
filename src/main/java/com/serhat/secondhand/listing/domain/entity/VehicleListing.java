@@ -87,4 +87,17 @@ public class VehicleListing extends Listing {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_trim_id")
     private VehicleTrim trim;
+
+    /**
+     * Catalog version (engine + gearbox + drivetrain). When set, the spec columns are copied from it by
+     * VehicleSpecSnapshotter. Not named {@code version}: {@link Listing} already has the {@code @Version} field.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_version_id")
+    private VehicleVersion vehicleVersion;
+
+    @Override
+    public String attributeScopeKey() {
+        return vehicleType != null ? vehicleType.getName() : null;
+    }
 }

@@ -8,6 +8,10 @@ import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicTy
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.CarBrand;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.FuelType;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleEngine;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleVersion;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.GearType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.Drivetrain;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleVersionRepository;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleGeneration;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleTrim;
@@ -55,6 +59,7 @@ class EnumReadServiceTest {
     @Mock private VehicleGenerationRepository vehicleGenerationRepository;
     @Mock private VehicleEngineRepository vehicleEngineRepository;
     @Mock private VehicleTrimRepository vehicleTrimRepository;
+    @Mock private VehicleVersionRepository vehicleVersionRepository;
     @Mock private SportDisciplineRepository sportDisciplineRepository;
     @Mock private SportEquipmentTypeRepository sportEquipmentTypeRepository;
     @Mock private SportConditionRepository sportConditionRepository;
@@ -84,6 +89,7 @@ class EnumReadServiceTest {
                 vehicleGenerationRepository,
                 vehicleEngineRepository,
                 vehicleTrimRepository,
+                vehicleVersionRepository,
                 sportDisciplineRepository,
                 sportEquipmentTypeRepository,
                 sportConditionRepository
@@ -183,6 +189,54 @@ class EnumReadServiceTest {
         assertThat(engines).hasSize(2);
         assertThat(engines).extracting("generationId")
                 .containsExactlyInAnyOrder(genA.getId(), genB.getId());
+    }
+
+    @Test
+    void getVehicleEngines_carriesTheSameIdVersionFacts() {
+        VehicleGeneration gen = new VehicleGeneration();
+        gen.setId(UUID.randomUUID());
+        gen.setName("G20");
+
+        VehicleEngine engine = new VehicleEngine();
+        engine.setId(UUID.randomUUID());
+        engine.setName("320i 170");
+        engine.setGeneration(gen);
+        engine.setFuelType(FuelType.GASOLINE);
+
+        VehicleEngine engineWithoutVersion = new VehicleEngine();
+        engineWithoutVersion.setId(UUID.randomUUID());
+        engineWithoutVersion.setName("330i");
+        engineWithoutVersion.setGeneration(gen);
+        engineWithoutVersion.setFuelType(FuelType.GASOLINE);
+
+        VehicleVersion version = new VehicleVersion();
+        version.setId(engine.getId());
+        version.setGeneration(gen);
+        version.setName("320i 170");
+        version.setHorsePower(170);
+        version.setEngineCapacity(1597);
+        version.setTorqueNm(250);
+        version.setGearbox(GearType.AUTOMATIC);
+        version.setGearCount(8);
+        version.setDrivetrain(Drivetrain.RWD);
+        version.setSource("verified");
+
+        when(vehicleEngineRepository.findAll()).thenReturn(List.of(engine, engineWithoutVersion));
+        when(vehicleVersionRepository.findAll()).thenReturn(List.of(version));
+
+        List<Map<String, Object>> engines = enumReadService.getVehicleEngines();
+
+        Map<String, Object> withVersion = engines.stream().filter(e -> engine.getId().equals(e.get("id"))).findFirst().orElseThrow();
+        assertThat(withVersion)
+                .containsEntry("versionId", engine.getId())
+                .containsEntry("horsePower", 170)
+                .containsEntry("engineCapacity", 1597)
+                .containsEntry("gearbox", "AUTOMATIC")
+                .containsEntry("drivetrain", "RWD")
+                .containsEntry("source", "verified");
+        Map<String, Object> withoutVersion = engines.stream().filter(e -> engineWithoutVersion.getId().equals(e.get("id"))).findFirst().orElseThrow();
+        assertThat(withoutVersion.get("versionId")).isNull();
+        assertThat(withoutVersion).doesNotContainKey("gearbox");
     }
 
     @Test

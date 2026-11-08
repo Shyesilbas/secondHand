@@ -31,6 +31,9 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleGeneration
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTrimRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
+import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleVersionRepository;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleVersion;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +63,7 @@ public class EnumReadService {
     private final VehicleGenerationRepository vehicleGenerationRepository;
     private final VehicleEngineRepository vehicleEngineRepository;
     private final VehicleTrimRepository vehicleTrimRepository;
+    private final VehicleVersionRepository vehicleVersionRepository;
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
@@ -135,12 +139,16 @@ public class EnumReadService {
 
     public List<Map<String, Object>> getVehicleTypes() {
         List<Map<String, Object>> raw = vehicleTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparingInt(VehicleType::getSortOrder)
+                        .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
+                    // Form rules of the type: allowed body types and REQUIRED/OPTIONAL/HIDDEN per spec field.
+                    map.put("bodyTypes", type.getBodyTypes().stream().map(Enum::name).toList());
+                    map.put("fieldRules", type.getFieldRules());
                     return map;
                 })
                 .toList();
@@ -407,6 +415,9 @@ public class EnumReadService {
                     map.put("modelId", gen.getModel() != null ? gen.getModel().getId() : null);
                     map.put("startYear", gen.getStartYear());
                     map.put("endYear", gen.getEndYear());
+                    map.put("bodyType", gen.getBodyType() != null ? gen.getBodyType().name() : null);
+                    map.put("doors", gen.getDoors() != null ? gen.getDoors().name() : null);
+                    map.put("seatCount", gen.getSeatCount() != null ? gen.getSeatCount().name() : null);
                     return map;
                 })
                 .toList();
@@ -416,7 +427,13 @@ public class EnumReadService {
         });
     }
 
+    /**
+     * Engines carry the catalog facts of their version (same id): the listing form copies them and sends the id
+     * as {@code vehicleVersionId}. {@code versionId} is null for an engine without a version row.
+     */
     public List<Map<String, Object>> getVehicleEngines() {
+        Map<UUID, VehicleVersion> versions = new HashMap<>();
+        vehicleVersionRepository.findAll().forEach(v -> versions.put(v.getId(), v));
         List<Map<String, Object>> raw = vehicleEngineRepository.findAll().stream()
                 .sorted(Comparator.comparing(e -> Optional.ofNullable(e.getName()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(eng -> {
@@ -427,6 +444,19 @@ public class EnumReadService {
                     map.put("fuelType", eng.getFuelType() != null ? eng.getFuelType().name() : null);
                     map.put("horsePower", eng.getHorsePower());
                     map.put("engineCapacity", eng.getEngineCapacity());
+                    VehicleVersion version = versions.get(eng.getId());
+                    map.put("versionId", version != null ? version.getId() : null);
+                    if (version != null) {
+                        if (version.getHorsePower() != null) map.put("horsePower", version.getHorsePower());
+                        if (version.getEngineCapacity() != null) map.put("engineCapacity", version.getEngineCapacity());
+                        map.put("torqueNm", version.getTorqueNm());
+                        map.put("gearbox", version.getGearbox() != null ? version.getGearbox().name() : null);
+                        map.put("gearCount", version.getGearCount());
+                        map.put("drivetrain", version.getDrivetrain() != null ? version.getDrivetrain().name() : null);
+                        map.put("startYear", version.getStartYear());
+                        map.put("endYear", version.getEndYear());
+                        map.put("source", version.getSource());
+                    }
                     return map;
                 })
                 .toList();

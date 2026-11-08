@@ -41,7 +41,8 @@ public class CatalogSeedStartupRunner implements ApplicationRunner {
             "clothing",
             "books",
             "sports",
-            "realestate"
+            "realestate",
+            "attributes"
     );
 
     private final List<SeedTask> seedTasks;

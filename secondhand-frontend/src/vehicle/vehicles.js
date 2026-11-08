@@ -1,5 +1,6 @@
 
 import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+import { cleanAttributes } from '../listing/components/attributes/attributeValues.js';
 
 export const VehicleCreateRequestDTO = Object.freeze({
     title: '',
@@ -18,6 +19,7 @@ export const VehicleCreateRequestDTO = Object.freeze({
     vehicleModelId: '',
     vehicleGenerationId: '',
     vehicleEngineId: '',
+    vehicleVersionId: '',
     vehicleTrimId: '',
     year: 0,
     mileage: 0,
@@ -53,6 +55,7 @@ export const createVehicleCreateRequest = (data) => ({
     vehicleModelId: toUuidOrNull(data.vehicleModelId),
     vehicleGenerationId: toUuidOrNull(data.vehicleGenerationId),
     vehicleEngineId: toUuidOrNull(data.vehicleEngineId),
+    vehicleVersionId: toUuidOrNull(data.vehicleVersionId),
     vehicleTrimId: toUuidOrNull(data.vehicleTrimId),
     year: parseInt(data.year, 10) || 0,
     mileage: parseInt(data.mileage, 10) || 0,
@@ -73,6 +76,7 @@ export const createVehicleCreateRequest = (data) => ({
     inspectionValidUntil: data.inspectionValidUntil ? String(data.inspectionValidUntil) : undefined,
     drivetrain: data.drivetrain || undefined,
     bodyType: data.bodyType || undefined,
+    attributes: cleanAttributes(data.attributes),
 });
 
 export const createVehicleUpdateRequest = (data) => {
@@ -91,6 +95,9 @@ export const createVehicleUpdateRequest = (data) => {
     }
     if (data.vehicleEngineId !== undefined) {
         updateData.vehicleEngineId = toUuidOrNull(data.vehicleEngineId);
+    }
+    if (data.vehicleVersionId !== undefined) {
+        updateData.vehicleVersionId = toUuidOrNull(data.vehicleVersionId);
     }
     if (data.vehicleTrimId !== undefined) {
         updateData.vehicleTrimId = toUuidOrNull(data.vehicleTrimId);
@@ -126,6 +133,8 @@ export const createVehicleUpdateRequest = (data) => {
     }
     if (data.drivetrain !== undefined && data.drivetrain !== '') updateData.drivetrain = data.drivetrain;
     if (data.bodyType !== undefined && data.bodyType !== '') updateData.bodyType = data.bodyType;
+    // Sent whole: the backend replaces the stored attributes, so a cleared answer is removed.
+    if (data.attributes !== undefined) updateData.attributes = cleanAttributes(data.attributes);
 
     if (Object.keys(base).length > 0) updateData.base = base;
 

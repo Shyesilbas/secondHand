@@ -3,9 +3,11 @@ import GenericListingDetails from '../components/details/GenericListingDetails.j
 import { vehicleService } from '../../vehicle/services/vehicleService.js';
 import { VehicleCreateRequestDTO } from '../../vehicle/vehicles.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
+import { vehicleAttributeQuery } from '../../vehicle/services/vehicleAttributeQuery.js';
 import {
- applyEngineCatalogDefaults,
+ applyGenerationBodyDefaults,
  applyGenerationCatalogDefaults,
+ catalogLockedHint,
  bodyTypeOptions,
  brandIdsForType,
  clearVehicleHierarchy,
@@ -14,21 +16,23 @@ import {
  findEngine,
  findGeneration,
  generationsForModel,
- getVehicleTypeName,
- hasBodyType,
- isCarVehicle,
- isCommercialVehicle,
- isMotorcycleVehicle,
+ isCatalogLocked,
+ isVehicleFieldVisible,
+ ruledByVehicleType,
  showEngineFields,
  showGenerationFields,
  showTrimFields,
+ syncCatalogVersion,
  toLookupOptions,
  toModelOptions,
  trimsForGeneration,
+ versionYearRange,
 } from '../../vehicle/utils/vehicleCatalogUtils.js';
 
 const resetFromType = ({ ctx }) => {
  clearVehicleHierarchy(ctx.setValue, 'type');
+ // Attributes are defined per vehicle type; answers of the previous type would be rejected.
+ ctx.setValue('attributes', {});
 };
 
 const resetFromBrand = ({ ctx }) => {
@@ -56,11 +60,21 @@ const syncModelBrandType = ({ value, ctx }) => {
  }
 };
 
+// Version facts and the version id follow from the engine in syncCatalogVersion (form effect).
+// An engine without a catalog version only prefills what it knows; the seller can still edit it.
 const onEnginePicked = ({ value, ctx }) => {
  ctx.setValue('vehicleEngineId', value);
  const eng = findEngine(ctx.enums, value);
- applyEngineCatalogDefaults(eng, ctx.setValue);
+ if (!eng || eng.versionId) return;
+ if (eng.fuelType) ctx.setValue('fuelType', eng.fuelType);
+ if (eng.horsePower > 0) ctx.setValue('horsePower', eng.horsePower);
+ if (eng.engineCapacity > 0) ctx.setValue('engineCapacity', eng.engineCapacity);
 };
+
+const lockable = (name) => ({
+ disabledWhen: (ctx) => isCatalogLocked(ctx, name),
+ getDescription: (ctx) => catalogLockedHint(ctx, name),
+});
 
 export const vehicleConfig = {
  label: 'Vehicle',
@@ -112,6 +126,13 @@ export const vehicleConfig = {
  ],
  },
  {
+ id: 'condition',
+ label: 'Durum',
+ title: 'Durum',
+ kind: 'attributes',
+ definitionsQuery: (listing) => vehicleAttributeQuery(listing?.vehicleType?.id),
+ },
+ {
  id: 'history',
  label: 'History',
  title: 'History',
@@ -131,6 +152,7 @@ export const vehicleConfig = {
  },
  formSchema: {
  initialData: {
+ attributes: {},
  ...VehicleCreateRequestDTO,
  title: '',
  description: '',
@@ -145,6 +167,7 @@ export const vehicleConfig = {
  kilometersPerLiter: '',
  vehicleGenerationId: '',
  vehicleEngineId: '',
+ vehicleVersionId: '',
  vehicleTrimId: '',
  },
  steps: [
@@ -220,9 +243,11 @@ export const vehicleConfig = {
  onChange: ({ value, ctx }) => {
  ctx.setValue('vehicleGenerationId', value);
  ctx.setValue('vehicleEngineId', '');
+ ctx.setValue('vehicleVersionId', '');
  ctx.setValue('vehicleTrimId', '');
  const gen = findGeneration(ctx.enums, value);
  applyGenerationCatalogDefaults(gen, ctx.setValue, ctx.formData?.year);
+ applyGenerationBodyDefaults(gen, ctx.setValue);
  },
  },
  {
@@ -253,8 +278,8 @@ export const vehicleConfig = {
  label: 'Fuel Type',
  type: 'enum',
  enumKey: 'fuelTypes',
- required: true,
- visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...lockable('fuelType'),
+ ...ruledByVehicleType('fuelType'),
  },
  { name: 'color', label: 'Color', type: 'enum', enumKey: 'colors' },
  {
@@ -262,37 +287,41 @@ export const vehicleConfig = {
  label: 'Door Count',
  type: 'enum',
  enumKey: 'doors',
-      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
+ ...lockable('doors'),
+ ...ruledByVehicleType('doors'),
  },
  {
  name: 'gearbox',
  label: 'Gearbox',
  type: 'enum',
  enumKey: 'gearTypes',
- required: true,
-      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx) || isMotorcycleVehicle(ctx),
+ ...lockable('gearbox'),
+ ...ruledByVehicleType('gearbox'),
  },
  {
  name: 'seatCount',
  label: 'Seat Count',
  type: 'enum',
  enumKey: 'seatCounts',
-      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
+ ...lockable('seatCount'),
+ ...ruledByVehicleType('seatCount'),
  },
  {
  name: 'drivetrain',
  label: 'Drivetrain',
  type: 'enum',
  enumKey: 'drivetrains',
-      visibleWhen: (ctx) => isCarVehicle(ctx) || isCommercialVehicle(ctx),
+ ...lockable('drivetrain'),
+ ...ruledByVehicleType('drivetrain'),
  },
  {
  name: 'bodyType',
  label: 'Body Type',
  type: 'enum',
  enumKey: 'bodyTypes',
- required: true,
-      visibleWhen: (ctx) => hasBodyType(ctx),
+ getOptions: (ctx) => bodyTypeOptions(ctx),
+ ...lockable('bodyType'),
+ ...ruledByVehicleType('bodyType'),
  },
  ],
  },
@@ -305,41 +334,50 @@ export const vehicleConfig = {
  name: 'mileage',
  label: 'Kilometer (km)',
  type: 'number',
- visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...ruledByVehicleType('mileage'),
  },
  {
  name: 'engineCapacity',
  label: 'Engine Capacity (cc)',
  type: 'number',
- requiredWhen: (ctx) => ['MOTORCYCLE'].includes(getVehicleTypeName(ctx)),
- visibleWhen: (ctx) => ['CAR', 'MOTORCYCLE', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...lockable('engineCapacity'),
+ ...ruledByVehicleType('engineCapacity'),
  },
  {
  name: 'horsePower',
  label: 'Horse Power',
  type: 'number',
- visibleWhen: (ctx) => ['CAR', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...lockable('horsePower'),
+ ...ruledByVehicleType('horsePower'),
  },
- { name: 'wheels', label: 'Wheel Size (inch)', type: 'number' },
+ { name: 'wheels', label: 'Wheel Size (inch)', type: 'number', ...ruledByVehicleType('wheels') },
  {
  name: 'fuelCapacity',
  label: 'Fuel Capacity (L)',
  type: 'number',
- visibleWhen: (ctx) => ['CAR', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...ruledByVehicleType('fuelCapacity'),
  },
  {
  name: 'fuelConsumption',
  label: 'Fuel Consumption (L/100km)',
  type: 'number',
- visibleWhen: (ctx) => ['CAR', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...ruledByVehicleType('fuelConsumption'),
  },
  {
  name: 'inspectionValidUntil',
  label: 'Inspection Valid Until',
  type: 'date',
- visibleWhen: (ctx) => ['CAR', 'OTHER'].includes(getVehicleTypeName(ctx)),
+ ...ruledByVehicleType('inspectionValidUntil'),
  },
  ],
+ },
+ {
+ id: 'vehicle-condition',
+ kind: 'attributes',
+ title: 'Durum ve geçmiş',
+ description: 'Tramer, boya/değişen ve diğer bilgiler; boş bıraktıkların ilanda görünmez',
+ visibleWhen: (ctx) => Boolean(ctx.formData?.vehicleTypeId),
+ definitionsQuery: (ctx) => vehicleAttributeQuery(ctx.formData?.vehicleTypeId),
  },
  {
  id: 'vehicle-extras',
@@ -380,14 +418,8 @@ export const vehicleConfig = {
  if (modelTypeId && String(ctx.formData?._modelTypeId ?? '') !== modelTypeId) {
  ctx.setValue('_modelTypeId', modelTypeId);
  }
- const engineId = ctx.formData?.vehicleEngineId;
- if (engineId) {
- const eng = findEngine(ctx.enums, engineId);
- if (eng?.fuelType && ctx.formData?.fuelType !== eng.fuelType) {
- ctx.setValue('fuelType', eng.fuelType);
- }
- }
  },
+ syncCatalogVersion,
  ],
  customValidators: [
  {
@@ -412,6 +444,12 @@ export const vehicleConfig = {
  if (showEngineFields(ctx) && !ctx.formData?.vehicleEngineId) {
  errors.vehicleEngineId = 'Please select an engine variant';
  }
+ const range = versionYearRange(ctx);
+ const year = parseInt(ctx.formData?.year, 10);
+ if (range && Number.isFinite(year)
+ && ((range.from != null && year < range.from) || (range.to != null && year > range.to))) {
+ errors.year = `This engine was sold from ${range.from ?? '?'} to ${range.to ?? 'today'}`;
+ }
  return errors;
  },
  },
@@ -428,7 +466,9 @@ export const vehicleConfig = {
  vehicleTypeId: data?.vehicleTypeId || data?.vehicleType?.id || '',
  vehicleGenerationId: data?.vehicleGenerationId || data?.generation?.id || '',
  vehicleEngineId: data?.vehicleEngineId || data?.engine?.id || '',
+ vehicleVersionId: data?.vehicleVersionId || data?.vehicleVersion?.id || '',
  vehicleTrimId: data?.vehicleTrimId || data?.trim?.id || '',
+ attributes: data?.attributes && typeof data.attributes === 'object' ? data.attributes : {},
  };
  },
  },
@@ -472,8 +512,8 @@ export const vehicleConfig = {
  kind: 'grid',
  dependsOn: ['brandId', 'vehicleTypeId'],
  paramKey: 'bodyType',
-        visibleWhen: (ctx) => hasBodyType(ctx),
- getOptions: ({ enums, selection }) => bodyTypeOptions(enums, selection?.brandId),
+        visibleWhen: (ctx) => isVehicleFieldVisible(ctx, 'bodyType'),
+ getOptions: (ctx) => bodyTypeOptions(ctx),
  },
  {
  enumKey: 'vehicleModels',
@@ -488,7 +528,7 @@ export const vehicleConfig = {
  filterModels(enums?.vehicleModels || [], {
  brandId: selection?.brandId,
  typeId: selection?.vehicleTypeId,
- bodyType: hasBodyType({ enums, selection }) ? selection?.bodyType : undefined,
+ bodyType: isVehicleFieldVisible({ enums, selection }, 'bodyType') ? selection?.bodyType : undefined,
  }),
  ),
  },

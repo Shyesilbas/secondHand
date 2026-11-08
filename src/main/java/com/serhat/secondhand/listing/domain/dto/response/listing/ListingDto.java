@@ -72,6 +72,8 @@ public abstract class ListingDto {
     private LocalDate sellerAccountCreationDate;
     
     private ListingType type;
+
+    private java.util.Map<String, Object> attributes;
     
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

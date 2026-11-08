@@ -17,7 +17,13 @@ public enum ListingErrorCodes implements ErrorCode {
     INVALID_LISTING_ID("INVALID_LISTING_ID", "Invalid listing ID" , HttpStatus.BAD_REQUEST ),
     LISTING_IS_RESERVED("RESERVED_LISTING", "This item is currently in another customer's cart. It may become available again in 15 minutes if they don't complete the purchase." , HttpStatus.CONFLICT ),
     LISTING_BELONGS_TO_USER("LISTING_BELONGS_TO_USER", "Listing belongs to user" ,HttpStatus.UNPROCESSABLE_ENTITY ),
-    LISTING_REQUIRED("LISTING_REQUIRED", "Listing is required", HttpStatus.BAD_REQUEST);
+    LISTING_REQUIRED("LISTING_REQUIRED", "Listing is required", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_UNKNOWN("ATTRIBUTE_UNKNOWN", "Attribute is not defined for this listing", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_CATALOG_LEVEL("ATTRIBUTE_CATALOG_LEVEL", "Attribute comes from the catalog and cannot be set on a listing", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_TYPE_MISMATCH("ATTRIBUTE_TYPE_MISMATCH", "Attribute value has the wrong type", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_OUT_OF_RANGE("ATTRIBUTE_OUT_OF_RANGE", "Attribute value is out of range", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_INVALID_OPTION("ATTRIBUTE_INVALID_OPTION", "Attribute value is not an allowed option", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_REQUIRED("ATTRIBUTE_REQUIRED", "Required attribute is missing", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

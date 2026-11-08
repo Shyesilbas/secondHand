@@ -51,6 +51,22 @@ public class VehicleGeneration implements Labelable, Persistable<UUID> {
     @Column(name = "end_year")
     private Integer endYear;
 
+    /** Body facts shared by every version of the generation; copied onto listings that pick a version. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "body_type", length = 50)
+    private BodyType bodyType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "doors", length = 20)
+    private Doors doors;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "seat_count", length = 20)
+    private SeatCount seatCount;
+
+    @Column(name = "is_facelift", nullable = false)
+    private boolean facelift;
+
     @Override
     public String getLabel() {
         return name;

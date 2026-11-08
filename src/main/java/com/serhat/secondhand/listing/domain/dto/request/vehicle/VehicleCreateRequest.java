@@ -16,6 +16,7 @@ public record VehicleCreateRequest(
     UUID vehicleGenerationId,
     UUID vehicleEngineId,
     UUID vehicleTrimId,
+    UUID vehicleVersionId,
     Integer year,
     Integer mileage,
     Integer engineCapacity,
@@ -33,5 +34,6 @@ public record VehicleCreateRequest(
     String accidentDetails,
     java.time.LocalDate inspectionValidUntil,
     Drivetrain drivetrain,
-    BodyType bodyType
+    BodyType bodyType,
+    java.util.Map<String, Object> attributes
 ) {} 

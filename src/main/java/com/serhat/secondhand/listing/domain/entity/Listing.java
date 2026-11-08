@@ -8,11 +8,15 @@ import com.serhat.secondhand.listing.util.ListingErrorCodes;
 import com.serhat.secondhand.listing.util.ListingNoGenerator;
 import com.serhat.secondhand.user.domain.entity.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter @Setter
@@ -83,6 +87,12 @@ public class Listing {
     @Version
     private Long version;
 
+    /** Type-specific extra facts, validated against listing_attribute_definitions (see ListingAttributeValidator). */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "attributes", columnDefinition = "jsonb", nullable = false)
+    @Builder.Default
+    private Map<String, Object> attributes = new LinkedHashMap<>();
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -90,6 +100,9 @@ public class Listing {
     @PrePersist
     void onCreate() { 
         createdAt = updatedAt = LocalDateTime.now();
+        if (attributes == null) {
+            attributes = new LinkedHashMap<>();
+        }
         if (listingNo == null) {
             listingNo = ListingNoGenerator.generate();
         }
@@ -98,6 +111,17 @@ public class Listing {
     @PreUpdate
     void onUpdate() { 
         updatedAt = LocalDateTime.now(); 
+        if (attributes == null) {
+            attributes = new LinkedHashMap<>();
+        }
+    }
+
+    /**
+     * Narrows which attribute definitions apply (e.g. vehicle type CAR); {@code null} = only the
+     * type-wide ({@code ALL}) definitions.
+     */
+    public String attributeScopeKey() {
+        return null;
     }
     
     public void publish() {

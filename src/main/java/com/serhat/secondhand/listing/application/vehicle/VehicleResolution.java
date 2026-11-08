@@ -8,6 +8,7 @@ public record VehicleResolution(
         VehicleModel model,
         VehicleGeneration generation,
         VehicleEngine engine,
-        VehicleTrim trim
+        VehicleTrim trim,
+        VehicleVersion version
 ) {}
 
