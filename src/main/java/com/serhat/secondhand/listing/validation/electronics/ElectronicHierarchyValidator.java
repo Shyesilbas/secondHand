@@ -33,6 +33,20 @@ public class ElectronicHierarchyValidator implements ElectronicSpecValidator {
             return Result.error("Electronic model does not match type", "ELECTRONIC_MODEL_TYPE_MISMATCH");
         }
 
+        if (listing.getVariant() != null && listing.getVariant().getModel() != null
+                && !listing.getModel().getId().equals(listing.getVariant().getModel().getId())) {
+            return Result.error("Electronic variant does not belong to the model", "ELECTRONIC_VARIANT_MODEL_MISMATCH");
+        }
+
+        if (listing.getColorName() != null) {
+            boolean known = listing.getModel().getColors() != null && listing.getModel().getColors().stream()
+                    .anyMatch(c -> listing.getColorName().equals(c.getName()));
+            if (!known) {
+                return Result.error("Color '" + listing.getColorName() + "' is not a color of this model",
+                        "ELECTRONIC_COLOR_NOT_IN_MODEL");
+            }
+        }
+
         return Result.success();
     }
 

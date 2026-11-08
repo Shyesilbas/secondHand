@@ -285,6 +285,10 @@ export const API_ENDPOINTS = {
         VEHICLE: {
             ATTRIBUTES: (typeId) => `/v1/catalog/vehicle/attributes?typeId=${encodeURIComponent(typeId)}`,
         },
+        ELECTRONICS: {
+            ATTRIBUTES: (typeId) => `/v1/catalog/electronics/attributes?typeId=${encodeURIComponent(typeId)}`,
+            MODEL: (modelId) => `/v1/catalog/electronics/models/${encodeURIComponent(modelId)}`,
+        },
     },
     AI: {
         SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`,

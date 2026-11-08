@@ -82,7 +82,7 @@ public class ListingFocusAgentContextAdapter implements AgentContextAdapter {
     }
 
     private static String electronicSummary(ElectronicListingDto e) {
-        return ("brand=%s, model=%s, ramGb=%s, storageGb=%s, storageType=%s, processor=%s, "
+        return ("brand=%s, model=%s, ramGb=%s, storageGb=%s, storageType=%s, processor=%s, chipset=%s, "
                 + "screenInch=%s, batteryHealthPercent=%s, gpu=%s, os=%s, year=%s, color=%s")
                 .formatted(
                         lookupLabel(e.getElectronicBrand()),
@@ -91,8 +91,10 @@ public class ListingFocusAgentContextAdapter implements AgentContextAdapter {
                         intOrDash(e.getStorage()),
                         e.getStorageType() != null ? e.getStorageType().name() : "-",
                         e.getProcessor() != null ? e.getProcessor().name() : "-",
+                        nullToDash(e.getChipset()),
                         intOrDash(e.getScreenSize()),
-                        intOrDash(e.getBatteryHealthPercent()),
+                        e.getAttributes() != null && e.getAttributes().get("batteryHealthPercent") != null
+                                ? e.getAttributes().get("batteryHealthPercent").toString() : "-",
                         nullToDash(e.getGpuModel()),
                         nullToDash(e.getOperatingSystem()),
                         intOrDash(e.getYear()),

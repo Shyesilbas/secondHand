@@ -65,9 +65,9 @@ function electronicsContextLines(listing) {
  listing.storage != null
  ? `${listing.storage} GB storage${listing.storageType ? ` (${listing.storageType})` : ''}`
  : null;
- const processor = listing.processor ? `Processor: ${listing.processor}` : null;
+ const processor = listing.chipset || listing.processor ? `Processor: ${listing.chipset || listing.processor}` : null;
  const battery =
- listing.batteryHealthPercent != null ? `Battery health: %${listing.batteryHealthPercent}` : null;
+ listing.attributes?.batteryHealthPercent != null ? `Battery health: %${listing.attributes.batteryHealthPercent}` : null;
  const screen = listing.screenSize != null ? `Screen: ${listing.screenSize}"` : null;
  const gpu = listing.gpuModel?.trim() ? `GPU: ${listing.gpuModel.trim()}` : null;
  const os = listing.operatingSystem?.trim() ? `Operating system: ${listing.operatingSystem.trim()}` : null;

@@ -78,6 +78,8 @@ public abstract class ListingMapper {
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "model", source = "model", qualifiedByName = "electronicModel")
     @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(electronicListing.getId()))")
+    @Mapping(target = "electronicVariantId", source = "variant.id")
+    @Mapping(target = "variantName", source = "variant.name")
     public abstract ElectronicListingDto toElectronicDto(ElectronicListing electronicListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -189,6 +191,9 @@ public abstract class ListingMapper {
     @Mapping(target = "electronicType", ignore = true)
     @Mapping(target = "electronicBrand", ignore = true)
     @Mapping(target = "model", ignore = true)
+    @Mapping(target = "variant", ignore = true)
+    @Mapping(target = "colorName", expression = "java(blankToNull(request.colorName()))")
+    @Mapping(target = "chipset", expression = "java(blankToNull(request.chipset()))")
     @Mapping(target = "title", source = "base.title")
     @Mapping(target = "description", source = "base.description")
     @Mapping(target = "price", source = "base.price")
@@ -303,6 +308,10 @@ public abstract class ListingMapper {
         if (request.fabricType() != null) request.fabricType().ifPresent(entity::setFabricType);
     }
 
+    protected String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
     public void updateElectronic(ElectronicListing entity, ElectronicUpdateRequest request) {
         if (entity == null || request == null) return;
         applyBase(entity, request.base());
@@ -317,7 +326,6 @@ public abstract class ListingMapper {
         if (request.screenSize() != null) request.screenSize().ifPresent(entity::setScreenSize);
         if (request.gpuModel() != null) request.gpuModel().ifPresent(entity::setGpuModel);
         if (request.operatingSystem() != null) request.operatingSystem().ifPresent(entity::setOperatingSystem);
-        if (request.batteryHealthPercent() != null) request.batteryHealthPercent().ifPresent(entity::setBatteryHealthPercent);
         if (request.batteryCapacityMah() != null) request.batteryCapacityMah().ifPresent(entity::setBatteryCapacityMah);
         if (request.cameraMegapixels() != null) request.cameraMegapixels().ifPresent(entity::setCameraMegapixels);
         if (request.supports5g() != null) request.supports5g().ifPresent(entity::setSupports5g);
@@ -328,17 +336,14 @@ public abstract class ListingMapper {
         if (request.noiseCancelling() != null) request.noiseCancelling().ifPresent(entity::setNoiseCancelling);
         if (request.hasMicrophone() != null) request.hasMicrophone().ifPresent(entity::setHasMicrophone);
         if (request.batteryLifeHours() != null) request.batteryLifeHours().ifPresent(entity::setBatteryLifeHours);
-        if (request.batteryReplaced() != null) request.batteryReplaced().ifPresent(entity::setBatteryReplaced);
-        if (request.batteryOriginal() != null) request.batteryOriginal().ifPresent(entity::setBatteryOriginal);
-        if (request.screenReplaced() != null) request.screenReplaced().ifPresent(entity::setScreenReplaced);
-        if (request.bodyReplaced() != null) request.bodyReplaced().ifPresent(entity::setBodyReplaced);
-        if (request.faceIdWorking() != null) request.faceIdWorking().ifPresent(entity::setFaceIdWorking);
-        if (request.touchIdWorking() != null) request.touchIdWorking().ifPresent(entity::setTouchIdWorking);
-        if (request.hasBox() != null) request.hasBox().ifPresent(entity::setHasBox);
-        if (request.hasInvoice() != null) request.hasInvoice().ifPresent(entity::setHasInvoice);
-        if (request.imeiRegistered() != null) request.imeiRegistered().ifPresent(entity::setImeiRegistered);
-        if (request.warrantyEndDate() != null) request.warrantyEndDate().ifPresent(entity::setWarrantyEndDate);
         if (request.condition() != null) request.condition().ifPresent(entity::setCondition);
+        // Sent as "" or null when the seller switches back to a generic color / clears the chip.
+        if (request.colorName() != null) entity.setColorName(request.colorName().filter(v -> !v.isBlank()).orElse(null));
+        if (request.chipset() != null) entity.setChipset(request.chipset().filter(v -> !v.isBlank()).orElse(null));
+        if (request.attributes() != null) {
+            entity.getAttributes().clear();
+            request.attributes().ifPresent(entity.getAttributes()::putAll);
+        }
     }
 
     public void updateRealEstate(RealEstateListing entity, RealEstateUpdateRequest request) {

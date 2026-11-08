@@ -24,7 +24,9 @@ public class ElectronicDetailStrategy implements ListingDetailStrategy {
                 : null;
         String ram = electronic.getRam() != null ? electronic.getRam().toString() : null;
         String storage = electronic.getStorage() != null ? electronic.getStorage().toString() : null;
-        String processor = electronic.getProcessor() != null ? electronic.getProcessor().getLabel() : null;
+        String processor = electronic.getChipset() != null && !electronic.getChipset().isBlank()
+                ? electronic.getChipset()
+                : electronic.getProcessor() != null ? electronic.getProcessor().getLabel() : null;
         String color = electronic.getColor() != null ? electronic.getColor().getLabel() : null;
 
         StringBuilder sb = new StringBuilder("Bu ürün bir ");

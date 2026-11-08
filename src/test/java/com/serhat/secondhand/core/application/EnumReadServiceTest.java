@@ -42,6 +42,7 @@ class EnumReadServiceTest {
     @Mock private ElectronicTypeRepository electronicTypeRepository;
     @Mock private ElectronicBrandRepository electronicBrandRepository;
     @Mock private ElectronicModelRepository electronicModelRepository;
+    @Mock private com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelVariantRepository electronicModelVariantRepository;
     @Mock private BookTypeRepository bookTypeRepository;
     @Mock private BookGenreRepository bookGenreRepository;
     @Mock private BookLanguageRepository bookLanguageRepository;
@@ -63,6 +64,7 @@ class EnumReadServiceTest {
     @Mock private SportDisciplineRepository sportDisciplineRepository;
     @Mock private SportEquipmentTypeRepository sportEquipmentTypeRepository;
     @Mock private SportConditionRepository sportConditionRepository;
+    @Mock private com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService listingAttributeCatalogService;
 
     private EnumReadService enumReadService;
 
@@ -72,6 +74,7 @@ class EnumReadServiceTest {
                 electronicTypeRepository,
                 electronicBrandRepository,
                 electronicModelRepository,
+                electronicModelVariantRepository,
                 bookTypeRepository,
                 bookGenreRepository,
                 bookLanguageRepository,
@@ -92,7 +95,8 @@ class EnumReadServiceTest {
                 vehicleVersionRepository,
                 sportDisciplineRepository,
                 sportEquipmentTypeRepository,
-                sportConditionRepository
+                sportConditionRepository,
+                listingAttributeCatalogService
         );
     }
 

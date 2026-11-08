@@ -29,6 +29,11 @@ public class ElectronicListing extends Listing {
     @JoinColumn(name = "electronic_model_id")
     private ElectronicModel model;
 
+    /** Catalog variant the seller picked; its facts and the model's specs are copied on save. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "electronic_variant_id")
+    private ElectronicModelVariant variant;
+
     private String origin;
 
     protected boolean warrantyProof;
@@ -37,6 +42,10 @@ public class ElectronicListing extends Listing {
 
     @Enumerated(EnumType.STRING)
     private Color color;
+
+    /** Official color name of the model (ElectronicModel.colors); {@link #color} is derived from it. */
+    @Column(name = "color_name", length = 100)
+    private String colorName;
 
 
     private Integer ram;
@@ -49,13 +58,16 @@ public class ElectronicListing extends Listing {
     @Enumerated(EnumType.STRING)
     private Processor processor;
 
+    /** Exact chip, e.g. "Apple A18 Pro" or "Intel Core i7-13700H"; processor stays the family. */
+    @Column(length = 150)
+    private String chipset;
+
     private Integer screenSize;
 
     private String gpuModel;
 
     private String operatingSystem;
 
-    private Integer batteryHealthPercent;
 
     private Integer batteryCapacityMah;
 
@@ -78,19 +90,15 @@ public class ElectronicListing extends Listing {
 
     private Integer batteryLifeHours;
 
-    private Boolean batteryReplaced;
-    private Boolean batteryOriginal;
-    private Boolean screenReplaced;
-    private Boolean bodyReplaced;
-    private Boolean faceIdWorking;
-    private Boolean touchIdWorking;
-    private Boolean hasBox;
-    private Boolean hasInvoice;
-    private Boolean imeiRegistered;
-    private java.time.LocalDate warrantyEndDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "condition", nullable = false)
     private ElectronicCondition condition;
 
+
+    /** Condition attributes are defined per electronic type (data/attributes/electronics.json scopes). */
+    @Override
+    public String attributeScopeKey() {
+        return electronicType != null ? electronicType.getName() : null;
+    }
 }

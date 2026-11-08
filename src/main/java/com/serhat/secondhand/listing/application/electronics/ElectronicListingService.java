@@ -35,6 +35,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
     private final ElectronicsFilterPredicateBuilder predicateBuilder;
     private final List<ElectronicSpecValidator> electronicSpecValidators;
     private final ElectronicListingResolver electronicListingResolver;
+    private final ElectronicSpecSnapshotter electronicSpecSnapshotter;
 
     public ElectronicListingService(
             ElectronicListingRepository repository,
@@ -46,6 +47,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
             ListingValidationEngine listingValidationEngine,
             List<ElectronicSpecValidator> electronicSpecValidators,
             ElectronicListingResolver electronicListingResolver,
+            ElectronicSpecSnapshotter electronicSpecSnapshotter,
             InventoryService inventoryService) {
         super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.repository = repository;
@@ -53,6 +55,7 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         this.predicateBuilder = predicateBuilder;
         this.electronicSpecValidators = electronicSpecValidators;
         this.electronicListingResolver = electronicListingResolver;
+        this.electronicSpecSnapshotter = electronicSpecSnapshotter;
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
@@ -75,7 +78,8 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         return electronicListingResolver.resolve(
                 request.electronicTypeId(),
                 request.electronicBrandId(),
-                request.electronicModelId()
+                request.electronicModelId(),
+                request.electronicVariantId()
         );
     }
 
@@ -85,6 +89,14 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
         entity.setElectronicType(res.type());
         entity.setElectronicBrand(res.brand());
         entity.setModel(res.model());
+        entity.setVariant(res.variant());
+    }
+
+    /** Catalog facts of the picked model and variant win over what the client sent. */
+    @Override
+    protected Result<Void> preProcess(ElectronicListing entity, ElectronicCreateRequest request) {
+        electronicSpecSnapshotter.apply(entity);
+        return Result.success();
     }
 
     @Override
@@ -114,9 +126,13 @@ public class ElectronicListingService extends AbstractListingService<ElectronicL
                         existing,
                         request.electronicTypeId(),
                         request.electronicBrandId(),
-                        request.electronicModelId()),
+                        request.electronicModelId(),
+                        request.electronicVariantId()),
                 (existing, req) -> listingMapper.updateElectronic(existing, req),
-                existing -> listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators)
+                existing -> {
+                    electronicSpecSnapshotter.apply(existing);
+                    return listingValidationEngine.cleanupAndValidate(existing, electronicSpecValidators);
+                }
         );
     }
 

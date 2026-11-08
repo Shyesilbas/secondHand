@@ -66,27 +66,30 @@ const createVehicleFilterConfig = () => {
  .addBooleanField('accidentHistory', 'Has Accident History / Hasarlı');
 };
 
-const getSelectedTypeNames = (filters, enums) => {
- const selectedIds = filters.electronicTypeIds || [];
- if (!selectedIds.length) return [];
- const allTypes = enums?.electronicTypes || [];
- const matchedNames = [];
- allTypes.forEach((t) => {
- if (selectedIds.includes(t.id) || selectedIds.includes(t.value)) {
- const raw = String(t.name || t.value || t.label || '').toUpperCase();
- matchedNames.push(raw);
- if (raw.includes('TELEFON') || raw.includes('PHONE')) matchedNames.push('MOBILE_PHONE');
- if (raw.includes('DİZÜSTÜ') || raw.includes('LAPTOP')) matchedNames.push('LAPTOP');
- if (raw.includes('MASAÜSTÜ') || raw.includes('DESKTOP')) matchedNames.push('DESKTOP');
- if (raw.includes('TABLET')) matchedNames.push('TABLET');
- if (raw.includes('KULAKLIK') || raw.includes('HEADPHONE')) matchedNames.push('HEADPHONES');
- if (raw.includes('MONİTÖR') || raw.includes('MONITOR')) matchedNames.push('MONITOR');
- if (raw.includes('TV')) matchedNames.push('TV');
- if (raw.includes('KAMERA') || raw.includes('CAMERA')) matchedNames.push('CAMERA');
- }
- });
- return matchedNames;
+// Electronics filters follow the selected types' rules (`electronicTypes[].fieldRules`, backend types.json)
+// and, for condition filters, the attribute keys the types define (`electronicTypes[].attributeKeys`).
+const selectedElectronicTypes = (filters, enums) => {
+ const ids = (Array.isArray(filters?.electronicTypeIds) ? filters.electronicTypeIds : [filters?.electronicTypeIds])
+  .filter(Boolean).map(String);
+ return (enums?.electronicTypes || []).filter((t) => ids.includes(String(t?.id)));
 };
+
+const shownForElectronicTypes = (field) => (filters, enums) => {
+ const types = selectedElectronicTypes(filters, enums);
+ return types.length === 0 || types.some((t) => (t?.fieldRules?.[field] ?? 'HIDDEN') !== 'HIDDEN');
+};
+
+const shownForElectronicAttribute = (key) => (filters, enums) => {
+ const types = selectedElectronicTypes(filters, enums);
+ return types.length === 0 || types.some((t) => (t?.attributeKeys || []).includes(key));
+};
+
+// Options of the headphone `batteryCondition` attribute (backend data/attributes/electronics.json).
+const HEADPHONE_BATTERY_CONDITIONS = [
+ { value: 'LIKE_NEW', label: 'İlk günkü süreye yakın' },
+ { value: 'REDUCED', label: 'Belirgin kısalmış' },
+ { value: 'WEAK', label: 'Çok kısa / zayıf' },
+];
 
 const createElectronicsFilterConfig = () => {
  return new FilterConfig()
@@ -96,114 +99,28 @@ const createElectronicsFilterConfig = () => {
  .addEnumField('conditions', 'Condition / Durum', 'electronicConditions', { displayAs: 'chips', multiple: true })
  .addEnumField('colors', 'Color / Renk', 'colors')
  .addNumericRangeField('year', 'Year / Yıl', { min: 2000, max: new Date().getFullYear(), placeholder: '2022' })
- 
- // Computer Specific Filters (visible for LAPTOP or DESKTOP)
- .addNumericRangeField('ram', 'RAM (GB)', {
- min: 1,
- placeholder: '16',
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('LAPTOP') || types.includes('DESKTOP');
- }
- })
- .addNumericRangeField('storage', 'Storage / Depolama (GB)', {
- min: 1,
- placeholder: '512',
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('LAPTOP') || types.includes('DESKTOP') || types.includes('MOBILE_PHONE') || types.includes('TABLET');
- }
- })
- .addEnumField('storageTypes', 'Storage Type / Disk Tipi', 'storageTypes', {
- displayAs: 'chips',
- multiple: true,
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('LAPTOP') || types.includes('DESKTOP');
- }
- })
- .addEnumField('processors', 'Processor / İşlemci', 'processors', {
- displayAs: 'chips',
- multiple: true,
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('LAPTOP') || types.includes('DESKTOP');
- }
- })
-
- // Screen Size Filter (visible for LAPTOP, TV, MONITOR, TABLET)
- .addNumericRangeField('screenSize', 'Screen Size / Ekran (inch)', {
- min: 1,
- placeholder: '15.6',
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('LAPTOP') || types.includes('TV') || types.includes('MONITOR') || types.includes('TABLET');
- }
- })
-
- // Mobile Phone / Tablet Specific Filters
- .addNumericRangeField('batteryHealthPercent', 'Battery Health (%) / Pil Sağlığı', {
- min: 1,
- max: 100,
- placeholder: '85',
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('MOBILE_PHONE') || types.includes('TABLET') || types.includes('LAPTOP');
- }
- })
- .addBooleanField('supports5g', '5G Support / 5G Desteği', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('MOBILE_PHONE') || types.includes('TABLET');
- }
- })
- .addBooleanField('dualSim', 'Dual SIM / Çift SIM', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('MOBILE_PHONE');
- }
- })
- .addBooleanField('hasNfc', 'NFC Support / NFC', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('MOBILE_PHONE');
- }
- })
- .addBooleanField('batteryOriginal', 'Original Battery / Orijinal Batarya')
- .addBooleanField('screenReplaced', 'Screen Replaced / Ekran Değişen')
- .addBooleanField('imeiRegistered', 'IMEI Registered / IMEI Kayıtlı TR')
-
- // Headphones & Audio Filters
- .addEnumField('connectionTypes', 'Connection Type / Bağlantı', 'electronicConnectionTypes', {
- displayAs: 'chips',
- multiple: true,
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('HEADPHONES') || types.includes('SPEAKER');
- }
- })
- .addBooleanField('wireless', 'Wireless / Kablosuz', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('HEADPHONES') || types.includes('SPEAKER');
- }
- })
- .addBooleanField('noiseCancelling', 'Active Noise Cancelling / ANC', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('HEADPHONES');
- }
- })
- .addBooleanField('hasMicrophone', 'Microphone / Dahili Mikrofon', {
- visibleWhen: (filters, enums) => {
- const types = getSelectedTypeNames(filters, enums);
- return types.length === 0 || types.includes('HEADPHONES') || types.includes('SPEAKER');
- }
- })
-
- // Generic Features
- .addBooleanField('hasBox', 'Has Original Box / Kutulu')
- .addBooleanField('hasInvoice', 'Has Invoice / Faturalı');
+ .addNumericRangeField('ram', 'RAM (GB)', { min: 1, placeholder: '16', visibleWhen: shownForElectronicTypes('ram') })
+ .addNumericRangeField('storage', 'Storage / Depolama (GB)', { min: 1, placeholder: '512', visibleWhen: shownForElectronicTypes('storage') })
+ .addEnumField('storageTypes', 'Storage Type / Disk Tipi', 'storageTypes', { displayAs: 'chips', multiple: true, visibleWhen: shownForElectronicTypes('storageType') })
+ .addEnumField('processors', 'Processor / İşlemci', 'processors', { displayAs: 'chips', multiple: true, visibleWhen: shownForElectronicTypes('processor') })
+ .addNumericRangeField('screenSize', 'Screen Size / Ekran (inch)', { min: 1, placeholder: '15', visibleWhen: shownForElectronicTypes('screenSize') })
+ .addNumericRangeField('batteryHealthPercent', 'Battery Health (%) / Pil Sağlığı', { min: 1, max: 100, placeholder: '85', visibleWhen: shownForElectronicAttribute('batteryHealthPercent') })
+ .addBooleanField('supports5g', '5G Support / 5G Desteği', { visibleWhen: shownForElectronicTypes('supports5g') })
+ .addBooleanField('dualSim', 'Dual SIM / Çift SIM', { visibleWhen: shownForElectronicTypes('dualSim') })
+ .addBooleanField('hasNfc', 'NFC Support / NFC', { visibleWhen: shownForElectronicTypes('hasNfc') })
+ .addBooleanField('batteryOriginal', 'Original Battery / Orijinal Batarya', { visibleWhen: shownForElectronicAttribute('batteryOriginal') })
+ .addBooleanField('screenReplaced', 'Screen Replaced / Ekran Değişen', { visibleWhen: shownForElectronicAttribute('screenReplaced') })
+ .addBooleanField('imeiRegistered', 'IMEI Registered / IMEI Kayıtlı TR', { visibleWhen: shownForElectronicAttribute('imeiRegistered') })
+ .addEnumField('connectionTypes', 'Connection Type / Bağlantı', 'electronicConnectionTypes', { displayAs: 'chips', multiple: true, visibleWhen: shownForElectronicTypes('connectionType') })
+ .addBooleanField('wireless', 'Wireless / Kablosuz', { visibleWhen: shownForElectronicTypes('wireless') })
+ .addBooleanField('noiseCancelling', 'Active Noise Cancelling / ANC', { visibleWhen: shownForElectronicTypes('noiseCancelling') })
+ .addBooleanField('hasMicrophone', 'Microphone / Dahili Mikrofon', { visibleWhen: shownForElectronicTypes('hasMicrophone') })
+ .addNumericRangeField('controllerCount', 'Controllers / Kol Sayısı', { min: 0, max: 8, placeholder: '2', visibleWhen: shownForElectronicAttribute('controllerCount') })
+ .addBooleanField('modded', 'Modded / Modlu', { visibleWhen: shownForElectronicAttribute('modded') })
+ .addEnumField('batteryConditions', 'Battery Condition / Pil Durumu', 'headphoneBatteryConditions', { displayAs: 'chips', multiple: true, getOptions: () => HEADPHONE_BATTERY_CONDITIONS, visibleWhen: shownForElectronicAttribute('batteryCondition') })
+ .addBooleanField('bothSidesWorking', 'Both Sides Working / İki Taraf Sorunsuz', { visibleWhen: shownForElectronicAttribute('bothSidesWorking') })
+ .addBooleanField('hasBox', 'Has Original Box / Kutulu', { visibleWhen: shownForElectronicAttribute('hasBox') })
+ .addBooleanField('hasInvoice', 'Has Invoice / Faturalı', { visibleWhen: shownForElectronicAttribute('hasInvoice') });
 };
 
 const createRealEstateFilterConfig = () => {

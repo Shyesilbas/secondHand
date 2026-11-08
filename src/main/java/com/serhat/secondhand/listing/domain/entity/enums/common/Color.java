@@ -32,7 +32,10 @@ public enum Color {
     BROWN("Kahverengi"),
     BEIGE("Bej"),
     PURPLE_AMETHYST("Ametist Moru"),
-    MATTE_BLACK("Mat Siyah");
+    MATTE_BLACK("Mat Siyah"),
+    PINK("Pembe"),
+    PURPLE("Mor"),
+    GOLD("Altın");
 
     private final String label;
 

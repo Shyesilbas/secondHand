@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.validation.vehicle;
 
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.vehicle.VehicleDataInitializer;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
@@ -32,10 +33,10 @@ class VehicleValidationTest {
     private VehicleType typeWithRules(String name, List<BodyType> bodyTypes, List<String> required, List<String> hidden) {
         VehicleType type = createType(name);
         type.setBodyTypes(new ArrayList<>(bodyTypes));
-        Map<String, VehicleFieldRule> rules = new LinkedHashMap<>();
+        Map<String, SpecFieldRule> rules = new LinkedHashMap<>();
         VehicleSpecFields.ALL.keySet().forEach(field -> rules.put(field,
-                required.contains(field) ? VehicleFieldRule.REQUIRED
-                        : hidden.contains(field) ? VehicleFieldRule.HIDDEN : VehicleFieldRule.OPTIONAL));
+                required.contains(field) ? SpecFieldRule.REQUIRED
+                        : hidden.contains(field) ? SpecFieldRule.HIDDEN : SpecFieldRule.OPTIONAL));
         type.setFieldRules(rules);
         return type;
     }

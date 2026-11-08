@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application.electronics;
 
+import com.serhat.secondhand.listing.application.filter.ListingAttributePredicates;
 import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ElectronicListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ElectronicListing;
@@ -84,10 +85,10 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         }
 
         if (filters.getMinBatteryHealthPercent() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("batteryHealthPercent"), filters.getMinBatteryHealthPercent()));
+            predicates.add(ListingAttributePredicates.integerAtLeast(cb, root.get("attributes"), "batteryHealthPercent", filters.getMinBatteryHealthPercent()));
         }
         if (filters.getMaxBatteryHealthPercent() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("batteryHealthPercent"), filters.getMaxBatteryHealthPercent()));
+            predicates.add(ListingAttributePredicates.integerAtMost(cb, root.get("attributes"), "batteryHealthPercent", filters.getMaxBatteryHealthPercent()));
         }
         if (filters.getMinBatteryCapacityMah() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("batteryCapacityMah"), filters.getMinBatteryCapacityMah()));
@@ -132,19 +133,34 @@ public class ElectronicsFilterPredicateBuilder implements FilterPredicateBuilder
         }
 
         if (filters.getBatteryOriginal() != null) {
-            predicates.add(cb.equal(root.get("batteryOriginal"), filters.getBatteryOriginal()));
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "batteryOriginal", filters.getBatteryOriginal()));
         }
         if (filters.getScreenReplaced() != null) {
-            predicates.add(cb.equal(root.get("screenReplaced"), filters.getScreenReplaced()));
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "screenReplaced", filters.getScreenReplaced()));
         }
         if (filters.getHasBox() != null) {
-            predicates.add(cb.equal(root.get("hasBox"), filters.getHasBox()));
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "hasBox", filters.getHasBox()));
         }
         if (filters.getHasInvoice() != null) {
-            predicates.add(cb.equal(root.get("hasInvoice"), filters.getHasInvoice()));
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "hasInvoice", filters.getHasInvoice()));
         }
         if (filters.getImeiRegistered() != null) {
-            predicates.add(cb.equal(root.get("imeiRegistered"), filters.getImeiRegistered()));
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "imeiRegistered", filters.getImeiRegistered()));
+        }
+        if (filters.getMinControllerCount() != null) {
+            predicates.add(ListingAttributePredicates.integerAtLeast(cb, root.get("attributes"), "controllerCount", filters.getMinControllerCount()));
+        }
+        if (filters.getMaxControllerCount() != null) {
+            predicates.add(ListingAttributePredicates.integerAtMost(cb, root.get("attributes"), "controllerCount", filters.getMaxControllerCount()));
+        }
+        if (filters.getModded() != null) {
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "modded", filters.getModded()));
+        }
+        if (filters.getBatteryConditions() != null && !filters.getBatteryConditions().isEmpty()) {
+            predicates.add(ListingAttributePredicates.textIn(cb, root.get("attributes"), "batteryCondition", filters.getBatteryConditions()));
+        }
+        if (filters.getBothSidesWorking() != null) {
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "bothSidesWorking", filters.getBothSidesWorking()));
         }
 
         return predicates;

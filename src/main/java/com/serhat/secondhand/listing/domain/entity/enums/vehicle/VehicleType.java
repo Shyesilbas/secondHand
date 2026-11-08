@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.domain.entity.enums.vehicle;
 
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Labelable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -60,9 +61,9 @@ public class VehicleType implements Labelable, Persistable<UUID> {
     @Column(name = "body_types", nullable = false, columnDefinition = "jsonb")
     private List<BodyType> bodyTypes = new ArrayList<>();
 
-    /** Spec field name -> rule; see {@link VehicleFieldRule}. */
+    /** Spec field name -> rule; see {@link SpecFieldRule}. */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "field_rules", nullable = false, columnDefinition = "jsonb")
-    private Map<String, VehicleFieldRule> fieldRules = new LinkedHashMap<>();
+    private Map<String, SpecFieldRule> fieldRules = new LinkedHashMap<>();
 }
 

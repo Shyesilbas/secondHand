@@ -46,6 +46,7 @@ public class EnumReadService {
     private final ElectronicTypeRepository electronicTypeRepository;
     private final ElectronicBrandRepository electronicBrandRepository;
     private final ElectronicModelRepository electronicModelRepository;
+    private final com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelVariantRepository electronicModelVariantRepository;
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
     private final BookLanguageRepository bookLanguageRepository;
@@ -67,6 +68,7 @@ public class EnumReadService {
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
+    private final com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService listingAttributeCatalogService;
 
     private String normalizeName(Map<String, Object> item) {
         Object val = item.get("name") != null ? item.get("name") : item.get("label");
@@ -157,11 +159,20 @@ public class EnumReadService {
 
     public List<Map<String, Object>> getElectronicTypes() {
         List<Map<String, Object>> raw = electronicTypeRepository.findAll().stream()
+                .sorted(java.util.Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType::getSortOrder)
+                        .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
+                    map.put("sortOrder", type.getSortOrder());
+                    // Spec field -> REQUIRED | OPTIONAL | HIDDEN (data/electronics/types.json); drives form and filters.
+                    map.put("fieldRules", type.getFieldRules());
+                    // Attribute keys this type defines (data/attributes/electronics.json); attribute filters follow them.
+                    map.put("attributeKeys", listingAttributeCatalogService
+                            .getDefinitions(com.serhat.secondhand.listing.domain.entity.enums.base.ListingType.ELECTRONICS, type.getName())
+                            .stream().map(com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto::getKey).toList());
                     return map;
                 }).toList();
         return deduplicateByName(raw);
@@ -180,6 +191,23 @@ public class EnumReadService {
     }
 
     public List<Map<String, Object>> getElectronicModels() {
+        // Variants ride along with their model so the form can pick one without another request.
+        Map<java.util.UUID, List<Map<String, Object>>> variantsByModel = new java.util.HashMap<>();
+        electronicModelVariantRepository.findAll().stream()
+                .sorted(java.util.Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModelVariant::getSortOrder))
+                .forEach(v -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", v.getId());
+                    map.put("name", v.getName());
+                    map.put("ram", v.getRam());
+                    map.put("storage", v.getStorage());
+                    map.put("storageType", v.getStorageType() != null ? v.getStorageType().name() : null);
+                    map.put("processor", v.getProcessor() != null ? v.getProcessor().name() : null);
+                    map.put("chipset", v.getChipset());
+                    map.put("gpuModel", v.getGpuModel());
+                    map.put("specs", v.getSpecs() != null ? v.getSpecs() : Map.of());
+                    variantsByModel.computeIfAbsent(v.getModel().getId(), k -> new java.util.ArrayList<>()).add(map);
+                });
         List<Map<String, Object>> raw = electronicModelRepository.findAll().stream()
                 .map(model -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -190,6 +218,15 @@ public class EnumReadService {
                     map.put("releaseYear", model.getReleaseYear());
                     map.put("isLegacy", Boolean.TRUE.equals(model.getIsLegacy()));
                     map.put("aliases", model.getAliases() != null ? model.getAliases() : List.of());
+                    map.put("specs", model.getSpecs() != null ? model.getSpecs() : Map.of());
+                    map.put("colors", model.getColors() != null ? model.getColors().stream().map(c -> {
+                        Map<String, Object> color = new LinkedHashMap<>();
+                        color.put("name", c.getName());
+                        color.put("color", c.getColor() != null ? c.getColor().name() : null);
+                        return color;
+                    }).toList() : List.of());
+                    map.put("variants", variantsByModel.getOrDefault(model.getId(), List.of()));
+                    map.put("catalogSource", model.getSource());
                     return map;
                 }).toList();
         return deduplicateBy(raw, item -> {

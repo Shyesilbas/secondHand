@@ -49,5 +49,11 @@ public class ElectronicListingFilterDto extends ListingFilterDto {
     private Boolean hasBox;
     private Boolean hasInvoice;
     private Boolean imeiRegistered;
+    // Condition attributes (listings.attributes) of game consoles and headphones.
+    private Integer minControllerCount;
+    private Integer maxControllerCount;
+    private Boolean modded;
+    private List<String> batteryConditions;
+    private Boolean bothSidesWorking;
     private List<ElectronicCondition> conditions;
 }

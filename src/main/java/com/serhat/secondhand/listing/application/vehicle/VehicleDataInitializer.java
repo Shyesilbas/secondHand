@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application.vehicle;
 
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
@@ -198,7 +199,7 @@ public class VehicleDataInitializer implements SeedTask {
                 throw new IllegalStateException(TYPES_PATH + ": vehicle type " + key + " fields must name exactly "
                         + VehicleSpecFields.ALL.keySet() + " (unknown: " + unknown + ", missing: " + missing + ")");
             }
-            fields.values().forEach(rule -> parseOptionalEnum(VehicleFieldRule.class, rule, "fields", TYPES_PATH));
+            fields.values().forEach(rule -> parseOptionalEnum(SpecFieldRule.class, rule, "fields", TYPES_PATH));
         }
         return byKey;
     }
@@ -661,9 +662,9 @@ public class VehicleDataInitializer implements SeedTask {
         type.setSortOrder(definition.getSortOrder() == null ? 0 : definition.getSortOrder());
         type.setBodyTypes(new ArrayList<>(definition.getBodyTypes().stream()
                 .map(b -> BodyType.valueOf(b.trim().toUpperCase(Locale.ROOT))).toList()));
-        Map<String, VehicleFieldRule> rules = new LinkedHashMap<>();
+        Map<String, SpecFieldRule> rules = new LinkedHashMap<>();
         definition.getFields().forEach((field, rule) ->
-                rules.put(field, VehicleFieldRule.valueOf(rule.trim().toUpperCase(Locale.ROOT))));
+                rules.put(field, SpecFieldRule.valueOf(rule.trim().toUpperCase(Locale.ROOT))));
         type.setFieldRules(rules);
         typesByKey.put(normalizedKey, typeRepository.save(type));
     }

@@ -2,7 +2,7 @@ package com.serhat.secondhand.listing.validation.vehicle;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.VehicleListing;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleFieldRule;
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
 import org.springframework.stereotype.Component;
 
@@ -21,14 +21,14 @@ public class VehicleTypeRulesValidator implements VehicleSpecValidator {
         if (type == null) {
             return Result.success();
         }
-        Map<String, VehicleFieldRule> rules = type.getFieldRules();
+        Map<String, SpecFieldRule> rules = type.getFieldRules();
         if (rules == null || rules.isEmpty()) {
             return Result.error("Vehicle type " + type.getName() + " has no field rules; run the vehicle seed",
                     "VEHICLE_TYPE_RULES_MISSING");
         }
 
         for (VehicleSpecFields.Field field : VehicleSpecFields.ALL.values()) {
-            if (rules.get(field.name()) != VehicleFieldRule.REQUIRED) {
+            if (rules.get(field.name()) != SpecFieldRule.REQUIRED) {
                 continue;
             }
             Object value = field.getter().apply(listing);
@@ -60,8 +60,8 @@ public class VehicleTypeRulesValidator implements VehicleSpecValidator {
         }
         for (VehicleSpecFields.Field field : VehicleSpecFields.ALL.values()) {
             // A field the rules do not name counts as HIDDEN, as in the form.
-            VehicleFieldRule rule = type.getFieldRules().get(field.name());
-            if (rule == null || rule == VehicleFieldRule.HIDDEN) {
+            SpecFieldRule rule = type.getFieldRules().get(field.name());
+            if (rule == null || rule == SpecFieldRule.HIDDEN) {
                 field.clearer().accept(listing);
             }
         }

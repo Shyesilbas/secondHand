@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
-import java.time.LocalDate;
 import java.util.UUID;
 
 public record ElectronicCreateRequest(
@@ -20,18 +19,20 @@ public record ElectronicCreateRequest(
         UUID electronicTypeId,
         UUID electronicBrandId,
         UUID electronicModelId,
+        UUID electronicVariantId,
         String origin,
         boolean warrantyProof,
         int year,
         Color color,
+        String colorName,
         Integer ram,
         Integer storage,
         StorageType storageType,
         Processor processor,
+        String chipset,
         Integer screenSize,
         String gpuModel,
         String operatingSystem,
-        Integer batteryHealthPercent,
         Integer batteryCapacityMah,
         Integer cameraMegapixels,
         Boolean supports5g,
@@ -42,16 +43,7 @@ public record ElectronicCreateRequest(
         Boolean noiseCancelling,
         Boolean hasMicrophone,
         Integer batteryLifeHours,
-        Boolean batteryReplaced,
-        Boolean batteryOriginal,
-        Boolean screenReplaced,
-        Boolean bodyReplaced,
-        Boolean faceIdWorking,
-        Boolean touchIdWorking,
-        Boolean hasBox,
-        Boolean hasInvoice,
-        Boolean imeiRegistered,
-        LocalDate warrantyEndDate,
         @NotNull(message = "Condition is required")
-        ElectronicCondition condition
+        ElectronicCondition condition,
+        java.util.Map<String, Object> attributes
 ) {}
