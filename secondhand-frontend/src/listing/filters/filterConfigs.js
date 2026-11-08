@@ -127,15 +127,19 @@ const createRealEstateFilterConfig = () => {
  return new FilterConfig()
  .addEnumField('realEstateTypeIds', 'Property Type / Mülk Tipi', 'realEstateTypes', { displayAs: 'chips', multiple: true })
  .addEnumField('adTypeId', 'Ad Type / İlan Tipi', 'realEstateAdTypes', { multiple: false })
- .addEnumField('heatingTypeIds', 'Heating Type / Isınma Tipi', 'heatingTypes', { displayAs: 'chips', multiple: true })
  .addEnumField('ownerTypeId', 'Owner Type / Kimden', 'ownerTypes', { multiple: false })
- .addNumericRangeField('squareMeters', 'Square Meters / Net m²', { min: 0, placeholder: '120' })
- .addNumericRangeField('roomCount', 'Room Count / Oda Sayısı', { min: 1, step: 1, placeholder: '3' })
- .addNumericRangeField('bathroomCount', 'Bathroom Count / Banyo Sayısı', { min: 1, step: 1, placeholder: '1' })
+ .addNumericRangeField('grossArea', 'Gross Area / Brüt m²', { min: 0, placeholder: '120' })
+ .addNumericRangeField('netArea', 'Net Area / Net m²', { min: 0, placeholder: '100' })
+ .addEnumField('roomConfigKeys', 'Rooms / Oda Sayısı', 'roomConfigs', { displayAs: 'chips', multiple: true })
+ .addNumericRangeField('floor', 'Floor / Kat', { min: -1, placeholder: '3' })
  .addNumericRangeField('buildingAge', 'Building Age / Bina Yaşı', { min: 0, placeholder: '5' })
- .addNumericRangeField('floor', 'Floor / Kat', { min: 0, placeholder: '3' })
+ .addEnumField('heatingTypeIds', 'Heating Type / Isınma Tipi', 'heatingTypes', { displayAs: 'chips', multiple: true })
  .addBooleanField('furnished', 'Furnished / Eşyalı')
- .addTextField('zoningStatus', 'Zoning Status / İmar Durumu', { placeholder: 'e.g. Konut İmarlı, Ticari' });
+ .addBooleanField('hasElevator', 'Elevator / Asansörlü')
+ .addBooleanField('hasParking', 'Parking / Otoparklı')
+ .addBooleanField('inSite', 'In a Site / Site İçinde')
+ .addBooleanField('loanEligible', 'Loan Eligible / Krediye Uygun')
+ .addEnumField('zoningStatusKeys', 'Zoning Status / İmar Durumu', 'zoningStatuses', { displayAs: 'chips', multiple: true });
 };
 
 const createClothingFilterConfig = () => {

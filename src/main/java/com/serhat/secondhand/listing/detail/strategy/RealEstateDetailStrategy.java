@@ -20,14 +20,14 @@ public class RealEstateDetailStrategy implements ListingDetailStrategy {
         String ownerType = realEstate.getOwnerType() != null ? realEstate.getOwnerType().getLabel().toLowerCase() : null;
         String heating = realEstate.getHeatingType() != null ? realEstate.getHeatingType().getLabel().toLowerCase() : null;
 
-        Integer squareMeters = realEstate.getSquareMeters();
+        Integer squareMeters = realEstate.getGrossAreaM2();
         Integer roomCount = realEstate.getRoomCount();
         Integer bathroomCount = realEstate.getBathroomCount();
         boolean furnished = realEstate.isFurnished();
 
         StringBuilder sb = new StringBuilder("Bu gayrimenkul");
         if (squareMeters != null) {
-            sb.append(" ").append(squareMeters).append(" m²");
+            sb.append(" ").append(squareMeters).append(" m² brüt");
         }
         if (roomCount != null) {
             sb.append(", ").append(roomCount).append(" odalı");

@@ -145,6 +145,11 @@ public abstract class ListingMapper {
     @Mapping(target = "realEstateType", ignore = true)
     @Mapping(target = "heatingType", ignore = true)
     @Mapping(target = "ownerType", ignore = true)
+    @Mapping(target = "buildingCondition", ignore = true)
+    @Mapping(target = "roomCount", ignore = true)
+    @Mapping(target = "floorNumber", ignore = true)
+    @Mapping(target = "latitude", ignore = true)
+    @Mapping(target = "longitude", ignore = true)
     @Mapping(target = "title", source = "base.title")
     @Mapping(target = "description", source = "base.description")
     @Mapping(target = "price", source = "base.price")
@@ -346,58 +351,51 @@ public abstract class ListingMapper {
         }
     }
 
+    /** Building condition is resolved by RealEstateListingResolver (unknown names are rejected there). */
     public void updateRealEstate(RealEstateListing entity, RealEstateUpdateRequest request) {
         if (entity == null || request == null) return;
         applyBase(entity, request.base());
-        if (request.squareMeters() != null) request.squareMeters().ifPresent(entity::setSquareMeters);
-        if (request.roomCount() != null) request.roomCount().ifPresent(entity::setRoomCount);
-        if (request.bathroomCount() != null) request.bathroomCount().ifPresent(entity::setBathroomCount);
-        if (request.floor() != null) request.floor().ifPresent(entity::setFloor);
-        if (request.buildingAge() != null) request.buildingAge().ifPresent(entity::setBuildingAge);
+        // Present = set (null clears); absent = keep. Toggles only change when sent.
+        set(request.grossAreaM2(), entity::setGrossAreaM2);
+        set(request.netAreaM2(), entity::setNetAreaM2);
+        setText(request.roomConfigKey(), entity::setRoomConfigKey);
+        set(request.bathroomCount(), entity::setBathroomCount);
+        setText(request.floorKey(), entity::setFloorKey);
+        set(request.totalFloors(), entity::setTotalFloors);
+        set(request.buildingAge(), entity::setBuildingAge);
+        set(request.monthlyFee(), entity::setMonthlyFee);
+        setText(request.siteName(), entity::setSiteName);
+        set(request.gardenAreaM2(), entity::setGardenAreaM2);
+        set(request.landShareM2(), entity::setLandShareM2);
+        setText(request.zoningStatusKey(), entity::setZoningStatusKey);
+        setText(request.parcelNo(), entity::setParcelNo);
+        setText(request.blockNo(), entity::setBlockNo);
+        setText(request.sheetNo(), entity::setSheetNo);
+        set(request.floorAreaRatio(), entity::setFloorAreaRatio);
+        set(request.heightLimit(), entity::setHeightLimit);
+        set(request.roadFrontage(), entity::setRoadFrontage);
+        setText(request.infrastructureStatusKey(), entity::setInfrastructureStatusKey);
         if (request.furnished() != null) request.furnished().ifPresent(entity::setFurnished);
-        if (request.zoningStatus() != null) request.zoningStatus().ifPresent(entity::setZoningStatus);
-
-        // Premium fields
-        if (request.grossAreaM2() != null) request.grossAreaM2().ifPresent(entity::setGrossAreaM2);
-        if (request.netAreaM2() != null) request.netAreaM2().ifPresent(entity::setNetAreaM2);
-        if (request.usageStatus() != null) request.usageStatus().ifPresent(entity::setUsageStatus);
-        if (request.deedStatus() != null) request.deedStatus().ifPresent(entity::setDeedStatus);
-        if (request.roomConfigKey() != null) request.roomConfigKey().ifPresent(entity::setRoomConfigKey);
-        if (request.floorNumber() != null) request.floorNumber().ifPresent(entity::setFloorNumber);
-        if (request.totalFloors() != null) request.totalFloors().ifPresent(entity::setTotalFloors);
         if (request.hasBalcony() != null) request.hasBalcony().ifPresent(entity::setHasBalcony);
         if (request.hasElevator() != null) request.hasElevator().ifPresent(entity::setHasElevator);
         if (request.hasParking() != null) request.hasParking().ifPresent(entity::setHasParking);
-        if (request.monthlyFee() != null) request.monthlyFee().ifPresent(entity::setMonthlyFee);
-        if (request.isInSite() != null) request.isInSite().ifPresent(entity::setInSite);
-        if (request.siteName() != null) request.siteName().ifPresent(entity::setSiteName);
-        if (request.gardenAreaM2() != null) request.gardenAreaM2().ifPresent(entity::setGardenAreaM2);
-        if (request.landShareM2() != null) request.landShareM2().ifPresent(entity::setLandShareM2);
+        if (request.inSite() != null) request.inSite().ifPresent(entity::setInSite);
         if (request.hasPool() != null) request.hasPool().ifPresent(entity::setHasPool);
-        if (request.zoningStatusKey() != null) request.zoningStatusKey().ifPresent(entity::setZoningStatusKey);
-        if (request.parcelNo() != null) request.parcelNo().ifPresent(entity::setParcelNo);
-        if (request.blockNo() != null) request.blockNo().ifPresent(entity::setBlockNo);
-        if (request.sheetNo() != null) request.sheetNo().ifPresent(entity::setSheetNo);
-        if (request.floorAreaRatio() != null) request.floorAreaRatio().ifPresent(entity::setFloorAreaRatio);
-        if (request.heightLimit() != null) request.heightLimit().ifPresent(entity::setHeightLimit);
-        if (request.roadFrontage() != null) request.roadFrontage().ifPresent(entity::setRoadFrontage);
-        if (request.infrastructureStatusKey() != null) request.infrastructureStatusKey().ifPresent(entity::setInfrastructureStatusKey);
-        if (request.waterSource() != null) request.waterSource().ifPresent(entity::setWaterSource);
         if (request.electricityAvailable() != null) request.electricityAvailable().ifPresent(entity::setElectricityAvailable);
         if (request.roadAccess() != null) request.roadAccess().ifPresent(entity::setRoadAccess);
-
-        if (request.buildingCondition() != null) request.buildingCondition().ifPresent(cond -> {
-            try {
-                entity.setBuildingCondition(com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition.valueOf(cond));
-            } catch (Exception e) {
-                log.warn("Failed to parse building condition: {}", cond, e);
-            }
-        });
         if (request.exchangeable() != null) request.exchangeable().ifPresent(entity::setExchangeable);
-        if (request.hasNorthFacade() != null) request.hasNorthFacade().ifPresent(entity::setHasNorthFacade);
-        if (request.hasSouthFacade() != null) request.hasSouthFacade().ifPresent(entity::setHasSouthFacade);
-        if (request.hasEastFacade() != null) request.hasEastFacade().ifPresent(entity::setHasEastFacade);
-        if (request.hasWestFacade() != null) request.hasWestFacade().ifPresent(entity::setHasWestFacade);
+        if (request.attributes() != null) {
+            entity.getAttributes().clear();
+            request.attributes().ifPresent(entity.getAttributes()::putAll);
+        }
+    }
+
+    private static <T> void set(java.util.Optional<T> value, java.util.function.Consumer<T> setter) {
+        if (value != null) setter.accept(value.orElse(null));
+    }
+
+    private void setText(java.util.Optional<String> value, java.util.function.Consumer<String> setter) {
+        if (value != null) setter.accept(blankToNull(value.orElse(null)));
     }
 
     public void updateSports(SportsListing entity, SportsUpdateRequest request) {

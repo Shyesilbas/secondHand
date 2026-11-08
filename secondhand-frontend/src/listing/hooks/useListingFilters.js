@@ -132,25 +132,17 @@ export const useListingFilters = ({
  const adTypeId = params.get('adTypeId');
  const ownerTypeId = params.get('ownerTypeId');
  const heatingTypeId = params.get('heatingTypeIds') || params.get('heatingTypeId');
- const squareMeters = params.get('squareMeters');
- const roomCount = params.get('roomCount');
- const bathroomCount = params.get('bathroomCount');
- const floor = params.get('floor');
- const buildingAge = params.get('buildingAge');
+ const roomConfigKey = params.get('roomConfigKeys') || params.get('roomConfigKey');
  const furnished = params.get('furnished');
- const zoningStatus = params.get('zoningStatus');
+ const zoningStatusKey = params.get('zoningStatusKeys') || params.get('zoningStatusKey');
 
  if (realEstateTypeId) next.realEstateTypeIds = [realEstateTypeId];
  if (adTypeId) next.adTypeId = adTypeId;
  if (ownerTypeId) next.ownerTypeId = ownerTypeId;
  if (heatingTypeId) next.heatingTypeIds = [heatingTypeId];
- if (squareMeters) next.squareMeters = squareMeters;
- if (roomCount) next.roomCount = roomCount;
- if (bathroomCount) next.bathroomCount = bathroomCount;
- if (floor) next.floor = floor;
- if (buildingAge) next.buildingAge = buildingAge;
+ if (roomConfigKey) next.roomConfigKeys = [roomConfigKey];
  if (furnished !== null && furnished !== undefined) next.furnished = furnished === 'true';
- if (zoningStatus) next.zoningStatus = zoningStatus;
+ if (zoningStatusKey) next.zoningStatusKeys = [zoningStatusKey];
  } else if (category === LISTING_TYPES.CLOTHING) {
  const brandId = params.get('brands') || params.get('brandId');
  const typeId = params.get('types') || params.get('clothingTypeId');

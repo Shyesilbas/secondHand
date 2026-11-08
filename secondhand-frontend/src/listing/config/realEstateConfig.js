@@ -1,19 +1,37 @@
 import { Home } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
+import RealEstateMap from '../../realEstate/components/RealEstateMap.jsx';
 import { realEstateService } from '../../realEstate/services/realEstateService.js';
 import { RealEstateCreateRequestDTO } from '../../realEstate/realEstates.js';
+import { realEstateAttributeQuery } from '../../realEstate/services/realEstateAttributeQuery.js';
+import {
+	attributeKeysHiddenForAdType,
+	findRealEstateType,
+	isRealEstateFieldVisible,
+	ruledByRealEstateType,
+} from '../../realEstate/utils/realEstateRules.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
 
-// Category comes from the backend (realEstateTypes[].category), the single source of truth for subtype rules.
-export const getRealEstateCategory = (ctx) => {
-	const typeId = ctx?.formData?.realEstateTypeId || ctx?.selection?.realEstateTypeId;
-	if (!typeId) return '';
-	const found = (ctx?.enums?.realEstateTypes || []).find((t) => String(t.id) === String(typeId));
-	return String(found?.category || '').toUpperCase();
-};
-const isLand = (ctx) => getRealEstateCategory(ctx) === 'LAND';
-const isResidential = (ctx) => getRealEstateCategory(ctx) === 'RESIDENTIAL';
+// Fields follow the selected property type's rules (`realEstateTypes[].fieldRules`, backend
+// RealEstateTypeRulesValidator). Category comes from the backend (`realEstateTypes[].category`).
+const rule = (name) => ruledByRealEstateType(name);
 const CATEGORY_TO_SUBTYPE = { RESIDENTIAL: 'KONUT', COMMERCIAL: 'ISYERI', LAND: 'ARSA', OTHER: 'DIGER' };
+
+const hasValue = (key) => (listing) => {
+	const v = listing?.[key];
+	return v != null && v !== '' && v !== false;
+};
+const m2 = (_listing, v) => (v ? `${v} m²` : null);
+const yesNo = (_listing, v) => (v ? 'Evet' : null);
+const money = (listing, v) => (v != null && v !== '' ? `${Number(v).toLocaleString('tr-TR')} ${listing?.currency || 'TRY'}` : null);
+const isLandListing = (listing) => String(listing?.realEstateType?.category || '').toUpperCase() === 'LAND'
+	|| Boolean(listing?.zoningStatusKey);
+
+const resetFromType = ({ value, ctx }) => {
+	ctx.setValue('realEstateTypeId', value);
+	// Attribute definitions are scoped by the type's category; answers of the previous category would be rejected.
+	ctx.setValue('attributes', {});
+};
 
 export const realEstateConfig = {
 	label: 'Real Estate',
@@ -23,86 +41,172 @@ export const realEstateConfig = {
 	detailsComponent: GenericListingDetails,
 	detailsSchema: {
 		title: 'Real Estate Information',
-		fields: [
-			{ label: 'Ad Type', key: 'adType', enumKey: 'realEstateAdTypes' },
-			{ label: 'Property Type', key: 'realEstateType', enumKey: 'realEstateTypes' },
-			{ label: 'Heating Type', key: 'heatingType', enumKey: 'heatingTypes' },
-			{ label: 'Owner Type', key: 'ownerType', enumKey: 'ownerTypes' },
-			{ label: 'Square Meters', key: 'squareMeters', format: (_listing, v) => (v ? `${v} m²` : null) },
-			{ label: 'Room Count', key: 'roomCount' },
-			{ label: 'Room Plan', key: 'roomConfigKey', enumKey: 'roomConfigs', visibleWhen: (listing) => Boolean(listing?.roomConfigKey) },
-			{ label: 'Zoning Status', key: 'zoningStatus', visibleWhen: (listing) => Boolean(listing?.zoningStatus) },
-			{ label: 'Bathroom Count', key: 'bathroomCount' },
-			{ label: 'Floor', key: 'floor' },
-			{ label: 'Building Age', key: 'buildingAge', format: (_listing, v) => (v ? `${v} years` : null) },
-			{ label: 'Furnished', key: 'furnished', format: (_listing, v) => (v ? 'Yes' : 'No') },
+		sections: [
+			{
+				id: 'basic',
+				label: 'Genel',
+				fields: [
+					{ label: 'İlan tipi', key: 'adType', enumKey: 'realEstateAdTypes' },
+					{ label: 'Emlak tipi', key: 'realEstateType', enumKey: 'realEstateTypes' },
+					{ label: 'Kimden', key: 'ownerType', enumKey: 'ownerTypes' },
+					{ label: 'Brüt m²', key: 'grossAreaM2', format: m2, visibleWhen: hasValue('grossAreaM2') },
+					{ label: 'Net m²', key: 'netAreaM2', format: m2, visibleWhen: hasValue('netAreaM2') },
+					{ label: 'Oda sayısı', key: 'roomConfigKey', enumKey: 'roomConfigs', visibleWhen: hasValue('roomConfigKey') },
+					{ label: 'Banyo sayısı', key: 'bathroomCount', visibleWhen: hasValue('bathroomCount') },
+					{ label: 'Isıtma', key: 'heatingType', enumKey: 'heatingTypes', visibleWhen: hasValue('heatingType') },
+					{ label: 'Eşyalı', key: 'furnished', format: yesNo, visibleWhen: hasValue('furnished') },
+					{ label: 'Aidat', key: 'monthlyFee', format: money, visibleWhen: hasValue('monthlyFee') },
+					{ label: 'Takasa uygun', key: 'exchangeable', format: yesNo, visibleWhen: hasValue('exchangeable') },
+				],
+			},
+			{
+				id: 'building',
+				label: 'Bina',
+				visibleWhen: (listing) => !isLandListing(listing),
+				fields: [
+					{ label: 'Bulunduğu kat', key: 'floorKey', enumKey: 'floors', visibleWhen: hasValue('floorKey') },
+					{ label: 'Kat sayısı', key: 'totalFloors', visibleWhen: hasValue('totalFloors') },
+					{ label: 'Bina yaşı', key: 'buildingAge', format: (_l, v) => (v === 0 ? 'Sıfır bina' : v ? `${v} yıl` : null), visibleWhen: (l) => l?.buildingAge != null },
+					{ label: 'Bina durumu', key: 'buildingCondition', enumKey: 'buildingConditions', visibleWhen: hasValue('buildingCondition') },
+					{ label: 'Asansör', key: 'hasElevator', format: yesNo, visibleWhen: hasValue('hasElevator') },
+					{ label: 'Balkon', key: 'hasBalcony', format: yesNo, visibleWhen: hasValue('hasBalcony') },
+					{ label: 'Otopark', key: 'hasParking', format: yesNo, visibleWhen: hasValue('hasParking') },
+					{ label: 'Site içinde', key: 'inSite', format: yesNo, visibleWhen: hasValue('inSite') },
+					{ label: 'Site adı', key: 'siteName', visibleWhen: hasValue('siteName') },
+					{ label: 'Havuz', key: 'hasPool', format: yesNo, visibleWhen: hasValue('hasPool') },
+					{ label: 'Bahçe', key: 'gardenAreaM2', format: m2, visibleWhen: hasValue('gardenAreaM2') },
+					{ label: 'Arsa payı', key: 'landShareM2', format: m2, visibleWhen: hasValue('landShareM2') },
+				],
+			},
+			{
+				id: 'land',
+				label: 'İmar',
+				visibleWhen: isLandListing,
+				fields: [
+					{ label: 'İmar durumu', key: 'zoningStatusKey', enumKey: 'zoningStatuses', visibleWhen: hasValue('zoningStatusKey') },
+					{ label: 'Ada', key: 'blockNo', visibleWhen: hasValue('blockNo') },
+					{ label: 'Parsel', key: 'parcelNo', visibleWhen: hasValue('parcelNo') },
+					{ label: 'Pafta', key: 'sheetNo', visibleWhen: hasValue('sheetNo') },
+					{ label: 'Emsal (KAKS)', key: 'floorAreaRatio', visibleWhen: hasValue('floorAreaRatio') },
+					{ label: 'Gabari', key: 'heightLimit', format: (_l, v) => (v ? `${v} m` : null), visibleWhen: hasValue('heightLimit') },
+					{ label: 'Yol cephesi', key: 'roadFrontage', format: (_l, v) => (v ? `${v} m` : null), visibleWhen: hasValue('roadFrontage') },
+					{ label: 'Altyapı', key: 'infrastructureStatusKey', enumKey: 'infrastructureStatuses', visibleWhen: hasValue('infrastructureStatusKey') },
+					{ label: 'Elektrik', key: 'electricityAvailable', format: yesNo, visibleWhen: hasValue('electricityAvailable') },
+					{ label: 'Yol', key: 'roadAccess', format: yesNo, visibleWhen: hasValue('roadAccess') },
+				],
+			},
+			{
+				id: 'condition',
+				label: 'Tapu ve kullanım',
+				kind: 'attributes',
+				definitionsQuery: (listing) => realEstateAttributeQuery(listing?.realEstateType?.id),
+			},
+			{
+				id: 'map',
+				label: 'Konum',
+				kind: 'component',
+				component: RealEstateMap,
+				visibleWhen: (listing) => listing?.latitude != null && listing?.longitude != null,
+			},
 		],
 	},
 	formSchema: {
-		initialData: {
-			...RealEstateCreateRequestDTO,
-			title: '', description: '', price: '', squareMeters: '', roomCount: '',
-			bathroomCount: '', floor: '', buildingAge: '', zoningStatus: '', zoningStatusKey: '', roomConfigKey: '', _realEstateTypeName: '',
-		},
+		initialData: { ...RealEstateCreateRequestDTO, title: '', description: '', price: '' },
 		steps: [
 			{ id: 1, title: 'Basic Information', description: 'Set the title, description and price of your listing', kind: 'basics', showQuantity: false },
 			{
 				id: 2, title: 'Property Details', description: 'Specify the property specifications', kind: 'details',
 				sections: [
 					{
-						id: 'realestate-basic', title: 'Basic Information', description: 'Ad type, property type and ownership status',
+						id: 'realestate-basic', title: 'Genel bilgiler', description: 'İlan tipi, emlak tipi ve ilan sahibi',
 						fields: [
-							{ name: 'adTypeId', label: 'Ad Type', type: 'enum', enumKey: 'realEstateAdTypes', required: true },
-							{ name: 'realEstateTypeId', label: 'Property Type', type: 'enum', enumKey: 'realEstateTypes', required: true },
-							{ name: 'heatingTypeId', label: 'Heating Type', type: 'enum', enumKey: 'heatingTypes', required: true, visibleWhen: (ctx) => !isLand(ctx) },
-							{ name: 'ownerTypeId', label: 'Owner Type', type: 'enum', enumKey: 'ownerTypes', required: true },
+							{ name: 'adTypeId', label: 'İlan tipi', type: 'enum', enumKey: 'realEstateAdTypes', required: true },
+							{ name: 'realEstateTypeId', label: 'Emlak tipi', type: 'enum', enumKey: 'realEstateTypes', required: true, onChange: resetFromType },
+							{ name: 'ownerTypeId', label: 'Kimden', type: 'enum', enumKey: 'ownerTypes', required: true },
+							{ name: 'heatingTypeId', label: 'Isıtma', type: 'enum', enumKey: 'heatingTypes', ...rule('heatingType') },
 						],
 					},
 					{
-						id: 'realestate-physical', title: 'Physical Characteristics', description: 'Square meters, number of rooms and other details',
+						id: 'realestate-area', title: 'Alan ve oda', description: 'Alanlar emlak tipine göre değişir',
+						visibleWhen: (ctx) => Boolean(findRealEstateType(ctx)),
 						fields: [
-							{ name: 'squareMeters', label: 'Square Meters', type: 'number', required: true, min: 0 },
-							{ name: 'roomConfigKey', label: 'Room Plan', type: 'enum', enumKey: 'roomConfigs', required: true, visibleWhen: isResidential },
-								{ name: 'roomCount', label: 'Room Count', type: 'number', required: true, min: 1, visibleWhen: (ctx) => !isLand(ctx) && !isResidential(ctx) },
-							{ name: 'bathroomCount', label: 'Bathroom Count', type: 'number', min: 0, visibleWhen: (ctx) => !isLand(ctx) },
-							{ name: 'floor', label: 'Floor', type: 'number', min: 0, visibleWhen: (ctx) => !isLand(ctx) },
-							{ name: 'buildingAge', label: 'Building Age', type: 'number', min: 0, visibleWhen: (ctx) => !isLand(ctx) },
-							{ name: 'zoningStatusKey', label: 'Zoning Status', type: 'enum', enumKey: 'zoningStatuses', required: true, visibleWhen: isLand },
+							{ name: 'grossAreaM2', label: 'Brüt m²', type: 'number', min: 1, ...rule('grossAreaM2') },
+							{ name: 'netAreaM2', label: 'Net m²', type: 'number', min: 1, ...rule('netAreaM2') },
+							{ name: 'roomConfigKey', label: 'Oda sayısı', type: 'enum', enumKey: 'roomConfigs', ...rule('roomConfigKey') },
+							{ name: 'bathroomCount', label: 'Banyo sayısı', type: 'number', min: 0, ...rule('bathroomCount') },
+							{ name: 'gardenAreaM2', label: 'Bahçe (m²)', type: 'number', min: 1, ...rule('gardenAreaM2') },
+							{ name: 'landShareM2', label: 'Arsa payı (m²)', type: 'number', min: 1, ...rule('landShareM2') },
 						],
 					},
 					{
-						id: 'realestate-extras', title: 'Additional Information', description: 'Furnished status',
-						visibleWhen: (ctx) => !isLand(ctx),
-						fields: [{ name: 'furnished', label: 'Furnished', type: 'toggle' }],
+						id: 'realestate-building', title: 'Bina ve kat',
+						visibleWhen: (ctx) => Boolean(findRealEstateType(ctx)),
+						fields: [
+							{ name: 'floorKey', label: 'Bulunduğu kat', type: 'enum', enumKey: 'floors', ...rule('floorKey') },
+							{ name: 'totalFloors', label: 'Kat sayısı', type: 'number', min: 1, ...rule('totalFloors') },
+							{ name: 'buildingAge', label: 'Bina yaşı', type: 'number', min: 0, max: 200, ...rule('buildingAge') },
+							{ name: 'buildingCondition', label: 'Bina durumu', type: 'enum', enumKey: 'buildingConditions', ...rule('buildingCondition') },
+							{ name: 'monthlyFee', label: 'Aidat (TL)', type: 'number', min: 0, ...rule('monthlyFee') },
+							{
+								name: 'siteName', label: 'Site adı', type: 'text',
+								visibleWhen: (ctx) => isRealEstateFieldVisible(ctx, 'siteName') && Boolean(ctx.formData?.inSite),
+							},
+							{ name: 'hasElevator', label: 'Asansör', type: 'toggle', ...rule('hasElevator') },
+							{ name: 'hasBalcony', label: 'Balkon', type: 'toggle', ...rule('hasBalcony') },
+							{ name: 'hasParking', label: 'Otopark', type: 'toggle', ...rule('hasParking') },
+							{ name: 'furnished', label: 'Eşyalı', type: 'toggle', ...rule('furnished') },
+							{ name: 'inSite', label: 'Site içinde', type: 'toggle', ...rule('inSite') },
+							{ name: 'hasPool', label: 'Havuz', type: 'toggle', ...rule('hasPool') },
+						],
+					},
+					{
+						id: 'realestate-land', title: 'İmar ve parsel',
+						visibleWhen: (ctx) => Boolean(findRealEstateType(ctx)),
+						fields: [
+							{ name: 'zoningStatusKey', label: 'İmar durumu', type: 'enum', enumKey: 'zoningStatuses', ...rule('zoningStatusKey') },
+							{ name: 'blockNo', label: 'Ada', type: 'text', ...rule('blockNo') },
+							{ name: 'parcelNo', label: 'Parsel', type: 'text', ...rule('parcelNo') },
+							{ name: 'sheetNo', label: 'Pafta', type: 'text', ...rule('sheetNo') },
+							{ name: 'floorAreaRatio', label: 'Emsal (KAKS)', type: 'number', min: 0, ...rule('floorAreaRatio') },
+							{ name: 'heightLimit', label: 'Gabari (m)', type: 'number', min: 0, ...rule('heightLimit') },
+							{ name: 'roadFrontage', label: 'Yol cephesi (m)', type: 'number', min: 0, ...rule('roadFrontage') },
+							{ name: 'infrastructureStatusKey', label: 'Altyapı', type: 'enum', enumKey: 'infrastructureStatuses', ...rule('infrastructureStatusKey') },
+							{ name: 'electricityAvailable', label: 'Elektrik var', type: 'toggle', ...rule('electricityAvailable') },
+							{ name: 'roadAccess', label: 'Yola cephe', type: 'toggle', ...rule('roadAccess') },
+						],
+					},
+					{
+						id: 'realestate-attributes',
+						kind: 'attributes',
+						title: 'Tapu, kullanım ve kira koşulları',
+						description: 'Boş bıraktıkların ilanda görünmez',
+						visibleWhen: (ctx) => Boolean(ctx.formData?.realEstateTypeId),
+						definitionsQuery: (ctx) => realEstateAttributeQuery(ctx.formData?.realEstateTypeId),
+						excludeKeys: attributeKeysHiddenForAdType,
+					},
+					{
+						id: 'realestate-extras', title: 'Diğer',
+						fields: [{ name: 'exchangeable', label: 'Takasa uygun', type: 'toggle' }],
 					},
 				],
 			},
-			{ id: 3, title: 'Location', description: 'Set the location of your item', kind: 'mediaLocation' },
+			{ id: 3, title: 'Location', description: 'Haritada mahallenin yaklaşık konumu gösterilir; adresin paylaşılmaz', kind: 'mediaLocation' },
 		],
 		derivedFields: [{ sourceField: 'realEstateTypeId', enumKey: 'realEstateTypes', targetField: '_realEstateTypeName', uppercase: true }],
-		effects: [
-			(ctx) => {
-				const land = isLand(ctx);
-				if (land) {
-					if (ctx.formData?.heatingTypeId) ctx.setValue('heatingTypeId', '');
-					if (ctx.formData?.bathroomCount) ctx.setValue('bathroomCount', '');
-					if (ctx.formData?.floor) ctx.setValue('floor', '');
-					if (ctx.formData?.buildingAge) ctx.setValue('buildingAge', '');
-					if (ctx.formData?.furnished) ctx.setValue('furnished', false);
-				} else if (ctx.formData?.zoningStatusKey || ctx.formData?.zoningStatus) {
-					ctx.setValue('zoningStatusKey', '');
-					ctx.setValue('zoningStatus', '');
-				}
-				// Land has no rooms and residential rooms come from the room plan (the backend derives roomCount).
-				if ((land || isResidential(ctx)) && String(ctx.formData?.roomCount ?? '') !== '0') ctx.setValue('roomCount', 0);
-				if (!isResidential(ctx) && ctx.formData?.roomConfigKey) ctx.setValue('roomConfigKey', '');
-			},
-		],
 		getTitle: ({ isEdit }) => (isEdit ? 'Edit Real Estate Listing' : 'Create Real Estate Listing'),
 		getSubtitle: ({ isEdit }) => (isEdit ? 'Update your real estate listing details' : 'Create your real estate listing step by step'),
 		normalizeInitialData: (data) => {
 			if (!data) return null;
-			return { ...data, adTypeId: data?.adTypeId || data?.adType?.id || '', realEstateTypeId: data?.realEstateTypeId || data?.realEstateType?.id || '', heatingTypeId: data?.heatingTypeId || data?.heatingType?.id || '', ownerTypeId: data?.ownerTypeId || data?.ownerType?.id || '' };
+			const out = {
+				...data,
+				adTypeId: data?.adTypeId || data?.adType?.id || '',
+				realEstateTypeId: data?.realEstateTypeId || data?.realEstateType?.id || '',
+				heatingTypeId: data?.heatingTypeId || data?.heatingType?.id || '',
+				ownerTypeId: data?.ownerTypeId || data?.ownerType?.id || '',
+				attributes: data?.attributes && typeof data.attributes === 'object' ? data.attributes : {},
+			};
+			Object.keys(out).forEach((k) => { if (out[k] === null) out[k] = ''; });
+			return out;
 		},
 	},
 	service: {
@@ -145,16 +249,16 @@ export const realEstateConfig = {
 			{ enumKey: 'realEstateAdTypes', initialDataKey: 'adTypeId', title: 'Choose ad type', description: 'Select an ad type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], paramKey: 'adTypeId' },
 			{
 				enumKey: 'heatingTypes', initialDataKey: 'heatingTypeId', title: 'Choose heating type', description: 'Select a heating type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], prefilter: false,
-				visibleWhen: (ctx) => !isLand(ctx),
+				visibleWhen: (ctx) => isRealEstateFieldVisible(ctx, 'heatingType'),
 			},
 			{ enumKey: 'ownerTypes', initialDataKey: 'ownerTypeId', title: 'Choose owner type', description: 'Select an owner type to tailor the form fields.', kind: 'grid', dependsOn: ['realEstateTypeId'], paramKey: 'ownerTypeId' },
 		],
 	},
 	filterConfig: filterConfigs.REAL_ESTATE,
 	sortOptions: [
-		{ value: 'squareMeters', label: 'Square Meters' }, { value: 'roomCount', label: 'Room Count' },
-		{ value: 'buildingAge', label: 'Building Age' }, { value: 'floor', label: 'Floor' },
+		{ value: 'grossArea', label: 'Brüt m²' }, { value: 'roomCount', label: 'Oda sayısı' },
+		{ value: 'buildingAge', label: 'Bina yaşı' }, { value: 'floor', label: 'Kat' },
 		{ value: 'price', label: 'Price' }, { value: 'createdAt', label: 'Date Added' },
 	],
-	defaultFilters: { minSquareMeters: 0, minRoomCount: 1 },
+	defaultFilters: {},
 };

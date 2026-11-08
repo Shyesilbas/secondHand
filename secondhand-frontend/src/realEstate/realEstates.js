@@ -1,4 +1,6 @@
 import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+import { cleanAttributes } from '../listing/components/attributes/attributeValues.js';
+import { REAL_ESTATE_FIELDS } from './utils/realEstateRules.js';
 
 export const RealEstateCreateRequestDTO = {
 	title: '',
@@ -13,56 +15,56 @@ export const RealEstateCreateRequestDTO = {
 	realEstateTypeId: '',
 	heatingTypeId: '',
 	ownerTypeId: '',
-	squareMeters: 0,
-	roomCount: 0,
-	bathroomCount: 0,
-	floor: 0,
-	buildingAge: 0,
-	furnished: false,
-	zoningStatus: '',
-	zoningStatusKey: '',
-	roomConfigKey: '',
+	...Object.fromEntries([...REAL_ESTATE_FIELDS.integer, ...REAL_ESTATE_FIELDS.decimal, ...REAL_ESTATE_FIELDS.text].map((k) => [k, ''])),
+	...Object.fromEntries(REAL_ESTATE_FIELDS.toggle.map((k) => [k, false])),
+	attributes: {},
 	_realEstateTypeName: '',
 };
 
-export const createRealEstateCreateRequest = (data) => {
-	return {
-		base: createListingBaseCreatePayload(data),
-
-		adTypeId: data.adTypeId || null,
-		realEstateTypeId: data.realEstateTypeId || null,
-		heatingTypeId: data.heatingTypeId || null,
-		ownerTypeId: data.ownerTypeId || null,
-		squareMeters: parseInt(data.squareMeters) || 0,
-		roomCount: parseInt(data.roomCount) || 0,
-		bathroomCount: parseInt(data.bathroomCount) || 0,
-		floor: parseInt(data.floor) || 0,
-		buildingAge: parseInt(data.buildingAge) || 0,
-		furnished: Boolean(data.furnished),
-		zoningStatus: (data.zoningStatus || '').trim() || null,
-		zoningStatusKey: (data.zoningStatusKey || '').trim() || undefined,
-		roomConfigKey: (data.roomConfigKey || '').trim() || undefined,
-	};
+const toInt = (v) => {
+	const n = parseInt(v, 10);
+	return Number.isFinite(n) ? n : null;
 };
+
+const toDecimal = (v) => {
+	const n = Number.parseFloat(String(v).replace(',', '.'));
+	return Number.isFinite(n) ? n : null;
+};
+
+/**
+ * Every rule-governed field is sent, empty ones as null, so an edit can clear a value; the backend also clears
+ * the fields the property type hides.
+ */
+const specPayload = (data) => {
+	const out = {};
+	REAL_ESTATE_FIELDS.integer.forEach((k) => { out[k] = data[k] === '' || data[k] == null ? null : toInt(data[k]); });
+	REAL_ESTATE_FIELDS.decimal.forEach((k) => { out[k] = data[k] === '' || data[k] == null ? null : toDecimal(data[k]); });
+	REAL_ESTATE_FIELDS.text.forEach((k) => { out[k] = String(data[k] ?? '').trim() || null; });
+	REAL_ESTATE_FIELDS.toggle.forEach((k) => { out[k] = Boolean(data[k]); });
+	return out;
+};
+
+export const createRealEstateCreateRequest = (data) => ({
+	base: createListingBaseCreatePayload(data),
+	adTypeId: data.adTypeId || null,
+	realEstateTypeId: data.realEstateTypeId || null,
+	heatingTypeId: data.heatingTypeId || null,
+	ownerTypeId: data.ownerTypeId || null,
+	...specPayload(data),
+	attributes: cleanAttributes(data.attributes),
+});
 
 export const createRealEstateUpdateRequest = (data) => {
 	const updateData = {};
-
 	const base = createListingBaseUpdatePayload(data);
-	if (data.adTypeId !== undefined && data.adTypeId !== '') updateData.adTypeId = data.adTypeId;
-	if (data.realEstateTypeId !== undefined && data.realEstateTypeId !== '') updateData.realEstateTypeId = data.realEstateTypeId;
-	if (data.heatingTypeId !== undefined && data.heatingTypeId !== '') updateData.heatingTypeId = data.heatingTypeId;
-	if (data.ownerTypeId !== undefined && data.ownerTypeId !== '') updateData.ownerTypeId = data.ownerTypeId;
-	if (data.squareMeters !== undefined && data.squareMeters !== '') updateData.squareMeters = parseInt(data.squareMeters);
-	if (data.roomCount !== undefined && data.roomCount !== '') updateData.roomCount = parseInt(data.roomCount);
-	if (data.bathroomCount !== undefined && data.bathroomCount !== '') updateData.bathroomCount = parseInt(data.bathroomCount);
-	if (data.floor !== undefined && data.floor !== '') updateData.floor = parseInt(data.floor);
-	if (data.buildingAge !== undefined && data.buildingAge !== '') updateData.buildingAge = parseInt(data.buildingAge);
-	if (data.furnished !== undefined) updateData.furnished = Boolean(data.furnished);
-	if (data.zoningStatus !== undefined && data.zoningStatus !== '') updateData.zoningStatus = data.zoningStatus.trim();
-	if (data.zoningStatusKey !== undefined && data.zoningStatusKey !== '') updateData.zoningStatusKey = data.zoningStatusKey.trim();
-	if (data.roomConfigKey !== undefined && data.roomConfigKey !== '') updateData.roomConfigKey = data.roomConfigKey.trim();
+	if (data.adTypeId) updateData.adTypeId = data.adTypeId;
+	if (data.realEstateTypeId) updateData.realEstateTypeId = data.realEstateTypeId;
+	// Sent as null to clear (heating is hidden for land).
+	if (data.heatingTypeId !== undefined) updateData.heatingTypeId = data.heatingTypeId || null;
+	if (data.ownerTypeId) updateData.ownerTypeId = data.ownerTypeId;
+	Object.assign(updateData, specPayload(data));
+	// Sent whole: the backend replaces the stored attributes, so a cleared answer is removed.
+	if (data.attributes !== undefined) updateData.attributes = cleanAttributes(data.attributes);
 	if (Object.keys(base).length > 0) updateData.base = base;
-
 	return updateData;
 };

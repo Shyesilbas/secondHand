@@ -20,7 +20,9 @@ import {
  */
 const ListingAttributeSection = ({ section, ctx, title, description }) => {
 	const query = useQuery(section.definitionsQuery(ctx));
-	const definitions = listingLevelDefinitions(query.data);
+	// `excludeKeys(ctx)` hides definitions that do not apply right now (e.g. rent-only answers on a sale listing).
+	const excluded = typeof section.excludeKeys === 'function' ? section.excludeKeys(ctx) : [];
+	const definitions = listingLevelDefinitions(query.data).filter((d) => !excluded.includes(d.key));
 	const attributes = ctx.formData?.attributes || {};
 	const errors = ctx.errors || {};
 

@@ -43,8 +43,8 @@ stateDiagram-v2
 ## Catalog Seeds
 - Run with `APP_SEED=<key[,key]|listing|all>`; seeds are idempotent upserts from `src/main/resources/data/**`.
 - `CatalogLegacyPruner` deletes rows missing from the JSON only if no foreign key references them. Real estate seeds also realign `name` to the JSON key (rows are matched by id).
-- After all seeds `CatalogSeedStartupRunner` clears the `catalog:*` caches; `GET /api/v1/enums/all` (gzip, 5 min browser cache) also serves `roomConfigs` and `zoningStatuses`.
-- The frontend derives land/residential behavior from `realEstateTypes[].category` and equipment options from `sportEquipmentTypes[].disciplineId`; do not hardcode type names.
+- After all seeds `CatalogSeedStartupRunner` clears the `catalog:*` caches; `GET /api/v1/enums/all` (gzip, 5 min browser cache) also serves `roomConfigs`, `zoningStatuses`, `floors`, `infrastructureStatuses` and `buildingConditions`.
+- The frontend derives real estate form fields from `realEstateTypes[].fieldRules` and equipment options from `sportEquipmentTypes[].disciplineId`; do not hardcode type names.
 
 ## Attributes (shared, all listing types)
 - `listing_attribute_definitions` (+ `listing_attribute_options`) declare which extra keys a listing type accepts; `scope_key` narrows a definition (vehicle type name, e.g. `CAR`), `ALL` applies to every scope. Seeded from `data/attributes/<type>.json` with seed key `attributes` (part of `listing`).
@@ -70,8 +70,16 @@ stateDiagram-v2
 - Lookups: `GET /api/v1/catalog/electronics/models/{id}` (specs, colors, variants) and `/attributes?typeId=` (public). `/api/v1/enums/all` `electronicModels[]` also carry `specs`, `colors`, `variants` and `catalogSource`, so the form works synchronously.
 - Listing form (`secondhand-frontend/src/listing/config/electronicsConfig.js`): fields follow the type rules, catalog values are read-only (catalog toggles are hidden), a model with official colors offers those instead of the generic list.
 
+## Real Estate Catalog
+- Property types: `data/realestate/realestate.json` gives each type a `category` (RESIDENTIAL/LAND/COMMERCIAL/OTHER, also the attribute scope), `sortOrder` and a `fields` rule (`REQUIRED`/`OPTIONAL`/`HIDDEN`) for every field in `RealEstateSpecFields`; stored on `real_estate_types` (V44) and served in `realEstateTypes[]` of `/api/v1/enums/all`. The seed fails if a type misses a field or makes a toggle REQUIRED. Ad types are only FOR_SALE and FOR_RENT.
+- `RealEstateTypeRulesValidator` applies the rules (`REAL_ESTATE_<FIELD>_REQUIRED`, hidden fields cleared, spec keys checked against `data/realestate/specs.json`, `REAL_ESTATE_FLOOR_ABOVE_TOTAL`, `REAL_ESTATE_NET_AREA_ABOVE_GROSS`). `roomCount` is derived from `roomConfigKey`, `floorNumber` from `floorKey` (ROOF = total floors); `deposit`/`minLeaseMonths` are kept only for rent, `loanEligible` only for sale.
+- Deed, usage status, facades, water source, loan eligibility, deposit and minimum lease are attribute definitions in `data/attributes/realestate.json` (scoped by category); V44 moved the old columns there and folded `square_meters`/`floor`/`zoning_status` into `gross_area_m2`/`floor_number`/`zoning_status_key`.
+- Map point: `RealEstateLocationService` stores a random point 100-300 m from the neighborhood center (`lat`/`lon` in `data/common/locations.json`, from OpenStreetMap) on create and when the neighborhood changes; no address is stored. Neighborhoods without coordinates get no point and no map.
+- Lookups: `GET /api/v1/catalog/real-estate/attributes?typeId=` (public). Form: `secondhand-frontend/src/listing/config/realEstateConfig.js`; the detail page shows an approximate-area Leaflet map.
+
 ## Listing Generator (local profile only)
-- `--app.seed=listings-generate` creates published vehicle and electronics listings for every ACTIVE user whose email is not `@example.test`, round-robin. Counts and randomness: `app.listing-generator.vehicles` / `.electronics` (default 200 each), `.seed` (42). Never part of `all`.
+- `--app.seed=listings-generate` creates published vehicle, electronics and real estate listings for every ACTIVE user whose email is not `@example.test`, round-robin. Counts and randomness: `app.listing-generator.vehicles` / `.electronics` / `.realestate` (default 200 each, 0 skips), `.seed` (42). Never part of `all`.
+- Real estate prices come from `data/listing-generator/realestate-prices.json` (git-ignored, `claude-draft`): sale and rent TL/m² per city plus district factors; the city is picked by its weight there. Rooms, area, floor, age and amenities are drawn per property type; real estate listings have no photos.
 - Prices come from `data/listing-generator/prices.json` (git-ignored, `claude-draft` estimates in TRY): vehicles per generation for an `anchorYear`, electronics per model for the cheapest variant (TVs: 55"). Unknown brand/model/generation names fail the run.
 - Listings go through `createListing` (validation, catalog snapshot, inventory), then fee-paid + `publish()` without `ListingPaymentHandler` or `NewListingCreatedEvent`, so no payment, notification or e-mail. `created_at` is spread over the last 120 days.
 - Photos come from `data/listing-generator/photos.json` (git-ignored; Wikimedia Commons photos already uploaded to Cloudinary `secondhand-generated/`), keyed by generation name or `TYPE|brand|model`. The photo sets the listing color; models without photos get `imageUrl = null`.

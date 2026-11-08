@@ -36,9 +36,9 @@ import java.util.*;
 public class LocationCatalogService {
 
     private static final String CATALOG_PATH = "data/common/locations.json";
-    private static final String CITIES_KEY = "v5:catalog:locations:cities";
-    private static final String DISTRICTS_HASH_KEY = "v5:catalog:locations:districts";
-    private static final String NEIGHBORHOODS_HASH_KEY = "v5:catalog:locations:neighborhoods";
+    private static final String CITIES_KEY = "v6:catalog:locations:cities";
+    private static final String DISTRICTS_HASH_KEY = "v6:catalog:locations:districts";
+    private static final String NEIGHBORHOODS_HASH_KEY = "v6:catalog:locations:neighborhoods";
     private static final Duration CATALOG_TTL = Duration.ofDays(7);
 
     private final ObjectMapper objectMapper;
@@ -150,6 +150,13 @@ public class LocationCatalogService {
         return getDistricts(cityKey).stream().anyMatch(d -> upper.equals(d.getKey()));
     }
 
+    /** The neighborhood of a district, with its center coordinates when locations.json has them. */
+    public Optional<NeighborhoodDto> findNeighborhood(String districtKey, String neighborhoodKey) {
+        if (districtKey == null || neighborhoodKey == null) return Optional.empty();
+        String upper = neighborhoodKey.toUpperCase(Locale.ENGLISH);
+        return getNeighborhoods(districtKey).stream().filter(n -> upper.equals(n.getKey())).findFirst();
+    }
+
     public boolean isValidNeighborhood(String districtKey, String neighborhoodKey) {
         if (districtKey == null || neighborhoodKey == null) return false;
         String upper = neighborhoodKey.toUpperCase(Locale.ENGLISH);
@@ -190,7 +197,8 @@ public class LocationCatalogService {
                             for (JsonNode neighborhoodNode : neighborhoodsNode) {
                                 String nbKey = neighborhoodNode.get("key").asText().toUpperCase(Locale.ENGLISH);
                                 String nbLabel = neighborhoodNode.get("label").asText();
-                                neighborhoods.add(new NeighborhoodDto(nbKey, nbLabel));
+                                neighborhoods.add(new NeighborhoodDto(nbKey, nbLabel,
+                                        coordinate(neighborhoodNode, "lat"), coordinate(neighborhoodNode, "lon")));
                             }
                         }
                         if (neighborhoods.isEmpty()) {
@@ -260,7 +268,8 @@ public class LocationCatalogService {
                         JsonNode nbNodes = d.get("neighborhoods");
                         if (nbNodes != null)
                             for (JsonNode nb : nbNodes)
-                                result.add(new NeighborhoodDto(nb.get("key").asText(), nb.get("label").asText()));
+                                result.add(new NeighborhoodDto(nb.get("key").asText(), nb.get("label").asText(),
+                                        coordinate(nb, "lat"), coordinate(nb, "lon")));
                         return result;
                     }
                 }
@@ -295,5 +304,17 @@ public class LocationCatalogService {
     public static class NeighborhoodDto {
         private String key;
         private String label;
+        /** Approximate center (OpenStreetMap); null when unknown. */
+        private Double lat;
+        private Double lon;
+
+        public NeighborhoodDto(String key, String label) {
+            this(key, label, null, null);
+        }
+    }
+
+    private static Double coordinate(JsonNode node, String field) {
+        JsonNode value = node.get(field);
+        return value != null && value.isNumber() ? value.asDouble() : null;
     }
 }

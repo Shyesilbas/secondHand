@@ -5,14 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.seed.CatalogLegacyPruner;
 import com.serhat.secondhand.core.seed.SeedTask;
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateTypeRepository;
+import com.serhat.secondhand.listing.validation.realestate.RealEstateSpecFields;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -31,8 +35,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * Seeds real estate reference data (property types, ad types, heating types,
- * owner types) from {@code classpath:seed/realestate.json}.
+ * Seeds real estate reference data (property types with category and field rules, ad types, heating types,
+ * owner types) from {@code data/realestate/realestate.json}.
  *
  * <p>Uses a <b>deterministic-UUID upsert</b> strategy:
  * <ul>
@@ -133,29 +137,53 @@ public class RealEstateDataInitializer implements SeedTask {
     private void seedPropertyTypes(JsonNode propertyTypesNode) {
         if (propertyTypesNode == null || !propertyTypesNode.isArray()) return;
         for (JsonNode node : propertyTypesNode) {
+            String key = node.get("key").asText();
             upsertPropertyType(
                     UUID.fromString(node.get("id").asText()),
-                    node.get("key").asText(),
-                    node.get("label").asText()
+                    key,
+                    node.get("label").asText(),
+                    RealEstateCategory.valueOf(node.get("category").asText()),
+                    node.path("sortOrder").asInt(0),
+                    fieldRules(key, node.get("fields"))
             );
         }
     }
 
-    private void upsertPropertyType(UUID id, String key, String label) {
-        Optional<RealEstateType> existing = realEstateTypeRepository.findById(id);
-        if (existing.isPresent()) {
-            RealEstateType type = existing.get();
-            type.setName(key);
-            type.setLabel(label);
-            type.markNotNew();
-            realEstateTypeRepository.save(type);
-            return;
+    /** Every type names every field of {@link RealEstateSpecFields}; toggles cannot be REQUIRED. */
+    private Map<String, SpecFieldRule> fieldRules(String typeKey, JsonNode fields) {
+        if (fields == null || !fields.isObject()) {
+            throw new IllegalStateException("Real estate type " + typeKey + " has no \"fields\" rules");
         }
-        RealEstateType type = new RealEstateType();
-        type.setId(id);
+        Map<String, SpecFieldRule> rules = new LinkedHashMap<>();
+        fields.fields().forEachRemaining(e -> rules.put(e.getKey(), SpecFieldRule.valueOf(e.getValue().asText())));
+        if (!rules.keySet().equals(RealEstateSpecFields.ALL.keySet())) {
+            throw new IllegalStateException("Real estate type " + typeKey + " must rule exactly the fields "
+                    + RealEstateSpecFields.ALL.keySet());
+        }
+        RealEstateSpecFields.ALL.values().stream()
+                .filter(f -> f.toggle() && rules.get(f.name()) == SpecFieldRule.REQUIRED)
+                .findFirst()
+                .ifPresent(f -> {
+                    throw new IllegalStateException("Toggle " + f.name() + " cannot be REQUIRED (" + typeKey + ")");
+                });
+        return rules;
+    }
+
+    private void upsertPropertyType(UUID id, String key, String label, RealEstateCategory category, int sortOrder,
+                                    Map<String, SpecFieldRule> rules) {
+        RealEstateType type = realEstateTypeRepository.findById(id).orElse(null);
+        if (type == null) {
+            type = new RealEstateType();
+            type.setId(id);
+            // isNew defaults to true → Spring Data will INSERT
+        } else {
+            type.markNotNew();
+        }
         type.setName(key);
         type.setLabel(label);
-        // isNew defaults to true → Spring Data will INSERT
+        type.setCategory(category);
+        type.setSortOrder(sortOrder);
+        type.setFieldRules(rules);
         realEstateTypeRepository.save(type);
     }
 

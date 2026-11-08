@@ -45,7 +45,7 @@ public final class ElectronicSpecFields {
 
     private static void add(String name, String label,
                             Function<ElectronicListing, Object> getter, Consumer<ElectronicListing> clearer) {
-        String code = "ELECTRONIC_" + name.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase() + "_REQUIRED";
+        String code = "ELECTRONIC_" + name.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(java.util.Locale.ROOT) + "_REQUIRED";
         ALL.put(name, new Field(name, label, code, getter, clearer));
     }
 }

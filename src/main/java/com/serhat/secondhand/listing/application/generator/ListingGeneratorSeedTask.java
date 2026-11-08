@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Local-only seed ({@code --app.seed=listings-generate}): creates realistic, already published vehicle and
- * electronics listings for the real (non-catalog) users, using estimated prices from
+ * Local-only seed ({@code --app.seed=listings-generate}): creates realistic, already published vehicle,
+ * electronics and real estate listings for the real (non-catalog) users, using estimated prices from
  * {@code data/listing-generator/prices.json}. Listings go through the normal create flow (validation, catalog
  * snapshot, inventory) but skip the listing-fee payment and the new-listing event, so no follower gets a
  * notification or e-mail. Every generated id is recorded in {@code generated_listings} for
@@ -47,12 +47,16 @@ class ListingGeneratorSeedTask implements SeedTask {
     private final CacheManager cacheManager;
     private final VehicleListingGenerator vehicleGenerator;
     private final ElectronicListingGenerator electronicGenerator;
+    private final RealEstateListingGenerator realEstateGenerator;
 
     @Value("${app.listing-generator.vehicles:200}")
     private int vehicleCount;
 
     @Value("${app.listing-generator.electronics:200}")
     private int electronicCount;
+
+    @Value("${app.listing-generator.realestate:200}")
+    private int realEstateCount;
 
     @Value("${app.listing-generator.seed:42}")
     private long seed;
@@ -92,10 +96,20 @@ class ListingGeneratorSeedTask implements SeedTask {
                     photos.electronic(candidate.price()));
             finish(id, batch, random);
         }
+        if (realEstateCount > 0) {
+            var realEstatePrices = realEstateGenerator.loadPrices();
+            var catalog = realEstateGenerator.catalog();
+            var cityWeights = realEstateGenerator.cityWeights(realEstatePrices);
+            for (int i = 0; i < realEstateCount; i++, n++) {
+                UUID id = realEstateGenerator.create(realEstatePrices, catalog, sellers.get(n % sellers.size()), random,
+                        locations.pick(random, cityWeights));
+                finish(id, batch, random);
+            }
+        }
         clearCache("listing:userListings");
         clearCache("user:profile");
-        log.info("Listing generator batch {}: {} vehicle + {} electronics listings for {} sellers (prices {} {})",
-                batch, vehicleCount, electronicCount, sellers.size(), prices.source(), prices.priceDate());
+        log.info("Listing generator batch {}: {} vehicle + {} electronics + {} real estate listings for {} sellers (prices {} {})",
+                batch, vehicleCount, electronicCount, realEstateCount, sellers.size(), prices.source(), prices.priceDate());
         return Result.success();
     }
 

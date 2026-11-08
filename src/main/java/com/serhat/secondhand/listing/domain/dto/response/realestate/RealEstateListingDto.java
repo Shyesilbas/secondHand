@@ -14,27 +14,25 @@ public class RealEstateListingDto extends ListingDto {
     private LookupDto realEstateType;
     private LookupDto heatingType;
     private LookupDto ownerType;
-    private Integer squareMeters;
-    private Integer roomCount;
-    private Integer bathroomCount;
-    private Integer floor;
-    private Integer buildingAge;
-    private boolean furnished;
-    private String zoningStatus;
 
-    // Premium fields
     private Integer grossAreaM2;
     private Integer netAreaM2;
-    private String usageStatus;
-    private String deedStatus;
     private String roomConfigKey;
+    /** Derived from the room plan. */
+    private Integer roomCount;
+    private Integer bathroomCount;
+    private String floorKey;
+    /** Derived from the floor. */
     private Integer floorNumber;
     private Integer totalFloors;
+    private Integer buildingAge;
+    private String buildingCondition;
+    private boolean furnished;
     private boolean hasBalcony;
     private boolean hasElevator;
     private boolean hasParking;
     private BigDecimal monthlyFee;
-    private boolean isInSite;
+    private boolean inSite;
     private String siteName;
     private Integer gardenAreaM2;
     private Integer landShareM2;
@@ -47,14 +45,11 @@ public class RealEstateListingDto extends ListingDto {
     private BigDecimal heightLimit;
     private BigDecimal roadFrontage;
     private String infrastructureStatusKey;
-    private String waterSource;
     private boolean electricityAvailable;
     private boolean roadAccess;
-
-    private String buildingCondition;
     private boolean exchangeable;
-    private boolean hasNorthFacade;
-    private boolean hasSouthFacade;
-    private boolean hasEastFacade;
-    private boolean hasWestFacade;
+
+    /** Approximate point (offset around the neighborhood center), null when unknown. */
+    private BigDecimal latitude;
+    private BigDecimal longitude;
 }

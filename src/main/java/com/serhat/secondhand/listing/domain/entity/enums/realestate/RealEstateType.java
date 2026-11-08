@@ -5,8 +5,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.Persistable;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -46,4 +51,18 @@ public class RealEstateType implements Labelable, Persistable<UUID> {
 
     @Column(nullable = false, length = 120)
     private String label;
+
+    /** Residential, land, commercial or other; scopes the type's attribute definitions. */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RealEstateCategory category = RealEstateCategory.OTHER;
+
+    /** Order of the type picker. */
+    @Column(name = "sort_order", nullable = false)
+    private int sortOrder;
+
+    /** Listing field name -> rule (data/realestate/realestate.json); see {@link SpecFieldRule}. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "field_rules", nullable = false, columnDefinition = "jsonb")
+    private Map<String, SpecFieldRule> fieldRules = new LinkedHashMap<>();
 }

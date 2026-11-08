@@ -6,6 +6,7 @@ import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.email.domain.entity.enums.EmailType;
 import com.serhat.secondhand.listing.application.common.ListingFeePaymentService;
 import com.serhat.secondhand.listing.application.realestate.RealEstateSpecCatalogService;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
@@ -266,6 +267,7 @@ public class EnumController {
                     map.put("value", spec.getKey());
                     map.put("label", spec.getLabel());
                     map.put("rooms", spec.getRooms());
+                    map.put("number", spec.getNumber());
                     return map;
                 })
                 .toList();
@@ -552,6 +554,11 @@ public class EnumController {
         allEnums.put("heatingTypes", getHeatingTypes().getBody());
         allEnums.put("roomConfigs", toSpecOptions(realEstateSpecCatalogService.getRoomConfigs()));
         allEnums.put("zoningStatuses", toSpecOptions(realEstateSpecCatalogService.getZoningStatuses()));
+        allEnums.put("floors", toSpecOptions(realEstateSpecCatalogService.getFloors()));
+        allEnums.put("infrastructureStatuses", toSpecOptions(realEstateSpecCatalogService.getInfrastructureStatuses()));
+        allEnums.put("buildingConditions", Arrays.stream(BuildingCondition.values())
+                .map(c -> Map.<String, Object>of("value", c.name(), "label", c.getLabel()))
+                .toList());
         allEnums.put("ownerTypes", getOwnerTypes().getBody());
         allEnums.put("clothingBrands", getClothingBrands().getBody());
         allEnums.put("clothingTypes", getClothingTypes().getBody());

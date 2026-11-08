@@ -289,6 +289,9 @@ export const API_ENDPOINTS = {
             ATTRIBUTES: (typeId) => `/v1/catalog/electronics/attributes?typeId=${encodeURIComponent(typeId)}`,
             MODEL: (modelId) => `/v1/catalog/electronics/models/${encodeURIComponent(modelId)}`,
         },
+        REAL_ESTATE: {
+            ATTRIBUTES: (typeId) => `/v1/catalog/real-estate/attributes?typeId=${encodeURIComponent(typeId)}`,
+        },
     },
     AI: {
         SUMMARY: (type, id) => `/v1/ai/summary/${type}/${id}`,

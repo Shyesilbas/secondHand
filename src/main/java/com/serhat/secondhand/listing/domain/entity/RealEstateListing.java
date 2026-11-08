@@ -36,26 +36,18 @@ public class RealEstateListing extends Listing {
     @JoinColumn(name = "owner_type_id", nullable = false)
     private ListingOwnerType ownerType;
 
-    @Column(name = "square_meters", nullable = false)
-    private Integer squareMeters;
-
-    @Column(name = "room_count", nullable = false)
+    /** Derived from {@link #roomConfigKey} on save; kept as a column for filters and sorting. */
+    @Column(name = "room_count")
     private Integer roomCount;
 
     @Column(name = "bathroom_count")
     private Integer bathroomCount;
-
-    @Column(name = "floor")
-    private Integer floor;
 
     @Column(name = "building_age")
     private Integer buildingAge;
 
     @Column(name = "is_furnished", nullable = false)
     private boolean furnished;
-
-    @Column(name = "zoning_status", length = 120)
-    private String zoningStatus;
 
     // ── New Premium Catalog-Driven Fields ───────────────────────────────
 
@@ -65,16 +57,15 @@ public class RealEstateListing extends Listing {
     @Column(name = "net_area_m2")
     private Integer netAreaM2;
 
-    @Column(name = "usage_status", length = 60)
-    private String usageStatus;
-
-    @Column(name = "deed_status", length = 60)
-    private String deedStatus;
-
     // Residential specs
     @Column(name = "room_config_key", length = 60)
     private String roomConfigKey;
 
+    /** A key of data/realestate/specs.json "floors" (BASEMENT, GROUND, FLOOR_3, ROOF ...). */
+    @Column(name = "floor_key", length = 30)
+    private String floorKey;
+
+    /** Derived from {@link #floorKey} on save (roof = total floors); used by filters. */
     @Column(name = "floor_number")
     private Integer floorNumber;
 
@@ -94,7 +85,7 @@ public class RealEstateListing extends Listing {
     private BigDecimal monthlyFee;
 
     @Column(name = "is_in_site", nullable = false)
-    private boolean isInSite;
+    private boolean inSite;
 
     @Column(name = "site_name", length = 120)
     private String siteName;
@@ -134,18 +125,12 @@ public class RealEstateListing extends Listing {
     @Column(name = "infrastructure_status_key", length = 60)
     private String infrastructureStatusKey;
 
-    // Farm specs
-    @Column(name = "water_source", length = 60)
-    private String waterSource;
-
     @Column(name = "electricity_available", nullable = false)
     private boolean electricityAvailable;
 
     @Column(name = "road_access", nullable = false)
     private boolean roadAccess;
 
-    // ── Newly Added Fields (Enhancement) ─────────────────────────────
-    
     @Enumerated(EnumType.STRING)
     @Column(name = "building_condition", length = 30)
     private com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition buildingCondition;
@@ -153,15 +138,19 @@ public class RealEstateListing extends Listing {
     @Column(name = "is_exchangeable", nullable = false)
     private boolean exchangeable;
 
-    @Column(name = "has_north_facade", nullable = false)
-    private boolean hasNorthFacade;
+    /**
+     * Offset point around the neighborhood center (set by the server, never the seller's address);
+     * null when the neighborhood has no known coordinates.
+     */
+    @Column(name = "latitude", precision = 9, scale = 6)
+    private BigDecimal latitude;
 
-    @Column(name = "has_south_facade", nullable = false)
-    private boolean hasSouthFacade;
+    @Column(name = "longitude", precision = 9, scale = 6)
+    private BigDecimal longitude;
 
-    @Column(name = "has_east_facade", nullable = false)
-    private boolean hasEastFacade;
-
-    @Column(name = "has_west_facade", nullable = false)
-    private boolean hasWestFacade;
+    /** Attribute definitions are scoped by the property type's category. */
+    @Override
+    public String attributeScopeKey() {
+        return realEstateType != null && realEstateType.getCategory() != null ? realEstateType.getCategory().name() : null;
+    }
 }

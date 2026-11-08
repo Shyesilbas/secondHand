@@ -33,10 +33,14 @@ const GenericListingDetails = ({ listing, flat = false }) => {
     if (!schema) return [];
     // An attributes tab is shown only when the seller answered something.
     const hasAttributes = Object.keys(listing?.attributes || {}).length > 0;
-    if (Array.isArray(schema.sections)) return schema.sections.filter((s) => s.kind !== 'attributes' || hasAttributes);
+    if (Array.isArray(schema.sections)) {
+      return schema.sections
+        .filter((s) => s.kind !== 'attributes' || hasAttributes)
+        .filter((s) => typeof s.visibleWhen !== 'function' || s.visibleWhen(listing));
+    }
     if (Array.isArray(schema.fields)) return [{ id: 'details', label: 'Genel', fields: schema.fields }];
     return [];
-  }, [schema, listing?.attributes]);
+  }, [schema, listing]);
 
   const [activeSection, setActiveSection] = useState(sections[0]?.id || 'details');
 
@@ -75,7 +79,9 @@ const GenericListingDetails = ({ listing, flat = false }) => {
         </div>
       )}
 
-      {active?.kind === 'attributes' ? (
+      {active?.kind === 'component' && active.component ? (
+        <active.component listing={listing} />
+      ) : active?.kind === 'attributes' ? (
         <ListingAttributeDetails
           section={active}
           listing={listing}

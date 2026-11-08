@@ -1,351 +1,216 @@
 package com.serhat.secondhand.listing.validation.realestate;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.realestate.RealEstateSpecCatalogService;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
+import com.serhat.secondhand.listing.domain.entity.enums.common.SpecFieldRule;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/** Rules come from the real data/realestate/realestate.json, so these tests also guard the seed data. */
 class RealEstateValidationTest {
 
-    private RealEstateSpecCatalogService specCatalogService;
-    private LandValidator landValidator;
-    private HouseValidator houseValidator;
-    private RealEstateSubtypeFieldPolicy subtypeFieldPolicy;
+    private static final Map<String, RealEstateType> TYPES = new HashMap<>();
+    private static JsonNode catalog;
 
-    private HeatingType combiHeating;
+    private RealEstateSpecCatalogService specs;
+    private RealEstateTypeRulesValidator validator;
+
+    @BeforeAll
+    static void loadTypes() throws Exception {
+        try (InputStream is = new ClassPathResource("data/realestate/realestate.json").getInputStream()) {
+            catalog = new ObjectMapper().readTree(is);
+        }
+        for (JsonNode node : catalog.get("propertyTypes")) {
+            RealEstateType type = new RealEstateType();
+            type.setId(UUID.fromString(node.get("id").asText()));
+            type.setName(node.get("key").asText());
+            type.setLabel(node.get("label").asText());
+            type.setCategory(RealEstateCategory.valueOf(node.get("category").asText()));
+            Map<String, SpecFieldRule> rules = new LinkedHashMap<>();
+            node.get("fields").fields().forEachRemaining(e -> rules.put(e.getKey(), SpecFieldRule.valueOf(e.getValue().asText())));
+            type.setFieldRules(rules);
+            TYPES.put(type.getName(), type);
+        }
+    }
 
     @BeforeEach
     void setUp() {
-        specCatalogService = new RealEstateSpecCatalogService(new ObjectMapper());
-        specCatalogService.init();
-
-        landValidator = new LandValidator();
-        houseValidator = new HouseValidator();
-        subtypeFieldPolicy = new RealEstateSubtypeFieldPolicy(specCatalogService);
-
-        combiHeating = new HeatingType();
-        combiHeating.setId(UUID.randomUUID());
-        combiHeating.setName("COMBI_BOILER");
-        combiHeating.setLabel("Kombi (Doğalgaz)");
+        specs = new RealEstateSpecCatalogService(new ObjectMapper());
+        specs.init();
+        validator = new RealEstateTypeRulesValidator(specs);
     }
 
-    private RealEstateType createType(String name) {
-        RealEstateType type = new RealEstateType();
-        type.setId(UUID.randomUUID());
-        type.setName(name);
-        type.setLabel(name);
-        return type;
+    private static RealEstateAdType adType(String name) {
+        RealEstateAdType ad = new RealEstateAdType();
+        ad.setId(UUID.randomUUID());
+        ad.setName(name);
+        ad.setLabel(name);
+        return ad;
     }
 
-    @Nested
-    @DisplayName("RealEstateCategory mapping tests")
-    class CategoryMappingTests {
-
-        @Test
-        void shouldCategorizeLandSubtypes() {
-            assertThat(RealEstateCategory.fromTypeName("LAND")).isEqualTo(RealEstateCategory.LAND);
-            assertThat(RealEstateCategory.fromTypeName("COMMERCIAL_LAND")).isEqualTo(RealEstateCategory.LAND);
-            assertThat(RealEstateCategory.fromTypeName("FARM")).isEqualTo(RealEstateCategory.LAND);
-            assertThat(RealEstateCategory.fromTypeName("VINEYARD")).isEqualTo(RealEstateCategory.LAND);
-            assertThat(RealEstateCategory.fromTypeName("OLIVE_GROVE")).isEqualTo(RealEstateCategory.LAND);
-        }
-
-        @Test
-        void shouldCategorizeResidentialSubtypes() {
-            assertThat(RealEstateCategory.fromTypeName("APARTMENT")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-            assertThat(RealEstateCategory.fromTypeName("RESIDENCE")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-            assertThat(RealEstateCategory.fromTypeName("STUDIO")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-            assertThat(RealEstateCategory.fromTypeName("DUPLEX")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-            assertThat(RealEstateCategory.fromTypeName("VILLA")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-            assertThat(RealEstateCategory.fromTypeName("PREFABRICATED")).isEqualTo(RealEstateCategory.RESIDENTIAL);
-        }
-
-        @Test
-        void shouldCategorizeCommercialSubtypes() {
-            assertThat(RealEstateCategory.fromTypeName("OFFICE")).isEqualTo(RealEstateCategory.COMMERCIAL);
-            assertThat(RealEstateCategory.fromTypeName("COMMERCIAL")).isEqualTo(RealEstateCategory.COMMERCIAL);
-            assertThat(RealEstateCategory.fromTypeName("WAREHOUSE")).isEqualTo(RealEstateCategory.COMMERCIAL);
-            assertThat(RealEstateCategory.fromTypeName("BUILDING")).isEqualTo(RealEstateCategory.COMMERCIAL);
-        }
-
-        @Test
-        void shouldCategorizeOtherSubtypes() {
-            assertThat(RealEstateCategory.fromTypeName("OTHER")).isEqualTo(RealEstateCategory.OTHER);
-            assertThat(RealEstateCategory.fromTypeName(null)).isEqualTo(RealEstateCategory.OTHER);
-            assertThat(RealEstateCategory.fromTypeName("")).isEqualTo(RealEstateCategory.OTHER);
-        }
+    private static RealEstateListing listing(String type, String adType) {
+        RealEstateListing listing = new RealEstateListing();
+        listing.setRealEstateType(TYPES.get(type));
+        listing.setAdType(adType(adType));
+        listing.setAttributes(new LinkedHashMap<>());
+        return listing;
     }
 
-    @Nested
-    @DisplayName("COMMERCIAL_LAND (Audit item 4 core bug) tests")
-    class CommercialLandTests {
-
-        @Test
-        void shouldValidateCommercialLandSuccessfully() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("COMMERCIAL_LAND"))
-                    .squareMeters(1000)
-                    .zoningStatus("COMMERCIAL_ZONED")
-                    .zoningStatusKey("COMMERCIAL_ZONED")
-                    .roomCount(0)
-                    .build();
-
-            // Run cleanup first
-            landValidator.cleanup(listing);
-            houseValidator.cleanup(listing);
-            subtypeFieldPolicy.cleanup(listing);
-
-            // Verify zoningStatus was preserved!
-            assertThat(listing.getZoningStatus()).isEqualTo("COMMERCIAL_ZONED");
-            assertThat(listing.getHeatingType()).isNull();
-            assertThat(listing.getRoomCount()).isEqualTo(0);
-
-            // Run validators
-            Result<Void> landRes = landValidator.validate(listing);
-            Result<Void> houseRes = houseValidator.validate(listing);
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-
-            assertThat(landRes.isSuccess()).isTrue();
-            assertThat(houseRes.isSuccess()).isTrue();
-            assertThat(policyRes.isSuccess()).isTrue();
-        }
-
-        @Test
-        void shouldFailIfCommercialLandLacksZoningStatus() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("COMMERCIAL_LAND"))
-                    .squareMeters(500)
-                    .build();
-
-            Result<Void> landRes = landValidator.validate(listing);
-            assertThat(landRes.isError()).isTrue();
-            assertThat(landRes.getErrorCode()).isEqualTo("LAND_ZONING_STATUS_REQUIRED");
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("SUBTYPE_ZONING_STATUS_REQUIRED");
-        }
-
-        @Test
-        void shouldRejectResidentialParametersOnCommercialLand() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("COMMERCIAL_LAND"))
-                    .squareMeters(500)
-                    .zoningStatus("COMMERCIAL_ZONED")
-                    .heatingType(combiHeating)
-                    .build();
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("SUBTYPE_INCOMPATIBLE_HEATING");
-        }
-
-        @Test
-        void shouldRejectInvalidZoningStatusKeyOnCommercialLand() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("COMMERCIAL_LAND"))
-                    .squareMeters(500)
-                    .zoningStatusKey("NON_EXISTING_STATUS")
-                    .build();
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("INVALID_ZONING_STATUS_KEY");
-        }
+    private static RealEstateListing apartment() {
+        RealEstateListing l = listing("APARTMENT", "FOR_SALE");
+        HeatingType heating = new HeatingType();
+        heating.setId(UUID.randomUUID());
+        heating.setName("COMBI_BOILER");
+        heating.setLabel("Kombi");
+        l.setHeatingType(heating);
+        l.setGrossAreaM2(120);
+        l.setNetAreaM2(100);
+        l.setRoomConfigKey("ROOM_3_1");
+        l.setFloorKey("FLOOR_3");
+        l.setTotalFloors(8);
+        l.setBuildingAge(10);
+        return l;
     }
 
-    @Nested
-    @DisplayName("Residential listing validation tests")
-    class ResidentialTests {
-
-        @Test
-        void shouldValidateApartmentWithRoomCountSuccessfully() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("APARTMENT"))
-                    .squareMeters(120)
-                    .roomCount(3)
-                    .heatingType(combiHeating)
-                    .build();
-
-            landValidator.cleanup(listing);
-            houseValidator.cleanup(listing);
-            subtypeFieldPolicy.cleanup(listing);
-
-            assertThat(landValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(houseValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(subtypeFieldPolicy.validate(listing).isSuccess()).isTrue();
-        }
-
-        @Test
-        void shouldValidatePrefabricatedWithRoomConfigKeySuccessfully() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("PREFABRICATED"))
-                    .squareMeters(90)
-                    .roomConfigKey("ROOM_2_1")
-                    .heatingType(combiHeating)
-                    .build();
-
-            landValidator.cleanup(listing);
-            houseValidator.cleanup(listing);
-            subtypeFieldPolicy.cleanup(listing);
-
-            // Verify roomCount was populated from roomConfigKey
-            assertThat(listing.getRoomCount()).isEqualTo(2);
-
-            assertThat(landValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(houseValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(subtypeFieldPolicy.validate(listing).isSuccess()).isTrue();
-        }
-
-        @Test
-        void shouldFailIfResidentialLacksHeatingType() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("APARTMENT"))
-                    .squareMeters(100)
-                    .roomCount(3)
-                    .build();
-
-            Result<Void> houseRes = houseValidator.validate(listing);
-            assertThat(houseRes.isError()).isTrue();
-            assertThat(houseRes.getErrorCode()).isEqualTo("REAL_ESTATE_HEATING_TYPE_REQUIRED");
-        }
-
-        @Test
-        void shouldFailIfResidentialHasZoningStatusKey() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("VILLA"))
-                    .squareMeters(250)
-                    .roomCount(5)
-                    .heatingType(combiHeating)
-                    .zoningStatusKey("RESIDENTIAL_ZONED")
-                    .build();
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("SUBTYPE_INCOMPATIBLE_ZONING");
-        }
-
-        @Test
-        void shouldFailIfResidentialHasInvalidRoomConfigKey() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("DUPLEX"))
-                    .squareMeters(180)
-                    .heatingType(combiHeating)
-                    .roomConfigKey("ROOM_INVALID_100")
-                    .build();
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("INVALID_ROOM_CONFIG_KEY");
-        }
+    private Result<Void> run(RealEstateListing listing) {
+        validator.cleanup(listing);
+        return validator.validate(listing);
     }
 
-    @Nested
-    @DisplayName("Commercial listing validation tests")
-    class CommercialTests {
-
-        @Test
-        void shouldValidateOfficeSuccessfully() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("OFFICE"))
-                    .squareMeters(85)
-                    .roomCount(2)
-                    .heatingType(combiHeating)
-                    .build();
-
-            landValidator.cleanup(listing);
-            houseValidator.cleanup(listing);
-            subtypeFieldPolicy.cleanup(listing);
-
-            assertThat(landValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(houseValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(subtypeFieldPolicy.validate(listing).isSuccess()).isTrue();
+    @Test
+    void everyTypeRulesEveryFieldAndNoToggleIsRequired() {
+        for (RealEstateType type : TYPES.values()) {
+            assertThat(type.getFieldRules().keySet()).as(type.getName()).isEqualTo(RealEstateSpecFields.ALL.keySet());
+            RealEstateSpecFields.ALL.values().stream().filter(RealEstateSpecFields.Field::toggle)
+                    .forEach(f -> assertThat(type.getFieldRules().get(f.name())).as(type.getName() + "." + f.name())
+                            .isNotEqualTo(SpecFieldRule.REQUIRED));
         }
-
-        @Test
-        void shouldValidateBuildingSuccessfully() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("BUILDING"))
-                    .squareMeters(1200)
-                    .roomCount(20)
-                    .heatingType(combiHeating)
-                    .build();
-
-            landValidator.cleanup(listing);
-            houseValidator.cleanup(listing);
-            subtypeFieldPolicy.cleanup(listing);
-
-            assertThat(landValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(houseValidator.validate(listing).isSuccess()).isTrue();
-            assertThat(subtypeFieldPolicy.validate(listing).isSuccess()).isTrue();
-        }
-
-        @Test
-        void shouldFailIfCommercialHasZoningStatusKey() {
-            RealEstateListing listing = RealEstateListing.builder()
-                    .realEstateType(createType("WAREHOUSE"))
-                    .squareMeters(500)
-                    .roomCount(1)
-                    .heatingType(combiHeating)
-                    .zoningStatusKey("COMMERCIAL_ZONED")
-                    .build();
-
-            Result<Void> policyRes = subtypeFieldPolicy.validate(listing);
-            assertThat(policyRes.isError()).isTrue();
-            assertThat(policyRes.getErrorCode()).isEqualTo("SUBTYPE_INCOMPATIBLE_ZONING");
-        }
+        assertThat(catalog.get("adTypes")).extracting(n -> n.get("key").asText()).containsExactly("FOR_SALE", "FOR_RENT");
     }
 
-    @Nested
-    @DisplayName("RealEstateSpecCatalogService expanded specs tests")
-    class SpecCatalogServiceTests {
+    @Test
+    void apartmentDerivesRoomCountAndFloorNumber() {
+        RealEstateListing l = apartment();
+        assertThat(run(l).isSuccess()).isTrue();
+        assertThat(l.getRoomCount()).isEqualTo(3);
+        assertThat(l.getFloorNumber()).isEqualTo(3);
+    }
 
-        @Test
-        void shouldRecognizeAllExpandedRoomConfigs() {
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_1_0")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_1_1")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_1_5_1")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_2_0")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_2_2")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_3_0")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_3_2")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_4_0")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_5_1")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_5_2")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_6_1")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_6_2")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_7_1")).isTrue();
-            assertThat(specCatalogService.isValidRoomConfig("ROOM_8_PLUS")).isTrue();
+    @Test
+    void roofFloorTakesTheTotalFloors() {
+        RealEstateListing l = apartment();
+        l.setFloorKey("ROOF");
+        assertThat(run(l).isSuccess()).isTrue();
+        assertThat(l.getFloorNumber()).isEqualTo(8);
+    }
 
-            assertThat(specCatalogService.isValidRoomConfig("UNKNOWN_ROOM")).isFalse();
-        }
+    @Test
+    void apartmentNeedsRoomPlanHeatingAndFloor() {
+        RealEstateListing noRooms = apartment();
+        noRooms.setRoomConfigKey(" ");
+        assertThat(run(noRooms).getErrorCode()).isEqualTo("REAL_ESTATE_ROOM_CONFIG_KEY_REQUIRED");
 
-        @Test
-        void shouldRecognizeAllExpandedZoningStatuses() {
-            assertThat(specCatalogService.isValidZoningStatus("RESIDENTIAL_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("COMMERCIAL_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("INDUSTRIAL_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("TOURISM_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("MIXED_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("AGRICULTURAL")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("VINEYARD_GARDEN")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("OLIVE_GROVE")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("PROTECTED_AREA")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("PUBLIC_ZONED")).isTrue();
-            assertThat(specCatalogService.isValidZoningStatus("UNZONED")).isTrue();
+        RealEstateListing noHeating = apartment();
+        noHeating.setHeatingType(null);
+        assertThat(run(noHeating).getErrorCode()).isEqualTo("REAL_ESTATE_HEATING_TYPE_REQUIRED");
 
-            assertThat(specCatalogService.isValidZoningStatus("UNKNOWN_ZONING")).isFalse();
-        }
+        RealEstateListing noFloor = apartment();
+        noFloor.setFloorKey(null);
+        assertThat(run(noFloor).getErrorCode()).isEqualTo("REAL_ESTATE_FLOOR_KEY_REQUIRED");
+    }
+
+    @Test
+    void rejectsImpossibleValues() {
+        RealEstateListing aboveTop = apartment();
+        aboveTop.setFloorKey("FLOOR_9");
+        assertThat(run(aboveTop).getErrorCode()).isEqualTo("REAL_ESTATE_FLOOR_ABOVE_TOTAL");
+
+        RealEstateListing netAboveGross = apartment();
+        netAboveGross.setNetAreaM2(130);
+        assertThat(run(netAboveGross).getErrorCode()).isEqualTo("REAL_ESTATE_NET_AREA_ABOVE_GROSS");
+
+        RealEstateListing unknownRooms = apartment();
+        unknownRooms.setRoomConfigKey("3+1");
+        assertThat(run(unknownRooms).getErrorCode()).isEqualTo("INVALID_ROOM_CONFIG_KEY");
+
+        RealEstateListing unknownFloor = apartment();
+        unknownFloor.setFloorKey("FLOOR_99");
+        assertThat(run(unknownFloor).getErrorCode()).isEqualTo("INVALID_FLOOR_KEY");
+    }
+
+    @Test
+    void landClearsBuildingFieldsAndNeedsZoning() {
+        RealEstateListing land = apartment();
+        land.setRealEstateType(TYPES.get("COMMERCIAL_LAND"));
+        land.setFurnished(true);
+        land.setHasElevator(true);
+        assertThat(run(land).getErrorCode()).isEqualTo("REAL_ESTATE_ZONING_STATUS_KEY_REQUIRED");
+        assertThat(land.getRoomConfigKey()).isNull();
+        assertThat(land.getRoomCount()).isNull();
+        assertThat(land.getHeatingType()).isNull();
+        assertThat(land.getFloorKey()).isNull();
+        assertThat(land.getFloorNumber()).isNull();
+        assertThat(land.isFurnished()).isFalse();
+        assertThat(land.isHasElevator()).isFalse();
+
+        land.setZoningStatusKey("COMMERCIAL_ZONED");
+        assertThat(run(land).isSuccess()).isTrue();
+    }
+
+    @Test
+    void residentialClearsLandFields() {
+        RealEstateListing l = apartment();
+        l.setZoningStatusKey("RESIDENTIAL_ZONED");
+        l.setParcelNo("12");
+        assertThat(run(l).isSuccess()).isTrue();
+        assertThat(l.getZoningStatusKey()).isNull();
+        assertThat(l.getParcelNo()).isNull();
+    }
+
+    @Test
+    void attributesOfTheOtherAdTypeAreDropped() {
+        RealEstateListing sale = apartment();
+        sale.getAttributes().putAll(Map.of("deposit", 40000, "minLeaseMonths", 12, "loanEligible", true));
+        run(sale);
+        assertThat(sale.getAttributes()).containsOnlyKeys("loanEligible");
+
+        RealEstateListing rent = apartment();
+        rent.setAdType(adType("FOR_RENT"));
+        rent.getAttributes().putAll(Map.of("deposit", 40000, "minLeaseMonths", 12, "loanEligible", true));
+        run(rent);
+        assertThat(rent.getAttributes()).containsOnlyKeys("deposit", "minLeaseMonths");
+    }
+
+    @Test
+    void siteNameIsClearedOutsideASite() {
+        RealEstateListing l = apartment();
+        l.setSiteName("Deniz Konakları");
+        run(l);
+        assertThat(l.getSiteName()).isNull();
+    }
+
+    @Test
+    void specCatalogServesFloorsAndInfrastructure() {
+        assertThat(specs.findFloor("BASEMENT")).get().extracting(RealEstateSpecCatalogService.SpecDto::getNumber).isEqualTo(-1);
+        assertThat(specs.findFloor("FLOOR_40")).isPresent();
+        assertThat(specs.isValidInfrastructureStatus("PARTIAL")).isTrue();
+        assertThat(specs.isValidRoomConfig("ROOM_8_PLUS")).isTrue();
     }
 }

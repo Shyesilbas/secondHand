@@ -35,6 +35,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
     private final RealEstateFilterPredicateBuilder predicateBuilder;
     private final List<RealEstateSpecValidator> realEstateSpecValidators;
     private final RealEstateListingResolver realEstateListingResolver;
+    private final RealEstateLocationService realEstateLocationService;
 
     public RealEstateListingService(
             RealEstateRepository realEstateRepository,
@@ -46,6 +47,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
             ListingValidationEngine listingValidationEngine,
             List<RealEstateSpecValidator> realEstateSpecValidators,
             RealEstateListingResolver realEstateListingResolver,
+            RealEstateLocationService realEstateLocationService,
             InventoryService inventoryService) {
         super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.realEstateRepository = realEstateRepository;
@@ -53,6 +55,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         this.predicateBuilder = predicateBuilder;
         this.realEstateSpecValidators = realEstateSpecValidators;
         this.realEstateListingResolver = realEstateListingResolver;
+        this.realEstateLocationService = realEstateLocationService;
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
@@ -76,7 +79,8 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
                 request.adTypeId(),
                 request.realEstateTypeId(),
                 request.heatingTypeId(),
-                request.ownerTypeId()
+                request.ownerTypeId(),
+                request.buildingCondition()
         );
     }
 
@@ -87,6 +91,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
         entity.setRealEstateType(res.realEstateType());
         entity.setHeatingType(res.heatingType());
         entity.setOwnerType(res.ownerType());
+        entity.setBuildingCondition(res.buildingCondition());
     }
 
     @Override
@@ -96,6 +101,7 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
 
     @Override
     protected RealEstateListing save(RealEstateListing entity) {
+        realEstateLocationService.placeIfMissing(entity);
         return realEstateRepository.save(entity);
     }
 
@@ -127,15 +133,22 @@ public class RealEstateListingService extends AbstractListingService<RealEstateL
                 request.adTypeId(),
                 request.realEstateTypeId(),
                 request.heatingTypeId(),
-                request.ownerTypeId()
+                request.ownerTypeId(),
+                request.buildingCondition()
         );
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
 
+        String previousNeighborhood = existing.getNeighborhoodKey();
         listingMapper.updateRealEstate(existing, request);
+        if (!java.util.Objects.equals(previousNeighborhood, existing.getNeighborhoodKey())) {
+            existing.setLatitude(null);
+            existing.setLongitude(null);
+        }
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, realEstateSpecValidators);
         if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
 
+        realEstateLocationService.placeIfMissing(existing);
         realEstateRepository.save(existing);
         log.info("Real estate listing updated: {}", existing.getId());
         return Result.success();

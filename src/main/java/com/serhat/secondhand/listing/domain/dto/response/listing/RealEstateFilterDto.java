@@ -13,15 +13,23 @@ public class RealEstateFilterDto extends ListingFilterDto {
     private List<UUID> realEstateTypeIds;
     private List<UUID> heatingTypeIds;
     private UUID ownerTypeId;
-    private Integer minSquareMeters;
-    private Integer maxSquareMeters;
+    private Integer minGrossArea;
+    private Integer maxGrossArea;
+    private Integer minNetArea;
+    private Integer maxNetArea;
+    private List<String> roomConfigKeys;
     private Integer minRoomCount;
     private Integer maxRoomCount;
-    private Integer minBathroomCount;
-    private Integer maxBathroomCount;
-    private Integer floor;
+    private Integer minFloor;
+    private Integer maxFloor;
     private Integer minBuildingAge;
     private Integer maxBuildingAge;
+    private List<String> zoningStatusKeys;
     private boolean furnished;
-    private String zoningStatus;
+    private boolean hasElevator;
+    private boolean hasParking;
+    private boolean inSite;
+    /** listings.attributes */
+    private List<String> deedStatuses;
+    private Boolean loanEligible;
 }

@@ -18,8 +18,8 @@ import java.util.*;
  * Heating types are <b>not</b> served from this catalog — they are managed as
  * full DB reference entities (see {@code HeatingType} and
  * {@code GET /api/v1/enums/all}).
- * This service only exposes non-entity catalogs: room configurations and
- * zoning statuses.
+ * This service only exposes non-entity catalogs: room configurations, zoning
+ * statuses, floors and infrastructure statuses.
  */
 @Service
 @RequiredArgsConstructor
@@ -32,9 +32,13 @@ public class RealEstateSpecCatalogService {
 
     private final List<SpecDto> roomConfigs = new ArrayList<>();
     private final List<SpecDto> zoningStatuses = new ArrayList<>();
+    private final List<SpecDto> floors = new ArrayList<>();
+    private final List<SpecDto> infrastructureStatuses = new ArrayList<>();
 
     private final Set<String> validRoomConfigKeys = new HashSet<>();
     private final Set<String> validZoningStatusKeys = new HashSet<>();
+    private final Set<String> validFloorKeys = new HashSet<>();
+    private final Set<String> validInfrastructureKeys = new HashSet<>();
 
     @PostConstruct
     public void init() {
@@ -52,6 +56,11 @@ public class RealEstateSpecCatalogService {
             JsonNode root = objectMapper.readTree(is);
             parseSpecNode(root.get("roomConfigs"), roomConfigs, validRoomConfigKeys);
             parseSpecNode(root.get("zoningStatuses"), zoningStatuses, validZoningStatusKeys);
+            parseSpecNode(root.get("floors"), floors, validFloorKeys);
+            parseSpecNode(root.get("infrastructureStatuses"), infrastructureStatuses, validInfrastructureKeys);
+            if (floors.isEmpty() || infrastructureStatuses.isEmpty()) {
+                throw new IllegalStateException(CATALOG_PATH + " needs \"floors\" and \"infrastructureStatuses\"");
+            }
         }
     }
 
@@ -62,7 +71,8 @@ public class RealEstateSpecCatalogService {
             String label = spec.get("label").asText();
             Integer rooms = spec.has("rooms") ? spec.get("rooms").asInt() : null;
             Integer livingRooms = spec.has("livingRooms") ? spec.get("livingRooms").asInt() : null;
-            targetList.add(new SpecDto(key, label, rooms, livingRooms));
+            Integer number = spec.has("number") ? spec.get("number").asInt() : null;
+            targetList.add(new SpecDto(key, label, rooms, livingRooms, number));
             targetKeys.add(key.trim().toUpperCase(Locale.ROOT));
         }
     }
@@ -75,6 +85,20 @@ public class RealEstateSpecCatalogService {
 
     public List<SpecDto> getZoningStatuses() {
         return Collections.unmodifiableList(zoningStatuses);
+    }
+
+    public List<SpecDto> getFloors() {
+        return Collections.unmodifiableList(floors);
+    }
+
+    public List<SpecDto> getInfrastructureStatuses() {
+        return Collections.unmodifiableList(infrastructureStatuses);
+    }
+
+    public Optional<SpecDto> findFloor(String key) {
+        if (key == null || key.isBlank()) return Optional.empty();
+        String normalized = key.trim();
+        return floors.stream().filter(f -> f.getKey().equals(normalized)).findFirst();
     }
 
     public Optional<SpecDto> findRoomConfig(String key) {
@@ -100,6 +124,11 @@ public class RealEstateSpecCatalogService {
         return validRoomConfigKeys.contains(key.trim().toUpperCase(Locale.ROOT));
     }
 
+    public boolean isValidInfrastructureStatus(String key) {
+        if (key == null || key.isBlank()) return false;
+        return validInfrastructureKeys.contains(key.trim().toUpperCase(Locale.ROOT));
+    }
+
     public boolean isValidZoningStatus(String key) {
         if (key == null || key.isBlank()) return false;
         return validZoningStatusKeys.contains(key.trim().toUpperCase(Locale.ROOT));
@@ -111,16 +140,19 @@ public class RealEstateSpecCatalogService {
         private final String label;
         private final Integer rooms;
         private final Integer livingRooms;
+        /** Floors only: the floor number filters use (null for roof and detached). */
+        private final Integer number;
 
         public SpecDto(String key, String label) {
-            this(key, label, null, null);
+            this(key, label, null, null, null);
         }
 
-        public SpecDto(String key, String label, Integer rooms, Integer livingRooms) {
+        public SpecDto(String key, String label, Integer rooms, Integer livingRooms, Integer number) {
             this.key = key;
             this.label = label;
             this.rooms = rooms;
             this.livingRooms = livingRooms;
+            this.number = number;
         }
     }
 }

@@ -58,7 +58,18 @@ final class GeneratorLocations {
     }
 
     Place pick(GeneratorRandom random) {
-        City city = random.weighted(weights);
+        return pickIn(random.weighted(weights), random);
+    }
+
+    /** Picks from the given cities only, with the given weights; an unknown city key is an error. */
+    Place pick(GeneratorRandom random, Map<String, Integer> cityWeights) {
+        String key = random.weighted(cityWeights);
+        City city = weights.keySet().stream().filter(c -> c.key().equals(key)).findFirst()
+                .orElseThrow(() -> new IllegalStateException("City " + key + " is not in data/common/locations.json"));
+        return pickIn(city, random);
+    }
+
+    private Place pickIn(City city, GeneratorRandom random) {
         District district = random.pick(city.districts());
         String neighborhood = district.neighborhoods().isEmpty() ? null : random.pick(district.neighborhoods());
         return new Place(city.key(), city.label(), district.key(), district.label(), neighborhood);

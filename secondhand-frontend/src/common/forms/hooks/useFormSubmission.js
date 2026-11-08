@@ -46,7 +46,7 @@ export const useFormSubmission = (config) => {
  const errorFields = Object.keys(newErrors || {});
  if (errorFields.some(field => ['title', 'description', 'price'].includes(field))) {
  goToStep(1);
- } else if (errorFields.some(field => ['brand', 'model', 'year', 'fuelType', 'adType', 'realEstateType', 'heatingType', 'ownerType', 'squareMeters', 'roomCount'].includes(field))) {
+ } else if (errorFields.some(field => ['brand', 'model', 'year', 'fuelType', 'adType', 'realEstateType', 'heatingType', 'ownerType', 'grossAreaM2', 'roomConfigKey'].includes(field))) {
  goToStep(2);
  } else if (errorFields.some(field => ['city', 'district'].includes(field))) {
  goToStep(3);

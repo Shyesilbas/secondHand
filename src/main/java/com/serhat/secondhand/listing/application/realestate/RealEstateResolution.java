@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.application.realestate;
 
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCondition;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.HeatingType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.ListingOwnerType;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateAdType;
@@ -9,5 +10,6 @@ public record RealEstateResolution(
         RealEstateAdType adType,
         RealEstateType realEstateType,
         HeatingType heatingType,
-        ListingOwnerType ownerType
+        ListingOwnerType ownerType,
+        BuildingCondition buildingCondition
 ) {}

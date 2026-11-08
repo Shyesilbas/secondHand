@@ -16,6 +16,7 @@ import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleGenerati
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleModel;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleTrim;
 import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
 import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import com.serhat.secondhand.listing.domain.repository.books.*;
 import com.serhat.secondhand.listing.domain.repository.clothing.*;
@@ -372,16 +373,18 @@ class EnumReadServiceTest {
     }
 
     @Test
-    void getRealEstateTypes_returnsTypesWithCategoryIncludingCommercialLandAsLand() {
+    void getRealEstateTypes_returnsTheSeededCategoryOfEachType() {
         RealEstateType commercialLand = new RealEstateType();
         commercialLand.setId(UUID.randomUUID());
         commercialLand.setName("COMMERCIAL_LAND");
         commercialLand.setLabel("Ticari / Sanayi İmarlı Arsa");
+        commercialLand.setCategory(RealEstateCategory.LAND);
 
         RealEstateType apartment = new RealEstateType();
         apartment.setId(UUID.randomUUID());
         apartment.setName("APARTMENT");
         apartment.setLabel("Daire");
+        apartment.setCategory(RealEstateCategory.RESIDENTIAL);
 
         when(realEstateTypeRepository.findAll()).thenReturn(List.of(commercialLand, apartment));
 

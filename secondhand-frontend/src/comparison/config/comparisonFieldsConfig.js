@@ -418,7 +418,7 @@ export const comparisonFieldsConfig = {
  priority: 3
  },
  {
- key: 'squareMeters',
+ key: 'grossAreaM2',
  label: 'Area',
  type: 'number',
  suffix: ' m²',
@@ -440,7 +440,7 @@ export const comparisonFieldsConfig = {
  priority: 6
  },
  {
- key: 'floor',
+ key: 'floorNumber',
  label: 'Floor',
  type: 'number',
  highlight: HIGHLIGHT_RULES.NONE,

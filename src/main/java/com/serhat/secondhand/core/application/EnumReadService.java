@@ -17,7 +17,7 @@ import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepo
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
@@ -237,13 +237,16 @@ public class EnumReadService {
 
     public List<Map<String, Object>> getRealEstateTypes() {
         List<Map<String, Object>> raw = realEstateTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparingInt(RealEstateType::getSortOrder)
+                        .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
-                    map.put("category", RealEstateCategory.fromTypeName(type.getName()).name());
+                    map.put("category", type.getCategory().name());
+                    map.put("sortOrder", type.getSortOrder());
+                    map.put("fieldRules", type.getFieldRules());
                     return map;
                 })
                 .toList();

@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.application.realestate;
 
 import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
+import com.serhat.secondhand.listing.application.filter.ListingAttributePredicates;
 import com.serhat.secondhand.listing.domain.dto.response.listing.RealEstateFilterDto;
 import com.serhat.secondhand.listing.domain.entity.RealEstateListing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
@@ -11,9 +12,9 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Locale;
 
 @Component
 public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<RealEstateListing, RealEstateFilterDto> {
@@ -24,64 +25,65 @@ public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<
 
         predicates.add(cb.equal(root.get("listingType"), ListingType.REAL_ESTATE));
 
-        if (filters.getHeatingTypeIds() != null && !filters.getHeatingTypeIds().isEmpty()) {
+        if (notEmpty(filters.getHeatingTypeIds())) {
             predicates.add(root.join("heatingType").get("id").in(filters.getHeatingTypeIds()));
         }
-        
-        if (filters.getRealEstateTypeIds() != null && !filters.getRealEstateTypeIds().isEmpty()) {
+        if (notEmpty(filters.getRealEstateTypeIds())) {
             predicates.add(root.join("realEstateType").get("id").in(filters.getRealEstateTypeIds()));
         }
-        
-        if (filters.getFloor() != null) {
-            predicates.add(cb.equal(root.get("floor"), filters.getFloor()));
-        }
-        
         if (filters.getAdTypeId() != null) {
             predicates.add(cb.equal(root.join("adType").get("id"), filters.getAdTypeId()));
         }
-        
         if (filters.getOwnerTypeId() != null) {
             predicates.add(cb.equal(root.join("ownerType").get("id"), filters.getOwnerTypeId()));
         }
 
-        if (filters.getMinSquareMeters() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("squareMeters"), filters.getMinSquareMeters()));
-        }
-        if (filters.getMaxSquareMeters() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("squareMeters"), filters.getMaxSquareMeters()));
-        }
-        
-        if (filters.getMinRoomCount() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("roomCount"), filters.getMinRoomCount()));
-        }
-        if (filters.getMaxRoomCount() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("roomCount"), filters.getMaxRoomCount()));
-        }
-        
-        if (filters.getMinBathroomCount() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("bathroomCount"), filters.getMinBathroomCount()));
-        }
-        if (filters.getMaxBathroomCount() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("bathroomCount"), filters.getMaxBathroomCount()));
-        }
-        
-        if (filters.getMinBuildingAge() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("buildingAge"), filters.getMinBuildingAge()));
-        }
-        if (filters.getMaxBuildingAge() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("buildingAge"), filters.getMaxBuildingAge()));
-        }
+        range(cb, predicates, root.<Integer>get("grossAreaM2"), filters.getMinGrossArea(), filters.getMaxGrossArea());
+        range(cb, predicates, root.<Integer>get("netAreaM2"), filters.getMinNetArea(), filters.getMaxNetArea());
+        range(cb, predicates, root.<Integer>get("roomCount"), filters.getMinRoomCount(), filters.getMaxRoomCount());
+        range(cb, predicates, root.<Integer>get("floorNumber"), filters.getMinFloor(), filters.getMaxFloor());
+        range(cb, predicates, root.<Integer>get("buildingAge"), filters.getMinBuildingAge(), filters.getMaxBuildingAge());
 
+        if (notEmpty(filters.getRoomConfigKeys())) {
+            predicates.add(root.get("roomConfigKey").in(filters.getRoomConfigKeys()));
+        }
+        if (notEmpty(filters.getZoningStatusKeys())) {
+            predicates.add(root.get("zoningStatusKey").in(filters.getZoningStatusKeys()));
+        }
         if (filters.isFurnished()) {
-            predicates.add(cb.equal(root.get("furnished"), true));
+            predicates.add(cb.isTrue(root.<Boolean>get("furnished")));
+        }
+        if (filters.isHasElevator()) {
+            predicates.add(cb.isTrue(root.<Boolean>get("hasElevator")));
+        }
+        if (filters.isHasParking()) {
+            predicates.add(cb.isTrue(root.<Boolean>get("hasParking")));
+        }
+        if (filters.isInSite()) {
+            predicates.add(cb.isTrue(root.<Boolean>get("inSite")));
         }
 
-        if (filters.getZoningStatus() != null && !filters.getZoningStatus().isBlank()) {
-            String q = "%" + filters.getZoningStatus().trim().toLowerCase(Locale.ROOT) + "%";
-            predicates.add(cb.like(cb.lower(root.get("zoningStatus")), q));
+        if (notEmpty(filters.getDeedStatuses())) {
+            predicates.add(ListingAttributePredicates.textIn(cb, root.get("attributes"), "deedStatus", filters.getDeedStatuses()));
+        }
+        if (filters.getLoanEligible() != null) {
+            predicates.add(ListingAttributePredicates.booleanEquals(cb, root.get("attributes"), "loanEligible", filters.getLoanEligible()));
         }
 
         return predicates;
+    }
+
+    private static void range(CriteriaBuilder cb, List<Predicate> predicates, Expression<Integer> field, Integer min, Integer max) {
+        if (min != null) {
+            predicates.add(cb.greaterThanOrEqualTo(field, min));
+        }
+        if (max != null) {
+            predicates.add(cb.lessThanOrEqualTo(field, max));
+        }
+    }
+
+    private static boolean notEmpty(Collection<?> values) {
+        return values != null && !values.isEmpty();
     }
 
     @Override
@@ -89,9 +91,10 @@ public class RealEstateFilterPredicateBuilder implements FilterPredicateBuilder<
         return switch (sortBy) {
             case "price" -> Optional.of(root.get("price"));
             case "createdat", "created_at" -> Optional.of(root.get("createdAt"));
-            case "squaremeters", "square_meters" -> Optional.of(root.get("squareMeters"));
+            case "grossarea", "gross_area", "squaremeters", "square_meters" -> Optional.of(root.get("grossAreaM2"));
             case "roomcount", "room_count" -> Optional.of(root.get("roomCount"));
             case "buildingage", "building_age" -> Optional.of(root.get("buildingAge"));
+            case "floor", "floornumber" -> Optional.of(root.get("floorNumber"));
             default -> Optional.empty();
         };
     }
