@@ -117,14 +117,14 @@ const ListingGallery = ({ images, title }) => {
       </div>
 
       {count > 1 && (
-        <div className="hidden gap-2 overflow-x-auto pb-1 sm:flex">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {images.map((url, idx) => (
             <button
               type="button"
               key={url}
               onClick={() => setIndex(idx)}
-              className={`h-16 w-16 shrink-0 overflow-hidden rounded border bg-background-tertiary transition-colors duration-150 ${
-                idx === index ? 'border-primary' : 'border-border hover:border-card-border-hover'
+              className={`h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded border bg-background-tertiary transition-colors duration-150 ${
+                idx === index ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover opacity-75 hover:opacity-100'
               }`}
               aria-label={t('photo_n', { defaultValue: 'Fotoğraf {{n}}', n: idx + 1 })}
               aria-current={idx === index ? 'true' : undefined}

@@ -9,12 +9,13 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { isPrefilterValueFilled } from '../utils/prefilterSelection.js';
 import { findEngine } from '../../vehicle/utils/vehicleCatalogUtils.js';
 import PageContainer from '../../common/components/layout/PageContainer.jsx';
-import Button from '../../common/components/ui/Button.jsx';
+import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
 import SearchableDropdown from '../../common/components/ui/SearchableDropdown.jsx';
-import { inputNormal } from '../../common/components/forms/inputStyles.js';
 
 const GRID_SEARCH_THRESHOLD = 8;
+const COMPACT_LIST_THRESHOLD = 6;
+const GROUPED_ALPHA_THRESHOLD = 18;
 
 const makeGetName = (enums) => (enumKey, idOrValue, { upper = false } = {}) => {
   const list = enums?.[enumKey] || [];
@@ -192,9 +193,8 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
               type="button"
               onClick={() => handleTypeSelect(type.value)}
               aria-pressed={selected}
-              className={`group flex items-center gap-3 rounded border bg-background-primary px-4 py-3.5 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
-                selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
-              }`}
+              className={`group flex items-center gap-3 rounded border bg-background-primary px-4 py-3.5 text-left transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${selected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
+                }`}
             >
               {Icon && <Icon className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />}
               <span className="min-w-0 flex-1">
@@ -219,56 +219,125 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
         ? options.filter(opt => optionLabel(opt).toLowerCase().includes(q)
           || (Array.isArray(opt.aliases) && opt.aliases.some(a => String(a).toLowerCase().includes(q))))
         : options;
+      const showSearch = options.length > GRID_SEARCH_THRESHOLD;
+      const isCompactSingleCol = options.length <= COMPACT_LIST_THRESHOLD;
+      const useAlphaGroups = !q && filtered.length >= GROUPED_ALPHA_THRESHOLD;
+
+      const renderOptionRow = (opt) => {
+        const id = optionId(opt);
+        const selected = String(selectedValue) === String(id);
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => handleOptionPick(id)}
+            aria-pressed={selected}
+            className={`group flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:bg-background-secondary ${selected
+                ? 'bg-background-tertiary/70 font-semibold text-text-primary'
+                : 'text-text-primary hover:bg-background-secondary'
+              }`}
+          >
+            <span className="truncate">{optionLabel(opt)}</span>
+            {selected ? (
+              <Check className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
+            ) : (
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+                strokeWidth={1.5}
+                aria-hidden
+              />
+            )}
+          </button>
+        );
+      };
+
+      let listBody;
+      if (filtered.length === 0) {
+        listBody = (
+          <div className="p-6">
+            <EmptyState
+              size="compact"
+              title={t('prefilter_no_match', 'Eşleşen seçenek yok')}
+              description={t('prefilter_no_match_desc', 'Farklı bir kelime dene.')}
+            />
+          </div>
+        );
+      } else if (useAlphaGroups) {
+        const groups = [];
+        const map = new Map();
+        filtered.forEach(opt => {
+          const raw = optionLabel(opt).trim();
+          const firstChar = raw ? raw.charAt(0).toLocaleUpperCase('tr-TR') : '#';
+          const letter = /^[A-ZÇĞİÖŞÜ]/i.test(firstChar) ? firstChar : '#';
+          if (!map.has(letter)) {
+            const bucket = { letter, items: [] };
+            map.set(letter, bucket);
+            groups.push(bucket);
+          }
+          map.get(letter).items.push(opt);
+        });
+        listBody = (
+          <div className="max-h-96 overflow-y-auto divide-y divide-border-light">
+            {groups.map(group => (
+              <div key={group.letter}>
+                <div className="sticky top-0 z-10 border-b border-border-light bg-background-secondary px-4 py-1.5 text-xs font-semibold text-text-tertiary">
+                  {group.letter}
+                </div>
+                <div className="grid grid-cols-1 divide-y divide-border-light sm:grid-cols-3 sm:divide-y-0">
+                  {group.items.map(opt => (
+                    <div key={optionId(opt)} className="border-border-light sm:border-b sm:border-r sm:[&:nth-child(3n)]:border-r-0">
+                      {renderOptionRow(opt)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      } else if (isCompactSingleCol) {
+        listBody = (
+          <div className="divide-y divide-border-light">
+            {filtered.map(renderOptionRow)}
+          </div>
+        );
+      } else {
+        listBody = (
+          <div className="max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 divide-y divide-border-light sm:grid-cols-2 sm:divide-y-0">
+              {filtered.map(opt => (
+                <div key={optionId(opt)} className="border-border-light sm:border-b sm:odd:border-r">
+                  {renderOptionRow(opt)}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       content = (
-        <div className="space-y-4">
-          {options.length > GRID_SEARCH_THRESHOLD && (
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" strokeWidth={1.5} aria-hidden />
+        <div>
+          {showSearch && (
+            <div className="flex items-center gap-2.5 border-b border-border-light px-4 py-2.5">
+              <Search className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
               <input
                 type="search"
                 value={optionFilter}
                 onChange={e => setOptionFilter(e.target.value)}
                 placeholder={t('prefilter_filter_options', { defaultValue: '{{title}} ara', title: stepTitle(selector) })}
                 aria-label={t('filter_options', 'Seçenekleri filtrele')}
-                className={`${inputNormal} pl-9`}
+                className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
               />
+              <span className="shrink-0 text-xs tabular-nums text-text-tertiary">
+                {filtered.length}
+              </span>
             </div>
           )}
-          {filtered.length === 0 ? (
-            <EmptyState
-              size="compact"
-              title={t('prefilter_no_match', 'Eşleşen seçenek yok')}
-              description={t('prefilter_no_match_desc', 'Farklı bir kelime dene.')}
-            />
-          ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {filtered.map(opt => {
-                const id = optionId(opt);
-                const selected = String(selectedValue) === String(id);
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => handleOptionPick(id)}
-                    aria-pressed={selected}
-                    className={`flex items-center justify-between gap-2 rounded border bg-background-primary px-3.5 py-3 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
-                      selected ? 'border-primary font-medium text-text-primary ring-1 ring-primary' : 'border-border text-text-primary hover:border-card-border-hover'
-                    }`}
-                  >
-                    <span className="truncate">{optionLabel(opt)}</span>
-                    {selected
-                      ? <Check className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} aria-hidden />
-                      : <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {listBody}
         </div>
       );
     } else {
       content = (
-        <div>
+        <div className="p-4 sm:p-5">
           <SearchableDropdown
             options={options}
             selectedValues={selectedValue ? [selectedValue] : []}
@@ -307,17 +376,32 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
   return (
     <div className="min-h-screen bg-background-secondary">
       <PageContainer narrow className="py-6 sm:py-10">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <Button variant="ghost" size="sm" className="-ml-3" onClick={onCancel}>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Button variant="secondary" size="sm" onClick={stepIndex > 0 ? handleBack : onCancel}>
             <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            <span>{t('cancel', 'Vazgeç')}</span>
+            <span>{stepIndex > 0 ? t('back', 'Geri') : t('cancel', 'Vazgeç')}</span>
           </Button>
-          {!isCreate && (
-            <Link to={ROUTES.LISTINGS} className="inline-flex items-center gap-1 text-sm text-text-secondary transition-colors duration-150 hover:text-text-primary">
-              {t('browse_all_listings', 'Tüm ilanlar')}
-              <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            </Link>
-          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            {!isCreate && (
+              <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary', 'sm')}>
+                <span>{t('browse_all_listings', 'Tüm ilanları gör')}</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </Link>
+            )}
+            {stepIndex > 0 && showContinue && (
+              <Button variant={isCreate ? 'primary' : 'secondary'} size="sm" onClick={() => goToStep(stepIndex + 1)}>
+                <span>{hasValue ? t('continue', 'Devam et') : t('skip', 'Atla')}</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </Button>
+            )}
+            {!isCreate && stepIndex > 0 && (
+              <Button variant="primary" size="sm" onClick={triggerBrowseSearch}>
+                <Search className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                <span>{t('prefilter_show_scope_results', { defaultValue: '{{scope}} ilanlarını gör', scope: resultsScope })}</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         {selectedType && (
@@ -337,48 +421,29 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
         {(subheading || browseHint) && <p className="mt-1.5 text-sm text-text-secondary">{subheading || browseHint}</p>}
 
         {crumbs.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-text-tertiary">{t('your_selections', 'Seçimlerin')}</span>
-            {crumbs.map(crumb => (
-              <button
-                key={crumb.index}
-                type="button"
-                onClick={() => (crumb.index === 0 ? resetCategory() : goToStep(crumb.index))}
-                title={t('prefilter_change_selection', 'Bu seçimi değiştir')}
-                className="inline-flex items-center rounded border border-border bg-background-primary px-2.5 py-1 text-sm text-text-primary transition-colors duration-150 hover:border-card-border-hover"
-              >
-                {crumb.label}
-              </button>
+          <nav className="mt-4 flex flex-wrap items-center gap-1.5 text-sm" aria-label={t('your_selections', 'Seçimlerin')}>
+            <span className="mr-1 text-xs font-medium text-text-tertiary">{t('your_selections', 'Seçimlerin')}</span>
+            {crumbs.map((crumb, idx) => (
+              <span key={crumb.index} className="inline-flex items-center gap-1.5">
+                {idx > 0 && (
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
+                )}
+                <button
+                  type="button"
+                  onClick={() => (crumb.index === 0 ? resetCategory() : goToStep(crumb.index))}
+                  title={t('prefilter_change_selection', 'Bu seçimi değiştir')}
+                  className="rounded-sm font-medium text-text-secondary transition-colors duration-150 hover:text-text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                >
+                  {crumb.label}
+                </button>
+              </span>
             ))}
-          </div>
+          </nav>
         )}
 
-        <div className={stepIndex === 0 ? 'mt-6' : 'mt-6 rounded border border-border bg-background-primary p-4 sm:p-5'}>
+        <div className={stepIndex === 0 ? 'mt-6' : 'mt-6 overflow-hidden rounded border border-border bg-background-primary'}>
           {content}
         </div>
-
-        {stepIndex > 0 && (
-          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button variant="ghost" onClick={handleBack}>
-              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              {t('back', 'Geri')}
-            </Button>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
-              {showContinue && (
-                <Button variant={isCreate ? 'primary' : 'secondary'} onClick={() => goToStep(stepIndex + 1)}>
-                  {hasValue ? t('continue', 'Devam et') : t('skip', 'Atla')}
-                  <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                </Button>
-              )}
-              {!isCreate && (
-                <Button onClick={triggerBrowseSearch}>
-                  <Search className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                  {t('prefilter_show_scope_results', { defaultValue: '{{scope}} ilanlarını gör', scope: resultsScope })}
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
       </PageContainer>
     </div>
   );

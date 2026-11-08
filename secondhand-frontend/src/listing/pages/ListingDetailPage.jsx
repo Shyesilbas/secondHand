@@ -16,7 +16,6 @@ import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import { useCart } from '../../cart/hooks/useCart.js';
-import MakeOfferModal from '../../offer/components/MakeOfferModal.jsx';
 import { formatCurrency } from '../../common/formatters.js';
 import AuraSummary from '../../common/components/AuraSummary.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
@@ -31,6 +30,7 @@ import ListingBuyBox from '../components/ListingBuyBox.jsx';
 import ListingSellerCard from '../components/ListingSellerCard.jsx';
 
 const ListingInfoModal = lazy(() => import('../components/ListingInfoModal.jsx'));
+const MakeOfferModal = lazy(() => import('../../offer/components/MakeOfferModal.jsx'));
 
 /* ── Helpers ─────────────────────────────────────────────── */
 
@@ -150,10 +150,11 @@ const ListingDetailPage = () => {
     }
   }, [listing, isOwner]);
 
-  /* Collapse the description again when navigating to another listing */
+  /* Collapse the description and scroll to top when navigating to another listing */
   useEffect(() => {
     setIsDescriptionExpanded(false);
-  }, [listing?.id]);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [id]);
 
   /* SEO */
   useEffect(() => {
@@ -244,7 +245,11 @@ const ListingDetailPage = () => {
 
   return (
     <div className={`min-h-screen bg-background-secondary text-text-primary ${showMobileBar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
-      <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
+      {isOfferModalOpen && (
+        <Suspense fallback={null}>
+          <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
+        </Suspense>
+      )}
       {isInsightsOpen && (
         <Suspense fallback={null}>
           <ListingInfoModal
@@ -260,7 +265,7 @@ const ListingDetailPage = () => {
       <PageContainer className="pt-4">
         <div className="mb-4 flex items-center justify-between gap-4">
           <nav className="flex min-w-0 items-center gap-1.5 text-sm text-text-tertiary" aria-label="Breadcrumb">
-            <Link to={ROUTES.LISTINGS} className="shrink-0 hover:text-text-primary">
+            <Link to={ROUTES.LISTINGS} className="shrink-0 hover:text-text-primary transition-colors">
               {t("all_listings", "İlanlar")}
             </Link>
             <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
@@ -268,9 +273,9 @@ const ListingDetailPage = () => {
             <ChevronRight className="hidden h-4 w-4 shrink-0 text-text-muted md:block" strokeWidth={1.5} aria-hidden />
             <span className="hidden truncate text-text-secondary md:inline" aria-current="page">{listing.title}</span>
           </nav>
-          <Button variant="ghost" size="sm" className="shrink-0" onClick={openAura} title={t("ask_aura_tip", "Bu ilan hakkında Aura AI ile konuş")}>
-            <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-            <span>{t("ask_aura", "Aura'ya sor")}</span>
+          <Button variant="ghost" size="sm" className="shrink-0" onClick={() => setIsInsightsOpen(true)}>
+            <BarChart3 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            <span>{t("market_insights", "Piyasa analizi")}</span>
           </Button>
         </div>
 
@@ -346,15 +351,10 @@ const ListingDetailPage = () => {
                 id="aura"
                 title={t('aura_listing_analysis', 'Aura analizi')}
                 action={
-                  <div className="flex shrink-0 items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setIsInsightsOpen(true)}>
-                      <BarChart3 className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                      <span className="hidden sm:inline">{t("market_insights", "Piyasa analizi")}</span>
-                    </Button>
-                    <Button variant="secondary" size="sm" onClick={openAura}>
-                      {t('ask_question', 'Soru sor')}
-                    </Button>
-                  </div>
+                  <Button variant="secondary" size="sm" onClick={openAura}>
+                    <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                    <span>{t('ask_aura', "Aura'ya sor")}</span>
+                  </Button>
                 }
               >
                 <AuraSummary type="listing" id={listing.id} listing={listing} />

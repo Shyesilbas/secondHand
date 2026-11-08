@@ -1,13 +1,9 @@
-import { useTranslation } from "react-i18next";
-import {
-  ShieldCheck,
-  CheckCircle2,
-  AlertTriangle
-} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Activity, AlertTriangle } from 'lucide-react';
 
 const SecuritySummary = ({
   totalElements = 0,
-  auditLogs = []
+  auditLogs = [],
 }) => {
   const { t } = useTranslation();
 
@@ -16,66 +12,52 @@ const SecuritySummary = ({
   ).length;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
       {/* 1. Total Security Events */}
-      <div className="bg-background-primary rounded border border-border p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-text-muted mb-1">
-              {t("total_events", "Toplam Hareket")}
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-text-primary tabular-nums">
-              {totalElements}
-            </p>
-            <p className="text-xs text-text-tertiary font-medium mt-1">
-              {t("recorded_security_events", "Kayıtlı hesap aktivitesi")}
-            </p>
-          </div>
-          <ShieldCheck className="shrink-0 h-5 w-5 text-text-primary" strokeWidth={1.5} aria-hidden />
+      <div className="flex items-start justify-between gap-4 rounded border border-border bg-background-primary p-5">
+        <div>
+          <p className="text-xs font-medium text-text-tertiary">
+            {t('total_events', 'Toplam Hareket')}
+          </p>
+          <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">
+            {totalElements}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            {t('recorded_security_events', 'Kayıtlı hesap aktivitesi')}
+          </p>
+        </div>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-secondary text-text-secondary">
+          <Activity className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         </div>
       </div>
 
-      {/* 2. Account Security Status */}
-      <div className="bg-background-primary rounded border border-border p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-text-muted mb-1">
-              {t("account_security_status", "Hesap Güvenlik Durumu")}
-            </p>
-            <p className="text-2xl sm:text-3xl font-semibold text-status-success-text">
-              {t("protected", "Korumada")}
-            </p>
-            <p className="text-xs text-text-tertiary font-medium mt-1">
-              {t("active_monitoring", "Aktif oturum ve denetim takibi")}
-            </p>
-          </div>
-          <CheckCircle2 className="shrink-0 h-5 w-5 text-status-success-text" strokeWidth={1.5} aria-hidden />
+      {/* 2. Failed / Suspicious Attempts */}
+      <div className="flex items-start justify-between gap-4 rounded border border-border bg-background-primary p-5">
+        <div>
+          <p className="text-xs font-medium text-text-tertiary">
+            {t('failed_attempts', 'Son Şüpheli Denemeler')}
+          </p>
+          <p
+            className={`mt-1 text-2xl font-semibold tabular-nums ${
+              failedAttempts > 0 ? 'text-status-error-text' : 'text-text-primary'
+            }`}
+          >
+            {failedAttempts}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            {failedAttempts > 0
+              ? t('attention_required', 'Bu sayfadaki kayıtlarda başarısız giriş denemesi var')
+              : t('no_failed_attempts', 'Son hareketlerde şüpheli deneme yok')}
+          </p>
         </div>
-      </div>
-
-      {/* 3. Failed / Suspicious Attempts */}
-      <div className="bg-background-primary rounded border border-border p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-text-muted mb-1">
-              {t("failed_attempts", "Son Şüpheli Denemeler")}
-            </p>
-            <p className={`text-2xl sm:text-3xl font-semibold tabular-nums ${failedAttempts > 0 ? 'text-status-error-text' : 'text-text-primary'}`}>
-              {failedAttempts}
-            </p>
-            <p className="text-xs text-text-tertiary font-medium mt-1">
-              {failedAttempts > 0
-                ? t("attention_required", "İncelemeniz önerilir")
-                : t("no_failed_attempts", "Son hareketlerde şüpheli deneme yok")}
-            </p>
-          </div>
-          <div className={`w-10 h-10 rounded flex items-center justify-center shrink-0 ${
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded border ${
             failedAttempts > 0
-              ? 'bg-background-secondary border border-border text-status-error-text'
-              : 'bg-background-secondary border border-border text-text-muted'
-          }`}>
-            <AlertTriangle className="w-5 h-5" strokeWidth={1.5} />
-          </div>
+              ? 'border-status-error-border bg-background-secondary text-status-error-text'
+              : 'border-border-light bg-background-secondary text-text-tertiary'
+          }`}
+        >
+          <AlertTriangle className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         </div>
       </div>
     </div>

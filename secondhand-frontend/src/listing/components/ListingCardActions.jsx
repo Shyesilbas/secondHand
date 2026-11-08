@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useShowcaseQueries } from '../../showcase/hooks/queries.js';
+import { useMyShowcases } from '../../showcase/hooks/useMyShowcases.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useListingActions } from '../hooks/useListingActions.js';
 import { ListingQuickActionsModal } from './ListingQuickActionsModal.jsx';
@@ -19,6 +20,7 @@ const ListingCardActions = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOwner = Boolean(user?.id && user.id === listing?.sellerId);
   const { isInShowcase } = useShowcaseQueries({ enabled: isOwner && isModalOpen });
+  const { showcases: myShowcases = [] } = useMyShowcases(user?.id, { enabled: isOwner && isModalOpen });
 
   const actions = useListingActions({
     listing,
@@ -28,7 +30,10 @@ const ListingCardActions = ({
 
   if (!isOwner) return null;
 
-  const listingInShowcase = isModalOpen ? isInShowcase(listing.id) : false;
+  const isInMyShowcases = Array.isArray(myShowcases) && myShowcases.some(
+    s => s?.status === 'ACTIVE' && (s?.listing?.id || s?.listingId) === listing.id
+  );
+  const listingInShowcase = isModalOpen ? (isInShowcase(listing.id) || isInMyShowcases) : false;
 
   return (
     <>
@@ -53,7 +58,7 @@ const ListingCardActions = ({
             e.stopPropagation();
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center justify-center rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-border-focus hover:bg-background-secondary h-9 w-9 cursor-pointer"
+          className="inline-flex h-8 w-8 items-center justify-center rounded border border-border bg-background-primary text-text-secondary transition-colors duration-150 ease-out hover:border-card-border-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus cursor-pointer"
           title={t("manage_listing", "İlanı Yönet")}
           aria-label={t("manage_listing", "İlanı Yönet")}
         >

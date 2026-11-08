@@ -1,11 +1,11 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { memo, useCallback, useState } from 'react';
 import { MapPin, Plus } from 'lucide-react';
 import useAddresses from '../hooks/useAddresses.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import AddressForm from './address/AddressForm.jsx';
 import AddressCard from './address/AddressCard.jsx';
-import { Button, EmptyState, SkeletonList } from '../../common/components/ui/index.js';
+import { Alert, Button, EmptyState, SkeletonList } from '../../common/components/ui/index.js';
 import logger from '../../common/utils/logger.js';
 
 const AddressList = memo(({ isActive }) => {
@@ -82,7 +82,11 @@ const AddressList = memo(({ isActive }) => {
         );
       } catch (err) {
         logger.error('Failed to select main address:', err);
-        showError('Error', err.response?.data?.message || t('failed_to_set_main_address', 'Varsayılan adres güncellenemedi.'));
+        showError(
+          t('error', 'Hata'),
+          err.response?.data?.message ||
+            t('failed_to_set_main_address', 'Varsayılan adres güncellenemedi.')
+        );
       }
     },
     [selectMainAddress, showSuccess, showError, t]
@@ -92,7 +96,10 @@ const AddressList = memo(({ isActive }) => {
     (addressId) => {
       showConfirmation(
         t('delete_address_title', 'Adresi Sil'),
-        t('delete_address_confirm', 'Bu adresi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.'),
+        t(
+          'delete_address_confirm',
+          'Bu adresi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.'
+        ),
         async () => {
           try {
             await deleteAddress(addressId);
@@ -102,7 +109,11 @@ const AddressList = memo(({ isActive }) => {
             );
           } catch (err) {
             logger.error('Failed to delete address:', err);
-            showError('Error', err.response?.data?.message || t('failed_to_delete_address', 'Adres silinemedi.'));
+            showError(
+              t('error', 'Hata'),
+              err.response?.data?.message ||
+                t('failed_to_delete_address', 'Adres silinemedi.')
+            );
           }
         }
       );
@@ -132,20 +143,25 @@ const AddressList = memo(({ isActive }) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <p className="text-xs text-text-muted">
-          {t('addresses_manage_helper', 'Kayıtlı teslimat ve fatura adreslerinizi buradan yönetebilirsiniz.')}
-        </p>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleAddClick}
-          className="shrink-0"
-        >
-          <Plus className="h-4 w-4" strokeWidth={1.5} />
-          <span>{t('add_address', 'Yeni Adres Ekle')}</span>
-        </Button>
-      </div>
+      {addresses.length > 0 && (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <p className="text-xs text-text-secondary">
+            <span className="font-semibold tabular-nums text-text-primary">
+              {addresses.length}
+            </span>{' '}
+            {t('saved_addresses_count', 'kayıtlı adres')}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleAddClick}
+            className="shrink-0"
+          >
+            <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+            <span>{t('add_address', 'Yeni Adres Ekle')}</span>
+          </Button>
+        </div>
+      )}
 
       <AddressForm
         isOpen={showAddAddress}
@@ -168,7 +184,7 @@ const AddressList = memo(({ isActive }) => {
 
       {loading ? (
         <div
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2"
+          className="grid grid-cols-1 gap-3 md:grid-cols-2"
           aria-busy="true"
           aria-label={t('loading_addresses', 'Adresler yükleniyor')}
         >
@@ -176,23 +192,25 @@ const AddressList = memo(({ isActive }) => {
           <SkeletonList />
         </div>
       ) : error ? (
-        <div className="text-center py-8">
-          <p className="text-sm font-medium text-status-error">
-            {t('failed_to_load_addresses', 'Adresler yüklenemedi')}
-          </p>
-        </div>
+        <Alert
+          type="error"
+          message={t('failed_to_load_addresses', 'Adresler yüklenemedi.')}
+        />
       ) : addresses.length === 0 ? (
         <EmptyState
           icon={MapPin}
           title={t('no_addresses_found', 'Kayıtlı adres bulunamadı')}
-          description={t('no_addresses_found_add_your_first_addres', 'Siparişlerinizde kullanmak üzere yeni bir adres ekleyin.')}
+          description={t(
+            'no_addresses_found_add_your_first_addres',
+            'Siparişlerinizde kullanmak üzere yeni bir adres ekleyin.'
+          )}
           primaryAction={{
             label: t('add_address', 'Yeni Adres Ekle'),
             onClick: handleAddClick
           }}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {addresses.map((address) => (
             <AddressCard
               key={address.id}

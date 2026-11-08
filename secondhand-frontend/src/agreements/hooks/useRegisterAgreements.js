@@ -29,6 +29,18 @@ export const useRegisterAgreements = () => {
  setSelectedAgreement(null);
  };
 
+ const handleAcceptFromModal = (agreement) => {
+ const id = agreement?.agreementId || selectedAgreement?.agreementId;
+ if (id) {
+ setAcceptedAgreements(prev => {
+ const newSet = new Set(prev);
+ newSet.add(id);
+ return newSet;
+ });
+ }
+ handleCloseModal();
+ };
+
  return {
  agreements,
  agreementsLoading,
@@ -38,7 +50,8 @@ export const useRegisterAgreements = () => {
  showAgreementModal,
  handleAgreementToggle,
  handleAgreementClick,
- handleCloseModal
+ handleCloseModal,
+ handleAcceptFromModal
  };
 };
 

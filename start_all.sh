@@ -28,8 +28,16 @@ NC='\033[0m'
 
 BACKEND_PID=""
 FRONTEND_PID=""
+COMPOSE_CMD=()
+DOCKER_STARTED=false
+CLEANED_UP=false
 
 cleanup() {
+    if [[ "$CLEANED_UP" == "true" ]]; then
+        return
+    fi
+    CLEANED_UP=true
+
     echo ""
     echo -e "${YELLOW}Shutting down services...${NC}"
 
@@ -44,7 +52,13 @@ cleanup() {
     fi
 
     wait 2>/dev/null || true
-    echo -e "${GREEN}All services stopped.${NC}"
+
+    if [[ "$DOCKER_STARTED" == "true" ]] && [[ ${#COMPOSE_CMD[@]} -gt 0 ]]; then
+        echo -e "${YELLOW}Stopping Docker containers...${NC}"
+        (cd "$ROOT_DIR" && "${COMPOSE_CMD[@]}" stop) || true
+    fi
+
+    echo -e "${GREEN}All services and Docker containers stopped.${NC}"
 }
 
 trap cleanup SIGINT SIGTERM EXIT
@@ -84,6 +98,7 @@ fi
 
 echo -e "${GREEN}[START]${NC} Starting Docker containers (PostgreSQL :5433, Redis :6379, Kafka :9092)..."
 "${COMPOSE_CMD[@]}" up -d
+DOCKER_STARTED=true
 
 echo -e "${BLUE}[INFO]${NC} Waiting for PostgreSQL and Redis to become ready..."
 for i in {1..30}; do
@@ -129,7 +144,7 @@ echo -e "${GREEN}[START]${NC} Starting Frontend on http://localhost:5173 ..."
 (cd "$FRONTEND_DIR" && npm run dev) > >(sed "s/^/$(printf "${GREEN}[FRONTEND]${NC} ")/") 2>&1 &
 FRONTEND_PID=$!
 
-echo -e "${BLUE}[INFO]${NC} Docker, Backend, and Frontend launched. Press Ctrl+C to stop Backend & Frontend (run '${COMPOSE_CMD[*]} down' to stop containers)."
+echo -e "${BLUE}[INFO]${NC} Docker, Backend, and Frontend launched. Press Ctrl+C to stop all."
 
 # Wait for both processes
 wait "$BACKEND_PID" "$FRONTEND_PID"

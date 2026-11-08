@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { get } from '../services/api/request.js';
 import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
+import Skeleton from './ui/Skeleton.jsx';
 
 export const AuraSummary = ({
   type = 'listing',
@@ -38,31 +39,31 @@ export const AuraSummary = ({
   }
 
   return (
-    <div className="rounded-md border border-border-light bg-white/90 p-4">
+    <div className="rounded border border-border-light bg-background-secondary p-4">
       <div className="flex items-center justify-between gap-3 mb-2.5 flex-wrap">
-        <div className="flex items-center gap-2 text-text-primary font-semibold text-xs tracking-tight">
-          <Sparkles className="w-4 h-4 animate-pulse text-status-warning fill-status-warning shrink-0" />
+        <div className="flex items-center gap-2 text-text-primary font-semibold text-xs">
+          <Sparkles className="w-4 h-4 text-status-warning shrink-0" strokeWidth={1.5} aria-hidden />
           <span>{t("aura_ai_yorum_analizi", "Aura AI Akıllı Değerlendirme")}</span>
         </div>
-        <span className="text-xs font-semibold text-text-primary bg-background-secondary border border-border-light px-2 py-0.5 rounded-sm shrink-0">
-          Otomatik Analiz
+        <span className="text-xs font-medium text-text-secondary bg-background-primary border border-border-light px-2 py-0.5 rounded-sm shrink-0">
+          {t("auto_analysis", "Otomatik analiz")}
         </span>
       </div>
 
       {isLoading ? (
-        <div className="space-y-2 py-1.5 animate-pulse">
-          <div className="h-3 bg-secondary-200/80 rounded w-full" />
-          <div className="h-3 bg-secondary-200/80 rounded w-5/6" />
-          <div className="h-3 bg-secondary-200/80 rounded w-3/4" />
+        <div className="space-y-2 py-1">
+          <Skeleton className="h-3.5 w-full" />
+          <Skeleton className="h-3.5 w-5/6" />
+          <Skeleton className="h-3.5 w-3/4" />
         </div>
       ) : error ? (
-        <div className="flex items-center gap-1.5 text-xs text-text-tertiary font-medium py-1">
-          <AlertCircle className="w-3.5 h-3.5 text-text-muted shrink-0" />
-          <span>Henüz yeterli değerlendirme verisi bulunmuyor veya analiz hazırlanıyor.</span>
+        <div className="flex items-center gap-2 text-sm text-text-tertiary py-1">
+          <AlertCircle className="w-4 h-4 text-text-muted shrink-0" strokeWidth={1.5} aria-hidden />
+          <span>{t("aura_summary_unavailable", "Henüz yeterli değerlendirme verisi bulunmuyor veya analiz hazırlanıyor.")}</span>
         </div>
       ) : (
-        <p className="text-xs text-text-secondary leading-relaxed font-medium whitespace-pre-line">
-          {summary || 'Bu ilan için otomatik Aura AI analizi hazırlanıyor.'}
+        <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+          {summary || t("aura_summary_preparing", "Bu ilan için otomatik Aura AI analizi hazırlanıyor.")}
         </p>
       )}
     </div>

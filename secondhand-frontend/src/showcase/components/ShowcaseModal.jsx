@@ -1,9 +1,12 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useMyShowcases } from '../hooks/useMyShowcases.js';
 import Modal from '../../common/components/ui/Modal.jsx';
-import Button from '../../common/components/ui/Button.jsx';
+import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { useListingData } from '../../listing/hooks/useListingData.js';
 import { usePlan } from '../../common/hooks/usePlan.js';
@@ -24,31 +27,62 @@ import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
 import { findLatestOtpFromEmails } from '../../payments/utils/otp.js';
 import { EMAIL_TYPES } from '../../emails/emails.js';
 import { getErrorMessage } from '../../common/utils/errorUtils.js';
+import { formatCurrency } from '../../common/formatters.js';
+import { ROUTES } from '../../common/constants/routes.js';
 import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  Package
+  Check,
+  Eye,
+  Minus,
+  Package,
+  Plus,
+  RotateCw,
+  Search,
+  Sparkles,
+  Wallet
 } from 'lucide-react';
 
 const PRESET_DURATIONS = [
   { days: 7, badge: null },
   { days: 14, badge: 'Popüler' },
   { days: 21, badge: null },
-  { days: 30, badge: 'En Avantajlı' }
+  { days: 30, badge: 'Avantajlı' }
 ];
 
 const STEPS = [
-  { step: 1, label: '1. Süre Seçimi', hint: 'Süre ve avantaj seçimi' },
-  { step: 2, label: '2. Onay & Bakiye', hint: 'Ödeme özeti ve yasal onaylar' },
-  { step: 3, label: '3. Doğrulama', hint: 'SMS/E-posta ile güvenli doğrulama' }
+  { step: 1, label: 'Süre Seçimi', hint: 'Vitrin süresini ve paketi belirleyin' },
+  { step: 2, label: 'Onay & Bakiye', hint: 'Ödeme özetini ve sözleşmeleri onaylayın' },
+  { step: 3, label: 'Doğrulama', hint: 'E-posta adresinize gönderilen kodu girin' }
+];
+
+const BENEFITS = [
+  {
+    icon: Search,
+    title: 'Üst Sıra Görünürlüğü',
+    desc: 'Ana sayfa vitrininde ve arama sonuçlarında öncelikli gösterim'
+  },
+  {
+    icon: Eye,
+    title: 'Daha Fazla Etkileşim',
+    desc: 'Standart ilanlara kıyasla daha yüksek görüntülenme ve mesaj oranı'
+  },
+  {
+    icon: Sparkles,
+    title: 'Vitrin İşareti',
+    desc: 'İlan kartında öne çıkarıldığını belirten vitrin etiketi'
+  }
 ];
 
 const ErrorLine = ({ children }) => (
-  <p className="flex items-center gap-2 text-sm text-status-error-text" role="alert">
-    <AlertCircle className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+  <div
+    className="flex items-start gap-2 rounded border border-status-error-border bg-status-error-bg px-3.5 py-2.5 text-xs sm:text-sm text-status-error-text"
+    role="alert"
+  >
+    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
     <span>{children}</span>
-  </p>
+  </div>
 );
 
 const ShowcaseModal = ({
@@ -62,9 +96,13 @@ const ShowcaseModal = ({
   initialDays = 7
 }) => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { user } = useAuthState();
   const { plan, maxShowcaseSlots } = usePlan({ enabled: isOpen });
-  const { showcases, isLoading: isCheckingLimit, refresh: refreshShowcases } = useMyShowcases(user?.id, { enabled: isOpen });
+  const { showcases, isLoading: isCheckingLimit, refresh: refreshShowcases } = useMyShowcases(
+    user?.id,
+    { enabled: isOpen }
+  );
   const { eWallet, refreshWallet } = useEWallet({ enabled: isOpen });
   const { emails, fetchEmails } = useEmails();
 
@@ -82,7 +120,7 @@ const ShowcaseModal = ({
   const [localEmails, setLocalEmails] = useState(null);
 
   const activeShowcaseCount = useMemo(
-    () => (Array.isArray(showcases) ? showcases.filter(s => s.status === 'ACTIVE').length : 0),
+    () => (Array.isArray(showcases) ? showcases.filter((s) => s.status === 'ACTIVE').length : 0),
     [showcases]
   );
   const limitExceeded = !isExtension && activeShowcaseCount >= maxShowcaseSlots;
@@ -96,18 +134,22 @@ const ShowcaseModal = ({
     getAcceptedAgreementIds
   } = useAgreementsState();
 
-  const { listing, isLoading: isListingLoading, error: listingError } = useListingData(listingId, isOpen);
+  const { listing, isLoading: isListingLoading, error: listingError } = useListingData(
+    listingId,
+    isOpen
+  );
   const showcasePricing = enums?.showcasePricingConfig;
 
   useEffect(() => {
     if (isOpen) {
       setCurrentStep(1);
+      setDays(initialDays || 7);
       setError(null);
       setVerificationCode('');
       setOtpExpiresAtMs(null);
       refreshWallet();
     }
-  }, [isOpen, refreshWallet]);
+  }, [isOpen, initialDays, refreshWallet]);
 
   const calculateTotal = useCallback(() => {
     if (!showcasePricing) return 0;
@@ -128,10 +170,14 @@ const ShowcaseModal = ({
   const balance = Number(eWallet?.balance || 0);
   const hasEnoughBalance = balance >= totalCost;
 
-  const suggestedFromInbox = useMemo(() => findLatestOtpFromEmails(localEmails || emails, {
-    emailType: EMAIL_TYPES.PAYMENT_VERIFICATION,
-    maxScan: 16
-  }), [emails, localEmails]);
+  const suggestedFromInbox = useMemo(
+    () =>
+      findLatestOtpFromEmails(localEmails || emails, {
+        emailType: EMAIL_TYPES.PAYMENT_VERIFICATION,
+        maxScan: 16
+      }),
+    [emails, localEmails]
+  );
 
   useOtpSuggestedToast({
     suggestedCode: suggestedFromInbox,
@@ -145,11 +191,14 @@ const ShowcaseModal = ({
     active: otpTtlActive
   } = useOtpValidityCountdown(otpTtlExpiresAt);
 
-  const otpFilled = sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH).length === OTP_CODE_LENGTH;
+  const otpFilled =
+    sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH).length === OTP_CODE_LENGTH;
 
-  const handleDaysChange = useCallback(e => {
+  const clampDays = (val) => Math.max(1, Math.min(30, val));
+
+  const handleDaysChange = useCallback((e) => {
     const val = parseInt(e.target.value, 10);
-    setDays(isNaN(val) ? 1 : Math.max(1, Math.min(30, val)));
+    setDays(Number.isNaN(val) ? 1 : clampDays(val));
   }, []);
 
   const handleRequestVerificationCode = async () => {
@@ -169,6 +218,7 @@ const ShowcaseModal = ({
       });
       const fetchedEmails = await fetchEmails(startTime);
       setLocalEmails(fetchedEmails);
+      setVerificationCode('');
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setCurrentStep(3);
     } catch (err) {
@@ -181,7 +231,7 @@ const ShowcaseModal = ({
   const handleFinalizePayment = async () => {
     const code = sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH);
     if (otpTtlExpired) {
-      setError('Doğrulama kodunun süresi doldu. Lütfen geri dönüp yeni kod isteyin.');
+      setError('Doğrulama kodunun süresi doldu. Yeni kod göndererek tekrar deneyin.');
       return;
     }
     if (code.length !== OTP_CODE_LENGTH) {
@@ -217,6 +267,12 @@ const ShowcaseModal = ({
       }
 
       refreshShowcases();
+      refreshWallet();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['showcases'] }),
+        queryClient.invalidateQueries({ queryKey: ['myShowcases'] }),
+        queryClient.invalidateQueries({ queryKey: ['listings'] })
+      ]);
 
       setSuccessSummary({
         title: listing?.title || listingTitle,
@@ -224,11 +280,13 @@ const ShowcaseModal = ({
         pricePaid: totalCost.toFixed(2)
       });
       setShowSuccessNotification(true);
-      onSuccess?.();
     } catch (err) {
-      if (err.response?.data?.error === 'SHOWCASE_SLOT_LIMIT_EXCEEDED' || err.errorCode === 'SHOWCASE_SLOT_LIMIT_EXCEEDED') {
+      if (
+        err.response?.data?.error === 'SHOWCASE_SLOT_LIMIT_EXCEEDED' ||
+        err.errorCode === 'SHOWCASE_SLOT_LIMIT_EXCEEDED'
+      ) {
         setShowUpgradeModal(true);
-        setUpgradeHint('Showcase slot limitinize ulaştınız.');
+        setUpgradeHint('Vitrin slot limitinize ulaştınız.');
         return;
       }
       setError(getErrorMessage(err, 'Ödeme tamamlanamadı.'));
@@ -239,7 +297,9 @@ const ShowcaseModal = ({
 
   if (!isOpen && !showSuccessNotification) return null;
 
-  const successTitle = successSummary?.title ?? listing?.title ?? listingTitle;
+  const resolvedTitle = listing?.title || listingTitle || t('promoted_listing', 'İlan');
+  const resolvedImage = listing?.imageUrl || listing?.images?.[0] || null;
+  const successTitle = successSummary?.title ?? resolvedTitle;
   const successDays = successSummary?.days ?? days;
   const successPricePaid = successSummary?.pricePaid ?? totalCost.toFixed(2);
 
@@ -248,170 +308,405 @@ const ShowcaseModal = ({
     setCurrentStep(step);
   };
 
-  const renderStep1 = () => (
-    <div className="space-y-6">
-      {(listing || listingTitle) && (
-        <div className="flex items-center gap-3 rounded border border-border-light p-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-secondary">
-            {listing?.images?.[0] ? (
-              <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover" />
-            ) : (
-              <Package className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="block text-sm text-text-tertiary">Vitrine Çıkacak İlan</span>
-            <h4 className="truncate text-sm font-medium text-text-primary">{listing?.title || listingTitle}</h4>
-          </div>
+  const renderListingPreviewStrip = () => (
+    <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary/50 p-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-primary">
+          {resolvedImage ? (
+            <img src={resolvedImage} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <Package className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
+          )}
         </div>
-      )}
+        <div className="min-w-0">
+          <span className="block text-xs text-text-tertiary">
+            {isExtension ? 'Süresi Uzatılacak İlan' : 'Vitrine Çıkacak İlan'}
+          </span>
+          <h4 className="truncate text-sm font-medium text-text-primary">{resolvedTitle}</h4>
+        </div>
+      </div>
 
+      {listing?.listingNo && (
+        <span className="shrink-0 rounded-sm border border-border-light bg-background-primary px-2 py-0.5 font-mono text-xs text-text-secondary">
+          #{listing.listingNo}
+        </span>
+      )}
+    </div>
+  );
+
+  const renderStep1 = () => (
+    <div className="space-y-5">
+      {renderListingPreviewStrip()}
+
+      {/* Duration Presets */}
       <fieldset>
-        <div className="mb-3 flex items-center justify-between">
-          <legend className="text-sm font-medium text-text-primary">Vitrin Süresi Seçin</legend>
-          <span className="text-sm tabular-nums text-text-tertiary">{days} Gün Seçildi</span>
+        <div className="mb-2.5 flex items-center justify-between">
+          <legend className="text-xs font-semibold text-text-secondary">
+            Hazır Vitrin Paketleri
+          </legend>
+          {showcasePricing && (
+            <span className="text-xs tabular-nums text-text-tertiary">
+              Günlük {formatCurrency(showcasePricing.totalDailyCost, 'TRY')} (KDV dahil)
+            </span>
+          )}
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {PRESET_DURATIONS.map(opt => {
+
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          {PRESET_DURATIONS.map((opt) => {
             const isSelected = days === opt.days;
+            const optionTotal = showcasePricing
+              ? showcasePricing.totalDailyCost * opt.days
+              : 0;
+
             return (
               <button
                 key={opt.days}
                 type="button"
                 onClick={() => setDays(opt.days)}
                 aria-pressed={isSelected}
-                className={`flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 ${
-                  isSelected ? 'border-primary bg-primary text-white' : 'border-border bg-background-primary text-text-primary hover:border-card-border-hover'
-                }`}
+                className={`relative flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 cursor-pointer ${isSelected
+                    ? 'border-primary bg-background-secondary/80 ring-1 ring-primary'
+                    : 'border-border-light bg-background-primary hover:border-border'
+                  }`}
               >
-                <span className="text-sm font-semibold tabular-nums">{opt.days} Gün</span>
-                <span className={`mt-1 text-sm tabular-nums ${isSelected ? 'text-white/80' : 'text-text-tertiary'}`}>
-                  {showcasePricing ? `₺${(showcasePricing.totalDailyCost * opt.days).toFixed(0)}` : ''}
-                </span>
-                {opt.badge && <span className={`mt-1 text-xs ${isSelected ? 'text-white/80' : 'text-text-tertiary'}`}>{opt.badge}</span>}
+                <div className="flex items-center justify-between gap-1.5">
+                  <span className="text-sm font-semibold tabular-nums text-text-primary">
+                    {opt.days} Gün
+                  </span>
+                  {isSelected ? (
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
+                      <Check className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
+                    </span>
+                  ) : opt.badge ? (
+                    <span className="rounded-sm bg-background-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
+                      {opt.badge}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-3">
+                  <span className="block text-base font-semibold tabular-nums text-text-primary">
+                    {showcasePricing ? formatCurrency(optionTotal, 'TRY') : '—'}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-text-tertiary">
+                    {opt.badge && isSelected ? opt.badge : 'KDV dahil'}
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
       </fieldset>
 
-      <div className="flex items-center justify-between gap-4 rounded border border-border-light px-4 py-3">
-        <div>
-          <label htmlFor="showcase-days" className="text-sm font-medium text-text-primary">Farklı bir gün mü istiyorsunuz?</label>
-          <p className="text-sm text-text-secondary">1 ile 30 gün arasında dilediğiniz süreyi girin.</p>
+      {/* Custom Days Stepper */}
+      <div className="flex items-center justify-between gap-4 rounded border border-border-light px-3.5 py-2.5">
+        <div className="min-w-0">
+          <label
+            htmlFor="showcase-days"
+            className="block text-xs sm:text-sm font-medium text-text-primary"
+          >
+            Özel Süre Belirle
+          </label>
+          <p className="text-xs text-text-tertiary">
+            1 ile 30 gün arasında dilediğiniz süreyi seçebilirsiniz
+          </p>
         </div>
-        <div className="flex h-10 shrink-0 items-center gap-1.5 rounded border border-border px-3">
-          <input id="showcase-days" type="number" min="1" max="30" value={days} onChange={handleDaysChange} className="w-12 bg-transparent text-right text-sm tabular-nums text-text-primary focus:outline-none" />
-          <span className="text-sm text-text-tertiary">Gün</span>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setDays((d) => clampDays(d - 1))}
+            disabled={days <= 1}
+            aria-label="Günü azalt"
+            className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
+          >
+            <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </button>
+
+          <div className="flex h-8 items-center gap-1 rounded border border-border bg-background-primary px-2.5">
+            <input
+              id="showcase-days"
+              type="number"
+              min="1"
+              max="30"
+              value={days}
+              onChange={handleDaysChange}
+              className="w-8 bg-transparent text-center text-sm font-semibold tabular-nums text-text-primary focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <span className="text-xs text-text-tertiary">gün</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setDays((d) => clampDays(d + 1))}
+            disabled={days >= 30}
+            aria-label="Günü artır"
+            className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </button>
         </div>
       </div>
 
-      <ul className="grid grid-cols-1 gap-2 text-sm text-text-secondary sm:grid-cols-3">
-        <li>10x Daha Fazla Ziyaret</li>
-        <li>Altın Vitrin Rozeti</li>
-        <li>Aramada En Üst Sıra</li>
-      </ul>
+      {/* Benefits Strip */}
+      <div className="grid grid-cols-1 gap-2.5 border-t border-border-light pt-4 sm:grid-cols-3">
+        {BENEFITS.map((benefit) => {
+          const Icon = benefit.icon;
+          return (
+            <div
+              key={benefit.title}
+              className="flex items-start gap-2.5 rounded border border-border-light bg-background-secondary/30 p-3"
+            >
+              <Icon
+                className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary"
+                strokeWidth={1.5}
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-text-primary">{benefit.title}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-text-tertiary">
+                  {benefit.desc}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 border-t border-border-light pt-4 sm:flex-row">
+      {/* Step 1 Footer */}
+      <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center">
         <div>
-          <span className="block text-sm text-text-tertiary">Ödenecek Tutar</span>
+          <span className="block text-xs text-text-tertiary">Toplam Ödenecek Tutar</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-semibold tabular-nums text-text-primary">₺{totalCost.toFixed(2)}</span>
-            <span className="text-sm text-text-tertiary">({days} Günlük KDV Dahil)</span>
+            <span className="text-xl font-semibold tabular-nums text-text-primary">
+              {formatCurrency(totalCost, 'TRY')}
+            </span>
+            <span className="text-xs text-text-tertiary">
+              ({days} gün · KDV dahil)
+            </span>
           </div>
         </div>
-        <Button className="w-full sm:w-auto" onClick={() => setCurrentStep(2)}>
-          Devam Et: Ödeme Özeti <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={onClose}>
+            {t('cancel', 'Vazgeç')}
+          </Button>
+          <Button onClick={() => setCurrentStep(2)}>
+            <span>Devam Et</span>
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Button>
+        </div>
       </div>
     </div>
   );
 
   const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-border-light pb-2">
-        <Button variant="ghost" size="sm" onClick={() => backTo(1)}>
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden /> Süre / Paket Değiştir
-        </Button>
-        <span className="text-sm text-text-tertiary">Seçim: <span className="font-medium text-text-primary">{days} Gün</span></span>
+    <div className="space-y-5">
+      {renderListingPreviewStrip()}
+
+      {/* Price Breakdown */}
+      <div>
+        <h4 className="mb-2 text-xs font-semibold text-text-secondary">Ücret Dökümü</h4>
+        <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-xs sm:text-sm">
+          <div className="flex justify-between gap-4 py-2.5">
+            <dt className="text-text-secondary">Seçilen Vitrin Süresi</dt>
+            <dd className="font-medium tabular-nums text-text-primary">{days} Gün</dd>
+          </div>
+          {showcasePricing && (
+            <>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-text-secondary">Günlük Birim Ücret (KDV Hariç)</dt>
+                <dd className="tabular-nums text-text-primary">
+                  {formatCurrency(showcasePricing.dailyCost, 'TRY')}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-text-secondary">Ara Toplam</dt>
+                <dd className="tabular-nums text-text-primary">
+                  {formatCurrency(calculateSubtotal(), 'TRY')}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-text-secondary">KDV (%{showcasePricing.taxPercentage})</dt>
+                <dd className="tabular-nums text-text-primary">
+                  {formatCurrency(calculateTax(), 'TRY')}
+                </dd>
+              </div>
+            </>
+          )}
+          <div className="flex items-baseline justify-between gap-4 py-3">
+            <dt className="font-semibold text-text-primary">Genel Toplam</dt>
+            <dd className="text-base font-semibold tabular-nums text-text-primary">
+              {formatCurrency(totalCost, 'TRY')}
+            </dd>
+          </div>
+        </dl>
       </div>
 
-      <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-sm">
-        <div className="flex justify-between gap-4 py-2"><dt className="text-text-secondary">İlan Başlığı</dt><dd className="max-w-xs truncate font-medium text-text-primary">{listing?.title || listingTitle}</dd></div>
-        <div className="flex justify-between gap-4 py-2"><dt className="text-text-secondary">Vitrin Süresi</dt><dd className="font-medium tabular-nums text-text-primary">{days} Gün</dd></div>
-        {showcasePricing && (
-          <>
-            <div className="flex justify-between gap-4 py-2"><dt className="text-text-secondary">Birim Günlük Ücret</dt><dd className="tabular-nums text-text-primary">₺{showcasePricing.dailyCost.toFixed(2)}</dd></div>
-            <div className="flex justify-between gap-4 py-2"><dt className="text-text-secondary">Ara Toplam</dt><dd className="tabular-nums text-text-primary">₺{calculateSubtotal().toFixed(2)}</dd></div>
-            <div className="flex justify-between gap-4 py-2"><dt className="text-text-secondary">KDV (%{showcasePricing.taxPercentage})</dt><dd className="tabular-nums text-text-primary">₺{calculateTax().toFixed(2)}</dd></div>
-          </>
-        )}
-        <div className="flex items-baseline justify-between gap-4 py-2"><dt className="font-medium text-text-primary">Toplam Ödenecek</dt><dd className="text-lg font-semibold tabular-nums text-text-primary">₺{totalCost.toFixed(2)}</dd></div>
-      </dl>
-
-      <div className="rounded border border-border-light p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h4 className="text-sm font-medium text-text-primary">E-Cüzdan ile Ödeme</h4>
-            <p className="text-sm text-text-secondary">
-              Mevcut Bakiye: <span className="font-medium tabular-nums text-text-primary">₺{balance.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </p>
-          </div>
-          {hasEnoughBalance && (
-            <div className="text-right">
-              <span className="block text-sm text-text-tertiary">Kalan Bakiye</span>
-              <span className="text-sm font-medium tabular-nums text-text-primary">
-                ₺{(balance - totalCost).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
+      {/* E-Wallet Balance Card */}
+      <div>
+        <h4 className="mb-2 text-xs font-semibold text-text-secondary">Ödeme Yöntemi</h4>
+        <div className="rounded border border-border-light bg-background-secondary/30 p-3.5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary">
+                <Wallet className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-text-primary">E-Cüzdan Bakiyesi</span>
+                  <span className="inline-flex items-center gap-1 rounded-sm border border-border-light bg-background-primary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${hasEnoughBalance ? 'bg-status-success' : 'bg-status-error'
+                        }`}
+                      aria-hidden
+                    />
+                    <span>{hasEnoughBalance ? 'Yeterli' : 'Yetersiz Bakiye'}</span>
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs tabular-nums text-text-secondary">
+                  Mevcut: <span className="font-medium text-text-primary">{formatCurrency(balance, 'TRY')}</span>
+                  {hasEnoughBalance && (
+                    <>
+                      {' · '}İşlem sonrası kalan:{' '}
+                      <span className="font-medium text-text-primary">
+                        {formatCurrency(balance - totalCost, 'TRY')}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
+
+            {!hasEnoughBalance && (
+              <Link
+                to={ROUTES.EWALLET}
+                onClick={onClose}
+                className={buttonClasses('secondary', 'sm')}
+              >
+                <span>Bakiye Yükle</span>
+              </Link>
+            )}
+          </div>
+
+          {!hasEnoughBalance && (
+            <p className="mt-2.5 border-t border-border-light pt-2.5 text-xs text-status-error-text">
+              Bu işlem için {formatCurrency(totalCost - balance, 'TRY')} ek bakiyeye ihtiyacınız var.
+            </p>
           )}
         </div>
-        {!hasEnoughBalance && <div className="mt-3"><ErrorLine>Bakiyeniz yetersiz. Lütfen devam etmeden önce bakiye yükleyin.</ErrorLine></div>}
       </div>
 
-      <div className="space-y-2">
-        <span className="block text-sm font-medium text-text-primary">Yasal Onaylar</span>
-        <PaymentAgreementsSection acceptedAgreements={acceptedAgreements} onToggle={onAgreementToggle} onRequiredAgreementsChange={onRequiredAgreementsChange} />
+      {/* Agreements */}
+      <div>
+        <PaymentAgreementsSection
+          acceptedAgreements={acceptedAgreements}
+          onToggle={onAgreementToggle}
+          onRequiredAgreementsChange={onRequiredAgreementsChange}
+        />
       </div>
 
       {error && <ErrorLine>{error}</ErrorLine>}
 
-      <Button className="w-full" onClick={handleRequestVerificationCode} disabled={loading || !hasEnoughBalance || !areAllAgreementsAccepted()}>
-        {loading ? 'Doğrulama Kodu Gönderiliyor...' : 'Doğrulama Kodunu Gönder ve İlerle'}
-      </Button>
+      {/* Step 2 Footer */}
+      <div className="flex items-center justify-between gap-3 border-t border-border-light pt-4">
+        <Button variant="secondary" onClick={() => backTo(1)} disabled={loading}>
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          <span>Süreyi Değiştir</span>
+        </Button>
+
+        <Button
+          onClick={handleRequestVerificationCode}
+          disabled={loading || !hasEnoughBalance || !areAllAgreementsAccepted()}
+        >
+          <span>
+            {loading ? 'Kod Gönderiliyor…' : 'Doğrulama Kodu Gönder'}
+          </span>
+          <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+        </Button>
+      </div>
     </div>
   );
 
   const renderStep3 = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between border-b border-border-light pb-2">
-        <Button variant="ghost" size="sm" onClick={() => backTo(2)}>
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden /> Onay Adımına Dön
-        </Button>
-        <span className="text-sm text-text-tertiary">Son Adım</span>
+    <div className="space-y-5">
+      {/* Compact Transaction Summary Bar */}
+      <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary/50 px-3.5 py-2.5 text-xs sm:text-sm">
+        <span className="truncate font-medium text-text-primary">
+          {resolvedTitle} · <span className="tabular-nums text-text-secondary">{days} Gün Vitrin</span>
+        </span>
+        <span className="shrink-0 font-semibold tabular-nums text-text-primary">
+          {formatCurrency(totalCost, 'TRY')}
+        </span>
       </div>
 
-      <div className="py-2 text-center">
-        <h4 className="text-lg font-semibold text-text-primary">Güvenlik Doğrulama Kodu</h4>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-text-secondary">İşlemi onaylamak için e-posta adresinize gönderilen 6 haneli kodu girin.</p>
-        {otpTtlActive && <p className="mt-2 text-sm tabular-nums text-text-tertiary">Kalan Süre: {otpTtlFormatted}</p>}
+      <div className="py-1 text-center">
+        <h4 className="text-base font-semibold text-text-primary">
+          Güvenlik Doğrulama Kodu
+        </h4>
+        <p className="mx-auto mt-1 max-w-sm text-xs sm:text-sm text-text-secondary">
+          Ödemeyi tamamlamak için e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.
+        </p>
+
+        <div className="mt-2.5 flex items-center justify-center gap-3 text-xs">
+          {otpTtlActive && (
+            <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 font-medium tabular-nums text-text-secondary">
+              <span>Kalan Süre: {otpTtlFormatted}</span>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleRequestVerificationCode}
+            disabled={loading}
+            className="inline-flex items-center gap-1 font-medium text-text-secondary transition-colors hover:text-text-primary disabled:opacity-50 cursor-pointer"
+          >
+            <RotateCw className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+            <span>Yeni Kod Gönder</span>
+          </button>
+        </div>
       </div>
 
       <div className="mx-auto max-w-xs">
-        <OtpDigitInputGroup length={OTP_CODE_LENGTH} value={verificationCode} onChange={setVerificationCode} disabled={loading} error={error} label="Doğrulama Kodu" onComplete={() => {}} />
+        <OtpDigitInputGroup
+          length={OTP_CODE_LENGTH}
+          value={verificationCode}
+          onChange={setVerificationCode}
+          disabled={loading}
+          error={error}
+          label="Doğrulama Kodu"
+          onComplete={() => { }}
+        />
       </div>
 
       {suggestedFromInbox && (
         <div className="mx-auto max-w-sm">
-          <OtpSuggestionBanner suggestedCode={suggestedFromInbox} onApply={setVerificationCode} />
+          <OtpSuggestionBanner
+            suggestedCode={suggestedFromInbox}
+            onApply={setVerificationCode}
+          />
         </div>
       )}
 
-      {error && <div className="flex justify-center"><ErrorLine>{error}</ErrorLine></div>}
+      {error && <ErrorLine>{error}</ErrorLine>}
 
-      <Button className="w-full" onClick={handleFinalizePayment} disabled={loading || !otpFilled || otpTtlExpired}>
-        {loading ? 'Ödeme Tamamlanıyor...' : `Vitrine Çıkar (₺${totalCost.toFixed(2)})`}
-      </Button>
+      {/* Step 3 Footer */}
+      <div className="flex items-center justify-between gap-3 border-t border-border-light pt-4">
+        <Button variant="secondary" onClick={() => backTo(2)} disabled={loading}>
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          <span>Geri</span>
+        </Button>
+
+        <Button
+          onClick={handleFinalizePayment}
+          disabled={loading || !otpFilled || otpTtlExpired}
+        >
+          <span>
+            {loading
+              ? 'Ödeme Tamamlanıyor…'
+              : `Ödemeyi Onayla (${formatCurrency(totalCost, 'TRY')})`}
+          </span>
+        </Button>
+      </div>
     </div>
   );
 
@@ -422,8 +717,17 @@ const ShowcaseModal = ({
 
     if (isCheckingLimit || isListingLoading) {
       return (
-        <Modal isOpen onClose={onClose} title={title} size="sm">
-          <p className="py-6 text-center text-sm text-text-secondary" role="status">Vitrin Hakları Kontrol Ediliyor...</p>
+        <Modal isOpen onClose={onClose} title={title} size="md">
+          <div className="space-y-4 py-2" aria-busy="true">
+            <Skeleton className="h-14 w-full" />
+            <div className="grid grid-cols-4 gap-2.5">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+            <Skeleton className="h-12 w-full" />
+          </div>
         </Modal>
       );
     }
@@ -435,16 +739,28 @@ const ShowcaseModal = ({
           onClose={onClose}
           title="Vitrin Limitine Ulaştınız"
           size="sm"
-          footer={<>
-            <Button variant="secondary" onClick={onClose}>Vazgeç</Button>
-            <Button onClick={() => {
-              setUpgradeHint(`Planınız (${plan}) vitrin limitine ulaştı.`);
-              setShowUpgradeModal(true);
-            }}>Plan Yükselt</Button>
-          </>}
+          footer={
+            <>
+              <Button variant="secondary" onClick={onClose}>
+                Vazgeç
+              </Button>
+              <Button
+                onClick={() => {
+                  setUpgradeHint(`Planınız (${plan}) vitrin limitine ulaştı.`);
+                  setShowUpgradeModal(true);
+                }}
+              >
+                Planı Yükselt
+              </Button>
+            </>
+          }
         >
           <p className="text-sm leading-relaxed text-text-secondary">
-            Mevcut <span className="font-medium text-text-primary">{plan}</span> planınız maksimum <span className="font-medium text-text-primary">{maxShowcaseSlots} vitrin ilanına</span> izin vermektedir (Şu an aktif: {activeShowcaseCount}). Daha fazla ilan öne çıkarmak için planınızı yükseltebilirsiniz.
+            Mevcut <span className="font-medium text-text-primary">{plan}</span> planınız aynı anda en fazla{' '}
+            <span className="font-medium tabular-nums text-text-primary">
+              {maxShowcaseSlots} aktif vitrin ilanına
+            </span>{' '}
+            izin vermektedir (Şu an aktif: {activeShowcaseCount}). Daha fazla ilanı vitrine çıkarmak için üyelik planınızı yükseltebilirsiniz.
           </p>
         </Modal>
       );
@@ -452,27 +768,74 @@ const ShowcaseModal = ({
 
     if (!listingId || listingError || !listing) {
       return (
-        <Modal isOpen onClose={onClose} title={t("something_went_wrong")} size="sm" footer={<Button variant="secondary" onClick={onClose}>{t("close")}</Button>}>
-          <p className="text-sm text-text-secondary">{listingError || 'İlan bulunamadı.'}</p>
+        <Modal
+          isOpen
+          onClose={onClose}
+          title={t('something_went_wrong', 'Bir Sorun Oluştu')}
+          size="sm"
+          footer={
+            <Button variant="secondary" onClick={onClose}>
+              {t('close', 'Kapat')}
+            </Button>
+          }
+        >
+          <p className="text-sm text-text-secondary">
+            {listingError || 'İlan bilgileri yüklenemedi.'}
+          </p>
         </Modal>
       );
     }
 
     return (
-      <Modal isOpen onClose={onClose} title={title} size="lg">
-        <p className="-mt-1 mb-4 text-sm text-text-secondary">{STEPS[currentStep - 1].hint}</p>
-        <ol className="mb-6 flex items-center gap-2">
-          {STEPS.map(item => {
+      <Modal
+        isOpen
+        onClose={onClose}
+        title={title}
+        description={STEPS[currentStep - 1].hint}
+        size="lg"
+      >
+        {/* Clean Stepper Bar */}
+        <ol className="mb-5 grid grid-cols-3 gap-2 border-b border-border-light pb-4">
+          {STEPS.map((item) => {
             const isActive = currentStep === item.step;
             const isDone = currentStep > item.step;
             return (
-              <li key={item.step} className="flex-1" aria-current={isActive ? 'step' : undefined}>
-                <div className={`h-1 rounded-sm ${isActive || isDone ? 'bg-primary' : 'bg-background-tertiary'}`} />
-                <span className={`mt-1.5 block text-sm ${isActive ? 'font-medium text-text-primary' : isDone ? 'text-text-secondary' : 'text-text-muted'}`}>{item.label}</span>
+              <li
+                key={item.step}
+                aria-current={isActive ? 'step' : undefined}
+                className="min-w-0"
+              >
+                <div
+                  className={`h-1 rounded-sm transition-colors ${isActive || isDone ? 'bg-primary' : 'bg-background-tertiary'
+                    }`}
+                />
+                <div className="mt-2 flex items-center gap-1.5">
+                  <span
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold tabular-nums ${isDone
+                        ? 'bg-primary text-white'
+                        : isActive
+                          ? 'border border-primary text-text-primary'
+                          : 'border border-border text-text-muted'
+                      }`}
+                  >
+                    {isDone ? <Check className="h-2.5 w-2.5" strokeWidth={2} /> : item.step}
+                  </span>
+                  <span
+                    className={`truncate text-xs ${isActive
+                        ? 'font-semibold text-text-primary'
+                        : isDone
+                          ? 'font-medium text-text-secondary'
+                          : 'text-text-muted'
+                      }`}
+                  >
+                    {item.label}
+                  </span>
+                </div>
               </li>
             );
           })}
         </ol>
+
         {currentStep === 1 && renderStep1()}
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
@@ -480,23 +843,24 @@ const ShowcaseModal = ({
     );
   };
 
-  const modalContent = (
+  return (
     <>
       {isOpen ? renderModalContent() : null}
       {showSuccessNotification && (
-        <ShowcaseSuccessModal 
-          isOpen={showSuccessNotification} 
+        <ShowcaseSuccessModal
+          isOpen={showSuccessNotification}
           onClose={() => {
             setShowSuccessNotification(false);
             setSuccessSummary(null);
+            onSuccess?.();
             onClose?.();
-          }} 
+          }}
           listingId={listingId}
           listingTitle={successTitle}
           days={successDays}
           pricePaid={successPricePaid}
           isExtension={isExtension}
-          listingImage={listing?.images?.[0] || null}
+          listingImage={resolvedImage}
         />
       )}
       {showUpgradeModal && (
@@ -508,8 +872,6 @@ const ShowcaseModal = ({
       )}
     </>
   );
-
-  return modalContent;
 };
 
 export default ShowcaseModal;

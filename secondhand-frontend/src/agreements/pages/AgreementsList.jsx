@@ -141,7 +141,7 @@ const AgreementsList = ({
  {modalAgreement && <AgreementModal open={!!modalAgreement} agreement={modalAgreement} onClose={() => setModalAgreement(null)} onAccept={async agreement => {
  await handleAcceptAgreement(agreement);
  setModalAgreement(null);
- }} accepting={acceptingAgreement === modalAgreement.agreementId} />}
+ }} accepting={acceptingAgreement === modalAgreement.agreementId} isAccepted={getUserAgreementStatus(modalAgreement.agreementId).status === 'accepted'} />}
  </div>;
 };
 export default AgreementsList;

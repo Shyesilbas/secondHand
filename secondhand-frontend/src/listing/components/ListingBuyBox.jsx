@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronRight, MapPin, Share2, ShieldCheck } from 'lucide-react';
 import Button from '../../common/components/ui/Button.jsx';
 import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
+import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
@@ -47,6 +48,12 @@ const ListingBuyBox = ({
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2 pt-2 text-sm text-text-tertiary">
           <span>{typeLabel}</span>
+          {listing.listingNo && (
+            <>
+              <span aria-hidden>·</span>
+              <span className="tabular-nums text-text-muted">#{listing.listingNo}</span>
+            </>
+          )}
           {price.hasCampaign && (
             <span className="rounded-sm bg-status-error-bg px-1.5 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
               {listing.campaignName || t('discount', 'İndirim')}
@@ -54,9 +61,12 @@ const ListingBuyBox = ({
             </span>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           {!isOwner && (
             <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className={ICON_BUTTON} />
+          )}
+          {!isOwner && (
+            <AddToListButton listingId={listing.id} listingTitle={listing.title} size="lg" className={ICON_BUTTON} />
           )}
           {!isOwner && <CompareButton listing={listing} variant="square" />}
           <button

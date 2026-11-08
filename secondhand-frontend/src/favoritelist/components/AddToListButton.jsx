@@ -18,24 +18,24 @@ const AddToListButton = ({
  } = useAuthState();
  if (!user) return null;
  const sizeClasses = {
- sm: 'h-7 w-7',
+ sm: 'h-8 w-8',
  md: 'h-9 w-9',
  lg: 'h-10 w-10'
  };
  const iconSizes = {
- sm: 'w-3.5 h-3.5',
+ sm: 'w-4 h-4',
  md: 'w-4 h-4',
  lg: 'w-5 h-5'
  };
- const defaultClassName = `bg-background-primary hover:bg-background-primary text-text-secondary hover:text-accent-slate-900 border-none ${sizeClasses[size]} rounded-full shadow-sm flex items-center justify-center transition-colors`;
+ const defaultClassName = `bg-background-primary text-text-secondary hover:text-text-primary border border-border hover:border-card-border-hover ${sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150`;
  const buttonClassName = className || defaultClassName;
  return <>
  <button type="button" onClick={e => {
  e.preventDefault();
  e.stopPropagation();
  setShowModal(true);
- }} onMouseDown={e => e.stopPropagation()} className={buttonClassName} title={t("add_to_list")}>
- <List className={iconSizes[size]} />
+ }} onMouseDown={e => e.stopPropagation()} className={buttonClassName} title={t("add_to_list")} aria-label={t("add_to_list")}>
+ <List className={iconSizes[size]} strokeWidth={1.5} />
  </button>
 
  {showModal && <AddToListModal isOpen={showModal} onClose={() => setShowModal(false)} listingId={listingId} listingTitle={listingTitle} />}

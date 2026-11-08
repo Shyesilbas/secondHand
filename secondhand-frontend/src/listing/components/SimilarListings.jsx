@@ -2,8 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listingService.js';
 import ListingCard from './ListingCard.jsx';
-import { Compass } from 'lucide-react';
-import { SkeletonGrid } from '../../common/components/ui/index.js';
+import Skeleton, { SkeletonGrid } from '../../common/components/ui/Skeleton.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 const SimilarListings = ({
  currentListing
@@ -44,24 +43,20 @@ const SimilarListings = ({
  staleTime: 5 * 60 * 1000 // 5 minutes cache
  });
  if (isLoading) {
- return <div className="border-t border-border-light/80 pt-10 mt-10">
- <h3 className="text-sm font-medium text-text-primary mb-6 flex items-center gap-2">
- <Compass className="w-4 h-4 text-primary animate-spin" />{t("finding_similar_listings")}</h3>
+ return <section className="border-t border-border-light pt-8" aria-busy="true">
+ <Skeleton className="mb-4 h-6 w-40" />
  <SkeletonGrid count={4} columns="grid-cols-2 md:grid-cols-4 gap-4" />
- </div>;
+ </section>;
  }
  if (error || !data || data.length === 0) return null;
- return <div className="border-t border-border-light/80 pt-10 mt-10">
- <div className="flex items-center justify-between mb-6">
- <div>
- <span className="text-xs font-semibold text-primary bg-background-tertiary px-2.5 py-1 rounded-sm border border-primary/50">{t("more_to_explore")}</span>
- <h3 className="text-sm font-medium text-text-primary mt-2 flex items-center gap-2">{t("similar_listings")}</h3>
- </div>
+ return <section className="border-t border-border-light pt-8" aria-labelledby="similar-listings-title">
+ <div className="mb-4 flex items-center justify-between gap-4">
+ <h2 id="similar-listings-title" className="text-lg font-semibold text-text-primary">{t("similar_listings", "Benzer ilanlar")}</h2>
  </div>
 
  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
  {data.map(listing => <ListingCard key={listing.id} listing={listing} showActions={false} isOwner={user?.id === listing.sellerId} currentUserId={user?.id} />)}
  </div>
- </div>;
+ </section>;
 };
 export default SimilarListings;

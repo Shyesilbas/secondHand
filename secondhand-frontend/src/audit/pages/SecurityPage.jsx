@@ -1,5 +1,5 @@
 import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuditLogsPagination } from '../hooks/useAuditLogsPagination.js';
@@ -8,18 +8,19 @@ import { authService } from '../../auth/services/authService.js';
 import {
   ArrowLeft,
   LogOut,
-  Settings2,
-  ShieldAlert,
-  ShieldCheck,
-  Activity
+  SlidersHorizontal,
+  Activity,
 } from 'lucide-react';
 import SecuritySummary from '../components/SecuritySummary.jsx';
+import SecurityDevices from '../components/SecurityDevices.jsx';
 import SecurityFilters from '../components/SecurityFilters.jsx';
 import SecurityActivityList from '../components/SecurityActivityList.jsx';
 import PaginationControls from '../components/PaginationControls.jsx';
 import LogDetailModal from '../components/LogDetailModal.jsx';
 import RevokeSessionsModal from '../components/RevokeSessionsModal.jsx';
+import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '@/common/constants/routes';
 
@@ -35,6 +36,7 @@ const SecurityPage = () => {
 
   const {
     auditLogs,
+    rawAuditLogs,
     totalElements,
     totalPages,
     currentPage,
@@ -55,7 +57,7 @@ const SecurityPage = () => {
     getEventStatusColor,
     getBrowserInfo,
     getLocationFromIP,
-    auditEnums
+    auditEnums,
   } = useAuditLogsPagination(user?.email, 10);
 
   const handleRevokeAllSessions = async () => {
@@ -75,106 +77,84 @@ const SecurityPage = () => {
   if (isLoading) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-background-secondary/60 pb-24 text-text-primary font-sans">
-      
-      {/* ── Top Navigation Bar ── */}
-      <header className="sticky top-0 z-30 bg-background-primary border-b border-border">
-        <PageContainer className="max-w-7xl h-14 flex items-center justify-between gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-text-primary transition-colors px-2 py-1.5 rounded hover:bg-background-tertiary cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{t("back", "Geri Dön")}</span>
-          </button>
+    <div className="min-h-screen bg-background-secondary pb-20 text-text-primary">
+      <PageContainer className="py-6 sm:py-10">
+        <div className="mb-4">
+          <Button variant="ghost" size="sm" className="-ml-3" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            <span>{t('back', 'Geri Dön')}</span>
+          </Button>
+        </div>
 
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-sm bg-background-secondary border border-border text-status-success-text text-xs font-medium">
-            <span className="inline-flex h-2 w-2 rounded-full bg-status-success" />
-            <span className="text-xs">{t("system_secure", "Sistem Koruması Aktif")}</span>
-          </div>
-        </PageContainer>
-      </header>
-
-      {/* ── Page Content ── */}
-      <PageContainer className="max-w-7xl pt-8 sm:pt-10">
-        
-        {/* Header Hero Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-background-secondary border border-border text-text-primary text-xs font-medium">
-              <ShieldCheck className="w-4 h-4 text-text-primary" strokeWidth={1.5} />
-              <span>{t("privacy_protection", "Güvenlik & Gizlilik Merkezi")}</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-text-primary tracking-tight">
-              {t("security_privacy", "Hesap Güvenliği & Denetim Günlüğü")}
+        {/* Header */}
+        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">
+              {t('security_privacy', 'Hesap Güvenliği & Denetim Günlüğü')}
             </h1>
-            <p className="text-xs sm:text-sm text-text-tertiary max-w-2xl font-normal leading-relaxed">
+            <p className="mt-1 max-w-2xl text-sm text-text-secondary">
               {t(
-                "keep_track_of_where_you_ve_signed_in_and",
-                "Hesabınıza gerçekleştirilen tüm oturum açma, parola değişikliği ve güvenlik aktivitelerini anlık takip edin."
+                'keep_track_of_where_you_ve_signed_in_and',
+                'Hesabınıza gerçekleştirilen oturum açma, parola değişikliği ve güvenlik aktivitelerini takip edin.'
               )}
             </p>
           </div>
 
-          {/* Revoke All Sessions Primary Button */}
           <Button
-            variant="danger"
+            variant="secondary"
             size="sm"
             onClick={() => setShowRevokeModal(true)}
-            className="shrink-0"
+            className="shrink-0 text-status-error-text hover:text-status-error-text"
           >
-            <LogOut className="w-4 h-4" strokeWidth={1.5} />
-            <span>{t("revoke_all_sessions", "Tüm Oturumları Kapat")}</span>
+            <LogOut className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+            <span>{t('revoke_all_sessions', 'Tüm Oturumları Kapat')}</span>
           </Button>
         </div>
 
-        {/* Global Error Banner (if any) */}
         {error && (
-          <div className="mb-6 p-4 bg-background-secondary border border-border rounded flex items-center gap-3 text-status-error-text text-xs font-medium">
-            <ShieldAlert className="w-5 h-5 text-status-error-text shrink-0" strokeWidth={1.5} />
-            <p>{error}</p>
+          <div className="mb-6">
+            <Alert type="error" message={error} />
           </div>
         )}
 
-        {/* ── Key Metrics Summary ── */}
-        <SecuritySummary totalElements={totalElements} auditLogs={auditLogs} />
+        {/* Key Metrics Summary */}
+        <SecuritySummary totalElements={totalElements} auditLogs={rawAuditLogs || auditLogs} />
 
-        {/* ── Main Activity Feed Container ── */}
-        <div className="bg-background-primary rounded border border-border overflow-hidden">
-          
+        {/* Recognized Devices & Current Session */}
+        <SecurityDevices
+          auditLogs={rawAuditLogs || auditLogs}
+          activeUserAgentFilter={filters.userAgent}
+          onFilterByDevice={(ua) => updateFilter('userAgent', ua)}
+        />
+
+        {/* Main Activity Feed Container */}
+        <div className="overflow-hidden rounded border border-border bg-background-primary">
           {/* Card Controls Header */}
-          <div className="px-6 py-4.5 border-b border-border-light flex items-center justify-between gap-4 flex-wrap bg-background-primary">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border-light px-5 py-4">
             <div className="flex items-center gap-2.5">
-              <Activity className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-text-primary tracking-tight">
-                  {t("login_activity", "Güvenlik Hareketleri")}
-                </h2>
-                <span className="px-2 py-0.5 rounded-sm bg-background-tertiary text-text-secondary text-xs font-medium tabular-nums border border-border">
-                  {totalElements} {t("events", "kayıt")}
-                </span>
-              </div>
+              <Activity className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+              <h2 className="text-sm font-semibold text-text-primary">
+                {t('login_activity', 'Güvenlik Hareketleri')}
+              </h2>
+              <span className="rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+                {totalElements} {t('events', 'kayıt')}
+              </span>
             </div>
 
-            {/* Filter Toggle Button */}
-            <button
-              type="button"
+            <Button
+              variant={showFilters || hasActiveFilters ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
-                showFilters || hasActiveFilters
-                  ? 'bg-primary text-white'
-                  : 'bg-background-tertiary text-text-secondary hover:text-text-primary hover:bg-background-secondary border border-border'
-              }`}
             >
-              <Settings2 className="w-3.5 h-3.5" strokeWidth={1.5} />
-              <span>{showFilters ? t("hide_filters", "Filtreleri Gizle") : t("filter_activity", "Filtrele")}</span>
+              <SlidersHorizontal className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+              <span>{showFilters ? t('hide_filters', 'Filtreleri Gizle') : t('filter_activity', 'Filtrele')}</span>
               {hasActiveFilters && (
-                <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
+                <span className="h-1.5 w-1.5 rounded-full bg-status-warning" aria-hidden />
               )}
-            </button>
+            </Button>
           </div>
 
-          {/* Collapsible Filter Drawer */}
+          {/* Collapsible Filter Panel */}
           <SecurityFilters
             filters={filters}
             hasActiveFilters={hasActiveFilters}
@@ -198,7 +178,7 @@ const SecurityPage = () => {
 
           {/* Pagination Controls */}
           {shouldShowPagination && (
-            <div className="p-4 border-t border-border-light bg-background-secondary/50">
+            <div className="border-t border-border-light bg-background-secondary/50 p-4">
               <PaginationControls
                 shouldShowPagination={shouldShowPagination}
                 currentPage={currentPage}
@@ -214,10 +194,9 @@ const SecurityPage = () => {
             </div>
           )}
         </div>
-
       </PageContainer>
 
-      {/* ── Modals ── */}
+      {/* Modals */}
       <LogDetailModal
         selectedLog={selectedLog}
         setSelectedLog={setSelectedLog}
@@ -237,16 +216,18 @@ const SecurityPage = () => {
 };
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-background-secondary/60 p-6 sm:p-12 font-sans">
-    <PageContainer className="max-w-7xl space-y-8 animate-pulse">
-      <div className="h-6 w-32 bg-background-tertiary rounded" />
-      <div className="h-10 w-2/5 bg-background-tertiary rounded" />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-28 bg-background-primary border border-border rounded" />
-        ))}
+  <div className="min-h-screen bg-background-secondary pb-20">
+    <PageContainer className="space-y-6 py-6 sm:py-10">
+      <Skeleton className="h-6 w-24" />
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-72" />
+        <Skeleton className="h-4 w-96 max-w-full" />
       </div>
-      <div className="h-96 bg-background-primary border border-border rounded" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+      <Skeleton className="h-96 w-full" />
     </PageContainer>
   </div>
 );

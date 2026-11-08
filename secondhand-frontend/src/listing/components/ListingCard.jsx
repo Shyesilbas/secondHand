@@ -61,26 +61,19 @@ const ListingCard = ({
    if (activeViewers > 0) {
      list.push({
        id: 'viewers',
-       icon: <Eye className="w-4 h-4" />,
-       text: `${activeViewers} kişi inceledi`,
-     });
-   }
-   if (cardFavoriteCount > 0) {
-     list.push({
-       id: 'favorites',
-       icon: <Heart className="w-4 h-4" />,
-       text: `${cardFavoriteCount} kişi favoriledi`,
+       icon: <Eye className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />,
+       text: t('social_proof_viewers', { count: activeViewers, defaultValue: `${activeViewers} kişi inceledi` }),
      });
    }
    if (cartReservations > 0) {
      list.push({
        id: 'cart',
-       icon: <Flame className="w-4 h-4" />,
-       text: `${cartReservations} kişi sepete ekledi`,
+       icon: <Flame className="w-3.5 h-3.5 shrink-0 text-status-warning" strokeWidth={1.5} />,
+       text: t('social_proof_in_carts', { count: cartReservations, defaultValue: `${cartReservations} kişinin sepetinde` }),
      });
    }
    return list;
- }, [activeViewers, cardFavoriteCount, cartReservations]);
+ }, [activeViewers, cartReservations, t]);
 
  const [storyIndex, setStoryIndex] = useState(-1);
  const [storyPlayed, setStoryPlayed] = useState(false);
@@ -129,22 +122,22 @@ const ListingCard = ({
  switch (status) {
  case LISTING_STATUS.ACTIVE:
  return {
- cls: 'bg-primary text-white font-semibold',
- label: 'Active'
+ cls: 'bg-primary text-white border-primary',
+ label: t('status_active', 'Aktif')
  };
  case LISTING_STATUS.SOLD:
  return {
- cls: 'bg-background-secondary text-status-error-text font-semibold',
- label: 'Sold'
+ cls: 'bg-background-primary text-status-error-text border-border',
+ label: t('status_sold', 'Satıldı')
  };
  case LISTING_STATUS.PENDING:
  return {
- cls: 'bg-background-secondary text-status-warning-text font-semibold',
- label: 'Pending'
+ cls: 'bg-background-primary text-status-warning-text border-border',
+ label: t('status_pending', 'Beklemede')
  };
  default:
  return {
- cls: 'bg-background-tertiary text-text-secondary font-semibold',
+ cls: 'bg-background-primary text-text-secondary border-border',
  label: status
  };
  }
@@ -170,7 +163,6 @@ const ListingCard = ({
 
  const averageRating = Number.isFinite(avgRaw) && avgRaw > 0 ? avgRaw : 0;
  const shouldShowReviews = reviewCount > 0 || averageRating > 0;
- const roundedForStars = shouldShowReviews ? Math.round(averageRating || 5) : 0;
  const hasCampaign = listing.campaignId && listing.campaignPrice != null && parseFloat(listing.campaignPrice) < parseFloat(listing.price);
  const displayPrice = hasCampaign ? listing.campaignPrice : listing.price;
  const isLowStock = listing.quantity != null && Number(listing.quantity) > 0 && Number(listing.quantity) < 10;
@@ -182,11 +174,11 @@ const ListingCard = ({
   onMouseLeave={handleCardMouseLeave}
   className={`group relative flex flex-col h-full
  bg-background-primary rounded
- border transition duration-200 ease-out
+ border transition-colors duration-150 ease-out
 
- ${isOutOfStock ? 'opacity-55' : ''}
+ ${isOutOfStock ? 'opacity-60' : ''}
  ${isSelectable && isInShowcase ? 'opacity-40 grayscale cursor-not-allowed' : ''}
- ${isSelected ? 'border-primary ring-2 ring-primary/20' : isInCompare ? 'border-primary ring-2 ring-primary-200' : 'border-border-light/80 hover:border-card-border-hover'}
+ ${isSelected ? 'border-primary ring-2 ring-primary/20' : isInCompare ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-card-border-hover'}
  `}>
  {isSelectable && <div className="absolute inset-0 z-40 cursor-pointer" onClick={e => {
  e.preventDefault();
@@ -195,154 +187,150 @@ const ListingCard = ({
  }} />}
 
  {/* Top-right action buttons */}
- <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 opacity-100 transition duration-200 motion-reduce:transition-none md:translate-x-2">
+ <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity duration-150 motion-reduce:transition-none">
  {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
  <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} size="sm" showCount={false} />
- {canAddToCart && <button onClick={e => {
+ {canAddToCart && <button type="button" onClick={e => {
  e.preventDefault();
  e.stopPropagation();
  if (!itemIsInCart) {
  addToCart(listing.id);
  }
- }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded border border-border flex items-center justify-center transition-colors ${
+ }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded border border-border flex items-center justify-center transition-colors duration-150 ${
  itemIsInCart
- ? 'bg-background-secondary text-status-success-text cursor-default'
- : 'bg-background-primary/90 text-text-tertiary hover:text-primary hover:bg-background-primary'
- }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
+ ? 'bg-background-secondary text-status-success cursor-default'
+ : 'bg-background-primary text-text-secondary hover:text-text-primary hover:border-card-border-hover'
+ }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")} aria-label={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
  {isAddingToCart ? (
  <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
  ) : itemIsInCart ? (
- <Check className="w-3.5 h-3.5 text-status-success" />
+ <Check className="w-4 h-4 text-status-success" strokeWidth={1.5} />
  ) : (
- <ShoppingBag className="w-3.5 h-3.5" />
+ <ShoppingBag className="w-4 h-4" strokeWidth={1.5} />
  )}
  </button>}
- {canMakeOffer && <button onClick={e => {
+ {canMakeOffer && <button type="button" onClick={e => {
  e.preventDefault();
  e.stopPropagation();
  setIsOfferModalOpen(true);
- }} className="w-8 h-8 rounded bg-background-primary border border-border flex items-center justify-center text-text-tertiary hover:text-status-success hover:bg-background-primary transition-colors" title={t("make_offer")}>
- <HandCoins className="w-3.5 h-3.5" />
+ }} className="w-8 h-8 rounded bg-background-primary border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-card-border-hover transition-colors duration-150" title={t("make_offer")} aria-label={t("make_offer")}>
+ <HandCoins className="w-4 h-4" strokeWidth={1.5} />
  </button>}
  <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
  <CompareButton listing={listing} size="sm" />
  </div>
 
  {/* Image */}
- <div className="relative aspect-4/3 bg-background-tertiary overflow-hidden rounded-t">
+ <div className="relative aspect-4/3 bg-background-tertiary overflow-hidden rounded-t border-b border-border-light">
  {listing.imageUrl ? <img src={optimizeCloudinaryUrl(listing.imageUrl, {
  width: 400,
  height: 300
- })} alt={listing.title} loading={priorityImage ? 'eager' : 'lazy'} fetchPriority={priorityImage ? 'high' : 'auto'} decoding="async" className="w-full h-full object-cover transition-transform duration-200 ease-out motion-reduce:transition-none" onError={e => {
+ })} alt={listing.title} loading={priorityImage ? 'eager' : 'lazy'} fetchPriority={priorityImage ? 'high' : 'auto'} decoding="async" className="w-full h-full object-cover" onError={e => {
  e.target.style.display = 'none';
  e.target.nextSibling.style.display = 'flex';
  }} /> : null}
- <div className={`w-full h-full flex flex-col items-center justify-center text-secondary-300 bg-background-tertiary ${listing.imageUrl ? 'hidden' : 'flex'}`}>
- <ImageIcon className="w-8 h-8" />
+ <div className={`w-full h-full flex flex-col items-center justify-center text-text-muted bg-background-tertiary ${listing.imageUrl ? 'hidden' : 'flex'}`}>
+ <ImageIcon className="w-8 h-8" strokeWidth={1.5} />
  </div>
 
- 
- 
-
   {/* Top-left badges */}
-  <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 items-start">
-  {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-semibold ${statusConfig.cls}`}>
+  <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 items-start">
+  {listing.status !== LISTING_STATUS.ACTIVE && <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-medium border ${statusConfig.cls}`}>
   {statusConfig.label}
   </span>}
-  {isInShowcase && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-text-primary border border-border">
-  <Zap className="w-3 h-3" />{t("featured")}</span>}
-  {isGreatSeller && <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-status-warning-text border border-border">
-  <Award className="w-3 h-3 shrink-0 text-status-warning-text" />{t("great_seller")}</span>}
-  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2.5 py-0.5 rounded-sm text-xs font-semibold bg-background-secondary text-status-error-text border border-border">
-  <TrendingDown className="w-3 h-3" />
+  {isInShowcase && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-xs font-medium bg-background-primary text-text-primary border border-border">
+  <Zap className="w-3 h-3 text-status-warning" strokeWidth={1.5} />{t("featured")}</span>}
+  {hasCampaign && discountPct > 0 && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-sm text-xs font-semibold tabular-nums bg-background-primary text-status-error-text border border-border">
+  <TrendingDown className="w-3 h-3" strokeWidth={1.5} />
   -{discountPct}%
   </span>}
   </div>
 
   {/* Quick View */}
-  <button onClick={e => {
+  <button type="button" onClick={e => {
   e.preventDefault();
   e.stopPropagation();
   setShowInfo(true);
-  }} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded bg-background-primary text-xs font-semibold text-text-secondary border border-border opacity-0 group-hover:opacity-100 translate-y-2 transition duration-200 motion-reduce:transition-none hover:bg-primary hover:text-white flex items-center gap-1.5 whitespace-nowrap">
-  <Eye className="w-3 h-3" />{t("quick_view")}</button>
+  }} className="absolute bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded bg-background-primary text-xs font-medium text-text-primary border border-border opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition duration-150 motion-reduce:transition-none hover:border-card-border-hover flex items-center gap-1.5 whitespace-nowrap">
+  <Eye className="w-3.5 h-3.5 text-text-secondary" strokeWidth={1.5} />{t("quick_view")}</button>
   </div>
 
   {/* Body */}
-  <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-3.5">
+  <Link to={ROUTES.LISTING_DETAIL(listing.id)} className="flex-1 flex flex-col p-4">
 
   {/* Title */}
-  <h3 className={`text-sm font-medium text-text-primary line-clamp-2 mb-1.5 transition-colors ${isOutOfStock ? 'line-through ' : ''}`}>
+  <h3 className={`text-sm font-medium text-text-primary line-clamp-2 min-h-10 leading-snug mb-2 ${isOutOfStock ? 'line-through text-text-muted' : ''}`}>
   {listing.title}
   </h3>
 
-  {/* Reviews: en az bir değerlendirme veya puan varsa göster */}
-  {shouldShowReviews && <div className="flex items-center gap-1.5 mb-1.5 min-h-4">
-  <div className="flex shrink-0" aria-hidden>
-  {[1, 2, 3, 4, 5].map(star => <Star key={star} className={`w-3 h-3 ${star <= roundedForStars ? 'text-status-warning fill-current' : 'text-secondary-200'}`} />)}
-  </div>
-  <span className="text-xs text-text-tertiary tabular-nums leading-none">
-  <span className="font-medium text-text-secondary">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
-  {reviewCount > 0 && <span className="text-text-muted"> ({reviewCount})</span>}
-  </span>
-  </div>}
-
-  {/* Price row */}
-  <div className="flex items-end gap-2 flex-wrap mb-1">
-  <span className={`text-base font-semibold text-text-primary tracking-tight ${isOutOfStock ? 'line-through text-text-muted' : ''}`}>
+  {/* Price & Rating row */}
+  <div className="flex items-baseline justify-between gap-2 mb-2">
+  <div className="flex items-baseline gap-1.5 flex-wrap min-w-0">
+  <span className={`text-base font-semibold tabular-nums tracking-tight ${isOutOfStock ? 'line-through text-text-muted' : 'text-text-primary'}`}>
   {formatCurrency(displayPrice, listing.currency)}
   </span>
-  {hasCampaign && <span className="text-xs text-text-muted line-through font-medium">
+  {hasCampaign && <span className="text-xs text-text-muted line-through tabular-nums">
   {formatCurrency(listing.price, listing.currency)}
   </span>}
   </div>
 
-  {/* Campaign tag */}
-  {hasCampaign && <span className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-sm bg-background-secondary text-status-error-text text-xs font-semibold border border-border mb-1.5">
-  {listing.campaignName || 'Campaign'}
-  </span>}
-
-  {/* Stock badge & Sequential Social Proof Micro-Story */}
-  <div className="flex flex-wrap items-center gap-1.5 mb-1.5 min-h-5">
-    {hasStockInfo && <span className={`self-start inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-semibold shrink-0 ${isOutOfStock ? 'bg-background-secondary text-status-error-text border border-border' : isLowStock ? 'bg-background-secondary text-status-warning-text border border-border' : 'bg-background-secondary text-text-tertiary border border-border-light'}`}>
-      {isOutOfStock ? 'Out of stock' : isLowStock && !isOwner ? `Only ${Number(listing.quantity)} left` : `${Number(listing.quantity)} in stock`}
-    </span>}
-
-    {/* Dynamic Sequential Micro-Story Ticker */}
-    {currentStory && (
-      <span
-        key={currentStory.id}
-        className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary transition-opacity duration-200 motion-reduce:transition-none"
-      >
-        {currentStory.icon}
-        <span>{currentStory.text}</span>
-      </span>
-    )}
+  {shouldShowReviews && (
+  <div className="inline-flex items-center gap-1 shrink-0 text-xs tabular-nums">
+  <Star className="w-3.5 h-3.5 text-status-warning fill-current shrink-0" strokeWidth={1.5} aria-hidden />
+  <span className="font-medium text-text-secondary">{averageRating > 0 ? averageRating.toFixed(1) : '5.0'}</span>
+  {reviewCount > 0 && <span className="text-text-muted">({reviewCount})</span>}
+  </div>
+  )}
   </div>
 
- {/* Description */}
- {listing.description && <p className="text-xs text-text-muted line-clamp-2 leading-relaxed mb-2">
- {listing.description}
- </p>}
+  {/* Stock / Campaign / Social Proof single-line meta */}
+  {(hasStockInfo || hasCampaign || currentStory) && (
+  <div className="flex items-center gap-1.5 mb-2.5 min-h-5 overflow-hidden whitespace-nowrap">
+    {currentStory ? (
+      <span
+        key={currentStory.id}
+        className="inline-flex items-center gap-1 text-xs font-medium text-text-secondary truncate"
+      >
+        {currentStory.icon}
+        <span className="truncate">{currentStory.text}</span>
+      </span>
+    ) : (
+      <>
+        {hasStockInfo && <span className={`inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-medium tabular-nums shrink-0 border ${isOutOfStock ? 'bg-background-secondary text-status-error-text border-border' : isLowStock ? 'bg-background-secondary text-status-warning-text border-border' : 'bg-background-secondary text-text-tertiary border-border-light'}`}>
+          {isOutOfStock
+            ? t('out_of_stock', 'Tükendi')
+            : isLowStock && !isOwner
+            ? t('only_x_left', { count: Number(listing.quantity), defaultValue: `Son ${Number(listing.quantity)} adet` })
+            : t('x_in_stock', { count: Number(listing.quantity), defaultValue: `${Number(listing.quantity)} stokta` })}
+        </span>}
+        {hasCampaign && listing.campaignName && (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-background-secondary text-text-secondary text-xs font-medium border border-border-light truncate">
+            {listing.campaignName}
+          </span>
+        )}
+      </>
+    )}
+  </div>
+  )}
 
  {/* Footer */}
- <div className="mt-auto pt-2.5 border-t border-border-light flex items-center justify-between gap-2">
- {listing.sellerName ? <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
- <div className="w-5 h-5 shrink-0 rounded bg-primary-50 flex items-center justify-center text-xs font-semibold text-primary">
+ <div className="mt-auto pt-2.5 border-t border-border-light flex items-center justify-between gap-2 text-xs">
+ {listing.sellerName ? <div className="flex items-center gap-1.5 min-w-0 flex-1">
+ <div className="w-5 h-5 shrink-0 rounded-full bg-background-tertiary border border-border-light flex items-center justify-center text-xs font-semibold text-text-secondary">
  {listing.sellerName[0]?.toUpperCase()}
  </div>
- <span className="text-xs font-medium text-text-tertiary truncate max-w-20" title={isGreatSeller ? 'Great Seller' : listing.sellerName}>
+ <span className="font-medium text-text-secondary truncate" title={listing.sellerName}>
  {listing.sellerName}
  </span>
- {isGreatSeller && <Award className="w-3 h-3 text-status-warning shrink-0" aria-label={t("great_seller")} />}
+ {isGreatSeller && <Award className="w-3.5 h-3.5 text-status-warning shrink-0" strokeWidth={1.5} title={t("great_seller")} aria-label={t("great_seller")} />}
  </div> : <div />}
- <div className="flex items-center gap-2.5 ml-auto">
- {listing.city && <div className="flex items-center gap-0.5 text-xs text-text-muted">
- <MapPin className="w-2.5 h-2.5 shrink-0" />
- <span className="truncate max-w-14">{listing.city}</span>
+ <div className="flex items-center gap-2.5 shrink-0 text-text-muted">
+ {listing.city && <div className="flex items-center gap-1">
+ <MapPin className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+ <span className="truncate max-w-24">{listing.city}</span>
  </div>}
- <div className="flex items-center gap-0.5 text-xs text-text-muted">
- <Heart className="w-2.5 h-2.5 shrink-0 fill-current" />
+ <div className="flex items-center gap-1 tabular-nums">
+ <Heart className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
  <span>{cardFavoriteCount}</span>
  </div>
  </div>

@@ -1,5 +1,6 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Heart } from 'lucide-react';
 import { favoriteService } from '../services/favoriteService.js';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
@@ -88,42 +89,33 @@ const FavoriteButton = ({
  }
  };
 
- const defaultButtonClass = size === 'sm' 
- ? `bg-background-primary hover:bg-background-primary border-none h-7 w-7 rounded-full shadow-sm flex items-center justify-center transition-colors ${
- isFavorited 
- ? 'text-status-error-DEFAULT hover:text-status-error-600' 
- : 'text-text-secondary hover:text-status-error-DEFAULT'
+ const defaultButtonClass = size === 'sm'
+ ? `h-8 w-8 rounded border border-border bg-background-primary flex items-center justify-center transition-colors duration-150 ${
+ isFavorited
+ ? 'text-status-error hover:border-card-border-hover'
+ : 'text-text-secondary hover:text-status-error hover:border-card-border-hover'
  }`
- : `${config.button} rounded-full flex items-center justify-center transition-colors ${
- isFavorited 
- ? 'bg-status-error-50 text-status-error-DEFAULT hover:bg-status-error-100' 
- : 'bg-tertiary text-text-muted hover:bg-tertiary'
+ : `${config.button} rounded border border-border flex items-center justify-center transition-colors duration-150 ${
+ isFavorited
+ ? 'bg-background-secondary text-status-error'
+ : 'bg-background-primary text-text-secondary hover:text-status-error hover:border-card-border-hover'
  }`;
 
  const buttonClass = className || defaultButtonClass;
 
  const ButtonContent = (
  <button
+ type="button"
  onClick={handleToggle}
  className={buttonClass}
  disabled={isLoading}
  aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
  title={isFavorited ? "Remove from favorites" : "Add to favorites"}
  >
- <svg
- className={`${size === 'sm' ? 'w-3.5 h-3.5' : config.icon} ${isLoading ? 'animate-pulse' : ''}`}
- fill={isFavorited ? "currentColor" : "none"}
- stroke="currentColor"
- viewBox="0 0 24 24"
- xmlns="http://www.w3.org/2000/svg"
- >
- <path
- strokeLinecap="round"
- strokeLinejoin="round"
- strokeWidth={isFavorited ? 0 : 1.5}
- d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+ <Heart
+ className={`${size === 'sm' ? 'w-4 h-4' : config.icon} ${isFavorited ? 'fill-current' : ''} ${isLoading ? 'animate-pulse' : ''}`}
+ strokeWidth={1.5}
  />
- </svg>
  </button>
  );
 
@@ -131,7 +123,7 @@ const FavoriteButton = ({
  return (
  <div className="flex items-center gap-1">
  {ButtonContent}
- <span className={`${config.text} text-text-secondary`}>
+ <span className={`${config.text} text-text-secondary tabular-nums`}>
  {favoriteCount}
  </span>
  </div>

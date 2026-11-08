@@ -40,43 +40,45 @@ const ProfilePage = () => {
       key: 'personal',
       label: t('personal_info', 'Kişisel Bilgiler'),
       icon: UserIcon,
-      description: t('personal_info_desc', 'Ad, e-posta ve telefon bilgileri')
+      description: t('personal_info_desc', 'Kimlik, iletişim ve üyelik bilgileriniz')
     },
     {
       key: 'addresses',
       label: t('addresses', 'Adreslerim'),
       icon: MapPinIcon,
-      description: t('addresses_desc', 'Teslimat ve fatura adresleri')
+      description: t('addresses_desc', 'Teslimat ve fatura adresleriniz')
     },
     {
       key: 'security',
       label: t('account_and_security', 'Hesap & Güvenlik'),
       icon: ShieldCheckIcon,
-      description: t('account_security_desc', 'Doğrulama, şifre ve oturumlar')
+      description: t('account_security_desc', 'Doğrulama durumu, şifre ve güvenlik merkezi')
     },
     {
       key: 'actions',
-      label: t('quick_actions', 'Hızlı İşlemler'),
+      label: t('quick_actions', 'Kısayollar'),
       icon: Cog6ToothIcon,
-      description: t('quick_actions_desc', 'Siparişler, değerlendirmeler ve destek')
+      description: t('quick_actions_desc', 'Siparişler, değerlendirmeler, sözleşmeler ve destek')
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-background-secondary py-5 sm:py-7">
-      <PageContainer className="max-w-4xl">
-        <div className="bg-background-primary rounded border border-border">
-          {/* ── 1. Compact Profile Header ───────────────────────── */}
-          <div className="p-4 sm:p-5 border-b border-border-light">
-            <ProfileHeader user={user} />
-          </div>
+  const currentTabMeta = tabs.find((item) => item.key === activeTab) || tabs[0];
 
-          {/* ── 2. Horizontal Tab Bar (düz tablar) ──────────────── */}
-          <div className="border-b border-border-light bg-background-primary px-4 sm:px-5">
+  return (
+    <div className="min-h-screen bg-background-secondary py-6 sm:py-8">
+      <PageContainer className="max-w-4xl space-y-5">
+        {/* 1. Profile Header Card */}
+        <section className="rounded border border-border bg-background-primary p-5 sm:p-6">
+          <ProfileHeader user={user} />
+        </section>
+
+        {/* 2. Tabbed Settings Surface */}
+        <div className="rounded border border-border bg-background-primary overflow-hidden">
+          <div className="border-b border-border-light bg-background-primary px-4 sm:px-6">
             <nav
               role="tablist"
               aria-label={t('profile_sections', 'Profil Bölümleri')}
-              className="flex items-center gap-1 sm:gap-3 overflow-x-auto no-scrollbar -mb-px"
+              className="-mb-px flex items-center gap-1 sm:gap-4 overflow-x-auto no-scrollbar"
             >
               {tabs.map((tab) => {
                 const Icon = tab.icon;
@@ -90,15 +92,15 @@ const ProfilePage = () => {
                     aria-selected={isActive}
                     type="button"
                     onClick={() => handleTabChange(tab.key)}
-                    className={`inline-flex items-center gap-2 py-3 px-2.5 sm:px-3 text-xs sm:text-sm font-medium border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                    className={`inline-flex items-center gap-2 border-b-2 py-3.5 px-2 sm:px-1 text-xs sm:text-sm transition-colors cursor-pointer whitespace-nowrap ${
                       isActive
-                        ? 'border-primary text-text-primary font-semibold'
-                        : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border'
+                        ? 'border-primary font-semibold text-text-primary'
+                        : 'border-transparent font-medium text-text-secondary hover:border-border hover:text-text-primary'
                     }`}
                   >
                     <Icon
                       className={`h-4 w-4 shrink-0 transition-colors ${
-                        isActive ? 'text-primary' : 'text-text-muted'
+                        isActive ? 'text-text-primary' : 'text-text-muted'
                       }`}
                       strokeWidth={1.5}
                       aria-hidden="true"
@@ -110,13 +112,21 @@ const ProfilePage = () => {
             </nav>
           </div>
 
-          {/* ── 3. Tab Content Panel ───────────────────────────── */}
           <main
             role="tabpanel"
             id={`profile-panel-${activeTab}`}
             aria-labelledby={`profile-tab-${activeTab}`}
-            className="p-4 sm:p-6"
+            className="p-5 sm:p-6"
           >
+            <div className="mb-5 border-b border-border-light pb-4">
+              <h2 className="text-base font-semibold text-text-primary">
+                {currentTabMeta.label}
+              </h2>
+              <p className="mt-0.5 text-xs text-text-secondary">
+                {currentTabMeta.description}
+              </p>
+            </div>
+
             {activeTab === 'personal' && (
               <ProfilePersonalInfo
                 user={user}

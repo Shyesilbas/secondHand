@@ -48,13 +48,13 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
  };
 
  const sizeClasses = {
- sm: 'h-7 w-7',
- md: 'h-8 w-8',
- lg: 'h-9 w-9'
+ sm: 'h-8 w-8',
+ md: 'h-9 w-9',
+ lg: 'h-10 w-10'
  };
 
  const iconSizes = {
- sm: 'w-3.5 h-3.5',
+ sm: 'w-4 h-4',
  md: 'w-4 h-4',
  lg: 'w-5 h-5'
  };
@@ -69,13 +69,11 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
  aria-pressed={isAdded}
  onClick={handleClick}
  disabled={isDisabled || isLimitReached}
- className={`${variant === 'square' ? 'h-10 w-10 rounded' : `${sizeClasses[size]} rounded-full`}
+ className={`${variant === 'square' ? 'h-10 w-10' : sizeClasses[size]} rounded
  flex items-center justify-center transition-colors duration-150
  ${isAdded
- ? 'bg-primary text-white'
- : variant === 'square'
- ? 'border border-border bg-background-primary text-text-secondary hover:bg-background-secondary hover:text-text-primary'
- : 'bg-background-primary border border-border-light hover:border-primary text-text-secondary hover:text-primary'
+ ? 'border border-primary bg-primary text-white'
+ : 'border border-border bg-background-primary text-text-secondary hover:border-card-border-hover hover:text-text-primary'
  }
  ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''}
  ${className}

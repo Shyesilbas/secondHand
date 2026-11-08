@@ -51,7 +51,8 @@ const OAuthCompletePage = () => {
  showAgreementModal,
  handleAgreementToggle,
  handleAgreementClick,
- handleCloseModal
+ handleCloseModal,
+ handleAcceptFromModal
  } = useRegisterAgreements();
 
  useEffect(() => {
@@ -197,7 +198,19 @@ const OAuthCompletePage = () => {
  </Button>
  </form>
 
- <AgreementModal agreement={selectedAgreement} open={showAgreementModal} onClose={handleCloseModal} />
+ <AgreementModal
+ agreement={selectedAgreement}
+ open={showAgreementModal}
+ onClose={handleCloseModal}
+ onAccept={agreement => {
+ handleAcceptFromModal(agreement);
+ if (errors.agreements) setErrors(prev => ({
+ ...prev,
+ agreements: ''
+ }));
+ }}
+ isAccepted={Boolean(selectedAgreement && acceptedAgreements.has(selectedAgreement.agreementId))}
+ />
  </div>;
 };
 export default OAuthCompletePage;

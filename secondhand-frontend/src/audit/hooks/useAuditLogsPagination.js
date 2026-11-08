@@ -217,6 +217,7 @@ export const useAuditLogsPagination = (userEmail, initialPageSize = 10) => {
 
  return {
  auditLogs: filteredAuditLogs,
+ rawAuditLogs: auditLogs,
  totalElements,
  totalPages,
  currentPage,

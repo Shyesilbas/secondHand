@@ -19,7 +19,8 @@ const RegisterPage = () => {
     showAgreementModal,
     handleAgreementToggle,
     handleAgreementClick,
-    handleCloseModal
+    handleCloseModal,
+    handleAcceptFromModal
   } = useRegisterForm();
 
   return (
@@ -39,7 +40,13 @@ const RegisterPage = () => {
         onToggleAgreement={handleAgreementToggle}
         onReadAgreement={handleAgreementClick}
       />
-      <AgreementModal agreement={selectedAgreement} open={showAgreementModal} onClose={handleCloseModal} />
+      <AgreementModal
+        agreement={selectedAgreement}
+        open={showAgreementModal}
+        onClose={handleCloseModal}
+        onAccept={handleAcceptFromModal}
+        isAccepted={Boolean(selectedAgreement && acceptedAgreements.has(selectedAgreement.agreementId))}
+      />
     </div>
   );
 };

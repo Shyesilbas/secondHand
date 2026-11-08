@@ -3,9 +3,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
-import { CheckCircle2, Package, Copy, Check, MapPin, Truck, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Package, Copy, Check, MapPin, Truck, ShieldCheck, FileText } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
+import { useRequiredAgreements } from '../../agreements/hooks/useAgreements.js';
+import { AGREEMENT_TYPE_LABELS } from '../../agreements/agreements.js';
+import AgreementModal from '../../agreements/components/AgreementModal.jsx';
 
 const DetailRow = ({ label, children }) => (
   <div className="min-w-0">
@@ -30,6 +33,8 @@ const OrderSuccessModal = ({
 }) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
+  const [selectedAgreement, setSelectedAgreement] = useState(null);
+  const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT');
   const isMeetup = deliveryMethod === 'SAFE_MEETUP';
   const isCargo = deliveryMethod === 'CARGO';
   const orderId = order?.id || order?.orderId || null;
@@ -200,6 +205,49 @@ const OrderSuccessModal = ({
           </section>
         )}
 
+        {agreements.length > 0 && (
+          <section className="border-t border-border-light pt-6">
+            <p className="mb-2.5 text-xs font-medium text-text-tertiary">
+              {t('od_accepted_agreements', 'Onaylanan sözleşmeler')}
+            </p>
+            <div className="space-y-2">
+              {agreements.map((agreement) => {
+                const agreementName = AGREEMENT_TYPE_LABELS[agreement.agreementType] || agreement.agreementType;
+                return (
+                  <div
+                    key={agreement.agreementId}
+                    className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary/70 px-3 py-2.5 text-xs"
+                  >
+                    <div className="flex min-w-0 items-start gap-2">
+                      <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-primary text-white">
+                        <Check className="h-3 w-3" strokeWidth={2} aria-hidden />
+                      </span>
+                      <div className="min-w-0 leading-relaxed text-text-secondary">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedAgreement(agreement)}
+                          className="mr-1 cursor-pointer text-left font-medium text-text-primary underline hover:text-primary"
+                        >
+                          {agreementName}
+                        </button>
+                        <span>{t('od_agreement_accepted_suffix', 'metnini okudum, onayladım.')}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAgreement(agreement)}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-primary hover:text-text-primary"
+                    >
+                      <FileText className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                      <span>{t('read', 'Oku')}</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Link to={ROUTES.LISTINGS} className={buttonClasses('secondary')}>
             {t('order_success_continue', 'Alışverişe dön')}
@@ -212,6 +260,13 @@ const OrderSuccessModal = ({
           </Link>
         </div>
       </div>
+
+      <AgreementModal
+        agreement={selectedAgreement}
+        open={Boolean(selectedAgreement)}
+        onClose={() => setSelectedAgreement(null)}
+        isAccepted
+      />
     </div>
   );
 };
