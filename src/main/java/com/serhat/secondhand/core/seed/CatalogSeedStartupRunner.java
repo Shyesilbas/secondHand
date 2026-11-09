@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  *
  * <p>Examples:
  * <pre>
- *   ./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.seed=vehicle,electronics
- *   APP_SEED=all ./mvnw spring-boot:run
+ *   mvn spring-boot:run -Dspring-boot.run.arguments=--app.seed=vehicle,electronics
+ *   APP_SEED=all mvn spring-boot:run
  * </pre>
  */
 @Component

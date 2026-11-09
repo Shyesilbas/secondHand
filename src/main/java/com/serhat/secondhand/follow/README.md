@@ -14,7 +14,7 @@ The `follow` domain enables buyers to follow favorite sellers, customize new-lis
 - **Soft Delete Re-activation:** If a previously unfollowed relationship is re-established, the existing record is restored with `deleted_at = null`.
 
 ## Integration Points
-- **Incoming:** Listens to `ListingCreatedEvent` / `ListingPublishedEvent` from the `listing` domain.
+- **Incoming:** `NewListingNotificationListener` handles `NewListingCreatedEvent` from the `listing` domain (`AFTER_COMMIT`, async).
 - **Outgoing:** Dispatches `NotificationDispatchRequestedEvent` to the `notification` domain for active followers.
 
 ## Public APIs

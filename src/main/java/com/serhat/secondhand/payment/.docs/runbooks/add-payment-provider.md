@@ -18,7 +18,7 @@ Instructions for adding a new payment method or changing pre-check / provider lo
 ## Procedure
 1. Decide whether the change belongs in `PaymentPreCheckService` (before the provider) or inside the provider adapter.
 2. New provider: create an adapter `@Component` implementing `PaymentProviderPort` (in the module that owns the money, like `ewallet/adapter/in`); no registry change is needed.
-3. Update `PaymentType` and transaction type enums if necessary.
+3. Update `PaymentTransactionType` (`payment/entity`) and `PaymentTransactionKind` (`payment/contract`) only if the provider introduces a new kind of transaction.
 4. Align error semantics with `PaymentErrorCodes`.
 5. Update request / validator / mapper objects together.
 6. If the provider needs OTP/verification, define it explicitly in the pre-check.
