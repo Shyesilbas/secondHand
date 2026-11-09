@@ -3,7 +3,7 @@
 Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
 
 > [!NOTE]
-> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `start_all.sh`, `prometheus.yml` ve Spring config dosyalarını kapsar.
+> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `scripts/start_all.sh`, `infra/monitoring/prometheus.yml` ve Spring config dosyalarını kapsar.
 
 ---
 
@@ -21,10 +21,10 @@ Prometheus ve Grafana compose'a dahil değildir; [`prometheus.yml`](../prometheu
 
 ```bash
 docker-compose up -d        # yalnızca altyapı
-./start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (./mvnw spring-boot:run) + frontend (npm run dev)
+./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (./mvnw spring-boot:run) + frontend (npm run dev)
 ```
 
-`start_all.sh` `docker compose` ya da `docker-compose` bulur, `--seed` verilirse `APP_SEED` ortam değişkenini backend'e geçirir.
+`scripts/start_all.sh` `docker compose` ya da `docker-compose` bulur, `--seed` verilirse `APP_SEED` ortam değişkenini backend'e geçirir.
 
 > [!WARNING]
 > Kafka tek node ve replication factor 1 ile çalışır; bu compose yalnızca geliştirme içindir.

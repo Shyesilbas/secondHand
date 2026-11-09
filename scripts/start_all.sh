@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FRONTEND_DIR="$ROOT_DIR/secondhand-frontend"
 SEED_ARG=""
 
@@ -14,7 +14,7 @@ for arg in "$@"; do
             SEED_ARG="${arg#*=}"
             ;;
         *)
-            echo "Usage: ./start_all.sh [--seed | --seed=<key[,key]|listing|all>]"
+            echo "Usage: ./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]"
             exit 1
             ;;
     esac

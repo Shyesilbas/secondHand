@@ -48,8 +48,8 @@ Deep dives (payments, pricing/coupons/campaigns, escrow, orders, stock, Redis/Ka
 **Quick start (Docker + backend + frontend):**
 ```bash
 cp .env.template .env   # first time only: fill required keys
-./start_all.sh          # starts Docker (Postgres/Redis/Kafka), backend (:8080) and frontend (:5173)
-./start_all.sh --seed   # optional: also runs catalog/agreement DataInitializers (or --seed=vehicle,electronics)
+./scripts/start_all.sh          # starts Docker (Postgres/Redis/Kafka), backend (:8080) and frontend (:5173)
+./scripts/start_all.sh --seed   # optional: also runs catalog/agreement DataInitializers (or --seed=vehicle,electronics)
 ```
 
 **Manual steps:**
