@@ -39,7 +39,7 @@ public class PaymentPreCheckService {
 
             if (paymentVerificationService.isVerificationRequired(paymentRequest.verificationCode())) {
                 paymentVerificationService.generateAndSendVerification(fromUser);
-                return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED.toString(), "Verification code is required.");
+                return Result.error(PaymentErrorCodes.PAYMENT_VERIFICATION_REQUIRED);
             }
 
             Result<Void> verificationResult = paymentVerificationService.validateCode(fromUser, paymentRequest.verificationCode());
