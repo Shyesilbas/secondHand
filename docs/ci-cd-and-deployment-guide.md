@@ -3,7 +3,7 @@
 Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
 
 > [!NOTE]
-> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `scripts/start_all.sh`, `infra/monitoring/prometheus.yml` ve Spring config dosyalarını kapsar.
+> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
 
 ---
 
@@ -17,7 +17,7 @@ Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docke
 | Redis | `redis:7-alpine` | `6379:6379` | Stok/kupon Lua rezervasyonları, lock'lar, cache, token blacklist. |
 | Kafka | `apache/kafka:3.7.0` | `9092:9092` | KRaft (single node, broker+controller), `KAFKA_NUM_PARTITIONS=3`, replication factor 1. Advertised listener `localhost:9092`. |
 
-Prometheus ve Grafana compose'a dahil değildir; [`prometheus.yml`](../prometheus.yml) (15s scrape, `/actuator/prometheus`, hedefler `host.docker.internal:8080` ve `backend:8080`) ve [`grafana/provisioning/`](../grafana/provisioning) ayrı çalıştırılacak hazır config'lerdir.
+Prometheus ve Grafana compose'a dahil değildir; metrikler `/actuator/prometheus` üzerinden dışarı aktarılır.
 
 ```bash
 docker-compose up -d        # yalnızca altyapı
@@ -74,7 +74,7 @@ Varsayılan profil `local`'dir (`spring.profiles.default`). Prod için `SPRING_P
 | `local` | `health,info,metrics,prometheus` | uygulama portu (8080) |
 | `prod` | `health,info,prometheus` | ayrı management portu `MANAGEMENT_SERVER_PORT` (varsayılan `9090`) |
 
-- Prod'da `/actuator/prometheus` 8080'de yayınlanmaz; management portu yalnızca iç ağdan (Prometheus, probe'lar) erişilebilir olmalıdır. Repodaki `prometheus.yml` local (8080) içindir; prod'da hedef portu 9090'a çevirmek gerekir.
+- Prod'da `/actuator/prometheus` 8080'de yayınlanmaz; management portu yalnızca iç ağdan (Prometheus, probe'lar) erişilebilir olmalıdır.
 - Metric'ler `application=<spring.application.name>` tag'i taşır.
 - Swagger/OpenAPI: path'ler `/v3/api-docs` ve `/swagger-ui.html`; **prod'da `springdoc.api-docs.enabled=false` ve `swagger-ui.enabled=false`**, yani prod'da erişilemez.
 

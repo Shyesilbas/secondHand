@@ -23,7 +23,6 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md)** | Redis in-memory stok rezervasyonu, 15 dk anti-hoarding TTL, PostgreSQL reconciliation ve drift auto-healing. |
 | **[multi-tier-redis-caching-and-invalidation.md](multi-tier-redis-caching-and-invalidation.md)** | Multi-tier Redis cache (`v4:`), Jackson `@class` serialization güvenliği, cache bazında TTL ve invalidation matrisi. |
 | **[social-proof-and-urgency-metrics-architecture.md](social-proof-and-urgency-metrics-architecture.md)** | 24 saatlik Redis ZSET tekil görüntüleme penceresi, 15 dk checkout stok tutma, 12 saatlik favori cache'i ve frontend anti-polling kuralları. |
-| **[concurrency-test-report.md](concurrency-test-report.md)** | `ConcurrentStockAndPaymentIntegrationTest` içindeki 6 entegrasyon testi ve ilk 4 senaryonun kayıtlı koşum sonuçları. |
 
 ### Kimlik, iletişim ve AI
 | Doküman | Kapsam |

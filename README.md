@@ -78,6 +78,6 @@ cp .env.template .env   # first time only: fill required keys
 
 ## Observability
 
-Actuator metrics are exposed at `/actuator/prometheus`. Prometheus and Grafana are not part of `docker-compose.yml`; `prometheus.yml` and `grafana/provisioning/` are ready-made configs to run separately.
+Actuator metrics are exposed at `/actuator/prometheus` for scraping.
 
 > **Flyway:** change the schema only by adding a new `V<N>__description.sql` under [`src/main/resources/db/migration`](src/main/resources/db/migration); never edit existing migrations.
