@@ -89,3 +89,6 @@ src/main/resources/data/
 /scratch/
 /plan*.md
 graphify-out/
+
+# IDE AI agent workspace tools & skills (kept local)
+.agents/
