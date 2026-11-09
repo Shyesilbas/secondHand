@@ -60,7 +60,7 @@ cp .env.template .env   # first time only: fill required keys
 2. Backend:
    ```bash
    cp .env.template .env   # fill JWT_SECRET_KEY, GEMINI_API_KEY, CLOUDINARY_*, GOOGLE_*
-   ./mvnw spring-boot:run
+   mvn spring-boot:run
    ```
    Starts on `http://localhost:8080`; Flyway runs migrations automatically. Swagger UI is configured only for the `prod` profile (`application-prod.yml`); the API spec is `secondhand-openapi.json`.
 3. Frontend:

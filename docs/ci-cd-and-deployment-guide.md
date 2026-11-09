@@ -3,7 +3,7 @@
 Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
 
 > [!NOTE]
-> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
+> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
 
 ---
 
@@ -21,7 +21,7 @@ Prometheus ve Grafana compose'a dahil değildir; metrikler `/actuator/prometheus
 
 ```bash
 docker-compose up -d        # yalnızca altyapı
-./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (./mvnw spring-boot:run) + frontend (npm run dev)
+./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (mvn spring-boot:run) + frontend (npm run dev)
 ```
 
 `scripts/start_all.sh` `docker compose` ya da `docker-compose` bulur, `--seed` verilirse `APP_SEED` ortam değişkenini backend'e geçirir.
@@ -78,8 +78,3 @@ Varsayılan profil `local`'dir (`spring.profiles.default`). Prod için `SPRING_P
 - Metric'ler `application=<spring.application.name>` tag'i taşır.
 - Swagger/OpenAPI: path'ler `/v3/api-docs` ve `/swagger-ui.html`; **prod'da `springdoc.api-docs.enabled=false` ve `swagger-ui.enabled=false`**, yani prod'da erişilemez.
 
----
-
-## 5. Docker İmajı
-
-[`Dockerfile`](../Dockerfile) iki aşamalıdır: `maven:3.9.6-eclipse-temurin-17-alpine` ile `mvn clean package -DskipTests -B`, sonra `eclipse-temurin:17-jre-alpine` runtime. Uygulama root olmayan `spring` kullanıcısıyla çalışır, port 8080 expose edilir. Testler imaj build'inde çalışmaz.

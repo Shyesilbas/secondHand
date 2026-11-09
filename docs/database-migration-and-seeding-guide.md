@@ -12,7 +12,7 @@ Veritabanı değişiklikleri yalnızca [`src/main/resources/db/migration/`](../s
 1. **Asla Mevcut Migrationu Düzenleme:** Yayınlanmış veya merge edilmiş hiçbir `V<N>__*.sql` dosyası değiştirilemez veya silinemez. Değişiklik ihtiyacı olduğunda her zaman yeni bir `V<N+1>__aciklama.sql` dosyası oluşturulur.
 2. **İsimlendirme Formatı:** `V{Sürüm}__{açıklama_yılan_yazımı}.sql` (örneğin: `V<N>__add_user_reputation_score.sql`). İki adet alt çizgi (`__`) zorunludur.
    - Silinmiş migration'ların kullandığı numaralar (V2–V9, V11–V13, V24–V32) eski veritabanı geçmişlerinde duruyor; tekrar kullanılmaz. Yeni dosya her zaman en büyük numaranın üstüne gelir.
-   - Maven, kaynakta silinen veya yeniden adlandırılan dosyayı `target/classes/db/migration/` içinden kaldırmaz ve Flyway classpath'ten okuduğu için eski kopyayı uygular. Bir migration'ı sildikten veya yeniden adlandırdıktan sonra uygulamayı başlatmadan önce `./mvnw clean` çalıştırın.
+   - Maven, kaynakta silinen veya yeniden adlandırılan dosyayı `target/classes/db/migration/` içinden kaldırmaz ve Flyway classpath'ten okuduğu için eski kopyayı uygular. Bir migration'ı sildikten veya yeniden adlandırdıktan sonra uygulamayı başlatmadan önce `mvn clean` çalıştırın.
 3. **Idempotent ve Geriye Dönük Uyumluluk:**
    - Tablo oluştururken: `CREATE TABLE IF NOT EXISTS ...`
    - Kolon eklerken: `ADD COLUMN IF NOT EXISTS ...`
@@ -27,7 +27,7 @@ Veritabanı değişiklikleri yalnızca [`src/main/resources/db/migration/`](../s
 - `local` profilinde checksum doğrulaması açıktır ve `out-of-order: true`'dur. Uygulandıktan sonra düzenlenen bir migration başlangıçta hata verir.
 - **Tek seferlik onarım:** V1 ve V18 uygulandıktan sonra düzenlendiği için, bu tarihten önce kurulmuş veritabanlarında ilk başlatma checksum hatasıyla durur. Bir kez şu komutu çalıştırın, sonra uygulamayı normal başlatın (V1.1, V33 ve V34 uygulanır; mevcut şemada V34 yalnızca `chk_users_gender` CHECK'ini kaldırır):
   ```bash
-  ./mvnw org.flywaydb:flyway-maven-plugin:11.7.2:repair -Dflyway.url=jdbc:postgresql://localhost:5433/secondhand -Dflyway.user=postgres -Dflyway.password=postgres -Dflyway.locations=filesystem:src/main/resources/db/migration
+  mvn org.flywaydb:flyway-maven-plugin:11.7.2:repair -Dflyway.url=jdbc:postgresql://localhost:5433/secondhand -Dflyway.user=postgres -Dflyway.password=postgres -Dflyway.locations=filesystem:src/main/resources/db/migration
   ```
 - `prod` profilinde `out-of-order` kapalıdır. Geçmişi V1.1'in ötesinde olan bir prod veritabanında Flyway, V1.1'i "ignored" olarak raporlar ve validate hatasıyla durur. Repair'den sonra bir kez `SPRING_FLYWAY_OUT_OF_ORDER=true` ile başlatın.
 
@@ -43,8 +43,8 @@ Marka, model, tip, il/ilçe ve teknik özellik verisi SQL'e satır satır yazıl
 Seed'ler uygulama açılışında kendiliğinden çalışmaz. [`CatalogSeedStartupRunner`](../src/main/java/com/serhat/secondhand/core/seed/CatalogSeedStartupRunner.java) yalnızca `app.seed` (veya `APP_SEED`) verildiğinde istenen `SeedTask`'leri çalıştırır:
 
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.arguments=--app.seed=vehicle,electronics
-APP_SEED=all ./mvnw spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.arguments=--app.seed=vehicle,electronics
+APP_SEED=all mvn spring-boot:run
 ```
 
 | Key | Görev | Not |
@@ -70,5 +70,5 @@ APP_SEED=all ./mvnw spring-boot:run
 4. İlgili JPA entity sınıfına yeni alanları ekleyin.
 5. Uygulamayı yerel profilde başlatıp Flyway loglarını doğrulayın:
    ```bash
-   ./mvnw spring-boot:run
+   mvn spring-boot:run
    ```

@@ -136,7 +136,7 @@ if [[ -n "$SEED_ARG" ]]; then
     echo -e "${BLUE}[INFO]${NC} Catalog seeding enabled (APP_SEED=$APP_SEED)"
 fi
 echo -e "${GREEN}[START]${NC} Starting Backend on http://localhost:8080 ..."
-./mvnw spring-boot:run > >(sed "s/^/$(printf "${BLUE}[BACKEND]${NC} ")/") 2>&1 &
+mvn spring-boot:run > >(sed "s/^/$(printf "${BLUE}[BACKEND]${NC} ")/") 2>&1 &
 BACKEND_PID=$!
 
 # 5. Start Frontend (Vite)
