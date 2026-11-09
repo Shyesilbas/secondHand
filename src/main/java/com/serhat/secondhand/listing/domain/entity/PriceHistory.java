@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "price_history")
 public class PriceHistory {
 
+    private static final BigDecimal MAX_PERCENTAGE_CHANGE = new BigDecimal("99999999.99");
+    private static final BigDecimal MIN_PERCENTAGE_CHANGE = MAX_PERCENTAGE_CHANGE.negate();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,10 +27,10 @@ public class PriceHistory {
     @JoinColumn(name = "listing_id", nullable = false)
     private Listing listing;
 
-    @Column(name = "old_price", precision = 10, scale = 2)
+    @Column(name = "old_price", precision = 15, scale = 2)
     private BigDecimal oldPrice;
 
-    @Column(name = "new_price", precision = 10, scale = 2, nullable = false)
+    @Column(name = "new_price", precision = 15, scale = 2, nullable = false)
     private BigDecimal newPrice;
 
     @Enumerated(EnumType.STRING)
@@ -40,15 +44,23 @@ public class PriceHistory {
     @Column(name = "change_reason")
     private String changeReason;
 
-    @Column(name = "percentage_change", precision = 5, scale = 2)
+    @Column(name = "percentage_change", precision = 10, scale = 2)
     private BigDecimal percentageChange;
 
     @PrePersist
-    private void calculatePercentageChange() {
-        if (oldPrice != null && oldPrice.compareTo(BigDecimal.ZERO) > 0) {
+    void calculatePercentageChange() {
+        if (oldPrice != null && oldPrice.compareTo(BigDecimal.ZERO) > 0 && newPrice != null) {
             BigDecimal difference = newPrice.subtract(oldPrice);
-            this.percentageChange = difference.divide(oldPrice, 4, BigDecimal.ROUND_HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+            BigDecimal rawPct = difference.divide(oldPrice, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100))
+                    .setScale(2, RoundingMode.HALF_UP);
+            if (rawPct.compareTo(MAX_PERCENTAGE_CHANGE) > 0) {
+                this.percentageChange = MAX_PERCENTAGE_CHANGE;
+            } else if (rawPct.compareTo(MIN_PERCENTAGE_CHANGE) < 0) {
+                this.percentageChange = MIN_PERCENTAGE_CHANGE;
+            } else {
+                this.percentageChange = rawPct;
+            }
         }
     }
 }

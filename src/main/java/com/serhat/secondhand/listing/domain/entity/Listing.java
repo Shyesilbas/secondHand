@@ -46,6 +46,7 @@ public class Listing {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(precision = 15, scale = 2)
     private BigDecimal price;
 
 
