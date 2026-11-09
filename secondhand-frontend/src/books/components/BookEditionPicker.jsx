@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpen, Search } from 'lucide-react';
 import Alert from '../../common/components/ui/Alert.jsx';
@@ -9,7 +10,7 @@ import { useDebouncedValue } from '../../common/hooks/useDebouncedValue.js';
 import { bookEditionLookupQuery } from '../services/bookCatalogQuery.js';
 import { applyBookEdition, clearBookEdition } from '../utils/bookEdition.js';
 
-const editionMeta = (e) => [e.publisher, e.publicationYear, e.pageCount ? `${e.pageCount} sayfa` : null, e.formatLabel]
+const editionMeta = (e, t) => [e.publisher, e.publicationYear, e.pageCount ? `${e.pageCount} ${t ? t('pages_suffix', 'sayfa') : 'sayfa'}` : null, e.formatLabel]
 	.filter(Boolean)
 	.join(' · ');
 
@@ -19,7 +20,7 @@ const Cover = ({ url }) => (
 	</div>
 );
 
-const EditionRow = ({ edition, onPick }) => (
+const EditionRow = ({ edition, onPick, t }) => (
 	<li>
 		<button
 			type="button"
@@ -31,7 +32,7 @@ const EditionRow = ({ edition, onPick }) => (
 				<p className="truncate text-sm font-medium text-text-primary">{edition.title}</p>
 				<p className="truncate text-sm text-text-secondary">{edition.authors}</p>
 				<p className="truncate text-xs text-text-tertiary tabular-nums">
-					{editionMeta(edition)}{edition.isbn ? ` · ISBN ${edition.isbn}` : ''}
+					{editionMeta(edition, t)}{edition.isbn ? ` · ISBN ${edition.isbn}` : ''}
 				</p>
 			</div>
 		</button>
@@ -45,6 +46,7 @@ const EditionRow = ({ edition, onPick }) => (
  * the cover preview, which then comes from the listing photo.
  */
 const BookEditionPicker = ({ ctx }) => {
+	const { t } = useTranslation();
 	const [term, setTerm] = useState('');
 	const [picked, setPicked] = useState(null);
 	const debounced = useDebouncedValue(term, 300);
@@ -62,13 +64,13 @@ const BookEditionPicker = ({ ctx }) => {
 						<p className="truncate text-sm font-medium text-text-primary">{e?.title || ctx.formData?.title}</p>
 						<p className="truncate text-sm text-text-secondary">{ctx.formData?.author}</p>
 						<p className="mt-1 text-xs text-text-tertiary tabular-nums">
-							Katalogdan · {[ctx.formData?.publisher, ctx.formData?.publicationYear].filter(Boolean).join(' · ')}
+							{t('from_catalog', 'Katalogdan')} · {[ctx.formData?.publisher, ctx.formData?.publicationYear].filter(Boolean).join(' · ')}
 							{ctx.formData?.isbn ? ` · ISBN ${ctx.formData.isbn}` : ''}
 						</p>
 					</div>
 				</div>
 				<Button variant="ghost" size="sm" className="shrink-0" onClick={() => clearBookEdition(ctx)}>
-					Bağlantıyı kaldır
+					{t('remove_link', 'Bağlantıyı kaldır')}
 				</Button>
 			</div>
 		);
@@ -83,8 +85,8 @@ const BookEditionPicker = ({ ctx }) => {
 					type="text"
 					value={term}
 					onChange={(event) => setTerm(event.target.value)}
-					placeholder="ISBN, kitap adı veya yazar"
-					aria-label="Katalogda kitap ara"
+					placeholder={t('book_search_placeholder', 'ISBN, kitap adı veya yazar')}
+					aria-label={t('search_book_in_catalog', 'Katalogda kitap ara')}
 					className={`${inputNormal} pl-9`}
 				/>
 			</div>
@@ -104,12 +106,12 @@ const BookEditionPicker = ({ ctx }) => {
 			{showResults && query.isError && (
 				<Alert
 					type="error"
-					message="Katalog araması yapılamadı. Bilgileri aşağıya elle girebilirsin."
-					action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>Tekrar dene</Button>}
+					message={t('book_catalog_search_error', 'Katalog araması yapılamadı. Bilgileri aşağıya elle girebilirsin.')}
+					action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('retry', 'Tekrar dene')}</Button>}
 				/>
 			)}
 			{showResults && query.isSuccess && results.length === 0 && (
-				<p className="text-sm text-text-secondary">Katalogda bulunamadı. Kitap bilgilerini aşağıya elle girebilirsin; ilan doğrulanmamış olarak görünür.</p>
+				<p className="text-sm text-text-secondary">{t('book_not_found_manual_hint', 'Katalogda bulunamadı. Kitap bilgilerini aşağıya elle girebilirsin; ilan doğrulanmamış olarak görünür.')}</p>
 			)}
 			{showResults && results.length > 0 && (
 				<ul className="max-h-80 divide-y divide-border-light overflow-y-auto rounded border border-border">
@@ -117,6 +119,7 @@ const BookEditionPicker = ({ ctx }) => {
 						<EditionRow
 							key={edition.id}
 							edition={edition}
+							t={t}
 							onPick={(e) => {
 								setPicked(e);
 								applyBookEdition(ctx, e, { previousTypeId: ctx.formData?.bookTypeId });

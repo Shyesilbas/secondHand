@@ -79,20 +79,23 @@ const FILTER_TYPE_MAP = {
   ]
 };
 
-const EmailListSkeleton = () => (
-  <div className="divide-y divide-border-light" aria-busy="true" aria-label="E-postalar yükleniyor">
-    {[1, 2, 3, 4, 5, 6].map((row) => (
-      <div key={row} className="px-4 py-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <div className="h-3 w-24 animate-pulse rounded-sm bg-background-tertiary" />
-          <div className="h-3 w-10 animate-pulse rounded-sm bg-background-tertiary" />
+const EmailListSkeleton = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="divide-y divide-border-light" aria-busy="true" aria-label={t("loading_emails", "E-postalar yükleniyor")}>
+      {[1, 2, 3, 4, 5, 6].map((row) => (
+        <div key={row} className="px-4 py-3.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="h-3 w-24 animate-pulse rounded-sm bg-background-tertiary" />
+            <div className="h-3 w-10 animate-pulse rounded-sm bg-background-tertiary" />
+          </div>
+          <div className="mt-2 h-4 w-3/4 animate-pulse rounded-sm bg-background-tertiary" />
+          <div className="mt-1.5 h-3 w-full animate-pulse rounded-sm bg-background-secondary" />
         </div>
-        <div className="mt-2 h-4 w-3/4 animate-pulse rounded-sm bg-background-tertiary" />
-        <div className="mt-1.5 h-3 w-full animate-pulse rounded-sm bg-background-secondary" />
-      </div>
-    ))}
-  </div>
-);
+      ))}
+    </div>
+  );
+};
 
 const EmailsPageFeedback = ({ error, emails, filterType, searchTerm, onRetry, onClearSearch }) => {
   const { t } = useTranslation();
@@ -501,7 +504,7 @@ const EmailsPage = ({ embedded = false }) => {
                 onClick={() => setPage((p) => p - 1)}
                 disabled={pageInfo.page === 0}
                 className="rounded p-1 text-text-tertiary transition-colors hover:bg-background-tertiary hover:text-text-primary disabled:opacity-30"
-                aria-label="Önceki Sayfa"
+                aria-label={t("previous_page", "Önceki Sayfa")}
               >
                 <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
               </button>
@@ -513,7 +516,7 @@ const EmailsPage = ({ embedded = false }) => {
                 onClick={() => setPage((p) => p + 1)}
                 disabled={pageInfo.page + 1 >= pageInfo.totalPages}
                 className="rounded p-1 text-text-tertiary transition-colors hover:bg-background-tertiary hover:text-text-primary disabled:opacity-30"
-                aria-label="Sonraki Sayfa"
+                aria-label={t("next_page", "Sonraki Sayfa")}
               >
                 <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
               </button>

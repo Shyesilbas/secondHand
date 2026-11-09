@@ -63,26 +63,26 @@ const ListingsContent = React.memo(({
                 hasSearch
                   ? t("no_results_found", "Arama sonucu bulunamadı")
                   : isFiltering
-                  ? t("no_matching_listings_title", "Eşleşen ilan bulunamadı")
-                  : t("nothing_here_yet", "Henüz ilan bulunmuyor")
+                    ? t("no_matching_listings_title", "Eşleşen ilan bulunamadı")
+                    : t("nothing_here_yet", "Henüz ilan bulunmuyor")
               }
               description={
                 hasSearch
                   ? t("try_different_keywords", "Farklı anahtar kelimeler deneyebilir veya filtreleri kaldırabilirsiniz.")
                   : isFiltering
-                  ? t("try_adjusting_filters", "Seçili filtrelere uygun ilan bulunamadı. Filtreleri temizleyerek veya kriterlerinizi genişleterek tekrar deneyebilirsiniz.")
-                  : categoryLabel
-                  ? t("no_listings_in_category", {
-                      defaultValue: `${categoryLabel} kategorisinde şu anda aktif ilan bulunmuyor.`
-                    })
-                  : t("no_listings_available", "Şu anda listelenen aktif ilan bulunmuyor.")
+                    ? t("try_adjusting_filters", "Seçili filtrelere uygun ilan bulunamadı. Filtreleri temizleyerek veya kriterlerinizi genişleterek tekrar deneyebilirsiniz.")
+                    : categoryLabel
+                      ? t("no_listings_in_category", {
+                        defaultValue: `${categoryLabel} kategorisinde şu anda aktif ilan bulunmuyor.`
+                      })
+                      : t("no_listings_available", "Şu anda listelenen aktif ilan bulunmuyor.")
               }
               primaryAction={
                 (isFiltering || hasSearch) && onResetFilters
                   ? {
-                      label: t("clear_filters", "Filtreleri Temizle"),
-                      onClick: onResetFilters
-                    }
+                    label: t("clear_filters", "Filtreleri Temizle"),
+                    onClick: onResetFilters
+                  }
                   : undefined
               }
               className="w-full"
@@ -103,7 +103,7 @@ const ListingsContent = React.memo(({
 
       {!isLoading && (!searchTerm || searchMode === 'none') && totalPages > 1 && (
         <div className="mt-10 flex justify-center">
-          <div className="bg-background-primary border border-border-light rounded p-1.5">
+          <div className="rounded-md border border-border-light bg-background-primary shadow-xs">
             <Pagination page={currentPage || 0} totalPages={totalPages || 0} onPageChange={onPageChange} />
           </div>
         </div>

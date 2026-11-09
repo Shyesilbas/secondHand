@@ -89,19 +89,24 @@ const formatAmount = (raw, currency = 'TRY') => {
 // Backend fallbacks for chat previews that carry no user content.
 const GENERIC_CHAT_MESSAGE = /^(You received a new message\.|New message from .+\.)$/;
 
-const formatListingSubject = (meta) => {
+const formatListingSubject = (meta, tr) => {
   if (!meta?.listingTitle) return null;
   const base = `“${meta.listingTitle}”`;
   const extraCount = Number(meta.itemCount) - 1;
-  return extraCount > 0 ? `${base} ve +${extraCount} ürün` : base;
+  if (extraCount > 0) {
+    return tr
+      ? tr('and_plus_more_items', '{{base}} ve +{{count}} ürün', { base, count: extraCount })
+      : `${base} ve +${extraCount} ürün`;
+  }
+  return base;
 };
 
-const formatOrderSubject = (meta) => {
-  const listingSubject = formatListingSubject(meta);
+const formatOrderSubject = (meta, tr) => {
+  const listingSubject = formatListingSubject(meta, tr);
   const orderNo = meta?.orderNumber ? `#${meta.orderNumber}` : null;
   if (listingSubject && orderNo) return `${listingSubject} (${orderNo})`;
   if (listingSubject) return listingSubject;
-  if (orderNo) return `${orderNo} numaralı`;
+  if (orderNo) return tr ? tr('order_numbered', '{{orderNo}} numaralı', { orderNo }) : `${orderNo} numaralı`;
   return null;
 };
 
@@ -200,11 +205,11 @@ const describePaymentSuccess = (notification, meta, listing, tr) => {
  */
 export const describeNotification = (notification, t) => {
   const meta = parseNotificationMetadata(notification?.metadata);
-  const listing = formatListingSubject(meta);
-  const orderSubject = formatOrderSubject(meta);
+  const tr = (key, defaultValue, values = {}) => t(key, { defaultValue, ...values });
+  const listing = formatListingSubject(meta, tr);
+  const orderSubject = formatOrderSubject(meta, tr);
   const orderAmount = formatAmount(meta.totalAmount, meta.currency);
   const fallbackMessage = notification?.message || '';
-  const tr = (key, defaultValue, values = {}) => t(key, { defaultValue, ...values });
 
   switch (notification?.type) {
     case 'ORDER_CREATED': {

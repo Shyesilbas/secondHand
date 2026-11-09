@@ -144,7 +144,7 @@ const OrderSummary = ({
               {isPremium && (
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-xs font-semibold text-status-warning bg-background-tertiary border border-border-light">
                   <Crown className="w-3 h-3 text-status-warning" />
-                  Öncelikli
+                  {t('priority', 'Öncelikli')}
                 </span>
               )}
               <span className="font-semibold text-status-success">{t("free", "Ücretsiz")}</span>
@@ -178,7 +178,7 @@ const OrderSummary = ({
           </div>
         ) : onOpenPremiumModal ? (
           <div className="border-t border-border-light bg-background-secondary px-5 py-2.5 flex items-center justify-between text-xs">
-            <span className="text-text-secondary">Kargonuz öncelikli hazırlansın mı?</span>
+            <span className="text-text-secondary">{t("priority_shipping_question", "Kargonuz öncelikli hazırlansın mı?")}</span>
             <button
               type="button"
               onClick={onOpenPremiumModal}

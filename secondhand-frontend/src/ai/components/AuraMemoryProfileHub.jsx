@@ -196,7 +196,7 @@ export default function AuraMemoryProfileHub() {
           {memory?.permanentInterests?.map(interest => (
             <span key={interest} className="inline-flex items-center gap-1.5 text-xs font-medium bg-background-tertiary border border-border-light px-2.5 py-1 rounded-sm text-text-primary">
               {interest}
-              <button type="button" onClick={() => handleRemoveInterest(interest)} aria-label={`${interest} kaldır`} className="text-text-muted hover:text-status-error transition-colors">
+              <button type="button" onClick={() => handleRemoveInterest(interest)} aria-label={t('remove_interest_item', '{{item}} kaldır', { item: interest })} className="text-text-muted hover:text-status-error transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -215,7 +215,7 @@ export default function AuraMemoryProfileHub() {
           />
           <Button type="submit" variant="secondary" size="md">
             <Plus className="w-4 h-4" strokeWidth={1.5} />
-            <span>Ekle</span>
+            <span>{t('add', 'Ekle')}</span>
           </Button>
         </form>
       </div>
@@ -227,7 +227,7 @@ export default function AuraMemoryProfileHub() {
           {memory?.secondHandProfile?.brands?.map(brand => (
             <span key={brand} className="inline-flex items-center gap-1.5 text-xs font-medium bg-background-tertiary border border-border-light px-2.5 py-1 rounded-sm text-text-primary">
               {brand}
-              <button type="button" onClick={() => handleRemoveBrand(brand)} aria-label={`${brand} kaldır`} className="text-text-muted hover:text-status-error transition-colors">
+              <button type="button" onClick={() => handleRemoveBrand(brand)} aria-label={t('remove_brand_item', '{{item}} kaldır', { item: brand })} className="text-text-muted hover:text-status-error transition-colors">
                 <X className="w-3 h-3" />
               </button>
             </span>

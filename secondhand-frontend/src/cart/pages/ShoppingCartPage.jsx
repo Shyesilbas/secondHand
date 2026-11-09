@@ -396,13 +396,13 @@ const ShoppingCartPage = () => {
                   <div>
                     <p className="font-semibold text-text-primary">
                       {hasExpiredReservations
-                        ? 'Bazı ürün rezervasyonlarının süresi doldu'
-                        : 'Rezervasyon süresi yakında doluyor'}
+                        ? t('reservations_expired_title', 'Bazı ürün rezervasyonlarının süresi doldu')
+                        : t('reservations_expiring_soon_title', 'Rezervasyon süresi yakında doluyor')}
                     </p>
                     <p className="mt-0.5 text-text-secondary">
                       {hasExpiredReservations
-                        ? 'Stok durumunu güncellemek veya alışverişi tamamlamak için hemen ödeme adımına geçin.'
-                        : 'Ürünlerinizi ayırmak ve kaçırmamak için alışverişinizi birkaç dakika içinde tamamlayın.'}
+                        ? t('reservations_expired_desc', 'Stok durumunu güncellemek veya alışverişi tamamlamak için hemen ödeme adımına geçin.')
+                        : t('reservations_expiring_soon_desc', 'Ürünlerinizi ayırmak ve kaçırmamak için alışverişinizi birkaç dakika içinde tamamlayın.')}
                     </p>
                   </div>
                 </div>
@@ -423,7 +423,7 @@ const ShoppingCartPage = () => {
                             {a.sellerName} {t("bundle_unlocked", "Paket İndirimi")}:
                           </span>
                           <span className="text-text-secondary">
-                            {a.quantity} ürün için %{a.discountValue} indirim uygulandı.
+                            {t('bundle_discount_applied_text', '{{count}} ürün için %{{discount}} indirim uygulandı.', { count: a.quantity, discount: a.discountValue })}
                           </span>
                         </div>
                       </div>

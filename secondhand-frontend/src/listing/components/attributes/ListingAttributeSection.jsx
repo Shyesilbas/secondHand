@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import Alert from '../../../common/components/ui/Alert.jsx';
 import Button from '../../../common/components/ui/Button.jsx';
@@ -19,6 +20,7 @@ import {
  * options returning attribute definitions); answers are kept in `formData.attributes`.
  */
 const ListingAttributeSection = ({ section, ctx, title, description }) => {
+	const { t } = useTranslation();
 	const query = useQuery(section.definitionsQuery(ctx));
 	// `excludeKeys(ctx)` hides definitions that do not apply right now (e.g. rent-only answers on a sale listing).
 	const excluded = typeof section.excludeKeys === 'function' ? section.excludeKeys(ctx) : [];
@@ -103,8 +105,8 @@ const ListingAttributeSection = ({ section, ctx, title, description }) => {
 			)}
 			{query.isError && (
 				<Alert
-					message="Ek bilgiler yüklenemedi."
-					action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>Tekrar dene</Button>}
+					message={t('additional_info_failed_load', 'Ek bilgiler yüklenemedi.')}
+					action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('retry', 'Tekrar dene')}</Button>}
 				/>
 			)}
 			{!query.isLoading && !query.isError && (

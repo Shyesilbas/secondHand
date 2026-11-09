@@ -77,21 +77,24 @@ export const PasswordField = (props) => {
 };
 
 /** Live checklist of the password rules the backend enforces. */
-export const PasswordRules = ({ password = '' }) => (
-  <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2" aria-label="Şifre kuralları">
-    {PASSWORD_RULES.map(rule => {
-      const ok = rule.test(password);
-      return (
-        <li key={rule.id} className={`flex items-center gap-1.5 text-xs ${ok ? 'text-status-success-text' : 'text-text-tertiary'}`}>
-          {ok
-            ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
-            : <span className="mx-1 h-1.5 w-1.5 shrink-0 rounded-full bg-border-dark" aria-hidden />}
-          {rule.label}
-        </li>
-      );
-    })}
-  </ul>
-);
+export const PasswordRules = ({ password = '' }) => {
+  const { t } = useTranslation();
+  return (
+    <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2" aria-label={t('password_rules', 'Şifre kuralları')}>
+      {PASSWORD_RULES.map(rule => {
+        const ok = rule.test(password);
+        return (
+          <li key={rule.id} className={`flex items-center gap-1.5 text-xs ${ok ? 'text-status-success-text' : 'text-text-tertiary'}`}>
+            {ok
+              ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden />
+              : <span className="mx-1 h-1.5 w-1.5 shrink-0 rounded-full bg-border-dark" aria-hidden />}
+            {t(rule.labelKey, rule.label)}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 
 export const AuthDivider = () => {
   const { t } = useTranslation();

@@ -4,8 +4,14 @@ import { PREFILTER_CATEGORY_COPY } from '../../listing/config/prefilterCopy.js';
 import { CardEmpty } from './DashboardUi.jsx';
 import { DASHBOARD_CURRENCY } from '../dashboardConstants.js';
 
-const categoryLabel = (key) =>
-  PREFILTER_CATEGORY_COPY[key]?.label || key.replace(/_/g, ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+const categoryLabel = (key, t) => {
+  if (t) {
+    const k = `category_${String(key).toLowerCase()}`;
+    const translated = t(k);
+    if (translated && translated !== k) return translated;
+  }
+  return PREFILTER_CATEGORY_COPY[key]?.label || key.replace(/_/g, ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+};
 
 /** Amount per category, largest first, each with a bar relative to the largest. */
 const CategoryBreakdown = ({ data = {}, currency = DASHBOARD_CURRENCY, label }) => {
@@ -28,7 +34,7 @@ const CategoryBreakdown = ({ data = {}, currency = DASHBOARD_CURRENCY, label }) 
       {entries.map(entry => (
         <div key={entry.key}>
           <div className="mb-1 flex items-center justify-between gap-3 text-sm">
-            <span className="truncate text-text-secondary">{categoryLabel(entry.key)}</span>
+            <span className="truncate text-text-secondary">{categoryLabel(entry.key, t)}</span>
             <span className="shrink-0 tabular-nums text-text-primary">
               {formatCurrency(entry.value, currency)}
               <span className="ml-2 text-xs text-text-tertiary">{`${Math.round((entry.value / total) * 100)}%`}</span>

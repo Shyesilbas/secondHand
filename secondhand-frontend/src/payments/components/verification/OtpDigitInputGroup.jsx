@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import {
  OTP_CODE_LENGTH,
@@ -17,6 +18,7 @@ const OtpDigitInputGroup = ({
  dataSlotPrefix = 'otp',
  disabled = false,
 }) => {
+  const { t } = useTranslation();
  const digits = sanitizeOtpInput(value, OTP_CODE_LENGTH);
  const codeArray = Array.from({length: OTP_CODE_LENGTH}, (_, i) => digits[i] || '');
 
@@ -70,7 +72,7 @@ const OtpDigitInputGroup = ({
  );
 
  return (
- <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label={`${OTP_CODE_LENGTH} haneli doğrulama kodu`}>
+ <div className="flex justify-center gap-2 sm:gap-2.5" role="group" aria-label={t('digit_verification_code_group', '{{count}} haneli doğrulama kodu', { count: OTP_CODE_LENGTH })}>
  {codeArray.map((digit, index) => (
  <input
  key={`${dataSlotPrefix}-${index}`}
@@ -82,7 +84,7 @@ const OtpDigitInputGroup = ({
  onKeyDown={(e) => handleKeyDown(index, e)}
  onPaste={handlePaste}
  onFocus={(e) => e.target.select()}
- aria-label={`${index + 1}. hane`}
+ aria-label={t('digit_input_index', '{{index}}. hane', { index: index + 1 })}
  className={`h-14 w-11 rounded border bg-background-primary text-center text-xl font-semibold tabular-nums text-text-primary transition-colors duration-150 focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted sm:w-12 ${
  digit ? 'border-border-dark' : 'border-border'
  }`}

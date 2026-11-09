@@ -1,5 +1,5 @@
 import { getListingConfig } from '../config/listingConfig.js';
-import { fieldLabel } from '../config/listingFormCopy.js';
+import { fieldLabel, isTurkish } from '../config/listingFormCopy.js';
 
 const toErrorsObject = (value) => {
  if (!value) return {};
@@ -22,18 +22,20 @@ const buildValidationCtx = (formData, enums = null) => ({
 
 const validateBaseStep1 = (formData) => {
  const errors = {};
- if (!formData?.title || !String(formData.title).trim()) errors.title = 'Başlık zorunlu.';
- if (!formData?.description || !String(formData.description).trim()) errors.description = 'Açıklama zorunlu.';
+ const tr = isTurkish();
+ if (!formData?.title || !String(formData.title).trim()) errors.title = tr ? 'Başlık zorunlu.' : 'Title is required.';
+ if (!formData?.description || !String(formData.description).trim()) errors.description = tr ? 'Açıklama zorunlu.' : 'Description is required.';
  const price = toNumber(formData?.price);
- if (!price || price <= 0) errors.price = 'Geçerli bir fiyat gir.';
- if (!formData?.currency) errors.currency = 'Para birimi seç.';
+ if (!price || price <= 0) errors.price = tr ? 'Geçerli bir fiyat gir.' : 'Enter a valid price.';
+ if (!formData?.currency) errors.currency = tr ? 'Para birimi seç.' : 'Select a currency.';
  return errors;
 };
 
 const validateBaseStepLocation = (formData) => {
  const errors = {};
- if (!formData?.city || !String(formData.city).trim()) errors.city = 'Şehir seç.';
- if (!formData?.district || !String(formData.district).trim()) errors.district = 'İlçe seç.';
+ const tr = isTurkish();
+ if (!formData?.city || !String(formData.city).trim()) errors.city = tr ? 'Şehir seç.' : 'Select a city.';
+ if (!formData?.district || !String(formData.district).trim()) errors.district = tr ? 'İlçe seç.' : 'Select a district.';
  return errors;
 };
 
@@ -58,11 +60,12 @@ const validateField = (field, ctx) => {
  const value = formData?.[field.name];
  const required = isFieldRequired(field, ctx);
 
+ const tr = isTurkish();
  if (required) {
  if (field.type === 'toggle') {
- if (!value) return `${fieldLabel(field)} zorunlu.`;
+ if (!value) return tr ? `${fieldLabel(field)} zorunlu.` : `${fieldLabel(field)} is required.`;
  } else if (isEmpty(value)) {
- return `${fieldLabel(field)} zorunlu.`;
+ return tr ? `${fieldLabel(field)} zorunlu.` : `${fieldLabel(field)} is required.`;
  }
  }
 
@@ -70,9 +73,9 @@ const validateField = (field, ctx) => {
 
  if (field.type === 'number') {
  const n = toNumber(value);
- if (n === null) return `${fieldLabel(field)} geçerli bir sayı olmalı.`;
- if (field.min !== undefined && field.min !== null && n < Number(field.min)) return `${fieldLabel(field)} en az ${field.min} olmalı.`;
- if (field.max !== undefined && field.max !== null && n > Number(field.max)) return `${fieldLabel(field)} en fazla ${field.max} olmalı.`;
+ if (n === null) return tr ? `${fieldLabel(field)} geçerli bir sayı olmalı.` : `${fieldLabel(field)} must be a valid number.`;
+ if (field.min !== undefined && field.min !== null && n < Number(field.min)) return tr ? `${fieldLabel(field)} en az ${field.min} olmalı.` : `${fieldLabel(field)} must be at least ${field.min}.`;
+ if (field.max !== undefined && field.max !== null && n > Number(field.max)) return tr ? `${fieldLabel(field)} en fazla ${field.max} olmalı.` : `${fieldLabel(field)} must be at most ${field.max}.`;
  }
 
  if (typeof field.validate === 'function') {

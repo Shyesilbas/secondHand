@@ -76,7 +76,7 @@ const optionId = (opt) => opt?.id ?? opt?.value;
 const optionLabel = (opt) => opt?.label || opt?.name || String(optionId(opt) ?? '');
 
 const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enums } = useEnums();
   const isCreate = mode === 'create';
   const completedRef = useRef(false);
@@ -86,11 +86,19 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
   const [stepIndex, setStepIndex] = useState(0);
   const [optionFilter, setOptionFilter] = useState('');
 
-  const categories = useMemo(() => getListingTypeOptions().map(o => ({
-    ...o,
-    label: PREFILTER_CATEGORY_COPY[o.value]?.label || o.label,
-    description: PREFILTER_CATEGORY_COPY[o.value]?.description || o.description
-  })), []);
+  const categories = useMemo(() => {
+    void i18n.language;
+    return getListingTypeOptions().map(o => {
+      const val = o.value.toLowerCase();
+      const transLabel = t(`category_${val}`);
+      const transDesc = t(`category_${val}_desc`);
+      return {
+        ...o,
+        label: (transLabel && transLabel !== `category_${val}`) ? transLabel : (PREFILTER_CATEGORY_COPY[o.value]?.label || o.label),
+        description: (transDesc && transDesc !== `category_${val}_desc`) ? transDesc : (PREFILTER_CATEGORY_COPY[o.value]?.description || o.description)
+      };
+    });
+  }, [t, i18n.language]);
   const selectorSteps = useMemo(() => buildSelectorSteps(selectedType, mode, selection, enums), [selectedType, mode, selection, enums]);
   const totalSteps = selectorSteps.length + 1;
   const selector = stepIndex > 0 ? selectorSteps[stepIndex - 1] : null;

@@ -39,7 +39,7 @@ const CartItemCard = ({
   const itemTotal = unitPrice * item.quantity;
   const originalItemTotal = (parseFloat(item.listing?.price) || 0) * item.quantity;
 
-  const sellerName = [item.listing?.sellerName, item.listing?.sellerSurname].filter(Boolean).join(' ') || item.listing?.sellerName || 'Satıcı';
+  const sellerName = [item.listing?.sellerName, item.listing?.sellerSurname].filter(Boolean).join(' ') || item.listing?.sellerName || t('seller', 'Satıcı');
   const sellerId = item.listing?.sellerId;
 
   const { stats: sellerStats } = useUserReviewStats(sellerId);
@@ -193,7 +193,7 @@ const CartItemCard = ({
                 onClick={() => handleQuantityChange(item.quantity - 1)}
                 disabled={isUpdating || item.quantity <= 1}
                 className="h-8 w-8 flex items-center justify-center text-text-secondary transition hover:bg-background-secondary disabled:opacity-30 disabled:hover:bg-transparent"
-                aria-label="Adet azalt"
+                aria-label={t("decrease_quantity", "Adet azalt")}
               >
                 <Minus className="h-3.5 w-3.5" strokeWidth={2} />
               </button>
@@ -208,7 +208,7 @@ const CartItemCard = ({
                   (maxStock != null && Number.isFinite(Number(maxStock)) && item.quantity >= Number(maxStock))
                 }
                 className="h-8 w-8 flex items-center justify-center text-text-secondary transition hover:bg-background-secondary disabled:opacity-30 disabled:hover:bg-transparent"
-                aria-label="Adet artır"
+                aria-label={t("increase_quantity", "Adet artır")}
               >
                 <Plus className="h-3.5 w-3.5" strokeWidth={2} />
               </button>

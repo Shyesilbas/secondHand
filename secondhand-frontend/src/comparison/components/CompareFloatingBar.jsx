@@ -30,9 +30,9 @@ const CompareFloatingBar = memo(() => {
  <Scale className="w-4 h-4 text-white" />
  </div>
  <div className="min-w-0">
- <span className="text-sm font-semibold text-text-primary truncate block">{t("compare")}{getListingTypeLabel(category)}
+ <span className="text-sm font-semibold text-text-primary truncate block">{t("compare_category", { defaultValue: "Compare {{category}}", category: getListingTypeLabel(category) })}
  </span>
- <span className="text-xs text-text-tertiary">{itemCount}{t("of")}{maxItems}{t("selected")}</span>
+ <span className="text-xs text-text-tertiary">{itemCount} {t("of")} {maxItems} {t("selected")}</span>
  </div>
  </div>
  <button type="button" onClick={clearComparison} className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-text-secondary hover:text-status-error-text hover:bg-background-secondary rounded transition-colors shrink-0">

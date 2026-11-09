@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import Alert from '../../../common/components/ui/Alert.jsx';
 import Button from '../../../common/components/ui/Button.jsx';
@@ -6,6 +7,7 @@ import { attributeLabel, formatAttributeValue, listingLevelDefinitions } from '.
 
 /** Detail-page rows for `listing.attributes`; `section.definitionsQuery(listing)` supplies the definitions. */
 const ListingAttributeDetails = ({ section, listing, renderRow }) => {
+	const { t } = useTranslation();
 	const query = useQuery(section.definitionsQuery(listing));
 
 	if (query.isLoading) {
@@ -18,8 +20,8 @@ const ListingAttributeDetails = ({ section, listing, renderRow }) => {
 	if (query.isError) {
 		return (
 			<Alert
-				message="Durum bilgileri yüklenemedi."
-				action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>Tekrar dene</Button>}
+				message={t('condition_info_failed_load', 'Durum bilgileri yüklenemedi.')}
+				action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('retry', 'Tekrar dene')}</Button>}
 			/>
 		);
 	}
@@ -29,7 +31,7 @@ const ListingAttributeDetails = ({ section, listing, renderRow }) => {
 		.filter((row) => row.value);
 
 	if (!rows.length) {
-		return <p className="py-3 text-sm text-text-muted">Satıcı durum bilgisi girmemiş.</p>;
+		return <p className="py-3 text-sm text-text-muted">{t('seller_no_condition_specified', 'Satıcı durum bilgisi girmemiş.')}</p>;
 	}
 	return (
 		<dl className="grid grid-cols-1 md:grid-cols-2 md:gap-x-12">

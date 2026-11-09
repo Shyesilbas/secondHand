@@ -73,7 +73,7 @@ export const ShippingDetailsSection = React.memo(({
  <div>
  <p className="text-xs font-semibold text-text-muted mb-1">{t("carrier", "Kargo Firması")}</p>
  <p className="text-sm font-semibold text-text-primary">
- {shipping.carrierName || 'Atanmadı'}
+ {shipping.carrierName || t('not_assigned', 'Atanmadı')}
  </p>
  </div>
 

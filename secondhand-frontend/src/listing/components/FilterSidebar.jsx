@@ -28,10 +28,11 @@ const FilterSidebar = ({
  const {
  t
  } = useTranslation();
- const {
- enums,
- isLoading: enumsLoading
- } = useEnums();
+  const {
+    enums,
+    getListingTypeLabel,
+    isLoading: enumsLoading
+  } = useEnums();
  const [localFilters, setLocalFilters] = useState(filters);
  const [mineActiveTab, setMineActiveTab] = useState('category');
  useEscapeKey(onClose, isOpen);
@@ -100,13 +101,13 @@ const FilterSidebar = ({
  <div>
  <div className="mb-3 flex gap-1 rounded bg-secondary-light p-1">
  {['category', 'status'].map(tab => <button key={tab} type="button" onClick={() => setMineActiveTab(tab)} className={`flex-1 px-3 py-2.5 text-sm font-semibold rounded transition-all capitalize ${mineActiveTab === tab ? 'bg-background-primary text-text-primary ring-1 ring-border-light/70' : 'text-text-muted hover:text-text-primary'}`}>
- {tab}
+ {tab === 'category' ? t('category', 'Kategori') : t('status', 'Durum')}
  </button>)}
  </div>
  <div className="space-y-1">
  {mineActiveTab === 'category' && <>
  <OptionRow label={t("all_categories")} active={selectedCategory === null} onClick={() => handleCategoryChange(null)} />
- {(enums?.listingTypes || []).map(type => <OptionRow key={type.value} label={type.label} active={selectedCategory === type.value} onClick={() => handleCategoryChange(type.value)} />)}
+ {(enums?.listingTypes || []).map(type => <OptionRow key={type.value} label={getListingTypeLabel(type.value)} active={selectedCategory === type.value} onClick={() => handleCategoryChange(type.value)} />)}
  </>}
  {mineActiveTab === 'status' && <>
  <OptionRow label={t("all_statuses")} active={selectedStatus === null} onClick={() => handleStatusChange(null)} />
@@ -115,12 +116,12 @@ const FilterSidebar = ({
  </div>
  </div>) : <>
  {/* Category — only when no category is pre-selected */}
- {showCategorySelector && <FilterSection title={t("category")} description="Pick a listing type to unlock specific filters">
+ {showCategorySelector && <FilterSection title={t("category")} description={t("filter_category_desc", "Pick a listing type to unlock specific filters")}>
  <div className="flex flex-wrap gap-1.5">
  <CategoryChip label={t("all")} active={!selectedCategory} onClick={() => onCategoryChange(null)} />
- {(enums?.listingTypes || []).map(t => {
- const typeConfig = getListingConfig(t.value);
- return <CategoryChip key={t.value} label={t.label} icon={typeConfig?.icon} active={selectedCategory === t.value} onClick={() => onCategoryChange(t.value)} />;
+ {(enums?.listingTypes || []).map(item => {
+ const typeConfig = getListingConfig(item.value);
+ return <CategoryChip key={item.value} label={getListingTypeLabel(item.value)} icon={typeConfig?.icon} active={selectedCategory === item.value} onClick={() => onCategoryChange(item.value)} />;
  })}
  </div>
  </FilterSection>}
@@ -128,17 +129,17 @@ const FilterSidebar = ({
  {/* Active category label (when category is locked) */}
  {selectedCategory && <div className="flex items-center justify-between rounded border border-border-light/80 bg-background-primary px-3 py-2.5">
  <span className="text-sm font-semibold tracking-tight text-text-primary">
- {listingConfig?.label || selectedCategory}
+ {getListingTypeLabel(selectedCategory) || selectedCategory}
  </span>
  <button type="button" onClick={() => onCategoryChange(null)} className="rounded px-2 py-1 text-xs font-semibold text-primary transition-colors hover:bg-background-tertiary">{t("change")}</button>
  </div>}
 
- <FilterSection title={t("budget_location")} description="Amounts and Turkish city / district">
+ <FilterSection title={t("budget_location")} description={t("filter_budget_desc", "Amounts and Turkish city / district")}>
  <PriceLocationFields filters={localFilters} onPriceChange={handleInputChange} onInputChange={handleInputChange} compact={true} />
  </FilterSection>
 
  {/* Category-specific filters */}
- {selectedCategory && filterConfig && <FilterSection title={listingConfig?.label ? `${listingConfig.label}` : 'Category'} description="Fine-tune this listing type">
+ {selectedCategory && filterConfig && <FilterSection title={getListingTypeLabel(selectedCategory) || t('category')} description={t('filter_category_finetune', 'Fine-tune this listing type')}>
  <FilterRenderer config={filterConfig} filters={localFilters} onChange={handleInputChange} enums={enums} title="" />
  </FilterSection>}
 

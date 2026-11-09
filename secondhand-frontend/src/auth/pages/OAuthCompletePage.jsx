@@ -111,11 +111,11 @@ const OAuthCompletePage = () => {
  const next = {};
  const phoneError = validatePhone(form.phone);
  if (phoneError) next.phone = phoneError;
- if (!form.gender) next.gender = 'Cinsiyet seç.';
+ if (!form.gender) next.gender = t('select_gender', 'Cinsiyet seç.');
  const birthdateError = validateBirthdate(form.birthdate);
  if (birthdateError) next.birthdate = birthdateError;
  if (agreementsLoading || agreements.some(a => !acceptedAgreements.has(a.agreementId))) {
- next.agreements = 'Devam etmek için sözleşmeleri onaylaman gerekiyor.';
+ next.agreements = t('agreements_required', 'Devam etmek için sözleşmeleri onaylaman gerekiyor.');
  }
  setErrors(next);
  return Object.keys(next).length === 0;
@@ -125,13 +125,13 @@ const OAuthCompletePage = () => {
  if (!validate()) return;
  if (!baseInfo.registrationToken) {
  setErrors({
- submit: 'Google oturumu bulunamadı. Lütfen Google ile yeniden giriş yap.'
+ submit: t('google_session_not_found', 'Google oturumu bulunamadı. Lütfen Google ile yeniden giriş yap.')
  });
  return;
  }
  if (!baseInfo.email) {
  setErrors({
- submit: 'Google hesabından e-posta adresi alınamadı.'
+ submit: t('google_email_missing', 'Google hesabından e-posta adresi alınamadı.')
  });
  return;
  }
@@ -154,7 +154,7 @@ const OAuthCompletePage = () => {
  });
  } catch (err) {
  setErrors({
- submit: err.response?.data?.message || 'Kayıt tamamlanamadı. Lütfen tekrar dene.'
+ submit: err.response?.data?.message || t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.')
  });
  } finally {
  setSubmitting(false);

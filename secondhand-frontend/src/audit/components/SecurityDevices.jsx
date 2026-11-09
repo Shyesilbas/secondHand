@@ -11,20 +11,21 @@ import {
 } from 'lucide-react';
 import { formatDateTime } from '../../common/formatters.js';
 
-const parseUserAgentDetails = (userAgent = '') => {
+const parseUserAgentDetails = (userAgent = '', t) => {
+  const tr = (k, def) => (t ? t(k, def) : def);
   if (!userAgent) {
     return {
       deviceType: 'desktop',
-      deviceLabel: 'Bilinmeyen Cihaz',
-      osLabel: 'Bilinmeyen İS',
-      browserLabel: 'Bilinmeyen Tarayıcı',
+      deviceLabel: tr('unknown_device', 'Bilinmeyen Cihaz'),
+      osLabel: tr('unknown_os', 'Bilinmeyen İS'),
+      browserLabel: tr('unknown_browser', 'Bilinmeyen Tarayıcı'),
       shortBrowser: ''
     };
   }
 
-  let browser = 'Tarayıcı';
+  let browser = tr('browser', 'Tarayıcı');
   let browserVersion = '';
-  let device = 'Masaüstü';
+  let device = tr('desktop', 'Masaüstü');
   let os = '';
   let deviceType = 'desktop';
 
@@ -57,7 +58,7 @@ const parseUserAgentDetails = (userAgent = '') => {
     const match = userAgent.match(/OS ([\d_]+)/);
     os = match ? `iPadOS ${match[1].replace(/_/g, '.')}` : 'iPadOS';
   } else if (userAgent.includes('Android')) {
-    device = 'Android Cihaz';
+    device = tr('android_device', 'Android Cihaz');
     deviceType = userAgent.toLowerCase().includes('mobile') ? 'mobile' : 'tablet';
     const match = userAgent.match(/Android ([\d.]+)/);
     os = match ? `Android ${match[1]}` : 'Android';
@@ -115,7 +116,7 @@ const SecurityDevices = ({
 
     // Seed with current browser session first so it is always visible
     if (currentUA) {
-      const parsed = parseUserAgentDetails(currentUA);
+      const parsed = parseUserAgentDetails(currentUA, t);
       const key = `${parsed.deviceLabel}|${parsed.browserLabel}`;
       map.set(key, {
         key,
@@ -131,17 +132,18 @@ const SecurityDevices = ({
 
     auditLogs.forEach((log) => {
       if (!log?.userAgent && !log?.ipAddress) return;
-      const parsed = parseUserAgentDetails(log.userAgent || '');
+      const parsed = parseUserAgentDetails(log.userAgent || '', t);
+      const currentParsed = currentUA ? parseUserAgentDetails(currentUA, t) : null;
       const isSameAsCurrent =
         Boolean(currentUA && log.userAgent && log.userAgent === currentUA) ||
         Boolean(
-          currentUA &&
-            parsed.deviceLabel === parseUserAgentDetails(currentUA).deviceLabel &&
-            parsed.browserLabel === parseUserAgentDetails(currentUA).browserLabel
+          currentParsed &&
+            parsed.deviceLabel === currentParsed.deviceLabel &&
+            parsed.browserLabel === currentParsed.browserLabel
         );
 
-      const key = isSameAsCurrent
-        ? `${parseUserAgentDetails(currentUA).deviceLabel}|${parseUserAgentDetails(currentUA).browserLabel}`
+      const key = isSameAsCurrent && currentParsed
+        ? `${currentParsed.deviceLabel}|${currentParsed.browserLabel}`
         : `${parsed.deviceLabel}|${parsed.browserLabel}|${log.ipAddress || ''}`;
 
       const existing = map.get(key);
@@ -179,7 +181,7 @@ const SecurityDevices = ({
       if (!b.lastSeen) return -1;
       return new Date(b.lastSeen) - new Date(a.lastSeen);
     });
-  }, [auditLogs, currentUA]);
+  }, [auditLogs, currentUA, t]);
 
   return (
     <section

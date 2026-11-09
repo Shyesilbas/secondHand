@@ -89,14 +89,14 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  refetchQr();
  onActionSuccess();
  } catch (err) {
- setConfirmError(err?.response?.data?.message || 'Kod yenilenirken hata oluştu.');
+ setConfirmError(err?.response?.data?.message || t('error_refreshing_code', 'Kod yenilenirken hata oluştu.'));
  }
  };
 
  const handleVerify = async e => {
  e.preventDefault();
  if (!pinCode || pinCode.trim().length !== 6) {
- setVerifyError('Lütfen 6 haneli kodu eksiksiz girin.');
+ setVerifyError(t('enter_6_digit_code', 'Lütfen 6 haneli kodu eksiksiz girin.'));
  return;
  }
  setIsVerifying(true);
@@ -104,13 +104,13 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  try {
  const res = await orderService.verifyMeetupCode(order.orderNumber, pinCode.trim());
  if (res.error) {
- setVerifyError(res.message || 'Kod doğrulama başarısız.');
+ setVerifyError(res.message || t('code_verification_failed', 'Kod doğrulama başarısız.'));
  } else {
  setPinCode('');
  onActionSuccess();
  }
  } catch (err) {
- setVerifyError(err?.response?.data?.message || 'Doğrulama hatası oluştu.');
+ setVerifyError(err?.response?.data?.message || t('verification_error_occurred', 'Doğrulama hatası oluştu.'));
  } finally {
  setIsVerifying(false);
  }
@@ -118,7 +118,7 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
 
  const handleConfirmCompletion = async () => {
  if (!confirmCheckbox) {
- setConfirmError('Lütfen onay kutusunu işaretleyin.');
+ setConfirmError(t('please_check_confirmation_box', 'Lütfen onay kutusunu işaretleyin.'));
  return;
  }
  setIsConfirming(true);
@@ -126,12 +126,12 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  try {
  const res = await orderService.confirmHandoverCompletion(order.orderNumber, true);
  if (res.error) {
- setConfirmError(res.message || 'İşlem tamamlanamadı.');
+ setConfirmError(res.message || t('operation_failed', 'İşlem tamamlanamadı.'));
  } else {
  onActionSuccess();
  }
  } catch (err) {
- setConfirmError(err?.response?.data?.message || 'İşlem tamamlanırken hata oluştu.');
+ setConfirmError(err?.response?.data?.message || t('error_completing_operation', 'İşlem tamamlanırken hata oluştu.'));
  } finally {
  setIsConfirming(false);
  }
@@ -162,10 +162,10 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  <div>
  <span className="block text-sm text-text-tertiary">{t("i_leti_im_bilgileri", "İletişim Bilgileri")}</span>
  <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-primary">
- <span>{isSeller ? `Alıcı: ${order.buyerName} ${order.buyerSurname}` : `Satıcı: ${order.sellerFullName || 'Satıcı'}`}</span>
+ <span>{isSeller ? `${t('buyer', 'Alıcı')}: ${order.buyerName} ${order.buyerSurname}` : `${t('seller', 'Satıcı')}: ${order.sellerFullName || t('seller', 'Satıcı')}`}</span>
  <span className="inline-flex items-center gap-1 tabular-nums">
  <Phone className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
- {(isSeller ? order.buyerPhone : order.sellerPhone) || 'Telefon Yok'}
+ {(isSeller ? order.buyerPhone : order.sellerPhone) || t('no_phone', 'Telefon Yok')}
  </span>
  </p>
  </div>
@@ -190,43 +190,43 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  {order.meetupVerificationCode || '------'}
  </span>
  <p className="mt-2 text-sm text-text-secondary">
- Kalan Süre: <span className="font-medium tabular-nums text-text-primary">{formatTime(qrCountdown)}</span>
+ {t("time_remaining_label", "Kalan Süre")}: <span className="font-medium tabular-nums text-text-primary">{formatTime(qrCountdown)}</span>
  </p>
 
  <div className="mt-6 w-full space-y-3 border-t border-border-light pt-5 text-left">
- <span className="block text-sm font-medium text-text-primary">Alternatif Teslimat Onayı</span>
+ <span className="block text-sm font-medium text-text-primary">{t("alternative_delivery_confirmation", "Alternatif Teslimat Onayı")}</span>
  <p className="text-sm text-text-secondary">
- Satıcı kodu sisteme giremezse, ürünü teslim aldıktan sonra doğrudan buradan onaylayabilirsiniz.
+ {t("alternative_delivery_desc", "Satıcı kodu sisteme giremezse, ürünü teslim aldıktan sonra doğrudan buradan onaylayabilirsiniz.")}
  </p>
- <ConfirmCheckbox checked={confirmCheckbox} onChange={setConfirmCheckbox} label="Ürünü elden eksiksiz teslim aldım ve işlemi tamamlamak istiyorum." />
+ <ConfirmCheckbox checked={confirmCheckbox} onChange={setConfirmCheckbox} label={t("received_item_confirm_label", "Ürünü elden eksiksiz teslim aldım ve işlemi tamamlamak istiyorum.")} />
  <Button className="w-full" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox}>
- {isConfirming ? 'İşlem Tamamlanıyor...' : 'Teslim Aldım & Onayla'}
+ {isConfirming ? t("completing_transaction", "İşlem Tamamlanıyor...") : t("received_and_confirm", "Teslim Aldım & Onayla")}
  </Button>
  {confirmError && <p className="text-sm text-status-error-text">{confirmError}</p>}
  </div>
  </>
  ) : (
  <div className="py-6">
- <p className="mb-3 text-sm text-text-secondary">Kodun geçerlilik süresi doldu.</p>
- <Button onClick={handleRegenerateCode}>Kodu Yenile</Button>
+ <p className="mb-3 text-sm text-text-secondary">{t("code_expired_message", "Kodun geçerlilik süresi doldu.")}</p>
+ <Button onClick={handleRegenerateCode}>{t("kodu_yenile", "Kodu Yenile")}</Button>
  </div>
  )}
  </div>
  ) : (
  <div className={PANEL}>
- <span className="mb-4 block text-sm font-medium text-text-primary">Alıcı Doğrulama Kodu Girişi</span>
+ <span className="mb-4 block text-sm font-medium text-text-primary">{t("buyer_code_entry_title", "Alıcı Doğrulama Kodu Girişi")}</span>
  {order.verificationLockedUntil && lockCountdown > 0 ? (
  <div className="rounded border border-border py-4 text-center" role="status">
- <p className="text-sm font-medium text-status-error-text">Doğrulama geçici olarak kilitlendi</p>
- <p className="mt-1 text-sm tabular-nums text-text-secondary">Lütfen {formatTime(lockCountdown)} sonra tekrar deneyin.</p>
+ <p className="text-sm font-medium text-status-error-text">{t("verification_temporarily_locked", "Doğrulama geçici olarak kilitlendi")}</p>
+ <p className="mt-1 text-sm tabular-nums text-text-secondary">{t("please_retry_after", { defaultValue: "Lütfen {{time}} sonra tekrar deneyin.", time: formatTime(lockCountdown) })}</p>
  </div>
  ) : (
  <form onSubmit={handleVerify} className="space-y-3">
- <label htmlFor="meetup-pin" className="block text-sm text-text-secondary">Alıcının ekranındaki 6 haneli güvenlik PIN kodunu giriniz:</label>
+ <label htmlFor="meetup-pin" className="block text-sm text-text-secondary">{t("enter_6_digit_buyer_pin", "Alıcının ekranındaki 6 haneli güvenlik PIN kodunu giriniz:")}</label>
  <div className="flex gap-2">
  <input id="meetup-pin" type="text" inputMode="numeric" value={pinCode} onChange={e => setPinCode(e.target.value.replace(/\D/g, '').substring(0, 6))} className="h-10 flex-1 rounded border border-border bg-background-primary px-4 text-center text-base font-medium tabular-nums focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" placeholder="000000" maxLength={6} disabled={isVerifying} />
  <Button type="submit" disabled={isVerifying || pinCode.length !== 6}>
- {isVerifying ? 'Doğrulanıyor...' : 'Kodu Onayla'}
+ {isVerifying ? t("verifying", "Doğrulanıyor...") : t("confirm_code", "Kodu Onayla")}
  </Button>
  </div>
  {verifyError && <p className="text-sm text-status-error-text">{verifyError}</p>}
@@ -239,12 +239,12 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  <div className={`${PANEL} space-y-3`}>
  <span className="flex items-center gap-1.5 text-sm font-medium text-text-primary">
  <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
- Ürün Teslimatı Doğrulandı
+ {t("delivery_verified_title", "Ürün Teslimatı Doğrulandı")}
  </span>
- <p className="text-sm text-text-secondary">Teslimat onaylandı. Siparişi tamamlayarak Escrow bakiyesini satıcıya aktarabilirsiniz.</p>
- <ConfirmCheckbox checked={confirmCheckbox} onChange={setConfirmCheckbox} label="Ürünün elden teslim edildiğini ve siparişin tamamlandığını onaylıyorum." />
+ <p className="text-sm text-text-secondary">{t("delivery_verified_desc", "Teslimat onaylandı. Siparişi tamamlayarak Escrow bakiyesini satıcıya aktarabilirsiniz.")}</p>
+ <ConfirmCheckbox checked={confirmCheckbox} onChange={setConfirmCheckbox} label={t("confirm_item_handed_over", "Ürünün elden teslim edildiğini ve siparişin tamamlandığını onaylıyorum.")} />
  <Button className="w-full" onClick={handleConfirmCompletion} disabled={isConfirming || !confirmCheckbox}>
- {isConfirming ? 'Tamamlanıyor...' : 'Siparişi Tamamla'}
+ {isConfirming ? t("completing", "Tamamlanıyor...") : t("complete_order", "Siparişi Tamamla")}
  </Button>
  {confirmError && <p className="text-sm text-status-error-text">{confirmError}</p>}
  </div>
@@ -254,11 +254,11 @@ const MeetupHandoverSection = ({ order, isSeller, onActionSuccess }) => {
  <div className={`${PANEL} flex items-start gap-3`}>
  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-status-success" strokeWidth={1.5} aria-hidden />
  <div>
- <span className="block text-sm font-medium text-text-primary">İşlem Başarıyla Tamamlandı</span>
- <p className="mt-0.5 text-sm text-text-secondary">Elden güvenli teslimat onaylandı ve ödeme satıcının cüzdanına aktarıldı.</p>
+ <span className="block text-sm font-medium text-text-primary">{t("transaction_completed_successfully", "İşlem Başarıyla Tamamlandı")}</span>
+ <p className="mt-0.5 text-sm text-text-secondary">{t("meetup_completed_escrow_released", "Elden güvenli teslimat onaylandı ve ödeme satıcının cüzdanına aktarıldı.")}</p>
  {order.completedAt && (
  <p className="mt-2 text-sm tabular-nums text-text-tertiary">
- {order.completedByUserName ? `Onaylayan: ${order.completedByUserName}` : 'Sistem tarafından onaylandı'}
+ {order.completedByUserName ? t("approved_by_user", { defaultValue: "Onaylayan: {{user}}", user: order.completedByUserName }) : t("approved_by_system", "Sistem tarafından onaylandı")}
  {` — ${formatDateTime(order.completedAt)}`}
  </p>
  )}

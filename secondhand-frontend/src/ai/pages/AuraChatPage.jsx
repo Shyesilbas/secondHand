@@ -45,25 +45,25 @@ const buildGeneralPrompts = (t) => [
     id: 'price',
     icon: TrendingDown,
     label: t('aura_prompt_general_price', 'Bir ürünün fiyatı uygun mu?'),
-    message: 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün gerçek piyasa değerini ve fırsat olup olmadığını nasıl belirleyebilirim?',
+    message: t('aura_prompt_general_price_msg', 'İkinci el piyasasında fiyat analizi nasıl yapılır? Bir ürünün gerçek piyasa değerini ve fırsat olup olmadığını nasıl belirleyebilirim?'),
   },
   {
     id: 'offer',
     icon: MessageSquare,
     label: t('aura_prompt_general_offer', 'Teklif mesajı nasıl yazılır?'),
-    message: 'Bir ilana teklif verirken satıcıyı ikna edecek, piyasaya uygun ve saygılı bir pazarlık mesajı taslağı hazırlar mısın?',
+    message: t('aura_prompt_general_offer_msg', 'Bir ilana teklif verirken satıcıyı ikna edecek, piyasaya uygun ve saygılı bir pazarlık mesajı taslağı hazırlar mısın?'),
   },
   {
     id: 'safety',
     icon: ShieldCheck,
     label: t('aura_prompt_general_safety', 'Güvenli ödeme nasıl çalışır?'),
-    message: 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu (Escrow) sistemi nasıl çalışır?',
+    message: t('aura_prompt_general_safety_msg', 'İkinci el alışverişte dolandırıcılıktan korunmak için nelere dikkat etmeliyim? Güvenli ödeme havuzu (Escrow) sistemi nasıl çalışır?'),
   },
   {
     id: 'search',
     icon: Search,
     label: t('aura_prompt_general_search', 'Bütçeme uygun ilan bul'),
-    message: 'Bütçeme ve kriterlerime en uygun ikinci el ilanları bulmama yardımcı olur musun?',
+    message: t('aura_prompt_general_search_msg', 'Bütçeme ve kriterlerime en uygun ikinci el ilanları bulmama yardımcı olur musun?'),
   },
 ];
 
@@ -72,25 +72,25 @@ const buildListingPrompts = (t, listing) => [
     id: 'price',
     icon: TrendingDown,
     label: t('aura_prompt_price', 'Fiyatı piyasaya göre değerlendir'),
-    message: `Bu ürünün (${listing?.title || 'ilan'}) fiyatı piyasa ortalamasına göre fırsat mı? Fiyat analizi yapabilir misin?`,
+    message: t('aura_prompt_listing_price_msg', 'Bu ürünün ({{title}}) fiyatı piyasa ortalamasına göre fırsat mı? Fiyat analizi yapabilir misin?', { title: listing?.title || t('listing', 'ilan') }),
   },
   {
     id: 'offer',
     icon: MessageSquare,
     label: t('aura_prompt_offer', 'Pazarlık mesajı yaz'),
-    message: 'Bu ürün için satıcıyı ikna edecek nazik ve piyasaya uygun bir pazarlık mesajı taslağı oluşturur musun?',
+    message: t('aura_prompt_listing_offer_msg', 'Bu ürün için satıcıyı ikna edecek nazik ve piyasaya uygun bir pazarlık mesajı taslağı oluşturur musun?'),
   },
   {
     id: 'safety',
     icon: ShieldCheck,
     label: t('aura_prompt_safety', 'Güvenli alışveriş adımları'),
-    message: 'Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu süreci nasıl işler?',
+    message: t('aura_prompt_listing_safety_msg', 'Bu satıcıdan alışveriş yaparken nelere dikkat etmeliyim ve güvenli ödeme havuzu süreci nasıl işler?'),
   },
   {
     id: 'pros-cons',
     icon: Wand2,
     label: t('aura_prompt_pros_cons', 'Avantaj ve riskleri çıkar'),
-    message: 'Bu ürünün özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?',
+    message: t('aura_prompt_listing_pros_cons_msg', 'Bu ürünün özellikleri ve açıklamasına göre öne çıkan avantajları ve olası riskleri nelerdir?'),
   },
 ];
 

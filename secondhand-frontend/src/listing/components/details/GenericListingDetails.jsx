@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEnums } from '../../../common/hooks/useEnums.js';
 import { getListingConfig } from '../../config/listingConfig.js';
 import { toDisplayText } from '../../utils/listingDisplayFormat.js';
@@ -24,6 +25,7 @@ const DetailRow = ({ label, value }) => (
 );
 
 const GenericListingDetails = ({ listing, flat = false }) => {
+  const { t } = useTranslation();
   const { enums } = useEnums();
 
   const config = useMemo(() => getListingConfig(listing?.type), [listing?.type]);
@@ -88,7 +90,7 @@ const GenericListingDetails = ({ listing, flat = false }) => {
           renderRow={(row) => <DetailRow key={row.key} label={row.label} value={row.value} />}
         />
       ) : visibleFields.length === 0 ? (
-        <p className="text-sm text-text-muted py-3">Belirtilmiş özellik bulunmuyor.</p>
+        <p className="text-sm text-text-muted py-3">{t("no_features_specified", "Belirtilmiş özellik bulunmuyor.")}</p>
       ) : (
         <dl className="grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
           {visibleFields.map((field) => {

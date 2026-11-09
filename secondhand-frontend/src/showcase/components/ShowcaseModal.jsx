@@ -45,33 +45,39 @@ import {
 } from 'lucide-react';
 
 const PRESET_DURATIONS = [
-  { days: 7, badge: null },
-  { days: 14, badge: 'Popüler' },
-  { days: 21, badge: null },
-  { days: 30, badge: 'Avantajlı' }
+  { days: 7, badge: null, badgeKey: null },
+  { days: 14, badge: 'Popüler', badgeKey: 'badge_popular' },
+  { days: 21, badge: null, badgeKey: null },
+  { days: 30, badge: 'Avantajlı', badgeKey: 'badge_advantageous' }
 ];
 
 const STEPS = [
-  { step: 1, label: 'Süre Seçimi', hint: 'Vitrin süresini ve paketi belirleyin' },
-  { step: 2, label: 'Onay & Bakiye', hint: 'Ödeme özetini ve sözleşmeleri onaylayın' },
-  { step: 3, label: 'Doğrulama', hint: 'E-posta adresinize gönderilen kodu girin' }
+  { step: 1, label: 'Süre Seçimi', labelKey: 'step_duration_selection', hint: 'Vitrin süresini ve paketi belirleyin', hintKey: 'step_duration_hint' },
+  { step: 2, label: 'Onay & Bakiye', labelKey: 'step_confirmation_balance', hint: 'Ödeme özetini ve sözleşmeleri onaylayın', hintKey: 'step_confirmation_hint' },
+  { step: 3, label: 'Doğrulama', labelKey: 'step_verification', hint: 'E-posta adresinize gönderilen kodu girin', hintKey: 'step_verification_hint' }
 ];
 
 const BENEFITS = [
   {
     icon: Search,
     title: 'Üst Sıra Görünürlüğü',
-    desc: 'Ana sayfa vitrininde ve arama sonuçlarında öncelikli gösterim'
+    titleKey: 'benefit_top_visibility_title',
+    desc: 'Ana sayfa vitrininde ve arama sonuçlarında öncelikli gösterim',
+    descKey: 'benefit_top_visibility_desc'
   },
   {
     icon: Eye,
     title: 'Daha Fazla Etkileşim',
-    desc: 'Standart ilanlara kıyasla daha yüksek görüntülenme ve mesaj oranı'
+    titleKey: 'benefit_more_engagement_title',
+    desc: 'Standart ilanlara kıyasla daha yüksek görüntülenme ve mesaj oranı',
+    descKey: 'benefit_more_engagement_desc'
   },
   {
     icon: Sparkles,
     title: 'Vitrin İşareti',
-    desc: 'İlan kartında öne çıkarıldığını belirten vitrin etiketi'
+    titleKey: 'benefit_showcase_badge_title',
+    desc: 'İlan kartında öne çıkarıldığını belirten vitrin etiketi',
+    descKey: 'benefit_showcase_badge_desc'
   }
 ];
 
@@ -203,7 +209,7 @@ const ShowcaseModal = ({
 
   const handleRequestVerificationCode = async () => {
     if (!hasEnoughBalance) {
-      setError('E-Cüzdan bakiyeniz bu işlem için yetersiz.');
+      setError(t('insufficient_ewallet_balance', 'E-Cüzdan bakiyeniz bu işlem için yetersiz.'));
       return;
     }
     setLoading(true);
@@ -222,7 +228,7 @@ const ShowcaseModal = ({
       setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
       setCurrentStep(3);
     } catch (err) {
-      setError(getErrorMessage(err, 'Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.'));
+      setError(getErrorMessage(err, t('verification_code_send_failed', 'Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.')));
     } finally {
       setLoading(false);
     }
@@ -231,11 +237,11 @@ const ShowcaseModal = ({
   const handleFinalizePayment = async () => {
     const code = sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH);
     if (otpTtlExpired) {
-      setError('Doğrulama kodunun süresi doldu. Yeni kod göndererek tekrar deneyin.');
+      setError(t('verification_code_expired', 'Doğrulama kodunun süresi doldu. Yeni kod göndererek tekrar deneyin.'));
       return;
     }
     if (code.length !== OTP_CODE_LENGTH) {
-      setError('Lütfen 6 haneli doğrulama kodunu eksiksiz girin.');
+      setError(t('enter_full_verification_code', 'Lütfen 6 haneli doğrulama kodunu eksiksiz girin.'));
       return;
     }
 
@@ -286,10 +292,10 @@ const ShowcaseModal = ({
         err.errorCode === 'SHOWCASE_SLOT_LIMIT_EXCEEDED'
       ) {
         setShowUpgradeModal(true);
-        setUpgradeHint('Vitrin slot limitinize ulaştınız.');
+        setUpgradeHint(t('showcase_slot_limit_reached', 'Vitrin slot limitinize ulaştınız.'));
         return;
       }
-      setError(getErrorMessage(err, 'Ödeme tamamlanamadı.'));
+      setError(getErrorMessage(err, t('payment_failed', 'Ödeme tamamlanamadı.')));
     } finally {
       setLoading(false);
     }
@@ -320,7 +326,7 @@ const ShowcaseModal = ({
         </div>
         <div className="min-w-0">
           <span className="block text-xs text-text-tertiary">
-            {isExtension ? 'Süresi Uzatılacak İlan' : 'Vitrine Çıkacak İlan'}
+            {isExtension ? t('listing_to_extend', 'Süresi Uzatılacak İlan') : t('listing_to_promote', 'Vitrine Çıkacak İlan')}
           </span>
           <h4 className="truncate text-sm font-medium text-text-primary">{resolvedTitle}</h4>
         </div>
@@ -342,11 +348,11 @@ const ShowcaseModal = ({
       <fieldset>
         <div className="mb-2.5 flex items-center justify-between">
           <legend className="text-xs font-semibold text-text-secondary">
-            Hazır Vitrin Paketleri
+            {t('preset_showcase_packages', 'Hazır Vitrin Paketleri')}
           </legend>
           {showcasePricing && (
             <span className="text-xs tabular-nums text-text-tertiary">
-              Günlük {formatCurrency(showcasePricing.totalDailyCost, 'TRY')} (KDV dahil)
+              {t('daily_price_with_vat', 'Günlük {{amount}} (KDV dahil)', { amount: formatCurrency(showcasePricing.totalDailyCost, 'TRY') })}
             </span>
           )}
         </div>
@@ -371,15 +377,15 @@ const ShowcaseModal = ({
               >
                 <div className="flex items-center justify-between gap-1.5">
                   <span className="text-sm font-semibold tabular-nums text-text-primary">
-                    {opt.days} Gün
+                    {t('days_count', { count: opt.days, defaultValue: '{{count}} Gün' })}
                   </span>
                   {isSelected ? (
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white">
                       <Check className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
                     </span>
                   ) : opt.badge ? (
-                    <span className="rounded-sm bg-background-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
-                      {opt.badge}
+                    <span className="rounded-sm bg-background-secondary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
+                      {opt.badgeKey ? t(opt.badgeKey, opt.badge) : opt.badge}
                     </span>
                   ) : null}
                 </div>
@@ -388,8 +394,8 @@ const ShowcaseModal = ({
                   <span className="block text-base font-semibold tabular-nums text-text-primary">
                     {showcasePricing ? formatCurrency(optionTotal, 'TRY') : '—'}
                   </span>
-                  <span className="mt-0.5 block text-[11px] text-text-tertiary">
-                    {opt.badge && isSelected ? opt.badge : 'KDV dahil'}
+                  <span className="mt-0.5 block text-xs text-text-tertiary">
+                    {opt.badge && isSelected ? opt.badge : t('vat_included', 'KDV dahil')}
                   </span>
                 </div>
               </button>
@@ -405,10 +411,10 @@ const ShowcaseModal = ({
             htmlFor="showcase-days"
             className="block text-xs sm:text-sm font-medium text-text-primary"
           >
-            Özel Süre Belirle
+            {t('custom_duration', 'Özel Süre Belirle')}
           </label>
           <p className="text-xs text-text-tertiary">
-            1 ile 30 gün arasında dilediğiniz süreyi seçebilirsiniz
+            {t('custom_duration_hint', '1 ile 30 gün arasında dilediğiniz süreyi seçebilirsiniz')}
           </p>
         </div>
 
@@ -417,7 +423,7 @@ const ShowcaseModal = ({
             type="button"
             onClick={() => setDays((d) => clampDays(d - 1))}
             disabled={days <= 1}
-            aria-label="Günü azalt"
+            aria-label={t('decrease_days', 'Günü azalt')}
             className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
           >
             <Minus className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -433,14 +439,14 @@ const ShowcaseModal = ({
               onChange={handleDaysChange}
               className="w-8 bg-transparent text-center text-sm font-semibold tabular-nums text-text-primary focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
-            <span className="text-xs text-text-tertiary">gün</span>
+            <span className="text-xs text-text-tertiary">{t('days_short', 'gün')}</span>
           </div>
 
           <button
             type="button"
             onClick={() => setDays((d) => clampDays(d + 1))}
             disabled={days >= 30}
-            aria-label="Günü artır"
+            aria-label={t('increase_days', 'Günü artır')}
             className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -454,7 +460,7 @@ const ShowcaseModal = ({
           const Icon = benefit.icon;
           return (
             <div
-              key={benefit.title}
+              key={benefit.titleKey || benefit.title}
               className="flex items-start gap-2.5 rounded border border-border-light bg-background-secondary/30 p-3"
             >
               <Icon
@@ -463,9 +469,9 @@ const ShowcaseModal = ({
                 aria-hidden
               />
               <div className="min-w-0">
-                <p className="text-xs font-medium text-text-primary">{benefit.title}</p>
-                <p className="mt-0.5 text-[11px] leading-snug text-text-tertiary">
-                  {benefit.desc}
+                <p className="text-xs font-medium text-text-primary">{benefit.titleKey ? t(benefit.titleKey, benefit.title) : benefit.title}</p>
+                <p className="mt-0.5 text-xs leading-snug text-text-tertiary">
+                  {benefit.descKey ? t(benefit.descKey, benefit.desc) : benefit.desc}
                 </p>
               </div>
             </div>
@@ -476,13 +482,13 @@ const ShowcaseModal = ({
       {/* Step 1 Footer */}
       <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center">
         <div>
-          <span className="block text-xs text-text-tertiary">Toplam Ödenecek Tutar</span>
+          <span className="block text-xs text-text-tertiary">{t('total_amount_to_pay', 'Toplam Ödenecek Tutar')}</span>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tabular-nums text-text-primary">
               {formatCurrency(totalCost, 'TRY')}
             </span>
             <span className="text-xs text-text-tertiary">
-              ({days} gün · KDV dahil)
+              ({days} {t('days_short', 'gün')} · {t('vat_included', 'KDV dahil')})
             </span>
           </div>
         </div>
@@ -492,7 +498,7 @@ const ShowcaseModal = ({
             {t('cancel', 'Vazgeç')}
           </Button>
           <Button onClick={() => setCurrentStep(2)}>
-            <span>Devam Et</span>
+            <span>{t('continue', 'Devam Et')}</span>
             <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           </Button>
         </div>
@@ -506,22 +512,22 @@ const ShowcaseModal = ({
 
       {/* Price Breakdown */}
       <div>
-        <h4 className="mb-2 text-xs font-semibold text-text-secondary">Ücret Dökümü</h4>
+        <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('fee_breakdown', 'Ücret Dökümü')}</h4>
         <dl className="divide-y divide-border-light rounded border border-border-light px-4 text-xs sm:text-sm">
           <div className="flex justify-between gap-4 py-2.5">
-            <dt className="text-text-secondary">Seçilen Vitrin Süresi</dt>
-            <dd className="font-medium tabular-nums text-text-primary">{days} Gün</dd>
+            <dt className="text-text-secondary">{t('selected_showcase_duration', 'Seçilen Vitrin Süresi')}</dt>
+            <dd className="font-medium tabular-nums text-text-primary">{days} {t('days_short', 'Gün')}</dd>
           </div>
           {showcasePricing && (
             <>
               <div className="flex justify-between gap-4 py-2.5">
-                <dt className="text-text-secondary">Günlük Birim Ücret (KDV Hariç)</dt>
+                <dt className="text-text-secondary">{t('daily_unit_fee_excl_vat', 'Günlük Birim Ücret (KDV Hariç)')}</dt>
                 <dd className="tabular-nums text-text-primary">
                   {formatCurrency(showcasePricing.dailyCost, 'TRY')}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 py-2.5">
-                <dt className="text-text-secondary">Ara Toplam</dt>
+                <dt className="text-text-secondary">{t('subtotal', 'Ara Toplam')}</dt>
                 <dd className="tabular-nums text-text-primary">
                   {formatCurrency(calculateSubtotal(), 'TRY')}
                 </dd>
@@ -535,7 +541,7 @@ const ShowcaseModal = ({
             </>
           )}
           <div className="flex items-baseline justify-between gap-4 py-3">
-            <dt className="font-semibold text-text-primary">Genel Toplam</dt>
+            <dt className="font-semibold text-text-primary">{t('grand_total', 'Genel Toplam')}</dt>
             <dd className="text-base font-semibold tabular-nums text-text-primary">
               {formatCurrency(totalCost, 'TRY')}
             </dd>
@@ -545,7 +551,7 @@ const ShowcaseModal = ({
 
       {/* E-Wallet Balance Card */}
       <div>
-        <h4 className="mb-2 text-xs font-semibold text-text-secondary">Ödeme Yöntemi</h4>
+        <h4 className="mb-2 text-xs font-semibold text-text-secondary">{t('payment_method', 'Ödeme Yöntemi')}</h4>
         <div className="rounded border border-border-light bg-background-secondary/30 p-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -554,21 +560,21 @@ const ShowcaseModal = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-text-primary">E-Cüzdan Bakiyesi</span>
-                  <span className="inline-flex items-center gap-1 rounded-sm border border-border-light bg-background-primary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary">
+                  <span className="text-sm font-medium text-text-primary">{t('ewallet_balance', 'E-Cüzdan Bakiyesi')}</span>
+                  <span className="inline-flex items-center gap-1 rounded-sm border border-border-light bg-background-primary px-1.5 py-0.5 text-xs font-medium text-text-secondary">
                     <span
                       className={`h-1.5 w-1.5 rounded-full ${hasEnoughBalance ? 'bg-status-success' : 'bg-status-error'
                         }`}
                       aria-hidden
                     />
-                    <span>{hasEnoughBalance ? 'Yeterli' : 'Yetersiz Bakiye'}</span>
+                    <span>{hasEnoughBalance ? t('sufficient', 'Yeterli') : t('insufficient_balance', 'Yetersiz Bakiye')}</span>
                   </span>
                 </div>
                 <p className="mt-0.5 text-xs tabular-nums text-text-secondary">
-                  Mevcut: <span className="font-medium text-text-primary">{formatCurrency(balance, 'TRY')}</span>
+                  {t('current_label', 'Mevcut')}: <span className="font-medium text-text-primary">{formatCurrency(balance, 'TRY')}</span>
                   {hasEnoughBalance && (
                     <>
-                      {' · '}İşlem sonrası kalan:{' '}
+                      {' · '}{t('after_transaction_remaining', 'İşlem sonrası kalan')}:{' '}
                       <span className="font-medium text-text-primary">
                         {formatCurrency(balance - totalCost, 'TRY')}
                       </span>
@@ -584,14 +590,17 @@ const ShowcaseModal = ({
                 onClick={onClose}
                 className={buttonClasses('secondary', 'sm')}
               >
-                <span>Bakiye Yükle</span>
+                <span>{t('load_balance', 'Bakiye Yükle')}</span>
               </Link>
             )}
           </div>
 
           {!hasEnoughBalance && (
             <p className="mt-2.5 border-t border-border-light pt-2.5 text-xs text-status-error-text">
-              Bu işlem için {formatCurrency(totalCost - balance, 'TRY')} ek bakiyeye ihtiyacınız var.
+              {t('insufficient_balance_needed', {
+                defaultValue: 'Bu işlem için {{amount}} ek bakiyeye ihtiyacınız var.',
+                amount: formatCurrency(totalCost - balance, 'TRY')
+              })}
             </p>
           )}
         </div>
@@ -612,7 +621,7 @@ const ShowcaseModal = ({
       <div className="flex items-center justify-between gap-3 border-t border-border-light pt-4">
         <Button variant="secondary" onClick={() => backTo(1)} disabled={loading}>
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-          <span>Süreyi Değiştir</span>
+          <span>{t('change_duration', 'Süreyi Değiştir')}</span>
         </Button>
 
         <Button
@@ -620,7 +629,7 @@ const ShowcaseModal = ({
           disabled={loading || !hasEnoughBalance || !areAllAgreementsAccepted()}
         >
           <span>
-            {loading ? 'Kod Gönderiliyor…' : 'Doğrulama Kodu Gönder'}
+            {loading ? t('sending_code', 'Kod Gönderiliyor…') : t('send_verification_code', 'Doğrulama Kodu Gönder')}
           </span>
           <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
         </Button>
@@ -633,7 +642,7 @@ const ShowcaseModal = ({
       {/* Compact Transaction Summary Bar */}
       <div className="flex items-center justify-between gap-3 rounded border border-border-light bg-background-secondary/50 px-3.5 py-2.5 text-xs sm:text-sm">
         <span className="truncate font-medium text-text-primary">
-          {resolvedTitle} · <span className="tabular-nums text-text-secondary">{days} Gün Vitrin</span>
+          {resolvedTitle} · <span className="tabular-nums text-text-secondary">{days} {t('showcase_days', 'Gün Vitrin')}</span>
         </span>
         <span className="shrink-0 font-semibold tabular-nums text-text-primary">
           {formatCurrency(totalCost, 'TRY')}
@@ -642,16 +651,16 @@ const ShowcaseModal = ({
 
       <div className="py-1 text-center">
         <h4 className="text-base font-semibold text-text-primary">
-          Güvenlik Doğrulama Kodu
+          {t('security_verification_code', 'Güvenlik Doğrulama Kodu')}
         </h4>
         <p className="mx-auto mt-1 max-w-sm text-xs sm:text-sm text-text-secondary">
-          Ödemeyi tamamlamak için e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.
+          {t('enter_6_digit_code_to_complete_payment', 'Ödemeyi tamamlamak için e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.')}
         </p>
 
         <div className="mt-2.5 flex items-center justify-center gap-3 text-xs">
           {otpTtlActive && (
             <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 font-medium tabular-nums text-text-secondary">
-              <span>Kalan Süre: {otpTtlFormatted}</span>
+              <span>{t('time_remaining_label', 'Kalan Süre')}: {otpTtlFormatted}</span>
             </span>
           )}
           <button
@@ -661,7 +670,7 @@ const ShowcaseModal = ({
             className="inline-flex items-center gap-1 font-medium text-text-secondary transition-colors hover:text-text-primary disabled:opacity-50 cursor-pointer"
           >
             <RotateCw className="h-3 w-3" strokeWidth={1.5} aria-hidden />
-            <span>Yeni Kod Gönder</span>
+            <span>{t('send_new_code', 'Yeni Kod Gönder')}</span>
           </button>
         </div>
       </div>
@@ -673,7 +682,7 @@ const ShowcaseModal = ({
           onChange={setVerificationCode}
           disabled={loading}
           error={error}
-          label="Doğrulama Kodu"
+          label={t('verification_code', 'Doğrulama Kodu')}
           onComplete={() => { }}
         />
       </div>
@@ -693,7 +702,7 @@ const ShowcaseModal = ({
       <div className="flex items-center justify-between gap-3 border-t border-border-light pt-4">
         <Button variant="secondary" onClick={() => backTo(2)} disabled={loading}>
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-          <span>Geri</span>
+          <span>{t('back', 'Geri')}</span>
         </Button>
 
         <Button
@@ -702,15 +711,15 @@ const ShowcaseModal = ({
         >
           <span>
             {loading
-              ? 'Ödeme Tamamlanıyor…'
-              : `Ödemeyi Onayla (${formatCurrency(totalCost, 'TRY')})`}
+              ? t('payment_processing', 'Ödeme Tamamlanıyor…')
+              : t('confirm_payment_with_amount', 'Ödemeyi Onayla ({{amount}})', { amount: formatCurrency(totalCost, 'TRY') })}
           </span>
         </Button>
       </div>
     </div>
   );
 
-  const title = isExtension ? 'Vitrin Süresini Uzat' : 'İlanı Vitrine Çıkar';
+  const title = isExtension ? t('extend_showcase_title', 'Vitrin Süresini Uzat') : t('promote_to_showcase_title', 'İlanı Vitrine Çıkar');
 
   const renderModalContent = () => {
     if (showSuccessNotification) return null;
@@ -737,30 +746,31 @@ const ShowcaseModal = ({
         <Modal
           isOpen
           onClose={onClose}
-          title="Vitrin Limitine Ulaştınız"
+          title={t('showcase_limit_reached', 'Vitrin Limitine Ulaştınız')}
           size="sm"
           footer={
             <>
               <Button variant="secondary" onClick={onClose}>
-                Vazgeç
+                {t('cancel', 'Vazgeç')}
               </Button>
               <Button
                 onClick={() => {
-                  setUpgradeHint(`Planınız (${plan}) vitrin limitine ulaştı.`);
+                  setUpgradeHint(t('plan_reached_showcase_limit', { defaultValue: 'Planınız ({{plan}}) vitrin limitine ulaştı.', plan }));
                   setShowUpgradeModal(true);
                 }}
               >
-                Planı Yükselt
+                {t('upgrade_plan', 'Planı Yükselt')}
               </Button>
             </>
           }
         >
           <p className="text-sm leading-relaxed text-text-secondary">
-            Mevcut <span className="font-medium text-text-primary">{plan}</span> planınız aynı anda en fazla{' '}
-            <span className="font-medium tabular-nums text-text-primary">
-              {maxShowcaseSlots} aktif vitrin ilanına
-            </span>{' '}
-            izin vermektedir (Şu an aktif: {activeShowcaseCount}). Daha fazla ilanı vitrine çıkarmak için üyelik planınızı yükseltebilirsiniz.
+            {t('upgrade_plan_showcase_limit_desc', {
+              defaultValue: 'Mevcut {{plan}} planınız aynı anda en fazla {{max}} aktif vitrin ilanına izin vermektedir (Şu an aktif: {{current}}). Daha fazla ilanı vitrine çıkarmak için üyelik planınızı yükseltebilirsiniz.',
+              plan,
+              max: maxShowcaseSlots,
+              current: activeShowcaseCount
+            })}
           </p>
         </Modal>
       );
@@ -780,7 +790,7 @@ const ShowcaseModal = ({
           }
         >
           <p className="text-sm text-text-secondary">
-            {listingError || 'İlan bilgileri yüklenemedi.'}
+            {listingError || t('failed_to_load_listing_info', 'İlan bilgileri yüklenemedi.')}
           </p>
         </Modal>
       );
@@ -791,7 +801,7 @@ const ShowcaseModal = ({
         isOpen
         onClose={onClose}
         title={title}
-        description={STEPS[currentStep - 1].hint}
+        description={t(STEPS[currentStep - 1].hintKey, STEPS[currentStep - 1].hint)}
         size="lg"
       >
         {/* Clean Stepper Bar */}
@@ -811,7 +821,7 @@ const ShowcaseModal = ({
                 />
                 <div className="mt-2 flex items-center gap-1.5">
                   <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold tabular-nums ${isDone
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums ${isDone
                         ? 'bg-primary text-white'
                         : isActive
                           ? 'border border-primary text-text-primary'
@@ -828,7 +838,7 @@ const ShowcaseModal = ({
                           : 'text-text-muted'
                       }`}
                   >
-                    {item.label}
+                    {t(item.labelKey, item.label)}
                   </span>
                 </div>
               </li>

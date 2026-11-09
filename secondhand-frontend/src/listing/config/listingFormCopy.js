@@ -1,3 +1,5 @@
+import i18n from '../../i18n.js';
+
 // Turkish copy for the listing form. Category configs keep their English text as the fallback;
 // the form looks fields up by name and step/section text by its English original.
 
@@ -145,5 +147,19 @@ const FORM_TEXT = {
   'Warranty document status': 'Garanti belgesi durumu.',
 };
 
-export const fieldLabel = (field) => FORM_FIELD_LABELS[field?.name] || field?.label || field?.name || '';
-export const formText = (text) => (text ? FORM_TEXT[text] || text : text);
+export const isTurkish = () => !i18n?.language || i18n.language.startsWith('tr');
+
+export const fieldLabel = (field) => {
+  if (isTurkish()) {
+    return FORM_FIELD_LABELS[field?.name] || field?.label || field?.name || '';
+  }
+  return field?.label || field?.name || '';
+};
+
+export const formText = (text) => {
+  if (!text) return text;
+  if (isTurkish()) {
+    return FORM_TEXT[text] || text;
+  }
+  return text;
+};

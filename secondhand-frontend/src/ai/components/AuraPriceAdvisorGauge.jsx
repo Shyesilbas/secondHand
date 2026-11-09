@@ -1,4 +1,5 @@
 import { Tag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '../../common/formatters.js';
 
 export default function AuraPriceAdvisorGauge({
@@ -9,6 +10,7 @@ export default function AuraPriceAdvisorGauge({
   currency = 'TRY',
   status = 'Good Deal'
 }) {
+  const { t } = useTranslation();
   const currentNum = Number(current);
   const minNum = Number(min);
   const maxNum = Number(max);
@@ -35,9 +37,11 @@ export default function AuraPriceAdvisorGauge({
           <Tag className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
           <div>
             <span className="text-xs font-semibold text-text-primary block">
-              Piyasa Değerlemesi & Fiyat Aralığı
+              {t('market_price_evaluation', 'Piyasa Değerlemesi & Fiyat Aralığı')}
             </span>
-            <span className="text-xs text-text-tertiary">Benzer ilan verileriyle kıyaslandı</span>
+            <span className="text-xs text-text-tertiary">
+              {t('compared_with_similar_listings', 'Benzer ilan verileriyle kıyaslandı')}
+            </span>
           </div>
         </div>
 
@@ -77,7 +81,7 @@ export default function AuraPriceAdvisorGauge({
           >
             <div className="w-1 h-2 bg-text-tertiary rounded-sm" />
             <span className="text-xs font-medium text-text-muted mt-2.5 whitespace-nowrap">
-              Ortalama
+              {t('average', 'Ortalama')}
             </span>
           </div>
         )}
@@ -86,15 +90,15 @@ export default function AuraPriceAdvisorGauge({
       {/* Price Labels */}
       <div className="grid grid-cols-3 gap-2 text-xs mt-3 pt-2.5 border-t border-border-light tabular-nums">
         <div>
-          <span className="block text-xs text-text-muted">En Düşük</span>
+          <span className="block text-xs text-text-muted">{t('lowest', 'En Düşük')}</span>
           <span className="text-text-secondary font-medium">{formatPrice(minNum)}</span>
         </div>
         <div className="text-center">
-          <span className="block text-xs text-text-tertiary">Bu İlan</span>
+          <span className="block text-xs text-text-tertiary">{t('this_listing', 'Bu İlan')}</span>
           <span className="font-semibold text-text-primary">{formatPrice(currentNum)}</span>
         </div>
         <div className="text-right">
-          <span className="block text-xs text-text-muted">En Yüksek</span>
+          <span className="block text-xs text-text-muted">{t('highest', 'En Yüksek')}</span>
           <span className="text-text-secondary font-medium">{formatPrice(maxNum)}</span>
         </div>
       </div>

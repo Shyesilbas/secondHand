@@ -412,8 +412,9 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
                   className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary accent-primary shrink-0 cursor-pointer"
                 />
                 <span className="leading-snug">
-                  <span className="font-medium text-text-primary">Mesafeli Satış ve PRO Üyelik Koşulları</span>
-                  {' metnini okudum ve onaylıyorum.'}
+                  <span className="font-medium text-text-primary">{t('distance_sales_pro_terms', 'Mesafeli Satış ve PRO Üyelik Koşulları')}</span>
+                  {' '}
+                  {t('kosullarini_kabul_ediyorum', 'metnini okudum, onaylıyorum.')}
                 </span>
               </label>
             )}

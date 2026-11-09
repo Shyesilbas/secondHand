@@ -41,7 +41,7 @@ const ActiveCouponsModal = ({
         <EmptyState
           icon={Ticket}
           title={t("no_active_coupons", "Aktif Kupon Bulunamadı")}
-          description="Şu anda sepetinize uygulanabilecek aktif kampanya kuponu bulunmuyor."
+          description={t("no_active_coupons_desc", "Şu anda sepetinize uygulanabilecek aktif kampanya kuponu bulunmuyor.")}
         />
       ) : (
         <ul className="divide-y divide-border-light">

@@ -25,7 +25,7 @@ export const formatCurrency = (value, currency = 'TRY', options = {}) => {
     return `${sym}${formatted}`;
 };
 
-export const formatCurrencyCompact = (value, currency = 'TRY') => {
+export const formatCurrencyCompact = (value, currency = 'TRY', options = {}) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
 
     if (numValue === null || numValue === undefined || isNaN(numValue)) {
@@ -39,23 +39,25 @@ export const formatCurrencyCompact = (value, currency = 'TRY') => {
     };
 
     const config = currencyConfig[currency] || currencyConfig['TRY'];
+    const maxDigits = options.maximumFractionDigits ?? options.decimals ?? 1;
+    const minDigits = options.minimumFractionDigits ?? 0;
 
     if (numValue >= 1000000) {
         const formatted = (numValue / 1000000).toLocaleString(config.locale, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 1
+            minimumFractionDigits: minDigits,
+            maximumFractionDigits: maxDigits
         });
         return `${config.symbol}${formatted}M`;
     } else if (numValue >= 1000) {
         const formatted = (numValue / 1000).toLocaleString(config.locale, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 1
+            minimumFractionDigits: minDigits,
+            maximumFractionDigits: maxDigits
         });
         return `${config.symbol}${formatted}K`;
     } else {
         const formatted = numValue.toLocaleString(config.locale, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
+            minimumFractionDigits: minDigits,
+            maximumFractionDigits: Math.min(maxDigits, 2)
         });
         return `${config.symbol}${formatted}`;
     }

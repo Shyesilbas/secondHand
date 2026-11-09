@@ -82,14 +82,14 @@ const ShowcaseSuccessModal = ({
               {days && (
                 <div className="flex justify-between py-2.5">
                   <dt className="text-text-secondary">
-                    {isExtension ? 'Eklenen Süre' : 'Vitrin Süresi'}
+                    {isExtension ? t('added_duration', 'Eklenen Süre') : t('showcase_duration', 'Vitrin Süresi')}
                   </dt>
-                  <dd className="font-medium tabular-nums text-text-primary">{days} Gün</dd>
+                  <dd className="font-medium tabular-nums text-text-primary">{t('days_count', { count: days, defaultValue: '{{count}} Gün' })}</dd>
                 </div>
               )}
               {pricePaid && (
                 <div className="flex justify-between py-2.5">
-                  <dt className="text-text-secondary">Ödenen Tutar</dt>
+                  <dt className="text-text-secondary">{t('amount_paid', 'Ödenen Tutar')}</dt>
                   <dd className="font-semibold tabular-nums text-text-primary">
                     {formatCurrency(Number(pricePaid), 'TRY')}
                   </dd>
@@ -101,7 +101,7 @@ const ShowcaseSuccessModal = ({
           {paymentAgreements.length > 0 && (
             <div className="space-y-1.5 border-t border-border-light pt-3">
               <span className="block text-xs font-medium text-text-secondary">
-                Onaylanan Sözleşmeler
+                {t('approved_agreements', 'Onaylanan Sözleşmeler')}
               </span>
               <div className="divide-y divide-border-light rounded border border-border-light bg-background-primary">
                 {paymentAgreements.map((agreement) => (
@@ -126,7 +126,7 @@ const ShowcaseSuccessModal = ({
                       onClick={() => setSelectedAgreement(agreement)}
                       className="shrink-0 font-medium text-text-secondary underline underline-offset-2 hover:text-text-primary cursor-pointer"
                     >
-                      Oku
+                      {t('read', 'Oku')}
                     </button>
                   </div>
                 ))}

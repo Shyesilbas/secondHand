@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {useCallback, useMemo, useState} from 'react';
 import {RegisterRequestDTO} from '../auth.js';
 import {authService} from '../services/authService.js';
@@ -10,6 +11,7 @@ import {formatPhoneNumber} from '../../common/utils/phoneFormatter.js';
 import {formatBirthdateInput} from '../../common/utils/dateFormat.js';
 
 export const useRegisterForm = () => {
+ const { t } = useTranslation();
  const [formData, setFormData] = useState({ ...RegisterRequestDTO, confirmPassword: '' });
  const [errors, setErrors] = useState({});
  const [isLoading, setIsLoading] = useState(false);
@@ -60,15 +62,15 @@ export const useRegisterForm = () => {
  acceptedAgreementIds: Array.from(agreementsApi.acceptedAgreements),
  };
  await authService.register(registerData);
- navigate(ROUTES.LOGIN, { state: { message: 'Hesabın oluşturuldu. Şimdi e-posta ve şifrenle giriş yapabilirsin.' } });
+ navigate(ROUTES.LOGIN, { state: { message: t('account_created_login_hint', 'Hesabın oluşturuldu. Şimdi e-posta ve şifrenle giriş yapabilirsin.') } });
  return true;
  } catch (error) {
- setErrors({ submit: error.response?.data?.message || 'Kayıt tamamlanamadı. Lütfen tekrar dene.' });
+ setErrors({ submit: error.response?.data?.message || t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.') });
  return false;
  } finally {
  setIsLoading(false);
  }
- }, [validateForm, formData, agreementsApi.acceptedAgreements, agreementsApi.agreements, navigate]);
+ }, [validateForm, formData, agreementsApi.acceptedAgreements, agreementsApi.agreements, navigate, t]);
 
  return useMemo(() => ({
  formData,

@@ -66,7 +66,11 @@ const CampaignCard = ({ campaign, listingsById, onEdit, onDelete }) => {
   if (scope.kind === 'LISTING') {
     scopeContent = <ListingScope ids={campaign.eligibleListingIds} listingsById={listingsById} />;
   } else if (scope.kind === 'TYPE') {
-    const labels = campaign.eligibleTypes.map(type => PREFILTER_CATEGORY_COPY[type]?.label || type);
+    const labels = campaign.eligibleTypes.map(type => {
+      const key = `category_${String(type).toLowerCase()}`;
+      const translated = t(key);
+      return (translated && translated !== key) ? translated : (PREFILTER_CATEGORY_COPY[type]?.label || type);
+    });
     scopeContent = t('campaign_scope_types', { defaultValue: '{{types}} kategorisindeki ilanların', types: labels.join(', ') });
   } else {
     scopeContent = t('campaign_scope_all', 'Tüm ilanların');

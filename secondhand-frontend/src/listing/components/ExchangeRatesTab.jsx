@@ -58,7 +58,7 @@ const ExchangeRatesTab = ({
  </div>
  ) : isError ? (
  <div role="alert" className="flex items-center justify-between gap-3">
- <p className="text-sm text-status-error-text">Unable to fetch live exchange rates</p>
+ <p className="text-sm text-status-error-text">{t("unable_to_fetch_live_rates", "Unable to fetch live exchange rates")}</p>
  <Button variant="secondary" size="sm" onClick={() => refetch()}>{t("try_again")}</Button>
  </div>
  ) : (

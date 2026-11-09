@@ -533,7 +533,7 @@ const GenericListingForm = ({
   });
  });
  });
- const typeLabel = PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType;
+ const typeLabel = t(`category_${listingType?.toLowerCase()}`, PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType);
  return (
   <div className="space-y-6">
    {/* Hero preview card */}
@@ -622,7 +622,7 @@ const GenericListingForm = ({
  return true;
  }, [wizardSteps, currentStep, formData?.city, formData?.district]);
  if (!formSchema) return null;
- const categoryLabel = PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType;
+ const categoryLabel = t(`category_${listingType?.toLowerCase()}`, PREFILTER_CATEGORY_COPY[listingType]?.label || listingConfig?.label || listingType);
  return (
   <ListingWizard
    title={isEdit ? t('edit_listing_title', 'İlanı düzenle') : t('new_listing_in_category', { defaultValue: 'Yeni ilan · {{category}}', category: categoryLabel })}

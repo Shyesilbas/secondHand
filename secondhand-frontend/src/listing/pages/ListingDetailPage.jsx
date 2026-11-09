@@ -194,7 +194,7 @@ const ListingDetailPage = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: listing?.title || 'SecondHand İlanı',
+          title: listing?.title || t('secondhand_listing', 'SecondHand İlanı'),
           url
         });
         return;
@@ -207,7 +207,7 @@ const ListingDetailPage = () => {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2200);
     }
-  }, [listing?.title]);
+  }, [listing?.title, t]);
 
   /* ── Render ──────────────────────────────────────────── */
 

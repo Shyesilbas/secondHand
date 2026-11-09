@@ -53,24 +53,28 @@ const getStatusBadge = (status) => {
   switch (status) {
     case 'SUCCESS':
       return {
+        labelKey: 'success',
         label: 'Başarılı',
         dotClass: 'bg-status-success',
         textClass: 'text-status-success-text',
       };
     case 'FAILURE':
       return {
+        labelKey: 'failed',
         label: 'Başarısız',
         dotClass: 'bg-status-error',
         textClass: 'text-status-error-text',
       };
     case 'ATTEMPT':
       return {
+        labelKey: 'attempt',
         label: 'Deneme',
         dotClass: 'bg-status-warning',
         textClass: 'text-status-warning-text',
       };
     default:
       return {
+        labelKey: null,
         label: status || 'Bilinmiyor',
         dotClass: 'bg-text-muted',
         textClass: 'text-text-secondary',
@@ -136,7 +140,7 @@ const SecurityActivityList = ({
                   </h4>
                   <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${statusBadge.textClass}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${statusBadge.dotClass}`} aria-hidden />
-                    {statusBadge.label}
+                    {statusBadge.labelKey ? t(statusBadge.labelKey, statusBadge.label) : statusBadge.label}
                   </span>
                 </div>
 

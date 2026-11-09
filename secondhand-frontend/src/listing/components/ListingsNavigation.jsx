@@ -37,7 +37,7 @@ const ListingsNavigation = ({
  <h1 className="text-xl sm:text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>
  <div className="flex items-center gap-1.5 mt-0.5">
  <span className="text-xs sm:text-sm font-medium text-text-secondary">
- {getListingTypeLabel(selectedCategory || filters?.listingType) || 'All Categories'}
+ {getListingTypeLabel(selectedCategory || filters?.listingType) || t('all_categories', 'Tüm Kategoriler')}
  </span>
  <span className="text-border-DEFAULT">·</span>
  <span className="text-text-muted text-xs sm:text-sm">{totalElements?.toLocaleString()} {t("results")}</span>
@@ -63,7 +63,7 @@ const ListingsNavigation = ({
  </div>
 
  {term ? <p className="mt-2 text-sm text-text-secondary" role="status" aria-live="polite">
- {isListingNo && listingNoLoading ? t("searching_listing_number") : isListingNo && listingNoError ? <span className="text-status-error-text">{listingNoError}</span> : <>{t("found")} <span className="font-medium tabular-nums text-text-primary">{filteredListings.length}</span> {t("results")}{isTitle ? ' in all pages' : ''}</>}
+ {isListingNo && listingNoLoading ? t("searching_listing_number") : isListingNo && listingNoError ? <span className="text-status-error-text">{listingNoError}</span> : <>{t("found")} <span className="font-medium tabular-nums text-text-primary">{filteredListings.length}</span> {t("results")}{isTitle ? t("in_all_pages", " in all pages") : ''}</>}
  </p> : null}
  </div>
  </div>

@@ -48,7 +48,7 @@ const AuraChatWidgetPanel = () => {
             fallbackToChat: false,
             onLimitExceeded: () => {
                 setShowUpgradeModal(true);
-                setUpgradeHint(t("aura_daily_limit_exceeded") || 'Günlük Aura AI limitinize ulaştınız.');
+                setUpgradeHint(t("aura_daily_limit_exceeded", "Günlük Aura AI limitinize ulaştınız."));
             }
         });
     const {

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { aiChatService } from '../services/aiChatService.js';
@@ -24,6 +25,7 @@ function loadPersistedMessages(persistSurface, userId) {
 }
 
 export const useAuraChat = ({
+
  userId,
  isAuthenticated,
  initialMessages = [],
@@ -34,6 +36,7 @@ export const useAuraChat = ({
  /** 'widget' | 'page' — persists the last conversation on this device */
  persistMessagesSurface = null,
 }) => {
+ const { t } = useTranslation();
  const queryClient = useQueryClient();
  const [messages, setMessages] = useState(() => initialMessages);
  const [input, setInput] = useState('');
@@ -135,7 +138,7 @@ export const useAuraChat = ({
  setMessages((prev) => [...prev, createChatMessage({ role: 'user', content: trimmed })]);
  }
  setInput('');
- appendAssistant('Aura ile sohbet etmek için giriş yapmalısın.');
+ appendAssistant(t('aura_login_required', 'Aura ile sohbet etmek için giriş yapmalısın.'));
  return;
  }
 
@@ -156,7 +159,7 @@ export const useAuraChat = ({
  ? { message: payload.message, context: payload.context }
  : { message: payload }
  );
- const answer = response?.answer || response?.message || (response?.success === false ? response?.error : null) || 'Üzgünüm, şu an bu soruya yanıt verilemedi. Lütfen tekrar deneyiniz.';
+ const answer = response?.answer || response?.message || (response?.success === false ? response?.error : null) || t('aura_default_error_response', 'Üzgünüm, şu an bu soruya yanıt verilemedi. Lütfen tekrar deneyiniz.');
  const dataSources = Array.isArray(response?.dataSources) ? response.dataSources : undefined;
  const suggestedListings = Array.isArray(response?.suggestedListings) ? response.suggestedListings : undefined;
  const meta = {};
@@ -175,7 +178,7 @@ export const useAuraChat = ({
  }
  const errorMessage = getApiErrorMessage(
  e,
- 'Mesajın gönderilemedi. Lütfen biraz sonra tekrar dene.'
+ t('aura_message_send_failed', 'Mesajın gönderilemedi. Lütfen biraz sonra tekrar dene.')
  );
  appendAssistant(errorMessage);
  } finally {
@@ -196,6 +199,7 @@ export const useAuraChat = ({
  removeTyping,
  replaceTypingWith,
  sendApi,
+ t,
  userId,
  withTyping,
  ]

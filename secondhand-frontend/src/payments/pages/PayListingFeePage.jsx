@@ -117,21 +117,21 @@ const PayListingFeePage = () => {
  <div className="flex items-center gap-2 bg-background-primary border border-border/80 p-2.5 rounded-md self-start md:self-auto">
  <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
  <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
- <span>Select</span>
+ <span>{t("select", "Select")}</span>
  </div>
  <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
  </svg>
  <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
  <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">2</span>
- <span>Pay Fee</span>
+ <span>{t("pay_fee", "Pay Fee")}</span>
  </div>
  <svg className="w-4 h-4 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
  </svg>
  <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-secondary font-medium text-xs">
  <span className="flex h-5 w-5 items-center justify-center rounded bg-secondary-400 text-white text-xs">3</span>
- <span>Published</span>
+ <span>{t("published", "Published")}</span>
  </div>
  </div>
  </div>

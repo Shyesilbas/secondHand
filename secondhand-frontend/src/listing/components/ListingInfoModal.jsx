@@ -111,7 +111,7 @@ const ListingInfoModal = ({
  if (!isOpen || !listing) return null;
  const st = statusBadge(listing.status);
 
- return <Modal isOpen={isOpen} onClose={onClose} title={t("listing_insights")} description={title} size="xl" footer={<>
+ return <Modal isOpen={isOpen} onClose={onClose} title={t("listing_insights")} description={title} size="2xl" footer={<>
  <Button variant="secondary" onClick={onClose}>{t("close")}</Button>
  <Link to={ROUTES.LISTING_DETAIL(listing.id)} onClick={onClose} className={buttonClasses('primary')}>
  {t("open_full_page")}
@@ -233,7 +233,7 @@ const ListingInfoModal = ({
  key={tab.id}
  type="button"
  onClick={() => onInsightChange(tab.id)}
- className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition-all ${
+ className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-all ${
  activeInsight === tab.id
  ? 'bg-background-secondary text-text-primary border border-border-light/50 font-semibold'
  : 'text-text-muted hover:text-text-primary border border-transparent'
@@ -246,8 +246,8 @@ const ListingInfoModal = ({
  })}
  </div>
 
- {/* Chart Content Area (Borderless) */}
- <div className="mt-4 flex-1 min-h-64 bg-background-primary rounded border border-border-light p-4 sm:p-5">
+ {/* Chart Content Area */}
+ <div className="mt-4 flex-1">
  {activeInsight === 'history' && (
  <Suspense fallback={null}>
  <PriceHistoryTab priceHistory={priceHistory} loading={historyLoading} error={historyError} currency={currency} />
@@ -261,7 +261,7 @@ const ListingInfoModal = ({
  {viewStats ? (
  <ViewStatisticsCard viewStats={viewStats} periodDays={viewStats?.periodDays || 7} />
  ) : (
- <div className="flex flex-col items-center justify-center py-12 text-center">
+ <div className="flex flex-col items-center justify-center py-12 text-center rounded border border-border-light bg-background-primary">
  <Eye className="mb-2 h-7 w-7 text-text-muted opacity-40" />
  <p className="text-xs font-semibold text-text-primary">{t("no_view_data")}</p>
  <p className="mt-0.5 max-w-xs text-xs text-text-muted">{t("open_the_full_listing_to_collect_views")}</p>

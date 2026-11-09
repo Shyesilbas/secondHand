@@ -19,13 +19,23 @@ const isBrowsingPage = (pathname) => {
  * deeper narrowing (type, brand, model) lives in the category flow and the listing filters.
  */
 const CategorySubHeader = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
-  const categories = useMemo(() => getListingTypeOptions().map(o => ({
-    value: o.value,
-    icon: o.icon,
-    label: PREFILTER_CATEGORY_COPY[o.value]?.label || o.label
-  })), []);
+  const categories = useMemo(() => {
+    void i18n.language;
+    return getListingTypeOptions().map(o => {
+      const key = `category_${o.value.toLowerCase()}`;
+      const translated = t(key);
+      const label = (translated && translated !== key)
+        ? translated
+        : (PREFILTER_CATEGORY_COPY[o.value]?.label || o.label);
+      return {
+        value: o.value,
+        icon: o.icon,
+        label
+      };
+    });
+  }, [t, i18n.language]);
 
   if (!isBrowsingPage(pathname)) return null;
 

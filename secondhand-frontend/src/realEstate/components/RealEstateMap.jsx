@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import 'leaflet/dist/leaflet.css';
 import { theme } from '../../common/theme/theme.js';
 import Alert from '../../common/components/ui/Alert.jsx';
@@ -12,6 +13,7 @@ const AREA_RADIUS_METERS = 400;
  * never a pin on the building. Shown only when the listing has coordinates.
  */
 const RealEstateMap = ({ listing }) => {
+	const { t } = useTranslation();
 	const containerRef = useRef(null);
 	const [state, setState] = useState('loading');
 	const lat = Number(listing?.latitude);
@@ -44,13 +46,13 @@ const RealEstateMap = ({ listing }) => {
 
 	return (
 		<div className="space-y-2">
-			{state === 'error' && <Alert type="error" message="Harita yüklenemedi." />}
+			{state === 'error' && <Alert type="error" message={t("map_load_failed", "Harita yüklenemedi.")} />}
 			<div className="relative h-72 w-full overflow-hidden rounded border border-border-light">
 				{state === 'loading' && <Skeleton className="absolute inset-0 h-full w-full" />}
-				<div ref={containerRef} className="h-full w-full" aria-label="İlanın yaklaşık konumu" />
+				<div ref={containerRef} className="h-full w-full" aria-label={t("approximate_listing_location", "İlanın yaklaşık konumu")} />
 			</div>
 			<p className="text-sm text-text-secondary">
-				Yaklaşık konum gösteriliyor; tam adres ilan sahibiyle görüşülerek öğrenilir.
+				{t("real_estate_map_hint", "Yaklaşık konum gösteriliyor; tam adres ilan sahibiyle görüşülerek öğrenilir.")}
 			</p>
 		</div>
 	);
