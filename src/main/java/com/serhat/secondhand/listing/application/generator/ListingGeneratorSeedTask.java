@@ -26,7 +26,7 @@ import java.util.UUID;
 
 /**
  * Local-only seed ({@code --app.seed=listings-generate}): creates realistic, already published vehicle,
- * electronics and real estate listings for the real (non-catalog) users, using estimated prices from
+ * electronics, real estate and book listings for the real (non-catalog) users, using estimated prices from
  * {@code data/listing-generator/prices.json}. Listings go through the normal create flow (validation, catalog
  * snapshot, inventory) but skip the listing-fee payment and the new-listing event, so no follower gets a
  * notification or e-mail. Every generated id is recorded in {@code generated_listings} for
@@ -48,6 +48,7 @@ class ListingGeneratorSeedTask implements SeedTask {
     private final VehicleListingGenerator vehicleGenerator;
     private final ElectronicListingGenerator electronicGenerator;
     private final RealEstateListingGenerator realEstateGenerator;
+    private final BookListingGenerator bookGenerator;
 
     @Value("${app.listing-generator.vehicles:200}")
     private int vehicleCount;
@@ -57,6 +58,9 @@ class ListingGeneratorSeedTask implements SeedTask {
 
     @Value("${app.listing-generator.realestate:200}")
     private int realEstateCount;
+
+    @Value("${app.listing-generator.books:200}")
+    private int bookCount;
 
     @Value("${app.listing-generator.seed:42}")
     private long seed;
@@ -106,10 +110,19 @@ class ListingGeneratorSeedTask implements SeedTask {
                 finish(id, batch, random);
             }
         }
+        if (bookCount > 0) {
+            var books = bookGenerator.candidates();
+            var conditions = bookGenerator.conditions();
+            for (int i = 0; i < bookCount; i++, n++) {
+                UUID id = bookGenerator.create(random.pick(books), conditions, sellers.get(n % sellers.size()), random,
+                        locations.pick(random));
+                finish(id, batch, random);
+            }
+        }
         clearCache("listing:userListings");
         clearCache("user:profile");
-        log.info("Listing generator batch {}: {} vehicle + {} electronics + {} real estate listings for {} sellers (prices {} {})",
-                batch, vehicleCount, electronicCount, realEstateCount, sellers.size(), prices.source(), prices.priceDate());
+        log.info("Listing generator batch {}: {} vehicle + {} electronics + {} real estate + {} book listings for {} sellers (prices {} {})",
+                batch, vehicleCount, electronicCount, realEstateCount, bookCount, sellers.size(), prices.source(), prices.priceDate());
         return Result.success();
     }
 

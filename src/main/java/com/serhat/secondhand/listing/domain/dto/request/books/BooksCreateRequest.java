@@ -16,7 +16,12 @@ public record BooksCreateRequest(
         @NotNull @Positive Integer pageCount,
         @NotNull UUID formatId,
         @NotNull UUID conditionId,
-        String isbn
+        String isbn,
+        /** Catalog edition; its facts replace the ones above (see BooksEditionSnapshotter). */
+        UUID editionId,
+        String publisher,
+        String translator,
+        java.util.Map<String, Object> attributes
 ) {}
 
 

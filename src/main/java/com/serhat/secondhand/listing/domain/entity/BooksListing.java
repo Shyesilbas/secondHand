@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.domain.entity;
 
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
+import com.serhat.secondhand.listing.domain.entity.enums.books.BookEdition;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
 import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
@@ -21,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @Getter @Setter
 @NoArgsConstructor
 @SuperBuilder
- @org.hibernate.annotations.BatchSize(size = 20)
+@org.hibernate.annotations.BatchSize(size = 20)
 public class BooksListing extends Listing {
 
     private String author;
@@ -50,8 +51,26 @@ public class BooksListing extends Listing {
     @JoinColumn(name = "book_condition_id")
     private BookCondition condition;
 
+    /** ISBN-13 (an ISBN-10 is converted on save). */
     @Column(length = 20)
     private String isbn;
+
+    /** Catalog edition; when set, the book facts above are copied from it (see BooksEditionSnapshotter). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "edition_id")
+    private BookEdition edition;
+
+    @Column(length = 200)
+    private String publisher;
+
+    @Column(length = 200)
+    private String translator;
+
+    /** Attribute scope = book type name (e.g. SINAV_HAZIRLIK). */
+    @Override
+    public String attributeScopeKey() {
+        return bookType != null ? bookType.getName() : null;
+    }
 }
 
 

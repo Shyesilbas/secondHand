@@ -3,6 +3,7 @@ package com.serhat.secondhand.listing.application.books;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import com.serhat.secondhand.listing.domain.repository.books.BookConditionRepository;
+import com.serhat.secondhand.listing.domain.repository.books.BookEditionRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookFormatRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookLanguageRepository;
@@ -21,8 +22,10 @@ public class BooksListingResolver {
     private final BookLanguageRepository bookLanguageRepository;
     private final BookFormatRepository bookFormatRepository;
     private final BookConditionRepository bookConditionRepository;
+    private final BookEditionRepository bookEditionRepository;
 
-    public Result<BooksResolution> resolve(UUID bookTypeId, UUID genreId, UUID languageId, UUID formatId, UUID conditionId) {
+    public Result<BooksResolution> resolve(UUID bookTypeId, UUID genreId, UUID languageId, UUID formatId, UUID conditionId,
+                                          UUID editionId) {
         var bookType = bookTypeRepository.findById(bookTypeId).orElse(null);
         if (bookType == null) return Result.error("Book type not found", "BOOK_TYPE_NOT_FOUND");
 
@@ -38,7 +41,10 @@ public class BooksListingResolver {
         var condition = bookConditionRepository.findById(conditionId).orElse(null);
         if (condition == null) return Result.error("Book condition not found", "BOOK_CONDITION_NOT_FOUND");
 
-        return Result.success(new BooksResolution(bookType, genre, language, format, condition));
+        var edition = editionId == null ? null : bookEditionRepository.findWithCatalogById(editionId).orElse(null);
+        if (editionId != null && edition == null) return Result.error("Book edition not found", "BOOK_EDITION_NOT_FOUND");
+
+        return Result.success(new BooksResolution(bookType, genre, language, format, condition, edition));
     }
 
     public Result<Void> apply(
@@ -47,7 +53,8 @@ public class BooksListingResolver {
             Optional<UUID> genreId,
             Optional<UUID> languageId,
             Optional<UUID> formatId,
-            Optional<UUID> conditionId
+            Optional<UUID> conditionId,
+            Optional<UUID> editionId
     ) {
         if (listing == null) {
             return Result.error("Listing is required", "LISTING_REQUIRED");
@@ -81,6 +88,16 @@ public class BooksListingResolver {
             var condition = bookConditionRepository.findById(conditionId.get()).orElse(null);
             if (condition == null) return Result.error("Book condition not found", "BOOK_CONDITION_NOT_FOUND");
             listing.setCondition(condition);
+        }
+
+        if (editionId != null) {
+            if (editionId.isEmpty()) {
+                listing.setEdition(null);
+            } else {
+                var edition = bookEditionRepository.findWithCatalogById(editionId.get()).orElse(null);
+                if (edition == null) return Result.error("Book edition not found", "BOOK_EDITION_NOT_FOUND");
+                listing.setEdition(edition);
+            }
         }
 
         return Result.success();

@@ -18,13 +18,16 @@ import com.serhat.secondhand.listing.domain.repository.books.BookLanguageReposit
 import com.serhat.secondhand.listing.domain.repository.books.BookTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +38,7 @@ import java.util.stream.Stream;
 
 /**
  * Seeds book reference data (types, genres, languages, formats, conditions)
- * from {@code classpath:data/books/books.json}.
+ * from {@code classpath:data/books/books.json}, then the book catalog (BookCatalogSeeder).
  *
  * <p>Uses an <b>upsert</b> strategy with deterministic UUIDs for all entities.
  * Genre entries are keyed as {@code TYPE_KEY + "_" + GENRE_KEY} to maintain
@@ -47,6 +50,8 @@ import java.util.stream.Stream;
 public class BooksDataInitializer implements SeedTask {
 
     private static final String CATALOG_PATH = "data/books/books.json";
+    /** BookGenreRepository caches findAll/findByNameIgnoreCase in Redis; a stale list hides genres added here. */
+    private static final String GENRE_CACHE = "catalog:bookGenres";
 
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
@@ -55,12 +60,16 @@ public class BooksDataInitializer implements SeedTask {
     private final BookConditionRepository bookConditionRepository;
     private final ObjectMapper objectMapper;
     private final CatalogLegacyPruner legacyPruner;
+    private final BookCatalogSeeder catalogSeeder;
+    private final BookGenreRemapper genreRemapper;
+    private final CacheManager cacheManager;
 
     private final Set<String> seenTypes = new HashSet<>();
     private final Set<String> seenGenres = new HashSet<>();
     private final Set<String> seenLanguages = new HashSet<>();
     private final Set<String> seenFormats = new HashSet<>();
     private final Set<String> seenConditions = new HashSet<>();
+    private final List<BookGenreRemapper.Replacement> replacements = new ArrayList<>();
 
     @Override
     public String key() {
@@ -71,24 +80,34 @@ public class BooksDataInitializer implements SeedTask {
     public Result<Void> run() {
         try {
             Stream.of(seenTypes, seenGenres, seenLanguages, seenFormats, seenConditions).forEach(Set::clear);
+            replacements.clear();
+            clearGenreCache();
             JsonNode root = loadCatalog();
             seedTypes(root.get("types"));
             seedGenres(root.get("genres"));
             seedLanguages(root.get("languages"));
             seedFormats(root.get("formats"));
             seedConditions(root.get("conditions"));
+            genreRemapper.remap(replacements, seenGenres, seenTypes);
             // genres reference types, so they go first
             legacyPruner.prune("book_genres", seenGenres, Map.of("OTHER", "OKUMA_KITABI_OTHER"));
             legacyPruner.prune("book_types", seenTypes);
             legacyPruner.prune("book_languages", seenLanguages);
-            legacyPruner.prune("book_formats", seenFormats, Map.of("EBOOK", "E_BOOK"));
+            legacyPruner.prune("book_formats", seenFormats);
             legacyPruner.prune("book_conditions", seenConditions);
+            clearGenreCache();
+            catalogSeeder.seed();
+            clearGenreCache();
             log.info("Books seed completed successfully");
             return Result.success();
         } catch (Exception e) {
             log.error("Books seed failed", e);
             return Result.error("Books seed failed: " + e.getMessage(), "SEED_FAILED");
         }
+    }
+
+    private void clearGenreCache() {
+        Optional.ofNullable(cacheManager.getCache(GENRE_CACHE)).ifPresent(cache -> cache.clear());
     }
 
     private JsonNode loadCatalog() throws Exception {
@@ -167,6 +186,7 @@ public class BooksDataInitializer implements SeedTask {
                 }
                 String genreKey = typeKey + "_" + subKey;
                 upsertGenre(genreKey, label, type);
+                collectReplacements(gNode.get("replaces"), genreKey);
             }
         }
 
@@ -176,6 +196,22 @@ public class BooksDataInitializer implements SeedTask {
                 .orElse(null);
         if (readingType != null) {
             upsertGenre("OTHER", "Other", readingType);
+        }
+    }
+
+    /** {@code replaces}: old full genre keys, or {@code {"from": key, "attributes": {...}}} to also set listing attributes. */
+    @SuppressWarnings("unchecked")
+    private void collectReplacements(JsonNode replaces, String genreKey) {
+        if (replaces == null) return;
+        for (JsonNode r : replaces) {
+            String from = (r.isObject() ? r.path("from") : r).asText().trim().toUpperCase(Locale.ROOT);
+            if (from.isEmpty()) {
+                throw new IllegalStateException(CATALOG_PATH + ": " + genreKey + " has an empty 'replaces' entry");
+            }
+            Map<String, Object> attributes = r.has("attributes")
+                    ? objectMapper.convertValue(r.get("attributes"), Map.class)
+                    : Map.of();
+            replacements.add(new BookGenreRemapper.Replacement(from, genreKey, attributes));
         }
     }
 

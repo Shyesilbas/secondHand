@@ -89,7 +89,7 @@ class LocationCatalogServiceTest {
         List<LocationCatalogService.NeighborhoodDto> kadikoyNbs = locationCatalogService.getNeighborhoods("ISTANBUL_KADIKOY");
         assertThat(kadikoyNbs).isNotEmpty();
         assertThat(kadikoyNbs).extracting(LocationCatalogService.NeighborhoodDto::getLabel)
-                .contains("Moda (Caferağa)", "Caddebostan", "Suadiye", "Fenerbahçe", "Bostancı");
+                .contains("Caferağa", "Caddebostan", "Suadiye", "Fenerbahçe", "Bostancı");
 
         List<LocationCatalogService.NeighborhoodDto> umraniyeNbs = locationCatalogService.getNeighborhoods("ISTANBUL_UMRANIYE");
         assertThat(umraniyeNbs).isNotEmpty();

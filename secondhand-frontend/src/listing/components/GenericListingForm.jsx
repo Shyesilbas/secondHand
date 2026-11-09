@@ -450,6 +450,14 @@ const GenericListingForm = ({
     if (section.kind === 'attributes') {
      return <ListingAttributeSection key={section.id} section={section} ctx={ctx} title={formText(section.title)} description={formText(section.description)} />;
     }
+    if (section.kind === 'component') {
+     const SectionComponent = section.component;
+     return (
+      <SectionCard key={section.id} title={formText(section.title)} description={formText(section.description)}>
+       <SectionComponent ctx={ctx} section={section} />
+      </SectionCard>
+     );
+    }
     if (!(section.fields || []).some(isFieldShown)) return null;
     return (
      <SectionCard key={section.id || section.title} title={formText(section.title)} description={formText(section.description)}>

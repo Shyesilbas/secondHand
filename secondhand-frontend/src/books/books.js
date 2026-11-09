@@ -1,5 +1,8 @@
 
 import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
+import { cleanAttributes } from '../listing/components/attributes/attributeValues.js';
+
+const textOrNull = (value) => (value == null || String(value).trim() === '' ? null : String(value).trim());
 
 export const createBooksCreateRequest = (data) => ({
     base: createListingBaseCreatePayload(data),
@@ -12,7 +15,11 @@ export const createBooksCreateRequest = (data) => ({
     pageCount: data.pageCount,
     formatId: data.formatId,
     conditionId: data.conditionId,
-    isbn: data.isbn || undefined,
+    isbn: textOrNull(data.isbn),
+    editionId: data.editionId || null,
+    publisher: textOrNull(data.publisher),
+    translator: textOrNull(data.translator),
+    attributes: cleanAttributes(data.attributes),
 });
 
 export const createBooksUpdateRequest = (data) => {
@@ -29,7 +36,13 @@ export const createBooksUpdateRequest = (data) => {
     updateData.pageCount = data.pageCount ?? undefined;
     updateData.formatId = data.formatId ?? undefined;
     updateData.conditionId = data.conditionId ?? undefined;
-    updateData.isbn = data.isbn ?? undefined;
+    if (data.isbn !== undefined) updateData.isbn = textOrNull(data.isbn);
+    // null unlinks the catalog edition.
+    if (data.editionId !== undefined) updateData.editionId = data.editionId || null;
+    if (data.publisher !== undefined) updateData.publisher = textOrNull(data.publisher);
+    if (data.translator !== undefined) updateData.translator = textOrNull(data.translator);
+    // Sent whole: the backend replaces the stored attributes, so a cleared answer is removed.
+    if (data.attributes !== undefined) updateData.attributes = cleanAttributes(data.attributes);
     return updateData;
 };
 

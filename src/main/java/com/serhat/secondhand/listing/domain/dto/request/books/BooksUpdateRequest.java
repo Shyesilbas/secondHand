@@ -16,7 +16,12 @@ public record BooksUpdateRequest(
         Optional<Integer> pageCount,
         Optional<UUID> formatId,
         Optional<UUID> conditionId,
-        Optional<String> isbn
+        Optional<String> isbn,
+        /** Empty (JSON null) unlinks the catalog edition. */
+        Optional<UUID> editionId,
+        Optional<String> publisher,
+        Optional<String> translator,
+        Optional<java.util.Map<String, Object>> attributes
 ) {}
 
 

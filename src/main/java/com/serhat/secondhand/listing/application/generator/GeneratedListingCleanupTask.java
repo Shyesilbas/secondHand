@@ -28,7 +28,7 @@ class GeneratedListingCleanupTask implements SeedTask {
     private static final List<String> INTERACTION_TABLES = List.of(
             "carts", "chat_rooms", "complaints", "escrows", "favorite_list_items", "favorites", "offers",
             "order_items", "payment", "showcases");
-    private static final List<String> SUBTYPE_TABLES = List.of("vehicle_listings", "electronic_listings", "real_estate_listings");
+    private static final List<String> SUBTYPE_TABLES = List.of("vehicle_listings", "electronic_listings", "real_estate_listings", "books_listings");
 
     private final JdbcTemplate jdbcTemplate;
     private final CacheManager cacheManager;

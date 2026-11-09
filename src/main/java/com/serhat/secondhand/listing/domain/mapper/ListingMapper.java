@@ -104,6 +104,9 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(booksListing.getId()))")
+    @Mapping(target = "editionId", source = "edition.id")
+    @Mapping(target = "coverUrl", source = "edition.coverUrl")
+    @Mapping(target = "editionSource", source = "edition.source")
     public abstract BooksListingDto toBooksDto(BooksListing booksListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -247,6 +250,7 @@ public abstract class ListingMapper {
     @Mapping(target = "language", ignore = true)
     @Mapping(target = "format", ignore = true)
     @Mapping(target = "condition", ignore = true)
+    @Mapping(target = "edition", ignore = true)
     @Mapping(target = "title", source = "base.title")
     @Mapping(target = "description", source = "base.description")
     @Mapping(target = "price", source = "base.price")
@@ -293,7 +297,13 @@ public abstract class ListingMapper {
         if (request.author() != null) request.author().ifPresent(entity::setAuthor);
         if (request.publicationYear() != null) request.publicationYear().ifPresent(entity::setPublicationYear);
         if (request.pageCount() != null) request.pageCount().ifPresent(entity::setPageCount);
-        if (request.isbn() != null) request.isbn().ifPresent(entity::setIsbn);
+        if (request.isbn() != null) entity.setIsbn(request.isbn().map(this::blankToNull).orElse(null));
+        if (request.publisher() != null) entity.setPublisher(request.publisher().map(this::blankToNull).orElse(null));
+        if (request.translator() != null) entity.setTranslator(request.translator().map(this::blankToNull).orElse(null));
+        if (request.attributes() != null) {
+            entity.getAttributes().clear();
+            request.attributes().ifPresent(entity.getAttributes()::putAll);
+        }
     }
 
     public void updateClothing(ClothingListing entity, ClothingUpdateRequest request) {

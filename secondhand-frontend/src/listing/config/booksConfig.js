@@ -2,6 +2,13 @@ import { BookOpen } from 'lucide-react';
 import GenericListingDetails from '../components/details/GenericListingDetails.jsx';
 import {booksService} from '../../books/services/booksService.js';
 import {filterConfigs} from '../filters/filterConfigs.js';
+import BookEditionPicker from '../../books/components/BookEditionPicker.jsx';
+import {bookAttributeQuery} from '../../books/services/bookCatalogQuery.js';
+import {hasBookEdition} from '../../books/utils/bookEdition.js';
+
+// While a catalog edition is linked its facts are read-only (BooksEditionSnapshotter copies them again on save).
+const catalogLocked = (ctx) => hasBookEdition(ctx);
+const hasValue = (key) => (listing) => listing?.[key] != null && listing?.[key] !== '';
 
 export const booksConfig = {
  label: 'Books',
@@ -11,16 +18,33 @@ export const booksConfig = {
  detailsComponent: GenericListingDetails,
  detailsSchema: {
  title: 'Books Information',
+ sections: [
+ {
+ id: 'basic',
+ label: 'Genel',
+ title: 'Genel',
  fields: [
- { label: 'Author', key: 'author' },
- { label: 'Book Type', key: 'bookType', enumKey: 'bookTypes' },
- { label: 'Genre', key: 'genre', enumKey: 'bookGenres' },
- { label: 'Language', key: 'language', enumKey: 'bookLanguages' },
- { label: 'Publication Year', key: 'publicationYear' },
- { label: 'Page Count', key: 'pageCount' },
+ { label: 'Yazar', key: 'author' },
+ { label: 'Yayınevi', key: 'publisher', visibleWhen: hasValue('publisher') },
+ { label: 'Çevirmen', key: 'translator', visibleWhen: hasValue('translator') },
+ { label: 'Kitap tipi', key: 'bookType', enumKey: 'bookTypes' },
+ { label: 'Tür', key: 'genre', enumKey: 'bookGenres' },
+ { label: 'Dil', key: 'language', enumKey: 'bookLanguages' },
+ { label: 'Baskı yılı', key: 'publicationYear' },
+ { label: 'Sayfa sayısı', key: 'pageCount' },
  { label: 'Format', key: 'format', enumKey: 'bookFormats' },
- { label: 'Condition', key: 'condition', enumKey: 'bookConditions' },
- { label: 'ISBN', key: 'isbn' },
+ { label: 'Durum', key: 'condition', enumKey: 'bookConditions' },
+ { label: 'ISBN', key: 'isbn', visibleWhen: hasValue('isbn') },
+ { label: 'Kaynak', key: 'editionId', format: (_listing, v) => (v ? 'Katalogdan doğrulandı' : 'Satıcının girdiği bilgiler') },
+ ],
+ },
+ {
+ id: 'condition',
+ label: 'Durum',
+ title: 'Durum',
+ kind: 'attributes',
+ definitionsQuery: (listing) => bookAttributeQuery(listing?.bookType?.id),
+ },
  ],
  },
  formSchema: {
@@ -28,6 +52,7 @@ export const booksConfig = {
  title: '', description: '', price: '', currency: 'TRY', quantity: 1,
  author: '', bookTypeId: '', genreId: '', _genreBookTypeId: '', languageId: '',
  publicationYear: '', pageCount: '', formatId: '', conditionId: '', isbn: '',
+ editionId: '', publisher: '', translator: '', attributes: {},
  city: '', district: '', imageUrl: '',
  },
  steps: [
@@ -36,25 +61,40 @@ export const booksConfig = {
  id: 2, title: 'Book Specifications', description: 'Specify the details of your book', kind: 'details',
  sections: [
  {
+ id: 'books-catalog', kind: 'component', component: BookEditionPicker,
+ title: 'Katalogda bul', description: 'ISBN ya da kitap adıyla ara; bulunan baskının bilgileri otomatik dolar',
+ },
+ {
  id: 'books-details', title: 'Book Details', description: 'Book information and features',
  fields: [
- { name: 'author', label: 'Author', type: 'text', required: true },
+ { name: 'author', label: 'Author', type: 'text', required: true, disabledWhen: catalogLocked },
+ { name: 'publisher', label: 'Publisher', type: 'text', disabledWhen: catalogLocked },
+ { name: 'translator', label: 'Translator', type: 'text', disabledWhen: catalogLocked },
  {
- name: 'bookTypeId', label: 'Book Type', type: 'enum', enumKey: 'bookTypes', required: true,
- onChange: ({ value, ctx }) => { ctx.setValue('bookTypeId', value); ctx.setValue('genreId', ''); },
+ name: 'bookTypeId', label: 'Book Type', type: 'enum', enumKey: 'bookTypes', required: true, disabledWhen: catalogLocked,
+ // Attribute answers are defined per book type; answers of the previous type would be rejected.
+ onChange: ({ value, ctx }) => { ctx.setValue('bookTypeId', value); ctx.setValue('genreId', ''); ctx.setValue('attributes', {}); },
  },
  {
  name: 'genreId', label: 'Genre', type: 'enum', enumKey: 'bookGenres', required: true,
- disabledWhen: (ctx) => !ctx.formData?.bookTypeId,
+ disabledWhen: (ctx) => !ctx.formData?.bookTypeId || catalogLocked(ctx),
  getOptions: (ctx) => (ctx.enums?.bookGenres || []).filter((g) => !ctx.formData?.bookTypeId || String(g?.bookTypeId ?? '') === String(ctx.formData?.bookTypeId)),
  },
- { name: 'languageId', label: 'Language', type: 'enum', enumKey: 'bookLanguages', required: true },
- { name: 'publicationYear', label: 'Publication Year', type: 'number', required: true },
- { name: 'pageCount', label: 'Page Count', type: 'number', required: true, min: 1 },
- { name: 'formatId', label: 'Format', type: 'enum', enumKey: 'bookFormats', required: true },
+ { name: 'languageId', label: 'Language', type: 'enum', enumKey: 'bookLanguages', required: true, disabledWhen: catalogLocked },
+ { name: 'publicationYear', label: 'Publication Year', type: 'number', required: true, disabledWhen: catalogLocked },
+ { name: 'pageCount', label: 'Page Count', type: 'number', required: true, min: 1, disabledWhen: catalogLocked },
+ { name: 'formatId', label: 'Format', type: 'enum', enumKey: 'bookFormats', required: true, disabledWhen: catalogLocked },
  { name: 'conditionId', label: 'Condition', type: 'enum', enumKey: 'bookConditions', required: true },
- { name: 'isbn', label: 'ISBN', type: 'text' },
+ { name: 'isbn', label: 'ISBN', type: 'text', placeholder: 'ISBN-10 veya ISBN-13', disabledWhen: catalogLocked },
  ],
+ },
+ {
+ id: 'books-condition',
+ kind: 'attributes',
+ title: 'Kullanım izleri',
+ description: 'Altı çizili sayfalar, notlar; test kitaplarında çözülmüş sayfalar',
+ visibleWhen: (ctx) => Boolean(ctx.formData?.bookTypeId),
+ definitionsQuery: (ctx) => bookAttributeQuery(ctx.formData?.bookTypeId),
  },
  ],
  },
@@ -86,7 +126,18 @@ export const booksConfig = {
  getSubtitle: ({ isEdit }) => (isEdit ? 'Update your book listing details' : 'Create your book listing step by step'),
  normalizeInitialData: (data) => {
  if (!data) return null;
- return { ...data, bookTypeId: data?.bookTypeId || data?.bookType?.id || '', genreId: data?.genreId || data?.genre?.id || '', languageId: data?.languageId || data?.language?.id || '', formatId: data?.formatId || data?.format?.id || '', conditionId: data?.conditionId || data?.condition?.id || '' };
+ return {
+ ...data,
+ bookTypeId: data?.bookTypeId || data?.bookType?.id || '',
+ genreId: data?.genreId || data?.genre?.id || '',
+ languageId: data?.languageId || data?.language?.id || '',
+ formatId: data?.formatId || data?.format?.id || '',
+ conditionId: data?.conditionId || data?.condition?.id || '',
+ editionId: data?.editionId || '',
+ publisher: data?.publisher || '',
+ translator: data?.translator || '',
+ attributes: data?.attributes && typeof data.attributes === 'object' ? data.attributes : {},
+ };
  },
  },
  service: {

@@ -18,4 +18,10 @@ public class BooksListingDto extends ListingDto {
     private LookupDto format;
     private LookupDto condition;
     private String isbn;
+    private String publisher;
+    private String translator;
+    /** Catalog edition id; null = seller-declared (unverified) book facts. */
+    private java.util.UUID editionId;
+    private String coverUrl;
+    private String editionSource;
 }

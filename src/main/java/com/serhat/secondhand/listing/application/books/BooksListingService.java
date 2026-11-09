@@ -35,6 +35,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
     private final BooksFilterPredicateBuilder predicateBuilder;
     private final List<BooksSpecValidator> booksSpecValidators;
     private final BooksListingResolver booksListingResolver;
+    private final BooksEditionSnapshotter editionSnapshotter;
 
     public BooksListingService(
             BooksListingRepository booksRepository,
@@ -46,6 +47,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
             ListingValidationEngine listingValidationEngine,
             List<BooksSpecValidator> booksSpecValidators,
             BooksListingResolver booksListingResolver,
+            BooksEditionSnapshotter editionSnapshotter,
             InventoryService inventoryService) {
         super(userService, listingValidationService, listingMapper, listingValidationEngine, inventoryService);
         this.booksRepository = booksRepository;
@@ -53,6 +55,7 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         this.predicateBuilder = predicateBuilder;
         this.booksSpecValidators = booksSpecValidators;
         this.booksListingResolver = booksListingResolver;
+        this.editionSnapshotter = editionSnapshotter;
     }
 
     @org.springframework.cache.annotation.CacheEvict(value = "user:profile", allEntries = true)
@@ -87,7 +90,8 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
                 request.genreId(),
                 request.languageId(),
                 request.formatId(),
-                request.conditionId()
+                request.conditionId(),
+                request.editionId()
         );
     }
 
@@ -99,6 +103,14 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
         entity.setLanguage(res.language());
         entity.setFormat(res.format());
         entity.setCondition(res.condition());
+        entity.setEdition(res.edition());
+    }
+
+    /** Catalog facts of the picked edition win over what the client sent. */
+    @Override
+    protected Result<Void> preProcess(BooksListing entity, BooksCreateRequest request) {
+        editionSnapshotter.apply(entity);
+        return Result.success();
     }
 
     @Override
@@ -138,11 +150,13 @@ public class BooksListingService extends AbstractListingService<BooksListing, Bo
                 request.genreId(),
                 request.languageId(),
                 request.formatId(),
-                request.conditionId()
+                request.conditionId(),
+                request.editionId()
         );
         if (applyResult.isError()) return Result.error(applyResult.getMessage(), applyResult.getErrorCode());
 
         listingMapper.updateBooks(existing, request);
+        editionSnapshotter.apply(existing);
 
         Result<Void> validationResult = listingValidationEngine.cleanupAndValidate(existing, booksSpecValidators);
         if (validationResult.isError()) return Result.error(validationResult.getMessage(), validationResult.getErrorCode());

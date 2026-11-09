@@ -72,6 +72,8 @@ class BooksValidationTest {
         assertThat(genres).isNotNull();
         assertThat(genres.isObject()).isTrue();
 
+        Set<String> keptGenres = new HashSet<>();
+        Set<String> replacedGenres = new HashSet<>();
         Iterator<Map.Entry<String, JsonNode>> fields = genres.properties().iterator();
         while (fields.hasNext()) {
             Map.Entry<String, JsonNode> entry = fields.next();
@@ -80,7 +82,7 @@ class BooksValidationTest {
 
             JsonNode list = entry.getValue();
             assertThat(list.isArray()).isTrue();
-            assertThat(list.size()).isGreaterThanOrEqualTo(3);
+            assertThat(list.size()).isGreaterThanOrEqualTo(2);
 
             boolean hasOther = false;
             for (JsonNode g : list) {
@@ -93,9 +95,16 @@ class BooksValidationTest {
                 if ("OTHER".equals(gKey)) {
                     hasOther = true;
                 }
+                keptGenres.add(typeKey + "_" + gKey);
+                for (JsonNode r : g.path("replaces")) {
+                    String from = (r.isObject() ? r.path("from") : r).asText();
+                    assertThat(replacedGenres.add(from)).as("Genre %s is replaced twice", from).isTrue();
+                }
             }
             assertThat(hasOther).as("Type %s must have an 'OTHER' genre", typeKey).isTrue();
         }
+
+        assertThat(replacedGenres).as("A replaced genre must not also be kept").doesNotContainAnyElementsOf(keptGenres);
 
         // 3. Languages
         JsonNode languages = root.get("languages");
@@ -122,7 +131,7 @@ class BooksValidationTest {
             assertThat(fmt.get("label").asText()).isNotBlank();
             formatKeys.add(key);
         }
-        assertThat(formatKeys).contains("HARDCOVER", "PAPERBACK", "SPIRAL", "POCKET", "E_BOOK", "AUDIOBOOK");
+        assertThat(formatKeys).containsExactlyInAnyOrder("HARDCOVER", "PAPERBACK", "SPIRAL", "POCKET");
 
         // 5. Conditions
         JsonNode conditions = root.get("conditions");

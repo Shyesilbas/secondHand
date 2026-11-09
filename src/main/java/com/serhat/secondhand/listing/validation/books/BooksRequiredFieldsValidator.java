@@ -1,6 +1,7 @@
 package com.serhat.secondhand.listing.validation.books;
 
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.application.books.Isbn;
 import com.serhat.secondhand.listing.domain.entity.BooksListing;
 import org.springframework.stereotype.Component;
 
@@ -44,9 +45,10 @@ public class BooksRequiredFieldsValidator implements BooksSpecValidator {
             return Result.error("Page count must be greater than 0", "BOOK_PAGE_COUNT_INVALID");
         }
 
+        // cleanup() already turned a valid ISBN into its ISBN-13; anything else left here is invalid.
         String isbn = listing.getIsbn();
-        if (isbn != null && !isbn.isBlank() && isbn.trim().length() > 20) {
-            return Result.error("ISBN is too long", "BOOK_ISBN_TOO_LONG");
+        if (isbn != null && Isbn.toIsbn13(isbn).filter(isbn::equals).isEmpty()) {
+            return Result.error("ISBN is not a valid ISBN-10 or ISBN-13", "BOOK_ISBN_INVALID");
         }
 
         return Result.success();
@@ -54,6 +56,19 @@ public class BooksRequiredFieldsValidator implements BooksSpecValidator {
 
     @Override
     public void cleanup(BooksListing listing) {
+        if (listing == null) {
+            return;
+        }
+        listing.setIsbn(blankToNull(listing.getIsbn()));
+        if (listing.getIsbn() != null) {
+            Isbn.toIsbn13(listing.getIsbn()).ifPresent(listing::setIsbn);
+        }
+        listing.setPublisher(blankToNull(listing.getPublisher()));
+        listing.setTranslator(blankToNull(listing.getTranslator()));
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }
 
