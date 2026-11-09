@@ -8,6 +8,8 @@ import logger from '../../common/utils/logger.js';
 const MAX_RECONNECT_ATTEMPTS = 10;
 const INITIAL_RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_DELAY = 30000;
+/** A connection counts as healthy (backoff reset) after staying up this long. */
+const STABLE_CONNECTION_MS = 10000;
 
 export const useNotificationWebSocket = (onNotificationReceived) => {
  const { user } = useAuthState();
@@ -16,29 +18,38 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
  const broadcastSubscription = useRef(null);
  const reconnectTimeoutRef = useRef(null);
  const reconnectAttempt = useRef(0);
+ const stableTimer = useRef(null);
 
  const connect = useCallback(() => {
- if (!user?.id) {
+ if (!user?.id || stompClient.current) {
  return;
  }
 
- if (stompClient.current?.connected) {
- return;
- }
-
- const headers = {};
-
+ const userId = user.id;
  const socket = new WebSocket(WS_BASE_URL);
- stompClient.current = Stomp.over(socket);
- stompClient.current.debug = () => {};
+ const client = Stomp.over(socket);
+ stompClient.current = client;
+ // A client that was replaced or disconnected (logout, account switch) must not act anymore.
+ const isCurrent = () => stompClient.current === client;
+ client.debug = () => {};
 
- stompClient.current.connect(
- headers,
+ client.connect(
+ {},
  () => {
- reconnectAttempt.current = 0; // Reset on successful connection
+ if (!isCurrent()) {
+ return;
+ }
+ // Reset the backoff only once the connection stays up; a CONNECT that is followed
+ // by a rejected SUBSCRIBE must keep backing off instead of retrying every second.
+ clearTimeout(stableTimer.current);
+ stableTimer.current = setTimeout(() => {
+ if (isCurrent()) {
+ reconnectAttempt.current = 0;
+ }
+ }, STABLE_CONNECTION_MS);
 
- const destination = `/user/${user.id}/notifications`;
- subscription.current = stompClient.current.subscribe(destination, (message) => {
+ const destination = `/user/${userId}/notifications`;
+ subscription.current = client.subscribe(destination, (message) => {
  try {
  const notification = JSON.parse(message.body);
  onNotificationReceived?.(notification);
@@ -47,7 +58,7 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
  }
  });
 
- broadcastSubscription.current = stompClient.current.subscribe('/topic/notifications', (message) => {
+ broadcastSubscription.current = client.subscribe('/topic/notifications', (message) => {
  try {
  const notification = JSON.parse(message.body);
  onNotificationReceived?.(notification);
@@ -57,7 +68,19 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
  });
  },
  (error) => {
+ if (!isCurrent()) {
+ return;
+ }
  logger.error('WebSocket connection error for notifications:', error);
+ clearTimeout(stableTimer.current);
+ subscription.current = null;
+ broadcastSubscription.current = null;
+ stompClient.current = null;
+ try {
+ client.deactivate();
+ } catch {
+ // Ignore
+ }
 
  if (reconnectAttempt.current < MAX_RECONNECT_ATTEMPTS) {
  const delay = Math.min(
@@ -75,28 +98,30 @@ export const useNotificationWebSocket = (onNotificationReceived) => {
  }, [user?.id, onNotificationReceived]);
 
  const disconnect = useCallback(() => {
- if (reconnectTimeoutRef.current) {
  clearTimeout(reconnectTimeoutRef.current);
  reconnectTimeoutRef.current = null;
- }
+ clearTimeout(stableTimer.current);
+ stableTimer.current = null;
  reconnectAttempt.current = 0;
 
- if (subscription.current) {
- subscription.current.unsubscribe();
- subscription.current = null;
- }
-
- if (broadcastSubscription.current) {
- broadcastSubscription.current.unsubscribe();
- broadcastSubscription.current = null;
- }
-
- if (stompClient.current) {
+ const client = stompClient.current;
+ // Clearing the ref first makes every late callback of this client a no-op.
+ stompClient.current = null;
+ [subscription, broadcastSubscription].forEach((ref) => {
  try {
- stompClient.current.deactivate();
+ ref.current?.unsubscribe();
  } catch {
- if (stompClient.current.connected) {
- stompClient.current.disconnect();
+ // Ignore
+ }
+ ref.current = null;
+ });
+
+ if (client) {
+ try {
+ client.deactivate();
+ } catch {
+ if (client.connected) {
+ client.disconnect();
  }
  }
  }

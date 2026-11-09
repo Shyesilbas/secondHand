@@ -7,6 +7,8 @@ import logger from '../utils/logger.js';
 const MAX_RECONNECT_ATTEMPTS = 10;
 const INITIAL_RECONNECT_DELAY = 1000; // 1s
 const MAX_RECONNECT_DELAY = 30000; // 30s
+/** A connection counts as healthy (backoff reset) after staying up this long. */
+const STABLE_CONNECTION_MS = 10000;
 /** Bellek/render: uzun oturumlarda mesaj dizisini sınırla */
 const MAX_MESSAGES_BUFFER = 200;
 
@@ -25,32 +27,42 @@ const useWebSocket = (userId, options = {}) => {
  const messageCallbacks = useRef(new Set());
  const reconnectAttempt = useRef(0);
  const reconnectTimer = useRef(null);
+ const stableTimer = useRef(null);
 
  // ==================== CONNECTION MANAGEMENT ====================
  
  const connect = useCallback(() => {
- // Prevent multiple connection attempts
- if (stompClient.current?.connected) {
+ // Without a user there is nothing to subscribe to; the cookie may already belong to someone else.
+ if (!userId || stompClient.current) {
  return;
  }
 
- const headers = {};
-
  const socket = new WebSocket(WS_BASE_URL);
- stompClient.current = Stomp.over(socket);
- 
- // Disable debug logs to reduce console noise
- stompClient.current.debug = () => {};
- 
- stompClient.current.connect(
- headers,
- () => {
- setIsConnected(true);
- reconnectAttempt.current = 0;
+ const client = Stomp.over(socket);
+ stompClient.current = client;
+ // A client that was replaced or disconnected (logout, account switch) must not act anymore.
+ const isCurrent = () => stompClient.current === client;
 
- // Stomp bağlandıktan sonra (React state gecikmesi yok); queue backend'de şu an boş olabilir
- if (userId && stompClient.current?.connected) {
- const userSub = stompClient.current.subscribe(
+ // Disable debug logs to reduce console noise
+ client.debug = () => {};
+
+ client.connect(
+ {},
+ () => {
+ if (!isCurrent()) {
+ return;
+ }
+ setIsConnected(true);
+ // Reset the backoff only once the connection stays up; a CONNECT that is followed
+ // by a rejected SUBSCRIBE must keep backing off instead of retrying every second.
+ clearTimeout(stableTimer.current);
+ stableTimer.current = setTimeout(() => {
+ if (isCurrent()) {
+ reconnectAttempt.current = 0;
+ }
+ }, STABLE_CONNECTION_MS);
+
+ const userSub = client.subscribe(
  `/user/${userId}/queue/messages`,
  (message) => {
  const messageData = JSON.parse(message.body);
@@ -59,11 +71,21 @@ const useWebSocket = (userId, options = {}) => {
  }
  );
  subscriptions.current.set(`user-${userId}`, userSub);
- }
  },
  (error) => {
+ if (!isCurrent()) {
+ return;
+ }
  logger.error('WebSocket connection error:', error);
+ clearTimeout(stableTimer.current);
  setIsConnected(false);
+ subscriptions.current.clear();
+ stompClient.current = null;
+ try {
+ client.deactivate();
+ } catch {
+ // Ignore
+ }
 
  if (reconnectAttempt.current < MAX_RECONNECT_ATTEMPTS) {
  const delay = Math.min(
@@ -81,15 +103,16 @@ const useWebSocket = (userId, options = {}) => {
  }, [userId]);
 
  const disconnect = useCallback(() => {
- // Clear any pending reconnect timer
- if (reconnectTimer.current) {
  clearTimeout(reconnectTimer.current);
  reconnectTimer.current = null;
- }
+ clearTimeout(stableTimer.current);
+ stableTimer.current = null;
  reconnectAttempt.current = 0;
 
- if (stompClient.current) {
- // Tüm subscription'ları temizle
+ const client = stompClient.current;
+ // Clearing the ref first makes every late callback of this client a no-op.
+ stompClient.current = null;
+ if (client) {
  subscriptions.current.forEach((subscription) => {
  try {
  subscription.unsubscribe();
@@ -98,17 +121,17 @@ const useWebSocket = (userId, options = {}) => {
  }
  });
  subscriptions.current.clear();
- 
+
  // Use deactivate() to ensure cleanup even if still in 'connecting' state
  try {
- stompClient.current.deactivate();
+ client.deactivate();
  } catch {
- if (stompClient.current.connected) {
- stompClient.current.disconnect();
+ if (client.connected) {
+ client.disconnect();
+ }
  }
  }
  setIsConnected(false);
- }
  }, []);
 
  // ==================== SUBSCRIPTION MANAGEMENT ====================
