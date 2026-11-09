@@ -40,7 +40,9 @@ public class OfferEmailNotificationService {
 
         var request = notificationTemplateCatalog.offerReceived(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null);
+                offer.getListing() != null ? offer.getListing().getTitle() : null,
+                offer.getTotalPrice() != null ? offer.getTotalPrice().toPlainString() : null,
+                offer.getQuantity());
         notificationEventPublisher.publishDispatch(request, "offer",
                 "offer-received:" + recipient.getId() + ":" + offer.getId());
     }
@@ -55,7 +57,9 @@ public class OfferEmailNotificationService {
 
         var request = notificationTemplateCatalog.offerCountered(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null);
+                offer.getListing() != null ? offer.getListing().getTitle() : null,
+                offer.getTotalPrice() != null ? offer.getTotalPrice().toPlainString() : null,
+                offer.getQuantity());
         notificationEventPublisher.publishDispatch(request, "offer",
                 "offer-countered:" + recipient.getId() + ":" + offer.getId());
     }
@@ -70,7 +74,9 @@ public class OfferEmailNotificationService {
 
         var request = notificationTemplateCatalog.offerAccepted(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null);
+                offer.getListing() != null ? offer.getListing().getTitle() : null,
+                offer.getTotalPrice() != null ? offer.getTotalPrice().toPlainString() : null,
+                offer.getQuantity());
         notificationEventPublisher.publishDispatch(request, "offer",
                 "offer-accepted:" + recipient.getId() + ":" + offer.getId());
     }
@@ -85,7 +91,9 @@ public class OfferEmailNotificationService {
 
         var request = notificationTemplateCatalog.offerRejected(
                 recipient.getId(), offer.getId(), offer.getListing().getId(),
-                offer.getListing() != null ? offer.getListing().getTitle() : null);
+                offer.getListing() != null ? offer.getListing().getTitle() : null,
+                offer.getTotalPrice() != null ? offer.getTotalPrice().toPlainString() : null,
+                offer.getQuantity());
         notificationEventPublisher.publishDispatch(request, "offer",
                 "offer-rejected:" + recipient.getId() + ":" + offer.getId());
     }
@@ -94,12 +102,14 @@ public class OfferEmailNotificationService {
     public void notifyExpiredToBoth(Offer offer) {
         if (offer == null)
             return;
+        String offerAmount = offer.getTotalPrice() != null ? offer.getTotalPrice().toPlainString() : null;
         if (offer.getBuyer() != null) {
             sendOfferTemplate(offer.getBuyer(), emailConfig.getOffer().getExpiredSubject(), "Teklifinizin Süresi Doldu",
                     offer, EmailType.OFFER_EXPIRED, null);
             var buyerRequest = notificationTemplateCatalog.offerExpired(
                     offer.getBuyer().getId(), offer.getId(), offer.getListing().getId(),
-                    offer.getListing() != null ? offer.getListing().getTitle() : null, true);
+                    offer.getListing() != null ? offer.getListing().getTitle() : null, true,
+                    offerAmount, offer.getQuantity());
             notificationEventPublisher.publishDispatch(buyerRequest, "offer",
                     "offer-expired:" + offer.getBuyer().getId() + ":" + offer.getId() + ":buyer");
         }
@@ -108,7 +118,8 @@ public class OfferEmailNotificationService {
                     "Bir Teklifin Süresi Doldu", offer, EmailType.OFFER_EXPIRED, null);
             var sellerRequest = notificationTemplateCatalog.offerExpired(
                     offer.getSeller().getId(), offer.getId(), offer.getListing().getId(),
-                    offer.getListing() != null ? offer.getListing().getTitle() : null, false);
+                    offer.getListing() != null ? offer.getListing().getTitle() : null, false,
+                    offerAmount, offer.getQuantity());
             notificationEventPublisher.publishDispatch(sellerRequest, "offer",
                     "offer-expired:" + offer.getSeller().getId() + ":" + offer.getId() + ":seller");
         }

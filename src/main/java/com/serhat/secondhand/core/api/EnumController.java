@@ -10,10 +10,11 @@ import com.serhat.secondhand.listing.domain.entity.enums.realestate.BuildingCond
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCategory;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingAudience;
 import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingSize;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingFit;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingPattern;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.FabricType;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicConnectionType;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
@@ -348,40 +349,31 @@ public class EnumController {
         return ResponseEntity.ok(conditions);
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getClothingGenders() {
-        List<Map<String, Object>> genders = Arrays.stream(ClothingGender.values())
-                .map(gender -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", gender.name());
-                    map.put("label", gender.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(genders);
+    private ResponseEntity<List<Map<String, Object>>> getClothingAudiences() {
+        return ResponseEntity.ok(Arrays.stream(ClothingAudience.values())
+                .map(a -> labelled(a.name(), a.getLabel())).toList());
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getClothingCategories() {
-        List<Map<String, Object>> categories = Arrays.stream(ClothingCategory.values())
-                .map(category -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", category.name());
-                    map.put("label", category.getLabel());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(categories);
+    private ResponseEntity<List<Map<String, Object>>> getClothingFits() {
+        return ResponseEntity.ok(Arrays.stream(ClothingFit.values())
+                .map(f -> labelled(f.name(), f.getLabel())).toList());
     }
 
-    private ResponseEntity<List<Map<String, Object>>> getClothingSizes() {
-        List<Map<String, Object>> sizes = Arrays.stream(ClothingSize.values())
-                .map(size -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("value", size.name());
-                    map.put("label", size.name());
-                    return map;
-                })
-                .toList();
-        return ResponseEntity.ok(sizes);
+    private ResponseEntity<List<Map<String, Object>>> getClothingPatterns() {
+        return ResponseEntity.ok(Arrays.stream(ClothingPattern.values())
+                .map(p -> labelled(p.name(), p.getLabel())).toList());
+    }
+
+    private ResponseEntity<List<Map<String, Object>>> getFabricTypes() {
+        return ResponseEntity.ok(Arrays.stream(FabricType.values())
+                .map(f -> labelled(f.name(), f.getLabel())).toList());
+    }
+
+    private static Map<String, Object> labelled(String value, String label) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("value", value);
+        map.put("label", label);
+        return map;
     }
 
     private ResponseEntity<List<Map<String, Object>>> getBookTypes() {
@@ -563,9 +555,11 @@ public class EnumController {
         allEnums.put("clothingBrands", getClothingBrands().getBody());
         allEnums.put("clothingTypes", getClothingTypes().getBody());
         allEnums.put("clothingConditions", getClothingConditions().getBody());
-        allEnums.put("clothingGenders", getClothingGenders().getBody());
-        allEnums.put("clothingCategories", getClothingCategories().getBody());
-        allEnums.put("clothingSizes", getClothingSizes().getBody());
+        allEnums.put("clothingAudiences", getClothingAudiences().getBody());
+        allEnums.put("clothingFits", getClothingFits().getBody());
+        allEnums.put("clothingPatterns", getClothingPatterns().getBody());
+        allEnums.put("fabricTypes", getFabricTypes().getBody());
+        allEnums.put("sizeSystems", enumReadService.getSizeSystems());
         allEnums.put("bookTypes", getBookTypes().getBody());
         allEnums.put("bookGenres", getBookGenres().getBody());
         allEnums.put("bookLanguages", getBookLanguages().getBody());

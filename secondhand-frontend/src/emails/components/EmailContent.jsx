@@ -91,6 +91,32 @@ const EDITORIAL_EMAIL_STYLE = `
     margin: 12px 0 !important;
     text-align: left !important;
     box-shadow: none !important;
+    white-space: normal !important;
+  }
+  .details-box {
+    padding: 12px 14px !important;
+    margin: 10px 0 !important;
+  }
+  .details-box .details-table {
+    width: 100% !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 4px 0 0 0 !important;
+    box-shadow: none !important;
+  }
+  .details-box .details-table td {
+    padding: 6px 0 !important;
+    border-bottom: 1px solid rgb(226 232 240) !important;
+    background-color: transparent !important;
+    color: rgb(51 65 85) !important;
+  }
+  .details-box .details-table tr:last-child td {
+    border-bottom: none !important;
+  }
+  .action-box {
+    padding: 10px 14px !important;
+    margin: 10px 0 !important;
   }
   .order-label,
   .receipt-label,
@@ -329,7 +355,7 @@ const EmailContent = ({
   return (
     <div className="flex h-full min-h-0 flex-col bg-background-primary">
       {/* Editorial Reading Header */}
-      <header className="shrink-0 border-b border-border bg-background-primary px-5 py-3 sm:px-7">
+      <header className="shrink-0 border-b border-border bg-background-primary px-4 py-2.5 sm:px-6 sm:py-3">
         {/* Top Meta & Actions Row */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 text-xs text-text-secondary">
@@ -408,24 +434,18 @@ const EmailContent = ({
         </div>
 
         {/* Subject */}
-        <h2 className="mt-1.5 text-lg font-semibold leading-snug text-text-primary">
+        <h2 className="mt-1 text-base sm:text-lg font-semibold leading-snug text-text-primary">
           {cleanSubject}
         </h2>
 
-        {/* Sender & Recipient Meta */}
-        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-tertiary">
-          <span>
-            {t('sender', 'Gönderen')}: <span className="font-medium text-text-secondary">{email.senderEmail}</span>
-          </span>
-          {email.recipientEmail && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>
-                {t('recipient', 'Alıcı')}: <span className="text-text-secondary">{email.recipientEmail}</span>
-              </span>
-            </>
-          )}
-        </div>
+        {/* Sender Meta (shown if non-system or custom sender) */}
+        {email.senderEmail && !email.senderEmail.toLowerCase().includes('noreply') && (
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-text-tertiary">
+            <span>
+              {t('sender', 'Gönderen')}: <span className="font-medium text-text-secondary">{email.senderEmail}</span>
+            </span>
+          </div>
+        )}
       </header>
 
       {/* Body: Normalized Sandboxed Iframe */}

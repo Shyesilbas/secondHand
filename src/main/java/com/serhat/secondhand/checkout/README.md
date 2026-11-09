@@ -5,7 +5,7 @@ The `checkout` domain acts as the orchestration layer that ties together the car
 
 ## Architecture Overview
 - **CheckoutOrchestrator:** The central nervous system of the purchase flow.
-- **CheckoutPricingContextFactory:** Calculates the final payable amount considering active cart items, accepted offers, and applied coupons.
+- **CheckoutPricingContextFactory:** Calculates the final payable amount considering active cart items, accepted offers, and applied coupons. It uses `IPricingService.priceCartForCheckout`: a requested coupon that is unknown or no longer applies fails checkout (and the payment verification email) with its coupon error code instead of being dropped silently.
 - **CheckoutStockReservationService:** Handles reserving stock atomically in Redis via Lua scripts (`reserve_stock_with_ttl.lua`) with an automatic 15-minute TTL per user, and supports instant explicit cancellation or success consumption.
 
 ## Business Invariants & Constraints

@@ -1,6 +1,6 @@
-# Escrow (Güvenli Havuz) Yaşam Döngüsü ve Durum Makinesi Rehberi
+# Escrow Yaşam Döngüsü ve Durum Makinesi Rehberi
 
-Bu doküman, **secondHand** platformunun finansal güvenliğini ve güvenli ticaret altyapısını oluşturan **Escrow (Emanet / Güvenli Havuz) Durum Makinesi**, **Asenkron Cüzdan Aktarımı (Kafka & Outbox)**, **İptal/İade Telafi Mekanizmaları** ve **Zaman Aşımı Otomasyonunu** uçtan uca açıklamaktadır.
+Bu doküman, **secondHand** platformunun finansal güvenliğini ve güvenli ticaret altyapısını oluşturan **Escrow Durum Makinesi**, **Asenkron Cüzdan Aktarımı (Kafka & Outbox)**, **İptal/İade Compensation Mekanizmaları** ve **Zaman Aşımı Otomasyonunu** uçtan uca açıklamaktadır.
 
 ---
 
@@ -11,7 +11,7 @@ C2C (Tüketiciden Tüketiciye) ikinci el e-ticarette iki taraf da risk altındad
 * **Satıcı Riski:** "Ürünü kargolarsam alıcı parayı ödemezse veya sahte bildirim yaparsa ne olacak?"
 
 ### secondHand Escrow Modeli:
-1. Alıcı ödemeyi yaptığında para doğrudan satıcının hesabına aktarılmaz; sistemin güvenli emanet havuzunda (`ESCROW` statüsünde) bloke edilir.
+1. Alıcı ödemeyi yaptığında para doğrudan satıcının hesabına aktarılmaz; sistemin güvenli escrow havuzunda (`ESCROW` statüsünde) bloke edilir.
 2. Satıcı ürünü kargolar veya güvenli buluşma ile teslim eder.
 3. Alıcı ürünü teslim alıp inceledikten sonra onay verir (veya yasal onay süresi dolunca sistem otomatik onaylar).
 4. Havuzdaki para satıcının **e-Cüzdanına (`eWallet`)** aktarılır.
@@ -25,14 +25,14 @@ sequenceDiagram
     autonumber
     actor Buyer as Alıcı
     actor Seller as Satıcı
-    participant Order as Order / Checkout Service
+    participant Order as CheckoutOrchestrator / Order Services
     participant Escrow as EscrowService (DB)
     participant Outbox as EscrowOutboxWorker
     participant Kafka as Apache Kafka (escrow.released.v1)
     participant Consumer as EscrowKafkaConsumer
     participant Wallet as e-Wallet Service (IEWalletService)
 
-    Buyer->>Order: Siparişi Oluştur ve Öde (CONFIRMED)
+    Buyer->>Order: Checkout + Ödeme (CONFIRMED / SAFE_MEETUP için MEETUP_PENDING)
     Order->>Escrow: escrowService.hold(order)
     Note over Escrow: Her OrderItem için Escrow kaydı oluşturulur (Status: ESCROW)
     
@@ -42,7 +42,7 @@ sequenceDiagram
     alt Senaryo 1: Alıcı Manuel Onayladı
         Buyer->>Order: "Teslim Aldım ve Onaylıyorum"
         Order->>Escrow: escrowService.release(order)
-    else Senaryo 2: Otomatik Zaman Aşımı (3 Gün / 24 Saat)
+    else Senaryo 2: Otomatik Zaman Aşımı (DELIVERED + 72 saat / HANDOVER_CONFIRMED + 24 saat)
         participant Scheduler as OrderCompletionScheduler
         Scheduler->>Escrow: escrowService.release(order)
     end
@@ -59,51 +59,61 @@ sequenceDiagram
 
 ## 3. Escrow Durumları (State Machine)
 
-| Durum (`PaymentStatus`) | Açıklama | Paranın Konumu | Sonraki Olası Durumlar |
+Escrow kaydı (`escrows` tablosu, [`Escrow.java`](../src/main/java/com/serhat/secondhand/escrow/domain/entity/Escrow.java)) ayrı bir enum kullanmaz; `PaymentStatus` değerlerinin bir alt kümesini taşır. Kayıt her zaman `ESCROW` ile açılır.
+
+| Durum (`PaymentStatus`) | Açıklama | Paranın Konumu | Geçişi Yapan Metot |
 | :--- | :--- | :--- | :--- |
-| **`ESCROW`** | Sipariş ödendi; para güvenli emanet havuzunda kilitli tutuluyor. | Sistem Havuzu | `COMPLETED`, `CANCELLED`, `REFUNDED` |
-| **`COMPLETED`** | Alıcı onayladı veya teslimat süresi doldu. Para satıcıya aktarıldı. | Satıcı Cüzdanı (`eWallet`) | *Terminal Durum (Son Durum)* |
-| **`CANCELLED`** | Kargolanmadan önce sipariş iptal edildi. Para alıcıya iade edildi. | Alıcı Cüzdanı / Kart | *Terminal Durum* |
-| **`REFUNDED`** | Ürün iade edildi / uyuşmazlık alıcı lehine sonuçlandı. | Alıcı Cüzdanı | *Terminal Durum* |
+| **`ESCROW`** | Ödeme alındı; para escrow'da tutuluyor. | Sistem Havuzu | `EscrowService.hold` |
+| **`COMPLETED`** | Alıcı onayladı veya otomatik tamamlama süresi doldu. | Satıcı Cüzdanı (`eWallet`) — Kafka consumer ile asenkron | `EscrowService.release` |
+| **`CANCELLED`** | Sipariş (kalem) iptal edildi. | Alıcı Cüzdanı (`REFUND`) | `EscrowService.cancel` |
+| **`REFUNDED`** | Teslimat sonrası iade onaylandı. | Alıcı Cüzdanı (`REFUND`) | `EscrowService.refund` |
+
+`COMPLETED`, `CANCELLED` ve `REFUNDED` terminaldir; `cancel`/`refund` yalnızca `ESCROW` durumundaki kayıtlara uygulanır.
 
 ---
 
 ## 4. Kritik İş Mantığı ve Teknik Mekanizmalar
 
 ### A. Çoklu Sepetlerde Oransal Tutar Bölüştürme (`calculateEscrowAmounts`)
-Kullanıcı sepetinde birden fazla farklı satıcıya ait ürün olduğunda ve genel bir sepet kuponu veya indirim uygulandığında, her ürün kaleminin (`OrderItem`) emanet tutarı kuruş hassasiyetinde (`RoundingMode.HALF_UP`) oransal olarak hesaplanır ([`EscrowService.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java)):
+Siparişe kupon/indirim uygulandığında (`order.totalAmount` < kalem toplamı), her ürün kaleminin (`OrderItem`) escrow tutarı 2 basamak hassasiyetinde (`RoundingMode.HALF_UP`) oransal olarak hesaplanır ([`EscrowService.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java)):
 
 $$\text{Escrow Tutarı} = \text{Toplam Ödenen Tutar} \times \frac{\text{Ürün Fiyatı}}{\text{Sepet Ürün Toplamı}}$$
 
-* Kuruş yuvarlama farklarının havuzda açık yaratmaması için son ürün kalemi `remaining` bakiye üzerinden dengelenir.
+* Kalemler `OrderItem.id` sırasına dizilir; yuvarlama farkının havuzda açık yaratmaması için son kalem `remaining` bakiyeyi alır.
+* Ödenecek tutar negatifse 0'a, kalem toplamından büyükse kalem toplamına çekilir; kalem toplamı 0 veya altındaysa tüm kalemler 0 tutarlı escrow alır.
+* `hold` idempotent'tir: `order_item_id` için zaten escrow varsa o kalem atlanır. `hold`, `CheckoutOrchestrator` içinde ödeme başarılı olduktan sonra çağrılır; hata dönerse checkout transaction'ı `IllegalStateException` ile geri alınır.
 
 ---
 
 ### B. Otomatik Serbest Bırakma Mekanizması ([`OrderCompletionScheduler.java`](../src/main/java/com/serhat/secondhand/order/application/OrderCompletionScheduler.java))
 
 Alıcı ürünü teslim almasına rağmen panelden onay vermeyi unutursa satıcının mağdur olmaması için **Otomatik Mutabakat Scheduler'ı** devrededir:
-1. **Kargolu Gönderimler:** Ürün `DELIVERED` durumuna geçtikten sonra belirlenen yasal inceleme süresi (örneğin 3 gün) boyunca alıcı uyuşmazlık bildirmezse scheduler `escrowService.release(order)` çağrısını yapar.
-2. **Güvenli Buluşma (`SAFE_MEETUP`):** Buluşma kodu doğrulandıktan (`HANDOVER_CONFIRMED`) 24 saat sonra emanet para otomatik olarak satıcıya serbest bırakılır.
+1. **Kargolu Gönderimler:** `shipping.deliveredAt` üzerinden `OrderBusinessConstants.AUTO_COMPLETION_HOURS` (72 saat) geçtiyse scheduler `escrowService.release(order)` çağırır. (İade penceresi `REFUND_WINDOW_HOURS` = 48 saattir; yani iade hakkı otomatik tamamlamadan önce biter.)
+2. **Güvenli Buluşma (`SAFE_MEETUP`):** `meetupVerifiedAt` üzerinden 24 saat geçtiyse (`HANDOVER_CONFIRMED`) aynı şekilde release edilir.
+3. **Kargolanmayan sipariş:** `CONFIRMED`/`PROCESSING` durumundaki `CARGO` siparişi 72 saatte (`SHIP_DEADLINE_HOURS`) kargolanmazsa `OrderCancellationService.cancelUnshippedOrder` çağrılır; escrow `CANCELLED` olur.
+4. **Bayat buluşma:** `MEETUP_PENDING` siparişi 7 gün içinde tamamlanmazsa scheduler doğrudan `escrowService.cancel` çağırır ve siparişi `CANCELLED` yapar.
+
+Release hata dönerse sipariş `COMPLETED` yapılmaz ve bir sonraki scheduler çalışmasında tekrar denenir.
 
 ---
 
-### C. Finansal Dayanıklılık: Transactional Outbox & Kafka Pipeline
+### C. Financial Resilience: Transactional Outbox & Kafka Pipeline
 
 Doğrudan `escrowService.release()` içinde üçüncü parti cüzdan/banka servisine senkron HTTP veya doğrudan Kafka çağrısı yapmak **Dual-Write** riski taşır (DB commit olup Kafka çökerse para buharlaşır; tersi durumda satıcıya çifte para gider).
 
 Bu nedenle **Transactional Outbox** mimarisi uygulanmıştır:
-1. `escrowService.release(order)` çalıştığında Escrow tablosu `COMPLETED` yapılır ve aynı ACID transaction içinde `escrow_outbox_events` tablosuna `EscrowReleased` event'i yazılır.
-2. [`EscrowOutboxWorker.java`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) bekleyen eventleri okuyup `escrow.released.v1` Kafka topic'ine gönderir.
-3. [`EscrowKafkaConsumer.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java) mesajı tüketir.
-4. **Idempotency Kilidi:** `ProcessedKafkaEventRepository` üzerinden `escrow:release:{escrowId}` deduplication kontrolü yapılır (`INSERT ON CONFLICT DO NOTHING`).
-5. Satıcının cüzdanına (`IEWalletService.creditWalletQuietly`) güvenle aktarılır.
+1. `escrowService.release(order)` (`findByOrderIdAndStatusForUpdate` ile satırlar kilitlenir) escrow'u `COMPLETED` yapar, `releasedAt` yazar, satıcı tarafındaki `ITEM_SALE`/`ITEM_PURCHASE` `Payment` kaydını `COMPLETED` yapıp `PaymentCompletedEvent` yayınlar ve aynı transaction içinde `escrow_outbox_events` tablosuna `ESCROW_RELEASED` event'i yazar ([`EscrowOutboxService`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxService.java)). `payment:stats` cache'i `allEntries` ile evict edilir.
+2. [`EscrowOutboxWorker.java`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) her 5 sn'de (`app.escrow.outbox.fixed-delay-ms`) `PENDING` ve zamanı gelmiş en fazla 50 event'i alır; her event `REQUIRES_NEW` transaction'da satır kilidiyle işlenir ve `escrow.released.v1` topic'ine gönderilir (broker ack bekleme limiti `app.outbox.publish-timeout-seconds`, varsayılan 15 sn).
+3. [`EscrowKafkaConsumer.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java) mesajı tüketir (group: `escrow-released-consumers`).
+4. **Idempotency Kilidi:** `ProcessedKafkaEventRepository.insertIfNotExists` ile `escrow:release:{escrowId}` anahtarı `INSERT ... ON CONFLICT DO NOTHING` ile yazılır; 0 satır eklendiyse event mükerrer sayılır ve atlanır.
+5. Satıcının cüzdanına `IEWalletService.creditWalletQuietly` ile bakiye eklenir. Dedupe kaydı ve cüzdan kredisi aynı transaction'dadır; hata olursa dedupe kaydı da geri alınır.
 
 ---
 
-### D. İptal ve İade Telafisi (Cancellation & Refund Compensation)
+### D. Cancellation & Refund Compensation
 
 * Sipariş henüz kargolanmadan iptal edilirse (`cancel`) veya iade onaylanırsa (`refund`), para satıcıdan **çekilmez** (çünkü satıcıya henüz para geçmemiştir).
-* Sistem emanet havuzundaki bloke bakiyeyi doğrudan alıcının e-cüzdanına `REFUND` işlem türüyle transfer eder:
+* Sistem escrow'daki bloke bakiyeyi, escrow'u `CANCELLED`/`REFUNDED` yaptıktan sonra aynı transaction içinde doğrudan alıcının e-cüzdanına `REFUND` işlem türüyle senkron olarak yazar (Kafka/outbox kullanılmaz):
   ```java
   walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), ... PaymentTransactionKind.REFUND, null);
   ```
@@ -115,9 +125,9 @@ Bu nedenle **Transactional Outbox** mimarisi uygulanmıştır:
 Olası yasal uyuşmazlıklar ve denetimler için `Escrow` entity'si ilişkisel foreign key'lerin yanı sıra işlemin yapıldığı andaki ilan başlığını, ilan numarasını ve tarih loglarını snapshot olarak saklar:
 * `listingTitle`, `listingNo`, `listingId`
 * `blockedAt` (Bloke Tarihi)
-* `releasedAt` (Satıcıya Aktarım Tarihi)
-* `refundedAt` (Alıcıya İade Tarihi)
-* Veritabanı composite indeksleri: `(order_id)`, `(seller_id)`, `(status)`.
+* `releasedAt` (Satıcıya Aktarım Tarihi; `release` set eder)
+* `refundedAt` (Alıcıya İade Tarihi; yalnızca `refund` set eder, `cancel` set etmez)
+* Tek kolonlu indeksler: `idx_escrow_order (order_id)`, `idx_escrow_seller (seller_id)`, `idx_escrow_status (status)`.
 
 ---
 
@@ -125,6 +135,8 @@ Olası yasal uyuşmazlıklar ve denetimler için `Escrow` entity'si ilişkisel f
 
 | Senaryo | Risk | Sistem Nasıl Önler? |
 | :--- | :--- | :--- |
-| **Mükerrer Teslimat Onayı** | Alıcı butona arka arkaya 5 kez basarsa çift para aktarımı. | `EscrowRepository.findByOrderIdAndStatusForUpdate` ile satır kilitlenir; ilk işlemden sonra status `COMPLETED` olduğu için diğer istekler no-op döner. |
-| **Kafka Rebalancing / Retry** | Kafka aynı mesajı tüketiciye 2 kez iletirse mükerrer cüzdan bakiyesi. | Consumer seviyesinde `processed_kafka_events` tablosunda `escrow:release:{escrowId}` deduplication key ile exactly-once garanti edilir. |
-| **Outbox Gönderim Hatası** | Kafka broker geçici olarak kapalıysa. | `EscrowOutboxWorker` exponential backoff ile `next_attempt_at` günceller ve broker açılana kadar güvenle dener. |
+| **Mükerrer Teslimat Onayı** | Alıcı butona arka arkaya basarsa çift para aktarımı. | `EscrowRepository.findByOrderIdAndStatusForUpdate` (`PESSIMISTIC_WRITE`) ile satırlar kilitlenir; ilk işlemden sonra status `COMPLETED` olduğu için `release` `ESCROW` kaydı bulamaz ve no-op `Result.success()` döner. |
+| **Çifte Cancel / Refund** | Aynı kalem için ikinci iptal/iade çift iade yaratır. | `cancel`/`refund` `findByOrderItemIdInForUpdate` ile kilitler; escrow kaydı yoksa `ESCROW_NOT_FOUND`, `ESCROW` dışındaysa `ESCROW_STATUS_INVALID` döner. Çağıran servis transaction'ı rollback-only yapar ve `REFUND_FAILED` döner. |
+| **Eksik / Bozuk Event** | `escrowId`, `sellerId` veya `amount` null; ya da satıcı bulunamıyor. | Consumer sessizce atlamaz: `ESCROW_RELEASE_EVENT_INVALID` / `ESCROW_RELEASE_SELLER_NOT_FOUND` (`BusinessException`) fırlatır; dedupe kaydı geri alınır, `DefaultErrorHandler` 2 kez daha dener (1 sn aralık) ve event `escrow.released.v1.DLT` topic'ine düşer. |
+| **Kafka Rebalancing / Retry** | Kafka aynı mesajı consumer'a 2 kez iletirse mükerrer cüzdan bakiyesi. | Consumer seviyesinde `processed_kafka_events` tablosunda `escrow:release:{escrowId}` deduplication key ile exactly-once garanti edilir. |
+| **Outbox Gönderim Hatası** | Kafka broker geçici olarak kapalıysa. | Worker `attemptCount`'u artırır ve `next_attempt_at`'ı `min(300, 2^attempt × 5)` sn sonrasına ayarlar (exponential backoff, üst sınır 5 dk). `maxAttempts` (varsayılan 10) dolunca event `FAILED` olur ve otomatik retry edilmez; para escrow'da `COMPLETED` görünür ama satıcı cüzdanına yansımaz, bu yüzden `FAILED` event'ler izlenmelidir. |

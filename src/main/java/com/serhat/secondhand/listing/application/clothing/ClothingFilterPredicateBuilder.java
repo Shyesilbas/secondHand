@@ -3,7 +3,7 @@ package com.serhat.secondhand.listing.application.clothing;
 import com.serhat.secondhand.listing.application.filter.FilterPredicateBuilder;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ClothingListingFilterDto;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
-import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGender;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingAudience;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Locale;
 
 @Component
 public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<ClothingListing, ClothingListingFilterDto> {
@@ -45,39 +44,26 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
             predicates.add(root.get("condition").in(filters.getConditions()));
         }
         
-        if (filters.getClothingGenders() != null && !filters.getClothingGenders().isEmpty()) {
-            predicates.add(root.get("clothingGender").in(expandGenderFilters(filters.getClothingGenders())));
-        }
-        
-        if (filters.getClothingCategories() != null && !filters.getClothingCategories().isEmpty()) {
-            predicates.add(root.get("clothingCategory").in(filters.getClothingCategories()));
+        if (filters.getAudiences() != null && !filters.getAudiences().isEmpty()) {
+            predicates.add(root.get("audience").in(expandAudienceFilters(filters.getAudiences())));
         }
 
-        if (filters.getMinPurchaseDate() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("purchaseDate"), filters.getMinPurchaseDate()));
-        }
-        
-        if (filters.getMaxPurchaseDate() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("purchaseDate"), filters.getMaxPurchaseDate()));
+        if (filters.getSizeSystem() != null && !filters.getSizeSystem().isBlank()) {
+            predicates.add(cb.equal(root.get("sizeSystem"), filters.getSizeSystem().trim()));
         }
 
         if (filters.getSizes() != null && !filters.getSizes().isEmpty()) {
-            predicates.add(root.get("size").in(filters.getSizes()));
+            predicates.add(root.get("sizeKey").in(filters.getSizes()));
         }
 
-        if (filters.getMinShoeSizeEu() != null) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("shoeSizeEu"), filters.getMinShoeSizeEu()));
+        if (filters.getMinPurchaseYear() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("purchaseYear"), filters.getMinPurchaseYear()));
         }
 
-        if (filters.getMaxShoeSizeEu() != null) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("shoeSizeEu"), filters.getMaxShoeSizeEu()));
+        if (filters.getMaxPurchaseYear() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("purchaseYear"), filters.getMaxPurchaseYear()));
         }
 
-        if (filters.getMaterial() != null && !filters.getMaterial().isBlank()) {
-            String q = "%" + filters.getMaterial().trim().toLowerCase(Locale.ROOT) + "%";
-            predicates.add(cb.like(cb.lower(root.get("material")), q));
-        }
-        
         return predicates;
     }
 
@@ -89,17 +75,17 @@ public class ClothingFilterPredicateBuilder implements FilterPredicateBuilder<Cl
             case "brand" -> Optional.of(root.join("brand").get("label"));
             case "type" -> Optional.of(root.join("clothingType").get("label"));
             case "condition" -> Optional.of(root.get("condition"));
-            case "clothingGender" -> Optional.of(root.get("clothingGender"));
-            case "clothingCategory" -> Optional.of(root.get("clothingCategory"));
-            case "purchasedate", "purchase_date" -> Optional.of(root.get("purchaseDate"));
+            case "audience" -> Optional.of(root.get("audience"));
+            case "purchaseyear", "purchase_year" -> Optional.of(root.get("purchaseYear"));
             default -> Optional.empty();
         };
     }
 
-    private EnumSet<ClothingGender> expandGenderFilters(List<ClothingGender> selectedGenders) {
-        EnumSet<ClothingGender> effective = EnumSet.copyOf(selectedGenders);
-        if (effective.contains(ClothingGender.MALE) || effective.contains(ClothingGender.FEMALE)) {
-            effective.add(ClothingGender.UNISEX);
+    /** Women's or men's searches also show unisex items. */
+    private EnumSet<ClothingAudience> expandAudienceFilters(List<ClothingAudience> selected) {
+        EnumSet<ClothingAudience> effective = EnumSet.copyOf(selected);
+        if (effective.contains(ClothingAudience.MEN) || effective.contains(ClothingAudience.WOMEN)) {
+            effective.add(ClothingAudience.UNISEX);
         }
         return effective;
     }

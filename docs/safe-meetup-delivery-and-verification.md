@@ -12,7 +12,7 @@ Bu doküman, **secondHand** platformundaki **Güvenli Buluşma (Safe Meetup)** t
 3. **Escrow Kilidi:** Kargo belgesi olmayan bir işlemde havuzdaki paranın satıcıya ne zaman ve nasıl aktarılacağı belirsizliği.
 
 ### secondHand Güvenli Buluşma Çözümü:
-* **Ödeme Önceden Escrow'da:** Alıcı ödemeyi platform üzerinden yapar; para güvence havuzunda bloke edilir (`MEETUP_PENDING`).
+* **Ödeme Önceden Escrow'da:** Alıcı ödemeyi platform üzerinden yapar; para escrow'da bloke edilir (`MEETUP_PENDING`).
 * **Alıcıya Özel Dinamik OTP / QR Kod:** Alıcıya 6 haneli, 5 dakika geçerli bir teslimat doğrulama kodu ve QR kod verilir.
 * **Fiziksel Teslim Anında Doğrulama:** Buluşma anında alıcı ürünü inceler, beğenirse kodu satıcıya gösterir. Satıcı kodu sisteme girdiğinde teslimat kesinleşir (`HANDOVER_CONFIRMED`).
 * **Otomatik veya Anında Escrow Çözümü:** Teslimat onaylandığında satıcının cüzdanına bakiye aktarılır.
@@ -69,7 +69,7 @@ sequenceDiagram
 | **`MEETUP_PENDING`** | Ödeme alındı, buluşma bekleniyor. | Alıcı kodu görüntüler; satıcı teslimata hazırlanır. İptal edilebilir. |
 | **`VERIFICATION_LOCKED`** | Satıcı 3 kez üst üste yanlış kod girdi. | Sistem 15 dakika boyunca kilitlenir; brute-force engellenir. |
 | **`HANDOVER_CONFIRMED`** | Kod doğrulandı; ürün fiziken el değiştirdi. | İptal edilemez. Alıcı hemen onaylayabilir veya 24 saat beklenir. |
-| **`COMPLETED`** | Emanet havuzundaki para satıcının e-Cüzdanına aktarıldı. | *Terminal Durum* (Yorum & değerlendirme aşaması). |
+| **`COMPLETED`** | escrow havuzundaki para satıcının e-Cüzdanına aktarıldı. | *Terminal Durum* (Yorum & değerlendirme aşaması). |
 
 ---
 
@@ -121,6 +121,6 @@ if (newAttempts >= 3) {
 | Senaryo | Ne Olur? | Sistemin Çözümü |
 | :--- | :--- | :--- |
 | **Alıcı Buluşmaya Gelmedi** | Ürün teslim edilmedi, kod verilmedi. | Sipariş `MEETUP_PENDING` durumunda olduğu için alıcı veya satıcı siparişi iptal edebilir; para alıcıya iade edilir. |
-| **Alıcı Ürünü Beğenmedi** | Fiziksel kontrolde kusur tespit edildi. | Alıcı kodu satıcıya **vermez**. Siparişi iptal eder; emanet havuzundaki para alıcı cüzdanına döner, satıcı ürününü geri alır. |
+| **Alıcı Ürünü Beğenmedi** | Fiziksel kontrolde kusur tespit edildi. | Alıcı kodu satıcıya **vermez**. Siparişi iptal eder; escrow havuzundaki para alıcı cüzdanına döner, satıcı ürününü geri alır. |
 | **Satıcı Kodu Tahmin Etmeye Çalıştı** | Art arda denemeler yaptı. | 3. yanlış denemede sistem 15 dakika kilitlenir (`VERIFICATION_LOCKED`). |
 | **İnternet Çekmeyen Kapalı Otopark / Metro** | Buluşma yerinde internet zayıf. | Alıcı önceden kodu veya QR kodu açıp ekran görüntüsü alabilir; satıcı internete çıktığı anda kodu girip doğrulayabilir. |

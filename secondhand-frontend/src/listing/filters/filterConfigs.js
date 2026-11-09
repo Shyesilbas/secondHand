@@ -142,17 +142,23 @@ const createRealEstateFilterConfig = () => {
  .addEnumField('zoningStatusKeys', 'Zoning Status / İmar Durumu', 'zoningStatuses', { displayAs: 'chips', multiple: true });
 };
 
+// Size keys repeat across systems ("38" is a numeric and a shoe size), so sizes are picked inside one system.
+const clothingSizeSystemOptions = (_filters, enums) =>
+ (enums?.sizeSystems || []).filter((s) => s?.value !== 'ONE_SIZE');
+
+const clothingSizeOptions = (filters, enums) =>
+ (enums?.sizeSystems || []).find((s) => s?.value === filters?.sizeSystem)?.values || [];
+
 const createClothingFilterConfig = () => {
  return new FilterConfig()
+ .addEnumField('audiences', 'For / Kimin için', 'clothingAudiences', { displayAs: 'chips', multiple: true })
  .addEnumField('types', 'Type / Giyim Türü', 'clothingTypes', { displayAs: 'chips', multiple: true })
- .addEnumField('clothingGenders', 'Gender / Cinsiyet', 'clothingGenders', { displayAs: 'chips', multiple: true })
- .addEnumField('clothingCategories', 'Category / Kategori', 'clothingCategories', { displayAs: 'chips', multiple: true })
  .addEnumField('brands', 'Brand / Marka', 'clothingBrands')
- .addEnumField('sizes', 'Size / Beden', 'clothingSizes', { displayAs: 'chips', multiple: true })
- .addNumericRangeField('shoeSizeEu', 'Shoe Size / Ayakkabı No (EU)', { min: 20, max: 55, step: 1, placeholder: '42' })
+ .addEnumField('sizeSystem', 'Size System / Beden Sistemi', 'sizeSystems', { multiple: false, getOptions: clothingSizeSystemOptions })
+ .addEnumField('sizes', 'Size / Beden', 'sizeSystems', { displayAs: 'chips', multiple: true, getOptions: clothingSizeOptions, visibleWhen: (filters) => Boolean(filters?.sizeSystem) })
  .addEnumField('colors', 'Color / Renk', 'colors')
  .addEnumField('conditions', 'Condition / Durum', 'clothingConditions', { displayAs: 'chips', multiple: true })
- .addTextField('material', 'Material / Kumaş', { placeholder: 'Örn: Pamuk, Deri, Keten' });
+ .addNumericRangeField('purchaseYear', 'Purchase Year / Satın Alma Yılı', { min: 1950, max: new Date().getFullYear(), placeholder: '2022' });
 };
 
 const createBooksFilterConfig = () => {

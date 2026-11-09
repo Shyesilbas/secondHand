@@ -1,6 +1,6 @@
 # WebSocket, STOMP ve Canlı Mesajlaşma Mimarisi
 
-Bu doküman, **secondHand** platformunun gerçek zamanlı mesajlaşma (Chat) ve canlı olay iletim altyapısını oluşturan **Spring WebSocket**, **STOMP Protokolü**, **HttpOnly Cookie El Sıkışması**, **Kanal Düzeyinde JWT Güvenliği**, **IDOR Korumalı Abonelik Yetkilendirmesi** ve **Sohbet İçi Teklif (In-Chat Offer)** akışlarını detaylandırmaktadır.
+Bu doküman, **secondHand** platformunun gerçek zamanlı mesajlaşma (Chat) ve canlı event iletim altyapısını oluşturan **Spring WebSocket**, **STOMP Protokolü**, **HttpOnly Cookie Handshake**, **Channel Seviyesinde JWT Güvenliği**, **IDOR Korumalı Subscription Yetkilendirmesi** ve **Sohbet İçi Teklif (In-Chat Offer)** akışlarını detaylandırmaktadır.
 
 ---
 
@@ -9,9 +9,9 @@ Bu doküman, **secondHand** platformunun gerçek zamanlı mesajlaşma (Chat) ve 
 Platformda kullanıcılar arası anlık mesajlaşma ve bildirim iletimi, geleneksel HTTP polling yerine çift yönlü, düşük gecikmeli **WebSocket + STOMP (Simple Text Oriented Messaging Protocol)** ile sağlanır:
 
 ```
-[İstemci / React UI]
+[Client / React UI]
         │
-        ├── 1. HTTP GET /ws (El Sıkışma / CookieHandshakeInterceptor)
+        ├── 1. HTTP GET /ws (Handshake / CookieHandshakeInterceptor)
         │      └── "sh_at" HttpOnly çerezinden JWT okunur -> session attribute'a yazılır.
         │
         ├── 2. STOMP CONNECT Frame
@@ -21,41 +21,56 @@ Platformda kullanıcılar arası anlık mesajlaşma ve bildirim iletimi, gelenek
         │      └── ChannelInterceptor -> ChatAuthorizationService (Oda üyesi mi? Yetkisizse REDDET).
         │
         └── 4. STOMP SEND Frame (/app/chat.sendMessage)
-               └── ChatWebSocketController -> MessageRepository + NotificationService -> /topic/chat/{roomId}
+               └── ChatWebSocketController -> ChatService.sendMessage -> MessageRepository
+                   -> ChatNotificationService -> /topic/chat/{roomId} (+ recipient için notification dispatch)
 ```
 
 ---
 
-## 2. El Sıkışma ve Çok Katmanlı Güvenlik Modeli
+## 2. Handshake ve Çok Katmanlı Güvenlik Modeli
 
-### A. HttpOnly Çerez El Sıkışması: [`WebSocketConfig.java`](../src/main/java/com/serhat/secondhand/core/config/WebSocketConfig.java)
-- **Endpoint:** `/ws`
-- **CORS / Origin Politikası:** Wildcard (`*`) kesinlikle kullanılmaz. `CorsConfigProperties.allowedOrigins` listesindeki güvenli frontend origin'leri (`http://localhost:5173` vb.) zorunludur.
-- **`CookieHandshakeInterceptor`:** Tarayıcı güvenliği gereği JavaScript tarafından okunamayan `sh_at` (Access Token) çerezini HTTP Handshake aşamasında yakalar ve WebSocket oturum özniteliğine (`ws_token`) aktarır.
+### A. HttpOnly Cookie Handshake: [`WebSocketConfig.java`](../src/main/java/com/serhat/secondhand/core/config/WebSocketConfig.java)
+- **Endpoint:** `/ws` (düz WebSocket; SockJS fallback'i yoktur).
+- **Origin Politikası:** Wildcard (`*`) kullanılmaz. `CorsConfigProperties.allowedOrigins` kullanılır; liste boşsa `http://localhost:5173`'e düşer.
+- **Simple broker:** `/topic`, `/queue`, `/user` prefix'leri için in-memory simple broker; uygulama prefix'i `/app`. Broker JVM içidir, relay yoktur: çoklu node'da bir node'dan yayınlanan mesaj yalnızca o node'a bağlı client'lara gider.
+- **`CookieHandshakeInterceptor`:** Tarayıcı güvenliği gereği JavaScript tarafından okunamayan `sh_at` (Access Token) çerezini HTTP Handshake aşamasında yakalar ve WebSocket oturum özniteliğine (`ws_token`) aktarır. Çerez yoksa handshake yine geçer; reddetme CONNECT aşamasında yapılır.
 
 ---
 
-### B. Kanal Düzeyinde Güvenlik ve IDOR Engelleme: [`WebSocketSecurityConfig.java`](../src/main/java/com/serhat/secondhand/core/config/WebSocketSecurityConfig.java)
+### B. Channel Seviyesinde Güvenlik ve IDOR Engelleme: [`WebSocketSecurityConfig.java`](../src/main/java/com/serhat/secondhand/core/config/WebSocketSecurityConfig.java)
 
-WebSocket protokolünde HTTP filtreleri (Spring Security Filter Chain) yalnızca ilk el sıkışmada devreye girer. El sıkışma sonrasındaki her bir STOMP çerçevesi (frame) için mesaj broker seviyesinde güvenlik `ChannelInterceptor` ile sağlanır:
+WebSocket protokolünde HTTP filtreleri (Spring Security Filter Chain) yalnızca ilk handshake'te devreye girer. Handshake sonrasındaki her bir STOMP çerçevesi (frame) için mesaj broker seviyesinde güvenlik `ChannelInterceptor` ile sağlanır:
 
 1. **CONNECT Doğrulaması (`authenticateConnect`):**
-   - STOMP başlıklarındaki `Authorization: Bearer <token>` veya el sıkışmadan gelen `ws_token` okunur.
-   - `JwtUtils.validateToken()` ile imza, süre ve kara liste denetimi yapılır.
-   - Doğrulanmış kullanıcı `UsernamePasswordAuthenticationToken` olarak `accessor.setUser(...)` içine enjekte edilir.
-2. **Kimliksiz İstek Koruması:**
-   - `CONNECT` haricindeki tüm komutlarda (`SUBSCRIBE`, `SEND`, `UNSUBSCRIBE`) oturum açmış kullanıcı zorunludur. Yetkisiz isteklerde `MessageDeliveryException("WebSocket authentication required")` fırlatılır.
-3. **Abonelik IDOR Koruması (`authorizeChatSubscription`):**
-   - Bir kullanıcı `/topic/chat/{roomId}` konusuna abone olmak istediğinde, `ChatAuthorizationService.validateRoomParticipant(roomId, userId)` çağrılır.
-   - Kullanıcı ilgili sohbet odasının alıcısı veya satıcısı değilse abonelik anında engellenir (`Not a participant of chat room`). Bu sayede kötü niyetli kullanıcıların rastgele oda numaralarını dinlemesi imkansız kılınır.
+   - Önce STOMP `Authorization: Bearer <token>` başlığı, yoksa handshake'ten gelen `ws_token` okunur. Token yoksa `WebSocket authentication required`, geçersizse `WebSocket authentication failed` ile bağlantı reddedilir.
+   - Kullanıcı `UserDetailsService` ile yüklenir ve `UsernamePasswordAuthenticationToken` olarak `accessor.setUser(...)` içine yazılır. `userId`, `iat` ve `jti` session attribute'larında saklanır.
+   - Token CONNECT anında `AccessRevocationService.isRevoked` ile de kontrol edilir (`WebSocket token revoked`).
+2. **Kimliksiz İstek ve Revocation Koruması:**
+   - `SUBSCRIBE`, `SEND`, `UNSUBSCRIBE` komutlarında kimlik zorunludur (`WebSocket authentication required`).
+   - Açık bağlantıda da her bu komutta `rejectIfRevoked` çalışır: ban veya logout sonrası mevcut bağlantı SUBSCRIBE/SEND yapamaz.
+3. **SEND Kısıtı (`authorizeSend`):** Yalnızca `/app/` hedeflerine SEND yapılabilir; `/topic`, `/queue`, `/user`'a doğrudan SEND reddedilir (sahte bildirim/mesaj engeli).
+4. **Subscription Allowlist'i (`authorizeSubscription`):**
+   - `*`, `?`, `{`, `}`, `..` içeren hedefler reddedilir (`Invalid subscription destination`).
+   - İzin verilenler: `/topic/notifications`, kullanıcının katılımcısı olduğu `/topic/chat/{roomId}` ve yalnızca kendi `/user/{userId}/...` hedefleri. Diğer her şey `Subscription destination not allowed`.
+   - Chat odası için `ChatAuthorizationService.validateRoomParticipant(roomId, userId)` çağrılır; katılımcı değilse `Not a participant of chat room`, `roomId` sayı değilse `Invalid chat subscription` (IDOR koruması).
 
 ---
 
 ## 3. STOMP Kanal ve Rota Yapısı
 
-| Ön Ek / Rota | Tür | Açıklama |
+| Hedef | Yön | Açıklama |
 | :--- | :--- | :--- |
-| **`/ws`** | Endpoint | STOMP bağlantı ve el sıkışma noktası. |
+| **`/ws`** | Endpoint | STOMP bağlantı ve handshake noktası. |
+| **`/app/chat.sendMessage`** | SEND | Odaya mesaj; `senderId` principal ile eşleşmeli, `ChatService.sendMessage` çağrılır. |
+| **`/app/chat.joinRoom`** | SEND | `chatRoomId`/`userId`'yi yalnızca WebSocket session attribute'larına yazar; DB veya broker yan etkisi yoktur. |
+| **`/app/chat.leaveRoom`** | SEND | Bu session attribute'larını siler. |
+| **`/app/chat.markAsRead`** | SEND | `ChatService.markMessagesAsRead`; DB'de okundu işaretler, karşı tarafa push yoktur. |
+| **`/topic/chat/{roomId}`** | Broker | `ChatNotificationService.sendMessage` ile oda mesajı yayını (normal ve OFFER mesajları). |
+| **`/topic/notifications`** | Broker | Herkese açık broadcast bildirim (`NotificationWebSocketService.sendBroadcast`). |
+| **`/user/{userId}/notifications`** | Broker | Kullanıcıya özel bildirim (`NotificationWebSocketService.sendNotificationToUser`); `convertAndSend` ile literal hedefe yazılır (`/queue` segmenti yoktur). |
+
+--- | :--- | :--- |
+| **`/ws`** | Endpoint | STOMP bağlantı ve handshake noktası. |
 | **`/app/chat.sendMessage`** | Giriş (SEND) | Kullanıcıdan odaya yeni mesaj gönderimi. |
 | **`/app/chat.joinRoom`** | Giriş (SEND) | Kullanıcının odaya giriş bildirimi. |
 | **`/app/chat.leaveRoom`** | Giriş (SEND) | Kullanıcının odadan ayrılma bildirimi. |
@@ -70,20 +85,24 @@ WebSocket protokolünde HTTP filtreleri (Spring Security Filter Chain) yalnızca
 Sohbet akışı yalnızca düz metin mesajlarından ibaret değildir; pazar yeri dinamiklerine bağlı yan etkiler içerir:
 
 1. **Sohbet İçi Teklif Verme (`SendInChatOfferRequest`):**
-   - Alıcı doğrudan sohbet penceresinden teklif fiyatı gönderebilir.
-   - Sistem arka planda `OfferService` üzerinden teklif kaydı açar ve sohbete özel teklif kartı mesajı (`OFFER`) iliştirir.
-   - Satıcı sohbet içerisinden tek tıklamayla teklifi kabul edebilir veya reddedebilir.
+   - `POST /api/v1/chats/rooms/{chat-room-id}/offers` (REST) → `ChatService.sendInChatOffer`. Oda katılımcısı olmak ve odanın bir ilana bağlı olması zorunludur; aksi halde `SecurityException` / `IllegalArgumentException`.
+   - `OfferService.create` ile teklif açılır, aynı transaction'da `MessageType.OFFER` mesajı kaydedilir, teklif alanlarıyla zenginleştirilip `/topic/chat/{roomId}`'ye yayınlanır.
+   - Geçmiş mesajlar okunurken (`getChatMessages`) OFFER kartı `enrichOfferMessage` ile güncel teklif durumundan doldurulur.
 2. **Oda Zenginleştirme (`ChatRoomEnricher`):**
-   - İstemci oda listesini sorguladığında, her oda için ilişkili ilanın kapak görseli, başlığı, güncel fiyatı, satıcı/alıcı profili ve okunmamış mesaj sayısı tek bir DTO (`ChatRoomDto`) halinde döner.
+   - `GET /api/v1/chats/rooms/user` sayfalı döner; `ChatRoomEnricher` her oda için ilan bilgisi, karşı taraf ve okunmamış sayısını `ChatRoomDto`'ya ekler.
 3. **Okunmamış Mesaj Takibi:**
-   - Kullanıcı odayı açtığında `/app/chat.markAsRead` gönderilir; mesajlar veritabanında okundu durumuna getirilir ve karşı tarafa çift mavi tik/okundu durumu iletilir.
+   - Frontend okundu işaretini REST ile yapar (`PUT /api/v1/chats/rooms/{chat-room-id}/messages/read`); STOMP `/app/chat.markAsRead` aynı servisi çağırır. İki yol da yalnızca DB'yi günceller, karşı tarafa okundu eventi yayınlanmaz.
+4. **Mesaj Bildirimi:** `ChatNotificationService.sendMessage`, oda yayınına ek olarak alıcıya `chat` kaynaklı bir notification dispatch'i publish eder (dedupe key `chat-message:{recipientId}:{messageId}`); ayrıntı için [bildirim dokümanı](notification-feed-and-broadcast-architecture.md).
 
 ---
 
-## 5. Hata Yönetimi ve Dayanıklılık
+## 5. Hata Yönetimi ve Resilience
 
-- **Mesaj Gönderen Eşleme Denetimi:** `ChatWebSocketController` içerisinde gönderilen payload'daki `senderId` ile STOMP oturumundaki `principal.getId()` doğrulanır. Uyuşmazlık durumunda mesaj işlenmez (spoofing engeli).
-- **Kopma ve Yeniden Bağlanma (Reconnect):** İstemci tarafı bağlantı koptuğunda exponential backoff ile `/ws` adresine yeniden bağlanır; `sh_at` çerezi geçerli olduğu sürece kullanıcıdan tekrar giriş yapması istenmez.
+- **Gönderen Eşleme Denetimi:** `sendMessage`, `joinRoom` ve `markAsRead` içinde payload `senderId` ile principal `user.getId()` karşılaştırılır; uyuşmazlıkta mesaj sessizce loglanıp düşürülür (client'a hata dönmez). `leaveRoom` bu kontrolü yapmaz.
+- **Yetki Hataları:** `ChatService` oda/participant ihlalinde `SecurityException`, geçersiz içerikte `IllegalArgumentException` fırlatır; STOMP üzerinden gelen bu hatalar client'a özel bir error frame ile dönmez (REST `POST /api/v1/chats/messages` yolunda HTTP hatasına çevrilir).
+- **Revocation:** Ban/logout olan kullanıcının açık bağlantısı bir sonraki SUBSCRIBE/SEND'de reddedilir; mevcut subscription'lar broker'dan aktif olarak düşürülmez.
+- **Reconnect:** Frontend (`useWebSocket.js`, `useNotificationWebSocket.js`) kopmada exponential backoff (1 sn'den başlar, üst sınır 30 sn) ve en fazla 10 deneme ile yeniden bağlanır. Her bağlantı `sh_at` çerezini yeniden okur; çerez süresi dolmuşsa CONNECT reddedilir.
+- **Notification push hatası:** `NotificationWebSocketService` exception'ı yakalayıp loglar; push kaybolsa da bildirim DB'de kalır.
 
 ---
 
@@ -94,3 +113,4 @@ Sohbet akışı yalnızca düz metin mesajlarından ibaret değildir; pazar yeri
 - STOMP Controller: [`ChatWebSocketController.java`](../src/main/java/com/serhat/secondhand/chat/controller/ChatWebSocketController.java)
 - Yetkilendirme Servisi: [`ChatAuthorizationService.java`](../src/main/java/com/serhat/secondhand/chat/application/ChatAuthorizationService.java)
 - REST API: [`ChatRestController.java`](../src/main/java/com/serhat/secondhand/chat/api/ChatRestController.java)
+- Yayın servisleri: [`ChatNotificationService.java`](../src/main/java/com/serhat/secondhand/chat/notification/ChatNotificationService.java), [`NotificationWebSocketService.java`](../src/main/java/com/serhat/secondhand/notification/application/NotificationWebSocketService.java)

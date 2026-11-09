@@ -1,6 +1,6 @@
 # Bildirim Olay Dağıtımı ve Broadcast Feed Mimarisi
 
-Bu doküman, **secondHand** platformundaki kullanıcı bildirim altyapısını oluşturan **Kişisel Bildirimler (`Notification`)**, **Toplu Sistem Duyuruları (`NotificationEvent`)**, **Birleşik Akış Projeksiyonu (`NotificationFeedRepository`)**, **Okundu Takip Mekanizması (`NotificationEventRead`)**, **WebSocket Canlı Push İletimi** ve **Rozet Önbellek Tahliyesi (`user:badges`)** mimarisini açıklamaktadır.
+Bu doküman, **secondHand** platformundaki kullanıcı bildirim altyapısını oluşturan **Kişisel Bildirimler (`Notification`)**, **Sistem Broadcast'leri (`NotificationEvent`)**, **Birleşik Akış Projeksiyonu (`NotificationFeedRepository`)**, **Okundu Takip Mekanizması (`NotificationEventRead`)**, **WebSocket Live Push** ve **Badge Cache Eviction (`user:badges`)** mimarisini açıklamaktadır.
 
 ---
 
@@ -13,7 +13,7 @@ Klasik bildirim sistemlerinde tüm kullanıcılara bir duyuru (örneğin kampany
 ### secondHand Çözümü (Hibrit Feed Mimarisi):
 Platformda iki ayrı veri modeli birleştirilmiştir:
 1. **Kişiye Özel Bildirimler (`notifications`):** Sipariş durumu, teklif kabulü veya mesaj uyarıları gibi doğrudan tek bir kullanıcıyı ilgilendiren olaylar.
-2. **Toplu Sistem Olayları (`notification_events`):** Tek bir satır olarak kaydedilen ve tüm kullanıcılara açık olan yayınlar.
+2. **Sistem Broadcast Event'leri (`notification_events`):** Tek bir satır olarak kaydedilen ve tüm kullanıcılara açık olan yayınlar.
 3. **Kullanıcı Okuma Takibi (`notification_event_reads`):** Kullanıcı bir genel duyuruyu okuduğunda yalnızca `(userId, eventId)` eşleşmesi kaydedilir.
 
 ---
@@ -56,11 +56,11 @@ Kullanıcı bildirim merkezini açtığında (`GET /api/v1/notifications`), [`No
 3. **Okundu Olarak İşaretleme (`markAsRead`):**
    - Bildirim kişisel bir `Notification` ise `isRead = true` yapılır.
    - Bildirim genel bir `NotificationEvent` ise `notification_event_reads` tablosuna idempotent `(userId, eventId)` satırı eklenir.
-   - Her okundu işleminde `@CacheEvict(value = "user:badges", key = "#userId")` tetiklenerek önbellekteki okunmamış rozet sayısı anında sıfırlanır.
+   - Her okundu işleminde `@CacheEvict(value = "user:badges", key = "#userId")` tetiklenerek cache'teki okunmamış badge sayısı anında sıfırlanır.
 
 ---
 
-## 4. Olay Dinleyicileri (Event Listeners)
+## 4. Event Listener'lar
 
 Bildirimler doğrudan controller çağrılarıyla değil, asenkron Spring domain olayları üzerinden tetiklenir:
 

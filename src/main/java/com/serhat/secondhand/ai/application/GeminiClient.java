@@ -42,16 +42,24 @@ public class GeminiClient {
     }
 
     public String generateText(String message) {
-        return generateTextWithModel(model, message, false);
+        return generateTextWithModel(model, message, false, null);
     }
 
     public String generateTextForMemory(String message) {
+        return generateForMemoryInternal(message, null);
+    }
+
+    public String generateJsonForMemory(String message) {
+        return generateForMemoryInternal(message, "application/json");
+    }
+
+    private String generateForMemoryInternal(String message, String responseMimeType) {
         try {
-            return generateTextWithModel(model, message, true);
+            return generateTextWithModel(model, message, true, responseMimeType);
         } catch (RuntimeException e) {
             log.warn("Primary model failed for memory extraction: {}", e.getMessage());
             try {
-                return generateTextWithModel(fallbackMemoryModel, message, true);
+                return generateTextWithModel(fallbackMemoryModel, message, true, responseMimeType);
             } catch (RuntimeException fallbackException) {
                 log.error("Fallback model also failed for memory extraction: {}", fallbackException.getMessage(), fallbackException);
                 return "Cevap hazır";
@@ -59,15 +67,18 @@ public class GeminiClient {
         }
     }
 
-    private String generateTextWithModel(String modelName, String message, boolean swallowRateLimit) {
+    private String generateTextWithModel(String modelName, String message, boolean swallowRateLimit, String responseMimeType) {
         String url = buildGenerateContentUrl(modelName);
         log.debug("Request to model: {} at URL: {}", modelName, url.replace(apiKey, "***"));
 
-        var request = new GeminiRequest(List.of(
-                new GeminiRequest.Content(List.of(
-                        new GeminiRequest.Part(message)
-                ))
-        ));
+        GeminiRequest.GenerationConfig generationConfig = (responseMimeType != null && !responseMimeType.isBlank())
+                ? new GeminiRequest.GenerationConfig(responseMimeType)
+                : null;
+
+        var request = new GeminiRequest(
+                List.of(new GeminiRequest.Content(List.of(new GeminiRequest.Part(message)))),
+                generationConfig
+        );
 
         long[] backoffMillis = {3000L, 3000L};
         int maxAttempts = backoffMillis.length + 1;

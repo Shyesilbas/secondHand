@@ -1,18 +1,18 @@
 # Teklif (Offer/Pazarlık) Sistemi ve 24 Saatlik Alıcı Kilidi (Concurrency Lock) Rehberi
 
-Bu doküman, **secondHand** platformunun pazarlık/teklif altyapısını oluşturan **Teklif Yaşam Döngüsü (State Machine)**, **Redis Tabanlı 24 Saatlik Alıcı Kilidi (`offer:reservation:{listingId}`)**, **Karşı Teklif (Counter-Offer) Ağacı** ve **Eşzamanlılık (Optimistic Locking & Concurrency Control)** kurallarını detaylandırmaktadır.
+Bu doküman, **secondHand** platformunun pazarlık/teklif altyapısını oluşturan **Teklif Yaşam Döngüsü (State Machine)**, **Redis Tabanlı 24 Saatlik Alıcı Kilidi (`v4:offer:lock:{listingId}`)**, **Karşı Teklif (Counter-Offer) Ağacı** ve **Eşzamanlılık (Optimistic Locking & Concurrency Control)** kurallarını detaylandırmaktadır.
 
 ---
 
 ## 1. Problem Tanımı ve Neden Özel Bir Kilit Gerekir?
 
-İkinci el e-ticarette pazarlık yapıldığında şu kritik yarış durumları (Race Conditions) ortaya çıkar:
+İkinci el e-ticarette pazarlık yapıldığında şu kritik race condition ortaya çıkar:
 1. **Çifte Kabul (Double Acceptance):** Satıcı aynı anda 2 farklı kullanıcının teklifini kabul ederse tek adet olan ürün kime satılacak?
 2. **Kabul Edilen Teklifin Çalınması (Price Sniping):** Satıcı bir alıcıyla pazarlıkta anlaşıp teklifi kabul ettiğinde, başka bir alıcı araya girip ürünü normal fiyattan satın alırsa pazarlık yapan alıcının hakkı gasp edilir.
 3. **Bekleyen Tekliflerin Askıda Kalması:** Bir teklif kabul edildiğinde veya karşı teklif verildiğinde eski tekliflerin durumu ne olacak?
 
 ### secondHand Çözümü:
-* Satıcı bir teklifi kabul ettiği anda **Redis üzerinde 24 saatlik özel alıcı kilidi (`offer:reservation:{listingId}`)** oluşturulur.
+* Satıcı bir teklifi kabul ettiği anda **Redis üzerinde 24 saatlik özel alıcı kilidi (`v4:offer:lock:{listingId}`)** oluşturulur.
 * Bu süre boyunca ürün yalnızca teklifi kabul edilen alıcıya indirimli fiyattan rezerve edilir; başka hiçbir alıcı ürünü satın alamaz veya yeni teklif veremez.
 
 ---
@@ -37,7 +37,7 @@ sequenceDiagram
         Seller->>OfferService: accept(sellerId, offerId)
         OfferService->>OfferService: Status: ACCEPTED
         OfferService->>Redis: lockAcceptedOffer(listingId, buyerId, offerId) [24h TTL]
-        Note over Redis: Key: offer:reservation:{listingId}<br/>Val: buyerId:offerId (24 Saatlik Kilit)
+        Note over Redis: Key: v4:offer:lock:{listingId}<br/>Val: buyerId:offerId (24 Saatlik Kilit)
         OfferService->>Email: Alıcıya "Teklifin Kabul Edildi!" Bildirimi
 
         Buyer->>Checkout: getAcceptedOfferForCheckout(buyerId, offerId)
@@ -73,12 +73,13 @@ sequenceDiagram
 ### A. Redis Tabanlı 24 Saatlik Alıcı Kilidi ([`OfferRedisReservationService.java`](../src/main/java/com/serhat/secondhand/offer/application/OfferRedisReservationService.java))
 ```java
 public boolean lockAcceptedOffer(UUID listingId, Long buyerId, UUID offerId) {
-    String key = "offer:reservation:" + listingId;
+    String key = OFFER_LOCK_KEY_PREFIX + listingId; // "v4:offer:lock:"
     String value = buyerId + ":" + offerId;
-    Boolean acquired = redisTemplate.opsForValue().setIfAbsent(key, value, Duration.ofHours(24));
+    Boolean acquired = redisTemplate.opsForValue().setIfAbsent(key, value, DEFAULT_OFFER_TTL); // 24 saat
     return Boolean.TRUE.equals(acquired);
 }
 ```
+* Redis erişilemezse metot `true` döner ve kabul akışı veritabanı satır kilidine (`findByIdWithLock`) güvenerek devam eder; Redis hatası kabulü engellemez.
 * `setIfAbsent` (`SETNX`) ile ilan üzerinde aynı anda sadece **tek bir aktif kabul** bulunabilir.
 * 24 saat içinde ödeme yapılmazsa anahtar Redis'ten otomatik düşer ve ilan serbest kalır.
 
@@ -92,7 +93,7 @@ public boolean lockAcceptedOffer(UUID listingId, Long buyerId, UUID offerId) {
 
 ### C. Veritabanı Düzeyinde İkili Kilit (Pessimistic & Optimistic Lock)
 * `accept()` anında hem `@Version` optimistik kilidi hem de `listingService.findByIdWithLock(listingId)` ile veritabanı satır kilidi (`Pessimistic Lock`) alınır.
-* Bu sayede yarış durumunda iki istek aynı milisaniyede gelse dahi yalnızca biri kabul edilir, diğeri `OFFER_CONCURRENT_MODIFICATION` veya `OFFER_ALREADY_ACCEPTED_FOR_LISTING` hatası alır.
+* Bu sayede race condition durumunda iki istek aynı milisaniyede gelse dahi yalnızca biri kabul edilir, diğeri `OFFER_CONCURRENT_MODIFICATION` veya `OFFER_ALREADY_ACCEPTED_FOR_LISTING` hatası alır.
 
 ---
 

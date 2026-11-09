@@ -28,7 +28,7 @@ public class ExchangeRateService {
 
     private static final String API_URL = "https://v6.exchangerate-api.com/v6/{apiKey}/pair/{base}/{target}";
 
-    @org.springframework.cache.annotation.Cacheable(value = "exchangeRates", key = "#from.toUpperCase() + '_' + #to.toUpperCase()")
+    @org.springframework.cache.annotation.Cacheable(value = "payment:exchangeRates", key = "#from.toUpperCase() + '_' + #to.toUpperCase()")
     public ExchangeRateDto getRate(String from, String to) {
         validateCurrencies(from, to);
         

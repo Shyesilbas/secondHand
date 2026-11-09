@@ -1,87 +1,77 @@
-# Multi-Tier Polymorphic Redis Cache (`v4::`) ve Invalidation Stratejisi Rehberi
+# Multi-Tier Redis Cache (`v4:`) ve Invalidation Rehberi
 
-Bu doküman, **secondHand** platformunun **Çok Katmanlı Önbellek (Multi-Tier Caching)** mimarisini, **Jackson Polymorphic Type Serialization (`@class`)** standardını, **Cache Key Versioning (`v4::`)** yapısını ve **Cache Invalidation (Tahliye) Matrisini** detaylandırmaktadır.
-
----
-
-## 1. Problem Tanımı ve Neden Özel Bir Cache Mimarisi?
-
-Büyük ölçekli Spring Boot uygulamalarında standart Redis önbellekleme kullanıldığında şu kronik sorunlar yaşanır:
-1. **Jackson Asimetri & Deserialization Hataları:** `PageImpl`, `CachedPage` (Java record), `UUID` ve enum tipleri cache'e yazılırken `@class` bilgisi kaybedilirse, okuma anında `LinkedHashMap cannot be cast to DTO` hatası oluşur.
-2. **Cache Zehirlenmesi (Cache Drift / Corrupted Schema):** DTO'da bir alan değiştirildiğinde Redis'teki eski format deserialize edilemez ve uygulama çöker.
-3. **Tek Boyutlu TTL Yetersizliği:** Statik il/ilçe verisi ile hızlı değişen vitrin ilanlarına aynı TTL süresini vermek DB yükünü artırır veya bayat veri sunar.
-
-### secondHand Çözümü:
-* **Deterministik ve Simetrik Jackson Serializer:** `GenericJackson2JsonRedisSerializer` üzerinde `DefaultTyping.EVERYTHING` ile root, nested ve leaf tüm seviyelerde `@class` taşınır.
-* **Key Prefix Versiyonlama (`v4::`):** Schema değişimlerinde versiyon artırılır; eski cache anahtarlarına erişilmez, TTL ile kendiliğinden temizlenir.
-* **Kademeli TTL Hiyerarşisi (Tier 0 $\rightarrow$ Tier 4):** Verinin değişim sıklığına göre optimize edilmiş TTL katmanları.
+Bu doküman, **secondHand** backend'indeki Spring Cache + Redis yapısını (TTL tier'ları, key formatı, serialization, eviction matrisi, hata davranışı) kod ile doğrulanmış haliyle anlatır. Tek kaynak: [`CacheConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java).
 
 ---
 
-## 2. Kademeli TTL Hiyerarşisi (Tiered Architecture)
+## 1. Tasarım Özeti
 
-[`CacheConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java) üzerinde tanımlanan katmanlar:
+* **Tek, simetrik serializer:** `GenericJackson2JsonRedisSerializer` + izole `ObjectMapper`; `DefaultTyping.EVERYTHING` ve `As.PROPERTY` ile root, nested ve final tipler (`CachedPage` record, `UUID`, enum) dahil her değere `@class` yazılır. Böylece okuma sırasında `LinkedHashMap cannot be cast` türü hatalar oluşmaz. `@JsonTypeInfo` taşıyan DTO'larda (`ListingDto`, `ListingFilterDto`) Jackson'ın kendi discriminator'ı önceliklidir.
+* **Key versioning:** Prefix `CACHE_VERSION + ":" + cacheName + ":"` biçimindedir (tek `:`). Örnek: `v4:user:profile:105`. Serializer/DTO formatı uyumsuz değişirse `CACHE_VERSION` artırılır; eski key'ler okunmaz ve TTL ile kendiliğinden silinir.
+* **Null cache'lenmez** (`disableCachingNullValues`). TTL'i tanımsız bir cache adı için varsayılan TTL **30 dakika**dır.
+* **`allEntries` eviction `SCAN` ile yapılır** (`BatchStrategies.scan(1000)`), `KEYS` kullanılmaz; Redis bloklanmaz.
+* **Whitelist tip doğrulayıcı:** `com.serhat.secondhand`, `java.util`, `java.time`, `java.lang`, `java.math`, `org.springframework.data.domain` ve array tipleri dışındaki `@class` deserialize edilmez.
 
-| Katman | TTL Süresi | Cache İsimleri | Veri Karakteristiği / Amacı |
+---
+
+## 2. TTL Tier'ları ve Cache İsimleri
+
+| Tier | TTL | Cache adı | Kullanım (`@Cacheable` yeri) |
 | :--- | :--- | :--- | :--- |
-| **Tier 0** | **7 Gün** | `locations` | Türkiye il/ilçe/mahalle coğrafi ağacı. Değişmez, restart-safe, JVM heap'te tutulmaz. |
-| **Tier 0b** | **3 Gün** | `aiSummaries` | Gemini AI tarafından üretilen ürün yorum analiz özetleri. |
-| **Tier 1** | **24 Saat** | `brands`, `vehicleTypes`, `electronicTypes`, `bookGenres`, `clothingTypes` | Statik katalog, marka ve kategori lookup tabloları. |
-| **Tier 2** | **2 Saat** | `completedOrder`, `paymentHistory`, `paymentStats`, `exchangeRates` | Tamamlanmış finansal geçmiş ve döviz kurları. |
-| **Tier 2b** | **15 Dk** | `userProfile` | Kullanıcı hesap bilgileri ve ayarları. |
-| **Tier 3** | **10 Dk** | `reviewStatsBatch`, `favoriteStatsBatch`, `sellerViewStats`, `userListings` | Toplu aggregation istatistikleri ve satıcı dashboard verileri. |
-| **Tier 3b / 4** | **5 Dk** | `pendingOrders`, `listingViewStats`, `activeShowcases`, `userBadges` | Hızlı değişen anlık vitrin ilanları, rozetler ve geçici sayaçlar. |
+| 0b | 3 gün | `ai:summaries` | `AiSummaryService` (key `user:<id>` / `listing:<id>`; "özet yok" mesajı cache'lenmez) |
+| 1 | 24 saat | `catalog:brands`, `catalog:vehicleTypes`, `catalog:electronicTypes`, `catalog:bookGenres`, `catalog:clothingTypes` | İlgili `*Repository` `findAll` / `findByName` |
+| 1 | 24 saat | `catalog:attributeDefinitions`, `catalog:vehicle` | `ListingAttributeCatalogService`, `VehicleCatalogService` |
+| 1b | 12 saat | `user:stats:favorites` | `FavoriteStatsService` |
+| 2 | 2 saat | `order:completed`, `payment:stats` | `OrderQueryService`, `PaymentStatsService` |
+| 2 | 2 saat | `payment:exchangeRates` | `ExchangeRateService` (key `<FROM>_<TO>`) |
+| 2 | 2 saat | `payment:history` | TTL tanımlı, ancak kodda `@Cacheable` kullanımı **yok** |
+| 2b | 15 dk | `user:profile` | `UserService` |
+| 3 | 10 dk | `user:stats:reviews`, `listing:views:seller`, `listing:userListings` | `ReviewService`, `ListingViewService`, `ListingQueryService` |
+| 3b | 5 dk | `order:pending`, `listing:views:listing` | `OrderQueryService`, `ListingViewService` |
+| 3b | 5 dk | `listing:showcases` | TTL tanımlı, ancak kodda `@Cacheable` kullanımı **yok** |
+| 4 | 5 dk | `user:badges` | `UserBadgeService` |
+
+> [!NOTE]
+> Konum kataloğu (il/ilçe/mahalle) `CacheManager` üzerinden değil, [`LocationCatalogService`](../src/main/java/com/serhat/secondhand/listing/application/common/LocationCatalogService.java) içinde `RedisTemplate<String, Object>` ile doğrudan yazılır. Key'ler `v6:catalog:locations:cities`, `v6:catalog:locations:districts` (hash), `v6:catalog:locations:neighborhoods` (hash); TTL 7 gün. Bu key'ler `CACHE_VERSION`'dan bağımsız kendi `v6` versiyonunu taşır; biri eksikse ilk okumada katalog yeniden yüklenir.
 
 ---
 
-## 3. Serileştirme & Güvenlik Mimarisi
+## 3. Eviction Matrisi
 
-### A. Whitelist Tabanlı Polymorphic Tip Doğrulayıcı
-Güvenlik açığı (Gadget Attack) riskini sıfırlamak için yalnızca belirlenen güvenli paketlerin serileştirilmesine izin verilir:
-```java
-BasicPolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder()
-        .allowIfSubType("com.serhat.secondhand")
-        .allowIfSubType("java.util")
-        .allowIfSubType("java.time")
-        .allowIfSubType("java.lang")
-        .allowIfSubType("java.math")
-        .allowIfSubType("org.springframework.data.domain")
-        .allowIfSubTypeIsArray()
-        .build();
-```
-
-### B. Versiyonlu Prefix Üretici
-```java
-private static final String CACHE_VERSION = "v4";
-
-RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-        .computePrefixWith(cacheName -> CACHE_VERSION + "::" + cacheName + "::")
-        .serializeKeysWith(SerializationPair.fromSerializer(new StringRedisSerializer()))
-        .serializeValuesWith(SerializationPair.fromSerializer(jsonSerializer));
-```
-* **Örnek Anahtar:** `v4::locations::istanbul` veya `v4::userProfile::105`
-
----
-
-## 4. Cache Invalidation (Tahliye) Matrisi
-
-Veri güncellendiğinde veya silindiğinde önbelleğin tutarlı kalması için uygulanan tahliye kuralları:
-
-| Olay / Değişiklik | Tetiklenen Servis | Tahliye Edilen Cache(ler) (`@CacheEvict`) |
+| Olay | Eviction yapan sınıf | Cache / key |
 | :--- | :--- | :--- |
-| **Yeni Ödeme Tamamlandı** | `EscrowService` / `PaymentProcessor` | `paymentStats` (all entries), `paymentHistory` |
-| **Yeni Yorum Eklendi** | `ReviewService` | `reviewStatsBatch`, `sellerViewStats` |
-| **Vitrin Paketi Satın Alındı** | `ShowcaseService` | `activeShowcases` |
-| **Kullanıcı Bilgisi Değişti** | `UserService` | `userProfile::[userId]`, `userBadges::[userId]` |
-| **Yeni İlan Eklendi / Silindi** | `ListingCommandService` | `userListings::[sellerId]` |
-| **Kampanya Oluşturuldu / Güncellendi / Silindi** | `CampaignService` | `listing:userListings` (all entries; kampanya fiyatı DTO'ya gömülü). Planlı başlangıç/bitiş tahliye tetiklemez, 10 dk TTL ile yenilenir. |
+| Ödeme / cüzdan işlemi | `EWalletService` (4 metot), `PaymentProcessor` (`cacheManager.getCache("payment:stats").clear()`) | `payment:stats` (all entries) |
+| Yorum eklendi | `ReviewService` | `user:stats:reviews` (all entries) |
+| Favori ekle/çıkar | `FavoriteService` (3 metot) | `user:stats:favorites` (all entries) |
+| Kullanıcı güncellendi | `UserService` | `user:profile` (`#user.id`) |
+| İlan publish/güncelle vb. | `ListingCommandService` (sınıf `@CacheConfig(cacheNames = "user:profile")`, 10 metot `@CacheEvict(allEntries = true)`) | `user:profile` (all entries) |
+| İlan oluştur/güncelle/sil | `AbstractListingService` (3 metot) | `listing:userListings` (all entries) |
+| Kampanya oluştur/güncelle/sil | `CampaignService` (3 metot) | `listing:userListings` (all entries). Planlı başlangıç/bitiş eviction tetiklemez; 10 dk TTL ile yenilenir. |
+| Sipariş tamamlandı | `OrderCompletionService` | `order:pending` (`#user.id`) |
+| Bildirim okundu / e-posta durumu | `NotificationService` (2), `EmailService` (3) | `user:badges` (`#userId`) |
+| Seed çalıştı | `CatalogSeedStartupRunner.evictCatalogCaches` | `catalog:*` adı ile başlayan tüm cache'ler `clear()` |
+| Vehicle / attribute initializer | `VehicleDataInitializer`, `ListingAttributeDataInitializer` | `catalog:vehicle`, `catalog:attributeDefinitions` |
+
+Eviction olmayan (yalnızca TTL ile yenilenen) cache'ler: `ai:summaries`, `order:completed`, `listing:views:*`, `catalog:*` (seed dışında), `listing:userListings` için satıcı dışı değişiklikler.
 
 ---
 
-## 5. Hata Toleransı & Dayanıklılık (Resilience)
+## 4. Fault Tolerance
 
-### A. Redis Çökmesinde Kesintisiz Hizmet ([`CacheErrorHandlerConfig.java`](../src/main/java/com/serhat/secondhand/core/config/CacheErrorHandlerConfig.java))
-Redis geçici olarak erişilemez olduğunda veya timeout verdiğinde, uygulama `500 Internal Server Error` **vermez**. `CacheErrorHandler` hataları sessizce loglar ve isteği doğrudan PostgreSQL veritabanından şeffaf bir şekilde çeker.
+[`CacheErrorHandlerConfig`](../src/main/java/com/serhat/secondhand/core/config/CacheErrorHandlerConfig.java) cache GET/PUT/EVICT/CLEAR hatalarını `warn` olarak loglar ve isteği yutmaz:
 
-### B. Uygulama Başlangıç Temizliği ([`CacheStartupCleaner.java`](../src/main/java/com/serhat/secondhand/core/config/CacheStartupCleaner.java))
-Uygulama bootstrap anında ayağa kalkarken geçici sayaç veya eski kilit anahtarlarını temizleyerek temiz bir başlangıç durumu garantiler.
+* **GET hatası** (Redis erişilemez veya bozuk/uyumsuz JSON): method gövdesi çalışır, sonuç DB'den gelir; ayrıca bozuk key için best-effort `evict` denenir.
+* **PUT hatası:** cache doldurulamaz, sonraki istek tekrar DB'ye gider.
+* **EVICT/CLEAR hatası:** yutulur. Redis geri geldiğinde ilgili key **TTL dolana kadar bayat** kalabilir; bu bilinen bir trade-off'tur.
+
+[`CacheStartupCleaner`](../src/main/java/com/serhat/secondhand/core/config/CacheStartupCleaner.java) tamamen yorum satırındadır; **açılışta cache veya Redis DB flush edilmez**. Format değişikliklerinde çözüm `CACHE_VERSION`'ı artırmaktır.
+
+---
+
+## 5. Yeni Cache Ekleme
+
+1. [`CacheConfig`](../src/main/java/com/serhat/secondhand/core/config/CacheConfig.java) içinde uygun TTL config'i ile `.withCacheConfiguration("<modül>:<ad>", ...)` ekle; eklenmezse 30 dk varsayılanı geçerli olur.
+2. Servis metoduna `@Cacheable(value = "<modül>:<ad>", key = ...)` koy. Dönüş tipi `@class` ile serialize edilebilmeli ve izinli paketlerde olmalı (`com.serhat.secondhand.*`).
+3. Veriyi değiştiren her yola `@CacheEvict` ekle; key'i `allEntries` mı tekil mi seçerken `@Cacheable` key formatına bak (ör. `payment:stats` key'i `userId_provider` olduğu için tamamı temizlenir).
+4. Public bir proxy çağrısı gerekir: aynı sınıf içi (self-call) çağrılarda Spring Cache devreye girmez.
+5. Serialization formatı kırıcı değişirse `CACHE_VERSION`'ı artır.

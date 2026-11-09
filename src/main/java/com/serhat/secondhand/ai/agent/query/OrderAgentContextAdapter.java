@@ -26,6 +26,9 @@ public class OrderAgentContextAdapter implements AgentContextAdapter {
 
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {
+        if (userId == null) {
+            return new AgentContextSection(SOURCE, "Unauthenticated user.", "skipped");
+        }
         try {
             var orderResult = orderQueryService.getUserOrders(userId, OrderListFilter.NONE, PageRequest.of(0, MAX_ITEMS));
             if (orderResult.isError() || orderResult.getData() == null) {
@@ -44,20 +47,41 @@ public class OrderAgentContextAdapter implements AgentContextAdapter {
                             Collectors.counting()
                     ));
 
-            String orderNumbers = orders.stream()
-                    .map(OrderDto::getOrderNumber)
-                    .filter(v -> v != null && !v.isBlank())
-                    .limit(3)
-                    .collect(Collectors.joining(", "));
+            String orderDetails = orders.stream()
+                    .limit(MAX_ITEMS)
+                    .map(OrderAgentContextAdapter::formatOrderLine)
+                    .collect(Collectors.joining("; "));
 
             String summary = "Recent order count=" + orders.size()
                     + ", statuses=" + statusCounts
-                    + (orderNumbers.isBlank() ? "" : ", examples=" + orderNumbers);
+                    + (orderDetails.isBlank() ? "" : ", details=[" + orderDetails + "]");
 
             return new AgentContextSection(SOURCE, summary, "ok");
         } catch (Exception e) {
             log.warn("Failed to build order context for user {}: {}", userId, e.getMessage());
             return new AgentContextSection(SOURCE, "Order data is temporarily unavailable.", "unavailable");
         }
+    }
+
+    private static String formatOrderLine(OrderDto o) {
+        String items = o.getOrderItems() == null ? "-" : o.getOrderItems().stream()
+                .map(item -> item.getListing() != null && item.getListing().getTitle() != null
+                        ? item.getListing().getTitle().trim()
+                        : null)
+                .filter(v -> v != null && !v.isBlank())
+                .limit(3)
+                .collect(Collectors.joining(" + "));
+        String amount = o.getTotalAmount() != null ? o.getTotalAmount().toPlainString() : "-";
+        String cur = o.getCurrency() != null ? o.getCurrency().name() : "";
+        String delivery = o.getDeliveryMethod() != null ? o.getDeliveryMethod().name() : "-";
+        return "%s(status=%s, payment=%s, delivery=%s, total=%s %s, items=%s)".formatted(
+                o.getOrderNumber() != null ? o.getOrderNumber() : "-",
+                o.getStatus() != null ? o.getStatus().name() : "UNKNOWN",
+                o.getPaymentStatus() != null ? o.getPaymentStatus().name() : "-",
+                delivery,
+                amount,
+                cur,
+                items.isBlank() ? "-" : items
+        );
     }
 }

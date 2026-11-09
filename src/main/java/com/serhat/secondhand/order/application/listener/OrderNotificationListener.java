@@ -64,31 +64,39 @@ public class OrderNotificationListener {
             return;
         }
         try {
+            Optional<Order> loaded = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId());
+            Order order = loaded.orElse(event.order());
+            OrderItemSummary summary = summarizeOrder(order);
+
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderCancelled(
                             event.requester().getId(),
-                            event.order().getId(),
-                            event.order().getOrderNumber()
+                            order.getId(),
+                            order.getOrderNumber(),
+                            summary.listingId(),
+                            summary.listingTitle(),
+                            summary.itemCount()
                     )
             );
             if (result.isError()) {
-                orderLog.logNotificationFailed("orderCancelledInApp", event.order().getOrderNumber(), result.getMessage());
+                orderLog.logNotificationFailed("orderCancelledInApp", order.getOrderNumber(), result.getMessage());
             }
 
-            Optional<Order> loaded = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId());
-            Order order = loaded.orElse(event.order());
             Set<Long> counterparties = collectOrderParticipantIds(order);
             counterparties.remove(event.requester().getId());
             for (Long uid : counterparties) {
                 var cr = notificationService.createAndSend(
                         notificationTemplateCatalog.orderCancelledCounterparty(
                                 uid,
-                                event.order().getId(),
-                                event.order().getOrderNumber()
+                                order.getId(),
+                                order.getOrderNumber(),
+                                summary.listingId(),
+                                summary.listingTitle(),
+                                summary.itemCount()
                         )
                 );
                 if (cr.isError()) {
-                    orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", event.order().getOrderNumber(), cr.getMessage());
+                    orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", order.getOrderNumber(), cr.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -100,15 +108,22 @@ public class OrderNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCompleted(OrderCompletedEvent event) {
         try {
+            Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
+            OrderItemSummary summary = summarizeOrder(order);
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderCompleted(
                             event.buyer().getId(),
-                            event.order().getId(),
-                            event.order().getOrderNumber()
+                            order.getId(),
+                            order.getOrderNumber(),
+                            summary.listingId(),
+                            summary.listingTitle(),
+                            summary.itemCount(),
+                            summary.totalAmount(),
+                            summary.currency()
                     )
             );
             if (result.isError()) {
-                orderLog.logNotificationFailed("orderCompletedInApp", event.order().getOrderNumber(), result.getMessage());
+                orderLog.logNotificationFailed("orderCompletedInApp", order.getOrderNumber(), result.getMessage());
             }
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCompletedInApp", event.order().getOrderNumber(), e.getMessage());
@@ -119,15 +134,22 @@ public class OrderNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderRefunded(OrderRefundedEvent event) {
         try {
+            Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
+            OrderItemSummary summary = summarizeOrder(order);
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderRefunded(
                             event.buyer().getId(),
-                            event.order().getId(),
-                            event.order().getOrderNumber()
+                            order.getId(),
+                            order.getOrderNumber(),
+                            summary.listingId(),
+                            summary.listingTitle(),
+                            summary.itemCount(),
+                            summary.totalAmount(),
+                            summary.currency()
                     )
             );
             if (result.isError()) {
-                orderLog.logNotificationFailed("orderRefundedInApp", event.order().getOrderNumber(), result.getMessage());
+                orderLog.logNotificationFailed("orderRefundedInApp", order.getOrderNumber(), result.getMessage());
             }
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderRefundedInApp", event.order().getOrderNumber(), e.getMessage());
@@ -137,18 +159,27 @@ public class OrderNotificationListener {
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderStatusChanged(OrderStatusChangedEvent event) {
+        if ("COMPLETED".equalsIgnoreCase(event.newStatus())) {
+            // OrderCompletedEvent already dispatches the dedicated ORDER_COMPLETED notification.
+            return;
+        }
         try {
+            Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
+            OrderItemSummary summary = summarizeOrder(order);
             var result = notificationService.createAndSend(
                     notificationTemplateCatalog.orderStatusChanged(
-                            event.order().getUser().getId(),
-                            event.order().getId(),
-                            event.order().getOrderNumber(),
+                            order.getUser().getId(),
+                            order.getId(),
+                            order.getOrderNumber(),
                             event.oldStatus(),
-                            event.newStatus()
+                            event.newStatus(),
+                            summary.listingId(),
+                            summary.listingTitle(),
+                            summary.itemCount()
                     )
             );
             if (result.isError()) {
-                orderLog.logNotificationFailed("orderStatusChangedInApp", event.order().getOrderNumber(), result.getMessage());
+                orderLog.logNotificationFailed("orderStatusChangedInApp", order.getOrderNumber(), result.getMessage());
             }
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderStatusChangedInApp", event.order().getOrderNumber(), e.getMessage());
@@ -162,12 +193,14 @@ public class OrderNotificationListener {
         String orderNumber = event.order().getOrderNumber();
         try {
             Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
+            OrderItemSummary summary = summarizeOrder(order);
             Long buyerId = order.getUser() != null ? order.getUser().getId() : null;
             for (Long uid : collectOrderParticipantIds(order)) {
                 var result = notificationService.createAndSend(
                         notificationTemplateCatalog.orderCancelledShipDeadline(
                                 uid, order.getId(), orderNumber,
-                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, !uid.equals(buyerId)));
+                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, !uid.equals(buyerId),
+                                summary.listingId(), summary.listingTitle(), summary.itemCount()));
                 if (result.isError()) {
                     orderLog.logNotificationFailed("orderShipDeadlineCancelledInApp", orderNumber, result.getMessage());
                 }
@@ -193,8 +226,18 @@ public class OrderNotificationListener {
     }
 
     private void sendBuyerInAppNotification(Long buyerId, OrderDto orderDto) {
+        List<OrderItemDto> items = orderDto.getOrderItems();
+        OrderItemDto firstItem = (items != null && !items.isEmpty()) ? items.get(0) : null;
+        String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
+        UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
+        Integer itemCount = items != null ? items.size() : null;
+        String totalAmount = orderDto.getTotalAmount() != null ? orderDto.getTotalAmount().toPlainString() : null;
+        String currency = orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY";
+
         var result = notificationService.createAndSend(
-                notificationTemplateCatalog.orderCreated(buyerId, orderDto.getId(), orderDto.getOrderNumber())
+                notificationTemplateCatalog.orderCreated(
+                        buyerId, orderDto.getId(), orderDto.getOrderNumber(),
+                        listingId, listingTitle, itemCount, totalAmount, currency)
         );
         if (result.isError()) {
             orderLog.logNotificationFailed("buyerOrderCreatedInApp", orderDto.getOrderNumber(), result.getMessage());
@@ -217,13 +260,33 @@ public class OrderNotificationListener {
             OrderItemDto firstItem = sellerItems.isEmpty() ? null : sellerItems.get(0);
             String listingTitle = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getTitle() : null;
             UUID listingId = firstItem != null && firstItem.getListing() != null ? firstItem.getListing().getId() : null;
+            String totalAmount = orderDto.getTotalAmount() != null ? orderDto.getTotalAmount().toPlainString() : null;
+            String currency = orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY";
 
             var result = notificationService.createAndSend(
-                    notificationTemplateCatalog.orderReceived(sellerId, orderDto.getId(), orderDto.getOrderNumber(), listingId, listingTitle)
+                    notificationTemplateCatalog.orderReceived(
+                            sellerId, orderDto.getId(), orderDto.getOrderNumber(),
+                            listingId, listingTitle, sellerItems.size(), totalAmount, currency)
             );
             if (result.isError()) {
                 orderLog.logNotificationFailed("sellerOrderReceivedInApp", orderDto.getOrderNumber(), result.getMessage());
             }
         }
+    }
+
+    private record OrderItemSummary(UUID listingId, String listingTitle, Integer itemCount, String totalAmount, String currency) {}
+
+    private static OrderItemSummary summarizeOrder(Order order) {
+        if (order == null) {
+            return new OrderItemSummary(null, null, null, null, null);
+        }
+        List<OrderItem> items = order.getOrderItems();
+        OrderItem first = (items != null && !items.isEmpty()) ? items.get(0) : null;
+        UUID listingId = (first != null && first.getListing() != null) ? first.getListing().getId() : null;
+        String listingTitle = (first != null && first.getListing() != null) ? first.getListing().getTitle() : null;
+        Integer count = items != null ? items.size() : null;
+        String totalAmount = order.getTotalAmount() != null ? order.getTotalAmount().toPlainString() : null;
+        String currency = order.getCurrency() != null ? order.getCurrency().name() : "TRY";
+        return new OrderItemSummary(listingId, listingTitle, count, totalAmount, currency);
     }
 }

@@ -4,10 +4,16 @@ import com.serhat.secondhand.listing.detail.ListingDetailStrategy;
 import com.serhat.secondhand.listing.domain.entity.ClothingListing;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
+import com.serhat.secondhand.listing.application.size.SizeSystemCatalog;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingAudience;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ClothingDetailStrategy implements ListingDetailStrategy {
+
+    private final SizeSystemCatalog sizeCatalog;
 
     @Override
     public String getDetailSummary(Listing listing) {
@@ -26,8 +32,9 @@ public class ClothingDetailStrategy implements ListingDetailStrategy {
         }
         String color = clothing.getColor() != null ? clothing.getColor().getLabel().toLowerCase() : null;
         String condition = clothing.getCondition() != null ? clothing.getCondition().getLabel().toLowerCase() : null;
-        String gender = clothing.getClothingGender() != null ? clothing.getClothingGender().getLabel().toLowerCase() : null;
-        String category = clothing.getClothingCategory() != null ? clothing.getClothingCategory().getLabel().toLowerCase() : null;
+        ClothingAudience audience = clothing.getAudience();
+        String size = SizeSystemCatalog.ONE_SIZE.equals(clothing.getSizeSystem())
+                ? null : sizeCatalog.label(clothing.getSizeSystem(), clothing.getSizeKey());
 
         StringBuilder sb = new StringBuilder("Bu ürün");
         if (brand != null && !brand.isBlank()) {
@@ -42,11 +49,11 @@ public class ClothingDetailStrategy implements ListingDetailStrategy {
         if (condition != null && !condition.isBlank()) {
             sb.append(", ").append(condition).append(" durumda");
         }
-        if (gender != null && !gender.isBlank()) {
-            sb.append(", ").append(gender).append(" için");
+        if (size != null) {
+            sb.append(", ").append(size).append(" beden");
         }
-        if (category != null && !category.isBlank()) {
-            sb.append(" ").append(category);
+        if (audience != null && audience != ClothingAudience.UNISEX) {
+            sb.append(", ").append(audience.getLabel().toLowerCase()).append(" için");
         }
         sb.append(" bir giyim ürünüdür.");
 

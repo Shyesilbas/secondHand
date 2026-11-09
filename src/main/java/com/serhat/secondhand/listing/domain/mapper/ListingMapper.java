@@ -33,6 +33,7 @@ import org.hibernate.Hibernate;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.serhat.secondhand.inventory.application.InventoryService;
+import com.serhat.secondhand.listing.application.size.SizeSystemCatalog;
 
 @Mapper(
     componentModel = "spring",
@@ -44,6 +45,9 @@ public abstract class ListingMapper {
 
     @Autowired
     protected InventoryService inventoryService;
+
+    @Autowired
+    protected SizeSystemCatalog sizeSystemCatalog;
 
     // ──────────────────────────────────────────────
     //  Shared nested mapping methods
@@ -96,6 +100,7 @@ public abstract class ListingMapper {
     @Mapping(target = "sellerAccountCreationDate", source = "seller.accountCreationDate")
     @Mapping(target = "type", source = "listingType")
     @Mapping(target = "quantity", expression = "java(inventoryService.getAvailableQuantity(clothingListing.getId()))")
+    @Mapping(target = "sizeLabel", expression = "java(sizeSystemCatalog.label(clothingListing.getSizeSystem(), clothingListing.getSizeKey()))")
     public abstract ClothingListingDto toClothingDto(ClothingListing clothingListing);
 
     @Mapping(target = "sellerName", source = "seller.name")
@@ -224,7 +229,8 @@ public abstract class ListingMapper {
     @Mapping(target = "listingType", constant = "CLOTHING")
     @Mapping(target = "brand", ignore = true)
     @Mapping(target = "clothingType", ignore = true)
-    @Mapping(target = "purchaseDate", ignore = true)
+    @Mapping(target = "sizeSystem", expression = "java(blankToNull(request.sizeSystem()))")
+    @Mapping(target = "sizeKey", expression = "java(blankToNull(request.sizeKey()))")
     @Mapping(target = "title", source = "base.title")
     @Mapping(target = "description", source = "base.description")
     @Mapping(target = "price", source = "base.price")
@@ -310,17 +316,18 @@ public abstract class ListingMapper {
         if (entity == null || request == null) return;
         applyBase(entity, request.base());
         if (request.color() != null) request.color().ifPresent(entity::setColor);
-        if (request.purchaseYear() != null) request.purchaseYear().ifPresent(y -> entity.setPurchaseDate(java.time.LocalDate.of(y, 1, 1)));
+        if (request.purchaseYear() != null) entity.setPurchaseYear(request.purchaseYear().orElse(null));
         if (request.condition() != null) request.condition().ifPresent(entity::setCondition);
-        if (request.size() != null) request.size().ifPresent(entity::setSize);
-        if (request.shoeSizeEu() != null) request.shoeSizeEu().ifPresent(entity::setShoeSizeEu);
-        if (request.material() != null) request.material().ifPresent(entity::setMaterial);
-        if (request.clothingGender() != null) request.clothingGender().ifPresent(entity::setClothingGender);
-        if (request.clothingCategory() != null) request.clothingCategory().ifPresent(entity::setClothingCategory);
-        
-        if (request.fit() != null) request.fit().ifPresent(entity::setFit);
-        if (request.pattern() != null) request.pattern().ifPresent(entity::setPattern);
-        if (request.fabricType() != null) request.fabricType().ifPresent(entity::setFabricType);
+        if (request.audience() != null) request.audience().ifPresent(entity::setAudience);
+        if (request.sizeSystem() != null) entity.setSizeSystem(request.sizeSystem().map(this::blankToNull).orElse(null));
+        if (request.sizeKey() != null) entity.setSizeKey(request.sizeKey().map(this::blankToNull).orElse(null));
+        if (request.fit() != null) entity.setFit(request.fit().orElse(null));
+        if (request.pattern() != null) entity.setPattern(request.pattern().orElse(null));
+        if (request.fabricType() != null) entity.setFabricType(request.fabricType().orElse(null));
+        if (request.attributes() != null) {
+            entity.getAttributes().clear();
+            request.attributes().ifPresent(entity.getAttributes()::putAll);
+        }
     }
 
     protected String blankToNull(String value) {

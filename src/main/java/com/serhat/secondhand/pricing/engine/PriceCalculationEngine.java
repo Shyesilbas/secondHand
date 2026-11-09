@@ -69,8 +69,9 @@ public class PriceCalculationEngine {
             int defaultQuantity = cartItem.getQuantity() != null ? cartItem.getQuantity() : 1;
             BigDecimal defaultUnitPrice = PricingUtil.scale(listing.getPrice());
 
+            // The accepted offer's quantity and total price belong to its own listing's line only.
             OfferPriceHandler.OfferPriceResult offerResult = OfferPriceHandler.applyOfferOverride(
-                    offerOverride, defaultQuantity, defaultUnitPrice);
+                    isOfferLine ? offerOverride : null, defaultQuantity, defaultUnitPrice);
 
             int quantity = offerResult.getQuantity();
             BigDecimal unitPrice = offerResult.getUnitPrice();

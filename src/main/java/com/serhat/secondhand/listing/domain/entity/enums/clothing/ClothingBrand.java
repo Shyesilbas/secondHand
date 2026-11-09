@@ -43,4 +43,9 @@ public class ClothingBrand implements Labelable, Persistable<UUID> {
 
     @Column(nullable = false, length = 120)
     private String label;
+
+    /** Price segment; drives the generated listing prices. */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private BrandSegment segment;
 }

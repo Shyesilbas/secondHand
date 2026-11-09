@@ -6,6 +6,7 @@ import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.repository.CouponRepository;
+import com.serhat.secondhand.coupon.util.CouponErrorCodes;
 import com.serhat.secondhand.coupon.validator.CouponValidator;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
@@ -36,20 +37,46 @@ public class PricingService implements IPricingService {
     }
 
     public PricingResultDto priceCart(User buyer, List<Cart> cartItems, String couponCode, UUID offerListingId, Integer offerQuantity, BigDecimal offerTotalPrice) {
-        OfferPriceHandler.OfferOverride override = null;
-        if (offerListingId != null) {
-            override = OfferPriceHandler.OfferOverride.builder()
-                    .listingId(offerListingId)
-                    .quantity(offerQuantity)
-                    .totalPrice(offerTotalPrice)
-                    .build();
+        return priceCartInternal(buyer, cartItems, couponCode, toOfferOverride(offerListingId, offerQuantity, offerTotalPrice));
+    }
+
+    /**
+     * Checkout pricing: a coupon the buyer asked for must apply. Where {@link #priceCart} drops a
+     * rejected coupon and returns the price without it (preview), this returns the coupon's error code,
+     * so an order is never created at a price the buyer did not see.
+     */
+    @Override
+    public Result<PricingResultDto> priceCartForCheckout(User buyer, List<Cart> cartItems, String couponCode,
+                                                         UUID offerListingId, Integer offerQuantity, BigDecimal offerTotalPrice) {
+        PricingOutcome outcome = price(buyer, cartItems, couponCode, toOfferOverride(offerListingId, offerQuantity, offerTotalPrice));
+        if (outcome.couponRejection() != null) {
+            return Result.error(outcome.couponRejection().getMessage(), outcome.couponRejection().getErrorCode());
         }
-        return priceCartInternal(buyer, cartItems, couponCode, override);
+        return Result.success(outcome.pricing());
+    }
+
+    private OfferPriceHandler.OfferOverride toOfferOverride(UUID offerListingId, Integer offerQuantity, BigDecimal offerTotalPrice) {
+        if (offerListingId == null) {
+            return null;
+        }
+        return OfferPriceHandler.OfferOverride.builder()
+                .listingId(offerListingId)
+                .quantity(offerQuantity)
+                .totalPrice(offerTotalPrice)
+                .build();
     }
 
     private PricingResultDto priceCartInternal(User buyer, List<Cart> cartItems, String couponCode, OfferPriceHandler.OfferOverride offerOverride) {
+        return price(buyer, cartItems, couponCode, offerOverride).pricing();
+    }
+
+    /** {@code couponRejection} is set when a coupon code was given but not applied. */
+    private record PricingOutcome(PricingResultDto pricing, Result<Void> couponRejection) {
+    }
+
+    private PricingOutcome price(User buyer, List<Cart> cartItems, String couponCode, OfferPriceHandler.OfferOverride offerOverride) {
         if (cartItems == null || cartItems.isEmpty()) {
-            return pricingMapper.toEmptyResult();
+            return new PricingOutcome(pricingMapper.toEmptyResult(), null);
         }
 
         List<Long> sellerIds = cartItems.stream()
@@ -63,29 +90,27 @@ public class PricingService implements IPricingService {
         // 1. Calculate pricing without coupon first to get true subtotal after campaigns
         PricingResultDto campaignPricing = priceCalculationEngine.calculateCartPricing(cartItems, campaignsBySeller, null, offerOverride);
 
-        Coupon coupon = null;
         String normalizedCouponCode = pricingMapper.normalizeCouponCode(couponCode);
-
-        if (normalizedCouponCode != null) {
-            coupon = couponRepository.findByCodeIgnoreCase(normalizedCouponCode).orElse(null);
-            if (coupon != null) {
-                Set<ListingType> cartTypes = priceCalculationEngine.extractCartTypes(cartItems);
-                BigDecimal postCampaignSubtotal = campaignPricing.getSubtotalAfterCampaigns();
-                
-                Result<Void> validationResult = couponValidator.validateCouponForCart(
-                        coupon, buyer, cartTypes, postCampaignSubtotal);
-                
-                if (validationResult.isError()) {
-                    coupon = null;
-                }
-            }
+        if (normalizedCouponCode == null) {
+            return new PricingOutcome(campaignPricing, null);
         }
 
+        Coupon coupon = couponRepository.findByCodeIgnoreCase(normalizedCouponCode).orElse(null);
         if (coupon == null) {
-            return campaignPricing;
+            return new PricingOutcome(campaignPricing, Result.error(CouponErrorCodes.COUPON_NOT_FOUND));
         }
 
-        return priceCalculationEngine.calculateCartPricing(cartItems, campaignsBySeller, coupon, offerOverride);
+        Set<ListingType> cartTypes = priceCalculationEngine.extractCartTypes(cartItems);
+        BigDecimal postCampaignSubtotal = campaignPricing.getSubtotalAfterCampaigns();
+        Result<Void> validationResult = couponValidator.validateCouponForCart(
+                coupon, buyer, cartTypes, postCampaignSubtotal);
+        if (validationResult.isError()) {
+            return new PricingOutcome(campaignPricing, validationResult);
+        }
+
+        PricingResultDto couponPricing = priceCalculationEngine.calculateCartPricing(cartItems, campaignsBySeller, coupon, offerOverride);
+        boolean noDiscount = couponPricing.getCouponDiscount() == null || couponPricing.getCouponDiscount().signum() <= 0;
+        return new PricingOutcome(couponPricing, noDiscount ? Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE) : null);
     }
 
     private BigDecimal calculatePreliminarySubtotal(List<Cart> cartItems) {

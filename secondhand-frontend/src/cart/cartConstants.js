@@ -18,6 +18,7 @@ export const CART_CHECKOUT_STEPS = Object.freeze([
 export const CART_MESSAGES = Object.freeze({
  RESERVATION_FAILED: 'We could not reserve the items in your cart. Some may be out of stock.',
  COUPON_NOT_APPLIED: 'The coupon could not be applied; prices are shown without it.',
+ COUPON_NO_LONGER_APPLIES: 'Your coupon no longer applies, so payment cannot go through with it. Go back to your cart and remove it to continue.',
  PRICING_PREVIEW_FAILED: 'We could not load the final price. The total shown is an estimate until it loads.',
  CHECKOUT_FAILED: 'Checkout failed',
  CHECKOUT_FAILED_TITLE: 'Checkout Failed',

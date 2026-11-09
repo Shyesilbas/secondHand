@@ -292,6 +292,9 @@ export const API_ENDPOINTS = {
         REAL_ESTATE: {
             ATTRIBUTES: (typeId) => `/v1/catalog/real-estate/attributes?typeId=${encodeURIComponent(typeId)}`,
         },
+        CLOTHING: {
+            ATTRIBUTES: (typeId) => `/v1/catalog/clothing/attributes?typeId=${encodeURIComponent(typeId)}`,
+        },
         BOOKS: {
             EDITIONS_BY_ISBN: (isbn) => `/v1/catalog/books/editions?isbn=${encodeURIComponent(isbn)}`,
             SEARCH: (q) => `/v1/catalog/books/search?q=${encodeURIComponent(q)}`,

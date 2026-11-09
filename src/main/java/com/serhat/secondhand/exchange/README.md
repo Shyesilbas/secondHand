@@ -5,7 +5,7 @@ The `exchange` domain provides multi-currency conversion rates between TRY, USD,
 
 ## Architecture Overview
 - **External Integration:** Integrates with ExchangeRate-API via `RestTemplate` with strict connect (5s) and read (10s) timeouts.
-- **Two-Hour Redis Caching:** Responses are cached via `@Cacheable(value = "exchangeRates")` with a 2-hour TTL (`Duration.ofHours(2)`) to minimize external API consumption and ensure resilience against remote outages.
+- **Two-Hour Redis Caching:** Responses are cached via `@Cacheable(value = "payment:exchangeRates")` with a 2-hour TTL (`Duration.ofHours(2)`) to minimize external API consumption and ensure resilience against remote outages.
 - **Input Validation:** Enforces ISO 4217 3-letter currency codes before initiating any network or cache requests.
 
 ## Business Invariants & Constraints

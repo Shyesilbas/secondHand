@@ -47,26 +47,46 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest orderCreated(Long userId, Long orderId, String orderNumber) {
+        return orderCreated(userId, orderId, orderNumber, null, null, null, null, null);
+    }
+
+    public NotificationRequest orderCreated(Long userId, Long orderId, String orderNumber,
+                                            UUID listingId, String listingTitle, Integer itemCount,
+                                            String totalAmount, String currency) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        payload.put(NotificationMetadataKeys.TOTAL_AMOUNT, safe(totalAmount));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
         return NotificationRequest.of(
                 userId,
                 NotificationType.ORDER_CREATED,
                 "Order placed",
                 "Your order #" + safe(orderNumber) + " was placed successfully.",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest orderReceived(Long sellerId, Long orderId, String orderNumber, UUID listingId, String listingTitle) {
-        String title = listingTitle == null || listingTitle.isBlank() ? "New order received" : "New order received";
+        return orderReceived(sellerId, orderId, orderNumber, listingId, listingTitle, null, null, null);
+    }
+
+    public NotificationRequest orderReceived(Long sellerId, Long orderId, String orderNumber,
+                                             UUID listingId, String listingTitle, Integer itemCount,
+                                             String totalAmount, String currency) {
+        String title = "New order received";
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         Map<String, String> payload = new LinkedHashMap<>();
         payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
         payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
         payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
         payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        payload.put(NotificationMetadataKeys.TOTAL_AMOUNT, safe(totalAmount));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
         return NotificationRequest.of(
                 sellerId,
                 NotificationType.ORDER_RECEIVED,
@@ -77,32 +97,49 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest orderCancelled(Long userId, Long orderId, String orderNumber) {
+        return orderCancelled(userId, orderId, orderNumber, null, null, null);
+    }
+
+    public NotificationRequest orderCancelled(Long userId, Long orderId, String orderNumber,
+                                              UUID listingId, String listingTitle, Integer itemCount) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
         return NotificationRequest.of(
                 userId,
                 NotificationType.ORDER_CANCELLED,
                 "Order cancelled",
                 "Order #" + safe(orderNumber) + " was cancelled.",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest orderStatusChanged(Long userId, Long orderId, String orderNumber, String oldStatus, String newStatus) {
+        return orderStatusChanged(userId, orderId, orderNumber, oldStatus, newStatus, null, null, null);
+    }
+
+    public NotificationRequest orderStatusChanged(Long userId, Long orderId, String orderNumber,
+                                                  String oldStatus, String newStatus,
+                                                  UUID listingId, String listingTitle, Integer itemCount) {
         String statusLabel = toTitle(newStatus);
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.OLD_STATUS, safe(oldStatus));
+        payload.put(NotificationMetadataKeys.NEW_STATUS, safe(newStatus));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
         return NotificationRequest.of(
                 userId,
                 NotificationType.ORDER_STATUS_CHANGED,
                 "Order status updated",
                 "Order #" + safe(orderNumber) + " is now " + statusLabel + ".",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber),
-                        NotificationMetadataKeys.OLD_STATUS, safe(oldStatus),
-                        NotificationMetadataKeys.NEW_STATUS, safe(newStatus)
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest listingSold(Long sellerId, UUID listingId, Long orderId, String orderNumber, String listingTitle) {
@@ -122,6 +159,10 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest offerReceived(Long userId, UUID offerId, UUID listingId, String listingTitle) {
+        return offerReceived(userId, offerId, listingId, listingTitle, null, null);
+    }
+
+    public NotificationRequest offerReceived(Long userId, UUID offerId, UUID listingId, String listingTitle, String offerAmount, Integer quantity) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         return NotificationRequest.of(
                 userId,
@@ -129,14 +170,14 @@ public class NotificationTemplateCatalog {
                 "New offer received",
                 "You received a new offer for " + listingText + ".",
                 "/offers",
-                toJson(Map.of(
-                        NotificationMetadataKeys.OFFER_ID, safeUuid(offerId),
-                        NotificationMetadataKeys.LISTING_ID, safeUuid(listingId),
-                        NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle)
-                )));
+                toJson(offerPayload(offerId, listingId, listingTitle, offerAmount, quantity)));
     }
 
     public NotificationRequest offerCountered(Long userId, UUID offerId, UUID listingId, String listingTitle) {
+        return offerCountered(userId, offerId, listingId, listingTitle, null, null);
+    }
+
+    public NotificationRequest offerCountered(Long userId, UUID offerId, UUID listingId, String listingTitle, String offerAmount, Integer quantity) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         return NotificationRequest.of(
                 userId,
@@ -144,14 +185,14 @@ public class NotificationTemplateCatalog {
                 "Counter offer received",
                 "You received a counter offer for " + listingText + ".",
                 "/offers",
-                toJson(Map.of(
-                        NotificationMetadataKeys.OFFER_ID, safeUuid(offerId),
-                        NotificationMetadataKeys.LISTING_ID, safeUuid(listingId),
-                        NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle)
-                )));
+                toJson(offerPayload(offerId, listingId, listingTitle, offerAmount, quantity)));
     }
 
     public NotificationRequest offerAccepted(Long userId, UUID offerId, UUID listingId, String listingTitle) {
+        return offerAccepted(userId, offerId, listingId, listingTitle, null, null);
+    }
+
+    public NotificationRequest offerAccepted(Long userId, UUID offerId, UUID listingId, String listingTitle, String offerAmount, Integer quantity) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         return NotificationRequest.of(
                 userId,
@@ -159,14 +200,14 @@ public class NotificationTemplateCatalog {
                 "Offer accepted",
                 "Your offer for " + listingText + " was accepted.",
                 "/offers",
-                toJson(Map.of(
-                        NotificationMetadataKeys.OFFER_ID, safeUuid(offerId),
-                        NotificationMetadataKeys.LISTING_ID, safeUuid(listingId),
-                        NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle)
-                )));
+                toJson(offerPayload(offerId, listingId, listingTitle, offerAmount, quantity)));
     }
 
     public NotificationRequest offerRejected(Long userId, UUID offerId, UUID listingId, String listingTitle) {
+        return offerRejected(userId, offerId, listingId, listingTitle, null, null);
+    }
+
+    public NotificationRequest offerRejected(Long userId, UUID offerId, UUID listingId, String listingTitle, String offerAmount, Integer quantity) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         return NotificationRequest.of(
                 userId,
@@ -174,29 +215,37 @@ public class NotificationTemplateCatalog {
                 "Offer rejected",
                 "Your offer for " + listingText + " was rejected.",
                 "/offers",
-                toJson(Map.of(
-                        NotificationMetadataKeys.OFFER_ID, safeUuid(offerId),
-                        NotificationMetadataKeys.LISTING_ID, safeUuid(listingId),
-                        NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle)
-                )));
+                toJson(offerPayload(offerId, listingId, listingTitle, offerAmount, quantity)));
     }
 
     public NotificationRequest offerExpired(Long userId, UUID offerId, UUID listingId, String listingTitle, boolean buyerSide) {
+        return offerExpired(userId, offerId, listingId, listingTitle, buyerSide, null, null);
+    }
+
+    public NotificationRequest offerExpired(Long userId, UUID offerId, UUID listingId, String listingTitle, boolean buyerSide, String offerAmount, Integer quantity) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a listing" : ("“" + listingTitle + "”");
         String message = buyerSide
                 ? ("Your offer for " + listingText + " has expired.")
                 : ("An offer for " + listingText + " has expired.");
+        Map<String, String> payload = offerPayload(offerId, listingId, listingTitle, offerAmount, quantity);
+        payload.put(NotificationMetadataKeys.RECIPIENT_ROLE, buyerSide ? "BUYER" : "SELLER");
         return NotificationRequest.of(
                 userId,
                 NotificationType.OFFER_EXPIRED,
                 "Offer expired",
                 message,
                 "/offers",
-                toJson(Map.of(
-                        NotificationMetadataKeys.OFFER_ID, safeUuid(offerId),
-                        NotificationMetadataKeys.LISTING_ID, safeUuid(listingId),
-                        NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle)
-                )));
+                toJson(payload));
+    }
+
+    private Map<String, String> offerPayload(UUID offerId, UUID listingId, String listingTitle, String offerAmount, Integer quantity) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.OFFER_ID, safeUuid(offerId));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.OFFER_AMOUNT, safe(offerAmount));
+        payload.put(NotificationMetadataKeys.QUANTITY, safeId(quantity));
+        return payload;
     }
 
     public NotificationRequest listingPriceDropped(Long userId, UUID listingId, String oldPrice, String newPrice, String listingTitle) {
@@ -219,11 +268,19 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest listingNewFromFollowed(Long userId, UUID listingId, Long sellerId, String listingTitle) {
+        return listingNewFromFollowed(userId, listingId, sellerId, listingTitle, null, null, null);
+    }
+
+    public NotificationRequest listingNewFromFollowed(Long userId, UUID listingId, Long sellerId, String listingTitle,
+                                                      String sellerName, String amountText, String currency) {
         String listingText = listingTitle == null || listingTitle.isBlank() ? "a new listing" : ("“" + listingTitle + "”");
         Map<String, String> payload = new LinkedHashMap<>();
         payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
         payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
         payload.put(NotificationMetadataKeys.SELLER_ID, sellerId == null ? "" : String.valueOf(sellerId));
+        payload.put(NotificationMetadataKeys.SELLER_NAME, safe(sellerName));
+        payload.put(NotificationMetadataKeys.AMOUNT_TEXT, safe(amountText));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
         return NotificationRequest.of(
                 userId,
                 NotificationType.LISTING_NEW_FROM_FOLLOWED,
@@ -240,6 +297,7 @@ public class NotificationTemplateCatalog {
         payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
         payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
         payload.put(NotificationMetadataKeys.ACTOR_USER_ID, safeId(actorUserId));
+        payload.put(NotificationMetadataKeys.ACTOR_NAME, safe(actorName));
         return NotificationRequest.of(
                 sellerId,
                 NotificationType.LISTING_FAVORITED,
@@ -291,13 +349,20 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest paymentSucceeded(Long userId, String amountText, String currency, String listingTitle, String transactionTypeLabel) {
+        return paymentSucceeded(userId, amountText, currency, listingTitle, transactionTypeLabel, null, null);
+    }
+
+    public NotificationRequest paymentSucceeded(Long userId, String amountText, String currency, String listingTitle,
+                                                String transactionTypeLabel, String transactionTypeCode, UUID listingId) {
         String title = "Payment received";
         String listingPart = listingTitle == null || listingTitle.isBlank() ? "" : (" for “" + listingTitle + "”");
         Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
         payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
-        payload.put("amountText", safe(amountText));
-        payload.put("currency", safe(currency));
-        payload.put("transactionType", safe(transactionTypeLabel));
+        payload.put(NotificationMetadataKeys.AMOUNT_TEXT, safe(amountText));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
+        payload.put(NotificationMetadataKeys.TRANSACTION_TYPE, safe(transactionTypeLabel));
+        payload.put(NotificationMetadataKeys.TRANSACTION_TYPE_CODE, safe(transactionTypeCode));
         return NotificationRequest.of(
                 userId,
                 NotificationType.PAYMENT_SUCCESS,
@@ -308,60 +373,102 @@ public class NotificationTemplateCatalog {
     }
 
     public NotificationRequest orderCompleted(Long buyerId, Long orderId, String orderNumber) {
+        return orderCompleted(buyerId, orderId, orderNumber, null, null, null, null, null);
+    }
+
+    public NotificationRequest orderCompleted(Long buyerId, Long orderId, String orderNumber,
+                                              UUID listingId, String listingTitle, Integer itemCount,
+                                              String totalAmount, String currency) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        payload.put(NotificationMetadataKeys.TOTAL_AMOUNT, safe(totalAmount));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
         return NotificationRequest.of(
                 buyerId,
                 NotificationType.ORDER_COMPLETED,
                 "Order completed",
                 "Order #" + safe(orderNumber) + " is completed. Thank you for shopping!",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest orderRefunded(Long buyerId, Long orderId, String orderNumber) {
+        return orderRefunded(buyerId, orderId, orderNumber, null, null, null, null, null);
+    }
+
+    public NotificationRequest orderRefunded(Long buyerId, Long orderId, String orderNumber,
+                                             UUID listingId, String listingTitle, Integer itemCount,
+                                             String totalAmount, String currency) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        payload.put(NotificationMetadataKeys.TOTAL_AMOUNT, safe(totalAmount));
+        payload.put(NotificationMetadataKeys.CURRENCY, safe(currency));
         return NotificationRequest.of(
                 buyerId,
                 NotificationType.ORDER_REFUNDED,
                 "Order refunded",
                 "Order #" + safe(orderNumber) + " has been refunded.",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
-                )));
+                toJson(payload));
     }
 
     /** The system cancelled an order its seller did not ship in time; the buyer is refunded. */
     public NotificationRequest orderCancelledShipDeadline(Long userId, Long orderId, String orderNumber, int deadlineHours, boolean sellerSide) {
+        return orderCancelledShipDeadline(userId, orderId, orderNumber, deadlineHours, sellerSide, null, null, null);
+    }
+
+    public NotificationRequest orderCancelledShipDeadline(Long userId, Long orderId, String orderNumber,
+                                                          int deadlineHours, boolean sellerSide,
+                                                          UUID listingId, String listingTitle, Integer itemCount) {
         String message = sellerSide
                 ? "Order #" + safe(orderNumber) + " was cancelled because it was not shipped within " + deadlineHours + " hours."
                 : "Order #" + safe(orderNumber) + " was cancelled because the seller did not ship it within " + deadlineHours + " hours. Your payment was refunded.";
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.REASON, "SHIP_DEADLINE_MISSED");
+        payload.put(NotificationMetadataKeys.RECIPIENT_ROLE, sellerSide ? "SELLER" : "BUYER");
+        payload.put(NotificationMetadataKeys.DEADLINE_HOURS, String.valueOf(deadlineHours));
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
         return NotificationRequest.of(
                 userId,
                 NotificationType.ORDER_CANCELLED,
                 "Order cancelled",
                 message,
                 sellerSide ? "/profile/i-sold" : "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber),
-                        NotificationMetadataKeys.REASON, "SHIP_DEADLINE_MISSED"
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest orderCancelledCounterparty(Long userId, Long orderId, String orderNumber) {
+        return orderCancelledCounterparty(userId, orderId, orderNumber, null, null, null);
+    }
+
+    public NotificationRequest orderCancelledCounterparty(Long userId, Long orderId, String orderNumber,
+                                                          UUID listingId, String listingTitle, Integer itemCount) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.REASON, "COUNTERPARTY_CANCELLED");
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
         return NotificationRequest.of(
                 userId,
                 NotificationType.ORDER_CANCELLED,
                 "Order cancelled",
                 "Order #" + safe(orderNumber) + " was cancelled by the other party.",
                 "/profile/orders",
-                toJson(Map.of(
-                        NotificationMetadataKeys.ORDER_ID, safeId(orderId),
-                        NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber)
-                )));
+                toJson(payload));
     }
 
     public NotificationRequest greatSellerAchieved(Long userId) {

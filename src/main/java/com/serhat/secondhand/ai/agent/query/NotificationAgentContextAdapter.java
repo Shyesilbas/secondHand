@@ -23,26 +23,42 @@ public class NotificationAgentContextAdapter implements AgentContextAdapter {
 
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {
+        if (userId == null) {
+            return new AgentContextSection(SOURCE, "Unauthenticated user.", "skipped");
+        }
         try {
             Long unreadCount = notificationService.getUnreadCount(userId);
             List<NotificationDto> notifications = notificationService
                     .getUserNotifications(userId, false, PageRequest.of(0, MAX_ITEMS))
                     .getContent();
 
-            String titles = notifications.stream()
-                    .map(NotificationDto::getTitle)
-                    .filter(v -> v != null && !v.isBlank())
-                    .limit(3)
-                    .collect(Collectors.joining(", "));
+            String details = notifications.stream()
+                    .limit(MAX_ITEMS)
+                    .map(NotificationAgentContextAdapter::formatNotification)
+                    .collect(Collectors.joining("; "));
 
             String summary = "Unread notifications=" + unreadCount
                     + ", recent items=" + notifications.size()
-                    + (titles.isBlank() ? "" : ", examples=" + titles);
+                    + (details.isBlank() ? "" : ", details=[" + details + "]");
 
             return new AgentContextSection(SOURCE, summary, "ok");
         } catch (Exception e) {
             log.warn("Failed to build notification context for user {}: {}", userId, e.getMessage());
             return new AgentContextSection(SOURCE, "Notification data is temporarily unavailable.", "unavailable");
         }
+    }
+
+    private static String formatNotification(NotificationDto n) {
+        String title = n.getTitle() != null ? n.getTitle().trim() : "-";
+        String msg = n.getMessage() != null ? n.getMessage().trim().replace('\n', ' ') : "";
+        if (msg.length() > 100) {
+            msg = msg.substring(0, 100).trim() + "…";
+        }
+        return "%s(type=%s, read=%s%s)".formatted(
+                title,
+                n.getType() != null ? n.getType().name() : "-",
+                Boolean.TRUE.equals(n.getIsRead()),
+                msg.isBlank() ? "" : ", msg=" + msg
+        );
     }
 }

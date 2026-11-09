@@ -24,6 +24,9 @@ public class ListingAgentContextAdapter implements AgentContextAdapter {
 
     @Override
     public AgentContextSection fetch(Long userId, AgentUiContextRequest uiContext) {
+        if (userId == null) {
+            return new AgentContextSection(SOURCE, "Unauthenticated user.", "skipped");
+        }
         try {
             List<ListingDto> listings = listingService.getMyListings(userId, 0, MAX_ITEMS).getContent();
             if (listings.isEmpty()) {
@@ -37,20 +40,36 @@ public class ListingAgentContextAdapter implements AgentContextAdapter {
                             Collectors.counting()
                     ));
 
-            String titles = listings.stream()
-                    .map(ListingDto::getTitle)
-                    .filter(v -> v != null && !v.isBlank())
-                    .limit(3)
-                    .collect(Collectors.joining(", "));
+            String items = listings.stream()
+                    .limit(MAX_ITEMS)
+                    .map(ListingAgentContextAdapter::formatSellerListing)
+                    .collect(Collectors.joining("; "));
 
             String summary = "Recent listing count=" + listings.size()
                     + ", statuses=" + statusCounts
-                    + (titles.isBlank() ? "" : ", examples=" + titles);
+                    + (items.isBlank() ? "" : ", items=[" + items + "]");
 
             return new AgentContextSection(SOURCE, summary, "ok");
         } catch (Exception e) {
             log.warn("Failed to build listing context for user {}: {}", userId, e.getMessage());
             return new AgentContextSection(SOURCE, "Listing data is temporarily unavailable.", "unavailable");
         }
+    }
+
+    private static String formatSellerListing(ListingDto l) {
+        String price = l.getPrice() != null ? l.getPrice().toPlainString() : "-";
+        String cur = l.getCurrency() != null ? l.getCurrency().name() : "";
+        long views = l.getViewCount() != null ? l.getViewCount() : 0L;
+        long favs = l.getFavoriteCount() != null ? l.getFavoriteCount() : 0L;
+        return "%s(no=%s, type=%s, status=%s, price=%s %s, views=%d, favorites=%d)".formatted(
+                l.getTitle() != null ? l.getTitle().trim() : "-",
+                l.getListingNo() != null ? l.getListingNo() : "-",
+                l.getType() != null ? l.getType().name() : "-",
+                l.getStatus() != null ? l.getStatus().name() : "UNKNOWN",
+                price,
+                cur,
+                views,
+                favs
+        );
     }
 }

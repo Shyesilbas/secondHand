@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,12 +88,6 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
     }
 
     @Override
-    protected Result<Void> preProcess(ClothingListing entity, ClothingCreateRequest request) {
-        entity.setPurchaseDate(toPurchaseDate(request.purchaseYear()));
-        return Result.success();
-    }
-
-    @Override
     protected Result<Void> validate(ClothingListing entity) {
         return listingValidationEngine.cleanupAndValidate(entity, clothingSpecValidators);
     }
@@ -136,9 +129,5 @@ public class ClothingListingService extends AbstractListingService<ClothingListi
 
     public Page<ListingDto> filterClothing(ClothingListingFilterDto filters) {
         return genericFilterService.filter(filters, ClothingListing.class, predicateBuilder);
-    }
-
-    private LocalDate toPurchaseDate(Integer year) {
-        return year == null ? null : LocalDate.of(year, 1, 1);
     }
 }

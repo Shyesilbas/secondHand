@@ -158,9 +158,12 @@ const CheckoutPage = () => {
   });
 
   const pricing = pricingQueryData?.data || null;
+  // The preview drops a coupon that no longer applies; checkout rejects it, so say so before the buyer pays.
+  const requestedCoupon = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
+  const couponDropped = pricingQueryData?.success === true && requestedCoupon != null && !pricing?.couponCode;
   const couponError = pricingQueryData?.success === false
     ? pricingQueryData.error?.response?.data?.message || CART_MESSAGES.COUPON_NOT_APPLIED
-    : null;
+    : couponDropped ? CART_MESSAGES.COUPON_NO_LONGER_APPLIES : null;
 
   const calculateTotal = useCallback(() => {
     if (pricing?.total != null) {

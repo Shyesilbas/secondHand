@@ -9,7 +9,7 @@ Bu doküman, **secondHand** platformunun yapay zeka asistanı olan **Aura**'nın
 Aura, kullanıcının platform içi niyetini analiz ederek yalnızca statik metin üretmekle kalmaz; kullanıcının geçmiş siparişlerini, odaklandığı ilanı, sepetini, okunmamış bildirimlerini ve kişisel tercihlerini bağlama enjekte eden ve gerektiğinde pazar yerinde canlı filtreli arama yürüten otonom bir asistandır.
 
 ```
-[İstemci / Web UI] ──(POST /api/v1/ai/agents/query)──► [AgentController]
+[Client / Web UI] ──(POST /api/v1/ai/agents/query)──► [AgentController]
                                                                │
      ┌─────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────┐
      ▼                                                         ▼                                                         ▼
@@ -89,7 +89,7 @@ Aura, kullanıcılar ile yapılan sohbetleri oturumlar arasında unutmamak için
 1. **Kural Tabanlı Anlık Çıkarım (Regex Patterns):**
    - Kullanıcının adı (`adım Serhat`), bütçesi (`bütçem 10000 TL`), ilgilendiği kategoriler veya iletişim tonu tercihleri (`resmi`, `samimi`) regex kalıplarıyla anında yakalanır.
 2. **Asenkron LLM Bellek Çıkarımı (`@Async`):**
-   - Her `N` mesajda bir (`MEMORY_UPDATE_EVERY_N_USER_MESSAGES = 3`) arka plan iş parçacığı tetiklenir.
+   - Her `N` mesajda bir (`MEMORY_UPDATE_EVERY_N_USER_MESSAGES = 3`) arka plan thread'i tetiklenir.
    - Son konuşma geçmişi analiz edilerek `UserMemory` tablosundaki profil güncellenir (`SecondHandProfileDto`).
    - Bu işlem ana istek-yanıt döngüsünü bloklamaz.
 

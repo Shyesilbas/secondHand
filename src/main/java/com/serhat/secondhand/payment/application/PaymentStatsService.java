@@ -1,8 +1,10 @@
 package com.serhat.secondhand.payment.application;
 
+import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
 import com.serhat.secondhand.payment.entity.Payment;
+import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
 import com.serhat.secondhand.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class PaymentStatsService {
 
     private final PaymentRepository paymentRepository;
+    private final EscrowRepository escrowRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentContextResolver paymentContextResolver;
 
@@ -32,13 +35,21 @@ public class PaymentStatsService {
         log.info("[CACHE MISS] payment:stats for userId: {}", userId);
 
         List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, providerName);
-        Object[] stats = statsRows.isEmpty() ? new Object[]{0L, 0L, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO} : statsRows.get(0);
+        Object[] stats = statsRows.isEmpty()
+                ? new Object[] { 0L, 0L, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO }
+                : statsRows.get(0);
 
         long total = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
         long successful = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
         BigDecimal incomingAmount = stats[2] != null ? (BigDecimal) stats[2] : BigDecimal.ZERO;
         BigDecimal outgoingAmount = stats[3] != null ? (BigDecimal) stats[3] : BigDecimal.ZERO;
-        BigDecimal escrowAmount = stats[4] != null ? (BigDecimal) stats[4] : BigDecimal.ZERO;
+        BigDecimal escrowAmount;
+        if (providerName == null || providerName.isBlank()) {
+            BigDecimal pendingEscrow = escrowRepository.sumAmountBySellerIdAndStatus(userId, PaymentStatus.ESCROW);
+            escrowAmount = pendingEscrow != null ? pendingEscrow : BigDecimal.ZERO;
+        } else {
+            escrowAmount = stats[4] != null ? (BigDecimal) stats[4] : BigDecimal.ZERO;
+        }
 
         Map<String, Object> result = new java.util.HashMap<>();
         result.put("totalPayments", total);
@@ -64,8 +75,7 @@ public class PaymentStatsService {
                     filter.dateTo(),
                     filter.amountMin(),
                     filter.amountMax(),
-                    filter.searchTerm()
-            );
+                    filter.searchTerm());
             paymentsPage = paymentRepository.findAll(spec, pageable);
         } else {
             paymentsPage = paymentRepository.findByUserId(userId, pageable);
@@ -75,7 +85,8 @@ public class PaymentStatsService {
     }
 
     private boolean isFilterPresent(PaymentFilter filter) {
-        if (filter == null) return false;
+        if (filter == null)
+            return false;
         return filter.transactionType() != null ||
                 filter.providerName() != null ||
                 filter.paymentDirection() != null ||
@@ -102,11 +113,10 @@ public class PaymentStatsService {
                 inferredData.direction(),
                 baseDto.listingId(),
                 payment.getListingTitle(), // Direct snapshot
-                payment.getListingNo(),    // Direct snapshot
+                payment.getListingNo(), // Direct snapshot
                 baseDto.processedAt(),
                 baseDto.status(),
                 baseDto.isSuccess(),
-                baseDto.description()
-        );
+                baseDto.description());
     }
 }

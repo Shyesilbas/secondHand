@@ -219,11 +219,18 @@ public class SellerFollowService {
                 emailEventPublisher.publish(new NewListingEmailEvent(follow.getFollower(), subject, data));
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
                 
+                String sellerFullName = ((seller.getName() == null ? "" : seller.getName()) + " "
+                        + (seller.getSurname() == null ? "" : seller.getSurname())).trim();
+                String amountText = listing.getPrice() != null ? listing.getPrice().toPlainString() : null;
+                String currency = listing.getCurrency() != null ? listing.getCurrency().name() : "TRY";
                 var request = notificationTemplateCatalog.listingNewFromFollowed(
                         follow.getFollower().getId(),
                         listing.getId(),
                         seller.getId(),
-                        listing.getTitle()
+                        listing.getTitle(),
+                        sellerFullName,
+                        amountText,
+                        currency
                 );
                 notificationEventPublisher.publishDispatch(
                         request,

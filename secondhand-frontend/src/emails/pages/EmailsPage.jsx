@@ -126,8 +126,8 @@ const EmailsPageFeedback = ({ error, emails, filterType, searchTerm, onRetry, on
           {searchTerm?.trim()
             ? t('no_emails_matching_search', 'Arama kriterlerinize uygun e-posta bulunamadı.')
             : filterType === EMAIL_FILTERS.ALL
-            ? EMAIL_MESSAGES.NO_EMAILS_ALL
-            : t('no_emails_in_folder', 'Bu klasörde henüz bir e-posta bulunmuyor.')}
+              ? EMAIL_MESSAGES.NO_EMAILS_ALL
+              : t('no_emails_in_folder', 'Bu klasörde henüz bir e-posta bulunmuyor.')}
         </p>
         {searchTerm?.trim() && onClearSearch && (
           <button
@@ -374,90 +374,36 @@ const EmailsPage = ({ embedded = false }) => {
           : 'flex h-dvh min-h-0 flex-col overflow-hidden bg-background-secondary'
       }
     >
-      {/* Header Bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-background-primary px-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          {!embedded && (
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="shrink-0 rounded p-2 text-text-tertiary transition-colors hover:bg-background-tertiary hover:text-text-primary"
-              aria-label={t('back', 'Geri')}
-            >
-              <ArrowLeftIcon className="h-5 w-5" strokeWidth={1.5} />
-            </button>
-          )}
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-base font-semibold tracking-tight text-text-primary">
-              {t('mailbox', 'Posta Kutusu')}
-            </h1>
-            {globalUnreadCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary tabular-nums">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
-                {globalUnreadCount} {t('unread_lower', 'okunmamış')}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="min-w-0 max-w-md flex-1 px-2">
-          <div className="relative">
-            <input
-              id="mail-search"
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t('search_mail', 'Konu veya içerikte ara...')}
-              className="h-9 w-full rounded border border-border bg-background-secondary pl-9 pr-8 text-xs text-text-primary transition-colors placeholder:text-text-muted focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-2 focus:ring-border-focus/20"
-            />
-            <MagnifyingGlassIcon
-              className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted"
-              strokeWidth={1.5}
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-text-muted hover:text-text-primary"
-                aria-label={t('clear_search', 'Aramayı temizle')}
-              >
-                <X className="h-3.5 w-3.5" strokeWidth={1.5} />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="rounded p-2 text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-40"
-            title={t('refresh', 'Yenile')}
-            aria-label={t('refresh', 'Yenile')}
-          >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />
-          </button>
-          <button
-            type="button"
-            onClick={handleDeleteAllEmails}
-            disabled={isDeleting || filteredEmails.length === 0}
-            className="rounded p-2 text-text-secondary transition-colors hover:bg-background-secondary hover:text-status-error disabled:opacity-30"
-            title={t('delete_all', 'Tümünü Sil')}
-            aria-label={t('delete_all', 'Tümünü Sil')}
-          >
-            <Trash2 className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-        </div>
-      </header>
-
       {/* 3-Column Editorial Layout: Folders | Messages | Reading Pane */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[204px_340px_minmax(0,1fr)] xl:grid-cols-[220px_360px_minmax(0,1fr)]">
         {/* 1. Folders Sidebar */}
         <aside className="hidden min-h-0 w-full min-w-0 flex-col border-r border-border bg-background-secondary/40 lg:flex">
-          <nav className="flex-1 space-y-0.5 overflow-y-auto p-2.5" aria-label={t('mail_folders', 'E-posta klasörleri')}>
+          {/* Folders Top Header */}
+          <div className="flex h-11 shrink-0 items-center justify-between border-b border-border bg-background-secondary/30 px-3">
+            <div className="flex min-w-0 items-center gap-2">
+              {!embedded && (
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="shrink-0 rounded p-1 text-text-tertiary transition-colors hover:bg-background-tertiary hover:text-text-primary"
+                  aria-label={t('back', 'Geri')}
+                >
+                  <ArrowLeftIcon className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+              )}
+              <span className="truncate text-xs font-semibold tracking-tight text-text-primary">
+                {t('mailbox', 'Posta Kutusu')}
+              </span>
+            </div>
+            {globalUnreadCount > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-sm bg-background-tertiary px-1.5 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+                {globalUnreadCount}
+              </span>
+            )}
+          </div>
+
+          <nav className="flex-1 space-y-0.5 overflow-y-auto p-2" aria-label={t('mail_folders', 'E-posta klasörleri')}>
             {folderItems.map((item) => {
               const Icon = item.icon;
               const active = filterType === item.id;
@@ -466,15 +412,14 @@ const EmailsPage = ({ embedded = false }) => {
                   key={item.id}
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
-                  className={`flex w-full items-center justify-between gap-2.5 rounded px-3 py-2 text-left text-xs transition-colors ${
-                    active
-                      ? 'bg-primary font-semibold text-white'
-                      : 'font-medium text-text-secondary hover:bg-background-tertiary hover:text-text-primary'
-                  }`}
+                  className={`flex w-full items-center justify-between gap-2.5 rounded px-2.5 py-2 text-left text-xs transition-colors ${active
+                      ? 'bg-background-tertiary font-semibold text-text-primary'
+                      : 'font-medium text-text-secondary hover:bg-background-tertiary/70 hover:text-text-primary'
+                    }`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
                     <Icon
-                      className={`h-4 w-4 shrink-0 ${active ? 'text-white' : 'text-text-muted'}`}
+                      className={`h-4 w-4 shrink-0 ${active ? 'text-primary' : 'text-text-muted'}`}
                       strokeWidth={1.5}
                     />
                     <span className="truncate">{item.label}</span>
@@ -487,14 +432,62 @@ const EmailsPage = ({ embedded = false }) => {
 
         {/* 2. Message List */}
         <section
-          className={`flex min-h-0 w-full min-w-0 flex-col border-r border-border bg-background-primary ${
-            selectedEmail ? 'hidden lg:flex' : 'flex'
-          }`}
+          className={`flex min-h-0 w-full min-w-0 flex-col border-r border-border bg-background-primary ${selectedEmail ? 'hidden lg:flex' : 'flex'
+            }`}
         >
+          {/* Top Search & Actions Bar */}
+          <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-border bg-background-primary px-3">
+            <div className="relative min-w-0 flex-1">
+              <input
+                id="mail-search"
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t('search_mail', 'E-postalarda ara...')}
+                className="h-8 w-full rounded border border-border bg-background-secondary pl-8 pr-7 text-xs text-text-primary transition-colors placeholder:text-text-muted focus:border-border-focus focus:bg-background-primary focus:outline-none focus:ring-1 focus:ring-border-focus"
+              />
+              <MagnifyingGlassIcon
+                className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-muted"
+                strokeWidth={1.5}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-text-muted hover:text-text-primary"
+                  aria-label={t('clear_search', 'Aramayı temizle')}
+                >
+                  <X className="h-3.5 w-3.5" strokeWidth={1.5} />
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="rounded p-1.5 text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-40"
+              title={t('refresh', 'Yenile')}
+              aria-label={t('refresh', 'Yenile')}
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteAllEmails}
+              disabled={isDeleting || filteredEmails.length === 0}
+              className="rounded p-1.5 text-text-secondary transition-colors hover:bg-background-secondary hover:text-status-error disabled:opacity-30"
+              title={t('delete_all', 'Tümünü Sil')}
+              aria-label={t('delete_all', 'Tümünü Sil')}
+            >
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+            </button>
+          </div>
+
           {/* Subheader: Folder Title & Pagination */}
-          <div className="flex h-10 shrink-0 items-center justify-between border-b border-border-light bg-background-secondary/50 px-4">
-            <div className="flex min-w-0 items-center gap-2">
-              <h2 className="truncate text-xs font-semibold text-text-primary">
+          <div className="flex h-8 shrink-0 items-center justify-between border-b border-border-light bg-background-secondary/30 px-3">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <h2 className="truncate text-xs font-medium text-text-secondary">
                 {selectedFolderLabel}
               </h2>
               <span className="text-xs text-text-muted tabular-nums">
@@ -502,7 +495,7 @@ const EmailsPage = ({ embedded = false }) => {
               </span>
             </div>
 
-            <div className="flex shrink-0 items-center gap-1 text-xs">
+            <div className="flex shrink-0 items-center gap-0.5 text-xs">
               <button
                 type="button"
                 onClick={() => setPage((p) => p - 1)}
@@ -512,8 +505,8 @@ const EmailsPage = ({ embedded = false }) => {
               >
                 <ChevronLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
               </button>
-              <span className="px-1 text-xs font-medium tabular-nums text-text-secondary">
-                {pageInfo.page + 1} / {Math.max(pageInfo.totalPages, 1)}
+              <span className="px-1 text-xs tabular-nums text-text-muted">
+                {pageInfo.page + 1}/{Math.max(pageInfo.totalPages, 1)}
               </span>
               <button
                 type="button"
@@ -535,11 +528,10 @@ const EmailsPage = ({ embedded = false }) => {
                   key={item.id}
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
-                  className={`shrink-0 rounded px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    filterType === item.id
-                      ? 'bg-primary text-white'
+                  className={`shrink-0 rounded px-2.5 py-1 text-xs font-medium transition-colors ${filterType === item.id
+                      ? 'border border-border-focus bg-background-tertiary font-semibold text-text-primary'
                       : 'border border-border bg-background-primary text-text-secondary'
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -578,9 +570,8 @@ const EmailsPage = ({ embedded = false }) => {
 
         {/* 3. Reading Pane */}
         <section
-          className={`flex min-h-0 min-w-0 flex-1 flex-col bg-background-primary ${
-            !selectedEmail ? 'hidden lg:flex' : 'flex'
-          }`}
+          className={`flex min-h-0 min-w-0 flex-1 flex-col bg-background-primary ${!selectedEmail ? 'hidden lg:flex' : 'flex'
+            }`}
         >
           {selectedEmail ? (
             <>

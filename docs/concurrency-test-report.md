@@ -6,15 +6,19 @@ Bu doküman, secondHand backend mimarisinde uygulanan **Redis 7 Lua Scripting**,
 
 ## Test Edilen Sistem & Metodoloji
 
-Tüm testler `src/test/java/com/serhat/secondhand/concurrency/ConcurrentStockAndPaymentIntegrationTest.java` sınıfında, gerçek veritabanı (PostgreSQL), Redis ve Kafka container'ları üzerinde **CountDownLatch** eşzamanlılık kontrolü ile yürütülmüştür.
+Tüm testler `src/test/java/com/serhat/secondhand/concurrency/ConcurrentStockAndPaymentIntegrationTest.java` sınıfındadır ve yerel Docker Compose servislerine (PostgreSQL `5433`, Redis `6379`, Kafka `9092`) bağlanır; Testcontainers kullanılmaz. Eşzamanlılık `CountDownLatch` ile kurulur.
+
+> **Güncellik:** Sınıfta 6 test vardır. Aşağıdaki log ve süreler ilk 4 senaryonun kayıtlı koşumundan gelir; 5. ve 6. senaryolar sonradan eklenmiştir ve bu rapor için koşumları kaydedilmemiştir.
+>
+> **Dikkat:** 4. test, veritabanındaki ilk ilanın `inventory.available_quantity` değerini 1'e çeker ve geri almaz. Dev veritabanında çalıştırmadan önce bunu göz önünde bulundurun.
 
 | Parametre | Değer |
 | :--- | :--- |
 | **Test Sınıfı** | `ConcurrentStockAndPaymentIntegrationTest` |
-| **Toplam Test Sayısı** | **4 Senaryo** |
-| **Test Başarı Oranı** | **4 / 4 (%100 BUILD SUCCESS)** |
+| **Toplam Test Sayısı** | **6 Senaryo** (kayıtlı koşum: ilk 4) |
+| **Kayıtlı Koşum Sonucu** | **4 / 4 BUILD SUCCESS** (5–6 bu raporda koşulmadı) |
 | **Eşzamanlılık Yöntemi** | `CountDownLatch` (Thread'lerin eşzamanlı başlatılması) |
-| **Toplam Koşum Süresi** | 38.30 saniye |
+| **Toplam Koşum Süresi** | 38.30 saniye (4 senaryoluk koşum) |
 
 ---
 
@@ -101,7 +105,32 @@ Kullanıcı son 1 adet ürünü rezerve etti (stok 0 oldu), ardından sepetten �
 
 ---
 
+## 5. Test: Sipariş İptali → Order Outbox (`testOrderCancellationOutboxFlow`)
+
+### Senaryo ve Amaç:
+`OrderOutboxService.enqueueOrderCancelled` ile bir `OrderCancelledKafkaEvent` yazılır.
+
+### Doğrulanan:
+* `order_outbox_events` tablosunda `aggregateId = 8888`, `eventType = ORDER_CANCELLED` kaydı bulunur.
+* Test, oluşturduğu outbox kayıtlarını `finally` bloğunda siler.
+* Kafka'ya publish ve tüketim bu testte doğrulanmaz; `order.cancelled.v1` için uygulamada consumer yoktur.
+
+---
+
+## 6. Test: Sipariş İadesi → Order Outbox (`testOrderRefundOutboxFlow`)
+
+### Senaryo ve Amaç:
+`OrderOutboxService.enqueueOrderRefunded` ile bir `OrderRefundedKafkaEvent` yazılır.
+
+### Doğrulanan:
+* `order_outbox_events` tablosunda `aggregateId = 7777`, `eventType = ORDER_REFUNDED` kaydı bulunur.
+* Test, oluşturduğu outbox kayıtlarını `finally` bloğunda siler.
+
+---
+
 ## Genel Mimari Performans Karşılaştırması
+
+> "Eski Mimari" sütunu bu testlerle ölçülmemiştir; yalnızca "Yeni Mimari" sütunundaki 20.4 ms kayıtlı koşumdan gelir.
 
 | Kriter | Eski Mimari (Senkron DB Lock) | Yeni Mimari (Redis + Outbox + Kafka) | İyileşme Oranı |
 | :--- | :---: | :---: | :---: |

@@ -4,6 +4,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
+import { PAYMENT_QUERY_KEYS } from '../../payments/paymentSchema.js';
 import { ORDER_QUERY_KEYS } from '../orderConstants.js';
 import { orderItemIds, reviewItemKey, useOrderItemReviews } from './useOrderItemReviews.js';
 import { useOrderSearch } from './useOrderSearch.js';
@@ -72,6 +73,9 @@ const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod,
  queryClient.invalidateQueries({
  queryKey: mode === ORDER_VIEW_MODES.SELLER ? ORDER_QUERY_KEYS.sellerOrders : ORDER_QUERY_KEYS.orders,
  });
+ queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.escrow });
+ queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.paymentStatistics });
+ queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.payments });
  }, [queryClient, mode]);
 
  return {

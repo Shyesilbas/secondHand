@@ -178,7 +178,7 @@ public class MemoryService {
         );
 
         try {
-            String raw = geminiClient.generateTextForMemory(prompt);
+            String raw = geminiClient.generateJsonForMemory(prompt);
             return parseExtraction(raw);
         } catch (Exception e) {
             log.error("Failed to extract memory with AI for user {}: {}", memory.getUserId(), e.getMessage(), e);

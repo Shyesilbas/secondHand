@@ -17,38 +17,36 @@ import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID>, JpaSpecificationExecutor<Payment> {
 
-    List<Payment> findByOrderIdAndToUserId(UUID orderId, Long toUserId);
+       List<Payment> findByOrderIdAndToUserId(UUID orderId, Long toUserId);
 
-    List<Payment> findByOrderIdAndToUserIdAndOrderItemId(UUID orderId, Long toUserId, Long orderItemId);
+       List<Payment> findByOrderIdAndToUserIdAndOrderItemId(UUID orderId, Long toUserId, Long orderItemId);
 
+       @Query("SELECT p FROM Payment p " +
+                     "LEFT JOIN FETCH p.fromUser " +
+                     "LEFT JOIN FETCH p.toUser " +
+                     "WHERE p.fromUser.id = :userId OR p.toUser.id = :userId")
+       Page<Payment> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT p FROM Payment p " +
-           "LEFT JOIN FETCH p.fromUser " +
-           "LEFT JOIN FETCH p.toUser " +
-           "WHERE p.fromUser.id = :userId OR p.toUser.id = :userId")
-    Page<Payment> findByUserId(@Param("userId") Long userId, Pageable pageable);
+       @Query("SELECT COUNT(p), " +
+                     "SUM(CASE WHEN p.isSuccess = true THEN 1 ELSE 0 END), " +
+                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.status = 'COMPLETED') THEN p.amount ELSE 0 END), "
+                     +
+                     "SUM(CASE WHEN (p.fromUser.id = :userId AND (p.toUser.id IS NULL OR p.toUser.id != :userId) AND p.isSuccess = true) THEN p.amount ELSE 0 END), "
+                     +
+                     "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.orderItemId IS NOT NULL AND p.status = 'ESCROW') THEN p.amount ELSE 0 END) "
+                     +
+                     "FROM Payment p WHERE (p.fromUser.id = :userId OR p.toUser.id = :userId) " +
+                     "AND (:providerName IS NULL OR p.providerName = :providerName)")
+       List<Object[]> getPaymentStats(@Param("userId") Long userId, @Param("providerName") String providerName);
 
+       Optional<Payment> findByIdempotencyKeyAndFromUserId(String idempotencyKey, Long fromUserId);
 
-    @Query("SELECT COUNT(p), " +
-            "SUM(CASE WHEN p.isSuccess = true THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.isSuccess = true AND p.status = 'COMPLETED') THEN p.amount ELSE 0 END), " +
-            "SUM(CASE WHEN (p.fromUser.id = :userId AND (p.toUser.id IS NULL OR p.toUser.id != :userId) AND p.isSuccess = true) THEN p.amount ELSE 0 END), " +
-            "SUM(CASE WHEN (p.toUser.id = :userId AND (p.fromUser.id IS NULL OR p.fromUser.id != :userId) AND p.status = 'ESCROW') THEN p.amount ELSE 0 END) " +
-            "FROM Payment p WHERE (p.fromUser.id = :userId OR p.toUser.id = :userId) " +
-            "AND (:providerName IS NULL OR p.providerName = :providerName)")
-    List<Object[]> getPaymentStats(@Param("userId") Long userId, @Param("providerName") String providerName);
-
-
-    Optional<Payment> findByIdempotencyKeyAndFromUserId(String idempotencyKey, Long fromUserId);
-
-
-
-
-    @Query("SELECT SUM(p.amount) FROM Payment p " +
-           "WHERE p.fromUser.id = :userId " +
-           "AND p.providerName = 'EWALLET' " +
-           "AND p.paymentDirection = com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING " +
-           "AND p.processedAt >= :startOfMonth " +
-           "AND p.isSuccess = true")
-    BigDecimal sumMonthlyEwalletSpending(@Param("userId") Long userId, @Param("startOfMonth") LocalDateTime startOfMonth);
+       @Query("SELECT SUM(p.amount) FROM Payment p " +
+                     "WHERE p.fromUser.id = :userId " +
+                     "AND p.providerName = 'EWALLET' " +
+                     "AND p.paymentDirection = com.serhat.secondhand.payment.entity.PaymentDirection.OUTGOING " +
+                     "AND p.processedAt >= :startOfMonth " +
+                     "AND p.isSuccess = true")
+       BigDecimal sumMonthlyEwalletSpending(@Param("userId") Long userId,
+                     @Param("startOfMonth") LocalDateTime startOfMonth);
 }

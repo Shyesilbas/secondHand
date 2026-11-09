@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,7 +25,4 @@ public interface ClothingListingRepository extends JpaRepository<ClothingListing
     
     @EntityGraph(attributePaths = {"seller", "brand", "clothingType"})
     Page<ClothingListing> findByBrand_IdAndClothingType_Id(UUID brandId, UUID clothingTypeId, Pageable pageable);
-    
-    @EntityGraph(attributePaths = {"seller", "brand", "clothingType"})
-    Page<ClothingListing> findByPurchaseDateAfter(LocalDate startDate, Pageable pageable);
 }

@@ -41,9 +41,12 @@ public class CheckoutPricingContextFactory {
 
         Offer acceptedOffer = offerResult.getData();
         List<Cart> effectiveCartItems = buildEffectiveCartItems(cartItems, acceptedOffer, user);
-        PricingResultDto pricing = calculatePricing(user, effectiveCartItems, request, acceptedOffer);
+        Result<PricingResultDto> pricingResult = calculatePricing(user, effectiveCartItems, request, acceptedOffer);
+        if (pricingResult.isError()) {
+            return Result.error(pricingResult.getMessage(), pricingResult.getErrorCode());
+        }
 
-        return Result.success(new CheckoutPricingContext(user, effectiveCartItems, acceptedOffer, pricing));
+        return Result.success(new CheckoutPricingContext(user, effectiveCartItems, acceptedOffer, pricingResult.getData()));
     }
 
     public List<Cart> buildEffectiveCartItems(List<Cart> cartItems, Offer acceptedOffer, User user) {
@@ -77,14 +80,14 @@ public class CheckoutPricingContextFactory {
         return offerService.getAcceptedOfferForCheckout(userId, request.getOfferId());
     }
 
-    private PricingResultDto calculatePricing(
+    private Result<PricingResultDto> calculatePricing(
             User user,
             List<Cart> effectiveCartItems,
             CheckoutRequest request,
             Offer acceptedOffer
     ) {
         if (acceptedOffer != null) {
-            return pricingService.priceCart(
+            return pricingService.priceCartForCheckout(
                     user,
                     effectiveCartItems,
                     request.getCouponCode(),
@@ -93,7 +96,7 @@ public class CheckoutPricingContextFactory {
                     acceptedOffer.getTotalPrice()
             );
         }
-        return pricingService.priceCart(user, effectiveCartItems, request.getCouponCode());
+        return pricingService.priceCartForCheckout(user, effectiveCartItems, request.getCouponCode(), null, null, null);
     }
 
     public record CheckoutPricingContext(

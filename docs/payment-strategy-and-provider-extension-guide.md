@@ -1,10 +1,10 @@
-# Ödeme Strateji Deseni & Yeni Sağlayıcı Ekleme Rehberi (Payment Strategy & Extension Architecture)
+# Payment Strategy Pattern & Yeni Provider Ekleme Rehberi
 
-Bu doküman, **secondHand** platformundaki ödeme altyapısının **Hexagonal Architecture (Port & Adapter)** ve **Strategy Pattern** prensipleriyle nasıl kurgulandığını, **Açık/Kapalı Prensibini (Open-Closed Principle - OCP)** ve sisteme **sıfır kod değişikliğiyle yeni bir ödeme sağlayıcısının (Stripe, İyzico, Kredi Kartı vb.)** nasıl entegre edileceğini adım adım açıklamaktadır.
+Bu doküman, **secondHand** platformundaki ödeme altyapısının **Hexagonal Architecture (Port & Adapter)** ve **Strategy Pattern** prensipleriyle nasıl kurgulandığını, **Açık/Kapalı Prensibini (Open-Closed Principle - OCP)** ve sisteme **sıfır kod değişikliğiyle yeni bir payment provider'ın (Stripe, İyzico, Kredi Kartı vb.)** nasıl entegre edileceğini adım adım açıklamaktadır.
 
 ---
 
-## 1. Problem Tanımı ve Neden Strateji Deseni?
+## 1. Problem Tanımı ve Neden Strategy Pattern?
 
 Monolitik veya kötü tasarlanmış ödeme sistemlerinde genellikle `PaymentService` içinde devasa `switch-case` veya `if-else` blokları bulunur:
 
@@ -20,32 +20,32 @@ if ("EWALLET".equals(provider)) {
 ```
 
 ### Bu Yaklaşımın Zararları:
-1. **Her Yeni Sağlayıcıda Mevcut Kodu Bozma Riski:** Yeni bir ödeme yöntemi eklerken mevcut çalışan ödeme metodunun kodunu değiştirmek regression hatalarına yol açar.
+1. **Her Yeni Provider'da Mevcut Kodu Bozma Riski:** Yeni bir ödeme yöntemi eklerken mevcut çalışan ödeme metodunun kodunu değiştirmek regression hatalarına yol açar.
 2. **SRP (Single Responsibility) İhlali:** `PaymentService` hem cüzdanı, hem kredi kartını, hem banka API'lerini bilmek zorunda kalır.
-3. **Test Zorluğu:** Her sağlayıcının testini tek bir devasa servis içinde mock'lamak karmaşıklaşır.
+3. **Test Zorluğu:** Her provider'ın testini tek bir devasa servis içinde mock'lamak karmaşıklaşır.
 
 ---
 
-## 2. Hexagonal Mimari ve Strateji Deseni (secondHand Çözümü)
+## 2. Hexagonal Mimari ve Strategy Pattern (secondHand Çözümü)
 
 ```
-[İstemci / PaymentRequest]
+[Client / PaymentRequest]
          │
          ▼
-[PaymentProcessor] ──(Tüm Sağlayıcıları Enjekte Eder: List<PaymentProviderPort>)
+[PaymentProcessor] ──(Tüm Provider'ları Inject Eder: List<PaymentProviderPort>)
          │
          ├───► [EWalletPaymentProviderAdapter] ──(supports: "EWALLET")
          ├───► [IyzicoPaymentProviderAdapter]   ──(supports: "IYZICO")
          ├───► [StripePaymentProviderAdapter]   ──(supports: "STRIPE")
-         └───► [Gelecekteki Yeni Sağlayıcı...] ──(supports: "NEW_PROVIDER")
+         └───► [Gelecekteki Yeni Provider...] ──(supports: "NEW_PROVIDER")
 ```
 
 ### A. Çekirdek Port Arayüzü: [`PaymentProviderPort.java`](../src/main/java/com/serhat/secondhand/payment/port/out/PaymentProviderPort.java)
-Tüm ödeme sağlayıcıları bu sözleşmeyi (contract) uygular:
+Tüm payment provider'lar bu sözleşmeyi (contract) uygular:
 
 ```java
 public interface PaymentProviderPort {
-    /** Bu adapter gelen sağlayıcı adını destekliyor mu? */
+    /** Bu adapter gelen provider adını destekliyor mu? */
     boolean supports(String providerName);
 
     /** Kullanıcı ve bakiye/limit açısından ödeme yapılabilir mi? */
@@ -60,7 +60,7 @@ public interface PaymentProviderPort {
 
 ### B. Dinamik Yönlendirici (Orchestrator): [`PaymentProcessor.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentProcessor.java)
 
-`PaymentProcessor`, Spring'in Dependency Injection yeteneğiyle kayıtlı tüm `PaymentProviderPort` bean'lerini otomatik listeler. Gelen istekteki `providerName` değerine göre doğru sağlayıcıyı O(1) hızında seçer:
+`PaymentProcessor`, Spring'in Dependency Injection yeteneğiyle kayıtlı tüm `PaymentProviderPort` bean'lerini otomatik listeler. Gelen istekteki `providerName` değerine göre doğru provider'ı O(1) hızında seçer:
 
 ```java
 PaymentProviderPort strategy = providers.stream()
@@ -111,12 +111,12 @@ sequenceDiagram
 
 ---
 
-## 4. Adım Adım: Yeni Bir Ödeme Sağlayıcısı Nasıl Eklenir?
+## 4. Adım Adım: Yeni Bir Payment Provider Nasıl Eklenir?
 
-Örneğin sisteme **İyzico / Kredi Kartı** sağlayıcısını entegre etmek için izlenecek adımlar:
+Örneğin sisteme **İyzico / Kredi Kartı** provider'ını entegre etmek için izlenecek adımlar:
 
 ### Adım 1: Adapter Sınıfını Oluşturun
-[`com.serhat.secondhand.payment.creditcard`](../src/main/java/com/serhat/secondhand/payment/creditcard) (veya ilgili alt paket) altında yeni sınıfı yazın:
+Yeni bir paket açın (örn. `com.serhat.secondhand.payment.creditcard`; bu paket henüz yoktur) ve sınıfı orada yazın. Mevcut tek örnek adapter [`EWalletPaymentProviderAdapter`](../src/main/java/com/serhat/secondhand/ewallet/adapter/in/EWalletPaymentProviderAdapter.java)'dır:
 
 ```java
 package com.serhat.secondhand.payment.creditcard;
@@ -150,7 +150,7 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
     @Override
     public PaymentResult process(User fromUser, User toUser, BigDecimal amount, UUID listingId, PaymentRequest request) {
         try {
-            // 1. İyzico API istemcisi üzerinden 3D Secure / Direct Charge çağrısı yap
+            // 1. İyzico API client'ı üzerinden 3D Secure / Direct Charge çağrısı yap
             String externalTransactionId = "IYZICO_TXN_" + UUID.randomUUID();
             
             // 2. Başarılı sonuç dön
@@ -166,11 +166,11 @@ public class IyzicoPaymentProviderAdapter implements PaymentProviderPort {
 ### Adım 2: Entegrasyonun Tamamlanması
 * **`PaymentProcessor` veya başka hiçbir sınıfı değiştirmenize gerek yoktur.**
 * `@Component` anatasyonu sayesinde Spring bu adapter'ı otomatik olarak `List<PaymentProviderPort>` listesine ekler.
-* İstemci `providerName: "IYZICO"` gönderdiği andan itibaren tüm ödeme akışı bu yeni adapter üzerinden akar.
+* Client `providerName: "IYZICO"` gönderdiği andan itibaren tüm ödeme akışı bu yeni adapter üzerinden akar.
 
 ---
 
-## 5. Ödeme Sonrası Yan Etki Deseni ([`PaymentCompletedHandler.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandler.java))
+## 5. Ödeme Sonrası Side-Effect Pattern ([`PaymentCompletedHandler.java`](../src/main/java/com/serhat/secondhand/payment/application/PaymentCompletedHandler.java))
 
 Ödeme tamamlandıktan sonra tetiklenecek işlemler de (Vitrin uzatma, ilan satın alma, komisyon kesme) yine Açık/Kapalı Prensibiyle yönetilir:
 
@@ -184,11 +184,11 @@ public interface PaymentCompletedHandler {
 
 ---
 
-## 6. Yeni Sağlayıcıların Otomatik Kazandığı Altyapı Güvenceleri
+## 6. Yeni Provider'ların Otomatik Kazandığı Altyapı Güvenceleri
 
-| Güvenlik / Dayanıklılık Katmanı | Nasıl Çalışır? | Sağlayıcıya Faydası |
+| Güvenlik / Resilience Katmanı | Nasıl Çalışır? | Provider'a Faydası |
 | :--- | :--- | :--- |
-| **Redis Idempotency Lock** | İstek `PaymentProcessor`'a girdiği an `Idempotency-Key` başlığı kilitlenir. | Yeni eklenen sağlayıcıda çift çekim (double-charge) kodu yazmanıza gerek kalmaz. |
-| **JPA Optimistic Lock Retry** | Eşzamanlı DB çakışmalarında `PaymentProcessor` 3 kez exponential backoff ile tekrar dener. | Concurrency yarış durumlarında otomatik kurtarma. |
+| **Redis Idempotency Lock** | İstek `PaymentProcessor`'a girdiği an `Idempotency-Key` başlığı kilitlenir. | Yeni eklenen provider'da çift çekim (double-charge) kodu yazmanıza gerek kalmaz. |
+| **JPA Optimistic Lock Retry** | Eşzamanlı DB çakışmalarında `PaymentProcessor` 3 kez exponential backoff ile tekrar dener. | Concurrency race condition durumlarında otomatik kurtarma. |
 | **Transactional Outbox & Kafka** | Ödeme başarılı olduğunda `PaymentOutboxService` üzerinden `payment.completed.v1` eventi yayınlanır. | E-posta, stok düşümü ve bildirimler asenkron olarak otomatik tetiklenir. |
-| **Önbellek Tahliyesi (`@CacheEvict`)** | Ödeme bitince `paymentStats` cache'i otomatik temizlenir. | Dashboard ve istatistiklerin anında güncellenmesi. |
+| **Cache Eviction (`@CacheEvict`)** | Ödeme bitince `paymentStats` cache'i otomatik temizlenir. | Dashboard ve istatistiklerin anında güncellenmesi. |

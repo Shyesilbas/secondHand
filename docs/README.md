@@ -1,49 +1,54 @@
-# secondHand Sistem Mimari Dokümantasyon Rehberi (`/docs`)
+# secondHand Mimari Dokümantasyonu (`/docs`)
 
-Bu dizin, secondHand platformunun yüksek performanslı, olay güdümlü ve finansal güvenliği garanti altına alan modern backend mimarisinin tüm detaylarını barındırır.
+Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mimari konuları anlatır. Modül iş kuralları `src/main/java/com/serhat/secondhand/<module>/README.md` içindedir.
 
 ---
 
 ## Doküman Haritası
 
-| Doküman | Kapsam ve Açıklama |
+### Para akışı
+| Doküman | Kapsam |
 | :--- | :--- |
-| **[external-integrations-cloudinary-and-exchange.md](external-integrations-cloudinary-and-exchange.md)** | Dış Entegrasyonlar: Cloudinary (Görsel Depolama & CDN) ve ExchangeRate-API (2 Saatlik Redis Önbellekli Döviz Kuru) rehberi. |
-| **[payment-strategy-and-provider-extension-guide.md](payment-strategy-and-provider-extension-guide.md)** | Ödeme Strateji Deseni (Strategy Pattern), Hexagonal Port & Adapter (`PaymentProviderPort`), Açık/Kapalı Prensibi (OCP) ve Yeni Sağlayıcı Ekleme rehberi. |
-| **[auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md)** | Stateless JWT & Çift Token Rotasyonu, Google OAuth2 SSO, OWASP Güvenlik Başlıkları, Prod Security Guard, RBAC, IDOR ve Kriptografi rehberi. |
-| **[safe-meetup-delivery-and-verification.md](safe-meetup-delivery-and-verification.md)** | Güvenli Buluşma (Safe Meetup), SHA-256 OTP & QR Kod doğrulama, Brute-Force kilit (`VERIFICATION_LOCKED`) ve 24 saatlik otomatik tamamlama rehberi. |
-| **[order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)** | Sipariş Durum Makinesi, Kargo & Güvenli Buluşma (Safe Meetup), Kalem Bazlı İptal/İade Telafi Yönetimi ve Otomasyon Scheduler rehberi. |
-| **[offer-system-and-concurrency-locks.md](offer-system-and-concurrency-locks.md)** | Teklif (Pazarlık) Durum Makinesi, 24 saatlik Redis alıcı rezervasyon kilidi (`offer:reservation`), karşı teklif zinciri ve eşzamanlılık rehberi. |
-| **[multi-tier-redis-caching-and-invalidation.md](multi-tier-redis-caching-and-invalidation.md)** | Multi-Tier Polymorphic Redis Önbellekleme (`v4::`), Jackson `@class` serileştirme güvenliği, kademeli TTL ve Invalidation matrisi rehberi. |
-| **[escrow-lifecycle-and-state-machine.md](escrow-lifecycle-and-state-machine.md)** | Escrow (Güvenli Havuz) Durum Makinesi, 3 günlük otomatik teslimat mutabakatı, Transactional Outbox ve satıcı e-Cüzdan aktarım mimarisi rehberi. |
-| **[stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md)** | Redis in-memory stok rezervasyonu, 15 dk anti-hoarding TTL, PostgreSQL veri mutabakatı (Reconciliation) ve otomatik drift onarım (Auto-Healing) rehberi. |
-| **[redis-and-kafka-architecture.md](redis-and-kafka-architecture.md)** | Redis (Multi-Tier Caching, Lua Scripting, Idempotency) ve Apache Kafka (Transactional Outbox, Consumer Idempotency, Topics) uçtan uca mimari raporu. |
-| **[social-proof-and-urgency-metrics-architecture.md](social-proof-and-urgency-metrics-architecture.md)** | Sosyal Kanıt & Canlı İlgi Mimarisi: 24 saatlik Redis ZSET tekil inceleme penceresi, 15 dk checkout stok tutma (sayfa yenileme korumalı), 12 saatlik favori önbelleği ve frontend anti-polling kuralları rehberi. |
-| **[aura-ai-and-context-architecture.md](aura-ai-and-context-architecture.md)** | Aura AI Asistanı: Gemini entegrasyonu, SSE streaming, Context Adapters, otonom arama planlaması (`AuraListingSearchOrchestrator`), kullanıcı uzun vadeli belleği ve güvenlik sınırları rehberi. |
-| **[websocket-stomp-and-chat-architecture.md](websocket-stomp-and-chat-architecture.md)** | Gerçek Zamanlı Mesajlaşma: Spring WebSocket, STOMP protokolü, HttpOnly çerez el sıkışması, kanal düzeyinde JWT güvenliği, IDOR korumalı oda aboneliği ve sohbet içi teklif rehberi. |
-| **[notification-feed-and-broadcast-architecture.md](notification-feed-and-broadcast-architecture.md)** | Bildirim Olay Dağıtımı: Kişisel bildirimler, toplu sistem yayınları (broadcast), birleşik akış projeksiyonu (`NotificationFeedRepository`), WebSocket canlı push iletimi ve rozet önbellek tahliyesi rehberi. |
-| **[catalog-and-category-polymorphism.md](catalog-and-category-polymorphism.md)** | Kategori Polimorfizmi & Katalog: 6 ana dikeyde JPA polimorfizmi, 189 JSON veri seti tohumlama hattı, `AbstractListingService` (Template Method), `ListingValidationEngine` ve hiyerarşik önbellekleme rehberi. |
-| **[database-migration-and-seeding-guide.md](database-migration-and-seeding-guide.md)** | Veritabanı Migrasyon & Tohumlama: Flyway versiyonlama standartları, DDL kuralları ve JSON katalog verilerinin upsert yaşam döngüsü rehberi. |
-| **[ci-cd-and-deployment-guide.md](ci-cd-and-deployment-guide.md)** | CI/CD, Dağıtım & Altyapı: Docker Compose servisleri (Postgres, Redis, Kafka KRaft), ortam değişkenleri (`.env`), Prod Security Guard ve Actuator/Prometheus rehberi. |
-| **[concurrency-test-report.md](concurrency-test-report.md)** | 4 kritik entegrasyon testinin (`ConcurrentStockAndPaymentIntegrationTest`) canlı test sonuçları, milisaniyelik log analizleri ve performans metrikleri. |
+| **[payment-strategy-and-provider-extension-guide.md](payment-strategy-and-provider-extension-guide.md)** | Payment Strategy Pattern, Hexagonal Port & Adapter (`PaymentProviderPort`), Open/Closed prensibi ve yeni provider ekleme. |
+| **[pricing-coupon-and-campaign-architecture.md](pricing-coupon-and-campaign-architecture.md)** | `PriceCalculationEngine` hesaplama sırası, satıcı kampanyaları, kupon tipleri ve audience'ları, Redis Lua kupon limiti ve redemption. |
+| **[order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)** | Sipariş state machine'i, kargo ve Safe Meetup, kalem bazlı iptal/iade compensation ve otomasyon scheduler'ları. |
+| **[escrow-lifecycle-and-state-machine.md](escrow-lifecycle-and-state-machine.md)** | Escrow state machine'i, 72 saatlik otomatik tamamlama, Transactional Outbox ve satıcı eWallet aktarımı. |
+| **[safe-meetup-delivery-and-verification.md](safe-meetup-delivery-and-verification.md)** | Safe Meetup, SHA-256 OTP & QR doğrulama, brute-force kilidi (`VERIFICATION_LOCKED`) ve 24 saatlik otomatik tamamlama. |
+| **[offer-system-and-concurrency-locks.md](offer-system-and-concurrency-locks.md)** | Teklif (pazarlık) state machine'i, 24 saatlik Redis alıcı kilidi (`v4:offer:lock:{listingId}`), counter-offer zinciri ve eşzamanlılık. |
+
+### Stok, Redis ve Kafka
+| Doküman | Kapsam |
+| :--- | :--- |
+| **[redis-and-kafka-architecture.md](redis-and-kafka-architecture.md)** | Redis (cache, Lua script'leri, idempotency, rate limiting) ve Kafka (Transactional Outbox, consumer idempotency, topic'ler, DLT). |
+| **[stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md)** | Redis in-memory stok rezervasyonu, 15 dk anti-hoarding TTL, PostgreSQL reconciliation ve drift auto-healing. |
+| **[multi-tier-redis-caching-and-invalidation.md](multi-tier-redis-caching-and-invalidation.md)** | Multi-tier Redis cache (`v4:`), Jackson `@class` serialization güvenliği, cache bazında TTL ve invalidation matrisi. |
+| **[social-proof-and-urgency-metrics-architecture.md](social-proof-and-urgency-metrics-architecture.md)** | 24 saatlik Redis ZSET tekil görüntüleme penceresi, 15 dk checkout stok tutma, 12 saatlik favori cache'i ve frontend anti-polling kuralları. |
+| **[concurrency-test-report.md](concurrency-test-report.md)** | `ConcurrentStockAndPaymentIntegrationTest` içindeki 6 entegrasyon testi ve ilk 4 senaryonun kayıtlı koşum sonuçları. |
+
+### Kimlik, iletişim ve AI
+| Doküman | Kapsam |
+| :--- | :--- |
+| **[auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md)** | Stateless JWT ve refresh token rotation, Google OAuth2 SSO, OWASP security header'ları, Prod Security Guard, RBAC, IDOR ve kriptografi. |
+| **[websocket-stomp-and-chat-architecture.md](websocket-stomp-and-chat-architecture.md)** | Spring WebSocket + STOMP, HttpOnly cookie handshake, channel seviyesinde JWT, IDOR korumalı room subscription ve sohbet içi teklif. |
+| **[notification-feed-and-broadcast-architecture.md](notification-feed-and-broadcast-architecture.md)** | Kişisel bildirimler, sistem broadcast'leri, unified feed projection (`NotificationFeedRepository`), WebSocket live push ve badge cache eviction. |
+| **[email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md)** | Event-driven e-posta gönderimi: `mail.dispatch.v1`, `EmailKafkaProducer`/`EmailKafkaConsumer`, template'ler ve idempotency. |
+| **[aura-ai-and-context-architecture.md](aura-ai-and-context-architecture.md)** | Aura AI asistanı: Gemini entegrasyonu, SSE streaming, context adapter'ları, otonom arama planlaması (`AuraListingSearchOrchestrator`), kullanıcı belleği ve güvenlik sınırları. |
+| **[external-integrations-cloudinary-and-exchange.md](external-integrations-cloudinary-and-exchange.md)** | Cloudinary (görsel depolama & CDN) ve ExchangeRate-API (2 saatlik Redis cache'li döviz kuru). |
+
+### Katalog, veri ve altyapı
+| Doküman | Kapsam |
+| :--- | :--- |
+| **[catalog-and-category-polymorphism.md](catalog-and-category-polymorphism.md)** | 6 vertical'da JPA polymorphism, `AbstractListingService` (Template Method), `ListingValidationEngine`, 317 dosyalık JSON katalog verisi ve kategoriye özel katalog kurallarına linkler. |
+| **[database-migration-and-seeding-guide.md](database-migration-and-seeding-guide.md)** | Flyway versiyonlama ve DDL kuralları, `--app.seed` key'leri, upsert + prune yaşam döngüsü. |
+| **[ci-cd-and-deployment-guide.md](ci-cd-and-deployment-guide.md)** | Docker Compose servisleri (Postgres, Redis, Kafka KRaft), environment variable'lar (`.env`), Prod Security Guard ve Actuator/Prometheus. |
 
 ---
 
-## Temel Mimari Prensipler Özeti
+## Temel Mimari Prensipler
 
-1. **In-Memory Atomic Operations (Redis 7 Lua Scripting):**
-   * *Nerede kullanılır?* Stok rezervasyonu (`reserve_stock_with_ttl.lua`), kupon kota kontrolü (`apply_coupon_with_limit.lua`), terk edilen sepet iadesi (`cancel_user_reservation.lua`).
-   * *Neden?* PostgreSQL'de `SELECT ... FOR UPDATE` kilit maliyetini sıfırlamak ve yanıt süresini ~20 milisaniyeye düşürmek için.
+Ayrıntılar ve kod referansları [redis-and-kafka-architecture.md](redis-and-kafka-architecture.md) içindedir.
 
-2. **Transactional Outbox Pattern (Dual-Write Koruması):**
-   * *Nerede kullanılır?* Ödeme tamamlama (`payment_outbox_events`), Escrow güvence havuzu çözümü (`escrow_outbox_events`).
-   * *Neden?* Veritabanına yazarken aynı anda Kafka'ya atılan mesajların ağ/sunucu kesintilerinde kaybolmasını önlemek, PostgreSQL ACID garantisiyle At-Least-Once teslimat sağlamak için.
-
-3. **Event-Driven Architecture (Apache Kafka):**
-   * *Topic'ler:* `payment.completed.v1`, `escrow.released.v1`.
-   * *Consumer'lar:* `InventoryKafkaConsumer` (fiziksel DB stok düşümü), `EscrowKafkaConsumer` (satıcı cüzdanına asenkron bakiye yükleme).
-   * *Neden?* HTTP isteklerini uzatmadan arka plan yan etkilerini asenkron, ölçeklenebilir ve bağımsız işlemek için.
-
-4. **Dedicated TTL Locks (Teklif & Vitrin):**
-   * *Nerede kullanılır?* Kabul edilen tekliflerin 24 saatlik alıcı rezervasyonu (`offer:reservation:{listingId}`), aktif vitrin süreleri (`showcase:active:{listingId}`).
-   * *Neden?* Zaman aşımı olan veriler için veritabanını her dakika tarayan ağır scheduler sorgularını ortadan kaldırmak için.
+1. **Atomik Redis Lua script'leri:** Stok rezervasyonu ve reconciliation, kupon limiti ve rate limiting; satır kilidi beklemeden tek atomik çağrı.
+2. **Transactional Outbox:** `payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`; event ana kayıtla aynı transaction'da yazılır, worker'lar Kafka'ya at-least-once gönderir.
+3. **Event-driven yan etkiler (Kafka):** `payment.completed.v1`, `escrow.released.v1`, `mail.dispatch.v1` topic'lerini dinleyen consumer'lar `processed_kafka_events` ile tekrar eden mesajları atlar.
+4. **TTL'li Redis kilitleri:** Kabul edilen teklifin 24 saatlik alıcı kilidi (`v4:offer:lock:{listingId}`) ve aktif vitrin süresi (`v4:listing:showcase:active:{listingId}`); süresi dolan veri için scheduler taraması gerekmez.

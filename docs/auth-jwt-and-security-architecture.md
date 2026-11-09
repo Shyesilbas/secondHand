@@ -9,7 +9,7 @@ Bu doküman, **secondHand** platformunda uygulanan **Stateless JWT & Oturum Yön
 Sistemimizde tek bir güvenlik katmanına güvenmek yerine **Katmanlı Savunma (Defense-in-Depth)** prensibi uygulanmıştır:
 
 ```
-[İstemci / Tarayıcı]
+[Client / Browser]
          │
          ▼
 [1. SecurityHeadersFilter] (HSTS, CSP, X-Frame-Options, X-Content-Type-Options)
@@ -49,14 +49,14 @@ Uygulama tamamen **Stateless** çalışır (`SessionCreationPolicy.STATELESS`); 
 OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refresh Token Rotation (RTR)** ve **Token Family** mimarisi uygulanmıştır ([`LoginService.java`](../src/main/java/com/serhat/secondhand/auth/application/LoginService.java) & [`TokenService.java`](../src/main/java/com/serhat/secondhand/auth/application/TokenService.java)):
 
 ```
-[İstemci] ──(POST /api/auth/refresh-token)──► [LoginService]
+[Client] ──(POST /api/auth/refresh-token)──► [LoginService]
                                                      │
                              ┌───────────────────────┴───────────────────────┐
                              ▼ (Geçerli Token)                               ▼ (İptal Edilmiş / Bayat Token)
                [Yeni Access & Refresh Token Üret]             [REUSE DETECTION (İHLAL TESPİTİ)!]
                ├── Eski Token'ı REVOKED yap                   ├── Saldırgan veya sızdırılmış token kullanıldı!
                ├── Yeni Token'a familyId & parentId bağla     ├── tokenService.revokeTokenFamily(familyId)
-               └── Yeni çerezi istemciye dön                  └── BÜTÜN Token Ailesi (Aktif Tüm Oturumlar) İptal Edilir!
+               └── Yeni cookie'yi client'a dön                └── BÜTÜN Token Ailesi (Aktif Tüm Oturumlar) İptal Edilir!
 ```
 
 1. **Tek Kullanımlık Refresh Token (Single-Use Token):**
@@ -82,7 +82,7 @@ OAuth 2.0 Security BCP (Best Current Practice) standardı doğrultusunda **Refre
 
 ---
 
-### C. Google OAuth2 Social Login & SSO Boru Hattı ([`OAuth2LoginSuccessHandler.java`](../src/main/java/com/serhat/secondhand/core/config/OAuth2LoginSuccessHandler.java))
+### C. Google OAuth2 Social Login & SSO Pipeline ([`OAuth2LoginSuccessHandler.java`](../src/main/java/com/serhat/secondhand/core/config/OAuth2LoginSuccessHandler.java))
 1. Kullanıcı `/oauth2/authorization/google` üzerinden Google'a yönlendirilir.
 2. Başarılı girişte `OAuth2LoginSuccessHandler` tetiklenir:
    - Kullanıcının e-postası sistemde varsa hesap eşleştirilir (`Account Linking`).

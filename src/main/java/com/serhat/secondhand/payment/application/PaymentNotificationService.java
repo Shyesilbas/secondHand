@@ -72,9 +72,11 @@ public class PaymentNotificationService {
 
             String amountText = paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "";
             String cur = paymentDto.currency() != null ? paymentDto.currency() : "";
+            String typeCode = paymentDto.transactionType() != null ? paymentDto.transactionType().name() : "";
             notificationEventPublisher.publishDispatch(
                     notificationTemplateCatalog.paymentSucceeded(
-                            user.getId(), amountText, cur, paymentDto.listingTitle(), typeLabel),
+                            user.getId(), amountText, cur, paymentDto.listingTitle(),
+                            typeLabel, typeCode, paymentDto.listingId()),
                     "payment", "payment-success:" + user.getId() + ":" + paymentDto.paymentId());
         } catch (Exception e) {
             log.warn("Failed to publish payment success notification for user {}: {}", user.getEmail(), e.getMessage());
@@ -113,6 +115,16 @@ public class PaymentNotificationService {
     }
 
     private void sendMembershipUpgradeNotification(User user, PaymentDto paymentDto) {
+        String amountText = paymentDto.amount() != null ? paymentDto.amount().toPlainString() : "";
+        String cur = paymentDto.currency() != null ? paymentDto.currency() : "TRY";
+        com.serhat.secondhand.notification.dto.NotificationRequest base = notificationTemplateCatalog.paymentSucceeded(
+                user.getId(),
+                amountText,
+                cur,
+                null,
+                "Premium Üyelik",
+                com.serhat.secondhand.payment.entity.PaymentTransactionType.MEMBERSHIP_PAYMENT.name(),
+                null);
         com.serhat.secondhand.notification.dto.NotificationRequest req = com.serhat.secondhand.notification.dto.NotificationRequest
                 .of(
                         user.getId(),
@@ -120,7 +132,7 @@ public class PaymentNotificationService {
                         "Premium Üyelik Aktif",
                         "Tebrikler! Premium üyeliğiniz başarıyla aktif edildi. Premium avantajlarınızın tadını çıkarın.",
                         "/profile",
-                        "{}");
+                        base.getMetadata());
         notificationEventPublisher.publishDispatch(req, "payment",
                 "membership-success:" + user.getId() + ":" + paymentDto.paymentId());
         log.info("Premium in-app notification sent to user: {}", user.getId());

@@ -4,8 +4,8 @@
 The `ai` domain orchestrates interactions with the "Aura" AI assistant, translating natural language user input into semantic listing searches, dynamic price advice, and automated listing generation.
 
 ## Architecture Overview
-- **AuraListingSearchOrchestrator:** Parses user intents and prepares prompts.
-- **ContextAdapters:** Systematically injects the active user's context (e.g., cart state, recent orders) into the LLM prompt.
+- **AuraListingSearchOrchestrator:** Extracts structured search plans (`SearchPlan`) via `GeminiClient.generateJsonForMemory` (`responseMimeType: "application/json"`), supporting hybrid category + text + location (`city`, `district`) + spec filters (`minPrice`, `maxPrice`, `minRam`, `minStorage`, `minYear`, `maxYear`, `maxMileage`, `minRoomCount`) and skipping DB search when intent is explicitly `NONE`.
+- **ContextAdapters:** Systematically injects the active user's context (`ListingFocusAgentContextAdapter` across all 6 verticals with real DB `marketPriceBenchmark` min/max/avg statistics for `<PriceAdvisorGauge>`, plus enriched `OrderAgentContextAdapter`, `ListingAgentContextAdapter`, and `NotificationAgentContextAdapter`) into the LLM prompt.
 - **GeminiClient:** Manages the HTTP communication layer with the Google Gemini API.
 
 ## Business Invariants & Constraints

@@ -69,6 +69,7 @@ public class EnumReadService {
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
     private final com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService listingAttributeCatalogService;
+    private final com.serhat.secondhand.listing.application.size.SizeSystemCatalog sizeSystemCatalog;
 
     private String normalizeName(Map<String, Object> item) {
         Object val = item.get("name") != null ? item.get("name") : item.get("label");
@@ -297,11 +298,13 @@ public class EnumReadService {
 
     public List<Map<String, Object>> getClothingBrands() {
         List<Map<String, Object>> raw = clothingBrandRepository.findAll().stream()
+                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", brand.getId());
                     map.put("name", brand.getName());
                     map.put("label", Optional.ofNullable(brand.getLabel()).filter(l -> !l.isBlank()).orElse(brand.getName()));
+                    map.put("segment", brand.getSegment() != null ? brand.getSegment().name() : null);
                     return map;
                 }).toList();
         return deduplicateByName(raw);
@@ -309,15 +312,38 @@ public class EnumReadService {
 
     public List<Map<String, Object>> getClothingTypes() {
         List<Map<String, Object>> raw = clothingTypeRepository.findAll().stream()
+                .sorted(Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType::getSortOrder)
+                        .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", type.getId());
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
-                    map.put("group", com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingGroup.fromTypeName(type.getName()).name());
+                    map.put("group", type.getGroup() != null ? type.getGroup().name() : null);
+                    map.put("sortOrder", type.getSortOrder());
+                    // Audience -> allowed size systems (data/clothing/types.json); a missing audience hides the type.
+                    map.put("sizeRules", type.getSizeRules());
+                    // fit / pattern / fabricType -> REQUIRED | OPTIONAL | HIDDEN.
+                    map.put("fieldRules", type.getFieldRules());
+                    // Condition attributes follow the type group (data/attributes/clothing.json scopes).
+                    map.put("attributeKeys", type.getGroup() == null ? List.of() : listingAttributeCatalogService
+                            .getDefinitions(com.serhat.secondhand.listing.domain.entity.enums.base.ListingType.CLOTHING, type.getGroup().name())
+                            .stream().map(com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto::getKey).toList());
                     return map;
                 }).toList();
         return deduplicateByName(raw);
+    }
+
+    /** Size systems from data/common/sizes.json: key, label, values [{value, label}]. */
+    public List<Map<String, Object>> getSizeSystems() {
+        return sizeSystemCatalog.all().stream().map(system -> {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("value", system.key());
+            map.put("label", system.label());
+            map.put("values", system.values().stream()
+                    .map(v -> Map.<String, Object>of("value", v.key(), "label", v.label())).toList());
+            return map;
+        }).toList();
     }
 
     public List<Map<String, Object>> getBookTypes() {

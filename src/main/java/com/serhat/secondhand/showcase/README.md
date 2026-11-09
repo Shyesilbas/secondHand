@@ -5,7 +5,7 @@ The `showcase` domain governs the paid "vitrin" (showcase) features, allowing se
 
 ## Architecture Overview
 - **ShowcaseService:** Central logic coordinating duration limits, payment validation, ownership verification, and Redis TTL registration.
-- **ShowcaseRedisManagerService:** Manages fast Redis active showcase caching (`showcase:active:{listingId}`) with automatic TTL expiration matching the showcase end date.
+- **ShowcaseRedisManagerService:** Manages fast Redis active showcase caching (`v4:listing:showcase:active:{listingId}`) with automatic TTL expiration matching the showcase end date.
 - **ShowcaseMapper:** Performs batch enrichment. It fetches favorite statistics and campaign pricing for all listings in a page simultaneously to avoid N+1 queries.
 - **ShowcaseScheduler:** Periodically expires showcases that have passed their expiration date via batch `saveAll`.
 

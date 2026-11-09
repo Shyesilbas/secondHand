@@ -85,9 +85,115 @@ function electronicsContextLines(listing) {
  ].filter(Boolean);
 }
 
+function vehicleContextLines(listing) {
+ if (listing.type !== LISTING_TYPES.VEHICLE) return [];
+ const vType = lookupLabel(listing.vehicleType);
+ const brand = lookupLabel(listing.brand);
+ const modelName = listing.model?.name?.trim() || null;
+ const gen = lookupLabel(listing.generation);
+ const engine = lookupLabel(listing.engine);
+ const trim = lookupLabel(listing.trim);
+ const year = listing.year != null ? `Model year: ${listing.year}` : null;
+ const mileage = listing.mileage != null ? `Mileage: ${listing.mileage} km` : null;
+ const fuel = listing.fuelType ? `Fuel: ${listing.fuelType}` : null;
+ const gearbox = listing.gearbox ? `Gearbox: ${listing.gearbox}` : null;
+ const hp = listing.horsePower != null ? `Horsepower: ${listing.horsePower} HP` : null;
+ const cc = listing.engineCapacity != null ? `Engine capacity: ${listing.engineCapacity} cc` : null;
+ const accident =
+ listing.accidentHistory != null
+ ? `Accident history: ${listing.accidentHistory ? 'Yes' : 'No'}${listing.accidentDetails ? ` (${listing.accidentDetails})` : ''}`
+ : null;
+ return [
+ [vType, brand, modelName, gen, engine, trim].filter(Boolean).length
+ ? `Vehicle: ${[vType, brand, modelName, gen, engine, trim].filter(Boolean).join(' · ')}`
+ : null,
+ year,
+ mileage,
+ fuel,
+ gearbox,
+ hp,
+ cc,
+ accident,
+ ].filter(Boolean);
+}
+
+function realEstateContextLines(listing) {
+ if (listing.type !== LISTING_TYPES.REAL_ESTATE) return [];
+ const adType = lookupLabel(listing.adType);
+ const reType = lookupLabel(listing.realEstateType);
+ const heating = lookupLabel(listing.heatingType);
+ const area =
+ listing.grossAreaM2 != null || listing.netAreaM2 != null
+ ? `Area: gross ${listing.grossAreaM2 ?? '-'} m², net ${listing.netAreaM2 ?? '-'} m²`
+ : null;
+ const rooms =
+ listing.roomConfigKey || listing.roomCount != null
+ ? `Rooms: ${listing.roomConfigKey || listing.roomCount}`
+ : null;
+ const floor =
+ listing.floorKey || listing.floorNumber != null
+ ? `Floor: ${listing.floorKey || listing.floorNumber}${listing.totalFloors != null ? ` / ${listing.totalFloors}` : ''}`
+ : null;
+ const age = listing.buildingAge != null ? `Building age: ${listing.buildingAge}` : null;
+ return [
+ [adType, reType].filter(Boolean).length ? `Property: ${[adType, reType].filter(Boolean).join(' · ')}` : null,
+ area,
+ rooms,
+ floor,
+ age,
+ heating ? `Heating: ${heating}` : null,
+ ].filter(Boolean);
+}
+
+function clothingContextLines(listing) {
+ if (listing.type !== LISTING_TYPES.CLOTHING) return [];
+ const brand = lookupLabel(listing.brand);
+ const cType = lookupLabel(listing.clothingType);
+ const size = listing.sizeSystem !== 'ONE_SIZE' ? listing.sizeLabel : null;
+ const cond = listing.condition ? `Condition: ${listing.condition}` : null;
+ const audience = listing.audience ? `For: ${listing.audience}` : null;
+ return [
+ [brand, cType].filter(Boolean).length ? `Item: ${[brand, cType].filter(Boolean).join(' · ')}` : null,
+ size ? `Size: ${size}` : null,
+ cond,
+ audience,
+ listing.fabricType ? `Fabric: ${listing.fabricType}` : null,
+ ].filter(Boolean);
+}
+
+function booksContextLines(listing) {
+ if (listing.type !== LISTING_TYPES.BOOKS) return [];
+ const bType = lookupLabel(listing.bookType);
+ const genre = lookupLabel(listing.genre);
+ const lang = lookupLabel(listing.language);
+ const format = lookupLabel(listing.format);
+ const cond = lookupLabel(listing.condition);
+ return [
+ listing.author ? `Author: ${listing.author}` : null,
+ [bType, genre].filter(Boolean).length ? `Genre: ${[bType, genre].filter(Boolean).join(' · ')}` : null,
+ lang ? `Language: ${lang}` : null,
+ format ? `Format: ${format}` : null,
+ cond ? `Condition: ${cond}` : null,
+ listing.publicationYear != null ? `Publication year: ${listing.publicationYear}` : null,
+ listing.pageCount != null ? `Pages: ${listing.pageCount}` : null,
+ ].filter(Boolean);
+}
+
+function sportsContextLines(listing) {
+ if (listing.type !== LISTING_TYPES.SPORTS) return [];
+ const discipline = lookupLabel(listing.discipline);
+ const equip = lookupLabel(listing.equipmentType);
+ const cond = lookupLabel(listing.condition);
+ return [
+ [discipline, equip].filter(Boolean).length ? `Equipment: ${[discipline, equip].filter(Boolean).join(' · ')}` : null,
+ cond ? `Condition: ${cond}` : null,
+ ].filter(Boolean);
+}
+
 export function buildAuraListingSessionContext(listing) {
  if (!listing) return null;
- const priceLine = formatListingPriceLabel(listing.price, listing.currency);
+ const effectivePrice = listing.campaignPrice ?? listing.price;
+ const priceLine = formatListingPriceLabel(effectivePrice, listing.currency);
  const typeStr = listingTypeLabel(listing.type);
  const statusStr = listingStatusLabel(listing.status);
  const location = [listing.district, listing.city].filter(Boolean).join(', ');
@@ -107,6 +213,11 @@ export function buildAuraListingSessionContext(listing) {
  listing.listingNo ? `Listing number: ${listing.listingNo}` : null,
  listing.id ? `ID: ${listing.id}` : null,
  ...electronicsContextLines(listing),
+ ...vehicleContextLines(listing),
+ ...realEstateContextLines(listing),
+ ...clothingContextLines(listing),
+ ...booksContextLines(listing),
+ ...sportsContextLines(listing),
  desc ? `Description summary: ${desc}` : null,
  ];
  return lines.filter(Boolean).join('\n');

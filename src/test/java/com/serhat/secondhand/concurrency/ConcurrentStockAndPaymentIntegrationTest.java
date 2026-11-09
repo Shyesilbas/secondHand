@@ -109,9 +109,8 @@ public class ConcurrentStockAndPaymentIntegrationTest {
             redisTemplate.delete("v4:inventory:reservation:" + (1000L + u) + ":" + testListingId);
         }
 
-        User seller = userRepository.findAll().stream().findFirst().orElseGet(() ->
-                userRepository.save(User.builder().email("seller_test_" + System.currentTimeMillis() + "@test.com").name("Seller").build())
-        );
+        User seller = userRepository.findAll().stream().findFirst().orElseGet(() -> userRepository.save(User.builder()
+                .email("seller_test_" + System.currentTimeMillis() + "@test.com").name("Seller").build()));
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfConcurrentUsers);
         CountDownLatch readyLatch = new CountDownLatch(numberOfConcurrentUsers);
@@ -120,92 +119,114 @@ public class ConcurrentStockAndPaymentIntegrationTest {
 
         List<String> successfulUsers = Collections.synchronizedList(new ArrayList<>());
         List<String> rejectedUsers = Collections.synchronizedList(new ArrayList<>());
+        List<UUID> createdPaymentIds = Collections.synchronizedList(new ArrayList<>());
         Map<String, Long> executionTimes = new ConcurrentHashMap<>();
 
-        // 2. 5 Thread oluşturup kapıda beklet
-        for (int i = 1; i <= numberOfConcurrentUsers; i++) {
-            final long userId = 1000L + i;
-            final String userName = "User-" + i + " (ID:" + userId + ")";
+        try {
+            // 2. 5 Thread oluşturup kapıda beklet
+            for (int i = 1; i <= numberOfConcurrentUsers; i++) {
+                final long userId = 1000L + i;
+                final String userName = "User-" + i + " (ID:" + userId + ")";
 
-            executorService.submit(() -> {
-                readyLatch.countDown();
-                try {
-                    startGate.await(); // Tabanca sesini bekle!
-
-                    long startTime = System.currentTimeMillis();
-                    log.info("⚡ [{}] -> Satın alma isteği ateşlendi!", userName);
-
+                executorService.submit(() -> {
+                    readyLatch.countDown();
                     try {
-                        // A) Redis Lua Atomik Rezervasyon
-                        redisReservationService.reserveStockWithTtl(userId, testListingId, 1, 900L);
-                        long duration = System.currentTimeMillis() - startTime;
-                        executionTimes.put(userName, duration);
+                        startGate.await(); // Tabanca sesini bekle!
 
-                        log.info("✅ [{}] -> STOK REZERVE EDİLDİ! (Süre: {} ms) | Redis Kilit Başarılı", userName, duration);
+                        long startTime = System.currentTimeMillis();
+                        log.info("⚡ [{}] -> Satın alma isteği ateşlendi!", userName);
 
-                        // B) Ödeme & Transactional Outbox Kaydı Simülasyonu
-                        Payment payment = Payment.builder()
-                                .amount(new BigDecimal("250.00"))
-                                .currency("TRY")
-                                .listingId(testListingId)
-                                .fromUser(seller) // Test için
-                                .toUser(seller)
-                                .status(PaymentStatus.COMPLETED)
-                                .isSuccess(true)
-                                .processedAt(LocalDateTime.now())
-                                .idempotencyKey("TEST-CONCURRENT-" + userId + "-" + testListingId)
-                                .build();
-                        payment = paymentRepository.save(payment);
+                        try {
+                            // A) Redis Lua Atomik Rezervasyon
+                            redisReservationService.reserveStockWithTtl(userId, testListingId, 1, 900L);
+                            long duration = System.currentTimeMillis() - startTime;
+                            executionTimes.put(userName, duration);
 
-                        // Outbox'a yaz
-                        paymentOutboxService.enqueuePaymentCompleted(payment);
+                            log.info("✅ [{}] -> STOK REZERVE EDİLDİ! (Süre: {} ms) | Redis Kilit Başarılı", userName,
+                                    duration);
 
-                        successfulUsers.add(userName);
-                        log.info("📬 [{}] -> Payment ve Outbox Event DB'ye ACID ile kaydedildi!", userName);
+                            // B) Ödeme & Transactional Outbox Kaydı Simülasyonu
+                            Payment payment = Payment.builder()
+                                    .amount(new BigDecimal("250.00"))
+                                    .currency("TRY")
+                                    .listingId(testListingId)
+                                    .fromUser(seller) // Test için
+                                    .toUser(seller)
+                                    .status(PaymentStatus.COMPLETED)
+                                    .isSuccess(true)
+                                    .processedAt(LocalDateTime.now())
+                                    .idempotencyKey("TEST-CONCURRENT-" + userId + "-" + testListingId)
+                                    .build();
+                            payment = paymentRepository.save(payment);
+                            createdPaymentIds.add(payment.getId());
 
-                    } catch (BusinessException ex) {
-                        long duration = System.currentTimeMillis() - startTime;
-                        executionTimes.put(userName, duration);
-                        rejectedUsers.add(userName);
-                        log.warn("❌ [{}] -> REDDEDİLDİ: {} (Süre: {} ms) | DB'ye yük binmedi!", userName, ex.getMessage(), duration);
-                    } catch (Exception ex) {
-                        log.error("💥 [{}] -> Beklenmeyen hata:", userName, ex);
-                        rejectedUsers.add(userName);
+                            // Outbox'a yaz
+                            paymentOutboxService.enqueuePaymentCompleted(payment);
+
+                            successfulUsers.add(userName);
+                            log.info("📬 [{}] -> Payment ve Outbox Event DB'ye ACID ile kaydedildi!", userName);
+
+                        } catch (BusinessException ex) {
+                            long duration = System.currentTimeMillis() - startTime;
+                            executionTimes.put(userName, duration);
+                            rejectedUsers.add(userName);
+                            log.warn("❌ [{}] -> REDDEDİLDİ: {} (Süre: {} ms) | DB'ye yük binmedi!", userName,
+                                    ex.getMessage(), duration);
+                        } catch (Exception ex) {
+                            log.error("💥 [{}] -> Beklenmeyen hata:", userName, ex);
+                            rejectedUsers.add(userName);
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        doneLatch.countDown();
                     }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } finally {
-                    doneLatch.countDown();
-                }
-            });
+                });
+            }
+
+            // Tüm thread'ler hazır olana kadar bekle
+            readyLatch.await();
+            log.info("🚦 5 Thread kapıda hazır bekliyor... 3.. 2.. 1.. FIRE! 💥");
+            startGate.countDown(); // Tabancayı ateşle!
+
+            // Tüm işlemlerin bitmesini bekle
+            boolean completedInTime = doneLatch.await(10, TimeUnit.SECONDS);
+            executorService.shutdown();
+
+            log.info("================================================================================");
+            log.info("🏁 [SIMULATION FINISHED]");
+            log.info("⏱️ Zamanında Bitti mi: {}", completedInTime);
+            log.info("🟢 Başarılı Satın Almalar (Kalan Stok 0 Oldu): {} -> {}", successfulUsers.size(),
+                    successfulUsers);
+            log.info("🔴 Stok Yetersizliği ile Reddedilenler: {} -> {}", rejectedUsers.size(), rejectedUsers);
+            log.info("📊 Ortalama Redis Lua Karar Süresi: {} ms",
+                    executionTimes.values().stream().mapToLong(Long::longValue).average().orElse(0.0));
+            log.info("================================================================================");
+
+            // 3. ASSERTIONS (Matematiksel Kesinlik Doğrulamaları)
+            Assertions.assertEquals(3, successfulUsers.size(), "Tam olarak 3 kullanıcı ürünü satın alabilmelidir.");
+            Assertions.assertEquals(2, rejectedUsers.size(), "Stok tükendiği için tam 2 kullanıcı reddedilmelidir.");
+
+            // Redis'teki stok anahtarının değerini doğrula (3 adet rezerve edildiği için
+            // kalan 0 olmalı)
+            String remainingRedisStock = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
+            log.info("🔍 Redis'te Kalan Fiziksel Stok Değeri: {}", remainingRedisStock);
+            Assertions.assertEquals("0", remainingRedisStock, "Redis'te kalan stok tam 0 olmalıdır.");
+        } finally {
+            redisTemplate.delete("v4:inventory:stock:" + testListingId);
+            for (long u = 1; u <= numberOfConcurrentUsers; u++) {
+                redisTemplate.delete("v4:inventory:reservation:" + (1000L + u) + ":" + testListingId);
+            }
+            if (!createdPaymentIds.isEmpty()) {
+                Set<String> aggregateIds = new HashSet<>();
+                createdPaymentIds.forEach(id -> aggregateIds.add(id.toString()));
+                List<PaymentOutboxEvent> toDelete = paymentOutboxRepository.findAll().stream()
+                        .filter(e -> aggregateIds.contains(e.getAggregateId()))
+                        .toList();
+                paymentOutboxRepository.deleteAll(toDelete);
+                paymentRepository.deleteAllById(createdPaymentIds);
+            }
         }
-
-        // Tüm thread'ler hazır olana kadar bekle
-        readyLatch.await();
-        log.info("🚦 5 Thread kapıda hazır bekliyor... 3.. 2.. 1.. FIRE! 💥");
-        startGate.countDown(); // Tabancayı ateşle!
-
-        // Tüm işlemlerin bitmesini bekle
-        boolean completedInTime = doneLatch.await(10, TimeUnit.SECONDS);
-        executorService.shutdown();
-
-        log.info("================================================================================");
-        log.info("🏁 [SIMULATION FINISHED]");
-        log.info("⏱️ Zamanında Bitti mi: {}", completedInTime);
-        log.info("🟢 Başarılı Satın Almalar (Kalan Stok 0 Oldu): {} -> {}", successfulUsers.size(), successfulUsers);
-        log.info("🔴 Stok Yetersizliği ile Reddedilenler: {} -> {}", rejectedUsers.size(), rejectedUsers);
-        log.info("📊 Ortalama Redis Lua Karar Süresi: {} ms",
-                executionTimes.values().stream().mapToLong(Long::longValue).average().orElse(0.0));
-        log.info("================================================================================");
-
-        // 3. ASSERTIONS (Matematiksel Kesinlik Doğrulamaları)
-        Assertions.assertEquals(3, successfulUsers.size(), "Tam olarak 3 kullanıcı ürünü satın alabilmelidir.");
-        Assertions.assertEquals(2, rejectedUsers.size(), "Stok tükendiği için tam 2 kullanıcı reddedilmelidir.");
-
-        // Redis'teki stok anahtarının değerini doğrula (3 adet rezerve edildiği için kalan 0 olmalı)
-        String remainingRedisStock = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
-        log.info("🔍 Redis'te Kalan Fiziksel Stok Değeri: {}", remainingRedisStock);
-        Assertions.assertEquals("0", remainingRedisStock, "Redis'te kalan stok tam 0 olmalıdır.");
     }
 
     @Autowired
@@ -242,8 +263,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                 try {
                     startGate.await();
                     int result = couponRedisLimiterService.acquireCouponUsage(
-                            testCouponCode, userId, globalLimit, 1, 3600L
-                    );
+                            testCouponCode, userId, globalLimit, 1, 3600L);
 
                     if (result > 0) {
                         successfulUsers.add(userName);
@@ -289,7 +309,8 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("================================================================================");
 
         User seller = userRepository.findAll().stream().findFirst().orElseThrow();
-        com.serhat.secondhand.escrow.domain.entity.Escrow escrow = com.serhat.secondhand.escrow.domain.entity.Escrow.builder()
+        com.serhat.secondhand.escrow.domain.entity.Escrow escrow = com.serhat.secondhand.escrow.domain.entity.Escrow
+                .builder()
                 .seller(seller)
                 .buyer(seller)
                 .amount(new BigDecimal("750.00"))
@@ -300,17 +321,27 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                 .blockedAt(LocalDateTime.now())
                 .build();
         final com.serhat.secondhand.escrow.domain.entity.Escrow savedEscrow = escrowRepository.save(escrow);
+        try {
+            // 1. Escrow Release tetikle (Outbox'a yaz)
+            escrowOutboxService.enqueueEscrowReleased(savedEscrow);
 
-        // 1. Escrow Release tetikle (Outbox'a yaz)
-        escrowOutboxService.enqueueEscrowReleased(savedEscrow);
+            // 2. Outbox tablosunu kontrol et
+            List<com.serhat.secondhand.escrow.outbox.EscrowOutboxEvent> outboxEvents = escrowOutboxRepository.findAll();
+            boolean eventExists = outboxEvents.stream()
+                    .anyMatch(e -> e.getAggregateId().equals(savedEscrow.getId().toString())
+                            && e.getEventType().equals("ESCROW_RELEASED"));
 
-        // 2. Outbox tablosunu kontrol et
-        List<com.serhat.secondhand.escrow.outbox.EscrowOutboxEvent> outboxEvents = escrowOutboxRepository.findAll();
-        boolean eventExists = outboxEvents.stream()
-                .anyMatch(e -> e.getAggregateId().equals(savedEscrow.getId().toString()) && e.getEventType().equals("ESCROW_RELEASED"));
-
-        log.info("📬 Escrow Outbox Tablosunda ESCROW_RELEASED Event Kaydı Bulundu mu: {}", eventExists);
-        Assertions.assertTrue(eventExists, "Escrow release eventi escrow_outbox_events tablosuna ACID ile yazılmalıdır.");
+            log.info("📬 Escrow Outbox Tablosunda ESCROW_RELEASED Event Kaydı Bulundu mu: {}", eventExists);
+            Assertions.assertTrue(eventExists,
+                    "Escrow release eventi escrow_outbox_events tablosuna ACID ile yazılmalıdır.");
+        } finally {
+            List<com.serhat.secondhand.escrow.outbox.EscrowOutboxEvent> toDelete = escrowOutboxRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getAggregateId().equals(savedEscrow.getId().toString()))
+                    .toList();
+            escrowOutboxRepository.deleteAll(toDelete);
+            escrowRepository.deleteById(savedEscrow.getId());
+        }
     }
 
     @Test
@@ -320,14 +351,14 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("⏳ [STOCK RESERVATION CANCELLATION & TTL SIMULATION STARTED]");
         log.info("================================================================================");
 
-        com.serhat.secondhand.listing.domain.entity.Listing realListing = listingRepository.findAll().stream().findFirst().orElseThrow();
+        com.serhat.secondhand.listing.domain.entity.Listing realListing = listingRepository.findAll().stream()
+                .findFirst().orElseThrow();
         UUID testListingId = realListing.getId();
         long testUserId = 9999L;
 
         // 1. Başlangıç stoğu 1 yap
-        Inventory inventory = inventoryRepository.findByListingId(testListingId).orElseGet(() ->
-                Inventory.builder().listingId(testListingId).build()
-        );
+        Inventory inventory = inventoryRepository.findByListingId(testListingId)
+                .orElseGet(() -> Inventory.builder().listingId(testListingId).build());
         inventory.setAvailableQuantity(1);
         inventoryRepository.save(inventory);
 
@@ -361,28 +392,34 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("================================================================================");
 
         long testOrderId = 8888L;
-        com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent event =
-                new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent(
-                        testOrderId,
-                        "ORD-TEST-8888",
-                        1001L,
-                        new BigDecimal("499.00"),
-                        List.of(new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail(
-                                UUID.randomUUID(), 1, new BigDecimal("499.00")
-                        )),
-                        "Customer cancellation test"
-                );
+        com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent event = new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent(
+                testOrderId,
+                "ORD-TEST-8888",
+                1001L,
+                new BigDecimal("499.00"),
+                List.of(new com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent.CancelledItemDetail(
+                        UUID.randomUUID(), 1, new BigDecimal("499.00"))),
+                "Customer cancellation test");
 
         // 1. Outbox'a yaz
         orderOutboxService.enqueueOrderCancelled(event);
+        try {
+            // 2. Outbox tablosunu kontrol et
+            List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
+            boolean eventExists = outboxEvents.stream()
+                    .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId))
+                            && e.getEventType().equals("ORDER_CANCELLED"));
 
-        // 2. Outbox tablosunu kontrol et
-        List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
-        boolean eventExists = outboxEvents.stream()
-                .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId)) && e.getEventType().equals("ORDER_CANCELLED"));
-
-        log.info("📬 Order Outbox Tablosunda ORDER_CANCELLED Event Kaydı Bulundu mu: {}", eventExists);
-        Assertions.assertTrue(eventExists, "Sipariş iptal eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
+            log.info("📬 Order Outbox Tablosunda ORDER_CANCELLED Event Kaydı Bulundu mu: {}", eventExists);
+            Assertions.assertTrue(eventExists,
+                    "Sipariş iptal eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
+        } finally {
+            List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> toDelete = orderOutboxRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getAggregateId().equals(String.valueOf(testOrderId)))
+                    .toList();
+            orderOutboxRepository.deleteAll(toDelete);
+        }
     }
 
     @Test
@@ -393,27 +430,33 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         log.info("================================================================================");
 
         long testOrderId = 7777L;
-        com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent event =
-                new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent(
-                        testOrderId,
-                        "ORD-REFUND-7777",
-                        1001L,
-                        new BigDecimal("299.00"),
-                        List.of(new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.RefundedItemDetail(
-                                UUID.randomUUID(), 1, new BigDecimal("299.00")
-                        )),
-                        "Customer refund test"
-                );
+        com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent event = new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent(
+                testOrderId,
+                "ORD-REFUND-7777",
+                1001L,
+                new BigDecimal("299.00"),
+                List.of(new com.serhat.secondhand.order.contract.OrderRefundedKafkaEvent.RefundedItemDetail(
+                        UUID.randomUUID(), 1, new BigDecimal("299.00"))),
+                "Customer refund test");
 
         // 1. Outbox'a yaz
         orderOutboxService.enqueueOrderRefunded(event);
+        try {
+            // 2. Outbox tablosunu kontrol et
+            List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
+            boolean eventExists = outboxEvents.stream()
+                    .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId))
+                            && e.getEventType().equals("ORDER_REFUNDED"));
 
-        // 2. Outbox tablosunu kontrol et
-        List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> outboxEvents = orderOutboxRepository.findAll();
-        boolean eventExists = outboxEvents.stream()
-                .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId)) && e.getEventType().equals("ORDER_REFUNDED"));
-
-        log.info("📬 Order Outbox Tablosunda ORDER_REFUNDED Event Kaydı Bulundu mu: {}", eventExists);
-        Assertions.assertTrue(eventExists, "Sipariş iade eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
+            log.info("📬 Order Outbox Tablosunda ORDER_REFUNDED Event Kaydı Bulundu mu: {}", eventExists);
+            Assertions.assertTrue(eventExists,
+                    "Sipariş iade eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
+        } finally {
+            List<com.serhat.secondhand.order.outbox.OrderOutboxEvent> toDelete = orderOutboxRepository.findAll()
+                    .stream()
+                    .filter(e -> e.getAggregateId().equals(String.valueOf(testOrderId)))
+                    .toList();
+            orderOutboxRepository.deleteAll(toDelete);
+        }
     }
 }

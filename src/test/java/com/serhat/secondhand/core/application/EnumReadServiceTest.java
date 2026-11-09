@@ -66,6 +66,7 @@ class EnumReadServiceTest {
     @Mock private SportEquipmentTypeRepository sportEquipmentTypeRepository;
     @Mock private SportConditionRepository sportConditionRepository;
     @Mock private com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService listingAttributeCatalogService;
+    @Mock private com.serhat.secondhand.listing.application.size.SizeSystemCatalog sizeSystemCatalog;
 
     private EnumReadService enumReadService;
 
@@ -97,7 +98,8 @@ class EnumReadServiceTest {
                 sportDisciplineRepository,
                 sportEquipmentTypeRepository,
                 sportConditionRepository,
-                listingAttributeCatalogService
+                listingAttributeCatalogService,
+                sizeSystemCatalog
         );
     }
 

@@ -119,6 +119,38 @@ export const stripEmailEmojis = (text) => {
   return text.replace(EMOJI_STRIP_RE, '');
 };
 
+export const decodeHtmlEntities = (str) => {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&copy;|\u00A9/gi, '')
+    .replace(/&quot;/gi, '"')
+    .replace(/&(?:apos|#39|#x27);/gi, "'")
+    .replace(/&lsquo;|&rsquo;/gi, "'")
+    .replace(/&ldquo;|&rdquo;/gi, '"')
+    .replace(/&ndash;/gi, '–')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&hellip;/gi, '…')
+    .replace(/&bull;/gi, '•')
+    .replace(/&#(\d+);/g, (_, dec) => {
+      try {
+        return String.fromCodePoint(parseInt(dec, 10));
+      } catch {
+        return '';
+      }
+    })
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => {
+      try {
+        return String.fromCodePoint(parseInt(hex, 16));
+      } catch {
+        return '';
+      }
+    })
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&amp;/gi, '&');
+};
+
 export const extractEmailPreview = (rawContent, subject = '') => {
   if (!rawContent || typeof rawContent !== 'string') return '';
 
@@ -130,16 +162,16 @@ export const extractEmailPreview = (rawContent, subject = '') => {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
     .replace(/<div[^>]*style=["'][^"']*display\s*:\s*none[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
-    .replace(/<div[^>]*class=["'][^"']*(?:header|footer|brand-badge|brand-name)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&copy;|\u00A9/gi, '')
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"');
+    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, ' ')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, ' ')
+    .replace(/<h[1-3][^>]*>[\s\S]*?<\/h[1-3]>/gi, ' ')
+    .replace(/<div[^>]*class=["'][^"']*(?:brand-badge|brand-name|crown-icon|benefit-icon)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
+    .replace(/<div[^>]*class=["'][^"']*(?:header|footer)[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, ' ')
+    .replace(/<p[^>]*class=["'][^"']*greeting[^"']*["'][^>]*>[\s\S]*?<\/p>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
 
-  let text = stripEmailEmojis(cleaned).replace(/\s+/g, ' ').trim();
+  const decoded = decodeHtmlEntities(cleaned);
+  let text = stripEmailEmojis(decoded).replace(/\s+/g, ' ').trim();
 
   if (subject) {
     const cleanSubj = stripEmailEmojis(String(subject)).trim();
@@ -149,7 +181,7 @@ export const extractEmailPreview = (rawContent, subject = '') => {
   }
 
   text = text
-    .replace(/^Merhaba\s+[^,]{1,40},\s*/i, '')
+    .replace(/^(?:Merhaba|Sayın|Sevgili)\s+[^,]{1,40},?\s*/i, '')
     .replace(/\s*Saygılarımızla,?\s*SecondHand\s*Ekibi.*$/i, '')
     .replace(/\s*20\d{2}\s*SecondHand.*$/i, '')
     .trim();

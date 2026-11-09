@@ -1,75 +1,110 @@
-# Kategori Polimorfizmi, Dinamik Katalog ve Doğrulama Zinciri Mimarisi
+# Kategori Polymorphism, Dinamik Katalog ve Doğrulama Zinciri
 
-Bu doküman, **secondHand** platformunun 6 temel dikeydeki (Emlak, Vasıta, Elektronik, Giyim, Kitap, Spor) **Polimorfik İlan Veri Modelini**, **189 JSON dosyasından oluşan Dinamik Tohumlama (Seeding) Mimarisini**, **Template Method Tabanlı Servis Katmanını (`AbstractListingService`)**, **Sorumluluk Zinciri Tabanlı Validatör Motorunu (`ListingValidationEngine`)** ve **Yerelleştirilmiş Hiyerarşik Önbellekleme Altyapısını (`EnumReadService`, `LocationCatalogService`)** detaylandırmaktadır.
+Bu doküman, 6 vertical'daki (Emlak, Vasıta, Elektronik, Giyim, Kitap, Spor) polymorphic ilan modelini, `AbstractListingService` template akışını, `ListingValidationEngine` doğrulama sırasını ve JSON katalog verisinin yapısını açıklar. Seeding'in nasıl çalıştırıldığı için [database-migration-and-seeding-guide.md](database-migration-and-seeding-guide.md) dosyasına bakın.
 
 ---
 
-## 1. Mimari Genel Bakış
+## 1. Veri Modeli
 
-İkinci el platformlarında farklı kategorilerin gereksinimleri radikal biçimde farklılaşır:
-- Bir otomobil için jenerasyon, yakıt tipi, vites, kasa tipi, beygir gücü ve motor hacmi gerekir.
-- Bir emlak için oda sayısı, ısıtma tipi, bina yaşı, kat ve imar durumu zorunludur.
-- Bir giyim ürünü için beden/numara, cinsiyet ve giyim grubu (`APPAREL`, `FOOTWEAR`, `ACCESSORY`) ayrımı şarttır.
-
-Bu karmaşıklığı monolitik tek bir tabloda `JSONB` kargaşasına dönüştürmek yerine, **JPA Polimorfizmi (`JOINED` Inheritance)** ve **Tasarım Kalıpları** ile tip güvenli bir mimari kurulmuştur.
+Kategori başına ayrı alan setleri tek tabloda `JSONB` blob'una dönüştürülmez; [`Listing`](../src/main/java/com/serhat/secondhand/listing/domain/entity/Listing.java) `@Inheritance(strategy = InheritanceType.JOINED)` ile kök varlıktır ve her kategori kendi tablosuna sahip bir alt sınıftır:
 
 ```
-                           [ Listing (Çekirdek Varlık) ]
-        (id, title, description, price, status, seller, address, images)
-                                       │
-     ┌──────────────┬──────────────┬───┴──────────┬──────────────┬──────────────┐
-     ▼              ▼              ▼              ▼              ▼              ▼
-[VehicleListing] [RealEstate] [ElectronicListing] [Clothing]   [BookListing]  [SportsListing]
- (generation,    (roomConfig,   (model, specs,    (size, group,  (author,       (sportBranch,
-  engine, km)     zoningStatus)  releaseYear)      gender)        isbn, genre)   equipmentType)
+                         Listing (ortak alanlar)
+        ┌──────────┬──────────┬──────┴─────┬──────────┬──────────┐
+ VehicleListing  RealEstate  Electronic  Clothing   Books     Sports
+                 Listing     Listing     Listing    Listing   Listing
 ```
 
----
-
-## 2. Tasarım Kalıpları ve Uygulama Mimarisi
-
-### A. Template Method Deseni: [`AbstractListingService.java`](../src/main/java/com/serhat/secondhand/listing/application/category/AbstractListingService.java)
-Tüm kategori servisleri (`VehicleListingService`, `RealEstateListingService`, vb.) `AbstractListingService` sınıfından türer.
-Ortak oluşturma ve güncelleme akışı üst sınıfta sabittir:
-1. `validateCommonRules()`: Satıcı yetkisi, genel başlık ve fiyat limitleri kontrol edilir.
-2. `validateCategorySpecificRules()`: Her kategori alt sınıfının kendi özelleşmiş kuralları çalıştırılır.
-3. `buildSpecificListing()`: İlgili kategoriye özgü JPA varlığı inşa edilir.
-4. `saveAndPublishEvents()`: İlan kaydedilir, Transactional Outbox veya event yayınlanır, Redis cache anahtarları temizlenir.
+Alt sınıflar `listing/domain/entity/` altındadır: `VehicleListing`, `RealEstateListing`, `ElectronicListing`, `ClothingListing`, `BooksListing`, `SportsListing`.
 
 ---
 
-### B. Chain of Responsibility: [`ListingValidationEngine.java`](../src/main/java/com/serhat/secondhand/listing/validation/common/ListingValidationEngine.java)
-İlan kaydedilmeden önce doğrulama kuralları sıralı zincir üzerinden işletilir:
-- **`ApparelValidator` / `FootwearValidator` / `AccessoryValidator`:** Giyim grubuna göre doğru beden/numara kurallarını denetler. Saat, çanta veya cüzdan tiplerine ayakkabı numarası girilmesini engeller.
-- **`HouseValidator` / `LandValidator` / `CommercialLandValidator`:** Arsa ilanlarında oda sayısı ve ısıtma tipi zorunluluğunu kaldırır; konutlarda imar durumu alanını temizler.
-- **`VehicleTypeRulesValidator`:** Araç tipinin `data/vehicles/types.json` kurallarını uygular (zorunlu alanlar, gizli alanların temizlenmesi, izinli kasa tipleri); tip adına bakan kod yoktur.
+## 2. Servis Katmanı: Template Method
+
+[`AbstractListingService<T, C>`](../src/main/java/com/serhat/secondhand/listing/application/category/AbstractListingService.java) tüm `*ListingService` sınıflarının üst sınıfıdır. `createListing(request, sellerId)` akışı sabittir (`@Transactional`, `@CacheEvict("listing:userListings", allEntries = true)`):
+
+1. Satıcı `userService.findById` ile yüklenir.
+2. `mapRequestToEntity` → (`requiresQuantityValidation()` true ise `validateQuantity`) → `resolveEntities` / `applyResolution` (brand, type gibi FK referansları) → `preProcess`.
+3. `validate(entity)`: alt sınıflar burada `listingValidationEngine.cleanupAndValidate(entity, <kategori validator listesi>)` çağırır.
+4. `save(entity)`, ardından `inventoryService.createInventory(id, quantity ?? 1)`.
+
+Güncelleme için `performUpdate(...)` sırası: ownership → finder → `isEditable()` (değilse `INVALID_LISTING_STATUS`) → resolver → updater → validator → save. Alt sınıfların doldurduğu abstract metotlar: `getListingType`, `mapRequestToEntity`, `resolveEntities`, `applyResolution`, `validate`, `save`, `extractQuantity`.
 
 ---
 
-## 3. Dinamik Veri Seti ve Tohumlama (Seeding Pipeline)
+## 3. Doğrulama: `ListingValidationEngine`
 
-Platformun marka, model, il/ilçe ve teknik özellikleri kodun içine gömülü değildir; [`src/main/resources/data/`](../src/main/resources/data/) altındaki JSON dosyalarından beslenir:
+[`ListingValidationEngine.cleanupAndValidate`](../src/main/java/com/serhat/secondhand/listing/validation/common/ListingValidationEngine.java) ilk hatada durur ve şu sırayı izler:
 
-| Dizin | Dosya Sayısı | İçerik ve Detay |
-| :--- | :---: | :--- |
-| **`data/electronics/`** | 189 Dosya | 80 marka, 19 elektronik tipi, model alias'ları (örn. "PS5", "15 Pro"), çıkış yılları (`releaseYear`). |
-| **`data/vehicles/`** | 86 Dosya | 73 marka, jenerasyon başlangıç/bitiş yılları, motor hacmi ve beygir gücü regex ayrıştırması. |
-| **`data/clothing/`** | 61 Tip | APPAREL, FOOTWEAR ve ACCESSORY gruplamaları (`types.json`). |
-| **`data/locations.json`** | 1 Dosya | 81 il, 973 resmi ilçe, 3.479 yaygın mahalle verisi. |
-| **`data/sports.json`** | 1 Dosya | 29 branş ve 60 zengin ekipman türü. |
+1. `listing == null` → `LISTING_REQUIRED`.
+2. `LocationValidator` (yapısal il/ilçe/mahalle kontrolü, [`LocationCatalogService`](../src/main/java/com/serhat/secondhand/listing/application/common/LocationCatalogService.java) üzerinden).
+3. `ListingLocationPolicy` (kategoriye göre lokasyon kuralı).
+4. Kategoriye ait her `CategorySpecValidator<T>` için önce `cleanup(listing)` (hepsi), sonra `validate(listing)` (hepsi).
+5. `ListingAttributeValidator` (`cleanup` + `validate`, `data/attributes/*.json` ile seed'lenen tanımlar).
 
-### Veri Yükleme ve Versiyonlama:
-- **`ElectronicDataInitializer`:** JSON'dan okunan modelleri `V21__add_electronic_model_metadata.sql` ile eklenen kolonlara upsert eder.
-- **`VehicleDataInitializer`:** Regex motoru ile model adından motor gücünü ve jenerasyon aralığını çıkarır (`V22` migrasyonu).
-- **`LocationCatalogService`:** `v5` Redis önbellek sürümüyle mahalle ve ilçe ağacını RAM'de tutar; form yanıt süresini 0.2 milisaniyeye indirir.
+`cleanupAndValidateCollectErrors` aynı adımları hata biriktirerek çalıştırır; hatalar `"KOD|mesaj"` string'leri olarak döner (konum hatasında kalan adımlar atlanır).
+
+Kategori validator'ları `listing/validation/<kategori>/` altındadır ve her serviste `List<...SpecValidator>` olarak enjekte edilir:
+
+| Kategori | Validator'lar |
+| :--- | :--- |
+| Vehicle | `VehicleRequiredFieldsValidator`, `VehicleHierarchyValidator`, `VehicleTypeRulesValidator` |
+| Electronics | `ElectronicRequiredFieldsValidator`, `ElectronicHierarchyValidator`, `ElectronicTypeRulesValidator` |
+| Clothing | `ClothingTypeRulesValidator` |
+| Real estate | `RealEstateTypeRulesValidator` |
+| Books | `BooksRequiredFieldsValidator`, `BooksHierarchyValidator` |
+| Sports | `SportsRequiredFieldsValidator`, `SportsHierarchyValidator` |
+
+`*TypeRulesValidator` sınıfları kuralları koddan değil, veritabanına seed'lenmiş type kurallarından (`types.json`, `realestate.json`) okur; tip adına bakan `if` zinciri yoktur.
 
 ---
 
-## 4. İlgili Dosyalar
+## 4. Katalog JSON Verisi
 
-- Şablon Servis: [`AbstractListingService.java`](../src/main/java/com/serhat/secondhand/listing/application/category/AbstractListingService.java)
-- Doğrulama Motoru: [`ListingValidationEngine.java`](../src/main/java/com/serhat/secondhand/listing/validation/common/ListingValidationEngine.java)
-- Katalog Önbellek Servisi: [`EnumReadService.java`](../src/main/java/com/serhat/secondhand/listing/application/common/EnumReadService.java)
-- Lokasyon Servisi: [`LocationCatalogService.java`](../src/main/java/com/serhat/secondhand/listing/application/common/LocationCatalogService.java)
-- Elektronik Seeder: [`ElectronicDataInitializer.java`](../src/main/java/com/serhat/secondhand/listing/application/electronics/ElectronicDataInitializer.java)
-- Vasıta Seeder: [`VehicleDataInitializer.java`](../src/main/java/com/serhat/secondhand/listing/application/vehicle/VehicleDataInitializer.java)
+Referans veri [`src/main/resources/data/`](../src/main/resources/data/) altındadır (toplam 317 JSON dosyası). Dizin `.gitignore` ile repo dışında tutulur; seed için yerel kopya gerekir ve bu dizine verilen linkler GitHub'da açılmaz. Sayılar dosyalardan doğrulanmıştır:
+
+| Yol | İçerik |
+| :--- | :--- |
+| `data/vehicles/` | 109 JSON: `brands.json` (72 marka), `types.json` (4 tip: bodyTypes + alan kuralları), `cars/`, `motorcycles/`, `trucks/`, `commercial/`, `bicycles/` altında marka başına model dosyaları |
+| `data/electronics/` | 191 JSON: `brands.json` (80 marka), `types.json` (19 tip + alan kuralları), tip klasörleri (`phones/`, `laptops/` …) altında marka/tip başına model dosyaları; `SOURCES.md` kaynakları listeler |
+| `data/clothing/` | `types.json` (59 tip; `group`, `sizes`, `fields`), `brands.json` (100 marka) |
+| `data/books/` | `books.json` (tür/dil/format vb. referans), `catalog.json` (publishers, authors, works) |
+| `data/realestate/` | `realestate.json` (tipler, ilan tipleri, ısıtma, owner type), `specs.json` |
+| `data/sports/sports.json` | 29 discipline, 163 equipment type, 5 condition |
+| `data/common/locations.json` | 81 il, 973 ilçe, 13.526 mahalle; `sizes.json` beden sistemleri |
+| `data/attributes/*.json` | Kategori bazlı dinamik attribute tanımları (5 dosya) |
+| `data/listing-generator/` | Listing generator girdileri (`photos`, `prices`, `realestate-prices`) |
+
+### Loader'lar
+
+Her kategorinin bir `SeedTask` implementasyonu (`*DataInitializer`) vardır; seed key'leri ve çalıştırma yolu [migration/seeding kılavuzunda](database-migration-and-seeding-guide.md#2-katalog-ve-json-seeding-pipeline) anlatılır. `VehicleDataInitializer` ve `ElectronicDataInitializer` bilinmeyen tip/body type referansında `IllegalStateException` / `IllegalArgumentException` ile seed'i durdurur.
+
+### Lokasyon cache'i
+
+`LocationCatalogService` `data/common/locations.json` dosyasını Redis'e üç anahtar olarak yazar: `v6:catalog:locations:cities` (value), `...:districts` ve `...:neighborhoods` (hash). Katalog Redis'te varsa startup'ta JSON tekrar parse edilmez; yoksa `reloadCatalog()` (synchronized) yeniden yükler. Redis okuma hatasında JSON'dan fallback okunur. Mahallesi olmayan ilçe için `<İLÇE>_MERKEZ` mahallesi döner. Yapıyı değiştirirseniz anahtar sürümünü (`v6`) artırın.
+
+### Enum / katalog okuma
+
+[`EnumReadService`](../src/main/java/com/serhat/secondhand/core/application/EnumReadService.java) repository'lerden katalog listelerini toplar ve `name`'e göre tekilleştirir. Cache'leme servis içinde değil repository seviyesindedir (örn. `CarBrandRepository.findAll` → `@Cacheable("catalog:brands")`); `CacheConfig` bu `catalog:*` cache'lerini ayrı `lookupConfig` ile tanımlar, key prefix'i `v4:<cacheName>:`'dir. Seed tamamlandığında `CatalogSeedStartupRunner` tüm `catalog:` cache'lerini temizler.
+
+---
+
+## 5. Yeni Kategori / Katalog Değeri Ekleme
+
+- **Mevcut kategoriye marka/model/tip:** ilgili JSON'u düzenleyin ve `--app.seed=<key>` ile seed'i çalıştırın (upsert; JSON'da kalmayan kayıtlar, referans edilmiyorsa prune edilir).
+- **Yeni kategori:** `Listing` alt sınıfı + Flyway migration (tablo), `*ListingService extends AbstractListingService`, `CategorySpecValidator` implementasyonları, `SeedTask` ve JSON verisi gerekir. API sözleşmesi ve katman kuralları için `polymorphic-catalog-and-layered-api` skill'ine bakın.
+
+---
+
+## 6. Kategoriye Özel Katalog Kuralları
+
+Her vertical'ın katalog hiyerarşisi, snapshot kuralları ve seed doğrulamaları [listing/README.md](../src/main/java/com/serhat/secondhand/listing/README.md) içinde tutulur; burada tekrar edilmez:
+
+| Konu | Bölüm |
+| :--- | :--- |
+| Araç: type → brand → model → generation → version (`vehicle_versions`), `VehicleSpecSnapshotter` | Vehicle Catalog |
+| Elektronik: model `specs`/`colors`, model varyantları (`electronic_model_variants`), `ElectronicSpecSnapshotter` | Electronics Catalog |
+| Emlak: rule-driven property type'lar, ilan detayında yaklaşık konum haritası | Real Estate Catalog |
+| Kitap: work/edition kataloğu, ISBN-13 doğrulaması (`BOOK_ISBN_INVALID`), `BooksEditionSnapshotter` | Book Catalog |
+| Giyim: type kuralları ve beden sistemleri | Clothing Catalog |
+| Listing generator (`listings-generate` / `listings-clean`, yalnızca local) | Listing Generator |

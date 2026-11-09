@@ -146,23 +146,19 @@ export const useListingFilters = ({
  } else if (category === LISTING_TYPES.CLOTHING) {
  const brandId = params.get('brands') || params.get('brandId');
  const typeId = params.get('types') || params.get('clothingTypeId');
- const gender = params.get('clothingGenders') || params.get('clothingGender');
- const categoryType = params.get('clothingCategories') || params.get('clothingCategory');
- const size = params.get('sizes') || params.get('size');
- const shoeSizeEu = params.get('shoeSizeEu');
+ const audience = params.get('audiences') || params.get('audience');
+ const sizeSystem = params.get('sizeSystem');
+ const size = params.get('sizes') || params.get('sizeKey');
  const color = params.get('colors') || params.get('color');
  const condition = params.get('conditions') || params.get('condition');
- const material = params.get('material');
 
  if (brandId) next.brands = [brandId];
  if (typeId) next.types = [typeId];
- if (gender) next.clothingGenders = [gender];
- if (categoryType) next.clothingCategories = [categoryType];
+ if (audience) next.audiences = [audience];
+ if (sizeSystem) next.sizeSystem = sizeSystem;
  if (size) next.sizes = [size];
- if (shoeSizeEu) next.shoeSizeEu = shoeSizeEu;
  if (color) next.colors = [color];
  if (condition) next.conditions = [condition];
- if (material) next.material = material;
  } else if (category === LISTING_TYPES.BOOKS) {
  const bookTypeId = params.get('bookTypeIds') || params.get('bookTypeId');
  const genreId = params.get('genreIds') || params.get('genreId');

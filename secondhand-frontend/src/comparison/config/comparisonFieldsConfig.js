@@ -267,10 +267,10 @@ export const comparisonFieldsConfig = {
  priority: 3
  },
  {
- key: 'clothingCategory',
- label: 'Category',
+ key: 'audience',
+ label: 'For',
  type: 'enum',
- enumKey: 'clothingCategories',
+ enumKey: 'clothingAudiences',
  highlight: HIGHLIGHT_RULES.NONE,
  priority: 4
  },
@@ -283,10 +283,9 @@ export const comparisonFieldsConfig = {
  priority: 5
  },
  {
- key: 'clothingGender',
- label: 'Gender',
- type: 'enum',
- enumKey: 'clothingGenders',
+ key: 'sizeLabel',
+ label: 'Size',
+ type: 'text',
  highlight: HIGHLIGHT_RULES.NONE,
  priority: 6
  },
@@ -299,9 +298,9 @@ export const comparisonFieldsConfig = {
  priority: 7
  },
  {
- key: 'purchaseDate',
- label: 'Purchase Date',
- type: 'date',
+ key: 'purchaseYear',
+ label: 'Purchase Year',
+ type: 'number',
  highlight: HIGHLIGHT_RULES.NONE,
  priority: 8
  }

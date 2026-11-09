@@ -39,7 +39,7 @@ Most backend modules have a matching folder under `secondhand-frontend/src/`. Bu
 | Reviews & forum | `review`, `forum` | `src/reviews` | |
 | Notifications & email | `notification`, `email` | `src/notification`, `src/emails` | Event-driven email |
 
-Deep dives (payments, escrow, stock, Redis/Kafka, cache, auth, offers, social proof): [`docs/README.md`](docs/README.md).
+Deep dives (payments, pricing/coupons/campaigns, escrow, orders, stock, Redis/Kafka, cache, auth, offers, chat, notifications, email, catalog, seeding, Aura AI, CI/CD): [`docs/README.md`](docs/README.md).
 
 ## Setup
 

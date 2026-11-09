@@ -28,12 +28,12 @@ Follow these rules whenever working on money flows (`checkout`, `order`, `paymen
   - `apply_coupon_with_limit.lua`: Atomic redemption quota enforcement.
 - **Async Stock Decrement & Auto-Healing:** Physical PostgreSQL stock is decremented asynchronously via `InventoryKafkaConsumer` after payment completion. Background stock reconciliation sweepers repair any drift between Redis reservations and PostgreSQL inventory.
 - **Dedicated Redis TTL Locks & Social Proof:**
-  - Accepted offers lock the listing for the buyer for 24 hours via `offer:reservation:{listingId}`.
-  - Active showcase promotions use `showcase:active:{listingId}`.
+  - Accepted offers lock the listing for the buyer for 24 hours via `v4:offer:lock:{listingId}`.
+  - Active showcase promotions use `v4:listing:showcase:active:{listingId}`.
   - Social proof metrics ("Active In Carts", 24h ZSET unique viewers, 12h favorite count cache) must use sub-millisecond Redis lookups or indexed queries (`idx_cart_listing`) without frontend polling loops.
 
 ## 4. Multi-Tier Redis Caching & Invalidation Discipline
-- **Redis-Only Spring Cache:** All `@Cacheable` lookups use Redis (`v4::` / `v5::` key prefixes with tiered TTLs and Jackson polymorphic serialization). Do not configure Caffeine as a Spring `@Cacheable` L1 manager (`Caffeine` is only permitted for local rate/attempt tracking in `LoginAttemptService`).
+- **Redis-Only Spring Cache:** All `@Cacheable` lookups use Redis (`v4:<cacheName>:` key prefix from `CacheConfig.CACHE_VERSION`, tiered TTLs and Jackson polymorphic serialization). Do not configure Caffeine as a Spring `@Cacheable` L1 manager (`Caffeine` is only permitted for local rate/attempt tracking in `LoginAttemptService`).
 - **Mandatory Eviction Matrix:** Every write, update, state transition, or seed path that mutates cached data must explicitly evict or refresh the affected Redis keys (`@CacheEvict`, `CatalogSeedStartupRunner` clearing `catalog:*`, or explicit `RedisTemplate` eviction). See `docs/multi-tier-redis-caching-and-invalidation.md`.
 
 ## 5. Verification Checklist

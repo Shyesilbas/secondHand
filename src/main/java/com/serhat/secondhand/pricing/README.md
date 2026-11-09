@@ -5,11 +5,12 @@ The `pricing` domain acts as the central Pricing Engine, dynamically calculating
 
 ## Architecture Overview
 - **PriceCalculationEngine:** The orchestrator that applies the pricing rules sequentially (Base Price -> Campaigns -> Coupons).
-- **Calculators:** Specialized strategy classes (`CampaignDiscountCalculator`, `CouponDiscountCalculator`) handle specific reduction logic.
+- **Calculators:** `CampaignDiscountCalculator` and `CouponDiscountCalculator` are not called anywhere; the engine holds its own copy of this logic. Change the engine.
+- Deep dive: `docs/pricing-coupon-and-campaign-architecture.md`.
 
 ## Business Invariants & Constraints
 - **Calculation Priority:** Campaign discounts are strictly applied BEFORE global coupon discounts.
-- **Category Exclusions:** High-value categories like Real Estate (`REAL_ESTATE`) and Vehicles (`VEHICLE`) are systemically excluded from standard percentage campaigns.
+- **Category Exclusions:** Real Estate (`REAL_ESTATE`) and Vehicles (`VEHICLE`) are excluded from every campaign and coupon.
 
 ## Integration Points
 - **Incoming:** Called primarily by the `checkout` domain during the final cart review.

@@ -18,8 +18,9 @@ const GROUPED_FILTERS = [
  ['electronicTypeIds'],
  ['types'],
  ['conditions'],
- ['clothingGenders'],
- ['clothingCategories'],
+ ['audiences'],
+ ['sizeSystem'],
+ ['sizes'],
  ['genres'],
  ['languages'],
  ['formats'],
@@ -41,7 +42,7 @@ const GROUPED_FILTERS = [
  ['minBuildingAge', 'maxBuildingAge'],
  ['minFloor', 'maxFloor'],
  ['minPageCount', 'maxPageCount'],
- ['purchaseDateFrom', 'purchaseDateTo']
+ ['minPurchaseYear', 'maxPurchaseYear']
 ];
 
 const getMinYearDefault = (listingType) => {
@@ -111,6 +112,8 @@ const resolveFilterValue = (key, rawVal, enums = {}) => {
  brandIds: 'carBrands',
  vehicleModelIds: 'vehicleModels',
  brands: 'clothingBrands',
+ audiences: 'clothingAudiences',
+ sizeSystem: 'sizeSystems',
  electronicBrandIds: 'electronicBrands',
  electronicTypeIds: 'electronicTypes',
  bookTypeIds: 'bookTypes',
@@ -193,8 +196,9 @@ const mapGroupToTag = (group, filters, enums) => {
  electronicTypeIds: 'Tip',
  types: 'Tip',
  conditions: 'Durum',
- clothingGenders: 'Cinsiyet',
- clothingCategories: 'Kategori',
+ audiences: 'Kimin için',
+ sizeSystem: 'Beden sistemi',
+ sizes: 'Beden',
  genres: 'Tür',
  languages: 'Dil',
  formats: 'Format',
@@ -216,8 +220,8 @@ const mapGroupToTag = (group, filters, enums) => {
  maxFloor: 'Kat',
  minPageCount: 'Sayfa',
  maxPageCount: 'Sayfa',
- purchaseDateFrom: 'Satın Alma',
- purchaseDateTo: 'Satın Alma'
+ minPurchaseYear: 'Satın Alma',
+ maxPurchaseYear: 'Satın Alma'
  };
 
  const key = activeKeys[0];

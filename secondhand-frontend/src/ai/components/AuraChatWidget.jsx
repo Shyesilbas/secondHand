@@ -10,6 +10,7 @@ import { createChatMessage, sendAuraRequest } from '../utils/auraChatUtils.js';
 import { buildAuraWidgetUiContext } from '../utils/auraWidgetContext.js';
 
 import AuraSuggestedListingChips from './AuraSuggestedListingChips.jsx';
+import AuraMessageContent from './AuraMessageContent.jsx';
 import { cacheService } from '../../common/services/cacheService.js';
 
 const PremiumUpgradeModal = lazy(() => import('@/common/components/ui/PremiumUpgradeModal'));
@@ -159,7 +160,7 @@ const AuraChatWidgetPanel = () => {
                                                 animationDelay: '240ms'
                                             }} />
                                         </div> : <>
-                                            {m.content}
+                                            <AuraMessageContent content={m.content} isUser={isUser} />
                                             {Array.isArray(m.meta?.suggestedListings) && m.meta.suggestedListings.length > 0 ? <AuraSuggestedListingChips listings={m.meta.suggestedListings} dense /> : null}
                                             {Array.isArray(m.meta?.dataSources) && m.meta.dataSources.length > 0 ? <div className="mt-2 flex flex-wrap gap-1.5">
                                                 {m.meta.dataSources.map(source => <span key={`${m.id}-${source.source}`} className="rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs leading-4 text-text-secondary">

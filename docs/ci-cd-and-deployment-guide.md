@@ -1,65 +1,85 @@
 # CI/CD, Dağıtım ve Altyapı İşletim Kılavuzu
 
-Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker konteyner yapılandırmasını, ortam değişkenlerini (`.env`), üretim profili (`prod`) güvenlik kontrollerini ve gözlemlenebilirlik (Observability) ayarlarını açıklamaktadır.
+Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
+
+> [!NOTE]
+> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `Dockerfile`, `start_all.sh`, `prometheus.yml` ve Spring config dosyalarını kapsar.
 
 ---
 
 ## 1. Altyapı ve Servis Bağımlılıkları
 
-Platform üç temel altyapı servisine bağımlıdır:
+[`docker-compose.yml`](../docker-compose.yml) üç servis tanımlar (hepsi `restart: unless-stopped`, named volume'lu):
 
-| Servis | İmaj | Port (Host:Container) | Açıklama |
+| Servis | İmaj | Port (Host:Container) | Kullanım |
 | :--- | :--- | :--- | :--- |
-| **PostgreSQL 15** | `postgres:15-alpine` | `5433:5432` | İlişkisel veritabanı, ACID işlemler, Outbox tabloları. |
-| **Redis 7** | `redis:7-alpine` | `6379:6379` | In-memory stok kilidi, Lua scriptleri, token kara listesi, önbellek. |
-| **Apache Kafka 3.7** | `apache/kafka:3.7.0` | `9092:9092` | KRaft modunda zookeeper'sız olay dağıtımı, 3 partition. |
+| PostgreSQL | `postgres:15-alpine` | `5433:5432` | Veritabanı (`secondhand`), Flyway migration'ları, outbox tabloları. `DB_USER`/`DB_PASSWORD` yoksa `postgres`/`postgres`. |
+| Redis | `redis:7-alpine` | `6379:6379` | Stok/kupon Lua rezervasyonları, lock'lar, cache, token blacklist. |
+| Kafka | `apache/kafka:3.7.0` | `9092:9092` | KRaft (single node, broker+controller), `KAFKA_NUM_PARTITIONS=3`, replication factor 1. Advertised listener `localhost:9092`. |
 
-### Başlatma Komutu:
+Prometheus ve Grafana compose'a dahil değildir; [`prometheus.yml`](../prometheus.yml) (15s scrape, `/actuator/prometheus`, hedefler `host.docker.internal:8080` ve `backend:8080`) ve [`grafana/provisioning/`](../grafana/provisioning) ayrı çalıştırılacak hazır config'lerdir.
+
 ```bash
-docker-compose up -d
+docker-compose up -d        # yalnızca altyapı
+./start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (./mvnw spring-boot:run) + frontend (npm run dev)
 ```
 
----
+`start_all.sh` `docker compose` ya da `docker-compose` bulur, `--seed` verilirse `APP_SEED` ortam değişkenini backend'e geçirir.
 
-## 2. Ortam Değişkenleri Şablonu (`.env`)
-
-Uygulama başlamadan önce `.env.template` dosyasından `.env` kopyalanmalı ve şu kritik anahtarlar tanımlanmalıdır:
-
-```properties
-# Güvenlik & JWT
-JWT_SECRET_KEY=en_az_32_karakterli_guclu_gizli_anahtar_buraya_yazilmalidir
-
-# Yapay Zeka (Gemini)
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_API_MODEL=gemini-3.1-flash-lite
-GEMINI_API_FALLBACK_MEMORY_MODEL=gemini-2.0-flash-lite
-
-# Bulut Depolama (Cloudinary)
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
-
-# Google OAuth2 SSO
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-
-# Dış Döviz Kuru API
-EXCHANGE_API_KEY=your_exchange_api_key
-```
+> [!WARNING]
+> Kafka tek node ve replication factor 1 ile çalışır; bu compose yalnızca geliştirme içindir.
 
 ---
 
-## 3. Üretim Profili ve Prod Security Guard
+## 2. Ortam Değişkenleri (`.env`)
 
-Uygulama `prod` profiliyle başlatıldığında ([`ProdSecurityGuard.java`](../src/main/java/com/serhat/secondhand/core/config/ProdSecurityGuard.java)) şu kontrolleri zorunlu kılar:
-1. `jwt.secretKey` tanımlanmamışsa veya 32 karakterden kısaysa uygulama başlamaz.
-2. `app.auth.cookie.secure = true` olmalıdır (`HttpOnly`, `SameSite=Strict/Lax`).
-3. CORS allowlist içinde `localhost` veya wildcard (`*`) bulunamaz.
+`.env.template` dosyasından `.env` oluşturulur. Şablondaki gruplar:
+
+| Grup | Değişkenler |
+| :--- | :--- |
+| Database / Redis | `DB_URL`, `DB_USER`, `DB_PASSWORD`, `REDIS_HOST`, `REDIS_PORT` |
+| JWT | `JWT_SECRET_KEY` (**base64** kodlu; decode edilince en az 32 byte) |
+| Google OAuth | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_SCOPE`, `REDIRECT_URI`, `ISSUER_URI` |
+| Cloudinary | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` |
+| Gemini | `GEMINI_API_KEY`, `GEMINI_API_MODEL`, `GEMINI_API_BASE_URL`, `GEMINI_API_FALLBACK_MEMORY_MODEL` (varsayılanlar `application-core.yml` içinde: `gemini-3.1-flash-lite`) |
+| Exchange | `EXCHANGE_API_KEY` |
+| App | `FRONTEND_URL`, `COOKIE_DOMAIN`, `CORS_ALLOWED_ORIGINS` |
+| Rate limit | `RATE_LIMIT_ENABLED`, `RATE_LIMIT_AUTH`, `RATE_LIMIT_PAYMENT`, `RATE_LIMIT_GENERAL`, `RATE_LIMIT_AI`, `RATE_LIMIT_WINDOW` |
+
+Rate limit varsayılanları ([`application-app.yml`](../src/main/resources/config/application-app.yml)): auth 3, payment 3, general 10, ai 6 istek/saniye; pencere 60 sn. Template'te olmayan ama config'te okunanlar: `COOKIE_SECURE` (varsayılan `false`), `COOKIE_SAME_SITE` (`Lax`), `CORS_ALLOW_CREDENTIALS` (`true`), `RATE_LIMIT_TRUSTED_PROXIES`, `MANAGEMENT_SERVER_PORT` (prod, `9090`).
 
 ---
 
-## 4. Gözlemlenebilirlik (Observability & Metrics)
+## 3. Profiller ve Prod Security Guard
 
-- **Actuator Endpoint:** `/actuator/health`, `/actuator/info`
-- **Prometheus Metrikleri:** `/actuator/prometheus` (HTTP gecikmeleri, JVM bellek havuzları, HikariCP bağlantı havuzu doluluğu, Kafka consumer lag metrikleri).
-- **Swagger / OpenAPI:** `secondhand-openapi.json` üzerinden API sözleşmesi doğrulanır; Swagger UI yalnızca `prod` profilinde yapılandırılmış güvenli yollardan erişilebilir.
+Varsayılan profil `local`'dir (`spring.profiles.default`). Prod için `SPRING_PROFILES_ACTIVE=prod` verilir; [`application-prod.yml`](../src/main/resources/application-prod.yml) `ddl-auto: validate` ve Flyway (`classpath:db/migration`, `baseline-on-migrate`) kullanır.
+
+[`ProdSecurityGuard`](../src/main/java/com/serhat/secondhand/core/config/ProdSecurityGuard.java) `@PostConstruct` içinde tüm hataları toplar ve biri varsa `IllegalStateException` ile uygulamayı başlatmaz:
+
+1. `jwt.secretKey` boş olamaz, geçerli base64 olmalı ve decode edilince ≥ 32 byte olmalı.
+2. `app.rate-limit.enabled = true` olmalı.
+3. `management.endpoints.web.exposure.include` içinde `*`, `env`, `configprops`, `beans`, `heapdump`, `threaddump`, `loggers`, `mappings`, `shutdown`, `logfile` bulunamaz.
+4. `app.auth.cookie.secure = true` olmalı ve `same-site` boş olamaz.
+5. `app.cors.allowed-origins` boş olamaz; `localhost`/`127.0.0.1` içeremez; `allow-credentials=true` iken `*` içeremez.
+
+> [!IMPORTANT]
+> `COOKIE_SECURE` varsayılanı `false` olduğu için prod'da `COOKIE_SECURE=true` ve `CORS_ALLOWED_ORIGINS` açıkça verilmelidir; aksi halde guard başlangıçta hata verir.
+
+---
+
+## 4. Observability
+
+| Profil | Exposure | Port |
+| :--- | :--- | :--- |
+| `local` | `health,info,metrics,prometheus` | uygulama portu (8080) |
+| `prod` | `health,info,prometheus` | ayrı management portu `MANAGEMENT_SERVER_PORT` (varsayılan `9090`) |
+
+- Prod'da `/actuator/prometheus` 8080'de yayınlanmaz; management portu yalnızca iç ağdan (Prometheus, probe'lar) erişilebilir olmalıdır. Repodaki `prometheus.yml` local (8080) içindir; prod'da hedef portu 9090'a çevirmek gerekir.
+- Metric'ler `application=<spring.application.name>` tag'i taşır.
+- Swagger/OpenAPI: path'ler `/v3/api-docs` ve `/swagger-ui.html`; **prod'da `springdoc.api-docs.enabled=false` ve `swagger-ui.enabled=false`**, yani prod'da erişilemez.
+
+---
+
+## 5. Docker İmajı
+
+[`Dockerfile`](../Dockerfile) iki aşamalıdır: `maven:3.9.6-eclipse-temurin-17-alpine` ile `mvn clean package -DskipTests -B`, sonra `eclipse-temurin:17-jre-alpine` runtime. Uygulama root olmayan `spring` kullanıcısıyla çalışır, port 8080 expose edilir. Testler imaj build'inde çalışmaz.

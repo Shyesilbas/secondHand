@@ -1,20 +1,27 @@
 import { createListingBaseCreatePayload, createListingBaseUpdatePayload } from '../listing/types/index.js';
 
+const toInt = (v) => (v !== undefined && v !== null && v !== '' ? parseInt(v, 10) : null);
+const orNull = (v) => (v ? v : null);
+const attributesOf = (data) => (data.attributes && typeof data.attributes === 'object' ? data.attributes : {});
+
 export const createClothingCreateRequest = (data) => ({
     base: createListingBaseCreatePayload(data),
     quantity: parseInt(data.quantity) || 1,
     brandId: data.brandId,
     clothingTypeId: data.clothingTypeId,
     color: data.color,
-    purchaseYear: data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined,
+    purchaseYear: toInt(data.purchaseYear),
     condition: data.condition,
-    size: data.size || null,
-    shoeSizeEu: data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : null,
-    material: data.material ? String(data.material).trim() : null,
-    clothingGender: data.clothingGender,
-    clothingCategory: data.clothingCategory
+    audience: data.audience,
+    sizeSystem: orNull(data.sizeSystem),
+    sizeKey: orNull(data.sizeKey),
+    fit: orNull(data.fit),
+    pattern: orNull(data.pattern),
+    fabricType: orNull(data.fabricType),
+    attributes: attributesOf(data),
 });
 
+// Optional fields are always sent so that clearing them (or a hidden field) reaches the backend.
 export const createClothingUpdateRequest = (data) => {
     const updateData = {};
     const base = createListingBaseUpdatePayload(data);
@@ -24,12 +31,14 @@ export const createClothingUpdateRequest = (data) => {
     updateData.brandId = data.brandId ? data.brandId : undefined;
     updateData.clothingTypeId = data.clothingTypeId ? data.clothingTypeId : undefined;
     updateData.color = data.color ? data.color : undefined;
-    updateData.purchaseYear = data.purchaseYear !== undefined && data.purchaseYear !== '' ? parseInt(data.purchaseYear) : undefined;
     updateData.condition = data.condition ? data.condition : undefined;
-    updateData.size = data.size ? data.size : undefined;
-    updateData.shoeSizeEu = data.shoeSizeEu !== undefined && data.shoeSizeEu !== '' ? parseInt(data.shoeSizeEu) : undefined;
-    updateData.material = data.material ? String(data.material).trim() : undefined;
-    updateData.clothingGender = data.clothingGender ? data.clothingGender : undefined;
-    updateData.clothingCategory = data.clothingCategory ? data.clothingCategory : undefined;
+    updateData.audience = data.audience ? data.audience : undefined;
+    updateData.purchaseYear = toInt(data.purchaseYear);
+    updateData.sizeSystem = orNull(data.sizeSystem);
+    updateData.sizeKey = orNull(data.sizeKey);
+    updateData.fit = orNull(data.fit);
+    updateData.pattern = orNull(data.pattern);
+    updateData.fabricType = orNull(data.fabricType);
+    updateData.attributes = attributesOf(data);
     return updateData;
 };

@@ -106,7 +106,13 @@ public class PaymentVerificationMessageBuilder {
             List<Cart> cartItems = cartRepository.findByUserIdWithListing(user.getId());
             List<Cart> effectiveCartItems = checkoutPricingContextFactory.buildEffectiveCartItems(cartItems, null,
                     user);
-            pricing = pricingService.priceCart(user, effectiveCartItems, couponCode);
+            Result<PricingResultDto> pricingResult = pricingService.priceCartForCheckout(
+                    user, effectiveCartItems, couponCode, null, null, null);
+            if (pricingResult.isError()) {
+                throw new BusinessException(pricingResult.getMessage(),
+                        org.springframework.http.HttpStatus.BAD_REQUEST, pricingResult.getErrorCode());
+            }
+            pricing = pricingResult.getData();
         }
 
         appendPricingSummary(details, pricing);

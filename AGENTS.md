@@ -38,5 +38,5 @@ Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; st
 ## Where to Look (On Demand)
 - Module business rules: `src/main/java/com/serhat/secondhand/<module>/README.md`; frontend: `secondhand-frontend/src/<module>/README.md`.
 - Backend task how-tos: `src/main/java/com/serhat/secondhand/<module>/.docs/runbooks/` and `listing/.docs/knowledge/`.
-- Architecture deep dives: `docs/README.md` (payments, escrow, stock, Redis/Kafka, auth, cache, offers, social proof, Aura AI).
+- Architecture deep dives: `docs/README.md` (payments, pricing/coupons/campaigns, escrow, orders, stock, Redis/Kafka, cache, auth, offers, chat, notifications, email, catalog, seeding, Aura AI, CI/CD).
 - API endpoint parity check: `python3 scripts/check_api_endpoints.py`.
