@@ -54,6 +54,22 @@ WebSocket protokolünde HTTP filtreleri (Spring Security Filter Chain) yalnızca
    - İzin verilenler: `/topic/notifications`, kullanıcının katılımcısı olduğu `/topic/chat/{roomId}` ve yalnızca kendi `/user/{userId}/...` hedefleri. Diğer her şey `Subscription destination not allowed`.
    - Chat odası için `ChatAuthorizationService.validateRoomParticipant(roomId, userId)` çağrılır; katılımcı değilse `Not a participant of chat room`, `roomId` sayı değilse `Invalid chat subscription` (IDOR koruması).
 
+   ```java
+   // WebSocketSecurityConfig.authorizeSubscription
+   if (destination == null || containsPatternOrTraversal(destination)) {
+       throw new MessageDeliveryException("Invalid subscription destination");
+   }
+   if (BROADCAST_NOTIFICATIONS_TOPIC.equals(destination)) { return; }          // /topic/notifications
+
+   Long userId = currentUserId(accessor);
+   if (destination.startsWith(CHAT_TOPIC_PREFIX)) {                            // /topic/chat/{roomId}
+       authorizeChatSubscription(destination, userId);
+       return;
+   }
+   if (destination.startsWith(USER_DESTINATION_PREFIX + userId + "/")) { return; }   // yalnızca kendi /user/{id}/...
+   throw new MessageDeliveryException("Subscription destination not allowed");
+   ```
+
 ---
 
 ## 3. STOMP Kanal ve Rota Yapısı
@@ -68,15 +84,6 @@ WebSocket protokolünde HTTP filtreleri (Spring Security Filter Chain) yalnızca
 | **`/topic/chat/{roomId}`** | Broker | `ChatNotificationService.sendMessage` ile oda mesajı yayını (normal ve OFFER mesajları). |
 | **`/topic/notifications`** | Broker | Herkese açık broadcast bildirim (`NotificationWebSocketService.sendBroadcast`). |
 | **`/user/{userId}/notifications`** | Broker | Kullanıcıya özel bildirim (`NotificationWebSocketService.sendNotificationToUser`); `convertAndSend` ile literal hedefe yazılır (`/queue` segmenti yoktur). |
-
---- | :--- | :--- |
-| **`/ws`** | Endpoint | STOMP bağlantı ve handshake noktası. |
-| **`/app/chat.sendMessage`** | Giriş (SEND) | Kullanıcıdan odaya yeni mesaj gönderimi. |
-| **`/app/chat.joinRoom`** | Giriş (SEND) | Kullanıcının odaya giriş bildirimi. |
-| **`/app/chat.leaveRoom`** | Giriş (SEND) | Kullanıcının odadan ayrılma bildirimi. |
-| **`/app/chat.markAsRead`** | Giriş (SEND) | Mesajların okundu olarak işaretlenmesi. |
-| **`/topic/chat/{roomId}`** | Çıkış (BROKER) | İlgili odadaki katılımcılara anlık mesaj ve olay yayını. |
-| **`/user/{userId}/queue/notifications`** | Çıkış (USER) | Kullanıcıya özel anlık bildirim ve uyarı iletimi. |
 
 ---
 

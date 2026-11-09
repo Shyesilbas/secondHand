@@ -228,10 +228,10 @@ const ListingDetailPage = () => {
   const stock = !hasStockInfo
     ? null
     : stockCount === 0
-    ? { dot: 'bg-text-muted', label: t('out_of_stock', 'Tükendi') }
-    : stockCount < LOW_STOCK_LIMIT
-    ? { dot: 'bg-status-warning', label: t('stock_last_n', { defaultValue: 'Son {{count}} adet', count: stockCount }) }
-    : { dot: 'bg-status-success', label: t('stock_in_n', { defaultValue: 'Stokta, {{count}} adet', count: stockCount }) };
+      ? { dot: 'bg-text-muted', label: t('out_of_stock', 'Tükendi') }
+      : stockCount < LOW_STOCK_LIMIT
+        ? { dot: 'bg-status-warning', label: t('stock_last_n', { defaultValue: 'Son {{count}} adet', count: stockCount }) }
+        : { dot: 'bg-status-success', label: t('stock_in_n', { defaultValue: 'Stokta, {{count}} adet', count: stockCount }) };
 
   const socialProof = [
     cartReservations > 0 && t('social_in_carts', { defaultValue: '{{count}} kişinin sepetinde', count: cartReservations }),
@@ -329,9 +329,8 @@ const ListingDetailPage = () => {
 
               <DetailSection id="description" title={t("about_this_item", "Açıklama")}>
                 <p
-                  className={`max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${
-                    shouldClampDescription && !isDescriptionExpanded ? 'line-clamp-6' : ''
-                  }`}
+                  className={`max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-text-secondary ${shouldClampDescription && !isDescriptionExpanded ? 'line-clamp-6' : ''
+                    }`}
                 >
                   {listing.description || t("no_description_provided", "Bu ilan için açıklama girilmemiş.")}
                 </p>

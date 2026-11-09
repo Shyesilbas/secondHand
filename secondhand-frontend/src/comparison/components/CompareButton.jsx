@@ -76,13 +76,13 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
   const buttonTitle = isAdded
     ? t('remove_from_comparison', 'Remove from comparison')
     : isDisabled
-    ? t('can_only_compare_category', {
+      ? t('can_only_compare_category', {
         defaultValue: 'Can only compare {{category}} items',
         category: getListingTypeLabel(category),
       })
-    : isLimitReached
-    ? t('maximum_items', { defaultValue: 'Maximum {{count}} items', count: maxItems })
-    : t('add_to_compare', 'Add to compare');
+      : isLimitReached
+        ? t('maximum_items', { defaultValue: 'Maximum {{count}} items', count: maxItems })
+        : t('add_to_compare', 'Add to compare');
 
   return (
     <button
@@ -91,13 +91,11 @@ const CompareButton = memo(({ listing, size = 'sm', className = '', variant = 'r
       aria-pressed={isAdded}
       onClick={handleClick}
       disabled={isDisabled || isLimitReached}
-      className={`${variant === 'square' ? 'h-10 w-10' : sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150 ${
-        isAdded
+      className={`${variant === 'square' ? 'h-10 w-10' : sizeClasses[size]} rounded flex items-center justify-center transition-colors duration-150 ${isAdded
           ? 'border border-primary bg-primary text-white'
           : 'border border-border bg-background-primary text-text-secondary hover:border-card-border-hover hover:text-text-primary'
-      } ${
-        (isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''
-      } ${className}`}
+        } ${(isDisabled || isLimitReached) && !isAdded ? 'opacity-50 cursor-not-allowed' : ''
+        } ${className}`}
       title={buttonTitle}
     >
       <Scale className={variant === 'square' ? 'h-4 w-4' : iconSizes[size]} strokeWidth={1.5} aria-hidden />

@@ -308,8 +308,8 @@ const PriceHistoryTab = ({
             const badgeClass = isUp
               ? 'bg-background-secondary text-status-error-text border-border'
               : isDown
-              ? 'bg-background-secondary text-text-primary border-border'
-              : 'bg-background-secondary text-text-secondary border-border-light';
+                ? 'bg-background-secondary text-text-primary border-border'
+                : 'bg-background-secondary text-text-secondary border-border-light';
             const dotClass = isUp ? 'bg-status-error' : isDown ? 'bg-status-success' : 'bg-primary';
             return (
               <div key={entry.id ?? idx} className="px-4 py-3 hover:bg-background-secondary/40 transition-colors">

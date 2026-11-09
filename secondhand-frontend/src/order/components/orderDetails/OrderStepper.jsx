@@ -47,20 +47,18 @@ const OrderStepper = ({ currentStatus, deliveryMethod }) => {
               aria-current={isCurrent ? 'step' : undefined}
             >
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full border bg-background-primary text-sm tabular-nums ${
-                  isDone
+                className={`flex h-8 w-8 items-center justify-center rounded-full border bg-background-primary text-sm tabular-nums ${isDone
                     ? 'border-primary bg-primary text-white'
                     : isCurrent
                       ? 'border-primary font-medium text-text-primary'
                       : 'border-border text-text-muted'
-                }`}
+                  }`}
               >
                 {isDone ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : idx + 1}
               </div>
               <span
-                className={`text-sm md:mt-3 ${
-                  isDone || isCurrent ? 'font-medium text-text-primary' : 'text-text-tertiary'
-                }`}
+                className={`text-sm md:mt-3 ${isDone || isCurrent ? 'font-medium text-text-primary' : 'text-text-tertiary'
+                  }`}
               >
                 {t(step.labelKey, step.label)}
               </span>

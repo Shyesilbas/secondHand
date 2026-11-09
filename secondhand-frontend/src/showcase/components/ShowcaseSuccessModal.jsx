@@ -52,13 +52,13 @@ const ShowcaseSuccessModal = ({
               ) : null}
               {isExtension
                 ? t(
-                    'showcase_extended_desc',
-                    'ilanınızın vitrin süresi başarıyla uzatıldı.'
-                  )
+                  'showcase_extended_desc',
+                  'ilanınızın vitrin süresi başarıyla uzatıldı.'
+                )
                 : t(
-                    'showcase_success_desc',
-                    'ilanınız başarıyla vitrine taşındı ve öncelikli olarak sergilenmeye başladı.'
-                  )}
+                  'showcase_success_desc',
+                  'ilanınız başarıyla vitrine taşındı ve öncelikli olarak sergilenmeye başladı.'
+                )}
             </p>
           </div>
 

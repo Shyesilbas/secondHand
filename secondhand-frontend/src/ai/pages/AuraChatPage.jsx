@@ -270,7 +270,7 @@ export const AuraChatPage = () => {
   }, [copiedId]);
 
   const copyToClipboard = (id, text) => {
-    navigator.clipboard?.writeText(text).then(() => setCopiedId(id)).catch(() => {});
+    navigator.clipboard?.writeText(text).then(() => setCopiedId(id)).catch(() => { });
   };
 
   const send = (text) => sendMessage({ text });

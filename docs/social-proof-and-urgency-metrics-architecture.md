@@ -1,100 +1,149 @@
-# Social Proof, Live Interest, and Urgency Metrics Architecture
+# Social Proof ve Aciliyet Metrikleri
 
-## 1. Overview & Business Rationale
+Bu doküman ilan kartında ve ilan detayında gösterilen "X kişinin sepetinde", "Son 24 saatte X kişi inceledi", favori sayısı ve checkout geri sayımının nereden geldiğini anlatır. Kod blokları projeden alınmıştır.
 
-In modern marketplace platforms (such as Booking.com, Airbnb, Trendyol, and Amazon), **Social Proof** (Sosyal Kanıt) and **Live Urgency** (Satın Alma Aciliyeti) metrics significantly increase conversion rates by providing transparency into real-time listing demand.
-
-This document outlines the end-to-end multi-tier caching, Redis presence tracking, stock hold guarantees, and frontend consumption rules for all live interest metrics in the SecondHand platform.
+İlgili dokümanlar: stok rezervasyonu [stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md), cache TTL'leri [multi-tier-redis-caching-and-invalidation.md](multi-tier-redis-caching-and-invalidation.md).
 
 ---
 
-## 2. Metrics Architecture Matrix
+## 1. Özet
 
-| Metric | Source of Truth | Sliding Window / TTL | Frontend Caching | Display Location | UI Representation |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Active Viewers** | Redis ZSET (`v4:listing:active_viewers:{id}`) | **24 Hours** (ZSET TTL: 26h) | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `Son 24 saatte X kişi inceledi`<br>`X inceliyor` |
-| **Cart / Checkout Intent** | PostgreSQL `Cart` + Redis Lua Reservation | **Active Cart / 15-min TTL** | 10 Minutes (`staleTime: 10m`) | `ListingDetailPage`, `ListingCard` | `Şu an X kişinin sepetinde / satın alma adımında.`<br>`X sepette` |
-| **Total Favorites** | PostgreSQL `favorites` + Redis (`user:stats:favorites`) | **12 Hours** (Redis Cache TTL) | Page Mount + Optimistic Toggle | `ListingDetailPage`, `ListingCard` | `Konum • Tarih • X favori` |
-| **Checkout Stock Reservation** | Redis Atomic Lua Script (`v4:inventory:reservation:...`) | **15 Minutes** (900s TTL) | Real-time countdown + `sessionStorage` | `CheckoutPage` | `Kalan Süre: 14:59` (Refreshte sıfırlanmaz) |
-
----
-
-## 3. Detailed Component Implementations
-
-### 3.1. Active Viewers (Redis Presence Tracking)
-
-When any user (authenticated or anonymous) views a listing, `POST /api/v1/listings/{id}/view` is dispatched asynchronously:
-
-1. **Unique Identifier Extraction:**
-   ```java
-   String dedupIdentifier = (userId != null) ? "u:" + userId 
-       : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId 
-       : "ip:" + ipHash);
-   ```
-2. **Redis ZSET Presence (24-Hour Sliding Window):**
-   * **Key:** `v4:listing:active_viewers:{listingId}`
-   * **Score:** Current Unix epoch timestamp in milliseconds (`System.currentTimeMillis()`)
-   * **Value:** `dedupIdentifier`
-   * **TTL:** 26 hours (auto-expires if no views occur).
-3. **Deduplication:**
-   * Because Redis ZSET members are unique, if the same user/session refreshes or revisits the listing 50 times in a day, only their timestamp score is updated—they are **always counted as 1 unique person**.
-4. **Retrieval (`GET /api/v1/listings/{id}/active-viewers`):**
-   * Cleans entries older than 24 hours via `ZREMRANGEBYSCORE(key, 0, now - 24h)`.
-   * Returns `ZCARD` in ~0.1 ms directly from Redis RAM.
-
----
-
-### 3.2. Cart & Checkout Intent
-
-1. **Cart Reservations (`CartService.java`):**
-   * When an item is in a user's active cart, `reservedAt` and `reservationEndTime` are maintained within the cart configuration window.
-   * `countActiveReservationsByListing` counts all active cart holders regardless of inventory threshold constraints.
-2. **Checkout Atomic Hold (`CheckoutStockReservationService.java`):**
-   * Upon entering checkout, `POST /api/checkout/initiate` executes an atomic Redis Lua script (`reserve_stock_with_ttl.lua`) with a 15-minute (900s) TTL.
-   * **Refresh Preservation:** If the user refreshes `CheckoutPage`, the Lua script recognizes the existing reservation and **does not reset the remaining TTL to 15:00**.
-   * The API returns `remainingTtlSeconds`, and `CheckoutPage` seamlessly continues its countdown without restarting.
-
----
-
-### 3.3. Total Favorites & 12-Hour Tiered Caching
-
-1. **Backend Cache Tier (`CacheConfig.java`):**
-   * Redis cache name: `user:stats:favorites`
-   * **TTL:** **12 Hours (`Duration.ofHours(12)`)**.
-   * Batch query optimization via `FavoriteStatsService.getFavoriteStatsForListings` attaches favorite count and user favorite status during listing DTO enrichment in a single round-trip.
-2. **Frontend Header Placement (`ListingDetailPage.jsx`):**
-   * Positioned cleanly in the metadata row right below the listing title:
-     ```
-     Kadıköy, İstanbul  •  25 Ağustos 2026  •  18 favori
-     ```
-3. **Zero-Lag Optimistic Updates:**
-   * Clicking the favorite button optimistically toggles the heart icon and increments/decrements the count instantly (`0 ms UI latency`).
-
----
-
-## 4. Frontend Polling & Caching Rules (Anti-Spam Strategy)
-
-To prevent the **N+1 Polling Antipattern** where multiple cards on a grid bombard the backend with periodic requests:
-
-1. **`ListingCard.jsx` (Grid / Showcase / Search):**
-   * `enablePolling: false` (Background polling is completely disabled).
-   * `staleTime: 10 * 60 * 1000` (10 minutes in-memory cache via React Query).
-   * Renders static/cached social badges (`X sepette` or `X inceliyor`).
-2. **`ListingDetailPage.jsx` (Active Listing):**
-   * `enablePolling: true`, `pollInterval: 10 * 60 * 1000` (refreshes at most once every 10 minutes).
-   * `refetchOnWindowFocus: false` to avoid spike loads on tab switches.
-3. **Urgency Banner Hierarchy:**
-   * **Priority 1 (Cart/Checkout):** `Şu an X kişinin sepetinde / satın alma adımında.`
-   * **Priority 2 (24h Viewers):** `Son 24 saatte X kişi bu ilanı inceledi.`
-
----
-
-## 5. API Endpoints Reference
-
-| Method | Endpoint | Access | Description |
+| Metrik | Kaynak | Pencere / TTL | Nerede gösterilir |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/listings/{id}/view` | Public | Asynchronously records unique listing view and Redis 24h presence. |
-| `GET` | `/api/v1/listings/{id}/active-viewers` | Public | Returns `{ count: X }` of unique viewers in the last 24 hours. |
-| `GET` | `/api/v1/cart/reservations/count/{listingId}` | Public | Returns `{ count: X }` of active cart reservations. |
-| `POST` | `/api/checkout/initiate` | Authenticated | Holds stock in Redis and returns `{ reserved: {...}, remainingTtlSeconds: 540 }`. |
-| `DELETE` | `/api/checkout/reservation/{listingId}` | Authenticated | Releases held stock in Redis if user cancels or navigates away. |
+| Son 24 saatte inceleyen | Redis ZSET `v4:listing:active_viewers:{listingId}` | 24 saatlik kayan pencere; key TTL 26 saat | İlan detayı, ilan kartı (hover) |
+| Sepetinde olan | Redis SET `v4:cart:in_cart_users:{listingId}` | Kullanıcı sepetten çıkarana ya da sepet rezervasyonu dolana kadar; key TTL 7 gün | İlan detayı, ilan kartı (hover) |
+| Favori sayısı | PostgreSQL `favorites` | Toplu sorgu sonucu `user:stats:favorites` cache'inde 12 saat | İlan detayı, ilan kartı |
+| Checkout geri sayımı | Redis `v4:inventory:reservation:{userId}:{listingId}` | 15 dk | `CheckoutPage` |
+
+Üç sayı tek endpoint'ten döner: `GET /api/v1/listings/{id}/social-proof`.
+
+```json
+{ "viewsLast24Hours": 12, "inCartCount": 3, "favoriteCount": 18 }
+```
+
+---
+
+## 2. İnceleyen sayısı (Redis ZSET)
+
+Frontend ilan açıldığında `POST /api/v1/listings/{id}/view` çağırır (public, giriş zorunlu değil). [`ListingViewService.trackView`](../src/main/java/com/serhat/secondhand/listing/application/common/ListingViewService.java) `@Async("viewTrackingExecutor")` ile çalışır, yani istek beklemez.
+
+**1. Kim olduğu belirlenir.** Giriş yapmış kullanıcı id'siyle, anonim ziyaretçi session id'siyle, o da yoksa IP hash'iyle sayılır. İlan sahibinin kendi görüntülemesi sayılmaz.
+
+```java
+String dedupIdentifier = (userId != null) ? "u:" + userId
+        : ((sessionId != null && !sessionId.isBlank()) ? "s:" + sessionId : "ip:" + ipHash);
+```
+
+**2. ZSET'e yazılır.** Member kullanıcı kimliği, score o anın milisaniyesidir. ZSET member'ları tekil olduğu için aynı kişi gün içinde 50 kez girse de **1 kişi** sayılır; yalnızca score'u güncellenir.
+
+```java
+String presenceKey = "v4:listing:active_viewers:" + listingId;
+redisTemplate.opsForZSet().add(presenceKey, dedupIdentifier, (double) System.currentTimeMillis());
+redisTemplate.expire(presenceKey, Duration.ofHours(26));
+```
+
+**3. Kalıcı görüntüleme kaydı ayrıca tekilleştirilir.** `listing_views` tablosuna satır yazılmadan önce `v4:listing:view:dedup:{kimlik}:{listingId}` key'i `SET NX` ile alınır (TTL `VIEW_DUPLICATE_WINDOW_HOURS` = 1 saat). Aynı kişi 1 saat içinde tekrar gelirse DB'ye yeni satır yazılmaz. Redis hata verirse satır yine yazılır. Bu tablo satıcının görüntüleme istatistikleri içindir (`GET /api/v1/listings/{id}/view-stats`), social proof sayısını etkilemez.
+
+**4. Okuma.** 24 saatten eski kayıtlar silinir, kalan member sayısı döner:
+
+```java
+long twentyFourHoursAgo = System.currentTimeMillis() - (24L * 60L * 60L * 1000L);
+redisTemplate.opsForZSet().removeRangeByScore(presenceKey, 0, (double) twentyFourHoursAgo);
+Long count = redisTemplate.opsForZSet().zCard(presenceKey);
+```
+
+Redis'e ulaşılamazsa sayı `0` döner; istek hata vermez.
+
+---
+
+## 3. Sepetinde olan sayısı (Redis SET)
+
+[`CartSocialMetricService`](../src/main/java/com/serhat/secondhand/cart/application/CartSocialMetricService.java) ilanı sepetinde tutan **farklı kullanıcıları** bir SET'te tutar; adet değil kişi sayılır.
+
+```java
+private static final String KEY_PREFIX = "v4:cart:in_cart_users:";
+private static final Duration KEY_TTL = Duration.ofDays(7);
+
+redisTemplate.opsForSet().add(key, userId.toString());   // sepete ekleme
+redisTemplate.expire(key, KEY_TTL);
+redisTemplate.opsForSet().remove(key, userId.toString()); // sepetten çıkarma
+Long count = redisTemplate.opsForSet().size(key);         // SCARD
+```
+
+SET'ten çıkarma üç yerden tetiklenir:
+
+- Kullanıcı ürünü sepetten çıkarır ya da sepeti boşaltır (`CartService`).
+- Sepet rezervasyonunun süresi dolar: [`CartReservationScheduler`](../src/main/java/com/serhat/secondhand/cart/application/CartReservationScheduler.java) her 60 sn'de (`app.cart.scheduler.cleanup-fixed-rate-ms`) `reservationEndTime`'ı geçmiş sepet satırlarının rezervasyonunu temizler ve kullanıcıyı SET'ten çıkarır. Rezervasyon süresi `app.cart.reservation.timeout-minutes` = 15 dk'dır.
+- Hiçbiri olmazsa key 7 gün sonra silinir.
+
+Liste ekranlarında sayılar tek tek değil, Redis pipeline ile toplu okunur (`getInCartCounts`). `GET /api/v1/cart/reservations/count/{listing-id}` (public) aynı sayıyı tek başına döner.
+
+> Bu sayı **sepet** içindir; checkout'ta alınan 15 dakikalık stok rezervasyonundan (`v4:inventory:reservation:*`) bağımsızdır.
+
+---
+
+## 4. Favori sayısı
+
+- Tek ilan (`/social-proof`): `FavoriteStatsService.getFavoriteStats(listingId, null)` ile okunur.
+- Liste (arama, vitrin): [`ListingSocialProofService.enrichWithSocialProof`](../src/main/java/com/serhat/secondhand/listing/application/common/ListingSocialProofService.java) tüm ilanlar için tek `favoriteRepository.countByListingIds` sorgusu atar ve sonucu `ListingDto.socialProof` alanına yazar.
+- `FavoriteStatsService.getFavoriteStatsForListings` sonucu `user:stats:favorites` cache'inde 12 saat tutulur; favori ekleme/çıkarma (`FavoriteService`) bu cache'in tamamını temizler.
+
+---
+
+## 5. Checkout geri sayımı
+
+`CheckoutPage` açıldığında `POST /api/checkout/initiate` çağrılır; sepetteki ürünler Redis'te 15 dakikalığına rezerve edilir ve kalan süre döner:
+
+```json
+{ "reserved": { "<listingId>": 1 }, "remainingTtlSeconds": 540 }
+```
+
+- Sayfa yenilenirse script aynı adet için rezervasyonu **yeniden başlatmaz**; `remainingTtlSeconds` kaldığı yerden gelir (ayrıntı: [stok dokümanı §3.1](stock-reservation-and-reconciliation.md#31-rezervasyon-reserve_stock_with_ttllua)).
+- Frontend bitiş zamanını `sessionStorage`'da `checkout_reservation_expiry` olarak saklar; backend cevabı gelene kadar sayaç bu değerden devam eder.
+- Rezervasyon alınamazsa (stok bitti vb.) sayfa hata mesajını gösterir ve ödemeye izin vermez.
+- `DELETE /api/checkout/reservation/{listingId}` rezervasyonu elle bırakır.
+
+---
+
+## 6. Frontend: istek sayısını sınırlama
+
+Bir liste sayfasında onlarca kart olduğu için her kartın kendi başına periyodik istek atması engellenmiştir. Tüm ekranlar [`useActiveReservationCount`](../secondhand-frontend/src/cart/hooks/useActiveReservationCount.js) hook'unu kullanır:
+
+```js
+useQuery({
+  queryKey: ['listing', 'social-proof', listingId],
+  enabled: Boolean(listingId) && enabled,
+  refetchInterval: enablePolling ? pollInterval : false,
+  staleTime: 30 * 1000,
+  refetchOnWindowFocus: true,
+});
+```
+
+| Ekran | Ayar | Sonuç |
+| :--- | :--- | :--- |
+| `ListingCard` | `enabled: isCardHovered` | İstek yalnızca kartın üzerine gelindiğinde atılır; polling yoktur. |
+| `ListingDetailPage` | `enablePolling: true`, `pollInterval: 10 dk` | Sayfa açıkken 10 dakikada bir yenilenir. |
+
+- Aynı ilan için sonuç 30 sn taze sayılır; bu sürede tekrar istek atılmaz.
+- İstek hata verirse hook sıfır değerleri döner, UI bozulmaz.
+- İlan detayında satırlar şu sırayla gösterilir: önce "`{{count}} kişinin sepetinde`", sonra "`Son 24 saatte {{count}} kişi inceledi`". İlan sahibine gösterilmez.
+
+---
+
+## 7. Endpoint'ler
+
+| Method | Endpoint | Erişim | Açıklama |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/listings/{id}/view` | Public | Görüntülemeyi asenkron kaydeder (ZSET + `listing_views`). |
+| `GET` | `/api/v1/listings/{id}/social-proof` | Public | `viewsLast24Hours`, `inCartCount`, `favoriteCount`. Frontend'in kullandığı endpoint. |
+| `GET` | `/api/v1/listings/{id}/active-viewers` | Public | Yalnızca `{ count }` (son 24 saat). |
+| `GET` | `/api/v1/cart/reservations/count/{listing-id}` | Public | Yalnızca `{ count }` (sepetinde olan kişi). |
+| `GET` | `/api/v1/listings/{id}/view-stats` | İlan sahibi | Tarih aralığına göre görüntüleme istatistikleri (varsayılan son 7 gün). |
+| `POST` | `/api/checkout/initiate` | Giriş yapmış | Stok rezervasyonu + `remainingTtlSeconds`. |
+| `DELETE` | `/api/checkout/reservation/{listingId}` | Giriş yapmış | Rezervasyonu bırakır. |
+
+## 8. Bilinen sınırlar
+
+- İnceleyen sayısı yalnızca Redis'tedir; Redis verisi silinirse sayaç sıfırdan başlar.
+- Liste zenginleştirmesinde (`enrichWithSocialProof`) inceleyen sayısı ilan başına ayrı Redis çağrısıyla okunur; sepet ve favori sayıları topludur.
+- IP ile sayılan anonim ziyaretçiler aynı ağ arkasında tek kişi görünür.

@@ -49,10 +49,10 @@ export default function AuraPriceAdvisorGauge({
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary">
           <span
             className={`h-1.5 w-1.5 rounded-full ${isGoodDeal
-                ? 'bg-status-success'
-                : isHigh
-                  ? 'bg-status-warning'
-                  : 'bg-text-tertiary'
+              ? 'bg-status-success'
+              : isHigh
+                ? 'bg-status-warning'
+                : 'bg-text-tertiary'
               }`}
           />
           <span>{status}</span>

@@ -10,13 +10,13 @@ const OrderSummary = ({
   pricing,
   disabled = false,
   couponInput = '',
-  setCouponInput = () => {},
+  setCouponInput = () => { },
   appliedCouponCode = null,
   couponError = null,
   isPreviewLoading = false,
-  onApplyCoupon = () => {},
-  onRemoveCoupon = () => {},
-  onOpenCouponsModal = () => {},
+  onApplyCoupon = () => { },
+  onRemoveCoupon = () => { },
+  onOpenCouponsModal = () => { },
   isPremium = false,
   onOpenPremiumModal = null,
 }) => {
@@ -25,9 +25,9 @@ const OrderSummary = ({
   const originalSubtotal = pricing?.originalSubtotal != null
     ? parseFloat(pricing.originalSubtotal)
     : cartItems.reduce((sum, item) => {
-        const price = parseFloat(item.listing?.price) || 0;
-        return sum + price * item.quantity;
-      }, 0);
+      const price = parseFloat(item.listing?.price) || 0;
+      return sum + price * item.quantity;
+    }, 0);
 
   const subtotalAfterCampaigns = pricing?.subtotalAfterCampaigns != null
     ? parseFloat(pricing.subtotalAfterCampaigns)

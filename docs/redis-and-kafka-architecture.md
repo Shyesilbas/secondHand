@@ -17,8 +17,9 @@ Sistemimizde veri tutarlılığı (consistency), yüksek eşzamanlılık (high c
          ├───► [Redis (In-Memory Engine)]
          │      ├── Multi-Tier Cache (v4: Prefix, Polymorphic JSON)
          │      ├── Atomik Lua Stok Rezervasyonu (15 dk TTL, Anti-Hoarding)
-         │      ├── Payment Idempotency Lock (SETNX)
-         │      └── Atomik Kupon Kullanım Limiter
+         │      ├── Payment Idempotency Lock (SET NX, 1 saat / 24 saat)
+         │      ├── Atomik Kupon Kullanım Limiter
+         │      └── Rate limit, login throttling, access token revocation
          │
          └───► [PostgreSQL (ACID Primary Database)]
                 ├── Business Entity Kayıtları
@@ -39,8 +40,8 @@ Sistemimizde veri tutarlılığı (consistency), yüksek eşzamanlılık (high c
         ▼                ▼                     ▼                      ▼
 [InventoryKafkaConsumer] [PaymentCompletedKafkaConsumer] [EscrowKafkaConsumer] [EmailKafkaConsumer]
  ├── Idempotency Check    ├── Idempotency Check           ├── Idempotency Check  ├── Idempotency Check
- ├── DB Stok Düşümü       ├── PaymentCompletedHandler'lar └── eWallet kredi       └── SMTP gönderimi
- └── Otomatik 'SOLD'      └── Ödeme bildirimi                 aktarımı
+ ├── DB Stok Düşümü       ├── PaymentCompletedHandler'lar └── eWallet kredi       └── emails tablosu
+ └── Otomatik 'SOLD'      └── Ödeme bildirimi                 aktarımı               (uygulama içi kutu)
 ```
 
 `payment.failed.v1` ve `payment.refunded.v1` için `KafkaConfig` içinde yalnızca `NewTopic` bean'i vardır; bu topic'lere publish eden ya da onları dinleyen kod yoktur.
@@ -65,38 +66,50 @@ Redis projemizde iki ana amaçla kullanılır:
 
 İkinci el e-ticarette her ürün genellikle tek adettir veya sınırlı stokludur. İlişkisel veritabanı satır kilitlemesi (`SELECT ... FOR UPDATE`) yüksek trafikte connection pool tükenmesine ve gecikmelere yol açar. Bu nedenle stok kontrolü ve rezervasyon **Redis Lua Scriptleri** ile in-memory yönetilir.
 
-* **Anahtar İsimlendirmeleri:**
-  * `stock:{listingId}`: Ürünün o anki rezerve edilmemiş boşta kalan stok adedi.
-  * `reservation:{userId}:{listingId}`: Kullanıcının sepete aldığı miktar ve TTL bilgisi.
+* **Key'ler** (`InventoryRedisReservationService`):
+  * `v4:inventory:stock:{listingId}`: Kimsenin tutmadığı, satılabilir adet (TTL yok).
+  * `v4:inventory:reservation:{userId}:{listingId}`: Kullanıcının checkout'ta tuttuğu adet (TTL 15 dk).
+  * `v4:inventory:pending:{orderItemId}:{listingId}`: Ödemesi alınmış, PostgreSQL'den henüz düşülmemiş adet (TTL 24 saat, yalnızca emniyet).
 
-* **Lua Scriptleri ([src/main/resources/scripts/](../src/main/resources/scripts/)):**
-  1. `reserve_stock_with_ttl.lua`:
-     * Redis'te stok anahtarı yoksa veritabanındaki mevcut stoktan anahtarı ilk kez doldurur (`lazy-init`).
-     * Yeterli stok olup olmadığını atomik olarak denetler.
-     * Stoğu talep edilen miktar kadar azaltır ve kullanıcıya özel rezervasyon anahtarını **15 dakikalık (900s) TTL** ile oluşturur.
-     * Yetersiz stok durumunda `-1` döner; `InventoryRedisReservationService` üzerinden anında `INSUFFICIENT_STOCK` exception fırlatılır.
-  2. `cancel_user_reservation.lua`:
-     * Kullanıcı ödemeyi iptal ederse veya sepetten vazgeçerse rezerve edilen miktarı okur, rezervasyon anahtarını siler ve `stock:{listingId}` değerini atomik olarak geri artırır.
-  3. `release_stock.lua`: Sipariş iptali/iadesinde `stock:{listingId}` değerini atomik artırır; anahtar yoksa oluşturmaz (`-1` döner).
-  4. `compare_and_set_stock.lua`: Reconciliation yazımı; stok, job'un okuduğu değerde duruyorsa yazar (`1`), aradan değiştiyse dokunmaz (`0`).
-  5. `reserve_stock.lua`: TTL'siz basit rezervasyon fallback'i.
+* **Lua script'leri ([src/main/resources/scripts/](../src/main/resources/scripts/)):**
 
-  Script tablosunun tamamı: [inventory/README.md](../src/main/java/com/serhat/secondhand/inventory/README.md).
+  | Script | Ne yapar | Dönüş |
+  | :--- | :--- | :--- |
+  | `reserve_stock_with_ttl.lua` | Stok key'i yoksa PostgreSQL adediyle oluşturur (lazy init), yeterliyse stoğu düşer ve rezervasyonu TTL ile yazar. Kullanıcının zaten tuttuğu adedi tekrar düşmez. | Kalan stok ya da `-1` (→ `INSUFFICIENT_STOCK`) |
+  | `cancel_user_reservation.lua` | Rezervasyondaki adedi stoğa geri ekler, rezervasyonu siler. | `1` / `0` |
+  | `release_stock.lua` | Sipariş iptali/iadesinde stoğu artırır; key yoksa oluşturmaz. | Yeni stok ya da `-1` |
+  | `compare_and_set_stock.lua` | Reconciliation yazımı: stok, job'un okuduğu değerdeyse yazar. | `1` / `0` |
+  | `reserve_stock.lua` | TTL'siz rezervasyon; checkout akışında kullanılmaz. | Kalan stok ya da `-1` |
 
-* **Reconciliation Scheduler ([StockReservationReconciliationScheduler.java](../src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java)):**
-  * Periyodik arka plan görevi (cron) çalışarak Redis üzerindeki in-memory stok miktarlarını PostgreSQL'deki kesin fiziksel stok durumuyla karşılaştırır; olası drift ve senkron uyumsuzluklarını onarır.
+* **Reconciliation:** [StockReservationReconciliationScheduler](../src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java) 5 dakikada bir `beklenen stok = PostgreSQL availableQuantity − rezervasyonlar − pending` kuralıyla Redis'i düzeltir. Süresi dolan rezervasyonların adedi stoğa bu job ile döner.
+
+  Akışın tamamı ve kod örnekleri: [stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md).
 
 ---
 
 ### C. Dağıtık Kilit, Idempotency & Kupon Limiter
 
 1. **Ödeme İdempotency Kilidi ([PaymentRedisIdempotencyService.java](../src/main/java/com/serhat/secondhand/payment/util/PaymentRedisIdempotencyService.java)):**
-   * Kullanıcıdan gelen `Idempotency-Key` başlığı Redis üzerinde `SET key value NX EX 120` komutu ile kilitlenir.
-   * Aynı anahtarla 2 dakika içinde gelen mükerrer ödeme istekleri veritabanına veya banka gateway'ine gitmeden engellenir (çift çekim önlenir).
+   * Key `v4:payment:idempotency:{key}`, değer `PENDING:{fingerprint}` ya da `DONE:{fingerprint}`. `claim` kilidi `SET NX` ile alır; bekleyen kilit **1 saat**, tamamlanmış sonuç **24 saat** saklanır (`PaymentProcessingConstants`).
+   * Aynı key aynı parametrelerle tekrar gelirse kayıtlı ödeme döner; farklı parametrelerle gelirse `IDEMPOTENCY_KEY_CONFLICT` (409). Akışın tamamı: [payment dokümanı §3](payment-strategy-and-provider-extension-guide.md#3-uçtan-uca-akış).
 2. **Kupon Limitleme ([CouponRedisLimiterService.java](../src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) & [apply_coupon_with_limit.lua](../src/main/resources/scripts/apply_coupon_with_limit.lua)):**
    * Kuponun genel toplam kullanım limiti ve kullanıcı bazlı kullanım limiti Redis üzerinde tek bir atomik Lua çağrısıyla denetlenir ve güncellenir. Checkout transaction commit edilmezse `release_coupon_usage.lua` kullanımı geri bırakır (`CouponService.releaseUsageUnlessCommitted`).
 3. **Rate Limiting ([RateLimitingFilter.java](../src/main/java/com/serhat/secondhand/core/security/RateLimitingFilter.java) & `rate_limit_window.lua`):**
-   * İstek sayacı ve pencere süresi tek bir atomik Lua çağrısıyla artırılır/kontrol edilir. Ayrıntılar: [auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md).
+   * Fixed window sayaç: key `ratelimit:{kategori}:{ip}:{pencere}`; `INCR` ve ilk istekte `PEXPIRE` tek atomik Lua çağrısındadır. Redis'e ulaşılamazsa istek 503 ile reddedilir. Ayrıntılar: [auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md).
+4. **Diğer Redis key'leri:**
+
+   | Key | TTL | Kullanan |
+   | :--- | :--- | :--- |
+   | `v4:offer:lock:{listingId}` | 24 saat | `OfferRedisReservationService` (kabul edilen teklif) |
+   | `v4:coupon:usage:global:{CODE}`, `v4:coupon:usage:user:{CODE}:{userId}` | 30 gün | `CouponRedisLimiterService` |
+   | `v4:listing:active_viewers:{listingId}` (ZSET) | 26 saat | `ListingViewService` |
+   | `v4:listing:view:dedup:{kimlik}:{listingId}` | 1 saat | `ListingViewService` |
+   | `v4:cart:in_cart_users:{listingId}` (SET) | 7 gün | `CartSocialMetricService` |
+   | `auth:login-fail:account:{email}:{ip}`, `auth:login-fail:ip:{ip}` | 15 dk | `LoginAttemptService` |
+   | `auth:access-revoked:{userId}`, `auth:access-token-revoked:{jti}` | access token ömrü kadar | `AccessRevocationService` |
+   | `v6:catalog:locations:*` | 7 gün | `LocationCatalogService` |
+
+   `ratelimit:` ve `auth:` key'leri `v4:` prefix'i taşımaz.
 
 ---
 
@@ -110,29 +123,58 @@ Veritabanına kayıt yazıp hemen ardından Kafka'ya mesaj gönderildiğinde mey
 
 1. Ödeme, sipariş iptali veya escrow işlemleri sırasında event **doğrudan Kafka'ya atılmaz**.
 2. Event kaydı, ana entity kaydı ile **aynı ACID veritabanı transaction'ında** Outbox tablosuna (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) yazılır.
-3. Arka plandaki worker'lar ([PaymentOutboxWorker](../src/main/java/com/serhat/secondhand/payment/outbox/PaymentOutboxWorker.java), [OrderOutboxWorker](../src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxWorker.java), [EscrowOutboxWorker](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java)) `PENDING` ve `FAILED` durumundaki eventleri periyodik olarak sorgular ve Kafka'ya gönderir.
-4. Başarılı gönderimde event statüsü `PROCESSED` olur; hata durumunda `attemptCount` artırılarak artan aralıklarla (exponential backoff) tekrar denenir.
+3. Arka plandaki worker'lar ([PaymentOutboxWorker](../src/main/java/com/serhat/secondhand/payment/outbox/PaymentOutboxWorker.java), [OrderOutboxWorker](../src/main/java/com/serhat/secondhand/order/outbox/OrderOutboxWorker.java), [EscrowOutboxWorker](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java)) 5 saniyede bir, zamanı gelmiş **`PENDING`** event'lerden en fazla 50 tanesini alır ve Kafka'ya gönderir.
+4. Broker onayı en fazla `app.outbox.publish-timeout-seconds` (15 sn) beklenir. Başarıda durum `PROCESSED` olur; hatada `attemptCount` artar ve `nextAttemptAt` ileri atılır. `maxAttempts` (10) dolunca event `FAILED` olur ve **otomatik olarak yeniden denenmez**; `FAILED` satırlar izlenmelidir.
 
-#### 1. Outbox Polling Yükü vs. CDC (Change Data Capture / Debezium)
-Outbox pattern uygulamasında iki temel yaklaşım bulunur:
-* **CDC (Debezium vb.):** PostgreSQL Write-Ahead Log (WAL) akışını dinleyerek DB'ye hiç `SELECT` atmadan eventleri Kafka'ya iletir. Çok yüksek hacimli enterprise mimarilerde DB yükünü sıfırlar ancak ek altyapı bileşeni (Kafka Connect / Debezium) ve WAL yönetimi karmaşıklığı getirir.
-* **Polling Worker (Projedeki Yaklaşımımız):** Spring `@Scheduled` worker'lar periyodik olarak (`fixedDelay = 5000ms`) bekleyen eventleri `SELECT` ile çeker.
-  * **İndeks Optimizasyonu:** Polling sorgularının (`WHERE status IN ('PENDING', 'FAILED') AND next_attempt_at <= :now ORDER BY created_at ASC`) tam tablo taraması (Seq Scan) ve filesort yapmasını önlemek için tüm outbox tablolarında composite index tanımlanmıştır:
-    ```sql
-    CREATE INDEX idx_*_outbox_status_attempt_created ON *_outbox_events (status, next_attempt_at, created_at);
-    ```
+Durumlar (`OutboxStatus`): `PENDING` → `PROCESSING` → `PROCESSED`, ya da deneme hakkı bitince `FAILED`.
 
-#### 2. Outbox Tablo Temizliği (Housekeeping / Purge Job)
-Başarıyla işlenen (`PROCESSED`) outbox eventleri ve tüketilen Kafka idempotency anahtarları zamanla tabloları şişirir (table bloat) ve sorgu performansını düşürür.
+Örnek ([`PaymentOutboxWorker.processEvent`](../src/main/java/com/serhat/secondhand/payment/outbox/PaymentOutboxWorker.java), her event `REQUIRES_NEW` transaction'da ve satır kilidiyle işlenir):
 
-* **[OutboxHousekeepingScheduler](../src/main/java/com/serhat/secondhand/core/outbox/OutboxHousekeepingScheduler.java):**
-  * Her gece saat 03:00'te (`cron = "0 0 3 * * ?"`) otomatik çalışır.
-  * `PROCESSED` durumunda olan ve **3 günden eski** (`app.outbox.cleanup.retention-days = 3`) tüm outbox kayıtlarını (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) temizler.
-  * Aynı zamanda `processed_kafka_events` tablosundaki eski idempotency loglarını purge eder.
-  * Purge sorgularının hızlı çalışması için `status, processed_at` composite indeksi eklenmiştir:
-    ```sql
-    CREATE INDEX idx_*_outbox_status_processed ON *_outbox_events (status, processed_at);
-    ```
+```java
+PaymentOutboxEvent event = paymentOutboxRepository.findByIdForUpdate(eventId).orElse(null);
+if (event == null || event.getStatus() == OutboxStatus.PROCESSED) { return; }
+try {
+    event.setStatus(OutboxStatus.PROCESSING);
+    Payment payment = paymentRepository.findById(UUID.fromString(event.getPayload())).orElseThrow();
+    paymentKafkaProducer.sendPaymentCompleted(payment).get(publishTimeoutSeconds, TimeUnit.SECONDS);
+    event.setStatus(OutboxStatus.PROCESSED);
+    event.setProcessedAt(LocalDateTime.now());
+} catch (Exception ex) {
+    int newAttempt = event.getAttemptCount() + 1;
+    event.setAttemptCount(newAttempt);
+    event.setNextAttemptAt(LocalDateTime.now().plusSeconds(Math.min(300, newAttempt * 10L)));
+    event.setStatus(newAttempt >= event.getMaxAttempts() ? OutboxStatus.FAILED : OutboxStatus.PENDING);
+}
+```
+
+Üç worker'ın bekleme (backoff) hesabı aynı değildir:
+
+| Worker | Yayınladığı topic | Sonraki deneme | Not |
+| :--- | :--- | :--- | :--- |
+| `PaymentOutboxWorker` | `payment.completed.v1` | `min(300, deneme × 10)` sn (doğrusal) | Payload yalnızca `paymentId`'dir; event gönderim anında `Payment` satırından üretilir. |
+| `EscrowOutboxWorker` | `escrow.released.v1` | `min(300, 2^deneme × 5)` sn | Payload JSON `EscrowReleasedKafkaEvent`. |
+| `OrderOutboxWorker` | `order.cancelled.v1`, `order.refunded.v1` | `2^deneme` sn (üst sınır yok) | Tüm batch tek transaction'da işlenir. |
+
+#### 1. Neden polling, neden CDC değil?
+CDC (Debezium vb.) WAL'i dinleyerek DB'ye `SELECT` atmadan çalışır ama Kafka Connect gibi ek bileşen ister. Projede Spring `@Scheduled` worker'lar yeterli görülmüştür. Polling sorgusu `status` ve `next_attempt_at` ile filtreler, `created_at`'e göre sıralar; her outbox tablosunda bu filtre için index vardır:
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_payment_outbox_status_next_attempt ON payment_outbox_events (status, next_attempt_at);
+-- aynı index: idx_escrow_outbox_status_next_attempt (V15), idx_order_outbox_status_next_attempt (V16)
+```
+
+#### 2. Outbox temizliği
+[OutboxHousekeepingScheduler](../src/main/java/com/serhat/secondhand/core/outbox/OutboxHousekeepingScheduler.java) her gece 03:00'te (`app.outbox.cleanup.cron`) çalışır:
+
+```java
+LocalDateTime cutoff = LocalDateTime.now().minusDays(retentionDays);   // app.outbox.cleanup.retention-days, varsayılan 3
+paymentOutboxRepository.deleteByStatusAndProcessedAtBefore(OutboxStatus.PROCESSED, cutoff);
+orderOutboxRepository.deleteByStatusAndProcessedAtBefore(OutboxStatus.PROCESSED, cutoff);
+escrowOutboxRepository.deleteByStatusAndProcessedAtBefore(OutboxStatus.PROCESSED, cutoff);
+processedKafkaEventRepository.deleteByProcessedAtBefore(cutoff);
+```
+
+Yalnızca `PROCESSED` satırlar silinir; `FAILED` satırlar kalır. `processed_kafka_events` de aynı sınırla temizlendiği için 3 günden eski bir mesaj yeniden teslim edilirse tekrar işlenir. `(status, processed_at)` için ayrı bir index tanımlı değildir.
 
 ---
 
@@ -140,14 +182,24 @@ Başarıyla işlenen (`PROCESSED`) outbox eventleri ve tüketilen Kafka idempote
 
 Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garantisi sunar. Rebalancing, timeout veya retry senaryolarında aynı mesaj bir consumer'a tekrar gelebilir.
 
-* **DB-Level Deduplication ([ProcessedKafkaEvent.java](../src/main/java/com/serhat/secondhand/core/idempotency/ProcessedKafkaEvent.java)):**
-* Consumer tarafında işlem başlamadan önce:
-  ```sql
-  INSERT INTO processed_kafka_events (event_id, consumer_group, processed_at)
-  VALUES ('payment:completed:UUID', 'inventory-sync-consumers', NOW())
-  ON CONFLICT (event_id) DO NOTHING;
-  ```
-* Etkilenen satır sayısı `0` ise event daha önce işlenmiştir; log basılarak işlem atlanır. Bu sayede mükerrer stok düşümü, çift bakiye yüklemesi veya mükerrer e-posta gönderimi %100 engellenir.
+Her consumer işe başlamadan önce [`ProcessedKafkaEventRepository.insertIfNotExists`](../src/main/java/com/serhat/secondhand/core/idempotency/ProcessedKafkaEventRepository.java) çağırır:
+
+```java
+@Query(value = "INSERT INTO processed_kafka_events (id, consumer_group, processed_at) "
+        + "VALUES (:id, :consumerGroup, NOW()) ON CONFLICT (id) DO NOTHING", nativeQuery = true)
+int insertIfNotExists(@Param("id") String id, @Param("consumerGroup") String consumerGroup);
+```
+
+Dönen değer `0` ise mesaj daha önce işlenmiştir ve atlanır. Insert, consumer'ın iş transaction'ı içindedir: iş hata verirse dedupe kaydı da geri alınır ve retry mesajı yeniden işleyebilir.
+
+| Consumer | Dedupe key | Group |
+| :--- | :--- | :--- |
+| `InventoryKafkaConsumer` | `inventory:payment:{paymentId}` | `inventory-sync-consumers` |
+| `PaymentCompletedKafkaConsumer` | `payment:completed:{paymentId}` | `payment-completed-consumers` |
+| `EscrowKafkaConsumer` | `escrow:release:{escrowId}` | `escrow-released-consumers` |
+| `EmailKafkaConsumer` | `mail:dispatch:{eventId}` | `mail-dispatch-consumers` |
+
+Aynı topic'i dinleyen iki consumer (`payment.completed.v1`) farklı key kullandığı için birbirini engellemez.
 
 ---
 
@@ -155,8 +207,8 @@ Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garan
 
 | Topic | Partition / Replica | Producer (Outbox) | Consumer | İşlenen Görevler |
 | :--- | :--- | :--- | :--- | :--- |
-| `payment.completed.v1` | 3 / 1 | `PaymentOutboxWorker` | `PaymentCompletedKafkaConsumer` | Alıcı ve satıcıya asenkron başarılı ödeme bildirimi ve dekont e-postası iletimi. |
-| `payment.completed.v1` | 3 / 1 | `PaymentOutboxWorker` | `InventoryKafkaConsumer` | PostgreSQL veritabanındaki kesin fiziksel stoktan düşüm yapılması ve stok 0 ise ilanın `SOLD` durumuna geçirilmesi. |
+| `payment.completed.v1` | 3 / 1 | `PaymentOutboxWorker` | `PaymentCompletedKafkaConsumer` | `PaymentCompletedHandler`'ları çalıştırır (ilan ücreti → ilanı yayına alma vb.) ve ödeyene ödeme bildirimi gönderir. |
+| `payment.completed.v1` | 3 / 1 | `PaymentOutboxWorker` | `InventoryKafkaConsumer` | Yalnızca `ITEM_PURCHASE` için PostgreSQL stoğunu düşer; stok 0 ise ilanı `SOLD` yapar, Redis pending işaretini siler. |
 | `escrow.released.v1` | 3 / 1 | `EscrowOutboxWorker` | `EscrowKafkaConsumer` | Ürün alıcıya teslim edilip onaylandığında, havuzdaki paranın satıcının `eWallet` hesabına aktarılması. |
 | `mail.dispatch.v1` | 3 / 1 | `EmailKafkaProducer` (outbox yok) | `EmailKafkaConsumer` | Asenkron e-posta gönderimi. Ayrıntılar: [email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md). |
 | `order.cancelled.v1` | 3 / 1 | `OrderOutboxWorker` | **Yok** | Dış tüketiciler için yayınlanır. Stok iadesi bu event'e bağlı değildir; senkron yapılır ([order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)). |
@@ -168,8 +220,9 @@ Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garan
 
 * **Serializer:** `JsonSerializer` (producer) ve `ErrorHandlingDeserializer` ile sarılmış `JsonDeserializer` (consumer).
 * **Deserialization Resilience:** Bozuk bir mesaj geldiğinde consumer container çökmez; hata yakalanıp loglanır ve stream akışı duraksamaz.
-* **Retry, Backoff & DLT:** `ConcurrentKafkaListenerContainerFactory` üzerinde `DefaultErrorHandler(DeadLetterPublishingRecoverer, new FixedBackOff(1000L, 2L))` tanımlıdır: geçici hatalarda 1 saniye aralıkla 2 retry yapılır, ardından mesaj `<topic>.DLT` topic'ine yazılır.
-* **Yapılandırma:** Producer/consumer serializer ayarları `src/main/resources/config/application-core.yml` içindedir.
+* **Retry, Backoff & DLT:** `ConcurrentKafkaListenerContainerFactory` üzerinde `DefaultErrorHandler(DeadLetterPublishingRecoverer, new FixedBackOff(1000L, 2L))` tanımlıdır: 1 saniye aralıkla 2 retry (toplam 3 deneme), ardından mesaj `<topic>.DLT` topic'ine yazılır. DLT'ler `payment.completed.v1.DLT`, `escrow.released.v1.DLT` ve `mail.dispatch.v1.DLT`'dir (1 partition); bunları okuyan consumer yoktur, yeniden işleme elle yapılır.
+* **Producer zaman sınırları:** `max.block.ms` 10 sn, `request.timeout.ms` 10 sn, `delivery.timeout.ms` 20 sn; broker kapalıyken outbox worker süresiz beklemez.
+* **Yapılandırma:** Producer/consumer ayarları `src/main/resources/config/application-core.yml` içindedir. `@Scheduled` job'ları 4 thread'lik havuzu paylaşır (`SCHEDULING_POOL_SIZE`).
 
 ---
 
@@ -178,8 +231,8 @@ Kafka mesaj dağıtımı doğası gereği *At-Least-Once (En az bir kere)* garan
 | İhtiyaç / Senaryo | Çözüm Bileşeni | Sağlanan Güvence |
 | :--- | :--- | :--- |
 | **Yüksek Trafikte Hızlı Stok Kontrolü** | Redis + Lua (`reserve_stock_with_ttl.lua`) | Sub-millisecond hız, Sıfır Over-Selling, DB kilidi yok. |
-| **Sepette Ürün Bekletme & Hoarding Önleme** | Redis Key TTL (15 Dakika) | Süresi dolan sepet stoğunun otomatik olarak havuza dönmesi. |
-| **Ödeme Esnasında Çift Çekim Önleme** | Redis `SETNX` Lock (`Idempotency-Key`) | Aynı isteğin 2 dakika boyunca mükerrer işlenmesini önleme. |
+| **Checkout'ta Ürün Bekletme & Hoarding Önleme** | Rezervasyon key'i (TTL 15 dk) + reconciliation job'u | Süresi dolan rezervasyonun adedi bir sonraki reconciliation turunda stoğa döner. |
+| **Ödeme Esnasında Çift Çekim Önleme** | Redis `SET NX` + DB `idempotencyKey` kontrolü | Aynı istek işlenirken 1 saat, tamamlandıktan sonra 24 saat boyunca tekrar çekim yapılmaz. |
 | **DB & Kafka Dual-Write Tutarlılığı** | Transactional Outbox Pattern | Veritabanı transaction'ı rollback olursa Kafka'ya event gitmez. |
 | **Mükerrer Kafka Mesajı Tüketimi** | `ProcessedKafkaEvent` (PostgreSQL Deduplication) | At-least-once teslimat üzerinde uygulama seviyesinde effectively-once işleme. |
 | **Ağır Okuma Sorguları (Katalog / Lokasyon)** | Multi-Tier Redis Cache (`v4:`) | Deterministic `@class` serialization; tekrar eden okumalar veritabanına gitmez. |

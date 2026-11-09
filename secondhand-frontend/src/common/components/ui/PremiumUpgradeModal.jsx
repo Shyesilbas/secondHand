@@ -264,22 +264,20 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
           >
             {index > 0 && <span className="h-px w-6 bg-border" aria-hidden />}
             <span
-              className={`inline-flex items-center gap-1.5 tabular-nums ${
-                step === id
+              className={`inline-flex items-center gap-1.5 tabular-nums ${step === id
                   ? 'font-semibold text-text-primary'
                   : step > id
-                  ? 'text-text-secondary'
-                  : 'text-text-tertiary'
-              }`}
+                    ? 'text-text-secondary'
+                    : 'text-text-tertiary'
+                }`}
             >
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${
-                  step === id
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${step === id
                     ? 'bg-primary font-medium text-white'
                     : step > id
-                    ? 'bg-background-tertiary text-text-secondary'
-                    : 'bg-background-secondary text-text-tertiary'
-                }`}
+                      ? 'bg-background-tertiary text-text-secondary'
+                      : 'bg-background-secondary text-text-tertiary'
+                  }`}
               >
                 {id}
               </span>
@@ -439,9 +437,8 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
             </p>
             {otpTtlActive && (
               <p
-                className={`mt-1 text-sm tabular-nums ${
-                  otpTtlExpired ? 'text-status-warning-text' : 'text-text-tertiary'
-                }`}
+                className={`mt-1 text-sm tabular-nums ${otpTtlExpired ? 'text-status-warning-text' : 'text-text-tertiary'
+                  }`}
               >
                 {otpTtlExpired
                   ? t('code_expired_request_new')

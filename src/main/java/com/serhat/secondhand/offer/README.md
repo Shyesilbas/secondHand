@@ -9,7 +9,7 @@ The `offer` domain manages buyer-to-seller negotiations (offers) on listings, in
 - **EmailNotificationService:** Broadcasts lifecycle events (e.g., offer accepted) to users.
 
 ## Business Invariants & Constraints
-- **Concurrency Lock & Redis Reservation:** Accepting an offer requires acquiring a lock on the Listing (`findByIdWithLock`). Upon acceptance, `OfferRedisReservationService` establishes a 24-hour Redis key (`v4:offer:lock:{listingId}`) to reserve the listing exclusively for the buyer at the discounted price.
+- **Concurrency Lock & Redis Reservation:** Accepting an offer requires acquiring a lock on the Listing (`findByIdWithLock`). Double acceptance is prevented by that row lock plus the `existsByListingAndStatusAndIdNot(ACCEPTED)` check. Upon acceptance, `OfferRedisReservationService` also writes a 24-hour Redis key (`v4:offer:lock:{listingId}`); no code reads it, so it does not stop other buyers from purchasing the listing.
 - **Offer Chains:** Counter-offers establish a `parentOffer` link to maintain negotiation history. The parent offer must be explicitly rejected before creating the counter.
 - **Authorization:** Only the explicitly designated receiver of an offer may accept or reject it.
 

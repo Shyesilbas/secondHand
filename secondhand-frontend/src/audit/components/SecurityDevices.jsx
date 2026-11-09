@@ -138,8 +138,8 @@ const SecurityDevices = ({
         Boolean(currentUA && log.userAgent && log.userAgent === currentUA) ||
         Boolean(
           currentParsed &&
-            parsed.deviceLabel === currentParsed.deviceLabel &&
-            parsed.browserLabel === currentParsed.browserLabel
+          parsed.deviceLabel === currentParsed.deviceLabel &&
+          parsed.browserLabel === currentParsed.browserLabel
         );
 
       const key = isSameAsCurrent && currentParsed
@@ -295,11 +295,10 @@ const SecurityDevices = ({
                     onClick={() =>
                       onFilterByDevice(isFiltered ? '' : filterToken)
                     }
-                    className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
-                      isFiltered
+                    className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer ${isFiltered
                         ? 'border-primary bg-primary text-white'
                         : 'border-border-light bg-background-primary text-text-secondary hover:border-border hover:text-text-primary'
-                    }`}
+                      }`}
                   >
                     <Filter className="h-3 w-3" strokeWidth={1.5} aria-hidden />
                     <span>

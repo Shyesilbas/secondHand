@@ -6,13 +6,13 @@ import { toDisplayText } from '../../utils/listingDisplayFormat.js';
 import ListingAttributeDetails from '../attributes/ListingAttributeDetails.jsx';
 
 const getValueByPath = (obj, path) => {
- if (!obj || !path) return undefined;
- if (typeof path !== 'string') return undefined;
+  if (!obj || !path) return undefined;
+  if (typeof path !== 'string') return undefined;
 
- return path.split('.').reduce((acc, key) => {
- if (acc == null) return undefined;
- return acc[key];
- }, obj);
+  return path.split('.').reduce((acc, key) => {
+    if (acc == null) return undefined;
+    return acc[key];
+  }, obj);
 };
 
 const DetailRow = ({ label, value }) => (
@@ -68,11 +68,10 @@ const GenericListingDetails = ({ listing, flat = false }) => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveSection(tab.id)}
-                className={`px-3 py-1.5 text-xs rounded font-medium transition-colors cursor-pointer ${
-                  isActive
+                className={`px-3 py-1.5 text-xs rounded font-medium transition-colors cursor-pointer ${isActive
                     ? 'bg-primary text-white'
                     : 'bg-background-secondary text-text-secondary hover:text-text-primary hover:bg-background-tertiary border border-border-light'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>

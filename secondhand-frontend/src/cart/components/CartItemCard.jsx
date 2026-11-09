@@ -74,9 +74,8 @@ const CartItemCard = ({
                 />
               ) : null}
               <div
-                className={`h-20 w-20 items-center justify-center bg-background-tertiary sm:h-24 sm:w-24 ${
-                  item.listing?.imageUrl ? 'hidden' : 'flex'
-                }`}
+                className={`h-20 w-20 items-center justify-center bg-background-tertiary sm:h-24 sm:w-24 ${item.listing?.imageUrl ? 'hidden' : 'flex'
+                  }`}
               >
                 <span className="text-sm font-semibold text-text-muted">
                   {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
@@ -160,9 +159,8 @@ const CartItemCard = ({
 
               {isReserved && !isExpired && (
                 <span
-                  className={`inline-flex items-center gap-1 font-medium tabular-nums ${
-                    isReservationExpiring ? 'text-status-error' : 'text-text-secondary'
-                  }`}
+                  className={`inline-flex items-center gap-1 font-medium tabular-nums ${isReservationExpiring ? 'text-status-error' : 'text-text-secondary'
+                    }`}
                 >
                   <Clock className="h-3 w-3" strokeWidth={1.75} />
                   <span>

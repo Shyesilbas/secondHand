@@ -416,8 +416,8 @@ const EmailsPage = ({ embedded = false }) => {
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
                   className={`flex w-full items-center justify-between gap-2.5 rounded px-2.5 py-2 text-left text-xs transition-colors ${active
-                      ? 'bg-background-tertiary font-semibold text-text-primary'
-                      : 'font-medium text-text-secondary hover:bg-background-tertiary/70 hover:text-text-primary'
+                    ? 'bg-background-tertiary font-semibold text-text-primary'
+                    : 'font-medium text-text-secondary hover:bg-background-tertiary/70 hover:text-text-primary'
                     }`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
@@ -532,8 +532,8 @@ const EmailsPage = ({ embedded = false }) => {
                   type="button"
                   onClick={() => handleFolderSelect(item.id)}
                   className={`shrink-0 rounded px-2.5 py-1 text-xs font-medium transition-colors ${filterType === item.id
-                      ? 'border border-border-focus bg-background-tertiary font-semibold text-text-primary'
-                      : 'border border-border bg-background-primary text-text-secondary'
+                    ? 'border border-border-focus bg-background-tertiary font-semibold text-text-primary'
+                    : 'border border-border bg-background-primary text-text-secondary'
                     }`}
                 >
                   {item.label}

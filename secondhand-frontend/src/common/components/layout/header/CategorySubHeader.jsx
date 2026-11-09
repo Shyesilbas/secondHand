@@ -40,9 +40,8 @@ const CategorySubHeader = () => {
   if (!isBrowsingPage(pathname)) return null;
 
   const activeCategory = pathname === ROUTES.LISTINGS ? new URLSearchParams(search).get('category') : null;
-  const linkClass = (active) => `inline-flex shrink-0 items-center gap-1.5 border-b-2 px-1 py-2.5 text-sm transition-colors duration-150 ${
-    active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
-  }`;
+  const linkClass = (active) => `inline-flex shrink-0 items-center gap-1.5 border-b-2 px-1 py-2.5 text-sm transition-colors duration-150 ${active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
+    }`;
 
   return (
     <nav className="border-t border-border-light bg-background-primary" aria-label={t('categories', 'Kategoriler')}>

@@ -241,8 +241,8 @@ const ListingPrefilterSelectionFlow = ({ mode = 'browse', onComplete, onCancel }
             onClick={() => handleOptionPick(id)}
             aria-pressed={selected}
             className={`group flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors duration-150 focus:outline-none focus-visible:bg-background-secondary ${selected
-                ? 'bg-background-tertiary/70 font-semibold text-text-primary'
-                : 'text-text-primary hover:bg-background-secondary'
+              ? 'bg-background-tertiary/70 font-semibold text-text-primary'
+              : 'text-text-primary hover:bg-background-secondary'
               }`}
           >
             <span className="truncate">{optionLabel(opt)}</span>

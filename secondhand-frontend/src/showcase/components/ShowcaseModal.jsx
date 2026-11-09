@@ -371,8 +371,8 @@ const ShowcaseModal = ({
                 onClick={() => setDays(opt.days)}
                 aria-pressed={isSelected}
                 className={`relative flex flex-col justify-between rounded border p-3 text-left transition-colors duration-150 cursor-pointer ${isSelected
-                    ? 'border-primary bg-background-secondary/80 ring-1 ring-primary'
-                    : 'border-border-light bg-background-primary hover:border-border'
+                  ? 'border-primary bg-background-secondary/80 ring-1 ring-primary'
+                  : 'border-border-light bg-background-primary hover:border-border'
                   }`}
               >
                 <div className="flex items-center justify-between gap-1.5">
@@ -822,20 +822,20 @@ const ShowcaseModal = ({
                 <div className="mt-2 flex items-center gap-1.5">
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums ${isDone
-                        ? 'bg-primary text-white'
-                        : isActive
-                          ? 'border border-primary text-text-primary'
-                          : 'border border-border text-text-muted'
+                      ? 'bg-primary text-white'
+                      : isActive
+                        ? 'border border-primary text-text-primary'
+                        : 'border border-border text-text-muted'
                       }`}
                   >
                     {isDone ? <Check className="h-2.5 w-2.5" strokeWidth={2} /> : item.step}
                   </span>
                   <span
                     className={`truncate text-xs ${isActive
-                        ? 'font-semibold text-text-primary'
-                        : isDone
-                          ? 'font-medium text-text-secondary'
-                          : 'text-text-muted'
+                      ? 'font-semibold text-text-primary'
+                      : isDone
+                        ? 'font-medium text-text-secondary'
+                        : 'text-text-muted'
                       }`}
                   >
                     {t(item.labelKey, item.label)}

@@ -24,37 +24,37 @@ import { getListingFavoriteCount } from '../../favorites/favorites.js';
 import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 const ShoppingCartPage = () => {
- const {
- t
- } = useTranslation();
- const navigate = useNavigate();
- const notification = useNotification();
- const {
- user,
- isAuthenticated
- } = useAuthState();
- const {
- favorites = [],
- isLoading: favoritesLoading
- } = useFavorites(0, 8);
- const {
- cartItems,
- cartCount,
- isLoading,
- updateCartItem,
- removeFromCart,
- clearCart,
- isUpdatingCart,
- isRemovingFromCart,
- isClearingCart
- } = useCart();
- const sellerIds = useMemo(() => {
- return [...new Set(cartItems.map(item => item.listing.sellerId))];
- }, [cartItems]);
+  const {
+    t
+  } = useTranslation();
+  const navigate = useNavigate();
+  const notification = useNotification();
+  const {
+    user,
+    isAuthenticated
+  } = useAuthState();
+  const {
+    favorites = [],
+    isLoading: favoritesLoading
+  } = useFavorites(0, 8);
+  const {
+    cartItems,
+    cartCount,
+    isLoading,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    isUpdatingCart,
+    isRemovingFromCart,
+    isClearingCart
+  } = useCart();
+  const sellerIds = useMemo(() => {
+    return [...new Set(cartItems.map(item => item.listing.sellerId))];
+  }, [cartItems]);
 
- const cartKey = useMemo(() => {
- return cartItems.map(i => `${i?.listing?.id || i?.id}:${i.quantity}`).join('|');
- }, [cartItems]);
+  const cartKey = useMemo(() => {
+    return cartItems.map(i => `${i?.listing?.id || i?.id}:${i.quantity}`).join('|');
+  }, [cartItems]);
 
   const { isPremium } = usePlan();
   const [couponInput, setCouponInput] = useState('');
@@ -137,88 +137,88 @@ const ShoppingCartPage = () => {
     setCouponInput('');
     setCouponError(null);
   };
- const checkReservationStatus = reservedAt => {
- if (!reservedAt) return {
- isExpired: false,
- timeRemaining: null
- };
- const reservedTime = new Date(reservedAt);
- const expirationTime = new Date(reservedTime.getTime() + 15 * 60 * 1000);
- const now = new Date();
- const diff = expirationTime - now;
- if (diff <= 0) {
- return {
- isExpired: true,
- timeRemaining: null
- };
- }
- const minutes = Math.floor(diff / 60000);
- return {
- isExpired: false,
- timeRemaining: {
- minutes,
- seconds: Math.floor(diff % 60000 / 1000)
- }
- };
- };
- const hasExpiredReservations = useMemo(() => cartItems.some(item => checkReservationStatus(item.reservedAt).isExpired), [cartItems]);
- const hasExpiringReservations = useMemo(() => cartItems.some(item => {
- const {
- isExpired,
- timeRemaining
- } = checkReservationStatus(item.reservedAt);
- return !isExpired && timeRemaining && timeRemaining.minutes < 5;
- }), [cartItems]);
- // Pricing and campaigns are now fetched and managed by TanStack useQuery above
- const bundleInfo = useMemo(() => {
- if (!sellerCampaigns.length || !cartItems.length) return {
- suggestions: [],
- applied: []
- };
- const suggestions = [];
- const applied = [];
- const quantitiesBySeller = {};
- cartItems.forEach(item => {
- const sId = item.listing.sellerId;
- quantitiesBySeller[sId] = (quantitiesBySeller[sId] || 0) + item.quantity;
- });
- sellerCampaigns.forEach(c => {
- if (c.minQuantity > 1) {
- const currentQty = quantitiesBySeller[c.sellerId] || 0;
- if (currentQty > 0) {
- if (currentQty < c.minQuantity) {
- suggestions.push({
- sellerId: c.sellerId,
- sellerName: c.sellerName || 'Seller',
- remaining: c.minQuantity - currentQty,
- discountValue: c.value,
- discountKind: c.discountKind,
- minQuantity: c.minQuantity
- });
- } else {
- applied.push({
- sellerId: c.sellerId,
- sellerName: c.sellerName || 'Seller',
- discountValue: c.value,
- discountKind: c.discountKind,
- quantity: currentQty
- });
- }
- }
- }
- });
- return {
- suggestions,
- applied
- };
- }, [sellerCampaigns, cartItems]);
- const calculateTotal = () => {
- return cartItems.reduce((total, item) => {
- const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
- return total + price * item.quantity;
- }, 0);
- };
- const favoriteListings = useMemo(() => favorites.map(fav => {
+  const checkReservationStatus = reservedAt => {
+    if (!reservedAt) return {
+      isExpired: false,
+      timeRemaining: null
+    };
+    const reservedTime = new Date(reservedAt);
+    const expirationTime = new Date(reservedTime.getTime() + 15 * 60 * 1000);
+    const now = new Date();
+    const diff = expirationTime - now;
+    if (diff <= 0) {
+      return {
+        isExpired: true,
+        timeRemaining: null
+      };
+    }
+    const minutes = Math.floor(diff / 60000);
+    return {
+      isExpired: false,
+      timeRemaining: {
+        minutes,
+        seconds: Math.floor(diff % 60000 / 1000)
+      }
+    };
+  };
+  const hasExpiredReservations = useMemo(() => cartItems.some(item => checkReservationStatus(item.reservedAt).isExpired), [cartItems]);
+  const hasExpiringReservations = useMemo(() => cartItems.some(item => {
+    const {
+      isExpired,
+      timeRemaining
+    } = checkReservationStatus(item.reservedAt);
+    return !isExpired && timeRemaining && timeRemaining.minutes < 5;
+  }), [cartItems]);
+  // Pricing and campaigns are now fetched and managed by TanStack useQuery above
+  const bundleInfo = useMemo(() => {
+    if (!sellerCampaigns.length || !cartItems.length) return {
+      suggestions: [],
+      applied: []
+    };
+    const suggestions = [];
+    const applied = [];
+    const quantitiesBySeller = {};
+    cartItems.forEach(item => {
+      const sId = item.listing.sellerId;
+      quantitiesBySeller[sId] = (quantitiesBySeller[sId] || 0) + item.quantity;
+    });
+    sellerCampaigns.forEach(c => {
+      if (c.minQuantity > 1) {
+        const currentQty = quantitiesBySeller[c.sellerId] || 0;
+        if (currentQty > 0) {
+          if (currentQty < c.minQuantity) {
+            suggestions.push({
+              sellerId: c.sellerId,
+              sellerName: c.sellerName || 'Seller',
+              remaining: c.minQuantity - currentQty,
+              discountValue: c.value,
+              discountKind: c.discountKind,
+              minQuantity: c.minQuantity
+            });
+          } else {
+            applied.push({
+              sellerId: c.sellerId,
+              sellerName: c.sellerName || 'Seller',
+              discountValue: c.value,
+              discountKind: c.discountKind,
+              quantity: currentQty
+            });
+          }
+        }
+      }
+    });
+    return {
+      suggestions,
+      applied
+    };
+  }, [sellerCampaigns, cartItems]);
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
+      return total + price * item.quantity;
+    }, 0);
+  };
+  const favoriteListings = useMemo(() => favorites.map(fav => {
     const listing = fav?.listing;
     if (!listing) return null;
     const favoriteCount = getListingFavoriteCount(listing);
@@ -232,24 +232,24 @@ const ShoppingCartPage = () => {
       }
     };
   }).filter(Boolean), [favorites]);
- const handleQuantityChange = (listingId, newQuantity) => {
- if (newQuantity < 1) return;
- const item = cartItems.find(ci => ci?.listing?.id === listingId);
- const max = item?.listing?.quantity;
- if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
- updateCartItem(listingId, Number(max), '');
- notification?.showError('Stock limit', `Only ${Number(max)} available.`);
- return;
- }
- updateCartItem(listingId, newQuantity, '');
- };
- const handleRemoveItem = listingId => {
- removeFromCart(listingId);
- };
- const handleClearCart = () => {
- clearCart();
- setShowClearModal(false);
- };
+  const handleQuantityChange = (listingId, newQuantity) => {
+    if (newQuantity < 1) return;
+    const item = cartItems.find(ci => ci?.listing?.id === listingId);
+    const max = item?.listing?.quantity;
+    if (max != null && Number.isFinite(Number(max)) && newQuantity > Number(max)) {
+      updateCartItem(listingId, Number(max), '');
+      notification?.showError('Stock limit', `Only ${Number(max)} available.`);
+      return;
+    }
+    updateCartItem(listingId, newQuantity, '');
+  };
+  const handleRemoveItem = listingId => {
+    removeFromCart(listingId);
+  };
+  const handleClearCart = () => {
+    clearCart();
+    setShowClearModal(false);
+  };
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background-secondary">
@@ -389,9 +389,8 @@ const ShoppingCartPage = () => {
                   className="flex items-start gap-3 rounded border border-border bg-background-primary p-3.5 text-xs text-text-secondary"
                 >
                   <AlertTriangle
-                    className={`h-4 w-4 shrink-0 mt-0.5 ${
-                      hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
-                    }`}
+                    className={`h-4 w-4 shrink-0 mt-0.5 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
+                      }`}
                   />
                   <div>
                     <p className="font-semibold text-text-primary">

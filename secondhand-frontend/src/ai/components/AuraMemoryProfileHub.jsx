@@ -10,7 +10,7 @@ export default function AuraMemoryProfileHub() {
   const queryClient = useQueryClient();
   const [newInterest, setNewInterest] = useState('');
   const [newBrand, setNewBrand] = useState('');
-  
+
   // Local state for editable form fields
   const [userName, setUserName] = useState('');
   const [preferredTone, setPreferredTone] = useState('');
@@ -76,7 +76,7 @@ export default function AuraMemoryProfileHub() {
   const handleAddInterest = (e) => {
     e.preventDefault();
     if (!newInterest.trim()) return;
-    
+
     const interests = [...(memory?.permanentInterests || [])];
     if (!interests.includes(newInterest.trim())) {
       interests.push(newInterest.trim());
@@ -147,9 +147,9 @@ export default function AuraMemoryProfileHub() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="text-sm font-medium text-text-secondary block mb-1">{t("how_to_address_you", "Hitap Şekli")}</label>
-          <input 
-            type="text" 
-            value={userName} 
+          <input
+            type="text"
+            value={userName}
             onChange={(e) => setUserName(e.target.value)}
             onBlur={handleSaveField}
             placeholder={t("name_placeholder", "İsminiz")}
@@ -158,8 +158,8 @@ export default function AuraMemoryProfileHub() {
         </div>
         <div>
           <label className="text-sm font-medium text-text-secondary block mb-1">{t("conversation_tone", "İletişim Tonu")}</label>
-          <select 
-            value={preferredTone} 
+          <select
+            value={preferredTone}
             onChange={(e) => {
               setPreferredTone(e.target.value);
               const updatedProfile = {
@@ -206,10 +206,10 @@ export default function AuraMemoryProfileHub() {
           )}
         </div>
         <form onSubmit={handleAddInterest} className="flex gap-2">
-          <input 
-            type="text" 
-            value={newInterest} 
-            onChange={(e) => setNewInterest(e.target.value)} 
+          <input
+            type="text"
+            value={newInterest}
+            onChange={(e) => setNewInterest(e.target.value)}
             placeholder={t("add_interest_placeholder", "Yeni ilgi alanı ekleyin...")}
             className={inputClass}
           />
@@ -237,10 +237,10 @@ export default function AuraMemoryProfileHub() {
           )}
         </div>
         <form onSubmit={handleAddBrand} className="flex gap-2">
-          <input 
-            type="text" 
-            value={newBrand} 
-            onChange={(e) => setNewBrand(e.target.value)} 
+          <input
+            type="text"
+            value={newBrand}
+            onChange={(e) => setNewBrand(e.target.value)}
             placeholder={t("add_brand_placeholder", "Yeni marka ekleyin...")}
             className={inputClass}
           />
@@ -255,18 +255,18 @@ export default function AuraMemoryProfileHub() {
       <div className="space-y-2">
         <label className="text-sm font-medium text-text-secondary block">{t("budget_preference", "Bütçe Aralığı")}</label>
         <div className="flex gap-2 items-center">
-          <input 
-            type="number" 
-            placeholder={t("min", "Min")} 
+          <input
+            type="number"
+            placeholder={t("min", "Min")}
             value={budgetMin}
             onChange={(e) => setBudgetMin(e.target.value)}
             onBlur={handleSaveField}
             className={inputClass}
           />
           <span className="text-text-tertiary text-sm">–</span>
-          <input 
-            type="number" 
-            placeholder={t("max", "Max")} 
+          <input
+            type="number"
+            placeholder={t("max", "Max")}
             value={budgetMax}
             onChange={(e) => setBudgetMax(e.target.value)}
             onBlur={handleSaveField}
@@ -305,8 +305,8 @@ export default function AuraMemoryProfileHub() {
       {/* User Notes */}
       <div>
         <label className="text-sm font-medium text-text-secondary block mb-1">{t("auras_special_notes", "Aura İçin Özel Notlar")}</label>
-        <textarea 
-          value={userNotes} 
+        <textarea
+          value={userNotes}
           onChange={(e) => setUserNotes(e.target.value)}
           onBlur={handleSaveField}
           placeholder={t("special_notes_placeholder", "Örn: Teknolojik aletlerde pil sağlığına dikkat ederim...")}

@@ -103,10 +103,40 @@ Doğrudan `escrowService.release()` içinde üçüncü parti cüzdan/banka servi
 
 Bu nedenle **Transactional Outbox** mimarisi uygulanmıştır:
 1. `escrowService.release(order)` (`findByOrderIdAndStatusForUpdate` ile satırlar kilitlenir) escrow'u `COMPLETED` yapar, `releasedAt` yazar, satıcı tarafındaki `ITEM_SALE`/`ITEM_PURCHASE` `Payment` kaydını `COMPLETED` yapıp `PaymentCompletedEvent` yayınlar ve aynı transaction içinde `escrow_outbox_events` tablosuna `ESCROW_RELEASED` event'i yazar ([`EscrowOutboxService`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxService.java)). `payment:stats` cache'i `allEntries` ile evict edilir.
-2. [`EscrowOutboxWorker.java`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) her 5 sn'de (`app.escrow.outbox.fixed-delay-ms`) `PENDING` ve zamanı gelmiş en fazla 50 event'i alır; her event `REQUIRES_NEW` transaction'da satır kilidiyle işlenir ve `escrow.released.v1` topic'ine gönderilir (broker ack bekleme limiti `app.outbox.publish-timeout-seconds`, varsayılan 15 sn).
+2. [`EscrowOutboxWorker.java`](../src/main/java/com/serhat/secondhand/escrow/outbox/EscrowOutboxWorker.java) her 5 sn'de (`app.escrow.outbox.fixed-delay-ms`) zamanı gelmiş en fazla 50 `PENDING` event'i alır; her event `REQUIRES_NEW` transaction'da satır kilidiyle işlenir ve `escrow.released.v1` topic'ine gönderilir (broker ack bekleme limiti `app.outbox.publish-timeout-seconds`, varsayılan 15 sn).
 3. [`EscrowKafkaConsumer.java`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java) mesajı tüketir (group: `escrow-released-consumers`).
 4. **Idempotency Kilidi:** `ProcessedKafkaEventRepository.insertIfNotExists` ile `escrow:release:{escrowId}` anahtarı `INSERT ... ON CONFLICT DO NOTHING` ile yazılır; 0 satır eklendiyse event mükerrer sayılır ve atlanır.
 5. Satıcının cüzdanına `IEWalletService.creditWalletQuietly` ile bakiye eklenir. Dedupe kaydı ve cüzdan kredisi aynı transaction'dadır; hata olursa dedupe kaydı da geri alınır.
+
+`release` tarafı ([`EscrowService`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowService.java)):
+
+```java
+List<Escrow> escrows = escrowRepository.findByOrderIdAndStatusForUpdate(order.getId(), PaymentStatus.ESCROW);
+if (escrows.isEmpty()) { return Result.success(); }        // ikinci çağrı no-op
+
+for (Escrow escrow : escrows) {
+    escrow.setStatus(PaymentStatus.COMPLETED);
+    escrow.setReleasedAt(LocalDateTime.now());
+    escrowRepository.save(escrow);
+    ...                                                     // satıcı tarafındaki Payment kaydı COMPLETED yapılır
+    escrowOutboxService.enqueueEscrowReleased(escrow);      // aynı transaction'da outbox satırı
+}
+```
+
+Consumer tarafı ([`EscrowKafkaConsumer`](../src/main/java/com/serhat/secondhand/escrow/application/EscrowKafkaConsumer.java)):
+
+```java
+if (event.escrowId() == null || event.sellerId() == null || event.amount() == null) {
+    throw new BusinessException(PaymentErrorCodes.ESCROW_RELEASE_EVENT_INVALID);   // atlanmaz, DLT'ye gider
+}
+String dedupeKey = "escrow:release:" + event.escrowId();
+int inserted = processedKafkaEventRepository.insertIfNotExists(dedupeKey, "escrow-released-consumers");
+if (inserted == 0) { return; }                                                      // mükerrer mesaj
+
+User seller = userRepository.findById(event.sellerId())
+        .orElseThrow(() -> new BusinessException(PaymentErrorCodes.ESCROW_RELEASE_SELLER_NOT_FOUND));
+walletService.creditWalletQuietly(seller, event.amount());
+```
 
 ---
 
@@ -138,5 +168,5 @@ Olası yasal uyuşmazlıklar ve denetimler için `Escrow` entity'si ilişkisel f
 | **Mükerrer Teslimat Onayı** | Alıcı butona arka arkaya basarsa çift para aktarımı. | `EscrowRepository.findByOrderIdAndStatusForUpdate` (`PESSIMISTIC_WRITE`) ile satırlar kilitlenir; ilk işlemden sonra status `COMPLETED` olduğu için `release` `ESCROW` kaydı bulamaz ve no-op `Result.success()` döner. |
 | **Çifte Cancel / Refund** | Aynı kalem için ikinci iptal/iade çift iade yaratır. | `cancel`/`refund` `findByOrderItemIdInForUpdate` ile kilitler; escrow kaydı yoksa `ESCROW_NOT_FOUND`, `ESCROW` dışındaysa `ESCROW_STATUS_INVALID` döner. Çağıran servis transaction'ı rollback-only yapar ve `REFUND_FAILED` döner. |
 | **Eksik / Bozuk Event** | `escrowId`, `sellerId` veya `amount` null; ya da satıcı bulunamıyor. | Consumer sessizce atlamaz: `ESCROW_RELEASE_EVENT_INVALID` / `ESCROW_RELEASE_SELLER_NOT_FOUND` (`BusinessException`) fırlatır; dedupe kaydı geri alınır, `DefaultErrorHandler` 2 kez daha dener (1 sn aralık) ve event `escrow.released.v1.DLT` topic'ine düşer. |
-| **Kafka Rebalancing / Retry** | Kafka aynı mesajı consumer'a 2 kez iletirse mükerrer cüzdan bakiyesi. | Consumer seviyesinde `processed_kafka_events` tablosunda `escrow:release:{escrowId}` deduplication key ile exactly-once garanti edilir. |
+| **Kafka Rebalancing / Retry** | Kafka aynı mesajı consumer'a 2 kez iletirse mükerrer cüzdan bakiyesi. | `processed_kafka_events` tablosundaki `escrow:release:{escrowId}` kaydı ikinci mesajı atlatır. Bu kayıtlar 3 gün sonra temizlenir (`OutboxHousekeepingScheduler`); daha eski bir mesajın yeniden teslimi tekrar işlenir. |
 | **Outbox Gönderim Hatası** | Kafka broker geçici olarak kapalıysa. | Worker `attemptCount`'u artırır ve `next_attempt_at`'ı `min(300, 2^attempt × 5)` sn sonrasına ayarlar (exponential backoff, üst sınır 5 dk). `maxAttempts` (varsayılan 10) dolunca event `FAILED` olur ve otomatik retry edilmez; para escrow'da `COMPLETED` görünür ama satıcı cüzdanına yansımaz, bu yüzden `FAILED` event'ler izlenmelidir. |
