@@ -53,7 +53,7 @@ const ListingSellerCard = ({ listing, isOwner }) => {
         )}
 
         {listing.sellerGreatSellerEligible && (
-          <span className="inline-flex items-center gap-1 rounded-sm bg-status-warning-bg px-1.5 py-0.5 text-xs font-medium text-status-warning-text">
+          <span className="inline-flex items-center gap-1 rounded-full border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text">
             <Award className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
             {t('great_seller_status', 'Harika satıcı')}
           </span>

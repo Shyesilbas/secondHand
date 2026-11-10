@@ -89,7 +89,7 @@ export const CommentItem = ({
  {/* Reply composer (inline) */}
  {isReplyTarget && <div className="mt-3 rounded border border-border-light bg-secondary-light/60 overflow-hidden focus-within:border-card-border-hover focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
  <textarea value={replyDraft?.content || ''} onChange={e => onReplyDraftChange?.(e.target.value)} placeholder={t("write_a_reply")} autoFocus className="w-full min-h-20 bg-transparent p-3 text-sm text-text-primary placeholder-text-muted focus:outline-none resize-none" />
- <div className="px-3 py-2.5 border-t border-border-light/60 bg-background-primary flex items-center justify-end gap-2">
+ <div className="px-3 py-2.5 border-t border-border-light bg-background-primary flex items-center justify-end gap-2">
  <button type="button" onClick={onCancelReply} className="px-3 py-1.5 rounded text-xs font-semibold text-text-secondary hover:bg-tertiary transition-colors duration-200">{t("cancel")}</button>
  <button type="button" onClick={onSubmitReply} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  <Send className="w-3 h-3" />{t("reply")}</button>

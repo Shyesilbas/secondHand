@@ -19,7 +19,7 @@ import {
  ORDER_VIEW_MODES,
  SELLER_TO_SHIP_STATUSES
 } from '../../constants/orderUiConstants.js';
-import { getOrderStatusDotClass } from '../../utils/statusPresentation.js';
+import { getOrderStatusBadgeClass, getOrderStatusDotClass } from '../../utils/statusPresentation.js';
 import Button, { buttonClasses } from '../../../common/components/ui/Button.jsx';
 import DataPagination from '../../../common/components/ui/DataPagination.jsx';
 import EmptyState from '../../../common/components/ui/EmptyState.jsx';
@@ -129,7 +129,7 @@ const ViewSwitch = ({ uiCopy }) => {
  isActive ? 'bg-background-primary font-medium text-text-primary' : 'text-text-secondary hover:text-text-primary'
  }`;
  return (
- <nav className="inline-flex rounded border border-border bg-background-tertiary p-0.5" aria-label={uiCopy.bought + ' / ' + uiCopy.sold}>
+ <nav className="inline-flex rounded-md border border-border bg-background-tertiary p-0.5" aria-label={uiCopy.bought + ' / ' + uiCopy.sold}>
  <NavLink to={ROUTES.MY_ORDERS} className={linkClass} end>{uiCopy.bought}</NavLink>
  <NavLink to={ROUTES.I_SOLD} className={linkClass} end>{uiCopy.sold}</NavLink>
  </nav>
@@ -284,8 +284,8 @@ const SearchBox = ({ search, onSubmit, uiCopy }) => {
 /* ── Order row ───────────────────────────────────────────── */
 
 const OrderRowSkeleton = () => (
- <div className="flex items-start gap-4 rounded border border-border bg-background-primary p-4 sm:p-5">
- <Skeleton className="h-16 w-16 shrink-0" />
+ <div className="flex items-start gap-4 rounded-md border border-border bg-background-primary p-4 sm:p-5 shadow-sm">
+ <Skeleton className="h-16 w-16 shrink-0 rounded-md" />
  <div className="flex-1 space-y-2.5 pt-0.5">
  <Skeleton className="h-4 w-52 max-w-full" />
  <Skeleton className="h-4 w-64 max-w-full" />
@@ -411,11 +411,11 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
  }
  }}
  aria-label={`${title}, ${statusLabel}`}
- className={`group flex cursor-pointer gap-4 rounded border bg-background-primary p-4 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${
- highlighted ? 'border-primary' : 'border-border hover:border-card-border-hover'
+ className={`group flex cursor-pointer gap-4 rounded-md border bg-background-primary p-4 shadow-sm hover:shadow transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus sm:p-5 ${
+ highlighted ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'
  }`}
  >
- <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-tertiary">
+ <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-background-tertiary">
  {imageUrl ? (
  <img src={optimizeCloudinaryUrl(imageUrl, { width: 160 })} alt="" loading="lazy" className="h-full w-full object-cover" />
  ) : (
@@ -433,7 +433,7 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
  <p className="mt-1 truncate text-sm tabular-nums text-text-tertiary">{meta.join(' · ')}</p>
  {!isBuyer && isAwaitingSellerShipment(order) && <ShipDeadline createdAt={order.createdAt} uiCopy={uiCopy} />}
  </div>
- <p className="shrink-0 text-base font-semibold tabular-nums text-text-primary">
+ <p className="shrink-0 text-base font-semibold tabular-nums text-text-price">
  <span className="sr-only">{uiCopy.totalLabel}: </span>
  {formatCurrency(total, currency)}
  </p>
@@ -441,7 +441,7 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
 
  <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
  <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
- <span className="inline-flex items-center gap-1.5 text-text-secondary">
+ <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${getOrderStatusBadgeClass(order.status)}`}>
  <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${getOrderStatusDotClass(order.status)}`} aria-hidden />
  {statusLabel}
  </span>

@@ -55,7 +55,7 @@ const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md
 
  return createPortal(
  <div
- className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4"
+ className="fixed inset-0 z-modal flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4"
  onMouseDown={(e) => e.target === e.currentTarget && onClose()}
  >
  <div
@@ -65,7 +65,7 @@ const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md
  aria-label={title}
  tabIndex={-1}
  onKeyDown={handleKeyDown}
- className={`flex max-h-[90vh] w-full ${SIZES[size]} flex-col rounded-md border border-border bg-background-primary shadow-md outline-none`}
+ className={`flex max-h-[90vh] w-full ${SIZES[size]} flex-col rounded-t-md sm:rounded-md border-t sm:border border-border bg-background-primary shadow-md outline-none`}
  >
  {header || (title ? (
  <header className="flex items-center justify-between gap-4 border-b border-border-light px-5 py-4">
@@ -77,14 +77,14 @@ const Modal = ({ isOpen, onClose, title, description, header, footer, size = 'md
  type="button"
  onClick={onClose}
  aria-label="Close"
- className="rounded p-2 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+ className="rounded-md p-2 text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
  >
  <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </header>
  ) : null)}
  <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
- {footer ? <footer className="flex justify-end gap-2 border-t border-border-light px-5 py-4">{footer}</footer> : null}
+ {footer ? <footer className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-2 border-t border-border-light px-5 py-4 [&>button]:w-full sm:[&>button]:w-auto">{footer}</footer> : null}
  </div>
  </div>,
  document.body

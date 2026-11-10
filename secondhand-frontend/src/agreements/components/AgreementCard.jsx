@@ -14,7 +14,7 @@ const AgreementCard = ({
  } = useTranslation();
  const StatusIcon = status.icon || ClockIcon;
  const isPending = status.status === 'pending' || status.status === 'outdated';
- return <div className="rounded border border-border-light bg-background-primary transition-all duration-200 hover:border-border-dark/30">
+ return <div className="rounded border border-border-light bg-background-primary transition-all duration-200 hover:border-border-dark">
  <div className="p-5">
  <div className="flex items-start justify-between gap-4">
  {/* Left: icon + info */}

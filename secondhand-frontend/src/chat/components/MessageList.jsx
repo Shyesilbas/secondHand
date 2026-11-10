@@ -27,7 +27,7 @@ const MessageBubble = memo(({
  }
 
  return <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
- <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-md relative group shadow-sm transition-all duration-300 ease-in-out ${isOwnMessage ? 'bg-primary text-white rounded-br-sm' : 'bg-background-primary text-text-primary border border-border-light/60 rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
+ <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-md relative group shadow-sm transition-all duration-300 ease-in-out ${isOwnMessage ? 'bg-primary text-white rounded-br-sm' : 'bg-background-primary text-text-primary border border-border-light rounded-bl-sm'}`} onMouseEnter={() => setShowDeleteButton(true)} onMouseLeave={() => setShowDeleteButton(false)}>
  <p className="text-sm break-words leading-relaxed tracking-tight">{message.content}</p>
  <div className="flex items-center justify-between mt-2">
  <p className={`text-xs tracking-tight ${isOwnMessage ? 'text-secondary-300' : 'text-text-tertiary'}`}>

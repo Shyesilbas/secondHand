@@ -55,11 +55,13 @@ const PaymentsPage = () => {
  }, {
  title: 'Incoming',
  value: formatCurrency(pickPaymentStatistic(paymentStats, 'incomingVolume')),
- icon: ArrowDownLeft
+ icon: ArrowDownLeft,
+ valueClassName: 'text-status-success-text'
  }, {
  title: 'Outgoing',
  value: formatCurrency(pickPaymentStatistic(paymentStats, 'outgoingVolume')),
- icon: ArrowUpRight
+ icon: ArrowUpRight,
+ valueClassName: 'text-status-error-text'
  }, {
  title: 'Protection (Escrow)',
  value: formatCurrency(pickPaymentStatistic(paymentStats, 'escrowAmount')),
@@ -134,7 +136,7 @@ const PaymentsPage = () => {
  <span className="text-xs font-semibold text-text-muted">{card.title}</span>
  </div>
  <div className="flex items-baseline gap-1">
- <span className="text-2xl font-semibold text-text-primary tracking-tight">{card.value}</span>
+ <span className={`text-2xl font-semibold tracking-tight tabular-nums ${card.valueClassName || 'text-text-primary'}`}>{card.value}</span>
  </div>
  </motion.div>)}
  </div>

@@ -108,7 +108,7 @@ const ChatPage = ({
  <p className="text-text-tertiary mt-2 tracking-tight">{t("connect_with_buyers_and_sellers")}</p>
  </div>
  <div className="flex items-center space-x-3">
- <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded border border-border-light/60">
+ <div className="flex items-center space-x-2 bg-background-primary px-5 py-2.5 rounded border border-border-light">
  <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`}></div>
  <span className="text-sm font-semibold text-text-secondary tracking-tight">
  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
@@ -118,7 +118,7 @@ const ChatPage = ({
  </div>}
 
  {embedded && <div className="mb-3 flex justify-end">
- <div className="flex items-center space-x-2 rounded border border-border-light/60 bg-background-primary px-4 py-2">
+ <div className="flex items-center space-x-2 rounded border border-border-light bg-background-primary px-4 py-2">
  <div className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-secondary-300'}`} />
  <span className="text-xs font-semibold text-text-secondary">
  {isConnected ? CHAT_MESSAGES.ONLINE : CHAT_MESSAGES.OFFLINE}
@@ -126,9 +126,9 @@ const ChatPage = ({
  </div>
  </div>}
 
- <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light/60 bg-background-primary shadow-sm`}>
+ <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 ${gridHeightClass} overflow-hidden rounded-md border border-border-light bg-background-primary shadow-sm`}>
  {/* Chat Rooms List */}
- <div className="lg:col-span-4 border-r border-border-light/60 h-full flex flex-col overflow-hidden">
+ <div className="lg:col-span-4 border-r border-border-light h-full flex flex-col overflow-hidden">
  <ChatList chatRooms={chatRooms} totalRooms={totalRooms} hasMoreRooms={hasMoreRooms} isFetchingMoreRooms={isFetchingMoreRooms} onLoadMoreRooms={fetchMoreRooms} isLoadingRooms={isLoadingRooms} selectedChatRoom={selectedChatRoom} userId={user?.id} isConnected={isConnected} onChatRoomSelect={handleChatRoomSelect} onListingClick={handleListingClick} onBrowseListings={handleBrowseListings} onDeleteConversation={handleDeleteConversation} />
  </div>
 
@@ -137,7 +137,7 @@ const ChatPage = ({
  <div className="lg:col-span-8 flex flex-col h-full overflow-hidden">
  {selectedChatRoom ? <div className="h-full flex flex-col overflow-hidden">
  {/* Chat Header */}
- <div className="bg-background-primary px-6 py-4 border-b border-border-light/60 flex items-center justify-between flex-shrink-0">
+ <div className="bg-background-primary px-6 py-4 border-b border-border-light flex items-center justify-between flex-shrink-0">
  <div className="flex items-center space-x-4">
  <button onClick={() => {
  selectChatRoom(null);

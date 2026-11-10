@@ -162,7 +162,7 @@ const CheckoutAddressStep = ({
             {deliveryOptions.map(option => {
               const selected = deliveryMethod === option.value;
               return (
-                <label key={option.value} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected, option.disabled)}`}>
+                <label key={option.value} className={`flex items-start gap-3 rounded-md border p-4 transition-colors duration-150 ${optionClass(selected, option.disabled)}`}>
                   <input
                     type="radio"
                     name="deliveryMethod"
@@ -197,7 +197,7 @@ const CheckoutAddressStep = ({
                         setMeetupLocation(hub);
                         setCustomLocationActive(false);
                       }}
-                      className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                      className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors duration-150 ${
                         selected ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                       }`}
                     >
@@ -213,7 +213,7 @@ const CheckoutAddressStep = ({
                     setCustomLocationActive(true);
                     if (PREDEFINED_HUBS.includes(meetupLocation)) setMeetupLocation('');
                   }}
-                  className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-sm transition-colors duration-150 ${
+                  className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors duration-150 ${
                     customLocationActive ? 'border-primary bg-primary text-text-inverse' : 'border-border text-text-secondary hover:border-card-border-hover hover:text-text-primary'
                   }`}
                 >
@@ -241,7 +241,7 @@ const CheckoutAddressStep = ({
           action={hasAddresses ? addAddressButton : null}
         >
           {!hasAddresses ? (
-            <div className="rounded border border-dashed border-border p-6 text-center">
+            <div className="rounded-md border border-dashed border-border p-6 text-center">
               <p className="text-sm font-medium text-text-primary">{t('no_saved_addresses', 'Kayıtlı adresin yok')}</p>
               <p className="mt-1 text-sm text-text-secondary">{t('checkout_add_first_address', 'Siparişi tamamlamak için bir adres ekle.')}</p>
               <Button size="sm" className="mt-4" onClick={() => setIsAddAddressModalOpen(true)}>
@@ -255,7 +255,7 @@ const CheckoutAddressStep = ({
                 {addresses.map(address => {
                   const selected = String(selectedShippingAddressId) === String(address.id);
                   return (
-                    <label key={address.id} className={`flex items-start gap-3 rounded border p-4 transition-colors duration-150 ${optionClass(selected)}`}>
+                    <label key={address.id} className={`flex items-start gap-3 rounded-md border p-4 transition-colors duration-150 ${optionClass(selected)}`}>
                       <input
                         type="radio"
                         name="shipping"
@@ -268,7 +268,11 @@ const CheckoutAddressStep = ({
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2">
                           <span className="truncate text-sm font-medium text-text-primary">{address.title || t('address', 'Adres')}</span>
-                          {address.mainAddress && <span className="shrink-0 text-xs text-text-tertiary">{t('default', 'Varsayılan')}</span>}
+                          {address.mainAddress && (
+                            <span className="inline-flex shrink-0 items-center rounded border border-border px-1.5 py-0.5 text-[11px] font-medium text-text-secondary bg-background-secondary">
+                              {t('default', 'Varsayılan')}
+                            </span>
+                          )}
                         </span>
                         <span className="mt-0.5 line-clamp-2 block text-sm text-text-secondary">{address.addressLine}</span>
                         <span className="mt-0.5 block text-xs text-text-tertiary">

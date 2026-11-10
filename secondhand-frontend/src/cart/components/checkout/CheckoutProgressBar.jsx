@@ -20,13 +20,17 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
                 onClick={() => done && onStepChange(step.id)}
                 disabled={!done}
                 aria-current={current ? 'step' : undefined}
-                className={`flex items-center gap-2 rounded px-1 py-1 text-sm transition-colors duration-150 ${
+                className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors duration-150 ${
                   current ? 'font-medium text-text-primary' : done ? 'text-text-secondary hover:text-text-primary' : 'cursor-default text-text-muted'
                 }`}
               >
                 <span
                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-medium tabular-nums ${
-                    current || done ? 'bg-primary text-text-inverse' : 'border border-border text-text-muted'
+                    done
+                      ? 'bg-primary text-text-inverse'
+                      : current
+                      ? 'border-2 border-primary bg-background-primary text-primary font-semibold ring-2 ring-primary/20'
+                      : 'border border-border text-text-muted'
                   }`}
                   aria-hidden
                 >
@@ -40,12 +44,28 @@ const CheckoutProgressBar = ({ currentStep, steps, onStepChange }) => {
         })}
       </ol>
 
-      <p className="truncate text-sm md:hidden">
-        <span className="tabular-nums text-text-tertiary">
-          {t('checkout_step_of', { defaultValue: 'Adım {{current}}/{{total}}', current: currentStep, total: steps.length })}
-        </span>
-        <span className="ml-2 font-medium text-text-primary">{t(active.labelKey, active.label)}</span>
-      </p>
+      <div className="space-y-1.5 md:hidden">
+        <div className="flex items-center justify-between text-xs">
+          <span className="tabular-nums text-text-tertiary">
+            {t('checkout_step_of', { defaultValue: 'Adım {{current}}/{{total}}', current: currentStep, total: steps.length })}
+          </span>
+          <span className="truncate font-medium text-text-primary">{t(active.labelKey, active.label)}</span>
+        </div>
+        <div className="flex items-center gap-1.5" aria-hidden>
+          {steps.map(step => {
+            const done = currentStep > step.id;
+            const current = currentStep === step.id;
+            return (
+              <span
+                key={step.id}
+                className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
+                  done || current ? 'bg-primary' : 'bg-border'
+                }`}
+              />
+            );
+          })}
+        </div>
+      </div>
     </nav>
   );
 };

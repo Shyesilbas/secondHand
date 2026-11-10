@@ -30,7 +30,7 @@ const ChatList = ({
  return room.otherParticipantName?.toLowerCase().includes(searchLower) || room.listingTitle?.toLowerCase().includes(searchLower) || room.title?.toLowerCase().includes(searchLower) || room.roomName?.toLowerCase().includes(searchLower) || room.lastMessage?.toLowerCase().includes(searchLower);
  });
  return <div className="bg-background-primary h-full flex flex-col overflow-hidden">
- <div className="px-6 py-5 border-b border-border-light/60 flex-shrink-0">
+ <div className="px-6 py-5 border-b border-border-light flex-shrink-0">
  <div className="flex items-center justify-between mb-5">
  <div>
  <h2 className="text-lg font-semibold text-text-primary tracking-tight">{t("conversations")}</h2>

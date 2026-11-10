@@ -75,7 +75,7 @@ const FilterSidebar = ({
   }
   return <>
     {isOpen && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />}
-    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light/80 bg-background-secondary shadow-md
+    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light bg-background-secondary shadow-md
  transform transition-transform duration-300 ease-out
  ${isOpen ? 'translate-x-0' : '-translate-x-full'}
  `} aria-labelledby="listing-filters-title">
@@ -100,7 +100,7 @@ const FilterSidebar = ({
           {mode === 'mine' ? (/* Mine mode: tabs for category/status */
             <div>
               <div className="mb-3 flex gap-1 rounded bg-secondary-light p-1">
-                {['category', 'status'].map(tab => <button key={tab} type="button" onClick={() => setMineActiveTab(tab)} className={`flex-1 px-3 py-2.5 text-sm font-semibold rounded transition-all capitalize ${mineActiveTab === tab ? 'bg-background-primary text-text-primary ring-1 ring-border-light/70' : 'text-text-muted hover:text-text-primary'}`}>
+                {['category', 'status'].map(tab => <button key={tab} type="button" onClick={() => setMineActiveTab(tab)} className={`flex-1 px-3 py-2.5 text-sm font-semibold rounded transition-all capitalize ${mineActiveTab === tab ? 'bg-background-primary text-text-primary ring-1 ring-border-border-light' : 'text-text-muted hover:text-text-primary'}`}>
                   {tab === 'category' ? t('category', 'Kategori') : t('status', 'Durum')}
                 </button>)}
               </div>
@@ -127,7 +127,7 @@ const FilterSidebar = ({
             </FilterSection>}
 
             {/* Active category label (when category is locked) */}
-            {selectedCategory && <div className="flex items-center justify-between rounded border border-border-light/80 bg-background-primary px-3 py-2.5">
+            {selectedCategory && <div className="flex items-center justify-between rounded border border-border-light bg-background-primary px-3 py-2.5">
               <span className="text-sm font-semibold tracking-tight text-text-primary">
                 {getListingTypeLabel(selectedCategory) || selectedCategory}
               </span>
@@ -150,7 +150,7 @@ const FilterSidebar = ({
         </div>
       </div>
 
-      <footer className="flex-shrink-0 border-t border-border-light/80 bg-background-primary px-4 py-3">
+      <footer className="flex-shrink-0 border-t border-border-light bg-background-primary px-4 py-3">
         <div className="flex gap-2">
           {mode !== 'mine' && <button type="button" onClick={handleApplyFilters} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 flex-1">{t("apply_filters")}</button>}
           <button type="button" onClick={handleReset} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border border-border bg-background-primary text-text-primary hover:border-card-border-hover hover:bg-background-secondary h-10 px-4">
@@ -167,7 +167,7 @@ const FilterSection = ({
   title,
   description,
   children
-}) => <section className="overflow-hidden rounded-md border border-border-light/70 bg-background-primary">
+}) => <section className="overflow-hidden rounded-md border border-border-light bg-background-primary">
     <div className="border-b border-border-light bg-background-secondary px-4 py-3">
       <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
       {description ? <p className="mt-0.5 text-xs font-medium leading-relaxed text-text-muted">{description}</p> : null}

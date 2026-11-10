@@ -19,7 +19,9 @@ const EmptyState = ({
  return (
  <div className={`bg-background-primary rounded border border-border ${padding} text-center ${className}`}>
  {(DefaultIcon || variant !== 'default') && (
- <DefaultIcon className="mx-auto mb-4 h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
+ <div className="w-10 h-10 rounded-full bg-background-secondary border border-border flex items-center justify-center text-text-muted mx-auto mb-3">
+ <DefaultIcon className="h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
+ </div>
  )}
  <h3 className="mb-2 text-sm font-medium text-text-primary">{title}</h3>
  {description && (

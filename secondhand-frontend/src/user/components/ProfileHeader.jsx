@@ -32,7 +32,11 @@ const ProfileHeader = ({ user }) => {
               <h1 className="truncate text-lg sm:text-xl font-semibold tracking-tight text-text-primary">
                 {fullName || t('profile_settings', 'Profil Ayarları')}
               </h1>
-              <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
+              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium ${
+                isVerified
+                  ? 'border-status-success-border bg-status-success-bg text-status-success-text'
+                  : 'border-status-warning-border bg-status-warning-bg text-status-warning-text'
+              }`}>
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
                     isVerified ? 'bg-status-success' : 'bg-status-warning'

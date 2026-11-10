@@ -151,7 +151,7 @@ const ListingInfoModal = ({
                                     {st.label}
                                 </span>
                                 {listing.listingNo && (
-                                    <span className="inline-flex items-center gap-1 rounded-sm bg-secondary-light px-2 py-0.5 text-xs font-semibold text-text-muted border border-border-light/50">
+                                    <span className="inline-flex items-center gap-1 rounded-sm bg-secondary-light px-2 py-0.5 text-xs font-semibold text-text-muted border border-border-light">
                                         <Hash className="h-3 w-3 opacity-60" />
                                         {listing.listingNo}
                                     </span>
@@ -234,7 +234,7 @@ const ListingInfoModal = ({
                                     type="button"
                                     onClick={() => onInsightChange(tab.id)}
                                     className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold transition-all ${activeInsight === tab.id
-                                            ? 'bg-background-secondary text-text-primary border border-border-light/50 font-semibold'
+                                            ? 'bg-background-secondary text-text-primary border border-border-light font-semibold'
                                             : 'text-text-muted hover:text-text-primary border border-transparent'
                                         }`}
                                 >

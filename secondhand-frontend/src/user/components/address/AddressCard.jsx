@@ -50,10 +50,10 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
 
   return (
     <div
-      className={`flex flex-col justify-between rounded border p-4 transition-colors ${
+      className={`flex flex-col justify-between rounded-md border p-4 shadow-sm hover:shadow transition-all ${
         address.mainAddress
-          ? 'border-border bg-background-secondary/40'
-          : 'border-border-light bg-background-primary hover:border-border'
+          ? 'border-primary ring-1 ring-primary bg-background-primary'
+          : 'border-border bg-background-primary hover:border-card-border-hover'
       }`}
     >
       <div>
@@ -68,7 +68,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
               {getAddressTypeLabel(address.addressType)}
             </h3>
             {address.mainAddress && (
-              <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-primary px-2 py-0.5 text-xs font-medium text-text-secondary">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
                 <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden="true" />
                 <span>{t('main', 'Varsayılan')}</span>
               </span>
@@ -79,7 +79,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onEdit(address)}
-              className="flex h-7 w-7 items-center justify-center rounded text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-background-tertiary hover:text-text-primary"
               title={t('update_address', 'Adresi düzenle')}
               aria-label={t('update_address', 'Adresi düzenle')}
             >
@@ -89,7 +89,7 @@ const AddressCard = ({ address, onEdit, onDelete, onSelectAsMain }) => {
             <button
               type="button"
               onClick={() => onDelete(address.id, address.addressType)}
-              className="flex h-7 w-7 items-center justify-center rounded text-text-muted transition-colors hover:bg-status-error-bg hover:text-status-error-text"
+              className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-status-error-bg hover:text-status-error-text"
               title={t('delete_address', 'Adresi sil')}
               aria-label={t('delete_address', 'Adresi sil')}
             >

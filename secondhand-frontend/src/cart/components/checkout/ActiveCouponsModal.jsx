@@ -49,8 +49,8 @@ const ActiveCouponsModal = ({
             <li key={c.id} className="flex flex-col justify-between gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-sm border border-border px-2 py-0.5 font-mono text-sm text-text-primary">{c.code}</span>
-                  <span className="text-sm text-text-secondary">
+                  <span className="rounded border border-border bg-background-secondary px-2 py-0.5 font-mono text-xs font-semibold text-text-primary">{c.code}</span>
+                  <span className="text-sm font-medium text-text-price">
                     {formatCouponKindLabel(c.discountKind)}: {formatCouponDiscount(c)}
                   </span>
                 </div>

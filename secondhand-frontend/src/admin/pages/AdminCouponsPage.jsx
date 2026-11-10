@@ -448,7 +448,7 @@ const AdminCouponsPage = () => {
  <div>{formatDateTime(row.endsAt)}</div>
  </td>
  <td className="px-4 py-3">
- <span className={`inline-flex px-2 py-0.5 rounded-sm text-xs font-medium ${row.active ? 'bg-background-secondary text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
+ <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${row.active ? 'border-status-success-border bg-status-success-bg text-status-success-text' : 'border-border bg-background-tertiary text-text-tertiary'}`}>
  {row.active ? 'On' : 'Off'}
  </span>
  </td>
@@ -465,8 +465,8 @@ const AdminCouponsPage = () => {
  </div>
 
  <Modal isOpen={!!modal} onClose={closeCouponModal} title={modal === 'create' ? t('admin_new_coupon') : t('admin_edit_coupon')} description={modal === 'create' ? t('admin_coupon_create_desc') : t('admin_coupon_edit_desc')} size="lg" footer={<>
- <Button variant="secondary" onClick={closeCouponModal}>{t("vazge")}</Button>
- <Button type="submit" form="admin-coupon-form" disabled={submitting}>{submitting ? 'Kaydediliyor…' : 'Kaydet'}</Button>
+ <Button variant="secondary" onClick={closeCouponModal}>{t("cancel", "Vazgeç")}</Button>
+ <Button type="submit" form="admin-coupon-form" disabled={submitting}>{submitting ? t("saving_progress", "Kaydediliyor…") : t("save", "Kaydet")}</Button>
  </>}>
  <form id="admin-coupon-form" onSubmit={handleSubmit} className="space-y-4">
  <FormSection Icon={Tag} title={t("temel_bilgiler")} subtitle={t('admin_basic_info_subtitle')}>

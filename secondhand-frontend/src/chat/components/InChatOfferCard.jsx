@@ -70,7 +70,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
  return (
  <div className={`my-2 p-4 rounded-md border shadow-sm max-w-sm w-full transition-all duration-200 ${statusConfig.bg}`}>
  {/* Header / Badge */}
- <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border/60">
+ <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-border">
  <div className="flex items-center gap-2">
  {statusConfig.icon}
  <span className="text-xs font-semibold text-text-secondary">

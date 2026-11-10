@@ -80,7 +80,7 @@ export const ShippingDetailsSection = React.memo(({
                 {shipping.trackingNumber && <div>
                     <p className="text-xs font-semibold text-text-muted mb-1">{t("tracking_number", "Takip Numarası")}</p>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <p className="text-sm font-semibold text-text-primary break-all bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover/60">{shipping.trackingNumber}</p>
+                        <p className="text-sm font-semibold text-text-primary break-all bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover">{shipping.trackingNumber}</p>
                         {useInternalLinks ? <button type="button" onClick={goInternalTracking} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("track_in_app", "Uygulamada Takip Et")}<ArrowRight className="w-3.5 h-3.5" />
                         </button> : null}
                         {canOpenCarrier ? <a href={shipping.trackingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold text-text-primary bg-background-tertiary border border-card-border-hover hover:bg-secondary-200/70 transition-colors">{t("open_carrier_site", "Kargo Sitesi")}</a> : null}
@@ -106,7 +106,7 @@ export const ShippingDetailsSection = React.memo(({
                     </div>
                 </div>}
 
-                {!shipping.trackingNumber && shipping.status === 'PENDING' && <div className="flex items-center gap-2 p-3 bg-background-secondary rounded-md border border-border/80">
+                {!shipping.trackingNumber && shipping.status === 'PENDING' && <div className="flex items-center gap-2 p-3 bg-background-secondary rounded-md border border-border">
                     <Clock className="w-4 h-4 text-text-muted shrink-0" />
                     <p className="text-xs text-text-secondary font-medium">{t("waiting_for_seller_to_ship_the_items", "Satıcının ürünü kargoya vermesi bekleniyor.")}</p>
                 </div>}

@@ -100,7 +100,7 @@ const PayListingFeePage = () => {
                         <BackButton onClick={() => navigate(-1)} />
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-border/80">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 pb-4 border-b border-border">
                         <div>
                             <span className="text-xs font-semibold text-text-primary mb-1 block">
                                 {t("checkout_marketplace")}
@@ -114,7 +114,7 @@ const PayListingFeePage = () => {
                         </div>
 
                         {/* Workflow Step Indicator */}
-                        <div className="flex items-center gap-2 bg-background-primary border border-border/80 p-2.5 rounded-md self-start md:self-auto">
+                        <div className="flex items-center gap-2 bg-background-primary border border-border p-2.5 rounded-md self-start md:self-auto">
                             <div className="flex items-center gap-2 px-3 py-1 rounded bg-background-tertiary text-text-primary font-semibold text-xs">
                                 <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-white text-xs">1</span>
                                 <span>{t("select", "Select")}</span>
@@ -142,7 +142,7 @@ const PayListingFeePage = () => {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="flex flex-col items-center justify-center py-20 bg-background-primary rounded-md border border-border/80"
+                        className="flex flex-col items-center justify-center py-20 bg-background-primary rounded-md border border-border"
                     >
                         <LoadingIndicator />
                         <p className="mt-4 text-sm font-semibold text-text-secondary animate-pulse">{t("loading_listings")}...</p>
@@ -163,7 +163,7 @@ const PayListingFeePage = () => {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.3 }}
-                            className="rounded-md border border-border/80 bg-background-primary px-8 py-16 text-center"
+                            className="rounded-md border border-border bg-background-primary px-8 py-16 text-center"
                         >
                             <EmptyState
                                 title={t("no_draft_listings")}

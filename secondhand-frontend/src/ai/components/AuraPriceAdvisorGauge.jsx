@@ -31,7 +31,7 @@ export default function AuraPriceAdvisorGauge({
   const isHigh = status.toLowerCase().includes('high') || status.toLowerCase().includes('yüksek') || status.toLowerCase().includes('pahalı');
 
   return (
-    <div className="my-3 rounded border border-border bg-background-secondary p-4">
+    <div className="my-3 rounded-md border border-border bg-background-secondary p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
@@ -95,7 +95,7 @@ export default function AuraPriceAdvisorGauge({
         </div>
         <div className="text-center">
           <span className="block text-xs text-text-tertiary">{t('this_listing', 'Bu İlan')}</span>
-          <span className="font-semibold text-text-primary">{formatPrice(currentNum)}</span>
+          <span className="font-semibold tabular-nums text-text-price">{formatPrice(currentNum)}</span>
         </div>
         <div className="text-right">
           <span className="block text-xs text-text-muted">{t('highest', 'En Yüksek')}</span>

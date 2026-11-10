@@ -30,11 +30,11 @@ const MetricCard = ({ title, value, trend, subtitle, to, emphasis = false }) => 
     </>
   );
 
-  const base = 'block rounded border bg-background-primary p-5';
+  const base = 'block rounded-md border bg-background-primary p-5 shadow-sm';
   const border = emphasis ? 'border-status-warning-border' : 'border-border';
 
   return to ? (
-    <Link to={to} className={`${base} ${border} transition-colors duration-150 hover:border-border-dark`}>
+    <Link to={to} className={`${base} ${border} transition-all duration-150 hover:shadow hover:border-card-borderHover`}>
       {body}
     </Link>
   ) : (

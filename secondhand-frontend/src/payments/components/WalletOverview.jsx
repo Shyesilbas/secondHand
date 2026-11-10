@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useMemo, useState } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import WalletOperationModal from './modals/WalletOperationModal.jsx';
-import { Wallet, ArrowUpRight, ArrowDownRight, Settings, AlertCircle, TrendingUp, ShieldAlert, CircleDollarSign } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownRight, Settings, AlertCircle, TrendingUp, ShieldAlert } from 'lucide-react';
 export const EWalletBalance = ({
  eWallet,
  totalAmount,
@@ -17,17 +17,17 @@ export const EWalletBalance = ({
  const spentPercentage = statisticsLoaded && totalAmount != null && eWallet.spendingWarningLimit ? Math.min(totalAmount / eWallet.spendingWarningLimit * 100, 100).toFixed(1) : 0;
  return <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
  <div className="lg:col-span-1">
- <div className="flex h-full flex-col justify-between rounded border border-border bg-background-primary p-5">
+ <div className="flex h-full flex-col justify-between rounded-md border border-border bg-background-primary p-5 shadow-sm">
  <div className="flex items-center gap-2 text-sm text-text-secondary">
  <Wallet className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  {t("prime_card")}
  </div>
  <div className="mt-6">
  <p className="text-sm text-text-secondary">{t("available_balance")}</p>
- <p className="mt-1 text-2xl font-semibold tabular-nums text-text-primary">{formatCurrency(eWallet.balance || 0)}</p>
+ <p className="mt-1 text-2xl font-semibold tabular-nums text-text-price">{formatCurrency(eWallet.balance || 0)}</p>
  </div>
  <div className="mt-6 flex items-center justify-between text-sm">
- <span className="inline-flex items-center gap-1.5 text-text-secondary">
+ <span className="inline-flex items-center gap-1.5 rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
  <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />{t("active")}
  </span>
  <span className="text-text-tertiary">{t("try")}</span>
@@ -39,7 +39,7 @@ export const EWalletBalance = ({
  <div className="lg:col-span-2 flex justify-between flex-col gap-4">
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-full">
  {/* Wallet Limit Card */}
- <div className="bg-background-primary rounded-md border border-border-light p-5 flex flex-col justify-between transition-shadow relative overflow-hidden group">
+ <div className="bg-background-primary rounded-md border border-border p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
  <div className="flex items-center justify-between mb-4">
  <TrendingUp className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
  <span className="text-xs font-semibold text-text-muted">{t("account_limit")}</span>
@@ -47,16 +47,13 @@ export const EWalletBalance = ({
  <div>
  <p className="text-sm text-text-tertiary mb-1">{t("maximum_allowed")}</p>
  <p className="text-xl font-semibold text-text-primary tracking-tight">
- {eWallet.limit ? formatCurrency(eWallet.limit) : 'Unlimited'}
+ {eWallet.limit ? formatCurrency(eWallet.limit) : t("unlimited", "Limitsiz")}
  </p>
  </div>
- {!eWallet.limit && <div className="absolute -bottom-4 -right-4 text-secondary-100/50 pointer-events-none">
- <CircleDollarSign className="w-32 h-32" />
- </div>}
  </div>
 
  {/* Spending Warning Card */}
- <div className="bg-background-primary rounded-md border border-border-light p-5 flex flex-col justify-between transition-shadow relative overflow-hidden group">
+ <div className="bg-background-primary rounded-md border border-border p-5 flex flex-col justify-between shadow-sm relative overflow-hidden group">
  <div className="flex items-center justify-between mb-4">
  <ShieldAlert className="h-5 w-5 shrink-0 text-status-error" strokeWidth={1.5} aria-hidden />
  <span className="text-xs font-semibold text-text-muted">{t("security")}</span>
@@ -65,7 +62,7 @@ export const EWalletBalance = ({
  <p className="text-sm text-text-tertiary mb-1">{t("warning_threshold")}</p>
  <div className="flex items-baseline gap-2">
  <p className="text-xl font-semibold text-text-primary tracking-tight">
- {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not configured'}
+ {eWallet.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : t("not_configured", "Tanımlanmamış")}
  </p>
  </div>
  

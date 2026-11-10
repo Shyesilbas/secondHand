@@ -27,7 +27,7 @@ const HeaderProfileMenu = ({
     <>
       <button onClick={onToggle} className="flex items-center gap-2.5 pl-2 group cursor-pointer" type="button">
         <div className="relative">
-          <div className={`w-9 h-9 rounded-full bg-background-tertiary border flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${isUnverified ? 'border-status-warning ring-2 ring-status-warning/20' : 'border-border-light/60 group-hover:border-card-border-hover/60'}`}>
+          <div className={`w-9 h-9 rounded-full bg-background-tertiary border flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${isUnverified ? 'border-status-warning ring-2 ring-status-warning/20' : 'border-border-light group-hover:border-card-border-hover'}`}>
             {user?.avatar ? (
               <img src={user.avatar} alt={t("profile")} className="w-full h-full object-cover" />
             ) : (
@@ -70,7 +70,7 @@ const HeaderProfileMenu = ({
             <Link
               to={ROUTES.VERIFY_ACCOUNT}
               onClick={onClose}
-              className="mx-1 my-2 p-2.5 rounded bg-background-secondary border border-border/90 flex items-center gap-3 hover:bg-background-secondary transition-all group cursor-pointer"
+              className="mx-1 my-2 p-2.5 rounded bg-background-secondary border border-border flex items-center gap-3 hover:bg-background-secondary transition-all group cursor-pointer"
             >
               <div className="w-7 h-7 rounded bg-status-warning text-white flex items-center justify-center shrink-0 font-semibold text-xs">
                 !

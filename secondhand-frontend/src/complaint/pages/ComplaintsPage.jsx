@@ -18,7 +18,7 @@ const ComplaintsPage = () => {
  getUserComplaints();
  }, [getUserComplaints]);
  return <div className="min-h-screen bg-background-secondary">
- <div className="sticky top-0 z-20 border-b border-border-light/80 bg-background-secondary">
+ <div className="sticky top-0 z-20 border-b border-border-light bg-background-secondary">
  <PageContainer className="flex items-center justify-between py-4">
  <div className="flex items-center gap-4">
  <div className="relative flex h-12 w-12 items-center justify-center rounded-md bg-background-tertiary ring-1 ring-primary/40">
@@ -45,7 +45,7 @@ const ComplaintsPage = () => {
 
  <PageContainer className="pb-10 pt-6">
  {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
- {[...Array(6)].map((_, i) => <div key={i} className="rounded-md border border-border-light/70 bg-background-primary/80 p-6 shadow-sm animate-pulse">
+ {[...Array(6)].map((_, i) => <div key={i} className="rounded-md border border-border bg-background-primary p-6 shadow-sm animate-pulse">
  <div className="space-y-4">
  <div className="flex items-center gap-3">
  <div className="h-9 w-9 rounded-md bg-background-tertiary" />
@@ -63,7 +63,7 @@ const ComplaintsPage = () => {
  </div>
  </div>)}
  </div> : error ? <div className="flex items-center justify-center py-16">
- <div className="w-full max-w-md rounded-md border border-border/80 bg-background-primary/90 p-8 text-center shadow-sm">
+ <div className="w-full max-w-md rounded-md border border-border bg-background-primary p-8 text-center shadow-sm">
  <ShieldAlert className="mx-auto mb-5 block h-5 w-5 shrink-0 text-status-error" strokeWidth={1.5} aria-hidden />
  <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("unable_to_load_complaints")}</h3>
  <p className="mt-2 text-sm leading-relaxed text-text-tertiary">
@@ -72,7 +72,7 @@ const ComplaintsPage = () => {
  <button onClick={() => getUserComplaints()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-5">{t("try_again")}</button>
  </div>
  </div> : complaints && complaints.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
- {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-md border border-border-light/70 bg-background-primary/90 shadow-sm transition-all duration-300 ease-in-out">
+ {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-md border border-border bg-background-primary shadow-sm hover:shadow transition-all duration-200">
  <ComplaintCard complaint={complaint} />
  </div>)}
  </div> : <div className="flex items-center justify-center py-20">

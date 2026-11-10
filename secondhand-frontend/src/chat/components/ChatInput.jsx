@@ -12,7 +12,7 @@ const ChatInput = ({
  t
  } = useTranslation();
  if (isEmbedded) {
- return <div className="border-t border-border-light/60 bg-background-primary p-5 flex-shrink-0">
+ return <div className="border-t border-border-light bg-background-primary p-5 flex-shrink-0">
  <div className="flex items-end space-x-3">
  <div className="flex-1">
  <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />
@@ -23,7 +23,7 @@ const ChatInput = ({
  </div>
  </div>;
  }
- return <div className="p-4 border-t border-border-light/60 bg-background-primary">
+ return <div className="p-4 border-t border-border-light bg-background-primary">
  <div className="flex items-end space-x-3">
  <div className="flex-1">
  <textarea ref={inputRef} value={messageText} onChange={e => setMessageText(e.target.value)} onKeyPress={handleKeyPress} placeholder={t("type_your_message")} className="w-full px-4 py-3 border border-border-light rounded resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all duration-300 ease-in-out tracking-tight" rows="1" />

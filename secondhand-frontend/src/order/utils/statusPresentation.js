@@ -3,6 +3,21 @@ import { PAYMENT_STATUSES } from '../../payments/paymentSchema.js';
 
 const statusUpper = (status) => String(status || '').toUpperCase();
 
+/** Standard Status Badge Token Matrix class */
+export const getOrderStatusBadgeClass = (status) => {
+  const value = statusUpper(status);
+  if ([ORDER_STATUSES.COMPLETED, ORDER_STATUSES.DELIVERED].includes(value)) {
+    return 'bg-status-success-bg text-status-success-text border-status-success-border';
+  }
+  if ([ORDER_STATUSES.CONFIRMED, ORDER_STATUSES.PROCESSING, ORDER_STATUSES.SHIPPED, ORDER_STATUSES.MEETUP_PENDING, ORDER_STATUSES.HANDOVER_CONFIRMED, ORDER_STATUSES.PENDING].includes(value)) {
+    return 'bg-status-warning-bg text-status-warning-text border-status-warning-border';
+  }
+  if ([ORDER_STATUSES.CANCELLED, ORDER_STATUSES.REFUNDED, ORDER_STATUSES.VERIFICATION_LOCKED].includes(value)) {
+    return 'bg-status-error-bg text-status-error-text border-status-error-border';
+  }
+  return 'bg-background-secondary text-text-secondary border-border';
+};
+
 /** 6px status dot colour (DESIGN.md: dot + text, never a filled pill) */
 export const getOrderStatusDotClass = (status) => {
  const s = statusUpper(status);

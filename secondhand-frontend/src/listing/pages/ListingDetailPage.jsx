@@ -378,7 +378,7 @@ const ListingDetailPage = () => {
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background-primary px-4 py-3 lg:hidden">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-semibold leading-tight tabular-nums text-text-primary">
+              <p className="truncate text-lg font-semibold leading-tight tabular-nums text-text-price">
                 {formatCurrency(displayPrice, listing.currency)}
               </p>
               {hasCampaign && (

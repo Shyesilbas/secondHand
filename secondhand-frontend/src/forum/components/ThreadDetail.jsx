@@ -56,14 +56,14 @@ export const ThreadDetail = ({
  }, [currentUserId, thread?.userId]);
  const canManage = isOwner && !!thread?.id && !String(thread?.id || '').startsWith('temp-');
  if (!threadId) {
- return <div className="rounded-md border border-border-light/80 bg-background-secondary/90 p-16 text-center shadow-sm ring-1 ring-border-light/80">
+ return <div className="rounded-md border border-border bg-background-secondary p-10 text-center shadow-sm">
  <MessageCircle className="mx-auto mb-5 block h-5 w-5 shrink-0 text-secondary-300" strokeWidth={1.5} aria-hidden />
  <p className="text-base font-semibold text-text-primary">{FORUM_MESSAGES.SELECT_THREAD_TITLE}</p>
  <p className="text-sm text-text-muted mt-1.5 max-w-xs mx-auto">{FORUM_MESSAGES.SELECT_THREAD_DESCRIPTION}</p>
  </div>;
  }
  const commentCount = commentsTree?.roots?.length || 0;
- return <div className="rounded-md border border-border-light/80 bg-background-primary/90 shadow-sm ring-1 ring-border-light/80 overflow-hidden">
+ return <div className="rounded-md border border-border bg-background-primary shadow-sm overflow-hidden">
 
  {/* ── Thread Header ─────────────────────────────────── */}
  <div className="px-6 py-5 border-b border-border-light">
@@ -143,7 +143,7 @@ export const ThreadDetail = ({
  {composerOpen && !draftComment?.parentCommentId && <div className="px-6 pb-5">
  <div className="rounded border border-border-light bg-secondary-light/60 overflow-hidden focus-within:border-card-border-hover focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-200">
  <textarea value={draftComment?.content || ''} onChange={e => onDraftChange?.(e.target.value)} placeholder={t("share_your_thoughts")} className="w-full min-h-24 bg-transparent p-4 text-sm text-text-primary placeholder-text-muted focus:outline-none resize-none" />
- <div className="px-4 py-3 border-t border-border-light/60 bg-background-primary flex items-center justify-end">
+ <div className="px-4 py-3 border-t border-border-light bg-background-primary flex items-center justify-end">
  <button type="button" onClick={onSubmitComment} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">
  <Send className="w-3.5 h-3.5" />{t("post")}</button>
  </div>

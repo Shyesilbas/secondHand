@@ -132,7 +132,7 @@ const UnifiedSearchBar = ({
  };
  return <div ref={searchRef} className={`relative ${className}`}>
  <div className="relative">
- <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={`Search ${activeTab}...`} className="w-full h-11 px-10 pr-40 text-sm bg-secondary-50 border border-border-light/80 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
+ <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={`Search ${activeTab}...`} className="w-full h-11 px-10 pr-40 text-sm bg-secondary-50 border border-border-light rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
  
  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
  {isLoading ? <svg className="animate-spin h-4 w-4 text-text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

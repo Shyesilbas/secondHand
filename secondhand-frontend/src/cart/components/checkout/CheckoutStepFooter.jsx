@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import Button from '../../../common/components/ui/Button.jsx';
 
 /** Shared step footer: an optional hint, a "Back" button and the step's primary action. */
@@ -7,8 +7,13 @@ const CheckoutStepFooter = ({ onBack, backLabel, backDisabled = false, hint = nu
   const { t } = useTranslation();
   return (
     <div className="border-t border-border-light px-5 py-4 sm:px-6">
-      {hint && <p className="mb-3 text-sm text-text-secondary">{hint}</p>}
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {hint && (
+        <div className="mb-3 flex items-center gap-1.5 text-xs text-text-secondary" role="status">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+          <span>{hint}</span>
+        </div>
+      )}
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between [&>button]:w-full sm:[&>button]:w-auto">
         <Button variant="ghost" onClick={onBack} disabled={backDisabled}>
           <ArrowLeft className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           <span>{backLabel || t('back', 'Geri')}</span>

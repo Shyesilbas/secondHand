@@ -55,7 +55,7 @@ const ListingBuyBox = ({
             </>
           )}
           {price.hasCampaign && (
-            <span className="rounded-sm bg-status-error-bg px-1.5 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
+            <span className="rounded-full border border-status-error-border bg-status-error-bg px-2 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
               {listing.campaignName || t('discount', 'İndirim')}
               {price.discount ? ` −%${price.discount}` : ''}
             </span>
@@ -97,7 +97,7 @@ const ListingBuyBox = ({
 
       <div className="mt-5 border-t border-border-light pt-5">
         <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="text-2xl font-semibold tabular-nums text-text-primary">
+          <span className="text-2xl font-semibold tabular-nums text-text-price">
             {formatCurrency(price.display, listing.currency)}
           </span>
           {price.hasCampaign && (
@@ -144,8 +144,8 @@ const ListingBuyBox = ({
                   {cart.isAdding
                     ? t('adding_to_cart', 'Ekleniyor...')
                     : cart.isInCart
-                    ? t('go_to_cart', 'Sepette, sepete git')
-                    : t('add_to_cart', 'Sepete ekle')}
+                      ? t('go_to_cart', 'Sepette, sepete git')
+                      : t('add_to_cart', 'Sepete ekle')}
                 </span>
               </Button>
               <div className="grid grid-cols-2 gap-2">

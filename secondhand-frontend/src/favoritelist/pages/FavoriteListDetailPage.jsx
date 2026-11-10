@@ -127,7 +127,7 @@ const FavoriteListDetailPage = () => {
  <button type="button" onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary transition hover:text-text-primary">
  <ArrowLeft className="h-4 w-4" />{t("back")}</button>
 
- <div className="overflow-hidden rounded-md border border-border-light/90 bg-background-primary">
+ <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
  <div className="border-b border-border-light bg-background-secondary/90 px-4 py-5 sm:px-6">
  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
  <div className="min-w-0 flex-1">

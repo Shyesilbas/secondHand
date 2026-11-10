@@ -14,11 +14,11 @@ const DraftListingsList = ({
  return (
  <div className="lg:col-span-7 xl:col-span-7 space-y-4">
  {/* Section Header */}
- <div className="flex items-center justify-between pb-2 border-b border-border/70">
+ <div className="flex items-center justify-between pb-2 border-b border-border">
  <div>
  <h2 className="text-lg font-semibold text-text-primary tracking-tight flex items-center gap-2">
  <span>{t("draft_listings")}</span>
- <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-sm text-xs font-semibold bg-secondary-200/80 text-text-primary border border-card-border-hover/60">
+ <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-sm text-xs font-semibold bg-secondary-200/80 text-text-primary border border-card-border-hover">
  {listings.length}
  </span>
  </h2>
@@ -45,7 +45,7 @@ const DraftListingsList = ({
  className={`group relative rounded-md p-4 cursor-pointer transition-all duration-200 border ${
  isSelected
  ? 'border-secondary-700 bg-white ring-2 ring-primary/10'
- : 'border-border/80 bg-white hover:border-secondary-400'
+ : 'border-border bg-white hover:border-secondary-400'
  }`}
  >
  <div className="flex items-start gap-3.5">
@@ -73,7 +73,7 @@ const DraftListingsList = ({
  {listing.title}
  </h3>
 
- <span className="font-semibold text-sm text-text-primary bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover/60 flex-shrink-0">
+ <span className="font-semibold text-sm text-text-primary bg-background-tertiary px-2 py-0.5 rounded-md border border-card-border-hover flex-shrink-0">
  {formatPaymentAmount(listing.price, listing.currency)}
  </span>
  </div>
@@ -90,7 +90,7 @@ const DraftListingsList = ({
  {listing.city}
  </span>
  )}
- <span className="inline-flex items-center gap-1 text-status-warning-text bg-background-secondary px-2 py-0.5 rounded font-semibold border border-border/50">
+ <span className="inline-flex items-center gap-1 text-status-warning-text bg-background-secondary px-2 py-0.5 rounded font-semibold border border-border">
  <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
  {t("draft")}
  </span>

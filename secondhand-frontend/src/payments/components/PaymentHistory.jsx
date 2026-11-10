@@ -54,7 +54,7 @@ const PaymentRow = ({
  </div>
 
  <div className="col-span-2 flex flex-col items-end shrink-0">
- <p className={`text-sm font-medium tabular-nums ${isIncoming ? 'text-status-success-text' : 'text-text-primary'}`}>
+ <p className={`text-sm font-medium tabular-nums ${isIncoming ? 'text-status-success-text' : 'text-status-error-text'}`}>
  {isIncoming ? '+' : '-'}{formatCurrency(payment.amount)}
  </p>
  <span className="text-xs text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">{t("receipt")}</span>

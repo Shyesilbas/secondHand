@@ -34,7 +34,7 @@ const EmailBody = ({ content }) => {
       referrerPolicy="no-referrer"
       onLoad={fitHeight}
       style={{ height }}
-      className="block w-full rounded border border-border-light bg-background-primary"
+      className="block w-full rounded-md border border-border-light bg-background-primary"
     />
   );
 };
@@ -65,7 +65,7 @@ const OtpSuggestionBanner = ({ suggestedCode, sourceEmail, onApply, appliedCode 
   const isApplied = appliedCode === code;
 
   return (
-    <div className="rounded border border-border bg-background-primary">
+    <div className="rounded-md border border-border bg-background-primary shadow-sm">
       <div className="flex flex-wrap items-center gap-3 px-4 py-3">
         <Mail className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
         <div className="min-w-0 flex-1">

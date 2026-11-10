@@ -201,6 +201,20 @@ const EmailsPage = ({ embedded = false }) => {
     totalElements: emailPage?.totalElements ?? emails.length
   };
 
+  const filteredEmails = useMemo(() => {
+    if (!searchTerm || !searchTerm.trim()) return emails;
+    const q = searchTerm.toLowerCase().trim();
+    return emails.filter((e) => {
+      const preview = extractEmailPreview(e.content, e.subject).toLowerCase();
+      return (
+        e.subject?.toLowerCase().includes(q) ||
+        e.senderEmail?.toLowerCase().includes(q) ||
+        e.recipientEmail?.toLowerCase().includes(q) ||
+        preview.includes(q)
+      );
+    });
+  }, [emails, searchTerm]);
+
   const handleDelete = useCallback(
     async ({ title, deleteFunc, onSuccess }) => {
       notification.showConfirmation(
@@ -283,20 +297,6 @@ const EmailsPage = ({ embedded = false }) => {
       setIsMarkingAllRead(false);
     }
   }, [globalUnreadCount, filteredEmails, queryClient, user?.id, page, filterType, notification]);
-
-  const filteredEmails = useMemo(() => {
-    if (!searchTerm || !searchTerm.trim()) return emails;
-    const q = searchTerm.toLowerCase().trim();
-    return emails.filter((e) => {
-      const preview = extractEmailPreview(e.content, e.subject).toLowerCase();
-      return (
-        e.subject?.toLowerCase().includes(q) ||
-        e.senderEmail?.toLowerCase().includes(q) ||
-        e.recipientEmail?.toLowerCase().includes(q) ||
-        preview.includes(q)
-      );
-    });
-  }, [emails, searchTerm]);
 
   const folderItems = useMemo(
     () => [

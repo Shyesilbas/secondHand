@@ -26,13 +26,13 @@ const PaymentPanel = ({
 
  return (
  <div className="lg:col-span-5 xl:col-span-5">
- <div className="sticky top-20 rounded-md border border-border bg-white p-5 shadow-md space-y-4">
+ <div className="sticky top-20 rounded-md border border-border bg-background-primary p-5 shadow-sm space-y-4">
  {/* Header */}
  <div className="flex items-center justify-between pb-3 border-b border-border-light">
  <h3 className="text-sm font-semibold text-text-primary">
  {t("payment_panel")}
  </h3>
- <span className="text-xs font-semibold text-text-primary bg-background-tertiary px-2 py-0.5 rounded border border-card-border-hover/60">
+ <span className="text-xs font-medium text-text-secondary bg-background-tertiary px-2 py-0.5 rounded-full border border-border">
  {t("instant_activation")}
  </span>
  </div>
@@ -40,7 +40,7 @@ const PaymentPanel = ({
  {selectedListing ? (
  <div className="space-y-3.5">
  {/* Listing Summary Card */}
- <div className="rounded border border-border/80 bg-background-secondary/70 p-3.5 space-y-2">
+ <div className="rounded-md border border-border bg-background-secondary p-3.5 space-y-2">
  <div className="flex items-center justify-between gap-2">
  <span className="text-xs font-semibold text-text-muted">
  {t("chosen_listing")}
@@ -54,11 +54,11 @@ const PaymentPanel = ({
  </h4>
 
  {feeConfig && (
- <div className="pt-2 border-t border-border/60 flex items-baseline justify-between">
+ <div className="pt-2 border-t border-border flex items-baseline justify-between">
  <span className="text-xs font-semibold text-text-secondary">
  {t("total_due")}
  </span>
- <span className="text-lg font-semibold text-text-primary">
+ <span className="text-lg font-semibold tabular-nums text-text-price">
  {formatPaymentAmount(feeConfig.totalCreationFee)}
  </span>
  </div>
@@ -66,9 +66,9 @@ const PaymentPanel = ({
  </div>
 
  {/* E-Wallet Balance Info */}
- <div className="rounded border border-border/80 bg-white p-3 flex items-center justify-between text-xs">
+ <div className="rounded-md border border-border bg-background-primary p-3 flex items-center justify-between text-xs">
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
+ <div className="w-7 h-7 rounded-md bg-secondary-200 text-text-primary flex items-center justify-center font-semibold">
  ₺
  </div>
  <div>

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Package } from 'lucide-react';
 import { ROUTES } from '../../../common/constants/routes.js';
 import { formatCurrency } from '../../../common/formatters.js';
 import { ReviewButton } from '../../../reviews/index.js';
@@ -25,7 +26,13 @@ const OrderItemRow = ({ item, currency, isSellerView, review, reviewsLoading, or
   const cancelled = item.cancelledQuantity > 0;
   const refunded = item.refundedQuantity > 0;
   const sellerName = [item.sellerName, item.sellerSurname].filter(Boolean).join(' ');
-  const thumb = <img src={item.listing?.imageUrl} alt="" className="h-full w-full object-cover" />;
+  const thumb = item.listing?.imageUrl ? (
+    <img src={item.listing.imageUrl} alt="" className="h-full w-full object-cover" />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center text-text-muted">
+      <Package className="h-6 w-6" strokeWidth={1.5} aria-hidden />
+    </div>
+  );
 
   return (
     <li className="flex gap-4 py-4 first:pt-0 last:pb-0">

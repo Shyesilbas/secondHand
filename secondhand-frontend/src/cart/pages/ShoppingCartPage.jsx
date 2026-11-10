@@ -372,7 +372,7 @@ const ShoppingCartPage = () => {
                 )}
               </section>
             ) : (
-              <div className="overflow-hidden rounded border border-border bg-background-primary flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-text-secondary">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
                 <Link to={ROUTES.LOGIN} className={`${buttonClasses()} shrink-0`}>
                   {CART_MESSAGES.EMPTY_CART_SIGN_IN}
@@ -388,7 +388,7 @@ const ShoppingCartPage = () => {
               {(hasExpiredReservations || hasExpiringReservations) && (
                 <div
                   role="alert"
-                  className="flex items-start gap-3 rounded border border-border bg-background-primary p-3.5 text-xs text-text-secondary"
+                  className="flex items-start gap-3 rounded-md border border-border bg-background-primary p-3.5 text-xs text-text-secondary shadow-sm"
                 >
                   <AlertTriangle
                     className={`h-4 w-4 shrink-0 mt-0.5 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
@@ -415,10 +415,10 @@ const ShoppingCartPage = () => {
                   {bundleInfo.applied.map((a, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between gap-3 rounded border border-border bg-background-primary p-3.5 text-xs"
+                      className="flex items-center justify-between gap-3 rounded-md border border-border bg-background-primary p-3.5 text-xs shadow-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Check className="h-4 w-4 text-status-success shrink-0" strokeWidth={2} />
+                        <Check className="h-4 w-4 text-status-success-icon shrink-0" strokeWidth={2} />
                         <div className="min-w-0">
                           <span className="font-semibold text-text-primary mr-1">
                             {a.sellerName} {t("bundle_unlocked", "Paket İndirimi")}:
@@ -449,7 +449,7 @@ const ShoppingCartPage = () => {
                     return (
                       <div
                         key={idx}
-                        className="rounded border border-border bg-background-primary p-4 sm:p-5"
+                        className="rounded-md border border-border bg-background-primary p-4 sm:p-5 shadow-sm"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="min-w-0 flex-1">
@@ -472,7 +472,7 @@ const ShoppingCartPage = () => {
                                 {s.remaining} {t("more_item", "ürün daha")}
                               </strong>{' '}
                               → sepette{' '}
-                              <span className="font-semibold text-status-success">
+                              <span className="font-semibold text-status-success-text">
                                 %{s.discountValue} indirim
                               </span>{' '}
                               kazanın.
@@ -495,7 +495,7 @@ const ShoppingCartPage = () => {
                           <button
                             type="button"
                             onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
-                            className="inline-flex items-center justify-center gap-1.5 rounded border border-border bg-background-primary px-3.5 py-2 text-xs font-semibold text-text-primary transition hover:bg-background-secondary shrink-0 self-start sm:self-center"
+                            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background-primary px-3.5 py-2 text-xs font-semibold text-text-primary transition hover:bg-background-secondary shrink-0 self-start sm:self-center"
                           >
                             <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" />
                             <span>{t("complete_bundle", "Paketi Tamamla")}</span>
@@ -508,7 +508,7 @@ const ShoppingCartPage = () => {
               )}
 
               {/* Items Card */}
-              <div className="overflow-hidden rounded border border-border bg-background-primary">
+              <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm">
                 <div className="flex items-center justify-between border-b border-border-light px-5 py-3.5 bg-background-primary">
                   <h2 className="text-sm font-semibold text-text-primary">
                     {t("your_items", "Ürünleriniz")} ({cartCount})

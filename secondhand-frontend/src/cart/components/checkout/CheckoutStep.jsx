@@ -73,7 +73,7 @@ const CheckoutStep = ({ step, checkout, cartItems, calculateTotal, onBack, onNex
   };
 
   return (
-    <div className="overflow-hidden rounded border border-border bg-background-primary">
+    <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm">
       {renderStepContent()}
     </div>
   );

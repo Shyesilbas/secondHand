@@ -85,7 +85,7 @@ const OtpDigitInputGroup = ({
           onPaste={handlePaste}
           onFocus={(e) => e.target.select()}
           aria-label={t('digit_input_index', '{{index}}. hane', { index: index + 1 })}
-          className={`h-14 w-11 rounded border bg-background-primary text-center text-xl font-semibold tabular-nums text-text-primary transition-colors duration-150 focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted sm:w-12 ${digit ? 'border-border-dark' : 'border-border'
+          className={`h-14 w-11 rounded-md border bg-background-primary text-center text-xl font-semibold tabular-nums text-text-primary transition-colors duration-150 focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus disabled:cursor-not-allowed disabled:bg-background-secondary disabled:text-text-muted sm:w-12 ${digit ? 'border-border-dark' : 'border-border'
             }`}
           maxLength={1}
           data-otp-slot={`${dataSlotPrefix}-${index}`}

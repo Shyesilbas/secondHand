@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import React, { useState } from 'react';
-import { Check, FileText } from 'lucide-react';
+import { Check, FileText, ShieldCheck } from 'lucide-react';
 import { useRequiredAgreements } from '../../../agreements/hooks/useAgreements.js';
 import { AGREEMENT_TYPE_LABELS } from '../../../agreements/agreements.js';
 import AgreementModal from '../../../agreements/components/AgreementModal.jsx';
@@ -59,11 +59,14 @@ export const OrderPaymentSummary = React.memo(({
         </dl>
 
         <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
-          <span className="text-sm font-medium text-text-primary">{t("od_total", "Toplam")}</span>
-          <span className="text-xl font-semibold tabular-nums text-text-primary">{formatCurrency(total, currency)}</span>
+          <span className="text-sm font-semibold text-text-primary">{t("od_total", "Toplam")}</span>
+          <span className="text-2xl font-bold tabular-nums text-text-price">{formatCurrency(total, currency)}</span>
         </div>
 
-        <p className="mt-3 text-sm text-text-tertiary">{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</p>
+        <div className="mt-3 flex items-center gap-2 rounded-sm bg-status-success-bg border border-status-success-border px-3 py-2 text-xs text-status-success-text">
+          <ShieldCheck className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
+        </div>
 
         {!isSellerView && agreements.length > 0 && (
           <div className="mt-4 border-t border-border-light pt-4">

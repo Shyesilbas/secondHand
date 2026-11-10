@@ -110,7 +110,7 @@ const AuraChatWidgetPanel = () => {
     }, [ensureGreeting, isOpen, messages.length]);
     return <div className="fixed bottom-5 right-5 z-modal">
         <div className={`absolute bottom-16 right-0 origin-bottom-right transition-all duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-            <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-md border border-border-light/90 bg-background-primary overflow-hidden flex flex-col">
+            <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-md border border-border-light bg-background-primary overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-3.5 border-b border-border-light bg-primary text-white">
                     <button type="button" onClick={() => {
@@ -148,7 +148,7 @@ const AuraChatWidgetPanel = () => {
                                     {isUser ? <UserRound className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
                                 </div>
                                 <div className={`min-w-0 max-w-[88%] ${isUser ? 'text-right' : ''}`}>
-                                    <div className={`inline-block rounded-md px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border/50 bg-background-tertiary/30 text-text-primary rounded-tl-sm'}`}>
+                                    <div className={`inline-block rounded-md px-3.5 py-2.5 text-sm leading-relaxed text-left whitespace-pre-wrap ${isUser ? 'bg-primary text-white rounded-tr-sm' : 'border border-border bg-background-tertiary/30 text-text-primary rounded-tl-sm'}`}>
                                         {m.typing ? <div className="flex items-center gap-1.5 py-0.5">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary" style={{
                                                 animationDelay: '0ms'
@@ -176,7 +176,7 @@ const AuraChatWidgetPanel = () => {
 
 
 
-                    <div className="shrink-0 border-t border-border-light/90 bg-background-primary p-3">
+                    <div className="shrink-0 border-t border-border-light bg-background-primary p-3">
                         <div className="flex items-end gap-2">
                             <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder={t("write_to_aura_enter_to_send")} className="flex-1 resize-none rounded-md border border-border-light bg-background-secondary/80 px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary focus:bg-background-primary" rows={2} />
                             <button type="button" onClick={() => sendMessage()} disabled={isSending || !input.trim()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 w-11" aria-label={t("send")}>

@@ -29,11 +29,11 @@ const OrderStepper = ({ currentStatus, deliveryMethod }) => {
     currentStatus === ORDER_STATUSES.VERIFICATION_LOCKED;
 
   return (
-    <div className="py-2">
-      <ol className="relative z-0 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center md:gap-0">
-        <div className="absolute left-0 top-4 z-0 hidden h-0.5 w-full bg-background-tertiary md:block" aria-hidden />
+    <div className="py-1">
+      <ol className="relative z-0 flex flex-col items-start justify-between gap-3 md:flex-row md:items-center md:gap-0">
+        <div className="absolute left-0 top-3.5 z-0 hidden h-0.5 w-full bg-border md:block" aria-hidden />
         <div
-          className="absolute left-0 top-4 z-0 hidden h-0.5 bg-primary transition-all duration-200 ease-out md:block"
+          className="absolute left-0 top-3.5 z-0 hidden h-0.5 bg-primary transition-all duration-300 ease-out md:block"
           style={{ width: `${Math.max(0, (currentIndex / (steps.length - 1)) * 100)}%` }}
           aria-hidden
         />
@@ -43,21 +43,21 @@ const OrderStepper = ({ currentStatus, deliveryMethod }) => {
           return (
             <li
               key={step.key}
-              className="relative z-10 flex w-full items-center gap-3 md:w-auto md:flex-col md:gap-0"
+              className="relative z-10 flex w-full items-center gap-2.5 md:w-auto md:flex-col md:gap-0"
               aria-current={isCurrent ? 'step' : undefined}
             >
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full border bg-background-primary text-sm tabular-nums ${isDone
+                className={`flex h-7 w-7 items-center justify-center rounded-full border bg-background-primary text-xs tabular-nums font-semibold transition-colors duration-150 ${isDone
                     ? 'border-primary bg-primary text-white'
                     : isCurrent
-                      ? 'border-primary font-medium text-text-primary'
+                      ? 'border-primary ring-2 ring-primary/20 text-text-primary'
                       : 'border-border text-text-muted'
                   }`}
               >
-                {isDone ? <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden /> : idx + 1}
+                {isDone ? <Check className="h-3.5 w-3.5" strokeWidth={2} aria-hidden /> : idx + 1}
               </div>
               <span
-                className={`text-sm md:mt-3 ${isDone || isCurrent ? 'font-medium text-text-primary' : 'text-text-tertiary'
+                className={`text-xs md:mt-2 text-center ${isDone || isCurrent ? 'font-semibold text-text-primary' : 'text-text-tertiary font-normal'
                   }`}
               >
                 {t(step.labelKey, step.label)}
@@ -67,7 +67,7 @@ const OrderStepper = ({ currentStatus, deliveryMethod }) => {
         })}
       </ol>
       {isFailed && (
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-sm text-status-error-text">
+        <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-status-error-text">
           <AlertCircle className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {t('status', 'Durum')}: {currentStatus}
         </p>
       )}

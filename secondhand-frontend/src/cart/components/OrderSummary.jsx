@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { memo } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { Check, Tag, Crown, Loader2, X, ArrowRight } from 'lucide-react';
+import { FieldError } from '../../common/components/forms/FormPrimitives.jsx';
 
 const OrderSummary = ({
   cartItems,
@@ -47,9 +48,9 @@ const OrderSummary = ({
 
   return (
     <aside className="sticky top-20">
-      <div className="overflow-hidden rounded border border-border bg-background-primary transition-colors">
+      <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm">
         {/* Coupon Section */}
-        <div className="border-b border-border-light p-5 space-y-2.5 bg-background-secondary/30">
+        <div className="border-b border-border-light p-5 space-y-2.5 bg-background-secondary">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-secondary">
               <Tag className="h-3.5 w-3.5 text-text-secondary" strokeWidth={1.75} />
@@ -64,7 +65,7 @@ const OrderSummary = ({
           </div>
 
           {appliedCouponCode ? (
-            <div className="flex items-center justify-between gap-2 rounded border border-border bg-background-primary px-3 py-2">
+            <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-background-primary px-3 py-2">
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-status-success">
                 <Check className="h-3.5 w-3.5 text-status-success" strokeWidth={2.5} />
                 {appliedCouponCode}
@@ -84,31 +85,27 @@ const OrderSummary = ({
                 value={couponInput}
                 onChange={(e) => setCouponInput(e.target.value)}
                 placeholder={t("enter_code", "Kupon kodu")}
-                className="min-w-0 flex-1 rounded border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
+                className="min-w-0 flex-1 rounded-md border border-border bg-background-primary px-3 py-1.5 text-xs font-medium text-text-primary outline-none transition placeholder:text-text-muted focus:border-border-focus"
               />
               <button
                 type="button"
                 onClick={onApplyCoupon}
                 disabled={isPreviewLoading || !couponInput.trim()}
-                className="inline-flex items-center justify-center rounded bg-primary px-3 text-xs font-medium text-text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 shrink-0"
+                className="inline-flex items-center justify-center rounded-md bg-primary px-3 text-xs font-medium text-text-inverse transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-40 shrink-0"
               >
                 {t("apply", "Uygula")}
               </button>
               <button
                 type="button"
                 onClick={onOpenCouponsModal}
-                className="inline-flex items-center justify-center rounded border border-border bg-background-primary px-2.5 text-xs font-medium text-text-secondary transition hover:bg-background-secondary hover:text-text-primary shrink-0"
+                className="inline-flex items-center justify-center rounded-md border border-border bg-background-primary px-2.5 text-xs font-medium text-text-secondary transition hover:bg-background-secondary hover:text-text-primary shrink-0"
               >
                 {t("browse", "Seç")}
               </button>
             </div>
           )}
 
-          {couponError && (
-            <p className="text-xs font-medium text-status-error">
-              {couponError}
-            </p>
-          )}
+          <FieldError error={couponError} />
         </div>
 
         {/* Pricing Breakdown */}
@@ -142,7 +139,7 @@ const OrderSummary = ({
             <span>{t("shipping", "Kargo Bedeli")}</span>
             <div className="flex items-center gap-1.5">
               {isPremium && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-xs font-semibold text-status-warning bg-background-tertiary border border-border-light">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium text-status-warning-text bg-status-warning-bg border border-status-warning-border">
                   <Crown className="w-3 h-3 text-status-warning" />
                   {t('priority', 'Öncelikli')}
                 </span>
@@ -164,7 +161,7 @@ const OrderSummary = ({
               </span>
               <span className="text-xs text-text-muted font-normal">KDV Dahil</span>
             </div>
-            <span className="text-2xl font-semibold tabular-nums text-text-primary">
+            <span className="text-2xl font-semibold tabular-nums text-text-price">
               {formatCurrency(total, currency)}
             </span>
           </div>
@@ -195,7 +192,7 @@ const OrderSummary = ({
             type="button"
             onClick={onCheckout}
             disabled={disabled}
-            className="inline-flex items-center justify-center gap-2 rounded bg-primary text-text-inverse hover:bg-primary-hover h-11 px-4 w-full text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-text-inverse hover:bg-primary-hover h-11 px-4 w-full text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40"
           >
             <span>{t("proceed_to_checkout", "Ödeme Adımına Geç")}</span>
             <ArrowRight className="h-4 w-4" />

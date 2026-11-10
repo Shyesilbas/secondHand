@@ -31,7 +31,7 @@ const ForumPage = () => {
  const threadCount = visibleThreads.length;
  return <div className="min-h-screen bg-background-secondary">
  {/* ── Hero Header ────────────────────────────────────────── */}
- <div className="bg-background-primary border-b border-border-light/80">
+ <div className="bg-background-primary border-b border-border-light">
  <PageContainer>
  <div className="py-6 sm:py-8">
  {/* Top row */}
@@ -107,7 +107,7 @@ const ForumPage = () => {
 
  {/* ── Thread List (Left) ─────────────────────────────── */}
  <div className="lg:col-span-5 xl:col-span-4">
- <div className="rounded-md border border-border-light/70 bg-background-primary p-2 lg:sticky lg:top-6 space-y-2 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
+ <div className="rounded-md border border-border-light bg-background-primary p-2 lg:sticky lg:top-6 space-y-2 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
  {forum.threadsError && <div className="rounded border border-border bg-background-secondary px-4 py-3 text-sm text-status-error-text font-medium">
  {forum.threadsError}
  </div>}
@@ -117,7 +117,7 @@ const ForumPage = () => {
  <ThreadCardSkeleton />
  <ThreadCardSkeleton />
  <ThreadCardSkeleton />
- </> : visibleThreads.length === 0 ? <div className="rounded-md border border-border-light/90 bg-background-primary/90 shadow-sm ring-1 ring-border-light p-12 text-center mx-0.5">
+ </> : visibleThreads.length === 0 ? <div className="rounded-md border border-border-light bg-background-primary/90 shadow-sm ring-1 ring-border-light p-12 text-center mx-0.5">
  <MessageCircle className="mx-auto mb-4 block h-5 w-5 shrink-0 text-text-primary" strokeWidth={1.5} aria-hidden />
  <p className="text-sm font-semibold text-text-primary">
  {listTab === FORUM_LIST_TABS.LIKED ? FORUM_MESSAGES.NO_LIKED_THREADS : FORUM_MESSAGES.NO_THREADS_FOUND}

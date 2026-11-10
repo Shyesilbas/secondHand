@@ -14,7 +14,7 @@ import { ShippingDetailsSection } from '../components/orderDetails/ShippingDetai
 const Panel = ({
  children,
  className = ''
-}) => <div className={`rounded-md border border-border-light/80 bg-background-primary shadow-sm ${className}`}>
+}) => <div className={`rounded-md border border-border-light bg-background-primary shadow-sm ${className}`}>
  {children}
  </div>;
 

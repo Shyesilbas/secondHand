@@ -147,16 +147,19 @@ const CheckoutPaymentStep = ({
             </Button>
           )}
         >
-          <p className="tabular-nums">
-            {t('checkout_wallet_balance', 'Bakiye')}: <span className="font-medium">{formatCurrency(walletBalance, cur)}</span>
+          <p className="tabular-nums text-text-secondary">
+            {t('checkout_wallet_balance', 'Bakiye')}: <span className="font-semibold text-text-price">{formatCurrency(walletBalance, cur)}</span>
           </p>
           {!hasEnoughBalance && (
-            <p className="mt-0.5 text-sm text-status-error-text">
-              {t('checkout_insufficient_balance', {
-                defaultValue: 'Bakiye yetersiz, {{amount}} eksik.',
-                amount: formatCurrency(Math.max(totalAmount - walletBalance, 0), cur)
-              })}
-            </p>
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-status-error-text" role="alert">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+              <span>
+                {t('checkout_insufficient_balance', {
+                  defaultValue: 'Bakiye yetersiz, {{amount}} eksik.',
+                  amount: formatCurrency(Math.max(totalAmount - walletBalance, 0), cur)
+                })}
+              </span>
+            </div>
           )}
         </SummaryRow>
 
@@ -170,19 +173,21 @@ const CheckoutPaymentStep = ({
         </div>
 
         {spendingWarning && (
-          <div className="flex items-start gap-3 px-5 py-4 sm:px-6" role="alert">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-status-warning-text" strokeWidth={1.5} aria-hidden />
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-text-primary">{t('spending_limit_warning', 'Aylık harcama limiti uyarısı')}</p>
-              <p className="mt-0.5 text-sm text-text-secondary">
-                {t('checkout_spending_warning_body', {
-                  defaultValue: 'Bu siparişle bu ayki harcaman {{amount}} olacak.',
-                  amount: formatCurrency(spendingWarning.projectedSpending, cur)
-                })}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button variant="secondary" size="sm" onClick={() => setSpendingWarning(null)}>{t('cancel', 'Vazgeç')}</Button>
-                <Button size="sm" onClick={handleContinueAnyway} disabled={isWorking}>{t('continue_anyway', 'Yine de devam et')}</Button>
+          <div className="px-5 py-4 sm:px-6">
+            <div className="flex items-start gap-3 rounded-md border border-status-warning-border bg-status-warning-bg/40 p-4" role="alert">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-status-warning-text" strokeWidth={1.5} aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-text-primary">{t('spending_limit_warning', 'Aylık harcama limiti uyarısı')}</p>
+                <p className="mt-0.5 text-sm text-text-secondary">
+                  {t('checkout_spending_warning_body', {
+                    defaultValue: 'Bu siparişle bu ayki harcaman {{amount}} olacak.',
+                    amount: formatCurrency(spendingWarning.projectedSpending, cur)
+                  })}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button variant="secondary" size="sm" onClick={() => setSpendingWarning(null)}>{t('cancel', 'Vazgeç')}</Button>
+                  <Button size="sm" onClick={handleContinueAnyway} disabled={isWorking}>{t('continue_anyway', 'Yine de devam et')}</Button>
+                </div>
               </div>
             </div>
           </div>

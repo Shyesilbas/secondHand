@@ -78,7 +78,7 @@ const PlatformCouponsPage = () => {
  const loading = tab === TABS.ACTIVE ? activeQ.isLoading : participationsQ.isLoading;
  const error = tab === TABS.ACTIVE ? activeQ.error : participationsQ.error;
  const ordersHref = orderId => orderId != null ? `${ROUTES.MY_ORDERS}?orderId=${encodeURIComponent(String(orderId))}` : null;
- const tableShell = 'rounded-md border border-border-light bg-background-primary overflow-hidden';
+ const tableShell = 'rounded-md border border-border bg-background-primary shadow-sm overflow-hidden';
  return <div className="min-h-screen bg-background-secondary">
  <PageContainer className="pb-10">
  <div className="sticky top-0 z-10 -mx-4 mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border-light bg-background-secondary px-4 py-4">
@@ -147,10 +147,10 @@ const PlatformCouponsPage = () => {
  </td>
  <td className="align-top whitespace-nowrap px-4 py-3">
  <span className="inline-flex flex-col gap-1">
- <span className="w-fit rounded border border-primary/20 bg-primary-light px-2 py-0.5 text-xs font-semibold text-primary">
+ <span className="w-fit rounded-full border border-border bg-background-tertiary px-2 py-0.5 text-xs font-medium text-text-secondary">
  {formatCouponKindLabel(c.discountKind)}
  </span>
- <span className="text-xs font-semibold tabular-nums text-text-primary">{formatCouponDiscount(c)}</span>
+ <span className="text-xs font-semibold tabular-nums text-text-price">{formatCouponDiscount(c)}</span>
  </span>
  </td>
  <td className="align-top whitespace-nowrap px-4 py-3 text-sm">
@@ -163,7 +163,7 @@ const PlatformCouponsPage = () => {
  <CouponPeriod startsAt={c.startsAt} endsAt={c.endsAt} />
  </td>
  <td className="align-top whitespace-nowrap px-4 py-3 text-right">
- <Link to={ROUTES.CHECKOUT} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3">{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" />
+ <Link to={ROUTES.CHECKOUT} className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-text-inverse hover:bg-primary-hover h-9 px-3">{t("deme")}<ExternalLink className="h-3.5 w-3.5 opacity-90" />
  </Link>
  </td>
  </tr>)}

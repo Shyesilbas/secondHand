@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Modal } from '../../common/components/ui/index.js';
+import { FieldError } from '../../common/components/forms/FormPrimitives.jsx';
+import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
 import { offerService } from '../services/offerService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
@@ -120,18 +122,18 @@ const MakeOfferModal = ({
  };
  return <Modal isOpen={isOpen} onClose={onClose} title={t("make_offer")} size="md" footer={<>
  <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>{t("cancel")}</Button>
- <Button type="submit" form="make-offer-form" disabled={isSubmitting}>{isSubmitting ? 'Sending…' : 'Send offer'}</Button>
+ <Button type="submit" form="make-offer-form" disabled={isSubmitting}>{isSubmitting ? t("sending", "Gönderiliyor…") : t("send_offer", "Teklif Gönder")}</Button>
  </>}>
  <p className="mb-4 line-clamp-2 text-sm text-text-secondary">{listingTitle}</p>
  <form id="make-offer-form" onSubmit={handleSubmit} noValidate className="space-y-5">
  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
- <label htmlFor="offer-qty" className="mb-1 block text-sm font-medium text-text-primary">{t("quantity")}</label>
- <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+ <label htmlFor="offer-qty" className="mb-1.5 block text-sm font-medium text-text-primary">{t("quantity")}</label>
+ <input id="offer-qty" type="number" min={1} value={quantity} onChange={handleQuantityChange} className={`${error ? inputError : inputNormal} h-10 tabular-nums`} />
  </div>
  <div>
- <label htmlFor="offer-total" className="mb-1 block text-sm font-medium text-text-primary">{t("total_offer_price")}</label>
- <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+ <label htmlFor="offer-total" className="mb-1.5 block text-sm font-medium text-text-primary">{t("total_offer_price")}</label>
+ <input id="offer-total" type="number" min={0} step="0.01" value={totalPrice} onChange={handleTotalChange} placeholder={t("enter_amount")} className={`${error ? inputError : inputNormal} h-10 tabular-nums`} />
  </div>
  </div>
 
@@ -144,9 +146,9 @@ const MakeOfferModal = ({
  {recommendedOffers.map(rec => {
  const active = selectedPreset === rec.key;
  const saveVsList = listTotal != null ? roundMoney(listTotal - rec.amount) : null;
- return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-card-border-hover'}`}>
+ return <button key={rec.key} type="button" aria-pressed={active} onClick={() => applyPreset(rec.key, rec.amount)} className={`flex flex-col rounded-md border px-4 py-3 text-left transition-colors ${active ? 'border-primary ring-1 ring-primary bg-background-secondary/50' : 'border-border hover:border-card-border-hover'}`}>
  <span className="text-xs text-text-secondary">{rec.title}</span>
- <span className="mt-1 text-lg font-semibold tabular-nums text-text-primary">{formatCurrency(rec.amount, currency)}</span>
+ <span className="mt-1 text-lg font-semibold tabular-nums text-text-price">{formatCurrency(rec.amount, currency)}</span>
  <span className="mt-1 text-xs text-text-tertiary">
  {rec.hint}
  {saveVsList != null && saveVsList > 0 ? <span className="tabular-nums"> · {t("save")}{formatCurrency(saveVsList, currency)}</span> : null}
@@ -166,7 +168,7 @@ const MakeOfferModal = ({
  </>}
  </p>
 
- {error ? <p role="alert" className="text-sm text-status-error-text">{error}</p> : null}
+ <FieldError error={error} />
  </form>
  </Modal>;
 };

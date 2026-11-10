@@ -124,7 +124,7 @@ const CompareModal = memo(() => {
  </p>
  <Button variant="secondary" onClick={closeModal}>{t("close")}</Button>
  </>}>
- <div className="-mx-5 -my-4">
+ <div className="-mx-5 -my-4 overflow-x-auto">
  <table className="w-full border-collapse text-sm">
  <thead className="sticky top-0 z-10 bg-background-secondary border-b border-border-light">
  <tr>
@@ -134,12 +134,12 @@ const CompareModal = memo(() => {
  {items.map(item => <th key={item.id} className="min-w-44 p-3 sm:p-4 border-l border-border-light align-bottom">
  <div className="flex flex-col items-center gap-2">
  <div className="relative group w-full max-w-28">
- <div className="aspect-square overflow-hidden rounded border border-border-light bg-background-tertiary">
+ <div className="aspect-square overflow-hidden rounded-md border border-border-light bg-background-tertiary">
  {item.imageUrl ? <img src={item.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
  <ImageIcon className="h-5 w-5 text-text-muted" strokeWidth={1.5} />
  </div>}
  </div>
- <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute right-1 top-1 rounded border border-border bg-background-primary p-1 text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus" aria-label={t("remove_from_comparison")}>
+ <button type="button" onClick={() => removeFromComparison(item.id)} className="absolute right-1 top-1 rounded-md border border-border bg-background-primary p-1 text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus" aria-label={t("remove_from_comparison")}>
  <X className="h-4 w-4" strokeWidth={1.5} />
  </button>
  </div>
@@ -166,7 +166,7 @@ const CompareModal = memo(() => {
  const showAward = highlighted && field.highlight !== HIGHLIGHT_RULES.BOOLEAN_TRUE;
  return <td key={item.id} className="p-3 sm:p-4 text-center align-middle border-l border-border-light">
  <div className={`${highlighted ? 'font-semibold text-text-primary' : 'text-text-primary'}
- ${field.key === 'price' ? 'text-base font-semibold text-text-primary' : ''}
+ ${field.key === 'price' ? 'text-base font-semibold tabular-nums text-text-price' : ''}
  `}>
  {showAward ? <span className="inline-flex items-center justify-center gap-1.5 flex-wrap">
  <Award className="h-4 w-4 shrink-0 text-status-success" strokeWidth={1.5} aria-label={t("highest_best")} />

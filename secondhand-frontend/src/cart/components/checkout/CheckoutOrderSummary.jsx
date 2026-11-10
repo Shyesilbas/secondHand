@@ -17,7 +17,7 @@ const CheckoutOrderSummary = ({ cartItems = [], calculateTotal, pricing }) => {
 
   return (
     <aside className="lg:sticky lg:top-20">
-      <div className="rounded border border-border bg-background-primary">
+      <div className="rounded-md border border-border bg-background-primary shadow-sm">
         <div className="flex items-baseline justify-between border-b border-border-light px-5 py-4">
           <h2 className="text-sm font-semibold text-text-primary">{t('order_summary', 'Sipariş özeti')}</h2>
           <span className="text-xs tabular-nums text-text-tertiary">
@@ -32,7 +32,7 @@ const CheckoutOrderSummary = ({ cartItems = [], calculateTotal, pricing }) => {
             const seller = [listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ') || listing.sellerUsername;
             return (
               <li key={item.id} className="flex items-start gap-3 py-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-border-light bg-background-tertiary">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-background-tertiary">
                   {listing.imageUrl ? (
                     <img src={listing.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                   ) : (
@@ -41,13 +41,19 @@ const CheckoutOrderSummary = ({ cartItems = [], calculateTotal, pricing }) => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm text-text-primary">{listing.title}</p>
-                  <p className="mt-0.5 truncate text-xs text-text-tertiary">
-                    {[
-                      item.isOffer ? t('offer', 'Teklif') : null,
-                      quantity > 1 ? `${quantity} × ${formatCurrency(unitPrice, listing.currency || currency)}` : null,
-                      seller
-                    ].filter(Boolean).join(' · ')}
-                  </p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-text-tertiary">
+                    {item.isOffer && (
+                      <span className="inline-flex items-center rounded border border-border px-1.5 py-0.5 text-[10px] font-medium text-text-secondary bg-background-secondary">
+                        {t('offer', 'Teklif')}
+                      </span>
+                    )}
+                    <span className="truncate">
+                      {[
+                        quantity > 1 ? `${quantity} × ${formatCurrency(unitPrice, listing.currency || currency)}` : null,
+                        seller
+                      ].filter(Boolean).join(' · ')}
+                    </span>
+                  </div>
                 </div>
                 <span className="shrink-0 text-sm font-medium tabular-nums text-text-primary">
                   {formatCurrency(lineTotal, listing.currency || currency)}
@@ -65,7 +71,7 @@ const CheckoutOrderSummary = ({ cartItems = [], calculateTotal, pricing }) => {
           {discounts > 0 && (
             <div className="flex justify-between text-text-secondary">
               <dt>{t('discount', 'İndirim')}</dt>
-              <dd className="tabular-nums text-status-success">−{formatCurrency(discounts, currency)}</dd>
+              <dd className="tabular-nums font-medium text-status-success-text">−{formatCurrency(discounts, currency)}</dd>
             </div>
           )}
           <div className="flex justify-between text-text-secondary">
@@ -74,7 +80,7 @@ const CheckoutOrderSummary = ({ cartItems = [], calculateTotal, pricing }) => {
           </div>
           <div className="flex items-baseline justify-between border-t border-border-light pt-3">
             <dt className="font-medium text-text-primary">{t('total', 'Toplam')}</dt>
-            <dd className="text-lg font-semibold tabular-nums text-text-primary">{formatCurrency(total, currency)}</dd>
+            <dd className="text-lg font-semibold tabular-nums text-text-price">{formatCurrency(total, currency)}</dd>
           </div>
         </dl>
       </div>

@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Modal } from '../../common/components/ui/index.js';
+import { FieldError } from '../../common/components/forms/FormPrimitives.jsx';
+import { inputError, inputNormal } from '../../common/components/forms/inputStyles.js';
 import { offerService } from '../services/offerService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { formatCurrency } from '../../common/formatters.js';
@@ -78,25 +80,25 @@ const CounterOfferModal = ({
 
  return <Modal isOpen={isOpen} onClose={onClose} title={t("counter_offer")} size="md" footer={<>
  <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>{t("cancel")}</Button>
- <Button type="submit" form="counter-offer-form" disabled={isSubmitting}>{isSubmitting ? 'Sending…' : 'Send counter offer'}</Button>
+ <Button type="submit" form="counter-offer-form" disabled={isSubmitting}>{isSubmitting ? t("sending", "Gönderiliyor…") : t("send_counter_offer", "Karşı Teklif Gönder")}</Button>
  </>}>
  <p className="mb-4 text-sm text-text-secondary">{listingTitle}</p>
  <form id="counter-offer-form" onSubmit={handleSubmit} noValidate className="space-y-4">
  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
- <label htmlFor="counter-qty" className="mb-1 block text-sm font-medium text-text-primary">{t("quantity")}</label>
- <input id="counter-qty" type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+ <label htmlFor="counter-qty" className="mb-1.5 block text-sm font-medium text-text-primary">{t("quantity")}</label>
+ <input id="counter-qty" type="number" min={1} value={quantity} onChange={e => setQuantity(e.target.value)} className={`${error ? inputError : inputNormal} h-10 tabular-nums`} />
  </div>
  <div>
- <label htmlFor="counter-total" className="mb-1 block text-sm font-medium text-text-primary">{t("total_price")}</label>
- <input id="counter-total" type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className="h-10 tabular-nums w-full rounded border border-border bg-background-primary px-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" />
+ <label htmlFor="counter-total" className="mb-1.5 block text-sm font-medium text-text-primary">{t("total_price")}</label>
+ <input id="counter-total" type="number" min={0} step="0.01" value={totalPrice} onChange={e => setTotalPrice(e.target.value)} className={`${error ? inputError : inputNormal} h-10 tabular-nums`} />
  </div>
  </div>
  <p className="text-sm text-text-secondary">{t("countering_for")}<span className="font-medium tabular-nums text-text-primary"> {Number(quantity) || 1} </span>{t("item_s")}{previewTotal != null && <>
- {' '}{t("total")}<span className="font-medium tabular-nums text-text-primary"> {formatCurrency(previewTotal, currency)}</span>
+ {' '}{t("total")}<span className="font-medium tabular-nums text-text-price"> {formatCurrency(previewTotal, currency)}</span>
  </>}
  </p>
- {error && <p role="alert" className="text-sm text-status-error-text">{error}</p>}
+ <FieldError error={error} />
  </form>
  </Modal>;
 };

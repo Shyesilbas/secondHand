@@ -47,7 +47,7 @@ const ChatHeader = ({
  const getHeaderName = () => selectedChatRoom?.otherParticipantName || selectedChatRoom?.title || 'Chat';
  const listingLabel = selectedChatRoom?.listingTitle || '';
  const profileId = selectedChatRoom?.otherParticipantId;
- return <div className="flex items-center justify-between p-4 border-b border-border-light/60 bg-background-primary text-text-primary flex-shrink-0">
+ return <div className="flex items-center justify-between p-4 border-b border-border-light bg-background-primary text-text-primary flex-shrink-0">
  <div className="flex items-center space-x-4">
  <div className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-status-success' : 'bg-text-muted'}`}></div>
  <div>
@@ -77,7 +77,7 @@ const ChatHeader = ({
  <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary/50 transition-all duration-300 ease-in-out p-2 rounded" title={t("options")}>
  <EllipsisVerticalIcon className="w-5 h-5" />
  </button>
- {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light/60 rounded shadow-md z-10 min-w-36">
+ {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light rounded shadow-md z-10 min-w-36">
  <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
  <TrashIcon className="w-4 h-4" />
  <span>{t("delete_chat")}</span>

@@ -66,9 +66,9 @@ const CheckoutPage = () => {
       }
     }).catch(err => {
       logger.warn('Could not initiate stock reservation:', err);
-      setReservationError(err?.response?.data?.message || CART_MESSAGES.RESERVATION_FAILED);
+      setReservationError(err?.response?.data?.message || t('checkout_reservation_failed', CART_MESSAGES.RESERVATION_FAILED));
     });
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     reserveStock();
@@ -162,8 +162,8 @@ const CheckoutPage = () => {
   const requestedCoupon = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
   const couponDropped = pricingQueryData?.success === true && requestedCoupon != null && !pricing?.couponCode;
   const couponError = pricingQueryData?.success === false
-    ? pricingQueryData.error?.response?.data?.message || CART_MESSAGES.COUPON_NOT_APPLIED
-    : couponDropped ? CART_MESSAGES.COUPON_NO_LONGER_APPLIES : null;
+    ? pricingQueryData.error?.response?.data?.message || t('checkout_coupon_not_applied', CART_MESSAGES.COUPON_NOT_APPLIED)
+    : couponDropped ? t('checkout_coupon_no_longer_applies', CART_MESSAGES.COUPON_NO_LONGER_APPLIES) : null;
 
   const calculateTotal = useCallback(() => {
     if (pricing?.total != null) {
@@ -202,14 +202,14 @@ const CheckoutPage = () => {
   if (!offerId && cartCount === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4 antialiased">
-        <div className="w-full max-w-sm text-center bg-background-primary p-8 rounded border border-border space-y-4">
+        <div className="w-full max-w-sm text-center bg-background-primary p-8 rounded-md border border-border shadow-sm space-y-4">
           <ShoppingCart className="mx-auto h-5 w-5 text-text-muted" strokeWidth={1.5} aria-hidden />
           <div className="space-y-1">
             <h1 className="text-sm font-semibold text-text-primary">
-              {CART_MESSAGES.EMPTY_CART_TITLE}
+              {t('empty_cart_title', CART_MESSAGES.EMPTY_CART_TITLE)}
             </h1>
             <p className="text-xs text-text-tertiary max-w-xs mx-auto">
-              {CART_MESSAGES.EMPTY_CART_DESCRIPTION}
+              {t('empty_cart_description', CART_MESSAGES.EMPTY_CART_DESCRIPTION)}
             </p>
           </div>
           <Button 
@@ -252,10 +252,26 @@ const CheckoutPage = () => {
             </div>
 
             <p
-              className={`flex shrink-0 items-center gap-1.5 text-sm tabular-nums ${reservationExpired ? 'text-status-error-text' : 'text-text-secondary'}`}
+              className={`flex shrink-0 items-center gap-1.5 text-sm tabular-nums font-medium ${
+                reservationExpired
+                  ? 'text-status-error-text'
+                  : timeLeft < 180
+                  ? 'text-status-warning-text'
+                  : 'text-text-secondary'
+              }`}
               title={t('cart_items_reserved_for_you', 'Sepetindeki ürünler senin için geçici olarak ayrıldı.')}
             >
-              <Clock className="h-4 w-4 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+              <Clock
+                className={`h-4 w-4 ${
+                  reservationExpired
+                    ? 'text-status-error-text'
+                    : timeLeft < 180
+                    ? 'text-status-warning-text'
+                    : 'text-text-tertiary'
+                }`}
+                strokeWidth={1.5}
+                aria-hidden
+              />
               <span className="sr-only">{t('checkout_reservation', 'Ürünler ayrıldı, kalan süre')}</span>
               {formatTimer(timeLeft)}
             </p>
@@ -275,7 +291,7 @@ const CheckoutPage = () => {
             {isOrderSummaryExpanded ? t('hide_order_summary', 'Özeti gizle') : t('show_order_summary', 'Özeti göster')}
             <ChevronDown className={`h-4 w-4 text-text-tertiary transition-transform duration-150 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} strokeWidth={1.5} aria-hidden />
           </span>
-          <span className="font-semibold tabular-nums text-text-primary">{formatCurrency(calculateTotal(), currency)}</span>
+          <span className="font-semibold tabular-nums text-text-price">{formatCurrency(calculateTotal(), currency)}</span>
         </button>
         {isOrderSummaryExpanded && <div className="mt-3">{summary}</div>}
       </div>
@@ -297,7 +313,7 @@ const CheckoutPage = () => {
             ) : (
               <div className="space-y-4">
                 {pricingFailed && (
-                  <Alert type="warning" message={CART_MESSAGES.PRICING_PREVIEW_FAILED} action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t('try_again', 'Tekrar dene')}</Button>} />
+                  <Alert type="warning" message={t('checkout_pricing_preview_failed', CART_MESSAGES.PRICING_PREVIEW_FAILED)} action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t('try_again', 'Tekrar dene')}</Button>} />
                 )}
                 {couponError && <Alert type="warning" message={couponError} />}
                 <CheckoutStep

@@ -52,7 +52,13 @@ const LogDetailModal = ({
       <dl className="divide-y divide-border-light">
         <Row label={t("event_type", "Olay Türü")}>{getEventTypeDisplay(selectedLog.eventType)}</Row>
         <Row label={t("status", "Durum")}>
-          <span className="inline-flex items-center gap-1.5">
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${
+            isFailure
+              ? 'border-status-error-border bg-status-error-bg text-status-error-text'
+              : selectedLog.eventStatus === 'SUCCESS'
+                ? 'border-status-success-border bg-status-success-bg text-status-success-text'
+                : 'border-status-warning-border bg-status-warning-bg text-status-warning-text'
+          }`}>
             <span className={`h-1.5 w-1.5 rounded-full ${dot}`} aria-hidden />
             {selectedLog.eventStatus}
           </span>

@@ -245,7 +245,7 @@ const MyShowcasesPanel = ({ userId }) => {
                     </div>
 
                     {/* Metrics Strip */}
-                    <div className="mt-3.5 grid grid-cols-2 gap-2 border-y border-border-light/60 py-2.5 text-xs">
+                    <div className="mt-3.5 grid grid-cols-2 gap-2 border-y border-border-light py-2.5 text-xs">
                       <div>
                         <span className="text-text-tertiary block">{t('spent_cost', 'Harcanan')}</span>
                         <span className="mt-0.5 font-medium tabular-nums text-text-primary block">

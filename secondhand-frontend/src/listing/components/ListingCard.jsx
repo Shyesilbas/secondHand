@@ -172,7 +172,7 @@ const ListingCard = ({
     onMouseLeave={handleCardMouseLeave}
     className={`group relative flex flex-col h-full
  bg-background-primary rounded
- border transition-colors duration-150 ease-out
+ border shadow-sm hover:shadow transition-all duration-200 ease-out
 
  ${isOutOfStock ? 'opacity-60' : ''}
  ${isSelectable && isInShowcase ? 'opacity-40 grayscale cursor-not-allowed' : ''}
@@ -184,37 +184,49 @@ const ListingCard = ({
       onSelectToggle?.(listing.id);
     }} />}
 
-    {/* Top-right action buttons */}
-    <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity duration-150 motion-reduce:transition-none">
+    {/* Top-right action buttons: Favorite & Owner actions always accessible; secondary actions reveal on desktop hover */}
+    <div className="absolute top-2.5 right-2.5 z-20 flex flex-col gap-1.5 items-end">
       {showActions && <ListingCardActions listing={listing} onChanged={onDeleted} />}
-      <FavoriteButton listingId={listing.id} listing={listing} initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false} initialCount={cardFavoriteCount} size="sm" showCount={false} />
-      {canAddToCart && <button type="button" onClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!itemIsInCart) {
-          addToCart(listing.id);
-        }
-      }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded border border-border flex items-center justify-center transition-colors duration-150 ${itemIsInCart
-          ? 'bg-background-secondary text-status-success cursor-default'
-          : 'bg-background-primary text-text-secondary hover:text-text-primary hover:border-card-border-hover'
-        }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")} aria-label={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
-        {isAddingToCart ? (
-          <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        ) : itemIsInCart ? (
-          <Check className="w-4 h-4 text-status-success" strokeWidth={1.5} />
-        ) : (
-          <ShoppingBag className="w-4 h-4" strokeWidth={1.5} />
-        )}
-      </button>}
-      {canMakeOffer && <button type="button" onClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsOfferModalOpen(true);
-      }} className="w-8 h-8 rounded bg-background-primary border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-card-border-hover transition-colors duration-150" title={t("make_offer")} aria-label={t("make_offer")}>
-        <HandCoins className="w-4 h-4" strokeWidth={1.5} />
-      </button>}
-      <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
-      <CompareButton listing={listing} size="sm" />
+      <FavoriteButton
+        listingId={listing.id}
+        listing={listing}
+        initialIsFavorited={listing.favoriteStats?.isFavorited ?? listing.favoriteStats?.favorited ?? false}
+        initialCount={cardFavoriteCount}
+        size="sm"
+        showCount={false}
+        className="min-h-9 min-w-9 md:min-h-8 md:min-w-8"
+      />
+
+      {/* Secondary contextual actions — kept on desktop hover to eliminate mobile photo obstruction */}
+      <div className="hidden md:flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 motion-reduce:transition-none">
+        {canAddToCart && <button type="button" onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!itemIsInCart) {
+            addToCart(listing.id);
+          }
+        }} disabled={isAddingToCart || itemIsInCart} className={`w-8 h-8 rounded border border-border flex items-center justify-center transition-colors duration-150 ${itemIsInCart
+            ? 'bg-background-secondary text-status-success cursor-default'
+            : 'bg-background-primary text-text-secondary hover:text-text-primary hover:border-card-border-hover'
+          }`} title={itemIsInCart ? t("in_cart") : t("add_to_cart")} aria-label={itemIsInCart ? t("in_cart") : t("add_to_cart")}>
+          {isAddingToCart ? (
+            <div className="w-3.5 h-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          ) : itemIsInCart ? (
+            <Check className="w-4 h-4 text-status-success" strokeWidth={1.5} />
+          ) : (
+            <ShoppingBag className="w-4 h-4" strokeWidth={1.5} />
+          )}
+        </button>}
+        {canMakeOffer && <button type="button" onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOfferModalOpen(true);
+        }} className="w-8 h-8 rounded bg-background-primary border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:border-card-border-hover transition-colors duration-150" title={t("make_offer")} aria-label={t("make_offer")}>
+          <HandCoins className="w-4 h-4" strokeWidth={1.5} />
+        </button>}
+        <AddToListButton listingId={listing.id} listingTitle={listing.title} size="sm" />
+        <CompareButton listing={listing} size="sm" />
+      </div>
     </div>
 
     {/* Image */}
@@ -263,7 +275,7 @@ const ListingCard = ({
       {/* Price & Rating row */}
       <div className="flex items-baseline justify-between gap-2 mb-2">
         <div className="flex items-baseline gap-1.5 flex-wrap min-w-0">
-          <span className={`text-base font-semibold tabular-nums tracking-tight ${isOutOfStock ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+          <span className={`text-base font-semibold tabular-nums tracking-tight ${isOutOfStock ? 'line-through text-text-muted' : 'text-text-price'}`}>
             {formatCurrency(displayPrice, listing.currency)}
           </span>
           {hasCampaign && <span className="text-xs text-text-muted line-through tabular-nums">

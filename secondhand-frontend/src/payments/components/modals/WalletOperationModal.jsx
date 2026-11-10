@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from 'react';
 import Modal from '../../../common/components/ui/Modal.jsx';
 import Button from '../../../common/components/ui/Button.jsx';
+import { FieldError } from '../../../common/components/forms/FormPrimitives.jsx';
+import { inputError, inputNormal } from '../../../common/components/forms/inputStyles.js';
 import { formatCurrency } from '../../../common/formatters.js';
 import { WALLET_OPERATION_MODES } from '../../paymentSchema.js';
 const WalletOperationModal = ({
@@ -34,52 +36,52 @@ const WalletOperationModal = ({
  onClose();
  };
  const title = (() => {
- if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw Money';
- if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit Money';
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Update Wallet Limit';
- return 'Update Spending Warning Limit';
+ if (mode === WALLET_OPERATION_MODES.WITHDRAW) return t("withdraw_money", "Para Çek");
+ if (mode === WALLET_OPERATION_MODES.DEPOSIT) return t("deposit_money", "Bakiye Yükle");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("update_wallet_limit", "Cüzdan Limitini Güncelle");
+ return t("update_spending_limit", "Harcama Uyarı Limitini Güncelle");
  })();
  const description = (() => {
- if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw from your eWallet.';
- if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit funds to your eWallet.';
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Set the maximum allowed balance for your eWallet.';
- return 'Set a threshold to warn you before overspending.';
+ if (mode === WALLET_OPERATION_MODES.WITHDRAW) return t("withdraw_desc", "E-Cüzdanınızdan hesabınıza para çekin.");
+ if (mode === WALLET_OPERATION_MODES.DEPOSIT) return t("deposit_desc", "E-Cüzdanınıza bakiye yükleyin.");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("update_limit_desc", "E-Cüzdanınız için tutulabilecek azami bakiyeyi belirleyin.");
+ return t("update_warning_desc", "Harcamalarınız bu tutara yaklaştığında bildirim alın.");
  })();
  const submitLabel = (() => {
- if (mode === WALLET_OPERATION_MODES.WITHDRAW) return 'Withdraw';
- if (mode === WALLET_OPERATION_MODES.DEPOSIT) return 'Deposit';
- return 'Update';
+ if (mode === WALLET_OPERATION_MODES.WITHDRAW) return t("withdraw", "Para Çek");
+ if (mode === WALLET_OPERATION_MODES.DEPOSIT) return t("deposit", "Yükle");
+ return t("update", "Güncelle");
  })();
  const currentValueLabel = (() => {
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Current:';
- if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'Current:';
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("current_label", "Mevcut:");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return t("current_label", "Mevcut:");
  return null;
  })();
  const currentValue = (() => {
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return eWallet?.limit ? formatCurrency(eWallet.limit) : 'No limit';
- if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return eWallet?.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : 'Not set';
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return eWallet?.limit ? formatCurrency(eWallet.limit) : t("unlimited", "Limitsiz");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return eWallet?.spendingWarningLimit ? formatCurrency(eWallet.spendingWarningLimit) : t("not_configured", "Tanımlanmamış");
  return null;
  })();
  const amountLabel = (() => {
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'New Wallet Limit (TRY)';
- if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'New Spending Warning Limit (TRY)';
- return 'Amount (TRY)';
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("new_wallet_limit_try", "Yeni Cüzdan Limiti (TRY)");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return t("new_warning_limit_try", "Yeni Harcama Uyarı Limiti (TRY)");
+ return t("amount_try", "Tutar (TRY)");
  })();
  const amountPlaceholder = (() => {
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'Enter new limit';
- if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'Enter warning limit';
- return 'Enter amount';
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("enter_new_limit", "Yeni limit girin");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return t("enter_warning_limit", "Uyarı limiti girin");
+ return t("enter_amount", "Tutar girin");
  })();
  const amountHelp = (() => {
- if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return 'This defines the maximum balance your eWallet can hold.';
- if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return 'You will be notified when your spending approaches this limit.';
+ if (mode === WALLET_OPERATION_MODES.UPDATE_LIMIT) return t("wallet_limit_help", "Cüzdanınızda tutabileceğiniz azami bakiyeyi tanımlar.");
+ if (mode === WALLET_OPERATION_MODES.UPDATE_WARNING) return t("wallet_warning_help", "Harcamanız bu limite yaklaştığında uyarılacaksınız.");
  return null;
  })();
  const handleSubmit = async e => {
  e.preventDefault();
  const numericAmount = parseFloat(amount);
  if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) {
- setError('Enter an amount greater than zero.');
+ setError(t("enter_amount_greater_than_zero", "Sıfırdan büyük bir tutar girin."));
  return;
  }
  try {
@@ -92,7 +94,7 @@ const WalletOperationModal = ({
  };
  return <Modal isOpen={isOpen} onClose={handleClose} title={title} size="md" footer={<>
  <Button variant="secondary" onClick={handleClose}>{t("cancel")}</Button>
- <Button type="submit" form="wallet-operation-form" disabled={loading}>{loading ? 'Processing...' : submitLabel}</Button>
+ <Button type="submit" form="wallet-operation-form" disabled={loading}>{loading ? t("processing", "İşleniyor...") : submitLabel}</Button>
  </>}>
  <form id="wallet-operation-form" onSubmit={handleSubmit} noValidate className="space-y-4">
  <p className="text-sm text-text-secondary">{description}</p>
@@ -100,12 +102,13 @@ const WalletOperationModal = ({
  {currentValueLabel} <span className="font-medium tabular-nums text-text-primary">{currentValue}</span>
  </p>}
  <div>
- <label htmlFor="wallet-operation-amount" className="mb-1 block text-sm font-medium text-text-primary">{amountLabel}</label>
- <input id="wallet-operation-amount" type="number" inputMode="decimal" step="0.01" min="0" autoFocus className="h-10 w-full rounded border border-border bg-background-primary px-3 text-sm tabular-nums text-text-primary placeholder:text-text-muted focus:border-border-focus focus:outline-none focus:ring-2 focus:ring-border-focus" placeholder={amountPlaceholder} value={amount} aria-invalid={Boolean(error)} aria-describedby={error ? 'wallet-operation-error' : undefined} onChange={e => {
+ <label htmlFor="wallet-operation-amount" className="mb-1.5 block text-sm font-medium text-text-primary">{amountLabel}</label>
+ <input id="wallet-operation-amount" type="number" inputMode="decimal" step="0.01" min="0" autoFocus className={`${error ? inputError : inputNormal} h-10 tabular-nums`} placeholder={amountPlaceholder} value={amount} aria-invalid={Boolean(error)} aria-describedby={error ? 'wallet-operation-error' : undefined} onChange={e => {
  setAmount(e.target.value);
  setError('');
  }} />
- {error ? <p id="wallet-operation-error" className="mt-1 text-xs text-status-error-text">{error}</p> : amountHelp ? <p className="mt-1 text-xs text-text-tertiary">{amountHelp}</p> : null}
+ <FieldError error={error} id="wallet-operation-error" />
+ {!error && amountHelp ? <p className="mt-1.5 text-xs text-text-tertiary">{amountHelp}</p> : null}
  </div>
  </form>
  </Modal>;

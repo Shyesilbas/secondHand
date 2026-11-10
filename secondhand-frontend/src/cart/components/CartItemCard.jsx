@@ -60,7 +60,7 @@ const CartItemCard = ({
         {/* Thumbnail */}
         <div className="relative shrink-0">
           {detailUrl ? (
-            <Link to={detailUrl} className="block overflow-hidden rounded border border-border-light bg-background-tertiary">
+            <Link to={detailUrl} className="block overflow-hidden rounded-md border border-border-light bg-background-tertiary">
               {item.listing?.imageUrl ? (
                 <img
                   src={item.listing.imageUrl}
@@ -83,7 +83,7 @@ const CartItemCard = ({
               </div>
             </Link>
           ) : (
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded border border-border-light bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
+            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-md border border-border-light bg-background-tertiary flex items-center justify-center text-sm font-semibold text-text-muted">
               {item.listing?.title?.charAt(0)?.toUpperCase() || '?'}
             </div>
           )}
@@ -152,7 +152,7 @@ const CartItemCard = ({
             {/* Badges and Reservation status */}
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
               {isLowStock && (
-                <span className="rounded-sm border border-border-light bg-background-tertiary px-1.5 py-0.5 text-xs font-medium text-status-warning tabular-nums">
+                <span className="rounded-full border border-status-warning-border bg-status-warning-bg px-2 py-0.5 text-xs font-medium text-status-warning-text tabular-nums">
                   {t("stock", "Stok: ")} {Number(maxStock)}
                 </span>
               )}
@@ -175,7 +175,7 @@ const CartItemCard = ({
               )}
 
               {hasCampaign && (
-                <span className="rounded-sm border border-border-light bg-background-tertiary px-1.5 py-0.5 text-xs font-semibold text-status-success">
+                <span className="rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
                   {item.listing?.campaignName || t("campaign", "Kampanya")}
                 </span>
               )}
@@ -185,7 +185,7 @@ const CartItemCard = ({
           {/* Bottom Bar: Stepper & Price */}
           <div className="mt-3 flex flex-wrap items-end justify-between gap-3 pt-1">
             {/* Quantity Stepper */}
-            <div className="inline-flex items-center rounded border border-border bg-background-primary h-8">
+            <div className="inline-flex items-center rounded-md border border-border bg-background-primary h-8">
               <button
                 type="button"
                 onClick={() => handleQuantityChange(item.quantity - 1)}
@@ -220,7 +220,7 @@ const CartItemCard = ({
                     {formatCurrency(originalItemTotal, item.listing?.currency)}
                   </span>
                 )}
-                <span className="text-base sm:text-lg font-semibold tabular-nums text-text-primary">
+                <span className="text-base sm:text-lg font-semibold tabular-nums text-text-price">
                   {formatCurrency(itemTotal, item.listing?.currency)}
                 </span>
               </div>
@@ -234,7 +234,7 @@ const CartItemCard = ({
 
           {/* Notes if present */}
           {item.notes && (
-            <div className="mt-3 rounded border border-border-light bg-background-secondary p-2.5 text-xs text-text-secondary">
+            <div className="mt-3 rounded-md border border-border-light bg-background-secondary p-2.5 text-xs text-text-secondary">
               <span className="font-semibold text-text-primary mr-1">{t("note", "Not:")}</span>
               {item.notes}
             </div>

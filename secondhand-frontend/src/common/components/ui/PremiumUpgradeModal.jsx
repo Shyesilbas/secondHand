@@ -255,7 +255,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
         </button>
       </div>
 
-      <ol className="mt-3.5 flex items-center gap-3 border-t border-border-light/60 pt-3 text-xs">
+      <ol className="mt-3.5 flex items-center gap-3 border-t border-border-light pt-3 text-xs">
         {STEPS.map(({ id, label }, index) => (
           <li
             key={id}
@@ -322,7 +322,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
       {step === 1 && (
         <div className="space-y-4 py-1">
           {/* Plan Pricing Banner */}
-          <div className="flex items-center justify-between rounded border border-border-light bg-background-secondary p-4">
+          <div className="flex items-center justify-between rounded-md border border-border bg-background-secondary p-4">
             <div>
               <span className="text-sm font-semibold text-text-primary">
                 {t('premium_plan_title', 'PRO Üyelik Planı')}
@@ -333,7 +333,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
             </div>
 
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-semibold tabular-nums tracking-tight text-text-primary">
+              <span className="text-2xl font-semibold tabular-nums tracking-tight text-text-price">
                 ₺{PREMIUM_PRICE}
               </span>
               <span className="text-xs font-normal text-text-tertiary">
@@ -343,8 +343,8 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
           </div>
 
           {/* Feature Comparison Table */}
-          <div className="overflow-hidden rounded border border-border-light bg-background-primary">
-            <div className="grid grid-cols-12 border-b border-border-light bg-background-secondary/70 px-4 py-2.5 text-xs font-semibold">
+          <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm">
+            <div className="grid grid-cols-12 border-b border-border-light bg-background-secondary px-4 py-2.5 text-xs font-semibold">
               <div className="col-span-5 text-text-secondary">
                 {t('privileges', 'Ayrıcalık')}
               </div>
@@ -357,7 +357,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               </div>
             </div>
 
-            <div className="divide-y divide-border-light/60 text-xs">
+            <div className="divide-y divide-border-light text-xs">
               {FEATURES.map((feature) => (
                 <div
                   key={feature.label}

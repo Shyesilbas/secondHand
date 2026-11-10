@@ -66,7 +66,7 @@ const FavoritesPage = () => {
  }, [fetchFavorites]);
  return <div className="min-h-screen bg-background-secondary/90">
  <PageContainer className="py-6 sm:py-8">
- <div className="overflow-hidden rounded-md border border-border-light/90 bg-background-primary">
+ <div className="overflow-hidden rounded-md border border-border-light bg-background-primary">
  <div className="flex flex-col gap-3 border-b border-border-light bg-background-secondary/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
  <div className="min-w-0">
  <h1 className="text-2xl font-semibold text-text-primary tracking-tight">{t("favorites")}</h1>

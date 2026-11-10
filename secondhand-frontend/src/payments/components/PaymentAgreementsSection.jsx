@@ -60,7 +60,7 @@ const PaymentAgreementsSection = ({
         return (
           <div
             key={agreement.agreementId}
-            className={`flex items-start justify-between gap-3 rounded border px-3 py-2.5 text-xs transition-colors duration-150 ${
+            className={`flex items-start justify-between gap-3 rounded-md border px-3 py-2.5 text-xs transition-colors duration-150 ${
               isChecked
                 ? 'border-border bg-background-secondary/70'
                 : 'border-border-light bg-background-primary hover:border-card-border-hover'
@@ -94,7 +94,7 @@ const PaymentAgreementsSection = ({
             <button
               type="button"
               onClick={() => handleAgreementClick(agreement)}
-              className="inline-flex shrink-0 items-center gap-1 rounded-sm px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
+              className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium text-text-tertiary transition-colors hover:bg-background-secondary hover:text-text-primary"
             >
               <FileText className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
               <span>{t('read', 'Oku')}</span>

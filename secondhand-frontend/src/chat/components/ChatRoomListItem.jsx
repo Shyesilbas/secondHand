@@ -41,7 +41,7 @@ const ChatRoomListItem = ({
  return <div className={`relative cursor-pointer transition-all duration-300 ease-in-out ${isSelected ? 'bg-background-tertiary/50 border-l-2 border-l-primary' : 'hover:bg-background-secondary/50'}`} onClick={onClick}>
  <div className="flex justify-between items-start">
  <div className="flex-1 min-w-0">
- <div className="p-4 border-b border-border-light/60">
+ <div className="p-4 border-b border-border-light">
  <div className="flex items-start space-x-3 w-full">
  <div className="flex-shrink-0">
  <div className="w-12 h-12 bg-secondary-700 rounded-md flex items-center justify-center">
@@ -99,7 +99,7 @@ const ChatRoomListItem = ({
  <EllipsisVerticalIcon className="w-4 h-4" />
  </button>
 
- {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light/60 rounded shadow-md z-10 min-w-36">
+ {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light rounded shadow-md z-10 min-w-36">
  <button onClick={handleDeleteClick} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
  <TrashIcon className="w-4 h-4" />
  <span>{t("delete_chat")}</span>

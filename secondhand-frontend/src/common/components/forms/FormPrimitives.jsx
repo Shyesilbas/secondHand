@@ -1,12 +1,12 @@
 import { AlertCircle } from 'lucide-react';
 
 // Shared by the listing and location forms so every field error and section looks the same.
-export const FieldError = ({ error }) => {
+export const FieldError = ({ error, id, className = '' }) => {
   if (!error) return null;
   return (
-    <p className="mt-1 flex items-center gap-1 text-xs text-status-error">
+    <p role="alert" id={id} className={`mt-1.5 flex items-center gap-1.5 text-xs text-status-error-text ${className}`}>
       <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
-      {error}
+      <span>{error}</span>
     </p>
   );
 };
