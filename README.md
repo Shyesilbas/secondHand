@@ -4,7 +4,7 @@ An enterprise-grade, high-concurrency C2C second-hand marketplace platform featu
 
 ---
 
-## ⚡ Tech Stack
+## Tech Stack
 
 | Layer | Technologies |
 | :--- | :--- |
@@ -16,11 +16,11 @@ An enterprise-grade, high-concurrency C2C second-hand marketplace platform featu
 | **AI & External** | Google Gemini API (Aura AI), Cloudinary CDN, ExchangeRate-API, Google OAuth2 |
 | **Observability** | Spring Boot Actuator, Prometheus Metrics endpoint (`/actuator/prometheus`) |
 
-> 🤖 **AI Agents & Contributors:** Start with [`AGENTS.md`](AGENTS.md) for cross-cutting standards, testing rules, and skill mappings.
+> **AI Agents & Contributors:** Start with [`AGENTS.md`](AGENTS.md) for cross-cutting standards, testing rules, and skill mappings.
 
 ---
 
-## 🏛️ Architecture Overview
+## Architecture Overview
 
 The backend uses a layered, hexagonal-inspired architecture with Transactional Outbox workers ensuring guaranteed at-least-once event delivery and strictly idempotent Kafka consumers.
 
@@ -70,7 +70,7 @@ flowchart TD
 
 ---
 
-## 🗺️ Domain & Directory Map
+## Domain & Directory Map
 
 Each backend module has a dedicated `README.md` defining its business invariants, state machines, and public APIs. Most modules correspond directly to a directory under `secondhand-frontend/src/`.
 
@@ -84,11 +84,11 @@ Each backend module has a dedicated `README.md` defining its business invariants
 | **AI Assistant** | `ai` | `src/ai` | "Aura" intelligent assistant: multi-vertical semantic search planning via Gemini API, live price gauge advisor benchmarked against real DB stats, user memory, and listing generator. |
 | **Core & Platform** | `core`, `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `src/admin`, `src/audit`, `src/agreements`, `src/dashboard`, `src/comparison` | Central `ResultResponses` envelope, dynamic `@PublicEndpoint` registry, Redis rate limiting, audit logging, legal terms consent, carrier adapters (`CargoProviderPort`), and currency conversion. |
 
-> 📚 **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md).
+> **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md).
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **JDK 17** & **Maven 3.9+**
@@ -119,7 +119,7 @@ Run the automated bootstrap script to spin up Docker services, compile the backe
 
 ---
 
-## 🛠️ Manual Startup & Seed Options
+## Manual Startup & Seed Options
 
 If you prefer running services independently:
 
@@ -149,7 +149,7 @@ Supported seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `r
 
 ---
 
-## 🔒 Security & Concurrency Highlights
+## Security & Concurrency Highlights
 
 - **Stateless Authentication:** Access tokens (15m) and Refresh tokens (7d) transmitted exclusively via `HttpOnly`, `SameSite=Strict`, `Secure` cookies. Token family tracking revokes stolen session trees immediately.
 - **CSRF & Rate Limiting:** Double-submit cookie pattern (`CsrfCookieFilter`). Distributed Redis Lua fixed-window limiter (`RateLimitingFilter`) guards public and sensitive auth endpoints against brute force and DDoS.
@@ -159,7 +159,7 @@ Supported seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `r
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 Unit tests use plain Mockito with zero Spring context startup overhead for sub-second feedback:
 
@@ -179,7 +179,7 @@ cd secondhand-frontend && npm run lint && npm run build
 
 ---
 
-## 🗄️ Database Migrations
+## Database Migrations
 
 Schema changes must strictly be performed by creating a new versioned migration file:
 `src/main/resources/db/migration/V<N>__description.sql`.
