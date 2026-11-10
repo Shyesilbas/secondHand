@@ -62,6 +62,12 @@ apiClient.interceptors.response.use(
 
  // Enrich error object - extract messages from backend
  if (errorData) {
+   if (!errorData.message && errorData.detail) {
+     errorData.message = errorData.detail;
+   }
+   if (!errorData.error && errorData.title) {
+     errorData.error = errorData.title;
+   }
  error.userMessage = errorData.detail || errorData.message || null;
  error.errorCode = errorData.errorCode || errorData.title || errorData.error || errorData.code;
  error.validationErrors = errorData.validationErrors ?? errorData.errors;

@@ -51,6 +51,13 @@ public class EmailController {
         return ResponseEntity.ok(emails);
     }
 
+    @PatchMapping("/read-all")
+    public ResponseEntity<Map<String, Object>> markAllAsRead(@AuthenticationPrincipal User currentUser) {
+        log.info("Marking all emails as read for user: {}", currentUser.getEmail());
+        int count = emailService.markAllAsRead(currentUser.getId());
+        return ResponseEntity.ok(Map.of("markedCount", count));
+    }
+
     @PatchMapping("/{id}/read")
     public ResponseEntity<EmailDto> markEmailAsRead(
             @PathVariable UUID id,

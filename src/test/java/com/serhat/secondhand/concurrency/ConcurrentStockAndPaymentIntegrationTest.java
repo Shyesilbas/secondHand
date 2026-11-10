@@ -56,10 +56,10 @@ import java.util.concurrent.atomic.AtomicInteger;
         "COOKIE_DOMAIN=localhost",
         "CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173",
         "RATE_LIMIT_ENABLED=false",
-        "RATE_LIMIT_AUTH=3",
-        "RATE_LIMIT_PAYMENT=3",
-        "RATE_LIMIT_GENERAL=10",
-        "RATE_LIMIT_AI=6",
+        "RATE_LIMIT_AUTH=20",
+        "RATE_LIMIT_PAYMENT=10",
+        "RATE_LIMIT_GENERAL=150",
+        "RATE_LIMIT_AI=15",
         "RATE_LIMIT_WINDOW=60"
 })
 @Slf4j

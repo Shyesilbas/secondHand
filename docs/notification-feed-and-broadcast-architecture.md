@@ -157,7 +157,7 @@ Broadcast için "toplam − okuduklarım" hesabı yapılır. Dikkat: kullanıcı
 | `payment` | `PaymentNotificationService` | Ödeme başarılı |
 | `follow` | `SellerFollowService`, `NewListingNotificationListener` | Takip edilen satıcıdan yeni ilan |
 | `favorite` | `FavoriteService` | İlan favorilendi |
-| `user` | `UserNotificationService`, `GreatSellerEligibilitySyncService` | Kullanıcı bildirimleri, Great Seller rozeti |
+| `user` | `UserNotificationService`, `GreatSellerEligibilitySyncService` | Kullanıcı bildirimleri, Great Seller badge'i |
 
 Başlık ve metinler [`NotificationTemplateCatalog`](../src/main/java/com/serhat/secondhand/notification/template/NotificationTemplateCatalog.java) içinden gelir.
 

@@ -12,6 +12,7 @@ import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import OtpDigitInputGroup from '../../payments/components/verification/OtpDigitInputGroup.jsx';
 import { AuthCard, AuthHeader } from '../components/AuthPrimitives.jsx';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 const RESEND_COOLDOWN_S = 60;
 
@@ -48,7 +49,7 @@ const AccountVerificationPage = () => {
       setCountdown(RESEND_COOLDOWN_S);
     } catch (err) {
       logger.error(err);
-      setError(err.response?.data?.message || t('auth_verify_send_failed', 'Kod gönderilemedi. Lütfen tekrar dene.'));
+      setError(getErrorMessage(err, t('auth_verify_send_failed', 'Kod gönderilemedi. Lütfen tekrar dene.')));
     } finally {
       setIsSending(false);
     }
@@ -68,7 +69,7 @@ const AccountVerificationPage = () => {
       notification.showSuccess(t('auth_verified_title', 'Hesabın doğrulandı'), t('auth_verified_text', 'Artık tüm özellikleri kullanabilirsin.'));
       navigate(ROUTES.PROFILE, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || t('auth_verify_failed', 'Kod doğrulanamadı. Kodu kontrol edip tekrar dene.'));
+      setError(getErrorMessage(err, t('auth_verify_failed', 'Kod doğrulanamadı. Kodu kontrol edip tekrar dene.')));
     } finally {
       setIsVerifying(false);
     }

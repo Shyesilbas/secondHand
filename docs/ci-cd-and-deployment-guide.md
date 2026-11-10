@@ -46,7 +46,7 @@ docker-compose up -d        # yalnızca altyapı
 | App | `FRONTEND_URL`, `COOKIE_DOMAIN`, `CORS_ALLOWED_ORIGINS` |
 | Rate limit | `RATE_LIMIT_ENABLED`, `RATE_LIMIT_AUTH`, `RATE_LIMIT_PAYMENT`, `RATE_LIMIT_GENERAL`, `RATE_LIMIT_AI`, `RATE_LIMIT_WINDOW` |
 
-Rate limit varsayılanları ([`application-app.yml`](../src/main/resources/config/application-app.yml)): auth 3, payment 3, general 10, ai 6 istek/saniye; pencere 60 sn. Template'te olmayan ama config'te okunanlar: `COOKIE_SECURE` (varsayılan `false`), `COOKIE_SAME_SITE` (`Lax`), `CORS_ALLOW_CREDENTIALS` (`true`), `RATE_LIMIT_TRUSTED_PROXIES`, `MANAGEMENT_SERVER_PORT` (prod, `9090`).
+Rate limit varsayılanları ([`application-app.yml`](../src/main/resources/config/application-app.yml)): payment 10, auth 20, ai 15, general 150 istek / 60 sn; pencere 60 sn. Template'te olmayan ama config'te okunanlar: `COOKIE_SECURE` (varsayılan `false`), `COOKIE_SAME_SITE` (`Lax`), `CORS_ALLOW_CREDENTIALS` (`true`), `RATE_LIMIT_TRUSTED_PROXIES`, `MANAGEMENT_SERVER_PORT` (prod, `9090`).
 
 ---
 

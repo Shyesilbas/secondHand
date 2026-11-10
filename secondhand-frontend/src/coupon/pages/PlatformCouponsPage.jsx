@@ -65,6 +65,7 @@ const PlatformCouponsPage = () => {
  queryKey: ['coupons', 'redemptions'],
  queryFn: () => couponService.redemptions(),
  select: d => Array.isArray(d) ? d : [],
+ enabled: tab === TABS.PARTICIPATED,
  staleTime: 30_000
  });
  const isFetching = tab === TABS.ACTIVE ? activeQ.isFetching : participationsQ.isFetching;

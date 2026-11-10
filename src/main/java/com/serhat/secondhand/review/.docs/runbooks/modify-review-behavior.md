@@ -20,7 +20,7 @@ Execution steps for adding new review fields, changing validation logic, or upda
 1. If adding statistical fields, modify the `ReviewStatsProjection` and `ListingReviewStatsProjection` interfaces first.
 2. Update `ReviewRepository` aggregate queries to match the projection changes.
 3. If changing creation rules, apply validations in `ReviewValidator`. Do not skip ownership or delivered status checks.
-4. For caching: the batch cache key is a sorted list of IDs. Ensure `ReviewService.createReview` correctly evicts the cache for the specific listing.
+4. For caching: listing review statistics are cached in `user:stats:reviews` using a sorted list of IDs. Ensure `ReviewService.createReview` correctly evicts this cache (`@CacheEvict(value = "user:stats:reviews", allEntries = true)`).
 
 ## Pitfalls
 - Breaking `EntityGraph` hints during DTO mapping, resulting in N+1 lazy loading issues.

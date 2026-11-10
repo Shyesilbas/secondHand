@@ -51,6 +51,7 @@ const OffersPage = () => {
  } = useQuery({
  queryKey: ['offers', 'made', madePage, size],
  queryFn: () => offerService.listMade(madePage, size),
+ enabled: activeTab === OFFER_TABS.MADE,
  });
 
  // 2. Fetch received offers
@@ -61,6 +62,7 @@ const OffersPage = () => {
  } = useQuery({
  queryKey: ['offers', 'received', receivedPage, size],
  queryFn: () => offerService.listReceived(receivedPage, size),
+ enabled: activeTab === OFFER_TABS.RECEIVED,
  });
 
  const made = useMemo(() => madeResponse?.content || [], [madeResponse]);

@@ -9,6 +9,7 @@ import { validateRegisterForm } from '../utils/registerValidator.js';
 import { useGenderEnum } from '../../common/hooks/useGenderEnum.js';
 import { formatPhoneNumber } from '../../common/utils/phoneFormatter.js';
 import { formatBirthdateInput } from '../../common/utils/dateFormat.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 export const useRegisterForm = () => {
     const { t } = useTranslation();
@@ -65,7 +66,7 @@ export const useRegisterForm = () => {
             navigate(ROUTES.LOGIN, { state: { message: t('account_created_login_hint', 'Hesabın oluşturuldu. Şimdi e-posta ve şifrenle giriş yapabilirsin.') } });
             return true;
         } catch (error) {
-            setErrors({ submit: error.response?.data?.message || t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.') });
+            setErrors({ submit: getErrorMessage(error, t('registration_failed_retry', 'Kayıt tamamlanamadı. Lütfen tekrar dene.')) });
             return false;
         } finally {
             setIsLoading(false);

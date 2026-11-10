@@ -15,5 +15,5 @@ The `cloudinary` domain manages external cloud image storage, CDN delivery, file
 - **Public ID Extraction:** Deleting an image parses the public ID from the stored URL and invokes Cloudinary's destroy API to prevent orphaned assets.
 
 ## Public APIs
-- `POST /api/images/upload`: Uploads a `MultipartFile` and returns `{ "url": "https://res.cloudinary.com/..." }`.
-- `DELETE /api/images/delete`: Accepts `{ "imageUrl": "..." }` and cleans up the remote asset.
+- `POST /api/v1/images/upload`: Uploads an image file and returns `{ "url": "https://res.cloudinary.com/..." }`.
+- `DELETE /api/v1/images/delete`: Accepts `{ "imageUrl": "..." }` and cleans up the remote asset.

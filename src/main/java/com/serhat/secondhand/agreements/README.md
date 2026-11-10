@@ -18,11 +18,18 @@ The `agreements` domain manages legal texts, platform terms, mandatory user cons
 - **Acceptance Status:** Unaccepted -> Accepted (specific version).
 
 ## Integration Points
-- **Incoming:** Initialized via application startup configurations.
+- **Incoming:** Initialized via application startup configurations. HTTP requests via `AgreementController`.
 - **Outgoing:** Sends broadcast emails via `email` domain when versions are bumped.
 
 ## Public APIs
-- Standard Acceptance Endpoints, Initialization endpoints.
+- `GET /api/v1/agreements`: Lists all platform agreements.
+- `POST /api/v1/agreements/initialize`: Seeds and initializes system agreements.
+- `GET /api/v1/agreements/required`: Lists required agreements for the caller's user group.
+- `GET /api/v1/agreements/{agreement-type}`: Retrieves current active text for an agreement type.
+- `POST /api/v1/agreements/accept`: Accepts a specific version of an agreement.
+- `GET /api/v1/agreements/user/agreements`: Current user's agreement acceptance list.
+- `GET /api/v1/agreements/user/status/{agreement-type}`: Verifies if user has accepted the latest version of an agreement.
+- `GET /api/v1/agreements/user/acceptance-history/{agreement-id}`: Historical acceptance audit logs for an agreement.
 
 ## Related Knowledge
 - **Modify Agreement Rules**

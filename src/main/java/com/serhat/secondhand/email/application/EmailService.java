@@ -66,6 +66,14 @@ public class EmailService {
     }
 
     @CacheEvict(value = "user:badges", key = "#userId")
+    public int markAllAsRead(Long userId) {
+        log.info("Marking all emails as read for userId: {}", userId);
+        int affected = emailRepository.markAllRead(userId, LocalDateTime.now());
+        log.info("Marked {} emails as read for userId: {}", affected, userId);
+        return affected;
+    }
+
+    @CacheEvict(value = "user:badges", key = "#userId")
     public EmailDto markAsRead(UUID emailId, Long userId, String userEmail) {
         Email email = emailRepository.findByIdAndRecipientEmail(emailId, userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found or unauthorized"));

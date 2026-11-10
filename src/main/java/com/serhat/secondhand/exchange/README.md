@@ -13,4 +13,4 @@ The `exchange` domain provides multi-currency conversion rates between TRY, USD,
 - **Resilience:** If the remote exchange rate provider is unavailable, a cached entry is used if available; otherwise a structured `EXCHANGE_SERVICE_UNAVAILABLE` business exception is returned rather than hanging user transactions.
 
 ## Public APIs
-- `GET /api/v1/exchange-rate?from={base}&to={target}`: Returns `{ "from": "USD", "to": "TRY", "rate": 34.25 }`.
+- `GET /api/v1/exchange-rates/{from}/{to}`: Returns exchange rate between two currencies (e.g. `/api/v1/exchange-rates/USD/TRY`).

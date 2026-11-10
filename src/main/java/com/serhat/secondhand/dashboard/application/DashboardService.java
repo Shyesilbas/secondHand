@@ -13,6 +13,7 @@ import com.serhat.secondhand.review.dto.ReviewStatsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,11 @@ public class DashboardService implements IDashboardService {
     @Qualifier("taskExecutor")
     private final Executor taskExecutor;
 
+    @Cacheable(
+            value = "dashboard:seller",
+            key = "#sellerId + ':' + (#startDate != null ? #startDate.toLocalDate() : 'null') + ':' + (#endDate != null ? #endDate.toLocalDate() : 'null')",
+            unless = "#result == null"
+    )
     public SellerDashboardDto getSellerDashboard(Long sellerId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Async Seller Dashboard starts: {}", sellerId);
 
@@ -179,6 +185,11 @@ public class DashboardService implements IDashboardService {
                 .build();
     }
 
+    @Cacheable(
+            value = "dashboard:buyer",
+            key = "#buyerId + ':' + (#startDate != null ? #startDate.toLocalDate() : 'null') + ':' + (#endDate != null ? #endDate.toLocalDate() : 'null')",
+            unless = "#result == null"
+    )
     public BuyerDashboardDto getBuyerDashboard(Long buyerId, LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Async Buyer Dashboard starts: {}", buyerId);
 

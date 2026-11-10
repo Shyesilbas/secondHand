@@ -145,7 +145,7 @@ export const handleError = (error, showError, options = {}) => {
  logger.error('Error notification failed:', e);
  }
  } else if (typeof showError === 'function') {
- showError(messageToShow);
+ showError(titleToShow, messageToShow);
  }
 
  return parsedError;

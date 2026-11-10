@@ -16,10 +16,10 @@ The `notification` domain delivers real-time transactional alerts, system-wide b
 
 ## Integration Points
 - **Incoming:** Domain events consumed via `NotificationDispatchRequestedEventListener` and `NotificationBroadcastRequestedEvent`.
-- **Outgoing:** STOMP WebSocket messages dispatched via Spring's `SimpMessagingTemplate`.
+- **Outgoing:** STOMP WebSocket messages dispatched via Spring's messaging template.
 
 ## Public APIs
-- `GET /api/v1/notifications?page&size&unreadOnly`: Paginated feed of combined personal and broadcast notifications, newest first; `unreadOnly=true` keeps unread personal rows and broadcast events without a read record.
-- `GET /api/v1/notifications/unread-count`: Combined count of unread personal and unread broadcast messages.
-- `PUT /api/v1/notifications/{id}/read`: Marks a single notification or broadcast event as read.
-- `PUT /api/v1/notifications/mark-all-read`: Marks all pending notifications as read for the authenticated user.
+- `GET /api/v1/notifications?page&size&unreadOnly`: Paginated feed of combined personal and broadcast notifications, newest first; `unreadOnly=true` filters for unread messages.
+- `GET /api/v1/notifications/unread-count`: Combined count of unread personal and broadcast notifications.
+- `PUT /api/v1/notifications/{id}/read`: Marks a single notification as read.
+- `PUT /api/v1/notifications/read-all`: Marks all notifications as read for the authenticated user.

@@ -1,14 +1,15 @@
 # Order Domain
 
 ## Purpose
-The `order` domain manages the end-to-end lifecycle of a purchase: order creation, state progression, completion, cancellation, refund, and escrow resolution.
+The `order` domain manages the end-to-end lifecycle of a purchase: order creation, state progression, completion, cancellation, refund, and escrow resolution across both cargo delivery and safe in-person meetup flows.
 
 ## Architecture Overview
 - **Rich Domain Model:** The `Order` entity centralizes core state transition logic.
 - **Policy Engine:** `policy` classes govern the validity of state transitions (e.g., is this order eligible for cancellation?).
-- **Service Orchestration:** Application services (`OrderCreationService`, `OrderModificationService`) execute policies and coordinate repositories.
-- **Automated Progression:** `OrderCompletionScheduler` automatically advances order states based on time thresholds.
+- **Service Orchestration:** Application services (`OrderCreationService`, `OrderModificationService`, `OrderCancellationService`, `OrderRefundService`) execute policies and coordinate repositories.
+- **Automated Progression:** `OrderCompletionScheduler` automatically advances order states based on time thresholds (e.g. ship deadline, auto-completion).
 - **AOP Logging:** `OrderLogAspect` intercepts and logs all API requests and mutations.
+- **Transactional Outbox:** Dispatches post-commit events reliably using `OrderOutboxWorker` to Kafka topics.
 
 ## Business Invariants & Constraints
 - **Policy Centricity:** Invalid state transitions must be rejected by policy rules, not by service-level checks.
@@ -43,14 +44,37 @@ stateDiagram-v2
 ```
 Authoritative rules: `Order` entity methods, `OrderStatus` (cancellable / refundable / completable sets), the `policy` classes and `OrderCompletionScheduler`. Safe Meetup details: `docs/safe-meetup-delivery-and-verification.md`.
 
-## List API
-- `GET /api/v1/orders` (buyer) and `GET /api/v1/orders/seller` take optional `deliveryMethod`, `statuses` (comma-separated `OrderStatus`, unknown value -> 400) and `orderNumber` (exact match). Filters are bundled in `OrderListFilter`; no status filter means every status.
-- `GET /api/v1/orders/status-counts` and `/orders/seller/status-counts` return `[{status, count}]` for the same scope (used for list tab badges).
+## Outbox Tables & Events
+- `order_outbox_events`: Dispatched by `OrderOutboxWorker` (every 5s).
+  - `ORDER_CANCELLED` -> `order.cancelled.v1`
+  - `ORDER_REFUNDED` -> `order.refunded.v1`
 
 ## Integration Points
-- **Incoming:** Checkout Domain (triggers order creation).
+- **Incoming:** Checkout Domain (triggers order creation via `OrderCreationService`).
 - **Outgoing:** Payment Domain (called for escrow release/refund execution), Shipping Domain (called for tracking updates).
-- **Events:** Publishes `OrderCancelledEvent`, `OrderRefundedEvent`, etc.
+- **Events:** Publishes `OrderCancelledEvent`, `OrderRefundedEvent` (both Spring ApplicationEvents and transactional outbox Kafka events).
+
+## Public APIs
+- `POST /api/v1/orders/checkout`: Place an order, creates child items, holds escrow, and publishes outbox events.
+- `GET /api/v1/orders`: Fetches paginated orders for the authenticated buyer (supports `deliveryMethod`, `statuses`, `orderNumber`).
+- `GET /api/v1/orders/status-counts`: Status counts for buyer order tabs.
+- `GET /api/v1/orders/{order-id}`: Fetches detailed buyer order information.
+- `GET /api/v1/orders/seller`: Fetches paginated orders for the authenticated seller.
+- `GET /api/v1/orders/seller/status-counts`: Status counts for seller order tabs.
+- `GET /api/v1/orders/seller/{order-id}`: Fetches detailed seller order information.
+- `GET /api/v1/orders/seller/pending-escrow-amount`: Aggregates total pending escrow funds for seller.
+- `GET /api/v1/orders/pending-completion`: Returns delivered orders approaching completion window.
+- `GET /api/v1/orders/items/{order-item-id}/review`: Fetches review associated with a specific order item.
+- `PUT /api/v1/orders/{order-id}/cancel`: Request cancellation.
+- `POST /api/v1/orders/{order-id}/refund`: Request refund.
+- `PUT /api/v1/orders/{order-id}/complete`: Confirms delivery and triggers escrow fund release.
+- `PUT /api/v1/orders/{order-id}/ship`: Seller assigns carrier and tracking number.
+- `PUT /api/v1/orders/{order-id}/name`: Updates delivery recipient name.
+- `PUT /api/v1/orders/{order-id}/address`: Updates delivery address.
+- `PUT /api/v1/orders/{order-id}/notes`: Updates order notes.
+- `POST /api/v1/orders/{order-number}/verify-meetup`: Verifies OTP / QR code during in-person delivery.
+- `POST /api/v1/orders/{order-number}/confirm-handover-completion`: Confirms completion of in-person handover.
+- `POST /api/v1/orders/{order-number}/regenerate-meetup-code`: Regenerates a new verification code for meetup delivery.
 
 ## Related Knowledge
 - **Modify State Rule**

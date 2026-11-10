@@ -34,10 +34,6 @@ const ShoppingCartPage = () => {
     isAuthenticated
   } = useAuthState();
   const {
-    favorites = [],
-    isLoading: favoritesLoading
-  } = useFavorites(0, 8);
-  const {
     cartItems,
     cartCount,
     isLoading,
@@ -48,6 +44,10 @@ const ShoppingCartPage = () => {
     isRemovingFromCart,
     isClearingCart
   } = useCart();
+  const {
+    favorites = [],
+    isLoading: favoritesLoading
+  } = useFavorites(0, 8, { enabled: Boolean(isAuthenticated && cartItems.length === 0) });
   const sellerIds = useMemo(() => {
     return [...new Set(cartItems.map(item => item.listing.sellerId))];
   }, [cartItems]);
@@ -71,6 +71,8 @@ const ShoppingCartPage = () => {
       let couponSuccess = true;
       let couponErr = null;
 
+      const campaignsPromise = campaignService.listBySellers(sellerIds).catch(() => ({ data: [] }));
+
       try {
         pricingRes = await couponService.preview(requested);
       } catch (e) {
@@ -83,7 +85,7 @@ const ShoppingCartPage = () => {
         }
       }
 
-      const campaignsRes = await campaignService.listBySellers(sellerIds).catch(() => ({ data: [] }));
+      const campaignsRes = await campaignsPromise;
 
       return {
         pricing: pricingRes?.data || pricingRes,

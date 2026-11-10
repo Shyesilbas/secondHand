@@ -16,7 +16,7 @@ Detailed documentation of the internal execution paths and data flows for listin
 
 ## Procedure (Data Flows)
 
-### 1. İlan Oluşturma Akışı
+### 1. Listing Creation Flow
 `Client Request` -> `Controller` -> `Service` -> `AbstractListingService.createListing()` [Template Method]
 - `userService.findById()`
 - `mapRequestToEntity()`
@@ -24,19 +24,19 @@ Detailed documentation of the internal execution paths and data flows for listin
 - `validate()` (ListingValidationEngine)
 - `save()`
 
-### 2. İlan Yayınlama Akışı
+### 2. Listing Publishing Flow
 `ListingController` -> `ListingCommandService.publish()` -> `Listing.publish()` [Rich Domain] -> `ListingRepository.save()` -> `ApplicationEventPublisher` -> `Follow Module Listener`
 
-### 3. İlan Arama ve Filtreleme
+### 3. Listing Search and Filtering
 - Global Search uses `ListingSearchService.globalSearch()` with JPA Criteria database-level token filtering (`title`, `description`, `listingNo` backed by `pg_trgm` GIN indexes; tokens shorter than 2 chars are dropped, 2-char tokens are matched but cannot use the trigram index), deterministic `ORDER BY createdAt DESC, id DESC`, DB pagination, and N+1 prevention (`LEFT JOIN FETCH seller`). The search transaction sets `plan_cache_mode = force_custom_plan` (transaction-local) because PostgreSQL's generic plan for the prepared statement ignores the LIKE pattern and skips the trigram indexes.
 - Category filtering uses `GenericListingFilterService.filter()` with JPA Criteria API and dynamic fetching.
 - Enrichment runs asynchronously via `CompletableFuture` to fetch reviews, campaigns, and favorites.
 
-### 4. Görüntülenme Takibi Akışı
+### 4. View Tracking Flow
 `ListingViewController` -> `ListingViewService.trackView()` [@Async]
 - IP hashing, duplicate control (1-hour window), async save.
 
-### 5. Fiyat Güncelleme Akışı (AOP)
+### 5. Price Update Flow (AOP)
 Controller -> Service -> `@TrackPriceChange` -> Repository.save() -> `PriceHistoryAspect.recordPriceChange()` -> Notification logic.
 
 ## Pitfalls

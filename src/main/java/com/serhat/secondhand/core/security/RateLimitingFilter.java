@@ -24,8 +24,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Per-IP, per-category request limit. Counters live in Redis (fixed window), so every instance shares them.
- * If Redis cannot be reached the request is rejected with 503 instead of passing unlimited.
+ * Per-IP, per-category request limit. Counters live in Redis (fixed window), so
+ * every instance shares them.
+ * If Redis cannot be reached the request is rejected with 503 instead of
+ * passing unlimited.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -47,10 +49,13 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         windowScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("scripts/rate_limit_window.lua")));
         windowScript.setResultType(Long.class);
 
-        log.info("RateLimitingFilter initialized - Enabled: {}, Auth: {}/s, Payment: {}/s, General: {}/s, Window: {}s",
-                rateLimitConfig.isEnabled(), rateLimitConfig.getAuth().getRequestsPerSecond(),
-                rateLimitConfig.getPayment().getRequestsPerSecond(), rateLimitConfig.getGeneral().getRequestsPerSecond(),
-                rateLimitConfig.getWindowSizeSeconds());
+        log.info(
+                "RateLimitingFilter initialized - Enabled: {}, Auth: {}/{}s, Payment: {}/{}s, AI: {}/{}s, General: {}/{}s",
+                rateLimitConfig.isEnabled(),
+                Category.AUTH.resolveLimit(rateLimitConfig), rateLimitConfig.getWindowSizeSeconds(),
+                Category.PAYMENT.resolveLimit(rateLimitConfig), rateLimitConfig.getWindowSizeSeconds(),
+                Category.AI.resolveLimit(rateLimitConfig), rateLimitConfig.getWindowSizeSeconds(),
+                Category.GENERAL.resolveLimit(rateLimitConfig), rateLimitConfig.getWindowSizeSeconds());
     }
 
     @Override
@@ -82,9 +87,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         Category category = categorize(requestURI);
 
-        int requestsPerSecond = category.requestsPerSecond(rateLimitConfig);
         int windowSeconds = rateLimitConfig.getWindowSizeSeconds();
-        int maxRequestsPerWindow = requestsPerSecond * windowSeconds;
+        int maxRequestsPerWindow = category.resolveLimit(rateLimitConfig);
 
         long windowMillis = windowSeconds * 1000L;
         long now = System.currentTimeMillis();
@@ -101,7 +105,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             count = result;
         } catch (DataAccessException | IllegalStateException e) {
             log.error("Rate limiter unavailable, rejecting request - URI: {}, error: {}", requestURI, e.getMessage());
-            writeError(response, 503, "Service Unavailable", "Rate limiter is unavailable. Please retry shortly.", requestURI, null);
+            writeError(response, 503, "Service Unavailable", "Rate limiter is unavailable. Please retry shortly.",
+                    requestURI, null);
             return;
         }
 
@@ -112,10 +117,12 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             response.setHeader("X-RateLimit-Reset", String.valueOf(resetAt));
             response.setHeader("Retry-After", String.valueOf(retryAfterSeconds));
             writeError(response, 429, "Too Many Requests",
-                    String.format("Rate limit exceeded. Maximum %d requests per %d seconds allowed for this endpoint type.",
+                    String.format(
+                            "Rate limit exceeded. Maximum %d requests per %d seconds allowed for this endpoint type.",
                             maxRequestsPerWindow, windowSeconds),
                     requestURI, retryAfterSeconds);
-            log.warn("Rate limit exceeded - IP: {}, URI: {}, Limit: {}/{}s", clientIp, requestURI, maxRequestsPerWindow, windowSeconds);
+            log.warn("Rate limit exceeded - IP: {}, URI: {}, Limit: {}/{}s", clientIp, requestURI, maxRequestsPerWindow,
+                    windowSeconds);
             return;
         }
 
@@ -144,7 +151,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private void writeError(HttpServletResponse response, int status, String error, String message,
-                            String path, Long retryAfterSeconds) throws IOException {
+            String path, Long retryAfterSeconds) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json;charset=UTF-8");
         String retry = retryAfterSeconds == null ? "" : ",\n    \"retryAfter\": " + retryAfterSeconds;
@@ -180,13 +187,18 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             this.name = name;
         }
 
-        int requestsPerSecond(RateLimitConfig config) {
+        int resolveLimit(RateLimitConfig config) {
+            int window = config.getWindowSizeSeconds();
             return switch (this) {
-                case AUTH -> config.getAuth().getRequestsPerSecond();
-                case AI -> config.getAi().getRequestsPerSecond();
-                case PAYMENT -> config.getPayment().getRequestsPerSecond();
-                case GENERAL -> config.getGeneral().getRequestsPerSecond();
+                case AUTH -> config.getAuth().resolveLimit(window, 20);
+                case AI -> config.getAi().resolveLimit(window, 15);
+                case PAYMENT -> config.getPayment().resolveLimit(window, 10);
+                case GENERAL -> config.getGeneral().resolveLimit(window, 150);
             };
+        }
+
+        int requestsPerSecond(RateLimitConfig config) {
+            return resolveLimit(config);
         }
     }
 }

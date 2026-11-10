@@ -14,11 +14,16 @@ The `follow` domain enables buyers to follow favorite sellers, customize new-lis
 - **Soft Delete Re-activation:** If a previously unfollowed relationship is re-established, the existing record is restored with `deleted_at = null`.
 
 ## Integration Points
-- **Incoming:** `NewListingNotificationListener` handles `NewListingCreatedEvent` from the `listing` domain (`AFTER_COMMIT`, async).
+- **Incoming:** `NewListingNotificationListener` handles `NewListingCreatedEvent` from the `listing` domain (`AFTER_COMMIT`, async). HTTP requests via `SellerFollowController`.
 - **Outgoing:** Dispatches `NotificationDispatchRequestedEvent` to the `notification` domain for active followers.
 
 ## Public APIs
-- `POST /api/v1/follows/{sellerId}`: Follows a seller with configurable notification preferences.
-- `DELETE /api/v1/follows/{sellerId}`: Unfollows a seller (soft delete).
+- `POST /api/v1/follows/{user-id}`: Follows a seller.
+- `DELETE /api/v1/follows/{user-id}`: Unfollows a seller (soft delete).
+- `PATCH /api/v1/follows/{user-id}/notifications`: Toggles notification preference for followed seller.
 - `GET /api/v1/follows/following`: Paginated list of sellers followed by the current user.
-- `GET /api/v1/follows/followers/{sellerId}`: Follower count and public stats for a seller profile.
+- `GET /api/v1/follows/followers`: Paginated list of followers of the authenticated user.
+- `GET /api/v1/follows/stats/{user-id}`: Follower and following count statistics for a profile.
+- `GET /api/v1/follows/check/{user-id}`: Checks if current user is following the target seller.
+- `GET /api/v1/follows/user/{user-id}/followers`: Paginated public followers of a user.
+- `GET /api/v1/follows/user/{user-id}/following`: Paginated public followings of a user.

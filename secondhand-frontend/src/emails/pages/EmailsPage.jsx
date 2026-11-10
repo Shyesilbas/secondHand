@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft as ArrowLeftIcon,
   Bell,
+  CheckCheck,
   ChevronLeft,
   ChevronRight,
   CreditCard,
@@ -158,6 +159,7 @@ const EmailsPage = ({ embedded = false }) => {
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [filterType, setFilterType] = useState(EMAIL_FILTERS.ALL);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(EMAIL_DEFAULTS.PAGE);
   const pageSize = EMAIL_DEFAULTS.PAGE_SIZE;
@@ -251,6 +253,37 @@ const EmailsPage = ({ embedded = false }) => {
       }
     });
 
+  const handleMarkAllAsRead = useCallback(async () => {
+    const hasUnread = (globalUnreadCount > 0) || filteredEmails.some((e) => !e.read && !e.isRead);
+    if (!hasUnread) return;
+
+    try {
+      setIsMarkingAllRead(true);
+      queryClient.setQueryData(['emails', 'my', user?.id, page, filterType], (oldData) => {
+        if (!oldData || !oldData.content) return oldData;
+        return {
+          ...oldData,
+          content: oldData.content.map((e) => ({ ...e, isRead: true, read: true }))
+        };
+      });
+      setSelectedEmail((prev) => (prev ? { ...prev, isRead: true, read: true } : prev));
+      queryClient.setQueryData(['badgeCounts', user?.id], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          emailCount: 0
+        };
+      });
+      await emailService.markAllAsRead();
+    } catch (err) {
+      handleError(err, notification.showError);
+      queryClient.invalidateQueries({ queryKey: ['emails', 'my', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['badgeCounts', user?.id] });
+    } finally {
+      setIsMarkingAllRead(false);
+    }
+  }, [globalUnreadCount, filteredEmails, queryClient, user?.id, page, filterType, notification]);
+
   const filteredEmails = useMemo(() => {
     if (!searchTerm || !searchTerm.trim()) return emails;
     const q = searchTerm.toLowerCase().trim();
@@ -307,7 +340,13 @@ const EmailsPage = ({ embedded = false }) => {
 
         try {
           await emailService.markAsRead(email.id);
-          queryClient.invalidateQueries({ queryKey: ['badgeCounts', user?.id] });
+          queryClient.setQueryData(['badgeCounts', user?.id], (old) => {
+            if (!old) return old;
+            return {
+              ...old,
+              emailCount: Math.max(0, (old.emailCount || 1) - 1)
+            };
+          });
         } catch (err) {
           console.error('Error marking email as read', err);
         }
@@ -474,6 +513,16 @@ const EmailsPage = ({ embedded = false }) => {
               aria-label={t('refresh', 'Yenile')}
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} strokeWidth={1.5} />
+            </button>
+            <button
+              type="button"
+              onClick={handleMarkAllAsRead}
+              disabled={isMarkingAllRead || (globalUnreadCount === 0 && !filteredEmails.some((e) => !e.read && !e.isRead))}
+              className="rounded p-1.5 text-text-secondary transition-colors hover:bg-background-secondary hover:text-text-primary disabled:opacity-30"
+              title={t('mark_all_read', 'Tümünü Okundu İşaretle')}
+              aria-label={t('mark_all_read', 'Tümünü Okundu İşaretle')}
+            >
+              <CheckCheck className={`h-3.5 w-3.5 ${isMarkingAllRead ? 'animate-pulse' : ''}`} strokeWidth={1.5} />
             </button>
             <button
               type="button"

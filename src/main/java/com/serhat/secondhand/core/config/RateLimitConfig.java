@@ -14,10 +14,10 @@ import java.util.List;
 @Setter
 public class RateLimitConfig {
     private boolean enabled = true;
-    private Auth auth = new Auth();
-    private Payment payment = new Payment();
-    private General general = new General();
-    private Ai ai = new Ai();
+    private Limit auth = new Limit(20);
+    private Limit payment = new Limit(10);
+    private Limit general = new Limit(150);
+    private Limit ai = new Limit(15);
     private int windowSizeSeconds = 60;
     private boolean trustForwardedHeaders = true;
     /** Direct peers (CIDR) whose X-Forwarded-For / X-Real-IP headers are believed: loopback and private ranges. */
@@ -26,25 +26,34 @@ public class RateLimitConfig {
 
     @Getter
     @Setter
-    public static class Auth {
-        private int requestsPerSecond = 3;
-    }
+    public static class Limit {
+        /** Explicit request limit per window (e.g. 10 requests per 60s). */
+        private Integer limit;
+        /** Optional legacy / fallback: requests per second. */
+        private Integer requestsPerSecond;
 
-    @Getter
-    @Setter
-    public static class Payment {
-        private int requestsPerSecond = 3;
-    }
+        public Limit() {
+        }
 
-    @Getter
-    @Setter
-    public static class General {
-        private int requestsPerSecond = 10;
-    }
+        public Limit(int defaultLimit) {
+            this.limit = defaultLimit;
+        }
 
-    @Getter
-    @Setter
-    public static class Ai {
-        private int requestsPerSecond = 6;
+        public int resolveLimit(int windowSeconds, int defaultLimit) {
+            if (limit != null && limit > 0) {
+                return limit;
+            }
+            if (requestsPerSecond != null && requestsPerSecond > 0) {
+                return requestsPerSecond * windowSeconds;
+            }
+            return defaultLimit;
+        }
+
+        public int getRequestsPerSecond() {
+            if (requestsPerSecond != null && requestsPerSecond > 0) {
+                return requestsPerSecond;
+            }
+            return limit != null ? limit : 0;
+        }
     }
 }

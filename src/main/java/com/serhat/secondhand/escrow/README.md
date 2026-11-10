@@ -28,3 +28,6 @@ stateDiagram-v2
 - **Outgoing:** Produces `escrow.released.v1` Kafka events via `EscrowOutboxWorker`. Consumed by `EscrowKafkaConsumer`.
 - **Outbox Table:** `escrow_outbox_events`
 
+## Related Knowledge
+- **Modify Escrow Behavior**
+  -> `.docs/runbooks/modify-escrow-behavior.md`

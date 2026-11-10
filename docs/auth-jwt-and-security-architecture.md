@@ -193,6 +193,8 @@ Kimliksiz bir `/api/` isteği 401 JSON (`{"error":"UNAUTHORIZED", ...}`), yetkis
 
 ## 7. Rate limiting
 
+Ayrıntılı analiz, CIDR IP sahtecilik koruması, iki aşamalı login kilitleri ve Fail-Closed sözleşmesi: [rate-limiting-and-throttling-architecture.md](rate-limiting-and-throttling-architecture.md).
+
 [`RateLimitingFilter`](../src/main/java/com/serhat/secondhand/core/security/RateLimitingFilter.java) IP ve kategori bazında **fixed window** sayaç tutar. Sayaç Redis'tedir, tüm instance'lar paylaşır.
 
 ```java
@@ -212,12 +214,12 @@ end
 return count
 ```
 
-| Kategori | Path | Varsayılan (`istek/sn × pencere`) | 60 sn'lik pencerede |
+| Kategori | Path | Varsayılan | 60 sn'lik pencerede |
 | :--- | :--- | :--- | :--- |
-| `auth` | `/api/auth/`, `/api/v1/auth/` | 3 × 60 | 180 |
-| `payment` | `/api/payment`, `/api/v1/payments` | 3 × 60 | 180 |
-| `ai` | `/api/ai/`, `/api/v1/ai/` | 6 × 60 | 360 |
-| `general` | diğer her şey | 10 × 60 | 600 |
+| `payment` | `/api/payment`, `/api/v1/payments` | `RATE_LIMIT_PAYMENT` | 10 |
+| `auth` | `/api/auth/`, `/api/v1/auth/` | `RATE_LIMIT_AUTH` | 20 |
+| `ai` | `/api/ai/`, `/api/v1/ai/` | `RATE_LIMIT_AI` | 15 |
+| `general` | diğer her şey | `RATE_LIMIT_GENERAL` | 150 |
 
 - Limit aşılınca 429 döner; `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` header'ları yazılır.
 - **Redis'e ulaşılamazsa istek 503 ile reddedilir**; limitsiz geçirilmez.

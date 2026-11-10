@@ -50,6 +50,14 @@ export const emailService = {
  throw error;
  }
  },
+ markAllAsRead: async () => {
+ try {
+ return await patch(API_ENDPOINTS.EMAILS.MARK_ALL_READ);
+ } catch (error) {
+ logger.error('Error marking all emails as read:', error);
+ throw error;
+ }
+ },
  deleteEmail: async(emailId) => del(API_ENDPOINTS.EMAILS.DELETE(emailId)),
  deleteAll: async() => del(API_ENDPOINTS.EMAILS.DELETE_ALL)
 };

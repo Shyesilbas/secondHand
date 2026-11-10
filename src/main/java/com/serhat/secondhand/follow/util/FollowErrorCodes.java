@@ -1,12 +1,24 @@
 package com.serhat.secondhand.follow.util;
 
-public final class FollowErrorCodes {
-    private FollowErrorCodes() {}
+import com.serhat.secondhand.core.exception.ErrorCode;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
-    public static final String CANNOT_FOLLOW_SELF = "FOLLOW_001";
-    public static final String ALREADY_FOLLOWING = "FOLLOW_002";
-    public static final String NOT_FOLLOWING = "FOLLOW_003";
-    public static final String USER_NOT_FOUND = "FOLLOW_004";
-    public static final String FOLLOW_NOT_FOUND = "FOLLOW_005";
+@Getter
+public enum FollowErrorCodes implements ErrorCode {
+    CANNOT_FOLLOW_SELF("FOLLOW_001", "You cannot follow yourself", HttpStatus.BAD_REQUEST),
+    ALREADY_FOLLOWING("FOLLOW_002", "You are already following this user", HttpStatus.CONFLICT),
+    NOT_FOLLOWING("FOLLOW_003", "You are not following this user", HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND("FOLLOW_004", "User not found", HttpStatus.NOT_FOUND),
+    FOLLOW_NOT_FOUND("FOLLOW_005", "Follow relationship not found", HttpStatus.NOT_FOUND);
+
+    private final String code;
+    private final String message;
+    private final HttpStatus httpStatus;
+
+    FollowErrorCodes(String code, String message, HttpStatus httpStatus) {
+        this.code = code;
+        this.message = message;
+        this.httpStatus = httpStatus;
+    }
 }
-

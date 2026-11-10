@@ -8,13 +8,13 @@ app:
   rate-limit:
     enabled: ${RATE_LIMIT_ENABLED:true}
     auth:
-      requests-per-second: ${RATE_LIMIT_AUTH:3}
+      limit: ${RATE_LIMIT_AUTH:20}
     payment:
-      requests-per-second: ${RATE_LIMIT_PAYMENT:3}
+      limit: ${RATE_LIMIT_PAYMENT:10}
     general:
-      requests-per-second: ${RATE_LIMIT_GENERAL:10}
+      limit: ${RATE_LIMIT_GENERAL:150}
     ai:
-      requests-per-second: ${RATE_LIMIT_AI:6}
+      limit: ${RATE_LIMIT_AI:15}
     window-size-seconds: ${RATE_LIMIT_WINDOW:60}
     # Proxy headers are honored only from these peers; X-Forwarded-For is read right to left.
     trust-forwarded-headers: ${RATE_LIMIT_TRUST_FORWARDED_HEADERS:true}

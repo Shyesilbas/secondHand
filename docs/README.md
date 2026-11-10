@@ -23,6 +23,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md)** | Redis in-memory stok rezervasyonu, 15 dk anti-hoarding TTL, PostgreSQL reconciliation ve drift auto-healing. |
 | **[multi-tier-redis-caching-and-invalidation.md](multi-tier-redis-caching-and-invalidation.md)** | Multi-tier Redis cache (`v4:`), Jackson `@class` serialization güvenliği, cache bazında TTL ve invalidation matrisi. |
 | **[social-proof-and-urgency-metrics-architecture.md](social-proof-and-urgency-metrics-architecture.md)** | 24 saatlik Redis ZSET tekil görüntüleme penceresi, 15 dk checkout stok tutma, 12 saatlik favori cache'i ve frontend anti-polling kuralları. |
+| **[rate-limiting-and-throttling-architecture.md](rate-limiting-and-throttling-architecture.md)** | Çok katmanlı hız sınırlama: Dağıtık Redis Lua fixed-window (`RateLimitingFilter`), IP sahtecilik koruması (`ClientIpResolver`), iki aşamalı login throttling (`LoginAttemptService`) ve domain kilitleri. |
 
 ### Kimlik, iletişim ve AI
 | Doküman | Kapsam |
@@ -40,6 +41,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[catalog-and-category-polymorphism.md](catalog-and-category-polymorphism.md)** | 6 vertical'da JPA polymorphism, `AbstractListingService` (Template Method), `ListingValidationEngine`, 317 dosyalık JSON katalog verisi ve kategoriye özel katalog kurallarına linkler. |
 | **[database-migration-and-seeding-guide.md](database-migration-and-seeding-guide.md)** | Flyway versiyonlama ve DDL kuralları, `--app.seed` key'leri, upsert + prune yaşam döngüsü. |
 | **[ci-cd-and-deployment-guide.md](ci-cd-and-deployment-guide.md)** | Docker Compose servisleri (Postgres, Redis, Kafka KRaft), environment variable'lar (`.env`), Prod Security Guard ve Actuator/Prometheus. |
+| **[error-handling-and-contract-architecture.md](error-handling-and-contract-architecture.md)** | Dual-track hata modeli (`ProblemDetail` + `ResultResponses`), HTTP durum haritalaması (`ErrorCodeStatuses`), frontend güvenli hata çözme (`errorUtils`) ve Axios katmanı. |
 
 ---
 

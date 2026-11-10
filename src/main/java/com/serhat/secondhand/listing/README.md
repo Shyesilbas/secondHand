@@ -107,3 +107,6 @@ stateDiagram-v2
 
 - **Listing Architecture Patterns**
   -> `.docs/knowledge/listing-architecture-patterns.md`
+
+- **Vehicle Catalog Sources**
+  -> `.docs/knowledge/vehicle-catalog-sources.md`

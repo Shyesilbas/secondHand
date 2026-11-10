@@ -18,11 +18,15 @@ The `campaign` domain allows sellers to create, manage, and apply discount campa
 - **Campaign State:** Active -> Inactive (Expired / Deactivated).
 
 ## Integration Points
-- **Incoming:** HTTP requests from sellers to manage campaigns.
+- **Incoming:** HTTP requests from sellers via `CampaignController` and public shoppers via `PublicCampaignController`.
 - **Outgoing:** The `pricing` domain queries this domain to fetch active campaigns for a given seller's items during checkout.
 
 ## Public APIs
-- `/api/v1/seller/campaigns` (CRUD and List operations).
+- `POST /api/v1/seller/campaigns`: Creates a new campaign for seller's eligible listings.
+- `PUT /api/v1/seller/campaigns/{id}`: Updates an existing campaign.
+- `DELETE /api/v1/seller/campaigns/{id}`: Deletes or cancels a seller campaign.
+- `GET /api/v1/seller/campaigns`: Lists campaigns belonging to the authenticated seller.
+- `GET /api/v1/campaigns/active`: Publicly lists all currently active marketplace campaigns.
 
 ## Related Knowledge
 - **Modify Campaign Behavior**

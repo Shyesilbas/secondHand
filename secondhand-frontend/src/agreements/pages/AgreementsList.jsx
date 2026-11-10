@@ -6,6 +6,7 @@ import { Check as CheckIcon, Clock as ClockIcon } from 'lucide-react';
 import { agreementService } from '../services/agreementService.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { SkeletonList } from '../../common/components/ui/index.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 const FILTER_TABS = [{
  key: 'all',
  label: 'All'
@@ -43,7 +44,7 @@ const AgreementsList = ({
  if (onAccepted) onAccepted();
  } catch (err) {
  console.error('Failed to accept agreement', err);
- notification.showError('Error', 'Failed to accept agreement.');
+ notification.showError('Error', getErrorMessage(err, 'Failed to accept agreement.'));
  } finally {
  setAcceptingAgreement(null);
  }

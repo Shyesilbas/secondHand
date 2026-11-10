@@ -109,6 +109,7 @@ export const API_ENDPOINTS = {
         DELETE: (emailId) => `/v1/emails/${emailId}`,
         DELETE_ALL: '/v1/emails',
         MARK_READ: (emailId) => `/v1/emails/${emailId}/read`,
+        MARK_ALL_READ: '/v1/emails/read-all',
     },
     ENUMS: {
         ALL: '/v1/enums/all',

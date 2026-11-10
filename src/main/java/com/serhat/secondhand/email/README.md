@@ -23,3 +23,12 @@ flowchart TD
 - **Sending is async:** business transactions must never write emails themselves; publish an event instead of calling `EmailSender` directly.
 
 The list of email types is the `EmailType` enum (`domain/entity/enums/EmailType.java`); templates are grouped by `orders/`, `offers/`, `payments/`, `notifications/`, `system/`.
+
+## Public APIs
+- `GET /api/v1/emails/my-emails`: Paginated list of emails in recipient inbox.
+- `GET /api/v1/emails/my-emails/{email-type}`: Paginated list filtered by email type.
+- `PATCH /api/v1/emails/read-all`: Marks all inbox emails as read.
+- `PATCH /api/v1/emails/{id}/read`: Marks a single email as read.
+- `GET /api/v1/emails/unread-count`: Count of unread emails.
+- `DELETE /api/v1/emails/{email-id}`: Deletes a specific email.
+- `DELETE /api/v1/emails`: Deletes all emails in the user inbox.

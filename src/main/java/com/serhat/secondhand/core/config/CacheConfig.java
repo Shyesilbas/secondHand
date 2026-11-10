@@ -140,6 +140,8 @@ public class CacheConfig {
                 .withCacheConfiguration("order:pending", shortConfig)
                 .withCacheConfiguration("listing:views:listing", shortConfig)
                 .withCacheConfiguration("listing:showcases", shortConfig)
+                .withCacheConfiguration("dashboard:seller", shortConfig)
+                .withCacheConfiguration("dashboard:buyer", shortConfig)
 
                 // Tier 4 — Ultra Kısa (5 dakika)
                 .withCacheConfiguration("user:badges", ultraShortConfig)

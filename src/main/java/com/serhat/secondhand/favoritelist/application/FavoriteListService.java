@@ -47,14 +47,11 @@ public class FavoriteListService {
 
         long userListCount = favoriteListRepository.countByOwner(currentUser);
         if (userListCount >= favoriteListConfig.getMaxListsPerUser()) {
-            return Result.error(
-                "Maximum list limit reached (" + favoriteListConfig.getMaxListsPerUser() + ")",
-                FavoriteListErrorCodes.FAVORITE_LIST_LIMIT_EXCEEDED
-            );
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_LIMIT_EXCEEDED);
         }
 
         if (favoriteListRepository.existsByOwnerAndName(currentUser, request.getName())) {
-            return Result.error("A list with this name already exists", FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
         }
 
         FavoriteList favoriteList = FavoriteList.builder()
@@ -68,7 +65,7 @@ public class FavoriteListService {
         try {
             favoriteList = favoriteListRepository.save(favoriteList);
         } catch (DataIntegrityViolationException ex) {
-            return Result.error("A list with this name already exists", FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
         }
         log.info("User {} created favorite list: {}", currentUser.getId(), favoriteList.getId());
 
@@ -92,7 +89,7 @@ public class FavoriteListService {
 
         if (request.getName() != null && !request.getName().equals(favoriteList.getName())) {
             if (favoriteListRepository.existsByOwnerAndName(currentUser, request.getName())) {
-                return Result.error("A list with this name already exists", FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
+                return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_NAME_EXISTS);
             }
             favoriteList.setName(request.getName());
         }
@@ -138,11 +135,11 @@ public class FavoriteListService {
                 .orElse(null);
 
         if (favoriteList == null) {
-            return Result.error("List not found", FavoriteListErrorCodes.FAVORITE_LIST_NOT_FOUND);
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_NOT_FOUND);
         }
 
         if (!favoriteList.isPublic() && (currentUser == null || !favoriteList.getOwner().getId().equals(currentUser.getId()))) {
-            return Result.error("This list is private", FavoriteListErrorCodes.FAVORITE_LIST_PRIVATE);
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_PRIVATE);
         }
 
         return Result.success(favoriteListMapper.toDto(favoriteList, currentUser));
@@ -185,21 +182,18 @@ public class FavoriteListService {
 
         long itemCount = favoriteListItemRepository.countByFavoriteList(favoriteList);
         if (itemCount >= favoriteListConfig.getMaxItemsPerList()) {
-            return Result.error(
-                "Maximum items per list reached (" + favoriteListConfig.getMaxItemsPerList() + ")",
-                FavoriteListErrorCodes.FAVORITE_LIST_ITEM_LIMIT_EXCEEDED
-            );
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_ITEM_LIMIT_EXCEEDED);
         }
 
         Listing listing = listingRepository.findById(request.getListingId())
             .orElse(null);
 
         if (listing == null) {
-            return Result.error("Listing not found", FavoriteListErrorCodes.LISTING_NOT_FOUND);
+            return Result.error(FavoriteListErrorCodes.LISTING_NOT_FOUND);
         }
 
         if (favoriteListItemRepository.existsByFavoriteListAndListing(favoriteList, listing)) {
-            return Result.error("Item already in list", FavoriteListErrorCodes.ITEM_ALREADY_IN_LIST);
+            return Result.error(FavoriteListErrorCodes.ITEM_ALREADY_IN_LIST);
         }
 
         FavoriteListItem item = FavoriteListItem.builder()
@@ -211,7 +205,7 @@ public class FavoriteListService {
         try {
             item = favoriteListItemRepository.save(item);
         } catch (DataIntegrityViolationException ex) {
-            return Result.error("Item already in list", FavoriteListErrorCodes.ITEM_ALREADY_IN_LIST);
+            return Result.error(FavoriteListErrorCodes.ITEM_ALREADY_IN_LIST);
         }
         log.info("User {} added listing {} to list {}", currentUser.getId(), request.getListingId(), listId);
 
@@ -234,7 +228,7 @@ public class FavoriteListService {
             .orElse(null);
 
         if (item == null) {
-            return Result.error("Item not in list", FavoriteListErrorCodes.ITEM_NOT_IN_LIST);
+            return Result.error(FavoriteListErrorCodes.ITEM_NOT_IN_LIST);
         }
 
         favoriteListItemRepository.delete(item);
@@ -255,15 +249,15 @@ public class FavoriteListService {
         User currentUser = currentUserResult.getData();
 
         if (!favoriteList.isPublic()) {
-            return Result.error("Cannot like a private list", FavoriteListErrorCodes.CANNOT_LIKE_PRIVATE_LIST);
+            return Result.error(FavoriteListErrorCodes.CANNOT_LIKE_PRIVATE_LIST);
         }
 
         if (favoriteList.getOwner().getId().equals(currentUser.getId())) {
-            return Result.error("Cannot like your own list", FavoriteListErrorCodes.CANNOT_LIKE_OWN_LIST);
+            return Result.error(FavoriteListErrorCodes.CANNOT_LIKE_OWN_LIST);
         }
 
         if (favoriteListLikeRepository.existsByFavoriteListAndUser(favoriteList, currentUser)) {
-            return Result.error("Already liked this list", FavoriteListErrorCodes.ALREADY_LIKED);
+            return Result.error(FavoriteListErrorCodes.ALREADY_LIKED);
         }
 
         FavoriteListLike like = FavoriteListLike.builder()
@@ -274,7 +268,7 @@ public class FavoriteListService {
         try {
             favoriteListLikeRepository.save(like);
         } catch (DataIntegrityViolationException ex) {
-            return Result.error("Already liked this list", FavoriteListErrorCodes.ALREADY_LIKED);
+            return Result.error(FavoriteListErrorCodes.ALREADY_LIKED);
         }
         log.info("User {} liked list {}", currentUser.getId(), listId);
         return Result.success();
@@ -296,7 +290,7 @@ public class FavoriteListService {
             .orElse(null);
 
         if (like == null) {
-            return Result.error("Not liked this list", FavoriteListErrorCodes.NOT_LIKED);
+            return Result.error(FavoriteListErrorCodes.NOT_LIKED);
         }
 
         favoriteListLikeRepository.delete(like);
@@ -315,7 +309,7 @@ public class FavoriteListService {
             .orElse(null);
 
         if (favoriteList == null) {
-            return Result.error("List not found", FavoriteListErrorCodes.FAVORITE_LIST_NOT_FOUND);
+            return Result.error(FavoriteListErrorCodes.FAVORITE_LIST_NOT_FOUND);
         }
 
         return Result.success(favoriteList);
@@ -323,7 +317,7 @@ public class FavoriteListService {
 
     private Result<Void> validateOwnership(FavoriteList favoriteList, Long userId) {
         if (!favoriteList.getOwner().getId().equals(userId)) {
-            return Result.error("You don't have permission to modify this list", FavoriteListErrorCodes.NOT_LIST_OWNER);
+            return Result.error(FavoriteListErrorCodes.NOT_LIST_OWNER);
         }
         return Result.success();
     }

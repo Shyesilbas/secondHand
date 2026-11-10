@@ -27,4 +27,4 @@ Execution steps for modifying how items are placed into the showcase (vitrin), e
 
 ## Related Files
 - `src/main/java/com/serhat/secondhand/showcase/application/ShowcaseService.java`
-- `src/main/java/com/serhat/secondhand/showcase/mapper/ShowcaseMapper.java`
+- `src/main/java/com/serhat/secondhand/showcase/ShowcaseMapper.java`

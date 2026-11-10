@@ -69,8 +69,10 @@ class RateLimitingFilterTest {
     @Test
     void onlyPaymentPathsUseThePaymentBucket() {
         assertThat(RateLimitingFilter.categorize("/api/v1/payments")).isEqualTo(RateLimitingFilter.Category.PAYMENT);
-        assertThat(RateLimitingFilter.categorize("/api/v1/payments/transfer")).isEqualTo(RateLimitingFilter.Category.PAYMENT);
-        assertThat(RateLimitingFilter.categorize("/api/v1/listings/payment-guide")).isEqualTo(RateLimitingFilter.Category.GENERAL);
+        assertThat(RateLimitingFilter.categorize("/api/v1/payments/transfer"))
+                .isEqualTo(RateLimitingFilter.Category.PAYMENT);
+        assertThat(RateLimitingFilter.categorize("/api/v1/listings/payment-guide"))
+                .isEqualTo(RateLimitingFilter.Category.GENERAL);
         assertThat(RateLimitingFilter.categorize("/api/v1/paymentsX")).isEqualTo(RateLimitingFilter.Category.GENERAL);
         assertThat(RateLimitingFilter.categorize("/api/v1/auth/login")).isEqualTo(RateLimitingFilter.Category.AUTH);
     }
@@ -78,7 +80,7 @@ class RateLimitingFilterTest {
     @Test
     @SuppressWarnings("unchecked")
     void requestOverTheSharedLimitIsRejected() throws Exception {
-        long limit = 10L * config.getWindowSizeSeconds();
+        long limit = RateLimitingFilter.Category.GENERAL.resolveLimit(config);
         when(redis.execute(any(RedisScript.class), anyList(), anyString())).thenReturn(limit + 1);
         FilterChain chain = mock(FilterChain.class);
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -102,7 +104,16 @@ class RateLimitingFilterTest {
         filter.doFilter(request("203.0.113.9", null), response, chain);
 
         verify(chain).doFilter(any(), any());
-        assertThat(response.getHeader("X-RateLimit-Remaining")).isEqualTo(String.valueOf(10L * config.getWindowSizeSeconds() - 1));
+        long expectedRemaining = RateLimitingFilter.Category.GENERAL.resolveLimit(config) - 1;
+        assertThat(response.getHeader("X-RateLimit-Remaining")).isEqualTo(String.valueOf(expectedRemaining));
+    }
+
+    @Test
+    void defaultCategoryLimitsAreSensibleForECommerce() {
+        assertThat(RateLimitingFilter.Category.PAYMENT.resolveLimit(config)).isEqualTo(10);
+        assertThat(RateLimitingFilter.Category.AUTH.resolveLimit(config)).isEqualTo(20);
+        assertThat(RateLimitingFilter.Category.AI.resolveLimit(config)).isEqualTo(15);
+        assertThat(RateLimitingFilter.Category.GENERAL.resolveLimit(config)).isEqualTo(150);
     }
 
     @Test

@@ -20,5 +20,5 @@ The `dashboard` domain provides aggregated operational analytics, sales funnel p
 - **Seller/Buyer Isolation:** Buyers can only query their own outgoing offers, active deliveries, and saved items; sellers only access metrics for listings they own.
 
 ## Public APIs
-- `GET /api/v1/dashboard/seller`: Aggregated revenue, active listings, offer conversion funnel, and review metrics.
-- `GET /api/v1/dashboard/buyer`: Active incoming deliveries, pending offers, price drop alerts on favorites, and total savings.
+- `GET /api/v1/dashboards/seller`: Aggregated revenue, active listings, offer conversion funnel, and review metrics.
+- `GET /api/v1/dashboards/buyer`: Active incoming deliveries, pending offers, price drop alerts on favorites, and total savings.

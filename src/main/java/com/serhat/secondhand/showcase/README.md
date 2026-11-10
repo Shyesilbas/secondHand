@@ -18,11 +18,17 @@ The `showcase` domain governs the paid "vitrin" (showcase) features, allowing se
 - **Showcase Status:** Active -> Expired / Cancelled.
 
 ## Integration Points
-- **Incoming:** Payment verification calls during showcase creation.
+- **Incoming:** Payment verification calls during showcase creation. HTTP requests via `ShowcaseController`.
 - **Outgoing:** Interacts with `listing` and `favorite` for batch enrichment.
 
 ## Public APIs
-- `/api/showcases` (Create, Extend, Cancel, List Active, List My).
+- `POST /api/v1/showcases`: Creates a showcase for a listing.
+- `POST /api/v1/showcases/bulks`: Creates showcases for multiple listings in batch.
+- `GET /api/v1/showcases/active`: Paginated active showcases displayed on homepage/discovery feeds.
+- `GET /api/v1/showcases/my`: Showcases owned by the authenticated seller.
+- `POST /api/v1/showcases/{id}/extend`: Extends duration of an active showcase.
+- `POST /api/v1/showcases/{id}/cancel`: Cancels an active showcase before expiration.
+- `GET /api/v1/showcases/pricing-config`: Returns daily showcase fees and pricing rules.
 
 ## Related Knowledge
 - **Modify Showcase Behavior**

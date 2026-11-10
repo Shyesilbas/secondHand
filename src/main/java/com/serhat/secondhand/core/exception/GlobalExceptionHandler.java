@@ -1,10 +1,11 @@
 package com.serhat.secondhand.core.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import com.serhat.secondhand.cart.exception.ReservationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +13,17 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -48,20 +54,6 @@ public class GlobalExceptionHandler {
         problem.setProperty("errors", validationErrors);
         log.warn("Validation error: {}", validationErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
-    }
-
-    @ExceptionHandler(ReservationException.class)
-    public ResponseEntity<ProblemDetail> handleReservationException(
-            ReservationException ex,
-            HttpServletRequest request) {
-        ProblemDetail problem = createProblem(
-                ex.getHttpStatus(),
-                ex.getErrorCode(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        log.warn("Reservation exception: {}", ex.getMessage());
-        return ResponseEntity.status(ex.getHttpStatus()).body(problem);
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
@@ -160,6 +152,111 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ProblemDetail> handleIllegalState(
+            IllegalStateException ex,
+            HttpServletRequest request) {
+
+        String sanitizedMessage = sanitizeMessage(ex.getMessage());
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                sanitizedMessage,
+                request.getRequestURI()
+        );
+
+        log.warn("Illegal state at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
+
+        Map<String, String> validationErrors = new HashMap<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            String propertyPath = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : "field";
+            validationErrors.put(propertyPath, violation.getMessage());
+        }
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.BAD_REQUEST,
+                "Validation Failed",
+                "Constraint validation failed",
+                request.getRequestURI()
+        );
+        problem.setProperty("errors", validationErrors);
+
+        log.warn("Constraint violation at {}: {}", request.getRequestURI(), validationErrors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "Method Not Allowed",
+                "Request method '" + ex.getMethod() + "' is not supported",
+                request.getRequestURI()
+        );
+
+        log.warn("Method not allowed at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(problem);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleMediaTypeNotSupported(
+            HttpMediaTypeNotSupportedException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Unsupported Media Type",
+                "Content-Type '" + ex.getContentType() + "' is not supported",
+                request.getRequestURI()
+        );
+
+        log.warn("Media type not supported at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(problem);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> handleMaxUploadSizeExceeded(
+            MaxUploadSizeExceededException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.PAYLOAD_TOO_LARGE,
+                "Payload Too Large",
+                "Uploaded file exceeds the maximum allowed size",
+                request.getRequestURI()
+        );
+
+        log.warn("Max upload size exceeded at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(problem);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ProblemDetail> handleNoResourceFound(
+            NoResourceFoundException ex,
+            HttpServletRequest request) {
+
+        ProblemDetail problem = createProblem(
+                HttpStatus.NOT_FOUND,
+                "Not Found",
+                "Resource not found: " + ex.getResourcePath(),
+                request.getRequestURI()
+        );
+
+        log.debug("Resource not found at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
+    }
+
     // Malformed client requests. Without this the generic handler below turns them into 500s.
     @ExceptionHandler({
             HttpMessageNotReadableException.class,
@@ -237,6 +334,8 @@ public class GlobalExceptionHandler {
     private ProblemDetail createProblem(HttpStatus status, String title, String detail, String path) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
         problem.setTitle(title);
+        problem.setProperty("message", detail);
+        problem.setProperty("error", title);
         problem.setProperty("path", path);
         problem.setProperty("timestamp", LocalDateTime.now());
         return problem;

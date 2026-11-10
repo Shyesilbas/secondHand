@@ -95,7 +95,7 @@ Redis projemizde iki ana amaçla kullanılır:
 2. **Kupon Limitleme ([CouponRedisLimiterService.java](../src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) & [apply_coupon_with_limit.lua](../src/main/resources/scripts/apply_coupon_with_limit.lua)):**
    * Kuponun genel toplam kullanım limiti ve kullanıcı bazlı kullanım limiti Redis üzerinde tek bir atomik Lua çağrısıyla denetlenir ve güncellenir. Checkout transaction commit edilmezse `release_coupon_usage.lua` kullanımı geri bırakır (`CouponService.releaseUsageUnlessCommitted`).
 3. **Rate Limiting ([RateLimitingFilter.java](../src/main/java/com/serhat/secondhand/core/security/RateLimitingFilter.java) & `rate_limit_window.lua`):**
-   * Fixed window sayaç: key `ratelimit:{kategori}:{ip}:{pencere}`; `INCR` ve ilk istekte `PEXPIRE` tek atomik Lua çağrısındadır. Redis'e ulaşılamazsa istek 503 ile reddedilir. Ayrıntılar: [auth-jwt-and-security-architecture.md](auth-jwt-and-security-architecture.md).
+   * Fixed window sayaç: key `ratelimit:{kategori}:{ip}:{pencere}`; `INCR` ve ilk istekte `PEXPIRE` tek atomik Lua çağrısındadır. Redis'e ulaşılamazsa istek 503 ile reddedilir. Ayrıntılar: [rate-limiting-and-throttling-architecture.md](rate-limiting-and-throttling-architecture.md).
 4. **Diğer Redis key'leri:**
 
    | Key | TTL | Kullanan |

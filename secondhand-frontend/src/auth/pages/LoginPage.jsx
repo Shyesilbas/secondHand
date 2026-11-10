@@ -11,6 +11,7 @@ import Button from '../../common/components/ui/Button.jsx';
 import Alert from '../../common/components/ui/Alert.jsx';
 import { AuthBrand, AuthDivider, AuthField, AuthHeader, GoogleButton, PasswordField } from '../components/AuthPrimitives.jsx';
 import { isValidEmail } from '../utils/passwordRules.js';
+import { getErrorMessage } from '../../common/utils/errorUtils.js';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -51,7 +52,7 @@ const LoginPage = () => {
       navigate(from, { replace: true });
     } catch (error) {
       logger.error('Login error:', error);
-      setSubmitError(error.response?.data?.message || t('auth_login_failed', 'Giriş yapılamadı. E-posta ve şifreni kontrol et.'));
+      setSubmitError(getErrorMessage(error, t('auth_login_failed', 'Giriş yapılamadı. E-posta ve şifreni kontrol et.')));
     } finally {
       setIsLoading(false);
     }

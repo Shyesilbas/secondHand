@@ -23,7 +23,7 @@ Execution instructions for modifying how listings are favorited, toggled, or how
 4. Ensure that any write operation (`addToFavorites`, `removeFromFavorites`, `toggleFavorite`) retains the `@Transactional` and `@CacheEvict(allEntries = true)` semantics to keep stats accurate.
 
 ## Pitfalls
-- Modifying a write operation but forgetting to evict the `favoriteStatsBatch` cache.
+- Modifying a write operation but forgetting to evict the `user:stats:favorites` cache.
 - Using N+1 querying in top-favorited endpoints instead of using batch/aggregate projections.
 
 ## Related Files

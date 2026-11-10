@@ -22,8 +22,8 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
 
 
     @Modifying
-    @Query("update Email e set e.readAt = :now where e.user = :user and e.readAt is null")
-    int markAllRead(@Param("user") User user, @Param("now") LocalDateTime now);
+    @Query("update Email e set e.readAt = :now where e.user.id = :userId and e.readAt is null and e.deletedAt is null")
+    int markAllRead(@Param("userId") Long userId, @Param("now") LocalDateTime now);
 
     long countByUserIdAndReadAtIsNull(Long userId);
 
