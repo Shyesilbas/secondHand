@@ -32,6 +32,13 @@ coverage
 *.sln
 *.sw?
 *~
+*.iml
+*.iws
+*.ipr
+
+# One-off developer scripts
+fix-*.cjs
+i18n-codemod.js
 
 # Build/tool output
 stats.html
