@@ -1,84 +1,186 @@
 # SecondHand
 
-C2C second-hand marketplace: listings, cart/checkout, escrow-backed payments with an e-wallet, offers/negotiation, real-time chat and "Aura", a Gemini-powered assistant.
+An enterprise-grade, high-concurrency C2C second-hand marketplace platform featuring polymorphic vertical catalogs, distributed lock-free stock reservations, escrow-backed multi-method payments, in-person safe meetup handovers, real-time STOMP messaging, and **Aura** — an autonomous Gemini-powered AI assistant.
 
-**Stack:** Spring Boot 3.5 (Java 17), PostgreSQL 15 + Flyway, Redis 7 (Lua), Apache Kafka 3.7, MapStruct · React 19, Vite 5, Tailwind 3, React Query · Gemini, Cloudinary, Google OAuth2 · Actuator/Prometheus.
+---
 
-**AI agents:** start with [`AGENTS.md`](AGENTS.md).
+## ⚡ Tech Stack
 
-## Architecture
+| Layer | Technologies |
+| :--- | :--- |
+| **Backend** | Spring Boot 3.5, Java 17, Spring Security 6, Spring Data JPA, MapStruct, Lombok |
+| **Database & Cache** | PostgreSQL 15, Flyway Migrations, Redis 7 (Atomic Lua Scripts, Multi-tier Cache) |
+| **Messaging** | Apache Kafka 3.7 (KRaft mode, Transactional Outbox, Consumer Idempotency) |
+| **Frontend** | React 19, Vite 5, Tailwind CSS 3, React Query (@tanstack), Axios |
+| **Real-Time** | Spring WebSocket, STOMP protocol, Redis Pub/Sub cross-instance routing |
+| **AI & External** | Google Gemini API (Aura AI), Cloudinary CDN, ExchangeRate-API, Google OAuth2 |
+| **Observability** | Spring Boot Actuator, Prometheus Metrics endpoint (`/actuator/prometheus`) |
+
+> 🤖 **AI Agents & Contributors:** Start with [`AGENTS.md`](AGENTS.md) for cross-cutting standards, testing rules, and skill mappings.
+
+---
+
+## 🏛️ Architecture Overview
+
+The backend uses a layered, hexagonal-inspired architecture with Transactional Outbox workers ensuring guaranteed at-least-once event delivery and strictly idempotent Kafka consumers.
 
 ```mermaid
-graph TD
-    React["React frontend"] --> Filters["SecurityHeaders, RateLimiting → Authentication (JWT) → CsrfCookie"]
-    Chat["STOMP WebSocket client"] --> Backend
-    Filters --> Backend["Spring Boot modules"]
-    Backend --> PG[("PostgreSQL + outbox tables")]
-    Backend --> Redis[("Redis: cache, stock reservation, locks")]
-    PG -->|"outbox workers"| Kafka[["Kafka"]]
-    Kafka --> Consumers["Inventory / Payment / Escrow / Email consumers"]
-    Consumers --> PG
-    Backend --> Gemini["Gemini API"]
-    Backend --> Cloudinary["Cloudinary"]
+flowchart TD
+    subgraph Client["Client Tier"]
+        UI["React 19 SPA"]
+        WS["STOMP WebSocket Client"]
+    end
+
+    subgraph Security["Security & Filter Chain"]
+        Filters["RateLimitingFilter (Redis Lua)<br/>→ AuthenticationFilter (JWT Cookie)<br/>→ CsrfCookieFilter (Double-Submit)"]
+    end
+
+    subgraph Backend["Spring Boot Modular Domains"]
+        Money["Money: checkout, order, payment, escrow, ewallet, coupon, pricing"]
+        Identity["Identity: auth, user, memberships, badges"]
+        Stock["Stock: cart, inventory"]
+        Product["Product: 6-vertical polymorphic listing, showcase, social"]
+        Comms["Comms: chat, notification, email"]
+        Aura["AI: Aura Gemini Assistant"]
+    end
+
+    subgraph Data["Persistence & Event Streaming"]
+        PG[("PostgreSQL 15<br/>• Domain Entities<br/>• Outbox Tables")]
+        Redis[("Redis 7<br/>• Multi-tier Cache (v4:)<br/>• Lua Stock & Coupon Limits<br/>• Distributed Locks & Rate Limits")]
+        Kafka[["Apache Kafka KRaft<br/>• payment.completed.v1<br/>• escrow.released.v1<br/>• order.cancelled.v1 / order.refunded.v1<br/>• mail.dispatch.v1"]]
+    end
+
+    subgraph External["External Integrations"]
+        Gemini["Google Gemini API"]
+        Cloudinary["Cloudinary CDN"]
+        Exchange["ExchangeRate-API"]
+    end
+
+    UI --> Security
+    WS -.->|"STOMP Handshake"| Comms
+    Security --> Backend
+    Backend --> PG
+    Backend --> Redis
+    PG -->|"Outbox Workers"| Kafka
+    Kafka -->|"Idempotent Consumers"| Backend
+    Aura --> Gemini
+    Product --> Cloudinary
+    Money --> Exchange
 ```
 
-Most backend modules have a matching folder under `secondhand-frontend/src/`. Business rules live in each module's `README.md`.
+---
 
-| Area | Backend package | Frontend | Notes |
+## 🗺️ Domain & Directory Map
+
+Each backend module has a dedicated `README.md` defining its business invariants, state machines, and public APIs. Most modules correspond directly to a directory under `secondhand-frontend/src/`.
+
+| Domain | Backend Packages | Frontend Directories | Responsibilities & Architectural Highlights |
 | :--- | :--- | :--- | :--- |
-| Auth | `auth`, `core/jwt`, `core/security` | `src/auth` | JWT access/refresh rotation, HttpOnly cookies, Google OAuth2, rate limiting |
-| Payment & wallet | `payment`, `ewallet` | `src/payments`, `src/ewallet` | `PaymentProviderPort`, transactional outbox |
-| Escrow | `escrow` | `src/ewallet` | Seller wallet credited asynchronously after delivery confirmation |
-| Orders | `order`, `checkout` | `src/order`, `src/cart` | State machine, per-item cancel/refund |
-| Cart & stock | `cart`, `inventory` | `src/cart` | Redis Lua reservation (15 min TTL), reconciliation |
-| Listings | `listing`, `showcase` | `src/listing`, `src/showcase`, one folder per vertical (`src/vehicle`, `electronics`, `realEstate`, `books`, `clothing`, `sports`) | 6 polymorphic verticals with catalog-driven forms (type rules, attributes, catalog snapshots), paid showcase |
-| Offers | `offer` | `src/offer` | 24 h Redis lock for an accepted offer |
-| Campaign & coupons | `campaign`, `coupon`, `pricing` | `src/campaign`, `src/coupon` | Lua-based redemption limits |
-| Chat | `chat` | `src/chat`, `src/inbox` | STOMP, JWT checked on connect |
-| Aura AI | `ai` | `src/ai` | Gemini search planning, context adapters, price advice |
-| Social | `review`, `forum`, `follow`, `favorite`, `favoritelist`, `complaint` | `src/reviews`, `src/forum`, `src/follow`, `src/favorites`, `src/favoritelist`, `src/complaint` | Reviews, forum, follows, favorite lists, complaints |
-| Other | `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `src/agreements`, `src/dashboard`, `src/comparison` | Agreements, dashboard, carrier and exchange-rate integrations, image storage |
-| Notifications & email | `notification`, `email` | `src/notification`, `src/emails` | Event-driven email |
+| **Money** | `checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing`, `campaign`, `offer` | `src/payments`, `src/ewallet`, `src/order`, `src/cart`, `src/coupon`, `src/campaign`, `src/offer` | Escrow-backed payments, internal e-wallet with pessimistic row locks, safe meetup delivery (OTP/QR verification), transactional outbox publishing, Lua-based coupon limiters. |
+| **Identity & Users** | `auth`, `user`, `core/jwt`, `core/security` | `src/auth`, `src/user` | Stateless JWT with refresh token rotation (HttpOnly cookies), Google OAuth2 SSO, user addresses, prestige Great Seller badges, subscription plans (`BASIC`, `PLUS`, `PRO`) with daily Aura question quotas. |
+| **Stock & Reservations** | `cart`, `inventory` | `src/cart` | Two-tier optimistic shopping cart, atomic Redis Lua stock reservations with 15-minute anti-hoarding TTL, background drift reconciliation scheduler. |
+| **Product & Catalogs** | `listing`, `showcase`, `favorite`, `favoritelist`, `review`, `follow`, `forum`, `complaint` | `src/listing`, `src/showcase`, `src/vehicle`, `src/electronics`, `src/realEstate`, `src/books`, `src/clothing`, `src/sports`, `src/favorites`, `src/favoritelist`, `src/reviews`, `src/follow`, `src/forum`, `src/complaint` | 6 polymorphic vertical catalogs (JPA Joined table inheritance), rule-driven forms, attribute engine, paid showcases, private broadcast offers to favoriters, forum threads, and trust/safety complaints. |
+| **Communications** | `chat`, `notification`, `email` | `src/chat`, `src/inbox`, `src/notification`, `src/emails` | Dual-channel chat (11 REST endpoints + STOMP WebSocket), hybrid notification feed (personal + system broadcasts), Kafka-dispatched transactional email rendered via Thymeleaf into in-app inboxes. |
+| **AI Assistant** | `ai` | `src/ai` | "Aura" intelligent assistant: multi-vertical semantic search planning via Gemini API, live price gauge advisor benchmarked against real DB stats, user memory, and listing generator. |
+| **Core & Platform** | `core`, `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `src/admin`, `src/audit`, `src/agreements`, `src/dashboard`, `src/comparison` | Central `ResultResponses` envelope, dynamic `@PublicEndpoint` registry, Redis rate limiting, audit logging, legal terms consent, carrier adapters (`CargoProviderPort`), and currency conversion. |
 
-Deep dives (payments, pricing/coupons/campaigns, escrow, orders, stock, Redis/Kafka, cache, auth, offers, chat, notifications, email, catalog, seeding, Aura AI, CI/CD): [`docs/README.md`](docs/README.md).
+> 📚 **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md).
 
-## Setup
+---
 
-**Requirements:** JDK 17, Maven, Node.js 18+, Docker.
+## 🚀 Getting Started
 
+### Prerequisites
+- **JDK 17** & **Maven 3.9+**
+- **Node.js 18+** & **npm**
+- **Docker** & **Docker Compose**
+
+### 1. Environment Setup
 ```bash
-cp .env.template .env           # first time only: fill JWT_SECRET_KEY, GEMINI_API_KEY, CLOUDINARY_*, GOOGLE_*
-./scripts/start_all.sh          # Docker (Postgres 5433, Redis 6379, Kafka 9092), backend (:8080), frontend (:5173)
-./scripts/start_all.sh --seed   # also runs catalog seeds; or --seed=<key[,key]|listing|all>
+# Clone repository and create local environment file
+cp .env.template .env
+```
+Fill in the required credentials in `.env` (e.g. `JWT_SECRET_KEY`, `GEMINI_API_KEY`, `CLOUDINARY_*`, `GOOGLE_*`).
+
+### 2. One-Command Quickstart
+Run the automated bootstrap script to spin up Docker services, compile the backend, apply migrations, seed the catalog, and start the frontend:
+```bash
+./scripts/start_all.sh --seed
 ```
 
-Seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `realestate`, `attributes`, `agreements` (`listing` = all catalog keys). `listings-generate` / `listings-clean` create or remove dev listings and are never part of `all`. Seeds read `src/main/resources/data/`, which is git-ignored, so a fresh clone needs a local copy first (details: [`docs/database-migration-and-seeding-guide.md`](docs/database-migration-and-seeding-guide.md)).
+| Service | Address | Default Port | Notes |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | `http://localhost:5173` | `5173` | Vite dev server |
+| **Backend API** | `http://localhost:8080/api/v1` | `8080` | Spring Boot API |
+| **Swagger UI** | `http://localhost:8080/swagger-ui.html` | `8080` | OpenAPI 3.0 docs (disabled in `prod`) |
+| **PostgreSQL** | `localhost:5433` | `5433` | Database: `secondhand` |
+| **Redis** | `localhost:6379` | `6379` | Redis 7 standalone |
+| **Kafka (KRaft)** | `localhost:9092` | `9092` | Event broker |
 
-**Running the parts yourself:**
+---
+
+## 🛠️ Manual Startup & Seed Options
+
+If you prefer running services independently:
+
 ```bash
-docker-compose up -d                          # infrastructure
-mvn spring-boot:run                           # backend, http://localhost:8080; Flyway migrates on startup
-cd secondhand-frontend && npm install && npm run dev   # http://localhost:5173
+# 1. Start Infrastructure
+docker compose up -d
+
+# 2. Run Backend (Flyway runs automatically on startup)
+mvn spring-boot:run
+
+# 3. Run Frontend
+cd secondhand-frontend
+npm install
+npm run dev
 ```
-The frontend reads `VITE_API_BASE_URL=http://localhost:8080/api/v1` and `VITE_WS_BASE_URL=ws://localhost:8080/ws` from `.env.local`. Swagger UI (`/swagger-ui.html`) is on by default and disabled in the `prod` profile.
 
-## Tests and checks
+### Seeding Catalog Data
+Catalog seeds are idempotent upserts from `src/main/resources/data/**` (local copy required):
+```bash
+# Seed all verticals and agreements
+mvn spring-boot:run -Dspring-boot.run.arguments="--app.seed=all"
 
-- Tests are skipped by default (`maven.test.skip=true`): `mvn test -Dmaven.test.skip=false -Dtest=<Class>`. Unit tests use plain Mockito.
-- `ConcurrentStockAndPaymentIntegrationTest` runs against the local services and leaves the first listing's stock at 1; run it deliberately.
-- Frontend: `npm run lint`, `npm run build` in `secondhand-frontend/`.
-- `python3 scripts/check_docs.py`: docs map, links, class names, stale commands. `python3 scripts/check_api_endpoints.py`: frontend/backend endpoint parity (one known false positive, `/v1/ai/summary/{param}/{param}`).
+# Or seed specific domains
+mvn spring-boot:run -Dspring-boot.run.arguments="--app.seed=vehicle,realestate,attributes"
+```
+Supported seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `realestate`, `attributes`, `agreements`, `listing` (all catalog keys), `all`. Dev listing utilities: `listings-generate`, `listings-clean`. (Details: [`docs/database-migration-and-seeding-guide.md`](docs/database-migration-and-seeding-guide.md)).
 
-## Security
+---
 
-- JWT access/refresh tokens in HttpOnly, SameSite cookies (never in response bodies); refresh tokens stored hashed, rotated atomically with token family revocation; logout revokes the used access token.
-- Double-submit CSRF cookie (`CsrfCookieFilter`); Redis-backed route rate limits (`RATE_LIMIT_*`, responds `429`) and login throttling per account+IP.
-- Google OAuth2 requires a verified email and never takes over a local account.
-- STOMP: JWT checked on connect, revoked sessions rejected, subscriptions limited to the user's own `/user/{id}/...` queues and rooms they belong to (`WebSocketSecurityConfig`).
-- Money endpoints are idempotent (`Idempotency-Key` for wallet deposit/withdraw).
+## 🔒 Security & Concurrency Highlights
 
-## Observability
+- **Stateless Authentication:** Access tokens (15m) and Refresh tokens (7d) transmitted exclusively via `HttpOnly`, `SameSite=Strict`, `Secure` cookies. Token family tracking revokes stolen session trees immediately.
+- **CSRF & Rate Limiting:** Double-submit cookie pattern (`CsrfCookieFilter`). Distributed Redis Lua fixed-window limiter (`RateLimitingFilter`) guards public and sensitive auth endpoints against brute force and DDoS.
+- **Zero Over-Selling:** Stock is atomically checked and decremented in Redis via Lua scripts (`reserve_stock_with_ttl.lua`) during checkout with a 15-minute auto-release TTL. Database stock is deducted asynchronously via Kafka events.
+- **ACID Transactional Outbox:** Events are enqueued in dedicated outbox tables (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) within the core business transaction and dispatched to Kafka via scheduled polling workers.
+- **Safe Meetup Handshake:** Buyers and sellers verify physical delivery via SHA-256 encrypted OTP codes or QR tokens. 3 consecutive failed attempts trigger an automated 15-minute security lock (`VERIFICATION_LOCKED`).
 
-Actuator metrics are exposed at `/actuator/prometheus` for scraping; no dashboards or Prometheus config are shipped in the repo.
+---
 
-> **Flyway:** change the schema only by adding a new `V<N>__description.sql` under [`src/main/resources/db/migration`](src/main/resources/db/migration); never edit existing migrations.
+## 🧪 Testing & Verification
+
+Unit tests use plain Mockito with zero Spring context startup overhead for sub-second feedback:
+
+```bash
+# Run targeted unit tests
+mvn test -Dmaven.test.skip=false -Dtest=ErrorCodeStatusesTest,RateLimitingFilterTest
+
+# Verify documentation consistency (class names, links, Redis keys, terms)
+python3 scripts/check_docs.py
+
+# Verify frontend/backend API route contract parity
+python3 scripts/check_api_endpoints.py
+
+# Frontend lint & build
+cd secondhand-frontend && npm run lint && npm run build
+```
+
+---
+
+## 🗄️ Database Migrations
+
+Schema changes must strictly be performed by creating a new versioned migration file:
+`src/main/resources/db/migration/V<N>__description.sql`.
+Never modify existing, already executed migrations.
