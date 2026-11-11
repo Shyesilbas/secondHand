@@ -1,61 +1,98 @@
 # User Domain
 
-## Purpose
-The `user` domain manages user profiles, delivery/billing addresses, user badges, membership subscriptions (`BASIC`, `PLUS`, `PRO`), daily Aura AI quotas, and automated seller prestige eligibility ("Great Seller").
+## 1. Domain Scope & Purpose
+The `user` domain manages user identities, privacy-governed public and private profiles, physical shipping/billing addresses, subscription tiers (`BASIC`, `PLUS`, `PRO`), daily Aura AI query quotas, prestige seller badge eligibility ("Great Seller"), and Trust & Safety sanction states.
 
-## Architecture Overview
-- **UserService:** Profile management, credential verification, and safe public profile resolution.
-- **AddressService:** Address lifecycle and single main-address resolution.
-- **MembershipService & MembershipScheduler:** Manages subscription plans, auto-renewal cycles, and daily Aura AI quotas.
-- **UserBadgeService & GreatSellerService:** Evaluates user metrics (ratings, completed orders, order volume) to assign prestige badges.
-- **GreatSellerEligibilityEventListener:** Listens asynchronously to `SellerEligibilityRecheckEvent` to trigger badge recalculation.
+```mermaid
+flowchart TD
+    A["User Management"] --> B["Profile & Privacy<br/>PublicUserProfileDto (Sanitized) vs UserDto (Private)"]
+    A --> C["Address Book<br/>Single Main Address Invariant"]
+    A --> D["Membership Subscriptions<br/>BASIC, PLUS, PRO + Daily Aura AI Quotas"]
+    A --> E["Prestige Badges & Policy<br/>GreatSellerPolicy (Ratings, Volume, Fulfillment)"]
+    A --> F["Trust & Safety Sanctions<br/>warning_count, banned_until, restrictions"]
+```
 
-## Business Invariants & Constraints
-- **Unique Identifiers:** Email and phone numbers must be strictly unique across the system.
-- **Main Address:** Only one address per user can be marked as the main address at any given time.
-- **Public Profile Privacy:** `GET /api/v1/users/{id}` returns `PublicUserProfileDto` (id, name, surname, accountCreationDate, accountVerified) only; never expose email, phone, birthdate, gender, role, or account status there. `GET /api/v1/users/{id}/listings` returns only `ACTIVE` listings.
-- **Badge Eligibility:** Great Seller status is resolved via `GreatSellerPolicy` using historical aggregate data, triggered event-driven on order/review completion.
-- **Membership & Aura AI Quota:** Users are assigned `MembershipPlan` tiers (`BASIC`, `PLUS`, `PRO`). `daily_aura_questions_used` is tracked and resets daily; exceeded quota returns `403 AURA_LIMIT_EXCEEDED`. `MembershipScheduler` handles recurring billing renewals and downgrades.
+---
 
-## State Machines
-- **Address Status:** Standard -> Main (demotes previously main address).
-- **Membership Status:** Active -> Cancelled (expires at period end) -> Expired.
+## 2. Step-by-Step Subsystem Lifecycles
 
-## Integration Points
-- **Incoming:** HTTP requests via `UserController`, `AddressController`, `MembershipController`, and `UserBadgesController`.
-- **Outgoing:** Listens to `order` and `review` events for badge re-evaluation. Used by `ai` domain for quota checking.
+### 2.1. User Profile & Data Protection
+* **Private Identity:** Authenticated users access their own detailed data (`UserDto`) containing email, phone, birthdate, gender, roles, and addresses.
+* **Public Profile Sanitization (`GET /api/v1/users/{id}`):** External users, buyers, or forum participants only receive `PublicUserProfileDto`. Sensitive attributes (email, phone, birthdate, password hashes, internal roles, and sanction details) are strictly omitted. Only public listings in `ListingStatus.ACTIVE` are visible on a user's storefront.
 
-## Public APIs
-- **User & Profile (`/api/v1/users`):**
-  - `GET /api/v1/users/me`: Current user profile.
-  - `GET /api/v1/users/{id}`: Safe public profile details.
-  - `GET /api/v1/users/{user-id}/listings`: Active listings belonging to user.
-  - `PUT /api/v1/users/email`: Updates authenticated user email.
-  - `PUT /api/v1/users/phone`: Updates authenticated user phone number.
-  - `POST /api/v1/users/verification/send`: Sends verification code.
-  - `POST /api/v1/users/verification/verify`: Verifies code for account activation.
-  - `GET /api/v1/users/great-sellers`: Lists great sellers.
-  - `GET /api/v1/users/{user-id}/great-seller-status`: Great seller eligibility breakdown.
-  - `GET /api/v1/users/{user-id}/reviews/received`: Reviews received by user.
-  - `GET /api/v1/users/{user-id}/reviews/written`: Reviews written by user.
-  - `GET /api/v1/users/{user-id}/review-stats`: Aggregated review rating statistics.
-  - `GET /api/v1/users/me/reviews/received`: Authenticated user's received reviews.
-  - `GET /api/v1/users/me/complaints`: Complaints filed by authenticated user.
-  - `GET /api/v1/users/me/complaints/received`: Complaints filed against authenticated user.
-  - `GET /api/v1/users/me/offers/made`: Offers created by authenticated user.
-  - `GET /api/v1/users/me/offers/received`: Offers received by authenticated user.
-  - `GET /api/v1/users/search`: Search users by term (admin).
-  - `GET /api/v1/users/audit-logs`: User audit logs (admin).
-- **Addresses (`/api/v1/users/addresses`):**
-  - `GET /api/v1/users/addresses`: Lists saved addresses.
-  - `POST /api/v1/users/addresses`: Adds a new address.
-  - `PUT /api/v1/users/addresses/{id}`: Updates an existing address.
-  - `DELETE /api/v1/users/addresses/{id}`: Deletes an address.
-  - `POST /api/v1/users/addresses/{id}/main`: Sets address as primary.
-- **Memberships (`/api/v1/memberships`):**
-  - `GET /api/v1/memberships/status`: Returns plan details, auto-renew status, and daily Aura AI quota usage.
-  - `POST /api/v1/memberships/upgrade`: Upgrades or modifies subscription tier.
-  - `POST /api/v1/memberships/cancel`: Cancels auto-renewal for current subscription.
-  - `POST /api/v1/memberships/toggle-auto-renew`: Toggles auto-renewal status.
-- **Badges (`/api/v1/user/badges`):**
-  - `GET /api/v1/user/badges`: Returns earned prestige badges for current user.
+### 2.2. Address Book Management (`AddressService`)
+* Users maintain multiple shipping/billing addresses in the `addresses` table.
+* **Single Main Address Invariant:** Exactly one address may carry `isMain = true` at any given time. Setting an address as main atomically demotes any previously designated main address within the same transaction (`addressRepository.demoteExistingMainAddress`).
+
+### 2.3. Membership Tiers & Daily Aura AI Quotas (`MembershipService`)
+* **Plans:** `MembershipPlan.BASIC` (free default), `MembershipPlan.PLUS`, `MembershipPlan.PRO`.
+* **Aura AI Integration:** Each plan defines a daily question ceiling. The system increments `daily_aura_questions_used` upon each query. If the quota is exceeded, the AI gateway halts with `403 Forbidden` (`AURA_LIMIT_EXCEEDED`).
+* **Automated Schedulers (`MembershipScheduler`):**
+  - **Daily Quota Reset:** Runs every midnight (`cron = "0 0 0 * * *"`) resetting `daily_aura_questions_used = 0` for all users.
+  - **Billing & Expiration:** Runs daily checking subscriptions where `membershipExpiresAt < NOW()`. If `autoRenew == true`, attempts to charge the user's eWallet; if renewal fails or auto-renew is off, downgrades the plan to `BASIC`.
+
+### 2.4. Prestige Seller Engine ("Great Seller")
+* Governed by `GreatSellerPolicy` and `GreatSellerService`.
+* Criteria evaluate lifetime completed orders, fulfillment speed, dispute ratio, and review score ($\ge 4.5/5.0$).
+* **Event-Driven Recalculation:** `GreatSellerEligibilityEventListener` listens to `SellerEligibilityRecheckEvent` (triggered after order completions or reviews) and schedules asynchronous background re-evaluations without blocking core order checkout threads.
+
+### 2.5. Trust & Safety Moderation States
+* Holds disciplinary fields populated by Aura AI moderation:
+  - `warning_count`: Official warning counter (3 warnings trigger 7-day suspension).
+  - `banned_until`: Expiration timestamp of temporary restrictions.
+  - `is_chat_restricted`, `is_listing_restricted`: Action guards checked via Redis cache (`v4:user:restriction:{userId}`).
+  - **180-Day Strike Decay:** If 180 consecutive days elapse since `last_penalized_at` with zero new infractions, `warning_count` is reset to 0 via lazy evaluation.
+
+---
+
+## 3. Business Invariants & Constraints
+
+* **Strict Uniqueness:** `email` and `phone` must be globally unique across all active accounts.
+* **Non-Demotable Own Listings:** Users are prevented from purchasing, favoring, or reviewing their own listings.
+* **Fiduciary Preservation:** Banned accounts retain rights to pending escrow payouts and balance withdrawals; only platform listing/showcase fees are non-refundable.
+
+---
+
+## 4. Database Schema & Flyway Structure
+
+* **`users` Table:**
+  - `id`: BigInt primary key.
+  - `email`, `phone`, `password`, `first_name`, `last_name`.
+  - `account_status`: Enum (`ACTIVE`, `PENDING_VERIFICATION`, `SUSPENDED`, `BLOCKED`, `DELETED`).
+  - `role`: Enum (`BUYER`, `SELLER`, `ADMIN`).
+  - `membership_plan`: Enum (`BASIC`, `PLUS`, `PRO`).
+  - `daily_aura_questions_used`: Integer tracking AI usage.
+  - `warning_count`, `banned_until`, `restriction_reason`, `last_penalized_at`, `is_chat_restricted`, `is_listing_restricted`.
+* **`addresses` Table:**
+  - `id`: BigInt primary key.
+  - `user_id`: Foreign key to `users`.
+  - `title`, `address_line1`, `address_line2`, `city`, `district`, `postal_code`, `is_main`.
+
+---
+
+## 5. Public REST API Contracts
+
+### Profile Operations (`UserController` — `/api/v1/users`)
+* **`GET /me`:** Full private profile of authenticated user.
+* **`GET /{id}`:** Sanitized public profile (`PublicUserProfileDto`).
+* **`GET /{id}/listings`:** Active storefront listings for a user.
+* **`PUT /email`:** Updates email address (requires re-verification).
+* **`PUT /phone`:** Updates phone number.
+* **`GET /great-sellers`:** Directory of top-rated platform sellers.
+* **`GET /{id}/great-seller-status`:** Detailed metrics breakdown for Great Seller status.
+
+### Address Book (`AddressController` — `/api/v1/users/addresses`)
+* **`GET /`:** Lists saved addresses for current user.
+* **`POST /`:** Adds a new shipping address.
+* **`PUT /{id}`:** Modifies address details.
+* **`DELETE /{id}`:** Deletes an address.
+* **`POST /{id}/main`:** Designates an address as primary.
+
+### Memberships (`MembershipController` — `/api/v1/memberships`)
+* **`GET /status`:** Returns active plan tier, auto-renew flag, and daily Aura AI quota usage.
+* **`POST /upgrade`:** Changes subscription plan (`MembershipUpgradeRequest`).
+* **`POST /cancel`:** Disables auto-renewal for current period.
+* **`POST /toggle-auto-renew`:** Toggles auto-renewal state.
+
+### Prestige Badges (`UserBadgesController` — `/api/v1/user/badges`)
+* **`GET /`:** Returns all badges earned by the authenticated user.

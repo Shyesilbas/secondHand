@@ -1,35 +1,77 @@
 # Cart Domain
 
-## Purpose
-The `cart` domain provides a lightweight, optimistic shopping cart service. It manages addition, modification, and deletion of items with zero database row locking, deferring strict atomic stock reservations to the `checkout` domain via Redis Lua scripts.
+## 1. Domain Scope & Purpose
+The `cart` domain provides an optimistic shopping cart service for buyers. It manages cart additions, quantity updates, item deletions, and listing enrichments without acquiring relational database locks. It decouples casual cart browsing from atomic stock deductions, deferring hard stock locks to the checkout phase while feeding real-time social proof demand metrics into Redis.
 
-## Architecture Overview
-- **CartService:** Core business logic handling cart additions, quantity updates, item removals, metadata enrichment, and demand tracking.
-- **CartValidator:** Validates user eligibility (cannot buy own items), listing active state, and available stock.
-- **CartReservationScheduler:** Periodically checks reservation consistency.
-- **Two-Tier Stock Model:** Cart additions operate optimistically without holding pessimistic database locks or blocking other shoppers. Hard atomic stock reservation is executed during the checkout step via `InventoryRedisReservationService` (Redis Lua).
+```mermaid
+flowchart TD
+    A["Buyer Adds Item to Cart<br/>POST /api/v1/cart/items"] --> B["CartValidator<br/>• Self-purchase check (buyer != seller)<br/>• Listing status == ACTIVE<br/>• Available inventory > 0"]
+    B --> C["PostgreSQL (carts table)<br/>Optimistic save (zero row locks)"]
+    C --> D["Social Demand Tracker<br/>Redis Set: v4:cart:in_cart_users:{listingId}"]
+    D --> E["Cart Enrichment<br/>ListingEnrichmentService (badges, seller info)"]
+    E --> F["Buyer Proceeds to Checkout<br/>Hard Redis Lua Reservation Enforced"]
+```
 
-## Business Invariants & Constraints
-- **Ownership Limitation:** Users cannot add their own listings to their cart.
-- **Listing Status:** Items added to the cart must be in an `ACTIVE` state.
-- **Zero DB Lock Contention:** Adding to cart does not acquire `PESSIMISTIC_WRITE` locks on listings or inventory, protecting the database during high-traffic flash sales and preventing Cart Hoarding DoS attacks.
-- **Social Demand Tracking:** Active items in user carts update the Redis Set `v4:cart:in_cart_users:{listingId}` to power live shopping demand statistics.
-- **Parallel Mutations:** Concurrent additions or updates that trigger DB unique constraint conflicts are intercepted and converted into standard business errors (`RESERVATION_FAILED`), not technical 500s.
+---
 
-## Integration Points
-- **Incoming:** User actions via `CartController`.
-- **Outgoing:** Validates listing state via the `listing` domain query APIs. Provides items to the `checkout` domain.
+## 2. Step-by-Step Cart Lifecycle
 
-## Public APIs
-- `GET /api/v1/cart`: Retrieves authenticated user's cart items, subtotal, and valid discounts.
-- `POST /api/v1/cart/items`: Adds a listing item to the cart.
-- `PUT /api/v1/cart/items/{listing-id}`: Updates quantity for an item in the cart.
-- `DELETE /api/v1/cart/items/{listing-id}`: Removes a single item from the cart.
-- `DELETE /api/v1/cart/items`: Clears all items from the user's cart.
-- `GET /api/v1/cart/count`: Returns count of items in the user's cart.
-- `GET /api/v1/cart/check/{listing-id}`: Checks if a listing is currently in the user's cart.
-- `GET /api/v1/cart/reservations/count/{listing-id}`: Returns count of active reservations for a listing.
+1. **Two-Tier Stock Model (Browsing vs. Checkout):**
+   - **Tier 1 — Optimistic Browsing (Cart Domain):** When a user adds an item to the cart or updates quantities, the system validates that current inventory is positive but **does not lock or hold stock in Redis or PostgreSQL**. Multiple users may place the same item in their carts concurrently.
+   - **Tier 2 — Atomic Reservation (Checkout Domain):** When the user transitions from cart to checkout (`/api/checkout/initiate` or `/api/v1/orders/checkout`), `CheckoutStockReservationService` executes the atomic Lua script (`reserve_stock_with_ttl.lua`), holding inventory for exactly 15 minutes.
+2. **Item Addition & Validation (`processCartAction`):**
+   - Validates that the buyer is not the seller of the listing (`CANNOT_ADD_OWN_LISTING`).
+   - Ensures the listing is in `ListingStatus.ACTIVE`.
+   - Validates that requested quantity is available in PostgreSQL inventory (`AVAILABLE_STOCK_INSUFFICIENT`).
+   - Saves or updates the `Cart` record. Handles race conditions (`DataIntegrityViolationException`, `ObjectOptimisticLockingFailureException`) gracefully by translating them into clean business results.
+3. **Social Demand Metrics (`CartSocialMetricService`):**
+   - On addition, adds the user ID to the Redis Set `v4:cart:in_cart_users:{listingId}` with a 7-day TTL.
+   - On item removal, removes the user ID from the Redis Set.
+   - Drives real-time urgency metrics (*"In X people's cart"*) displayed across catalog cards and listing detail views without running expensive database aggregate queries.
+4. **Cart Retrieval & Metadata Enrichment (`getCartItems`):**
+   - Loads paginated cart records with eager listing joins (`findByUserIdWithListing`).
+   - Passes loaded listings through `ListingEnrichmentService` to attach active showcase flags, seller reputation badges, and favorite status for the viewing buyer.
 
-## Related Knowledge
-- **Cart Feature Development**
-  -> `.docs/runbooks/cart-feature-runbook.md`
+---
+
+## 3. Business Invariants & Concurrency Guarantees
+
+* **Zero DB Lock Contention:** Adding an item to the cart never executes `PESSIMISTIC_WRITE` locks on `listings` or `inventory` tables. This guarantees high throughput during flash sales and prevents "Cart Hoarding" Denial-of-Service attacks.
+* **Self-Purchase Prevention:** Users are strictly blocked from adding their own items to the cart (`CANNOT_ADD_OWN_LISTING`).
+* **Active Status Constraint:** Only listings in `ListingStatus.ACTIVE` can reside in the cart. If a seller archives or deletes an item while it sits in a buyer's cart, subsequent checkout attempts cleanly fail.
+* **Deterministic Quantity Floors:** Cart quantities must be positive integers ($\ge 1$). Setting quantity to 0 triggers automatic item deletion.
+
+---
+
+## 4. Redis Key Standards
+
+| Redis Key Pattern | Type | TTL | Purpose |
+| :--- | :--- | :--- | :--- |
+| `v4:cart:in_cart_users:{listingId}` | Set (User IDs) | 7 Days | Tracks distinct user IDs holding the listing in their active cart for social proof metrics. |
+
+---
+
+## 5. Database Schema & Flyway Structure
+
+Stored in the `carts` table:
+* `id`: BigInt primary key.
+* `user_id`: Foreign key to `users` (buyer).
+* `listing_id`: Foreign key to `listings`.
+* `quantity`: Integer requested quantity (default: 1).
+* `is_reserved`: Boolean indicating low-stock warning flag.
+* `reserved_at`, `reservation_end_time`: Timestamps for cart reservation tracking.
+* `created_at`, `updated_at`: Audit timestamps.
+* Indexed on `(user_id, listing_id)` with unique constraint.
+
+---
+
+## 6. Public REST API Contracts (`CartController` — `/api/v1/cart`)
+
+* **`GET /`:** Retrieves paginated items in the user's cart enriched with seller badges and pricing.
+* **`POST /items`:** Adds a listing item to the cart (`AddToCartRequest`).
+* **`PUT /items/{listingId}`:** Updates requested quantity for an item (`UpdateCartItemRequest`).
+* **`DELETE /items/{listingId}`:** Removes a specific item from the cart.
+* **`DELETE /items`:** Clears all items from the current user's cart.
+* **`GET /count`:** Fast integer endpoint returning total count of items in the user's cart (powers header cart badge).
+* **`GET /check/{listingId}`:** Quick boolean check verifying whether a listing is already in the user's cart.
+* **`GET /reservations/count/{listingId}`:** Returns active reservation count for a listing.

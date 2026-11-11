@@ -33,6 +33,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[notification-feed-and-broadcast-architecture.md](notification-feed-and-broadcast-architecture.md)** | Kişisel bildirimler, sistem broadcast'leri, unified feed projection (`NotificationFeedRepository`), WebSocket live push ve badge cache eviction. |
 | **[email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md)** | Event-driven e-posta gönderimi: `mail.dispatch.v1`, `EmailKafkaProducer`/`EmailKafkaConsumer`, template'ler ve idempotency. |
 | **[aura-ai-and-context-architecture.md](aura-ai-and-context-architecture.md)** | Aura AI asistanı: Gemini entegrasyonu, SSE streaming, context adapter'ları, otonom arama planlaması (`AuraListingSearchOrchestrator`), kullanıcı belleği ve güvenlik sınırları. |
+| **[aura-trust-safety-and-complaint-moderation-architecture.md](aura-trust-safety-and-complaint-moderation-architecture.md)** | Aura AI güven ve moderasyon motoru: 2 saatlik soğuma süresi, Redis ZSET gecikmeli kuyruğu, saatlik 10 batch worker'ı, sohbet/ilan analizi ve kademeli ceza merdiveni. |
 | **[external-integrations-cloudinary-and-exchange.md](external-integrations-cloudinary-and-exchange.md)** | Cloudinary (görsel depolama & CDN) ve ExchangeRate-API (2 saatlik Redis cache'li döviz kuru). |
 
 ### Katalog, veri ve altyapı

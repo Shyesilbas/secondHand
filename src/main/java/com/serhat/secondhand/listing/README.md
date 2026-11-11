@@ -1,112 +1,201 @@
 # Listing Domain
 
-## Purpose
-The `listing` domain is the core catalog engine. It manages the creation, validation, lifecycle (publish, deactivate, sell), searching, filtering, and statistical tracking of items across 6 distinct categories (Vehicle, Electronics, Books, Clothing, Real Estate, Sports).
+## 1. Executive Summary & Purpose
+The `listing` domain is the core polymorphic catalog engine of the marketplace. It manages the creation, validation, lifecycle transitions (publish, deactivate, sell, reserve), search indexing, multi-vertical attribute rules, dynamic pricing history, and real-time view/social proof metrics across 6 distinct categories:
+1. **Vehicles** (`VehicleListing` -> `vehicle_listings`)
+2. **Electronics** (`ElectronicListing` -> `electronic_listings`)
+3. **Real Estate** (`RealEstateListing` -> `real_estate_listings`)
+4. **Books** (`BooksListing` -> `books_listings`)
+5. **Clothing** (`ClothingListing` -> `clothing_listings`)
+6. **Sports & Outdoor** (`SportsListing` -> `sports_listings`)
 
-## Architecture Overview
-- **Rich Domain Model:** `Listing` entity encapsulates state-changing business rules (`publish()`, `deactivate()`, `updatePrice()`).
-- **CQRS Separation:** Write operations (`ListingCommandService`) are segregated from complex read operations (`ListingQueryService`, `ListingSearchService`).
-- **Ports & Adapters (Hexagonal):** Interactions with `payment` are abstracted through `ListingFeePaymentPort` and `PaymentModuleAdapter`.
-- **AOP:** Price history changes are automatically tracked via `@TrackPriceChange` aspects.
-- **Asynchronous Execution:** View tracking (`ListingViewService`) and read enrichment (fetching favorites/reviews) are executed asynchronously.
+---
 
-## Business Invariants & Constraints
-- **State Validation:** A listing cannot be published unless its status is `DRAFT` or `INACTIVE` and any required listing fees are paid.
-- **Polymorphism:** Category-specific data must inherit from the base `Listing` entity using the `JOINED` inheritance strategy.
-- **Ownership Security:** Mutations (update, deactivate, mark sold) mandate strict ownership validation (`validateOwnership()`) in the domain logic.
-- **Event Emission:** `NewListingCreatedEvent` is published exclusively after a successful transition to the `ACTIVE` state.
-- **Decoupling:** `listing` must never directly depend on `payment` implementation details; it relies on ports.
+## 2. Architecture & Data Flow
 
-## State Machine
+```mermaid
+flowchart TD
+    subgraph ClientLayer ["Client Ingestion (REST)"]
+        BLC["ListingController\n/api/v1/listings"]
+        VLC["VehicleListingController\n/api/v1/vehicles"]
+        ELC["ElectronicListingController\n/api/v1/electronics"]
+        RLC["RealEstateController\n/api/v1/real-estates"]
+        BKC["BooksListingController\n/api/v1/books"]
+        CLC["ClothingListingController\n/api/v1/clothings"]
+        SLC["SportsListingController\n/api/v1/sports"]
+    end
+
+    subgraph ServicePipeline ["CQRS & Validation Engine"]
+        LVE["ListingValidationEngine\n(Category + Attribute Validators)"]
+        CS["AbstractListingService / ListingCommandService"]
+        Snap["Spec Snapshotters\n(Vehicle, Electronic, Book)"]
+        QS["ListingQueryService / ListingSearchService"]
+    end
+
+    subgraph Persistence ["PostgreSQL Joined Table Inheritance"]
+        BaseListings[("listings\n(PK: id, title, price, status, attributes JSONB)")]
+        VL[("vehicle_listings")]
+        EL[("electronic_listings")]
+        RL[("real_estate_listings")]
+        BL[("book_listings")]
+        CL[("clothing_listings")]
+        SL[("sports_listings")]
+    end
+
+    subgraph AncillaryServices ["Cross-Cutting Services & Redis"]
+        LVS["ListingViewService\n(Async View Tracking & Debounce)"]
+        SPS["ListingSocialProofService\n(Viewers + InCart + Favorites)"]
+        PHA["@TrackPriceChange Aspect\n(listing_price_histories)"]
+        Cache["Redis Caching\ncatalog:*, listing:userListings"]
+    end
+
+    BLC & VLC & ELC & RLC & BKC & CLC & SLC --> LVE
+    LVE --> Snap
+    Snap --> CS
+    CS --> BaseListings
+    BaseListings --- VL & EL & RL & BL & CL & SL
+    CS -.-> PHA
+    BLC --> QS
+    QS --> Cache
+    BLC --> LVS & SPS
+```
+
+---
+
+## 3. Polymorphic Model & Database Architecture
+
+Marketplace listings leverage **JPA Joined Table Inheritance** (`@Inheritance(strategy = InheritanceType.JOINED)`):
+
+### 3.1 Base Entity: `listings`
+Common fields shared across all listing categories:
+- `id` (UUID, PK)
+- `user_id` (BIGINT, FK -> `users.id`, listing seller)
+- `category` (VARCHAR, maps to `ListingType`)
+- `title` (VARCHAR(150), indexed)
+- `description` (TEXT)
+- `price` (NUMERIC(12,2), not null)
+- `currency` (VARCHAR(3), default `'TRY'`)
+- `status` (VARCHAR, maps to `ListingStatus`: `DRAFT`, `ACTIVE`, `INACTIVE`, `RESERVED`, `SOLD`, `DELETED`)
+- `stock` (INT, default `1`)
+- `city` / `district` / `neighborhood` (Location hierarchy strings)
+- `images` (List of photo URLs stored in JSON/collection table)
+- `attributes` (JSONB, indexed with GIN: `idx_listings_attributes_gin`)
+- `view_count` / `favorite_count` (Denormalized counters)
+- `created_at` / `updated_at` / `published_at` (Timestamps)
+
+### 3.2 Category-Specific Tables
+1. **`vehicle_listings`:** `brand_id`, `model_id`, `generation_id`, `version_id`, `trim_id`, `model_year`, `kilometer`, `fuel_type`, `transmission`, `body_type`, `engine_power`, `engine_capacity`, `color`, `damage_status`.
+2. **`electronic_listings`:** `type_id`, `brand_id`, `model_id`, `variant_id`, `condition`, `color`, `has_box`, `has_invoice`, `warranty_status`.
+3. **`real_estate_listings`:** `type_id`, `ad_type` (`FOR_SALE`, `FOR_RENT`), `gross_area_m2`, `net_area_m2`, `room_count`, `floor_number`, `total_floors`, `heating_type`, `building_age`, `furnished`, `approximate_lat`, `approximate_lon`.
+4. **`book_listings`:** `work_id`, `edition_id`, `author_id`, `publisher_id`, `genre_id`, `isbn`, `publication_year`, `page_count`, `cover_type`, `language`, `condition`.
+5. **`clothing_listings`:** `type_id`, `brand_id`, `audience` (`WOMEN`, `MEN`, `UNISEX`, `GIRL`, `BOY`, `BABY`), `size_system`, `size_key`, `color`, `condition`, `purchase_year`.
+6. **`sports_listings`:** `sport_discipline_id`, `sport_equipment_type_id`, `sport_condition_id`.
+
+---
+
+## 4. Lifecycle & State Machine
+
 ```mermaid
 stateDiagram-v2
     [*] --> DRAFT: Create Listing
-    DRAFT --> ACTIVE: Publish (Fee Paid)
-    ACTIVE --> INACTIVE: Deactivate
+    DRAFT --> ACTIVE: Publish (Fee Verification / Promotion)
+    ACTIVE --> INACTIVE: Seller Deactivates
     INACTIVE --> ACTIVE: Reactivate
-    ACTIVE --> SOLD: Mark as Sold
-    ACTIVE --> RESERVED: Temporarily Reserved
-    RESERVED --> ACTIVE: Reservation Cancelled
-    RESERVED --> SOLD: Sale Completed
+    ACTIVE --> RESERVED: In Exclusive Offer Hold (24h)
+    RESERVED --> ACTIVE: Offer Lock Expired / Cancelled
+    RESERVED --> SOLD: Order Paid & Completed
+    ACTIVE --> SOLD: Direct Purchase Complete
+    ACTIVE --> DELETED: Soft Delete by Seller / Moderator
+    INACTIVE --> DELETED: Soft Delete
 ```
 
-## Integration Points
-- **Incoming:** None directly (acts as a core source of truth).
-- **Outgoing:** Payment Domain (via Adapter for listing fees), Follow/Notification (publishes events on new listings or price drops).
+- **Listing Creation:** Initial creation transitions listing to `DRAFT` or `ACTIVE` depending on whether listing fees are required by current membership tier limits.
+- **Publish:** Validates completeness, required attributes, hierarchy integrity, and issues `NewListingCreatedEvent` upon transitioning to `ACTIVE`.
+- **Price Tracking:** Any modification to `price` triggers the `@TrackPriceChange` aspect, recording historical records in `listing_price_histories` (`old_price`, `new_price`, `changed_at`).
 
-## Public APIs (Logical)
-- CRUD for Base Listings and Specific Categories
-- Search & Dynamic Criteria Filtering
-- View Tracking & Aggregated Statistics
-- Price History Queries
+---
 
-## Catalog Seeds
-- Run with `APP_SEED=<key[,key]|listing|all>`; seeds are idempotent upserts from `src/main/resources/data/**`.
-- `CatalogLegacyPruner` deletes rows missing from the JSON only if no foreign key references them. Real estate seeds also realign `name` to the JSON key (rows are matched by id).
-- After all seeds `CatalogSeedStartupRunner` clears the `catalog:*` caches; `GET /api/v1/enums/all` (gzip, 5 min browser cache) also serves `roomConfigs`, `zoningStatuses`, `floors`, `infrastructureStatuses` and `buildingConditions`.
-- The frontend derives real estate form fields from `realEstateTypes[].fieldRules` and equipment options from `sportEquipmentTypes[].disciplineId`; do not hardcode type names.
+## 5. Attributes Engine & Catalog Snapshotting
 
-## Attributes (shared, all listing types)
-- `listing_attribute_definitions` (+ `listing_attribute_options`) declare which extra keys a listing type accepts; `scope_key` narrows a definition (vehicle type name, e.g. `CAR`), `ALL` applies to every scope. Seeded from `data/attributes/<type>.json` with seed key `attributes` (part of `listing`).
-- `LISTING`-level values live in `listings.attributes` (JSONB, GIN index). `CATALOG`-level keys describe catalog leaves (e.g. `vehicle_versions.specs`) and are rejected on a listing.
-- `ListingValidationEngine` runs `ListingAttributeValidator` after the category validators: unknown key, wrong type, range, option and required checks (`ATTRIBUTE_*` codes in `ListingErrorCodes`); empty values are dropped and accepted values normalized. Definitions are cached in `catalog:attributeDefinitions`.
-- Removing a definition from the file deletes it; listings that still carry the key fail validation on their next update.
+### 5.1 Dynamic Attributes (`listing_attribute_definitions`)
+- Extra fields configured dynamically per category/type without altering SQL schemas.
+- `scope_key` narrows definitions (e.g. `CAR`, `PHONE`, `RESIDENTIAL`), while `ALL` applies globally.
+- Validated by `ListingAttributeValidator`: checks data types (INTEGER, DECIMAL, BOOLEAN, STRING, SELECT), allowed options (`listing_attribute_options`), regex patterns, and range boundaries.
+- Values are persisted into the `listings.attributes` JSONB column.
 
-## Vehicle Catalog
-- Vehicle types: `data/vehicles/types.json` defines the only types (CAR Otomobil, COMMERCIAL Hafif Ticari, TRUCK Ağır Vasıta, MOTORCYCLE Motosiklet; bicycles live under sports). Each type lists its allowed `bodyTypes` and a `fields` rule (`REQUIRED`/`OPTIONAL`/`HIDDEN`) for every spec field in `VehicleSpecFields`; stored on `vehicle_types` (V40) and served in `vehicleTypes[]` of `/api/v1/enums/all`. `VehicleTypeRulesValidator` applies them (`VEHICLE_<FIELD>_REQUIRED`, `VEHICLE_BODY_TYPE_NOT_ALLOWED`, hidden fields cleared); the form reads the same rules, so neither side checks type names. Type-specific extras (tramer, payload, axle configuration, cabin, ...) are attribute definitions scoped by type name. The listing form shows them in the "Durum ve geçmiş" section and the detail page in a "Durum" tab (frontend `listing/components/attributes/`).
-- Hierarchy: type -> brand -> model -> generation -> version -> (trim). A generation holds body facts (`body_type`, `doors`, `seat_count`, `is_facelift`); a version (`vehicle_versions`) is one engine + gearbox + drivetrain with power, torque, years, list price, `source` (`claude-draft`/`verified`) and CATALOG `specs`.
-- When a listing picks `vehicleVersionId`, `VehicleSpecSnapshotter` copies fuel, cc, hp, gearbox, drivetrain (version) and body type, doors, seats (generation) over the client's values; a null catalog value keeps the seller's. Without a version the specs are seller-declared (unverified).
-- `VehicleHierarchyValidator`: the version must belong to the selected generation, the model year must be inside the version's years (generation's years when the version has none), and a trim must be one the version lists (no list = any trim of the generation).
-- Seed files: `generations[].versions[]` is the full format; legacy `engines[]` (name + fuel) still works; a generation may not list both. Each version shares its id with a `vehicle_engines` row; versions and engines that left a seeded generation are pruned unless a listing points at them. The seed fails if brands.json uses a type types.json does not define, or a model/generation body type its type does not allow. Models a run did not seed are pruned unless a listing points at them; before that, a listing on such a model is moved to the seeded model with the same brand and name (e.g. a van moved from CAR to COMMERCIAL), matching generation, engine/version (name + fuel) and trim by name and clearing what has no match. Types missing from types.json are then pruned.
-- Lookups: `GET /api/v1/catalog/vehicle/{types|brands|models|generations|versions|trims|attributes}` (public, cached in `catalog:vehicle`, `year` narrows generations and versions). In `/api/v1/enums/all`, `vehicleGenerations` carry the body facts and `vehicleEngines` carry their same-id version's facts (`versionId`, hp, cc, torque, gearbox, drivetrain, years, `source`).
-- Listing form (`secondhand-frontend/src/listing/config/vehicleConfig.js`): picking an engine sends its id as `vehicleVersionId` too, fills the catalog facts and shows them read-only; the model year must fall inside the version's years.
+### 5.2 Deterministic Snapshotters
+When an entity links to a verified catalog item, snapshotters copy canonical specifications into the listing to guarantee immutable facts:
+- **`VehicleSpecSnapshotter`:** Copies engine specs (`hp`, `cc`, `torque`, `gearbox`, `fuel`) from `vehicle_versions` and body facts (`doors`, `seat_count`) from `vehicle_generations`.
+- **`ElectronicSpecSnapshotter`:** Copies hardware specs (`chipset`, `battery_mah`, `camera`) and official colors from `electronic_models` and `electronic_model_variants`.
+- **`BooksEditionSnapshotter`:** Copies ISBN-13, page count, publication year, author, and publisher from `book_editions`.
 
-## Electronics Catalog
-- Electronic types: `data/electronics/types.json` defines the 19 types (label, `sortOrder`) and a `fields` rule (`REQUIRED`/`OPTIONAL`/`HIDDEN`) for every spec field in `ElectronicSpecFields`; stored on `electronic_types` (V41) and served in `electronicTypes[]` of `/api/v1/enums/all` together with `attributeKeys`. `ElectronicTypeRulesValidator` applies them (`ELECTRONIC_<FIELD>_REQUIRED`, hidden fields cleared, `wireless` derived from the connection type, `ELECTRONIC_YEAR_INVALID`, `ELECTRONIC_ORIGIN_REQUIRED` for warranty proof without origin); no code checks type names. The seed fails if brands.json uses a type types.json does not define.
-- Condition and history answers (battery health, replaced parts, Face ID, IMEI, box, invoice, warranty end; consoles: controller count, drift, modded, cables, games; headphones: battery condition, both sides working, charging case, ear pads) are attribute definitions in `data/attributes/electronics.json`, scoped by type name, stored in `listings.attributes`. V41 copied the old `electronic_listings` columns into it and V42 dropped them. Filters on them use `ListingAttributePredicates` (JSONB, integer values cast in SQL).
-- Hierarchy: type -> brand -> model -> variant. A model holds `specs` (keys in `ElectronicCatalogSpecs`: copied keys such as chipset, battery mAh, camera, 5G/NFC/dual SIM; display-only keys such as `screenInches`, refresh rate, IP rating), official `colors` (`[{name, color}]`, `color` = `Color` enum) and `source` (`claude-draft`/`verified`). A variant (`electronic_model_variants`) is one storage/RAM (phone) or CPU/GPU/RAM/SSD (laptop) combination.
-- When a listing has a model, `ElectronicSpecSnapshotter` copies the model specs, then the picked variant's columns and specs, over the client's values (null catalog values keep the seller's); `colorName` must be one of the model's colors and sets the generic `color`. `Processor` stays the filterable family; `chipset` is the exact chip text. `ElectronicHierarchyValidator` adds `ELECTRONIC_VARIANT_MODEL_MISMATCH` and `ELECTRONIC_COLOR_NOT_IN_MODEL`.
-- Seed checks: unknown spec keys, wrong value kinds, facts without `source`, unknown colors, duplicate variant names and variant columns repeated inside variant `specs` fail the seed. Variants that left a model are deleted unless a listing references them. Filled so far: iPhone 13-17, Galaxy S23-S25 and A34-A56, Pixel 6-8, Xiaomi 13-15 and POCO F6/X6 Pro, iPads 2021+, Galaxy Tab S8-S10, MacBook Air/Pro M1-M4, 13 consoles, 25 headphones, 12 Apple/Samsung watches, 55 cameras, 13 OLED TV series (size variants), 20 monitors, 10 speakers (all `claude-draft`; see `data/electronics/SOURCES.md`).
-- Lookups: `GET /api/v1/catalog/electronics/models/{id}` (specs, colors, variants) and `/attributes?typeId=` (public). `/api/v1/enums/all` `electronicModels[]` also carry `specs`, `colors`, `variants` and `catalogSource`, so the form works synchronously.
-- Listing form (`secondhand-frontend/src/listing/config/electronicsConfig.js`): fields follow the type rules, catalog values are read-only (catalog toggles are hidden), a model with official colors offers those instead of the generic list.
+---
 
-## Real Estate Catalog
-- Property types: `data/realestate/realestate.json` gives each type a `category` (RESIDENTIAL/LAND/COMMERCIAL/OTHER, also the attribute scope), `sortOrder` and a `fields` rule (`REQUIRED`/`OPTIONAL`/`HIDDEN`) for every field in `RealEstateSpecFields`; stored on `real_estate_types` (V44) and served in `realEstateTypes[]` of `/api/v1/enums/all`. The seed fails if a type misses a field or makes a toggle REQUIRED. Ad types are only FOR_SALE and FOR_RENT.
-- `RealEstateTypeRulesValidator` applies the rules (`REAL_ESTATE_<FIELD>_REQUIRED`, hidden fields cleared, spec keys checked against `data/realestate/specs.json`, `REAL_ESTATE_FLOOR_ABOVE_TOTAL`, `REAL_ESTATE_NET_AREA_ABOVE_GROSS`). `roomCount` is derived from `roomConfigKey`, `floorNumber` from `floorKey` (ROOF = total floors); `deposit`/`minLeaseMonths` are kept only for rent, `loanEligible` only for sale.
-- Deed, usage status, facades, water source, loan eligibility, deposit and minimum lease are attribute definitions in `data/attributes/realestate.json` (scoped by category); V44 moved the old columns there and folded `square_meters`/`floor`/`zoning_status` into `gross_area_m2`/`floor_number`/`zoning_status_key`.
-- Map point: `RealEstateLocationService` stores a random point 100-300 m from the neighborhood center (`lat`/`lon` in `data/common/locations.json`, from OpenStreetMap) on create and when the neighborhood changes; no address is stored. Neighborhoods without coordinates get no point and no map.
-- Lookups: `GET /api/v1/catalog/real-estate/attributes?typeId=` (public). Form: `secondhand-frontend/src/listing/config/realEstateConfig.js`; the detail page shows an approximate-area Leaflet map.
+## 6. Real-Time View Tracking & Social Proof
 
-## Book Catalog
-- V45 adds `book_authors`, `book_publishers`, `book_works` (title, type, genre, original language, ordered authors) and `book_editions` (one ISBN-13: publisher, year, pages, format, language, translator, cover, exam year). Seeded by `books` from `data/books/catalog.json` (git-ignored; built from Open Library Turkish editions, plus `claude-draft` exam books without ISBN); every row has `source` `verified` or `claude-draft`, bad keys, ISBNs or duplicates fail the seed. Editions or works removed from the file are deleted unless a listing points at them. E-book and audiobook formats are gone (V45 moved their listings to paperback).
-- A listing may link `editionId`; `BooksEditionSnapshotter` then copies author, type, genre, language, format, publisher, year, pages, ISBN and translator from the catalog on create and update. Without an edition the seller types them and the listing shows as unverified. ISBN is stored as ISBN-13 (ISBN-10 converted, bad checksum = `BOOK_ISBN_INVALID`).
-- Types and genres (`data/books/books.json`): 19 types, each genre list on one axis (subject, exam, field); level, format and age are attributes. A genre may list the old genres it `replaces` (optionally with attributes, e.g. `prepFormat`); `BookGenreRemapper` moves listings and works onto it before the old rows are pruned, and the seed fails if anything still points at a genre or type that is gone. Listings linked to an edition follow their work's type and genre on every seed. The seed clears the Redis `catalog:bookGenres` cache.
-- Attributes in `data/attributes/books.json`, scope = type name: `usageMarks`, `collectorFeatures` (all); `prepFormat`, `subject`, `aytField`, `solvedRatio`, `videoSolutions` (SINAV_HAZIRLIK); `gradeLevel`, `schoolBookKind` (OKUL_KITAPLARI); `ageRange` (COCUK_KITAPLARI); `volumeNumber` (CIZGI_ROMAN_VE_MANGA); `issueNumber` (DERGI_VE_SURELI_YAYIN).
-- Lookups (public): `GET /api/v1/catalog/books/editions?isbn=`, `/search?q=` (title or author, min 2 chars, 20 results), `/attributes?typeId=`. Covers are Open Library URLs (`covers.openlibrary.org`), not uploaded to Cloudinary. Form: `secondhand-frontend/src/listing/config/booksConfig.js` with `BookEditionPicker`.
+Managed by `ListingViewController` and `ListingViewService`:
+- **Asynchronous Tracking:** View events (`POST /api/v1/listings/{id}/view`) are decoupled from reads and executed asynchronously.
+- **Debounce Window:** Implements sliding-window debounce per client IP/session/user to prevent artificial view inflation.
+- **Active Viewers (24h):** Calculates unique visitors over the past 24 hours (`getActiveViewerCount`).
+- **Unified Social Proof:** `ListingSocialProofService.getSocialProof(id)` combines 3 hot metrics in a single lightweight payload:
+  $$\text{SocialProof} = \{ \text{activeViewers24h}, \text{inCartUsersCount}, \text{favoriteCount} \}$$
 
-## Clothing Catalog
-- Types (`data/clothing/types.json`, 59): `group` (APPAREL, FOOTWEAR, ACCESSORY), `sortOrder`, `sizes` = audience -> allowed size systems (an audience missing there means the type is not offered for it, e.g. no men's dress), `fields` = fit / pattern / fabricType as REQUIRED, OPTIONAL or HIDDEN. Brands (`brands.json`, 100) carry a price `segment` (BUDGET, MID, PREMIUM, LUXURY). The seed fails on unknown groups, audiences, systems or rules, rewrites legacy names to the key and clears the Redis `catalog:clothingTypes` cache.
-- Size systems are shared in `data/common/sizes.json` (`SizeSystemCatalog`, loaded at startup, fail-fast): LETTER, WOMEN_NUMERIC, MEN_NUMERIC, JEANS (`W32_L32`), SHOE_EU, KIDS_SHOE_EU, KIDS_AGE, BABY_MONTHS, ONE_SIZE. A listing stores `audience` (WOMEN, MEN, UNISEX, GIRL, BOY, BABY), `size_system` + `size_key` (keys repeat across systems) and an optional `purchase_year`; V46 copied the old gender/category, size, shoe size and purchase date into these and dropped the old columns and `material`.
-- `ClothingTypeRulesValidator`: type offered for the audience (`CLOTHING_TYPE_NOT_FOR_AUDIENCE`), size required and from an allowed system (`CLOTHING_SIZE_REQUIRED` / `_SYSTEM_INVALID` / `CLOTHING_SIZE_INVALID`), REQUIRED fields set, purchase year 1950..this year, a `FLAWED` item names at least one `defects` value (`CLOTHING_DEFECTS_REQUIRED`). Cleanup sets the only allowed system (and `ONE_SIZE`) and clears HIDDEN fields. Conditions: NEW_WITH_TAGS, NEW_WITHOUT_TAGS, VERY_GOOD, GOOD, FLAWED.
-- Attributes in `data/attributes/clothing.json`, scope = type group: `defects` (all), `season` (APPAREL, FOOTWEAR), `chestCm` / `waistCm` / `lengthCm` / `inseamCm` (APPAREL), `authenticity` (FOOTWEAR, ACCESSORY). Lookup: `GET /api/v1/catalog/clothing/attributes?typeId=` (public). Filters: `audiences` (WOMEN or MEN also match UNISEX), `sizeSystem` + `sizes`, purchase year range. `/enums/all` serves `clothingAudiences`, `sizeSystems`, `clothingFits`, `clothingPatterns`, `fabricTypes` and types with `sizeRules`, `fieldRules`, `attributeKeys`. Form: `secondhand-frontend/src/listing/config/clothingConfig.js`.
+---
 
-## Listing Generator (local profile only)
-- `--app.seed=listings-generate` creates published vehicle, electronics, real estate, book and clothing listings for every ACTIVE user whose email is not `@example.test`, round-robin. Counts and randomness: `app.listing-generator.vehicles` / `.electronics` / `.realestate` / `.books` / `.clothing` (default 200 each, 0 skips), `.seed` (42). Never part of `all`.
-- Clothing listings have no photos. Type by popularity, audience among those the type allows (women most), a brand that sells that type (`ClothingListingGenerator` brand kinds; kids get budget/mid brands only), mid-range sizes most often. Price is `claude-draft`: new price per type times brand segment, condition and a kids factor. Underwear, socks and swimwear are only listed new; flawed items name defects.
-- Book listings link a random catalog edition (photo = its cover). Price is `claude-draft`: estimated new price from type and pages (exam books: from `prepFormat`), times condition, hardcover, past exam year and solved-pages factors, rounded to 5 TL. Exam book format and subject are read from the title.
-- Real estate prices come from `data/listing-generator/realestate-prices.json` (git-ignored, `claude-draft`): sale and rent TL/m² per city plus district factors; the city is picked by its weight there. Rooms, area, floor, age and amenities are drawn per property type; real estate listings have no photos.
-- Prices come from `data/listing-generator/prices.json` (git-ignored, `claude-draft` estimates in TRY): vehicles per generation for an `anchorYear`, electronics per model for the cheapest variant (TVs: 55"). Unknown brand/model/generation names fail the run.
-- Listings go through `createListing` (validation, catalog snapshot, inventory), then fee-paid + `publish()` without `ListingPaymentHandler` or `NewListingCreatedEvent`, so no payment, notification or e-mail. `created_at` is spread over the last 120 days.
-- Photos come from `data/listing-generator/photos.json` (git-ignored; Wikimedia Commons photos already uploaded to Cloudinary `secondhand-generated/`), keyed by generation name or `TYPE|brand|model`. The photo sets the listing color; models without photos get `imageUrl = null`.
-- Vehicles use only generations with a body type and versions with fuel and gearbox; others are skipped with a warning (today: light commercials, motorcycles and some cars).
-- Every id is stored in `generated_listings` (V43). `--app.seed=listings-clean` hard-deletes generated listings nobody touched and soft-deletes (`DELETED`) those with carts, favorites, offers, chats, orders, payments, complaints or showcases.
+## 7. Redis Caching Topology
 
-## Related Knowledge
-- **Listing Data Flows**
-  -> `.docs/knowledge/listing-data-flows.md`
+| Cache Name | Key Pattern | Purpose | Invalidation Event |
+|---|---|---|---|
+| `catalog:brands` | `catalog:brands:all` | Vehicle brand catalog lookup | Admin catalog mutation |
+| `catalog:vehicleTypes` | `catalog:vehicleTypes:all` | Vehicle type definitions | Startup / Seed runner |
+| `catalog:clothingTypes` | `catalog:clothingTypes:all` | Clothing category rules & sizes | Catalog seed update |
+| `catalog:electronicTypes` | `catalog:electronicTypes:all` | Electronic types and specs | Catalog seed update |
+| `catalog:bookGenres` | `catalog:bookGenres:all` | Book genre taxonomy | Book remapper / Seed update |
+| `listing:userListings` | `listings:{userId}:{page}:{size}` | User profile listings feed | Create, update, delete, status change |
+| `listing:views:seller` | `listing:views:seller:{sellerId}` | Aggregated seller view statistics | Expired hourly |
+| `listing:views:listing` | `listing:views:listing:{listingId}` | Specific listing view counters | Expired hourly |
 
-- **Listing Architecture Patterns**
-  -> `.docs/knowledge/listing-architecture-patterns.md`
+---
 
-- **Vehicle Catalog Sources**
-  -> `.docs/knowledge/vehicle-catalog-sources.md`
+## 8. Public REST API Specifications
+
+### 8.1 Base Listing Endpoints (`/api/v1/listings`)
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/api/v1/listings` | Public | Paginated base listing search and filter |
+| `GET` | `/api/v1/listings/{id}` | Public | Detailed listing information |
+| `POST` | `/api/v1/listings` | Bearer | Create base listing |
+| `PUT` | `/api/v1/listings/{id}` | Bearer | Update base listing |
+| `DELETE` | `/api/v1/listings/{id}` | Bearer | Soft delete listing |
+| `POST` | `/api/v1/listings/{id}/publish` | Bearer | Publish draft listing |
+| `POST` | `/api/v1/listings/{id}/deactivate` | Bearer | Deactivate active listing |
+| `POST` | `/api/v1/listings/{id}/reactivate` | Bearer | Reactivate inactive listing |
+| `POST` | `/api/v1/listings/{id}/sold` | Bearer | Mark listing as sold |
+| `POST` | `/api/v1/listings/{id}/view` | Public | Track listing view (debounced) |
+| `GET` | `/api/v1/listings/{id}/view-stats` | Bearer | Listing view metrics (owner only) |
+| `GET` | `/api/v1/listings/{id}/active-viewers` | Public | Active 24h viewers counter |
+| `GET` | `/api/v1/listings/{id}/social-proof` | Public | Consolidated social proof payload |
+
+### 8.2 Category-Specific Endpoints
+| Category | Base Endpoint | Create | Update | Detail | Filter |
+|---|---|---|---|---|---|
+| **Vehicles** | `/api/v1/vehicles` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+| **Electronics** | `/api/v1/electronics` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+| **Real Estate** | `/api/v1/real-estates` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+| **Books** | `/api/v1/books` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+| **Clothing** | `/api/v1/clothings` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+| **Sports** | `/api/v1/sports` | `POST /create-listing` | `PUT /{id}` | `GET /{id}` | `POST /filter` |
+
+### 8.3 Price History Endpoints (`/api/v1/price-history`)
+| Method | Endpoint | Auth | Purpose |
+|---|---|---|---|
+| `GET` | `/api/v1/price-history/listing/{listing-id}` | Public | Full chronological price change history |
+| `GET` | `/api/v1/price-history/listing/{listing-id}/latest` | Public | Most recent price change |
+| `GET` | `/api/v1/price-history/listing/{listing-id}/exists` | Public | Boolean check whether price changed |
+
+---
+
+## 9. Related Knowledge & Runbooks
+- **Listing Data Flows**: `.docs/knowledge/listing-data-flows.md`
+- **Listing Architecture Patterns**: `.docs/knowledge/listing-architecture-patterns.md`
+- **Vehicle Catalog Sources**: `.docs/knowledge/vehicle-catalog-sources.md`

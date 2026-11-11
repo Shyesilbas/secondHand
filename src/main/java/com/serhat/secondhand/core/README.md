@@ -1,31 +1,92 @@
 # Core Domain
 
-## Purpose
-The `core` domain provides cross-cutting infrastructural services, including global security (JWT, CSRF, Rate Limiting), global error handling, standard API response wrappers, platform enum catalogs, and verification utilities (OTP).
+## 1. Domain Scope & Purpose
+The `core` domain provides the cross-cutting infrastructural foundation of the entire backend. It implements the Spring Security filter chain, distributed Redis Lua rate limiting, dynamic public route discovery, stateless JWT resolution, transactional outbox housekeeping, deterministic database catalog seeding, unified error handling, and asynchronous audit logging.
 
-## Architecture Overview
-- **Security & JWT:** Uses `JwtUtils` and `AuthenticationFilter` for secure token management. Enforces CSRF via strict cookies and manages Rate Limits.
-- **Dynamic Endpoints:** Routes are dynamically classified as public vs. protected using `@PublicEndpoint` via `PublicEndpointRegistry`.
-- **Global Error Handling:** `GlobalExceptionHandler` ensures all exceptions are translated into a standardized JSON error shape.
-- **Audit Logging:** An AOP `AuditAspect` asynchronously records sensitive actions to `audit_logs`.
-- **Outbox Housekeeping:** `OutboxHousekeepingScheduler` purges processed outbox events older than the retention threshold.
-- **Seeders:** Includes `CatalogSeedStartupRunner` for database initialization.
+```mermaid
+flowchart TD
+    A["Incoming HTTP Request"] --> B["SecurityHeadersFilter<br/>OWASP Security Headers (CSP, HSTS, X-Frame)"]
+    B --> C["RateLimitingFilter<br/>Redis Lua Distributed Rate Limiter"]
+    C --> D["AuthenticationFilter<br/>Stateless JWT Cookie Parser & SecurityContext"]
+    D --> E["CsrfCookieFilter<br/>Double-Submit Cookie CSRF Defense"]
+    E --> F["AuthorizationFilter<br/>PublicEndpointRegistry vs @PreAuthorize"]
+    F --> G["Controller & Application Services"]
+    G --> H["GlobalExceptionHandler / ResultResponses<br/>Unified ErrorCode to HTTP Status Mapping"]
+```
 
-## Business Invariants & Constraints
-- **Response Format:** All API responses must be wrapped in `Result<T>` and handled via `ResultResponses`.
-- **Error Status:** `ResultResponses` takes the HTTP status of an error from the `ErrorCode` enum that declares its code (404, 403, 409, ...), even after the error was passed on as `Result.error(message, code)`. Codes no enum declares return 400. Two enums declaring one code with different statuses fail on first use (`core/result/ErrorCodeStatuses`).
-- **Public Routing:** New unprotected endpoints must be explicitly annotated with `@PublicEndpoint`.
-- **Statelessness:** JWT token validation is stateless but relies on refresh token rotation (RTR) managed in `auth`.
+---
 
-## Integration Points
-- **Incoming:** Every HTTP request passes through `core` filters.
-- **Outgoing:** Provides infrastructural utilities, exception handling, and error response envelopes to every other domain.
+## 2. Security Filter Chain & Request Lifecycle
 
-## Public APIs
-- **Enum Catalog (`/api/v1/enums`):**
-  - `GET /api/v1/enums/all`: Master dictionary of system enums, carrier names, vehicle type specifications, and field rules (cached, gzip).
-- **Audit Logs (`/api/v1/admin/audit-logs` & `/api/v1/audit/enums` - Admin):**
-  - `GET /api/v1/audit/enums/all`: Metadata of recorded event types and statuses.
-  - `GET /api/v1/admin/audit-logs/*`: Historical audit trail queries filtered by user, event type, date range, or failed attempt thresholds.
-- **Rate Limit Testing (`/api/v1/test/rate-limits`):**
-  - Diagnostics for testing IP-based and auth-based rate limit buckets.
+Every incoming HTTP request traverses the core filter pipeline in strict order:
+
+1. **Security Headers Filter (`SecurityHeadersFilter`):**
+   - Injects enterprise OWASP security headers: `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`.
+2. **Distributed Redis Rate Limiter (`RateLimitingFilter`):**
+   - Resolves trusted client IP via `ClientIpResolver` (guards against spoofed `X-Forwarded-For` headers).
+   - Executes atomic Redis Lua script (`scripts/rate_limit.lua`) enforcing fixed-window rate limits per IP or authenticated user.
+   - Public auth endpoints (`/login`, `/register`) carry tighter burst limits than read-only endpoints. Exceeded limits immediately return `429 Too Many Requests`.
+3. **JWT Authentication Filter (`AuthenticationFilter`):**
+   - Extracts the JWT access token from the `access_token` `HttpOnly` cookie (or fallback `Authorization: Bearer` header).
+   - Verifies cryptographic signature using `JwtUtils`.
+   - Populates Spring Security's `SecurityContextHolder` with authenticated user principal and roles without touching the database.
+4. **CSRF Cookie Filter (`CsrfCookieFilter`):**
+   - Enforces Double-Submit Cookie pattern, setting the `XSRF-TOKEN` cookie required on state-mutating requests (`POST`, `PUT`, `DELETE`).
+5. **Dynamic Public Endpoint Resolution (`PublicEndpointRegistry`):**
+   - Scans controller methods at application startup for `@PublicEndpoint`.
+   - Populates `PublicRouteRequestMatcher`. Requests matching registered public routes bypass authentication without fragile hardcoded path strings in `SecurityConfig`.
+
+---
+
+## 3. Error Handling & The Result Envelope
+
+Platform APIs strictly reject raw runtime exceptions and hand-rolled JSON responses in favor of a dual-track unified response standard:
+
+* **Unified Result Envelope (`Result<T>`):**
+  - **Success:** `{"success": true, "data": ...}`
+  - **Failure:** `{"success": false, "message": "Human readable message", "errorCode": "RESOURCE_NOT_FOUND"}`
+* **HTTP Status Resolution (`ErrorCodeStatuses`):**
+  - `ResultResponses` resolves HTTP status codes by inspecting the declaring `ErrorCode` enum definition:
+    - Domain not found codes $\rightarrow$ `404 Not Found`.
+    - Authorization/ownership violations $\rightarrow$ `403 Forbidden`.
+    - Concurrency/conflict codes $\rightarrow$ `409 Conflict`.
+    - Rate limit exceeded codes $\rightarrow$ `429 Too Many Requests`.
+    - General business constraint failures $\rightarrow$ `400 Bad Request`.
+* **Global Exception Handler (`GlobalExceptionHandler`):**
+  - Catches `BusinessException`, validation failures (`MethodArgumentNotValidException`), access denied errors, and unhandled runtime exceptions, translating them into standard Result payloads with RFC-7807 ProblemDetail compatibility.
+
+---
+
+## 4. Infrastructural Subsystems
+
+### 4.1. Transactional Outbox Housekeeping (`OutboxHousekeepingScheduler`)
+* Runs periodically purges historical `PROCESSED` events older than 7 days from `payment_outbox_events`, `order_outbox_events`, and `escrow_outbox_events` to prevent unbounded table bloat.
+
+### 4.2. Catalog Seeding Engine
+* **`CatalogSeedStartupRunner` & `SeedTask`:** Executed on startup when `--app.seed` argument is supplied. Reads deterministic JSON data from `resources/data/**` and performs idempotent upserts across categories, attributes, and agreements.
+* **`CatalogLegacyPruner`:** Prunes obsolete seed records without compromising existing user-created items.
+
+### 4.3. Audit Logging (`AuditAspect`)
+* Intercepts sensitive operations annotated with `@Auditable`.
+* Asynchronously records user ID, IP address, action type, execution duration, and payload snapshot into the `audit_logs` table.
+
+### 4.4. OTP Verification Service (`VerificationService`)
+* Issues and validates time-limited 6-digit numeric codes for email confirmation, phone verification, and payment authorizations (`CodeType`).
+* Enforces maximum attempt limits; 3 consecutive incorrect codes trigger `VerificationLockedException` (15-minute cooldown).
+
+---
+
+## 5. Redis Key Standards
+
+| Redis Key Pattern | Type | TTL | Purpose |
+| :--- | :--- | :--- | :--- |
+| `v4:ratelimit:ip:{clientIp}` | Integer | 60s | Fixed-window request counter per IP address. |
+| `v4:ratelimit:user:{userId}` | Integer | 60s | Fixed-window request counter per authenticated user. |
+
+---
+
+## 6. Public REST API Contracts
+
+* **`GET /api/v1/enums/all`:** Master cached dictionary of all system enums, vehicle types, carrier definitions, and validation rules (`@PublicEndpoint`).
+* **`GET /api/v1/admin/audit-logs`:** Paginated administrative search over system audit logs (`@PreAuthorize("hasRole('ADMIN')")`).
+* **`GET /api/v1/test/rate-limits/ping`:** Diagnostic endpoint to verify IP and client rate limit headers.
