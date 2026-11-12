@@ -2,7 +2,7 @@
 
 React 19 single-page application for the SecondHand marketplace platform.
 
-Detailed coding conventions and design standards live in [AGENTS.md](AGENTS.md) and `.agents/skills/restrained-ui-design-standard/SKILL.md`.
+Detailed coding conventions and design standards live in [AGENTS.md](../AGENTS.md) and `.agents/skills/restrained-ui-design-standard/SKILL.md`.
 
 ## Quick Start
 
