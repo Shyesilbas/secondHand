@@ -66,8 +66,8 @@ flowchart TD
 | `v4:coupon:usage:user:{CODE}:{userId}` | String (Integer) | 30 Days | Individual redemption count for `{userId}` on coupon `{CODE}`. |
 
 ### Lua Scripts:
-* **`scripts/apply_coupon_with_limit.lua`:** Atomically reads current global and user counts. If `globalLimit > 0 && currentGlobal >= globalLimit`, returns `-1`. If `userLimit > 0 && currentUser >= userLimit`, returns `-2`. Otherwise increments both keys and applies TTL.
-* **`scripts/release_coupon_usage.lua`:** Compensating script that atomically decrements both keys if the checkout transaction fails.
+* **`src/main/resources/scripts/apply_coupon_with_limit.lua`:** Atomically reads current global and user counts. If `globalLimit > 0 && currentGlobal >= globalLimit`, returns `-1`. If `userLimit > 0 && currentUser >= userLimit`, returns `-2`. Otherwise increments both keys and applies TTL.
+* **`src/main/resources/scripts/release_coupon_usage.lua`:** Compensating script that atomically decrements both keys if the checkout transaction fails.
 
 ---
 

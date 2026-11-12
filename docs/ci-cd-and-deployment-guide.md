@@ -20,7 +20,7 @@ Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docke
 Prometheus ve Grafana compose'a dahil değildir; metrikler `/actuator/prometheus` üzerinden dışarı aktarılır.
 
 ```bash
-docker-compose up -d        # yalnızca altyapı
+docker compose up -d        # yalnızca altyapı
 ./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]   # altyapı + backend (mvn spring-boot:run) + frontend (npm run dev)
 ```
 

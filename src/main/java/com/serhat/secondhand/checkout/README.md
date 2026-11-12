@@ -69,10 +69,10 @@ The main entry point is `CheckoutOrchestrator.executeCheckout(userId, request)`,
 | `v4:inventory:stock:{listingId}` | String (Integer) | Managed | Available in-memory stock count. |
 | `v4:inventory:purchased:{listingId}` | Hash | None / Permanent | Reconciled purchase markers before DB synchronization. |
 
-### Lua Scripts Utilized:
+### Stock Reservation Lifecycle & Lua Scripts:
 * **`reserve_stock_with_ttl.lua`:** Atomically validates `available_stock >= requested_qty`, decrements available stock, creates the reservation key, and sets the 15-minute expiration.
-* **`cancel_user_reservation.lua`:** Atomically deletes the user's reservation key and restores the held quantity back to `available_stock`.
-* **`consume_reservation_on_purchase.lua`:** Converts a temporary reservation into a permanent purchase deduction upon transaction commit.
+* **`cancel_user_reservation.lua`:** Atomically deletes the user's reservation key and restores the held quantity back to `available_stock` (on abandonment, cart removal, or rollback).
+* **Purchase Finalization (`consumeReservationOnPurchase`):** Upon transaction commit (`afterCommit`), `InventoryRedisReservationService` converts the temporary reservation into a pending purchase marker (`v4:inventory:pending:`) and deletes the reservation key before Kafka consumer DB deduction.
 
 ---
 

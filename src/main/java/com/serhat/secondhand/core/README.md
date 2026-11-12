@@ -24,7 +24,7 @@ Every incoming HTTP request traverses the core filter pipeline in strict order:
    - Injects enterprise OWASP security headers: `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Strict-Transport-Security`, `Referrer-Policy: strict-origin-when-cross-origin`.
 2. **Distributed Redis Rate Limiter (`RateLimitingFilter`):**
    - Resolves trusted client IP via `ClientIpResolver` (guards against spoofed `X-Forwarded-For` headers).
-   - Executes atomic Redis Lua script (`scripts/rate_limit.lua`) enforcing fixed-window rate limits per IP or authenticated user.
+   - Executes atomic Redis Lua script (`src/main/resources/scripts/rate_limit_window.lua`) enforcing fixed-window rate limits per IP or authenticated user.
    - Public auth endpoints (`/login`, `/register`) carry tighter burst limits than read-only endpoints. Exceeded limits immediately return `429 Too Many Requests`.
 3. **JWT Authentication Filter (`AuthenticationFilter`):**
    - Extracts the JWT access token from the `access_token` `HttpOnly` cookie (or fallback `Authorization: Bearer` header).

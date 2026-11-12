@@ -37,7 +37,7 @@ Environment variables are configured in `.env` (copy from `.env.example`).
 
 ## Architecture
 
-- **UI Framework & Tooling:** React 19 with Vite 5. TailwindCSS 3 for utility styling with semantic color tokens in `src/common/constants/theme.js`.
+- **UI Framework & Tooling:** React 19 with Vite 5. TailwindCSS 3 for utility styling with semantic color tokens in `src/common/theme/theme.js`.
 - **Routing:** React Router 7 (`src/common/routes/AppRoutes.jsx`). Eagerly loads critical paths (`HomePage`, `AboutPage`) and uses React `Suspense` with code-splitting for feature screens.
 - **Server State Management:** `@tanstack/react-query` v5. Server data is never duplicated into local React state. Default `staleTime` is 5 minutes; mutations invalidate affected query keys.
 - **HTTP Client & Authentication:** Axios 1.11 via `src/common/services/api/request.js`.
@@ -59,14 +59,20 @@ secondhand-frontend/
 │   ├── ai/             # Aura AI assistant, chat page, and price advisor
 │   ├── audit/          # Security activity logs and session management
 │   ├── auth/           # Login, registration, password reset, OAuth2
+│   ├── books/          # Books vertical catalog forms, details, and metadata filters
+│   ├── campaign/       # Seller and platform promotional campaigns and discount banners
 │   ├── cart/           # Shopping cart, checkout steps, reservation timers
 │   ├── chat/           # Direct user-to-user messaging and STOMP hooks
+│   ├── clothing/       # Clothing vertical catalog forms, size guides, and metadata filters
 │   ├── common/         # Layout, shared UI primitives, routes, API clients
 │   ├── comparison/     # Product comparison drawer and modal
 │   ├── complaint/      # Support and complaint reporting flows
 │   ├── coupon/         # Platform and discount coupon listings
 │   ├── dashboard/      # Buyer and seller analytics and metric charts
+│   ├── electronics/    # Electronics vertical catalog forms, specs, and metadata filters
+│   ├── emails/         # Transactional email template viewer and preview
 │   ├── ewallet/        # Digital wallet balance, limits, and transactions
+│   ├── favoritelist/   # Named custom collections and favorite lists management
 │   ├── favorites/      # Favorite listings and saved lists
 │   ├── follow/         # Seller following system
 │   ├── forum/          # Community discussion forum
@@ -78,13 +84,16 @@ secondhand-frontend/
 │   ├── offer/          # Price bargaining, counter-offers, and negotiation cards
 │   ├── order/          # Buyer and seller order lifecycle and meetup flows
 │   ├── payments/       # Listing fee payments, wallet operations, and OTP
+│   ├── realEstate/     # Real estate vertical catalog forms, property details, and floor plans
 │   ├── reviews/        # User and listing star ratings and reviews
 │   ├── showcase/       # Premium showcase listing boosts
-│   └── user/           # User profile, address management, and badges
+│   ├── sports/         # Sports & outdoor vertical catalog forms, specs, and metadata filters
+│   ├── user/           # User profile, address management, and badges
+│   └── vehicle/        # Vehicle vertical catalog forms, technical specs, and damage records
 ```
 
 ## Source of Truth
 
 - **Business Rules:** Backend module `README.md` files (`src/main/java/com/serhat/secondhand/<module>/README.md`).
 - **API Contracts:** Backend controllers and `src/common/constants/apiEndpoints.js`.
-- **UI Design System:** `.agents/skills/restrained-ui-design-standard/SKILL.md` and `src/common/constants/theme.js`.
+- **UI Design System:** `.agents/skills/restrained-ui-design-standard/SKILL.md` and `src/common/theme/theme.js`.

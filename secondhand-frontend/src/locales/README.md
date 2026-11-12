@@ -19,7 +19,7 @@ The `locales` module manages bilingual internationalization (i18n) across the pl
 | Route / Component | Guard / Access | Component | Purpose & Query Params |
 |---|---|---|---|
 | Global Header / Footer | Public | `LanguageSwitcher` | Interactive switcher allowing users to toggle between Turkish and English instantly. |
-| Global Application Root | Public | `i18n.js` | Initializes `i18next`, bundles translation catalogs, and mounts language detector. |
+| Global Application Root | Public | `src/i18n.js` | Initializes `i18next`, bundles translation catalogs, and mounts language detector. |
 
 ---
 
