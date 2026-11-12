@@ -1,5 +1,10 @@
 # Emails UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`email`](../../../src/main/java/com/serhat/secondhand/email/README.md)
+> - **Architecture Deep Dive:** [`docs/email-architecture-and-event-driven-dispatch.md`](../../../docs/email-architecture-and-event-driven-dispatch.md)
+
 ## 1. Executive Summary & Route Map
 The `emails` module renders the user's dedicated in-app transactional email inbox. Because the marketplace intentionally avoids external SMTP relay dependencies in development and staging, all system notices, order confirmations, OTP codes, and bargaining updates are delivered to this mailbox.
 

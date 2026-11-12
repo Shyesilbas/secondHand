@@ -11,12 +11,14 @@ Reports:
 Usage: python3 scripts/check_docs.py [--no-class]
 Exit code 1 when anything is reported.
 """
+import fnmatch
+import os
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SKIP_DIRS = {"node_modules", "target", "dist", "build", ".git", "graphify-out", "db-backups"}
+SKIP_DIRS = {"node_modules", "target", "dist", "build", ".git", "graphify-out", "db-backups", ".idea", ".mvn", ".turbo", ".vite", ".gemini"}
 
 # Forced Turkish -> English convention (see AGENTS.md "Docs language").
 FORCED_TERMS = {
@@ -45,9 +47,13 @@ FENCE_RE = re.compile(r"^```.*?^```", re.S | re.M)
 
 
 def walk(base: Path, pattern: str):
-    for p in base.rglob(pattern):
-        if not any(part in SKIP_DIRS for part in p.relative_to(ROOT).parts):
-            yield p
+    if not base.exists():
+        return
+    for root, dirs, files in os.walk(base):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for f in files:
+            if fnmatch.fnmatch(f, pattern):
+                yield Path(root) / f
 
 
 def doc_files():
@@ -62,16 +68,21 @@ def doc_files():
 
 def known_names():
     names = set()
-    for ext in ("*.java", "*.js", "*.jsx", "*.ts", "*.tsx", "*.lua", "*.sql"):
-        for p in walk(ROOT, ext):
-            names.add(p.stem)
-            if p.suffix == ".java":
-                text = p.read_text(encoding="utf-8", errors="ignore")
-                names.update(TYPE_DECL_RE.findall(text))
-                names.update(IMPORT_RE.findall(text))
-            elif p.suffix in (".js", ".jsx", ".ts", ".tsx"):
-                text = p.read_text(encoding="utf-8", errors="ignore")
-                names.update(re.findall(r"\b(?:function|const|class)\s+([A-Z]\w*)", text))
+    code_exts = {".java", ".js", ".jsx", ".ts", ".tsx", ".lua", ".sql"}
+    for root, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for f in files:
+            p = Path(root) / f
+            ext = p.suffix
+            if ext in code_exts:
+                names.add(p.stem)
+                if ext == ".java":
+                    text = p.read_text(encoding="utf-8", errors="ignore")
+                    names.update(TYPE_DECL_RE.findall(text))
+                    names.update(IMPORT_RE.findall(text))
+                elif ext in (".js", ".jsx", ".ts", ".tsx"):
+                    text = p.read_text(encoding="utf-8", errors="ignore")
+                    names.update(re.findall(r"\b(?:function|const|class)\s+([A-Z]\w*)", text))
     for p in list(walk(ROOT / "src" / "main" / "resources", "*.yml")) + list(walk(ROOT / "src" / "main" / "resources", "*.properties")):
         names.update(FQCN_RE.findall(p.read_text(encoding="utf-8", errors="ignore")))
     return names | NON_TYPES | JDK_TYPES | INTENTIONAL

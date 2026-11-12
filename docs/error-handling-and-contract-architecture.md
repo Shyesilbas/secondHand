@@ -183,7 +183,7 @@ if (errorData) {
 
 ### 2. Güvenli Mesaj Çözümleyici (`errorUtils.js`)
 [`errorUtils.js`](../secondhand-frontend/src/common/utils/errorUtils.js) içindeki `getErrorMessage(error, fallback)` fonksiyonu, kullanıcıya ham teknik hataların yansımasını önler:
-* Öncelik: `error.userMessage` ➔ `error.response?.data?.message` ➔ `error.response?.data?.detail` ➔ `error.response?.data?.error`.
+* Öncelik: `error.userMessage` -> `error.response?.data?.message` -> `error.response?.data?.detail` -> `error.response?.data?.error`.
 * **Axios Filtresi:** `error.message` alanı yalnızca `"Request failed with status code"` ile **başlamıyorsa** kullanılır. Böylece kullanıcılar ekranda `"Request failed with status code 409"` yerine gerçek hata sebebini veya fallback metnini görür.
 
 ### 3. Merkezi Bildirim Entegrasyonu (`errorHandler.js`)

@@ -4,6 +4,13 @@ Unified communications dashboard combining system emails, push notifications, an
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`chat`](../../../src/main/java/com/serhat/secondhand/chat/README.md)
+> - **Backend Module:** [`notification`](../../../src/main/java/com/serhat/secondhand/notification/README.md)
+> - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](../../../docs/websocket-stomp-and-chat-architecture.md)
+> - **Architecture Deep Dive:** [`docs/notification-feed-and-broadcast-architecture.md`](../../../docs/notification-feed-and-broadcast-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `inbox` module provides a consolidated communication portal for marketplace members. Rather than fragmenting messages across multiple disconnected screens, it brings all correspondence into a single master layout:

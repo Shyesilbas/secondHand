@@ -4,6 +4,11 @@ Administrative coupon management, audience segmentation targeting, discount conf
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`coupon`](../../../src/main/java/com/serhat/secondhand/coupon/README.md)
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../docs/pricing-coupon-and-campaign-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `admin` module provides administrative oversight and promotional configuration tools for platform operators. The current primary capability centers on coupon lifecycle management:

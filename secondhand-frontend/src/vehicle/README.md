@@ -1,5 +1,10 @@
 # Vehicle Catalog UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Catalog Scope
 The `vehicle` module governs automotive listing creation, catalog specification hierarchies, vehicle damage mapping, and spec-driven filters across 4 primary vehicle types:
 - **`CAR`** (Otomobil)

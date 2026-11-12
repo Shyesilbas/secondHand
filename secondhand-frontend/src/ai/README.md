@@ -4,6 +4,12 @@ Conversational marketplace shopping assistant, autonomous catalog search, memory
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`ai`](../../../src/main/java/com/serhat/secondhand/ai/README.md)
+> - **Architecture Deep Dive:** [`docs/aura-ai-and-context-architecture.md`](../../../docs/aura-ai-and-context-architecture.md)
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation-architecture.md`](../../../docs/aura-trust-safety-and-complaint-moderation-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `ai` module houses the frontend interfaces for **Aura AI (Gemini 2.5 Pro / Flash)**, the platform's intelligent assistant. Aura assists buyers and sellers with discovery, deal evaluation, and transaction guidance:

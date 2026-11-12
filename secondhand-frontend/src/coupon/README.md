@@ -1,5 +1,10 @@
 # Coupon UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`coupon`](../../../src/main/java/com/serhat/secondhand/coupon/README.md)
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../docs/pricing-coupon-and-campaign-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `coupon` module provides customer-facing discovery, redemption tracking, and validation formatting for platform-wide and seller promotional discount vouchers.
 

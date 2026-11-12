@@ -1,5 +1,11 @@
 # Offer UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`offer`](../../../src/main/java/com/serhat/secondhand/offer/README.md)
+> - **Architecture Deep Dive:** [`docs/offer-system-and-concurrency-locks.md`](../../../docs/offer-system-and-concurrency-locks.md)
+> - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](../../../docs/websocket-stomp-and-chat-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `offer` module manages real-time price bargaining between buyers and sellers, counter-offer negotiations, offer expiration tracking, and one-click transition to checkout for accepted proposals.
 

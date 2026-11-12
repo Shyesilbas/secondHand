@@ -4,6 +4,11 @@ Saved listings management, heart toggle buttons, optimistic favorite state updat
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`favorite`](../../../src/main/java/com/serhat/secondhand/favorite/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `favorites` module provides users with the ability to bookmark listings they are interested in monitoring or purchasing later. In addition to serving as a personal wishlist:

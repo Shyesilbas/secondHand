@@ -4,6 +4,11 @@ Legal terms, privacy policies, distance sales contracts, registration legal gate
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`agreements`](../../../src/main/java/com/serhat/secondhand/agreements/README.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+
 ## 1. Overview & Purpose
 
 The `agreements` module enforces platform legal compliance and regulatory consent across the marketplace. It manages legal document presentation, user acceptance logging, and version diff audits:

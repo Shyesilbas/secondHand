@@ -4,6 +4,11 @@ Authentication flows, multi-step registration with synchronous password policy c
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`auth`](../../../src/main/java/com/serhat/secondhand/auth/README.md)
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../docs/auth-jwt-and-security-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `auth` module provides the security perimeter and identity lifecycle for the frontend application. It manages session establishment, token renewal, registration onboarding, and federated identity:

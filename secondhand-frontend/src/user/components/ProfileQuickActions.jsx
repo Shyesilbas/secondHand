@@ -52,7 +52,7 @@ const ProfileQuickActions = ({ user }) => {
 
   const reviewBadge =
     !reviewStatsLoading && reviewStats
-      ? `${reviewStats.totalReviews || 0} · ${(reviewStats.averageRating || 0).toFixed(1)} ★`
+      ? `${reviewStats.totalReviews || 0} · ${(reviewStats.averageRating || 0).toFixed(1)} / 5`
       : null;
 
   return (

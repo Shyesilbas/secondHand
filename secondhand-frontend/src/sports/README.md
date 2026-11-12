@@ -1,5 +1,10 @@
 # Sports Catalog UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Catalog Scope
 The `sports` module handles sporting equipment, fitness machinery, bicycles, water sports, winter sports, and outdoor gear across 8 primary athletic disciplines:
 - **`CYCLING`** (Bisiklet & Aksesuarları: Yol, Dağ, Şehir, Elektrikli)

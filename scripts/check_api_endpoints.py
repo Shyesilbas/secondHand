@@ -2,17 +2,20 @@
 import os
 import re
 import sys
+from pathlib import Path
 
-# Paths
-FRONTEND_FILE = "/Users/serhat/IdeaProjects/secondHand/secondhand-frontend/src/common/constants/apiEndpoints.js"
-BACKEND_DIR = "/Users/serhat/IdeaProjects/secondHand/src/main/java"
+# Paths (resolved dynamically relative to repo root)
+REPO_ROOT = Path(__file__).resolve().parent.parent
+FRONTEND_FILE = str(REPO_ROOT / "secondhand-frontend" / "src" / "common" / "constants" / "apiEndpoints.js")
+BACKEND_DIR = str(REPO_ROOT / "src" / "main" / "java")
 
-# Whitelist (endpoints defined by Spring Security, WebSockets, or third-party logic not in controllers)
+# Whitelist (endpoints defined by Spring Security, WebSockets, or polymorphic routes)
 WHITELIST = [
     r"^/auth/oauth2/complete$",
     r"^/ws$",
     r"^/favorites$",  # handled by FavoriteController RequestMapping base path with empty/no-value methods
-    r"^/images/.*", # handled by ImagesController
+    r"^/images/.*",  # handled by ImagesController
+    r"^/v1/ai/summary/.*",  # polymorphic frontend route targeting /user/{id} or /listing/{id}
 ]
 
 def extract_js_endpoints(file_path):
@@ -159,12 +162,11 @@ def main():
             missing_endpoints.append(js_path)
 
     if missing_endpoints:
-        print("\n[WARNING] Mismatched/Unresolved Frontend Endpoints (No matching Java Controller found):")
+        print(f"\n[FAIL] Found {len(missing_endpoints)} mismatched/unresolved frontend endpoint(s):")
         for ep in sorted(missing_endpoints):
             print(f"  - {ep}")
         print("\nPlease check if these endpoints are handled by security/websockets or if they are legacy/dead routes.")
-        # Exit success as it is a warning check script
-        sys.exit(0)
+        sys.exit(1)
     else:
         print("\n[SUCCESS] All frontend endpoints matched to java controller mappings successfully!")
         sys.exit(0)

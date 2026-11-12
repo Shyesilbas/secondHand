@@ -1,5 +1,11 @@
 # Listing UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `listing` module forms the marketplace's visual catalog core. It manages the multi-faceted search grid, prefilter selector, listing creation wizard, edit workflows, seller catalog management, real-time social proof indicators, and unified listing detail views across all 6 product categories.
 

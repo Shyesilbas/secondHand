@@ -4,6 +4,12 @@ Core foundation for the frontend application: HTTP networking, authentication in
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`core`](../../../src/main/java/com/serhat/secondhand/core/README.md)
+> - **Architecture Deep Dive:** [`docs/error-handling-and-contract-architecture.md`](../../../docs/error-handling-and-contract-architecture.md)
+> - **Architecture Deep Dive:** [`docs/frontend-architecture-and-state-management.md`](../../../docs/frontend-architecture-and-state-management.md)
+
 ## 1. Overview & Purpose
 
 The `common` module serves as the architectural backbone of the `secondhand-frontend` single-page application. It encapsulates cross-cutting infrastructure used by all domain feature modules:

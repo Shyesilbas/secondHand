@@ -1,5 +1,10 @@
 # Real Estate Catalog UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Catalog Scope
 The `realEstate` module handles property listings across 4 primary property categories:
 - **`RESIDENTIAL`** (Konut: Daire, Villa, Müstakil Ev, Yazlık)

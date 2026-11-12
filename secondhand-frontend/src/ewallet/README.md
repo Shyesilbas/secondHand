@@ -1,5 +1,10 @@
 # eWallet UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`ewallet`](../../../src/main/java/com/serhat/secondhand/ewallet/README.md)
+> - **Architecture Deep Dive:** [`docs/escrow-lifecycle-and-state-machine.md`](../../../docs/escrow-lifecycle-and-state-machine.md)
+
 ## 1. Executive Summary & Architecture
 The `ewallet` module manages the user's digital wallet balance, deposit and bank withdrawal requests, custom monthly spending limits, and preemptive checkout spending warning dialogs.
 

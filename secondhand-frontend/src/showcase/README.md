@@ -1,5 +1,10 @@
 # Showcase UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`showcase`](../../../src/main/java/com/serhat/secondhand/showcase/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Executive Summary & Architecture
 The `showcase` module governs paid listing promotions ("vitrin"). It enables sellers to boost listing visibility on the homepage and discovery feeds, calculate daily fees with applicable taxes, manage active promotion durations, and purchase extensions using eWallet funds.
 

@@ -1,5 +1,11 @@
 # Cart & Checkout UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`cart`](../../../src/main/java/com/serhat/secondhand/cart/README.md)
+> - **Architecture Deep Dive:** [`docs/stock-reservation-and-reconciliation.md`](../../../docs/stock-reservation-and-reconciliation.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+
 ## 1. Executive Summary & Route Map
 The `cart` module orchestrates shopping cart state management, line-item pricing recalculation, seller-based campaign/coupon discounts, active checkout stock reservation with anti-hoarding countdowns, and the multi-step checkout wizard.
 

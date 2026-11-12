@@ -6,7 +6,7 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, R
 - **Start All Services:** `./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]` (Docker: Postgres 5433, Redis 6379, Kafka 9092; then backend and frontend).
 - **Backend:** `mvn spring-boot:run` | Tests: `mvn test -Dmaven.test.skip=false -Dtest=<Class>` (Mockito only, no Spring context).
 - **Frontend:** `cd secondhand-frontend && npm run dev` | `npm run build` | `npm run lint`.
-- **Docs & Endpoint Drift:** `python3 scripts/check_docs.py` (0 issues mandatory) | `python3 scripts/check_api_endpoints.py`.
+- **Verification & Drift:** `./scripts/verify.sh` (runs docs drift, API parity, zero-emoji scan, and frontend lint) | `python3 scripts/check_docs.py` | `python3 scripts/check_api_endpoints.py`.
 
 ## Operational Agent Skills (`.agents/skills/`)
 Local operational skills (symlinked in `.claude/skills`). Activate the relevant skill before modifying code:
@@ -51,4 +51,4 @@ Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; st
 - **Backend Task How-Tos:** Direct links inside module READMEs or inspect `<module>/.docs/runbooks/` and `listing/.docs/knowledge/`.
 - **Architecture Deep Dives:** Direct links inside module READMEs or cross-cutting index in `docs/README.md`.
 - Docs drift check: `python3 scripts/check_docs.py` (must report 0 issues after doc changes).
-- API endpoint parity check: `python3 scripts/check_api_endpoints.py` (currently flags `/v1/ai/summary/{param}/{param}`, a false positive: the backend serves `/user/{id}` and `/listing/{id}`).
+- API endpoint parity check: `python3 scripts/check_api_endpoints.py` (0 warnings mandatory).

@@ -4,6 +4,11 @@ Seller following system, follower/following relationship lists, and new-listing 
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`follow`](../../../src/main/java/com/serhat/secondhand/follow/README.md)
+> - **Architecture Deep Dive:** [`docs/email-architecture-and-event-driven-dispatch.md`](../../../docs/email-architecture-and-event-driven-dispatch.md)
+
 ## 1. Overview & Purpose
 
 The `follow` module establishes social trust and subscription channels between buyers and sellers. When a buyer follows a reputable seller:

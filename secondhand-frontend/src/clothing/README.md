@@ -1,5 +1,10 @@
 # Clothing Catalog UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Catalog Scope
 The `clothing` module manages fashion, footwear, and accessory listings across 59 distinct garment categories grouped into 3 overarching departments:
 - **`APPAREL`** (Giyim: Üst Giyim, Alt Giyim, Dış Giyim, Elbise, Takım Elbise)

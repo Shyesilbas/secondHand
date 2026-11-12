@@ -1,5 +1,10 @@
 # Comparison UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Architecture
 The `comparison` module allows shoppers to benchmark multiple listings side-by-side across pricing, specifications, seller reputations, and category-specific attributes.
 

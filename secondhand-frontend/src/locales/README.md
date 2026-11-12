@@ -4,6 +4,11 @@ Multi-language dictionary catalogs, language detection, locale switching, and tr
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`core`](../../../src/main/java/com/serhat/secondhand/core/README.md)
+> - **Architecture Deep Dive:** [`docs/error-handling-and-contract-architecture.md`](../../../docs/error-handling-and-contract-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `locales` module manages bilingual internationalization (i18n) across the platform. It provides language negotiation, localized terminology, and dynamic dictionary hydration:

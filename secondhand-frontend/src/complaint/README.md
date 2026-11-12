@@ -1,5 +1,10 @@
 # Complaints & Trust & Safety UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`complaint`](../../../src/main/java/com/serhat/secondhand/complaint/README.md)
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation-architecture.md`](../../../docs/aura-trust-safety-and-complaint-moderation-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `complaint` module provides user reporting workflows, in-chat violation evidence submission, cooling-off countdown tracking, user grievance ticket history, and one-time sanction appeal submission in alignment with the **Aura Trust & Safety Autonomous Moderation Architecture**.
 

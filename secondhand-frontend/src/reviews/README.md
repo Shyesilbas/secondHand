@@ -4,6 +4,11 @@ Star ratings, aggregate seller reputation statistics, verified buyer feedback, a
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`review`](../../../src/main/java/com/serhat/secondhand/review/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `reviews` module provides a comprehensive trust and reputation system across the marketplace. Reviews can only be submitted by verified buyers who completed an order item transaction (via order delivery confirmation). The module handles:

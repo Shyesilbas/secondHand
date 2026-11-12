@@ -1,5 +1,11 @@
 # Order UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`order`](../../../src/main/java/com/serhat/secondhand/order/README.md)
+> - **Architecture Deep Dive:** [`docs/order-lifecycle-and-compensation-management.md`](../../../docs/order-lifecycle-and-compensation-management.md)
+> - **Architecture Deep Dive:** [`docs/safe-meetup-delivery-and-verification.md`](../../../docs/safe-meetup-delivery-and-verification.md)
+
 ## 1. Executive Summary & Route Map
 The `order` module manages the full post-purchase lifecycle for both buyers and sellers. It coordinates multi-seller split orders, cargo tracking, Safe Meetup QR/OTP handovers, item-level cancellations/refunds, and buyer review hooks.
 

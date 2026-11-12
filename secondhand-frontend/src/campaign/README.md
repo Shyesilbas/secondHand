@@ -1,5 +1,10 @@
 # Campaign UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`campaign`](../../../src/main/java/com/serhat/secondhand/campaign/README.md)
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../docs/pricing-coupon-and-campaign-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `campaign` module empowers marketplace sellers to design, launch, edit, and deactivate promotional campaigns across their own listings (store-wide discounts, category specials, or specific item sales).
 

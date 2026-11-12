@@ -1,5 +1,10 @@
 # Notification UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`notification`](../../../src/main/java/com/serhat/secondhand/notification/README.md)
+> - **Architecture Deep Dive:** [`docs/notification-feed-and-broadcast-architecture.md`](../../../docs/notification-feed-and-broadcast-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `notification` module provides real-time transactional alert delivery, toast popups, unread badge counters, in-app notification drawers, and STOMP WebSocket push synchronization.
 

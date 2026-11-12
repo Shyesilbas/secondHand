@@ -4,6 +4,11 @@ Marketplace landing page, catalog discovery, trust assurances, seller highlights
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`showcase`](../../../src/main/java/com/serhat/secondhand/showcase/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `home` module serves as the primary storefront and brand entry point for the marketplace. It orchestrates product discovery, trust guarantees, and merchant recruitment:

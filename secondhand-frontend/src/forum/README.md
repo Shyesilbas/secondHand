@@ -4,6 +4,11 @@ Community discussion boards, peer-to-peer marketplace advice threads, author ano
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`forum`](../../../src/main/java/com/serhat/secondhand/forum/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `forum` module powers the marketplace's community hub where buyers and sellers discuss trading tips, surface platform feedback, and seek advice. Key capabilities include:

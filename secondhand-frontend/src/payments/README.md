@@ -1,5 +1,10 @@
 # Payments UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`payment`](../../../src/main/java/com/serhat/secondhand/payment/README.md)
+> - **Architecture Deep Dive:** [`docs/payment-strategy-and-provider-extension-guide.md`](../../../docs/payment-strategy-and-provider-extension-guide.md)
+
 ## 1. Executive Summary & Route Map
 The `payments` module provides the customer-facing financial management hub, historical payment ledger, listing fee checkout, and two-factor authentication (2FA OTP) verification dialogs.
 

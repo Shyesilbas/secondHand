@@ -1,5 +1,10 @@
 # Electronics Catalog UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`listing`](../../../src/main/java/com/serhat/secondhand/listing/README.md)
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../docs/catalog-and-category-polymorphism.md)
+
 ## 1. Executive Summary & Catalog Scope
 The `electronics` module manages listing creation, catalog hardware snapshotting, official color pickers, and condition questionnaires across 19 consumer technology categories (Smartphones, Laptops, Tablets, Smartwatches, Gaming Consoles, Headphones, Cameras, Televisions, Monitors, Audio Systems, PC Components).
 

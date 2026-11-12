@@ -4,6 +4,11 @@ Custom user-curated listing folders, public collection sharing, multi-list bookm
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`favoritelist`](../../../src/main/java/com/serhat/secondhand/favoritelist/README.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../docs/social-proof-and-urgency-metrics-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `favoritelist` module expands beyond simple one-click favoriting by enabling users to create and organize customized listing collections (e.g., "Vintage Road Bikes", "Living Room Furniture", "Summer Outfits"). The module provides:

@@ -4,6 +4,11 @@ Comprehensive analytics dashboards for sellers and buyers featuring performance 
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`dashboard`](../../../src/main/java/com/serhat/secondhand/dashboard/README.md)
+> - **Architecture Deep Dive:** [`docs/multi-tier-redis-caching-and-invalidation.md`](../../../docs/multi-tier-redis-caching-and-invalidation.md)
+
 ## 1. Overview & Purpose
 
 The `dashboard` module delivers commercial intelligence and transaction analytics tailored to marketplace participants. It provides two distinct role-specific operational dashboards:

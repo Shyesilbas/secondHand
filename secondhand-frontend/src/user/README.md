@@ -4,6 +4,12 @@ User profile management, public seller storefronts, multi-address book CRUD, pho
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`user`](../../../src/main/java/com/serhat/secondhand/user/README.md)
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../docs/auth-jwt-and-security-architecture.md)
+> - **Architecture Deep Dive:** [`docs/multi-tier-redis-caching-and-invalidation.md`](../../../docs/multi-tier-redis-caching-and-invalidation.md)
+
 ## 1. Overview & Purpose
 
 The `user` module serves as the primary account hub and personal identity center for the application. It handles both private account management and public seller reputation:

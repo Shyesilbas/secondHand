@@ -4,6 +4,11 @@ Security activity monitoring, active device session management, event log inspec
 
 ---
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`user`](../../../src/main/java/com/serhat/secondhand/user/README.md)
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../docs/auth-jwt-and-security-architecture.md)
+
 ## 1. Overview & Purpose
 
 The `audit` module gives users complete transparency and control over their account security. It surfaces authentication activity, connected hardware sessions, and forensic event logs:

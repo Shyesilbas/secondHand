@@ -364,7 +364,7 @@ C2C pazaryerlerinde sistemin kötüye kullanılmasını (örneğin rakip bir sat
     - Haklıysa yeşil badge: `Çözüldü (İşlem Yapıldı)`
     - Haksızsa gri badge: `İhlal Görülmedi (Kapatıldı)`
   - **Aura Karar Paneli:**
-    > 🤖 **Aura Güvenlik Raporu (10/11/2026 18:30):**  
+    > **Aura Güvenlik Raporu (10/11/2026 18:30):**  
     > *"Sohbet geçmişi incelenmiş ve topluluk kurallarımıza aykırı hakaret içerikli ifadeler tespit edilmiştir. Şikayet edilen kullanıcıya 7 gün süreyle mesajlaşma ve işlem kısıtlaması uygulanmıştır."*
 * **İtiraz Butonu ("Karara İtiraz Et"):**
   - Ceza alan kullanıcının kartında `appeal_status = 'NONE'` iken *"Karara İtiraz Et"* aksiyonu sunulur. Kullanıcı gerekçesini yazıp gönderdiğinde kart sarı badge ile `İtiraz İnceleniyor (Re-evaluation)` durumuna geçer. İtiraz onaylanırsa ceza kalkar ve kart yeşil badge ile `İtiraz Kabul Edildi (Ceza İptal)` olarak güncellenir.
@@ -372,7 +372,7 @@ C2C pazaryerlerinde sistemin kötüye kullanılmasını (örneğin rakip bir sat
 ### 6.3. Kısıtlı Kullanıcı Deneyimi (Banner Bildirimi)
 7 günlük engel alan bir kullanıcı oturum açtığında:
 * Sayfanın üstünde kırmızı/amber tonlu bir uyarı çubuğu yer alır:
-  > ⚠️ **Hesap Kısıtlaması:** *Topluluk kuralları ihlali nedeniyle hesabınız 17 Kasım 2026 18:30 tarihine kadar kısıtlanmıştır. Bu süre boyunca mesaj gönderemez ve yeni ilan açamazsınız.*
+  > **Hesap Kısıtlaması:** *Topluluk kuralları ihlali nedeniyle hesabınız 17 Kasım 2026 18:30 tarihine kadar kısıtlanmıştır. Bu süre boyunca mesaj gönderemez ve yeni ilan açamazsınız.*
 
 ---
 

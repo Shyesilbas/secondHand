@@ -1,5 +1,10 @@
 # Chat & Real-Time Messaging UI Module
 
+> [!NOTE]
+> **Backend Counterpart & Architecture Deep Dive:**
+> - **Backend Module:** [`chat`](../../../src/main/java/com/serhat/secondhand/chat/README.md)
+> - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](../../../docs/websocket-stomp-and-chat-architecture.md)
+
 ## 1. Executive Summary & Route Map
 The `chat` module provides direct, real-time messaging between marketplace buyers and sellers. It integrates WebSocket STOMP communications, room list synchronization, unread message badges, in-chat price bargaining (`InChatOfferCard`), and reporting shortcuts.
 
