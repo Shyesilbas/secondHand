@@ -9,6 +9,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 ### Para akışı
 | Doküman | Kapsam |
 | :--- | :--- |
+| **[checkout-pipeline-and-distributed-transaction-flow.md](checkout-pipeline-and-distributed-transaction-flow.md)** | Uçtan uca checkout hattı: Sepet doğrulama, Redis Lua 15 dk stok rezervasyonu, çoklu satıcıya sipariş bölme (*order splitting*), eWallet/provider ödemesi, escrow blokesi ve iki yönlü compensation (*rollback/compensation*). |
 | **[payment-strategy-and-provider-extension-guide.md](payment-strategy-and-provider-extension-guide.md)** | Payment Strategy Pattern, Hexagonal Port & Adapter (`PaymentProviderPort`), Open/Closed prensibi ve yeni provider ekleme. |
 | **[pricing-coupon-and-campaign-architecture.md](pricing-coupon-and-campaign-architecture.md)** | `PriceCalculationEngine` hesaplama sırası, satıcı kampanyaları, kupon tipleri ve audience'ları, Redis Lua kupon limiti ve redemption. |
 | **[order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)** | Sipariş state machine'i, kargo ve Safe Meetup, kalem bazlı iptal/iade compensation ve otomasyon scheduler'ları. |
@@ -42,6 +43,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[catalog-and-category-polymorphism.md](catalog-and-category-polymorphism.md)** | 6 vertical'da JPA polymorphism, `AbstractListingService` (Template Method), `ListingValidationEngine`, 317 dosyalık JSON katalog verisi ve kategoriye özel katalog kurallarına linkler. |
 | **[database-migration-and-seeding-guide.md](database-migration-and-seeding-guide.md)** | Flyway versiyonlama ve DDL kuralları, `--app.seed` key'leri, upsert + prune yaşam döngüsü. |
 | **[ci-cd-and-deployment-guide.md](ci-cd-and-deployment-guide.md)** | Docker Compose servisleri (Postgres, Redis, Kafka KRaft), environment variable'lar (`.env`), Prod Security Guard ve Actuator/Prometheus. |
+| **[frontend-architecture-and-state-management.md](frontend-architecture-and-state-management.md)** | React 19 SPA mimarisi, React Query v5 server-state yönetimi, Axios 401 sessiz refresh kuyruğu (*mutex queue*), client depolama güvenliği, Apple/Spotify tier tasarım tokens ve dual-sync WebSocket. |
 | **[error-handling-and-contract-architecture.md](error-handling-and-contract-architecture.md)** | Dual-track hata modeli (`ProblemDetail` + `ResultResponses`), HTTP durum haritalaması (`ErrorCodeStatuses`), frontend güvenli hata çözme (`errorUtils`) ve Axios katmanı. |
 
 ---
