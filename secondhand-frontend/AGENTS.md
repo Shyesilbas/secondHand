@@ -7,8 +7,6 @@ React 19 + Vite, Tailwind 3, React Router 7, React Query 5, Axios, STOMP, `lucid
 Before modifying frontend code or UI, load the relevant skill from `.agents/skills/`:
 - **`restrained-ui-design-standard`** (`../.agents/skills/restrained-ui-design-standard/SKILL.md`): **Mandatory before any UI change.** Enforces Apple/Spotify-tier restraint, zero emojis, purposeful non-flashy color balance, `rounded-md` ceiling, `theme.js` tokens, 4 data states (`Skeleton`, `EmptyState`, `Alert`, `Disabled`), and pre-completion regex/lint checks.
 - **`frontend-modular-architecture`** (`../.agents/skills/frontend-modular-architecture/SKILL.md`): Enforces the 6-section module architecture, React Router 7 routes, component hierarchies, React Query 5 data flow, explicit query key invalidation matrices, form validation standards, and backend error unwrapping.
-- **`realtime-chat-and-websocket-lifecycle`** (`../.agents/skills/realtime-chat-and-websocket-lifecycle/SKILL.md`): Enforces STOMP WebSocket connection singleton lifecycle, room subscription cleanup on unmount, exponential reconnect backoff, and dual-sync badge updates.
-- **`ai-aura-moderation-and-agent-workflows`** (`../.agents/skills/ai-aura-moderation-and-agent-workflows/SKILL.md`): Enforces Aura conversational AI integration, dynamic `uiContext` injection, 403 quota gating, and zero-retry protection.
 - **`polymorphic-catalog-and-layered-api`** (`../.agents/skills/polymorphic-catalog-and-layered-api/SKILL.md`): Enforces React Query state discipline (`useQuery`/`useMutation` only, `request.js`, query key arrays, `useEnums`, and dynamic catalog metadata).
 
 ## Structure & Shared Primitives
