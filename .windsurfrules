@@ -1,0 +1,6 @@
+# Windsurf Rules — secondHand
+
+You are working on secondHand.
+Always strictly follow all architecture rules, conventions, and constraints in `AGENTS.md`.
+Consult `.agents/skills/` and `docs/README.md` for deep-dive architecture and design systems.
+Maintain strict zero drift on `python3 scripts/check_docs.py`.

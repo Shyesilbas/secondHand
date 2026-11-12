@@ -3,7 +3,7 @@
 Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
 
 > [!NOTE]
-> Repoda `.github/` dizini ve CI workflow dosyası yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
+> Repoda CI workflow dosyası (`.github/workflows`) yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
 
 ---
 

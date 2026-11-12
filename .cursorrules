@@ -1,0 +1,11 @@
+# Cursor Rules — secondHand
+
+You are working on secondHand, a C2C second-hand marketplace with a Spring Boot 3.5 backend and React 19 frontend.
+Always strictly follow all architecture rules, constraints, and instructions in `AGENTS.md`.
+
+Before modifying code:
+1. Read `AGENTS.md` for project map, risk tiers, and operational rules.
+2. Load relevant specialized skills from `.agents/skills/` (e.g. `transactional-outbox-and-redis-concurrency`, `restrained-ui-design-standard`, `polymorphic-catalog-and-layered-api`, `frontend-modular-architecture`).
+3. For backend modules, consult `src/main/java/com/serhat/secondhand/<module>/README.md`.
+4. For frontend, consult `secondhand-frontend/AGENTS.md` and module READMEs.
+5. Keep diffs minimal, never guess behavior in money/stock flows, and maintain zero drift on `python3 scripts/check_docs.py`.
