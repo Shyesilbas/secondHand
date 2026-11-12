@@ -97,10 +97,10 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         int numberOfConcurrentUsers = 5;
 
         log.info("================================================================================");
-        log.info("🚀 [FLASH-SALE SIMULATION STARTED]");
-        log.info("📦 Ürün ID: {}", testListingId);
-        log.info("🔢 Başlangıç Stoğu: {}", initialStock);
-        log.info("👥 Eşzamanlı Alıcı Sayısı: {}", numberOfConcurrentUsers);
+        log.info("[FLASH-SALE SIMULATION STARTED]");
+        log.info("Listing ID: {}", testListingId);
+        log.info("Initial Stock: {}", initialStock);
+        log.info("Concurrent Users: {}", numberOfConcurrentUsers);
         log.info("================================================================================");
 
         // Redis'teki stok anahtarını başlangıç değeriyle doğrudan ayarla
@@ -134,7 +134,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                         startGate.await(); // Tabanca sesini bekle!
 
                         long startTime = System.currentTimeMillis();
-                        log.info("⚡ [{}] -> Satın alma isteği ateşlendi!", userName);
+                        log.info("[START] [{}] -> Purchase request triggered", userName);
 
                         try {
                             // A) Redis Lua Atomik Rezervasyon
@@ -142,7 +142,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                             long duration = System.currentTimeMillis() - startTime;
                             executionTimes.put(userName, duration);
 
-                            log.info("✅ [{}] -> STOK REZERVE EDİLDİ! (Süre: {} ms) | Redis Kilit Başarılı", userName,
+                            log.info("[OK] [{}] -> Stock reserved (Duration: {} ms) | Redis lock success", userName,
                                     duration);
 
                             // B) Ödeme & Transactional Outbox Kaydı Simülasyonu
@@ -164,16 +164,16 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                             paymentOutboxService.enqueuePaymentCompleted(payment);
 
                             successfulUsers.add(userName);
-                            log.info("📬 [{}] -> Payment ve Outbox Event DB'ye ACID ile kaydedildi!", userName);
+                            log.info("[OUTBOX] [{}] -> Payment and Outbox Event persisted with ACID", userName);
 
                         } catch (BusinessException ex) {
                             long duration = System.currentTimeMillis() - startTime;
                             executionTimes.put(userName, duration);
                             rejectedUsers.add(userName);
-                            log.warn("❌ [{}] -> REDDEDİLDİ: {} (Süre: {} ms) | DB'ye yük binmedi!", userName,
+                            log.warn("[REJECTED] [{}] -> Rejected: {} (Duration: {} ms)", userName,
                                     ex.getMessage(), duration);
                         } catch (Exception ex) {
-                            log.error("💥 [{}] -> Beklenmeyen hata:", userName, ex);
+                            log.error("[ERROR] [{}] -> Unexpected error:", userName, ex);
                             rejectedUsers.add(userName);
                         }
                     } catch (InterruptedException e) {
@@ -186,7 +186,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
 
             // Tüm thread'ler hazır olana kadar bekle
             readyLatch.await();
-            log.info("🚦 5 Thread kapıda hazır bekliyor... 3.. 2.. 1.. FIRE! 💥");
+            log.info("[READY] 5 Threads ready at gate... firing!");
             startGate.countDown(); // Tabancayı ateşle!
 
             // Tüm işlemlerin bitmesini bekle
@@ -194,12 +194,12 @@ public class ConcurrentStockAndPaymentIntegrationTest {
             executorService.shutdown();
 
             log.info("================================================================================");
-            log.info("🏁 [SIMULATION FINISHED]");
-            log.info("⏱️ Zamanında Bitti mi: {}", completedInTime);
-            log.info("🟢 Başarılı Satın Almalar (Kalan Stok 0 Oldu): {} -> {}", successfulUsers.size(),
+            log.info("[SIMULATION FINISHED]");
+            log.info("Completed In Time: {}", completedInTime);
+            log.info("Successful Purchases (Remaining stock 0): {} -> {}", successfulUsers.size(),
                     successfulUsers);
-            log.info("🔴 Stok Yetersizliği ile Reddedilenler: {} -> {}", rejectedUsers.size(), rejectedUsers);
-            log.info("📊 Ortalama Redis Lua Karar Süresi: {} ms",
+            log.info("Stock Rejections: {} -> {}", rejectedUsers.size(), rejectedUsers);
+            log.info("Average Redis Lua decision duration: {} ms",
                     executionTimes.values().stream().mapToLong(Long::longValue).average().orElse(0.0));
             log.info("================================================================================");
 
@@ -210,7 +210,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
             // Redis'teki stok anahtarının değerini doğrula (3 adet rezerve edildiği için
             // kalan 0 olmalı)
             String remainingRedisStock = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
-            log.info("🔍 Redis'te Kalan Fiziksel Stok Değeri: {}", remainingRedisStock);
+            log.info("[REDIS] Remaining stock in Redis: {}", remainingRedisStock);
             Assertions.assertEquals("0", remainingRedisStock, "Redis'te kalan stok tam 0 olmalıdır.");
         } finally {
             redisTemplate.delete("v4:inventory:stock:" + testListingId);
@@ -240,10 +240,10 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         int numberOfConcurrentUsers = 5;
 
         log.info("================================================================================");
-        log.info("🎟️ [COUPON FLASH-SALE CONCURRENCY SIMULATION STARTED]");
-        log.info("🔖 Kupon Kodu: {}", testCouponCode);
-        log.info("🔢 Global Kullanım Limiti: {}", globalLimit);
-        log.info("👥 Eşzamanlı İstek Sayısı: {}", numberOfConcurrentUsers);
+        log.info("[COUPON FLASH-SALE CONCURRENCY SIMULATION STARTED]");
+        log.info("Coupon Code: {}", testCouponCode);
+        log.info("Global Usage Limit: {}", globalLimit);
+        log.info("Concurrent Request Count: {}", numberOfConcurrentUsers);
         log.info("================================================================================");
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfConcurrentUsers);
@@ -267,13 +267,13 @@ public class ConcurrentStockAndPaymentIntegrationTest {
 
                     if (result > 0) {
                         successfulUsers.add(userName);
-                        log.info("✅ [{}] -> KUPON BAŞARIYLA ALINDI! (Redis Sıra No: {})", userName, result);
+                        log.info("[OK] [{}] -> Coupon acquired successfully (Redis seq: {})", userName, result);
                     } else {
                         rejectedUsers.add(userName);
-                        log.warn("❌ [{}] -> KUPON LİMİTİ DOLDU (Sonuç Kodu: {})", userName, result);
+                        log.warn("[REJECTED] [{}] -> Coupon limit reached (Code: {})", userName, result);
                     }
                 } catch (Exception e) {
-                    log.error("Hata:", e);
+                    log.error("Error:", e);
                 } finally {
                     doneLatch.countDown();
                 }
@@ -285,8 +285,8 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         doneLatch.await(5, TimeUnit.SECONDS);
         executorService.shutdown();
 
-        log.info("🟢 Kupon Kazananlar: {} -> {}", successfulUsers.size(), successfulUsers);
-        log.info("🔴 Kupon Kaçıranlar: {} -> {}", rejectedUsers.size(), rejectedUsers);
+        log.info("[SUCCESS] Coupon Winners: {} -> {}", successfulUsers.size(), successfulUsers);
+        log.info("[EXHAUSTED] Coupon Misses: {} -> {}", rejectedUsers.size(), rejectedUsers);
 
         Assertions.assertEquals(2, successfulUsers.size(), "Kuponu tam olarak 2 kişi alabilmelidir.");
         Assertions.assertEquals(3, rejectedUsers.size(), "Kupon kotası dolduğu için 3 kişi reddedilmelidir.");
@@ -305,7 +305,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
     @DisplayName("Escrow Release -> Transactional Outbox Flow Test")
     public void testEscrowOutboxReleaseFlow() {
         log.info("================================================================================");
-        log.info("🤝 [ESCROW RELEASE & OUTBOX SIMULATION STARTED]");
+        log.info("[ESCROW RELEASE & OUTBOX SIMULATION STARTED]");
         log.info("================================================================================");
 
         User seller = userRepository.findAll().stream().findFirst().orElseThrow();
@@ -331,7 +331,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                     .anyMatch(e -> e.getAggregateId().equals(savedEscrow.getId().toString())
                             && e.getEventType().equals("ESCROW_RELEASED"));
 
-            log.info("📬 Escrow Outbox Tablosunda ESCROW_RELEASED Event Kaydı Bulundu mu: {}", eventExists);
+            log.info("[OUTBOX] Escrow Outbox ESCROW_RELEASED event found: {}", eventExists);
             Assertions.assertTrue(eventExists,
                     "Escrow release eventi escrow_outbox_events tablosuna ACID ile yazılmalıdır.");
         } finally {
@@ -348,7 +348,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
     @DisplayName("Stock Reservation Manual Cancellation & TTL Release Test")
     public void testStockReservationTtlAndCancellation() {
         log.info("================================================================================");
-        log.info("⏳ [STOCK RESERVATION CANCELLATION & TTL SIMULATION STARTED]");
+        log.info("[STOCK RESERVATION CANCELLATION & TTL SIMULATION STARTED]");
         log.info("================================================================================");
 
         com.serhat.secondhand.listing.domain.entity.Listing realListing = listingRepository.findAll().stream()
@@ -368,13 +368,13 @@ public class ConcurrentStockAndPaymentIntegrationTest {
         // 2. Kullanıcı stoğu rezerve eder
         redisReservationService.reserveStockWithTtl(testUserId, testListingId, 1, 900L);
         String stockAfterReserve = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
-        log.info("📦 Rezervasyon Sonrası Redis Kalan Stok: {}", stockAfterReserve);
+        log.info("[STOCK] Redis stock after reserve: {}", stockAfterReserve);
         Assertions.assertEquals("0", stockAfterReserve);
 
         // 3. Kullanıcı sepetten ürünü çıkarır veya checkout iptal eder
         redisReservationService.cancelUserReservation(testUserId, testListingId);
         String stockAfterCancel = redisTemplate.opsForValue().get("v4:inventory:stock:" + testListingId);
-        log.info("♻️ İptal Sonrası Redis Serbest Kalan Stok: {}", stockAfterCancel);
+        log.info("[RESTORED] Redis stock restored after cancel: {}", stockAfterCancel);
         Assertions.assertEquals("1", stockAfterCancel, "İptal edilen rezervasyon stoğa anında geri iade edilmelidir.");
     }
 
@@ -388,7 +388,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
     @DisplayName("Order Cancelled -> Transactional Outbox Flow Test")
     public void testOrderCancellationOutboxFlow() {
         log.info("================================================================================");
-        log.info("📦 [ORDER CANCELLATION & OUTBOX SIMULATION STARTED]");
+        log.info("[ORDER CANCELLATION & OUTBOX SIMULATION STARTED]");
         log.info("================================================================================");
 
         long testOrderId = 8888L;
@@ -410,7 +410,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                     .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId))
                             && e.getEventType().equals("ORDER_CANCELLED"));
 
-            log.info("📬 Order Outbox Tablosunda ORDER_CANCELLED Event Kaydı Bulundu mu: {}", eventExists);
+            log.info("[OUTBOX] Order Outbox ORDER_CANCELLED event found: {}", eventExists);
             Assertions.assertTrue(eventExists,
                     "Sipariş iptal eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
         } finally {
@@ -426,7 +426,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
     @DisplayName("Order Refunded -> Transactional Outbox Flow Test")
     public void testOrderRefundOutboxFlow() {
         log.info("================================================================================");
-        log.info("🔄 [ORDER REFUND & OUTBOX SIMULATION STARTED]");
+        log.info("[ORDER REFUND & OUTBOX SIMULATION STARTED]");
         log.info("================================================================================");
 
         long testOrderId = 7777L;
@@ -448,7 +448,7 @@ public class ConcurrentStockAndPaymentIntegrationTest {
                     .anyMatch(e -> e.getAggregateId().equals(String.valueOf(testOrderId))
                             && e.getEventType().equals("ORDER_REFUNDED"));
 
-            log.info("📬 Order Outbox Tablosunda ORDER_REFUNDED Event Kaydı Bulundu mu: {}", eventExists);
+            log.info("[OUTBOX] Order Outbox ORDER_REFUNDED event found: {}", eventExists);
             Assertions.assertTrue(eventExists,
                     "Sipariş iade eventi order_outbox_events tablosuna ACID ile yazılmalıdır.");
         } finally {

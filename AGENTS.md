@@ -1,6 +1,6 @@
 # secondHand — Unified Agent Guide
 
-C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, Redis 7, Kafka 3.7) and React 19 frontend (`secondhand-frontend/`). This file is the single canonical source of truth for all AI agents.
+C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, Redis 7, Kafka 3.7) and React 19 frontend (`secondhand-frontend/`). This file is the single canonical source of truth for all AI agents. Detailed domain rules live in module `README.md` files; detailed tasks live in `.agents/skills/`.
 
 ## Core Commands & Local Environment
 - **Start All Services:** `./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]` (Docker: Postgres 5433, Redis 6379, Kafka 9092; then backend and frontend).
@@ -19,26 +19,19 @@ Local operational skills (symlinked in `.claude/skills`). Activate the relevant 
 - **`frontend-modular-architecture`**: 6-section module architecture, React Router 7 routes, component hierarchy, React Query 5 invalidation matrix, form validation, error unwrapping.
 - **`error-handling-and-frontend-contract`**: Dual-track error payload (`ProblemDetail` + `ResultResponses`), `ErrorCode` enum discipline, HTTP status resolution, `errorUtils.getErrorMessage`.
 
-## Stack Discipline & Architecture Guidelines
-
-### Backend (Spring Boot 3.5, Java 17)
-- **Layered Flow:** `controller -> service -> validator/policy -> repository -> mapper`. Controllers never hold business logic or return raw entities.
-- **Review Checklist:** Entity leaked? Rollback broken? N+1 query or missing pagination? Main transaction broken by async event listener? Missing cache eviction, `@PreAuthorize` or ownership check?
-- **Flyway Migrations:** `src/main/resources/db/migration/V<N>__*.sql`. Never modify existing migrations.
-
-### Frontend (React 19, Vite 5, Tailwind 3)
-- **Data Flow:** React Query 5 (`useQuery`/`useMutation`) only; server data is never duplicated in local React state. Mutations must explicitly invalidate affected query keys.
-- **Shared Primitives:** UI in `src/common/components/ui/` (`Button`, `Modal`, `Skeleton`, `EmptyState`, `Alert`, `DataPagination`); forms in `common/components/forms/` (`inputStyles.js`, `FormPrimitives.jsx`).
-- **4 Data States:** Every view must handle: Loading (Skeleton), Empty (EmptyState), Error (Alert), Submitting (Disabled).
-- **Security & Network:** Cookies (`HttpOnly`, `SameSite`) for tokens; Axios wrapper `src/common/services/api/request.js`; interceptor 401 mutex refresh queue. No JWT in `localStorage`. Clean up STOMP/WebSocket in `useEffect`.
-
-## Working Rules & Token Economy
-- **Load Minimum Context (Save Tokens):** Start from the symptom and trace the execution path. Read only the specific files involved. Use targeted grep/symbol lookups instead of reading full directories. Don't read `docs/` "just in case".
-- **Minimal Diffs:** One change solves one problem. Keep diffs strictly inside the affected call chain. Do not refactor unrelated working code.
-- **High-Risk Domain Discipline:** Money (`checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing`) & Stock (`inventory`, `cart`) = High Risk. No guessed behavior, no silent fallbacks. Fail fast with clear error codes.
-- **Money Fix Test Requirement:** Any money/stock fix must ship with a unit test that fails without the fix.
-- **Facts Over Guesses:** Verify findings in code before reporting. Clearly distinguish verified facts from hypotheses.
+## Mandatory Architecture & Code Invariants
+- **Zero Emoji Standard:** Absolutely zero emojis in code, comments, UI text, buttons, alerts, status pills, or git commits. Use `lucide-react` icons for UI indicators.
+- **Backend Flow:** Strict layered flow (`controller -> service -> validator/policy -> repository -> mapper`). Controllers never contain business logic or leak raw JPA entities. Flyway migrations (`src/main/resources/db/migration/V<N>__*.sql`) are strictly immutable; never edit existing migrations.
+- **Frontend State & Security:** React Query 5 only (`useQuery`/`useMutation`); server state is never duplicated into local React state. Session tokens must live in `HttpOnly`, `SameSite` cookies; never in `localStorage`.
+- **High-Risk Domain Discipline:** Money (`checkout`, `order`, `payment`, `escrow`, `ewallet`, `coupon`, `pricing`) & Stock (`inventory`, `cart`) = High Risk. No guessed behavior, no silent fallbacks. Fail fast with clear error codes. Any money/stock fix must ship with a unit test that fails without the fix.
 - **Docs Language:** `docs/` is Turkish prose with English technical terms (cache, handshake, provider, consumer); module READMEs and code are English.
+
+## Token & Context Economy Rules (Strict for Agents)
+- **Ignore Vendor & Build Artifacts:** Never scan, search, or read files in `node_modules/`, `dist/`, `.vite/`, `.turbo/`, `target/`, `.mvn/`, `.idea/`, `.vscode/`, or `.git/`.
+- **Data Inspection Economy (Head-First):** When inspecting large files, seed JSONs, SQL dumps, or logs, NEVER read or dump the full file. Use `head -n 5` / `head -n 20`, targeted `grep -m 5`, line-limited queries, or specific JSON keys.
+- **Load Minimum Context:** Start from the symptom and trace the execution path. Read only the specific files involved. Consult module `README.md` files on demand; do not read architecture docs "just in case".
+- **Minimal Diffs:** One change solves one problem. Keep diffs strictly inside the affected call chain. Do not refactor unrelated working code.
+- **Facts Over Guesses:** Verify findings in code before reporting. Clearly distinguish verified facts from hypotheses.
 
 ## Project Map & Risk Tiers
 | Group | Modules | Risk |
