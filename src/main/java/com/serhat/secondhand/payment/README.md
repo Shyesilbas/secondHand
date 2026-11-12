@@ -6,12 +6,11 @@ The `payment` domain is the financial transaction execution engine of the market
 > [!NOTE]
 > **Related Documentation & Runbooks:**
 > - **Architecture Deep Dive:** [`docs/payment-strategy-and-provider-extension-guide.md`](../../../../../../../docs/payment-strategy-and-provider-extension-guide.md)
-> - **Distributed Checkout Pipeline:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
 > - **Frontend Module:** [`secondhand-frontend/src/payments/README.md`](../../../../../../../secondhand-frontend/src/payments/README.md)
 > - **Task Runbooks:**
->   - [`add-payment-provider.md`](.docs/runbooks/add-payment-provider.md) — Step-by-step guide for implementing new payment adapters
->   - [`add-event-handler.md`](.docs/runbooks/add-event-handler.md) — Handling post-payment event callbacks
->   - [`payment-feature-runbook.md`](.docs/runbooks/payment-feature-runbook.md) — End-to-end payment feature checklist
+>   - [`add-payment-provider.md`](.docs/runbooks/add-payment-provider.md) — Add Payment Provider
+>   - [`add-event-handler.md`](.docs/runbooks/add-event-handler.md) — Add Event Handler
+>   - [`payment-feature-runbook.md`](.docs/runbooks/payment-feature-runbook.md) — Payment Feature Runbook
 
 ```mermaid
 sequenceDiagram
