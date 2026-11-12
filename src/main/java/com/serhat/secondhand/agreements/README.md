@@ -3,6 +3,12 @@
 ## 1. Executive Summary & Purpose
 The `agreements` domain governs legal terms, user consent policies, mandatory regulatory disclosures (KVKK, Distance Sales Contracts), version progression, and automated platform-wide notification broadcasts upon policy updates.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Frontend Module:** [`secondhand-frontend/src/agreements/README.md`](../../../../../../../secondhand-frontend/src/agreements/README.md)
+> - **Task Runbooks:**
+>   - [`modify-agreement-rules.md`](.docs/runbooks/modify-agreement-rules.md) — Modify agreement validation and versioning rules
+
 ### Core Architectural Features
 - **Semantic Versioning & Audit Trail:** Legal agreements track version strings (e.g. "1.0", "1.1"). Historical user acceptances are permanently preserved in `user_agreements` for legal auditing.
 - **Dynamic Group Requirements:** Evaluates mandatory agreements based on user operational stage (`AgreementRequirement`: registration, checkout, seller onboarding).

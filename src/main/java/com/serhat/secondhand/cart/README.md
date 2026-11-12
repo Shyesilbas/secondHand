@@ -3,6 +3,14 @@
 ## 1. Domain Scope & Purpose
 The `cart` domain provides an optimistic shopping cart service for buyers. It manages cart additions, quantity updates, item deletions, and listing enrichments without acquiring relational database locks. It decouples casual cart browsing from atomic stock deductions, deferring hard stock locks to the checkout phase while feeding real-time social proof demand metrics into Redis.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/stock-reservation-and-reconciliation.md`](../../../../../../../docs/stock-reservation-and-reconciliation.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/cart/README.md`](../../../../../../../secondhand-frontend/src/cart/README.md)
+> - **Task Runbooks:**
+>   - [`cart-feature-runbook.md`](.docs/runbooks/cart-feature-runbook.md) — Cart feature development playbook
+
 ```mermaid
 flowchart TD
     A["Buyer Adds Item to Cart<br/>POST /api/v1/cart/items"] --> B["CartValidator<br/>• Self-purchase check (buyer != seller)<br/>• Listing status == ACTIVE<br/>• Available inventory > 0"]

@@ -3,6 +3,11 @@
 ## 1. Executive Summary & Purpose
 The `follow` domain implements user-to-seller social graph mechanics. It enables buyers to follow trustworthy sellers, customize notification preferences per seller, view seller subscriber counts, and automatically receive real-time push alerts and transactional emails whenever followed sellers publish new listings.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/email-architecture-and-event-driven-dispatch.md`](../../../../../../../docs/email-architecture-and-event-driven-dispatch.md)
+> - **Frontend Module:** [`secondhand-frontend/src/follow/README.md`](../../../../../../../secondhand-frontend/src/follow/README.md)
+
 ### Architectural Highlights
 - **Directional Social Relationship:** `SellerFollow` entity represents a unidirectional relationship between `follower` (buyer) and `followed` (seller).
 - **Soft Delete Reversible Lifecycle:** Uses `@SQLDelete` and Hibernate `@SQLRestriction("deleted_at IS NULL")` to preserve social graph history; re-following an unfollowed seller reactivates the archived record with `deleted_at = null`.

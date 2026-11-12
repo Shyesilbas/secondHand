@@ -3,6 +3,14 @@
 ## 1. Domain Scope & Purpose
 The `offer` domain governs price negotiations (bargaining) between buyers and sellers on active marketplace listings. It manages the multi-turn negotiation state machine (initial offer, acceptance, rejection, and counter-offers), establishes 24-hour exclusive buyer purchase holds via Redis, enforces listing-level concurrency locks to prevent double-acceptance, and handles automated expiration.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/offer-system-and-concurrency-locks.md`](../../../../../../../docs/offer-system-and-concurrency-locks.md)
+> - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](../../../../../../../docs/websocket-stomp-and-chat-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/offer/README.md`](../../../../../../../secondhand-frontend/src/offer/README.md)
+> - **Task Runbooks:**
+>   - [`modify-offer-behavior.md`](.docs/runbooks/modify-offer-behavior.md) — Modify offer negotiation rules
+
 ```mermaid
 flowchart TD
     A["Buyer Submits Offer<br/>POST /api/v1/offers"] --> B["OfferValidator<br/>• Self-offer check (buyer != seller)<br/>• Listing ACTIVE & stock >= qty"]

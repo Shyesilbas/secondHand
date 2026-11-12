@@ -3,6 +3,16 @@
 ## 1. Domain Scope & Purpose
 The `core` domain provides the cross-cutting infrastructural foundation of the entire backend. It implements the Spring Security filter chain, distributed Redis Lua rate limiting, dynamic public route discovery, stateless JWT resolution, transactional outbox housekeeping, deterministic database catalog seeding, unified error handling, and asynchronous audit logging.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/redis-and-kafka-architecture.md`](../../../../../../../docs/redis-and-kafka-architecture.md)
+> - **Architecture Deep Dive:** [`docs/multi-tier-redis-caching-and-invalidation.md`](../../../../../../../docs/multi-tier-redis-caching-and-invalidation.md)
+> - **Architecture Deep Dive:** [`docs/rate-limiting-and-throttling-architecture.md`](../../../../../../../docs/rate-limiting-and-throttling-architecture.md)
+> - **Architecture Deep Dive:** [`docs/error-handling-and-contract-architecture.md`](../../../../../../../docs/error-handling-and-contract-architecture.md)
+> - **Architecture Deep Dive:** [`docs/database-migration-and-seeding-guide.md`](../../../../../../../docs/database-migration-and-seeding-guide.md)
+> - **Architecture Deep Dive:** [`docs/ci-cd-and-deployment-guide.md`](../../../../../../../docs/ci-cd-and-deployment-guide.md)
+> - **Frontend Module:** [`secondhand-frontend/src/common/README.md`](../../../../../../../secondhand-frontend/src/common/README.md)
+
 ```mermaid
 flowchart TD
     A["Incoming HTTP Request"] --> B["SecurityHeadersFilter<br/>OWASP Security Headers (CSP, HSTS, X-Frame)"]

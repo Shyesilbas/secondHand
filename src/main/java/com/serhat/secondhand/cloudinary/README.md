@@ -3,6 +3,10 @@
 ## 1. Executive Summary & Purpose
 The `cloudinary` domain manages external media storage, automated format and quality optimization, responsive image resizing, and remote asset lifecycle cleanup for listing photo galleries and user profile avatars.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/external-integrations-cloudinary-and-exchange.md`](../../../../../../../docs/external-integrations-cloudinary-and-exchange.md)
+
 ### Core Architectural Features
 - **Stateless Cloud Storage:** Image binaries are never stored on the local application filesystem or inside PostgreSQL. Upload streams are piped directly to Cloudinary and tracked via HTTPS `secure_url`.
 - **Dynamic Optimization Pipeline:** Assets are ingested with `quality: auto` and `fetch_format: auto`, allowing Cloudinary's edge CDN to deliver modern image formats (WebP, AVIF) tailored to client browser capabilities.

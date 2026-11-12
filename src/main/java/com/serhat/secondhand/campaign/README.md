@@ -3,6 +3,13 @@
 ## 1. Domain Scope & Purpose
 The `campaign` domain enables marketplace sellers to configure and manage targeted promotional discounts across their active inventory. It supports both percentage and fixed-amount price cuts, enforces category-level eligibility restrictions, manages time-based activation and automated expiration, and integrates with the pricing engine to calculate buyer discounts during cart review and checkout.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../../../../../docs/pricing-coupon-and-campaign-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/campaign/README.md`](../../../../../../../secondhand-frontend/src/campaign/README.md)
+> - **Task Runbooks:**
+>   - [`modify-campaign-behavior.md`](.docs/runbooks/modify-campaign-behavior.md) — Modify campaign discount rules
+
 ```mermaid
 flowchart TD
     A["Seller Creates Campaign<br/>POST /api/v1/seller/campaigns"] --> B["CampaignValidator<br/>• Value Bounds & Dates<br/>• Verify Listing Ownership<br/>• Exclude Real Estate / Vehicle"]

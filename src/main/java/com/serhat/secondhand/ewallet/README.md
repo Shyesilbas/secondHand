@@ -3,6 +3,14 @@
 ## 1. Domain Scope & Purpose
 The `ewallet` domain manages the internal virtual stored-value accounts of platform users. It provides deposit, withdrawal, and peer-to-peer settlement facilities, implements pessimistic database locking (`SELECT ... FOR UPDATE`) to prevent race conditions and double-spending, monitors proactive spending warning thresholds, and serves as an integrated payment method via `EWalletPaymentProviderAdapter`.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/payment-strategy-and-provider-extension-guide.md`](../../../../../../../docs/payment-strategy-and-provider-extension-guide.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/ewallet/README.md`](../../../../../../../secondhand-frontend/src/ewallet/README.md)
+> - **Task Runbooks:**
+>   - [`modify-ewallet-rules.md`](.docs/runbooks/modify-ewallet-rules.md) — Modify eWallet balance rules and limits
+
 ```mermaid
 flowchart TD
     A["Debit / Credit Request<br/>(Deposit, Withdraw, Pay, Escrow Credit)"] --> B["Pessimistic Row Lock<br/>eWalletRepository.findByUserIdForUpdate(userId)"]

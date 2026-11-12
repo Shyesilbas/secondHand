@@ -3,6 +3,13 @@
 ## 1. Executive Summary & Architecture
 The `review` domain governs post-transaction buyer feedback, rating evaluations (1-5 stars), text comments, and reputation metrics calculation for sellers.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../../../../../docs/social-proof-and-urgency-metrics-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/reviews/README.md`](../../../../../../../secondhand-frontend/src/reviews/README.md)
+> - **Task Runbooks:**
+>   - [`modify-review-behavior.md`](.docs/runbooks/modify-review-behavior.md) — Modify review submission and rating rules
+
 ### Architectural Responsibilities
 - **Verified Purchase Enforcement:** A review can only be submitted for an order item whose associated order is fulfilled (`ShippingStatus.DELIVERED` for cargo, or `OrderStatus.HANDOVER_CONFIRMED` / `OrderStatus.COMPLETED` for Safe Meetup).
 - **Strict Buyer Verification:** Only the actual buyer of the order item can author the review.

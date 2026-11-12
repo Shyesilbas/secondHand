@@ -3,6 +3,12 @@
 ## 1. Executive Summary & Architecture
 The `email` domain handles transactional notifications, order lifecycle communications, authentication codes, offer bargaining alerts, and system notices.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/email-architecture-and-event-driven-dispatch.md`](../../../../../../../docs/email-architecture-and-event-driven-dispatch.md)
+> - **Frontend Module:** [`secondhand-frontend/src/emails/README.md`](../../../../../../../secondhand-frontend/src/emails/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/inbox/README.md`](../../../../../../../secondhand-frontend/src/inbox/README.md)
+
 ### Key Architectural Characteristics
 - **In-App Inbox Delivery:** By deliberate design, outbound emails are delivered to the recipient's personal in-app inbox (persisted in the `emails` table, read via `GET /api/v1/emails/my-emails`). There is no external SMTP relay dependency in dev/staging.
 - **Asynchronous Kafka Pipeline:** Core domain transactions never execute email rendering or persistence synchronously. Instead, they publish events consumed by `EmailKafkaProducer` to the topic `mail.dispatch.v1`.

@@ -3,6 +3,12 @@
 ## 1. Executive Summary & Architecture
 The `shipping` domain encapsulates logistics carrier integration, shipment state tracking, and tracking number assignment for marketplace purchases delivered via cargo carriers.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/safe-meetup-delivery-and-verification.md`](../../../../../../../docs/safe-meetup-delivery-and-verification.md)
+> - **Architecture Deep Dive:** [`docs/external-integrations-cloudinary-and-exchange.md`](../../../../../../../docs/external-integrations-cloudinary-and-exchange.md)
+> - **Frontend Module:** [`secondhand-frontend/src/order/README.md`](../../../../../../../secondhand-frontend/src/order/README.md)
+
 ### Architectural Highlights
 - **Hexagonal Carrier Port:** Logistics providers are decoupled via `CargoProviderPort`. The current reference implementation (`JetKargoAdapter`) integrates mock carrier tracking and generation.
 - **Independent State Machine:** Shipping status transitions (`ShippingStatus`) operate orthogonally to financial payments and escrow holdings.

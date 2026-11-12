@@ -3,6 +3,15 @@
 ## 1. Domain Scope & Purpose
 The `escrow` domain implements the platform's "Safe Trade" fiduciary guarantee. It holds buyer funds in custody upon checkout and releases them to the seller's eWallet only after delivery handover has been verified (or returns them to the buyer if an order is cancelled or refunded). Fund releases are decoupled via the Transactional Outbox pattern and Apache Kafka.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/escrow-lifecycle-and-state-machine.md`](../../../../../../../docs/escrow-lifecycle-and-state-machine.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/payments/README.md`](../../../../../../../secondhand-frontend/src/payments/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/order/README.md`](../../../../../../../secondhand-frontend/src/order/README.md)
+> - **Task Runbooks:**
+>   - [`modify-escrow-behavior.md`](.docs/runbooks/modify-escrow-behavior.md) — Modify escrow state rules and release conditions
+
 ```mermaid
 flowchart TD
     A["Checkout Completes Payment"] --> B["EscrowService.hold(order)<br/>Persists Escrow records for each OrderItem<br/>Status: PaymentStatus.ESCROW"]

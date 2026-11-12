@@ -3,6 +3,11 @@
 ## 1. Executive Summary & Architecture
 The `dashboard` domain provides real-time operational intelligence, sales funnel analytics, conversion tracking, and delivery timelines for marketplace sellers and buyers using **Hexagonal Architecture (Ports & Adapters)**.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/multi-tier-redis-caching-and-invalidation.md`](../../../../../../../docs/multi-tier-redis-caching-and-invalidation.md)
+> - **Frontend Module:** [`secondhand-frontend/src/dashboard/README.md`](../../../../../../../secondhand-frontend/src/dashboard/README.md)
+
 ### Architectural Highlights
 - **Strict Hexagonal Decoupling:** `DashboardService` depends strictly on outbound abstraction ports rather than coupling directly to entities or repositories of external domains.
 - **Concurrent Non-Blocking Aggregation:** Executes multi-metric queries in parallel using Java `CompletableFuture.allOf(...)` bounded by the dedicated `taskExecutor` pool, dropping query latency from sequential $\sum t_i$ to $\max(t_i)$.

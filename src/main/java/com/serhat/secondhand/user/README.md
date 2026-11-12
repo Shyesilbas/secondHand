@@ -3,6 +3,12 @@
 ## 1. Domain Scope & Purpose
 The `user` domain manages user identities, privacy-governed public and private profiles, physical shipping/billing addresses, subscription tiers (`BASIC`, `PLUS`, `PRO`), daily Aura AI query quotas, prestige seller badge eligibility ("Great Seller"), and Trust & Safety sanction states.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../../../../../docs/auth-jwt-and-security-architecture.md)
+> - **Architecture Deep Dive:** [`docs/multi-tier-redis-caching-and-invalidation.md`](../../../../../../../docs/multi-tier-redis-caching-and-invalidation.md)
+> - **Frontend Module:** [`secondhand-frontend/src/user/README.md`](../../../../../../../secondhand-frontend/src/user/README.md)
+
 ```mermaid
 flowchart TD
     A["User Management"] --> B["Profile & Privacy<br/>PublicUserProfileDto (Sanitized) vs UserDto (Private)"]

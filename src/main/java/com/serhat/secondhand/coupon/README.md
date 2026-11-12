@@ -3,6 +3,12 @@
 ## 1. Domain Scope & Purpose
 The `coupon` domain governs platform-wide promotional discounts, audience-targeted marketing campaigns, atomic high-concurrency usage quotas, and single-redemption checkout guarantees. It combines sub-millisecond Redis Lua pre-checks with PostgreSQL pessimistic row locks (`SELECT ... FOR UPDATE`) to eliminate overselling and race conditions during high-volume flash sales.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../../../../../docs/pricing-coupon-and-campaign-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/coupon/README.md`](../../../../../../../secondhand-frontend/src/coupon/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/admin/README.md`](../../../../../../../secondhand-frontend/src/admin/README.md)
+
 ```mermaid
 flowchart TD
     A["Checkout Initiates Redemption<br/>CouponService.redeem(code, userId, order)"] --> B["Database Pessimistic Lock<br/>findByCodeIgnoreCaseForUpdate(code)"]

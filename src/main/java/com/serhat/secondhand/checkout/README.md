@@ -3,6 +3,13 @@
 ## 1. Domain Scope & Purpose
 The `checkout` domain is the central orchestration hub of the purchasing lifecycle. It coordinates the conversion of ephemeral shopping carts and accepted bargaining offers into immutable legal orders, executes multi-provider payments, establishes escrow protection, and enforces non-blocking, lock-free stock reservations.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Architecture Deep Dive:** [`docs/stock-reservation-and-reconciliation.md`](../../../../../../../docs/stock-reservation-and-reconciliation.md)
+> - **Frontend Module:** [`secondhand-frontend/src/cart/README.md`](../../../../../../../secondhand-frontend/src/cart/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/payments/README.md`](../../../../../../../secondhand-frontend/src/payments/README.md)
+
 ```mermaid
 flowchart TD
     A["Buyer Enters Checkout<br/>POST /api/checkout/initiate"] --> B["CheckoutStockReservationService<br/>Atomic Redis Lua Reservation (15-min TTL)"]

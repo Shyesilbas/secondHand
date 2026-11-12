@@ -3,6 +3,14 @@
 ## 1. Domain Scope & Purpose
 The `auth` domain governs user authentication, cryptographic session issuance, Refresh Token Rotation (RTR), session revocation, two-tier brute-force login throttling, password lifecycle, and Google OAuth2 Single Sign-On (SSO). It implements strict token family tracking to detect and defend against token theft and replay attacks.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../../../../../docs/auth-jwt-and-security-architecture.md)
+> - **Architecture Deep Dive:** [`docs/rate-limiting-and-throttling-architecture.md`](../../../../../../../docs/rate-limiting-and-throttling-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/auth/README.md`](../../../../../../../secondhand-frontend/src/auth/README.md)
+> - **Task Runbooks:**
+>   - [`modify-auth-rules.md`](.docs/runbooks/modify-auth-rules.md) — Modify authentication and token rules
+
 ```mermaid
 flowchart TD
     A["User Submits Credentials<br/>POST /api/v1/auth/login"] --> B["LoginAttemptService<br/>Check IP & Email Throttling in Redis"]

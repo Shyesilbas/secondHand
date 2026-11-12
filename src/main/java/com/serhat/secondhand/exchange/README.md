@@ -3,6 +3,11 @@
 ## 1. Executive Summary & Purpose
 The `exchange` domain provides real-time and cached currency exchange rates between supported currencies (`USD`, `EUR`, and `TRY`) for multi-currency conversion displays, international buyer price approximations, and escrow valuation.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/external-integrations-cloudinary-and-exchange.md`](../../../../../../../docs/external-integrations-cloudinary-and-exchange.md)
+> - **Frontend Module:** [`secondhand-frontend/src/common/README.md`](../../../../../../../secondhand-frontend/src/common/README.md)
+
 ### Core Architectural Features
 - **Third-Party API Integration:** Connects to ExchangeRate-API via Spring's `RestTemplate` configured with strict 5-second connection and 10-second read timeouts.
 - **Two-Hour Redis Caching:** Exchange pairs are cached via `@Cacheable(value = "payment:exchangeRates")` with a 2-hour TTL to guard against remote downtime, eliminate redundant outbound HTTP requests, and prevent vendor rate-limit exhaustion.

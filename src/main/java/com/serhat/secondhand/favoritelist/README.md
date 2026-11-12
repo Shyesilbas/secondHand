@@ -3,6 +3,13 @@
 ## 1. Executive Summary & Purpose
 The `favoritelist` domain enables users to curate custom, named collections of listings (e.g. "Dream Cars", "Living Room Makeover", "Tech Gadgets"), configure visibility permissions (Public vs. Private), and allows community users to discover and like public collections.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../../../../../docs/social-proof-and-urgency-metrics-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/favoritelist/README.md`](../../../../../../../secondhand-frontend/src/favoritelist/README.md)
+> - **Task Runbooks:**
+>   - [`modify-favoritelist-behavior.md`](.docs/runbooks/modify-favoritelist-behavior.md) — Modify favorite list and collection behavior
+
 ### Core Architectural Features
 - **Configurable Capacity Limits:** Enforces maximum collections per user (`maxListsPerUser`) and maximum items per list (`maxItemsPerList`) via `FavoriteListConfig`.
 - **Database-Level Projections:** Endpoints utilize `FavoriteListSummaryProjection` to calculate collection size and like counts directly in PostgreSQL, avoiding expensive in-memory collection hydration.

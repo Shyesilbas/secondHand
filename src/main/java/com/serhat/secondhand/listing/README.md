@@ -9,6 +9,22 @@ The `listing` domain is the core polymorphic catalog engine of the marketplace. 
 5. **Clothing** (`ClothingListing` -> `clothing_listings`)
 6. **Sports & Outdoor** (`SportsListing` -> `sports_listings`)
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/catalog-and-category-polymorphism.md`](../../../../../../../docs/catalog-and-category-polymorphism.md)
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../../../../../docs/social-proof-and-urgency-metrics-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/listing/README.md`](../../../../../../../secondhand-frontend/src/listing/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/vehicle/README.md`](../../../../../../../secondhand-frontend/src/vehicle/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/electronics/README.md`](../../../../../../../secondhand-frontend/src/electronics/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/realEstate/README.md`](../../../../../../../secondhand-frontend/src/realEstate/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/books/README.md`](../../../../../../../secondhand-frontend/src/books/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/clothing/README.md`](../../../../../../../secondhand-frontend/src/clothing/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/sports/README.md`](../../../../../../../secondhand-frontend/src/sports/README.md)
+> - **Task Runbooks:**
+>   - [`listing-data-flows.md`](.docs/knowledge/listing-data-flows.md) — Listing Data Flows & State Lifecycle
+>   - [`listing-architecture-patterns.md`](.docs/knowledge/listing-architecture-patterns.md) — Listing Architecture Patterns
+>   - [`vehicle-catalog-sources.md`](.docs/knowledge/vehicle-catalog-sources.md) — Vehicle Catalog Sources & Rules
+
 ---
 
 ## 2. Architecture & Data Flow

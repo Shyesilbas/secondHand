@@ -3,6 +3,18 @@
 ## 1. Domain Scope & Purpose
 The `order` domain manages the complete lifecycle of customer purchases across both standard cargo shipping (`DeliveryMethod.CARGO`) and safe in-person meetups (`DeliveryMethod.SAFE_MEETUP`). It enforces multi-seller partitioning, state transitions governed by explicit policies, item-by-item compensation accounting (cancellations and refunds), automated completion/cancellation schedulers, and transactional outbox event streaming to Kafka.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/order-lifecycle-and-compensation-management.md`](../../../../../../../docs/order-lifecycle-and-compensation-management.md)
+> - **Architecture Deep Dive:** [`docs/safe-meetup-delivery-and-verification.md`](../../../../../../../docs/safe-meetup-delivery-and-verification.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/order/README.md`](../../../../../../../secondhand-frontend/src/order/README.md)
+> - **Task Runbooks:**
+>   - [`add-order-endpoint.md`](.docs/runbooks/add-order-endpoint.md) — Add new order endpoint
+>   - [`modify-refund-behavior.md`](.docs/runbooks/modify-refund-behavior.md) — Modify refund compensation rules
+>   - [`modify-state-rule.md`](.docs/runbooks/modify-state-rule.md) — Modify order state machine transitions
+>   - [`order-feature-runbook.md`](.docs/runbooks/order-feature-runbook.md) — Order feature development playbook
+
 ```mermaid
 flowchart TD
     A["Checkout Domain<br/>POST /api/v1/orders/checkout"] --> B["OrderCreationService<br/>Partition cart by seller → Generate Orders"]

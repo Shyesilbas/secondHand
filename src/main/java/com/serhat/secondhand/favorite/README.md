@@ -3,6 +3,13 @@
 ## 1. Executive Summary & Architecture
 The `favorite` domain allows users to bookmark active listings, query social proof metrics, aggregate cross-platform popularity analytics, and empowers sellers to broadcast targeted, private discounted offers to users who have bookmarked their listings.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../../../../../docs/social-proof-and-urgency-metrics-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/favorites/README.md`](../../../../../../../secondhand-frontend/src/favorites/README.md)
+> - **Task Runbooks:**
+>   - [`modify-favorite-rules.md`](.docs/runbooks/modify-favorite-rules.md) — Modify favorite rules and cache keys
+
 ### Architectural Highlights
 - **Active State Validation:** Bookmarking requires the listing to be in the `ACTIVE` state (`ListingAccessService.validateActive`).
 - **Self-Favorite Prevention:** Users cannot favorite their own listings (`OWN_LISTING`).

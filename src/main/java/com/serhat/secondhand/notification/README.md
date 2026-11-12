@@ -3,6 +3,12 @@
 ## 1. Executive Summary & Purpose
 The `notification` domain delivers real-time transactional alerts, system-wide broadcast announcements, and unread badge tracking across web and mobile interfaces.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/notification-feed-and-broadcast-architecture.md`](../../../../../../../docs/notification-feed-and-broadcast-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/notification/README.md`](../../../../../../../secondhand-frontend/src/notification/README.md)
+> - **Frontend Module:** [`secondhand-frontend/src/inbox/README.md`](../../../../../../../secondhand-frontend/src/inbox/README.md)
+
 Instead of traditional high-cost fan-out patterns (inserting $N$ rows for $N$ users on system announcements), this domain implements a **Hybrid Feed Architecture**:
 - **Personal Notifications:** High-cardinality, user-specific events (`notifications` table) directly targeted to a single recipient (`userId`).
 - **Broadcast Announcements:** Zero-fan-out single-record events (`notification_events` table) fanned out on read via a lightweight join table (`notification_event_reads`).

@@ -47,8 +47,8 @@ Local operational skills (symlinked in `.claude/skills`). Activate the relevant 
 Key flow: `checkout` -> `order` -> `payment` -> `escrow` -> seller `ewallet`; stock is atomically reserved in Redis (15m TTL), then deducted in PostgreSQL via Kafka events.
 
 ## Where to Look (On Demand)
-- Module business rules: `src/main/java/com/serhat/secondhand/<module>/README.md`; frontend: `secondhand-frontend/src/<module>/README.md`.
-- Backend task how-tos: `src/main/java/com/serhat/secondhand/<module>/.docs/runbooks/` and `listing/.docs/knowledge/`.
-- Architecture deep dives: `docs/README.md` (payments, pricing/coupons/campaigns, escrow, orders, stock, Redis/Kafka, cache, auth, offers, chat, notifications, email, catalog, seeding, Aura AI, CI/CD).
+- **Module Business Rules & Hubs:** `src/main/java/com/serhat/secondhand/<module>/README.md`; frontend: `secondhand-frontend/src/<module>/README.md`. Every module README is a self-contained domain hub directly cross-linking its task runbooks (`.docs/runbooks/`), corresponding `docs/*.md` architecture deep dives, and frontend counterpart views.
+- **Backend Task How-Tos:** Direct links inside module READMEs or inspect `<module>/.docs/runbooks/` and `listing/.docs/knowledge/`.
+- **Architecture Deep Dives:** Direct links inside module READMEs or cross-cutting index in `docs/README.md`.
 - Docs drift check: `python3 scripts/check_docs.py` (must report 0 issues after doc changes).
 - API endpoint parity check: `python3 scripts/check_api_endpoints.py` (currently flags `/v1/ai/summary/{param}/{param}`, a false positive: the backend serves `/user/{id}` and `/listing/{id}`).

@@ -3,6 +3,12 @@
 ## 1. Domain Scope & Purpose
 The `pricing` domain is the deterministic, stateless calculation engine of the platform. It calculates item prices, applies seller-level campaign discounts, resolves accepted offer price overrides, evaluates platform coupons, and proportionally apportions multi-seller deductions to determine buyer payable totals and seller payouts.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/pricing-coupon-and-campaign-architecture.md`](../../../../../../../docs/pricing-coupon-and-campaign-architecture.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/cart/README.md`](../../../../../../../secondhand-frontend/src/cart/README.md)
+
 ```mermaid
 flowchart TD
     A["Cart Items + Optional Offer Override + Optional Coupon Code"] --> B["Step 1: Resolve Offer Overrides<br/>Offer lines bypass campaigns"]

@@ -3,6 +3,12 @@
 ## 1. Purpose & Problem Statement
 In high-concurrency second-hand e-commerce environments, standard relational database row-locking (`SELECT FOR UPDATE`) causes database connection starvation, latency spikes, and deadlocks when multiple buyers attempt to purchase or hold the same product simultaneously.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/stock-reservation-and-reconciliation.md`](../../../../../../../docs/stock-reservation-and-reconciliation.md)
+> - **Architecture Deep Dive:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/cart/README.md`](../../../../../../../secondhand-frontend/src/cart/README.md)
+
 The `inventory` domain implements a **High-Performance Distributed Stock Reservation Engine** combining:
 - **Redis In-Memory Lua Scripting** for sub-millisecond atomic checks, reservations, and anti-hoarding TTLs.
 - **Transactional Outbox & Apache Kafka** for reliable, asynchronous eventual consistency to PostgreSQL.

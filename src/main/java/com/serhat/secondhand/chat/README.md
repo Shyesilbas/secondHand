@@ -3,6 +3,11 @@
 ## 1. Domain Scope & Purpose
 The `chat` domain provides dual-channel, real-time messaging between marketplace users. It supports standard REST APIs alongside full-duplex WebSocket connections using the STOMP protocol, orchestrates cross-instance message routing via Redis Pub/Sub, enforces strict participant-level authorization (IDOR prevention), and provides integrated in-chat bargaining offers.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](../../../../../../../docs/websocket-stomp-and-chat-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/chat/README.md`](../../../../../../../secondhand-frontend/src/chat/README.md)
+
 ```mermaid
 flowchart TD
     subgraph REST["REST Communication Channel"]

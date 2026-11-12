@@ -3,6 +3,16 @@
 ## 1. Domain Scope & Purpose
 The `payment` domain is the financial transaction execution engine of the marketplace. It handles multi-provider payment authorization, cryptographic and OTP verification challenges, distributed Redis idempotency, payment ledger persistence, and transactional outbox event streaming. All secondary side-effects (e.g. buyer notifications, seller alerts, ledger balance updates, and downstream escrow creation) are decoupled via Apache Kafka.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/payment-strategy-and-provider-extension-guide.md`](../../../../../../../docs/payment-strategy-and-provider-extension-guide.md)
+> - **Distributed Checkout Pipeline:** [`docs/checkout-pipeline-and-distributed-transaction-flow.md`](../../../../../../../docs/checkout-pipeline-and-distributed-transaction-flow.md)
+> - **Frontend Module:** [`secondhand-frontend/src/payments/README.md`](../../../../../../../secondhand-frontend/src/payments/README.md)
+> - **Task Runbooks:**
+>   - [`add-payment-provider.md`](.docs/runbooks/add-payment-provider.md) — Step-by-step guide for implementing new payment adapters
+>   - [`add-event-handler.md`](.docs/runbooks/add-event-handler.md) — Handling post-payment event callbacks
+>   - [`payment-feature-runbook.md`](.docs/runbooks/payment-feature-runbook.md) — End-to-end payment feature checklist
+
 ```mermaid
 sequenceDiagram
     autonumber

@@ -3,7 +3,10 @@
 ## Purpose
 The `complaint` domain handles user reporting, listing abuse flagging, dispute intake, and autonomous **Aura AI (Gemini)** moderation across the platform. It eliminates the need for human administrators while maintaining strict guarantees around fairness, cooling-off buffers, rate limits, and financial rights protection.
 
-> **Full Architectural Blueprint:** For the complete system design, Redis queue schemas, prompt specifications, and sanction ladder, see [`docs/aura-trust-safety-and-complaint-moderation-architecture.md`](../../../../../../../docs/aura-trust-safety-and-complaint-moderation-architecture.md).
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation-architecture.md`](../../../../../../../docs/aura-trust-safety-and-complaint-moderation-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/complaint/README.md`](../../../../../../../secondhand-frontend/src/complaint/README.md)
 
 ## Architecture & Lifecycle Overview
 1. **Intake & Cooling-Off Period:**

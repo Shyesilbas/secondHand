@@ -7,6 +7,12 @@ The `ai` domain orchestrates interactions with **Aura**, the marketplace's multi
 3. **Conversational Memory:** Extracts and updates persistent user preferences (budget, preferred categories, sizing, brands) across multi-turn sessions.
 4. **Automated Review Summaries:** Synthesizes buyer feedback for sellers and individual listings into concise, actionable summaries.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/aura-ai-and-context-architecture.md`](../../../../../../../docs/aura-ai-and-context-architecture.md)
+> - **Architecture Deep Dive:** [`docs/aura-trust-safety-and-complaint-moderation-architecture.md`](../../../../../../../docs/aura-trust-safety-and-complaint-moderation-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/ai/README.md`](../../../../../../../secondhand-frontend/src/ai/README.md)
+
 ---
 
 ## 2. Architecture & Pipeline

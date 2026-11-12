@@ -3,6 +3,13 @@
 ## 1. Executive Summary & Purpose
 The `showcase` domain governs the paid "vitrin" (showcase) promotional features of the marketplace. It allows sellers to boost listing visibility on the homepage and category discovery feeds for a user-specified duration (in days), supporting extensions, early cancellations, and automated expiration.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Architecture Deep Dive:** [`docs/social-proof-and-urgency-metrics-architecture.md`](../../../../../../../docs/social-proof-and-urgency-metrics-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/showcase/README.md`](../../../../../../../secondhand-frontend/src/showcase/README.md)
+> - **Task Runbooks:**
+>   - [`modify-showcase-behavior.md`](.docs/runbooks/modify-showcase-behavior.md) — Modify showcase boost duration and fee rules
+
 ### Core Architectural Responsibilities
 - **Paid Listing Promotion:** Computes daily costs plus applicable taxes and executes payment capture via `PaymentProcessor`.
 - **Plan Quota Enforcement:** Validates user membership tier (`BASIC`, `PLUS`, `PRO`) showcase slot quotas via `PlanValidator.checkShowcaseSlot`.

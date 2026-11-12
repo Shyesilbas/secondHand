@@ -3,6 +3,10 @@
 ## 1. Executive Summary & Purpose
 The `forum` domain powers community discussions, feature suggestions, complaint topics, and interactive feedback across the marketplace.
 
+> [!NOTE]
+> **Related Documentation & Runbooks:**
+> - **Frontend Module:** [`secondhand-frontend/src/forum/README.md`](../../../../../../../secondhand-frontend/src/forum/README.md)
+
 ### Architectural Features
 - **Hierarchical Discussion:** Supports root topics (`ForumThread`) with categorized domains (`ForumCategory`: `SUGGESTIONS`, `COMPLAINTS`) and nested replies (`ForumComment`).
 - **Granular Author Privacy:** `ForumAuthorVisibility` allows authors to choose between anonymous posting (`ANONYMOUS`), display nickname (`DISPLAY_NAME`), or full name (`FULL_NAME`).
