@@ -11,6 +11,7 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL, Redi
 - **`docs-drift-audit`** (`.agents/skills/docs-drift-audit/SKILL.md`): Docs audits and updates: `python3 scripts/check_docs.py` (map, links, class names, forced Turkish, stale commands) plus manual checks of keys, TTLs, topics and counts against code.
 - **`restrained-ui-design-standard`** (`.agents/skills/restrained-ui-design-standard/SKILL.md`): Apple/Spotify-tier frontend UI design rules, semantic tokens, purposeful non-flashy color balance, radius ceiling (`rounded-md`), 4-state data discipline, and mandatory pre-completion regex/lint checks.
 - **`error-handling-and-frontend-contract`** (`.agents/skills/error-handling-and-frontend-contract/SKILL.md`): Dual-track error payload compatibility (`ProblemDetail` + `ResultResponses`), `ErrorCode` enum discipline, HTTP status resolution (`ErrorCodeStatuses`), and frontend safe message unwrapping (`errorUtils.getErrorMessage`, Axios interceptors, `errorHandler.js`).
+- **`frontend-modular-architecture`** (`.agents/skills/frontend-modular-architecture/SKILL.md`): Comprehensive guide and 6-section specification for secondhand-frontend architecture, React 19 + React Query 5 data flow, component tree hierarchy, 4-state UX discipline, React Router 7 routes, form validation, and restrained design system compliance.
 
 ## Sub-Directory Guides
 - Backend (`src/`): `src/main/java/com/serhat/secondhand/AGENTS.md`

@@ -1,18 +1,99 @@
 # Chat & Real-Time Messaging UI Module
 
-Direct user-to-user messaging, chat room management, in-chat offer cards, and STOMP WebSocket communication.
+## 1. Executive Summary & Route Map
+The `chat` module provides direct, real-time messaging between marketplace buyers and sellers. It integrates WebSocket STOMP communications, room list synchronization, unread message badges, in-chat price bargaining (`InChatOfferCard`), and reporting shortcuts.
 
-## Architecture
+### Route Map
+| Route Path | Component | Access | Lazy Loaded | Purpose |
+|---|---|---|---|---|
+| `/inbox?tab=chat` | `InboxPage` / `ChatPage` | `Protected` | Yes | Unified messaging portal with room sidebar and active window |
+| `/chat` (legacy) | Redirect -> `/inbox?tab=chat` | `Protected` | Yes | Backward compatibility route redirect |
 
-- **`useChat`:** Manages active chat room state, infinite room pagination (`GET /v1/chats/rooms/user?page&size`), historical message pagination (`/v1/chats/rooms/{id}/messages`), STOMP message broadcasting (`/app/chat.sendMessage`), and room subscriptions (`/topic/chat/{roomId}`).
-- **`useWebSocket`:** Centralized STOMP client over WebSocket (`WS_BASE_URL`). Subscribes to user private queues (`/user/{userId}/queue/messages`) and active room topics (`/topic/chat/{roomId}`), dispatches room presence (`/app/chat.joinRoom`, `/app/chat.leaveRoom`), and manages reconnect backoff up to 10 attempts.
-- **`useUnreadCount`:** Tracks unread message counts for navigation bar badges, updating via WebSocket events and React Query query invalidation.
-- **`InChatOfferCard`:** Renders contextual offer status and negotiation action buttons (Accept/Reject/Counter) directly inside the message timeline.
-- **`InboxPage` Integration:** All chat interactions live inside the unified `InboxPage` under `?tab=chat`. Legacy `/chat` routes automatically redirect to `/inbox?tab=chat&room={id}`.
+---
 
-## Invariants
+## 2. Component Hierarchy & File Structure
 
-- **Dual-Channel Delivery:** Real-time messages are dispatched over STOMP (`/app/chat.sendMessage`) when connected; REST endpoints (`chatService.sendMessage`) provide fallback and room creation capabilities.
-- **Room Membership:** Users can only view or subscribe to chat rooms where they are an authenticated participant (buyer or seller).
-- **Mark As Read:** Opening or switching to a chat room triggers `chatService.markMessagesAsRead(chatRoomId)`, immediately invalidating `['unreadCount']` and room queries.
-- **Restrained Styling:** Strict compliance with `.agents/skills/restrained-ui-design-standard/SKILL.md`: clean message bubbles, no animated bouncing dots or neon colors, subtle timestamp indicators, and hairline dividers.
+```
+src/chat/
+├── pages/
+│   └── ChatPage.jsx                    # Standalone and tabbed chat container
+├── components/
+│   ├── ChatList.jsx                    # Conversations sidebar with unread indicators
+│   ├── ChatRoomListItem.jsx            # Individual room card with avatar, last message, timestamp
+│   ├── ChatWindow.jsx                  # Active room view, header, timeline, and input box
+│   ├── ChatHeader.jsx                  # Participant metadata, listing context pill, report trigger
+│   ├── MessageList.jsx                 # Virtualized message bubble list with date dividers
+│   ├── ChatInput.jsx                   # Expanding textarea, submit button, keyboard shortcuts (Enter)
+│   ├── InChatOfferCard.jsx             # Embedded offer card with Accept/Reject/Counter actions
+│   └── ContactSellerButton.jsx         # Contextual trigger on listing detail to initiate room
+├── hooks/
+│   ├── useChat.js                      # Core STOMP WebSocket client, room subscription, send handler
+│   ├── useChatWindow.js                # Active window scrolling, read receipt observer
+│   └── useUnreadCount.js               # Tracks total unread messages for navbar notification badge
+├── services/
+│   └── chatService.js                  # Raw Axios endpoints (/api/v1/chats/**)
+├── chatIdUtils.js                      # Helper resolving room IDs and counterparty user IDs
+├── chatConstants.js                    # STOMP destination paths, reconnect limits, message types
+└── README.md                           # Module documentation
+```
+
+---
+
+## 3. Real-Time WebSocket & React Query Data Flow
+
+### 3.1 STOMP WebSocket Protocol
+- **Broker Endpoint:** Connected via `@stomp/stompjs` using HttpOnly session cookies.
+- **Outbound Message Send:** Published to `/app/chat.sendMessage`.
+- **Inbound Room Subscription:** Subscribed to `/topic/chat/{roomId}`.
+- **User Destination Queue:** Subscribed to `/user/queue/messages` for incoming alerts while outside the active room.
+- **Presence & Read Signals:** Dispatches `/app/chat.joinRoom` and `/app/chat.leaveRoom`.
+
+### 3.2 Query Key Topology & Invalidation
+- `['chatRooms']`: List of user's active conversations.
+- `['chatMessages', roomId]`: Chronological messages for a room.
+- `['unreadChatCount']`: Total unread message badge count.
+
+| Trigger / Mutation | Invalidated Query Keys | UX Impact |
+|---|---|---|
+| Open Room / Mark as Read | `['unreadChatCount']`, `['chatRooms']` | Clears unread badge on conversation card |
+| In-Chat Offer Action | `['offers']`, `['chatMessages', roomId]` | Updates offer card state to Accepted/Rejected |
+| Inbound Message Arrives | `['chatRooms']` | Moves conversation to top of sidebar |
+
+---
+
+## 4. 4-State UX Handling Discipline
+
+1. **Loading State:**
+   - Conversations sidebar renders 5 skeleton rows mimicking room previews.
+   - Message timeline displays alternating left/right skeleton message bubbles.
+2. **Empty State:**
+   - Room list empty: Displays an empty state with a message icon: "No conversations yet."
+   - Active window without room: "Select a conversation from the left to start messaging."
+3. **Error State:**
+   - Connection drops show a subtle reconnecting alert banner at the top of the chat window.
+4. **Disabled / Submitting State:**
+   - Submit button is disabled when input is empty or whitespace-only.
+   - Disabled while reconnection is in flight.
+
+---
+
+## 5. In-Chat Offer Negotiation Flow (`InChatOfferCard`)
+- When a buyer makes an offer from a listing or directly in chat, an `InChatOfferCard` renders in the message stream.
+- The seller can directly click "Accept", "Reject", or "Counter" without leaving the chat thread.
+- Acceptance locks the listing for 24 hours and provides a direct "Proceed to Checkout" button for the buyer.
+
+---
+
+## 6. Backend Contract & Safe Error Handling
+- Exceptions parsed via `errorUtils.getErrorMessage(err)`:
+  - `CHAT_NOT_PARTICIPANT` -> "You are not authorized to view or post in this chat room."
+  - `CHAT_MESSAGE_TOO_LONG` -> "Messages are limited to 2,000 characters."
+  - `RECIPIENT_BANNED` -> "This user is restricted from receiving new messages."
+
+---
+
+## 7. Restrained Design Tokens & Anti-Patterns
+- **Message Bubbles:** Subtle neutral styling (`bg-surface-secondary text-content-primary` for incoming, `bg-primary text-white` for outgoing).
+- **Typography:** Timestamps use `font-mono tabular-nums text-xs text-text-muted`.
+- **Zero Emojis:** Strictly prohibited across system messages, presence tags, and in-chat offer action buttons.
+- **Radius Ceiling:** Message bubbles, inputs, and offer cards adhere strictly to `rounded-md`.
