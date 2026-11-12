@@ -9,3 +9,4 @@ Before modifying code:
 3. For backend modules, consult `src/main/java/com/serhat/secondhand/<module>/README.md`.
 4. For frontend, consult `secondhand-frontend/AGENTS.md` and module READMEs.
 5. Keep diffs minimal, never guess behavior in money/stock flows, and maintain zero drift on `python3 scripts/check_docs.py`.
+

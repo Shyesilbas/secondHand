@@ -8,3 +8,4 @@ Key guidelines:
 - Consult frontend standards in `secondhand-frontend/AGENTS.md`.
 - Use the restrained Apple/Spotify-tier UI design standard (zero emoji, `rounded-md` maximum, semantic theme tokens).
 - Money and stock flows require unit tests that fail without the fix and strict transactional outbox guarantees.
+
