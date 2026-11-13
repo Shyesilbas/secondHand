@@ -15,7 +15,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[order-lifecycle-and-compensation-management.md](order-lifecycle-and-compensation-management.md)** | Sipariş state machine'i, kargo ve Safe Meetup, kalem bazlı iptal/iade compensation ve otomasyon scheduler'ları. |
 | **[escrow-lifecycle-and-state-machine.md](escrow-lifecycle-and-state-machine.md)** | Escrow state machine'i, 72 saatlik otomatik tamamlama, Transactional Outbox ve satıcı eWallet aktarımı. |
 | **[safe-meetup-delivery-and-verification.md](safe-meetup-delivery-and-verification.md)** | Safe Meetup, SHA-256 OTP & QR doğrulama, brute-force kilidi (`VERIFICATION_LOCKED`) ve 24 saatlik otomatik tamamlama. |
-| **[offer-system-and-concurrency-locks.md](offer-system-and-concurrency-locks.md)** | Teklif (pazarlık) state machine'i, 24 saatlik Redis alıcı kilidi (`v4:offer:lock:{listingId}`), counter-offer zinciri ve eşzamanlılık. |
+| **[offer-system-and-concurrency-locks.md](offer-system-and-concurrency-locks.md)** | Teklif (pazarlık) state machine'i, ilan başına tek kabul (satır kilidi + DB kontrolü), counter-offer zinciri, kabul edilen teklifin ödeme süresince stok tutması. |
 
 ### Stok, Redis ve Kafka
 | Doküman | Kapsam |
@@ -34,7 +34,6 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | **[notification-feed-and-broadcast-architecture.md](notification-feed-and-broadcast-architecture.md)** | Kişisel bildirimler, sistem broadcast'leri, unified feed projection (`NotificationFeedRepository`), WebSocket live push ve badge cache eviction. |
 | **[email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md)** | Event-driven e-posta gönderimi: `mail.dispatch.v1`, `EmailKafkaProducer`/`EmailKafkaConsumer`, template'ler ve idempotency. |
 | **[aura-ai-and-context-architecture.md](aura-ai-and-context-architecture.md)** | Aura AI asistanı: Gemini entegrasyonu, SSE streaming, context adapter'ları, otonom arama planlaması (`AuraListingSearchOrchestrator`), kullanıcı belleği ve güvenlik sınırları. |
-| **[aura-trust-safety-and-complaint-moderation-architecture.md](aura-trust-safety-and-complaint-moderation-architecture.md)** | Aura AI güven ve moderasyon motoru: 2 saatlik soğuma süresi, Redis ZSET gecikmeli kuyruğu, saatlik 10 batch worker'ı, sohbet/ilan analizi ve kademeli ceza merdiveni. |
 | **[external-integrations-cloudinary-and-exchange.md](external-integrations-cloudinary-and-exchange.md)** | Cloudinary (görsel depolama & CDN) ve ExchangeRate-API (2 saatlik Redis cache'li döviz kuru). |
 
 ### Katalog, veri ve altyapı
@@ -48,6 +47,11 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 
 ---
 
+### Öneriler (uygulanmamış)
+| Doküman | Kapsam |
+| :--- | :--- |
+| **[proposals/aura-trust-safety-and-complaint-moderation.md](proposals/aura-trust-safety-and-complaint-moderation.md)** | Aura AI otonom moderasyon tasarımı: cooling-off kuyruğu, sanction ladder, appeal. Kodda yok; yalnızca bu özellik geliştirilirken açın. |
+
 ## Temel Mimari Prensipler
 
 Ayrıntılar ve kod referansları [redis-and-kafka-architecture.md](redis-and-kafka-architecture.md) içindedir.
@@ -55,4 +59,4 @@ Ayrıntılar ve kod referansları [redis-and-kafka-architecture.md](redis-and-ka
 1. **Atomik Redis Lua script'leri:** Stok rezervasyonu ve reconciliation, kupon limiti ve rate limiting; satır kilidi beklemeden tek atomik çağrı.
 2. **Transactional Outbox:** `payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`; event ana kayıtla aynı transaction'da yazılır, worker'lar Kafka'ya at-least-once gönderir.
 3. **Event-driven yan etkiler (Kafka):** `payment.completed.v1`, `escrow.released.v1`, `mail.dispatch.v1` topic'lerini dinleyen consumer'lar `processed_kafka_events` ile tekrar eden mesajları atlar.
-4. **TTL'li Redis kilitleri:** Kabul edilen teklifin 24 saatlik alıcı kilidi (`v4:offer:lock:{listingId}`) ve aktif vitrin süresi (`v4:listing:showcase:active:{listingId}`); süresi dolan veri için scheduler taraması gerekmez.
+4. **TTL'li Redis kilitleri:** Aktif vitrin süresi (`v4:listing:showcase:active:{listingId}`); süresi dolan veri için scheduler taraması gerekmez.

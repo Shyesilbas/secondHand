@@ -86,7 +86,7 @@ offerEmailNotificationService.notifyCounterReceived(saved);
 - Yeni teklifin `createdBy` değeri counter'ı veren taraftır; sıra karşı tarafa geçer.
 - Counter verilirken ilan uygunluğu ve stok yeniden kontrol edilir.
 
-## 6. Kabul anındaki kilitler
+## 6. Kabul anındaki kilitler ve stok tutma
 
 `accept` sırasıyla şunları yapar:
 
@@ -99,50 +99,39 @@ Listing lockedListing = listingService.findByIdWithLock(offer.getListing().getId
 if (offerRepository.existsByListingAndStatusAndIdNot(lockedListing, OfferStatus.ACCEPTED, offer.getId())) {
     return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
 }
+LocalDateTime paymentDeadline = offerConfigProperties.calculatePaymentDeadline();
+Result<Void> holdResult = offerStockHoldService.hold(offer, paymentDeadline);   // stok tutma
+if (holdResult.isError()) return Result.error(holdResult.getMessage(), holdResult.getErrorCode());
 offer.setStatus(OfferStatus.ACCEPTED);
-saved = offerRepository.save(offer);
-offerRedisReservationService.lockAcceptedOffer(lockedListing.getId(), offer.getBuyer().getId(), offer.getId());
+offer.setExpiresAt(paymentDeadline);
+saved = offerRepository.save(offer);   // çakışmada offerStockHoldService.releaseNow(offer)
 ```
 
 | Katman | Ne sağlar |
 | :--- | :--- |
 | İlan satır kilidi (`findByIdWithLock`) | Aynı ilan için iki `accept` sıraya girer. |
-| `existsByListingAndStatusAndIdNot(ACCEPTED)` | Kilidi ikinci alan istek, ilk kabulü görür ve `OFFER_ALREADY_ACCEPTED_FOR_LISTING` döner. **Çifte kabulü asıl engelleyen kontrol budur.** |
+| `existsByListingAndStatusAndIdNot(ACCEPTED)` | Kilidi ikinci alan istek, ilk kabulü görür ve `OFFER_ALREADY_ACCEPTED_FOR_LISTING` döner. **Çifte kabulü engelleyen kontrol budur.** |
 | `@Version` (optimistic lock) | Aynı teklif satırına eşzamanlı yazma `OFFER_CONCURRENT_MODIFICATION` döner. |
-| Redis `v4:offer:lock:{listingId}` | Aşağıya bakın. |
+| Stok tutma (`OfferStockHoldService`) | Teklif adedi alıcı adına ödeme süresi boyunca Redis stoğundan düşülür. |
 
-### Redis kilidi: `v4:offer:lock:{listingId}`
+### Stok tutma
 
-[`OfferRedisReservationService`](../src/main/java/com/serhat/secondhand/offer/application/OfferRedisReservationService.java):
+[`OfferStockHoldService`](../src/main/java/com/serhat/secondhand/offer/application/OfferStockHoldService.java) ayrı bir key kullanmaz; alıcının normal checkout rezervasyonunu yazar: `InventoryRedisReservationService.reserveStockWithTtl(buyerId, listingId, quantity, ttl)`, yani `v4:inventory:reservation:{userId}:{listingId}`, TTL = ödeme süresine kalan süre.
 
-```java
-private static final String OFFER_LOCK_KEY_PREFIX = "v4:offer:lock:";
-private static final Duration DEFAULT_OFFER_TTL = Duration.ofHours(24);
-
-Boolean acquired = redisTemplate.opsForValue().setIfAbsent(key, buyerId + ":" + offerId, DEFAULT_OFFER_TTL);
-// Redis hatasında true döner: kabul akışı DB kilidine güvenerek devam eder
-```
-
-Kodda doğrulanan davranış:
-
-- Key kabul anında `SET NX` ile yazılır, değeri `buyerId:offerId`, TTL 24 saattir.
-- `accept`, `lockAcceptedOffer`'ın dönüş değerine **bakmaz**; kilit alınamasa da kabul tamamlanır.
-- Key'i **okuyan bir kod yoktur** ve `releaseAcceptedOffer` hiçbir yerden çağrılmaz; key yalnızca TTL ile silinir.
-
-Sonuç: bu key şu an bir işaretten ibarettir. Başka bir alıcının ilanı liste fiyatından satın almasını ya da yeni teklif vermesini **engellemez**; bu yönde bir kontrol checkout ya da `create` akışında bulunmaz.
+- Stok yetmezse `accept` `INVENTORY_INSUFFICIENT_STOCK`, Redis hatasında `OFFER_STOCK_HOLD_FAILED` döner; teklif `PENDING` kalır.
+- Transaction rollback olursa (`afterCompletion`) ya da `save` optimistic lock çakışması verirse tutulan adet hemen geri verilir.
+- Diğer alıcıların checkout'u düşük Redis stoğunu görür; ilanı liste fiyatından alamazlar. `StockReservationReconciliationScheduler` bu key'i diğer rezervasyonlar gibi sayar.
+- Teklifli checkout aynı adedi tekrar ister; `reserve_stock_with_ttl.lua` yalnızca farkı aldığı için ek stok düşmez. `CheckoutOrchestrator` teklif ilanını bırakılacak rezervasyonlardan çıkarır: başarısız checkout tutmayı silmez, alıcı yeniden deneyebilir. Başarıda `consumeReservationsOnSuccess` rezervasyonu pending'e çevirir.
+- Teklif süresi dolunca (§7) tutma commit sonrası `cancelUserReservation` ile bırakılır.
 
 ## 7. Süre dolması
 
-- [`OfferScheduler`](../src/main/java/com/serhat/secondhand/offer/scheduler/OfferScheduler.java) dakikada bir (`app.offer.scheduler-cron`, varsayılan `0 * * * * *`) `expiresAt`'ı geçmiş `PENDING` teklifleri `EXPIRED` yapar ve iki tarafa bildirim gönderir.
-- Scheduler çalışmadan önce bir işlem gelirse (`accept`, `reject`, `counter`) teklif o anda `EXPIRED` yapılır ve `OFFER_EXPIRED` döner.
-- Süre kontrolü yalnızca `PENDING` için vardır:
-  ```java
-  private boolean isExpired(Offer offer) {
-      return offer != null && offer.getStatus() == OfferStatus.PENDING
-              && offer.getExpiresAt() != null && LocalDateTime.now().isAfter(offer.getExpiresAt());
-  }
-  ```
-  `ACCEPTED` bir teklifin ödeme için süre sınırı **yoktur**. Alıcı ödeme yapmazsa teklif `ACCEPTED` kalır ve aynı ilan için başka bir teklifin kabulü `OFFER_ALREADY_ACCEPTED_FOR_LISTING` ile reddedilmeye devam eder.
+`expiresAt` iki farklı süreyi tutar: `PENDING` iken yanıt süresi (`app.offer.expiration-hours`), `accept` sonrasında ödeme süresi (`app.offer.accepted-payment-hours`, varsayılan 24 saat; `OfferConfigProperties.calculatePaymentDeadline`). İki statü de `OfferStatus.EXPIRABLE` kümesindedir.
+
+- [`OfferScheduler`](../src/main/java/com/serhat/secondhand/offer/scheduler/OfferScheduler.java) dakikada bir (`app.offer.scheduler-cron`, varsayılan `0 * * * * *`) süresi geçmiş `EXPIRABLE` teklifleri bulur ve her birini koşullu `expireIfOverdue` (id + version + statü + `expiresAt < now`) ile `EXPIRED` yapar. Aynı anda checkout `completeIfAccepted` ile teklifi tamamladıysa UPDATE 0 satır döner, teklif atlanır ve bildirim gönderilmez.
+- Scheduler çalışmadan önce bir işlem gelirse (`accept`, `reject`, `counter`) teklif o anda `EXPIRED` yapılır ve `OFFER_EXPIRED` döner; süresi geçmiş kabul edilmiş teklifle checkout da `OFFER_EXPIRED` alır.
+- Sonuç: alıcı ödeme süresi içinde ödemezse teklif `EXPIRED` olur, stok tutması bırakılır (§6) ve ilan için yeni bir teklif kabul edilebilir.
+- `V48__offer_accepted_payment_deadline.sql` mevcut `ACCEPTED` tekliflerin `expires_at` değerini kabul anı (`updated_at`) + 24 saate çeker; uzun süredir bekleyenler ilk scheduler turunda düşer.
 
 ## 8. Kabul edilmiş teklifle checkout
 
@@ -174,9 +163,11 @@ Sonuç: bu key şu an bir işaretten ibarettir. Başka bir alıcının ilanı li
 | `OFFER_ALREADY_ACCEPTED_FOR_LISTING` | İlanın kabul edilmiş başka bir teklifi var. |
 | `OFFER_CONCURRENT_MODIFICATION` | Optimistic lock çakışması ya da eşzamanlı `markCompleted`. |
 | `OFFER_QUANTITY_EXCEEDS_STOCK` | İstenen adet stoktan fazla. |
+| `INVENTORY_INSUFFICIENT_STOCK` | Kabulde teklif adedi Redis stoğunda tutulamadı. |
+| `OFFER_STOCK_HOLD_FAILED` | Kabulde Redis stok tutma hatası; tekrar denenebilir. |
 
 ## 11. Bilinen sınırlar
 
-- Redis kilidi okunmadığı için kabul edilmiş teklif, ilanı başka alıcılara karşı rezerve etmez (§6).
-- `ACCEPTED` teklif için ödeme süresi ve otomatik iptal yoktur (§7).
+- Süre dolunca alıcının o ilandaki rezervasyonunun tamamı bırakılır; aynı alıcının aynı ilan için ayrıca tuttuğu sepet rezervasyonu da gider.
+- Bırakma Redis hatasıyla başarısız olursa loglanır; adet en geç key TTL'inde (ödeme süresi) stoğa döner.
 - `createSellerOffer` (satıcının doğrudan teklif oluşturması) süre verilmezse 48 saat kullanır; diğer yollar `app.offer.expiration-hours` değerini kullanır.

@@ -1,103 +1,25 @@
 # Auth Domain
 
-## 1. Domain Scope & Purpose
-The `auth` domain governs user authentication, cryptographic session issuance, Refresh Token Rotation (RTR), session revocation, two-tier brute-force login throttling, password lifecycle, and Google OAuth2 Single Sign-On (SSO). It implements strict token family tracking to detect and defend against token theft and replay attacks.
+Manages user registration, credential and Google OAuth2 login, `HttpOnly` JWT cookie issuance (`access_token`, `refresh_token`), Refresh Token Rotation (RTR) with family-wide replay theft revocation (`tokens` table), session revocation (`AccessRevocationService`), two-tier login throttling (`LoginAttemptService`), and password reset/change flows.
 
 > [!NOTE]
 > **Related Documentation & Runbooks:**
-> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](../../../../../../../docs/auth-jwt-and-security-architecture.md)
-> - **Architecture Deep Dive:** [`docs/rate-limiting-and-throttling-architecture.md`](../../../../../../../docs/rate-limiting-and-throttling-architecture.md)
-> - **Frontend Module:** [`secondhand-frontend/src/auth/README.md`](../../../../../../../secondhand-frontend/src/auth/README.md)
-> - **Task Runbooks:**
->   - [`modify-auth-rules.md`](.docs/runbooks/modify-auth-rules.md) — Modify authentication and token rules
+> - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](/docs/auth-jwt-and-security-architecture.md) (RTR token families, cookie security, OAuth2 flow)
+> - **Architecture Deep Dive:** [`docs/rate-limiting-and-throttling-architecture.md`](/docs/rate-limiting-and-throttling-architecture.md)
+> - **Frontend Module:** [`secondhand-frontend/src/auth/README.md`](/secondhand-frontend/src/auth/README.md)
+> - **Key Entry Points:** [`AuthController`](api/AuthController.java) · [`PasswordController`](api/PasswordController.java) · [`TokenService`](application/TokenService.java) · [`RegistrationService`](application/RegistrationService.java) · [`LoginAttemptService`](application/LoginAttemptService.java) · [`AccessRevocationService`](application/AccessRevocationService.java) · [`PasswordService`](application/PasswordService.java) · [`TokenCleanupScheduler`](application/TokenCleanupScheduler.java)
 
-```mermaid
-flowchart TD
-    A["User Submits Credentials<br/>POST /api/v1/auth/login"] --> B["LoginAttemptService<br/>Check IP & Email Throttling in Redis"]
-    B --> C["UserDetailsServiceImpl<br/>Load User & Verify AccountStatus.ACTIVE"]
-    C --> D["BCrypt Password Match"]
-    D --> E["TokenService.createRefreshToken<br/>Save Token in DB (Family UUID)"]
-    E --> F["JwtUtils.generateAccessToken (15m)<br/>JwtUtils.generateRefreshToken (7d)"]
-    F --> G["CookieUtils.setAuthCookies<br/>HttpOnly, SameSite=Strict, Secure"]
-    G --> H["200 OK (UserDto)"]
+## Business Rules & Invariants
+- **Registration & Account Standing:** `RegistrationValidator` enforces unique email/phone, mandatory legal agreement consent (`agreementsAccepted == true`), and BCrypt password hashing. Login requires `AccountStatus.ACTIVE` (`AccountNotActiveException` on `BLOCKED`/`SUSPENDED`/`DELETED`).
+- **HttpOnly Cookies & Refresh Token Rotation (RTR):** Tokens live in `HttpOnly`, `SameSite`, `Secure` cookies (`CookieUtils`), never in JSON bodies or `localStorage`. Rotating a refresh token (`POST /api/v1/auth/refresh`) marks the parent `Token` row `TokenStatus.REVOKED` and issues a child in the same `family_id`. If an already-`REVOKED` refresh token is presented (replay theft), `TokenService` immediately revokes the entire token family (`revokeAllByFamilyId`) and returns `401 INVALID_REFRESH_TOKEN`.
+- **Housekeeping (`TokenCleanupScheduler`):** Purges expired/revoked `tokens` rows older than 30 days daily at midnight.
+- **Change rule:** Tokens are minted only after the user/token rows are saved; refresh validates both the JWT signature and the stored token status.
 
-    I["Client Rotates Token<br/>POST /api/v1/auth/refresh"] --> J{"Is Refresh Token Valid & Active?"}
-    J -->|"Yes"| K["Mark Old Token REVOKED<br/>Issue Child Token in Same Family"]
-    J -->|"Already REVOKED (Replay Attack)"| L["Token Family Theft Detected!<br/>Revoke ALL Sessions for User<br/>Return 401 INVALID_REFRESH_TOKEN"]
-```
+## Redis & Throttling Keys
+- `LoginAttemptService` (15m TTL): `auth:login-fail:ip:{clientIp}` and `auth:login-fail:account:{email}:{clientIp}`.
+- `AccessRevocationService`: `auth:access-revoked:{userId}` (user revocation watermark) and `auth:access-token-revoked:{tokenId}` (single-JWT revocation marker).
+- `PasswordService` (15m TTL): `auth:pwreset:requests:{emailSha256}`.
 
----
-
-## 2. Step-by-Step Authentication & Session Lifecycles
-
-### 2.1. Registration & Login
-1. **User Registration (`POST /api/v1/auth/register`):**
-   - Validates uniqueness of email and phone number via `RegistrationValidator`.
-   - **Legal Agreement Invariant:** Enforces mandatory consent (`agreementsAccepted == true`).
-   - Hashes password using `BCryptPasswordEncoder` (strength: 12).
-   - Publishes `UserRegisteredEvent` triggering welcome and verification emails.
-2. **Credential Authentication (`POST /api/v1/auth/login`):**
-   - **Two-Tier Rate Limiting (`LoginAttemptService`):** Checks both client IP and user email. Exceeding thresholds enforces progressive backoff and temporary account locking.
-   - Verifies that `user.getAccountStatus() == AccountStatus.ACTIVE`. Blocked or deactivated users receive `AccountNotActiveException`.
-   - Verifies credentials. On success, clears failed attempt counters in Redis.
-
-### 2.2. Refresh Token Rotation (RTR) & Replay Attack Defense
-Platform security strictly adheres to OAuth 2.0 RTR specifications:
-1. **Access Token:** Short-lived JWT (15 minutes / 900s) containing user claims, permissions, and roles. Stored in an `HttpOnly`, `SameSite=Strict`, `Secure` cookie named `access_token`.
-2. **Refresh Token:** Long-lived JWT (7 days / 604,800s) backed by a database row in the `tokens` table. Stored in cookie `refresh_token`.
-3. **Rotation Protocol (`POST /api/v1/auth/refresh`):**
-   - Reads the cookie and parses the JWT signature.
-   - Verifies that the corresponding database `Token` row has `status == TokenStatus.ACTIVE`.
-   - **Replay Attack / Theft Detection:** If an incoming token has `status == TokenStatus.REVOKED`, the system recognizes a token replay attack (a stolen token being reused). It immediately revokes the **entire token family** (`tokenRepository.revokeAllByFamilyId`), terminating all active sessions for that user across all devices.
-   - On legitimate rotation, the parent token is marked `TokenStatus.REVOKED`, and a new child token is minted with the same `familyId` and an updated expiry.
-
-### 2.3. Google OAuth2 Single Sign-On (SSO)
-1. User authenticates via `/api/v1/auth/oauth2/google`.
-2. Handled by `OAuth2LoginSuccessHandler`, which verifies Google claims and resolves or registers the user in `OAuthService`.
-3. If new, generates a secure random password and marks the account verified.
-4. Generates initial session cookies and redirects to the frontend dashboard.
-
----
-
-## 3. Business Invariants & Security Guarantees
-
-* **Zero Plaintext Tokens:** Refresh token entities store SHA-256 hashes or cryptographic random UUIDs; access tokens are verified statelessly by signature.
-* **HttpOnly Cookie Enforcement:** Tokens are never returned in JSON response bodies to prevent XSS exfiltration. All session cookies set `HttpOnly`, `SameSite=Strict`, and `Secure` (in production).
-* **Account Status Guard:** Login is strictly forbidden for accounts in `AccountStatus.BLOCKED`, `SUSPENDED`, or `DELETED`.
-* **Automated Housekeeping:** `TokenCleanupScheduler` runs daily at midnight (`cron = "0 0 0 * * *"`) to physically purge expired and revoked tokens older than 30 days (`tokenRepository.deleteAllExpiredOrRevokedBefore`).
-
----
-
-## 4. Redis Keys & Throttling Limits
-
-| Redis Key Pattern | Type | TTL | Purpose |
-| :--- | :--- | :--- | :--- |
-| `v4:auth:login_attempts:ip:{clientIp}` | Integer | 900s (15 min) | Tracks consecutive failed logins from an IP address. |
-| `v4:auth:login_attempts:email:{email}` | Integer | 900s (15 min) | Tracks consecutive failed logins against a specific user account. |
-
----
-
-## 5. Database Schema & Flyway Structure
-
-Stored in the `tokens` table:
-* `id`: UUID primary key.
-* `user_id`: Foreign key to `users`.
-* `token`: Cryptographic token value.
-* `family_id`: UUID grouping tokens issued within the same device session.
-* `status`: `TokenStatus` enum (`ACTIVE`, `REVOKED`, `EXPIRED`).
-* `expires_at`: Timestamp when the refresh token expires.
-* `created_at`: Creation timestamp.
-* Indexed on `(user_id, status)` and `(family_id)`.
-
----
-
-## 6. Public REST API Contracts (`AuthController` & `PasswordController`)
-
-* **`POST /api/v1/auth/register`:** Creates a new buyer/seller account (`RegisterRequest`).
-* **`POST /api/v1/auth/login`:** Validates credentials and sets `access_token` and `refresh_token` cookies.
-* **`POST /api/v1/auth/logout`:** Revokes the current session token in PostgreSQL and clears browser cookies.
-* **`POST /api/v1/auth/refresh`:** Atomically rotates refresh token, returning a refreshed access cookie.
-* **`POST /api/v1/auth/revoke-all-sessions`:** Invalidates all active tokens for the user, forcing re-login across all devices.
-* **`POST /api/v1/auth/passwords/forgot`:** Dispatches a password reset OTP verification code.
-* **`POST /api/v1/auth/passwords/reset`:** Resets password using the verified code and updates user credentials.
-* **`PUT /api/v1/auth/passwords/change`:** Allows an authenticated user to change their current password.
+## API
+- **`AuthController` (`/api/v1/auth`):** `POST /register` (`RegisterRequest`) · `POST /login` · `POST /logout` · `POST /refresh` · `POST /revoke-all-sessions` · `GET /oauth2/google` (`OAuth2LoginSuccessHandler`).
+- **`PasswordController` (`/api/v1/auth/passwords`):** `POST /forgot` · `POST /reset` · `PUT /change`.

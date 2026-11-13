@@ -19,7 +19,7 @@ Uygulama, modern tarayıcı standartları ve yüksek performans hedefleri doğru
    ├── Sunucu Durumu (Async):    TanStack React Query v5 (Cache, Invalidation, Stale-Time)
    ├── Client Ağ Katmanı:        Axios Singleton (CSRF injection, 401 refresh queue)
    ├── Güvenlik & Oturum:        HttpOnly Cookies (sh_at, sh_rt) + Sanitized tokenStorage
-   ├── Gerçek Zamanlı İletişim:  STOMP over SockJS (/ws) + Dual-Sync REST mutabakatı
+   ├── Gerçek Zamanlı İletişim:  STOMP over native WebSocket (/ws, VITE_WS_BASE_URL)
    └── Tasarım Sistemi:          Tailwind CSS v3 + theme.js (Restrained Design Standard)
 ```
 
@@ -35,9 +35,9 @@ Uygulamadaki tüm rotalar erişim izinlerine göre üç temel guard bileşeni il
 
 | Guard | Hedef Kitle | Davranış | Korunan Örnek Rotalar |
 | :--- | :--- | :--- | :--- |
-| `ProtectedRoute` | Giriş yapmış üyeler | Oturum yoksa isteği durdurur; mevcut URL'i `returnUrl` state'i ile saklayarak `/login` sayfasına yönlendirir. | `/cart`, `/checkout`, `/orders/*`, `/inbox`, `/account`, `/favorites` |
-| `PublicRoute` | Yalnızca misafirler | Kullanıcı zaten oturum açmışsa gereksiz login/register ekranlarını engelleyip ana sayfaya (`/`) yönlendirir. | `/login`, `/register`, `/forgot-password` |
-| `AdminRoute` | Yöneticiler | `user.role === 'ADMIN'` şartını arar; yetkisiz kullanıcıları doğrudan ana sayfaya veya login'e yönlendirir. | `/admin/coupons` |
+| `ProtectedRoute` | Giriş yapmış üyeler | Oturum yoksa login prompt'u açar (`useLoginPrompt`); iptal edilirse `/` adresine döner. | `/cart`, `/checkout`, `/profile/orders`, `/inbox`, `/dashboard`, `/favorites` |
+| `PublicRoute` | Yalnızca misafirler | Oturum açıksa `location.state.from` adresine, yoksa `/` adresine yönlendirir. | `/login`, `/register`, `/forgot-password` |
+| `AdminRoute` | Yöneticiler | Misafiri `/login`'e (`state.from` ile), admin olmayanı (`isAdminUser`) `/` adresine yönlendirir. | `/admin/coupons` |
 
 Sayfa bileşenleri ilk açılış süresini (First Contentful Paint) minimize etmek için rota bazında `React.lazy` ile dinamik olarak yüklenir; yalnızca ana sayfa (`HomePage`) ve kurumsal bilgi sayfası (`AboutPage`) bundle içine eager olarak dahil edilir.
 
@@ -49,28 +49,14 @@ Frontend mimarisinde sunucu verileri (server-state) ile arayüz durumları (UI-s
 - **Kural:** Sunucudan dönen veriler hiçbir zaman yerel `useState` veya React Context içine kopyalanmaz. Tüm sunucu etkileşimi React Query üzerinden yürütülür.
 
 ### 3.1. Query Key Disiplini
-Query key'leri tutarlılık için daima dizi tuple formatında yapılandırılır:
-- Varlık koleksiyonları: `['<entity>', 'list', filters]` (ör. `['listings', 'category', 'electronics']`)
-- Tekil detay kayıtları: `['<entity>', 'detail', id]` (ör. `['listings', id]`)
-- Kullanıcıya özel kaynaklar: `['<entity>', 'my']` veya `['user', userId, 'addresses']`
+Query key'leri dizi tuple formatındadır; yeni modüllerde `['<entity>', 'list', filters]`, `['<entity>', 'detail', id]`, `['<entity>', 'my']` biçimi ve modül sabitleri (ör. `ORDER_QUERY_KEYS`, `COMPLAINT_KEYS`) tercih edilir. Mevcut kodda düz key'ler de vardır (`['cartItems', userId]`, `['badgeCounts', userId]`, `['favoriteLists', ...]`); her modülün gerçek key listesi kendi README'sindeki "React Query Keys" tablosundadır.
 
 ### 3.2. Cache Süreleri (Stale Time & GC Time)
-Backend `CacheConfig` Redis süreleriyle uyumlu olarak frontend cache süreleri normalize edilmiştir:
-- **Statik / Nadir Değişen Veriler (Katalog & Enum):** `staleTime: 60 * 60 * 1000` (60 dk), `gcTime: 24 * 60 * 60 * 1000`.
-- **Dinamik Varlıklar (İlanlar, Yorumlar, Favoriler):** `staleTime: 60 * 1000` (1 dk), `gcTime: 5 * 60 * 1000` (5 dk).
-- **Gerçek Zamanlı Kritik Veriler (Sepet, Bildirim Sayaçları, Teklifler):** `staleTime: 0` veya `30 * 1000` (30 sn).
+- **Global varsayılan (`App.jsx`):** `staleTime` 5 dk, `retry: 1`, `refetchOnWindowFocus`, `refetchOnMount` ve `refetchOnReconnect` kapalı.
+- Hook bazında override edilir (en sık: 5 dk, 1 dk, 30 sn, 2 dk); badge sayaçları (`useBadgeCounts`) 2 dk `staleTime`, polling yok.
 
-### 3.3. Mutasyon ve Invalidation Matrisi
-Veri değiştiren (`POST`, `PUT`, `DELETE`, `PATCH`) her mutasyon sonrasında ilgili cache alanları `queryClient.invalidateQueries` ile tazelenir:
-
-```
-[İlan Satın Alındı (Checkout)]
-        │
-        ├──► invalidate: ['cart']                         (Sepet sıfırlanır)
-        ├──► invalidate: ['orders', 'my']                 (Sipariş listesi güncellenir)
-        ├──► invalidate: ['user', 'badges']               (Bekleyen sipariş badge'i artar)
-        └──► invalidate: ['listings', listingId]          (İlan stok/satıldı durumu yenilenir)
-```
+### 3.3. Mutasyon ve Cache Güncelleme
+Her mutasyon `onSuccess` içinde ilgili key'leri `invalidateQueries` veya `setQueryData` ile günceller. Checkout örneği (`useCheckout` -> `resetCartState` in `useCart.js`): `['cartItems']` boş diziye set edilip invalidate edilir, sepet sayacı 0'lanır ve `/orders/success` sayfasına geçilir. Sipariş ve bakiye ekranları kendi query'leri açıldığında yeniden çekilir.
 
 ---
 
@@ -79,8 +65,8 @@ Veri değiştiren (`POST`, `PUT`, `DELETE`, `PATCH`) her mutasyon sonrasında il
 Tüm HTTP çağrıları `src/common/services/api/request.js` içerisindeki merkezi Axios sarmalayıcısından geçer. Doğrudan bileşen içinden kontrolsüz `fetch` veya `axios` çağrısı yapılması yasaktır.
 
 ### 4.1. CSRF ve Kimlik Doğrulama Koruması
-- İstemci `withCredentials = true` ile çalışır.
-- Tarayıcıya sunucu tarafından gönderilen `XSRF-TOKEN` cookie değeri, Axios interceptor tarafından okunarak her yazma isteğinde `X-XSRF-TOKEN` HTTP başlığına dönüştürülür.
+- İstemci `withCredentials = true` ile çalışır (`config.js`).
+- `XSRF-TOKEN` cookie değeri, request interceptor tarafından her istekte `X-XSRF-TOKEN` başlığına yazılır (header yoksa). CSRF kaynaklı 403'ler `CSRF_ERROR` koduyla işaretlenir, refresh denenmez.
 - Ham JWT access token veya refresh token dizgileri `localStorage` içinde **asla tutulmaz**. Oturum yönetimi sunucu taraflı `HttpOnly`, `SameSite=Lax` cookie'ler (`sh_at` ve `sh_rt`) üzerinden yürütülür.
 
 ### 4.2. Eşzamanlı 401 İsteklerini Yöneten Sessiz Refresh Kuyruğu (*Mutex Promise Queue*)
@@ -110,34 +96,24 @@ sequenceDiagram
     Interceptor-->>Page: Request 3 Kuyruktan Çıkarılıp Denenir (200 OK)
 ```
 
-Eğer refresh isteği başarısız olursa (`401` veya `403` dönerse), tüm kuyruk temizlenir, `tokenStorage.clearUser()` çağrılır ve kullanıcı güvenli biçimde `/login` rotasına sevk edilir.
+Login, register, OAuth complete, forgot/reset password ve refresh endpoint'lerinin kendi 401'leri refresh tetiklemez. Refresh başarısız olursa kuyruktaki tüm istekler reject edilir ve `AuthProvider.handleTokenRefreshFailure` çalışır: `clearUser()`, `queryClient.clear()` ve oturum state'i sıfırlanır; korumalı sayfadaki kullanıcı `ProtectedRoute` üzerinden login prompt'u görür.
 
 ---
 
 ## 5. İstemci Depolama Güvenliği (`tokenStorage.js`)
 
-`localStorage` yalnızca sayfa yenilendiğinde anlık ekran yanıp sönmesini (FOUC) engellemek amacıyla **yalnızca sanitize edilmiş genel profil metaverilerini** saklar:
-- Saklanan alanlar: `id`, `email`, `role`, `firstName`, `lastName`, `plan`, `planExpiry`.
-- Kesinlikle yasaklı alanlar: Şifreler, token'lar, API anahtarları veya kredi kartı verileri `tokenStorage.setUser` fonksiyonunda katı bir filtreleme süzgecinden geçirilir ve depolama alanına sızması engellenir.
+`localStorage` (`user` key'i) sayfa yenilendiğinde oturum state'ini hızlı göstermek için kullanıcı nesnesini saklar. `tokenStorage.setUser` bir whitelist değil, blacklist uygular: `password`, `accessToken`, `refreshToken`, `token` alanlarını ve adında `password`, `token`, `secret` veya `key` geçen her alanı siler; geri kalan tüm alanlar saklanır. Yeni hassas alan eklerken bu isim kuralına uyun.
 
 ---
 
-## 6. Tasarım Sistemi ve Dört Durumlu UX Disiplini (4-State UX)
+## 6. Tasarım Sistemi
 
-Uygulamanın görsel dili `.agents/skills/restrained-ui-design-standard/SKILL.md` ve `src/common/theme/theme.js` ile tanımlanan Apple/Spotify seviyesi kısıtlı tasarım standartlarına dayanır:
-
-1. **Köşe Yuvarlama Tavanı (Radius Ceiling):** Tüm kartlar, paneller, butonlar ve form elemanlarında mutlak tavan `rounded-md` (en fazla 12px) değeridir. Balonvari `rounded-2xl` veya hap şeklindeki devasa ovallikler yasaktır.
-2. **Geliştirici Arayüzünde Sıfır Emoji:** Butonlarda, toast bildirimlerinde, alert kutularında veya boş durumlarda dekoratif emoji kullanılmaz; semboller için `lucide-react` (16px/20px, stroke 1.5) kullanılır. (Kullanıcıların sohbet mesajları bu kısıtlamadan muaftır).
-3. **Zorunlu 4 Veri Durumu (Four-State UX):**
-   - **Loading State:** Tam ekranı bloke eden yükleme çarkları yerine, içeriğin nihai geometrisine tam oturan `Skeleton` bileşenleri (`SkeletonCard`, `SkeletonList`, `SkeletonGrid`).
-   - **Empty State:** Nötr bir simge, kısa başlık, açıklama ve tek bir aksiyon butonu içeren standart `EmptyState`.
-   - **Error State:** Sayfa yapısını bozmayan, `errorUtils.getErrorMessage` ile açılmış hata metni ve yeniden deneme butonu barındıran `Alert` bileşeni.
-   - **Data State:** Tabular sayılar ve para birimleri için `tabular-nums` kullanan, temiz tipografik hiyerarşiye sahip içerik düzeni.
+Kurallar (radius tavanı, token'lar, emoji yasağı, dört veri durumu) tek yerde tutulur: `restrained-ui-design-standard` skill'i ve `src/common/theme/theme.js`. Bu doküman onları tekrar etmez.
 
 ---
 
-## 7. Çift Kanallı Gerçek Zamanlı Senkronizasyon (Dual Sync)
+## 7. Gerçek Zamanlı İletişim
 
-Gerçek zamanlı bildirim ve mesajlaşma süreçleri WebSocket STOMP bağlantısı üzerinden yürütülür:
-- **WebSocket Push:** Gelen anlık mesajlar `/topic/chat/{roomId}` ve bildirimler `/user/queue/notifications` üzerinden arayüzdeki badge sayaçlarını ve sohbet ekranını anında günceller.
-- **REST Mutabakatı:** Mobil cihaz uyku modundan çıktığında veya internet kesintisi sonrası WebSocket yeniden bağlandığında, bağlantı kopukluğu esnasında kaybolmuş olabilecek paketleri kompanse etmek için arka planda `/v1/user/badges` uç noktasına sessiz bir REST sorgusu atılarak gerçek sayaç verileri eşitlenir (*dual-sync reconciliation*).
+- **Bağlantı:** `useWebSocket` (chat) ve `useNotificationWebSocket` ayrı STOMP client'ları açar; hata sonrası exponential backoff ile `MAX_RECONNECT_ATTEMPTS` kadar yeniden bağlanır.
+- **Abonelikler:** chat `/user/{userId}/queue/messages`; bildirimler `/user/{userId}/notifications` ve broadcast `/topic/notifications`. Gönderim `/app/chat.sendMessage`, `/app/chat.joinRoom`, `/app/chat.leaveRoom`.
+- **Sayaçlar:** `useBadgeCounts` `/v1/user/badges` endpoint'ini okur (`['badgeCounts', userId]`); reconnect sonrası otomatik REST senkronu yoktur. Bildirim ve e-posta okuma akışları bu key'i invalidate eder (`useInAppNotifications`, `EmailsPage`).

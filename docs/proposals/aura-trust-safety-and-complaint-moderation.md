@@ -1,5 +1,8 @@
 # Aura AI Güven, Moderasyon ve Şikayet Mimarisi (Trust & Safety)
 
+> [!WARNING]
+> **Durum: Öneri, uygulanmadı (kontrol: 2026-11-12).** Kodda yalnızca temel şikayet kaydı var (`ComplaintService`, `ComplaintStatus`, `POST /api/v1/complaints`). Cooling-off kuyruğu, Aura incelemesi, sanction ladder, appeal ve bu dokümandaki Redis key'leri henüz yok; "V35" planı geçersiz (son migration V47). Mevcut davranış için [`complaint/README.md`](../../src/main/java/com/serhat/secondhand/complaint/README.md). Bu dokümanı yalnızca moderasyon özelliği uygulanırken açın.
+
 Bu doküman, insan moderatör ihtiyacı olmadan çalışan, **Aura AI (Gemini)** destekli otonom güven ve moderasyon sistemini; 2 saatlik soğuma süresini (cooling-off buffer), Redis Sorted Set tabanlı saatlik batch kuyruğunu, sohbet ve ilan şikayetlerinin analizini ve kademeli ceza/kısıtlama merdivenini (Sanction Ladder) anlatır.
 
 ---
@@ -378,7 +381,7 @@ C2C pazaryerlerinde sistemin kötüye kullanılmasını (örneğin rakip bir sat
 
 ## 7. E-posta Bildirim Mimarisi ve Şablon Haritası (Email Lifecycle & Event Dispatch)
 
-Sistemdeki tüm moderasyon olayları, platform içi anlık bildirimlere (`Notification`) ek olarak asenkron ve event-driven mimariyle (`mail.dispatch.v1` Kafka topic'i üzerinden) e-posta olarak da iletilir. Ayrıntılar için [email-architecture-and-event-driven-dispatch.md](email-architecture-and-event-driven-dispatch.md) dokümanına bakılabilir.
+Sistemdeki tüm moderasyon olayları, platform içi anlık bildirimlere (`Notification`) ek olarak asenkron ve event-driven mimariyle (`mail.dispatch.v1` Kafka topic'i üzerinden) e-posta olarak da iletilir. Ayrıntılar için [email-architecture-and-event-driven-dispatch.md](../email-architecture-and-event-driven-dispatch.md) dokümanına bakılabilir.
 
 ### 7.1. E-posta Bildirim Matrisi
 

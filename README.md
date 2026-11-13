@@ -81,10 +81,10 @@ Each backend module has a dedicated `README.md` defining its business invariants
 | **Stock & Reservations** | `cart`, `inventory` | `src/cart` | Two-tier optimistic shopping cart, atomic Redis Lua stock reservations with 15-minute anti-hoarding TTL, background drift reconciliation scheduler. |
 | **Product & Catalogs** | `listing`, `showcase`, `favorite`, `favoritelist`, `review`, `follow`, `forum` | `src/listing`, `src/showcase`, `src/vehicle`, `src/electronics`, `src/realEstate`, `src/books`, `src/clothing`, `src/sports`, `src/favorites`, `src/favoritelist`, `src/reviews`, `src/follow`, `src/forum` | 6 polymorphic vertical catalogs (JPA Joined table inheritance), rule-driven forms, attribute engine, paid showcases, private broadcast offers to favoriters, and community forum threads. |
 | **Communications** | `chat`, `notification`, `email` | `src/chat`, `src/inbox`, `src/notification`, `src/emails` | Dual-channel chat (11 REST endpoints + STOMP WebSocket), hybrid notification feed (personal + system broadcasts), Kafka-dispatched transactional email rendered via Thymeleaf into in-app inboxes. |
-| **AI & Autonomous Moderation** | `ai`, `complaint` | `src/ai`, `src/complaint` | "Aura" intelligent assistant & Trust & Safety moderation engine: multi-vertical semantic search planning via Gemini API, live price gauge advisor, and autonomous complaint resolution (2-hour cooling-off queue, hourly batch limits, Gemini Multimodal evidence review, prompt injection sandbox, and graduated sanction ladder). |
+| **AI & Complaints** | `ai`, `complaint` | `src/ai`, `src/complaint` | "Aura" assistant: multi-vertical search planning via Gemini API and live price advisor. User complaints are stored; AI moderation is a [proposal](docs/proposals/aura-trust-safety-and-complaint-moderation.md), not implemented. |
 | **Core & Platform** | `core`, `agreements`, `dashboard`, `shipping`, `exchange`, `cloudinary` | `src/admin`, `src/audit`, `src/agreements`, `src/dashboard`, `src/comparison` | Central `ResultResponses` envelope, dynamic `@PublicEndpoint` registry, Redis rate limiting, audit logging, legal terms consent, carrier adapters (`CargoProviderPort`), and currency conversion. |
 
-> **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md) and the comprehensive [Aura Trust & Safety Moderation Architecture](docs/aura-trust-safety-and-complaint-moderation-architecture.md).
+> **Deep Dive Documentation:** For architectural blueprints, state machine diagrams, and concurrency guarantees, visit [`docs/README.md`](docs/README.md).
 
 ---
 
@@ -156,7 +156,6 @@ Supported seed keys: `vehicle`, `electronics`, `clothing`, `books`, `sports`, `r
 - **Zero Over-Selling:** Stock is atomically checked and decremented in Redis via Lua scripts (`reserve_stock_with_ttl.lua`) during checkout with a 15-minute auto-release TTL. Database stock is deducted asynchronously via Kafka events.
 - **ACID Transactional Outbox:** Events are enqueued in dedicated outbox tables (`payment_outbox_events`, `order_outbox_events`, `escrow_outbox_events`) within the core business transaction and dispatched to Kafka via scheduled polling workers.
 - **Safe Meetup Handshake:** Buyers and sellers verify physical delivery via SHA-256 encrypted OTP codes or QR tokens. 3 consecutive failed attempts trigger an automated 15-minute security lock (`VERIFICATION_LOCKED`).
-- **Autonomous Trust & Safety (Aura AI Moderation):** Autonomous complaint resolution replacing human administration with a 2-hour cooling-off queue (`v4:complaints:delayed_queue`), hourly 10-batch limits, Gemini Multimodal evidence review, prompt injection defense, and a graduated sanction ladder with strict bad-faith complaint penalties.
 
 ---
 

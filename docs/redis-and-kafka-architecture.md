@@ -62,54 +62,23 @@ Redis projemizde iki ana amaçla kullanılır:
 
 ---
 
-### B. Atomik Envanter ve Stok Rezervasyonu (Lua Scripting)
+### B. Modül Bazlı Redis Key, Lua ve Kilit Kayıt Defteri (Registry)
 
-İkinci el e-ticarette her ürün genellikle tek adettir veya sınırlı stokludur. İlişkisel veritabanı satır kilitlemesi (`SELECT ... FOR UPDATE`) yüksek trafikte connection pool tükenmesine ve gecikmelere yol açar. Bu nedenle stok kontrolü ve rezervasyon **Redis Lua Scriptleri** ile in-memory yönetilir.
+İkinci el e-ticarette yüksek eşzamanlılık gerektiren stok rezervasyonu, ödeme idempotency kilidi, kupon kotaları ve rate limiting işlemleri, veritabanı satır kilitleri (`SELECT ... FOR UPDATE`) yerine **Redis ve atomik Lua script'leri** (`src/main/resources/scripts/`) ile yönetilir. Her modül kendi Redis key ve TTL kurallarının tek sahibidir (One Home per Fact):
 
-* **Key'ler** (`InventoryRedisReservationService`):
-  * `v4:inventory:stock:{listingId}`: Kimsenin tutmadığı, satılabilir adet (TTL yok).
-  * `v4:inventory:reservation:{userId}:{listingId}`: Kullanıcının checkout'ta tuttuğu adet (TTL 15 dk).
-  * `v4:inventory:pending:{orderItemId}:{listingId}`: Ödemesi alınmış, PostgreSQL'den henüz düşülmemiş adet (TTL 24 saat, yalnızca emniyet).
+| Alan / Key Prefix | Sahip Sınıf & Lua Script | Detaylı Kurallar (Modül Hub & Deep Dive) |
+| :--- | :--- | :--- |
+| `v4:inventory:stock:{listingId}`<br/>`v4:inventory:reservation:{userId}:{listingId}`<br/>`v4:inventory:pending:{orderItemId}:{listingId}` | `InventoryRedisReservationService`<br/>`StockReservationReconciliationScheduler`<br/>(`reserve_stock_with_ttl.lua`, `cancel_user_reservation.lua`, `release_stock.lua`, `compare_and_set_stock.lua`, `reserve_stock.lua`) | [`inventory/README.md`](../src/main/java/com/serhat/secondhand/inventory/README.md) · [`stock-reservation-and-reconciliation.md`](stock-reservation-and-reconciliation.md) |
+| `v4:payment:idempotency:{key}` | `PaymentRedisIdempotencyService` (`PaymentProcessingConstants`) | [`payment/README.md`](../src/main/java/com/serhat/secondhand/payment/README.md) · [`payment-strategy-and-provider-extension-guide.md`](payment-strategy-and-provider-extension-guide.md) |
+| `v4:coupon:usage:global:{CODE}`<br/>`v4:coupon:usage:user:{CODE}:{userId}` | `CouponRedisLimiterService`<br/>(`apply_coupon_with_limit.lua`, `release_coupon_usage.lua`) | [`coupon/README.md`](../src/main/java/com/serhat/secondhand/coupon/README.md) · [`pricing-coupon-and-campaign-architecture.md`](pricing-coupon-and-campaign-architecture.md) |
+| `v4:listing:showcase:active:{listingId}` | `ShowcaseRedisManagerService` | [`showcase/README.md`](../src/main/java/com/serhat/secondhand/showcase/README.md) · [`social-proof-and-urgency-metrics-architecture.md`](social-proof-and-urgency-metrics-architecture.md) |
+| `v4:listing:active_viewers:{listingId}`<br/>`v4:listing:view:dedup:{kimlik}:{listingId}` | `ListingViewService` | [`listing/README.md`](../src/main/java/com/serhat/secondhand/listing/README.md) · [`social-proof-and-urgency-metrics-architecture.md`](social-proof-and-urgency-metrics-architecture.md) |
+| `v4:cart:in_cart_users:{listingId}` | `CartSocialMetricService` | [`cart/README.md`](../src/main/java/com/serhat/secondhand/cart/README.md) · [`social-proof-and-urgency-metrics-architecture.md`](social-proof-and-urgency-metrics-architecture.md) |
+| `v6:catalog:locations:*` | `LocationCatalogService` | [`listing/README.md`](../src/main/java/com/serhat/secondhand/listing/README.md) · [`multi-tier-redis-caching-and-invalidation.md`](multi-tier-redis-caching-and-invalidation.md) |
+| `ratelimit:{kategori}:{ip/user}:{pencere}` | `RateLimitingFilter` (`rate_limit_window.lua`) | [`core/README.md`](../src/main/java/com/serhat/secondhand/core/README.md) · [`rate-limiting-and-throttling-architecture.md`](rate-limiting-and-throttling-architecture.md) |
+| `auth:login-fail:*`, `auth:access-revoked:*`, `auth:access-token-revoked:*`, `auth:pwreset:requests:*` | `LoginAttemptService`, `AccessRevocationService`, `PasswordService` | [`auth/README.md`](../src/main/java/com/serhat/secondhand/auth/README.md) · [`auth-jwt-and-security-architecture.md`](auth-jwt-and-security-architecture.md) |
 
-* **Lua script'leri ([src/main/resources/scripts/](../src/main/resources/scripts/)):**
-
-  | Script | Ne yapar | Dönüş |
-  | :--- | :--- | :--- |
-  | `reserve_stock_with_ttl.lua` | Stok key'i yoksa PostgreSQL adediyle oluşturur (lazy init), yeterliyse stoğu düşer ve rezervasyonu TTL ile yazar. Kullanıcının zaten tuttuğu adedi tekrar düşmez. | Kalan stok ya da `-1` (→ `INSUFFICIENT_STOCK`) |
-  | `cancel_user_reservation.lua` | Rezervasyondaki adedi stoğa geri ekler, rezervasyonu siler. | `1` / `0` |
-  | `release_stock.lua` | Sipariş iptali/iadesinde stoğu artırır; key yoksa oluşturmaz. | Yeni stok ya da `-1` |
-  | `compare_and_set_stock.lua` | Reconciliation yazımı: stok, job'un okuduğu değerdeyse yazar. | `1` / `0` |
-  | `reserve_stock.lua` | TTL'siz rezervasyon; checkout akışında kullanılmaz. | Kalan stok ya da `-1` |
-
-* **Reconciliation:** [StockReservationReconciliationScheduler](../src/main/java/com/serhat/secondhand/inventory/application/StockReservationReconciliationScheduler.java) 5 dakikada bir `beklenen stok = PostgreSQL availableQuantity − rezervasyonlar − pending` kuralıyla Redis'i düzeltir. Süresi dolan rezervasyonların adedi stoğa bu job ile döner.
-
-  Akışın tamamı ve kod örnekleri: [stock-reservation-and-reconciliation.md](stock-reservation-and-reconciliation.md).
-
----
-
-### C. Dağıtık Kilit, Idempotency & Kupon Limiter
-
-1. **Ödeme İdempotency Kilidi ([PaymentRedisIdempotencyService.java](../src/main/java/com/serhat/secondhand/payment/util/PaymentRedisIdempotencyService.java)):**
-   * Key `v4:payment:idempotency:{key}`, değer `PENDING:{fingerprint}` ya da `DONE:{fingerprint}`. `claim` kilidi `SET NX` ile alır; bekleyen kilit **1 saat**, tamamlanmış sonuç **24 saat** saklanır (`PaymentProcessingConstants`).
-   * Aynı key aynı parametrelerle tekrar gelirse kayıtlı ödeme döner; farklı parametrelerle gelirse `IDEMPOTENCY_KEY_CONFLICT` (409). Akışın tamamı: [payment dokümanı §3](payment-strategy-and-provider-extension-guide.md#3-uçtan-uca-akış).
-2. **Kupon Limitleme ([CouponRedisLimiterService.java](../src/main/java/com/serhat/secondhand/coupon/application/CouponRedisLimiterService.java) & [apply_coupon_with_limit.lua](../src/main/resources/scripts/apply_coupon_with_limit.lua)):**
-   * Kuponun genel toplam kullanım limiti ve kullanıcı bazlı kullanım limiti Redis üzerinde tek bir atomik Lua çağrısıyla denetlenir ve güncellenir. Checkout transaction commit edilmezse `release_coupon_usage.lua` kullanımı geri bırakır (`CouponService.releaseUsageUnlessCommitted`).
-3. **Rate Limiting ([RateLimitingFilter.java](../src/main/java/com/serhat/secondhand/core/security/RateLimitingFilter.java) & `rate_limit_window.lua`):**
-   * Fixed window sayaç: key `ratelimit:{kategori}:{ip}:{pencere}`; `INCR` ve ilk istekte `PEXPIRE` tek atomik Lua çağrısındadır. Redis'e ulaşılamazsa istek 503 ile reddedilir. Ayrıntılar: [rate-limiting-and-throttling-architecture.md](rate-limiting-and-throttling-architecture.md).
-4. **Diğer Redis key'leri:**
-
-   | Key | TTL | Kullanan |
-   | :--- | :--- | :--- |
-   | `v4:offer:lock:{listingId}` | 24 saat | `OfferRedisReservationService` (kabul edilen teklif) |
-   | `v4:coupon:usage:global:{CODE}`, `v4:coupon:usage:user:{CODE}:{userId}` | 30 gün | `CouponRedisLimiterService` |
-   | `v4:listing:active_viewers:{listingId}` (ZSET) | 26 saat | `ListingViewService` |
-   | `v4:listing:view:dedup:{kimlik}:{listingId}` | 1 saat | `ListingViewService` |
-   | `v4:cart:in_cart_users:{listingId}` (SET) | 7 gün | `CartSocialMetricService` |
-   | `auth:login-fail:account:{email}:{ip}`, `auth:login-fail:ip:{ip}` | 15 dk | `LoginAttemptService` |
-   | `auth:access-revoked:{userId}`, `auth:access-token-revoked:{jti}` | access token ömrü kadar | `AccessRevocationService` |
-   | `v6:catalog:locations:*` | 7 gün | `LocationCatalogService` |
-
-   `ratelimit:` ve `auth:` key'leri `v4:` prefix'i taşımaz.
+`ratelimit:` ve `auth:` key'leri `v4:` prefix'i taşımaz.
 
 ---
 

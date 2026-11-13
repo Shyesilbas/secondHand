@@ -2,8 +2,6 @@
 
 Multi-language dictionary catalogs, language detection, locale switching, and translation synchronization.
 
----
-
 > [!NOTE]
 > **Backend Counterpart & Architecture Deep Dive:**
 > - **Backend Module:** [`core`](../../../src/main/java/com/serhat/secondhand/core/README.md)
@@ -17,36 +15,30 @@ The `locales` module manages bilingual internationalization (i18n) across the pl
 3. **Runtime Language Detection & Persistence:** Automatically detects browser language preferences and persists explicit user choices in local storage.
 4. **Natural Technical Vocabulary:** Strict compliance with platform localization guidelines: natural, widely accepted technical vocabulary is preferred over forced or obscure Turkish translations.
 
----
-
 ## 2. Route Map & Entry Points
 
-| Route / Component | Guard / Access | Component | Purpose & Query Params |
-|---|---|---|---|
-| Global Header / Footer | Public | `LanguageSwitcher` | Interactive switcher allowing users to toggle between Turkish and English instantly. |
-| Global Application Root | Public | `src/i18n.js` | Initializes `i18next`, bundles translation catalogs, and mounts language detector. |
+- No own route; components are embedded in other modules' pages.
 
----
+| Embedded entry | Where |
+|---|---|
+| `LanguageSwitcher` | Interactive switcher allowing users to toggle between Turkish and English instantly. |
+| `src/i18n.js` | Initializes `i18next`, bundles translation catalogs, and mounts language detector. |
 
-## 3. Component Hierarchy & Core Sub-Components
+## 3. Component Rules
 
-```
-locales/
-├── tr/
-│   └── translation.json               # Turkish master translation catalog
-├── en/
-│   └── translation.json               # English master translation catalog
-└── README.md                          # Module architecture specification
-```
-
-### Component Roles & Invariants
 - **Key Parity Invariant:** Every key present in `tr/translation.json` must have a corresponding counterpart in `en/translation.json` to prevent key fallback leaks.
 - **XSS Protection:** React JSX automatically escapes dynamic values. `i18next` is initialized with `interpolation: { escapeValue: false }` to avoid double-encoding characters.
 - **No Direct Emoji Characters:** Translation strings avoid decorative or celebratory emojis in compliance with the restrained design standard.
 
 ---
 
-## 4. State Management & React Query Contract
+## 4. React Query Keys
+
+Generated from code; the hook files are the source of truth.
+
+- No queries defined in this module.
+
+## 5. State Management
 
 ### i18n Engine Contract
 - **Engine Stack:** `i18next` + `react-i18next` + `i18next-browser-languagedetector`.
@@ -56,25 +48,6 @@ locales/
   2. The `Accept-Language` request header for subsequent API dispatches.
   3. The `i18nextLng` storage key in browser storage.
 
----
-
-## 5. Form & Data Validation Rules
+## 6. Form & Data Validation Rules
 
 - **Interpolation Parameters:** Parametric translation keys (such as `{{count}}`, `{{min}}`, `{{max}}`) must receive valid numbers or strings to avoid rendering raw curly braces in the UI.
-
----
-
-## 6. UX States, Backend Error Contract & Restrained Design Tokens
-
-### 4-State UX Handling
-1. **Loading State:** Translation catalogs are bundled synchronously with the application build, avoiding asynchronous Flash of Unstyled Content (FOUC) or raw translation key flashes.
-2. **Empty / Missing Key Fallback:** If a key is absent in the active language, `i18next` falls back gracefully to `en` before rendering the literal key string.
-3. **Error State:** If translation loading fails, default English strings render automatically.
-4. **Data State:** Fully localized user interface with proper pluralization, date formatting, and currency symbols.
-
-### Backend Error Contract
-- Backend error responses containing an `errorCode` enum are mapped to localized strings via the `errors.*` translation namespace in `translation.json`.
-
-### Restrained Design Tokens
-- **Language Toggle Switcher:** Compact text buttons (`TR` | `EN`) with subtle active state highlights (`text-foreground font-semibold`) and neutral inactive states (`text-muted-foreground hover:text-foreground`).
-- **Typography:** Uses platform sans-serif typography with complete Turkish character support (`ç`, `ğ`, `ı`, `ö`, `ş`, `ü`).

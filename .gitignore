@@ -92,3 +92,6 @@ graphify-out/
 
 # IDE AI agent workspace tools & skills (kept local)
 .agents/
+
+# Python bytecode from scripts/
+__pycache__/
