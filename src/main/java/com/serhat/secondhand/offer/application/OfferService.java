@@ -1,5 +1,6 @@
 package com.serhat.secondhand.offer.application;
 
+import com.serhat.secondhand.offer.config.OfferConfigProperties;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
@@ -39,7 +40,8 @@ public class OfferService implements IOfferService {
     private final OfferEmailNotificationService offerEmailNotificationService;
     private final OfferValidator offerValidator;
     private final OfferMapper offerMapper;
-    private final OfferRedisReservationService offerRedisReservationService;
+    private final OfferStockHoldService offerStockHoldService;
+    private final OfferConfigProperties offerConfigProperties;
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
@@ -125,13 +127,20 @@ public class OfferService implements IOfferService {
             return Result.error(OfferErrorCodes.OFFER_ALREADY_ACCEPTED_FOR_LISTING);
         }
 
+        // From here expiresAt is the buyer's payment deadline; OfferScheduler expires the offer after it.
+        LocalDateTime paymentDeadline = offerConfigProperties.calculatePaymentDeadline();
+        // Hold the stock before changing the offer, so a refused hold leaves the offer untouched (still PENDING).
+        Result<Void> holdResult = offerStockHoldService.hold(offer, paymentDeadline);
+        if (holdResult.isError()) return Result.error(holdResult.getMessage(), holdResult.getErrorCode());
+
         offer.setStatus(OfferStatus.ACCEPTED);
+        offer.setExpiresAt(paymentDeadline);
         Offer saved;
         try {
             saved = offerRepository.save(offer);
-            offerRedisReservationService.lockAcceptedOffer(lockedListing.getId(), offer.getBuyer().getId(), offer.getId());
         } catch (ObjectOptimisticLockingFailureException ex) {
             log.warn("Concurrent accept offer conflict for offer {}", offerId, ex);
+            offerStockHoldService.releaseNow(offer);
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
         offerEmailNotificationService.notifyAcceptedToCreator(saved);
@@ -289,14 +298,16 @@ public class OfferService implements IOfferService {
         return userResult;
     }
 
+    /** PENDING offers expire at the response deadline, ACCEPTED offers at the payment deadline. */
     private boolean isExpired(Offer offer) {
         return offer != null &&
-                offer.getStatus() == OfferStatus.PENDING &&
+                OfferStatus.EXPIRABLE.contains(offer.getStatus()) &&
                 offer.getExpiresAt() != null &&
                 LocalDateTime.now().isAfter(offer.getExpiresAt());
     }
 
     private void processManualExpiration(Offer offer) {
+        boolean wasAccepted = offer.getStatus() == OfferStatus.ACCEPTED;
         offer.setStatus(OfferStatus.EXPIRED);
         try {
             offerRepository.save(offer);
@@ -304,6 +315,7 @@ public class OfferService implements IOfferService {
             log.warn("Concurrent manual expiration conflict for offer {}", offer.getId(), ex);
             return;
         }
+        if (wasAccepted) offerStockHoldService.releaseAfterCommit(offer);
         offerEmailNotificationService.notifyExpiredToBoth(offer);
     }
 

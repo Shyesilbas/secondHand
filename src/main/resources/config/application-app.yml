@@ -61,6 +61,7 @@ app:
     scheduler-deactivate-fixed-delay-ms: ${CAMPAIGN_DEACTIVATE_FIXED_DELAY_MS:600000}
   offer:
     expiration-hours: ${OFFER_EXPIRATION_HOURS:24}
+    accepted-payment-hours: ${OFFER_ACCEPTED_PAYMENT_HOURS:24}
     scheduler-cron: ${OFFER_SCHEDULER_CRON:0 * * * * *}
   showcase:
     daily:

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,7 +18,21 @@ import java.util.UUID;
 @Repository
 public interface OfferRepository extends JpaRepository<Offer, UUID> {
 
-    List<Offer> findAllByStatusAndExpiresAtBefore(OfferStatus status, LocalDateTime now);
+    @EntityGraph(attributePaths = {"listing", "buyer", "seller"})
+    List<Offer> findAllByStatusInAndExpiresAtBefore(Collection<OfferStatus> statuses, LocalDateTime now);
+
+    /**
+     * Expires the offer only if it is still in an expirable status at the version the scheduler read and
+     * its deadline has passed; returns rows changed. A concurrent checkout (completeIfAccepted) wins cleanly.
+     */
+    @org.springframework.data.jpa.repository.Modifying(flushAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE Offer o SET o.status = com.serhat.secondhand.offer.entity.OfferStatus.EXPIRED,"
+            + " o.version = o.version + 1, o.updatedAt = :now"
+            + " WHERE o.id = :id AND o.version = :version AND o.status IN :statuses AND o.expiresAt < :now")
+    int expireIfOverdue(@org.springframework.data.repository.query.Param("id") UUID id,
+                        @org.springframework.data.repository.query.Param("version") Long version,
+                        @org.springframework.data.repository.query.Param("statuses") Collection<OfferStatus> statuses,
+                        @org.springframework.data.repository.query.Param("now") LocalDateTime now);
 
     Optional<Offer> findByIdAndBuyerId(UUID id, Long buyerId);
 

@@ -19,7 +19,8 @@ public enum OfferErrorCodes implements ErrorCode {
     OFFER_ALREADY_ACCEPTED_FOR_LISTING("OFFER_ALREADY_ACCEPTED_FOR_LISTING", "There is already an accepted offer for this listing", HttpStatus.CONFLICT),
     INVALID_QUANTITY("OFFER_INVALID_QUANTITY", "Quantity must be at least 1", HttpStatus.BAD_REQUEST),
     OFFER_QUANTITY_EXCEEDS_STOCK("OFFER_QUANTITY_EXCEEDS_STOCK", "Offer quantity exceeds available listing stock", HttpStatus.CONFLICT),
-    INVALID_TOTAL_PRICE("OFFER_INVALID_TOTAL_PRICE", "Total price must be greater than 0", HttpStatus.BAD_REQUEST);
+    INVALID_TOTAL_PRICE("OFFER_INVALID_TOTAL_PRICE", "Total price must be greater than 0", HttpStatus.BAD_REQUEST),
+    OFFER_STOCK_HOLD_FAILED("OFFER_STOCK_HOLD_FAILED", "Stock could not be held for this offer. Please retry.", HttpStatus.SERVICE_UNAVAILABLE);
 
     private final String code;
     private final String message;

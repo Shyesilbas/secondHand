@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -78,7 +79,12 @@ public class CheckoutOrchestrator {
             return Result.error(reservedResult.getMessage(), reservedResult.getErrorCode());
         }
 
-        Map<UUID, Integer> reserved = reservedResult.getData();
+        Map<UUID, Integer> reserved = new HashMap<>(reservedResult.getData());
+        if (acceptedOffer != null) {
+            // The offer listing's stock is the offer's own hold (OfferStockHoldService); a failed checkout must
+            // leave it for the buyer's retry. On success consumeReservationsOnSuccess still moves it to pending.
+            reserved.remove(acceptedOffer.getListing().getId());
+        }
 
         Result<List<Order>> ordersResult = orderCreationService.createOrders(user, effectiveCartItems, request, pricing);
         if (ordersResult.isError()) {

@@ -14,9 +14,15 @@ import java.time.LocalDateTime;
 public class OfferConfigProperties {
 
     private int expirationHours = 24;
+    /** Hours the buyer has to pay after the seller accepts; an unpaid accepted offer then expires. */
+    private int acceptedPaymentHours = 24;
     private String schedulerCron = "0 * * * * *";
 
     public LocalDateTime calculateExpiresAt() {
         return LocalDateTime.now().plusHours(expirationHours);
+    }
+
+    public LocalDateTime calculatePaymentDeadline() {
+        return LocalDateTime.now().plusHours(acceptedPaymentHours);
     }
 }
