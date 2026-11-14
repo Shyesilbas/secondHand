@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {useAuthState} from '../../auth/AuthContext.jsx';
 import {useChatWindow} from '../hooks/useChatWindow.js';
 import {useNotification} from '../../notification/NotificationContext.jsx';
 import ChatHeader from './ChatHeader.jsx';
 import MessageList from './MessageList.jsx';
 import ChatInput from './ChatInput.jsx';
+import ReportMessageModal from '../../complaint/components/ReportMessageModal.jsx';
 import { CHAT_DEFAULTS, CHAT_MESSAGES } from '../chatConstants.js';
 
 const ChatWindow = ({
@@ -35,6 +36,9 @@ const ChatWindow = ({
  scrollToBottom
  } = useChatWindow({ selectedChatRoom, onSendMessage });
 
+ const [reportedMessage, setReportedMessage] = useState(null);
+ const canReport = Boolean(selectedChatRoom?.id && selectedChatRoom?.otherParticipantId);
+ const reportModal = canReport && <ReportMessageModal chatRoom={selectedChatRoom} message={reportedMessage} onClose={() => setReportedMessage(null)} />;
  const prevLenRef = useRef(messages?.length || 0);
  const messagesContainerRef = useRef(null);
  const prevChatRoomIdRef = useRef(selectedChatRoom?.id);
@@ -79,6 +83,7 @@ const ChatWindow = ({
  messagesContainerRef={messagesContainerRef}
  user={user}
  onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
+ onReportMessage={canReport ? setReportedMessage : undefined}
  fetchNextPage={fetchNextPage}
  hasNextPage={hasNextPage}
  isFetchingNextPage={isFetchingNextPage}
@@ -91,6 +96,7 @@ const ChatWindow = ({
  inputRef={inputRef}
  isEmbedded={true}
  />
+ {reportModal}
  </div>
  );
  }
@@ -111,6 +117,7 @@ const ChatWindow = ({
  messagesContainerRef={messagesContainerRef}
  user={user}
  onDeleteMessage={onDeleteMessage ? handleDeleteMessage : undefined}
+ onReportMessage={canReport ? setReportedMessage : undefined}
  fetchNextPage={fetchNextPage}
  hasNextPage={hasNextPage}
  isFetchingNextPage={isFetchingNextPage}
@@ -123,6 +130,7 @@ const ChatWindow = ({
  inputRef={inputRef}
  isEmbedded={false}
  />
+ {reportModal}
  </div>
  );
 };

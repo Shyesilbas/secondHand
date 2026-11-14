@@ -29,13 +29,68 @@ public class GeminiClient {
     private String fallbackMemoryModel;
 
     private final RestTemplate restTemplate;
+    private final RestTemplate strictRestTemplate;
 
     public GeminiClient() {
         org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(5000);
         factory.setReadTimeout(30000);
         this.restTemplate = new RestTemplate(factory);
+
+        org.springframework.http.client.SimpleClientHttpRequestFactory strictFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        strictFactory.setConnectTimeout(5000);
+        strictFactory.setReadTimeout(STRICT_READ_TIMEOUT_MS);
+        this.strictRestTemplate = new RestTemplate(strictFactory);
     }
+
+    /** Read timeout for {@link #generateStrictJson}; moderation must not hold the worker for long. */
+    static final int STRICT_READ_TIMEOUT_MS = 15000;
+
+    /**
+     * One structured-output call with no retry and no fallback text: any failure, empty or blocked
+     * answer throws, so callers (Aura moderation) can retry later instead of acting on a placeholder.
+     */
+    public String generateStrictJson(String systemInstruction, String prompt, java.util.Map<String, Object> responseSchema) {
+        return generateStrictJson(systemInstruction, prompt, List.of(), responseSchema);
+    }
+
+    /**
+     * Same as {@link #generateStrictJson(String, String, java.util.Map)} with images sent as inline parts
+     * after the prompt, in the given order.
+     */
+    public String generateStrictJson(String systemInstruction, String prompt, List<InlineImage> images,
+                                     java.util.Map<String, Object> responseSchema) {
+        String url = buildGenerateContentUrl(model);
+        List<GeminiRequest.Part> parts = new java.util.ArrayList<>();
+        parts.add(new GeminiRequest.Part(prompt));
+        for (InlineImage image : images) {
+            parts.add(GeminiRequest.Part.image(image.mimeType(),
+                    java.util.Base64.getEncoder().encodeToString(image.bytes())));
+        }
+        var request = new GeminiRequest(
+                List.of(new GeminiRequest.Content(parts)),
+                new GeminiRequest.GenerationConfig("application/json", responseSchema),
+                new GeminiRequest.Content(List.of(new GeminiRequest.Part(systemInstruction))));
+        GeminiResponse response;
+        try {
+            response = strictRestTemplate.postForObject(url, request, GeminiResponse.class);
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw new BusinessException("The AI service is rate limited.", HttpStatus.TOO_MANY_REQUESTS, "AI_RATE_LIMIT_EXCEEDED");
+        } catch (Exception e) {
+            log.error("Strict Gemini call failed with model {}: {}", model, e.getMessage());
+            throw new BusinessException("The AI service encountered an error.", HttpStatus.BAD_GATEWAY, "AI_SERVICE_ERROR");
+        }
+        if (response == null || response.candidates() == null || response.candidates().isEmpty()
+                || response.candidates().get(0).content() == null
+                || response.candidates().get(0).content().parts() == null
+                || response.candidates().get(0).content().parts().isEmpty()) {
+            throw new BusinessException("The AI service returned no answer.", HttpStatus.BAD_GATEWAY, "AI_EMPTY_RESPONSE");
+        }
+        return response.candidates().get(0).content().parts().get(0).text();
+    }
+
+    /** Raw image bytes for {@link #generateStrictJson(String, String, List, java.util.Map)}. */
+    public record InlineImage(String mimeType, byte[] bytes) {}
 
     public String model() {
         return model;

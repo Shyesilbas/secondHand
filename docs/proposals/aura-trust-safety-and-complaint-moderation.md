@@ -1,7 +1,7 @@
 # Aura AI Güven, Moderasyon ve Şikayet Mimarisi (Trust & Safety)
 
 > [!WARNING]
-> **Durum: Öneri, uygulanmadı (kontrol: 2026-11-12).** Kodda yalnızca temel şikayet kaydı var (`ComplaintService`, `ComplaintStatus`, `POST /api/v1/complaints`). Cooling-off kuyruğu, Aura incelemesi, sanction ladder, appeal ve bu dokümandaki Redis key'leri henüz yok; "V35" planı geçersiz (son migration V47). Mevcut davranış için [`complaint/README.md`](../../src/main/java/com/serhat/secondhand/complaint/README.md). Bu dokümanı yalnızca moderasyon özelliği uygulanırken açın.
+> **Durum: Faz 1-5 uygulandı (kontrol: 2026-11-14).** Kodda: `V49__complaint_moderation_foundation.sql` ve `V50__complaint_bad_faith_and_appeals.sql`, kabul kuralları (`ComplaintValidator`), günlük kota (`ComplaintRateLimiter`), moderasyon e-postaları ve bildirimleri (`ComplaintEmailNotifier`, `ComplaintNotificationListener`), Redis kuyrukları ve worker (`ComplaintReviewQueue`, `ComplaintReviewWorker`, varsayılan kapalı, `moderationExecutor` üzerinde), Aura incelemesi ve kanıt görselleri (`AuraComplaintReviewHandler`, `EvidenceImageLoader`), sanction ladder (`SanctionPolicy`, `SanctionExecutor`), kötü niyetli şikayet ve brigade sinyalleri (5.3), banlanan satıcının kargolanmamış siparişlerinin iptali (`BannedSellerOrderCancellationListener`, 5.2), appeal (`AuraAppealReviewHandler`, 5.6), kısıtlamalar (`UserRestrictionService`) ve Faz 5 UI. Bekleyenler: ilan açıklamasına askı notu eklenmesi (satıcı içeriğini değiştirdiği için yapılmadı), kötü niyetli şikayet cezasına itiraz. Farklar: `evidence_image_urls` `JSONB`; e-postalar outbox değil doğrudan Kafka publish; başarısız inceleme `retry-delay` kadar ileri atılır; günlük kota yalnızca geçerli şikayetlerde tüketilir; Gemini'ye kullanıcı adı, başka kullanıcı id'si veya IP değil yalnızca id ve sayılar gider; kötü niyet cezası için `bad-faith-min-confidence` gerekir; düşük güvenli itiraz onayı reddedilmiş sayılır; çok satıcılı siparişler ban ile iptal edilmez; kısıtlama cache'i JWT claim değil Redis + PostgreSQL fallback kullanır. Güncel kurallar için [`complaint/README.md`](../../src/main/java/com/serhat/secondhand/complaint/README.md).
 
 Bu doküman, insan moderatör ihtiyacı olmadan çalışan, **Aura AI (Gemini)** destekli otonom güven ve moderasyon sistemini; 2 saatlik soğuma süresini (cooling-off buffer), Redis Sorted Set tabanlı saatlik batch kuyruğunu, sohbet ve ilan şikayetlerinin analizini ve kademeli ceza/kısıtlama merdivenini (Sanction Ladder) anlatır.
 
@@ -502,28 +502,28 @@ Canlı ortamda (production) yüksek kullanıcı trafiği altında veritabanını
 
 ```
 [Faz 1: Veritabanı ve DTO]
-  ├── Flyway V35 migrasyonu (users & complaints yeni kolonları)
+  ├── Flyway V49 migrasyonu (users & complaints yeni kolonları) [tamam]
   ├── User ve Complaint JPA entity güncellemeleri
   └── ComplaintDto, Response modelleri ve enum'lar
 
 [Faz 2: E-posta Altyapısı ve Şablonlar]
-  ├── EmailType enum genişletmesi (7 yeni tip)
-  ├── EmailEvent sınıfları ve Data DTO'ları
-  └── templates/emails/moderation/ altında 7 responsive HTML şablonu
+  ├── EmailType enum genişletmesi (8 yeni tip) [tamam]
+  ├── EmailEvent sınıfları ve Data DTO'ları [tamam]
+  └── templates/emails/moderation/ altında 8 responsive HTML şablonu [tamam]
 
 [Faz 3: Redis Kuyruk ve Worker]
-  ├── Redis ZSET servisi (delayed queue ekleme ve çekme)
-  ├── Spring Boot @Scheduled worker
-  └── Dağıtık kilit mekanizması (Redis lock)
+  ├── Redis ZSET servisi (delayed queue ekleme ve çekme) [tamam]
+  ├── Spring Boot @Scheduled worker [tamam]
+  └── Dağıtık kilit mekanizması (Redis lock) [tamam]
 
 [Faz 4: Aura AI İnceleme Servisi]
-  ├── Bağlam toplama servisi (Kanıt mesajı, chat transcript & listing snapshot)
-  ├── Gemini structured JSON prompt entegrasyonu
-  ├── Yaptırım motoru (İlan kaldırma, iadesiz askıya alma, ban, warning)
-  └── E-posta ve sistem bildirimlerinin tetiklenmesi
+  ├── Bağlam toplama servisi (Kanıt mesajı, chat transcript & listing snapshot) [tamam, görseller hariç]
+  ├── Gemini structured JSON prompt entegrasyonu [tamam]
+  ├── Yaptırım motoru (İlan kaldırma, iadesiz askıya alma, ban, warning) [tamam, sipariş iptali hariç]
+  └── E-posta ve sistem bildirimlerinin tetiklenmesi [e-posta tamam, bildirim zili yok]
 
 [Faz 5: Frontend UI Entegrasyonu]
   ├── ChatHeader'a interaktif kanıt mesajı seçim modu & şikayet modalı
   ├── ComplaintsPage sekmeleri, durum badge'leri ve Aura Karar Paneli
-  └── Kısıtlı kullanıcı arayüzü korumaları (mesaj engeli, banner)
+  └── Kısıtlı kullanıcı arayüzü korumaları (mesaj engeli, banner) [backend guard tamam, UI bekliyor]
 ```

@@ -6,6 +6,7 @@ import FavoriteButton from '../../favorites/components/FavoriteButton.jsx';
 import AddToListButton from '../../favoritelist/components/AddToListButton.jsx';
 import CompareButton from '../../comparison/components/CompareButton.jsx';
 import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
+import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import ListingCardActions from './ListingCardActions.jsx';
 import SafeMeetupModal from './SafeMeetupModal.jsx';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
@@ -175,6 +176,18 @@ const ListingBuyBox = ({
               <ChevronRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
             </button>
           </p>
+        </div>
+      )}
+
+      {!isOwner && (listing.sellerId || listing.userId) && (
+        <div className="mt-4 flex justify-end">
+          <ComplaintButton
+            targetUserId={listing.sellerId || listing.userId}
+            targetUserName={listing.sellerName || ''}
+            listingId={listing.id}
+            listingTitle={listing.title}
+            variant="ghost"
+          />
         </div>
       )}
 

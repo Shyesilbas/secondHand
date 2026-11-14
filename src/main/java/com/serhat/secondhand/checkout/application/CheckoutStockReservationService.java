@@ -1,5 +1,7 @@
 package com.serhat.secondhand.checkout.application;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
@@ -31,12 +33,17 @@ public class CheckoutStockReservationService {
     private final ListingRepository listingRepository;
     private final InventoryRedisReservationService redisReservationService;
     private final com.serhat.secondhand.cart.repository.CartRepository cartRepository;
+    private final UserRestrictionService userRestrictionService;
 
     /** How long a checkout holds stock for the buyer (anti-hoarding window). */
     @Value("${app.checkout.reservation-ttl-seconds:900}")
     private long reservationTtlSeconds;
 
     public Result<Map<UUID, Integer>> reserveUserCartStock(Long userId) {
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CHECKOUT);
+        if (restriction.isError()) {
+            return Result.error(restriction.getMessage(), restriction.getErrorCode());
+        }
         List<Cart> cartItems = cartRepository.findByUserIdWithListing(userId);
         if (cartItems.isEmpty()) {
             return Result.success(Map.of());

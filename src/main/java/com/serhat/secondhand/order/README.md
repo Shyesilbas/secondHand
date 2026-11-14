@@ -14,6 +14,7 @@ Manages the post-checkout order lifecycle across cargo shipping (`DeliveryMethod
 - **Time Windows (`OrderBusinessConstants`):**
   - `STATUS_UPDATE_INTERVAL_MINUTES` (5m): `CONFIRMED` -> `PROCESSING` automatic transition.
   - `SHIP_DEADLINE_HOURS` (72h): unshipped cargo orders are auto-cancelled by `OrderCompletionScheduler`.
+- **Banned seller (`BannedSellerOrderCancellationListener`):** after a `UserBannedEvent` commits, unshipped cargo orders whose every item belongs to that seller are cancelled and refunded (`OrderCancellationService.cancelForRestrictedSeller`, one transaction per order, cause `SELLER_RESTRICTED`). Mixed-seller and meetup orders keep their normal deadline paths.
   - `AUTO_COMPLETION_HOURS` (72h cargo after `DELIVERED`; 24h meetup after `HANDOVER_CONFIRMED`): `OrderCompletionScheduler` completes the order and calls `EscrowService.releaseEscrowForOrder`.
   - `REFUND_WINDOW_HOURS` (48h): buyer refund window after `DELIVERED`, strictly before escrow release.
 - **Safe Meetup Handshake:** `MEETUP_PENDING` orders verify via 6-digit SHA-256 OTP or QR (`verifyMeetup` -> `HANDOVER_CONFIRMED`); 3 failed attempts trigger a 15-minute `VERIFICATION_LOCKED` cooldown.

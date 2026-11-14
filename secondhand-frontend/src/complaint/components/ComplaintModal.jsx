@@ -5,6 +5,7 @@ import { useAuthState } from '../../auth/AuthContext.jsx';
 import { Button, Modal } from '../../common/components/ui/index.js';
 import logger from '../../common/utils/logger.js';
 import { COMPLAINT_DEFAULTS, COMPLAINT_MESSAGES } from '../complaintConstants.js';
+import EvidenceImagePicker from './EvidenceImagePicker.jsx';
 const FIELD = 'w-full rounded border bg-background-primary px-3 text-sm text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-border-focus';
 const ComplaintModal = ({
  isOpen,
@@ -14,6 +15,8 @@ const ComplaintModal = ({
  targetUserId,
  listingId,
  listingTitle,
+ chatRoomId,
+ reportedMessage,
  isLoading
 }) => {
  const {
@@ -21,14 +24,16 @@ const ComplaintModal = ({
  } = useTranslation();
  const [formData, setFormData] = useState({
  reason: '',
- description: ''
+ description: '',
+ evidenceImageUrls: []
  });
  const [errors, setErrors] = useState({});
  useEffect(() => {
  if (isOpen) {
  setFormData({
  reason: '',
- description: ''
+ description: '',
+ evidenceImageUrls: []
  });
  setErrors({});
  }
@@ -60,8 +65,11 @@ const ComplaintModal = ({
  complainerId: currentUser.id,
  complainedUserId: targetUserId,
  listingId,
+ chatRoomId,
+ reportedMessageId: reportedMessage?.id,
  reason: formData.reason,
- description: formData.description.trim()
+ description: formData.description.trim(),
+ evidenceImageUrls: formData.evidenceImageUrls
  };
  try {
  await onSubmit(complaintData);
@@ -83,7 +91,7 @@ const ComplaintModal = ({
  }));
  }
  };
- return <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={listingId ? 'Report listing' : 'Report user'} size="sm" footer={<>
+ return <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title={reportedMessage ? t('report_message', 'Report message') : listingId ? 'Report listing' : 'Report user'} size="sm" footer={<>
  <Button variant="secondary" onClick={onClose} disabled={isLoading}>{t("cancel")}</Button>
  <Button type="submit" form="complaint-form" disabled={isLoading || !formData.reason || !formData.description.trim()}>
  {isLoading ? t("submitting") : t("submit_complaint")}
@@ -92,6 +100,10 @@ const ComplaintModal = ({
  <p className="mb-4 text-sm text-text-secondary">
  {t("you_are_reporting")}<span className="font-medium text-text-primary">{listingId && listingTitle ? listingTitle : targetUserName}</span>
  </p>
+ {reportedMessage && <blockquote className="mb-4 rounded border border-border-light bg-background-secondary px-3 py-2 text-sm text-text-secondary">
+ <span className="mb-1 block text-xs text-text-tertiary">{t('reported_message', 'Reported message')}</span>
+ <span className="break-words">{reportedMessage.content}</span>
+ </blockquote>}
  <form id="complaint-form" onSubmit={handleSubmit} noValidate className="space-y-4">
  <div>
  <label htmlFor="complaint-reason" className="mb-1 block text-sm font-medium text-text-primary">{t("reason")}</label>
@@ -114,6 +126,8 @@ const ComplaintModal = ({
  </p>
  </div>
  </div>
+
+ <EvidenceImagePicker urls={formData.evidenceImageUrls} onChange={urls => handleInputChange('evidenceImageUrls', urls)} disabled={isLoading} />
 
  <div className="border-t border-border-light pt-4">
  <h4 className="text-sm font-medium text-text-primary">{t("how_does_the_complaint_process_work")}</h4>

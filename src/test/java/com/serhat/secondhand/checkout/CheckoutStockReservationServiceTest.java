@@ -22,7 +22,7 @@ class CheckoutStockReservationServiceTest {
 
     private final InventoryRedisReservationService redis = mock(InventoryRedisReservationService.class);
     private final CheckoutStockReservationService service = new CheckoutStockReservationService(
-            mock(ListingRepository.class), redis, mock(CartRepository.class));
+            mock(ListingRepository.class), redis, mock(CartRepository.class), com.serhat.secondhand.user.RestrictionTestSupport.allowAll());
 
     @AfterEach
     void clearSynchronization() {

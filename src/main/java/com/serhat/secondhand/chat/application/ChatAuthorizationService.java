@@ -73,6 +73,15 @@ public class ChatAuthorizationService {
         return Result.success(message);
     }
 
+    /** Returns the message only when it belongs to {@code roomId}; otherwise MESSAGE_NOT_FOUND. */
+    public Result<Message> findMessageInRoom(Long messageId, Long roomId) {
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if (message == null || !roomId.equals(message.getChatRoomId())) {
+            return Result.error(ChatErrorCodes.MESSAGE_NOT_FOUND);
+        }
+        return Result.success(message);
+    }
+
     public Result<Void> authorizeMessageParticipants(ChatRoom room, Long senderId, Long recipientId) {
         if (senderId.equals(recipientId)) {
             return Result.error(ChatErrorCodes.INVALID_MESSAGE_CONTENT);

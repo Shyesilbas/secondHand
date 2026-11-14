@@ -1,92 +1,99 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FileSearch, ShieldAlert } from 'lucide-react';
 import PageContainer from '@/common/components/layout/PageContainer';
-import { useTranslation } from "react-i18next";
-import { useEffect } from 'react';
-import { ShieldAlert, FileSearch } from 'lucide-react';
-import { useComplaints } from '../hooks/useComplaints.js';
+import { Alert, Button, EmptyState, Skeleton } from '../../common/components/ui/index.js';
+import { useMyComplaints, useReceivedComplaints } from '../hooks/useComplaints.js';
+import { getComplaintErrorMessage } from '../utils/complaintError.js';
+import { COMPLAINT_TABS } from '../complaintConstants.js';
 import ComplaintCard from '../components/ComplaintCard.jsx';
-const ComplaintsPage = () => {
- const {
- t
- } = useTranslation();
- const {
- complaints,
- isLoading,
- error,
- getUserComplaints
- } = useComplaints();
- useEffect(() => {
- getUserComplaints();
- }, [getUserComplaints]);
- return <div className="min-h-screen bg-background-secondary">
- <div className="sticky top-0 z-20 border-b border-border-light bg-background-secondary">
- <PageContainer className="flex items-center justify-between py-4">
- <div className="flex items-center gap-4">
- <div className="relative flex h-12 w-12 items-center justify-center rounded-md bg-background-tertiary ring-1 ring-primary/40">
- <div className="absolute inset-px rounded-md bg-background-primary" />
- <ShieldAlert className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
- </div>
- <div>
- <h1 className="text-2xl font-semibold text-text-primary tracking-tighter">{t("my_complaints")}</h1>
- <div className="mt-0.5 flex items-center gap-3 text-xs text-text-tertiary">
- <span className="leading-relaxed">{t("track_and_manage_your_submissions_to_our")}</span>
- </div>
- </div>
- </div>
- <div className="hidden sm:flex items-center gap-2">
- <div className="inline-flex items-center gap-2 rounded-sm border border-primary bg-background-tertiary/80 px-3 py-1 text-xs font-medium tracking-tight text-primary">
- <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
- <span>
- {complaints?.length || 0}{t("complaint")}{complaints?.length !== 1 ? 's' : ''}
- </span>
- </div>
- </div>
- </PageContainer>
- </div>
+import AppealModal from '../components/AppealModal.jsx';
+import RestrictionBanner from '../components/RestrictionBanner.jsx';
 
- <PageContainer className="pb-10 pt-6">
- {isLoading ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
- {[...Array(6)].map((_, i) => <div key={i} className="rounded-md border border-border bg-background-primary p-6 shadow-sm animate-pulse">
- <div className="space-y-4">
- <div className="flex items-center gap-3">
- <div className="h-9 w-9 rounded-md bg-background-tertiary" />
- <div className="space-y-2">
- <div className="h-4 w-28 rounded-md bg-background-tertiary" />
- <div className="h-3 w-40 rounded-md bg-background-tertiary" />
- </div>
- </div>
- <div className="space-y-2">
- <div className="h-3 w-3/4 rounded-md bg-background-tertiary" />
- <div className="h-3 w-2/3 rounded-md bg-background-tertiary" />
- <div className="h-3 w-5/6 rounded-md bg-background-tertiary" />
- </div>
- <div className="h-9 rounded-md bg-background-tertiary" />
- </div>
- </div>)}
- </div> : error ? <div className="flex items-center justify-center py-16">
- <div className="w-full max-w-md rounded-md border border-border bg-background-primary p-8 text-center shadow-sm">
- <ShieldAlert className="mx-auto mb-5 block h-5 w-5 shrink-0 text-status-error" strokeWidth={1.5} aria-hidden />
- <h3 className="text-sm font-medium text-text-primary tracking-tight">{t("unable_to_load_complaints")}</h3>
- <p className="mt-2 text-sm leading-relaxed text-text-tertiary">
- {error}
- </p>
- <button onClick={() => getUserComplaints()} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-5">{t("try_again")}</button>
- </div>
- </div> : complaints && complaints.length > 0 ? <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
- {complaints.map((complaint, index) => <div key={complaint?.complaintId || complaint?.id || `complaint-${index}`} className="rounded-md border border-border bg-background-primary shadow-sm hover:shadow transition-all duration-200">
- <ComplaintCard complaint={complaint} />
- </div>)}
- </div> : <div className="flex items-center justify-center py-20">
- <div className="mx-auto max-w-md text-center">
- <FileSearch className="mx-auto mb-6 block h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} aria-hidden />
- <h3 className="text-sm font-medium text-text-primary tracking-tighter">{t("no_complaints_submitted")}</h3>
- <p className="mt-2 text-sm leading-relaxed text-text-tertiary">{t("if_you_encounter_inappropriate_behavior_")}</p>
- <button className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-10 px-4 mt-6">
- <span className="flex h-5 w-5 items-center justify-center rounded bg-primary-hover">
- <span className="h-2 w-2 rounded-full bg-background-primary" />
- </span>{t("submit_new_complaint")}</button>
- </div>
- </div>}
- </PageContainer>
- </div>;
+const ComplaintsPage = () => {
+  const { t } = useTranslation();
+  const [tab, setTab] = useState(COMPLAINT_TABS.FILED);
+  const [appealing, setAppealing] = useState(null);
+  const filed = useMyComplaints({ enabled: tab === COMPLAINT_TABS.FILED });
+  const received = useReceivedComplaints({ enabled: tab === COMPLAINT_TABS.RECEIVED });
+  const query = tab === COMPLAINT_TABS.FILED ? filed : received;
+  const complaints = query.data || [];
+
+  const tabs = [
+    { key: COMPLAINT_TABS.FILED, label: t('complaints_filed', 'Filed by me') },
+    { key: COMPLAINT_TABS.RECEIVED, label: t('complaints_received', 'About me') },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background-secondary">
+      <div className="border-b border-border-light bg-background-secondary">
+        <PageContainer className="flex items-center gap-4 py-4">
+          <ShieldAlert className="h-5 w-5 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{t('my_complaints')}</h1>
+            <p className="mt-0.5 text-xs text-text-tertiary">{t('track_and_manage_your_submissions_to_our')}</p>
+          </div>
+        </PageContainer>
+        <PageContainer>
+          <div className="flex" role="tablist" aria-label={t('complaint_views', 'Complaint views')}>
+            {tabs.map((item) => {
+              const active = tab === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setTab(item.key)}
+                  className={`-mb-px border-b-2 px-3 py-2 text-sm transition-colors duration-150 ${
+                    active ? 'border-primary font-medium text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </PageContainer>
+      </div>
+
+      <PageContainer className="space-y-6 pb-10 pt-6">
+        <RestrictionBanner />
+        {query.isLoading ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-56 w-full" />)}
+          </div>
+        ) : query.isError ? (
+          <Alert
+            type="error"
+            message={getComplaintErrorMessage(query.error, t('unable_to_load_complaints'))}
+            action={<Button variant="secondary" size="sm" onClick={() => query.refetch()}>{t('try_again')}</Button>}
+          />
+        ) : complaints.length === 0 ? (
+          <EmptyState
+            icon={FileSearch}
+            title={tab === COMPLAINT_TABS.FILED ? t('no_complaints_submitted') : t('no_complaints_received', 'No complaints about you')}
+            description={tab === COMPLAINT_TABS.FILED
+              ? t('if_you_encounter_inappropriate_behavior_')
+              : t('no_complaints_received_hint', 'Complaints decided against you would appear here.')}
+          />
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {complaints.map((complaint) => (
+              <ComplaintCard
+                key={complaint.complaintId}
+                complaint={complaint}
+                side={tab}
+                onAppeal={setAppealing}
+              />
+            ))}
+          </div>
+        )}
+      </PageContainer>
+
+      <AppealModal complaint={appealing} isOpen={Boolean(appealing)} onClose={() => setAppealing(null)} />
+    </div>
+  );
 };
+
 export default ComplaintsPage;

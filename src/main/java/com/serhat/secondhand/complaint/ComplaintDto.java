@@ -2,7 +2,9 @@ package com.serhat.secondhand.complaint;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public record ComplaintDto(
@@ -18,6 +20,25 @@ public record ComplaintDto(
         @JsonFormat(pattern = "dd/MM/yyyy")
         LocalDateTime updatedAt,
         @JsonFormat(pattern = "dd/MM/yyyy")
-        LocalDateTime resolvedAt
+        LocalDateTime resolvedAt,
+        ComplaintStatus status,
+        String adminNotes,
+        LocalDateTime eligibleForReviewAt,
+        Long chatRoomId,
+        Long reportedMessageId,
+        List<String> evidenceImageUrls,
+        ViolationCategory violationCategory,
+        PenaltyAction penaltyAction,
+        BigDecimal aiConfidenceScore,
+        LocalDateTime aiReviewedAt,
+        AppealStatus appealStatus,
+        String appealReason,
+        LocalDateTime appealSubmittedAt,
+        LocalDateTime appealReviewedAt,
+        String appealDecisionNotes,
+        /** Null when the decision cannot be appealed. */
+        LocalDateTime appealDeadline,
+        boolean badFaithReport,
+        PenaltyAction complainerPenaltyAction
 ) {
 }

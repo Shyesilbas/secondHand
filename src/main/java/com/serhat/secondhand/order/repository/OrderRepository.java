@@ -92,6 +92,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Long> findIdsByStatusCreatedBefore(@Param("status") OrderStatus status, @Param("method") DeliveryMethod method,
                                             @Param("cutoff") LocalDateTime cutoff, Pageable pageable);
 
+    /**
+     * Unshipped cargo orders whose every item is sold by {@code sellerId}. Orders shared with other
+     * sellers are left to the ship-deadline scheduler, so another seller's items are never cancelled.
+     */
+    @Query("SELECT o.id FROM Order o WHERE o.status IN :statuses AND o.deliveryMethod = :method " +
+            "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o AND oi.seller.id = :sellerId) " +
+            "AND NOT EXISTS (SELECT 1 FROM OrderItem oi2 WHERE oi2.order = o AND oi2.seller.id <> :sellerId) " +
+            "ORDER BY o.id")
+    List<Long> findIdsOfSellerOnlyOrders(@Param("sellerId") Long sellerId,
+                                         @Param("statuses") Collection<OrderStatus> statuses,
+                                         @Param("method") DeliveryMethod method,
+                                         Pageable pageable);
+
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping LEFT JOIN FETCH o.user WHERE o.id = :id")
     Optional<Order> findByIdWithShippingAndUser(@Param("id") Long id);
 

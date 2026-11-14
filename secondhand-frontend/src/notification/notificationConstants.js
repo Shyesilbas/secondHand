@@ -8,6 +8,9 @@ import {
   MessageSquare,
   Package,
   RefreshCw,
+  Scale,
+  ShieldAlert,
+  ShieldCheck,
   ShoppingBag,
   Star,
   Tag,
@@ -44,7 +47,17 @@ const ICONS = {
   PAYMENT_SUCCESS: CreditCard,
   PAYMENT_FAILED: CreditCard,
   AGREEMENT_UPDATED: FileText,
-  GREAT_SELLER_ACHIEVED: Award
+  GREAT_SELLER_ACHIEVED: Award,
+  COMPLAINT_REVIEWED: ShieldCheck,
+  MODERATION_SANCTION: ShieldAlert,
+  MODERATION_APPEAL_DECIDED: Scale
+};
+
+const PENALTY_LABELS = {
+  WARNING: ['moderation_penalty_warning', 'resmi uyarı'],
+  LISTING_SUSPENDED: ['moderation_penalty_listing_suspended', 'ilan askıya alma'],
+  TEMP_BAN_7_DAYS: ['moderation_penalty_temp_ban', '7 günlük kısıtlama'],
+  PERM_BAN: ['moderation_penalty_perm_ban', 'kalıcı engelleme']
 };
 
 export const getNotificationIcon = (type) => ICONS[type] || Bell;
@@ -236,7 +249,11 @@ export const describeNotification = (notification, t) => {
       const isCounterparty = meta.reason === 'COUNTERPARTY_CANCELLED' || /other party/i.test(fallbackMessage);
       return {
         title: tr('notif_order_cancelled_title', 'Sipariş iptal edildi'),
-        message: meta.reason === 'SHIP_DEADLINE_MISSED'
+        message: meta.reason === 'SELLER_RESTRICTED'
+          ? (!isSellerSide
+            ? tr('notif_order_seller_restricted_buyer', '{{prefix}}siparişi satıcının hesabı kısıtlandığı için iptal edildi; ödemen iade edildi.', { prefix })
+            : tr('notif_order_seller_restricted_seller', '{{prefix}}siparişi hesabın kısıtlandığı için otomatik olarak iptal edildi.', { prefix }))
+          : meta.reason === 'SHIP_DEADLINE_MISSED'
           ? (!isSellerSide
             ? tr('notif_order_ship_deadline_buyer', '{{prefix}}siparişi satıcı 72 saat içinde kargoya vermediği için iptal edildi; ödemen iade edildi.', { prefix })
             : tr('notif_order_ship_deadline_seller', '{{prefix}}siparişi 72 saat içinde kargoya verilmediği için otomatik olarak iptal edildi.', { prefix }))
@@ -421,6 +438,30 @@ export const describeNotification = (notification, t) => {
         title: tr('notif_great_seller_title', 'Harika satıcı rozetini kazandın'),
         message: tr('notif_great_seller_body', 'Rozetin artık profilinde görünüyor.')
       };
+    case 'COMPLAINT_REVIEWED':
+      return {
+        title: tr('notif_complaint_reviewed_title', 'Şikayetin incelendi'),
+        message: meta.complaintStatus === 'RESOLVED'
+          ? tr('notif_complaint_resolved_body', 'Şikayetin haklı bulundu ve gerekli işlem uygulandı.')
+          : tr('notif_complaint_dismissed_body', 'Şikayetin incelendi; kural ihlali tespit edilmedi.')
+      };
+    case 'MODERATION_SANCTION': {
+      const label = PENALTY_LABELS[meta.penaltyAction];
+      const penalty = label ? tr(label[0], label[1]) : tr('moderation_penalty_generic', 'moderasyon yaptırımı');
+      return {
+        title: tr('notif_moderation_sanction_title', 'Moderasyon kararı'),
+        message: meta.reason === 'BAD_FAITH_REPORT'
+          ? tr('notif_moderation_bad_faith_body', 'Kötü niyetli şikayet nedeniyle hesabına {{penalty}} uygulandı.', { penalty })
+          : tr('notif_moderation_sanction_body', 'Topluluk kuralları ihlali nedeniyle hesabına {{penalty}} uygulandı.', { penalty })
+      };
+    }
+    case 'MODERATION_APPEAL_DECIDED':
+      return {
+        title: tr('notif_moderation_appeal_title', 'İtirazın sonuçlandı'),
+        message: meta.appealStatus === 'APPROVED'
+          ? tr('notif_moderation_appeal_approved_body', 'İtirazın kabul edildi.')
+          : tr('notif_moderation_appeal_rejected_body', 'İtirazın incelendi; karar geçerliliğini koruyor.')
+      };
     default:
       return { title: notification?.title || tr('notification', 'Bildirim'), message: fallbackMessage };
   }
@@ -447,6 +488,10 @@ export const getNotificationTargetRoute = (notification) => {
     case 'ORDER_RECEIVED':
     case 'LISTING_SOLD':
       return ROUTES.I_SOLD;
+    case 'COMPLAINT_REVIEWED':
+    case 'MODERATION_SANCTION':
+    case 'MODERATION_APPEAL_DECIDED':
+      return ROUTES.COMPLAINTS;
     case 'PAYMENT_SUCCESS': {
       const txCode = meta.transactionTypeCode || '';
       const txLabel = meta.transactionType || '';

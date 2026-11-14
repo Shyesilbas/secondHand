@@ -52,6 +52,7 @@ public class UserController {
     private final IComplaintService complaintService;
     private final IOfferService offerService;
     private final GreatSellerService greatSellerService;
+    private final com.serhat.secondhand.user.application.UserRestrictionService userRestrictionService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
@@ -93,6 +94,12 @@ public class UserController {
     @GetMapping("/me/complaints")
     public ResponseEntity<java.util.List<ComplaintDto>> getMyComplaints(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(complaintService.getUserComplaints(currentUser));
+    }
+
+    @GetMapping("/me/restriction")
+    public ResponseEntity<com.serhat.secondhand.user.dto.RestrictionStatusDto> getMyRestriction(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userRestrictionService.status(currentUser.getId()));
     }
 
     @GetMapping("/me/complaints/received")

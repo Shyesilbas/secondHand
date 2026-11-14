@@ -45,5 +45,11 @@ public final class NotificationMetadataKeys {
     public static final String CHAT_ROOM_ID = "chatRoomId";
     public static final String SENDER_ID = "senderId";
     public static final String MESSAGE_ID = "messageId";
-}
 
+    public static final String COMPLAINT_ID = "complaintId";
+    public static final String COMPLAINT_STATUS = "complaintStatus";
+    public static final String PENALTY_ACTION = "penaltyAction";
+    public static final String BANNED_UNTIL = "bannedUntil";
+    public static final String APPEAL_STATUS = "appealStatus";
+    public static final String PENALTY_REVERSED = "penaltyReversed";
+}

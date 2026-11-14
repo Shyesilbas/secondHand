@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.category;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingValidationService;
@@ -27,6 +29,14 @@ public abstract class AbstractListingService<T extends Listing, C> {
     protected final ListingValidationEngine listingValidationEngine;
     protected final InventoryService inventoryService;
 
+    // Setter injection so the six vertical services keep their constructors.
+    protected UserRestrictionService userRestrictionService;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setUserRestrictionService(UserRestrictionService userRestrictionService) {
+        this.userRestrictionService = userRestrictionService;
+    }
+
     protected AbstractListingService(
             IUserService userService,
             ListingValidationService listingValidationService,
@@ -44,6 +54,11 @@ public abstract class AbstractListingService<T extends Listing, C> {
     @CacheEvict(value = "listing:userListings", allEntries = true)
     public Result<UUID> createListing(C request, Long sellerId) {
         log.info("Creating {} listing for sellerId: {}", getListingType(), sellerId);
+
+        Result<Void> restriction = userRestrictionService.check(sellerId, RestrictedAction.CREATE_LISTING);
+        if (restriction.isError()) {
+            return Result.error(restriction.getMessage(), restriction.getErrorCode());
+        }
 
         Result<User> sellerResult = userService.findById(sellerId);
         if (sellerResult.isError()) {

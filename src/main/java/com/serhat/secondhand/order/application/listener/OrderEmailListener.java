@@ -68,15 +68,23 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String displayName = getOrderDisplayName(order.getName(), order.getOrderNumber());
-            // For a missed ship deadline the requester is the refunded buyer and the others are the seller(s).
-            String content = event.shipDeadlineMissed()
-                    ? "Siparişiniz (" + displayName + ") satıcı " + OrderBusinessConstants.SHIP_DEADLINE_HOURS
-                        + " saat içinde kargoya vermediği için iptal edildi ve ödemeniz iade edildi."
-                    : "Siparişiniz (" + displayName + ") iptal edilmiştir.";
-            String counterpartyMessage = event.shipDeadlineMissed()
-                    ? "Sipariş " + displayName + " " + OrderBusinessConstants.SHIP_DEADLINE_HOURS
-                        + " saat içinde kargoya verilmediği için otomatik olarak iptal edildi."
-                    : "Sipariş " + displayName + " karşı taraf tarafından iptal edildi.";
+            // For a system cancellation the requester is the refunded buyer and the others are the seller(s).
+            String content = switch (event.cause()) {
+                case SHIP_DEADLINE_MISSED -> "Siparişiniz (" + displayName + ") satıcı "
+                        + OrderBusinessConstants.SHIP_DEADLINE_HOURS
+                        + " saat içinde kargoya vermediği için iptal edildi ve ödemeniz iade edildi.";
+                case SELLER_RESTRICTED -> "Siparişiniz (" + displayName
+                        + ") satıcı hesabı kısıtlandığı için iptal edildi ve ödemeniz iade edildi.";
+                case PARTICIPANT_REQUEST -> "Siparişiniz (" + displayName + ") iptal edilmiştir.";
+            };
+            String counterpartyMessage = switch (event.cause()) {
+                case SHIP_DEADLINE_MISSED -> "Sipariş " + displayName + " "
+                        + OrderBusinessConstants.SHIP_DEADLINE_HOURS
+                        + " saat içinde kargoya verilmediği için otomatik olarak iptal edildi.";
+                case SELLER_RESTRICTED -> "Sipariş " + displayName
+                        + " hesabınız kısıtlandığı için otomatik olarak iptal edildi ve alıcıya iade yapıldı.";
+                case PARTICIPANT_REQUEST -> "Sipariş " + displayName + " karşı taraf tarafından iptal edildi.";
+            };
 
             var data1 = GenericEmailData.builder()
                     .userName(event.requester().getName())

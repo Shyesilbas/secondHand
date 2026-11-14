@@ -3,6 +3,7 @@ package com.serhat.secondhand.order.application.listener;
 import com.serhat.secondhand.notification.application.INotificationService;
 import com.serhat.secondhand.notification.template.NotificationTemplateCatalog;
 import com.serhat.secondhand.order.application.OrderLogService;
+import com.serhat.secondhand.order.application.event.OrderCancellationCause;
 import com.serhat.secondhand.order.application.event.OrderCancelledEvent;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.application.event.OrderCompletedEvent;
@@ -59,8 +60,8 @@ public class OrderNotificationListener {
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onOrderCancelled(OrderCancelledEvent event) {
-        if (event.shipDeadlineMissed()) {
-            notifyShipDeadlineCancellation(event);
+        if (event.cause().isSystemCancellation()) {
+            notifySystemCancellation(event);
             return;
         }
         try {
@@ -188,25 +189,30 @@ public class OrderNotificationListener {
 
     // ── Private helpers ──────────────────────────────────────────────────────
 
-    // Nobody "cancelled" this order: the buyer is told about the refund, each seller about the missed deadline.
-    private void notifyShipDeadlineCancellation(OrderCancelledEvent event) {
+    // Nobody "cancelled" this order: the buyer is told about the refund, each seller about the cause.
+    private void notifySystemCancellation(OrderCancelledEvent event) {
         String orderNumber = event.order().getOrderNumber();
         try {
             Order order = orderRepository.findByIdWithOrderItemsAndSellers(event.order().getId()).orElse(event.order());
             OrderItemSummary summary = summarizeOrder(order);
             Long buyerId = order.getUser() != null ? order.getUser().getId() : null;
             for (Long uid : collectOrderParticipantIds(order)) {
-                var result = notificationService.createAndSend(
-                        notificationTemplateCatalog.orderCancelledShipDeadline(
+                boolean sellerSide = !uid.equals(buyerId);
+                var request = event.cause() == OrderCancellationCause.SELLER_RESTRICTED
+                        ? notificationTemplateCatalog.orderCancelledSellerRestricted(
+                                uid, order.getId(), orderNumber, sellerSide,
+                                summary.listingId(), summary.listingTitle(), summary.itemCount())
+                        : notificationTemplateCatalog.orderCancelledShipDeadline(
                                 uid, order.getId(), orderNumber,
-                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, !uid.equals(buyerId),
-                                summary.listingId(), summary.listingTitle(), summary.itemCount()));
+                                OrderBusinessConstants.SHIP_DEADLINE_HOURS, sellerSide,
+                                summary.listingId(), summary.listingTitle(), summary.itemCount());
+                var result = notificationService.createAndSend(request);
                 if (result.isError()) {
-                    orderLog.logNotificationFailed("orderShipDeadlineCancelledInApp", orderNumber, result.getMessage());
+                    orderLog.logNotificationFailed("orderSystemCancelledInApp", orderNumber, result.getMessage());
                 }
             }
         } catch (Exception e) {
-            orderLog.logNotificationFailed("orderShipDeadlineCancelledInApp", orderNumber, e.getMessage());
+            orderLog.logNotificationFailed("orderSystemCancelledInApp", orderNumber, e.getMessage());
         }
     }
 

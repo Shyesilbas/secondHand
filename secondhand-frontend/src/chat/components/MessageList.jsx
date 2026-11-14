@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { memo, useState, useRef, useLayoutEffect } from 'react';
-import { Trash2 as TrashIcon } from 'lucide-react';
+import { Flag, Trash2 as TrashIcon } from 'lucide-react';
 import { formatRelativeTime } from '../../common/utils/dateFormat.js';
 import { sameChatId } from '../chatIdUtils.js';
 import { InChatOfferCard } from './InChatOfferCard.jsx';
@@ -10,6 +10,7 @@ const MessageBubble = memo(({
  message,
  isOwnMessage,
  onDeleteMessage,
+ onReportMessage,
  currentUserId
 }) => {
  const { t } = useTranslation();
@@ -35,6 +36,9 @@ const MessageBubble = memo(({
  </p>
  {isOwnMessage && <div className={`w-2 h-2 rounded-full ml-2 ${isOwnMessage ? 'bg-secondary-300' : 'bg-text-muted'}`}></div>}
  </div>
+ {!isOwnMessage && showDeleteButton && onReportMessage && <button type="button" onClick={() => onReportMessage(message)} className="absolute -top-2 -right-2 rounded-full border border-border-light bg-background-primary p-1.5 text-text-secondary transition-colors duration-150 hover:text-status-error-text" title={t("report_message", "Report message")} aria-label={t("report_message", "Report message")}>
+ <Flag className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+ </button>}
  {isOwnMessage && showDeleteButton && onDeleteMessage && <button type="button" onClick={handleDeleteClick} className="absolute -top-2 -right-2 bg-status-error text-white rounded-full p-1.5 hover:bg-status-error-text transition-all duration-300 ease-in-out transform" title={t("delete_message")}>
  <TrashIcon className="w-3 h-3" />
  </button>}
@@ -49,6 +53,7 @@ const MessageList = memo(({
  messagesContainerRef,
  user,
  onDeleteMessage,
+ onReportMessage,
  fetchNextPage,
  hasNextPage,
  isFetchingNextPage
@@ -104,7 +109,7 @@ const MessageList = memo(({
  </div>
  <h3 className="text-sm font-medium text-text-primary mb-1 tracking-tight">{t("no_messages_yet")}</h3>
  <p className="text-xs text-text-tertiary tracking-tight">{t("send_the_first_message")}</p>
- </div> : messages.map(message => <MessageBubble key={message.id} message={message} isOwnMessage={sameChatId(message.senderId, user?.id)} onDeleteMessage={onDeleteMessage} />)}
+ </div> : messages.map(message => <MessageBubble key={message.id} message={message} isOwnMessage={sameChatId(message.senderId, user?.id)} onDeleteMessage={onDeleteMessage} onReportMessage={onReportMessage} />)}
  <div ref={messagesEndRef} />
  </div>;
 });

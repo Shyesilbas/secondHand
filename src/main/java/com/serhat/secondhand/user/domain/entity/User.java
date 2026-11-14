@@ -165,6 +165,27 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean autoRenew = true;
 
+    @Column(name = "warning_count", nullable = false)
+    @Builder.Default
+    private Integer warningCount = 0;
+
+    @Column(name = "banned_until")
+    private LocalDateTime bannedUntil;
+
+    @Column(name = "restriction_reason")
+    private String restrictionReason;
+
+    @Column(name = "last_penalized_at")
+    private LocalDateTime lastPenalizedAt;
+
+    @Column(name = "is_chat_restricted", nullable = false)
+    @Builder.Default
+    private boolean chatRestricted = false;
+
+    @Column(name = "is_listing_restricted", nullable = false)
+    @Builder.Default
+    private boolean listingRestricted = false;
+
     public boolean isPremium() {
         return plan == MembershipPlan.PREMIUM && expirationDate != null && !LocalDateTime.now().isAfter(expirationDate);
     }

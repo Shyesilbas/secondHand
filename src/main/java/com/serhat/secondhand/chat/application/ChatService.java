@@ -1,5 +1,7 @@
 package com.serhat.secondhand.chat.application;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.chat.dto.ChatMessageDto;
 import com.serhat.secondhand.chat.dto.ChatRoomDto;
 import com.serhat.secondhand.chat.enricher.ChatEnrichmentContext;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChatService {
+
+    private final UserRestrictionService userRestrictionService;
 
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
@@ -193,6 +197,7 @@ public class ChatService {
     @Transactional
 
     public ChatMessageDto sendMessage(ChatMessageDto dto) {
+        userRestrictionService.require(dto.getSenderId(), RestrictedAction.SEND_MESSAGE);
 
         Result<Void> contentResult = chatAuthorizationService.validateMessageContent(dto.getContent());
         if (contentResult.isError()) {

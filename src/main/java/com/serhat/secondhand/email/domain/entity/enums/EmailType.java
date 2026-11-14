@@ -40,7 +40,15 @@ public enum EmailType {
     AUDIT_ALERT("Audit Alert"),
     ESCROW_RELEASED("Escrow Released"),
     LISTING_APPROVED("Listing Approved"),
-    REVIEW_SUBMITTED("Review Submitted");
+    REVIEW_SUBMITTED("Review Submitted"),
+    COMPLAINT_SUBMITTED("Complaint Submitted"),
+    COMPLAINT_RESOLVED("Complaint Resolved"),
+    COMPLAINT_DISMISSED("Complaint Dismissed"),
+    MODERATION_WARNING("Moderation Warning"),
+    MODERATION_LISTING_SUSPENDED("Listing Suspended"),
+    MODERATION_TEMP_BAN("Account Temporarily Restricted"),
+    MODERATION_PERM_BAN("Account Closed"),
+    MODERATION_APPEAL_OUTCOME("Appeal Outcome");
 
     private final String label;
 

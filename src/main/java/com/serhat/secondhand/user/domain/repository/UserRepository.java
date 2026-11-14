@@ -66,4 +66,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
              WHERE id = :userId AND daily_aura_reset_date = :today AND daily_aura_usage > 0
             """, nativeQuery = true)
     int releaseAuraSlot(@Param("userId") Long userId, @Param("today") java.time.LocalDate today);
+
+    interface RestrictionState {
+        com.serhat.secondhand.user.domain.entity.enums.AccountStatus getAccountStatus();
+        java.time.LocalDateTime getBannedUntil();
+        boolean isChatRestricted();
+        boolean isListingRestricted();
+    }
+
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT u.accountStatus AS accountStatus, u.bannedUntil AS bannedUntil, " +
+            "u.chatRestricted AS chatRestricted, u.listingRestricted AS listingRestricted " +
+            "FROM User u WHERE u.id = :id")
+    java.util.Optional<RestrictionState> findRestrictionStateById(@org.springframework.data.repository.query.Param("id") Long id);
 }

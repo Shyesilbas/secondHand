@@ -73,6 +73,7 @@ public class EmailConfig {
     private Order order = new Order();
     private Offer offer = new Offer();
     private Follow follow = new Follow();
+    private Moderation moderation = new Moderation();
 
     @Getter
     @Setter
@@ -129,5 +130,33 @@ public class EmailConfig {
             return "%s %s yeni bir ilan ekledi!";
         }
     }
-}
 
+    @Getter
+    @Setter
+    public class Moderation {
+        public String getComplaintSubmittedSubject() {
+            return getSubject("email.subject.complaint-submitted");
+        }
+        public String getComplaintResolvedSubject() {
+            return getSubject("email.subject.complaint-resolved");
+        }
+        public String getComplaintDismissedSubject() {
+            return getSubject("email.subject.complaint-dismissed");
+        }
+        public String getWarningSubject() {
+            return getSubject("email.subject.moderation-warning");
+        }
+        public String getListingSuspendedSubject() {
+            return getSubject("email.subject.moderation-listing-suspended");
+        }
+        public String getTempBanSubject() {
+            return getSubject("email.subject.moderation-temp-ban");
+        }
+        public String getPermBanSubject() {
+            return getSubject("email.subject.moderation-perm-ban");
+        }
+        public String getAppealOutcomeSubject() {
+            return getSubject("email.subject.moderation-appeal-outcome");
+        }
+    }
+}

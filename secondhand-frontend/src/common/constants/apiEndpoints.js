@@ -102,6 +102,9 @@ export const API_ENDPOINTS = {
     COMPLAINTS: {
         CREATE: '/v1/complaints',
         MY_COMPLAINTS: '/v1/users/me/complaints',
+        RECEIVED: '/v1/users/me/complaints/received',
+        APPEAL: (complaintId) => `/v1/complaints/${complaintId}/appeal`,
+        MY_RESTRICTION: '/v1/users/me/restriction',
     },
     EMAILS: {
         MY_EMAILS: '/v1/emails/my-emails',

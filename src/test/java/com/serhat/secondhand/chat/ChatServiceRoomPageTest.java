@@ -38,7 +38,7 @@ class ChatServiceRoomPageTest {
     private final ChatRoomEnricher enricher = mock(ChatRoomEnricher.class);
 
     private final ChatService chatService = new ChatService(
-            roomRepository, messageRepository, mock(ListingRepository.class), mock(IUserService.class),
+            com.serhat.secondhand.user.RestrictionTestSupport.allowAll(), roomRepository, messageRepository, mock(ListingRepository.class), mock(IUserService.class),
             new ChatRoomMapper(), mock(ChatMessageMapper.class), enricher, mock(ChatNotificationService.class),
             mock(ChatRoomUpdater.class), mock(ChatAuthorizationService.class), mock(IOfferService.class),
             mock(OfferRepository.class));

@@ -5,7 +5,7 @@ Orchestrates the Aura conversational assistant (Google Gemini), semantic multi-v
 > [!NOTE]
 > **Related Documentation & Runbooks:**
 > - **Architecture Deep Dive:** [`docs/aura-ai-and-context-architecture.md`](/docs/aura-ai-and-context-architecture.md) (search planning, context adapters, price gauge, quota mechanics)
-> - **Proposal (not implemented):** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](/docs/proposals/aura-trust-safety-and-complaint-moderation.md)
+> - **Complaint moderation:** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](/docs/proposals/aura-trust-safety-and-complaint-moderation.md) — uses `GeminiClient.generateStrictJson` (one call, response schema, optional inline images, 15 s timeout, throws instead of returning placeholder text).
 > - **Frontend Module:** [`secondhand-frontend/src/ai/README.md`](/secondhand-frontend/src/ai/README.md)
 > - **Key Entry Points:** [`AgentController`](agent/api/AgentController.java) · [`AgentQueryService`](agent/query/AgentQueryService.java) · [`AuraListingSearchOrchestrator`](agent/search/AuraListingSearchOrchestrator.java) · [`AiSummaryController`](api/AiSummaryController.java) · [`AiChatController`](api/AiChatController.java) · [`MemoryService`](memory/service/MemoryService.java) · [`MemoryConversationService`](memory/service/MemoryConversationService.java)
 

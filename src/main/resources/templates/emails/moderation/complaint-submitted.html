@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şikayetiniz Alındı</title>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: #0f172a; font-size: 14px; line-height: 1.6; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 640px; margin: 0 auto; padding: 18px 24px; background-color: #ffffff; }
+        .header { padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+        .brand-name { font-size: 12px; font-weight: 500; color: #64748b; margin-bottom: 4px; }
+        .header h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #0f172a; }
+        .content { color: #334155; font-size: 14px; line-height: 1.6; }
+        .content p { margin: 0 0 10px 0; font-size: 14px; }
+        .greeting { font-weight: 600; color: #0f172a; }
+        .details { width: 100%; border-collapse: collapse; margin: 6px 0 14px 0; }
+        .details td { padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: top; }
+        .details td.label { color: #64748b; width: 40%; }
+        .details td.value { color: #0f172a; font-weight: 600; }
+        .note { border-left: 3px solid #64748b; padding: 8px 12px; margin: 0 0 14px 0; background-color: #f8fafc; white-space: pre-wrap; font-size: 13px; color: #334155; }
+        .note-title { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; white-space: normal; }
+        .signoff { margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 10px; font-size: 13px; color: #475569; }
+        .footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-name">SecondHand</div>
+            <h1>Şikayetiniz Alındı</h1>
+        </div>
+        <div class="content">
+            <p class="greeting" th:text="#{email.body.hello(${userName})}">Merhaba Kullanıcı,</p>
+            <p>Şikayetiniz kayda alındı. Kısa bir bekleme süresinin ardından Aura güvenlik sistemi tarafından incelenecek ve sonuç size e-posta ile bildirilecektir.</p>
+            <table class="details" role="presentation">
+                <tr><td class="label">Şikayet No</td><td class="value" th:text="${complaintId}">-</td></tr>
+                <tr th:if="${targetLabel != null}"><td class="label">Şikayet Edilen</td><td class="value" th:text="${targetLabel}">-</td></tr>
+                <tr><td class="label">Sebep</td><td class="value" th:text="${reason}">-</td></tr>
+                <tr th:if="${eligibleAt != null}"><td class="label">İnceleme Başlangıcı</td><td class="value" th:text="${eligibleAt}">-</td></tr>
+            </table>
+            <p>İnceleme sürecinde aynı kullanıcı hakkında yeni bir şikayet açamazsınız. Sürecin durumunu Şikayetlerim ekranından takip edebilirsiniz.</p>
+
+            <p class="signoff" th:utext="#{email.body.team}">Saygılarımızla,<br><strong style="color: #0f172a; font-weight: 600;">SecondHand Ekibi</strong></p>
+        </div>
+        <div class="footer" th:text="#{email.footer.copyright}">&copy; 2026 SecondHand Pazaryeri. Tüm hakları saklıdır.</div>
+    </div>
+</body>
+</html>

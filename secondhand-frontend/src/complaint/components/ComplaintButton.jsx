@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from 'react';
 import { AlertTriangle as ExclamationTriangleIcon } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { useComplaints } from '../hooks/useComplaints.js';
+import { useCreateComplaint } from '../hooks/useComplaints.js';
 import ComplaintModal from './ComplaintModal.jsx';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
@@ -19,16 +19,13 @@ const ComplaintButton = ({
  t
  } = useTranslation();
  const [showModal, setShowModal] = useState(false);
- const [isSubmitting, setIsSubmitting] = useState(false);
  const {
  authState: {
  user: currentUser,
  isAuthenticated
  }
  } = useAuth();
- const {
- createComplaint
- } = useComplaints();
+ const createMutation = useCreateComplaint();
  const promptLogin = useLoginPrompt();
  const handleReportClick = () => {
  if (!isAuthenticated) {
@@ -40,24 +37,19 @@ const ComplaintButton = ({
  const handleComplaint = async complaintData => {
  if (!currentUser?.id) throw new Error('User not authenticated');
  if (!targetUser?.id && !targetUserId) throw new Error('Target user not found');
- setIsSubmitting(true);
- try {
- await createComplaint({
- complainerId: currentUser.id,
+ await createMutation.mutateAsync({
  complainedUserId: targetUser?.id || targetUserId,
  listingId,
  reason: complaintData.reason,
- description: complaintData.description
+ description: complaintData.description,
+ evidenceImageUrls: complaintData.evidenceImageUrls
  });
- } finally {
- setIsSubmitting(false);
- }
  };
  return <>
  <button type="button" onClick={handleReportClick} className={variant === "ghost" ? `${buttonClasses('ghost', 'sm')} ${className}` : `inline-flex items-center gap-2 px-3 py-2 bg-secondary-600 text-white rounded hover:bg-secondary-700 transition-colors text-sm ${className}`} title={`Report ${targetUserName}`}>
  <ExclamationTriangleIcon className="w-4 h-4" strokeWidth={1.5} aria-hidden />{t("report")}</button>
 
- <ComplaintModal isOpen={showModal} onClose={() => setShowModal(false)} onSubmit={handleComplaint} targetUserName={targetUserName} targetUserId={targetUserId} listingId={listingId} listingTitle={listingTitle} isLoading={isSubmitting} />
+ <ComplaintModal isOpen={showModal} onClose={() => setShowModal(false)} onSubmit={handleComplaint} targetUserName={targetUserName} targetUserId={targetUserId} listingId={listingId} listingTitle={listingTitle} isLoading={createMutation.isPending} />
  </>;
 };
 export default ComplaintButton;

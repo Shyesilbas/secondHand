@@ -55,6 +55,25 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
+    /**
+     * Complaint moderation batches (Gemini calls, up to 15 s each) run here so they never hold the
+     * shared scheduler thread. One thread: the worker lock allows one batch at a time anyway.
+     */
+    @Bean(name = "moderationExecutor")
+    public ThreadPoolTaskExecutor moderationExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(1);
+        executor.setThreadNamePrefix("moderation-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setRejectedExecutionHandler((r, e) ->
+            log.warn("Moderation batch rejected, previous batch still running"));
+        executor.initialize();
+        return executor;
+    }
+
     @Bean(name = "emailExecutor")
     public ThreadPoolTaskExecutor emailExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

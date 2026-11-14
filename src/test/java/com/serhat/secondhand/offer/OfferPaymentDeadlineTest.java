@@ -40,7 +40,7 @@ class OfferPaymentDeadlineTest {
     private final OfferStockHoldService stockHold = new OfferStockHoldService(mock(InventoryRedisReservationService.class));
 
     private final OfferService offerService = new OfferService(offerRepository, listingService, userService,
-            notifications, validator, mock(OfferMapper.class), stockHold, config);
+            notifications, validator, mock(OfferMapper.class), stockHold, config, com.serhat.secondhand.user.RestrictionTestSupport.allowAll());
     private final OfferScheduler scheduler = new OfferScheduler(offerRepository, notifications, stockHold);
 
     private static Offer offer(OfferStatus status, LocalDateTime expiresAt) {

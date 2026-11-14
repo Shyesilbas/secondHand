@@ -10,6 +10,8 @@ import java.util.List;
 public interface IComplaintService {
     
     Result<ComplaintDto> createComplaint(Long userId, ComplaintRequest complaintRequest);
+
+    Result<ComplaintDto> submitAppeal(Long userId, String complaintId, com.serhat.secondhand.complaint.AppealRequest request);
     
     List<ComplaintDto> getUserComplaints(User user);
     

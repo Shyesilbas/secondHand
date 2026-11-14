@@ -1,5 +1,7 @@
 package com.serhat.secondhand.checkout.application;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.result.Result;
@@ -53,6 +55,7 @@ public class CheckoutOrchestrator {
     private final CheckoutPricingContextFactory checkoutPricingContextFactory;
     private final CheckoutStockReservationService checkoutStockReservationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserRestrictionService userRestrictionService;
 
     /**
      * Places one order per seller in a single transaction. Every order is paid and put in escrow
@@ -61,6 +64,11 @@ public class CheckoutOrchestrator {
     @Transactional
     public Result<CheckoutResultDto> executeCheckout(Long userId, CheckoutRequest request) {
         log.info("Executing checkout for userId: {}", userId);
+
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CHECKOUT);
+        if (restriction.isError()) {
+            return Result.error(restriction.getMessage(), restriction.getErrorCode());
+        }
 
         Result<CheckoutPricingContextFactory.CheckoutPricingContext> pricingContextResult =
                 checkoutPricingContextFactory.build(userId, request);

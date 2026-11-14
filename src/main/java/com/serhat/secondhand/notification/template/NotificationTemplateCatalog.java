@@ -449,6 +449,29 @@ public class NotificationTemplateCatalog {
                 toJson(payload));
     }
 
+    public NotificationRequest orderCancelledSellerRestricted(Long userId, Long orderId, String orderNumber,
+                                                              boolean sellerSide, UUID listingId,
+                                                              String listingTitle, Integer itemCount) {
+        String message = sellerSide
+                ? "Order #" + safe(orderNumber) + " was cancelled because your account is restricted."
+                : "Order #" + safe(orderNumber) + " was cancelled because the seller's account is restricted. Your payment was refunded.";
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.ORDER_ID, safeId(orderId));
+        payload.put(NotificationMetadataKeys.ORDER_NUMBER, safe(orderNumber));
+        payload.put(NotificationMetadataKeys.REASON, "SELLER_RESTRICTED");
+        payload.put(NotificationMetadataKeys.RECIPIENT_ROLE, sellerSide ? "SELLER" : "BUYER");
+        payload.put(NotificationMetadataKeys.LISTING_ID, safeUuid(listingId));
+        payload.put(NotificationMetadataKeys.LISTING_TITLE, safe(listingTitle));
+        payload.put(NotificationMetadataKeys.ITEM_COUNT, safeId(itemCount));
+        return NotificationRequest.of(
+                userId,
+                NotificationType.ORDER_CANCELLED,
+                "Order cancelled",
+                message,
+                sellerSide ? "/profile/i-sold" : "/profile/orders",
+                toJson(payload));
+    }
+
     public NotificationRequest orderCancelledCounterparty(Long userId, Long orderId, String orderNumber) {
         return orderCancelledCounterparty(userId, orderId, orderNumber, null, null, null);
     }
@@ -479,6 +502,44 @@ public class NotificationTemplateCatalog {
                 "You earned the Great Seller badge. Keep up the great work!",
                 "/profile",
                 toJson(Map.of(NotificationMetadataKeys.USER_ID, safeId(userId))));
+    }
+
+    /** Outcome of the user's own complaint; {@code status} is RESOLVED or DISMISSED. */
+    public NotificationRequest complaintReviewed(Long userId, String complaintId, String status) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.COMPLAINT_ID, safe(complaintId));
+        payload.put(NotificationMetadataKeys.COMPLAINT_STATUS, safe(status));
+        String message = "RESOLVED".equals(status)
+                ? "Your complaint was reviewed and the reported user was sanctioned."
+                : "Your complaint was reviewed; no rule violation was found.";
+        return NotificationRequest.of(userId, NotificationType.COMPLAINT_REVIEWED, "Complaint reviewed", message,
+                "/complaints", toJson(payload));
+    }
+
+    /** A moderation penalty applied to {@code userId}; {@code bannedUntil} only for a temporary ban. */
+    public NotificationRequest moderationSanction(Long userId, String complaintId, String penaltyAction,
+                                                  java.time.LocalDateTime bannedUntil, boolean badFaithReport) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.COMPLAINT_ID, safe(complaintId));
+        payload.put(NotificationMetadataKeys.PENALTY_ACTION, safe(penaltyAction));
+        payload.put(NotificationMetadataKeys.BANNED_UNTIL, bannedUntil == null ? "" : bannedUntil.toString());
+        payload.put(NotificationMetadataKeys.REASON, badFaithReport ? "BAD_FAITH_REPORT" : "COMMUNITY_RULES");
+        return NotificationRequest.of(userId, NotificationType.MODERATION_SANCTION, "Moderation decision",
+                "A moderation penalty (" + safe(penaltyAction) + ") was applied to your account.",
+                "/complaints", toJson(payload));
+    }
+
+    public NotificationRequest moderationAppealDecided(Long userId, String complaintId, String appealStatus,
+                                                       boolean penaltyReversed) {
+        Map<String, String> payload = new LinkedHashMap<>();
+        payload.put(NotificationMetadataKeys.COMPLAINT_ID, safe(complaintId));
+        payload.put(NotificationMetadataKeys.APPEAL_STATUS, safe(appealStatus));
+        payload.put(NotificationMetadataKeys.PENALTY_REVERSED, String.valueOf(penaltyReversed));
+        String message = "APPROVED".equals(appealStatus)
+                ? "Your appeal was approved."
+                : "Your appeal was reviewed and the decision stands.";
+        return NotificationRequest.of(userId, NotificationType.MODERATION_APPEAL_DECIDED, "Appeal decided", message,
+                "/complaints", toJson(payload));
     }
 
     private String toJson(Map<String, String> payload) {

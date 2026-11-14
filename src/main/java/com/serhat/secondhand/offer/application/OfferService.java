@@ -1,5 +1,7 @@
 package com.serhat.secondhand.offer.application;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.offer.config.OfferConfigProperties;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
@@ -42,9 +44,12 @@ public class OfferService implements IOfferService {
     private final OfferMapper offerMapper;
     private final OfferStockHoldService offerStockHoldService;
     private final OfferConfigProperties offerConfigProperties;
+    private final UserRestrictionService userRestrictionService;
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
+        Result<Void> restriction = userRestrictionService.check(buyerId, RestrictedAction.MAKE_OFFER);
+        if (restriction.isError()) return restriction.propagateError();
         Result<User> buyerResult = findUser(buyerId);
         if (buyerResult.isError()) return buyerResult.propagateError();
         User buyer = buyerResult.getData();
@@ -175,6 +180,8 @@ public class OfferService implements IOfferService {
 
     @Transactional
     public Result<OfferDto> counter(Long userId, UUID offerId, CounterOfferRequest request) {
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.MAKE_OFFER);
+        if (restriction.isError()) return restriction.propagateError();
         Result<User> userResult = findUser(userId);
         if (userResult.isError()) return userResult.propagateError();
         User user = userResult.getData();
@@ -334,6 +341,8 @@ public class OfferService implements IOfferService {
     @Override
     @Transactional
     public Result<OfferDto> createSellerOffer(Long sellerId, Long buyerId, UUID listingId, java.math.BigDecimal price, int expirationHours) {
+        Result<Void> restriction = userRestrictionService.check(sellerId, RestrictedAction.MAKE_OFFER);
+        if (restriction.isError()) return restriction.propagateError();
         Result<User> sellerResult = findUser(sellerId);
         if (sellerResult.isError()) return sellerResult.propagateError();
         User seller = sellerResult.getData();

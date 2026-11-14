@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.common;
 
+import com.serhat.secondhand.user.application.UserRestrictionService;
+import com.serhat.secondhand.user.domain.entity.enums.RestrictedAction;
 import com.serhat.secondhand.core.config.ListingConfig;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
@@ -37,6 +39,7 @@ public class ListingCommandService {
     private final PriceHistoryService priceHistoryService;
     private final EntityManager entityManager;
     private final InventoryService inventoryService;
+    private final UserRestrictionService userRestrictionService;
     private static final List<ListingStatus> EDITABLE_STATUSES = List.of(
             ListingStatus.DRAFT,
             ListingStatus.ACTIVE,
@@ -44,6 +47,10 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> publish(UUID listingId, Long userId) {
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CREATE_LISTING);
+        if (restriction.isError()) {
+            return restriction;
+        }
         try {
             Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
             listing.publish();
@@ -58,6 +65,10 @@ public class ListingCommandService {
 
     @org.springframework.cache.annotation.CacheEvict(allEntries = true)
     public Result<Void> reactivate(UUID listingId, Long userId) {
+        Result<Void> restriction = userRestrictionService.check(userId, RestrictedAction.CREATE_LISTING);
+        if (restriction.isError()) {
+            return restriction;
+        }
         try {
             Listing listing = listingValidationService.findAndValidateOwner(listingId, userId);
             listing.reactivate();

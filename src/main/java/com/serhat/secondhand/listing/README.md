@@ -13,6 +13,7 @@ Manages the 6-vertical polymorphic product catalog (`VehicleListing`, `Electroni
 - **Joined Polymorphism & Rule-Driven Validation:** Base `listings` rows join to `vehicle_listings`, `electronic_listings`, `real_estate_listings`, `book_listings`, `clothing_listings`, and `sports_listings`. `ListingValidationEngine` runs location checks, category `CategorySpecValidator`s (`*TypeRulesValidator` + `*HierarchyValidator`), and `ListingAttributeValidator` (`listing_attribute_definitions` stored in `listings.attributes` JSONB with GIN index `idx_listings_attributes_gin`).
 - **Deterministic Spec Snapshotters:** `VehicleSpecSnapshotter`, `ElectronicSpecSnapshotter`, and `BooksEditionSnapshotter` overwrite client inputs with non-null verified catalog facts on create and update; unlinked listings remain allowed as unverified.
 - **Lifecycle & Price History (`ListingStatus`):** Transitions across `DRAFT`, `ACTIVE` (publishes `NewListingCreatedEvent`), `INACTIVE`, `RESERVED` (24h accepted offer hold), `SOLD`, and `DELETED`. Modifying `price` triggers `@TrackPriceChange` (`listing_price_histories`).
+- **Moderation Takedowns:** `ListingModerationService` moves `ACTIVE` listings to `INACTIVE` for complaint sanctions without an owner check; it requires the caller's transaction.
 - **Debounced Views & Social Proof:** `ListingViewService` records views asynchronously with IP/session/user debounce. `ListingSocialProofService` combines 24h active viewers, in-cart count, and favorite count in one payload.
 
 ## Redis & Caching
