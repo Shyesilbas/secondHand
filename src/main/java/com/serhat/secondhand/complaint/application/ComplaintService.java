@@ -1,5 +1,6 @@
 package com.serhat.secondhand.complaint.application;
 
+import com.serhat.secondhand.chat.application.ChatAuthorizationService;
 import com.serhat.secondhand.complaint.AppealRequest;
 import com.serhat.secondhand.complaint.Complaint;
 import com.serhat.secondhand.complaint.ComplaintDto;
@@ -25,6 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +44,7 @@ public class ComplaintService implements IComplaintService {
     private final ComplaintModerationProperties moderationProperties;
     private final ApplicationEventPublisher eventPublisher;
     private final ComplaintRateLimiter complaintRateLimiter;
+    private final ChatAuthorizationService chatAuthorizationService;
 
 
     @Transactional
@@ -99,7 +105,7 @@ public class ComplaintService implements IComplaintService {
                 savedComplaint.getEligibleForReviewAt()));
 
         log.info("Complaint created with ID: {}", savedComplaint.getId());
-        return Result.success(complaintMapper.mapComplaintToDto(savedComplaint));
+        return Result.success(toDtos(List.of(savedComplaint)).get(0));
     }
 
 
@@ -123,22 +129,31 @@ public class ComplaintService implements IComplaintService {
         log.info("Appeal filed for complaint {} by user {}", complaintId, userId);
         Complaint updated = complaintRepository.findByIdWithDetails(complaintId)
                 .orElseThrow(() -> new IllegalStateException("Complaint " + complaintId + " disappeared after appeal"));
-        return Result.success(complaintMapper.mapComplaintToDto(updated));
+        return Result.success(toDtos(List.of(updated)).get(0));
     }
 
     @Transactional(readOnly = true)
     public List<ComplaintDto> getUserComplaints(User user) {
         log.info("Getting complaints for user: {}", user.getId());
-        return complaintRepository.findByComplainerWithDetails(user).stream()
-                .map(complaintMapper::mapComplaintToDto)
-                .toList();
+        return toDtos(complaintRepository.findByComplainerWithDetails(user));
     }
 
     @Transactional(readOnly = true)
     public List<ComplaintDto> getComplaintsAboutUser(User user) {
         log.info("Getting complaints about user: {}", user.getId());
-        return complaintRepository.findByComplainedUserWithDetails(user).stream()
-                .map(complaintMapper::mapComplaintToDto)
+        return toDtos(complaintRepository.findByComplainedUserWithDetails(user));
+    }
+
+    /** Maps complaints in one batch so the reported message contents are loaded with a single query. */
+    private List<ComplaintDto> toDtos(List<Complaint> complaints) {
+        Set<Long> messageIds = complaints.stream()
+                .map(Complaint::getReportedMessageId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Long, String> messageContents = chatAuthorizationService.findMessageContents(messageIds);
+        return complaints.stream()
+                .map(complaint -> complaintMapper.mapComplaintToDto(complaint,
+                        complaint.getReportedMessageId() == null ? null : messageContents.get(complaint.getReportedMessageId())))
                 .toList();
     }
 

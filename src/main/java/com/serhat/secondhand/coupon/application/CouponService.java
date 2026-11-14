@@ -1,5 +1,6 @@
 package com.serhat.secondhand.coupon.application;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import com.serhat.secondhand.core.result.Result;
@@ -353,16 +354,13 @@ public class CouponService {
         if (types == null || types.isEmpty()) {
             return Result.success(defaultEligibleTypes());
         }
-        if (types.contains(ListingType.REAL_ESTATE) || types.contains(ListingType.VEHICLE)) {
+        if (DiscountEligibility.containsNonDiscountable(types)) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
         return Result.success(types);
     }
 
     private Set<ListingType> defaultEligibleTypes() {
-        EnumSet<ListingType> all = EnumSet.allOf(ListingType.class);
-        all.remove(ListingType.REAL_ESTATE);
-        all.remove(ListingType.VEHICLE);
-        return all;
+        return DiscountEligibility.discountableTypes();
     }
 }

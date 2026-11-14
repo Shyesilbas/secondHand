@@ -254,6 +254,12 @@ public class ListingController {
         return ResultResponses.created(listingFeePaymentService.payListingCreationFee(currentUser.getId(), request));
     }
 
+    @GetMapping("/fee-quote")
+    @Operation(summary = "Get the listing fee and whether the caller's eWallet covers it")
+    public ResponseEntity<?> getListingFeeQuote(@AuthenticationPrincipal User currentUser) {
+        return ResultResponses.ok(Result.success(listingFeePaymentService.getListingFeeQuote(currentUser.getId())));
+    }
+
     @PublicEndpoint
     @GetMapping("/fee-config")
     @Operation(summary = "Get listing fee configuration")

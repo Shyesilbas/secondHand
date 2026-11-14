@@ -22,7 +22,8 @@ const PaymentMethodsLoading = () => {
  );
 };
 
-const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
+// Coverage comes from the backend fee quote (`sufficientBalance`); the balance is shown, never compared here.
+const EWalletPaymentMethod = ({ eWallet, feeQuote }) => {
  const { t } = useTranslation();
  if (!eWallet) {
  return (
@@ -33,8 +34,7 @@ const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
  );
  }
  const balance = toNumber(eWallet?.balance);
- const totalFee = toNumber(feeConfig?.totalCreationFee);
- const hasSufficientBalance = balance >= totalFee;
+ const hasSufficientBalance = feeQuote?.sufficientBalance === true;
 
  return (
  <div className="flex items-center justify-between rounded border border-border p-4">
@@ -55,27 +55,28 @@ const EWalletPaymentMethod = ({ eWallet, feeConfig }) => {
 const PaymentMethodDetails = ({
  isLoadingPaymentMethods,
  eWallet,
- feeConfig
+ feeQuote
 }) => {
  if (isLoadingPaymentMethods) {
  return <PaymentMethodsLoading />;
  }
- return <EWalletPaymentMethod eWallet={eWallet} feeConfig={feeConfig} />;
+ return <EWalletPaymentMethod eWallet={eWallet} feeQuote={feeQuote} />;
 };
 
 const canProceedWithPaymentMethod = ({
  isLoadingPaymentMethods,
  eWallet,
- feeConfig
+ feeQuote
 }) => {
  if (isLoadingPaymentMethods) return false;
- return !!eWallet && toNumber(eWallet.balance) >= toNumber(feeConfig?.totalCreationFee);
+ return !!eWallet && feeQuote?.sufficientBalance === true;
 };
 
 const PaymentVerificationModal = ({
  isOpen,
  selectedListing,
  feeConfig,
+ feeQuote,
  paymentType = PAYMENT_TYPES.EWALLET,
  paymentMethods,
  isLoadingPaymentMethods,
@@ -147,7 +148,7 @@ const PaymentVerificationModal = ({
  const canStartPayment = canProceedWithPaymentMethod({
  isLoadingPaymentMethods,
  eWallet,
- feeConfig
+ feeQuote
  });
 
  const handleClose = () => {
@@ -228,7 +229,7 @@ const PaymentVerificationModal = ({
  paymentMethods={paymentMethods}
  isLoadingPaymentMethods={isLoadingPaymentMethods}
  eWallet={eWallet}
- feeConfig={feeConfig}
+ feeQuote={feeQuote}
  onNavigateToPaymentMethods={onNavigateToPaymentMethods}
  />
  </div>

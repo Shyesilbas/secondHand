@@ -42,6 +42,13 @@ public class InventoryKafkaConsumer {
             return;
         }
 
+        // Stock is consumed only by checkout payments, which always carry their order line.
+        if (event.orderItemId() == null) {
+            log.error("ITEM_PURCHASE PaymentCompletedKafkaEvent {} has no orderItemId; refusing inventory deduction for listing {}.",
+                    event.paymentId(), event.listingId());
+            return;
+        }
+
         // Checkout'un bıraktığı pending işareti yalnızca bu transaction commit olursa silinir: düşüm yapıldı,
         // daha önce yapılmıştı (duplicate) ya da ilan artık yok. Rollback'te işaret kalır ve stok tutulmaya devam eder.
         clearPendingPurchaseAfterCommit(event);

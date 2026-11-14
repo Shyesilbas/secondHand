@@ -6,6 +6,7 @@ import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.mapper.CampaignMapper;
 import com.serhat.secondhand.campaign.repository.CampaignRepository;
+import com.serhat.secondhand.campaign.repository.projection.CampaignListProjection;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.campaign.validator.CampaignValidator;
 import com.serhat.secondhand.core.result.Result;
@@ -91,8 +92,13 @@ public class CampaignService implements ICampaignService {
 
     @Transactional(readOnly = true)
     public Page<CampaignDto> listMyCampaigns(Long userId, Pageable pageable) {
-        return campaignRepository.findPageSummaryBySellerId(userId, pageable)
-                .map(campaignMapper::toDto);
+        Page<CampaignListProjection> page = campaignRepository.findPageSummaryBySellerId(userId, pageable);
+        List<UUID> campaignIds = page.getContent().stream().map(CampaignListProjection::getId).toList();
+        Map<UUID, Set<ListingType>> typesByCampaign = loadEligibleTypes(campaignIds);
+        Map<UUID, Set<UUID>> listingIdsByCampaign = loadEligibleListingIds(campaignIds);
+        return page.map(row -> campaignMapper.toDto(row,
+                typesByCampaign.getOrDefault(row.getId(), Set.of()),
+                listingIdsByCampaign.getOrDefault(row.getId(), Set.of())));
     }
 
     @Transactional(readOnly = true)
@@ -143,22 +149,33 @@ public class CampaignService implements ICampaignService {
 
     private void hydrateEligibleCollections(List<Campaign> campaigns) {
         List<UUID> campaignIds = campaigns.stream().map(Campaign::getId).toList();
-
-        Map<UUID, Set<ListingType>> typesByCampaign = new HashMap<>();
-        campaignRepository.findEligibleTypesByCampaignIds(campaignIds)
-                .forEach(row -> typesByCampaign
-                        .computeIfAbsent(row.getCampaignId(), key -> new HashSet<>())
-                        .add(row.getListingType()));
-
-        Map<UUID, Set<UUID>> listingIdsByCampaign = new HashMap<>();
-        campaignRepository.findEligibleListingIdsByCampaignIds(campaignIds)
-                .forEach(row -> listingIdsByCampaign
-                        .computeIfAbsent(row.getCampaignId(), key -> new HashSet<>())
-                        .add(row.getListingId()));
+        Map<UUID, Set<ListingType>> typesByCampaign = loadEligibleTypes(campaignIds);
+        Map<UUID, Set<UUID>> listingIdsByCampaign = loadEligibleListingIds(campaignIds);
 
         campaigns.forEach(campaign -> {
             campaign.setEligibleTypes(new HashSet<>(typesByCampaign.getOrDefault(campaign.getId(), Set.of())));
             campaign.setEligibleListingIds(new HashSet<>(listingIdsByCampaign.getOrDefault(campaign.getId(), Set.of())));
         });
+    }
+
+    /** One batch query for all campaigns on the page; an empty id list skips the query. */
+    private Map<UUID, Set<ListingType>> loadEligibleTypes(List<UUID> campaignIds) {
+        Map<UUID, Set<ListingType>> typesByCampaign = new HashMap<>();
+        if (campaignIds.isEmpty()) return typesByCampaign;
+        campaignRepository.findEligibleTypesByCampaignIds(campaignIds)
+                .forEach(row -> typesByCampaign
+                        .computeIfAbsent(row.getCampaignId(), key -> new HashSet<>())
+                        .add(row.getListingType()));
+        return typesByCampaign;
+    }
+
+    private Map<UUID, Set<UUID>> loadEligibleListingIds(List<UUID> campaignIds) {
+        Map<UUID, Set<UUID>> listingIdsByCampaign = new HashMap<>();
+        if (campaignIds.isEmpty()) return listingIdsByCampaign;
+        campaignRepository.findEligibleListingIdsByCampaignIds(campaignIds)
+                .forEach(row -> listingIdsByCampaign
+                        .computeIfAbsent(row.getCampaignId(), key -> new HashSet<>())
+                        .add(row.getListingId()));
+        return listingIdsByCampaign;
     }
 }

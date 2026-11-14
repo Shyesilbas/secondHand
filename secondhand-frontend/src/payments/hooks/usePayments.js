@@ -35,6 +35,11 @@ export const usePayments = () => {
  setPageSize(newPageSize);
  }, []);
 
+ const changeFilterAndResetPage = useCallback((key, value) => {
+ handleFilterChange(key, value);
+ setCurrentPage(0);
+ }, [handleFilterChange]);
+
  const { data, isLoading, error: queryError, refetch } = usePaymentsQuery({
  userId: user?.id,
  currentPage,
@@ -62,10 +67,7 @@ export const usePayments = () => {
  showFilters,
  hasActiveFilters,
  shouldShowPagination,
- handleFilterChange: (key, value) => {
- handleFilterChange(key, value);
- setCurrentPage(0);
- },
+ handleFilterChange: changeFilterAndResetPage,
  clearFilters: () => {
  clearFilters();
  setCurrentPage(0);

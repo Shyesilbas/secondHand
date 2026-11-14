@@ -1,7 +1,7 @@
 package com.serhat.secondhand.pricing.engine;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.campaign.entity.Campaign;
-import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.campaign.mapper.CampaignMapper;
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.coupon.entity.Coupon;
@@ -10,11 +10,13 @@ import com.serhat.secondhand.listing.util.ListingCampaignPricingUtil;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
+import com.serhat.secondhand.pricing.dto.BundleCampaignProgressDto;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.pricing.handler.OfferPriceHandler;
 import com.serhat.secondhand.pricing.mapper.PricingMapper;
 import com.serhat.secondhand.pricing.util.PricingUtil;
+import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -80,7 +82,7 @@ public class PriceCalculationEngine {
             AppliedCampaignDto appliedCampaign = null;
             BigDecimal campaignUnitPrice = unitPrice;
 
-            if (!isOfferLine && type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
+            if (!isOfferLine && DiscountEligibility.isDiscountable(type)) {
                 List<Campaign> sellerCampaigns = campaignsBySeller.getOrDefault(listing.getSeller().getId(), List.of());
                 AppliedCampaignDto best = findBestCampaignForListing(sellerCampaigns, listing, campaignQualifyingQuantities);
                 if (best != null && best.getDiscountAmount() != null && best.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
@@ -108,7 +110,8 @@ public class PriceCalculationEngine {
                     PricingUtil.scale(sellerSubtotalsAfterCampaign.getOrDefault(sellerId, BigDecimal.ZERO).add(lineAfterCampaign)));
 
             pricedItems.add(pricingMapper.toPricedCartItemDto(
-                    listing, sellerId, type, quantity, unitPrice, campaignUnitPrice, lineAfterCampaign, appliedCampaign));
+                    listing, sellerId, type, quantity, unitPrice, campaignUnitPrice, PricingUtil.scale(lineOriginal),
+                    lineAfterCampaign, lineCampaignDiscount, appliedCampaign));
         }
 
         BigDecimal couponDiscount = coupon == null ? BigDecimal.ZERO : computeCouponDiscount(coupon, pricedItems);
@@ -121,10 +124,7 @@ public class PriceCalculationEngine {
                     || coupon.getDiscountKind() == CouponDiscountKind.TYPE_PERCENT;
 
             for (PricedCartItemDto item : pricedItems) {
-                boolean eligible = true;
-                if (item.getListingType() == ListingType.REAL_ESTATE || item.getListingType() == ListingType.VEHICLE) {
-                    eligible = false;
-                }
+                boolean eligible = DiscountEligibility.isDiscountable(item.getListingType());
                 if (typeScoped && eligibleTypes != null && !eligibleTypes.isEmpty() && !eligibleTypes.contains(item.getListingType())) {
                     eligible = false;
                 }
@@ -191,8 +191,36 @@ public class PriceCalculationEngine {
                 discountTotal,
                 total,
                 payableBySeller,
-                pricedItems
+                pricedItems,
+                buildBundleProgress(cartItems, campaignsBySeller, campaignQualifyingQuantities)
         );
+    }
+
+    /**
+     * Bundle campaigns (minQuantity > 1) the cart already covers with at least one item, in cart seller order.
+     * Uses the qualifying quantities that also gate the bundle price, so the hint never disagrees with the total.
+     */
+    private List<BundleCampaignProgressDto> buildBundleProgress(List<Cart> cartItems,
+                                                               Map<Long, List<Campaign>> campaignsBySeller,
+                                                               Map<UUID, Integer> qualifyingQuantities) {
+        Map<Long, User> sellersInCartOrder = new LinkedHashMap<>();
+        for (Cart item : cartItems) {
+            if (item.getListing() != null && item.getListing().getSeller() != null) {
+                sellersInCartOrder.putIfAbsent(item.getListing().getSeller().getId(), item.getListing().getSeller());
+            }
+        }
+        List<BundleCampaignProgressDto> progress = new ArrayList<>();
+        for (Map.Entry<Long, User> entry : sellersInCartOrder.entrySet()) {
+            for (Campaign campaign : campaignsBySeller.getOrDefault(entry.getKey(), List.of())) {
+                int minQuantity = campaign.getMinQuantity() != null ? campaign.getMinQuantity() : 1;
+                int qualifying = qualifyingQuantities.getOrDefault(campaign.getId(), 0);
+                if (minQuantity <= 1 || qualifying <= 0) {
+                    continue;
+                }
+                progress.add(pricingMapper.toBundleProgress(campaign, entry.getValue(), minQuantity, qualifying));
+            }
+        }
+        return progress;
     }
 
     /**
@@ -253,7 +281,7 @@ public class PriceCalculationEngine {
                 continue;
             }
 
-            BigDecimal discount = computeCampaignDiscountAmount(c, unitPrice);
+            BigDecimal discount = ListingCampaignPricingUtil.unitDiscount(c, unitPrice);
             if (discount.compareTo(bestDiscount) > 0) {
                 bestDiscount = discount;
                 bestCampaign = c;
@@ -265,23 +293,6 @@ public class PriceCalculationEngine {
         }
 
         return campaignMapper.toAppliedCampaignDto(bestCampaign, bestDiscount);
-    }
-
-    /**
-     * Computes campaign discount amount based on discount kind (percent/fixed).
-     */
-    public BigDecimal computeCampaignDiscountAmount(Campaign campaign, BigDecimal unitPrice) {
-        BigDecimal discount;
-        if (campaign.getDiscountKind() == CampaignDiscountKind.PERCENT) {
-            BigDecimal pct = campaign.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
-            discount = PricingUtil.scale(unitPrice.multiply(pct));
-        } else {
-            discount = PricingUtil.scale(campaign.getValue());
-        }
-        if (discount.compareTo(unitPrice) > 0) {
-            discount = unitPrice;
-        }
-        return discount;
     }
 
     /**
@@ -336,7 +347,7 @@ public class PriceCalculationEngine {
                 || coupon.getDiscountKind() == CouponDiscountKind.TYPE_PERCENT;
 
         for (PricedCartItemDto item : items) {
-            if (item.getListingType() == ListingType.REAL_ESTATE || item.getListingType() == ListingType.VEHICLE) {
+            if (!DiscountEligibility.isDiscountable(item.getListingType())) {
                 continue;
             }
             if (typeScoped && eligibleTypes != null && !eligibleTypes.isEmpty() && !eligibleTypes.contains(item.getListingType())) {
@@ -399,14 +410,14 @@ public class PriceCalculationEngine {
     }
 
     /**
-     * Extracts listing types from cart items (excluding REAL_ESTATE and VEHICLE).
+     * Extracts discountable listing types from cart items (see DiscountEligibility).
      */
     public Set<ListingType> extractCartTypes(List<Cart> cartItems) {
         Set<ListingType> types = new HashSet<>();
         for (Cart item : cartItems) {
             if (item.getListing() != null && item.getListing().getListingType() != null) {
                 ListingType type = item.getListing().getListingType();
-                if (type != ListingType.REAL_ESTATE && type != ListingType.VEHICLE) {
+                if (DiscountEligibility.isDiscountable(type)) {
                     types.add(type);
                 }
             }

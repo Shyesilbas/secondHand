@@ -25,6 +25,7 @@ All routes live in `common/routes/AppRoutes.jsx` with paths from `common/constan
 ## 3. Component Rules
 
 - **Zero Direct Axios Usage:** All application API requests must pass through `request.js`. Feature modules never import Axios directly.
+- **Searchable pages:** `constants/appPages.js` indexes nested pages (campaigns, coupons, complaints). Header search matches by label and keywords above listing results.
 - **No Token Storage in LocalStorage:** Raw JWT credentials exist only in server-set `HttpOnly` cookies. `tokenStorage.js` stores sanitized public user details (`id`, `email`, `role`, `plan`).
 - **Silent Refresh Deduplication:** When multiple requests encounter `401 Unauthorized` simultaneously, `interceptors.js` pauses them in a shared queue while single refresh executes, preventing token race conditions.
 
@@ -44,6 +45,7 @@ Generated from code; the hook files are the source of truth.
 | `['locations', 'districts', cityKey]` | `useLocationOptions.js` |
 | `['locations', 'neighborhoods', districtKey]` | `useLocationOptions.js` |
 | `['membership', 'status', user?.id]` | `usePlan.js` |
+| `['membership', 'quote']` | `PremiumUpgradeModal.jsx` |
 
 | Invalidated / updated key | By |
 |---|---|

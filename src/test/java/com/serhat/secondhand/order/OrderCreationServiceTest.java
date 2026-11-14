@@ -9,6 +9,7 @@ import com.serhat.secondhand.order.dto.CheckoutRequest;
 import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
 import com.serhat.secondhand.user.application.AddressService;
@@ -70,10 +71,12 @@ class OrderCreationServiceTest {
         Cart a1 = cart(sellerA, "100", 1);
         Cart a2 = cart(sellerA, "50", 2);
         Cart b1 = cart(sellerB, "200", 1);
+        PricedCartItemDto a1Line = priced(a1, "100", "90", "9", "81");
+        a1Line.setCampaignDiscount(new BigDecimal("10"));
         PricingResultDto pricing = PricingResultDto.builder()
                 .couponCode("SAVE10")
                 .items(List.of(
-                        priced(a1, "100", "90", "9", "81"),
+                        a1Line,
                         priced(a2, "50", "100", "10", "90"),
                         priced(b1, "200", "200", "0", "200")))
                 .build();
@@ -99,5 +102,48 @@ class OrderCreationServiceTest {
         assertThat(orderB.getTotalAmount()).isEqualByComparingTo("200");
         assertThat(orderB.getCouponCode()).isNull();
         assertThat(orderA.getOrderNumber()).isNotEqualTo(orderB.getOrderNumber());
+    }
+    @Test
+    void campaignLine_recordsCampaignIdAndLineDiscount_plainLineRecordsZero() {
+        Address address = mock(Address.class);
+        when(address.getUser()).thenReturn(buyer);
+        when(addressService.getAddressById(10L)).thenReturn(Optional.of(address));
+        when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
+
+        User seller = user(2L);
+        Cart campaignCart = cart(seller, "50", 2);
+        Cart plainCart = cart(seller, "80", 1);
+        UUID campaignId = UUID.randomUUID();
+        PricedCartItemDto campaignLine = priced(campaignCart, "50", "80", "0", "80");
+        campaignLine.setCampaignDiscount(new BigDecimal("20"));
+        campaignLine.setAppliedCampaign(AppliedCampaignDto.builder()
+                .campaignId(campaignId)
+                .name("Bahar indirimi")
+                .discountAmount(new BigDecimal("10"))
+                .build());
+        PricingResultDto pricing = PricingResultDto.builder()
+                .items(List.of(campaignLine, priced(plainCart, "80", "80", "0", "80")))
+                .build();
+        CheckoutRequest request = CheckoutRequest.builder().shippingAddressId(10L).build();
+
+        Result<List<Order>> result = service.createOrders(buyer, List.of(campaignCart, plainCart), request, pricing);
+
+        assertThat(result.isError()).isFalse();
+        List<OrderItem> items = result.getData().get(0).getOrderItems();
+        OrderItem campaignItem = items.stream()
+                .filter(i -> i.getListing() == campaignCart.getListing()).findFirst().orElseThrow();
+        OrderItem plainItem = items.stream()
+                .filter(i -> i.getListing() == plainCart.getListing()).findFirst().orElseThrow();
+
+        assertThat(campaignItem.getCampaignId()).isEqualTo(campaignId);
+        assertThat(campaignItem.getCampaignName()).isEqualTo("Bahar indirimi");
+        assertThat(campaignItem.getOriginalUnitPrice()).isEqualByComparingTo("50");
+        assertThat(campaignItem.getCampaignDiscount()).isEqualByComparingTo("20");
+        assertThat(result.getData().get(0).getCampaignDiscount()).isEqualByComparingTo("20");
+
+        assertThat(plainItem.getCampaignId()).isNull();
+        assertThat(plainItem.getCampaignName()).isNull();
+        assertThat(plainItem.getOriginalUnitPrice()).isEqualByComparingTo("80");
+        assertThat(plainItem.getCampaignDiscount()).isEqualByComparingTo("0");
     }
 }

@@ -5,6 +5,7 @@ Provides real-time 1-on-1 buyer-seller messaging (`chat_rooms` and `messages` ta
 > [!NOTE]
 > **Related Documentation & Runbooks:**
 > - **Architecture Deep Dive:** [`docs/websocket-stomp-and-chat-architecture.md`](/docs/websocket-stomp-and-chat-architecture.md) (STOMP handshake, channel interceptor, Redis Pub/Sub broadcast)
+> - **Proposal:** [`docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md)
 > - **Frontend Module:** [`secondhand-frontend/src/chat/README.md`](/secondhand-frontend/src/chat/README.md)
 > - **Key Entry Points:** [`ChatRestController`](api/ChatRestController.java) · [`ChatWebSocketController`](controller/ChatWebSocketController.java) · [`ChatService`](application/ChatService.java) · [`ChatAuthorizationService`](application/ChatAuthorizationService.java) · [`ChatNotificationService`](notification/ChatNotificationService.java)
 

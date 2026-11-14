@@ -11,6 +11,10 @@ import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class ChatAuthorizationService {
@@ -80,6 +84,18 @@ public class ChatAuthorizationService {
             return Result.error(ChatErrorCodes.MESSAGE_NOT_FOUND);
         }
         return Result.success(message);
+    }
+
+    /**
+     * Returns the content of the given messages keyed by id. Deleted messages are absent from the map,
+     * so callers must treat a missing key as "no longer available".
+     */
+    public Map<Long, String> findMessageContents(Collection<Long> messageIds) {
+        if (messageIds.isEmpty()) {
+            return Map.of();
+        }
+        return messageRepository.findAllById(messageIds).stream()
+                .collect(Collectors.toMap(Message::getId, Message::getContent));
     }
 
     public Result<Void> authorizeMessageParticipants(ChatRoom room, Long senderId, Long recipientId) {

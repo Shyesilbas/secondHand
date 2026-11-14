@@ -68,7 +68,7 @@ const PaymentReceiptModal = ({
  <dl className="divide-y divide-border-light">
  <InfoRow label={t("transaction_category")} value={TRANSACTION_TYPE_LABELS[payment.transactionType] || payment.transactionType} />
  <InfoRow label={t("date")} value={formatDateTime(payment.processedAt || payment.createdAt)} />
- <InfoRow label={t("payment_method")} value={payment.paymentType || t("ewallet", "E-Cüzdan")} />
+ <InfoRow label={t("payment_method")} value={payment.providerName} />
  <InfoRow label={t("reference_id")} value={transactionId} isCopyable />
  {payment.listingTitle && <InfoRow label={t("product_item")} value={payment.listingTitle} />}
  <InfoRow label={t("sender")} value={payment.senderDisplayName || t("anonymous", "Anonim")} />

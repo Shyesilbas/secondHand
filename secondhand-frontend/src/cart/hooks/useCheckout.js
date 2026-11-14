@@ -9,7 +9,6 @@ import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.j
 import logger from '../../common/utils/logger.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_MESSAGES, CART_PAYMENT_TYPES } from '../cartConstants.js';
-import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
 import { getCheckoutErrorMessage } from '../utils/checkoutError.js';
 
 export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCode, offerId) => {
@@ -91,7 +90,9 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  // Basic requirement: address
  if (!selectedShippingAddressId) return true;
  
- if (!eWallet || (eWallet.balance < calculateTotal())) return true;
+ const total = calculateTotal();
+ if (total == null) return true;
+ if (!eWallet || (eWallet.balance < total)) return true;
  
  return false;
  }, [cartCount, offerId, selectedShippingAddressId, eWallet, calculateTotal]);
@@ -143,13 +144,13 @@ export const useCheckout = (cartCount, calculateTotal, resetCartState, couponCod
  setIsCheckingOut(true);
  const startTime = Date.now() - 3000; // 3 seconds buffer for clock skew
  try {
- await orderService.initiatePaymentVerification?.({
+ const verification = await orderService.initiatePaymentVerification({
  transactionType: CART_CHECKOUT_DEFAULTS.VERIFICATION_TRANSACTION_TYPE,
  couponCode: couponCode?.trim() || null,
  offerId: offerId || null
  });
  showSuccess(CART_MESSAGES.VERIFICATION_SENT_TITLE, CART_MESSAGES.VERIFICATION_SENT_DESCRIPTION);
- setPaymentVerificationExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
+ setPaymentVerificationExpiresAtMs(new Date(verification.expiresAt).getTime());
  try {
  await fetchEmails(startTime);
  } catch (err) {

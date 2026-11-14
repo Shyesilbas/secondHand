@@ -1,10 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { showcaseService } from '../services/showcaseService.js';
 
 export const SHOWCASE_QUERY_KEYS = {
     all: ['showcases'],
     active: (page = 0, size = 12) => [...SHOWCASE_QUERY_KEYS.all, 'active', page, size],
     mine: (userId) => [...SHOWCASE_QUERY_KEYS.all, 'mine', userId || 'anonymous'],
+    quotes: (daysOptions) => [...SHOWCASE_QUERY_KEYS.all, 'quotes', daysOptions],
 };
 
 export const useShowcaseQueries = (options = {}) => {
@@ -43,3 +44,15 @@ export const useShowcaseQueries = (options = {}) => {
     };
 };
 
+
+/** Backend-priced showcase quotes (cost, tax, balance check) for the given durations. */
+export const useShowcaseQuotes = (daysOptions, { enabled = true } = {}) => {
+    const sorted = [...new Set(daysOptions)].sort((a, b) => a - b);
+    return useQuery({
+        queryKey: SHOWCASE_QUERY_KEYS.quotes(sorted),
+        queryFn: () => showcaseService.getQuotes(sorted),
+        enabled: enabled && sorted.length > 0,
+        staleTime: 0,
+        placeholderData: keepPreviousData,
+    });
+};

@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
     LISTINGS: {
         MY_LISTINGS: '/v1/listings/my',
         BY_ID: (id) => `/v1/listings/${id}`,
+        BY_IDS: '/v1/listings/bulks',
         BY_LISTING_NO: (listingNo) => `/v1/listings/search/listing-no/${listingNo}`,
         SEARCH: '/v1/listings/search',
         DELETE: (id) => `/v1/listings/${id}`,
@@ -66,6 +67,7 @@ export const API_ENDPOINTS = {
     },
     PAYMENTS: {
         LISTING_FEE_PAYMENT: '/v1/listings/pay-fee',
+        LISTING_FEE_QUOTE: '/v1/listings/fee-quote',
         MY_PAYMENTS: '/v1/payments/my',
         STATISTICS: '/v1/payments/statistics',
         INITIATE_VERIFICATION: '/v1/payments/initiate-verification',
@@ -236,6 +238,7 @@ export const API_ENDPOINTS = {
         CREATE: '/v1/showcases',
         ACTIVE: '/v1/showcases/active',
         MY_SHOWCASES: '/v1/showcases/my',
+        QUOTES: '/v1/showcases/quotes',
         EXTEND: (id) => `/v1/showcases/${id}/extend`,
         CANCEL: (id) => `/v1/showcases/${id}/cancel`,
     },
@@ -315,6 +318,7 @@ export const API_ENDPOINTS = {
     },
     MEMBERSHIP: {
         STATUS: '/v1/memberships/status',
+        QUOTE: '/v1/memberships/quote',
         UPGRADE: '/v1/memberships/upgrade',
         CANCEL: '/v1/memberships/cancel',
         TOGGLE_AUTO_RENEW: '/v1/memberships/toggle-auto-renew',

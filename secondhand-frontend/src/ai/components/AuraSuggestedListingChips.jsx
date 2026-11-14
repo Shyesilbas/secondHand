@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from 'react-router-dom';
 import { MapPin, Tag, ArrowUpRight } from 'lucide-react';
 import { ROUTES } from '../../common/constants/routes.js';
+import { formatPrice } from '../../common/formatters.js';
 
 export default function AuraSuggestedListingChips({
   listings,
@@ -22,7 +23,7 @@ export default function AuraSuggestedListingChips({
         {listings.map((l) => {
           const id = l?.id;
           const href = id ? ROUTES.LISTING_DETAIL(id) : null;
-          const price = l?.price != null && l?.currency ? `${l.price} ${l.currency}` : l?.price != null ? String(l.price) : null;
+          const price = l?.price != null ? `${formatPrice(l.price)} ${l.currency || 'TRY'}` : null;
           const loc = [l?.district, l?.city].filter(Boolean).join(' · ');
 
           const cardContent = (

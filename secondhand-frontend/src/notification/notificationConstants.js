@@ -18,6 +18,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { ROUTES } from '../common/constants/routes.js';
+import { formatCurrency } from '../common/formatters.js';
 
 export const NOTIFICATION_PAGE_SIZE = 20;
 
@@ -92,11 +93,7 @@ const formatAmount = (raw, currency = 'TRY') => {
   const num = typeof raw === 'number' ? raw : Number.parseFloat(String(raw).replace(',', '.'));
   if (Number.isNaN(num)) return null;
   const cur = (currency || 'TRY').toUpperCase();
-  try {
-    return num.toLocaleString('tr-TR', { style: 'currency', currency: cur === 'TL' ? 'TRY' : cur, maximumFractionDigits: 2 });
-  } catch {
-    return `${num.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ${cur}`;
-  }
+  return formatCurrency(num, cur === 'TL' ? 'TRY' : cur);
 };
 
 // Backend fallbacks for chat previews that carry no user content.
@@ -254,12 +251,12 @@ export const describeNotification = (notification, t) => {
             ? tr('notif_order_seller_restricted_buyer', '{{prefix}}siparişi satıcının hesabı kısıtlandığı için iptal edildi; ödemen iade edildi.', { prefix })
             : tr('notif_order_seller_restricted_seller', '{{prefix}}siparişi hesabın kısıtlandığı için otomatik olarak iptal edildi.', { prefix }))
           : meta.reason === 'SHIP_DEADLINE_MISSED'
-          ? (!isSellerSide
-            ? tr('notif_order_ship_deadline_buyer', '{{prefix}}siparişi satıcı 72 saat içinde kargoya vermediği için iptal edildi; ödemen iade edildi.', { prefix })
-            : tr('notif_order_ship_deadline_seller', '{{prefix}}siparişi 72 saat içinde kargoya verilmediği için otomatik olarak iptal edildi.', { prefix }))
-          : isCounterparty
-            ? tr('notif_order_cancelled_by_other', '{{prefix}}siparişi karşı taraf tarafından iptal edildi.', { prefix })
-            : tr('notif_order_cancelled_body', '{{prefix}}siparişi iptal edildi.', { prefix })
+            ? (!isSellerSide
+              ? tr('notif_order_ship_deadline_buyer', '{{prefix}}siparişi satıcı 72 saat içinde kargoya vermediği için iptal edildi; ödemen iade edildi.', { prefix })
+              : tr('notif_order_ship_deadline_seller', '{{prefix}}siparişi 72 saat içinde kargoya verilmediği için otomatik olarak iptal edildi.', { prefix }))
+            : isCounterparty
+              ? tr('notif_order_cancelled_by_other', '{{prefix}}siparişi karşı taraf tarafından iptal edildi.', { prefix })
+              : tr('notif_order_cancelled_body', '{{prefix}}siparişi iptal edildi.', { prefix })
       };
     }
     case 'ORDER_STATUS_CHANGED': {

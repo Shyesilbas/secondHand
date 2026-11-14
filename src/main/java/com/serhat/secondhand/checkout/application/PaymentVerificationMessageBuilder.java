@@ -2,14 +2,17 @@ package com.serhat.secondhand.checkout.application;
 
 import com.serhat.secondhand.cart.entity.Cart;
 import com.serhat.secondhand.cart.repository.CartRepository;
-import com.serhat.secondhand.core.config.ListingConfig;
+import com.serhat.secondhand.core.config.AppConfigProperties;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.listing.application.common.ListingCommandService;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.pricing.application.IPricingService;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
+import com.serhat.secondhand.showcase.application.ShowcasePricingCalculator;
+import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentVerificationMessageBuilder {
 
-    private final ListingConfig listingConfig;
     private final ListingQueryService listingService;
+    private final ListingCommandService listingCommandService;
+    private final ShowcasePricingCalculator showcasePricingCalculator;
+    private final ShowcaseValidator showcaseValidator;
+    private final AppConfigProperties appConfigProperties;
     private final IPricingService pricingService;
     private final CheckoutPricingContextFactory checkoutPricingContextFactory;
     private final CartRepository cartRepository;
@@ -44,25 +50,19 @@ public class PaymentVerificationMessageBuilder {
 
         switch (type) {
             case ITEM_PURCHASE -> appendCartDetails(details, user, req);
-            case LISTING_CREATION -> appendListingDetails(details, req, calculateTotalListingFee());
+            case LISTING_CREATION -> appendListingDetails(details, req, listingCommandService.calculateTotalListingFee());
             case SHOWCASE_PAYMENT -> {
-                appendListingDetails(details, req, req != null ? req.getAmount() : null);
-                if (req != null && req.getDays() != null) {
-                    details.append("        <tr>");
-                    details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Süre</td>");
-                    details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                            .append(req.getDays()).append(" Gün</td>");
-                    details.append("        </tr>");
-                }
+                int days = requireValidShowcaseDays(req);
+                appendListingDetails(details, req, showcasePricingCalculator.totalCost(days));
+                details.append("        <tr>");
+                details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Süre</td>");
+                details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
+                        .append(days).append(" Gün</td>");
+                details.append("        </tr>");
             }
+            case MEMBERSHIP_PAYMENT -> appendAmountRow(details, appConfigProperties.getMembership().getPremiumPrice());
             default -> {
-                if (req != null && req.getAmount() != null) {
-                    details.append("        <tr>");
-                    details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Tutar</td>");
-                    details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
-                            .append(formatMoney(req.getAmount())).append("</td>");
-                    details.append("        </tr>");
-                }
+                // Other transaction types do not start an OTP from the client; no amount is shown.
             }
         }
 
@@ -172,11 +172,7 @@ public class PaymentVerificationMessageBuilder {
     private void appendListingDetails(StringBuilder details, InitiateVerificationRequest req, BigDecimal amount) {
         if (req != null) {
             String title = null;
-            if (req.getCustomTitle() != null && !req.getCustomTitle().isBlank()) {
-                title = req.getCustomTitle();
-            } else if (req.isBulk()) {
-                title = "Toplu Vitrin Öne Çıkarma";
-            } else if (req.getListingId() != null) {
+            if (req.getListingId() != null) {
                 var listingOpt = listingService.findById(req.getListingId());
                 if (listingOpt.isPresent()) {
                     title = listingOpt.get().getTitle();
@@ -221,10 +217,19 @@ public class PaymentVerificationMessageBuilder {
         return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", amount);
     }
 
-    private BigDecimal calculateTotalListingFee() {
-        BigDecimal fee = listingConfig.getCreation().getFee();
-        BigDecimal tax = listingConfig.getFee().getTax();
-        BigDecimal taxAmount = fee.multiply(tax).divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
-        return fee.add(taxAmount);
+    private int requireValidShowcaseDays(InitiateVerificationRequest req) {
+        Integer days = req != null ? req.getDays() : null;
+        if (days == null || showcaseValidator.validateDaysCount(days).isError()) {
+            throw new BusinessException(com.serhat.secondhand.showcase.ShowcaseErrorCodes.INVALID_DAYS_COUNT);
+        }
+        return days;
+    }
+
+    private void appendAmountRow(StringBuilder details, BigDecimal amount) {
+        details.append("        <tr>");
+        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 500;\">Tutar</td>");
+        details.append("          <td style=\"padding: 5px 0; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums;\">")
+                .append(formatMoney(amount)).append("</td>");
+        details.append("        </tr>");
     }
 }

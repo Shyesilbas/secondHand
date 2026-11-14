@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import { formatCurrency, formatDateTime, resolveEnumLabel } from '../../common/formatters.js';
-import { getLastUpdateInfo, isCancellableStatus, isModifiableStatus, isRefundableStatus } from '../orderConstants.js';
-import { ORDER_LIMITS, ORDER_STATUSES, ORDER_VIEW_MODES } from '../constants/orderUiConstants.js';
+import { getLastUpdateInfo, hasOrderAction } from '../orderConstants.js';
+import { ORDER_ACTIONS, ORDER_LIMITS, ORDER_VIEW_MODES } from '../constants/orderUiConstants.js';
 import { getOrderStatusBadgeClass, getOrderStatusDotClass, getPaymentStatusIndicatorClass, getPaymentStatusTextClass } from '../utils/statusPresentation.js';
 import { AddressSection, NotesSection } from './orderDetails/OrderEditableSections.jsx';
 import { ShipOrderForm } from './orderDetails/ShipOrderForm.jsx';
@@ -98,7 +98,7 @@ const OrderDetailsModal = React.memo(({
  setIsEditingNotes
  });
 
- const isModifiable = !isSellerView && isModifiableStatus(selectedOrder?.status, enums);
+ const isModifiable = !isSellerView && hasOrderAction(selectedOrder, ORDER_ACTIONS.EDIT);
  const { addresses, loading: addressesLoading } = useAddresses({
  enabled: isEditingAddress
  });
@@ -113,12 +113,8 @@ const OrderDetailsModal = React.memo(({
  const orderItems = useMemo(() => selectedOrder?.orderItems || [], [selectedOrder]);
  const reviewItemIds = useMemo(() => (selectedOrder ? orderItemIds([selectedOrder]) : []), [selectedOrder]);
  const { reviews: orderReviews, isLoading: reviewsLoading } = useOrderItemReviews(reviewItemIds, {
- enabled: isOpen && !isSellerView && [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED].includes(selectedOrder?.status)
+ enabled: isOpen && !isSellerView && hasOrderAction(selectedOrder, ORDER_ACTIONS.REVIEW)
  });
- const sellerTotalAmount = useMemo(() => {
- if (!isSellerView) return null;
- return orderItems.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
- }, [isSellerView, orderItems]);
 
  const lastUpdate = useMemo(() => getLastUpdateInfo(selectedOrder), [selectedOrder]);
 
@@ -202,10 +198,12 @@ const header = (
 
  const showInvoice = !isLoading && selectedOrder?.paymentReference && onOpenReceipt;
  const showBuyerActions = !isLoading && selectedOrder && !isSellerView;
- const showCancel = showBuyerActions && isCancellableStatus(selectedOrder.status, enums);
- const showRefund = showBuyerActions && isRefundableStatus(selectedOrder.status, enums);
+ const showCancel = showBuyerActions && hasOrderAction(selectedOrder, ORDER_ACTIONS.CANCEL);
+ const showRefund = showBuyerActions && hasOrderAction(selectedOrder, ORDER_ACTIONS.REFUND);
+ // Safe Meetup completion runs through MeetupHandoverSection (CONFIRM_HANDOVER), not this footer.
+ const showComplete = showBuyerActions && selectedOrder.deliveryMethod !== 'SAFE_MEETUP' && hasOrderAction(selectedOrder, ORDER_ACTIONS.COMPLETE);
  const trackingUrl = !isLoading ? selectedOrder?.shipping?.trackingUrl : null;
- const footer = showInvoice || showCancel || showRefund || trackingUrl ? (
+ const footer = showInvoice || showCancel || showRefund || showComplete || trackingUrl ? (
  <div className="flex w-full flex-wrap items-center justify-between gap-3">
  <div>
  {showInvoice && (
@@ -220,10 +218,10 @@ const header = (
  <Button variant="danger" onClick={() => setCancelModalOpen(true)}>{t("cancel_order")}</Button>
  )}
  {showRefund && (
- <>
  <Button variant="secondary" onClick={() => setRefundModalOpen(true)}>{t("request_refund")}</Button>
+ )}
+ {showComplete && (
  <Button onClick={handleCompleteOrder} disabled={isProcessing}>{t("approve_complete")}</Button>
- </>
  )}
  {trackingUrl && (
  <a href={trackingUrl} target="_blank" rel="noopener noreferrer" className={buttonClasses('secondary')}>
@@ -283,7 +281,7 @@ const header = (
  )}
 
  {/* Ship Order Form */}
- {isSellerView && (selectedOrder.status === 'CONFIRMED' || selectedOrder.status === 'PROCESSING') && (
+ {isSellerView && hasOrderAction(selectedOrder, ORDER_ACTIONS.SHIP) && (
  <ShipOrderForm carriers={enums.carriers || []} isProcessing={isProcessing} onShip={handleShipOrder} CardComponent={OrderCard} />
  )}
 
@@ -325,7 +323,7 @@ const header = (
  )}
 
  {/* Payment Details */}
- <OrderPaymentSummary CardComponent={OrderCard} isSellerView={isSellerView} selectedOrder={selectedOrder} sellerTotalAmount={sellerTotalAmount} resolveEnumLabel={(group, value) => resolveEnumLabel(enums, group, value)} formatCurrency={formatCurrency} getPaymentStatusIndicatorClass={getPaymentStatusIndicatorClass} getPaymentStatusTextClass={getPaymentStatusTextClass} />
+ <OrderPaymentSummary CardComponent={OrderCard} isSellerView={isSellerView} selectedOrder={selectedOrder} resolveEnumLabel={(group, value) => resolveEnumLabel(enums, group, value)} formatCurrency={formatCurrency} getPaymentStatusIndicatorClass={getPaymentStatusIndicatorClass} getPaymentStatusTextClass={getPaymentStatusTextClass} />
  </div>
  </div>
  </div>

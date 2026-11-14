@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { searchUsers } from '../../../user/services/userSearchService.js';
 import { listingService } from '../../../listing/services/listingService.js';
 import { ROUTES } from '../../constants/routes.js';
+import { matchAppPages } from '../../constants/appPages.js';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
 import SearchResults from './SearchResults.jsx';
 const NO_RESULTS = [];
@@ -22,12 +23,20 @@ const UnifiedSearchBar = ({
  const inputRef = useRef(null);
  const navigate = useNavigate();
  const term = useDebouncedValue(query.trim().toLowerCase(), 500);
- const { data: results = NO_RESULTS, isFetching: isLoading } = useQuery({
+ const { data: listingOrUserResults = NO_RESULTS, isFetching: isLoading } = useQuery({
  queryKey: ['globalSearch', activeTab, term],
  queryFn: async () => activeTab === 'users' ? searchUsers(term, 8) : (await listingService.globalSearch(term, 0, 8)).content || [],
  enabled: term.length >= 2,
  staleTime: 60 * 1000
  });
+ // Matching pages come first; keyboard selection and SearchResults index into this combined list.
+ const pageHits = useMemo(() => matchAppPages(query).map(page => ({
+ id: page.to,
+ type: 'link',
+ key: page.key,
+ labelKey: page.labelKey
+ })), [query]);
+ const results = useMemo(() => [...pageHits, ...listingOrUserResults], [pageHits, listingOrUserResults]);
  const handleInputChange = e => {
  setQuery(e.target.value);
  setSelectedIndex(-1);

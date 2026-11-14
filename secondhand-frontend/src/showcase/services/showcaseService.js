@@ -7,6 +7,13 @@ export const showcaseService = {
 
  getUserShowcases: () => get(API_ENDPOINTS.SHOWCASES.MY_SHOWCASES),
 
+ // Spring binds repeated `days=` params to a list; axios would send `days[]=`.
+ getQuotes: (daysOptions) => {
+ const query = new URLSearchParams();
+ daysOptions.forEach((d) => query.append('days', String(d)));
+ return get(`${API_ENDPOINTS.SHOWCASES.QUOTES}?${query.toString()}`);
+ },
+
  createShowcase: async (listingId, days, paymentType, verificationCode, agreementsAccepted = false, acceptedAgreementIds = []) => {
  const payload = {
  listingId,

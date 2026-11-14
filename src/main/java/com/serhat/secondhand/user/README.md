@@ -5,6 +5,7 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 > [!NOTE]
 > **Related Documentation & Runbooks:**
 > - **Architecture Deep Dive:** [`docs/auth-jwt-and-security-architecture.md`](/docs/auth-jwt-and-security-architecture.md) · [`docs/multi-tier-redis-caching-and-invalidation.md`](/docs/multi-tier-redis-caching-and-invalidation.md)
+> - **Proposal:** [`docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md)
 > - **Frontend Module:** [`secondhand-frontend/src/user/README.md`](/secondhand-frontend/src/user/README.md)
 > - **Key Entry Points:** [`UserController`](api/UserController.java) · [`AddressController`](api/AddressController.java) · [`MembershipController`](api/MembershipController.java) · [`UserBadgesController`](api/UserBadgesController.java) · [`UserService`](application/UserService.java) · [`IUserService`](application/IUserService.java) · [`MembershipService`](application/MembershipService.java) · [`GreatSellerPolicy`](domain/greatseller/GreatSellerPolicy.java) · [`UserRestrictionService`](application/UserRestrictionService.java)
 
@@ -20,5 +21,5 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 ## API
 - **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`).
 - **Addresses (`AddressController`, `/api/v1/users/addresses`):** `GET /` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/main`.
-- **Memberships (`MembershipController`, `/api/v1/memberships`):** `GET /status` · `POST /upgrade` (`MembershipUpgradeRequest`) · `POST /cancel` · `POST /toggle-auto-renew`.
+- **Memberships (`MembershipController`, `/api/v1/memberships`):** `GET /status` · `GET /quote` (`MembershipQuoteDto`: premium price and eWallet balance check) · `POST /upgrade` (`MembershipUpgradeRequest`) · `POST /cancel` · `POST /toggle-auto-renew`.
 - **Badges (`UserBadgesController`, `/api/v1/user/badges`):** `GET /`.

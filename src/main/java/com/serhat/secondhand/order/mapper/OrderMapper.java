@@ -148,15 +148,24 @@ public class OrderMapper {
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())
                 .totalPrice(orderItem.getTotalPrice())
+                .campaignName(orderItem.getCampaignName())
+                .originalUnitPrice(orderItem.getOriginalUnitPrice())
+                .campaignDiscount(orderItem.getCampaignDiscount())
                 .currency(orderItem.getCurrency())
                 .notes(orderItem.getNotes())
                 .createdAt(orderItem.getCreatedAt())
                 .cancelledQuantity(cancelledQuantity > 0 ? cancelledQuantity : null)
                 .refundedQuantity(refundedQuantity > 0 ? refundedQuantity : null)
+                .remainingQuantity(remainingQuantity(orderItem.getQuantity(), cancelledQuantity, refundedQuantity))
                 .cancelReason(cancelReasons.get(orderItem.getId()))
                 .cancelReasonText(cancelReasonTexts.get(orderItem.getId()))
                 .refundReason(refundReasons.get(orderItem.getId()))
                 .refundReasonText(refundReasonTexts.get(orderItem.getId()))
                 .build();
+    }
+
+    static int remainingQuantity(Integer quantity, int cancelledQuantity, int refundedQuantity) {
+        int ordered = quantity != null ? quantity : 0;
+        return Math.max(0, ordered - cancelledQuantity - refundedQuantity);
     }
 }

@@ -1,4 +1,4 @@
-import { CreditCard, Package, Receipt, Sparkles, TrendingUp } from 'lucide-react';
+import { CreditCard, LayoutDashboard, LifeBuoy, Megaphone, Package, Receipt, Sparkles, Ticket, TrendingUp } from 'lucide-react';
 import { ROUTES } from '../../../constants/routes.js';
 
 export const getPaymentsMenuItems = () => [
@@ -12,7 +12,12 @@ export const getListingsMenuItems = () => [
   { to: ROUTES.MY_LISTINGS, icon: Package, labelKey: 'my_listings', key: 'listings' },
 ];
 
+/** Profile dropdown: the pages that were only reachable through the account hub sidebar. */
 export const getProfileMenuItems = () => [
-  { to: ROUTES.AURA_CHAT, icon: Sparkles, labelKey: 'aura_assistant', key: 'aura' },
+  { to: ROUTES.DASHBOARD, icon: LayoutDashboard, labelKey: 'account_hub', key: 'accountHub' },
   { to: ROUTES.MY_LISTINGS, icon: Package, labelKey: 'my_listings', key: 'myListings' },
+  { to: ROUTES.SELLER_CAMPAIGNS, icon: Megaphone, labelKey: 'campaigns', key: 'campaigns' },
+  { to: ROUTES.PLATFORM_COUPONS, icon: Ticket, labelKey: 'platform_coupons', key: 'coupons' },
+  { to: ROUTES.COMPLAINTS, icon: LifeBuoy, labelKey: 'complaints', key: 'complaints' },
+  { to: ROUTES.AURA_CHAT, icon: Sparkles, labelKey: 'aura_assistant', key: 'aura' },
 ];

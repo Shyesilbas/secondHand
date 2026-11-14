@@ -36,7 +36,7 @@ class InventoryKafkaConsumerTest {
     }
 
     private PaymentCompletedKafkaEvent event(String type) {
-        return event(type, null);
+        return event(type, 5L);
     }
 
     private PaymentCompletedKafkaEvent event(String type, Long orderItemId) {
@@ -47,6 +47,13 @@ class InventoryKafkaConsumerTest {
     @Test
     void listingFeeDoesNotTouchInventory() {
         consumer.consumePaymentCompleted(event("LISTING_CREATION"));
+        verifyNoInteractions(inventoryService);
+        verify(processed, never()).insertIfNotExists(any(), any());
+    }
+
+    @Test
+    void itemPurchaseWithoutOrderItem_doesNotTouchInventory() {
+        consumer.consumePaymentCompleted(event("ITEM_PURCHASE", null));
         verifyNoInteractions(inventoryService);
         verify(processed, never()).insertIfNotExists(any(), any());
     }

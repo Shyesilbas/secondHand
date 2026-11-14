@@ -76,3 +76,7 @@ app:
     outbox:
       fixed-delay-ms: ${PAYMENT_OUTBOX_FIXED_DELAY_MS:5000}
       initial-delay-ms: ${PAYMENT_OUTBOX_INITIAL_DELAY_MS:5000}
+  moderation:
+    worker:
+      enabled: ${MODERATION_WORKER_ENABLED:true}
+      cron: ${MODERATION_WORKER_CRON:0 0 * * * *}

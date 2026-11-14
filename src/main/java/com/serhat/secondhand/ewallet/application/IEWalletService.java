@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ewallet.application;
 
+import com.serhat.secondhand.ewallet.dto.WalletTransactionReference;
 import com.serhat.secondhand.ewallet.dto.*;
 import com.serhat.secondhand.payment.contract.PaymentTransactionKind;
 import com.serhat.secondhand.payment.entity.PaymentResult;
@@ -29,16 +30,18 @@ public interface IEWalletService {
     boolean hasSufficientBalance(User user, BigDecimal amount);
 
     boolean hasSufficientBalance(Long userId, BigDecimal amount);
+
+    BalanceCheckDto checkBalance(Long userId, BigDecimal amount);
     
     PaymentResult processEWalletPayment(User fromUser, User toUser, BigDecimal amount, UUID listingId);
     
     void creditToUser(User user, BigDecimal amount);
     
-    void creditToUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser);
+    void creditToUser(User user, BigDecimal amount, WalletTransactionReference reference, PaymentTransactionKind transactionKind, User counterpartUser);
 
     void creditWalletQuietly(User user, BigDecimal amount);
     
-    void debitFromUser(User user, BigDecimal amount, UUID listingId, String listingTitle, String listingNo, PaymentTransactionKind transactionKind, User counterpartUser);
+    void debitFromUser(User user, BigDecimal amount, WalletTransactionReference reference, PaymentTransactionKind transactionKind, User counterpartUser);
     
     SpendingWarningCheckResponse checkSpendingWarning(BigDecimal amount);
 }

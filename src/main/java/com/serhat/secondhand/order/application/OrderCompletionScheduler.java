@@ -89,7 +89,7 @@ public class OrderCompletionScheduler {
                 OrderStatus.DELIVERED, this::autoComplete, now);
         updatedCount += processEach(
                 orderRepository.findIdsByStatusMeetupVerifiedBefore(OrderStatus.HANDOVER_CONFIRMED,
-                        DeliveryMethod.SAFE_MEETUP, now.minusHours(24), FIRST_BATCH),
+                        DeliveryMethod.SAFE_MEETUP, now.minusHours(OrderBusinessConstants.MEETUP_AUTO_COMPLETION_HOURS), FIRST_BATCH),
                 OrderStatus.HANDOVER_CONFIRMED, this::completeVerifiedMeetup, now);
         updatedCount += processEach(
                 orderRepository.findIdsByStatusCreatedBefore(OrderStatus.MEETUP_PENDING,

@@ -10,7 +10,7 @@ Manages platform promotional coupons (`coupons`, `coupon_eligible_users`, `coupo
 
 ## Business Rules & Invariants
 - **Discount Kinds & Audiences:** Supports `CouponDiscountKind` (`ORDER_PERCENT`, `ORDER_FIXED`, `TYPE_PERCENT`, `TYPE_FIXED`, `THRESHOLD_FIXED`, `THRESHOLD_PERCENT`) and `CouponAudience` (`ALL_USERS`, `USER_ID_LIST`, `NEVER_ORDERED_FIRST_ORDER`).
-- **Vertical Exclusion & Post-Campaign Base:** `ListingType.REAL_ESTATE` and `ListingType.VEHICLE` are excluded (`COUPON_NOT_APPLICABLE`). `minSubtotal` is evaluated against the cart subtotal *after* seller campaigns.
+- **Vertical Exclusion & Post-Campaign Base:** Non-discountable verticals (`DiscountEligibility`) are rejected (`COUPON_NOT_APPLICABLE`). `minSubtotal` is evaluated against the cart subtotal *after* seller campaigns.
 - **Single Redemption per Checkout (`CouponService.redeem`):**
   1. Acquires a PostgreSQL `PESSIMISTIC_WRITE` row lock via `findByCodeIgnoreCaseForUpdate`.
   2. Executes `CouponRedisLimiterService.acquireCouponUsage` (`apply_coupon_with_limit.lua`) and registers `releaseUsageUnlessCommitted` (`release_coupon_usage.lua`) via `TransactionSynchronization` so rolled-back checkouts restore quota immediately.

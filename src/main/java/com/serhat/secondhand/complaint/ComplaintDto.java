@@ -39,6 +39,8 @@ public record ComplaintDto(
         /** Null when the decision cannot be appealed. */
         LocalDateTime appealDeadline,
         boolean badFaithReport,
-        PenaltyAction complainerPenaltyAction
+        PenaltyAction complainerPenaltyAction,
+        /** Content of the reported chat message; null when no message is reported or it was deleted. */
+        String reportedMessageContent
 ) {
 }

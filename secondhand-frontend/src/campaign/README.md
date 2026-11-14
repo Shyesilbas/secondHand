@@ -18,7 +18,8 @@ Generated from code; the hook files are the source of truth.
 | Query key | Defined in |
 |---|---|
 | `['campaigns', 'my', page, PAGE_SIZE]` | `MyCouponsPage.jsx` |
-| `['myListingsForCampaign']` | `CreateCampaignModal.jsx`, `MyCouponsPage.jsx` |
+| `['myListingsForCampaign']` | `CreateCampaignModal.jsx` |
+| `['campaignPickedListings', ids]` | `MyCouponsPage.jsx` (titles for picked listings, via `POST /v1/listings/bulks`) |
 
 | Invalidated / updated key | By |
 |---|---|

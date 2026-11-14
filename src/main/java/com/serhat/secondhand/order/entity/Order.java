@@ -244,6 +244,19 @@ public class Order {
         this.notes = notes;
     }
 
+    /**
+     * True once the buyer holds the goods. Review creation ({@code ReviewValidator}) and the
+     * {@code REVIEW} order action both read this rule.
+     */
+    public boolean isFulfilledForReview() {
+        if (this.deliveryMethod == DeliveryMethod.SAFE_MEETUP) {
+            return this.status == OrderStatus.HANDOVER_CONFIRMED || this.status == OrderStatus.COMPLETED;
+        }
+        ShippingStatus shippingStatus = this.shipping != null ? this.shipping.getStatus() : null;
+        return shippingStatus != null
+                && (shippingStatus == ShippingStatus.DELIVERED || this.status == OrderStatus.COMPLETED);
+    }
+
     public void markAsProcessing() {
         if (this.status != OrderStatus.CONFIRMED) {
             throw new IllegalStateException("Only confirmed orders can be moved to processing");

@@ -4,7 +4,7 @@ User-to-user complaints (`complaints` table), optionally about a listing or a ch
 
 > [!NOTE]
 > **Related Documentation:**
-> - **Design:** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](/docs/proposals/aura-trust-safety-and-complaint-moderation.md)
+> - **Design:** [`docs/proposals/aura-trust-safety-and-complaint-moderation.md`](/docs/proposals/aura-trust-safety-and-complaint-moderation.md) · [`docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md`](/docs/proposals/chat-moderation-user-blocking-and-messaging-settings.md)
 > - **Frontend Module:** [`secondhand-frontend/src/complaint/README.md`](/secondhand-frontend/src/complaint/README.md)
 > - **Key Entry Points:** [`ComplaintService`](application/ComplaintService.java) · [`ComplaintValidator`](validator/ComplaintValidator.java) · [`ComplaintReviewWorker`](queue/ComplaintReviewWorker.java) · [`AuraComplaintReviewHandler`](review/AuraComplaintReviewHandler.java) · [`AuraAppealReviewHandler`](review/AuraAppealReviewHandler.java) · [`SanctionPolicy`](review/SanctionPolicy.java) · [`SanctionExecutor`](review/SanctionExecutor.java)
 
@@ -20,8 +20,8 @@ User-to-user complaints (`complaints` table), optionally about a listing or a ch
 - **Notifications:** emails (`ComplaintEmailListener`) and bell notifications (`ComplaintNotificationListener`) after commit.
 
 ## Redis Queue & Worker
-- `ComplaintReviewQueue` (`QUEUE_KEY`, `APPEAL_QUEUE_KEY`), filled after commit by `ComplaintQueueListener`; `ComplaintQueueRecovery` releases stale claims and re-queues `PENDING` complaints and appeals on startup (ZADD NX).
-- `ComplaintReviewWorker` (`app.moderation.worker.*`, off by default) runs on `moderationExecutor` under `ComplaintWorkerLock`: up to `batch-size` complaints, then appeals; failures move back by `retry-delay`.
+- `ComplaintReviewQueue` (`QUEUE_KEY`, `APPEAL_QUEUE_KEY`), filled after commit by `ComplaintQueueListener`; `ComplaintQueueRecovery` releases stale claims, re-queues `PENDING` complaints and appeals on startup (ZADD NX), and triggers an initial worker batch.
+- `ComplaintReviewWorker` (`app.moderation.worker.*`) runs on `moderationExecutor` under `ComplaintWorkerLock`: up to `batch-size` complaints, then appeals; failures move back by `retry-delay`.
 
 ## API
 - `POST /api/v1/complaints` (`ComplaintController`) — submit (`ComplaintRequest`).

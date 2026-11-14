@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   CheckCircle,
@@ -12,6 +12,7 @@ import {
   Plus,
   Power,
   PowerOff,
+  Sparkles,
   Trash2,
   Zap
 } from 'lucide-react';
@@ -19,8 +20,10 @@ import { Button, Modal } from '../../common/components/ui/index.js';
 import { PriceInput } from '../../common/components/ui/PriceInput.jsx';
 import { listingService } from '../services/listingService.js';
 import { LISTING_STATUS, NON_PURCHASABLE_TYPES } from '../types/index.js';
-import { formatCurrency } from '../../common/formatters.js';
+import { formatCurrency, formatDate } from '../../common/formatters.js';
 import { optimizeCloudinaryUrl } from '../../common/utils/imageOptimizer.js';
+
+const ShowcaseModal = lazy(() => import('../../showcase/components/ShowcaseModal.jsx'));
 
 const MIN_QUANTITY = 1; // Backend UpdateQuantityRequest enforces @Min(1).
 const DISCOUNT_STEPS = [5, 10, 15];
@@ -73,11 +76,13 @@ export const ListingQuickActionsModal = ({
   listing,
   actions,
   listingInShowcase = false,
+  activeShowcase = null,
   onChanged,
   showSuccess,
   showError
 }) => {
   const { t } = useTranslation();
+  const [isShowcaseModalOpen, setIsShowcaseModalOpen] = useState(false);
 
   const initialPrice = Number(listing?.price) || 0;
   const initialQty = Number(listing?.quantity ?? MIN_QUANTITY);
@@ -168,7 +173,8 @@ export const ListingQuickActionsModal = ({
   const imageUrl = listing.imageUrl || listing.imageUrls?.[0];
 
   return (
-    <Modal
+    <>
+      <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={t('manage_listing', 'İlanı yönet')}
@@ -318,15 +324,89 @@ export const ListingQuickActionsModal = ({
           </section>
         )}
 
+        {!isSold && (
+          <section className="space-y-3 border-t border-border-light pt-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-text-tertiary">
+                {t('showcase', 'Vitrin')}
+              </h3>
+              {listingInShowcase && (
+                <span className="inline-flex items-center gap-1.5 rounded-sm border border-border-light bg-background-secondary px-2 py-0.5 text-xs font-medium text-text-secondary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-status-success" aria-hidden />
+                  <span>{t('featured', 'Vitrinde')}</span>
+                </span>
+              )}
+            </div>
+
+            <div className="rounded border border-border-light bg-background-secondary/40 p-3.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary">
+                    <Sparkles className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-text-primary">
+                      {listingInShowcase
+                        ? t('showcase_extended_title', 'İlanınız vitrinde')
+                        : t('add_to_showcase', 'Vitrine ekle')}
+                    </p>
+                    <p className="mt-0.5 text-xs text-text-secondary">
+                      {listingInShowcase
+                        ? (activeShowcase?.endDate
+                            ? `${t('expires', 'Bitiş')}: ${formatDate(activeShowcase.endDate)}`
+                            : t('showcase_desc', 'Anasayfa vitrininde göster'))
+                        : t('showcase_desc', 'Anasayfa vitrininde göster')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2">
+                  {listingInShowcase ? (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setIsShowcaseModalOpen(true)}
+                    >
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                      <span>{t('extend_showcase_title', 'Vitrin Süresini Uzat')}</span>
+                    </Button>
+                  ) : isActive ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setIsShowcaseModalOpen(true)}
+                    >
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />
+                      <span>{t('add_to_showcase', 'Vitrine ekle')}</span>
+                    </Button>
+                  ) : (
+                    <span className="text-xs text-text-muted">
+                      {t('status_inactive', 'Pasif')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <div className="space-y-4 border-t border-border-light pt-5">
           {!isSold && (
             <ActionGroup title={t('promote', 'Öne çıkar')}>
-              {isActive && !listingInShowcase && (
+              {!listingInShowcase ? (
+                isActive && (
+                  <ActionRow
+                    icon={Zap}
+                    title={t('add_to_showcase', 'Vitrine ekle')}
+                    description={t('showcase_desc', 'Anasayfa vitrininde göster')}
+                    onClick={() => setIsShowcaseModalOpen(true)}
+                  />
+                )
+              ) : (
                 <ActionRow
-                  icon={Zap}
-                  title={t('add_to_showcase', 'Vitrine ekle')}
-                  description={t('showcase_desc', 'Anasayfa vitrininde göster')}
-                  onClick={actions.handleOpenShowcase}
+                  icon={Sparkles}
+                  title={t('extend_showcase_title', 'Vitrin süresini uzat')}
+                  description={t('showcase_duration', 'Vitrin süresi')}
+                  onClick={() => setIsShowcaseModalOpen(true)}
                 />
               )}
               <ActionRow
@@ -402,5 +482,22 @@ export const ListingQuickActionsModal = ({
         </div>
       </div>
     </Modal>
+    {isShowcaseModalOpen && (
+      <Suspense fallback={null}>
+        <ShowcaseModal
+          isOpen={isShowcaseModalOpen}
+          onClose={() => setIsShowcaseModalOpen(false)}
+          listingId={listing.id}
+          listingTitle={listing.title}
+          isExtension={listingInShowcase}
+          showcaseId={activeShowcase?.id}
+          onSuccess={() => {
+            setIsShowcaseModalOpen(false);
+            onChanged?.(listing.id);
+          }}
+        />
+      </Suspense>
+    )}
+    </>
   );
 };

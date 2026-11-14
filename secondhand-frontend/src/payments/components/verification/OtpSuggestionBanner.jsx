@@ -4,6 +4,7 @@ import { Check, ChevronDown, Copy, Mail } from 'lucide-react';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
 import { OTP_CODE_LENGTH } from '../../../common/constants/otp.js';
 import Button from '../../../common/components/ui/Button.jsx';
+import { getProcessedContent } from '../../../emails/emails.js';
 
 const looksLikeHtml = (text) => /<\/?[a-z][\s\S]*>/i.test(text);
 
@@ -29,7 +30,7 @@ const EmailBody = ({ content }) => {
     <iframe
       ref={frameRef}
       title={t('payment_email_preview', 'Doğrulama e-postası')}
-      srcDoc={content}
+      srcDoc={getProcessedContent(content)}
       sandbox="allow-same-origin"
       referrerPolicy="no-referrer"
       onLoad={fitHeight}

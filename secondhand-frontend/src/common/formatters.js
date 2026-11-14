@@ -25,6 +25,24 @@ export const formatCurrency = (value, currency = 'TRY', options = {}) => {
     return `${sym}${formatted}`;
 };
 
+/** Formats raw unformatted monetary patterns in text, e.g. "10000000 TRY" -> "10.000.000,00 TRY". */
+export const formatMonetaryAmountsInText = (text) => {
+    if (!text || typeof text !== 'string') return text || '';
+    return text.replace(/\b(\d{1,3}(?:\.\d{3})*(?:,\d{2})?|\d+(?:\.\d{1,2})?|\d+,\d{1,2})\s*(TRY|TL|USD|EUR)\b/g, (match, rawNum, cur) => {
+        if (/\.\d{3}/.test(rawNum) && rawNum.includes(',')) return match;
+        let num;
+        if (/\.\d{3}/.test(rawNum) && !rawNum.includes(',')) {
+            num = parseFloat(rawNum.replace(/\./g, ''));
+        } else if (rawNum.includes(',')) {
+            num = parseFloat(rawNum.replace(',', '.'));
+        } else {
+            num = parseFloat(rawNum);
+        }
+        if (num == null || Number.isNaN(num)) return match;
+        return `${formatPrice(num)} ${cur}`;
+    });
+};
+
 export const formatCurrencyCompact = (value, currency = 'TRY', options = {}) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
 

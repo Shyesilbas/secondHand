@@ -17,6 +17,6 @@ public interface IShowcaseService {
     Result<Void> cancelShowcase(Long userId, UUID showcaseId);
     void expireShowcases();
     ShowcasePricingDto getShowcasePricingConfig();
+    Result<List<com.serhat.secondhand.showcase.dto.ShowcaseQuoteDto>> getShowcaseQuotes(Long userId, List<Integer> daysOptions);
     Result<Showcase> createShowcase(Long userId, ShowcasePaymentRequest request);
-    Result<List<Showcase>> createBulkShowcase(Long userId, com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request);
 }

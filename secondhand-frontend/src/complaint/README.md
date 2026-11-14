@@ -31,5 +31,6 @@ Generated from code; `complaintConstants.js` and the hook files are the source o
 ## 3. Module Rules
 - **Entry points:** `ComplaintButton` in `UserProfileHeader` and `ListingBuyBox` (listing complaint); `ReportMessageModal` from the chat message flag in `MessageList` (sends `chatRoomId` and `reportedMessageId`).
 - **Evidence:** `EvidenceImagePicker` uploads through the image endpoint; the limit mirrors `app.moderation.max-evidence-images`.
+- **Detail:** a card opens `ComplaintDetailModal`, which shows the reported chat message (`reportedMessageContent` from the backend, null once the message is deleted), the listing link, evidence and the Aura decision.
 - **Appeal:** offered only while `appealStatus` is `NONE` and `appealDeadline` is in the future; the backend validates again.
 - **Errors:** show backend codes (`COMPLAINT_ALREADY_EXISTS`, `APPEAL_WINDOW_CLOSED`) via `getErrorMessage`.

@@ -51,7 +51,9 @@ const CheckoutPaymentStep = ({
   const [isWorking, setIsWorking] = useState(false);
 
   const walletBalance = Number(eWallet?.balance || 0);
-  const hasEnoughBalance = !!eWallet && totalAmount <= walletBalance;
+  // totalAmount is null until the backend pricing preview loads; never pay or warn on a guessed amount.
+  const isPriced = totalAmount != null;
+  const hasEnoughBalance = isPriced && !!eWallet && totalAmount <= walletBalance;
   const agreementsAccepted = areAllAgreementsAccepted();
   const canProceed = hasEnoughBalance && agreementsAccepted;
   const isMeetup = deliveryMethod === 'SAFE_MEETUP';
@@ -150,7 +152,7 @@ const CheckoutPaymentStep = ({
           <p className="tabular-nums text-text-secondary">
             {t('checkout_wallet_balance', 'Bakiye')}: <span className="font-semibold text-text-price">{formatCurrency(walletBalance, cur)}</span>
           </p>
-          {!hasEnoughBalance && (
+          {isPriced && !hasEnoughBalance && (
             <div className="mt-1 flex items-center gap-1.5 text-xs text-status-error-text" role="alert">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
               <span>
@@ -204,7 +206,9 @@ const CheckoutPaymentStep = ({
               </>
             ) : (
               <>
-                <span>{t('checkout_confirm_send_code', { defaultValue: '{{amount}} öde, kodu gönder', amount: formatCurrency(totalAmount, cur) })}</span>
+                <span>{isPriced
+                  ? t('checkout_confirm_send_code', { defaultValue: '{{amount}} öde, kodu gönder', amount: formatCurrency(totalAmount, cur) })
+                  : t('checkout_price_loading', 'Fiyat hesaplanıyor')}</span>
                 <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
               </>
             )}

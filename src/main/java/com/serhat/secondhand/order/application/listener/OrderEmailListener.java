@@ -68,7 +68,8 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String displayName = getOrderDisplayName(order.getName(), order.getOrderNumber());
-            // For a system cancellation the requester is the refunded buyer and the others are the seller(s).
+            // For a system cancellation the requester is the refunded buyer and the others
+            // are the seller(s).
             String content = switch (event.cause()) {
                 case SHIP_DEADLINE_MISSED -> "Siparişiniz (" + displayName + ") satıcı "
                         + OrderBusinessConstants.SHIP_DEADLINE_HOURS
@@ -91,7 +92,8 @@ public class OrderEmailListener {
                     .headerTitle("Sipariş İptali")
                     .message(content)
                     .build();
-            emailEventPublisher.publish(new OrderCancelledEmailEvent(event.requester(), emailConfig.getOrder().getCancelledSubject(), data1));
+            emailEventPublisher.publish(new OrderCancelledEmailEvent(event.requester(),
+                    emailConfig.getOrder().getCancelledSubject(), data1));
 
             Order full = orderRepository.findByIdWithOrderItemsAndSellers(order.getId()).orElse(order);
             Set<Long> recipientIds = new LinkedHashSet<>();
@@ -117,7 +119,8 @@ public class OrderEmailListener {
                         .headerTitle("Sipariş İptali")
                         .message(counterpartyMessage)
                         .build();
-                emailEventPublisher.publish(new OrderCancelledEmailEvent(counterparty, emailConfig.getOrder().getCancelledSubject(), data));
+                emailEventPublisher.publish(
+                        new OrderCancelledEmailEvent(counterparty, emailConfig.getOrder().getCancelledSubject(), data));
             }
 
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
@@ -132,14 +135,16 @@ public class OrderEmailListener {
         try {
             Order order = event.order();
             String completionWord = event.isAutomatic() ? "otomatik olarak tamamlandı" : "tamamlandı";
-            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") " + completionWord + ".";
+            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") "
+                    + completionWord + ".";
 
             var data = GenericEmailData.builder()
                     .userName(event.buyer().getName())
                     .headerTitle("Sipariş Tamamlandı")
                     .message(content)
                     .build();
-            emailEventPublisher.publish(new OrderCompletedEmailEvent(event.buyer(), emailConfig.getOrder().getCompletedSubject(), data));
+            emailEventPublisher.publish(
+                    new OrderCompletedEmailEvent(event.buyer(), emailConfig.getOrder().getCompletedSubject(), data));
             orderLog.logNotificationSent("orderCompletedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderCompletedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -151,14 +156,16 @@ public class OrderEmailListener {
     public void onOrderRefunded(OrderRefundedEvent event) {
         try {
             Order order = event.order();
-            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber()) + ") iade edilmiştir. İade tutarı e-cüzdanınıza aktarıldı.";
+            String content = "Siparişiniz (" + getOrderDisplayName(order.getName(), order.getOrderNumber())
+                    + ") iade edilmiştir. İade tutarı e-cüzdanınıza aktarıldı.";
 
             var data = GenericEmailData.builder()
                     .userName(event.buyer().getName())
                     .headerTitle("Sipariş İade")
                     .message(content)
                     .build();
-            emailEventPublisher.publish(new OrderRefundedEmailEvent(event.buyer(), emailConfig.getOrder().getRefundedSubject(), data));
+            emailEventPublisher.publish(
+                    new OrderRefundedEmailEvent(event.buyer(), emailConfig.getOrder().getRefundedSubject(), data));
             orderLog.logNotificationSent("orderRefundedEmail", order.getOrderNumber());
         } catch (Exception e) {
             orderLog.logNotificationFailed("orderRefundedEmail", event.order().getOrderNumber(), e.getMessage());
@@ -174,25 +181,34 @@ public class OrderEmailListener {
 
             if (orderDto.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP && orderDto.getShippingAddress() != null) {
                 shippingAddress = orderDto.getShippingAddress().getAddressLine() + "<br>" +
-                                 orderDto.getShippingAddress().getCity() + " " +
-                                 orderDto.getShippingAddress().getState() + " " +
-                                 orderDto.getShippingAddress().getPostalCode() + "<br>" +
-                                 orderDto.getShippingAddress().getCountry();
+                        orderDto.getShippingAddress().getCity() + " " +
+                        orderDto.getShippingAddress().getState() + " " +
+                        orderDto.getShippingAddress().getPostalCode() + "<br>" +
+                        orderDto.getShippingAddress().getCountry();
             }
 
-            String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
-            String paymentMethodLabel = orderDto.getPaymentProviderName() != null ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentProviderName()) : "E-Cüzdan (E-Wallet)";
+            String formattedDate = orderDto.getCreatedAt() != null
+                    ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt())
+                    : "";
+            String paymentMethodLabel = orderDto.getPaymentProviderName() != null
+                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)"
+                            : orderDto.getPaymentProviderName())
+                    : "E-Cüzdan (E-Wallet)";
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(customer.getName())
                     .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
                     .status(orderDto.getStatus() != null ? orderDto.getStatus().name() : "")
                     .paymentStatus(orderDto.getPaymentStatus() != null ? orderDto.getPaymentStatus().name() : "")
-                    .totalAmount(orderDto.getTotalAmount() + " " + orderDto.getCurrency())
+                    .totalAmount(formatMoney(orderDto.getTotalAmount(),
+                            orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY"))
                     .items(orderDto.getOrderItems())
                     .deliveryMethod(orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "")
-                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
-                    .meetupVerificationCode(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP ? orderDto.getMeetupVerificationCode() : "")
+                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP
+                            && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
+                    .meetupVerificationCode(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP
+                            ? orderDto.getMeetupVerificationCode()
+                            : "")
                     .shippingAddress(shippingAddress)
                     .orderDate(formattedDate)
                     .paymentMethod(paymentMethodLabel)
@@ -208,7 +224,8 @@ public class OrderEmailListener {
 
     private void sendSellerNotificationEmails(OrderDto orderDto) {
         if (orderDto.getOrderItems() == null || orderDto.getOrderItems().isEmpty()) {
-            orderLog.logDataWarning("No order items found for seller email notifications in order: {}", orderDto.getOrderNumber());
+            orderLog.logDataWarning("No order items found for seller email notifications in order: {}",
+                    orderDto.getOrderNumber());
             return;
         }
 
@@ -234,26 +251,33 @@ public class OrderEmailListener {
 
             if (orderDto.getDeliveryMethod() != DeliveryMethod.SAFE_MEETUP && orderDto.getShippingAddress() != null) {
                 shippingAddress = orderDto.getShippingAddress().getAddressLine() + "<br>" +
-                                 orderDto.getShippingAddress().getCity() + " " +
-                                 orderDto.getShippingAddress().getState() + " " +
-                                 orderDto.getShippingAddress().getPostalCode() + "<br>" +
-                                 orderDto.getShippingAddress().getCountry();
+                        orderDto.getShippingAddress().getCity() + " " +
+                        orderDto.getShippingAddress().getState() + " " +
+                        orderDto.getShippingAddress().getPostalCode() + "<br>" +
+                        orderDto.getShippingAddress().getCountry();
             }
 
             BigDecimal total = sellerItems.stream()
-                .map(OrderItemDto::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    .map(OrderItemDto::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            String formattedDate = orderDto.getCreatedAt() != null ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt()) : "";
-            String paymentMethodLabel = orderDto.getPaymentProviderName() != null ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)" : orderDto.getPaymentProviderName()) : "E-Cüzdan (E-Wallet)";
+            String formattedDate = orderDto.getCreatedAt() != null
+                    ? java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm").format(orderDto.getCreatedAt())
+                    : "";
+            String paymentMethodLabel = orderDto.getPaymentProviderName() != null
+                    ? (orderDto.getPaymentProviderName().equals("EWALLET") ? "E-Cüzdan (E-Wallet)"
+                            : orderDto.getPaymentProviderName())
+                    : "E-Cüzdan (E-Wallet)";
 
             var data = OrderConfirmationEmailData.builder()
                     .userName(seller.getName())
                     .orderNumber(getOrderDisplayName(orderDto.getName(), orderDto.getOrderNumber()))
-                    .totalAmount(total + " " + orderDto.getCurrency())
+                    .totalAmount(
+                            formatMoney(total, orderDto.getCurrency() != null ? orderDto.getCurrency().name() : "TRY"))
                     .items(sellerItems)
                     .deliveryMethod(orderDto.getDeliveryMethod() != null ? orderDto.getDeliveryMethod().name() : "")
-                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
+                    .meetupLocation(orderDto.getDeliveryMethod() == DeliveryMethod.SAFE_MEETUP
+                            && orderDto.getMeetupLocation() != null ? orderDto.getMeetupLocation() : "Belirtilmemiş")
                     .shippingAddress(shippingAddress)
                     .orderDate(formattedDate)
                     .paymentMethod(paymentMethodLabel)
@@ -276,5 +300,12 @@ public class OrderEmailListener {
             return "#ORD-" + cleanNumber.substring(0, Math.min(8, cleanNumber.length()));
         }
         return "Unknown";
+    }
+
+    private String formatMoney(BigDecimal amount, String currency) {
+        if (amount == null)
+            return "0,00 " + (currency != null ? currency : "TRY");
+        return String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f %s", amount,
+                currency != null ? currency : "TRY");
     }
 }

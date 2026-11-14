@@ -8,6 +8,7 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.policy.OrderCompletionPolicy;
 import com.serhat.secondhand.order.repository.OrderRepository;
+import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.order.validator.OrderStatusConsistencyLogger;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -68,9 +69,10 @@ public class OrderCompletionService {
             return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
         }
 
-        // Check if code has expired (5 minutes)
+        // Check if code has expired
         if (order.getMeetupVerificationCodeGeneratedAt() != null) {
-            if (order.getMeetupVerificationCodeGeneratedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+            if (order.getMeetupVerificationCodeGeneratedAt().isBefore(
+                    LocalDateTime.now().minusMinutes(OrderBusinessConstants.MEETUP_CODE_TTL_MINUTES))) {
                 return Result.error(OrderErrorCodes.MEETUP_CODE_EXPIRED);
             }
         }
@@ -89,7 +91,7 @@ public class OrderCompletionService {
             }
         }
 
-        if (order.getStatus() != OrderStatus.MEETUP_PENDING && order.getStatus() != OrderStatus.VERIFICATION_LOCKED) {
+        if (!order.getStatus().isMeetupVerifiable()) {
             return Result.error("Order is not in a verification pending state", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
         }
 
@@ -145,13 +147,8 @@ public class OrderCompletionService {
             return Result.error(OrderErrorCodes.NOT_AUTHORIZED_FOR_ORDER);
         }
 
-        if (order.getStatus() != OrderStatus.HANDOVER_CONFIRMED && order.getStatus() != OrderStatus.MEETUP_PENDING) {
-            return Result.error("Order handover is not confirmed yet", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
-        }
-
-        if (order.getStatus() == OrderStatus.MEETUP_PENDING && !isBuyer) {
-            return Result.error("Only the buyer can manually complete a pending meetup order without code verification", OrderErrorCodes.ORDER_CANNOT_BE_COMPLETED.getCode());
-        }
+        Result<Void> handoverValidation = orderCompletionPolicy.validateHandoverConfirmable(order, isBuyer);
+        if (handoverValidation.isError()) return handoverValidation.propagateError();
 
         Result<Void> releaseResult = releaseEscrowsForOrder(order);
         if (releaseResult.isError()) return escrowReleaseFailed();

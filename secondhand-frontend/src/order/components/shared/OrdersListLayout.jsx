@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import React, { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ORDER_QUERY_KEYS } from '../../orderConstants.js';
+import { ORDER_QUERY_KEYS, hasOrderAction } from '../../orderConstants.js';
 import { orderService } from '../../services/orderService.js';
 import { formatCurrency, formatLongDate, resolveEnumLabel } from '../../../common/formatters.js';
 import { ROUTES } from '../../../common/constants/routes.js';
@@ -12,6 +12,7 @@ import PaymentReceiptModal from '../../../common/components/modals/PaymentReceip
 import OrderDetailsModal from '../OrderDetailsModal.jsx';
 import ReviewModal from '../../../reviews/components/ReviewModal.jsx';
 import {
+ ORDER_ACTIONS,
  ORDER_DEFAULTS,
  ORDER_LIST_TABS,
  ORDER_STATUSES,
@@ -79,7 +80,7 @@ const useOrdersCopy = () => {
  summaryEscrow: t('orders_ui_summary_escrow', 'Güvencede bekleyen'),
  summaryCompleted: t('orders_ui_summary_completed', 'Tamamlanan satış'),
  escrowInRow: amount => t('orders_ui_escrow_in_row', { defaultValue: '{{amount}} güvencede', amount }),
- escrowAwaitingDelivery: t('orders_ui_escrow_awaiting_delivery', 'teslimattan 72 saat sonra aktarılır'),
+ escrowAwaitingDelivery: t('orders_ui_escrow_awaiting_delivery', 'teslimat onaylandıktan sonra aktarılır'),
  escrowReleased: t('orders_ui_escrow_released', 'otomatik aktarıldı'),
  escrowReleasesIn: hours => t('orders_ui_escrow_releases_in', { defaultValue: '~{{hours}} saat içinde aktarılır', hours }),
  startShopping: t('orders_ui_start_shopping', 'Alışverişe başla'),
@@ -295,16 +296,13 @@ const OrderRowSkeleton = () => (
  </div>
 );
 
+// Release time is the backend `autoCompleteAt`; the release itself is the COMPLETED status.
 const escrowReleaseHint = (order, uiCopy) => {
- const deliveredAt = order.shipping?.deliveredAt;
- if (!deliveredAt) return uiCopy.escrowAwaitingDelivery;
- const diffMs = new Date(deliveredAt).getTime() + ORDER_TIME.DELIVERY_CONFIRMATION_WINDOW_MS - Date.now();
- if (diffMs <= 0) return uiCopy.escrowReleased;
- return uiCopy.escrowReleasesIn(Math.ceil(diffMs / ORDER_TIME.MINUTE_MS / 60));
+ if (order.status === ORDER_STATUSES.COMPLETED) return uiCopy.escrowReleased;
+ if (!order.autoCompleteAt) return uiCopy.escrowAwaitingDelivery;
+ const diffMs = new Date(order.autoCompleteAt).getTime() - Date.now();
+ return uiCopy.escrowReleasesIn(Math.max(1, Math.ceil(diffMs / ORDER_TIME.MINUTE_MS / 60)));
 };
-
-const isAwaitingSellerShipment = order =>
- order.deliveryMethod === 'CARGO' && SELLER_TO_SHIP_STATUSES.includes(order.status) && !!order.createdAt;
 
 /** Re-renders every minute so the remaining ship time stays current. */
 const useMinuteTick = (enabled) => {
@@ -317,9 +315,10 @@ const useMinuteTick = (enabled) => {
  return now;
 };
 
-const ShipDeadline = ({ createdAt, uiCopy }) => {
+/** Counts down to the backend `shipDeadline`; the scheduler cancels the order after it. */
+const ShipDeadline = ({ deadline, uiCopy }) => {
  const now = useMinuteTick(true);
- const leftMs = new Date(createdAt).getTime() + ORDER_TIME.SHIP_DEADLINE_MS - now;
+ const leftMs = new Date(deadline).getTime() - now;
  if (leftMs <= 0) {
  return (
  <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-status-error">
@@ -340,28 +339,28 @@ const ShipDeadline = ({ createdAt, uiCopy }) => {
  );
 };
 
-// One next step per status; the most important one for the viewer is the primary button.
+// One next step per row, picked from the backend `allowedActions`; the most important one is primary.
 const getRowAction = ({ order, isBuyer, isReviewed, uiCopy, handlers }) => {
- const s = order.status;
+ const can = action => hasOrderAction(order, action);
  if (isBuyer) {
- if (s === ORDER_STATUSES.DELIVERED || s === ORDER_STATUSES.HANDOVER_CONFIRMED) {
+ if (can(ORDER_ACTIONS.COMPLETE)) {
  return { variant: 'primary', icon: CircleCheck, label: uiCopy.confirmReceipt, onClick: e => handlers.complete(order.id, e) };
  }
- if (s === ORDER_STATUSES.MEETUP_PENDING) {
+ if (can(ORDER_ACTIONS.SHOW_MEETUP_CODE)) {
  return { variant: 'secondary', icon: KeyRound, label: uiCopy.meetupCode, onClick: () => handlers.open(order) };
  }
- if (s === ORDER_STATUSES.SHIPPED) {
+ if (order.status === ORDER_STATUSES.SHIPPED) {
  return { variant: 'secondary', icon: Truck, label: uiCopy.trackShipment, onClick: () => handlers.open(order) };
  }
- if (s === ORDER_STATUSES.COMPLETED && !isReviewed) {
+ if (can(ORDER_ACTIONS.REVIEW) && !isReviewed) {
  return { variant: 'secondary', icon: Star, label: uiCopy.reviewNow, onClick: () => handlers.review(order) };
  }
  return null;
  }
- if (SELLER_TO_SHIP_STATUSES.includes(s) && order.deliveryMethod !== 'SAFE_MEETUP') {
+ if (can(ORDER_ACTIONS.SHIP)) {
  return { variant: 'primary', icon: Truck, label: uiCopy.shipOrder, onClick: () => handlers.open(order) };
  }
- if (s === ORDER_STATUSES.MEETUP_PENDING) {
+ if (can(ORDER_ACTIONS.VERIFY_MEETUP)) {
  return { variant: 'secondary', icon: KeyRound, label: uiCopy.meetupDetail, onClick: () => handlers.open(order) };
  }
  return null;
@@ -376,9 +375,8 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
  const title = order.name || firstItem?.listing?.title || uiCopy.orderCardTitleFallback;
  const extraCount = Math.max(items.length - 1, 0);
  const currency = order.currency || 'TRY';
- const total = isBuyer
- ? parseFloat(order.totalAmount)
- : items.reduce((sum, item) => sum + (parseFloat(item.totalPrice) || 0), 0);
+ // Seller rows show the backend sellerTotal (this seller's escrow share), never a client-side sum.
+ const total = parseFloat(isBuyer ? order.totalAmount : order.sellerTotal) || 0;
  const statusLabel = resolveEnumLabel(enums, 'orderStatuses', order.status) || order.status;
  const deliveryLabel = order.deliveryMethod === 'SAFE_MEETUP' ? uiCopy.deliveryMeetup : order.deliveryMethod === 'CARGO' ? uiCopy.deliveryCargo : null;
  const counterpart = isBuyer
@@ -431,7 +429,7 @@ const OrderRow = React.memo(({ viewMode, order, enums, uiCopy, isReviewed, highl
  {extraCount > 0 && <span className="ml-1.5 font-normal text-text-tertiary">{uiCopy.moreItems(extraCount)}</span>}
  </p>
  <p className="mt-1 truncate text-sm tabular-nums text-text-tertiary">{meta.join(' · ')}</p>
- {!isBuyer && isAwaitingSellerShipment(order) && <ShipDeadline createdAt={order.createdAt} uiCopy={uiCopy} />}
+ {!isBuyer && order.shipDeadline && <ShipDeadline deadline={order.shipDeadline} uiCopy={uiCopy} />}
  </div>
  <p className="shrink-0 text-base font-semibold tabular-nums text-text-price">
  <span className="sr-only">{uiCopy.totalLabel}: </span>

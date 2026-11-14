@@ -7,6 +7,7 @@ import { useMyComplaints, useReceivedComplaints } from '../hooks/useComplaints.j
 import { getComplaintErrorMessage } from '../utils/complaintError.js';
 import { COMPLAINT_TABS } from '../complaintConstants.js';
 import ComplaintCard from '../components/ComplaintCard.jsx';
+import ComplaintDetailModal from '../components/ComplaintDetailModal.jsx';
 import AppealModal from '../components/AppealModal.jsx';
 import RestrictionBanner from '../components/RestrictionBanner.jsx';
 
@@ -14,10 +15,13 @@ const ComplaintsPage = () => {
   const { t } = useTranslation();
   const [tab, setTab] = useState(COMPLAINT_TABS.FILED);
   const [appealing, setAppealing] = useState(null);
+  // Only the id is kept locally; the complaint itself is read from the query so the modal reflects server state.
+  const [openedId, setOpenedId] = useState(null);
   const filed = useMyComplaints({ enabled: tab === COMPLAINT_TABS.FILED });
   const received = useReceivedComplaints({ enabled: tab === COMPLAINT_TABS.RECEIVED });
   const query = tab === COMPLAINT_TABS.FILED ? filed : received;
   const complaints = query.data || [];
+  const opened = complaints.find((c) => c.complaintId === openedId) || null;
 
   const tabs = [
     { key: COMPLAINT_TABS.FILED, label: t('complaints_filed', 'Filed by me') },
@@ -84,6 +88,7 @@ const ComplaintsPage = () => {
                 key={complaint.complaintId}
                 complaint={complaint}
                 side={tab}
+                onOpen={(c) => setOpenedId(c.complaintId)}
                 onAppeal={setAppealing}
               />
             ))}
@@ -91,6 +96,12 @@ const ComplaintsPage = () => {
         )}
       </PageContainer>
 
+      <ComplaintDetailModal
+        complaint={opened}
+        side={tab}
+        isOpen={Boolean(opened)}
+        onClose={() => setOpenedId(null)}
+      />
       <AppealModal complaint={appealing} isOpen={Boolean(appealing)} onClose={() => setAppealing(null)} />
     </div>
   );

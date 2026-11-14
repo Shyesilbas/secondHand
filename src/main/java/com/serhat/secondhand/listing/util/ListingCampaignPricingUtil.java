@@ -1,5 +1,6 @@
 package com.serhat.secondhand.listing.util;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.campaign.application.ICampaignService;
@@ -20,7 +21,6 @@ public class ListingCampaignPricingUtil {
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     private static final int SCALE = 2;
     private static final int PRECISION = 6;
-    private static final Set<ListingType> NON_CAMPAIGNABLE_TYPES = EnumSet.of(ListingType.REAL_ESTATE, ListingType.VEHICLE);
 
     private final ICampaignService campaignService;
 
@@ -70,7 +70,7 @@ public class ListingCampaignPricingUtil {
             return;
         }
 
-        if (isNonCampaignableType(dto.getType())) {
+        if (!DiscountEligibility.isDiscountable(dto.getType())) {
             setNoCampaignData(dto);
             return;
         }
@@ -84,10 +84,6 @@ public class ListingCampaignPricingUtil {
         }
 
         applyCampaign(dto, bestCampaign, unitPrice);
-    }
-
-    private boolean isNonCampaignableType(ListingType type) {
-        return NON_CAMPAIGNABLE_TYPES.contains(type);
     }
 
     private Campaign findBestCampaign(List<Campaign> campaigns, UUID listingId, ListingType type, BigDecimal unitPrice) {
@@ -104,7 +100,7 @@ public class ListingCampaignPricingUtil {
                 continue;
             }
 
-            BigDecimal discount = computeDiscount(campaign, unitPrice);
+            BigDecimal discount = unitDiscount(campaign, unitPrice);
             if (discount.compareTo(bestDiscount) > 0) {
                 bestDiscount = discount;
                 bestCampaign = campaign;
@@ -115,7 +111,7 @@ public class ListingCampaignPricingUtil {
     }
 
     private void applyCampaign(ListingDto dto, Campaign campaign, BigDecimal unitPrice) {
-        BigDecimal discount = computeDiscount(campaign, unitPrice);
+        BigDecimal discount = unitDiscount(campaign, unitPrice);
         BigDecimal campaignPrice = calculateCampaignPrice(unitPrice, discount);
 
         dto.setCampaignPrice(campaignPrice);
@@ -141,7 +137,7 @@ public class ListingCampaignPricingUtil {
     }
 
     public boolean isApplicable(Campaign campaign, UUID listingId, ListingType type) {
-        if (campaign == null || !campaign.isActive() || isNonCampaignableType(type)) {
+        if (campaign == null || !campaign.isActive() || !DiscountEligibility.isDiscountable(type)) {
             return false;
         }
 
@@ -172,7 +168,10 @@ public class ListingCampaignPricingUtil {
         return collection != null && !collection.isEmpty();
     }
 
-    private BigDecimal computeDiscount(Campaign campaign, BigDecimal unitPrice) {
+    /**
+     * Per-unit discount of a campaign, capped at the unit price. Single formula for listing cards and checkout pricing.
+     */
+    public static BigDecimal unitDiscount(Campaign campaign, BigDecimal unitPrice) {
         BigDecimal discount;
         if (campaign.getDiscountKind() == CampaignDiscountKind.PERCENT) {
             BigDecimal percentage = campaign.getValue().divide(HUNDRED, PRECISION, RoundingMode.HALF_UP);
@@ -186,7 +185,7 @@ public class ListingCampaignPricingUtil {
         return discount;
     }
 
-    private BigDecimal scale(BigDecimal value) {
+    private static BigDecimal scale(BigDecimal value) {
         return value == null ? ZERO : value.setScale(SCALE, RoundingMode.HALF_UP);
     }
 }

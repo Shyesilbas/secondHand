@@ -66,7 +66,7 @@ const PaymentFilterSidebar = ({
  <span className="text-sm font-medium inline-flex items-center gap-2">
  <ShoppingCart className="w-4 h-4" />{t("purchases")}</span>
  </button>
- <button onClick={() => handleInputChange('paymentType', localFilters.paymentType === PAYMENT_TYPES.EWALLET ? '' : PAYMENT_TYPES.EWALLET)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.paymentType === PAYMENT_TYPES.EWALLET ? 'border-card-border-hover bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
+ <button onClick={() => handleInputChange('providerName', localFilters.providerName === PAYMENT_TYPES.EWALLET ? '' : PAYMENT_TYPES.EWALLET)} className={`w-full p-2.5 rounded border transition-all duration-200 text-left ${localFilters.providerName === PAYMENT_TYPES.EWALLET ? 'border-card-border-hover bg-primary text-text-inverse' : 'border-border-light bg-background-primary text-text-secondary hover:border-card-border-hover'}`}>
  <span className="text-sm font-medium inline-flex items-center gap-2">
  <Wallet className="w-4 h-4" />{t("ewallet")}</span>
  </button>
@@ -96,7 +96,7 @@ const PaymentFilterSidebar = ({
 
  <div className="bg-background-primary rounded-md border border-border-light p-4">
  <h3 className="text-sm font-medium text-text-primary mb-3">{t("payment_method")}</h3>
- <select value={localFilters.paymentType || ''} onChange={e => handleInputChange('paymentType', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-xs focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all">
+ <select value={localFilters.transactionType || ''} onChange={e => handleInputChange('transactionType', e.target.value)} className="w-full px-2 py-2.5 bg-background-secondary border border-border-light rounded text-xs focus:ring-4 focus:ring-primary-200 focus:border-primary focus:bg-background-primary transition-all">
  <option value="">{t("all_payment_methods")}</option>
  <option value={PAYMENT_TYPES.EWALLET}>{t("ewallet")}</option>
  </select>

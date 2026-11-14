@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { enumService } from '../services/enumService.js';
@@ -34,5 +34,11 @@ export const useEnums = (options = {}) => {
     [enums.listingTypes, t, i18n.language]
   );
 
-  return { enums, isLoading, error, getListingTypeLabel: getLabel };
+  // Verticals that may receive seller campaigns or platform coupons; the backend owns this rule.
+  const discountableListingTypes = useMemo(
+    () => (enums.listingTypes || []).filter((type) => type.discountable).map((type) => type.value),
+    [enums.listingTypes]
+  );
+
+  return { enums, isLoading, error, getListingTypeLabel: getLabel, discountableListingTypes };
 };

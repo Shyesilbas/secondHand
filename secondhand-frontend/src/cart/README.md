@@ -21,7 +21,7 @@ Generated from code; the hook files are the source of truth.
 |---|---|
 | `['activeCoupons']` | `ActiveCouponsModal.jsx` |
 | `['cartItems', user?.id]` | `useCart.js` |
-| `['cartPricingAndCampaigns', cartKey, sellerIds, appliedCouponCode]` | `ShoppingCartPage.jsx` |
+| `['cartPricing', cartKey, appliedCouponCode]` | `ShoppingCartPage.jsx` |
 | `['checkoutPreview', cartKey, appliedCouponCode, offerId]` | `CheckoutPage.jsx` |
 | `['listing', 'social-proof', listingId]` | `useActiveReservationCount.js` |
 | `['offerContext', offerId]` | `CheckoutPage.jsx` |
@@ -31,6 +31,11 @@ Generated from code; the hook files are the source of truth.
 | `['cartItems']` | `useCart.js` |
 
 ## 3. Form & Business Invariants
+
+### Backend-Owned Prices
+- Cart and checkout show only amounts from the pricing preview (`couponService.preview`): per line from `items[]` (matched by `listingId` via `indexPricedLines`), totals from the result, bundle hints from `bundleCampaigns[]`. No price arithmetic in the UI; amounts show a `Skeleton` while the preview loads.
+- `getPricedTotal` returns null until the preview loads; checkout payment stays disabled on null.
+- The cart query uses `keepPreviousData`: while repricing, prices stay dimmed, a line priced for another quantity shows a `Skeleton`, coupon checks wait for real data and checkout is disabled.
 
 ### 15-Minute Stock Reservation Synchronization
 - When entering `/checkout`, the backend reserves physical stock in Redis for 900 seconds (`reserve_stock_with_ttl.lua`).

@@ -143,8 +143,9 @@ public class OfferEmailNotificationService {
             String nextStep) {
         String unitPrice = "";
         if (offer.getTotalPrice() != null && offer.getQuantity() != null && offer.getQuantity() > 0) {
-            unitPrice = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2, RoundingMode.HALF_UP)
-                    + " TL";
+            BigDecimal unit = offer.getTotalPrice().divide(BigDecimal.valueOf(offer.getQuantity()), 2,
+                    RoundingMode.HALF_UP);
+            unitPrice = String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", unit);
         }
 
         var data = OfferEmailData.builder()
@@ -153,7 +154,9 @@ public class OfferEmailNotificationService {
                 .headline(headline)
                 .listingTitle(offer.getListing() != null ? offer.getListing().getTitle() : "Bilinmeyen İlan")
                 .quantity(offer.getQuantity() != null ? offer.getQuantity() : 0)
-                .totalPrice(offer.getTotalPrice() != null ? (offer.getTotalPrice() + " TL") : "")
+                .totalPrice(offer.getTotalPrice() != null
+                        ? String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f TL", offer.getTotalPrice())
+                        : "")
                 .unitPrice(unitPrice)
                 .expiresAt(offer.getExpiresAt() != null ? offer.getExpiresAt().toString() : "")
                 .nextStep(nextStep)

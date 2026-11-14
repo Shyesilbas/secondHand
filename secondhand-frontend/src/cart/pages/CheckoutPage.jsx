@@ -16,10 +16,11 @@ import { ROUTES } from '../../common/constants/routes.js';
 import { CART_CHECKOUT_DEFAULTS, CART_CHECKOUT_STEPS, CART_MESSAGES } from '../cartConstants.js';
 import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency } from '../../common/formatters.js';
-import { getCheckoutCurrency, getCheckoutLinePricing } from '../utils/checkoutLinePricing.js';
+import { getCheckoutCurrency, getPricedTotal } from '../utils/pricedLines.js';
 import logger from '../../common/utils/logger.js';
 import Alert from '../../common/components/ui/Alert.jsx';
 import Button from '../../common/components/ui/Button.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
 
 const CheckoutPage = () => {
   const { t } = useTranslation();
@@ -108,13 +109,7 @@ const CheckoutPage = () => {
     queryFn: async () => {
       const offer = await offerService.getById(offerId);
       const listing = offer?.listingId ? await listingService.getListingById(offer.listingId) : null;
-      const safeListing = listing ? {
-        ...listing,
-        campaignId: null,
-        campaignPrice: null,
-        campaignName: null
-      } : null;
-      return { offer, listing: safeListing };
+      return { offer, listing: listing || null };
     },
     enabled: !!offerId,
     staleTime: 5 * 60 * 1000,
@@ -165,12 +160,8 @@ const CheckoutPage = () => {
     ? pricingQueryData.error?.response?.data?.message || t('checkout_coupon_not_applied', CART_MESSAGES.COUPON_NOT_APPLIED)
     : couponDropped ? t('checkout_coupon_no_longer_applies', CART_MESSAGES.COUPON_NO_LONGER_APPLIES) : null;
 
-  const calculateTotal = useCallback(() => {
-    if (pricing?.total != null) {
-      return parseFloat(pricing.total) || 0;
-    }
-    return displayCartItems.reduce((total, item) => total + getCheckoutLinePricing(item).lineTotal, 0);
-  }, [pricing, displayCartItems]);
+  // Payable total from the backend preview only; null until it loads, and payment stays disabled meanwhile.
+  const calculateTotal = useCallback(() => getPricedTotal(pricing), [pricing]);
 
   const effectiveCartCount = offerId ? Math.max(cartCount, 1) : cartCount;
   const checkout = useCheckout(effectiveCartCount, calculateTotal, resetCartState, appliedCouponCode, offerId);
@@ -228,7 +219,7 @@ const CheckoutPage = () => {
 
   const reservationExpired = timeLeft <= 0;
   const summary = (
-    <CheckoutOrderSummary cartItems={displayCartItems} calculateTotal={calculateTotal} pricing={pricing} />
+    <CheckoutOrderSummary cartItems={displayCartItems} pricing={pricing} />
   );
 
   return (
@@ -291,7 +282,9 @@ const CheckoutPage = () => {
             {isOrderSummaryExpanded ? t('hide_order_summary', 'Özeti gizle') : t('show_order_summary', 'Özeti göster')}
             <ChevronDown className={`h-4 w-4 text-text-tertiary transition-transform duration-150 ${isOrderSummaryExpanded ? 'rotate-180' : ''}`} strokeWidth={1.5} aria-hidden />
           </span>
-          <span className="font-semibold tabular-nums text-text-price">{formatCurrency(calculateTotal(), currency)}</span>
+          {calculateTotal() != null
+            ? <span className="font-semibold tabular-nums text-text-price">{formatCurrency(calculateTotal(), currency)}</span>
+            : <Skeleton className="h-5 w-20" />}
         </button>
         {isOrderSummaryExpanded && <div className="mt-3">{summary}</div>}
       </div>

@@ -1,6 +1,6 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Download, Search, Wallet, ArrowUpRight, ArrowDownLeft, ShieldCheck, Filter } from 'lucide-react';
 import PaymentReceiptModal from '../../common/components/modals/PaymentReceiptModal.jsx';
@@ -8,7 +8,8 @@ import PaymentHistory from '../components/PaymentHistory.jsx';
 import PaymentNavigation, { PaymentPagination } from '../components/PaymentNavigation.jsx';
 import { usePayments } from '../hooks/usePayments.js';
 import { usePaymentStatisticsQuery } from '../hooks/queries.js';
-import { PAYMENT_DIRECTIONS, pickPaymentStatistic, TRANSACTION_TYPE_LABELS } from '../paymentSchema.js';
+import { PAYMENT_DIRECTIONS, TRANSACTION_TYPE_LABELS } from '../paymentSchema.js';
+import { useDebouncedValue } from '../../common/hooks/useDebouncedValue.js';
 import { formatCurrency } from '../../common/formatters.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { motion } from 'framer-motion';
@@ -40,7 +41,6 @@ const PaymentsPage = () => {
  setShowFilters
  } = usePayments();
  const [searchTerm, setSearchTerm] = useState('');
- const [directionFilter, setDirectionFilter] = useState('');
  const {
  data: paymentStats
  } = usePaymentStatisticsQuery(undefined, {
@@ -49,37 +49,37 @@ const PaymentsPage = () => {
  const toggleFilterSidebar = useCallback(() => setShowFilters(!showFilters), [showFilters, setShowFilters]);
  const closeFilterSidebar = useCallback(() => setShowFilters(false), [setShowFilters]);
  const statCards = useMemo(() => [{
- title: 'Available Balance',
- value: formatCurrency(pickPaymentStatistic(paymentStats, 'totalVolume')),
+ title: 'Total Volume',
+ value: formatCurrency(paymentStats?.totalAmount),
  icon: Wallet
  }, {
  title: 'Incoming',
- value: formatCurrency(pickPaymentStatistic(paymentStats, 'incomingVolume')),
+ value: formatCurrency(paymentStats?.incomingAmount),
  icon: ArrowDownLeft,
  valueClassName: 'text-status-success-text'
  }, {
  title: 'Outgoing',
- value: formatCurrency(pickPaymentStatistic(paymentStats, 'outgoingVolume')),
+ value: formatCurrency(paymentStats?.outgoingAmount),
  icon: ArrowUpRight,
  valueClassName: 'text-status-error-text'
  }, {
  title: 'Protection (Escrow)',
- value: formatCurrency(pickPaymentStatistic(paymentStats, 'escrowAmount')),
+ value: formatCurrency(paymentStats?.escrowAmount),
  icon: ShieldCheck
  }], [paymentStats]);
- const visiblePayments = useMemo(() => {
- const normalizedSearch = searchTerm.trim().toLowerCase();
- return payments.filter(payment => {
- const matchesDirection = !directionFilter || payment.paymentDirection === directionFilter;
- if (!matchesDirection) return false;
- if (!normalizedSearch) return true;
- const searchableValues = [payment.transactionType, TRANSACTION_TYPE_LABELS[payment.transactionType], payment.listingTitle, payment.senderDisplayName, payment.receiverDisplayName];
- return searchableValues.some(value => String(value || '').toLowerCase().includes(normalizedSearch));
- });
- }, [payments, directionFilter, searchTerm]);
+ // Search and direction run on the backend (`searchTerm`, `paymentDirection`) across every page.
+ // Only a change in this box writes the filter, so the sidebar's seller input is not overwritten.
+ const debouncedSearch = useDebouncedValue(searchTerm, 300);
+ const lastSentSearch = useRef(debouncedSearch);
+ useEffect(() => {
+ if (lastSentSearch.current === debouncedSearch) return;
+ lastSentSearch.current = debouncedSearch;
+ handleFilterChange('seller', debouncedSearch.trim());
+ }, [debouncedSearch, handleFilterChange]);
+ const directionFilter = filters.paymentDirection || '';
  const exportCsv = useCallback(() => {
  const headers = ['Date', 'Type', 'Direction', 'Amount', 'Status', 'Listing'];
- const rows = visiblePayments.map(p => [p.processedAt || '', TRANSACTION_TYPE_LABELS[p.transactionType] || p.transactionType || '', p.paymentDirection, p.amount ?? 0, p.isSuccess ? 'Success' : 'Failed', p.listingTitle || '']);
+ const rows = payments.map(p => [p.processedAt || '', TRANSACTION_TYPE_LABELS[p.transactionType] || p.transactionType || '', p.paymentDirection, p.amount, p.status, p.listingTitle || '']);
  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
  const blob = new Blob([csv], {
  type: 'text/csv'
@@ -89,7 +89,7 @@ const PaymentsPage = () => {
  a.href = url;
  a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
  a.click();
- }, [visiblePayments]);
+ }, [payments]);
  return <div className="min-h-screen bg-background-secondary">
  <PaymentNavigation showFilters={showFilters} onCloseFilters={closeFilterSidebar} filters={filters} onFilterChange={handleFilterChange} onResetFilters={clearFilters} hasActiveFilters={hasActiveFilters} />
 
@@ -161,7 +161,7 @@ const PaymentsPage = () => {
  }, {
  id: PAYMENT_DIRECTIONS.OUTGOING,
  label: 'Outgoing'
- }].map(tab => <button key={tab.id} onClick={() => setDirectionFilter(tab.id)} className={`px-4 py-1.5 rounded text-xs font-semibold transition-all ${directionFilter === tab.id ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary'}`}>
+ }].map(tab => <button key={tab.id} onClick={() => handleFilterChange('paymentDirection', tab.id)} className={`px-4 py-1.5 rounded text-xs font-semibold transition-all ${directionFilter === tab.id ? 'bg-background-primary text-text-primary' : 'text-text-tertiary hover:text-text-secondary'}`}>
  {tab.label}
  </button>)}
  </div>
@@ -170,7 +170,7 @@ const PaymentsPage = () => {
 
  {/* Transaction List */}
  <div className="p-0">
- <PaymentHistory payments={visiblePayments} onShowReceipt={showReceipt} hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} isLoading={isLoading} error={error} onRetry={refetch} />
+ <PaymentHistory payments={payments} onShowReceipt={showReceipt} hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} isLoading={isLoading} error={error} onRetry={refetch} />
  </div>
 
  {/* Pagination */}

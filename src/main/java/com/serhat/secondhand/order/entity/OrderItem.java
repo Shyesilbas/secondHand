@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter @Setter
 @EqualsAndHashCode(of = "id")
@@ -56,6 +57,22 @@ public class OrderItem {
 
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
+
+    // Seller campaign applied to this line at checkout; null when no campaign applied.
+    @Column(name = "campaign_id")
+    private UUID campaignId;
+
+    // Campaign name at checkout time; kept so a later rename or soft delete does not change order history.
+    @Column(name = "campaign_name")
+    private String campaignName;
+
+    // Unit price before the campaign and coupon (listing or accepted offer price).
+    @Column(name = "original_unit_price", precision = 10, scale = 2)
+    private BigDecimal originalUnitPrice;
+
+    // Campaign discount for the whole line; zero when no campaign applied, null on pre-V51 rows.
+    @Column(name = "campaign_discount", precision = 10, scale = 2)
+    private BigDecimal campaignDiscount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", length = 10, nullable = false)

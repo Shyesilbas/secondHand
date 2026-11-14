@@ -60,7 +60,8 @@ import java.util.concurrent.atomic.AtomicInteger;
         "RATE_LIMIT_PAYMENT=10",
         "RATE_LIMIT_GENERAL=150",
         "RATE_LIMIT_AI=15",
-        "RATE_LIMIT_WINDOW=60"
+        "RATE_LIMIT_WINDOW=60",
+        "MODERATION_WORKER_ENABLED=false"
 })
 @Slf4j
 public class ConcurrentStockAndPaymentIntegrationTest {

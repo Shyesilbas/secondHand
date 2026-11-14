@@ -99,4 +99,19 @@ public class EWalletValidator {
         }
         return eWallet.get().getBalance().compareTo(amount) >= 0;
     }
+
+    public com.serhat.secondhand.ewallet.dto.BalanceCheckDto checkBalance(Long userId, BigDecimal amount) {
+        if (userId == null || amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("userId and a positive amount are required");
+        }
+        BigDecimal balance = eWalletRepository.findByUserId(userId)
+                .map(EWallet::getBalance)
+                .orElse(BigDecimal.ZERO);
+        BigDecimal difference = balance.subtract(amount);
+        boolean sufficient = difference.signum() >= 0;
+        return new com.serhat.secondhand.ewallet.dto.BalanceCheckDto(
+                sufficient,
+                sufficient ? difference : BigDecimal.ZERO,
+                sufficient ? BigDecimal.ZERO : difference.negate());
+    }
 }

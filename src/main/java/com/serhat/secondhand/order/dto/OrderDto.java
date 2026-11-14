@@ -2,6 +2,7 @@ package com.serhat.secondhand.order.dto;
 
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 
+import com.serhat.secondhand.order.entity.enums.OrderAction;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.shipping.dto.ShippingDto;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -65,4 +67,18 @@ public class OrderDto {
     private String buyerPhone;
     private String sellerPhone;
     private String sellerFullName;
+
+    // Viewer-specific state from OrderViewPolicy; set on read endpoints, null on write-path responses.
+    /** Operations the current viewer may start; the frontend renders controls only for these. */
+    private Set<OrderAction> allowedActions;
+    /** Buyer view, DELIVERED only: last moment a refund is accepted. */
+    private LocalDateTime refundDeadline;
+    /** Unshipped cargo orders: the scheduler cancels the order after this. */
+    private LocalDateTime shipDeadline;
+    /** DELIVERED / HANDOVER_CONFIRMED: earliest automatic completion and escrow release. */
+    private LocalDateTime autoCompleteAt;
+    /** Buyer view, MEETUP_PENDING only: the current OTP/QR code stops being accepted. */
+    private LocalDateTime meetupCodeExpiresAt;
+    /** Seller view only: this seller's share (escrow amounts held or released, excluding cancelled/refunded lines). */
+    private BigDecimal sellerTotal;
 }

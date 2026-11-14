@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 public class ShowcaseConfig {
     private Daily daily;
     private Fee fee;
-    private BulkDiscount bulkDiscount = new BulkDiscount();
     private Scheduler scheduler = new Scheduler();
     private Integer maxDays = 30;
     private Integer activeListDefaultSize = 12;
@@ -29,13 +28,6 @@ public class ShowcaseConfig {
     @Setter
     public static class Fee {
         private BigDecimal tax;
-    }
-
-    @Getter
-    @Setter
-    public static class BulkDiscount {
-        private Integer listingThreshold = 4;
-        private Integer listingDiscountPercentage = 10;
     }
 
     @Getter

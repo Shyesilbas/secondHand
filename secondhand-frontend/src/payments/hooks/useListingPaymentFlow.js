@@ -5,7 +5,6 @@ import { paymentService } from '../services/paymentService.js';
 import { orderService } from '../../order/services/orderService.js';
 import {
  createListingFeePaymentRequest,
- OTP_CODE_VALIDITY_SECONDS,
  PAYMENT_FLOW_DEFAULTS,
  PAYMENT_TRANSACTION_TYPES,
  PAYMENT_TYPES,
@@ -151,13 +150,12 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
  setIsProcessingPayment(true);
 
  try {
- await orderService.initiatePaymentVerification({
+ const verification = await orderService.initiatePaymentVerification({
  transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
  listingId: selectedListing.id,
- amount: feeConfig.totalCreationFee
  });
  showInfo('Verification Required', 'Enter the verification code sent to your email.');
- setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
+ setCodeExpiryTime(new Date(verification.expiresAt));
  return true;
  } catch (err) {
  handleError(err, showError);
@@ -177,14 +175,11 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
  try {
  if (!listingFeeIdempotencyKeyRef.current) {
- listingFeeIdempotencyKeyRef.current =
- typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.randomUUID === 'function'
- ? `listing-fee-${globalThis.crypto.randomUUID()}`
- : `listing-fee-${selectedListing.id}-${feeConfig.totalCreationFee}`;
+ listingFeeIdempotencyKeyRef.current = `listing-fee-${globalThis.crypto.randomUUID()}`;
  }
  const paymentData = createListingFeePaymentRequest({
  listingId: selectedListing.id,
- paymentType: paymentType,
+ providerName: paymentType,
  verificationCode: verificationCode,
  agreementsAccepted: true,
  acceptedAgreementIds: getAcceptedAgreementIds(),
@@ -203,6 +198,7 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
  await Promise.all([
  queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.draftListings }),
  queryClient.invalidateQueries({ queryKey: ['ewallet'] }),
+ queryClient.invalidateQueries({ queryKey: PAYMENT_QUERY_KEYS.listingFeeQuote }),
  queryClient.invalidateQueries({ queryKey: ['payments'] }),
  queryClient.invalidateQueries({ queryKey: ['myListings'] }),
  ]);
@@ -227,14 +223,13 @@ export const usePayListingFee = ({ selectedListing: initialSelectedListing, feeC
 
  setIsResendingCode(true);
  try {
- await orderService.initiatePaymentVerification({
+ const verification = await orderService.initiatePaymentVerification({
  transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
  listingId: selectedListing.id,
- amount: feeConfig?.totalCreationFee
  });
  showSuccess('Success', 'A new verification code has been sent to your email.');
  setVerificationCode('');
- setCodeExpiryTime(new Date(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000));
+ setCodeExpiryTime(new Date(verification.expiresAt));
  } catch (err) {
  handleError(err, showError);
  } finally {

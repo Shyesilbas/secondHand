@@ -122,6 +122,11 @@ export const listingService = {
     globalSearch: async (query, page = 0, size = 8) => {
         return get(`${API_ENDPOINTS.LISTINGS.SEARCH}?query=${encodeURIComponent(query)}&page=${page}&size=${size}`);
     },
+    /** Batch lookup by id, for pages that only need a few known listings (no paging limit). */
+    getListingsByIds: async (ids) => {
+        return post(API_ENDPOINTS.LISTINGS.BY_IDS, ids);
+    },
+
     getListingById: async (id) => {
         return get(API_ENDPOINTS.LISTINGS.BY_ID(id));
     },

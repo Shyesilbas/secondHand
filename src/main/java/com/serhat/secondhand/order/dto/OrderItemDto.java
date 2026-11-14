@@ -24,11 +24,17 @@ public class OrderItemDto {
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    // Campaign snapshot taken at checkout; all null on lines without a campaign record.
+    private String campaignName;
+    private BigDecimal originalUnitPrice;
+    private BigDecimal campaignDiscount;
     private Currency currency;
     private String notes;
     private LocalDateTime createdAt;
     private Integer cancelledQuantity;
     private Integer refundedQuantity;
+    /** Quantity not yet cancelled or refunded; only lines with a positive value can be compensated. */
+    private Integer remainingQuantity;
     private String cancelReason;
     private String cancelReasonText;
     private String refundReason;

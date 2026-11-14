@@ -15,7 +15,7 @@ public class ShowcasePricingDto {
     
     private BigDecimal dailyCost;
     private BigDecimal taxPercentage;
+    private BigDecimal dailyTaxAmount;
     private BigDecimal totalDailyCost;
-    private Integer bulkDiscountThreshold;
-    private Integer bulkDiscountPercentage;
+    private Integer maxDays;
 }

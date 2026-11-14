@@ -42,17 +42,18 @@ const MyCouponsPage = () => {
   const totalPages = campaignsPage?.totalPages || 0;
   const totalElements = campaignsPage?.totalElements || 0;
 
-  // Same query the create modal uses, so the titles of picked listings come from one cache.
-  const { data: myListings = [] } = useQuery({
-    queryKey: ['myListingsForCampaign'],
-    queryFn: async () => {
-      const res = await listingService.getMyListings(0, 50);
-      return Array.isArray(res) ? res : Array.isArray(res?.content) ? res.content : [];
-    },
-    enabled: campaigns.some(c => c.eligibleListingIds?.length > 0),
+  // Titles are looked up for the picked ids only; the seller's full listing list is paged and can miss them.
+  const pickedIds = useMemo(
+    () => [...new Set(campaigns.flatMap(c => c.eligibleListingIds || []))].sort(),
+    [campaigns]
+  );
+  const { data: pickedListings = [] } = useQuery({
+    queryKey: ['campaignPickedListings', pickedIds],
+    queryFn: () => listingService.getListingsByIds(pickedIds),
+    enabled: pickedIds.length > 0,
     staleTime: 2 * 60 * 1000,
   });
-  const listingsById = useMemo(() => new Map(myListings.map(l => [l.id, l])), [myListings]);
+  const listingsById = useMemo(() => new Map((pickedListings || []).map(l => [l.id, l])), [pickedListings]);
 
   const deleteMutation = useMutation({
     mutationFn: (id) => campaignService.remove(id),

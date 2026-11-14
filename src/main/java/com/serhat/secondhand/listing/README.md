@@ -21,6 +21,6 @@ Manages the 6-vertical polymorphic product catalog (`VehicleListing`, `Electroni
 - Redis keys: `v4:listing:active_viewers:{id}` (24h ZSET) and `v6:catalog:locations:*` (`LocationCatalogService`).
 
 ## API
-- **Base (`ListingController`, `/api/v1/listings`):** `GET /` · `GET /{id}` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/{publish|deactivate|reactivate|sold|view}` · `GET /{id}/{view-stats|active-viewers|social-proof}`.
+- **Base (`ListingController`, `/api/v1/listings`):** `GET /` · `GET /{id}` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/{publish|deactivate|reactivate|sold|view}` · `GET /{id}/{view-stats|active-viewers|social-proof}`. Fee: `GET /fee-config` · `GET /fee-quote` (server fee + `sufficientBalance`) · `POST /pay-fee`.
 - **Verticals (`/api/v1/{vehicles|electronics|real-estates|books|clothings|sports}`):** `POST /create-listing` · `PUT /{id}` · `GET /{id}` · `POST /filter`.
 - **Price History (`/api/v1/price-history/listing/{listing-id}`):** `GET /` · `GET /latest` · `GET /exists`.

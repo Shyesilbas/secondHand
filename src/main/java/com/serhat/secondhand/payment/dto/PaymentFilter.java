@@ -1,5 +1,7 @@
 package com.serhat.secondhand.payment.dto;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 
@@ -10,8 +12,8 @@ public record PaymentFilter(
         PaymentTransactionType transactionType,
         String providerName,
         PaymentDirection paymentDirection,
-        LocalDateTime dateFrom,
-        LocalDateTime dateTo,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateFrom,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTo,
         BigDecimal amountMin,
         BigDecimal amountMax,
         String searchTerm

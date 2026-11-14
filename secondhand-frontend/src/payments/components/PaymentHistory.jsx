@@ -50,7 +50,7 @@ const PaymentRow = ({
  </div>
 
  <div className="col-span-1 hidden lg:block text-center text-xs text-text-secondary">
- {payment.paymentType || 'Wallet'}
+ {payment.providerName}
  </div>
 
  <div className="col-span-2 flex flex-col items-end shrink-0">

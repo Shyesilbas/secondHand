@@ -24,6 +24,12 @@ public class MembershipController {
         return ResultResponses.ok(Result.success(membershipService.getStatus(userId)));
     }
 
+    @GetMapping("/quote")
+    public ResponseEntity<?> getUpgradeQuote(@AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = ((User) userDetails).getId();
+        return ResultResponses.ok(Result.success(membershipService.getUpgradeQuote(userId)));
+    }
+
     @PostMapping("/upgrade")
     public ResponseEntity<?> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MembershipUpgradeRequest request) {
         Long userId = ((User) userDetails).getId();

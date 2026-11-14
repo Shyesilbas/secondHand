@@ -16,7 +16,7 @@ public class ComplaintMapper {
 
     private final ComplaintModerationProperties moderationProperties;
 
-    public ComplaintDto mapComplaintToDto(Complaint complaint) {
+    public ComplaintDto mapComplaintToDto(Complaint complaint, String reportedMessageContent) {
         return new ComplaintDto(
                 complaint.getId(),
                 complaint.getComplainer().getName() + " " + complaint.getComplainer().getSurname(),
@@ -45,7 +45,8 @@ public class ComplaintMapper {
                 complaint.getAppealDecisionNotes(),
                 complaint.appealDeadline(moderationProperties.getReview().getAppealWindow()),
                 complaint.isBadFaithReport(),
-                complaint.getComplainerPenaltyAction()
+                complaint.getComplainerPenaltyAction(),
+                reportedMessageContent
         );
     }
 

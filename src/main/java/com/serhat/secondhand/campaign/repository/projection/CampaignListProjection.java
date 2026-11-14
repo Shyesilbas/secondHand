@@ -14,6 +14,7 @@ public interface CampaignListProjection {
     LocalDateTime getEndsAt();
     CampaignDiscountKind getDiscountKind();
     BigDecimal getValue();
+    Integer getMinQuantity();
     boolean isApplyToFutureListings();
 }
 

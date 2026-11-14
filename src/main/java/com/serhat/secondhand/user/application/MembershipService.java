@@ -1,12 +1,15 @@
 package com.serhat.secondhand.user.application;
 
 import com.serhat.secondhand.core.exception.BusinessException;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
+import com.serhat.secondhand.ewallet.dto.BalanceCheckDto;
 import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.payment.application.PaymentRequestFactory;
 import com.serhat.secondhand.payment.dto.PaymentRequest;
 import com.serhat.secondhand.user.domain.entity.User;
 import com.serhat.secondhand.user.domain.entity.enums.MembershipPlan;
 import com.serhat.secondhand.user.domain.repository.UserRepository;
+import com.serhat.secondhand.user.dto.MembershipQuoteDto;
 import com.serhat.secondhand.user.dto.MembershipStatusDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +30,24 @@ public class MembershipService {
     private final PaymentProcessor paymentProcessor;
     private final PaymentRequestFactory paymentRequestFactory;
     private final com.serhat.secondhand.core.config.AppConfigProperties appConfigProperties;
+    private final IEWalletService eWalletService;
 
     public MembershipStatusDto getStatus(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException("Kullanıcı bulunamadı", HttpStatus.NOT_FOUND, "USER_NOT_FOUND"));
         return MembershipStatusDto.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public MembershipQuoteDto getUpgradeQuote(Long userId) {
+        BigDecimal premiumPrice = appConfigProperties.getMembership().getPremiumPrice();
+        BalanceCheckDto balance = eWalletService.checkBalance(userId, premiumPrice);
+        return new MembershipQuoteDto(
+                premiumPrice,
+                appConfigProperties.getMembership().getPremiumDurationDays(),
+                balance.sufficientBalance(),
+                balance.balanceAfterPayment(),
+                balance.shortfall());
     }
 
     public MembershipStatusDto upgradeToPremium(Long userId, com.serhat.secondhand.user.dto.MembershipUpgradeRequest request) {

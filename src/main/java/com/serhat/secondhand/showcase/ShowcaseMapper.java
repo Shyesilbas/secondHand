@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -94,30 +93,14 @@ public class ShowcaseMapper {
                 .build();
     }
 
-    public BigDecimal calculateDailyCostWithTax(BigDecimal dailyCost, BigDecimal taxPercentage) {
-        return dailyCost
-                .multiply(taxPercentage)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                .add(dailyCost);
-    }
-
-    public BigDecimal calculateTotalCost(BigDecimal dailyCostWithTax, int days) {
-        return dailyCostWithTax.multiply(new BigDecimal(days));
-    }
-
-
-    public ShowcasePricingDto toPricingDto(BigDecimal dailyCost, BigDecimal taxPercentage, Integer threshold, Integer percentage) {
-        BigDecimal dailyCostTax = dailyCost
-                .multiply(taxPercentage)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        BigDecimal totalDailyCost = dailyCost.add(dailyCostTax);
-
+    public ShowcasePricingDto toPricingDto(BigDecimal dailyCost, BigDecimal taxPercentage, BigDecimal totalDailyCost,
+                                           Integer maxDays) {
         return ShowcasePricingDto.builder()
                 .dailyCost(dailyCost)
                 .taxPercentage(taxPercentage)
+                .dailyTaxAmount(totalDailyCost.subtract(dailyCost))
                 .totalDailyCost(totalDailyCost)
-                .bulkDiscountThreshold(threshold)
-                .bulkDiscountPercentage(percentage)
+                .maxDays(maxDays)
                 .build();
     }
 }

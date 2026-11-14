@@ -1,5 +1,6 @@
 package com.serhat.secondhand.coupon.validator;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.coupon.entity.Coupon;
 import com.serhat.secondhand.coupon.entity.CouponAudience;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.Set;
 
 @Component
@@ -38,9 +38,7 @@ public class CouponValidator {
                 && coupon.getStartsAt().isAfter(coupon.getEndsAt())) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
-        if (coupon.getEligibleTypes() != null
-                && (coupon.getEligibleTypes().contains(ListingType.REAL_ESTATE)
-                || coupon.getEligibleTypes().contains(ListingType.VEHICLE))) {
+        if (DiscountEligibility.containsNonDiscountable(coupon.getEligibleTypes())) {
             return Result.error(CouponErrorCodes.COUPON_NOT_APPLICABLE);
         }
 
@@ -174,9 +172,6 @@ public class CouponValidator {
     }
 
     private Set<ListingType> defaultEligibleTypes() {
-        EnumSet<ListingType> all = EnumSet.allOf(ListingType.class);
-        all.remove(ListingType.REAL_ESTATE);
-        all.remove(ListingType.VEHICLE);
-        return all;
+        return DiscountEligibility.discountableTypes();
     }
 }

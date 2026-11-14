@@ -7,6 +7,7 @@ import { useDraftListings, usePayListingFee } from '../hooks/useListingPaymentFl
 import { useEnums } from '../../common/hooks/useEnums.js';
 import { usePaymentMethods } from '../hooks/useFinancialAccountManager.js';
 import { useEmails } from '../hooks/useEmails.js';
+import { useListingFeeQuoteQuery } from '../hooks/queries.js';
 import BackButton from '../../common/components/ui/BackButton.jsx';
 import ErrorMessage from '../../common/components/ui/ErrorMessage.jsx';
 import EmptyState from '../../common/components/ui/EmptyState.jsx';
@@ -37,6 +38,7 @@ const PayListingFeePage = () => {
     } = usePaymentMethods();
 
     const feeConfig = enums?.listingFeeConfig;
+    const { data: feeQuote } = useListingFeeQuoteQuery();
     const { emails, fetchEmails, clearEmails } = useEmails();
     const { eWallet } = useEWallet();
 
@@ -201,6 +203,7 @@ const PayListingFeePage = () => {
                                 <PaymentPanel
                                     selectedListing={selectedListing}
                                     feeConfig={feeConfig}
+                                    feeQuote={feeQuote}
                                     paymentType={PAYMENT_TYPES.EWALLET}
                                     isProcessingPayment={isProcessingPayment}
                                     onPayment={async () => {
@@ -223,6 +226,7 @@ const PayListingFeePage = () => {
                         isOpen={showConfirmModal}
                         selectedListing={selectedListing}
                         feeConfig={feeConfig}
+                        feeQuote={feeQuote}
                         paymentType={PAYMENT_TYPES.EWALLET}
                         paymentMethods={paymentMethods}
                         isLoadingPaymentMethods={isPaymentMethodsLoading}

@@ -20,7 +20,11 @@ public class PricedCartItemDto {
     private int quantity;
     private BigDecimal originalUnitPrice;
     private BigDecimal campaignUnitPrice;
+    // Line total before the campaign and coupon (listing price x quantity, or the accepted offer total).
+    private BigDecimal originalLineTotal;
     private BigDecimal lineSubtotal;
+    // Campaign discount of the whole line, computed once by PriceCalculationEngine; zero when no campaign applied.
+    private BigDecimal campaignDiscount;
     private AppliedCampaignDto appliedCampaign;
     private BigDecimal couponDiscount;
     private BigDecimal netUnitPrice;

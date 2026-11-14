@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,7 +9,6 @@ import { formatDateTime } from '../../common/formatters.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { adminCouponApi } from '../services/adminCouponApi.js';
 import { Button, Modal, SkeletonList } from '../../common/components/ui/index.js';
-const LISTING_TYPES = ['VEHICLE', 'ELECTRONICS', 'REAL_ESTATE', 'CLOTHING', 'BOOKS', 'SPORTS', 'OTHER'];
 const AUDIENCES = [{
  value: 'ALL_USERS',
  labelKey: 'admin_audience_all_users',
@@ -113,6 +113,7 @@ const AdminCouponsPage = () => {
  const {
  t
  } = useTranslation();
+ const { discountableListingTypes } = useEnums();
  const {
  showError,
  showSuccess
@@ -607,7 +608,7 @@ const AdminCouponsPage = () => {
 
  <FormSection Icon={Layers} title={t("r_n_kapsam")} subtitle={t('admin_scope_subtitle')}>
  <div className="flex flex-wrap gap-2">
- {LISTING_TYPES.map(t => {
+ {discountableListingTypes.map(t => {
  const on = form.eligibleTypes.includes(t);
  return <button key={t} type="button" onClick={() => toggleListingType(t)} className={`rounded border px-3 py-2 text-xs font-medium transition ${on ? 'border-primary bg-primary-light text-primary ring-1 ring-primary/15' : 'border-border-light bg-background-primary text-text-secondary hover:border-border-dark hover:bg-background-secondary'}`}>
  {t.replace(/_/g, ' ')}

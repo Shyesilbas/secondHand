@@ -5,6 +5,7 @@ import { formatPaymentAmount } from '../utils/formatPaymentAmount.js';
 const PaymentPanel = ({
  selectedListing,
  feeConfig,
+ feeQuote,
  isProcessingPayment,
  onPayment,
  eWallet,
@@ -15,9 +16,8 @@ const PaymentPanel = ({
 }) => {
  const { t } = useTranslation();
 
- const totalFee = feeConfig?.totalCreationFee || 0;
- const eWalletBalance = eWallet?.balance || 0;
- const hasSufficientEWalletBalance = eWalletBalance >= totalFee;
+ // Backend fee quote decides coverage; the panel never compares balance and fee itself.
+ const hasSufficientEWalletBalance = feeQuote?.sufficientBalance === true;
 
  const isButtonDisabled =
  isProcessingPayment ||
@@ -75,7 +75,7 @@ const PaymentPanel = ({
  <span className="font-semibold text-text-primary block">{t("ewallet")}</span>
  {eWallet && (
  <span className="text-xs text-text-tertiary ">
- {formatPaymentAmount(eWalletBalance)}
+ {formatPaymentAmount(eWallet?.balance)}
  </span>
  )}
  </div>

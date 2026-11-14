@@ -19,10 +19,10 @@ import java.util.concurrent.Executor;
  * Hourly batch: takes up to {@code app.moderation.worker.batch-size} due complaints from the Redis queue
  * and hands each to the {@link ComplaintReviewHandler}, then as many pending appeals to the
  * {@link AppealReviewHandler}. Only one instance runs at a time
- * ({@link ComplaintWorkerLock}). Disabled by default; enabling it without a handler bean fails startup.
+ * ({@link ComplaintWorkerLock}). Enabled by default.
  */
 @Component
-@ConditionalOnProperty(prefix = "app.moderation.worker", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "app.moderation.worker", name = "enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 public class ComplaintReviewWorker {
 

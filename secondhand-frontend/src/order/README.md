@@ -51,6 +51,6 @@ Generated from code; the hook files are the source of truth.
   - At the physical meetup, the seller inputs the code into `MeetupHandoverSection` or scans the QR.
   - If code matches, backend updates status to `HANDOVER_CONFIRMED`.
 
-### Item-Level Compensation Planning
-- In accordance with backend architecture, cancellations and refunds operate at the individual `OrderItem` level rather than cancelling the entire order.
-- Buyers can cancel unshipped items within 72 hours of order creation.
+### Backend-Driven Actions and Deadlines
+- Every button, form and countdown reads the order's backend fields: `allowedActions` via `hasOrderAction`, `shipDeadline`, `autoCompleteAt`, `meetupCodeExpiresAt` and seller `sellerTotal`. Never derive an action, deadline or amount from `status` or timestamps.
+- Cancellation and refund are per `OrderItem`; `CancelRefundModal` lists only lines with `remainingQuantity > 0`.

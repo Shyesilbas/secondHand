@@ -28,18 +28,32 @@ export const usePaymentsQuery = ({ userId, currentPage, pageSize, filters }) => 
     });
 };
 
-export const usePaymentStatisticsQuery = (paymentType, options = {}) => {
+export const usePaymentStatisticsQuery = (providerName, options = {}) => {
     const { enabled = true } = options;
     const { user, isAuthenticated } = useAuthState();
 
     return useQuery({
-        queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, paymentType],
-        queryFn: () => paymentService.getStatistics(paymentType),
+        queryKey: [...PAYMENT_QUERY_KEYS.paymentStatistics, user?.id, providerName],
+        queryFn: () => paymentService.getStatistics(providerName),
         enabled: enabled && !!(isAuthenticated && user?.id),
         staleTime: 30 * 1000,
         gcTime: 10 * 60 * 1000,
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         retry: 1,
+    });
+};
+
+/** Listing fee and eWallet coverage, both decided by the backend (`GET /v1/listings/fee-quote`). */
+export const useListingFeeQuoteQuery = (options = {}) => {
+    const { enabled = true } = options;
+    const { user, isAuthenticated } = useAuthState();
+
+    return useQuery({
+        queryKey: [...PAYMENT_QUERY_KEYS.listingFeeQuote, user?.id],
+        queryFn: () => paymentService.getListingFeeQuote(),
+        enabled: enabled && !!(isAuthenticated && user?.id),
+        staleTime: 15 * 1000,
+        refetchOnWindowFocus: true,
     });
 };

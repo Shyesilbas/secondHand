@@ -19,5 +19,7 @@ public class ListingFeeConfigDto {
 
     private BigDecimal taxPercentage;
 
+    private BigDecimal taxAmount;
+
     private BigDecimal totalCreationFee;
 }

@@ -27,7 +27,8 @@ CheckoutOrchestrator → sipariş(ler) → CouponService.redeem (checkout transa
 ```
 
 * [`PriceCalculationEngine`](../src/main/java/com/serhat/secondhand/pricing/engine/PriceCalculationEngine.java) saf hesaplama yapar; repository veya dış servis çağırmaz.
-* `pricing/calculator/` altındaki `CampaignDiscountCalculator` ve `CouponDiscountCalculator` hiçbir yerden çağrılmaz; aynı mantık engine içinde tekrar yazılmıştır. Değişiklik engine'de yapılmalıdır.
+* Kampanya birim indirimi tek formülle hesaplanır (`ListingCampaignPricingUtil.unitDiscount`); ilan kartları ve `PriceCalculationEngine` aynı metodu kullanır. Satır bazındaki kampanya indirimi engine'de bir kez hesaplanır (`PricedCartItemDto.campaignDiscount`) ve sipariş bu değeri olduğu gibi kopyalar.
+* Kampanya ve kupon alamayan vertical'lar tek yerde tanımlıdır (`DiscountEligibility`); frontend bu bilgiyi `/api/v1/enums/all` içindeki `listingTypes[].discountable` alanından okur.
 * Tüm tutarlar `PricingUtil.scale` ile 2 haneye `HALF_UP` yuvarlanır.
 
 ---

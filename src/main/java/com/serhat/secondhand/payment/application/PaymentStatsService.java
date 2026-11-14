@@ -3,6 +3,7 @@ package com.serhat.secondhand.payment.application;
 import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
+import com.serhat.secondhand.payment.dto.PaymentStatisticsDto;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.payment.mapper.PaymentMapper;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +30,9 @@ public class PaymentStatsService {
     private final PaymentMapper paymentMapper;
     private final PaymentContextResolver paymentContextResolver;
 
-    @Cacheable(value = "payment:stats", key = "#userId + '_' + #providerName")
-    public Map<String, Object> getPaymentStatistics(Long userId, String providerName) {
+    // The 'dto_' key prefix keeps entries cached before PaymentStatisticsDto (plain maps) from being read back.
+    @Cacheable(value = "payment:stats", key = "'dto_' + #userId + '_' + #providerName")
+    public PaymentStatisticsDto getPaymentStatistics(Long userId, String providerName) {
         log.info("[CACHE MISS] payment:stats for userId: {}", userId);
 
         List<Object[]> statsRows = paymentRepository.getPaymentStats(userId, providerName);
@@ -51,16 +52,15 @@ public class PaymentStatsService {
             escrowAmount = stats[4] != null ? (BigDecimal) stats[4] : BigDecimal.ZERO;
         }
 
-        Map<String, Object> result = new java.util.HashMap<>();
-        result.put("totalPayments", total);
-        result.put("successfulPayments", successful);
-        result.put("failedPayments", total - successful);
-        result.put("successRate", total > 0 ? (double) successful / total * 100 : 0.0);
-        result.put("incomingAmount", incomingAmount);
-        result.put("outgoingAmount", outgoingAmount);
-        result.put("totalAmount", incomingAmount.add(outgoingAmount)); // Total volume is incoming + outgoing
-        result.put("escrowAmount", escrowAmount);
-        return result;
+        return new PaymentStatisticsDto(
+                total,
+                successful,
+                total - successful,
+                total > 0 ? (double) successful / total * 100 : 0.0,
+                incomingAmount,
+                outgoingAmount,
+                incomingAmount.add(outgoingAmount),
+                escrowAmount);
     }
 
     public Page<PaymentDto> getMyPayments(Long userId, Pageable pageable, PaymentFilter filter) {

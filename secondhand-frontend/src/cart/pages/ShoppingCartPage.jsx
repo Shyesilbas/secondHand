@@ -1,7 +1,7 @@
 import PageContainer from '@/common/components/layout/PageContainer';
 import { useTranslation } from "react-i18next";
 import { useMemo, useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePlan } from '@/common/hooks/usePlan';
 import ActiveCouponsModal from '../components/checkout/ActiveCouponsModal.jsx';
@@ -12,11 +12,12 @@ import CartItemCard from '../components/CartItemCard.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import ClearCartModal from '../components/ClearCartModal.jsx';
 import ListingCard from '../../listing/components/ListingCard.jsx';
-import { SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
+import { Alert, SkeletonGrid, EmptyState } from '../../common/components/ui/index.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import { CART_MESSAGES } from '../cartConstants.js';
 import { couponService } from '../services/couponService.js';
-import { campaignService } from '../../listing/services/campaignService.js';
+import { formatCurrency } from '../../common/formatters.js';
+import { formatBundleValue, getCheckoutCurrency, indexPricedLines } from '../utils/pricedLines.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { useAuthState } from '../../auth/AuthContext.jsx';
 import { useFavorites } from '../../favorites/hooks/useFavorites.js';
@@ -48,10 +49,6 @@ const ShoppingCartPage = () => {
     favorites = [],
     isLoading: favoritesLoading
   } = useFavorites(0, 8, { enabled: Boolean(isAuthenticated && cartItems.length === 0) });
-  const sellerIds = useMemo(() => {
-    return [...new Set(cartItems.map(item => item.listing.sellerId))];
-  }, [cartItems]);
-
   const cartKey = useMemo(() => {
     return cartItems.map(i => `${i?.listing?.id || i?.id}:${i.quantity}`).join('|');
   }, [cartItems]);
@@ -63,15 +60,15 @@ const ShoppingCartPage = () => {
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
   const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
 
-  const { data: pricingData, isLoading: isPreviewLoading } = useQuery({
-    queryKey: ['cartPricingAndCampaigns', cartKey, sellerIds, appliedCouponCode],
+  // keepPreviousData: a quantity change keeps the last backend prices on screen (marked as updating) instead of
+  // flashing skeletons; stale lines and checkout stay blocked until the new preview arrives.
+  const { data: pricingData, isFetching: isPreviewLoading, isPlaceholderData: isRepricing, isError: pricingFailed, refetch: refetchPricing } = useQuery({
+    queryKey: ['cartPricing', cartKey, appliedCouponCode],
     queryFn: async () => {
       const requested = appliedCouponCode != null && String(appliedCouponCode).trim() !== '' ? String(appliedCouponCode).trim().toUpperCase() : null;
       let pricingRes;
       let couponSuccess = true;
       let couponErr = null;
-
-      const campaignsPromise = campaignService.listBySellers(sellerIds).catch(() => ({ data: [] }));
 
       try {
         pricingRes = await couponService.preview(requested);
@@ -85,11 +82,8 @@ const ShoppingCartPage = () => {
         }
       }
 
-      const campaignsRes = await campaignsPromise;
-
       return {
         pricing: pricingRes?.data || pricingRes,
-        sellerCampaigns: Array.isArray(campaignsRes?.data) ? campaignsRes.data : Array.isArray(campaignsRes) ? campaignsRes : [],
         couponSuccess,
         couponError: couponErr
       };
@@ -97,14 +91,21 @@ const ShoppingCartPage = () => {
     enabled: cartItems.length > 0,
     staleTime: 10 * 1000,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const pricing = pricingData?.pricing || null;
-  const sellerCampaigns = useMemo(() => pricingData?.sellerCampaigns || [], [pricingData?.sellerCampaigns]);
+  const pricedLines = useMemo(() => indexPricedLines(pricing), [pricing]);
+  // Bundle progress is computed by the backend from the same quantities that decide the price.
+  const bundleCampaigns = useMemo(() => pricing?.bundleCampaigns || [], [pricing?.bundleCampaigns]);
+  const unlockedBundles = useMemo(() => bundleCampaigns.filter(b => b.unlocked), [bundleCampaigns]);
+  const pendingBundles = useMemo(() => bundleCampaigns.filter(b => !b.unlocked), [bundleCampaigns]);
+  const currency = getCheckoutCurrency(cartItems);
   const [showClearModal, setShowClearModal] = useState(false);
 
   useEffect(() => {
-    if (pricingData) {
+    // Placeholder data belongs to the previous cart or coupon; judging the coupon on it would reject a valid code.
+    if (pricingData && !isRepricing) {
       if (pricingData.couponSuccess) {
         const echoed = pricing?.couponCode != null && String(pricing.couponCode).trim() !== '' ? String(pricing.couponCode).trim().toUpperCase() : null;
         if (!appliedCouponCode) {
@@ -122,7 +123,7 @@ const ShoppingCartPage = () => {
         setAppliedCouponCode(null);
       }
     }
-  }, [pricingData, pricing, appliedCouponCode]);
+  }, [pricingData, pricing, appliedCouponCode, isRepricing]);
 
   const onApplyCoupon = () => {
     const next = couponInput?.trim() || '';
@@ -171,55 +172,6 @@ const ShoppingCartPage = () => {
     } = checkReservationStatus(item.reservedAt);
     return !isExpired && timeRemaining && timeRemaining.minutes < 5;
   }), [cartItems]);
-  // Pricing and campaigns are now fetched and managed by TanStack useQuery above
-  const bundleInfo = useMemo(() => {
-    if (!sellerCampaigns.length || !cartItems.length) return {
-      suggestions: [],
-      applied: []
-    };
-    const suggestions = [];
-    const applied = [];
-    const quantitiesBySeller = {};
-    cartItems.forEach(item => {
-      const sId = item.listing.sellerId;
-      quantitiesBySeller[sId] = (quantitiesBySeller[sId] || 0) + item.quantity;
-    });
-    sellerCampaigns.forEach(c => {
-      if (c.minQuantity > 1) {
-        const currentQty = quantitiesBySeller[c.sellerId] || 0;
-        if (currentQty > 0) {
-          if (currentQty < c.minQuantity) {
-            suggestions.push({
-              sellerId: c.sellerId,
-              sellerName: c.sellerName || 'Seller',
-              remaining: c.minQuantity - currentQty,
-              discountValue: c.value,
-              discountKind: c.discountKind,
-              minQuantity: c.minQuantity
-            });
-          } else {
-            applied.push({
-              sellerId: c.sellerId,
-              sellerName: c.sellerName || 'Seller',
-              discountValue: c.value,
-              discountKind: c.discountKind,
-              quantity: currentQty
-            });
-          }
-        }
-      }
-    });
-    return {
-      suggestions,
-      applied
-    };
-  }, [sellerCampaigns, cartItems]);
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => {
-      const price = parseFloat(item.listing.campaignPrice ?? item.listing.price) || 0;
-      return total + price * item.quantity;
-    }, 0);
-  };
   const favoriteListings = useMemo(() => favorites.map(fav => {
     const listing = fav?.listing;
     if (!listing) return null;
@@ -410,21 +362,21 @@ const ShoppingCartPage = () => {
               )}
 
               {/* Applied Bundles (Success) */}
-              {bundleInfo.applied.length > 0 && (
+              {unlockedBundles.length > 0 && (
                 <div className="space-y-2.5">
-                  {bundleInfo.applied.map((a, idx) => (
+                  {unlockedBundles.map((a) => (
                     <div
-                      key={idx}
+                      key={a.campaignId}
                       className="flex items-center justify-between gap-3 rounded-md border border-border bg-background-primary p-3.5 text-xs shadow-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Check className="h-4 w-4 text-status-success-icon shrink-0" strokeWidth={2} />
                         <div className="min-w-0">
                           <span className="font-semibold text-text-primary mr-1">
-                            {a.sellerName} {t("bundle_unlocked", "Paket İndirimi")}:
+                            {a.sellerName || t('seller', 'Satıcı')} {t("bundle_unlocked", "Paket İndirimi")}:
                           </span>
                           <span className="text-text-secondary">
-                            {t('bundle_discount_applied_text', '{{count}} ürün için %{{discount}} indirim uygulandı.', { count: a.quantity, discount: a.discountValue })}
+                            {t('bundle_discount_applied_value_text', { defaultValue: '{{count}} ürün için {{discount}} indirim uygulandı.', count: a.qualifyingQuantity, discount: formatBundleValue(a, formatCurrency, currency) })}
                           </span>
                         </div>
                       </div>
@@ -441,14 +393,13 @@ const ShoppingCartPage = () => {
               )}
 
               {/* Bundle Suggestions (Potential) */}
-              {bundleInfo.suggestions.length > 0 && (
+              {pendingBundles.length > 0 && (
                 <div className="space-y-3">
-                  {bundleInfo.suggestions.map((s, idx) => {
-                    const currentQty = s.minQuantity - s.remaining;
-                    const progress = (currentQty / s.minQuantity) * 100;
+                  {pendingBundles.map((s) => {
+                    const progress = (s.qualifyingQuantity / s.minQuantity) * 100;
                     return (
                       <div
-                        key={idx}
+                        key={s.campaignId}
                         className="rounded-md border border-border bg-background-primary p-4 sm:p-5 shadow-sm"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -461,7 +412,7 @@ const ShoppingCartPage = () => {
                                   onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
                                   className="text-text-primary hover:underline font-semibold"
                                 >
-                                  {s.sellerName}
+                                  {s.sellerName || t('seller', 'Satıcı')}
                                 </button>
                               </span>
                             </div>
@@ -469,11 +420,11 @@ const ShoppingCartPage = () => {
                             <p className="mt-1.5 text-xs text-text-secondary">
                               {t("add", "Ekle:")}{' '}
                               <strong className="text-text-primary">
-                                {s.remaining} {t("more_item", "ürün daha")}
+                                {s.remainingQuantity} {t("more_item", "ürün daha")}
                               </strong>{' '}
                               → sepette{' '}
                               <span className="font-semibold text-status-success-text">
-                                %{s.discountValue} indirim
+                                {formatBundleValue(s, formatCurrency, currency)} indirim
                               </span>{' '}
                               kazanın.
                             </p>
@@ -486,7 +437,7 @@ const ShoppingCartPage = () => {
                                 />
                               </div>
                               <div className="flex justify-between text-xs text-text-muted tabular-nums">
-                                <span>{currentQty} {t("items_in_cart", "ürün sepette")}</span>
+                                <span>{s.qualifyingQuantity} {t("items_in_cart", "ürün sepette")}</span>
                                 <span>Hedef: {s.minQuantity} {t("items", "ürün")}</span>
                               </div>
                             </div>
@@ -522,6 +473,8 @@ const ShoppingCartPage = () => {
                     <CartItemCard
                       key={item.id}
                       item={item}
+                      pricedLine={pricedLines.get(item.listing?.id)}
+                      isRepricing={isRepricing}
                       onQuantityChange={handleQuantityChange}
                       onRemoveItem={handleRemoveItem}
                       isUpdating={isUpdatingCart}
@@ -533,19 +486,26 @@ const ShoppingCartPage = () => {
             </div>
 
             {/* Right Column: Order Summary */}
-            <div className="lg:col-span-4">
+            <div className="space-y-3 lg:col-span-4">
+              {pricingFailed && (
+                <Alert
+                  type="warning"
+                  message={t('checkout_pricing_preview_failed', CART_MESSAGES.PRICING_PREVIEW_FAILED)}
+                  action={<Button variant="secondary" size="sm" onClick={() => refetchPricing()}>{t('try_again', 'Tekrar dene')}</Button>}
+                />
+              )}
               <OrderSummary
                 cartItems={cartItems}
                 cartCount={cartCount}
-                calculateTotal={calculateTotal}
                 pricing={pricing}
                 onCheckout={() => navigate(ROUTES.CHECKOUT, { state: { couponCode: appliedCouponCode } })}
-                disabled={cartCount === 0 || hasExpiredReservations}
+                disabled={cartCount === 0 || hasExpiredReservations || !pricing || isRepricing}
                 couponInput={couponInput}
                 setCouponInput={setCouponInput}
                 appliedCouponCode={appliedCouponCode}
                 couponError={couponError}
                 isPreviewLoading={isPreviewLoading}
+                isRepricing={isRepricing}
                 onApplyCoupon={onApplyCoupon}
                 onRemoveCoupon={onRemoveCoupon}
                 onOpenCouponsModal={() => setIsCouponsModalOpen(true)}
@@ -575,7 +535,7 @@ const ShoppingCartPage = () => {
         <PremiumUpgradeModal
           isOpen={isPremiumModalOpen}
           onClose={() => setIsPremiumModalOpen(false)}
-          featureHint="Öncelikli Kargo"
+          featureHint={t('priority_shipping', 'Öncelikli Kargo')}
         />
       </PageContainer>
     </div>

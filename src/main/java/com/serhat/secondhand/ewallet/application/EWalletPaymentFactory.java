@@ -1,5 +1,6 @@
 package com.serhat.secondhand.ewallet.application;
 
+import com.serhat.secondhand.ewallet.dto.WalletTransactionReference;
 import com.serhat.secondhand.payment.entity.Payment;
 import com.serhat.secondhand.payment.entity.PaymentDirection;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
@@ -42,7 +43,7 @@ public class EWalletPaymentFactory {
                 .build();
     }
 
-    public Payment buildRefundPayment(User seller, User buyer, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
+    public Payment buildRefundPayment(User seller, User buyer, BigDecimal amount, WalletTransactionReference reference) {
         return Payment.builder()
                 .fromUser(seller)
                 .toUser(buyer)
@@ -50,16 +51,18 @@ public class EWalletPaymentFactory {
                 .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.INCOMING)
-                .listingId(listingId)
-                .listingTitle(listingTitle)
-                .listingNo(listingNo)
-                .description(String.format("Refund for item: %s (%s)", listingTitle, listingNo))
+                .listingId(reference.listingId())
+                .listingTitle(reference.listingTitle())
+                .listingNo(reference.listingNo())
+                .orderId(reference.orderExternalId())
+                .orderItemId(reference.orderItemId())
+                .description(String.format("Refund for item: %s (%s)", reference.listingTitle(), reference.listingNo()))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
     }
 
-    public Payment buildRefundDebitPayment(User seller, User buyer, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
+    public Payment buildRefundDebitPayment(User seller, User buyer, BigDecimal amount, WalletTransactionReference reference) {
         return Payment.builder()
                 .fromUser(seller)
                 .toUser(buyer)
@@ -67,16 +70,18 @@ public class EWalletPaymentFactory {
                 .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.REFUND)
                 .paymentDirection(PaymentDirection.OUTGOING)
-                .listingId(listingId)
-                .listingTitle(listingTitle)
-                .listingNo(listingNo)
-                .description(String.format("Refund debit for item: %s (%s)", listingTitle, listingNo))
+                .listingId(reference.listingId())
+                .listingTitle(reference.listingTitle())
+                .listingNo(reference.listingNo())
+                .orderId(reference.orderExternalId())
+                .orderItemId(reference.orderItemId())
+                .description(String.format("Refund debit for item: %s (%s)", reference.listingTitle(), reference.listingNo()))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();
     }
 
-    public Payment buildItemSalePayment(User buyer, User seller, BigDecimal amount, UUID listingId, String listingTitle, String listingNo) {
+    public Payment buildItemSalePayment(User buyer, User seller, BigDecimal amount, WalletTransactionReference reference) {
         return Payment.builder()
                 .fromUser(buyer)
                 .toUser(seller)
@@ -84,10 +89,12 @@ public class EWalletPaymentFactory {
                 .providerName("EWALLET")
                 .transactionType(PaymentTransactionType.ITEM_SALE)
                 .paymentDirection(PaymentDirection.INCOMING)
-                .listingId(listingId)
-                .listingTitle(listingTitle)
-                .listingNo(listingNo)
-                .description(String.format("Sale of item: %s (%s)", listingTitle, listingNo))
+                .listingId(reference.listingId())
+                .listingTitle(reference.listingTitle())
+                .listingNo(reference.listingNo())
+                .orderId(reference.orderExternalId())
+                .orderItemId(reference.orderItemId())
+                .description(String.format("Sale of item: %s (%s)", reference.listingTitle(), reference.listingNo()))
                 .processedAt(LocalDateTime.now())
                 .isSuccess(true)
                 .build();

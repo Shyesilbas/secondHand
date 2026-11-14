@@ -1,5 +1,6 @@
 package com.serhat.secondhand.escrow.application;
 
+import com.serhat.secondhand.ewallet.dto.WalletTransactionReference;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.escrow.domain.entity.Escrow;
 import com.serhat.secondhand.escrow.domain.repository.EscrowRepository;
@@ -23,6 +24,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +107,24 @@ public class EscrowService {
                 ));
     }
 
+    /** Escrow states that still pay the seller: held ({@code ESCROW}) or released ({@code COMPLETED}). */
+    private static final Set<PaymentStatus> SELLER_EARNING_STATUSES = EnumSet.of(PaymentStatus.ESCROW, PaymentStatus.COMPLETED);
+
+    /**
+     * Per order, the seller's share: escrow amounts (coupon already allocated per line at checkout)
+     * that are held or released. Cancelled and refunded lines are excluded.
+     */
+    @Transactional(readOnly = true)
+    public Map<Long, BigDecimal> sumSellerAmountsByOrderIds(List<Long> orderIds, Long sellerId) {
+        if (orderIds == null || orderIds.isEmpty()) return Map.of();
+
+        return escrowRepository.findByOrderIdInAndSellerIdAndStatusIn(orderIds, sellerId, SELLER_EARNING_STATUSES).stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.getOrder().getId(),
+                        Collectors.mapping(Escrow::getAmount, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ));
+    }
+
     @Transactional
     @org.springframework.cache.annotation.CacheEvict(value = "payment:stats", allEntries = true)
     public Result<Void> release(Order order) {
@@ -169,7 +189,7 @@ public class EscrowService {
                 // 3. Refund the Buyer (Real move)
                 // Since this was in ESCROW, money was held by the system (not by the seller).
                 // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), escrow.getListingTitle(), escrow.getListingNo(), PaymentTransactionKind.REFUND, null);
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), refundReference(order, escrow), PaymentTransactionKind.REFUND, null);
                 
                 log.info("Cancelled escrow and refunded {} to buyer for order item {}", 
                         escrow.getAmount(), escrow.getOrderItem().getId());
@@ -200,13 +220,19 @@ public class EscrowService {
 
                 // Credit buyer's wallet — money returns from escrow (system), not from seller.
                 // counterpartUser=null so fromUser defaults to buyer (the actual owner of the escrowed funds).
-                walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), escrow.getListingTitle(), escrow.getListingNo(), PaymentTransactionKind.REFUND, null);
+                walletService.creditToUser(order.getUser(), escrow.getAmount(), refundReference(order, escrow), PaymentTransactionKind.REFUND, null);
             } else {
                 log.warn("Escrow {} for order {} is in {} status, skipping refund. Refund is only possible while funds are in ESCROW.",
                         escrow.getId(), order.getOrderNumber(), escrow.getStatus());
             }
         }
         return Result.success();
+    }
+
+    // Links the refund payment to its order (Order.externalId, as payment.order_id stores it) and order line.
+    private static WalletTransactionReference refundReference(Order order, Escrow escrow) {
+        return new WalletTransactionReference(escrow.getListingId(), escrow.getListingTitle(), escrow.getListingNo(),
+                order.getExternalId(), escrow.getOrderItem().getId());
     }
 
     private Result<Void> validateEscrowsReadyForCompensation(List<Long> itemIds, List<Escrow> escrows, PaymentStatus requiredStatus) {

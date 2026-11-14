@@ -23,6 +23,7 @@ public class PricingResultDto {
     private BigDecimal total;
     private Map<Long, BigDecimal> payableBySeller;
     private List<PricedCartItemDto> items;
+    private List<BundleCampaignProgressDto> bundleCampaigns;
 }
 
 

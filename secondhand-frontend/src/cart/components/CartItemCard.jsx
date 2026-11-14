@@ -5,9 +5,13 @@ import { formatCurrency } from '../../common/formatters.js';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
 import { useReservationTimer } from '../hooks/useReservationTimer.js';
 import { ROUTES } from '../../common/constants/routes.js';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { hasCampaignOnLine } from '../utils/pricedLines.js';
 
 const CartItemCard = ({
   item,
+  pricedLine,
+  isRepricing = false,
   onQuantityChange,
   onRemoveItem,
   isUpdating,
@@ -29,15 +33,12 @@ const CartItemCard = ({
     onRemoveItem(item.listing.id);
   };
 
-  const hasCampaign = Boolean(
-    item.listing?.campaignId &&
-    item.listing?.campaignPrice != null &&
-    parseFloat(item.listing.campaignPrice) < parseFloat(item.listing.price)
-  );
-
-  const unitPrice = parseFloat(hasCampaign ? item.listing.campaignPrice : item.listing.price) || 0;
-  const itemTotal = unitPrice * item.quantity;
-  const originalItemTotal = (parseFloat(item.listing?.price) || 0) * item.quantity;
+  // Prices come from the backend pricing preview. While a new preview loads, a line whose quantity still matches
+  // keeps its last price dimmed; a line priced for another quantity shows a skeleton instead of a wrong amount.
+  const lineMatchesCart = Boolean(pricedLine) && pricedLine.quantity === item.quantity;
+  const shownLine = lineMatchesCart ? pricedLine : null;
+  const hasCampaign = hasCampaignOnLine(shownLine);
+  const currency = item.listing?.currency;
 
   const sellerName = [item.listing?.sellerName, item.listing?.sellerSurname].filter(Boolean).join(' ') || item.listing?.sellerName || t('seller', 'Satıcı');
   const sellerId = item.listing?.sellerId;
@@ -176,7 +177,7 @@ const CartItemCard = ({
 
               {hasCampaign && (
                 <span className="rounded-full border border-status-success-border bg-status-success-bg px-2 py-0.5 text-xs font-medium text-status-success-text">
-                  {item.listing?.campaignName || t("campaign", "Kampanya")}
+                  {shownLine?.appliedCampaign?.name || t("campaign", "Kampanya")}
                 </span>
               )}
             </div>
@@ -213,23 +214,30 @@ const CartItemCard = ({
             </div>
 
             {/* Price display */}
-            <div className="text-right">
-              <div className="flex items-baseline justify-end gap-1.5">
-                {hasCampaign && (
-                  <span className="text-xs text-text-muted line-through tabular-nums">
-                    {formatCurrency(originalItemTotal, item.listing?.currency)}
+            {shownLine ? (
+              <div className={`text-right transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
+                <div className="flex items-baseline justify-end gap-1.5">
+                  {hasCampaign && (
+                    <span className="text-xs text-text-muted line-through tabular-nums">
+                      {formatCurrency(shownLine.originalLineTotal, currency)}
+                    </span>
+                  )}
+                  <span className="text-base sm:text-lg font-semibold tabular-nums text-text-price">
+                    {formatCurrency(shownLine.lineSubtotal, currency)}
                   </span>
+                </div>
+                {shownLine.quantity > 1 && (
+                  <p className="text-xs text-text-muted tabular-nums mt-0.5">
+                    {shownLine.quantity} × {formatCurrency(shownLine.campaignUnitPrice, currency)}
+                  </p>
                 )}
-                <span className="text-base sm:text-lg font-semibold tabular-nums text-text-price">
-                  {formatCurrency(itemTotal, item.listing?.currency)}
-                </span>
               </div>
-              {item.quantity > 1 && (
-                <p className="text-xs text-text-muted tabular-nums mt-0.5">
-                  {item.quantity} × {formatCurrency(unitPrice, item.listing?.currency)}
-                </p>
-              )}
-            </div>
+            ) : (
+              <div className="flex flex-col items-end gap-1" aria-busy="true">
+                <Skeleton className="h-6 w-24" />
+                {item.quantity > 1 && <Skeleton className="h-3 w-16" />}
+              </div>
+            )}
           </div>
 
           {/* Notes if present */}

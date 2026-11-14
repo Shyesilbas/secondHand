@@ -145,8 +145,9 @@ walletService.creditWalletQuietly(seller, event.amount());
 * Sipariş henüz kargolanmadan iptal edilirse (`cancel`) veya iade onaylanırsa (`refund`), para satıcıdan **çekilmez** (çünkü satıcıya henüz para geçmemiştir).
 * Sistem escrow'daki bloke bakiyeyi, escrow'u `CANCELLED`/`REFUNDED` yaptıktan sonra aynı transaction içinde doğrudan alıcının e-cüzdanına `REFUND` işlem türüyle senkron olarak yazar (Kafka/outbox kullanılmaz):
   ```java
-  walletService.creditToUser(order.getUser(), escrow.getAmount(), escrow.getListingId(), ... PaymentTransactionKind.REFUND, null);
+  walletService.creditToUser(order.getUser(), escrow.getAmount(), refundReference(order, escrow), PaymentTransactionKind.REFUND, null);
   ```
+* `WalletTransactionReference` iade `payment` kaydını siparişe (`order_id` = `Order.externalId`) ve sipariş kalemine (`order_item_id`) bağlar; aynı ilan birden çok kez satılsa da iadenin hangi siparişe ait olduğu bellidir.
 
 ---
 

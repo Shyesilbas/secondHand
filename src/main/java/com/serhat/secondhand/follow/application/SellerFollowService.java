@@ -47,7 +47,7 @@ public class SellerFollowService {
         }
 
         User userToFollow = userRepository.findById(userIdToFollow)
-            .orElse(null);
+                .orElse(null);
 
         if (userToFollow == null) {
             return Result.error(FollowErrorCodes.USER_NOT_FOUND);
@@ -57,21 +57,23 @@ public class SellerFollowService {
             return Result.error(FollowErrorCodes.ALREADY_FOLLOWING);
         }
 
-        var archivedFollow = sellerFollowRepository.findAnyByFollowerAndFollowed(currentUser.getId(), userToFollow.getId())
+        var archivedFollow = sellerFollowRepository
+                .findAnyByFollowerAndFollowed(currentUser.getId(), userToFollow.getId())
                 .orElse(null);
         if (archivedFollow != null && archivedFollow.getDeletedAt() != null) {
             archivedFollow.setDeletedAt(null);
             archivedFollow.setNotifyOnNewListing(true);
             SellerFollow reactivated = sellerFollowRepository.save(archivedFollow);
-            log.info("User {} re-followed user {} by reactivating archived relation", currentUser.getId(), userIdToFollow);
+            log.info("User {} re-followed user {} by reactivating archived relation", currentUser.getId(),
+                    userIdToFollow);
             return Result.success(sellerFollowMapper.toDto(reactivated));
         }
 
         SellerFollow sellerFollow = SellerFollow.builder()
-            .follower(currentUser)
-            .followed(userToFollow)
-            .notifyOnNewListing(true)
-            .build();
+                .follower(currentUser)
+                .followed(userToFollow)
+                .notifyOnNewListing(true)
+                .build();
 
         sellerFollow = sellerFollowRepository.save(sellerFollow);
         log.info("User {} started following user {}", currentUser.getId(), userIdToFollow);
@@ -81,14 +83,14 @@ public class SellerFollowService {
 
     public Result<Void> unfollow(User currentUser, Long userIdToUnfollow) {
         User userToUnfollow = userRepository.findById(userIdToUnfollow)
-            .orElse(null);
+                .orElse(null);
 
         if (userToUnfollow == null) {
             return Result.error(FollowErrorCodes.USER_NOT_FOUND);
         }
 
         SellerFollow sellerFollow = sellerFollowRepository.findByFollowerAndFollowed(currentUser, userToUnfollow)
-            .orElse(null);
+                .orElse(null);
 
         if (sellerFollow == null) {
             return Result.error(FollowErrorCodes.NOT_FOLLOWING);
@@ -101,14 +103,14 @@ public class SellerFollowService {
 
     public Result<SellerFollowDto> toggleNotifications(User currentUser, Long followedUserId) {
         User followedUser = userRepository.findById(followedUserId)
-            .orElse(null);
+                .orElse(null);
 
         if (followedUser == null) {
             return Result.error(FollowErrorCodes.USER_NOT_FOUND);
         }
 
         SellerFollow sellerFollow = sellerFollowRepository.findByFollowerAndFollowed(currentUser, followedUser)
-            .orElse(null);
+                .orElse(null);
 
         if (sellerFollow == null) {
             return Result.error(FollowErrorCodes.NOT_FOLLOWING);
@@ -116,8 +118,8 @@ public class SellerFollowService {
 
         sellerFollow.setNotifyOnNewListing(!sellerFollow.isNotifyOnNewListing());
         sellerFollow = sellerFollowRepository.save(sellerFollow);
-        log.info("User {} toggled notifications for user {} to {}", 
-            currentUser.getId(), followedUserId, sellerFollow.isNotifyOnNewListing());
+        log.info("User {} toggled notifications for user {} to {}",
+                currentUser.getId(), followedUserId, sellerFollow.isNotifyOnNewListing());
 
         return Result.success(sellerFollowMapper.toDto(sellerFollow));
     }
@@ -125,25 +127,25 @@ public class SellerFollowService {
     @Transactional(readOnly = true)
     public Page<SellerFollowDto> getFollowing(User currentUser, Pageable pageable) {
         return sellerFollowRepository.findByFollowerOrderByCreatedAtDesc(currentUser, pageable)
-            .map(sellerFollowMapper::toDto);
+                .map(sellerFollowMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Page<SellerFollowDto> getFollowers(User currentUser, Pageable pageable) {
         return sellerFollowRepository.findByFollowedOrderByCreatedAtDesc(currentUser, pageable)
-            .map(sellerFollowMapper::toDto);
+                .map(sellerFollowMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Page<SellerFollowDto> getFollowersOfUser(Long userId, Pageable pageable) {
         return sellerFollowRepository.findByFollowedId(userId, pageable)
-            .map(sellerFollowMapper::toDto);
+                .map(sellerFollowMapper::toDto);
     }
 
     @Transactional(readOnly = true)
     public Page<SellerFollowDto> getFollowingOfUser(Long userId, Pageable pageable) {
         return sellerFollowRepository.findByFollowerId(userId, pageable)
-            .map(sellerFollowMapper::toDto);
+                .map(sellerFollowMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -156,7 +158,7 @@ public class SellerFollowService {
 
         if (currentUser != null && !currentUser.getId().equals(userId)) {
             isFollowing = sellerFollowRepository.isFollowing(currentUser.getId(), userId);
-            
+
             if (isFollowing) {
                 User targetUser = userRepository.findById(userId).orElse(null);
                 if (targetUser != null) {
@@ -167,12 +169,12 @@ public class SellerFollowService {
         }
 
         return FollowStatsDto.builder()
-            .userId(userId)
-            .followersCount(followersCount)
-            .followingCount(followingCount)
-            .following(isFollowing)
-            .notifyOnNewListing(notifyOnNewListing)
-            .build();
+                .userId(userId)
+                .followersCount(followersCount)
+                .followingCount(followingCount)
+                .following(isFollowing)
+                .notifyOnNewListing(notifyOnNewListing)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -193,32 +195,35 @@ public class SellerFollowService {
             return;
         }
 
-        log.info("Notifying {} followers about new listing {} by user {}", 
-            followers.size(), listing.getId(), seller.getId());
+        log.info("Notifying {} followers about new listing {} by user {}",
+                followers.size(), listing.getId(), seller.getId());
 
         String subject = String.format(
                 emailConfig.getFollow().getNewListingSubjectFormat(),
                 seller.getName(),
-                seller.getSurname()
-        );
-        
+                seller.getSurname());
+
         for (SellerFollow follow : followers) {
             try {
                 var data = NewListingEmailData.builder()
                         .userName(follow.getFollower().getName())
                         .headerTitle("Yeni Bir İlan Eklendi!")
-                        .introText("Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname() + " yeni bir ilan ekledi:")
+                        .introText("Takip ettiğiniz satıcı " + seller.getName() + " " + seller.getSurname()
+                                + " yeni bir ilan ekledi:")
                         .listingTitle(listing.getTitle())
-                        .listingPrice(listing.getPrice() + " " + listing.getCurrency())
+                        .listingPrice(String.format(java.util.Locale.forLanguageTag("tr-TR"), "%,.2f %s",
+                                listing.getPrice() != null ? listing.getPrice() : java.math.BigDecimal.ZERO,
+                                listing.getCurrency() != null ? listing.getCurrency().name() : "TRY"))
                         .listingCity(listing.getCity())
                         .listingUrl("/listings/" + listing.getId())
-                        .manageNotificationText("Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.")
+                        .manageNotificationText(
+                                "Bu bildirimleri kapatmak için satıcı profilinden bildirim ayarlarınızı güncelleyebilirsiniz.")
                         .listingImage(listing.getImageUrl())
                         .build();
 
                 emailEventPublisher.publish(new NewListingEmailEvent(follow.getFollower(), subject, data));
                 log.debug("Sent new listing notification to user {}", follow.getFollower().getId());
-                
+
                 String sellerFullName = ((seller.getName() == null ? "" : seller.getName()) + " "
                         + (seller.getSurname() == null ? "" : seller.getSurname())).trim();
                 String amountText = listing.getPrice() != null ? listing.getPrice().toPlainString() : null;
@@ -230,16 +235,15 @@ public class SellerFollowService {
                         listing.getTitle(),
                         sellerFullName,
                         amountText,
-                        currency
-                );
+                        currency);
                 notificationEventPublisher.publishDispatch(
                         request,
                         "follow",
-                        "follow-new-listing:" + follow.getFollower().getId() + ":" + listing.getId() + ":" + seller.getId()
-                );
+                        "follow-new-listing:" + follow.getFollower().getId() + ":" + listing.getId() + ":"
+                                + seller.getId());
             } catch (Exception e) {
-                log.error("Failed to send new listing notification to user {}: {}", 
-                    follow.getFollower().getId(), e.getMessage());
+                log.error("Failed to send new listing notification to user {}: {}",
+                        follow.getFollower().getId(), e.getMessage());
             }
         }
     }

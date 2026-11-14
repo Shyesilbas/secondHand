@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -36,11 +38,21 @@ public class ListingPaymentHandler {
             return null;
         }
         Long userId = listing.getSeller() != null ? listing.getSeller().getId() : null;
-        if (userId != null) {
-            listing.markFeeAsPaid();
-            listingRepository.save(listing);
-            listingCommandService.publish(listing.getId(), userId);
+        Long payerId = payment.getFromUser() != null ? payment.getFromUser().getId() : null;
+        if (userId == null || !userId.equals(payerId)) {
+            log.error("LISTING_CREATION payment {} was made by user {} but listing {} belongs to {}; not publishing.",
+                    payment.getId(), payerId, listing.getId(), userId);
+            return null;
         }
+        BigDecimal requiredFee = listingCommandService.calculateTotalListingFee();
+        if (payment.getAmount() == null || payment.getAmount().compareTo(requiredFee) < 0) {
+            log.error("LISTING_CREATION payment {} amount {} is below the listing fee {}; not publishing listing {}.",
+                    payment.getId(), payment.getAmount(), requiredFee, listing.getId());
+            return null;
+        }
+        listing.markFeeAsPaid();
+        listingRepository.save(listing);
+        listingCommandService.publish(listing.getId(), userId);
         return listing;
     }
 

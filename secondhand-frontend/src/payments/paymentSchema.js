@@ -4,7 +4,7 @@ import { OTP_CODE_LENGTH as COMMON_OTP_CODE_LENGTH } from '../common/constants/o
 export const DEFAULT_PAYMENT_FILTERS = Object.freeze({
  seller: '',
  transactionType: '',
- paymentType: '',
+ providerName: '',
  dateFrom: '',
  dateTo: '',
  amountMin: '',
@@ -15,6 +15,7 @@ export const DEFAULT_PAYMENT_FILTERS = Object.freeze({
 export const PAYMENT_QUERY_KEYS = Object.freeze({
  payments: ['payments'],
  paymentStatistics: ['paymentStatistics'],
+ listingFeeQuote: ['listingFeeQuote'],
  paymentMethods: ['paymentMethods'],
  emailsMy: ['emails', 'my'],
  draftListings: ['draftListings'],
@@ -25,28 +26,6 @@ export const PAYMENT_FLOW_DEFAULTS = Object.freeze({
  DRAFT_LISTINGS_PAGE_SIZE: 100,
  DRAFT_LISTINGS_MAX_PAGES: 10,
 });
-
-/**
- * İstatistik API alan adı sapmalarına karşı tek yerden okuma (PaymentsPage vb.)
- */
-const PAYMENT_STATISTICS_FIELD_KEYS = Object.freeze({
- totalVolume: ['totalAmount', 'totalVolume', 'total'],
- incomingVolume: ['incomingAmount', 'totalIncomingAmount', 'incomingTotal'],
- outgoingVolume: ['outgoingAmount', 'totalOutgoingAmount', 'outgoingTotal'],
- escrowAmount: ['escrowAmount', 'totalEscrowAmount', 'escrowTotal'],
- successfulCount: ['successfulCount', 'successfulPayments', 'successCount', 'successfulTransactions'],
-});
-
-export const pickPaymentStatistic = (stats, keyGroup) => {
- if (!stats || !keyGroup) return 0;
- const keys = PAYMENT_STATISTICS_FIELD_KEYS[keyGroup];
- if (!keys) return 0;
- for (const key of keys) {
- const value = stats[key];
- if (typeof value === 'number') return value;
- }
- return 0;
-};
 
 export { normalizeArrayResponse };
 
@@ -87,8 +66,6 @@ export const DEFAULT_CURRENCY = 'TRY';
 export const DEFAULT_CURRENCY_SYMBOL = '₺';
 
 export const OTP_CODE_LENGTH = COMMON_OTP_CODE_LENGTH;
-/** Ödeme doğrulama kodu TTL (saniye); tüm frontend geri sayaçları buna bağlanır */
-export const OTP_CODE_VALIDITY_SECONDS = 180;
 
 export const VERIFICATION_STEPS = Object.freeze({
  REVIEW: 'REVIEW',
@@ -102,21 +79,26 @@ export const WALLET_OPERATION_MODES = Object.freeze({
  UPDATE_WARNING: 'updateWarning',
 });
 
+/**
+ * Ledger row from `GET /v1/payments/my` (backend `PaymentDto`), passed through as sent: direction and
+ * type are already resolved for the viewer by `PaymentContextResolver`. No field is defaulted here.
+ */
 export const PaymentDto = (data) => ({
- paymentId: data.paymentId || null,
- senderDisplayName: data.senderDisplayName || '',
- receiverDisplayName: data.receiverDisplayName || '',
- amount: data.amount || 0,
- currency: data.currency || 'TRY',
- paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
- transactionType: data.transactionType || PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
- paymentDirection: data.paymentDirection || PAYMENT_DIRECTIONS.OUTGOING,
- listingId: data.listingId || null,
- listingTitle: data.listingTitle || null,
- listingNo: data.listingNo || null,
- processedAt: data.processedAt || null,
- isSuccess: data.isSuccess || false,
- status: data.status || (data.isSuccess ? 'COMPLETED' : 'FAILED')
+ paymentId: data.paymentId,
+ senderDisplayName: data.senderDisplayName,
+ receiverDisplayName: data.receiverDisplayName,
+ amount: data.amount,
+ currency: data.currency,
+ providerName: data.providerName,
+ transactionType: data.transactionType,
+ paymentDirection: data.paymentDirection,
+ listingId: data.listingId,
+ listingTitle: data.listingTitle,
+ listingNo: data.listingNo,
+ processedAt: data.processedAt,
+ isSuccess: data.isSuccess,
+ status: data.status,
+ description: data.description,
 });
 
 export const TRANSACTION_TYPE_LABELS = {
@@ -131,12 +113,10 @@ export const TRANSACTION_TYPE_LABELS = {
 };
 
 export const createListingFeePaymentRequest = (data) => {
+ // Mirrors backend ListingFeePaymentRequest; the fee amount is set by the backend.
  return {
- listingId: data.listingId || '',
- paymentType: data.paymentType || PAYMENT_TYPES.EWALLET,
- providerName: data.providerName || data.paymentType || PAYMENT_TYPES.EWALLET,
- transactionType: PAYMENT_TRANSACTION_TYPES.LISTING_CREATION,
- paymentDirection: PAYMENT_DIRECTIONS.OUTGOING,
+ listingId: data.listingId,
+ providerName: data.providerName,
  verificationCode: data.verificationCode || null,
  agreementsAccepted: data.agreementsAccepted || false,
  acceptedAgreementIds: data.acceptedAgreementIds || [],

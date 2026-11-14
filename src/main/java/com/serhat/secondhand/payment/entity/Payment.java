@@ -76,6 +76,8 @@ public class Payment {
     @Builder.Default
     private PaymentStatus status = PaymentStatus.COMPLETED;
 
+    // Order.externalId (not orders.id) of the order this payment belongs to; FK fk_payment_order_external_id.
+    // Set on purchases and refunds, null for payments that belong to no order.
     private UUID orderId;
     
     @Column(columnDefinition = "TEXT")

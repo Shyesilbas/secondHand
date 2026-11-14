@@ -5,6 +5,7 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.verification.CodeType;
 import com.serhat.secondhand.core.verification.IVerificationService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
+import com.serhat.secondhand.payment.dto.PaymentVerificationDto;
 import com.serhat.secondhand.payment.entity.PaymentTransactionType;
 import com.serhat.secondhand.checkout.application.PaymentVerificationMessageBuilder;
 import com.serhat.secondhand.payment.util.PaymentErrorCodes;
@@ -25,7 +26,7 @@ public class PaymentVerificationService implements IPaymentVerificationService {
     private final PaymentVerificationMessageBuilder paymentVerificationMessageBuilder;
 
     @Override
-    public void initiatePaymentVerification(Long userId, InitiateVerificationRequest req) {
+    public PaymentVerificationDto initiatePaymentVerification(Long userId, InitiateVerificationRequest req) {
         var userResult = userService.findById(userId);
         if (userResult.isError()) {
             throw new BusinessException(userResult.getMessage(), org.springframework.http.HttpStatus.NOT_FOUND, "USER_NOT_FOUND");
@@ -36,7 +37,7 @@ public class PaymentVerificationService implements IPaymentVerificationService {
                 req != null ? req.getTransactionType() : "NULL");
 
         String code = verificationService.generateCode();
-        verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
+        var verification = verificationService.generateVerification(user, code, CodeType.PAYMENT_VERIFICATION);
 
         PaymentTransactionType type = (req != null && req.getTransactionType() != null)
                 ? req.getTransactionType() : PaymentTransactionType.ITEM_PURCHASE;
@@ -50,6 +51,7 @@ public class PaymentVerificationService implements IPaymentVerificationService {
             log.error("Failed to send notification to user: {}", user.getEmail(), e);
             throw e;
         }
+        return new PaymentVerificationDto(verification.getCodeExpiresAt());
     }
 
     @Override

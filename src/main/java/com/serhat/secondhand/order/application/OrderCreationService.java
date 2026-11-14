@@ -17,6 +17,7 @@ import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.order.util.OrderErrorCodes;
 import com.serhat.secondhand.pricing.dto.PricedCartItemDto;
 import com.serhat.secondhand.pricing.dto.PricingResultDto;
+import com.serhat.secondhand.pricing.util.PricingUtil;
 import com.serhat.secondhand.user.application.AddressService;
 import com.serhat.secondhand.user.domain.entity.Address;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -81,7 +81,7 @@ public class OrderCreationService {
             }
 
             try {
-                populateOrderItems(sellerCart, order, unitPriceByListingId, lineSubtotalByListingId);
+                populateOrderItems(sellerCart, order, pricedByListingId, unitPriceByListingId, lineSubtotalByListingId);
             } catch (IllegalStateException e) {
                 return Result.error(e.getMessage(), OrderErrorCodes.ORDER_ITEM_MISSING_SELLER.getCode());
             }
@@ -119,10 +119,9 @@ public class OrderCreationService {
                 continue;
             }
             BigDecimal line = priced.getLineSubtotal();
-            BigDecimal original = priced.getOriginalUnitPrice() != null ? priced.getOriginalUnitPrice().multiply(quantity) : line;
             BigDecimal coupon = priced.getCouponDiscount() != null ? priced.getCouponDiscount() : BigDecimal.ZERO;
             subtotal = subtotal.add(line);
-            campaignDiscount = campaignDiscount.add(original.subtract(line).max(BigDecimal.ZERO));
+            campaignDiscount = campaignDiscount.add(lineCampaignDiscount(priced));
             couponDiscount = couponDiscount.add(coupon);
             total = total.add(priced.getNetLineTotal() != null ? priced.getNetLineTotal() : line.subtract(coupon));
         }
@@ -130,7 +129,12 @@ public class OrderCreationService {
     }
 
     private static BigDecimal scale(BigDecimal value) {
-        return value.setScale(2, RoundingMode.HALF_UP);
+        return PricingUtil.scale(value);
+    }
+
+    // The pricing engine owns the campaign math; order only copies its per-line result.
+    private static BigDecimal lineCampaignDiscount(PricedCartItemDto priced) {
+        return priced != null && priced.getCampaignDiscount() != null ? priced.getCampaignDiscount() : BigDecimal.ZERO;
     }
 
     private record SellerAmounts(BigDecimal subtotal, BigDecimal campaignDiscount, BigDecimal couponDiscount, BigDecimal total) {}
@@ -164,13 +168,15 @@ public class OrderCreationService {
         return Result.success();
     }
 
-    private void populateOrderItems(List<Cart> cartItems, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
+    private void populateOrderItems(List<Cart> cartItems, Order order, Map<UUID, PricedCartItemDto> pricedByListingId,
+                                    Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         for (Cart cart : cartItems) {
-            order.addItem(createOrderItem(cart, order, unitPriceByListingId, lineSubtotalByListingId));
+            order.addItem(createOrderItem(cart, order, pricedByListingId, unitPriceByListingId, lineSubtotalByListingId));
         }
     }
 
-    private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
+    private OrderItem createOrderItem(Cart cart, Order order, Map<UUID, PricedCartItemDto> pricedByListingId,
+                                      Map<UUID, BigDecimal> unitPriceByListingId, Map<UUID, BigDecimal> lineSubtotalByListingId) {
         Listing listing = cart.getListing();
         BigDecimal unitPrice = listing != null ? listing.getPrice() : BigDecimal.ZERO;
         BigDecimal lineSubtotal = unitPrice.multiply(BigDecimal.valueOf(cart.getQuantity()));
@@ -201,8 +207,21 @@ public class OrderCreationService {
                 .currency(Currency.TRY)
                 .notes(cart.getNotes())
                 .build();
-        
+        applyCampaignAttribution(item, listing, pricedByListingId.get(listing.getId()));
         return item;
+    }
+
+    // Snapshots the seller campaign that priced this line; the same per-line value feeds Order.campaignDiscount.
+    private static void applyCampaignAttribution(OrderItem item, Listing listing, PricedCartItemDto priced) {
+        BigDecimal originalUnitPrice = priced != null && priced.getOriginalUnitPrice() != null
+                ? priced.getOriginalUnitPrice()
+                : listing.getPrice();
+        item.setOriginalUnitPrice(originalUnitPrice != null ? scale(originalUnitPrice) : null);
+        item.setCampaignDiscount(scale(lineCampaignDiscount(priced)));
+        if (priced != null && priced.getAppliedCampaign() != null) {
+            item.setCampaignId(priced.getAppliedCampaign().getCampaignId());
+            item.setCampaignName(priced.getAppliedCampaign().getName());
+        }
     }
 
     private Map<UUID, PricedCartItemDto> buildPricedItemsByListingId(PricingResultDto pricing) {

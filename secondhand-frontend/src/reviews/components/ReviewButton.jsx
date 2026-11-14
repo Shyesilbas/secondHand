@@ -3,7 +3,6 @@ import { Star } from 'lucide-react';
 import { useState } from 'react';
 import ReviewModal from './ReviewModal.jsx';
 import Button from '../../common/components/ui/Button.jsx';
-import { ORDER_STATUSES } from '../../order/constants/orderUiConstants.js';
 import { REVIEW_MESSAGES } from '../reviewConstants.js';
 
 // `existingReview` comes from the caller's review query; after creation the caller refetches it.
@@ -11,15 +10,14 @@ const ReviewButton = ({
  orderItem,
  onReviewCreated,
  existingReview = null,
- orderStatus,
- shippingStatus,
+ canReview = false,
  reviewsLoading = false
 }) => {
  const {
  t
  } = useTranslation();
  const [showModal, setShowModal] = useState(false);
- const canReview = orderStatus === ORDER_STATUSES.COMPLETED || orderStatus === ORDER_STATUSES.DELIVERED || shippingStatus === ORDER_STATUSES.DELIVERED || orderItem?.shippingStatus === ORDER_STATUSES.DELIVERED;
+ // `canReview` is the order's backend REVIEW action (same rule as review creation).
  if (!canReview) {
  return null;
  }

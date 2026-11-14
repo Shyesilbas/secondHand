@@ -48,7 +48,7 @@ export const AddressSection = React.memo(({
   if (isEditingAddress) {
     return (
       <Card>
-        <h3 className="mb-4 text-lg font-semibold text-text-primary">{t("edit_addresses")}</h3>
+        <h3 className="mb-4 text-base font-semibold text-text-primary">{t("edit_addresses")}</h3>
         {addressesLoading ? (
           <p className="text-sm text-text-tertiary">{t("loading_addresses")}</p>
         ) : (
@@ -80,7 +80,7 @@ export const AddressSection = React.memo(({
   return (
     <Card>
       <div className="mb-4 flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-text-primary">{t("od_addresses", "Adresler")}</h3>
+        <h3 className="text-base font-semibold text-text-primary">{t("od_addresses", "Adresler")}</h3>
         {isModifiable ? <Button variant="ghost" size="sm" onClick={handleStartEditAddress}>{t("change_address")}</Button> : null}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -116,7 +116,7 @@ export const NotesSection = React.memo(({
   if (isEditingNotes) {
     return (
       <Card>
-        <h3 className="mb-4 text-lg font-semibold text-text-primary">{t("edit_order_notes")}</h3>
+        <h3 className="mb-4 text-base font-semibold text-text-primary">{t("edit_order_notes")}</h3>
         <textarea
           value={orderNotes}
           onChange={e => setOrderNotes(e.target.value)}
@@ -148,7 +148,7 @@ export const NotesSection = React.memo(({
   return (
     <Card>
       <div className="mb-3 flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-text-primary">{t("order_notes")}</h3>
+        <h3 className="text-base font-semibold text-text-primary">{t("order_notes")}</h3>
         {isModifiable ? <Button variant="ghost" size="sm" onClick={handleStartEditNotes}>{t("od_edit_note", "Notu düzenle")}</Button> : null}
       </div>
       <p className="whitespace-pre-wrap text-sm text-text-primary">{selectedOrder.notes}</p>

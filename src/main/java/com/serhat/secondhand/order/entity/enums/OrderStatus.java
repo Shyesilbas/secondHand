@@ -49,6 +49,26 @@ public enum OrderStatus {
     public static final Set<OrderStatus> COMPLETABLE_STATUSES =
             EnumSet.of(DELIVERED, HANDOVER_CONFIRMED);
 
+    /**
+     * Statuses in which the seller can hand a cargo order to the carrier.
+     */
+    public static final Set<OrderStatus> SHIPPABLE_STATUSES =
+            EnumSet.of(CONFIRMED, PROCESSING);
+
+    /**
+     * Safe Meetup statuses in which the seller can submit the buyer's OTP/QR code.
+     */
+    public static final Set<OrderStatus> MEETUP_VERIFIABLE_STATUSES =
+            EnumSet.of(MEETUP_PENDING, VERIFICATION_LOCKED);
+
+    public boolean isShippable() {
+        return SHIPPABLE_STATUSES.contains(this);
+    }
+
+    public boolean isMeetupVerifiable() {
+        return MEETUP_VERIFIABLE_STATUSES.contains(this);
+    }
+
     public boolean isCancellable() {
         return CANCELLABLE_STATUSES.contains(this);
     }

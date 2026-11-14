@@ -1,14 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '../../common/constants/routes.js';
-import { formatDate } from '../../common/formatters.js';
-import { Calendar, ExternalLink, LayoutDashboard, Mail } from 'lucide-react';
-import Alert from '../../common/components/ui/Alert.jsx';
-import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
+import { ExternalLink, LayoutDashboard, Mail } from 'lucide-react';
+import { buttonClasses } from '../../common/components/ui/Button.jsx';
 
 const ProfileHeader = ({ user }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const name = user?.name || '';
   const surname = user?.surname || '';
@@ -17,7 +14,6 @@ const ProfileHeader = ({ user }) => {
     (name?.[0] || user?.email?.[0] || 'U').toUpperCase() +
     (surname?.[0] || '').toUpperCase();
   const isVerified = Boolean(user?.accountVerified);
-  const memberSince = formatDate(user?.accountCreationDate);
 
   return (
     <div className="flex flex-col gap-4">
@@ -58,14 +54,6 @@ const ProfileHeader = ({ user }) => {
                   <span className="truncate">{user.email}</span>
                 </span>
               )}
-              {memberSince && (
-                <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden="true" />
-                  <span>
-                    {t('member_since', 'Üyelik:')} {memberSince}
-                  </span>
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -91,24 +79,6 @@ const ProfileHeader = ({ user }) => {
         </div>
       </div>
 
-      {!isVerified && (
-        <Alert
-          type="warning"
-          message={t(
-            'verify_email_notice',
-            'Hesabınız henüz doğrulanmadı. Tüm pazar yeri özelliklerinden yararlanmak için e-posta adresinizi doğrulayın.'
-          )}
-          action={
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate(ROUTES.VERIFY_ACCOUNT)}
-            >
-              {t('verify_now', 'Şimdi Doğrula')}
-            </Button>
-          }
-        />
-      )}
     </div>
   );
 };

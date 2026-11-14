@@ -11,6 +11,7 @@ import {
 	ruledByRealEstateType,
 } from '../../realEstate/utils/realEstateRules.js';
 import { filterConfigs } from '../filters/filterConfigs.js';
+import { formatPrice } from '../../common/formatters.js';
 
 // Fields follow the selected property type's rules (`realEstateTypes[].fieldRules`, backend
 // RealEstateTypeRulesValidator). Category comes from the backend (`realEstateTypes[].category`).
@@ -23,7 +24,7 @@ const hasValue = (key) => (listing) => {
 };
 const m2 = (_listing, v) => (v ? `${v} m²` : null);
 const yesNo = (_listing, v) => (v ? 'Evet' : null);
-const money = (listing, v) => (v != null && v !== '' ? `${Number(v).toLocaleString('tr-TR')} ${listing?.currency || 'TRY'}` : null);
+const money = (listing, v) => (v != null && v !== '' ? `${formatPrice(v)} ${listing?.currency || 'TRY'}` : null);
 const isLandListing = (listing) => String(listing?.realEstateType?.category || '').toUpperCase() === 'LAND'
 	|| Boolean(listing?.zoningStatusKey);
 

@@ -11,6 +11,7 @@ import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
+import com.serhat.secondhand.order.policy.OrderViewPolicy;
 import com.serhat.secondhand.order.repository.OrderItemCancelRepository;
 import com.serhat.secondhand.order.repository.OrderItemRefundRepository;
 import com.serhat.secondhand.order.repository.OrderRepository;
@@ -45,6 +46,7 @@ public class OrderQueryService {
     private final OrderValidationService orderValidationService;
     private final OrderItemCancelRepository orderItemCancelRepository;
     private final OrderItemRefundRepository orderItemRefundRepository;
+    private final OrderViewPolicy orderViewPolicy;
     private final OrderQueryService self;
 
     public OrderQueryService(OrderRepository orderRepository,
@@ -54,6 +56,7 @@ public class OrderQueryService {
                              OrderValidationService orderValidationService,
                              OrderItemCancelRepository orderItemCancelRepository,
                              OrderItemRefundRepository orderItemRefundRepository,
+                             OrderViewPolicy orderViewPolicy,
                              @Lazy OrderQueryService self) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
@@ -62,6 +65,7 @@ public class OrderQueryService {
         this.orderValidationService = orderValidationService;
         this.orderItemCancelRepository = orderItemCancelRepository;
         this.orderItemRefundRepository = orderItemRefundRepository;
+        this.orderViewPolicy = orderViewPolicy;
         this.self = self;
     }
 
@@ -77,10 +81,10 @@ public class OrderQueryService {
 
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
-        return Result.success(orders.map(order -> orderMapper.toDto(order, 
+        return Result.success(orders.map(order -> applyBuyerView(orderMapper.toDto(order, 
                 metadata.cancelled(), metadata.refunded(),
                 metadata.cancelReasons(), metadata.cancelReasonTexts(),
-                metadata.refundReasons(), metadata.refundReasonTexts())));
+                metadata.refundReasons(), metadata.refundReasonTexts()), order)));
     }
 
     public Result<OrderDto> getOrderById(Long orderId, Long userId) {
@@ -89,16 +93,17 @@ public class OrderQueryService {
         Order order = orderResult.getData();
 
         // Tamamlanmış siparişler cache'den döner (statüsü artık değişmez)
+        // The view fields are applied after the cache so they never depend on a cached copy.
         if (TERMINAL_STATUSES.contains(order.getStatus())) {
-            return Result.success(self.getCachedCompletedOrder(orderId, order));
+            return Result.success(applyBuyerView(self.getCachedCompletedOrder(orderId, order), order));
         }
 
         MetadataContext metadata = fetchMetadata(order);
 
-        return Result.success(orderMapper.toDto(order, 
+        return Result.success(applyBuyerView(orderMapper.toDto(order, 
                 metadata.cancelled(), metadata.refunded(),
                 metadata.cancelReasons(), metadata.cancelReasonTexts(),
-                metadata.refundReasons(), metadata.refundReasonTexts()));
+                metadata.refundReasons(), metadata.refundReasonTexts()), order));
     }
 
     /**
@@ -125,7 +130,10 @@ public class OrderQueryService {
         return orderRepository.findByIdForSeller(orderId, sellerId)
                 .map(order -> {
                     MetadataContext metadata = fetchMetadata(order);
-                    return buildSellerOrderDto(order, sellerId, metadata);
+                    OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata);
+                    orderDto.setSellerTotal(escrowService.sumSellerAmountsByOrderIds(List.of(order.getId()), sellerId)
+                            .getOrDefault(order.getId(), BigDecimal.ZERO));
+                    return orderDto;
                 })
                 .map(Result::success)
                 .orElseGet(() -> Result.error(OrderErrorCodes.ORDER_NOT_BELONG_TO_USER));
@@ -146,12 +154,14 @@ public class OrderQueryService {
 
         List<Long> orderIds = orderList.stream().map(Order::getId).toList();
         Map<Long, BigDecimal> escrowAmounts = escrowService.sumPendingAmountsByOrderIds(orderIds, sellerId);
+        Map<Long, BigDecimal> sellerTotals = escrowService.sumSellerAmountsByOrderIds(orderIds, sellerId);
         
         MetadataContext metadata = fetchBulkMetadata(orderList);
 
         return Result.success(orders.map(order -> {
             OrderDto orderDto = buildSellerOrderDto(order, sellerId, metadata);
             orderDto.setEscrowAmount(escrowAmounts.getOrDefault(order.getId(), BigDecimal.ZERO));
+            orderDto.setSellerTotal(sellerTotals.getOrDefault(order.getId(), BigDecimal.ZERO));
             return orderDto;
         }));
     }
@@ -223,7 +233,29 @@ public class OrderQueryService {
         }
         orderDto.setEscrowAmount(null);
         orderDto.setMeetupVerificationCode(null); // kod yalnızca alıcıya görünür
+        // Order-level money covers every seller in the order; a seller reads only sellerTotal.
+        orderDto.setTotalAmount(null);
+        orderDto.setSubtotal(null);
+        orderDto.setCampaignDiscount(null);
+        orderDto.setCouponCode(null);
+        orderDto.setCouponDiscount(null);
+        orderDto.setDiscountTotal(null);
+        applyView(orderDto, orderViewPolicy.sellerView(order, sellerId));
         return orderDto;
+    }
+
+    private OrderDto applyBuyerView(OrderDto orderDto, Order order) {
+        if (orderDto == null) return null;
+        applyView(orderDto, orderViewPolicy.buyerView(order));
+        return orderDto;
+    }
+
+    private static void applyView(OrderDto orderDto, OrderViewPolicy.View view) {
+        orderDto.setAllowedActions(view.allowedActions());
+        orderDto.setRefundDeadline(view.refundDeadline());
+        orderDto.setShipDeadline(view.shipDeadline());
+        orderDto.setAutoCompleteAt(view.autoCompleteAt());
+        orderDto.setMeetupCodeExpiresAt(view.meetupCodeExpiresAt());
     }
 
     @Cacheable(value = "order:pending", key = "#userId")

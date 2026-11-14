@@ -1,3 +1,5 @@
+import { formatMonetaryAmountsInText } from '../common/formatters.js';
+
 export const EMAIL_TYPES = {
   VERIFICATION: 'VERIFICATION',
   VERIFICATION_CODE: 'VERIFICATION_CODE',
@@ -210,6 +212,324 @@ export const extractEmailPreview = (rawContent, subject = '') => {
     .replace(/\s*20\d{2}\s*SecondHand.*$/i, '')
     .trim();
 
-  return text;
+  return formatMonetaryAmountsInText(text);
+};
+
+const EDITORIAL_EMAIL_STYLE = `
+<style id="sh-editorial-email-style">
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: rgb(255 255 255) !important;
+    color: rgb(15 23 42) !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    font-variant-numeric: tabular-nums !important;
+    -webkit-font-smoothing: antialiased !important;
+  }
+  .container {
+    max-width: 720px !important;
+    margin: 0 !important;
+    padding: 16px 24px 20px 24px !important;
+    background-color: rgb(255 255 255) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .header,
+  .brand-badge,
+  .crown-icon,
+  .benefit-icon {
+    display: none !important;
+  }
+  .content {
+    padding: 0 !important;
+    color: rgb(51 65 85) !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+  }
+  .content p,
+  .greeting,
+  .intro-text {
+    margin: 0 0 10px 0 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    color: rgb(51 65 85) !important;
+  }
+  .greeting {
+    font-weight: 600 !important;
+    color: rgb(15 23 42) !important;
+  }
+  .order-card,
+  .receipt-card,
+  .offer-card,
+  .offer-box,
+  .earning-card,
+  .code-card,
+  .badge-card,
+  .details-box,
+  .action-box,
+  .listing-card {
+    background: rgb(255 255 255) !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(226 232 240) !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    margin: 12px 0 !important;
+    text-align: left !important;
+    box-shadow: none !important;
+    white-space: normal !important;
+  }
+  .details-box {
+    padding: 12px 14px !important;
+    margin: 10px 0 !important;
+  }
+  .details-box .details-table {
+    width: 100% !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 4px 0 0 0 !important;
+    box-shadow: none !important;
+  }
+  .details-box .details-table td {
+    padding: 6px 0 !important;
+    border-bottom: 1px solid rgb(241 245 249) !important;
+    background-color: transparent !important;
+    color: rgb(51 65 85) !important;
+  }
+  .details-box .details-table tr:last-child td {
+    border-bottom: none !important;
+  }
+  .action-box {
+    background: rgb(255 255 255) !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(226 232 240) !important;
+    border-left: 3px solid rgb(203 213 225) !important;
+    padding: 10px 14px !important;
+    margin: 10px 0 !important;
+  }
+  .content .info-box,
+  .content .warning-box,
+  .content .alert-box,
+  .content .notice-box,
+  .content .summary-box,
+  .content .callout,
+  .content .note,
+  .content blockquote {
+    background: rgb(255 255 255) !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(226 232 240) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+  .content tr,
+  .content th,
+  .content td {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+  .order-label,
+  .receipt-label,
+  .offer-label,
+  .earning-label,
+  .code-label {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: rgb(100 116 139) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin: 0 0 2px 0 !important;
+  }
+  .order-amount,
+  .receipt-amount,
+  .offer-amount,
+  .offer-box h2,
+  .earning-amount,
+  .listing-price {
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    color: rgb(15 23 42) !important;
+    letter-spacing: -0.02em !important;
+    margin: 2px 0 0 0 !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .code-value,
+  .pin-box {
+    display: inline-block !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2em !important;
+    color: rgb(15 23 42) !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(203 213 225) !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    margin: 6px 0 !important;
+    box-shadow: none !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .details-table,
+  table[role="presentation"] {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 12px 0 !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(226 232 240) !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+  .details-table td,
+  table[role="presentation"] td {
+    padding: 7px 14px !important;
+    font-size: 13px !important;
+    border-bottom: 1px solid rgb(241 245 249) !important;
+    color: rgb(51 65 85) !important;
+  }
+  .details-table tr:last-child td,
+  table[role="presentation"] tr:last-child td {
+    border-bottom: none !important;
+  }
+  .detail-key,
+  .detail-label {
+    color: rgb(100 116 139) !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+  }
+  .detail-val,
+  .detail-value {
+    color: rgb(15 23 42) !important;
+    font-weight: 600 !important;
+    text-align: right !important;
+    font-size: 13px !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .detail-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 6px 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid rgb(241 245 249) !important;
+    font-size: 13px !important;
+  }
+  .detail-row:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+  .item-row,
+  .benefit-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 9px 14px !important;
+    border: 1px solid rgb(226 232 240) !important;
+    border-radius: 8px !important;
+    margin-bottom: 6px !important;
+    background-color: rgb(255 255 255) !important;
+  }
+  .item-title,
+  .benefit-title,
+  .listing-title,
+  .badge-title {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    color: rgb(15 23 42) !important;
+    margin: 0 !important;
+  }
+  .item-meta,
+  .benefit-desc,
+  .listing-city,
+  .badge-desc {
+    font-size: 12px !important;
+    color: rgb(100 116 139) !important;
+    margin-top: 2px !important;
+    font-weight: 400 !important;
+  }
+  .item-price,
+  .highlight {
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    color: rgb(15 23 42) !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+  .listing-img {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 8px !important;
+    background-color: rgb(255 255 255) !important;
+    border: 1px solid rgb(226 232 240) !important;
+    margin-right: 14px !important;
+  }
+  .listing-img img {
+    border-radius: 8px !important;
+  }
+  .button,
+  a.button {
+    display: inline-block !important;
+    background: rgb(15 23 42) !important;
+    background-color: rgb(15 23 42) !important;
+    color: rgb(255 255 255) !important;
+    text-decoration: none !important;
+    padding: 9px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: 0 !important;
+    margin-top: 8px !important;
+    box-shadow: none !important;
+  }
+  .signoff {
+    margin-top: 14px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid rgb(241 245 249) !important;
+    font-size: 13px !important;
+    color: rgb(71 85 105) !important;
+  }
+  .footer {
+    background-color: transparent !important;
+    padding: 10px 0 0 0 !important;
+    margin-top: 12px !important;
+    text-align: left !important;
+    font-size: 12px !important;
+    color: rgb(148 163 184) !important;
+    border-top: 1px solid rgb(241 245 249) !important;
+  }
+  @media (max-width: 640px) {
+    .container {
+      padding: 14px !important;
+    }
+  }
+</style>
+`;
+
+export const getProcessedContent = (content) => {
+  if (!content) return '';
+  const formatted = formatMonetaryAmountsInText(String(content));
+  const htmlEndIdx = formatted.toLowerCase().indexOf('</html>');
+  const bounded = htmlEndIdx !== -1 ? formatted.slice(0, htmlEndIdx + 7) : formatted;
+  const cleaned = stripEmailEmojis(bounded);
+
+  const isHtml = /<[a-z][\s\S]*>/i.test(cleaned);
+  if (isHtml) {
+    if (/<\/head>/i.test(cleaned)) {
+      return cleaned.replace(/<\/head>/i, `<base target="_top">${EDITORIAL_EMAIL_STYLE}</head>`);
+    }
+    if (/<head>/i.test(cleaned)) {
+      return cleaned.replace(/<head>/i, `<head><base target="_top">${EDITORIAL_EMAIL_STYLE}`);
+    }
+    return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${EDITORIAL_EMAIL_STYLE}</head><body><div class="container"><div class="content">${cleaned}</div></div></body></html>`;
+  }
+
+  const escaped = cleaned
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><base target="_top">${EDITORIAL_EMAIL_STYLE}</head><body><div class="container"><div class="content" style="white-space: pre-wrap; word-wrap: break-word;">${escaped}</div></div></body></html>`;
 };
 

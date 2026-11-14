@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import EmptyState from '../ui/EmptyState.jsx';
 import { formatCurrency } from '../../formatters.js';
-import { Search as MagnifyingGlassIcon, Compass, Inbox, PlusSquare, Sparkles, User, ChevronRight } from 'lucide-react';
+import { Search as MagnifyingGlassIcon, ArrowRight, Compass, Inbox, PlusSquare, Sparkles, User, ChevronRight } from 'lucide-react';
 const SearchResults = ({
  results,
  activeTab,
@@ -112,22 +112,43 @@ const SearchResults = ({
  </div>
  </div>;
 
+ const renderPageResult = (page, index) => <div key={`page-${page.key}`} onClick={() => onResultSelect(page)} className={`px-4 py-3 cursor-pointer border-b border-border-light last:border-b-0 hover:bg-secondary-50 flex items-center gap-3 ${index === selectedIndex ? 'bg-secondary-100' : ''}`}>
+ <div className="w-8 h-8 rounded bg-secondary-100 text-text-muted flex items-center justify-center shrink-0">
+ <ArrowRight className="w-4 h-4" />
+ </div>
+ <div className="flex-1 min-w-0 text-sm font-medium text-text-primary truncate">
+ {t(page.labelKey)}
+ </div>
+ </div>;
+
  // If query is empty or too short, render Quick Links
  if (query.trim().length < 2) {
  return renderQuickLinks();
  }
+ // Page hits are typed as links; the rest are listings or users, rendered for the active tab.
+ const pageHits = results.filter(result => result.type === 'link');
+ const itemResults = results.filter(result => result.type !== 'link');
  if (results.length > 0) {
  return <>
+ {pageHits.length > 0 && <>
+ <div className="px-4 py-2 bg-secondary-50 border-b border-border-light">
+ <div className="text-sm font-medium text-text-secondary">{t("search_pages", "Sayfalar")}</div>
+ </div>
+ {results.map((result, index) => result.type === 'link' ? renderPageResult(result, index) : null)}
+ </>}
+
+ {itemResults.length > 0 && <>
  {/* Tab Header */}
  <div className="px-4 py-2 bg-secondary-50 border-b border-border-light flex items-center justify-between">
  <div className="text-sm font-medium text-text-secondary capitalize">
  {activeTab} {t("results")}</div>
  <div className="text-xs text-text-muted">
- {results.length} {t("found")}</div>
+ {itemResults.length} {t("found")}</div>
  </div>
 
  {/* Results */}
- {results.map((result, index) => activeTab === 'users' ? renderUserResult(result, index) : renderListingResult(result, index))}
+ {results.map((result, index) => result.type === 'link' ? null : activeTab === 'users' ? renderUserResult(result, index) : renderListingResult(result, index))}
+ </>}
 
  {/* Footer */}
  <div className="px-4 py-2 text-xs text-text-muted bg-secondary-50 border-t border-border-light flex items-center justify-between">

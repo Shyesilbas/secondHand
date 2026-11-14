@@ -4,6 +4,8 @@ import { API_ENDPOINTS } from '../constants/apiEndpoints.js';
 export const membershipService = {
  getStatus: () => get(API_ENDPOINTS.MEMBERSHIP.STATUS),
 
+ getQuote: () => get(API_ENDPOINTS.MEMBERSHIP.QUOTE),
+
  upgradeToPremium: (payload) => post(API_ENDPOINTS.MEMBERSHIP.UPGRADE, payload),
 
  cancelSubscription: () => post(API_ENDPOINTS.MEMBERSHIP.CANCEL),

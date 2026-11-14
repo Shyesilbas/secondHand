@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthState } from '../../auth/AuthContext.jsx';
@@ -14,6 +14,7 @@ import { useEWallet } from '../../ewallet/hooks/useEWallet.js';
 import { useEmails } from '../../payments/hooks/useEmails.js';
 import { orderService } from '../../order/services/orderService.js';
 import { showcaseService } from '../services/showcaseService.js';
+import { useShowcaseQuotes } from '../hooks/queries.js';
 import PaymentAgreementsSection from '../../payments/components/PaymentAgreementsSection.jsx';
 import { useAgreementsState } from '../../payments/hooks/useListingPaymentFlow.js';
 import ShowcaseSuccessModal from './ShowcaseSuccessModal.jsx';
@@ -23,7 +24,6 @@ import OtpSuggestionBanner from '../../payments/components/verification/OtpSugge
 import { useOtpSuggestedToast } from '../../payments/hooks/useOtpSuggestedToast.js';
 import { useOtpValidityCountdown } from '../../payments/hooks/useOtpValidityCountdown.js';
 import { OTP_CODE_LENGTH, sanitizeOtpInput } from '../../common/constants/otp.js';
-import { OTP_CODE_VALIDITY_SECONDS } from '../../payments/paymentSchema.js';
 import { findLatestOtpFromEmails } from '../../payments/utils/otp.js';
 import { EMAIL_TYPES } from '../../emails/emails.js';
 import { getErrorMessage } from '../../common/utils/errorUtils.js';
@@ -144,7 +144,21 @@ const ShowcaseModal = ({
     listingId,
     isOpen
   );
-  const showcasePricing = enums?.showcasePricingConfig;
+  const maxDays = enums?.showcasePricingConfig?.maxDays;
+  const quoteDays = useMemo(
+    () => [...PRESET_DURATIONS.map((opt) => opt.days), days],
+    [days]
+  );
+  const {
+    data: quotes,
+    isError: isQuoteError,
+    refetch: refetchQuotes,
+  } = useShowcaseQuotes(quoteDays, { enabled: isOpen });
+  const quoteByDays = useMemo(
+    () => new Map((quotes || []).map((q) => [q.days, q])),
+    [quotes]
+  );
+  const selectedQuote = quoteByDays.get(days) || null;
 
   useEffect(() => {
     if (isOpen) {
@@ -154,27 +168,12 @@ const ShowcaseModal = ({
       setVerificationCode('');
       setOtpExpiresAtMs(null);
       refreshWallet();
+      refetchQuotes();
     }
-  }, [isOpen, initialDays, refreshWallet]);
+  }, [isOpen, initialDays, refreshWallet, refetchQuotes]);
 
-  const calculateTotal = useCallback(() => {
-    if (!showcasePricing) return 0;
-    return showcasePricing.totalDailyCost * days;
-  }, [showcasePricing, days]);
-
-  const calculateSubtotal = useCallback(() => {
-    if (!showcasePricing) return 0;
-    return showcasePricing.dailyCost * days;
-  }, [showcasePricing, days]);
-
-  const calculateTax = useCallback(() => {
-    if (!showcasePricing) return 0;
-    return (showcasePricing.totalDailyCost - showcasePricing.dailyCost) * days;
-  }, [showcasePricing, days]);
-
-  const totalCost = useMemo(() => calculateTotal(), [calculateTotal]);
-  const balance = Number(eWallet?.balance || 0);
-  const hasEnoughBalance = balance >= totalCost;
+  const totalCost = selectedQuote?.totalCost ?? null;
+  const hasEnoughBalance = selectedQuote?.sufficientBalance === true;
 
   const suggestedFromInbox = useMemo(
     () =>
@@ -200,12 +199,12 @@ const ShowcaseModal = ({
   const otpFilled =
     sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH).length === OTP_CODE_LENGTH;
 
-  const clampDays = (val) => Math.max(1, Math.min(30, val));
+  const clampDays = (val) => Math.max(1, maxDays ? Math.min(maxDays, val) : val);
 
-  const handleDaysChange = useCallback((e) => {
+  const handleDaysChange = (e) => {
     const val = parseInt(e.target.value, 10);
     setDays(Number.isNaN(val) ? 1 : clampDays(val));
-  }, []);
+  };
 
   const handleRequestVerificationCode = async () => {
     if (!hasEnoughBalance) {
@@ -216,16 +215,15 @@ const ShowcaseModal = ({
     setError(null);
     const startTime = Date.now() - 3000;
     try {
-      await orderService.initiatePaymentVerification({
+      const verification = await orderService.initiatePaymentVerification({
         transactionType: 'SHOWCASE_PAYMENT',
         listingId,
-        days,
-        amount: totalCost
+        days
       });
       const fetchedEmails = await fetchEmails(startTime);
       setLocalEmails(fetchedEmails);
       setVerificationCode('');
-      setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
+      setOtpExpiresAtMs(new Date(verification.expiresAt).getTime());
       setCurrentStep(3);
     } catch (err) {
       setError(getErrorMessage(err, t('verification_code_send_failed', 'Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.')));
@@ -283,7 +281,7 @@ const ShowcaseModal = ({
       setSuccessSummary({
         title: listing?.title || listingTitle,
         days,
-        pricePaid: totalCost.toFixed(2)
+        pricePaid: totalCost
       });
       setShowSuccessNotification(true);
     } catch (err) {
@@ -307,7 +305,7 @@ const ShowcaseModal = ({
   const resolvedImage = listing?.imageUrl || listing?.images?.[0] || null;
   const successTitle = successSummary?.title ?? resolvedTitle;
   const successDays = successSummary?.days ?? days;
-  const successPricePaid = successSummary?.pricePaid ?? totalCost.toFixed(2);
+  const successPricePaid = successSummary?.pricePaid ?? totalCost;
 
   const backTo = (step) => {
     setError(null);
@@ -350,9 +348,9 @@ const ShowcaseModal = ({
           <legend className="text-xs font-semibold text-text-secondary">
             {t('preset_showcase_packages', 'Hazır Vitrin Paketleri')}
           </legend>
-          {showcasePricing && (
+          {enums?.showcasePricingConfig && (
             <span className="text-xs tabular-nums text-text-tertiary">
-              {t('daily_price_with_vat', 'Günlük {{amount}} (KDV dahil)', { amount: formatCurrency(showcasePricing.totalDailyCost, 'TRY') })}
+              {t('daily_price_with_vat', 'Günlük {{amount}} (KDV dahil)', { amount: formatCurrency(enums.showcasePricingConfig.totalDailyCost, 'TRY') })}
             </span>
           )}
         </div>
@@ -360,9 +358,7 @@ const ShowcaseModal = ({
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {PRESET_DURATIONS.map((opt) => {
             const isSelected = days === opt.days;
-            const optionTotal = showcasePricing
-              ? showcasePricing.totalDailyCost * opt.days
-              : 0;
+            const optionTotal = quoteByDays.get(opt.days)?.totalCost;
 
             return (
               <button
@@ -392,7 +388,7 @@ const ShowcaseModal = ({
 
                 <div className="mt-3">
                   <span className="block text-base font-semibold tabular-nums text-text-primary">
-                    {showcasePricing ? formatCurrency(optionTotal, 'TRY') : '—'}
+                    {optionTotal != null ? formatCurrency(optionTotal, 'TRY') : '—'}
                   </span>
                   <span className="mt-0.5 block text-xs text-text-tertiary">
                     {opt.badge && isSelected ? opt.badge : t('vat_included', 'KDV dahil')}
@@ -434,7 +430,7 @@ const ShowcaseModal = ({
               id="showcase-days"
               type="number"
               min="1"
-              max="30"
+              max={maxDays}
               value={days}
               onChange={handleDaysChange}
               className="w-8 bg-transparent text-center text-sm font-semibold tabular-nums text-text-primary focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -445,7 +441,7 @@ const ShowcaseModal = ({
           <button
             type="button"
             onClick={() => setDays((d) => clampDays(d + 1))}
-            disabled={days >= 30}
+            disabled={maxDays != null && days >= maxDays}
             aria-label={t('increase_days', 'Günü artır')}
             className="flex h-8 w-8 items-center justify-center rounded border border-border-light bg-background-primary text-text-secondary transition-colors hover:border-border hover:text-text-primary disabled:opacity-40 cursor-pointer"
           >
@@ -479,13 +475,17 @@ const ShowcaseModal = ({
         })}
       </div>
 
+      {isQuoteError && (
+        <ErrorLine>{t('showcase_quote_failed', 'Vitrin fiyatı alınamadı. Lütfen tekrar deneyin.')}</ErrorLine>
+      )}
+
       {/* Step 1 Footer */}
       <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center">
         <div>
           <span className="block text-xs text-text-tertiary">{t('total_amount_to_pay', 'Toplam Ödenecek Tutar')}</span>
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-semibold tabular-nums text-text-primary">
-              {formatCurrency(totalCost, 'TRY')}
+              {totalCost != null ? formatCurrency(totalCost, 'TRY') : '—'}
             </span>
             <span className="text-xs text-text-tertiary">
               ({days} {t('days_short', 'gün')} · {t('vat_included', 'KDV dahil')})
@@ -497,7 +497,7 @@ const ShowcaseModal = ({
           <Button variant="secondary" onClick={onClose}>
             {t('cancel', 'Vazgeç')}
           </Button>
-          <Button onClick={() => setCurrentStep(2)}>
+          <Button onClick={() => setCurrentStep(2)} disabled={!selectedQuote}>
             <span>{t('continue', 'Devam Et')}</span>
             <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
           </Button>
@@ -518,24 +518,24 @@ const ShowcaseModal = ({
             <dt className="text-text-secondary">{t('selected_showcase_duration', 'Seçilen Vitrin Süresi')}</dt>
             <dd className="font-medium tabular-nums text-text-primary">{days} {t('days_short', 'Gün')}</dd>
           </div>
-          {showcasePricing && (
+          {selectedQuote && (
             <>
               <div className="flex justify-between gap-4 py-2.5">
                 <dt className="text-text-secondary">{t('daily_unit_fee_excl_vat', 'Günlük Birim Ücret (KDV Hariç)')}</dt>
                 <dd className="tabular-nums text-text-primary">
-                  {formatCurrency(showcasePricing.dailyCost, 'TRY')}
+                  {formatCurrency(selectedQuote.dailyCost, 'TRY')}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 py-2.5">
                 <dt className="text-text-secondary">{t('subtotal', 'Ara Toplam')}</dt>
                 <dd className="tabular-nums text-text-primary">
-                  {formatCurrency(calculateSubtotal(), 'TRY')}
+                  {formatCurrency(selectedQuote.subtotal, 'TRY')}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 py-2.5">
-                <dt className="text-text-secondary">KDV (%{showcasePricing.taxPercentage})</dt>
+                <dt className="text-text-secondary">KDV (%{selectedQuote.taxPercentage})</dt>
                 <dd className="tabular-nums text-text-primary">
-                  {formatCurrency(calculateTax(), 'TRY')}
+                  {formatCurrency(selectedQuote.taxAmount, 'TRY')}
                 </dd>
               </div>
             </>
@@ -543,7 +543,7 @@ const ShowcaseModal = ({
           <div className="flex items-baseline justify-between gap-4 py-3">
             <dt className="font-semibold text-text-primary">{t('grand_total', 'Genel Toplam')}</dt>
             <dd className="text-base font-semibold tabular-nums text-text-primary">
-              {formatCurrency(totalCost, 'TRY')}
+              {totalCost != null ? formatCurrency(totalCost, 'TRY') : '—'}
             </dd>
           </div>
         </dl>
@@ -571,12 +571,12 @@ const ShowcaseModal = ({
                   </span>
                 </div>
                 <p className="mt-0.5 text-xs tabular-nums text-text-secondary">
-                  {t('current_label', 'Mevcut')}: <span className="font-medium text-text-primary">{formatCurrency(balance, 'TRY')}</span>
+                  {t('current_label', 'Mevcut')}: <span className="font-medium text-text-primary">{formatCurrency(Number(eWallet?.balance ?? 0), 'TRY')}</span>
                   {hasEnoughBalance && (
                     <>
                       {' · '}{t('after_transaction_remaining', 'İşlem sonrası kalan')}:{' '}
                       <span className="font-medium text-text-primary">
-                        {formatCurrency(balance - totalCost, 'TRY')}
+                        {formatCurrency(selectedQuote.balanceAfterPayment, 'TRY')}
                       </span>
                     </>
                   )}
@@ -595,11 +595,11 @@ const ShowcaseModal = ({
             )}
           </div>
 
-          {!hasEnoughBalance && (
+          {selectedQuote && !hasEnoughBalance && (
             <p className="mt-2.5 border-t border-border-light pt-2.5 text-xs text-status-error-text">
               {t('insufficient_balance_needed', {
                 defaultValue: 'Bu işlem için {{amount}} ek bakiyeye ihtiyacınız var.',
-                amount: formatCurrency(totalCost - balance, 'TRY')
+                amount: formatCurrency(selectedQuote.shortfall, 'TRY')
               })}
             </p>
           )}

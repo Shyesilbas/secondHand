@@ -83,4 +83,19 @@ class ComplaintQueueRecoveryTest {
         org.assertj.core.api.Assertions.assertThat(recovery.recover()).isEqualTo(1);
         verify(queue).scheduleAppealIfAbsent("p", t);
     }
+
+    @Test
+    void triggersReviewBatchAfterRecoveryWhenWorkerIsPresent() {
+        ComplaintReviewWorker worker = mock(ComplaintReviewWorker.class);
+        ComplaintQueueRecovery withWorker = new ComplaintQueueRecovery(repository, queue,
+                new com.serhat.secondhand.complaint.config.ComplaintModerationProperties(),
+                mock(org.springframework.transaction.PlatformTransactionManager.class),
+                java.util.Optional.of(worker));
+        when(repository.findPendingForQueue(any()))
+                .thenReturn(new SliceImpl<>(List.of(), PageRequest.of(0, 500), false));
+
+        withWorker.onApplicationReady();
+
+        verify(worker).scheduleBatch();
+    }
 }

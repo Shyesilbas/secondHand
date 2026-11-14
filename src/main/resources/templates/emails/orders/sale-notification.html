@@ -1,39 +1,210 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${headerTitle != null ? headerTitle : 'Ürününüz Satıldı'}">Yeni Satış Bildirimi</title>
     <style>
-        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: #0f172a; font-size: 14px; line-height: 1.6; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
-        .container { max-width: 640px; margin: 0 auto; padding: 18px 24px; background-color: #ffffff; }
-        .header { padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
-        .brand-name { font-size: 12px; font-weight: 500; color: #64748b; margin-bottom: 4px; }
-        .header h1 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #0f172a; }
-        .content { color: #334155; font-size: 14px; line-height: 1.6; }
-        .content p { margin: 0 0 10px 0; font-size: 14px; }
-        .greeting { font-weight: 600; color: #0f172a; }
-        .earning-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
-        .earning-label { font-size: 12px; font-weight: 500; color: #64748b; margin-bottom: 2px; }
-        .earning-amount { font-size: 22px; font-weight: 600; color: #0f172a; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-        .details-table { width: 100%; border-collapse: collapse; margin: 12px 0; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
-        .details-table td { padding: 7px 14px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
-        .details-table tr:last-child td { border-bottom: none; }
-        .detail-key { color: #64748b; font-weight: 500; }
-        .detail-val { color: #0f172a; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-        .section-heading { color: #0f172a; margin: 14px 0 8px 0; font-size: 14px; font-weight: 600; }
-        .item-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 6px; background: #ffffff; }
-        .item-info { flex-grow: 1; }
-        .item-title { font-weight: 600; font-size: 14px; color: #0f172a; }
-        .item-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
-        .item-price { font-weight: 600; font-size: 14px; color: #0f172a; font-variant-numeric: tabular-nums; }
-        .action-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #334155; }
-        .action-title { margin: 0 0 6px 0; color: #0f172a; font-size: 14px; font-weight: 600; }
-        .button { display: inline-block; background-color: #0f172a; color: #ffffff !important; text-decoration: none; padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; margin-top: 8px; }
-        .signoff { margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 10px; font-size: 13px; color: #475569; }
-        .footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: #0f172a;
+            font-size: 14px;
+            line-height: 1.6;
+            font-variant-numeric: tabular-nums;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 18px 24px;
+            background-color: #ffffff;
+        }
+
+        .header {
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+        }
+
+        .content {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .content p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+
+        .greeting {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .earning-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+
+        .earning-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .earning-amount {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .details-table td {
+            padding: 7px 14px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .detail-val {
+            color: #0f172a;
+            font-weight: 600;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .section-heading {
+            color: #0f172a;
+            margin: 14px 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: #ffffff;
+        }
+
+        .item-info {
+            flex-grow: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .item-price {
+            font-weight: 600;
+            font-size: 14px;
+            color: #0f172a;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .action-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .action-title {
+            margin: 0 0 6px 0;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #0f172a;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .signoff {
+            margin-top: 14px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .footer {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f1f5f9;
+            font-size: 12px;
+            color: #94a3b8;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -64,7 +235,8 @@
                 </tr>
                 <tr th:if="${deliveryMethod != null && !#strings.isEmpty(deliveryMethod)}">
                     <td class="detail-key">Teslimat Yöntemi</td>
-                    <td class="detail-val" th:text="${deliveryMethod == 'SAFE_MEETUP' ? 'Elden Güvenli Buluşma' : 'Kargo'}">Kargo</td>
+                    <td class="detail-val"
+                        th:text="${deliveryMethod == 'SAFE_MEETUP' ? 'Elden Güvenli Buluşma' : 'Kargo'}">Kargo</td>
                 </tr>
                 <tr th:if="${notes != null && !#strings.isEmpty(notes)}">
                     <td class="detail-key">Alıcı Notu</td>
@@ -76,36 +248,47 @@
                 <h3 class="section-heading">Satılan Ürünler</h3>
                 <div class="item-row" th:each="item : ${items}">
                     <div class="item-info">
-                        <div class="item-title" th:text="${item.listing != null ? item.listing.title : 'Ürün'}">Ürün Adı</div>
+                        <div class="item-title" th:text="${item.listing != null ? item.listing.title : 'Ürün'}">Ürün Adı
+                        </div>
                         <div class="item-meta">Adet: <strong th:text="${item.quantity}">1</strong></div>
                     </div>
-                    <div class="item-price" th:text="${item.totalPrice + ' ' + (item.currency != null ? item.currency : 'TL')}">0.00 TL</div>
+                    <div class="item-price"
+                        th:text="${item.totalPrice != null ? (#numbers.formatDecimal(item.totalPrice, 1, 'POINT', 2, 'COMMA') + ' ' + (item.currency != null ? item.currency : 'TL')) : '0,00 TL'}">
+                        0,00 TL</div>
                 </div>
             </div>
 
-            <div class="action-box" th:if="${deliveryMethod == 'SHIPPING' && shippingAddress != null && !#strings.isEmpty(shippingAddress)}">
+            <div class="action-box"
+                th:if="${deliveryMethod == 'SHIPPING' && shippingAddress != null && !#strings.isEmpty(shippingAddress)}">
                 <h3 class="action-title">Alıcı Kargo Adresi</h3>
-                <p style="margin: 0; font-size: 13px; color: #334155;" th:utext="${shippingAddress}">Adres detayları...</p>
-                <p style="font-size: 12px; color: #64748b; margin-top: 8px; margin-bottom: 0;">Lütfen ürünü paketleyip kargoya verdikten sonra takip numarasını sisteme girin.</p>
+                <p style="margin: 0; font-size: 13px; color: #334155;" th:utext="${shippingAddress}">Adres detayları...
+                </p>
+                <p style="font-size: 12px; color: #64748b; margin-top: 8px; margin-bottom: 0;">Lütfen ürünü paketleyip
+                    kargoya verdikten sonra takip numarasını sisteme girin.</p>
             </div>
 
             <div class="action-box" th:if="${deliveryMethod == 'SAFE_MEETUP'}">
                 <h3 class="action-title">Güvenli Elden Teslimat</h3>
-                <p style="margin: 0; font-size: 13px; color: #334155;"><strong>Buluşma Noktası:</strong> <span th:text="${meetupLocation}">Konum</span></p>
+                <p style="margin: 0; font-size: 13px; color: #334155;"><strong>Buluşma Noktası:</strong> <span
+                        th:text="${meetupLocation}">Konum</span></p>
                 <p style="font-size: 12px; color: #64748b; margin-top: 8px; margin-bottom: 0;">
-                    Alıcı ile buluşup teslimatı yaparken alıcının size ileteceği 6 haneli doğrulama kodunu sisteme girerek teslimatı tamamlayın.
+                    Alıcı ile buluşup teslimatı yaparken alıcının size ileteceği 6 haneli doğrulama kodunu sisteme
+                    girerek teslimatı tamamlayın.
                 </p>
             </div>
 
             <p th:if="${actionUrl != null}">
-                <a th:href="${actionUrl}" class="button" th:text="${actionText != null ? actionText : 'Satış Detayları'}">Satış Detayları</a>
+                <a th:href="${actionUrl}" class="button"
+                    th:text="${actionText != null ? actionText : 'Satış Detayları'}">Satış Detayları</a>
             </p>
 
-            <p class="signoff" th:utext="#{email.body.team}">Saygılarımızla,<br><strong style="color: #0f172a; font-weight: 600;">SecondHand Ekibi</strong></p>
+            <p class="signoff" th:utext="#{email.body.team}">Saygılarımızla,<br><strong
+                    style="color: #0f172a; font-weight: 600;">SecondHand Ekibi</strong></p>
         </div>
         <div class="footer">
             &copy; 2026 SecondHand Pazaryeri. Tüm hakları saklıdır.
         </div>
     </div>
 </body>
+
 </html>

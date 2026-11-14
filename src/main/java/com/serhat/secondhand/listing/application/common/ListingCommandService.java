@@ -257,12 +257,16 @@ public class ListingCommandService {
     }
 
     public BigDecimal calculateTotalListingFee() {
+        return listingConfig.getCreation().getFee().add(calculateListingFeeTax());
+    }
+
+    /** Tax part of the listing fee; the frontend shows it as-is and never derives it. */
+    public BigDecimal calculateListingFeeTax() {
         BigDecimal fee = listingConfig.getCreation().getFee();
         BigDecimal tax = listingConfig.getFee().getTax();
-        BigDecimal taxAmount = fee.multiply(tax).divide(
+        return fee.multiply(tax).divide(
                 ListingBusinessConstants.PERCENT_DIVISOR,
                 ListingBusinessConstants.FEE_TAX_CALCULATION_SCALE,
                 ListingBusinessConstants.FEE_TAX_ROUNDING_MODE);
-        return fee.add(taxAmount);
     }
 }

@@ -1,7 +1,7 @@
 import CheckoutAddressStep from './CheckoutAddressStep.jsx';
 import CheckoutPaymentStep from './CheckoutPaymentStep.jsx';
 import CheckoutVerificationStep from './CheckoutVerificationStep.jsx';
-import { getCheckoutCurrency } from '../../utils/checkoutLinePricing.js';
+import { getCheckoutCurrency } from '../../utils/pricedLines.js';
 
 // `checkout` is the useCheckout() result; each step takes only the fields it needs from it.
 const CheckoutStep = ({ step, checkout, cartItems, calculateTotal, onBack, onNext, onGoToStep }) => {

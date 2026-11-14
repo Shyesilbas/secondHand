@@ -5,20 +5,19 @@ import { useNotification } from '../../notification/NotificationContext.jsx';
 import { orderService } from '../services/orderService.js';
 import { paymentService } from '../../payments/services/paymentService.js';
 import { PAYMENT_QUERY_KEYS } from '../../payments/paymentSchema.js';
-import { ORDER_QUERY_KEYS } from '../orderConstants.js';
+import { ORDER_QUERY_KEYS, hasOrderAction } from '../orderConstants.js';
 import { orderItemIds, reviewItemKey, useOrderItemReviews } from './useOrderItemReviews.js';
 import { useOrderSearch } from './useOrderSearch.js';
 import {
+ ORDER_ACTIONS,
  ORDER_DEFAULTS,
  ORDER_MESSAGES,
  ORDER_LIST_TABS,
- ORDER_STATUSES,
  ORDER_TIME,
  ORDER_VIEW_MODES,
  getOrderTabStatuses,
 } from '../constants/orderUiConstants.js';
 
-const REVIEWABLE_STATUSES = [ORDER_STATUSES.DELIVERED, ORDER_STATUSES.COMPLETED, ORDER_STATUSES.HANDOVER_CONFIRMED];
 
 const useOrdersListQuery = ({ mode, page, size, sort, direction, deliveryMethod, statuses, orderNumber }) => {
  const { user } = useAuthState();
@@ -178,7 +177,7 @@ export const useOrderFlow = ({
 
  // Buyer list: which delivered orders already carry a review (first reviewed item is the summary).
  const reviewableOrders = useMemo(
- () => (isBuyer ? orders.filter((o) => REVIEWABLE_STATUSES.includes(o?.status)) : []),
+ () => (isBuyer ? orders.filter((o) => hasOrderAction(o, ORDER_ACTIONS.REVIEW)) : []),
  [isBuyer, orders]
  );
  const reviewableItemIds = useMemo(() => orderItemIds(reviewableOrders), [reviewableOrders]);

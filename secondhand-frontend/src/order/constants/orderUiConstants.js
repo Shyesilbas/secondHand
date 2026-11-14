@@ -19,6 +19,19 @@ export const ORDER_STATUSES = Object.freeze({
  VERIFICATION_LOCKED: 'VERIFICATION_LOCKED',
 });
 
+/** Mirrors backend `OrderAction`; the backend sends the allowed subset per viewer in `allowedActions`. */
+export const ORDER_ACTIONS = Object.freeze({
+ CANCEL: 'CANCEL',
+ REFUND: 'REFUND',
+ COMPLETE: 'COMPLETE',
+ EDIT: 'EDIT',
+ REVIEW: 'REVIEW',
+ SHOW_MEETUP_CODE: 'SHOW_MEETUP_CODE',
+ CONFIRM_HANDOVER: 'CONFIRM_HANDOVER',
+ SHIP: 'SHIP',
+ VERIFY_MEETUP: 'VERIFY_MEETUP',
+});
+
 /** List tabs. Each tab maps to a set of backend statuses; the backend filters with `statuses`. */
 export const ORDER_LIST_TABS = Object.freeze({
  ALL: 'all',
@@ -72,12 +85,9 @@ export const ORDER_LIMITS = Object.freeze({
 export const ORDER_TIME = Object.freeze({
  SECOND_MS: 1000,
  MINUTE_MS: 60 * 1000,
- DELIVERY_CONFIRMATION_WINDOW_MS: 72 * 60 * 60 * 1000,
- /** Mirrors backend OrderBusinessConstants.SHIP_DEADLINE_HOURS: unshipped cargo orders are cancelled after this. */
- SHIP_DEADLINE_MS: 72 * 60 * 60 * 1000,
+ /** Display tone thresholds for the backend `shipDeadline`; the deadline itself comes from the backend. */
  SHIP_DEADLINE_WARNING_MS: 24 * 60 * 60 * 1000,
  SHIP_DEADLINE_URGENT_MS: 6 * 60 * 60 * 1000,
- REFUND_WINDOW_MS: 48 * 60 * 60 * 1000,
  PENDING_ESCROW_REFRESH_MS: 30 * 1000,
  PENDING_ESCROW_STALE_MS: 30 * 1000,
  ORDERS_QUERY_GC_MS: 10 * 60 * 1000,

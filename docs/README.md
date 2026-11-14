@@ -51,6 +51,7 @@ Bu dizin, modül README'lerinin ötesine geçen, birden fazla modülü kesen mim
 | Doküman | Kapsam |
 | :--- | :--- |
 | **[proposals/aura-trust-safety-and-complaint-moderation.md](proposals/aura-trust-safety-and-complaint-moderation.md)** | Aura AI otonom moderasyon tasarımı: cooling-off kuyruğu, sanction ladder, appeal. Kodda yok; yalnızca bu özellik geliştirilirken açın. |
+| **[proposals/chat-moderation-user-blocking-and-messaging-settings.md](proposals/chat-moderation-user-blocking-and-messaging-settings.md)** | Sohbet moderasyonu mesaj gizleme (tombstone), kısıtlama UI kilidi, karşılıklı kullanıcı engelleme, engellenen kullanıcılar listesi ve global/ilan bazlı `canSendMessage` ayarı (tasarım aşamasında). |
 
 ## Temel Mimari Prensipler
 

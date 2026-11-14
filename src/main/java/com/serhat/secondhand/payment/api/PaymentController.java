@@ -3,13 +3,12 @@ package com.serhat.secondhand.payment.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.payment.application.IPaymentVerificationService;
-import com.serhat.secondhand.payment.application.PaymentProcessor;
 import com.serhat.secondhand.payment.application.PaymentStatsService;
 import com.serhat.secondhand.payment.dto.InitiateVerificationRequest;
 import com.serhat.secondhand.payment.dto.PaymentDto;
 import com.serhat.secondhand.payment.dto.PaymentFilter;
-import com.serhat.secondhand.payment.dto.PaymentRequest;
-import com.serhat.secondhand.payment.util.PaymentIdempotencyHelper;
+import com.serhat.secondhand.payment.dto.PaymentStatisticsDto;
+import com.serhat.secondhand.payment.dto.PaymentVerificationDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +24,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -34,41 +32,18 @@ import java.util.Map;
 @Tag(name = "Payment Management", description = "Payment processing operations")
 public class PaymentController {
 
-    private final PaymentProcessor paymentProcessor;
     private final PaymentStatsService paymentStatsService;
     private final IPaymentVerificationService paymentVerificationService;
-    private final PaymentIdempotencyHelper idempotencyHelper;
-
-    @PostMapping("/pay")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Create a new payment", description = "Processes a general payment request using idempotency for safety.")
-    public ResponseEntity<?> createPayment(
-            @Valid @RequestBody PaymentRequest paymentRequest,
-            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
-            @AuthenticationPrincipal User currentUser) {
-
-        if (idempotencyKey == null || idempotencyKey.isBlank()) {
-            throw new IllegalArgumentException("Idempotency-Key header is required");
-        }
-
-        log.info("Creating payment for user ID {}", currentUser.getId());
-
-        PaymentRequest finalRequest = idempotencyHelper.withIdempotencyKey(paymentRequest, idempotencyKey);
-        Result<PaymentDto> result = paymentProcessor.executeSinglePayment(currentUser.getId(), finalRequest);
-
-        return ResultResponses.created(result);
-    }
 
     @PostMapping("/initiate-verification")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Initiate payment verification", description = "Starts the verification process (e.g., OTP) for a payment.")
-    public ResponseEntity<Void> initiatePaymentVerification(
+    public ResponseEntity<PaymentVerificationDto> initiatePaymentVerification(
             @Valid @RequestBody(required = false) InitiateVerificationRequest request,
             @AuthenticationPrincipal User currentUser) {
 
         log.info("Initiating payment verification for user ID: {}", currentUser.getId());
-        paymentVerificationService.initiatePaymentVerification(currentUser.getId(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(paymentVerificationService.initiatePaymentVerification(currentUser.getId(), request));
     }
 
     @GetMapping("/my")
@@ -91,7 +66,7 @@ public class PaymentController {
 
     @GetMapping("/statistics")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, Object>> getPaymentStatistics(
+    public ResponseEntity<PaymentStatisticsDto> getPaymentStatistics(
             @AuthenticationPrincipal User currentUser,
             @RequestParam(name = "providerName", required = false) String providerName) {
 

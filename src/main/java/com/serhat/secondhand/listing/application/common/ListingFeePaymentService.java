@@ -5,7 +5,9 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.port.ListingFeePaymentPort;
 import com.serhat.secondhand.listing.domain.dto.request.listing.ListingFeePaymentRequest;
 import com.serhat.secondhand.listing.validation.common.ListingFeePaymentValidation;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
 import com.serhat.secondhand.payment.dto.ListingFeeConfigDto;
+import com.serhat.secondhand.payment.dto.ListingFeeQuoteDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class ListingFeePaymentService {
     private final ListingFeePaymentValidation listingFeePaymentValidation;
     private final ListingCommandService listingCommandService;
     private final ListingFeePaymentPort listingFeePaymentPort;
+    private final IEWalletService eWalletService;
 
     @Transactional
     public Result<UUID> payListingCreationFee(Long userId, ListingFeePaymentRequest request) {
@@ -45,8 +48,15 @@ public class ListingFeePaymentService {
         return ListingFeeConfigDto.builder()
                 .creationFee(listingConfig.getCreation().getFee())
                 .taxPercentage(listingConfig.getFee().getTax())
+                .taxAmount(listingCommandService.calculateListingFeeTax())
                 .totalCreationFee(totalFee)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ListingFeeQuoteDto getListingFeeQuote(Long userId) {
+        BigDecimal totalFee = listingCommandService.calculateTotalListingFee();
+        return new ListingFeeQuoteDto(totalFee, eWalletService.hasSufficientBalance(userId, totalFee));
     }
 
     private ListingFeePaymentRequest enrichWithTotalFee(ListingFeePaymentRequest request, Long userId, BigDecimal totalFee) {

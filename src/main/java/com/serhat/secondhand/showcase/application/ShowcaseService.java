@@ -2,6 +2,8 @@ package com.serhat.secondhand.showcase.application;
 
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.core.result.Result;
+import com.serhat.secondhand.ewallet.application.IEWalletService;
+import com.serhat.secondhand.ewallet.dto.BalanceCheckDto;
 import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.util.ListingErrorCodes;
@@ -15,6 +17,7 @@ import com.serhat.secondhand.showcase.ShowcaseStatus;
 import com.serhat.secondhand.showcase.dto.ShowcaseDto;
 import com.serhat.secondhand.showcase.dto.ShowcasePaymentRequest;
 import com.serhat.secondhand.showcase.dto.ShowcasePricingDto;
+import com.serhat.secondhand.showcase.dto.ShowcaseQuoteDto;
 import com.serhat.secondhand.showcase.repository.ShowcaseRepository;
 import com.serhat.secondhand.showcase.validator.ShowcaseValidator;
 import com.serhat.secondhand.user.application.IUserService;
@@ -50,6 +53,8 @@ public class ShowcaseService implements IShowcaseService {
     private final PaymentRequestFactory paymentRequestFactory;
     private final PlanValidator planValidator;
     private final ShowcaseRedisManagerService showcaseRedisManagerService;
+    private final ShowcasePricingCalculator showcasePricingCalculator;
+    private final IEWalletService eWalletService;
 
     private <T> Result<T> validateShowcaseDays(int days) {
         Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
@@ -57,13 +62,6 @@ public class ShowcaseService implements IShowcaseService {
             return Result.error(validationResult.getMessage(), validationResult.getErrorCode());
         }
         return null;
-    }
-
-    private BigDecimal getDailyCostWithTax() {
-        return showcaseMapper.calculateDailyCostWithTax(
-                showcaseConfig.getDaily().getCost(),
-                showcaseConfig.getFee().getTax()
-        );
     }
 
     @Override
@@ -92,8 +90,8 @@ public class ShowcaseService implements IShowcaseService {
     private Result<Showcase> createShowcaseInternal(ShowcasePaymentRequest request, User user, Listing listing,
             Long userId) {
         // Pricing Calculation
-        BigDecimal showcaseDailyCost = showcaseConfig.getDaily().getCost();
-        BigDecimal totalCost = showcaseMapper.calculateTotalCost(getDailyCostWithTax(), request.days());
+        BigDecimal showcaseDailyCost = showcasePricingCalculator.dailyCost();
+        BigDecimal totalCost = showcasePricingCalculator.totalCost(request.days());
 
         // Payment Processing
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcasePaymentRequest(user, listing, request,
@@ -166,7 +164,7 @@ public class ShowcaseService implements IShowcaseService {
         }
 
         // Pricing Calculation for extension
-        BigDecimal additionalCost = showcaseMapper.calculateTotalCost(getDailyCostWithTax(), request.days());
+        BigDecimal additionalCost = showcasePricingCalculator.totalCost(request.days());
 
         // Payment Processing for extension
         PaymentRequest paymentRequest = paymentRequestFactory.buildShowcaseExtensionRequest(
@@ -218,38 +216,42 @@ public class ShowcaseService implements IShowcaseService {
     public ShowcasePricingDto getShowcasePricingConfig() {
         log.info("Getting showcase pricing configuration");
         return showcaseMapper.toPricingDto(
-                showcaseConfig.getDaily().getCost(),
-                showcaseConfig.getFee().getTax(),
-                showcaseConfig.getBulkDiscount().getListingThreshold(),
-                showcaseConfig.getBulkDiscount().getListingDiscountPercentage());
+                showcasePricingCalculator.dailyCost(),
+                showcasePricingCalculator.taxPercentage(),
+                showcasePricingCalculator.dailyCostWithTax(),
+                showcasePricingCalculator.maxDays());
     }
 
     @Override
-    @Transactional
-    public Result<List<Showcase>> createBulkShowcase(Long userId, com.serhat.secondhand.showcase.dto.BulkShowcasePaymentRequest request) {
-        if (request.listingIds() == null || request.listingIds().isEmpty()) {
-            return Result.error("Listing IDs cannot be empty");
+    @Transactional(readOnly = true)
+    public Result<List<ShowcaseQuoteDto>> getShowcaseQuotes(Long userId, List<Integer> daysOptions) {
+        if (daysOptions == null || daysOptions.isEmpty()) {
+            return Result.error(ShowcaseErrorCodes.INVALID_DAYS_COUNT);
+        }
+        if (daysOptions.stream().anyMatch(java.util.Objects::isNull)) {
+            return Result.error(ShowcaseErrorCodes.INVALID_DAYS_COUNT);
+        }
+        List<Integer> durations = daysOptions.stream().distinct().sorted().toList();
+        for (Integer days : durations) {
+            Result<List<ShowcaseQuoteDto>> daysError = validateShowcaseDays(days);
+            if (daysError != null) return daysError;
         }
 
-        List<Showcase> createdShowcases = new ArrayList<>();
-        for (UUID listingId : request.listingIds()) {
-            ShowcasePaymentRequest singleRequest = new ShowcasePaymentRequest(
-                listingId,
-                request.days() != null ? request.days() : 1,
-                request.providerName(),
-                request.verificationCode(),
-                request.agreementsAccepted(),
-                request.acceptedAgreementIds(),
-                request.idempotencyKey()
-            );
-
-            Result<Showcase> singleResult = createShowcase(userId, singleRequest);
-            if (singleResult.isError()) {
-                return Result.error(singleResult.getMessage(), singleResult.getErrorCode());
-            }
-            createdShowcases.add(singleResult.getData());
+        List<ShowcaseQuoteDto> quotes = new ArrayList<>();
+        for (Integer days : durations) {
+            BigDecimal totalCost = showcasePricingCalculator.totalCost(days);
+            BalanceCheckDto balance = eWalletService.checkBalance(userId, totalCost);
+            quotes.add(new ShowcaseQuoteDto(
+                    days,
+                    showcasePricingCalculator.dailyCost(),
+                    showcasePricingCalculator.taxPercentage(),
+                    showcasePricingCalculator.subtotal(days),
+                    showcasePricingCalculator.taxAmount(days),
+                    totalCost,
+                    balance.sufficientBalance(),
+                    balance.balanceAfterPayment(),
+                    balance.shortfall()));
         }
-
-        return Result.success(createdShowcases);
+        return Result.success(quotes);
     }
 }

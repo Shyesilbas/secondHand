@@ -82,8 +82,8 @@ public class ComplaintModerationProperties {
     @Getter
     @Setter
     public static class Worker {
-        /** Off until an Aura review handler exists (phase 4); enabling without one fails startup. */
-        private boolean enabled = false;
+        /** Controls whether the scheduled Aura review worker runs. */
+        private boolean enabled = true;
 
         private String cron = "0 0 * * * *";
 

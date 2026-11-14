@@ -187,7 +187,7 @@ const Footer = () => {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="tracking-tight text-text-muted">{t("tax")} ({feeConfig.taxPercentage}%):</span>
-                            <span className="text-secondary-100">{formatCurrency(feeConfig.totalCreationFee - feeConfig.creationFee, 'TRY')}</span>
+                            <span className="text-secondary-100">{formatCurrency(feeConfig.taxAmount, 'TRY')}</span>
                           </div>
                           <div className="mt-1 flex items-baseline justify-between border-t border-white/10 pt-1 text-text-secondary font-semibold">
                             <span>{t("total")}</span>
@@ -207,7 +207,7 @@ const Footer = () => {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="tracking-tight text-text-muted">{t("tax")} ({showcasePricing.taxPercentage}%):</span>
-                            <span className="text-secondary-100">{formatCurrency(showcasePricing.totalDailyCost - showcasePricing.dailyCost, 'TRY')}</span>
+                            <span className="text-secondary-100">{formatCurrency(showcasePricing.dailyTaxAmount, 'TRY')}</span>
                           </div>
                           <div className="mt-1 flex items-baseline justify-between border-t border-white/10 pt-1 text-status-warning font-semibold">
                             <span>{t("total_per_day")}</span>

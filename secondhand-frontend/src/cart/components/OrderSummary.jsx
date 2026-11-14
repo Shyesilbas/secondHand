@@ -3,10 +3,11 @@ import { memo } from 'react';
 import { formatCurrency } from '../../common/formatters.js';
 import { Check, Tag, Crown, Loader2, X, ArrowRight } from 'lucide-react';
 import { FieldError } from '../../common/components/forms/FormPrimitives.jsx';
+import Skeleton from '../../common/components/ui/Skeleton.jsx';
+import { getCheckoutCurrency } from '../utils/pricedLines.js';
 
 const OrderSummary = ({
   cartItems,
-  calculateTotal,
   onCheckout,
   pricing,
   disabled = false,
@@ -15,6 +16,7 @@ const OrderSummary = ({
   appliedCouponCode = null,
   couponError = null,
   isPreviewLoading = false,
+  isRepricing = false,
   onApplyCoupon = () => { },
   onRemoveCoupon = () => { },
   onOpenCouponsModal = () => { },
@@ -23,28 +25,11 @@ const OrderSummary = ({
 }) => {
   const { t } = useTranslation();
 
-  const originalSubtotal = pricing?.originalSubtotal != null
-    ? parseFloat(pricing.originalSubtotal)
-    : cartItems.reduce((sum, item) => {
-      const price = parseFloat(item.listing?.price) || 0;
-      return sum + price * item.quantity;
-    }, 0);
-
-  const subtotalAfterCampaigns = pricing?.subtotalAfterCampaigns != null
-    ? parseFloat(pricing.subtotalAfterCampaigns)
-    : calculateTotal();
-
-  const campaignDiscount = pricing?.campaignDiscount != null
-    ? parseFloat(pricing.campaignDiscount)
-    : Math.max(0, (originalSubtotal || 0) - (subtotalAfterCampaigns || 0));
-
-  const couponDiscount = pricing?.couponDiscount != null
-    ? parseFloat(pricing.couponDiscount)
-    : 0;
-
-  const total = pricing?.total != null ? parseFloat(pricing.total) : subtotalAfterCampaigns - couponDiscount;
-  const currency = cartItems.length > 0 ? cartItems[0].listing?.currency : 'TRY';
-  const hasCampaign = campaignDiscount > 0;
+  // Every amount comes from the backend pricing preview; while it loads the amounts show skeletons.
+  const currency = getCheckoutCurrency(cartItems);
+  const hasCampaign = Number(pricing?.campaignDiscount) > 0;
+  const hasCoupon = Number(pricing?.couponDiscount) > 0;
+  const amount = (value, skeletonClass = 'h-4 w-16') => (pricing ? formatCurrency(value, currency) : <Skeleton className={skeletonClass} />);
 
   return (
     <aside className="sticky top-20">
@@ -109,11 +94,11 @@ const OrderSummary = ({
         </div>
 
         {/* Pricing Breakdown */}
-        <div className="p-5 space-y-3 text-xs">
+        <div className={`p-5 space-y-3 text-xs transition-opacity duration-150 ${isRepricing ? 'opacity-50' : ''}`} aria-busy={isRepricing}>
           <div className="flex justify-between items-center text-text-secondary font-medium">
             <span>{t("subtotal", "Ara Toplam")}</span>
             <span className="font-semibold text-text-primary tabular-nums">
-              {formatCurrency(originalSubtotal, currency)}
+              {amount(pricing?.originalSubtotal)}
             </span>
           </div>
 
@@ -121,16 +106,16 @@ const OrderSummary = ({
             <div className="flex justify-between items-center text-status-success font-medium">
               <span>{t("campaign", "Kampanya İndirimi")}</span>
               <span className="font-semibold tabular-nums">
-                −{formatCurrency(campaignDiscount, currency)}
+                −{amount(pricing?.campaignDiscount)}
               </span>
             </div>
           )}
 
-          {couponDiscount > 0 && (
+          {hasCoupon && (
             <div className="flex justify-between items-center text-status-success font-medium">
               <span>{t("coupon", "Kupon İndirimi")}</span>
               <span className="font-semibold tabular-nums">
-                −{formatCurrency(couponDiscount, currency)}
+                −{amount(pricing?.couponDiscount)}
               </span>
             </div>
           )}
@@ -162,7 +147,7 @@ const OrderSummary = ({
               <span className="text-xs text-text-muted font-normal">KDV Dahil</span>
             </div>
             <span className="text-2xl font-semibold tabular-nums text-text-price">
-              {formatCurrency(total, currency)}
+              {amount(pricing?.total, 'h-7 w-28')}
             </span>
           </div>
         </div>

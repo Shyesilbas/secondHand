@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useEnums } from '../../common/hooks/useEnums.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Modal } from '../../common/components/ui/index.js';
@@ -65,6 +66,7 @@ const CreateCampaignModal = ({
  showSuccess
  } = useNotification();
  const queryClient = useQueryClient();
+ const { discountableListingTypes } = useEnums();
  const [form, setForm] = useState(defaultForm);
  const [isSaving, setIsSaving] = useState(false);
  const { data: myListings = [] } = useQuery({
@@ -77,8 +79,8 @@ const CreateCampaignModal = ({
  staleTime: 2 * 60 * 1000,
  });
  const availableListings = useMemo(() => {
- return (myListings || []).filter(l => l?.type !== 'VEHICLE' && l?.type !== 'REAL_ESTATE');
- }, [myListings]);
+ return (myListings || []).filter(l => discountableListingTypes.includes(l?.type));
+ }, [myListings, discountableListingTypes]);
  const availableTypes = useMemo(() => {
  const types = new Set();
  availableListings.forEach(l => {

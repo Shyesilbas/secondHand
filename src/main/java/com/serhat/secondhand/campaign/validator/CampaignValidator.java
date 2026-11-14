@@ -1,10 +1,10 @@
 package com.serhat.secondhand.campaign.validator;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.entity.CampaignDiscountKind;
 import com.serhat.secondhand.campaign.util.CampaignErrorCodes;
 import com.serhat.secondhand.core.result.Result;
-import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
 import com.serhat.secondhand.user.domain.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Component
@@ -80,8 +79,7 @@ public class CampaignValidator {
         if (campaign.getEligibleTypes() == null) {
             return Result.success();
         }
-        if (campaign.getEligibleTypes().contains(ListingType.REAL_ESTATE)
-                || campaign.getEligibleTypes().contains(ListingType.VEHICLE)) {
+        if (DiscountEligibility.containsNonDiscountable(campaign.getEligibleTypes())) {
             return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_ALLOWED_FOR_TYPE);
         }
         return Result.success();
@@ -102,7 +100,7 @@ public class CampaignValidator {
         }
         if (listingRepository.existsByIdInAndListingTypeIn(
                 eligibleIds,
-                List.of(ListingType.REAL_ESTATE, ListingType.VEHICLE))) {
+                DiscountEligibility.NON_DISCOUNTABLE_TYPES)) {
             return Result.error(CampaignErrorCodes.CAMPAIGN_NOT_ALLOWED_FOR_TYPE);
         }
         

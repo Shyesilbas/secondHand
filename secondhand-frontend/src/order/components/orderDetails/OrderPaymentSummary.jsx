@@ -4,6 +4,7 @@ import { Check, FileText, ShieldCheck } from 'lucide-react';
 import { useRequiredAgreements } from '../../../agreements/hooks/useAgreements.js';
 import { AGREEMENT_TYPE_LABELS } from '../../../agreements/agreements.js';
 import AgreementModal from '../../../agreements/components/AgreementModal.jsx';
+import { ORDER_STATUSES } from '../../constants/orderUiConstants.js';
 
 const Row = ({ label, children }) => (
   <div className="flex items-baseline justify-between gap-4">
@@ -16,7 +17,6 @@ export const OrderPaymentSummary = React.memo(({
   CardComponent: Card,
   isSellerView,
   selectedOrder,
-  sellerTotalAmount,
   resolveEnumLabel,
   formatCurrency,
   getPaymentStatusIndicatorClass,
@@ -24,14 +24,25 @@ export const OrderPaymentSummary = React.memo(({
 }) => {
   const { t } = useTranslation();
   const { currency, subtotal, couponDiscount, paymentProviderName, paymentStatus } = selectedOrder;
-  const total = isSellerView ? sellerTotalAmount : selectedOrder.totalAmount;
+  // Seller view: backend sellerTotal (escrow share, cancelled/refunded lines excluded); buyer view: order total.
+  const total = isSellerView ? selectedOrder.sellerTotal : selectedOrder.totalAmount;
   const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT');
   const [selectedAgreement, setSelectedAgreement] = useState(null);
+
+  const orderStatus = String(selectedOrder?.status || '').toUpperCase();
+  const showEscrowNotice = Boolean(
+    selectedOrder?.status &&
+    ![
+      ORDER_STATUSES.CANCELLED,
+      ORDER_STATUSES.REFUNDED,
+      ORDER_STATUSES.COMPLETED
+    ].includes(orderStatus)
+  );
 
   return (
     <>
       <Card>
-        <h3 className="mb-4 text-lg font-semibold text-text-primary">{t("payment_summary", "Ödeme özeti")}</h3>
+        <h3 className="mb-4 text-base font-semibold text-text-primary">{t("payment_summary", "Ödeme özeti")}</h3>
 
         <dl className="space-y-3 text-sm">
           {!isSellerView && subtotal != null ? (
@@ -60,13 +71,15 @@ export const OrderPaymentSummary = React.memo(({
 
         <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-border-light pt-4">
           <span className="text-sm font-semibold text-text-primary">{t("od_total", "Toplam")}</span>
-          <span className="text-2xl font-bold tabular-nums text-text-price">{formatCurrency(total, currency)}</span>
+          <span className="text-2xl font-bold tabular-nums text-text-price">{total != null ? formatCurrency(total, currency) : '—'}</span>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 rounded-sm bg-status-success-bg border border-status-success-border px-3 py-2 text-xs text-status-success-text">
-          <ShieldCheck className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-          <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
-        </div>
+        {showEscrowNotice && (
+          <div className="mt-3 flex items-center gap-2 rounded-sm border border-border bg-background-secondary px-3 py-2 text-xs text-text-secondary">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
+            <span>{t("od_escrow_note", "Ödeme, teslimat onaylanana kadar escrow havuzunda tutulur.")}</span>
+          </div>
+        )}
 
         {!isSellerView && agreements.length > 0 && (
           <div className="mt-4 border-t border-border-light pt-4">
@@ -82,9 +95,7 @@ export const OrderPaymentSummary = React.memo(({
                     className="flex items-start justify-between gap-3 rounded border border-border bg-background-secondary/70 px-3 py-2.5 text-xs"
                   >
                     <div className="flex min-w-0 items-start gap-2">
-                      <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-primary text-white">
-                        <Check className="h-3 w-3" strokeWidth={2} aria-hidden />
-                      </span>
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-text-tertiary" strokeWidth={1.5} aria-hidden />
                       <div className="min-w-0 leading-relaxed text-text-secondary">
                         <button
                           type="button"

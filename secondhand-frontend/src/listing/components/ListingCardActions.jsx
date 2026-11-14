@@ -30,10 +30,12 @@ const ListingCardActions = ({
 
   if (!isOwner) return null;
 
-  const isInMyShowcases = Array.isArray(myShowcases) && myShowcases.some(
-    s => s?.status === 'ACTIVE' && (s?.listing?.id || s?.listingId) === listing.id
-  );
-  const listingInShowcase = isModalOpen ? (isInShowcase(listing.id) || isInMyShowcases) : false;
+  const activeShowcase = isModalOpen && Array.isArray(myShowcases)
+    ? myShowcases.find(
+        s => s?.status === 'ACTIVE' && (s?.listing?.id || s?.listingId) === listing?.id
+      )
+    : null;
+  const listingInShowcase = isModalOpen ? Boolean(isInShowcase(listing?.id) || activeShowcase) : false;
 
   return (
     <>
@@ -73,6 +75,7 @@ const ListingCardActions = ({
           listing={listing}
           actions={actions}
           listingInShowcase={listingInShowcase}
+          activeShowcase={activeShowcase}
           onChanged={onChanged}
           showSuccess={showSuccess}
           showError={showError}

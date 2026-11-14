@@ -40,7 +40,7 @@ class ComplaintServiceTest {
     private final ComplaintService service = new ComplaintService(
             repository, new ComplaintMapper(properties), userService, listingQueryService,
             new ComplaintValidator(repository, mock(ChatAuthorizationService.class), properties), properties,
-            eventPublisher, rateLimiter);
+            eventPublisher, rateLimiter, mock(ChatAuthorizationService.class));
 
     private static User user(long id) {
         User u = new User();

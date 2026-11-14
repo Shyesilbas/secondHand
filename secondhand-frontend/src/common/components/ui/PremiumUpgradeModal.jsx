@@ -2,7 +2,7 @@ import { Check, X, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Button from './Button.jsx';
 import Modal from './Modal.jsx';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { membershipService } from '../../services/membershipService';
 import { useNotification } from '../../../notification/NotificationContext.jsx';
@@ -18,21 +18,19 @@ import { orderService } from '../../../order/services/orderService.js';
 import { useEmails } from '../../../payments/hooks/useEmails.js';
 import { EMAIL_TYPES } from '../../../emails/emails.js';
 import { sanitizeOtpInput, findLatestOtpWithEmail } from '../../../payments/utils/otp.js';
-import { OTP_CODE_VALIDITY_SECONDS } from '../../../payments/paymentSchema.js';
 import { useEWallet } from '../../../ewallet/hooks/useEWallet.js';
 import { useAuth } from '../../../auth/AuthContext.jsx';
 import { authService } from '../../../auth/services/authService.js';
+import { formatCurrency } from '../../formatters.js';
 
-const PREMIUM_PRICE = 100;
-
-const getAgreementLabel = (agreement) => {
+const getAgreementLabel = (agreement, t) => {
   const type = agreement?.agreementType;
-  if (type === 'DISTANCE_SELLING') return 'Mesafeli Satış Sözleşmesi';
-  if (type === 'PAYMENT_TERMS') return 'Ödeme ve Üyelik Koşulları';
-  if (type === 'TERMS_OF_SERVICE') return 'Kullanıcı Sözleşmesi';
-  if (type === 'KVKK') return 'KVKK Aydınlatma Metni';
-  if (type === 'PRIVACY_POLICY') return 'Gizlilik Politikası';
-  return AGREEMENT_TYPE_LABELS[type] || agreement?.title || 'Üyelik Sözleşmesi';
+  if (type === 'DISTANCE_SELLING') return t('agreement_distance_selling', 'Mesafeli Satış Sözleşmesi');
+  if (type === 'PAYMENT_TERMS') return t('agreement_payment_terms', 'Ödeme ve Üyelik Koşulları');
+  if (type === 'TERMS_OF_SERVICE') return t('agreement_terms_of_service', 'Kullanıcı Sözleşmesi');
+  if (type === 'KVKK') return t('agreement_kvkk', 'KVKK Aydınlatma Metni');
+  if (type === 'PRIVACY_POLICY') return t('agreement_privacy_policy', 'Gizlilik Politikası');
+  return (t ? t(`agreement_${String(type).toLowerCase()}`, AGREEMENT_TYPE_LABELS[type]) : null) || AGREEMENT_TYPE_LABELS[type] || agreement?.title || (t ? t('agreement_membership', 'Üyelik Sözleşmesi') : 'Üyelik Sözleşmesi');
 };
 
 const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
@@ -45,18 +43,18 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
     () => [
       {
         label: t('fast_shipping', 'Hızlı Teslimat'),
-        free: '3 iş günü',
-        premium: '1 iş günü (Ekspres kargo)',
+        free: t('premium_feature_shipping_free', '3 iş günü'),
+        premium: t('premium_feature_shipping_premium', '1 iş günü (Ekspres kargo)'),
       },
       {
         label: t('showcase_slot', 'Vitrin Yuvası'),
-        free: '1 yuva',
-        premium: '4 yuva (4x daha fazla alıcı)',
+        free: t('premium_feature_showcase_free', '1 yuva'),
+        premium: t('premium_feature_showcase_premium', '4 yuva (4x daha fazla alıcı)'),
       },
       {
         label: t('aura_ai_message_limit', 'Aura AI Asistanı'),
-        free: '2 soru / gün',
-        premium: '8 soru / gün (4x limit)',
+        free: t('premium_feature_aura_free', '2 soru / gün'),
+        premium: t('premium_feature_aura_premium', '8 soru / gün (4x limit)'),
       },
     ],
     [t]
@@ -80,6 +78,13 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
 
   const { emails, fetchEmails } = useEmails();
   const { eWallet, refreshWallet } = useEWallet({ enabled: isOpen });
+  const { data: quote, refetch: refetchQuote } = useQuery({
+    queryKey: ['membership', 'quote'],
+    queryFn: membershipService.getQuote,
+    enabled: isOpen,
+    staleTime: 0,
+  });
+  const premiumPrice = quote?.price;
   const { requiredAgreements: agreements = [] } = useRequiredAgreements('ONLINE_PAYMENT', { enabled: isOpen });
 
   const {
@@ -116,6 +121,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   useEffect(() => {
     if (isOpen) {
       refreshWallet();
+      refetchQuote();
       setStep(1);
       setError(null);
       setVerificationCode('');
@@ -134,23 +140,22 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
     }
   }, [step]);
 
-  const canAfford = Number(eWallet?.balance || 0) >= PREMIUM_PRICE;
+  const canAfford = quote?.sufficientBalance === true;
 
   const sendVerificationCode = async () => {
     setLoading(true);
     setError(null);
     const startTime = Date.now() - 3000;
     try {
-      await orderService.initiatePaymentVerification({
+      const verification = await orderService.initiatePaymentVerification({
         transactionType: 'MEMBERSHIP_PAYMENT',
-        amount: PREMIUM_PRICE,
       });
       const res = await fetchEmails(startTime);
       setLocalEmails(res);
-      setOtpExpiresAtMs(Date.now() + OTP_CODE_VALIDITY_SECONDS * 1000);
+      setOtpExpiresAtMs(new Date(verification.expiresAt).getTime());
       setStep(2);
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Doğrulama kodu gönderilemedi.');
+      setError(err?.response?.data?.message || err?.message || t('verification_code_send_failed', 'Doğrulama kodu gönderilemedi.'));
     } finally {
       setLoading(false);
     }
@@ -159,11 +164,11 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
   const handleUpgrade = async () => {
     const code = sanitizeOtpInput(verificationCode, OTP_CODE_LENGTH);
     if (otpTtlExpired) {
-      setError('Doğrulama kodunun süresi doldu. Geri dönüp yeni kod isteyin.');
+      setError(t('code_expired_request_new', 'Doğrulama kodunun süresi doldu. Geri dönüp yeni kod isteyin.'));
       return;
     }
     if (code.length !== OTP_CODE_LENGTH) {
-      setError('6 haneli doğrulama kodunu girin.');
+      setError(t('enter_6_digit_code', '6 haneli doğrulama kodunu girin.'));
       return;
     }
 
@@ -185,10 +190,10 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
       }
       queryClient.invalidateQueries({ queryKey: ['membership'] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
-      showSuccess('Premium Üyelik', 'Premium planına başarıyla geçiş yaptınız!');
+      showSuccess(t('premium_membership', 'Premium Üyelik'), t('premium_membership_success', 'Premium planına başarıyla geçiş yaptınız!'));
       onClose?.();
     } catch (err) {
-      setError(err?.response?.data?.message ?? 'Bir hata oluştu.');
+      setError(err?.response?.data?.message ?? t('an_error_occurred', 'Bir hata oluştu.'));
     } finally {
       setLoading(false);
     }
@@ -216,13 +221,14 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
 
   const canGoNext = useCallback(() => {
     if (step === 1) {
+      if (!quote) return false;
       if (agreements && agreements.length > 0) {
         return areAllAgreementsAccepted();
       }
       return fallbackAccepted;
     }
     return false;
-  }, [step, agreements, areAllAgreementsAccepted, fallbackAccepted]);
+  }, [step, quote, agreements, areAllAgreementsAccepted, fallbackAccepted]);
 
   const header = (
     <header className="border-b border-border-light px-6 py-4">
@@ -241,7 +247,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
               </span>
             </div>
             <p className="text-xs text-text-secondary">
-              {featureHint ?? t('access_all_features', 'Ayrıcalıklı teslimat, vitrin ve AI gücü')}
+              {featureHint ?? t('premium_modal_subtitle', 'Ayrıcalıklı teslimat, vitrin ve AI gücü')}
             </p>
           </div>
         </div>
@@ -334,7 +340,7 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
 
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-semibold tabular-nums tracking-tight text-text-price">
-                ₺{PREMIUM_PRICE}
+                {premiumPrice != null ? formatCurrency(premiumPrice, 'TRY') : '—'}
               </span>
               <span className="text-xs font-normal text-text-tertiary">
                 / {t('per_month', 'ay')}
@@ -395,8 +401,9 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
                       className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary accent-primary shrink-0 cursor-pointer"
                     />
                     <span className="leading-snug">
-                      <span className="font-medium text-text-primary">{getAgreementLabel(agreement)}</span>
-                      {' şartlarını okudum ve kabul ediyorum.'}
+                      <span className="font-medium text-text-primary">{getAgreementLabel(agreement, t)}</span>
+                      {' '}
+                      {t('kosullarini_kabul_ediyorum', 'şartlarını okudum ve kabul ediyorum.')}
                     </span>
                   </label>
                 );
@@ -451,11 +458,11 @@ const PremiumUpgradeModal = ({ isOpen, onClose, featureHint }) => {
             <div>
               <p className="text-sm font-medium text-text-primary">{t('premium_membership')}</p>
               <p className="text-sm tabular-nums text-text-secondary">
-                {t('my_ewallet')}: {Number(eWallet?.balance || 0).toFixed(2)}₺
+                {t('my_ewallet')}: {formatCurrency(Number(eWallet?.balance || 0), 'TRY')}
               </p>
             </div>
             <span className="text-lg font-semibold tabular-nums text-text-primary">
-              ₺{PREMIUM_PRICE}
+              {premiumPrice != null ? formatCurrency(premiumPrice, 'TRY') : '—'}
             </span>
           </div>
 

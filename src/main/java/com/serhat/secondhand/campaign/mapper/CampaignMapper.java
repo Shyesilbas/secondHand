@@ -5,12 +5,14 @@ import com.serhat.secondhand.campaign.dto.CreateCampaignRequest;
 import com.serhat.secondhand.campaign.dto.UpdateCampaignRequest;
 import com.serhat.secondhand.campaign.entity.Campaign;
 import com.serhat.secondhand.campaign.repository.projection.CampaignListProjection;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.pricing.dto.AppliedCampaignDto;
 import com.serhat.secondhand.user.domain.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Component
 public class CampaignMapper {
@@ -43,7 +45,8 @@ public class CampaignMapper {
                 .build();
     }
 
-    public CampaignDto toDto(CampaignListProjection campaign) {
+    /** Summary row for list views; the eligibility sets are hydrated by the caller in batch. */
+    public CampaignDto toDto(CampaignListProjection campaign, Set<ListingType> eligibleTypes, Set<UUID> eligibleListingIds) {
         return CampaignDto.builder()
                 .id(campaign.getId())
                 .name(campaign.getName())
@@ -52,8 +55,9 @@ public class CampaignMapper {
                 .endsAt(campaign.getEndsAt())
                 .discountKind(campaign.getDiscountKind())
                 .value(campaign.getValue())
-                .eligibleTypes(new HashSet<>())
-                .eligibleListingIds(new HashSet<>())
+                .minQuantity(campaign.getMinQuantity())
+                .eligibleTypes(eligibleTypes)
+                .eligibleListingIds(eligibleListingIds)
                 .applyToFutureListings(campaign.isApplyToFutureListings())
                 .build();
     }

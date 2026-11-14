@@ -61,6 +61,7 @@ export class ComplaintDto {
     this.eligibleForReviewAt = data.eligibleForReviewAt;
     this.chatRoomId = data.chatRoomId;
     this.reportedMessageId = data.reportedMessageId;
+    this.reportedMessageContent = data.reportedMessageContent ?? null;
     this.evidenceImageUrls = Array.isArray(data.evidenceImageUrls) ? data.evidenceImageUrls : [];
     this.violationCategory = data.violationCategory;
     this.penaltyAction = data.penaltyAction;

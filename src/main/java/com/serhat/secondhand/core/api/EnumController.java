@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.api;
 
+import com.serhat.secondhand.pricing.util.DiscountEligibility;
 import com.serhat.secondhand.core.audit.entity.AuditLog;
 import com.serhat.secondhand.core.application.EnumReadService;
 import com.serhat.secondhand.core.security.PublicEndpoint;
@@ -57,6 +58,7 @@ public class EnumController {
                     Map<String, Object> typeMap = new LinkedHashMap<>();
                     typeMap.put("value", type.name());
                     typeMap.put("label", type.getLabel());
+                    typeMap.put("discountable", DiscountEligibility.isDiscountable(type));
                     return typeMap;
                 })
                 .toList();
@@ -481,6 +483,7 @@ public class EnumController {
         Map<String, Object> configMap = new LinkedHashMap<>();
         configMap.put("creationFee", config.getCreationFee());
         configMap.put("taxPercentage", config.getTaxPercentage());
+        configMap.put("taxAmount", config.getTaxAmount());
         configMap.put("totalCreationFee", config.getTotalCreationFee());
         
         // Add cache version based on config hash
@@ -499,7 +502,9 @@ public class EnumController {
         Map<String, Object> configMap = new LinkedHashMap<>();
         configMap.put("dailyCost", config.getDailyCost());
         configMap.put("taxPercentage", config.getTaxPercentage());
+        configMap.put("dailyTaxAmount", config.getDailyTaxAmount());
         configMap.put("totalDailyCost", config.getTotalDailyCost());
+        configMap.put("maxDays", config.getMaxDays());
         
         // Add cache version based on config hash
         String configHash = String.valueOf(

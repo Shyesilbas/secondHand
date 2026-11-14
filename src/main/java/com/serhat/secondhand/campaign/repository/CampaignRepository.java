@@ -21,7 +21,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, UUID> {
 
     @Query("SELECT c.id AS id, c.name AS name, c.active AS active, c.startsAt AS startsAt, " +
             "c.endsAt AS endsAt, c.discountKind AS discountKind, c.value AS value, " +
-            "c.applyToFutureListings AS applyToFutureListings " +
+            "c.minQuantity AS minQuantity, c.applyToFutureListings AS applyToFutureListings " +
             "FROM Campaign c WHERE c.seller.id = :sellerId ORDER BY c.createdAt DESC")
     Page<CampaignListProjection> findPageSummaryBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
