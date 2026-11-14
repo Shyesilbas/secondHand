@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useTranslation } from "react-i18next";
+import { useAuthState } from '../../../auth/AuthContext.jsx';
 import { formatCurrency, parsePrice } from '../../formatters.js';
 import { PriceInput } from '../ui/PriceInput.jsx';
 import { Type, DollarSign, Info } from 'lucide-react';
@@ -13,6 +15,14 @@ const ListingBasics = ({
   showQuantity = true
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuthState();
+  const defaultCanSendMessage = user?.canSendMessage ?? true;
+  // A new listing starts from the seller's global messaging setting; an edited one keeps its own value.
+  useEffect(() => {
+    if (formData.canSendMessage === undefined) {
+      onInputChange({ target: { name: 'canSendMessage', checked: defaultCanSendMessage, type: 'checkbox' } });
+    }
+  }, [formData.canSendMessage, defaultCanSendMessage, onInputChange]);
   const titleLen = formData.title?.length || 0;
   const currentPrice = formData.price ? parsePrice(formData.price) : null;
 
@@ -129,6 +139,32 @@ const ListingBasics = ({
               <FieldError error={errors.quantity} />
             </div>
           )}
+
+          <div className="md:col-span-2 pt-2">
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="canSendMessage"
+                checked={Boolean(formData.canSendMessage ?? defaultCanSendMessage)}
+                onChange={e => onInputChange({
+                  target: {
+                    name: 'canSendMessage',
+                    checked: e.target.checked,
+                    type: 'checkbox'
+                  }
+                })}
+                className="mt-0.5 h-4 w-4 rounded border-border-light text-primary focus:ring-primary"
+              />
+              <div className="min-w-0 flex-1">
+                <span className="block text-sm font-medium text-text-primary">
+                  {t("allow_buyers_to_message", "Alıcılar bu ilan için mesaj gönderebilsin")}
+                </span>
+                <span className="block text-xs text-text-secondary mt-0.5">
+                  {t("allow_buyers_to_message_hint", "Kapatırsanız bu ilan için yeni ve mevcut tüm sohbetlerde mesajlaşma kilitlenir.")}
+                </span>
+              </div>
+            </label>
+          </div>
 
           <div className="md:col-span-2 pt-2">
             <label className="flex items-start gap-3 cursor-pointer select-none">

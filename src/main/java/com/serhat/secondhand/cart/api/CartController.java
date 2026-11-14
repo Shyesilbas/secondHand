@@ -2,6 +2,7 @@ package com.serhat.secondhand.cart.api;
 
 import com.serhat.secondhand.cart.application.CartService;
 import com.serhat.secondhand.cart.dto.AddToCartRequest;
+import com.serhat.secondhand.cart.dto.CartDto;
 import com.serhat.secondhand.cart.dto.UpdateCartItemRequest;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.PublicEndpoint;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -33,7 +35,7 @@ public class CartController {
     @GetMapping
     @Operation(summary = "Get cart items", description = "Get all items in the user's cart with pagination")
 
-    public ResponseEntity<?> getCartItems(
+    public ResponseEntity<Page<CartDto>> getCartItems(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
@@ -44,7 +46,7 @@ public class CartController {
     @PostMapping("/items")
     @Operation(summary = "Add item to cart", description = "Add a listing to the user's cart")
 
-    public ResponseEntity<?> addToCart(
+    public ResponseEntity<CartDto> addToCart(
             @Valid @RequestBody AddToCartRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -56,7 +58,7 @@ public class CartController {
     @PutMapping("/items/{listing-id}")
     @Operation(summary = "Update cart item", description = "Update quantity or notes of a cart item")
 
-    public ResponseEntity<?> updateCartItem(
+    public ResponseEntity<CartDto> updateCartItem(
             @PathVariable("listing-id") UUID listingId,
             @Valid @RequestBody UpdateCartItemRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -69,7 +71,7 @@ public class CartController {
     @DeleteMapping("/items/{listing-id}")
     @Operation(summary = "Remove item from cart", description = "Remove a specific item from the user's cart")
 
-    public ResponseEntity<?> removeFromCart(
+    public ResponseEntity<Map<String, String>> removeFromCart(
             @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
 
@@ -83,7 +85,7 @@ public class CartController {
     @DeleteMapping("/items")
     @Operation(summary = "Clear cart", description = "Remove all items from the user's cart")
 
-    public ResponseEntity<?> clearCart(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<Map<String, String>> clearCart(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Clear cart request - user: {}", currentUser.getEmail());
         return ResultResponses.okWithBody(
@@ -94,33 +96,33 @@ public class CartController {
     @GetMapping("/count")
     @Operation(summary = "Get cart item count", description = "Get the total number of items in the user's cart")
 
-    public ResponseEntity<?> getCartItemCount(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<Map<String, Long>> getCartItemCount(@AuthenticationPrincipal User currentUser) {
 
         log.debug("Get cart count request - user: {}", currentUser.getEmail());
-        var result = cartService.getCartItemCount(currentUser.getId());
-        return ResultResponses.okWithBody(result, Map.of("count", result.getData()));
+        Long count = ResultResponses.unwrap(cartService.getCartItemCount(currentUser.getId()));
+        return ResponseEntity.ok(Map.of("count", count));
     }
 
     @GetMapping("/check/{listing-id}")
     @Operation(summary = "Check if item is in cart", description = "Check if a specific listing is in the user's cart")
 
-    public ResponseEntity<?> isInCart(
+    public ResponseEntity<Map<String, Boolean>> isInCart(
             @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
 
         log.debug("Check in cart request - user: {}, listingId: {}",
                 currentUser.getEmail(), listingId);
-        var result = cartService.isInCart(currentUser.getId(), listingId);
-        return ResultResponses.okWithBody(result, Map.of("inCart", result.getData()));
+        Boolean inCart = ResultResponses.unwrap(cartService.isInCart(currentUser.getId(), listingId));
+        return ResponseEntity.ok(Map.of("inCart", inCart));
     }
 
     @PublicEndpoint
     @GetMapping("/reservations/count/{listing-id}")
     @Operation(summary = "Get active reservation count", description = "Get the total number of active reservations for a listing")
 
-    public ResponseEntity<?> getActiveReservationCount(@PathVariable("listing-id") UUID listingId) {
+    public ResponseEntity<Map<String, Integer>> getActiveReservationCount(@PathVariable("listing-id") UUID listingId) {
         log.debug("Get active reservation count request - listingId: {}", listingId);
-        var result = cartService.getActiveReservationCount(listingId);
-        return ResultResponses.okWithBody(result, Map.of("count", result.getData()));
+        Integer count = ResultResponses.unwrap(cartService.getActiveReservationCount(listingId));
+        return ResponseEntity.ok(Map.of("count", count));
     }
 }

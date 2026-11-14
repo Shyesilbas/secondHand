@@ -186,6 +186,10 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean listingRestricted = false;
 
+    @Column(name = "can_send_message", nullable = false)
+    @Builder.Default
+    private boolean canSendMessage = true;
+
     public boolean isPremium() {
         return plan == MembershipPlan.PREMIUM && expirationDate != null && !LocalDateTime.now().isAfter(expirationDate);
     }

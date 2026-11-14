@@ -231,8 +231,8 @@ public class OrderCompletionService {
                     pngOutputStream
             );
             return pngOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate QR Code image", e);
+        } catch (com.google.zxing.WriterException | java.io.IOException e) {
+            throw new IllegalStateException("Failed to generate QR Code image", e);
         }
     }
 

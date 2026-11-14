@@ -64,7 +64,7 @@ public class NotificationController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Notification not found")
     })
-    public ResponseEntity<?> markAsRead(@PathVariable UUID id,
+    public ResponseEntity<Void> markAsRead(@PathVariable UUID id,
                                           @AuthenticationPrincipal User currentUser) {
         log.info("API request to mark notification {} as read for user: {}", id, currentUser.getEmail());
         return ResultResponses.ok(notificationService.markAsRead(id, currentUser.getId()));

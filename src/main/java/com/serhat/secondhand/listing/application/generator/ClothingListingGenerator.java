@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.generator;
 
+import static com.serhat.secondhand.listing.application.generator.GeneratorRandom.weights;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.core.result.Result;
@@ -277,18 +279,17 @@ class ClothingListingGenerator {
                 .filter(s -> s != null && !s.isBlank()).collect(Collectors.joining(" ")) + ", " + CONDITION_WORD.get(condition);
         title = Character.toUpperCase(title.charAt(0)) + title.substring(1);
 
-        BaseListingCreateRequest base = new BaseListingCreateRequest(title,
+        BaseListingCreateRequest base = ListingGeneratorSupport.baseRequest(
+                title,
                 description(type, brand, audience, condition, sizeText, fabric, purchaseYear, attributes),
-                GeneratorRandom.roundPrice(Math.max(50, price)), Currency.TRY, place.cityLabel(), place.districtLabel(),
-                place.cityKey(), place.districtKey(), place.neighborhoodKey(), null, random.chance(0.6));
+                GeneratorRandom.roundPrice(Math.max(50, price)),
+                place,
+                null,
+                random.chance(0.6));
         ClothingCreateRequest request = new ClothingCreateRequest(base, 1, brand.id(), type.id(), color, purchaseYear,
                 condition, audience, system, sizeKey, fit, pattern, fabric, attributes);
-        Result<UUID> result = clothingListingService.createClothingListing(request, sellerId);
-        if (result.isError()) {
-            throw new IllegalStateException("Generated clothing listing rejected (" + title + "): "
-                    + result.getErrorCode() + " " + result.getMessage());
-        }
-        return result.getData();
+        return ListingGeneratorSupport.requireCreated(
+                clothingListingService.createClothingListing(request, sellerId), "clothing", title);
     }
 
     private static final Locale TR = Locale.forLanguageTag("tr");
@@ -490,7 +491,7 @@ class ClothingListingGenerator {
     private <T> T read(String json, TypeReference<T> type) {
         try {
             return objectMapper.readValue(json, type);
-        } catch (Exception e) {
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
             throw new IllegalStateException("Cannot read clothing type rules " + json, e);
         }
     }
@@ -498,14 +499,5 @@ class ClothingListingGenerator {
     @SafeVarargs
     private static Set<String> union(Set<String>... sets) {
         return Stream.of(sets).flatMap(Set::stream).collect(Collectors.toUnmodifiableSet());
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Map<T, Integer> weights(Object... pairs) {
-        Map<T, Integer> map = new LinkedHashMap<>();
-        for (int i = 0; i < pairs.length; i += 2) {
-            map.put((T) pairs[i], (Integer) pairs[i + 1]);
-        }
-        return map;
     }
 }

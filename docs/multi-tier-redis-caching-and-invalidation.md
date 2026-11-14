@@ -19,7 +19,7 @@ Bu doküman, **secondHand** backend'indeki Spring Cache + Redis yapısını (TTL
 | Tier | TTL | Cache adı | Kullanım (`@Cacheable` yeri) |
 | :--- | :--- | :--- | :--- |
 | 0b | 3 gün | `ai:summaries` | `AiSummaryService` (key `user:<id>` / `listing:<id>`; "özet yok" mesajı cache'lenmez) |
-| 1 | 24 saat | `catalog:brands`, `catalog:vehicleTypes`, `catalog:electronicTypes`, `catalog:bookGenres`, `catalog:clothingTypes` | İlgili `*Repository` `findAll` / `findByName` |
+| 1 | 24 saat | `catalog:enums`, `catalog:brands`, `catalog:vehicleTypes`, `catalog:electronicTypes`, `catalog:bookGenres`, `catalog:clothingTypes` | `EnumReadService` (`'dbBundle'` ve tekil lookup'lar) ile ilgili `*Repository` `findAll` / `findByName` |
 | 1 | 24 saat | `catalog:attributeDefinitions`, `catalog:vehicle` | `ListingAttributeCatalogService`, `VehicleCatalogService` |
 | 1b | 12 saat | `user:stats:favorites` | `FavoriteStatsService` |
 | 2 | 2 saat | `order:completed`, `payment:stats` | `OrderQueryService`, `PaymentStatsService` |
@@ -27,7 +27,7 @@ Bu doküman, **secondHand** backend'indeki Spring Cache + Redis yapısını (TTL
 | 2 | 2 saat | `payment:history` | TTL tanımlı, ancak kodda `@Cacheable` kullanımı **yok** |
 | 2b | 15 dk | `user:profile` | `UserService` |
 | 3 | 10 dk | `user:stats:reviews`, `listing:views:seller`, `listing:userListings` | `ReviewService`, `ListingViewService`, `ListingQueryService` |
-| 3b | 5 dk | `order:pending`, `listing:views:listing` | `OrderQueryService`, `ListingViewService` |
+| 3b | 5 dk | `order:pending`, `listing:views:listing`, `dashboard:seller`, `dashboard:buyer` | `OrderQueryService`, `ListingViewService`, `DashboardService` |
 | 3b | 5 dk | `listing:showcases` | TTL tanımlı, ancak kodda `@Cacheable` kullanımı **yok** |
 | 4 | 5 dk | `user:badges` | `UserBadgeService` |
 

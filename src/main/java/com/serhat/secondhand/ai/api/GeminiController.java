@@ -30,7 +30,7 @@ public class GeminiController {
 
     // With context
     @PostMapping("/ask")
-    public ResponseEntity<?> askQuestion(@Valid @RequestBody UserQuestionRequest request) {
+    public ResponseEntity<AiResponse> askQuestion(@Valid @RequestBody UserQuestionRequest request) {
         log.info("New question received: {}", request.question().substring(0, Math.min(50, request.question().length())));
         AiResponse response = aiService.askQuestion(request);
         return ResultResponses.ok(Result.success(response));
@@ -38,7 +38,7 @@ public class GeminiController {
 
     // No context
     @GetMapping("/quick")
-    public ResponseEntity<?> quickQuestion(@RequestParam("q") String question) {
+    public ResponseEntity<AiResponse> quickQuestion(@RequestParam("q") String question) {
         if (question == null || question.isBlank()) {
             throw new IllegalArgumentException("Question cannot be empty");
         }

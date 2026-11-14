@@ -1,5 +1,6 @@
 package com.serhat.secondhand.escrow.outbox;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.escrow.application.EscrowKafkaProducer;
 import com.serhat.secondhand.escrow.contract.EscrowReleasedKafkaEvent;
@@ -17,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.UUID;
 
 @Component
@@ -50,6 +53,9 @@ public class EscrowOutboxWorker {
                 );
 
         for (EscrowOutboxEvent event : events) {
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             self.processEvent(event.getId());
         }
     }
@@ -73,21 +79,28 @@ public class EscrowOutboxWorker {
             event.setLastError(null);
             escrowOutboxRepository.save(event);
             log.info("Successfully processed and published escrow outbox event ID: {}", eventId);
-        } catch (Exception ex) {
-            log.error("Failed to process escrow outbox event ID: {}", eventId, ex);
-            int attempts = event.getAttemptCount() + 1;
-            event.setAttemptCount(attempts);
-            event.setLastError(ex.getMessage());
-
-            if (attempts >= event.getMaxAttempts()) {
-                event.setStatus(OutboxStatus.FAILED);
-                log.error("Escrow outbox event ID: {} max attempts reached ({})", eventId, attempts);
-            } else {
-                event.setStatus(OutboxStatus.PENDING);
-                long delaySeconds = (long) Math.min(300, Math.pow(2, attempts) * 5);
-                event.setNextAttemptAt(LocalDateTime.now().plusSeconds(delaySeconds));
-            }
-            escrowOutboxRepository.save(event);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            recordFailure(event, eventId, ex);
+        } catch (JsonProcessingException | ExecutionException | TimeoutException | RuntimeException ex) {
+            recordFailure(event, eventId, ex);
         }
+    }
+
+    private void recordFailure(EscrowOutboxEvent event, UUID eventId, Exception ex) {
+        log.error("Failed to process escrow outbox event ID: {}", eventId, ex);
+        int attempts = event.getAttemptCount() + 1;
+        event.setAttemptCount(attempts);
+        event.setLastError(ex.getMessage());
+
+        if (attempts >= event.getMaxAttempts()) {
+            event.setStatus(OutboxStatus.FAILED);
+            log.error("Escrow outbox event ID: {} max attempts reached ({})", eventId, attempts);
+        } else {
+            event.setStatus(OutboxStatus.PENDING);
+            long delaySeconds = (long) Math.min(300, Math.pow(2, attempts) * 5);
+            event.setNextAttemptAt(LocalDateTime.now().plusSeconds(delaySeconds));
+        }
+        escrowOutboxRepository.save(event);
     }
 }

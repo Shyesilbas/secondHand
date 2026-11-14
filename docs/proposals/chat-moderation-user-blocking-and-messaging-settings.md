@@ -1,7 +1,7 @@
 # Sohbet Moderasyonu, Kısıtlama UI Kilidi, Karşılıklı Engelleme ve Mesajlaşma Ayarları
 
 > [!WARNING]
-> **Durum: Tasarım / Uygulama Planı (henüz kodlanmadı — kontrol: 2026-11-14).** Bu doküman; moderasyon sonrası sohbet mesajlarının gizlenmesi (tombstone), yaptırım (`UserRestrictionService`) altındaki kullanıcılar için frontend aksiyon kilidi, karşılıklı kullanıcı engelleme ve hem kullanıcı (`User`) hem de ilan (`Listing`) bazında `canSendMessage` tercihinin yönetilmesini tanımlar. Güncel çalışan moderasyon kuralları için [`complaint/README.md`](../../src/main/java/com/serhat/secondhand/complaint/README.md) ve [`aura-trust-safety-and-complaint-moderation.md`](aura-trust-safety-and-complaint-moderation.md) dosyalarına bakınız.
+> **Durum: Uygulandı (V54, kontrol: 2026-11-14); modül kuralları `user/README.md` ve `chat/README.md` içindedir.** Bu doküman; moderasyon sonrası sohbet mesajlarının gizlenmesi (tombstone), yaptırım (`UserRestrictionService`) altındaki kullanıcılar için frontend aksiyon kilidi, karşılıklı kullanıcı engelleme ve hem kullanıcı (`User`) hem de ilan (`Listing`) bazında `canSendMessage` tercihinin yönetilmesini tanımlar. Güncel çalışan moderasyon kuralları için [`complaint/README.md`](../../src/main/java/com/serhat/secondhand/complaint/README.md) ve [`aura-trust-safety-and-complaint-moderation.md`](aura-trust-safety-and-complaint-moderation.md) dosyalarına bakınız.
 
 ---
 

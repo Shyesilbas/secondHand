@@ -22,7 +22,7 @@ const UnifiedSearchBar = ({
  const searchRef = useRef(null);
  const inputRef = useRef(null);
  const navigate = useNavigate();
- const term = useDebouncedValue(query.trim().toLowerCase(), 500);
+ const term = useDebouncedValue(query.trim().toLowerCase(), 300);
  const { data: listingOrUserResults = NO_RESULTS, isFetching: isLoading } = useQuery({
  queryKey: ['globalSearch', activeTab, term],
  queryFn: async () => activeTab === 'users' ? searchUsers(term, 8) : (await listingService.globalSearch(term, 0, 8)).content || [],
@@ -107,6 +107,13 @@ const UnifiedSearchBar = ({
  }
  } else if (selectedIndex >= 0 && results[selectedIndex]) {
  handleResultSelect(results[selectedIndex]);
+ } else if (activeTab === 'listings' && document.activeElement === inputRef.current) {
+ // No highlighted suggestion: show every match on the listings page.
+ const q = query.trim();
+ setQuery('');
+ setIsVisible(false);
+ inputRef.current?.blur();
+ navigate(`${ROUTES.LISTINGS}?q=${encodeURIComponent(q)}`);
  }
  break;
  case 'Escape':
@@ -141,7 +148,7 @@ const UnifiedSearchBar = ({
  };
  return <div ref={searchRef} className={`relative ${className}`}>
  <div className="relative">
- <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={`Search ${activeTab}...`} className="w-full h-11 px-10 pr-40 text-sm bg-secondary-50 border border-border-light rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
+ <input ref={inputRef} type="text" value={query} onChange={handleInputChange} onFocus={handleFocus} placeholder={activeTab === 'users' ? t('search_users_placeholder', 'Kullanıcı ara...') : t('search_listings_placeholder', 'İlan ara...')} className="w-full h-11 px-10 pr-40 text-sm bg-secondary-50 border border-border-light rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary focus:bg-background-primary transition-all placeholder:text-text-muted text-text-primary" />
  
  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
  {isLoading ? <svg className="animate-spin h-4 w-4 text-text-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -45,6 +45,7 @@ public class OfferService implements IOfferService {
     private final OfferStockHoldService offerStockHoldService;
     private final OfferConfigProperties offerConfigProperties;
     private final UserRestrictionService userRestrictionService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     @Transactional
     public Result<OfferDto> create(Long buyerId, CreateOfferRequest request) {
@@ -59,6 +60,8 @@ public class OfferService implements IOfferService {
 
         Listing listing = listingService.findById(request.getListingId()).orElse(null);
         if (listing == null) return Result.error(OfferErrorCodes.LISTING_NOT_FOUND);
+
+        if (listing.getSeller() != null) userBlockService.requireNotBlocked(buyerId, listing.getSeller().getId());
 
         Result<Void> listingValidationResult = offerValidator.validateListingForOffer(listing, buyer);
         if (listingValidationResult.isError()) return Result.error(listingValidationResult.getMessage(), listingValidationResult.getErrorCode());
@@ -75,8 +78,10 @@ public class OfferService implements IOfferService {
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
 
+        // Materialize lazy associations inside the active transaction before @Async dispatch.
+        OfferDto dto = offerMapper.toDto(saved);
         offerEmailNotificationService.notifyOfferReceived(saved);
-        return Result.success(offerMapper.toDto(saved));
+        return Result.success(dto);
     }
 
     @Transactional(readOnly = true)
@@ -113,6 +118,7 @@ public class OfferService implements IOfferService {
         if (offerResult.isError()) return Result.error(offerResult.getMessage(), offerResult.getErrorCode());
 
         Offer offer = offerResult.getData();
+        if (offer.getBuyer() != null) userBlockService.requireNotBlocked(sellerId, offer.getBuyer().getId());
 
         if (isExpired(offer)) {
             processManualExpiration(offer);
@@ -148,8 +154,9 @@ public class OfferService implements IOfferService {
             offerStockHoldService.releaseNow(offer);
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
+        OfferDto dto = offerMapper.toDto(saved);
         offerEmailNotificationService.notifyAcceptedToCreator(saved);
-        return Result.success(offerMapper.toDto(saved));
+        return Result.success(dto);
     }
 
     @Transactional
@@ -174,8 +181,9 @@ public class OfferService implements IOfferService {
             log.warn("Concurrent reject offer conflict for offer {}", offerId, ex);
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
+        OfferDto dto = offerMapper.toDto(saved);
         offerEmailNotificationService.notifyRejectedToCreator(saved);
-        return Result.success(offerMapper.toDto(saved));
+        return Result.success(dto);
     }
 
     @Transactional
@@ -193,6 +201,11 @@ public class OfferService implements IOfferService {
         if (previousResult.isError()) return Result.error(previousResult.getMessage(), previousResult.getErrorCode());
 
         Offer previous = previousResult.getData();
+        if (previous.getBuyer() != null && previous.getListing() != null && previous.getListing().getSeller() != null) {
+            Long counterpartId = userId.equals(previous.getBuyer().getId())
+                    ? previous.getListing().getSeller().getId() : previous.getBuyer().getId();
+            userBlockService.requireNotBlocked(userId, counterpartId);
+        }
 
         if (isExpired(previous)) {
             processManualExpiration(previous);
@@ -227,8 +240,9 @@ public class OfferService implements IOfferService {
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
 
+        OfferDto dto = offerMapper.toDto(saved);
         offerEmailNotificationService.notifyCounterReceived(saved);
-        return Result.success(offerMapper.toDto(saved));
+        return Result.success(dto);
     }
 
     @Transactional
@@ -323,6 +337,7 @@ public class OfferService implements IOfferService {
             return;
         }
         if (wasAccepted) offerStockHoldService.releaseAfterCommit(offer);
+        offerMapper.toDto(offer);
         offerEmailNotificationService.notifyExpiredToBoth(offer);
     }
 
@@ -373,7 +388,8 @@ public class OfferService implements IOfferService {
             return Result.error(OfferErrorCodes.OFFER_CONCURRENT_MODIFICATION);
         }
 
+        OfferDto dto = offerMapper.toDto(saved);
         offerEmailNotificationService.notifyCounterReceived(saved);
-        return Result.success(offerMapper.toDto(saved));
+        return Result.success(dto);
     }
 }

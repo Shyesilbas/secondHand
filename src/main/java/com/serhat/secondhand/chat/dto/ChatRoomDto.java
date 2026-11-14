@@ -25,6 +25,9 @@ public class ChatRoomDto {
     private Long otherParticipantId;
     private String otherParticipantName;
     private Long unreadCount;
+    private boolean lastMessageRemoved;
+    private boolean messagingDisabled;
+    private String messagingDisabledReason;
 
 
 }

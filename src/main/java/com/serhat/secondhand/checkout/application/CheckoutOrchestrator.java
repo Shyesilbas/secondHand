@@ -56,6 +56,7 @@ public class CheckoutOrchestrator {
     private final CheckoutStockReservationService checkoutStockReservationService;
     private final ApplicationEventPublisher eventPublisher;
     private final UserRestrictionService userRestrictionService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     /**
      * Places one order per seller in a single transaction. Every order is paid and put in escrow
@@ -81,6 +82,13 @@ public class CheckoutOrchestrator {
         List<Cart> effectiveCartItems = pricingContext.effectiveCartItems();
         Offer acceptedOffer = pricingContext.acceptedOffer();
         PricingResultDto pricing = pricingContext.pricing();
+
+        // A new purchase is closed between blocked users; orders that already run are not touched.
+        for (Cart item : effectiveCartItems) {
+            if (item.getListing() != null && item.getListing().getSeller() != null) {
+                userBlockService.requireNotBlocked(userId, item.getListing().getSeller().getId());
+            }
+        }
 
         Result<Map<UUID, Integer>> reservedResult = checkoutStockReservationService.reserveStock(userId, effectiveCartItems);
         if (reservedResult.isError()) {
@@ -156,7 +164,7 @@ public class CheckoutOrchestrator {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             return Result.success(new CheckoutResultDto(orderDtos, totalAmount));
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             checkoutStockReservationService.releaseReservedStock(userId, reserved);
             log.error("Critical exception during checkout for orders: {}", orderNumbers, e);
             throw e;

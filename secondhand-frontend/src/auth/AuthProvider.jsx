@@ -125,7 +125,16 @@ export const AuthProvider = ({ children }) => {
  });
  }, []);
 
+ const isAuthenticatedRef = useRef(false);
+ useEffect(() => {
+ isAuthenticatedRef.current = authState.isAuthenticated;
+ }, [authState.isAuthenticated]);
+
  const handleTokenRefreshFailure = useCallback(() => {
+ // A guest has no session to end. Clearing the query cache here would refetch every query on the
+ // page, hit the same 401 again and loop.
+ if (!isAuthenticatedRef.current) return;
+ isAuthenticatedRef.current = false;
  clearUser();
  queryClient.clear();
  setAuthState({ user: null, isAuthenticated: false, isLoading: false });

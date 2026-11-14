@@ -338,7 +338,7 @@ public class Order {
             }
             return hexString.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
         }
     }
 }

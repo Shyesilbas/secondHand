@@ -116,6 +116,7 @@ export const compressImage = (file, options = {}) => {
  * @param {number} [options.width] Target width of the image
  * @param {number} [options.height] Target height of the image
  * @param {string} [options.crop='fill'] Cloudinary crop mode (e.g. 'fill', 'limit', 'thumb', 'scale')
+ * @param {string} [options.gravity] Cloudinary gravity for crop positioning (e.g. 'auto', 'center')
  * @returns {string} The optimized image URL
  */
 export const optimizeCloudinaryUrl = (url, options = {}) => {
@@ -126,7 +127,7 @@ export const optimizeCloudinaryUrl = (url, options = {}) => {
  return url;
  }
 
- const { width, height, crop = 'fill' } = options;
+ const { width, height, crop = 'fill', gravity } = options;
 
  // Build the transformation string
  // q_auto: automatic quality compression
@@ -135,6 +136,7 @@ export const optimizeCloudinaryUrl = (url, options = {}) => {
 
  if (width || height) {
  transformations += `,c_${crop}`;
+ if (gravity) transformations += `,g_${gravity}`;
  if (width) transformations += `,w_${width}`;
  if (height) transformations += `,h_${height}`;
  }

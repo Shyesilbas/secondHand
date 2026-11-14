@@ -23,7 +23,9 @@ public enum ListingErrorCodes implements ErrorCode {
     ATTRIBUTE_TYPE_MISMATCH("ATTRIBUTE_TYPE_MISMATCH", "Attribute value has the wrong type", HttpStatus.BAD_REQUEST),
     ATTRIBUTE_OUT_OF_RANGE("ATTRIBUTE_OUT_OF_RANGE", "Attribute value is out of range", HttpStatus.BAD_REQUEST),
     ATTRIBUTE_INVALID_OPTION("ATTRIBUTE_INVALID_OPTION", "Attribute value is not an allowed option", HttpStatus.BAD_REQUEST),
-    ATTRIBUTE_REQUIRED("ATTRIBUTE_REQUIRED", "Required attribute is missing", HttpStatus.BAD_REQUEST);
+    ATTRIBUTE_REQUIRED("ATTRIBUTE_REQUIRED", "Required attribute is missing", HttpStatus.BAD_REQUEST),
+    LISTING_ACCESS_DENIED_BLOCKED("LISTING_ACCESS_DENIED_BLOCKED", "This listing is not available to you", HttpStatus.FORBIDDEN),
+    BULK_LISTING_LIMIT_EXCEEDED("BULK_LISTING_LIMIT_EXCEEDED", "Too many listing IDs requested in bulk", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

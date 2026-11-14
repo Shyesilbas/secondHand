@@ -24,12 +24,12 @@ public class AiSummaryController {
     private final AiSummaryService aiSummaryService;
 
     @GetMapping("/user/{user-id}")
-    public ResponseEntity<?> getUserSummary(@PathVariable("user-id") Long userId) {
+    public ResponseEntity<String> getUserSummary(@PathVariable("user-id") Long userId) {
         return ResultResponses.ok(Result.success(aiSummaryService.getUserReviewsSummary(userId)));
     }
 
     @GetMapping("/listing/{listing-id}")
-    public ResponseEntity<?> getListingSummary(@PathVariable("listing-id") UUID listingId) {
+    public ResponseEntity<String> getListingSummary(@PathVariable("listing-id") UUID listingId) {
         return ResultResponses.ok(Result.success(aiSummaryService.getListingReviewsSummary(listingId)));
     }
 }

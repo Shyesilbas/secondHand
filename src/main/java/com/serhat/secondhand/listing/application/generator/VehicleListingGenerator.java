@@ -1,6 +1,5 @@
 package com.serhat.secondhand.listing.application.generator;
 
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService;
 import com.serhat.secondhand.listing.application.vehicle.VehicleListingService;
 import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
@@ -8,8 +7,6 @@ import com.serhat.secondhand.listing.domain.dto.request.vehicle.VehicleCreateReq
 import com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto;
 import com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeOptionDto;
 import com.serhat.secondhand.listing.domain.entity.attribute.ListingAttributeOption;
-import com.serhat.secondhand.listing.domain.entity.attribute.AttributeLevel;
-import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import lombok.RequiredArgsConstructor;
@@ -126,10 +123,8 @@ class VehicleListingGenerator {
         int annualKm = ANNUAL_KM.getOrDefault(c.typeName(), 15_000);
         int mileage = (int) (Math.round(annualKm * age * random.between(0.55, 1.5) / 500.0) * 500);
 
-        Map<String, AttributeDefinitionDto> defs = attributeCatalogService
-                .getDefinitions(ListingType.VEHICLE, c.typeName()).stream()
-                .filter(d -> d.getLevel() == AttributeLevel.LISTING)
-                .collect(Collectors.toMap(AttributeDefinitionDto::getKey, d -> d, (a, b) -> a, LinkedHashMap::new));
+        Map<String, AttributeDefinitionDto> defs = ListingGeneratorSupport.listingAttributes(
+                attributeCatalogService, ListingType.VEHICLE, c.typeName());
         Condition cond = condition(random, age, year, defs);
 
         double price = random.between(c.price().low(), c.price().high())
@@ -138,12 +133,15 @@ class VehicleListingGenerator {
                 * powerFactor(c.versions(), version)
                 * cond.priceFactor();
 
-        String title = truncate(year + " " + c.brandLabel() + " " + c.modelName() + " " + version.name()
-                + " · " + String.format(java.util.Locale.ROOT, "%,d", mileage).replace(',', '.') + " km", 100);
-        BaseListingCreateRequest base = new BaseListingCreateRequest(title,
-                description(c, version, year, mileage, cond, random), GeneratorRandom.roundPrice(price), Currency.TRY,
-                place.cityLabel(), place.districtLabel(), place.cityKey(), place.districtKey(), place.neighborhoodKey(),
-                photo != null ? photo.url() : null, random.chance(0.7));
+        String title = ListingGeneratorSupport.truncate(year + " " + c.brandLabel() + " " + c.modelName() + " " + version.name()
+                + " · " + ListingGeneratorSupport.formatGroupedInt(mileage) + " km", 100);
+        BaseListingCreateRequest base = ListingGeneratorSupport.baseRequest(
+                title,
+                description(c, version, year, mileage, cond, random),
+                GeneratorRandom.roundPrice(price),
+                place,
+                photo != null ? photo.url() : null,
+                random.chance(0.7));
         UUID trimId = c.trims().isEmpty() || random.chance(0.4) ? null : random.pick(c.trims());
         LocalDate inspection = age >= 3 ? LocalDate.now().plusDays(random.between(30, 700)) : null;
 
@@ -151,12 +149,10 @@ class VehicleListingGenerator {
                 c.generationId(), version.id(), trimId, version.id(), year, mileage,
                 null, null, null, null, null, color, null, null, null, null, null,
                 cond.accident(), cond.accident() ? cond.accidentText() : null, inspection, null, null, cond.attributes());
-        Result<UUID> result = vehicleListingService.createVehicleListing(request, sellerId);
-        if (result.isError()) {
-            throw new IllegalStateException("Generated vehicle listing rejected (" + c.price().generation() + " / "
-                    + version.name() + " / " + year + "): " + result.getErrorCode() + " " + result.getMessage());
-        }
-        return result.getData();
+        return ListingGeneratorSupport.requireCreated(
+                vehicleListingService.createVehicleListing(request, sellerId),
+                "vehicle",
+                c.price().generation() + " / " + version.name() + " / " + year);
     }
 
     private record Condition(Map<String, Object> attributes, double priceFactor, boolean accident, String accidentText,
@@ -227,14 +223,15 @@ class VehicleListingGenerator {
             }
         }
         boolean accident = heavy || tramer >= 40_000;
-        String accidentText = heavy ? "Ağır hasar kaydı var, onarımı yapıldı." : "Tramer kaydı " + formatTry(tramer) + ".";
+        String accidentText = heavy ? "Ağır hasar kaydı var, onarımı yapıldı."
+                : "Tramer kaydı " + ListingGeneratorSupport.formatTry(tramer) + ".";
         return new Condition(attrs, factor, accident, accidentText, painted, changed, tramer, owners, service, optionLabels);
     }
 
     private String description(Candidate c, Version v, int year, int mileage, Condition cond, GeneratorRandom random) {
         List<String> s = new ArrayList<>();
         s.add(year + " model " + c.brandLabel() + " " + c.modelName() + " " + v.name() + ", "
-                + String.format(java.util.Locale.ROOT, "%,d", mileage).replace(',', '.') + " km'de.");
+                + ListingGeneratorSupport.formatGroupedInt(mileage) + " km'de.");
         s.add(cond.ownerCount() == 1 ? "İlk sahibinden, aracın tüm geçmişi bende." : cond.ownerCount() + ". sahibiyim.");
         s.add(switch (cond.service()) {
             case "FULL_AUTHORIZED" -> "Bakımları yetkili serviste zamanında yapıldı.";
@@ -249,7 +246,7 @@ class VehicleListingGenerator {
             if (cond.changedParts() > 0) parts.add(cond.changedParts() + " parça değişen");
             s.add(String.join(", ", parts) + "; detaylar ilandaki boya/değişen şemasında.");
         }
-        s.add(cond.tramer() == 0 ? "Tramer kaydı yok." : formatTry(cond.tramer()) + " tramer kaydı var.");
+        s.add(cond.tramer() == 0 ? "Tramer kaydı yok." : ListingGeneratorSupport.formatTry(cond.tramer()) + " tramer kaydı var.");
         if (!cond.optionLabels().isEmpty()) s.add("Donanım: " + String.join(", ", cond.optionLabels()) + ".");
         s.add(random.pick(CLOSINGS));
         return String.join(" ", s);
@@ -267,15 +264,7 @@ class VehicleListingGenerator {
         return 0.94 + 0.12 * pos;
     }
 
-    private static String formatTry(long amount) {
-        return String.format(java.util.Locale.ROOT, "%,d", amount).replace(',', '.') + " TL";
-    }
-
     private static double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
-    }
-
-    private static String truncate(String s, int max) {
-        return s.length() <= max ? s : s.substring(0, max).trim();
     }
 }

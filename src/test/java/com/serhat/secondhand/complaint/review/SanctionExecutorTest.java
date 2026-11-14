@@ -34,8 +34,13 @@ class SanctionExecutorTest {
     private final AccessRevocationService revocation = mock(AccessRevocationService.class);
     private final UserRestrictionService restrictions = mock(UserRestrictionService.class);
     private final ApplicationEventPublisher events = mock(ApplicationEventPublisher.class);
+    private final com.serhat.secondhand.chat.repository.MessageRepository messages =
+            mock(com.serhat.secondhand.chat.repository.MessageRepository.class);
+    private final com.serhat.secondhand.chat.application.ChatRoomUpdater roomUpdater =
+            mock(com.serhat.secondhand.chat.application.ChatRoomUpdater.class);
     private final SanctionExecutor executor = new SanctionExecutor(listings, revocation,
-            new ComplaintModerationProperties(), mock(PlatformTransactionManager.class), restrictions, events);
+            new ComplaintModerationProperties(), mock(PlatformTransactionManager.class), restrictions, events,
+            messages, roomUpdater);
 
     @BeforeEach
     void startSynchronization() {
@@ -258,5 +263,53 @@ class SanctionExecutorTest {
     void permanentBanIsNeverReversed() {
         assertThatThrownBy(() -> executor.reverse(decided(user(0), PenaltyAction.PERM_BAN), NOW))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    private static com.serhat.secondhand.chat.entity.Message reportedMessage() {
+        com.serhat.secondhand.chat.entity.Message m = new com.serhat.secondhand.chat.entity.Message();
+        m.setId(77L);
+        m.setChatRoomId(9L);
+        m.setContent("violating text");
+        return m;
+    }
+
+    @Test
+    void warningRemovesTheReportedMessageButKeepsItsText() {
+        com.serhat.secondhand.chat.entity.Message m = reportedMessage();
+        when(messages.findById(77L)).thenReturn(java.util.Optional.of(m));
+        Complaint complaint = Complaint.builder().id("c-1").complainedUser(user(0)).reportedMessageId(77L).build();
+
+        executor.apply(complaint, PenaltyAction.WARNING, 0, "HARASSMENT", NOW);
+
+        assertThat(m.isRemovedByModeration()).isTrue();
+        assertThat(m.getRemovedAt()).isEqualTo(NOW);
+        assertThat(m.getContent()).isEqualTo("violating text");
+        verify(messages).save(m);
+        verify(roomUpdater).updateLastMessage(9L);
+    }
+
+    @Test
+    void noPenaltyLeavesTheMessageAlone() {
+        Complaint complaint = Complaint.builder().id("c-1").complainedUser(user(0)).reportedMessageId(77L).build();
+
+        executor.apply(complaint, PenaltyAction.NONE, 0, "HARASSMENT", NOW);
+
+        verifyNoInteractions(messages, roomUpdater);
+    }
+
+    @Test
+    void approvedAppealRestoresTheMessage() {
+        com.serhat.secondhand.chat.entity.Message m = reportedMessage();
+        m.setRemovedByModeration(true);
+        m.setRemovedAt(NOW);
+        when(messages.findById(77L)).thenReturn(java.util.Optional.of(m));
+        Complaint complaint = Complaint.builder().id("c-1").complainedUser(user(1)).reportedMessageId(77L)
+                .penaltyAction(PenaltyAction.WARNING).resolvedAt(NOW).build();
+
+        executor.reverse(complaint, NOW.plusDays(1));
+
+        assertThat(m.isRemovedByModeration()).isFalse();
+        assertThat(m.getRemovedAt()).isNull();
+        verify(roomUpdater).updateLastMessage(9L);
     }
 }

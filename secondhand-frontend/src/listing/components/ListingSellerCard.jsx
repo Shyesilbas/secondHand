@@ -5,11 +5,14 @@ import { ROUTES } from '../../common/constants/routes.js';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { FollowButton } from '../../follow/index.js';
 import { useUserReviewStats } from '../../reviews/hooks/useReviews.js';
+import { useAuthState } from '../../auth/AuthContext.jsx';
 
 // Compact seller summary shown under the buy box: identity, rating, membership and follow.
 const ListingSellerCard = ({ listing, isOwner }) => {
   const { t } = useTranslation();
-  const { stats, loading: isLoading } = useUserReviewStats(listing.sellerId, { enabled: Boolean(listing.sellerId) });
+  const { isAuthenticated } = useAuthState();
+  // Seller review stats need a session on the backend, so guests get no rating row instead of a 401.
+  const { stats, loading: isLoading } = useUserReviewStats(listing.sellerId, { enabled: Boolean(listing.sellerId) && isAuthenticated });
 
   const fullName = [listing.sellerName, listing.sellerSurname].filter(Boolean).join(' ') || t('seller', 'Satıcı');
   const initial = (listing.sellerName?.[0] || 'S').toUpperCase();
@@ -19,7 +22,7 @@ const ListingSellerCard = ({ listing, isOwner }) => {
   const profilePath = ROUTES.USER_PROFILE(listing.sellerId);
 
   return (
-    <section className="rounded border border-border bg-background-primary p-5" aria-label={t('seller_information', 'Satıcı bilgileri')}>
+    <section className="rounded-lg border border-border bg-background-secondary/60 p-5" aria-label={t('seller_information', 'Satıcı bilgileri')}>
       <div className="flex items-center justify-between gap-3">
         <Link to={profilePath} className="group flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background-tertiary text-sm font-semibold text-text-primary">
@@ -38,7 +41,7 @@ const ListingSellerCard = ({ listing, isOwner }) => {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border-light pt-4 text-sm">
-        {isLoading ? (
+        {!isAuthenticated ? null : isLoading ? (
           <Skeleton className="h-5 w-40" />
         ) : reviewCount > 0 ? (
           <span className="inline-flex items-center gap-1.5 tabular-nums text-text-primary">

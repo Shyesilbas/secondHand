@@ -1,12 +1,15 @@
 package com.serhat.secondhand.core.application;
 
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookFormat;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookGenre;
-import com.serhat.secondhand.listing.domain.entity.enums.books.BookLanguage;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportCondition;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportDiscipline;
-import com.serhat.secondhand.listing.domain.entity.enums.sports.SportEquipmentType;
+import com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService;
+import com.serhat.secondhand.listing.application.size.SizeSystemCatalog;
+import com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto;
+import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
+import com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModelVariant;
+import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType;
+import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
+import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleVersion;
 import com.serhat.secondhand.listing.domain.repository.books.BookConditionRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookFormatRepository;
 import com.serhat.secondhand.listing.domain.repository.books.BookGenreRepository;
@@ -16,8 +19,8 @@ import com.serhat.secondhand.listing.domain.repository.clothing.ClothingBrandRep
 import com.serhat.secondhand.listing.domain.repository.clothing.ClothingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicBrandRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelRepository;
+import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelVariantRepository;
 import com.serhat.secondhand.listing.domain.repository.electronics.ElectronicTypeRepository;
-import com.serhat.secondhand.listing.domain.entity.enums.realestate.RealEstateType;
 import com.serhat.secondhand.listing.domain.repository.realestate.HeatingTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.ListingOwnerTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.realestate.RealEstateAdTypeRepository;
@@ -32,21 +35,34 @@ import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleModelRepos
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTrimRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleTypeRepository;
 import com.serhat.secondhand.listing.domain.repository.vehicle.VehicleVersionRepository;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleType;
-import com.serhat.secondhand.listing.domain.entity.enums.vehicle.VehicleVersion;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class EnumReadService {
 
+    public static final String CACHE_NAME = "catalog:enums";
+
     private final ElectronicTypeRepository electronicTypeRepository;
     private final ElectronicBrandRepository electronicBrandRepository;
     private final ElectronicModelRepository electronicModelRepository;
-    private final com.serhat.secondhand.listing.domain.repository.electronics.ElectronicModelVariantRepository electronicModelVariantRepository;
+    private final ElectronicModelVariantRepository electronicModelVariantRepository;
     private final BookTypeRepository bookTypeRepository;
     private final BookGenreRepository bookGenreRepository;
     private final BookLanguageRepository bookLanguageRepository;
@@ -68,60 +84,198 @@ public class EnumReadService {
     private final SportDisciplineRepository sportDisciplineRepository;
     private final SportEquipmentTypeRepository sportEquipmentTypeRepository;
     private final SportConditionRepository sportConditionRepository;
-    private final com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService listingAttributeCatalogService;
-    private final com.serhat.secondhand.listing.application.size.SizeSystemCatalog sizeSystemCatalog;
+    private final ListingAttributeCatalogService listingAttributeCatalogService;
+    private final SizeSystemCatalog sizeSystemCatalog;
 
-    private String normalizeName(Map<String, Object> item) {
-        Object val = item.get("name") != null ? item.get("name") : item.get("label");
-        if (val == null) return "";
-        String s = String.valueOf(val).trim().toUpperCase(Locale.ROOT);
-        return "NULL".equals(s) ? "" : s;
+    /**
+     * Fetches all database-backed catalog sections inside a single read-only transaction and caches
+     * them as a Redis bundle under {@code v4:catalog:enums:dbBundle}.
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'dbBundle'")
+    public Map<String, Object> getCatalogEnumBundle() {
+        Map<String, Object> bundle = new LinkedHashMap<>();
+        bundle.put("carBrands", buildCarBrands());
+        bundle.put("vehicleTypes", buildVehicleTypes());
+        bundle.put("vehicleModels", buildVehicleModels());
+        bundle.put("vehicleGenerations", buildVehicleGenerations());
+        bundle.put("vehicleEngines", buildVehicleEngines());
+        bundle.put("vehicleTrims", buildVehicleTrims());
+        bundle.put("electronicTypes", buildElectronicTypes());
+        bundle.put("electronicBrands", buildElectronicBrands());
+        bundle.put("electronicModels", buildElectronicModels());
+        bundle.put("realEstateTypes", buildRealEstateTypes());
+        bundle.put("realEstateAdTypes", buildRealEstateAdTypes());
+        bundle.put("heatingTypes", buildHeatingTypes());
+        bundle.put("ownerTypes", buildOwnerTypes());
+        bundle.put("clothingBrands", buildClothingBrands());
+        bundle.put("clothingTypes", buildClothingTypes());
+        bundle.put("sizeSystems", buildSizeSystems());
+        bundle.put("bookTypes", buildBookTypes());
+        bundle.put("bookGenres", buildBookGenres());
+        bundle.put("bookLanguages", buildBookLanguages());
+        bundle.put("bookFormats", buildBookFormats());
+        bundle.put("bookConditions", buildBookConditions());
+        bundle.put("sportDisciplines", buildSportDisciplines());
+        bundle.put("sportEquipmentTypes", buildSportEquipmentTypes());
+        bundle.put("sportConditions", buildSportConditions());
+        return bundle;
     }
 
-    private List<Map<String, Object>> deduplicateBy(
-            List<Map<String, Object>> items,
-            java.util.function.Function<Map<String, Object>, String> keyExtractor) {
-        if (items == null || items.isEmpty()) return Collections.emptyList();
-        Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
-        for (Map<String, Object> item : items) {
-            String key = keyExtractor.apply(item);
-            if (key == null || key.isBlank() || "NULL".equalsIgnoreCase(key)) continue;
-
-            if (!uniqueMap.containsKey(key)) {
-                uniqueMap.put(key, item);
-            } else {
-                // If existing item has raw key as label but new item has localized label, replace it
-                Map<String, Object> existing = uniqueMap.get(key);
-                String existingLabel = String.valueOf(existing.get("label"));
-                String newLabel = String.valueOf(item.get("label"));
-                String rawName = normalizeName(item);
-                if (existingLabel.equalsIgnoreCase(rawName) && !newLabel.equalsIgnoreCase(rawName)) {
-                    uniqueMap.put(key, item);
-                }
-            }
-        }
-        return new ArrayList<>(uniqueMap.values());
-    }
-
-    private List<Map<String, Object>> deduplicateByName(List<Map<String, Object>> items) {
-        return deduplicateBy(items, this::normalizeName);
-    }
-
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'carBrands'")
     public List<Map<String, Object>> getCarBrands() {
-        List<Map<String, Object>> raw = carBrandRepository.findAll().stream()
-                .sorted(Comparator.comparing(b -> Optional.ofNullable(b.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(brand -> {
-                    Map<String, Object> brandMap = new LinkedHashMap<>();
-                    brandMap.put("id", brand.getId());
-                    brandMap.put("name", brand.getName());
-                    brandMap.put("label", Optional.ofNullable(brand.getLabel()).filter(l -> !l.isBlank()).orElse(brand.getName()));
-                    return brandMap;
-                })
-                .toList();
-        return deduplicateByName(raw);
+        return buildCarBrands();
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'vehicleModels'")
     public List<Map<String, Object>> getVehicleModels() {
+        return buildVehicleModels();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'vehicleTypes'")
+    public List<Map<String, Object>> getVehicleTypes() {
+        return buildVehicleTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'electronicTypes'")
+    public List<Map<String, Object>> getElectronicTypes() {
+        return buildElectronicTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'electronicBrands'")
+    public List<Map<String, Object>> getElectronicBrands() {
+        return buildElectronicBrands();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'electronicModels'")
+    public List<Map<String, Object>> getElectronicModels() {
+        return buildElectronicModels();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'realEstateTypes'")
+    public List<Map<String, Object>> getRealEstateTypes() {
+        return buildRealEstateTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'realEstateAdTypes'")
+    public List<Map<String, Object>> getRealEstateAdTypes() {
+        return buildRealEstateAdTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'heatingTypes'")
+    public List<Map<String, Object>> getHeatingTypes() {
+        return buildHeatingTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'ownerTypes'")
+    public List<Map<String, Object>> getOwnerTypes() {
+        return buildOwnerTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'clothingBrands'")
+    public List<Map<String, Object>> getClothingBrands() {
+        return buildClothingBrands();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'clothingTypes'")
+    public List<Map<String, Object>> getClothingTypes() {
+        return buildClothingTypes();
+    }
+
+    /** Size systems from data/common/sizes.json: key, label, values [{value, label}]. */
+    @Cacheable(value = CACHE_NAME, key = "'sizeSystems'")
+    public List<Map<String, Object>> getSizeSystems() {
+        return buildSizeSystems();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'bookTypes'")
+    public List<Map<String, Object>> getBookTypes() {
+        return buildBookTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'bookGenres'")
+    public List<Map<String, Object>> getBookGenres() {
+        return buildBookGenres();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'bookLanguages'")
+    public List<Map<String, Object>> getBookLanguages() {
+        return buildBookLanguages();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'bookFormats'")
+    public List<Map<String, Object>> getBookFormats() {
+        return buildBookFormats();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'bookConditions'")
+    public List<Map<String, Object>> getBookConditions() {
+        return buildBookConditions();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'sportDisciplines'")
+    public List<Map<String, Object>> getSportDisciplines() {
+        return buildSportDisciplines();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'sportEquipmentTypes'")
+    public List<Map<String, Object>> getSportEquipmentTypes() {
+        return buildSportEquipmentTypes();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'sportConditions'")
+    public List<Map<String, Object>> getSportConditions() {
+        return buildSportConditions();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'vehicleGenerations'")
+    public List<Map<String, Object>> getVehicleGenerations() {
+        return buildVehicleGenerations();
+    }
+
+    /**
+     * Engines carry the catalog facts of their version (same id): the listing form copies them and sends the id
+     * as {@code vehicleVersionId}. {@code versionId} is null for an engine without a version row.
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'vehicleEngines'")
+    public List<Map<String, Object>> getVehicleEngines() {
+        return buildVehicleEngines();
+    }
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "'vehicleTrims'")
+    public List<Map<String, Object>> getVehicleTrims() {
+        return buildVehicleTrims();
+    }
+
+    private List<Map<String, Object>> buildCarBrands() {
+        return buildSimpleCatalog(carBrandRepository.findAll(),
+                b -> b.getId(), b -> b.getName(), b -> b.getLabel());
+    }
+
+    private List<Map<String, Object>> buildVehicleModels() {
         List<Map<String, Object>> raw = vehicleModelRepository.findAll().stream()
                 .sorted(Comparator.comparing(m -> Optional.ofNullable(m.getName()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(model -> {
@@ -130,17 +284,17 @@ public class EnumReadService {
                     modelMap.put("name", model.getName());
                     modelMap.put("brandId", model.getBrand() != null ? model.getBrand().getId() : null);
                     modelMap.put("typeId", model.getType() != null ? model.getType().getId() : null);
-                    modelMap.put("supportedBodyTypes", model.getSupportedBodyTypes());
+                    modelMap.put("supportedBodyTypes", sanitizeList(model.getSupportedBodyTypes()));
                     return modelMap;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("brandId") + ":" + item.get("typeId") + ":" + name;
         });
     }
 
-    public List<Map<String, Object>> getVehicleTypes() {
+    private List<Map<String, Object>> buildVehicleTypes() {
         List<Map<String, Object>> raw = vehicleTypeRepository.findAll().stream()
                 .sorted(Comparator.comparingInt(VehicleType::getSortOrder)
                         .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
@@ -150,17 +304,17 @@ public class EnumReadService {
                     map.put("name", type.getName());
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
                     // Form rules of the type: allowed body types and REQUIRED/OPTIONAL/HIDDEN per spec field.
-                    map.put("bodyTypes", type.getBodyTypes().stream().map(Enum::name).toList());
-                    map.put("fieldRules", type.getFieldRules());
+                    map.put("bodyTypes", sanitizeList(type.getBodyTypes()));
+                    map.put("fieldRules", sanitizeMap(type.getFieldRules()));
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getElectronicTypes() {
+    private List<Map<String, Object>> buildElectronicTypes() {
         List<Map<String, Object>> raw = electronicTypeRepository.findAll().stream()
-                .sorted(java.util.Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicType::getSortOrder)
+                .sorted(Comparator.comparingInt(ElectronicType::getSortOrder)
                         .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -169,17 +323,20 @@ public class EnumReadService {
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
                     map.put("sortOrder", type.getSortOrder());
                     // Spec field -> REQUIRED | OPTIONAL | HIDDEN (data/electronics/types.json); drives form and filters.
-                    map.put("fieldRules", type.getFieldRules());
+                    map.put("fieldRules", sanitizeMap(type.getFieldRules()));
                     // Attribute keys this type defines (data/attributes/electronics.json); attribute filters follow them.
                     map.put("attributeKeys", listingAttributeCatalogService
-                            .getDefinitions(com.serhat.secondhand.listing.domain.entity.enums.base.ListingType.ELECTRONICS, type.getName())
-                            .stream().map(com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto::getKey).toList());
+                            .getDefinitions(ListingType.ELECTRONICS, type.getName())
+                            .stream()
+                            .map(AttributeDefinitionDto::getKey)
+                            .collect(Collectors.toCollection(ArrayList::new)));
                     return map;
-                }).toList();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getElectronicBrands() {
+    private List<Map<String, Object>> buildElectronicBrands() {
         List<Map<String, Object>> raw = electronicBrandRepository.findAll().stream()
                 .map(brand -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -187,15 +344,16 @@ public class EnumReadService {
                     map.put("name", brand.getName());
                     map.put("label", Optional.ofNullable(brand.getLabel()).filter(l -> !l.isBlank()).orElse(brand.getName()));
                     return map;
-                }).toList();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getElectronicModels() {
+    private List<Map<String, Object>> buildElectronicModels() {
         // Variants ride along with their model so the form can pick one without another request.
-        Map<java.util.UUID, List<Map<String, Object>>> variantsByModel = new java.util.HashMap<>();
+        Map<UUID, List<Map<String, Object>>> variantsByModel = new HashMap<>();
         electronicModelVariantRepository.findAll().stream()
-                .sorted(java.util.Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicModelVariant::getSortOrder))
+                .sorted(Comparator.comparingInt(ElectronicModelVariant::getSortOrder))
                 .forEach(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
                     map.put("id", v.getId());
@@ -206,8 +364,8 @@ public class EnumReadService {
                     map.put("processor", v.getProcessor() != null ? v.getProcessor().name() : null);
                     map.put("chipset", v.getChipset());
                     map.put("gpuModel", v.getGpuModel());
-                    map.put("specs", v.getSpecs() != null ? v.getSpecs() : Map.of());
-                    variantsByModel.computeIfAbsent(v.getModel().getId(), k -> new java.util.ArrayList<>()).add(map);
+                    map.put("specs", sanitizeMap(v.getSpecs()));
+                    variantsByModel.computeIfAbsent(v.getModel().getId(), k -> new ArrayList<>()).add(map);
                 });
         List<Map<String, Object>> raw = electronicModelRepository.findAll().stream()
                 .map(model -> {
@@ -218,25 +376,29 @@ public class EnumReadService {
                     map.put("typeId", model.getType() != null ? model.getType().getId() : null);
                     map.put("releaseYear", model.getReleaseYear());
                     map.put("isLegacy", Boolean.TRUE.equals(model.getIsLegacy()));
-                    map.put("aliases", model.getAliases() != null ? model.getAliases() : List.of());
-                    map.put("specs", model.getSpecs() != null ? model.getSpecs() : Map.of());
-                    map.put("colors", model.getColors() != null ? model.getColors().stream().map(c -> {
-                        Map<String, Object> color = new LinkedHashMap<>();
-                        color.put("name", c.getName());
-                        color.put("color", c.getColor() != null ? c.getColor().name() : null);
-                        return color;
-                    }).toList() : List.of());
-                    map.put("variants", variantsByModel.getOrDefault(model.getId(), List.of()));
+                    map.put("aliases", sanitizeList(model.getAliases()));
+                    map.put("specs", sanitizeMap(model.getSpecs()));
+                    List<Map<String, Object>> colorList = model.getColors() == null
+                            ? new ArrayList<>()
+                            : model.getColors().stream().map(c -> {
+                                Map<String, Object> color = new LinkedHashMap<>();
+                                color.put("name", c.getName());
+                                color.put("color", c.getColor() != null ? c.getColor().name() : null);
+                                return color;
+                            }).collect(Collectors.toCollection(ArrayList::new));
+                    map.put("colors", colorList);
+                    map.put("variants", variantsByModel.getOrDefault(model.getId(), new ArrayList<>()));
                     map.put("catalogSource", model.getSource());
                     return map;
-                }).toList();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("brandId") + ":" + item.get("typeId") + ":" + name;
         });
     }
 
-    public List<Map<String, Object>> getRealEstateTypes() {
+    private List<Map<String, Object>> buildRealEstateTypes() {
         List<Map<String, Object>> raw = realEstateTypeRepository.findAll().stream()
                 .sorted(Comparator.comparingInt(RealEstateType::getSortOrder)
                         .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
@@ -247,56 +409,29 @@ public class EnumReadService {
                     map.put("label", Optional.ofNullable(type.getLabel()).filter(l -> !l.isBlank()).orElse(type.getName()));
                     map.put("category", type.getCategory().name());
                     map.put("sortOrder", type.getSortOrder());
-                    map.put("fieldRules", type.getFieldRules());
+                    map.put("fieldRules", sanitizeMap(type.getFieldRules()));
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getRealEstateAdTypes() {
-        List<Map<String, Object>> raw = realEstateAdTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(adType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", adType.getId());
-                    map.put("name", adType.getName());
-                    map.put("label", Optional.ofNullable(adType.getLabel()).filter(l -> !l.isBlank()).orElse(adType.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildRealEstateAdTypes() {
+        return buildSimpleCatalog(realEstateAdTypeRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getHeatingTypes() {
-        List<Map<String, Object>> raw = heatingTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(heatingType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", heatingType.getId());
-                    map.put("name", heatingType.getName());
-                    map.put("label", Optional.ofNullable(heatingType.getLabel()).filter(l -> !l.isBlank()).orElse(heatingType.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildHeatingTypes() {
+        return buildSimpleCatalog(heatingTypeRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getOwnerTypes() {
-        List<Map<String, Object>> raw = listingOwnerTypeRepository.findAll().stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(ownerType -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", ownerType.getId());
-                    map.put("name", ownerType.getName());
-                    map.put("label", Optional.ofNullable(ownerType.getLabel()).filter(l -> !l.isBlank()).orElse(ownerType.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildOwnerTypes() {
+        return buildSimpleCatalog(listingOwnerTypeRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getClothingBrands() {
+    private List<Map<String, Object>> buildClothingBrands() {
         List<Map<String, Object>> raw = clothingBrandRepository.findAll().stream()
                 .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(brand -> {
@@ -306,13 +441,14 @@ public class EnumReadService {
                     map.put("label", Optional.ofNullable(brand.getLabel()).filter(l -> !l.isBlank()).orElse(brand.getName()));
                     map.put("segment", brand.getSegment() != null ? brand.getSegment().name() : null);
                     return map;
-                }).toList();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getClothingTypes() {
+    private List<Map<String, Object>> buildClothingTypes() {
         List<Map<String, Object>> raw = clothingTypeRepository.findAll().stream()
-                .sorted(Comparator.comparingInt(com.serhat.secondhand.listing.domain.entity.enums.clothing.ClothingType::getSortOrder)
+                .sorted(Comparator.comparingInt(ClothingType::getSortOrder)
                         .thenComparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(type -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -322,48 +458,49 @@ public class EnumReadService {
                     map.put("group", type.getGroup() != null ? type.getGroup().name() : null);
                     map.put("sortOrder", type.getSortOrder());
                     // Audience -> allowed size systems (data/clothing/types.json); a missing audience hides the type.
-                    map.put("sizeRules", type.getSizeRules());
+                    map.put("sizeRules", sanitizeMap(type.getSizeRules()));
                     // fit / pattern / fabricType -> REQUIRED | OPTIONAL | HIDDEN.
-                    map.put("fieldRules", type.getFieldRules());
+                    map.put("fieldRules", sanitizeMap(type.getFieldRules()));
                     // Condition attributes follow the type group (data/attributes/clothing.json scopes).
-                    map.put("attributeKeys", type.getGroup() == null ? List.of() : listingAttributeCatalogService
-                            .getDefinitions(com.serhat.secondhand.listing.domain.entity.enums.base.ListingType.CLOTHING, type.getGroup().name())
-                            .stream().map(com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto::getKey).toList());
+                    List<String> attrKeys = type.getGroup() == null
+                            ? new ArrayList<>()
+                            : listingAttributeCatalogService
+                                    .getDefinitions(ListingType.CLOTHING, type.getGroup().name())
+                                    .stream()
+                                    .map(AttributeDefinitionDto::getKey)
+                                    .collect(Collectors.toCollection(ArrayList::new));
+                    map.put("attributeKeys", attrKeys);
                     return map;
-                }).toList();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    /** Size systems from data/common/sizes.json: key, label, values [{value, label}]. */
-    public List<Map<String, Object>> getSizeSystems() {
+    private List<Map<String, Object>> buildSizeSystems() {
         return sizeSystemCatalog.all().stream().map(system -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("value", system.key());
             map.put("label", system.label());
-            map.put("values", system.values().stream()
-                    .map(v -> Map.<String, Object>of("value", v.key(), "label", v.label())).toList());
+            List<Map<String, Object>> values = system.values().stream()
+                    .map(v -> {
+                        Map<String, Object> entry = new LinkedHashMap<>();
+                        entry.put("value", v.key());
+                        entry.put("label", v.label());
+                        return entry;
+                    })
+                    .collect(Collectors.toCollection(ArrayList::new));
+            map.put("values", values);
             return map;
-        }).toList();
+        }).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public List<Map<String, Object>> getBookTypes() {
-        List<Map<String, Object>> raw = bookTypeRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(t -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", t.getId());
-                    map.put("name", t.getName());
-                    map.put("label", Optional.ofNullable(t.getLabel()).filter(l -> !l.isBlank()).orElse(t.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildBookTypes() {
+        return buildSimpleCatalog(bookTypeRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getBookGenres() {
-        List<Map<String, Object>> raw = bookGenreRepository.findAll()
-                .stream()
+    private List<Map<String, Object>> buildBookGenres() {
+        List<Map<String, Object>> raw = bookGenreRepository.findAll().stream()
                 .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(g -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -373,76 +510,35 @@ public class EnumReadService {
                     map.put("bookTypeId", g.getBookType() != null ? g.getBookType().getId() : null);
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("bookTypeId") + ":" + name;
         });
     }
 
-    public List<Map<String, Object>> getBookLanguages() {
-        List<Map<String, Object>> raw = bookLanguageRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(lang -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", lang.getId());
-                    map.put("name", lang.getName());
-                    map.put("label", Optional.ofNullable(lang.getLabel()).filter(l -> !l.isBlank()).orElse(lang.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildBookLanguages() {
+        return buildSimpleCatalog(bookLanguageRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getBookFormats() {
-        List<Map<String, Object>> raw = bookFormatRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(fmt -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", fmt.getId());
-                    map.put("name", fmt.getName());
-                    map.put("label", Optional.ofNullable(fmt.getLabel()).filter(l -> !l.isBlank()).orElse(fmt.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildBookFormats() {
+        return buildSimpleCatalog(bookFormatRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getBookConditions() {
-        List<Map<String, Object>> raw = bookConditionRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(cond -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", cond.getId());
-                    map.put("name", cond.getName());
-                    map.put("label", Optional.ofNullable(cond.getLabel()).filter(l -> !l.isBlank()).orElse(cond.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildBookConditions() {
+        return buildSimpleCatalog(bookConditionRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getSportDisciplines() {
-        List<Map<String, Object>> raw = sportDisciplineRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(v -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", v.getId());
-                    map.put("name", v.getName());
-                    map.put("label", Optional.ofNullable(v.getLabel()).filter(l -> !l.isBlank()).orElse(v.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildSportDisciplines() {
+        return buildSimpleCatalog(sportDisciplineRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getSportEquipmentTypes() {
-        List<Map<String, Object>> raw = sportEquipmentTypeRepository.findAll()
-                .stream()
+    private List<Map<String, Object>> buildSportEquipmentTypes() {
+        List<Map<String, Object>> raw = sportEquipmentTypeRepository.findAll().stream()
                 .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(v -> {
                     Map<String, Object> map = new LinkedHashMap<>();
@@ -452,26 +548,16 @@ public class EnumReadService {
                     map.put("disciplineId", v.getDiscipline() != null ? v.getDiscipline().getId() : null);
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateByName(raw);
     }
 
-    public List<Map<String, Object>> getSportConditions() {
-        List<Map<String, Object>> raw = sportConditionRepository.findAll()
-                .stream()
-                .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getLabel()).orElse(""), String.CASE_INSENSITIVE_ORDER))
-                .map(v -> {
-                    Map<String, Object> map = new LinkedHashMap<>();
-                    map.put("id", v.getId());
-                    map.put("name", v.getName());
-                    map.put("label", Optional.ofNullable(v.getLabel()).filter(l -> !l.isBlank()).orElse(v.getName()));
-                    return map;
-                })
-                .toList();
-        return deduplicateByName(raw);
+    private List<Map<String, Object>> buildSportConditions() {
+        return buildSimpleCatalog(sportConditionRepository.findAll(),
+                t -> t.getId(), t -> t.getName(), t -> t.getLabel());
     }
 
-    public List<Map<String, Object>> getVehicleGenerations() {
+    private List<Map<String, Object>> buildVehicleGenerations() {
         List<Map<String, Object>> raw = vehicleGenerationRepository.findAll().stream()
                 .sorted(Comparator.comparing(g -> Optional.ofNullable(g.getName()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(gen -> {
@@ -486,18 +572,14 @@ public class EnumReadService {
                     map.put("seatCount", gen.getSeatCount() != null ? gen.getSeatCount().name() : null);
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("modelId") + ":" + name;
         });
     }
 
-    /**
-     * Engines carry the catalog facts of their version (same id): the listing form copies them and sends the id
-     * as {@code vehicleVersionId}. {@code versionId} is null for an engine without a version row.
-     */
-    public List<Map<String, Object>> getVehicleEngines() {
+    private List<Map<String, Object>> buildVehicleEngines() {
         Map<UUID, VehicleVersion> versions = new HashMap<>();
         vehicleVersionRepository.findAll().forEach(v -> versions.put(v.getId(), v));
         List<Map<String, Object>> raw = vehicleEngineRepository.findAll().stream()
@@ -525,14 +607,14 @@ public class EnumReadService {
                     }
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("generationId") + ":" + name + ":" + item.get("fuelType");
         });
     }
 
-    public List<Map<String, Object>> getVehicleTrims() {
+    private List<Map<String, Object>> buildVehicleTrims() {
         List<Map<String, Object>> raw = vehicleTrimRepository.findAll().stream()
                 .sorted(Comparator.comparing(t -> Optional.ofNullable(t.getName()).orElse(""), String.CASE_INSENSITIVE_ORDER))
                 .map(trim -> {
@@ -542,10 +624,109 @@ public class EnumReadService {
                     map.put("generationId", trim.getGeneration() != null ? trim.getGeneration().getId() : null);
                     return map;
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
         return deduplicateBy(raw, item -> {
             String name = normalizeName(item);
             return name.isBlank() ? "" : item.get("generationId") + ":" + name;
         });
+    }
+
+    private <T> List<Map<String, Object>> buildSimpleCatalog(
+            List<T> items,
+            Function<T, Object> idExtractor,
+            Function<T, String> nameExtractor,
+            Function<T, String> labelExtractor) {
+        List<Map<String, Object>> raw = items.stream()
+                .sorted(Comparator.comparing(t -> Optional.ofNullable(labelExtractor.apply(t)).orElse(""), String.CASE_INSENSITIVE_ORDER))
+                .map(item -> {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", idExtractor.apply(item));
+                    String name = nameExtractor.apply(item);
+                    map.put("name", name);
+                    map.put("label", Optional.ofNullable(labelExtractor.apply(item)).filter(l -> !l.isBlank()).orElse(name));
+                    return map;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+        return deduplicateByName(raw);
+    }
+
+    private String normalizeName(Map<String, Object> item) {
+        Object val = item.get("name") != null ? item.get("name") : item.get("label");
+        if (val == null) return "";
+        String s = String.valueOf(val).trim().toUpperCase(Locale.ROOT);
+        return "NULL".equals(s) ? "" : s;
+    }
+
+    private List<Map<String, Object>> deduplicateBy(
+            List<Map<String, Object>> items,
+            Function<Map<String, Object>, String> keyExtractor) {
+        if (items == null || items.isEmpty()) return new ArrayList<>();
+        Map<String, Map<String, Object>> uniqueMap = new LinkedHashMap<>();
+        for (Map<String, Object> item : items) {
+            String key = keyExtractor.apply(item);
+            if (key == null || key.isBlank() || "NULL".equalsIgnoreCase(key)) continue;
+
+            if (!uniqueMap.containsKey(key)) {
+                uniqueMap.put(key, item);
+            } else {
+                // If existing item has raw key as label but new item has localized label, replace it.
+                Map<String, Object> existing = uniqueMap.get(key);
+                String existingLabel = String.valueOf(existing.get("label"));
+                String newLabel = String.valueOf(item.get("label"));
+                String rawName = normalizeName(item);
+                if (existingLabel.equalsIgnoreCase(rawName) && !newLabel.equalsIgnoreCase(rawName)) {
+                    uniqueMap.put(key, item);
+                }
+            }
+        }
+        return new ArrayList<>(uniqueMap.values());
+    }
+
+    private List<Map<String, Object>> deduplicateByName(List<Map<String, Object>> items) {
+        return deduplicateBy(items, this::normalizeName);
+    }
+
+    /**
+     * Converts Hibernate PersistentCollections, immutable JDK collections, and Enum values
+     * into plain mutable ArrayList/LinkedHashMap/String values compatible with CacheConfig's Jackson typing.
+     */
+    private List<Object> sanitizeList(Collection<?> source) {
+        if (source == null || source.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Object> result = new ArrayList<>(source.size());
+        for (Object item : source) {
+            result.add(sanitizeValue(item));
+        }
+        return result;
+    }
+
+    private Map<String, Object> sanitizeMap(Map<?, ?> source) {
+        if (source == null || source.isEmpty()) {
+            return new LinkedHashMap<>();
+        }
+        Map<String, Object> result = new LinkedHashMap<>(source.size());
+        for (Map.Entry<?, ?> entry : source.entrySet()) {
+            Object rawKey = entry.getKey();
+            String key = rawKey instanceof Enum<?> e ? e.name() : String.valueOf(rawKey);
+            result.put(key, sanitizeValue(entry.getValue()));
+        }
+        return result;
+    }
+
+    private Object sanitizeValue(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Enum<?> e) {
+            return e.name();
+        }
+        if (value instanceof Collection<?> col) {
+            return sanitizeList(col);
+        }
+        if (value instanceof Map<?, ?> map) {
+            return sanitizeMap(map);
+        }
+        return value;
     }
 }

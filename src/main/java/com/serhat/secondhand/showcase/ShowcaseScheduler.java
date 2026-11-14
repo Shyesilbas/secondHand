@@ -3,6 +3,7 @@ package com.serhat.secondhand.showcase;
 import com.serhat.secondhand.core.config.ShowcaseConfig;
 import com.serhat.secondhand.showcase.application.ShowcaseService;
 import lombok.RequiredArgsConstructor;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class ShowcaseScheduler {
     private final ShowcaseConfig showcaseConfig;
     
     @Scheduled(cron = "#{@showcaseConfig.scheduler.expireCron}")
+    @SchedulerLock(name = "showcaseExpirationScheduler", lockAtMostFor = "PT15M", lockAtLeastFor = "PT1M")
     public void expireShowcases() {
         showcaseService.expireShowcases();
     }

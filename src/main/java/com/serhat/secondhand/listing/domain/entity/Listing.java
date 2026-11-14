@@ -80,6 +80,10 @@ public class Listing {
     @Builder.Default
     private boolean allowMeetup = false;
 
+    @Column(name = "can_send_message", nullable = false)
+    @Builder.Default
+    private boolean canSendMessage = true;
+
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

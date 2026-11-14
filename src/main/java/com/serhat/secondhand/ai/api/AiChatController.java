@@ -1,7 +1,9 @@
 package com.serhat.secondhand.ai.api;
 
 import com.serhat.secondhand.ai.application.GeminiAiService;
+import com.serhat.secondhand.ai.dto.AiResponse;
 import com.serhat.secondhand.ai.dto.ChatRequest;
+import com.serhat.secondhand.ai.dto.UserMemoryDto;
 import com.serhat.secondhand.ai.dto.UserQuestionRequest;
 import com.serhat.secondhand.ai.memory.service.MemoryService;
 import com.serhat.secondhand.core.result.Result;
@@ -24,46 +26,46 @@ public class AiChatController {
     private final MemoryService memoryService;
 
     @PostMapping("/chats")
-    public ResponseEntity<?> chat(@AuthenticationPrincipal User user, @Valid @RequestBody ChatRequest request) {
+    public ResponseEntity<AiResponse> chat(@AuthenticationPrincipal User user, @Valid @RequestBody ChatRequest request) {
         Long userId = user.getId();
         UserQuestionRequest question = new UserQuestionRequest(request.message(), request.context());
         return ResultResponses.ok(Result.success(geminiAiService.askQuestion(userId, question)));
     }
 
     @PostMapping("/chats/new")
-    public ResponseEntity<?> newChat(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> newChat(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.clearConversationHistory(userId);
         return ResultResponses.noContent(Result.success());
     }
 
     @DeleteMapping("/chats/history")
-    public ResponseEntity<?> deleteHistory(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteHistory(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.clearConversationHistory(userId);
         return ResultResponses.noContent(Result.success());
     }
 
     @DeleteMapping("/memories")
-    public ResponseEntity<?> deleteMemory(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteMemory(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         memoryService.deleteMemory(userId);
         return ResultResponses.noContent(Result.success());
     }
 
     @GetMapping("/memories")
-    public ResponseEntity<?> getMemory(@AuthenticationPrincipal User user) {
+    public ResponseEntity<UserMemoryDto> getMemory(@AuthenticationPrincipal User user) {
         return ResultResponses.ok(Result.success(memoryService.getMemoryDto(user.getId())));
     }
 
     @PutMapping("/memories")
-    public ResponseEntity<?> updateMemory(@AuthenticationPrincipal User user, @RequestBody com.serhat.secondhand.ai.dto.UserMemoryDto dto) {
+    public ResponseEntity<Void> updateMemory(@AuthenticationPrincipal User user, @RequestBody UserMemoryDto dto) {
         memoryService.updateMemory(user.getId(), dto);
         return ResultResponses.ok(Result.success());
     }
 
     @DeleteMapping("/memories/interests")
-    public ResponseEntity<?> deleteInterest(@AuthenticationPrincipal User user, @RequestParam String interest) {
+    public ResponseEntity<Void> deleteInterest(@AuthenticationPrincipal User user, @RequestParam String interest) {
         memoryService.removeInterest(user.getId(), interest);
         return ResultResponses.noContent(Result.success());
     }

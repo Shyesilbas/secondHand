@@ -15,6 +15,8 @@ import com.serhat.secondhand.order.entity.OrderItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -92,7 +94,7 @@ public class CheckoutStockReservationService {
                 log.warn("Stock reservation failed for listingId {} by user {}: {}", listingId, userId, e.getMessage());
                 releaseReservedStock(userId, reserved);
                 return Result.error(e.getMessage(), e.getErrorCode());
-            } catch (Exception e) {
+            } catch (DataAccessException | SerializationException e) {
                 log.error("Unexpected error during stock reservation for listingId {} by user {}", listingId, userId, e);
                 releaseReservedStock(userId, reserved);
                 return Result.error("Stock reservation failed. Please try again.", "STOCK_RESERVATION_ERROR");
@@ -112,7 +114,8 @@ public class CheckoutStockReservationService {
                 } else {
                     redisReservationService.releaseStock(listingId, quantity);
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
+                // Compensation loop: keep releasing remaining reservations even if one fails.
                 log.error("Failed to release stock in Redis for listingId {} user {}", listingId, userId, ex);
             }
         });
@@ -172,7 +175,7 @@ public class CheckoutStockReservationService {
         lines.forEach(line -> {
             try {
                 redisReservationService.consumeReservationOnPurchase(userId, line.listingId(), line.orderItemId(), line.quantity());
-            } catch (Exception ex) {
+            } catch (DataAccessException | SerializationException ex) {
                 // Reservation key stays and expires with its TTL; until then the units remain held (no oversell).
                 log.warn("Could not convert reservation of user {} on listing {} to a pending purchase",
                         userId, line.listingId(), ex);

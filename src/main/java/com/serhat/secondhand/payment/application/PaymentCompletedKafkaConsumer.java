@@ -55,7 +55,7 @@ public class PaymentCompletedKafkaConsumer {
                     });
                 }
             });
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.error("Error processing PaymentCompletedKafkaEvent for paymentId: {}", event.paymentId(), ex);
             throw ex; // Re-throw to allow Kafka error handler / DLQ mechanisms to handle it
         }

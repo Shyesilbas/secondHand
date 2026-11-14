@@ -1,5 +1,6 @@
 package com.serhat.secondhand.escrow.outbox;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.escrow.contract.EscrowReleasedKafkaEvent;
 import com.serhat.secondhand.escrow.domain.entity.Escrow;
@@ -49,9 +50,9 @@ public class EscrowOutboxService {
 
             escrowOutboxRepository.save(outboxEvent);
             log.info("Enqueued ESCROW_RELEASED outbox event for escrow ID: {}", escrow.getId());
-        } catch (Exception e) {
-            log.error("Failed to enqueue escrow release outbox event for escrow ID: {}", escrow.getId(), e);
-            throw new RuntimeException("Escrow outbox enqueue failed", e);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize escrow release outbox event for escrow ID: {}", escrow.getId(), e);
+            throw new IllegalStateException("Escrow outbox serialization failed", e);
         }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 
 @Service
@@ -53,21 +54,19 @@ public class UserBadgeService {
         var ordersFuture = CompletableFuture.supplyAsync(() -> 
             orderQueryService.getPendingCompletionStatus(userId), taskExecutor);
 
-        // Wait for all to complete
-        CompletableFuture.allOf(notificationFuture, emailFuture, chatFuture, ordersFuture).join();
-
         try {
-            Map<String, Object> pendingOrders = ordersFuture.get();
+            CompletableFuture.allOf(notificationFuture, emailFuture, chatFuture, ordersFuture).join();
+            Map<String, Object> pendingOrders = ordersFuture.join();
             return Map.of(
-                "notificationCount", notificationFuture.get(),
-                "emailUnreadCount", emailFuture.get(),
-                "chatUnreadCount", chatFuture.get(),
+                "notificationCount", notificationFuture.join(),
+                "emailUnreadCount", emailFuture.join(),
+                "chatUnreadCount", chatFuture.join(),
                 "hasPendingOrders", pendingOrders.getOrDefault("hasPendingOrders", false),
                 "pendingOrderCount", pendingOrders.getOrDefault("pendingCount", 0L)
             );
-        } catch (Exception e) {
+        } catch (CompletionException e) {
             log.error("Error calculating aggregated badges for user {}", userId, e);
-            throw new RuntimeException("Failed to calculate user badges", e);
+            throw e;
         }
     }
 }

@@ -20,5 +20,6 @@ public record UserDto(
                 @JsonFormat(pattern = "dd/MM/yyyy") LocalDate accountCreationDate,
                 AccountStatus accountStatus,
                 boolean accountVerified,
-                UserRole role) {
+                UserRole role,
+                boolean canSendMessage) {
 }

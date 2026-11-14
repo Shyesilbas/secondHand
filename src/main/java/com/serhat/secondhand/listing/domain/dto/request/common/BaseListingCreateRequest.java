@@ -18,5 +18,6 @@ public record BaseListingCreateRequest(
         @NotBlank String districtKey,
         String neighborhoodKey,
         String imageUrl,
-        boolean allowMeetup
+        boolean allowMeetup,
+        Boolean canSendMessage
 ) {}

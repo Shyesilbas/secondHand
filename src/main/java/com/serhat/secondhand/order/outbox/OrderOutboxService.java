@@ -1,12 +1,12 @@
 package com.serhat.secondhand.order.outbox;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent;
 import com.serhat.secondhand.payment.outbox.OutboxStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -35,9 +35,9 @@ public class OrderOutboxService {
 
             orderOutboxRepository.save(outboxEvent);
             log.info("OrderOutboxEvent enqueued: eventType=ORDER_CANCELLED, orderId={}", event.orderId());
-        } catch (Exception ex) {
-            log.error("Failed to enqueue ORDER_CANCELLED event for orderId: {}", event.orderId(), ex);
-            throw new RuntimeException("Failed to enqueue outbox event", ex);
+        } catch (JsonProcessingException ex) {
+            log.error("Failed to serialize ORDER_CANCELLED event for orderId: {}", event.orderId(), ex);
+            throw new IllegalStateException("Failed to serialize ORDER_CANCELLED outbox event", ex);
         }
     }
 
@@ -57,9 +57,9 @@ public class OrderOutboxService {
 
             orderOutboxRepository.save(outboxEvent);
             log.info("OrderOutboxEvent enqueued: eventType=ORDER_REFUNDED, orderId={}", event.orderId());
-        } catch (Exception ex) {
-            log.error("Failed to enqueue ORDER_REFUNDED event for orderId: {}", event.orderId(), ex);
-            throw new RuntimeException("Failed to enqueue outbox event", ex);
+        } catch (JsonProcessingException ex) {
+            log.error("Failed to serialize ORDER_REFUNDED event for orderId: {}", event.orderId(), ex);
+            throw new IllegalStateException("Failed to serialize ORDER_REFUNDED outbox event", ex);
         }
     }
 }

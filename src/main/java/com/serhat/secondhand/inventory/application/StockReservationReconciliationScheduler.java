@@ -4,6 +4,7 @@ import com.serhat.secondhand.inventory.domain.entity.Inventory;
 import com.serhat.secondhand.inventory.domain.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -47,6 +48,7 @@ public class StockReservationReconciliationScheduler {
      * so a reservation, cancellation or release made during the run is never overwritten.
      */
     @Scheduled(fixedDelayString = "${app.inventory.reconciliation.fixed-delay-ms:300000}", initialDelay = 60000)
+    @SchedulerLock(name = "stockReservationReconciliationScheduler", lockAtMostFor = "PT4M30S", lockAtLeastFor = "PT30S")
     public void reconcileOrphanedStockReservations() {
         try {
             // SCAN instead of KEYS (KEYS blocks Redis)

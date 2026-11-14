@@ -86,7 +86,7 @@ const ForumPage = () => {
  })}
  
  {isAuthenticated && <>
- <div className="w-px h-6 bg-tertiary mx-1 hidden sm:block" />
+ <div className="w-px h-6 bg-background-tertiary mx-1 hidden sm:block" />
  <button type="button" onClick={() => setListTab(listTab === FORUM_LIST_TABS.LIKED ? FORUM_LIST_TABS.ALL : FORUM_LIST_TABS.LIKED)} className={`inline-flex items-center gap-1.5 rounded px-4 py-2 text-sm font-semibold transition-all duration-200 ${listTab === FORUM_LIST_TABS.LIKED ? 'bg-background-secondary text-status-error-text border border-border' : 'bg-background-primary text-text-secondary border border-border-light hover:border-border-DEFAULT hover:text-text-primary hover:bg-secondary-light'}`}>
  <Heart className={`w-3.5 h-3.5 ${listTab === FORUM_LIST_TABS.LIKED ? 'fill-status-error' : ''}`} />{t("liked")}</button>
  </>}

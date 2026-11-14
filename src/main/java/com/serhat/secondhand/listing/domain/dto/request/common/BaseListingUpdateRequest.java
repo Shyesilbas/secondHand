@@ -16,5 +16,6 @@ public record BaseListingUpdateRequest(
         Optional<String> districtKey,
         Optional<String> neighborhoodKey,
         Optional<String> imageUrl,
-        Boolean allowMeetup
+        Boolean allowMeetup,
+        Boolean canSendMessage
 ) {}

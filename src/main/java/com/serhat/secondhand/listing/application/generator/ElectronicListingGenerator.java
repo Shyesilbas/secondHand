@@ -1,15 +1,13 @@
 package com.serhat.secondhand.listing.application.generator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.attribute.ListingAttributeCatalogService;
 import com.serhat.secondhand.listing.application.electronics.ElectronicListingService;
 import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.electronics.ElectronicCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto;
-import com.serhat.secondhand.listing.domain.entity.attribute.AttributeLevel;
-import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingType;
 import com.serhat.secondhand.listing.domain.entity.enums.common.Color;
 import com.serhat.secondhand.listing.domain.entity.enums.electronic.ElectronicCondition;
@@ -25,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Builds realistic electronics listings from catalog models with data: the seller picks a variant and an official
@@ -95,7 +92,7 @@ class ElectronicListingGenerator {
             try {
                 List<Map<String, String>> raw = objectMapper.readValue((String) m.get("colors"), new TypeReference<>() {});
                 colors = raw.stream().map(c -> new ModelColor(c.get("name"), Color.valueOf(c.get("color")))).toList();
-            } catch (Exception e) {
+            } catch (JsonProcessingException e) {
                 throw new IllegalStateException("Unreadable colors on electronic model " + p.model(), e);
             }
             Object release = m.get("release_year");
@@ -129,10 +126,8 @@ class ElectronicListingGenerator {
                 : Map.of(ElectronicCondition.LIKE_NEW, 18, ElectronicCondition.VERY_GOOD, 32, ElectronicCondition.GOOD, 30,
                 ElectronicCondition.FAIR, 14, ElectronicCondition.DAMAGED, 6));
 
-        Map<String, AttributeDefinitionDto> defs = attributeCatalogService
-                .getDefinitions(ListingType.ELECTRONICS, c.typeName()).stream()
-                .filter(d -> d.getLevel() == AttributeLevel.LISTING)
-                .collect(Collectors.toMap(AttributeDefinitionDto::getKey, d -> d, (a, b) -> a, LinkedHashMap::new));
+        Map<String, AttributeDefinitionDto> defs = ListingGeneratorSupport.listingAttributes(
+                attributeCatalogService, ListingType.ELECTRONICS, c.typeName());
         Map<String, Object> attrs = attributes(c, condition, age, defs, random);
 
         boolean invoice = Boolean.TRUE.equals(attrs.get("hasInvoice"));
@@ -149,22 +144,23 @@ class ElectronicListingGenerator {
                 ? c.brandLabel() + " " + c.modelName() + " " + variant.ram() + " GB / "
                 + (variant.storage() >= 1024 ? variant.storage() / 1024 + " TB" : variant.storage() + " GB")
                 : label;
-        String title = truncate(titleLabel + titleSuffix(attrs, condition), 100);
-        BaseListingCreateRequest base = new BaseListingCreateRequest(title,
-                description(label, condition, attrs, random), GeneratorRandom.roundPrice(price), Currency.TRY,
-                place.cityLabel(), place.districtLabel(), place.cityKey(), place.districtKey(), place.neighborhoodKey(),
-                photo != null ? photo.url() : null, random.chance(0.8));
+        String title = ListingGeneratorSupport.truncate(titleLabel + titleSuffix(attrs, condition), 100);
+        BaseListingCreateRequest base = ListingGeneratorSupport.baseRequest(
+                title,
+                description(label, condition, attrs, random),
+                GeneratorRandom.roundPrice(price),
+                place,
+                photo != null ? photo.url() : null,
+                random.chance(0.8));
         ElectronicCreateRequest request = new ElectronicCreateRequest(base, 1, c.typeId(), c.brandId(), c.modelId(),
                 variant != null ? variant.id() : null, warrantyProof ? "Türkiye" : null, warrantyProof, c.releaseYear(),
                 color, official != null ? official.name() : null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 condition, attrs);
-        Result<UUID> result = electronicListingService.createElectronicListing(request, sellerId);
-        if (result.isError()) {
-            throw new IllegalStateException("Generated electronics listing rejected (" + c.typeName() + " / "
-                    + c.modelName() + "): " + result.getErrorCode() + " " + result.getMessage());
-        }
-        return result.getData();
+        return ListingGeneratorSupport.requireCreated(
+                electronicListingService.createElectronicListing(request, sellerId),
+                "electronics",
+                c.typeName() + " / " + c.modelName());
     }
 
     private static Variant pickVariant(Candidate c, GeneratorRandom random) {
@@ -288,9 +284,5 @@ class ElectronicListingGenerator {
 
     private static double log2(double x) {
         return Math.log(x) / Math.log(2);
-    }
-
-    private static String truncate(String s, int max) {
-        return s.length() <= max ? s : s.substring(0, max).trim();
     }
 }

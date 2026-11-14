@@ -7,6 +7,7 @@ import com.serhat.secondhand.offer.entity.OfferStatus;
 import com.serhat.secondhand.offer.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class OfferScheduler {
     private final OfferStockHoldService offerStockHoldService;
 
     @Scheduled(cron = "${app.offer.scheduler-cron:0 * * * * *}")
+    @SchedulerLock(name = "offerExpiryScheduler", lockAtMostFor = "PT55S", lockAtLeastFor = "PT10S")
     @Transactional
     public void checkExpiredOffers() {
         LocalDateTime now = LocalDateTime.now();

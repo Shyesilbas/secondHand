@@ -44,7 +44,7 @@ export default {
         button: theme.colors.button,
         
         'app-bg': theme.colors.background.secondary,
-        'main-bg': theme.colors.background.primary,
+        'main-bg': theme.colors.background.secondary,
         'sidebar-bg': theme.colors.background.tertiary,
         'sidebar-border': theme.colors.border.DEFAULT,
         'header-bg': theme.colors.background.secondary,

@@ -1,6 +1,9 @@
 package com.serhat.secondhand.complaint.review;
 
 import com.serhat.secondhand.auth.application.AccessRevocationService;
+import com.serhat.secondhand.chat.application.ChatRoomUpdater;
+import com.serhat.secondhand.chat.entity.Message;
+import com.serhat.secondhand.chat.repository.MessageRepository;
 import com.serhat.secondhand.complaint.Complaint;
 import com.serhat.secondhand.complaint.PenaltyAction;
 import com.serhat.secondhand.complaint.config.ComplaintModerationProperties;
@@ -37,13 +40,19 @@ public class SanctionExecutor {
     private final TransactionTemplate requiresNew;
     private final UserRestrictionService userRestrictionService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MessageRepository messageRepository;
+    private final ChatRoomUpdater chatRoomUpdater;
 
     public SanctionExecutor(ListingModerationService listingModerationService,
                             AccessRevocationService accessRevocationService,
                             ComplaintModerationProperties properties,
                             PlatformTransactionManager transactionManager,
                             UserRestrictionService userRestrictionService,
-                            ApplicationEventPublisher eventPublisher) {
+                            ApplicationEventPublisher eventPublisher,
+                            MessageRepository messageRepository,
+                            ChatRoomUpdater chatRoomUpdater) {
+        this.messageRepository = messageRepository;
+        this.chatRoomUpdater = chatRoomUpdater;
         this.userRestrictionService = userRestrictionService;
         this.eventPublisher = eventPublisher;
         this.listingModerationService = listingModerationService;
@@ -56,7 +65,31 @@ public class SanctionExecutor {
     /** Sanctions the reported user. Returns the end of the restriction for a temporary ban, otherwise null. */
     public LocalDateTime apply(Complaint complaint, PenaltyAction penalty, int effectiveWarnings, String reason,
                                LocalDateTime now) {
-        return applyTo(complaint.getComplainedUser(), complaint, penalty, effectiveWarnings, reason, now);
+        LocalDateTime bannedUntil = applyTo(complaint.getComplainedUser(), complaint, penalty, effectiveWarnings, reason, now);
+        if (penalty != PenaltyAction.NONE) {
+            setMessageRemoved(complaint, true, now);
+        }
+        return bannedUntil;
+    }
+
+    /**
+     * Soft-redacts (or restores) the reported chat message. The row and its text stay in the database so
+     * an appeal can still be reviewed from the original wording.
+     */
+    private void setMessageRemoved(Complaint complaint, boolean removed, LocalDateTime now) {
+        Long messageId = complaint.getReportedMessageId();
+        if (messageId == null) {
+            return;
+        }
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if (message == null) {
+            log.warn("Reported message {} of complaint {} no longer exists", messageId, complaint.getId());
+            return;
+        }
+        message.setRemovedByModeration(removed);
+        message.setRemovedAt(removed ? now : null);
+        messageRepository.save(message);
+        chatRoomUpdater.updateLastMessage(message.getChatRoomId());
     }
 
     /**
@@ -136,6 +169,7 @@ public class SanctionExecutor {
             case TEMP_BAN_7_DAYS -> liftTempBan(user, complaint);
             default -> throw new IllegalStateException("unreachable");
         };
+        setMessageRemoved(complaint, false, now);
         log.warn("Moderation penalty {} of complaint {} reversed on appeal for user {} (lifted={})",
                 penalty, complaint.getId(), user.getId(), reversed);
         return reversed;

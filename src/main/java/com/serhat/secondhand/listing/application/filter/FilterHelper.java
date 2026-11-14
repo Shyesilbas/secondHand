@@ -23,6 +23,9 @@ public class FilterHelper {
     public static List<Predicate> buildBasePredicates(CriteriaBuilder cb, Root<?> root, ListingFilterDto filters) {
         List<Predicate> predicates = new ArrayList<>();
 
+        if (filters.getExcludedSellerIds() != null && !filters.getExcludedSellerIds().isEmpty()) {
+            predicates.add(cb.not(root.get("seller").get("id").in(filters.getExcludedSellerIds())));
+        }
         if (filters.getStatus() != null) {
             predicates.add(cb.equal(root.get("status"), filters.getStatus()));
         }

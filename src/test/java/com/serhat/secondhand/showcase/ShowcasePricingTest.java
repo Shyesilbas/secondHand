@@ -47,7 +47,8 @@ class ShowcasePricingTest {
         service = new ShowcaseService(config, mock(ShowcaseRepository.class), mock(ShowcaseMapper.class),
                 mock(ListingQueryService.class), mock(PaymentProcessor.class), mock(IUserService.class),
                 new ShowcaseValidator(config), mock(PaymentRequestFactory.class), mock(PlanValidator.class),
-                mock(ShowcaseRedisManagerService.class), calculator, eWalletService);
+                mock(ShowcaseRedisManagerService.class), calculator, eWalletService,
+                mock(com.serhat.secondhand.user.application.UserBlockService.class));
     }
 
     @Test

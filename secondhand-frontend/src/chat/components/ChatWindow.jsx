@@ -6,6 +6,7 @@ import ChatHeader from './ChatHeader.jsx';
 import MessageList from './MessageList.jsx';
 import ChatInput from './ChatInput.jsx';
 import ReportMessageModal from '../../complaint/components/ReportMessageModal.jsx';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { CHAT_DEFAULTS, CHAT_MESSAGES } from '../chatConstants.js';
 
 const ChatWindow = ({
@@ -36,6 +37,18 @@ const ChatWindow = ({
  scrollToBottom
  } = useChatWindow({ selectedChatRoom, onSendMessage });
 
+ const { canSendMessages } = useRestrictionFlags();
+ const roomLockReasons = {
+ BLOCKED: 'Bu kullanıcıyla mesajlaşma kapalı.',
+ LISTING_MESSAGING_DISABLED: 'Bu ilan/sohbet için mesajlaşma kapatıldı.',
+ USER_MESSAGING_DISABLED: 'Bu kullanıcı mesaj almıyor.'
+ };
+ let inputDisabledReason = null;
+ if (!canSendMessages) {
+ inputDisabledReason = 'Hesabınızdaki kısıtlama nedeniyle mesaj gönderemezsiniz';
+ } else if (selectedChatRoom?.messagingDisabled) {
+ inputDisabledReason = roomLockReasons[selectedChatRoom.messagingDisabledReason] || roomLockReasons.LISTING_MESSAGING_DISABLED;
+ }
  const [reportedMessage, setReportedMessage] = useState(null);
  const canReport = Boolean(selectedChatRoom?.id && selectedChatRoom?.otherParticipantId);
  const reportModal = canReport && <ReportMessageModal chatRoom={selectedChatRoom} message={reportedMessage} onClose={() => setReportedMessage(null)} />;
@@ -95,6 +108,7 @@ const ChatWindow = ({
  handleSendMessage={handleSendMessage}
  inputRef={inputRef}
  isEmbedded={true}
+ disabledReason={inputDisabledReason}
  />
  {reportModal}
  </div>
@@ -129,6 +143,7 @@ const ChatWindow = ({
  handleSendMessage={handleSendMessage}
  inputRef={inputRef}
  isEmbedded={false}
+ disabledReason={inputDisabledReason}
  />
  {reportModal}
  </div>

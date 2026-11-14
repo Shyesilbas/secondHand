@@ -66,6 +66,7 @@ export const createListingBaseCreatePayload = (data) => ({
     neighborhoodKey: data.neighborhoodKey || undefined,
     imageUrl: data.imageUrl || undefined,
     allowMeetup: data.allowMeetup !== undefined ? Boolean(data.allowMeetup) : false,
+    canSendMessage: data.canSendMessage !== undefined ? Boolean(data.canSendMessage) : undefined,
 });
 
 export const createListingBaseUpdatePayload = (data) => {
@@ -81,6 +82,7 @@ export const createListingBaseUpdatePayload = (data) => {
     if (data.neighborhoodKey !== undefined) base.neighborhoodKey = data.neighborhoodKey || null;
     if (data.imageUrl !== undefined) base.imageUrl = data.imageUrl || undefined;
     if (data.allowMeetup !== undefined) base.allowMeetup = Boolean(data.allowMeetup);
+    if (data.canSendMessage !== undefined) base.canSendMessage = Boolean(data.canSendMessage);
     return base;
 };
 

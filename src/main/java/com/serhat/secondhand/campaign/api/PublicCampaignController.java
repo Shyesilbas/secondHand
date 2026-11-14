@@ -1,6 +1,8 @@
 package com.serhat.secondhand.campaign.api;
 
 import com.serhat.secondhand.campaign.application.ICampaignService;
+import com.serhat.secondhand.campaign.dto.CampaignDto;
+import com.serhat.secondhand.campaign.mapper.CampaignMapper;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,10 +22,10 @@ import java.util.List;
 public class PublicCampaignController {
 
     private final ICampaignService campaignService;
-    private final com.serhat.secondhand.campaign.mapper.CampaignMapper campaignMapper;
+    private final CampaignMapper campaignMapper;
 
     @GetMapping("/active")
-    public ResponseEntity<?> getActiveCampaignsForSellers(@RequestParam List<Long> sellerIds) {
+    public ResponseEntity<List<CampaignDto>> getActiveCampaignsForSellers(@RequestParam List<Long> sellerIds) {
         var dtos = campaignService.loadActiveCampaignsForSellers(sellerIds)
                 .stream()
                 .map(campaignMapper::toDto)

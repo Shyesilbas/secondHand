@@ -10,6 +10,7 @@ import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.shipping.entity.Shipping;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -162,5 +163,25 @@ class OrderCompletionSchedulerTest {
         assertThat(recent.getStatus()).isEqualTo(OrderStatus.PROCESSING);
         verify(cancellationService, never()).cancelUnshippedOrder(any());
         verify(orderRepository, never()).save(any());
+    }
+
+    @Test
+    void unshippedCargoOrderOfRestrictedSeller_isCancelledByCompensationSweep() {
+        Order stuck = order(9L, OrderStatus.CONFIRMED, LocalDateTime.now().minusMinutes(1));
+        stuck.setDeliveryMethod(DeliveryMethod.CARGO);
+        when(orderRepository.findIdsOfRestrictedSellerOrders(
+                eq(List.of(OrderStatus.CONFIRMED, OrderStatus.PROCESSING)),
+                eq(DeliveryMethod.CARGO),
+                eq(AccountStatus.BLOCKED),
+                any(),
+                any()))
+                .thenReturn(List.of(9L));
+        when(orderRepository.findByIdWithShippingAndUser(9L)).thenReturn(Optional.of(stuck));
+        when(cancellationService.cancelForRestrictedSeller(9L)).thenReturn(Result.success());
+
+        scheduler.autoUpdateOrderStatus();
+
+        verify(cancellationService).cancelForRestrictedSeller(9L);
+        verify(orderLog).logSchedulerCompleted(1);
     }
 }

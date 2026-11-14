@@ -2,8 +2,6 @@ package com.serhat.secondhand.listing.api;
 
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
-
-import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.application.books.BooksListingService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
@@ -22,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +34,7 @@ public class BooksListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new books listing")
-    public ResponseEntity<?> createBooksListing(
+    public ResponseEntity<Map<String, UUID>> createBooksListing(
             @Valid @RequestBody BooksCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
         var result = booksListingService.createBooksListing(request, currentUser.getId());
@@ -44,7 +43,7 @@ public class BooksListingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a books listing")
-    public ResponseEntity<?> updateBooksListing(
+    public ResponseEntity<Void> updateBooksListing(
             @PathVariable UUID id,
             @Valid @RequestBody BooksUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -53,14 +52,14 @@ public class BooksListingController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get books listing details")
-    public ResponseEntity<?> getBooksDetails(@PathVariable UUID id) {
+    public ResponseEntity<BooksListingDto> getBooksDetails(@PathVariable UUID id) {
         BooksListingDto dto = booksListingService.getBooksDetails(id);
         return ResultResponses.ok(Result.success(dto));
     }
 
     @PostMapping("/filter")
     @Operation(summary = "Filter books listings")
-    public ResponseEntity<?> filterBooks(@RequestBody BooksListingFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterBooks(@RequestBody BooksListingFilterDto filters) {
         Page<ListingDto> page = booksListingService.filterBooks(filters);
         return ResultResponses.ok(Result.success(page));
     }

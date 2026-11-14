@@ -1,5 +1,6 @@
 package com.serhat.secondhand.core.exception;
 
+import com.serhat.secondhand.core.result.ResultFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -329,6 +330,12 @@ public class GlobalExceptionHandler {
 
         log.error("Unexpected exception: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
+    }
+
+    @ExceptionHandler(ResultFailureException.class)
+    public ResponseEntity<Map<String, String>> handleResultFailure(ResultFailureException ex) {
+        return ResponseEntity.status(ex.getStatus())
+                .body(Map.of("error", ex.getErrorCode(), "message", ex.getMessage()));
     }
 
     private ProblemDetail createProblem(HttpStatus status, String title, String detail, String path) {

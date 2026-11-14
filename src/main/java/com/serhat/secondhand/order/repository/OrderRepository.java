@@ -5,6 +5,7 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.enums.DeliveryMethod;
 import com.serhat.secondhand.order.entity.enums.OrderStatus;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -66,6 +67,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.user JOIN FETCH o.orderItems oi LEFT JOIN FETCH oi.listing JOIN FETCH oi.seller WHERE o.id = :id")
     Optional<Order> findByIdWithOrderItemsAndSellers(@Param("id") Long id);
 
+    @Query("SELECT DISTINCT o FROM Order o "
+            + "JOIN FETCH o.user "
+            + "LEFT JOIN FETCH o.shippingAddress "
+            + "LEFT JOIN FETCH o.billingAddress "
+            + "LEFT JOIN FETCH o.shipping "
+            + "LEFT JOIN FETCH o.completedByUser "
+            + "JOIN FETCH o.orderItems oi "
+            + "LEFT JOIN FETCH oi.listing l "
+            + "LEFT JOIN FETCH l.seller "
+            + "LEFT JOIN FETCH oi.seller "
+            + "WHERE o.id = :id")
+    Optional<Order> findByIdWithFullDetails(@Param("id") Long id);
+
 
     @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.orderItems oi JOIN FETCH oi.listing l WHERE o.id = :orderId AND l.seller.id = :sellerId")
     Optional<Order> findByIdForSeller(@Param("orderId") Long orderId, @Param("sellerId") Long sellerId);
@@ -104,6 +118,23 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                          @Param("statuses") Collection<OrderStatus> statuses,
                                          @Param("method") DeliveryMethod method,
                                          Pageable pageable);
+
+    /**
+     * Fallback reconciliation query for unshipped single-seller cargo orders whose seller is currently banned,
+     * covering crashes or transient failures during {@code BannedSellerOrderCancellationListener}.
+     */
+    @Query("SELECT o.id FROM Order o WHERE o.status IN :statuses AND o.deliveryMethod = :method " +
+            "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o " +
+            "AND (oi.seller.accountStatus = :blockedStatus OR oi.seller.bannedUntil > :now)) " +
+            "AND NOT EXISTS (SELECT 1 FROM OrderItem oi2 WHERE oi2.order = o " +
+            "AND oi2.seller.accountStatus <> :blockedStatus " +
+            "AND (oi2.seller.bannedUntil IS NULL OR oi2.seller.bannedUntil <= :now)) " +
+            "ORDER BY o.id")
+    List<Long> findIdsOfRestrictedSellerOrders(@Param("statuses") Collection<OrderStatus> statuses,
+                                               @Param("method") DeliveryMethod method,
+                                               @Param("blockedStatus") AccountStatus blockedStatus,
+                                               @Param("now") LocalDateTime now,
+                                               Pageable pageable);
 
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.shipping LEFT JOIN FETCH o.user WHERE o.id = :id")
     Optional<Order> findByIdWithShippingAndUser(@Param("id") Long id);

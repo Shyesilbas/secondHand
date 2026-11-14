@@ -5,6 +5,8 @@ import com.serhat.secondhand.favoritelist.application.FavoriteListService;
 import com.serhat.secondhand.favoritelist.config.FavoriteListConfig;
 import com.serhat.secondhand.favoritelist.dto.AddToListRequest;
 import com.serhat.secondhand.favoritelist.dto.CreateFavoriteListRequest;
+import com.serhat.secondhand.favoritelist.dto.FavoriteListDto;
+import com.serhat.secondhand.favoritelist.dto.FavoriteListItemDto;
 import com.serhat.secondhand.favoritelist.dto.FavoriteListSummaryDto;
 import com.serhat.secondhand.favoritelist.dto.UpdateFavoriteListRequest;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -37,7 +39,7 @@ public class FavoriteListController {
 
     @PostMapping
     @Operation(summary = "Create a new favorite list")
-    public ResponseEntity<?> createList(
+    public ResponseEntity<FavoriteListDto> createList(
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody CreateFavoriteListRequest request) {
         return ResultResponses.created(favoriteListService.createList(currentUser.getId(), request));
@@ -80,7 +82,7 @@ public class FavoriteListController {
 
     @GetMapping("/{list-id}")
     @Operation(summary = "Get a favorite list by ID")
-    public ResponseEntity<?> getListById(
+    public ResponseEntity<FavoriteListDto> getListById(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(favoriteListService.getListById(listId, currentUser));
@@ -88,7 +90,7 @@ public class FavoriteListController {
 
     @PutMapping("/{list-id}")
     @Operation(summary = "Update a favorite list")
-    public ResponseEntity<?> updateList(
+    public ResponseEntity<FavoriteListDto> updateList(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody UpdateFavoriteListRequest request) {
@@ -97,7 +99,7 @@ public class FavoriteListController {
 
     @DeleteMapping("/{list-id}")
     @Operation(summary = "Delete a favorite list")
-    public ResponseEntity<?> deleteList(
+    public ResponseEntity<Void> deleteList(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteListService.deleteList(currentUser.getId(), listId));
@@ -105,7 +107,7 @@ public class FavoriteListController {
 
     @PostMapping("/{list-id}/items")
     @Operation(summary = "Add an item to a favorite list")
-    public ResponseEntity<?> addItemToList(
+    public ResponseEntity<FavoriteListItemDto> addItemToList(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser,
             @Valid @RequestBody AddToListRequest request) {
@@ -114,7 +116,7 @@ public class FavoriteListController {
 
     @DeleteMapping("/{list-id}/items/{listing-id}")
     @Operation(summary = "Remove an item from a favorite list")
-    public ResponseEntity<?> removeItemFromList(
+    public ResponseEntity<Void> removeItemFromList(
             @PathVariable("list-id") Long listId,
             @PathVariable("listing-id") UUID listingId,
             @AuthenticationPrincipal User currentUser) {
@@ -123,7 +125,7 @@ public class FavoriteListController {
 
     @PostMapping("/{list-id}/like")
     @Operation(summary = "Like a favorite list")
-    public ResponseEntity<?> likeList(
+    public ResponseEntity<Void> likeList(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(favoriteListService.likeList(currentUser.getId(), listId));
@@ -131,7 +133,7 @@ public class FavoriteListController {
 
     @DeleteMapping("/{list-id}/like")
     @Operation(summary = "Unlike a favorite list")
-    public ResponseEntity<?> unlikeList(
+    public ResponseEntity<Void> unlikeList(
             @PathVariable("list-id") Long listId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.noContent(favoriteListService.unlikeList(currentUser.getId(), listId));

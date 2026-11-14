@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -29,6 +30,11 @@ import java.math.BigDecimal;
         @JsonSubTypes.Type(value = SportsListingFilterDto.class, name = "SPORTS")
 })
 public abstract class ListingFilterDto {
+
+    /** Set by the search service from the viewer's blocks; never read from the request body. */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private Set<Long> excludedSellerIds;
+
     private ListingType listingType;
     private ListingStatus status;
     private String title;

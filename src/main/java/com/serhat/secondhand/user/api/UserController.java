@@ -12,14 +12,26 @@ import com.serhat.secondhand.listing.application.common.ListingQueryService;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingDto;
 import com.serhat.secondhand.listing.domain.entity.enums.base.ListingStatus;
 import com.serhat.secondhand.offer.application.IOfferService;
+import com.serhat.secondhand.offer.dto.OfferDto;
 import com.serhat.secondhand.review.application.IReviewService;
+import com.serhat.secondhand.review.dto.ReviewDto;
+import com.serhat.secondhand.review.dto.UserReviewStatsDto;
 import com.serhat.secondhand.user.application.GreatSellerService;
 import com.serhat.secondhand.user.application.IUserService;
+import com.serhat.secondhand.user.domain.dto.BlockStatusDto;
+import com.serhat.secondhand.user.domain.dto.BlockedUserDto;
+import com.serhat.secondhand.user.domain.dto.GreatSellerPublicProfileDto;
+import com.serhat.secondhand.user.domain.dto.GreatSellerStatusDto;
+import com.serhat.secondhand.user.domain.dto.PublicUserProfileDto;
 import com.serhat.secondhand.user.domain.dto.UpdateEmailRequest;
 import com.serhat.secondhand.user.domain.dto.UpdatePhoneRequest;
+import com.serhat.secondhand.user.domain.dto.UpdateUserSettingsRequest;
 import com.serhat.secondhand.user.domain.dto.UserDto;
+import com.serhat.secondhand.user.domain.dto.UserSettingsDto;
 import com.serhat.secondhand.user.domain.dto.VerificationRequest;
+import com.serhat.secondhand.user.dto.RestrictionStatusDto;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.util.UserErrorCodes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -53,6 +65,8 @@ public class UserController {
     private final IOfferService offerService;
     private final GreatSellerService greatSellerService;
     private final com.serhat.secondhand.user.application.UserRestrictionService userRestrictionService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
+    private final com.serhat.secondhand.user.application.UserSettingsService userSettingsService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
@@ -63,20 +77,20 @@ public class UserController {
     @PublicEndpoint
     @GetMapping("/great-sellers")
     @Operation(summary = "Public list of Great Seller–eligible users (home discovery)")
-    public ResponseEntity<?> listGreatSellerProfiles(@RequestParam(defaultValue = "16") int limit) {
+    public ResponseEntity<List<GreatSellerPublicProfileDto>> listGreatSellerProfiles(@RequestParam(defaultValue = "16") int limit) {
         return ResultResponses.ok(Result.success(greatSellerService.listGreatSellerProfiles(limit)));
     }
 
 
     @PostMapping("/verification/send")
-    public ResponseEntity<?> sendVerificationCode(Authentication authentication) {
+    public ResponseEntity<Void> sendVerificationCode(Authentication authentication) {
         log.info("Sending verification code for user: {}", authentication.getName());
         return ResultResponses.ok(verificationService.sendAccountVerificationCode(authentication));
     }
 
 
     @PostMapping("/verification/verify")
-    public ResponseEntity<?> verifyUser(
+    public ResponseEntity<Void> verifyUser(
             @Valid @RequestBody VerificationRequest request,
             Authentication authentication) {
         log.info("Verifying user account for: {}", authentication.getName());
@@ -84,7 +98,7 @@ public class UserController {
     }
 
     @GetMapping("/me/reviews/received")
-    public ResponseEntity<?> getMyReceivedReviews(
+    public ResponseEntity<Page<ReviewDto>> getMyReceivedReviews(
             @PageableDefault(size = 10) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
         log.info("Getting reviews received by current user: {}", currentUser.getId());
@@ -92,30 +106,67 @@ public class UserController {
     }
 
     @GetMapping("/me/complaints")
-    public ResponseEntity<java.util.List<ComplaintDto>> getMyComplaints(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<ComplaintDto>> getMyComplaints(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(complaintService.getUserComplaints(currentUser));
     }
 
     @GetMapping("/me/restriction")
-    public ResponseEntity<com.serhat.secondhand.user.dto.RestrictionStatusDto> getMyRestriction(
+    public ResponseEntity<RestrictionStatusDto> getMyRestriction(
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userRestrictionService.status(currentUser.getId()));
     }
 
+    @GetMapping("/me/settings")
+    public ResponseEntity<UserSettingsDto> getMySettings(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userSettingsService.getSettings(currentUser.getId()));
+    }
+
+    @PatchMapping("/me/settings")
+    public ResponseEntity<UserSettingsDto> updateMySettings(
+            @Valid @RequestBody UpdateUserSettingsRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userSettingsService.updateSettings(currentUser.getId(), request));
+    }
+
+    @GetMapping("/me/blocked-users")
+    public ResponseEntity<List<BlockedUserDto>> getMyBlockedUsers(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userBlockService.getBlockedUsers(currentUser.getId()));
+    }
+
+    @PostMapping("/{user-id}/block")
+    public ResponseEntity<BlockStatusDto> blockUser(@PathVariable("user-id") Long userId,
+                                       @AuthenticationPrincipal User currentUser) {
+        userBlockService.blockUser(currentUser.getId(), userId);
+        return ResponseEntity.ok(userBlockService.getBlockStatus(currentUser.getId(), userId));
+    }
+
+    @DeleteMapping("/{user-id}/block")
+    public ResponseEntity<BlockStatusDto> unblockUser(@PathVariable("user-id") Long userId,
+                                         @AuthenticationPrincipal User currentUser) {
+        userBlockService.unblockUser(currentUser.getId(), userId);
+        return ResponseEntity.ok(userBlockService.getBlockStatus(currentUser.getId(), userId));
+    }
+
+    @GetMapping("/{user-id}/block-status")
+    public ResponseEntity<BlockStatusDto> getBlockStatus(@PathVariable("user-id") Long userId,
+                                            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userBlockService.getBlockStatus(currentUser.getId(), userId));
+    }
+
     @GetMapping("/me/complaints/received")
-    public ResponseEntity<java.util.List<ComplaintDto>> getComplaintsAboutMe(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<List<ComplaintDto>> getComplaintsAboutMe(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(complaintService.getComplaintsAboutUser(currentUser));
     }
 
     @GetMapping("/me/offers/made")
-    public ResponseEntity<?> getMyOffersMade(
+    public ResponseEntity<Page<OfferDto>> getMyOffersMade(
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(offerService.listMade(currentUser.getId(), pageable));
     }
 
     @GetMapping("/me/offers/received")
-    public ResponseEntity<?> getMyOffersReceived(
+    public ResponseEntity<Page<OfferDto>> getMyOffersReceived(
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(offerService.listReceived(currentUser.getId(), pageable));
@@ -124,33 +175,37 @@ public class UserController {
     @PublicEndpoint
     @GetMapping("/{user-id}/great-seller-status")
     @Operation(summary = "Great Seller badge eligibility and progress")
-    public ResponseEntity<?> getGreatSellerStatus(@PathVariable("user-id") Long userId) {
+    public ResponseEntity<GreatSellerStatusDto> getGreatSellerStatus(@PathVariable("user-id") Long userId) {
         return ResultResponses.ok(Result.success(greatSellerService.getStatus(userId)));
     }
 
     @GetMapping("/{user-id}/reviews/received")
-    public ResponseEntity<?> getReviewsReceivedByUser(
+    public ResponseEntity<Page<ReviewDto>> getReviewsReceivedByUser(
             @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResultResponses.ok(reviewService.getReviewsForUser(userId, pageable));
     }
 
     @GetMapping("/{user-id}/reviews/written")
-    public ResponseEntity<?> getReviewsWrittenByUser(
+    public ResponseEntity<Page<ReviewDto>> getReviewsWrittenByUser(
             @PathVariable("user-id") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResultResponses.ok(reviewService.getReviewsByUser(userId, pageable));
     }
 
     @GetMapping("/{user-id}/review-stats")
-    public ResponseEntity<?> getUserReviewStats(@PathVariable("user-id") Long userId) {
+    public ResponseEntity<UserReviewStatsDto> getUserReviewStats(@PathVariable("user-id") Long userId) {
         return ResultResponses.ok(reviewService.getUserReviewStats(userId));
     }
 
     @GetMapping("/{user-id}/listings")
     public ResponseEntity<Page<ListingDto>> getListingsByUser(
             @PathVariable("user-id") Long userId,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 10) Pageable pageable,
+            @AuthenticationPrincipal User currentUser) {
+        if (currentUser != null) {
+            ResultResponses.unwrap(userBlockService.checkProfileAccess(currentUser.getId(), userId));
+        }
         // Public profile: only listings that are live for buyers (no drafts, inactive or sold ones).
         return ResponseEntity.ok(listingService.getMyListingsByStatus(
                 userId, ListingStatus.ACTIVE, pageable.getPageNumber(), pageable.getPageSize()));
@@ -158,13 +213,16 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<PublicUserProfileDto> getUserById(@PathVariable Long id, @AuthenticationPrincipal User currentUser) {
+        if (userBlockService.getBlockStatus(currentUser.getId(), id).blockedMe()) {
+            throw ResultResponses.fail(UserErrorCodes.USER_BLOCKED_YOU);
+        }
         return ResultResponses.ok(userService.getPublicProfile(id));
     }
 
 
     @PutMapping("/email")
-    public ResponseEntity<?> updateEmail(
+    public ResponseEntity<String> updateEmail(
             @Valid @RequestBody UpdateEmailRequest request,
             Authentication authentication) {
         log.info("Updating email for user: {}", authentication.getName());
@@ -173,7 +231,7 @@ public class UserController {
 
 
     @PutMapping("/phone")
-    public ResponseEntity<?> updatePhone(
+    public ResponseEntity<String> updatePhone(
             @Valid @RequestBody UpdatePhoneRequest request,
             Authentication authentication) {
         log.info("Updating phone for user: {}", authentication.getName());

@@ -28,7 +28,7 @@ public class EmailKafkaProducer {
                 .exceptionally(ex -> {
                     log.error("Failed to publish MailDispatchKafkaEvent: eventId={}, recipient={}",
                             event.eventId(), event.recipientEmail(), ex);
-                    throw new RuntimeException("Kafka publish failed for mail dispatch", ex);
+                    throw new IllegalStateException("Kafka publish failed for mail dispatch", ex);
                 });
     }
 }

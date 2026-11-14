@@ -37,6 +37,12 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_POOL_CONNECTION_TIMEOUT_MS:10000}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT_MS:300000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME_MS:1800000}
   jackson:
     date-format: dd/MM/yyyy HH:mm
     # Named zone instead of a fixed offset so DST rule changes are picked up from tzdata.
@@ -45,9 +51,10 @@ spring:
     serialization:
       fail-on-empty-beans: false
   jpa:
+    open-in-view: false
     properties:
       hibernate:
-        enable_lazy_load_no_trans: true
+        enable_lazy_load_no_trans: false
         default_batch_fetch_size: 20
         jdbc.batch_size: 20
         order_inserts: true

@@ -7,13 +7,13 @@ import { formatForumDateTime } from '../utils/forumDateFormat.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 export const ThreadDetailSkeleton = () => <div className="rounded-md border border-border-light bg-background-primary overflow-hidden animate-pulse">
  <div className="px-6 py-5 border-b border-border-light">
- <div className="h-6 w-2/3 bg-tertiary rounded mb-3" />
- <div className="h-4 w-1/3 bg-tertiary rounded" />
+ <div className="h-6 w-2/3 bg-background-tertiary rounded mb-3" />
+ <div className="h-4 w-1/3 bg-background-tertiary rounded" />
  </div>
  <div className="p-6">
- <div className="h-4 w-full bg-tertiary rounded mb-2" />
- <div className="h-4 w-5/6 bg-tertiary rounded mb-2" />
- <div className="h-4 w-4/6 bg-tertiary rounded" />
+ <div className="h-4 w-full bg-background-tertiary rounded mb-2" />
+ <div className="h-4 w-5/6 bg-background-tertiary rounded mb-2" />
+ <div className="h-4 w-4/6 bg-background-tertiary rounded" />
  </div>
  <div className="border-t border-border-light">
  <CommentSkeleton />
@@ -128,7 +128,7 @@ export const ThreadDetail = ({
  <div className="px-6 py-4 flex items-center justify-between gap-3">
  <div className="flex items-center gap-2">
  <h3 className="text-sm font-medium text-text-primary">{t("comments")}</h3>
- <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-sm bg-tertiary text-xs font-semibold text-text-secondary tabular-nums">
+ <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-sm bg-background-tertiary text-xs font-semibold text-text-secondary tabular-nums">
  {commentCount}
  </span>
  {draftComment?.parentCommentId ? <span className="text-xs text-text-primary font-medium ml-2">{t("replying")}<button type="button" className="ml-1.5 text-xs text-text-muted hover:text-text-secondary" onClick={() => onReplyTarget?.(null)}>{t("cancel")}</button>

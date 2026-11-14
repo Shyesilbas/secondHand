@@ -1,14 +1,18 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ChevronRight, KeyRound, MailCheck, Shield, UserCheck } from 'lucide-react';
+import { ChevronRight, KeyRound, MessageSquare, MailCheck, Shield, UserCheck } from 'lucide-react';
 import { USER_ACCOUNT_STATUSES } from '../userConstants.js';
 import { ROUTES } from '../../common/constants/routes.js';
 import Button from '../../common/components/ui/Button.jsx';
+import { useUserSettings, useUpdateUserSettings } from '../hooks/useBlocking.js';
 
 const ProfileAccountStatus = ({ user }) => {
   const { t } = useTranslation();
   const accountStatus = user?.accountStatus || 'ACTIVE';
   const isVerified = Boolean(user?.accountVerified);
+  const { data: settings } = useUserSettings();
+  const updateSettings = useUpdateUserSettings();
+  const messagingOn = settings?.canSendMessage ?? user?.canSendMessage ?? true;
 
   const getStatusDetails = () => {
     switch (accountStatus) {
@@ -104,6 +108,39 @@ const ProfileAccountStatus = ({ user }) => {
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Messaging preference (global default for new listings and direct chats) */}
+      <div className="flex items-center justify-between gap-4 py-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-text-secondary" strokeWidth={1.5} aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="text-sm font-medium text-text-primary">
+              {t('messaging_preference', 'Mesajlaşma Tercihi (Global)')}
+            </h3>
+            <p className="mt-0.5 text-xs text-text-secondary">
+              {t('messaging_preference_desc', 'Kapalıyken yeni ilanlarınızda mesajlaşma varsayılan olarak kapalı gelir ve doğrudan mesaj alamazsınız.')}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={messagingOn}
+          disabled={updateSettings.isPending}
+          onClick={() => updateSettings.mutate({ canSendMessage: !messagingOn })}
+          aria-label={t('messaging_preference', 'Mesajlaşma Tercihi (Global)')}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+            messagingOn ? 'bg-status-success' : 'bg-border'
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${
+              messagingOn ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
       </div>
 
       {/* 3. Change Password Row */}

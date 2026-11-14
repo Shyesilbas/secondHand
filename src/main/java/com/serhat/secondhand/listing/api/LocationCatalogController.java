@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/catalog/locations")
 @RequiredArgsConstructor
@@ -18,18 +20,18 @@ public class LocationCatalogController {
     private final LocationCatalogService locationCatalogService;
 
     @GetMapping("/cities")
-    public ResponseEntity<?> getCities() {
+    public ResponseEntity<List<LocationCatalogService.CityDto>> getCities() {
         return ResultResponses.ok(Result.success(locationCatalogService.getCities()));
     }
 
     @GetMapping("/districts")
-    public ResponseEntity<?> getDistricts(
+    public ResponseEntity<List<LocationCatalogService.DistrictDto>> getDistricts(
             @RequestParam String cityKey) {
         return ResultResponses.ok(Result.success(locationCatalogService.getDistricts(cityKey)));
     }
 
     @GetMapping("/neighborhoods")
-    public ResponseEntity<?> getNeighborhoods(
+    public ResponseEntity<List<LocationCatalogService.NeighborhoodDto>> getNeighborhoods(
             @RequestParam String districtKey) {
         return ResultResponses.ok(Result.success(locationCatalogService.getNeighborhoods(districtKey)));
     }

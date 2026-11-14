@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Menu, Search } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 const ListingsNavigation = ({
     totalElements,
     selectedCategory,
@@ -25,13 +25,14 @@ const ListingsNavigation = ({
     const listingNoError = engineSearch?.listingNo?.error || '';
     const clear = engineSearch?.clear;
     return <>
-        <div className="bg-background-primary border-b border-border-light">
+        <div className="bg-gradient-to-b from-background-primary via-background-primary/70 to-background-secondary">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <button onClick={onToggleFilterSidebar} className="p-2 rounded hover:bg-secondary-light transition-colors text-text-muted hover:text-text-primary relative">
-                            <Menu className="w-5 h-5" />
-                            {hasActiveFilters ? <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" /> : null}
+                        <button type="button" onClick={onToggleFilterSidebar} className="relative inline-flex h-10 shrink-0 items-center gap-2 rounded border border-border bg-background-primary px-3 text-sm font-medium text-text-primary transition-colors duration-150 hover:border-card-border-hover hover:bg-background-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+                            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                            {t("filters", "Filtreler")}
+                            {hasActiveFilters ? <span className="h-2 w-2 rounded-full bg-primary" aria-hidden /> : null}
                         </button>
                         <div>
                             <h1 className="text-xl sm:text-2xl font-semibold text-text-primary tracking-tight">{title}</h1>

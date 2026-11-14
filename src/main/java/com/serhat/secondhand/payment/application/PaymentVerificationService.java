@@ -47,7 +47,7 @@ public class PaymentVerificationService implements IPaymentVerificationService {
         try {
             paymentNotificationService.sendPaymentVerificationNotification(user, code, details);
             log.info("Payment verification notification sent to user: {}", user.getEmail());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Failed to send notification to user: {}", user.getEmail(), e);
             throw e;
         }

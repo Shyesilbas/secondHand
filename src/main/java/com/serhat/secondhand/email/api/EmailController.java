@@ -74,7 +74,7 @@ public class EmailController {
     }
 
     @DeleteMapping("/{email-id}")
-    public ResponseEntity<?> delete(
+    public ResponseEntity<String> delete(
             @PathVariable("email-id") UUID emailId,
             @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(emailService.deleteEmail(emailId, currentUser.getId()));

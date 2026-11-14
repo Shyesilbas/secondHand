@@ -29,17 +29,12 @@ public class PasswordController {
     private final PasswordService passwordService;
 
     @PutMapping("/change")
-    public ResponseEntity<?> changePassword(
+    public ResponseEntity<ChangePasswordResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             Authentication authentication) {
-        
-        var result = passwordService.changePassword(request, authentication);
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-        
+        var message = ResultResponses.unwrap(passwordService.changePassword(request, authentication));
         return ResponseEntity.ok(ChangePasswordResponse.builder()
-                .message(result.getData())
+                .message(message)
                 .status("success")
                 .build());
     }
@@ -53,17 +48,12 @@ public class PasswordController {
     )
     @ApiResponse(responseCode = "200", description = "Generic acknowledgement (does not reveal account existence)")
     @ApiResponse(responseCode = "400", description = "Invalid email format")
-    public ResponseEntity<?> forgotPassword(
+    public ResponseEntity<ForgotPasswordResponse> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {
-
-        var result = passwordService.forgotPassword(request);
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-
+        var message = ResultResponses.unwrap(passwordService.forgotPassword(request));
         // Doğrulama kodu kasıtlı olarak yanıtta yoktur; yalnızca e-posta kanalı üzerinden iletilir.
         return ResponseEntity.ok(ForgotPasswordResponse.builder()
-                .message(result.getData())
+                .message(message)
                 .status("success")
                 .build());
     }
@@ -76,16 +66,11 @@ public class PasswordController {
     )
     @ApiResponse(responseCode = "200", description = "Password reset successfully")
     @ApiResponse(responseCode = "400", description = "Invalid or expired token, or password requirements not met")
-    public ResponseEntity<?> resetPassword(
+    public ResponseEntity<ResetPasswordResponse> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
-        
-        var result = passwordService.resetPassword(request);
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-        
+        var message = ResultResponses.unwrap(passwordService.resetPassword(request));
         return ResponseEntity.ok(ResetPasswordResponse.builder()
-                .message(result.getData())
+                .message(message)
                 .status("success")
                 .build());
     }

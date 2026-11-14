@@ -30,6 +30,17 @@ export const useMyRestriction = ({ enabled = true } = {}) =>
     staleTime: COMPLAINT_DEFAULTS.RESTRICTION_STALE_TIME_MS,
   });
 
+/** What the signed-in user may do right now; everything is allowed until the restriction loads. */
+export const useRestrictionFlags = () => {
+  const { data } = useMyRestriction();
+  return {
+    canSendMessages: data?.canSendMessages !== false,
+    canCreateListings: data?.canCreateListings !== false,
+    canMakeOffers: data?.canMakeOffers !== false,
+    canCheckout: data?.canCheckout !== false,
+  };
+};
+
 export const useCreateComplaint = () => {
   const { showNotification } = useNotification();
   const queryClient = useQueryClient();

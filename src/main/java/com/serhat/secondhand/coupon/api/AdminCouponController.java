@@ -3,6 +3,7 @@ package com.serhat.secondhand.coupon.api;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.coupon.application.CouponService;
+import com.serhat.secondhand.coupon.dto.CouponAudienceStatsDto;
 import com.serhat.secondhand.coupon.dto.CreateCouponRequest;
 import com.serhat.secondhand.coupon.dto.CouponDto;
 import com.serhat.secondhand.coupon.dto.UpdateCouponRequest;
@@ -29,26 +30,26 @@ public class AdminCouponController {
 
     @GetMapping
     @Operation(summary = "List all coupons")
-    public ResponseEntity<?> listAll() {
+    public ResponseEntity<List<CouponDto>> listAll() {
         List<CouponDto> list = couponService.listAll();
         return ResultResponses.ok(Result.success(list));
     }
 
     @PostMapping
     @Operation(summary = "Create coupon")
-    public ResponseEntity<?> create(@Valid @RequestBody CreateCouponRequest request) {
+    public ResponseEntity<CouponDto> create(@Valid @RequestBody CreateCouponRequest request) {
         return ResultResponses.created(couponService.create(request));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update coupon")
-    public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody UpdateCouponRequest request) {
+    public ResponseEntity<CouponDto> update(@PathVariable UUID id, @Valid @RequestBody UpdateCouponRequest request) {
         return ResultResponses.ok(couponService.update(id, request));
     }
 
     @GetMapping("/audience-stats")
     @Operation(summary = "Eligible user count for a rule-based audience")
-    public ResponseEntity<?> audienceStats(@RequestParam CouponAudience audience) {
+    public ResponseEntity<CouponAudienceStatsDto> audienceStats(@RequestParam CouponAudience audience) {
         return ResultResponses.ok(couponService.audienceStats(audience));
     }
 }

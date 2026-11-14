@@ -50,13 +50,14 @@ public class CartService {
     private final CartReservationScheduler cartReservationScheduler;
     private final InventoryService inventoryService;
     private final CartSocialMetricService cartSocialMetricService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     @Transactional
     public Result<Page<CartDto>> getCartItems(Long userId, Pageable pageable) {
         clearExpiredReservationsIfEnabled();
         Result<User> userResult = userService.findById(userId);
         if (userResult.isError()) {
-            return Result.error(userResult.getErrorCode());
+            return userResult.propagateError();
         }
 
         Page<Cart> cartPage = cartRepository.findByUserIdWithListing(userId, pageable);
@@ -109,9 +110,11 @@ public class CartService {
             return Result.error(CartErrorCodes.LISTING_NOT_FOUND);
         }
 
+        if (listing.getSeller() != null) userBlockService.requireNotBlocked(userId, listing.getSeller().getId());
+
         Result<Void> listingValidation = cartValidator.validateListing(listing,userId);
         if (listingValidation.isError()) {
-            return Result.error(listingValidation.getErrorCode());
+            return listingValidation.propagateError();
         }
 
         Optional<Cart> existingCartItemOpt = cartRepository
@@ -134,7 +137,7 @@ public class CartService {
                 0
         );
         if (reservationValidation.isError()) {
-            return Result.error(reservationValidation.getErrorCode());
+            return reservationValidation.propagateError();
         }
 
         Cart cartItem = existingCartItemOpt.orElseGet(() ->

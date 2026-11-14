@@ -78,7 +78,7 @@ class RestrictionGuardsTest {
         OfferService service = new OfferService(offers, mock(ListingQueryService.class), users,
                 mock(OfferEmailNotificationService.class), mock(OfferValidator.class), mock(OfferMapper.class),
                 new OfferStockHoldService(mock(InventoryRedisReservationService.class)), new OfferConfigProperties(),
-                restrictions);
+                restrictions, mock(com.serhat.secondhand.user.application.UserBlockService.class));
 
         assertThat(service.create(USER, new CreateOfferRequest()).getErrorCode()).isEqualTo("ACCOUNT_RESTRICTED_OFFER");
         assertThat(service.counter(USER, UUID.randomUUID(), new CounterOfferRequest()).getErrorCode())
@@ -95,7 +95,7 @@ class RestrictionGuardsTest {
         CheckoutOrchestrator orchestrator = new CheckoutOrchestrator(mock(CartRepository.class),
                 mock(OrderCreationService.class), mock(OrderPaymentService.class), mock(OrderRepository.class),
                 mock(OrderMapper.class), mock(CouponService.class), mock(IOfferService.class), mock(EscrowService.class),
-                pricing, mock(CheckoutStockReservationService.class), mock(ApplicationEventPublisher.class), restrictions);
+                pricing, mock(CheckoutStockReservationService.class), mock(ApplicationEventPublisher.class), restrictions, mock(com.serhat.secondhand.user.application.UserBlockService.class));
         CartRepository carts = mock(CartRepository.class);
         CheckoutStockReservationService reservation = new CheckoutStockReservationService(
                 mock(ListingRepository.class), mock(InventoryRedisReservationService.class), carts, restrictions);
@@ -127,7 +127,8 @@ class RestrictionGuardsTest {
         ChatService chat = new ChatService(restrictions, mock(ChatRoomRepository.class), messages,
                 mock(ListingRepository.class), mock(IUserService.class), new ChatRoomMapper(),
                 mock(ChatMessageMapper.class), mock(ChatRoomEnricher.class), mock(ChatNotificationService.class),
-                mock(ChatRoomUpdater.class), authorization, mock(IOfferService.class), mock(OfferRepository.class));
+                mock(ChatRoomUpdater.class), authorization, mock(IOfferService.class), mock(OfferRepository.class),
+                mock(com.serhat.secondhand.user.application.UserBlockService.class));
         ChatMessageDto dto = new ChatMessageDto();
         dto.setSenderId(USER);
         dto.setContent("hi");

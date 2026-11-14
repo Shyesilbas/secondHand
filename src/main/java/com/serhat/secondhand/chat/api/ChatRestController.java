@@ -80,7 +80,7 @@ public class ChatRestController {
     }
 
     @PostMapping("/rooms/{chat-room-id}/offers")
-    public ResponseEntity<?> sendInChatOffer(
+    public ResponseEntity<ChatMessageDto> sendInChatOffer(
             @PathVariable("chat-room-id") Long chatRoomId,
             @Valid @RequestBody com.serhat.secondhand.chat.dto.SendInChatOfferRequest request,
             @AuthenticationPrincipal User currentUser) {

@@ -111,6 +111,7 @@ public class CacheConfig {
                 .withCacheConfiguration("ai:summaries", aiSummariesConfig)
 
                 // Tier 1 — Statik lookup tabloları (24 saat)
+                .withCacheConfiguration("catalog:enums", lookupConfig)
                 .withCacheConfiguration("catalog:brands", lookupConfig)
                 .withCacheConfiguration("catalog:vehicleTypes", lookupConfig)
                 .withCacheConfiguration("catalog:electronicTypes", lookupConfig)

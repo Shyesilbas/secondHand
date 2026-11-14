@@ -1,5 +1,7 @@
 package com.serhat.secondhand.listing.application.generator;
 
+import static com.serhat.secondhand.listing.application.generator.GeneratorRandom.weights;
+
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.books.BooksListingService;
 import com.serhat.secondhand.listing.domain.dto.request.books.BooksCreateRequest;
@@ -167,18 +169,13 @@ class BookListingGenerator {
 
         String title = c.title() + " - " + c.authors() + ", " + c.publisher() + " (" + CONDITION_WORD.get(condition) + ")";
         if (title.length() > 120) title = c.title() + " - " + c.publisher() + " (" + CONDITION_WORD.get(condition) + ")";
-        BaseListingCreateRequest base = new BaseListingCreateRequest(title, description(c, condition, marks, solved),
-                asking, Currency.TRY, place.cityLabel(), place.districtLabel(), place.cityKey(), place.districtKey(),
-                place.neighborhoodKey(), c.coverUrl(), random.chance(0.7));
+        BaseListingCreateRequest base = ListingGeneratorSupport.baseRequest(
+                title, description(c, condition, marks, solved), asking, place, c.coverUrl(), random.chance(0.7));
         BooksCreateRequest request = new BooksCreateRequest(base, 1, c.authors(), c.typeId(), c.genreId(),
                 c.languageId(), c.year() != null ? c.year() : 2015, pages, c.formatId(), conditionIds.get(condition),
                 c.isbn(), c.editionId(), null, null, attributes);
-        Result<UUID> result = booksListingService.createBooksListing(request, sellerId);
-        if (result.isError()) {
-            throw new IllegalStateException("Generated book listing rejected (" + c.title() + "): "
-                    + result.getErrorCode() + " " + result.getMessage());
-        }
-        return result.getData();
+        return ListingGeneratorSupport.requireCreated(
+                booksListingService.createBooksListing(request, sellerId), "book", c.title());
     }
 
     private static String firstMatch(List<Map.Entry<String, String>> words, String text, String fallback) {
@@ -219,14 +216,5 @@ class BookListingGenerator {
         if ("FULL".equals(solved)) d.append(" Tamamı çözüldü, konu tekrarı için uygun.");
         d.append(" Kargo veya elden teslim olur.");
         return d.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Map<T, Integer> weights(Object... keyWeightPairs) {
-        Map<T, Integer> w = new LinkedHashMap<>();
-        for (int i = 0; i < keyWeightPairs.length; i += 2) {
-            w.put((T) keyWeightPairs[i], (Integer) keyWeightPairs[i + 1]);
-        }
-        return w;
     }
 }

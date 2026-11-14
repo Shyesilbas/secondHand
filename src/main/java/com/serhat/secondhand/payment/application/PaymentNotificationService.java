@@ -84,7 +84,7 @@ public class PaymentNotificationService {
                                                         user.getId(), amountText, cur, paymentDto.listingTitle(),
                                                         typeLabel, typeCode, paymentDto.listingId()),
                                         "payment", "payment-success:" + user.getId() + ":" + paymentDto.paymentId());
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                         log.warn("Failed to publish payment success notification for user {}: {}", user.getEmail(),
                                         e.getMessage());
                 }
@@ -177,7 +177,7 @@ public class PaymentNotificationService {
                         emailEventPublisher.publish(new PaymentVerificationEmailEvent(user, subject, data));
                         log.info("Payment verification email event published successfully for user: {}",
                                         user.getEmail());
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                         log.error("Failed to publish payment verification notification for user {}: {}",
                                         user.getEmail(),
                                         e.getMessage(), e);

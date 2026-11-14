@@ -46,6 +46,12 @@ public class Message {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
     
+    @Column(name = "removed_by_moderation", nullable = false)
+    private boolean removedByModeration = false;
+
+    @Column(name = "removed_at")
+    private LocalDateTime removedAt;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

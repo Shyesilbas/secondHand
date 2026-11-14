@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.listing.application.vehicle.VehicleCatalogService;
+import com.serhat.secondhand.listing.domain.dto.response.attribute.AttributeDefinitionDto;
+import com.serhat.secondhand.listing.domain.dto.response.vehicle.VehicleCatalogItemDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,43 +33,43 @@ public class VehicleCatalogController {
 
     @GetMapping("/types")
     @Operation(summary = "Vehicle types")
-    public ResponseEntity<?> types() {
+    public ResponseEntity<List<VehicleCatalogItemDto>> types() {
         return ResultResponses.ok(Result.success(vehicleCatalogService.types()));
     }
 
     @GetMapping("/brands")
     @Operation(summary = "Brands that have models of the vehicle type")
-    public ResponseEntity<?> brands(@RequestParam UUID typeId) {
+    public ResponseEntity<List<VehicleCatalogItemDto>> brands(@RequestParam UUID typeId) {
         return ResultResponses.ok(Result.success(vehicleCatalogService.brands(typeId)));
     }
 
     @GetMapping("/models")
     @Operation(summary = "Models of a brand for the vehicle type")
-    public ResponseEntity<?> models(@RequestParam UUID brandId, @RequestParam UUID typeId) {
+    public ResponseEntity<List<VehicleCatalogItemDto>> models(@RequestParam UUID brandId, @RequestParam UUID typeId) {
         return ResultResponses.ok(Result.success(vehicleCatalogService.models(brandId, typeId)));
     }
 
     @GetMapping("/generations")
     @Operation(summary = "Generations of a model, with body type, doors and seats")
-    public ResponseEntity<?> generations(@RequestParam UUID modelId, @RequestParam(required = false) Integer year) {
+    public ResponseEntity<List<VehicleCatalogItemDto>> generations(@RequestParam UUID modelId, @RequestParam(required = false) Integer year) {
         return ResultResponses.ok(Result.success(vehicleCatalogService.generations(modelId, year)));
     }
 
     @GetMapping("/versions")
     @Operation(summary = "Versions of a generation, with the specs a listing copies")
-    public ResponseEntity<?> versions(@RequestParam UUID generationId, @RequestParam(required = false) Integer year) {
+    public ResponseEntity<List<VehicleCatalogItemDto>> versions(@RequestParam UUID generationId, @RequestParam(required = false) Integer year) {
         return ResultResponses.ok(Result.success(vehicleCatalogService.versions(generationId, year)));
     }
 
     @GetMapping("/trims")
     @Operation(summary = "Trims of a generation")
-    public ResponseEntity<?> trims(@RequestParam UUID generationId) {
+    public ResponseEntity<List<VehicleCatalogItemDto>> trims(@RequestParam UUID generationId) {
         return ResultResponses.ok(Result.success(vehicleCatalogService.trims(generationId)));
     }
 
     @GetMapping("/attributes")
     @Operation(summary = "Attribute definitions of a vehicle type")
-    public ResponseEntity<?> attributes(@RequestParam UUID typeId) {
+    public ResponseEntity<List<AttributeDefinitionDto>> attributes(@RequestParam UUID typeId) {
         return ResultResponses.ok(vehicleCatalogService.attributes(typeId));
     }
 }

@@ -56,7 +56,7 @@ public class CouponRedisLimiterService {
 
             if (result == null) return -1;
             return result.intValue();
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataAccessException | org.springframework.data.redis.serializer.SerializationException e) {
             log.error("Redis coupon limit evaluation failed for coupon: {}, fallback to DB validation", couponCode, e);
             return NOT_COUNTED;
         }
@@ -66,7 +66,7 @@ public class CouponRedisLimiterService {
     public void releaseCouponUsage(String couponCode, Long userId) {
         try {
             redisTemplate.execute(releaseCouponScript, List.of(globalKey(couponCode), userKey(couponCode, userId)));
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataAccessException | org.springframework.data.redis.serializer.SerializationException e) {
             // The counters are only a pre-check; the database limits still apply.
             log.error("Failed to release Redis coupon usage for coupon: {}, user: {}", couponCode, userId, e);
         }

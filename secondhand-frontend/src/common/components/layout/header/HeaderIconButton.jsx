@@ -5,7 +5,7 @@ const HeaderIconButton = ({ to, icon: Icon, badge = 0, onClick, title }) => (
  to={to}
  onClick={onClick}
  title={title}
- className="group relative p-2 text-text-secondary hover:text-text-primary transition-all duration-200 rounded hover:bg-tertiary"
+ className="group relative p-2 text-text-secondary hover:text-text-primary transition-all duration-200 rounded hover:bg-background-tertiary"
  >
  <Icon className="w-4 h-4 stroke-1.5" />
  {badge > 0 && (

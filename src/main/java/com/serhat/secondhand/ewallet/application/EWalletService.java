@@ -239,8 +239,8 @@ public class EWalletService implements IEWalletService {
                     listingId,
                     fromUser.getId(),
                     toUser != null ? toUser.getId() : null);
-        } catch (Exception e) {
-            log.error("Error processing eWallet payment for user: {}", fromUser.getEmail(), e);
+        } catch (BusinessException e) {
+            log.warn("Business rejection processing eWallet payment for user: {}: {}", fromUser.getEmail(), e.getMessage());
             return PaymentResult.failure(
                     e.getMessage(),
                     amount,

@@ -4,6 +4,8 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.user.application.MembershipService;
 import com.serhat.secondhand.user.domain.entity.User;
+import com.serhat.secondhand.user.dto.MembershipQuoteDto;
+import com.serhat.secondhand.user.dto.MembershipStatusDto;
 import com.serhat.secondhand.user.dto.MembershipUpgradeRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,31 +21,31 @@ public class MembershipController {
     private final MembershipService membershipService;
 
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<MembershipStatusDto> getStatus(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.getStatus(userId)));
     }
 
     @GetMapping("/quote")
-    public ResponseEntity<?> getUpgradeQuote(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<MembershipQuoteDto> getUpgradeQuote(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.getUpgradeQuote(userId)));
     }
 
     @PostMapping("/upgrade")
-    public ResponseEntity<?> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MembershipUpgradeRequest request) {
+    public ResponseEntity<MembershipStatusDto> upgradeToPremium(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MembershipUpgradeRequest request) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.upgradeToPremium(userId, request)));
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<?> cancelSubscription(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<MembershipStatusDto> cancelSubscription(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.cancelSubscription(userId)));
     }
 
     @PostMapping("/toggle-auto-renew")
-    public ResponseEntity<?> toggleAutoRenew(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean autoRenew) {
+    public ResponseEntity<MembershipStatusDto> toggleAutoRenew(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean autoRenew) {
         Long userId = ((User) userDetails).getId();
         return ResultResponses.ok(Result.success(membershipService.toggleAutoRenew(userId, autoRenew)));
     }

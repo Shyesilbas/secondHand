@@ -16,6 +16,8 @@ import com.serhat.secondhand.inventory.application.InventoryService;
 import com.serhat.secondhand.inventory.application.InventoryRedisReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -78,7 +80,7 @@ public class OrderCompensationPersistenceService {
             public void afterCommit() {
                 try {
                     redisReservationService.releaseStock(listingId, delta);
-                } catch (Exception e) {
+                } catch (DataAccessException | SerializationException e) {
                     // reconciliation scheduler heals Redis drift
                     log.warn("Redis stock restore failed for listing {}", listingId, e);
                 }

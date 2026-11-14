@@ -11,6 +11,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
@@ -29,11 +31,10 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix(asyncConfigProperties.getThreadNamePrefix());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
-        executor.setRejectedExecutionHandler((r, e) -> 
-            log.warn("Task rejected from async executor. Queue full. Task: {}", r.toString()));
+        executor.setRejectedExecutionHandler(callerRunsWithWarning("taskExecutor"));
         executor.initialize();
-        
-        log.info("Async executor initialized - Core: {}, Max: {}, Queue: {}", 
+
+        log.info("Async executor initialized - Core: {}, Max: {}, Queue: {} with CallerRunsPolicy",
             asyncConfigProperties.getCorePoolSize(), asyncConfigProperties.getMaxPoolSize(), asyncConfigProperties.getQueueCapacity());
         return executor;
     }
@@ -47,12 +48,20 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("notification-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
-        executor.setRejectedExecutionHandler((r, e) -> 
-            log.warn("Notification task rejected. Queue full. Task: {}", r.toString()));
+        executor.setRejectedExecutionHandler(callerRunsWithWarning("notificationExecutor"));
         executor.initialize();
-        
-        log.info("Notification executor initialized - Core: 2, Max: 5, Queue: 200");
+
+        log.info("Notification executor initialized - Core: 2, Max: 5, Queue: 200 with CallerRunsPolicy");
         return executor;
+    }
+
+    private RejectedExecutionHandler callerRunsWithWarning(String executorName) {
+        ThreadPoolExecutor.CallerRunsPolicy delegate = new ThreadPoolExecutor.CallerRunsPolicy();
+        return (task, executor) -> {
+            log.warn("Async executor '{}' queue saturated (active={}, pool={}, queue={}); running on caller thread",
+                    executorName, executor.getActiveCount(), executor.getPoolSize(), executor.getQueue().size());
+            delegate.rejectedExecution(task, executor);
+        };
     }
 
     /**

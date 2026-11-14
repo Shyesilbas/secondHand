@@ -13,6 +13,8 @@ import com.serhat.secondhand.chat.mapper.ChatRoomMapper;
 import com.serhat.secondhand.chat.notification.ChatNotificationService;
 import com.serhat.secondhand.chat.repository.ChatRoomRepository;
 import com.serhat.secondhand.chat.repository.MessageRepository;
+import com.serhat.secondhand.chat.util.ChatErrorCodes;
+import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.domain.entity.Listing;
 import com.serhat.secondhand.listing.domain.repository.listing.ListingRepository;
@@ -33,6 +35,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatService {
 
+    static final String MESSAGING_LOCK_BLOCKED = "BLOCKED";
+    static final String MESSAGING_LOCK_LISTING = "LISTING_MESSAGING_DISABLED";
+    static final String MESSAGING_LOCK_USER = "USER_MESSAGING_DISABLED";
+
     private final UserRestrictionService userRestrictionService;
 
     private final ChatRoomRepository chatRoomRepository;
@@ -47,6 +53,7 @@ public class ChatService {
     private final ChatAuthorizationService chatAuthorizationService;
     private final com.serhat.secondhand.offer.application.IOfferService offerService;
     private final com.serhat.secondhand.offer.repository.OfferRepository offerRepository;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     @Transactional(readOnly = true)
     public Page<ChatRoomDto> getUserChatRooms(Long userId, Pageable pageable) {
@@ -98,6 +105,7 @@ public class ChatService {
 
         ChatEnrichmentContext context =
                 new ChatEnrichmentContext(userMap, unreadCountMap, listingMap);
+        Set<Long> hiddenUserIds = userBlockService.getMutuallyHiddenUserIds(userId);
 
         List<ChatRoomDto> dtos = rooms.stream()
                 .map(room -> {
@@ -110,7 +118,9 @@ public class ChatService {
                         }
                     }
 
-                    return chatRoomEnricher.enrich(room, userId, context, dto);
+                    chatRoomEnricher.enrich(room, userId, context, dto);
+                    applyMessagingLock(dto, room, userId, context, hiddenUserIds);
+                    return dto;
                 })
                 .collect(Collectors.toList());
         return new PageImpl<>(dtos, idPage.getPageable(), idPage.getTotalElements());
@@ -142,7 +152,43 @@ public class ChatService {
         ChatEnrichmentContext context =
                 new ChatEnrichmentContext(userMap, unreadCountMap, listingMap);
 
-        return chatRoomEnricher.enrich(room, viewerUserId, context, dto);
+        chatRoomEnricher.enrich(room, viewerUserId, context, dto);
+        applyMessagingLock(dto, room, viewerUserId, context, userBlockService.getMutuallyHiddenUserIds(viewerUserId));
+        return dto;
+    }
+
+    private void applyMessagingLock(ChatRoomDto dto, ChatRoom room, Long viewerId, ChatEnrichmentContext context,
+                                    Set<Long> hiddenUserIds) {
+        Long otherId = room.getParticipantIds().stream().filter(id -> !id.equals(viewerId)).findFirst().orElse(null);
+        String reason = null;
+        if (otherId != null && hiddenUserIds.contains(otherId)) {
+            reason = MESSAGING_LOCK_BLOCKED;
+        } else if (room.getListingId() != null) {
+            Listing listing = context.getListing(room.getListingId());
+            if (listing != null && !listing.isCanSendMessage()) {
+                reason = MESSAGING_LOCK_LISTING;
+            }
+        } else if (otherId != null) {
+            User other = context.getUser(otherId);
+            if (other != null && !other.isCanSendMessage()) {
+                reason = MESSAGING_LOCK_USER;
+            }
+        }
+        dto.setMessagingDisabled(reason != null);
+        dto.setMessagingDisabledReason(reason);
+    }
+
+    /** Throws when a block or a messaging switch forbids a message from {@code sender} to {@code recipient}. */
+    private void requireMessagingAllowed(ChatRoom room, User sender, User recipient) {
+        userBlockService.requireNotBlocked(sender.getId(), recipient.getId());
+        if (room.getListingId() != null) {
+            Listing listing = listingRepository.findById(UUID.fromString(room.getListingId())).orElse(null);
+            if (listing != null && !listing.isCanSendMessage()) {
+                throw new BusinessException(ChatErrorCodes.CHAT_DISABLED_BY_SELLER);
+            }
+        } else if (!recipient.isCanSendMessage()) {
+            throw new BusinessException(ChatErrorCodes.CHAT_DISABLED_BY_USER);
+        }
     }
 
     @Transactional
@@ -150,6 +196,12 @@ public class ChatService {
         Result<Void> validationResult = chatAuthorizationService.validateUsersExist(user1, user2);
         if (validationResult.isError()) {
             throw new IllegalArgumentException("Unable to create chat. Please ensure both users exist.");
+        }
+
+        userBlockService.requireNotBlocked(user1, user2);
+        User target = userService.findById(user2).getData();
+        if (!target.isCanSendMessage()) {
+            throw new BusinessException(ChatErrorCodes.CHAT_DISABLED_BY_USER);
         }
 
         return chatRoomRepository
@@ -172,6 +224,11 @@ public class ChatService {
     public ChatRoomDto createOrGetListingChat(Long userId, String listingId, String listingTitle) {
         Listing listing =
                 listingRepository.findById(UUID.fromString(listingId)).orElseThrow();
+
+        userBlockService.requireNotBlocked(userId, listing.getSeller().getId());
+        if (!listing.isCanSendMessage()) {
+            throw new BusinessException(ChatErrorCodes.CHAT_DISABLED_BY_SELLER);
+        }
 
         List<ChatRoom> existingRooms = chatRoomRepository.findListingChatRooms(listingId, userId);
         if (!existingRooms.isEmpty()) {
@@ -235,6 +292,8 @@ public class ChatService {
 
         User sender = senderResult.getData();
         User recipient = recipientResult.getData();
+
+        requireMessagingAllowed(room, sender, recipient);
 
         Message saved =
                 messageRepository.save(
@@ -303,6 +362,9 @@ public class ChatService {
                 .filter(id -> !id.equals(senderId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Recipient not found in chat room."));
+
+        requireMessagingAllowed(room, userService.findById(senderId).getData(),
+                userService.findById(recipientId).getData());
 
         com.serhat.secondhand.offer.dto.CreateOfferRequest offerReq = com.serhat.secondhand.offer.dto.CreateOfferRequest.builder()
                 .listingId(listingId)

@@ -36,12 +36,14 @@ class ChatServiceRoomPageTest {
     private final ChatRoomRepository roomRepository = mock(ChatRoomRepository.class);
     private final MessageRepository messageRepository = mock(MessageRepository.class);
     private final ChatRoomEnricher enricher = mock(ChatRoomEnricher.class);
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService =
+            mock(com.serhat.secondhand.user.application.UserBlockService.class);
 
     private final ChatService chatService = new ChatService(
             com.serhat.secondhand.user.RestrictionTestSupport.allowAll(), roomRepository, messageRepository, mock(ListingRepository.class), mock(IUserService.class),
             new ChatRoomMapper(), mock(ChatMessageMapper.class), enricher, mock(ChatNotificationService.class),
             mock(ChatRoomUpdater.class), mock(ChatAuthorizationService.class), mock(IOfferService.class),
-            mock(OfferRepository.class));
+            mock(OfferRepository.class), userBlockService);
 
     private static ChatRoom room(long id) {
         ChatRoom room = new ChatRoom();

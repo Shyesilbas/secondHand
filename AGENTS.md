@@ -4,7 +4,7 @@ C2C second-hand marketplace: Spring Boot 3.5 / Java 17 backend (PostgreSQL 15, R
 
 ## Commands
 - **Start all:** `./scripts/start_all.sh [--seed | --seed=<key[,key]|listing|all>]` (Docker: Postgres 5433, Redis 6379, Kafka 9092; then backend and frontend).
-- **Backend:** `mvn spring-boot:run` | test: `mvn test -Dmaven.test.skip=false -Dtest=<Class>` (plain Mockito `*Test`, no Spring context; `ConcurrentStockAndPaymentIntegrationTest` is the only `*IntegrationTest`, needs Docker).
+- **Backend:** `mvn spring-boot:run` | unit tests: `mvn test [-Dtest=<Class>]` (plain Mockito `*Test`, default) | JaCoCo + tests: `mvn -B verify` | integration tests (needs Docker): `mvn test -Pintegration-tests -Dtest=ConcurrentStockAndPaymentIntegrationTest`.
 - **Frontend:** `cd secondhand-frontend && npm run dev | build | lint`.
 - **Verify:** `./scripts/verify.sh` = `python3 scripts/check_docs.py` (0 issues after doc changes) + `python3 scripts/check_api_endpoints.py` (0 warnings) + zero-emoji scan + frontend lint.
 

@@ -36,7 +36,7 @@ public class AgentController {
     private final AuraListingSearchOrchestrator listingSearchOrchestrator;
 
     @PostMapping("/query")
-    public ResponseEntity<?> query(
+    public ResponseEntity<AgentQueryResponse> query(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody AgentQueryRequest request
     ) {

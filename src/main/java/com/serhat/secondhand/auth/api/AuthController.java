@@ -10,6 +10,7 @@ import com.serhat.secondhand.auth.domain.dto.request.RegisterRequest;
 import com.serhat.secondhand.auth.domain.dto.response.AuthClientResponse;
 import com.serhat.secondhand.auth.domain.dto.response.AuthMessageResponse;
 import com.serhat.secondhand.auth.domain.dto.response.LoginResponse;
+import com.serhat.secondhand.auth.domain.dto.response.RegisterResponse;
 import com.serhat.secondhand.auth.domain.exception.InvalidRefreshTokenException;
 import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
@@ -46,14 +47,14 @@ public class AuthController {
 
     @PublicEndpoint
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request for email: {}", request.getEmail());
         return ResultResponses.ok(registrationService.register(request));
     }
 
     @PublicEndpoint
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<AuthClientResponse> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
@@ -73,14 +74,14 @@ public class AuthController {
 
     @PublicEndpoint
     @GetMapping("/oauth2/google")
-    public ResponseEntity<?> redirectToGoogle() {
+    public ResponseEntity<Void> redirectToGoogle() {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/oauth2/authorization/google"))
                 .build();
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(
+    public ResponseEntity<AuthMessageResponse> logout(
             Authentication authentication,
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
@@ -104,7 +105,7 @@ public class AuthController {
 
     @PublicEndpoint
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(
+    public ResponseEntity<AuthClientResponse> refreshToken(
             HttpServletRequest request,
             HttpServletResponse httpResponse) {
         log.info("Token refresh request");
@@ -123,7 +124,7 @@ public class AuthController {
 
     @PublicEndpoint
     @PostMapping("/oauth2/complete")
-    public ResponseEntity<?> completeOAuth(
+    public ResponseEntity<AuthClientResponse> completeOAuth(
             @Valid @RequestBody OAuthCompleteRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
@@ -138,7 +139,7 @@ public class AuthController {
 
     @PostMapping("/revoke-all-sessions")
     @Operation(summary = "Revoke all user sessions", description = "Invalidates all active sessions for the authenticated user")
-    public ResponseEntity<?> revokeAllSessions(
+    public ResponseEntity<AuthMessageResponse> revokeAllSessions(
             Authentication authentication,
             HttpServletRequest request,
             HttpServletResponse httpResponse) {

@@ -98,6 +98,7 @@ Sistemde iki ana hata üretim yolu bulunur:
 | `HttpMediaTypeNotSupportedException` | `415 UNSUPPORTED_MEDIA_TYPE`| `Unsupported Media Type`| Desteklenmeyen `Content-Type` başlığı. |
 | `BusinessException` | Dinamik (`getHttpStatus`) | Dinamik (`getErrorCode`) | Domain iş kuralı fırlatmaları; exception'ın kendi status'ü ile döner. |
 | `AsyncRequestNotUsableException` | Yanıt dönmez | — | Client yanıt gitmeden bağlantıyı kopardığında debug loglanır. |
+| `ResultFailureException` | `ErrorCodeStatuses` eşlemesi | `Result.error` kaynaklı Track A `{"error": CODE, "message": "..."}` yanıtı |
 | `Exception` | `500 INTERNAL_SERVER_ERROR` | `Internal Server Error` | Öngörülemeyen sistem hataları. İstemciye stack trace sızdırılmaz. |
 
 ---

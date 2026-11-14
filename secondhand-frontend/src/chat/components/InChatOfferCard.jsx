@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { offerService } from '../../offer/services/offerService.js';
 import { Tag as FiTag, CheckCircle2 as FiCheckCircle, XCircle as FiXCircle, Clock as FiClock, ShoppingBag as FiShoppingBag, ArrowRight as FiArrowRight } from 'lucide-react';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { formatCurrency } from '../../common/formatters.js';
 
 export const InChatOfferCard = ({ message, currentUserId }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { canCheckout } = useRestrictionFlags();
 
     const isSender = String(message.senderId) === String(currentUserId);
     const offerId = message.offerId;
@@ -127,6 +129,7 @@ export const InChatOfferCard = ({ message, currentUserId }) => {
                 <div className="pt-1">
                     <button
                         onClick={() => navigate(`/checkout?offerId=${offerId}`)}
+                        disabled={!canCheckout}
                         className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 w-full"
                     >
                         <FiShoppingBag className="w-4 h-4" />

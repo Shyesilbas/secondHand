@@ -10,7 +10,9 @@ import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.order.util.OrderBusinessConstants;
 import com.serhat.secondhand.payment.entity.PaymentStatus;
 import com.serhat.secondhand.shipping.entity.Shipping;
+import com.serhat.secondhand.user.domain.entity.enums.AccountStatus;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +64,7 @@ public class OrderCompletionScheduler {
     }
 
     @Scheduled(fixedRate = OrderBusinessConstants.STATUS_UPDATE_INTERVAL_MINUTES * 60 * 1000L)
+    @SchedulerLock(name = "orderCompletionScheduler", lockAtMostFor = "PT4M30S", lockAtLeastFor = "PT30S")
     public void autoUpdateOrderStatus() {
         orderLog.logSchedulerStarted();
         LocalDateTime now = LocalDateTime.now();
@@ -80,6 +83,15 @@ public class OrderCompletionScheduler {
         updatedCount += processEach(
                 orderRepository.findIdsByStatusCreatedBefore(OrderStatus.PROCESSING, DeliveryMethod.CARGO, shipDeadline, FIRST_BATCH),
                 OrderStatus.PROCESSING, this::cancelUnshipped, now);
+        // Compensation sweep in case async BannedSellerOrderCancellationListener failed or was interrupted by a restart.
+        updatedCount += processEach(
+                orderRepository.findIdsOfRestrictedSellerOrders(
+                        List.of(OrderStatus.CONFIRMED, OrderStatus.PROCESSING),
+                        DeliveryMethod.CARGO,
+                        AccountStatus.BLOCKED,
+                        now,
+                        FIRST_BATCH),
+                null, this::cancelRestrictedSellerOrder, now);
         updatedCount += processEach(
                 orderRepository.findIdsByStatusInTransitBefore(OrderStatus.SHIPPED, intervalCutoff, FIRST_BATCH),
                 OrderStatus.SHIPPED, this::toDelivered, now);
@@ -105,7 +117,7 @@ public class OrderCompletionScheduler {
         for (Long orderId : orderIds) {
             try {
                 Boolean changed = transactionTemplate.execute(tx -> orderRepository.findByIdWithShippingAndUser(orderId)
-                        .filter(order -> order.getStatus() == expectedStatus)
+                        .filter(order -> expectedStatus == null || order.getStatus() == expectedStatus)
                         .map(order -> step.test(order, now))
                         .orElse(false));
                 if (Boolean.TRUE.equals(changed)) {
@@ -141,6 +153,19 @@ public class OrderCompletionScheduler {
         var result = orderCancellationService.cancelUnshippedOrder(order.getId());
         if (result.isError()) {
             log.warn("Unshipped order {} could not be cancelled: {}", order.getOrderNumber(), result.getErrorCode());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean cancelRestrictedSellerOrder(Order order, LocalDateTime now) {
+        if (order.getDeliveryMethod() != DeliveryMethod.CARGO
+                || (order.getStatus() != OrderStatus.CONFIRMED && order.getStatus() != OrderStatus.PROCESSING)) {
+            return false;
+        }
+        var result = orderCancellationService.cancelForRestrictedSeller(order.getId());
+        if (result.isError()) {
+            log.warn("Restricted-seller order {} could not be cancelled: {}", order.getOrderNumber(), result.getErrorCode());
             return false;
         }
         return true;

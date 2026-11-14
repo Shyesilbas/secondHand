@@ -2,6 +2,7 @@ package com.serhat.secondhand.complaint.api;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.serhat.secondhand.complaint.AppealRequest;
+import com.serhat.secondhand.complaint.ComplaintDto;
 import com.serhat.secondhand.complaint.ComplaintRequest;
 import com.serhat.secondhand.complaint.application.ComplaintService;
 import com.serhat.secondhand.core.result.ResultResponses;
@@ -25,13 +26,13 @@ public class ComplaintController {
     private final ComplaintService complaintService;
 
     @PostMapping
-    public ResponseEntity<?> createComplaint(@RequestBody @Valid ComplaintRequest complaintRequest,
+    public ResponseEntity<ComplaintDto> createComplaint(@RequestBody @Valid ComplaintRequest complaintRequest,
                                              @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(complaintService.createComplaint(currentUser.getId(),complaintRequest));
     }
 
     @PostMapping("/{complaintId}/appeal")
-    public ResponseEntity<?> appeal(@PathVariable String complaintId,
+    public ResponseEntity<ComplaintDto> appeal(@PathVariable String complaintId,
                                     @RequestBody @Valid AppealRequest appealRequest,
                                     @AuthenticationPrincipal User currentUser) {
         return ResultResponses.ok(complaintService.submitAppeal(currentUser.getId(), complaintId, appealRequest));

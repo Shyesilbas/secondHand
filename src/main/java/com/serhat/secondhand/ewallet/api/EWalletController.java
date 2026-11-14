@@ -32,33 +32,33 @@ public class EWalletController {
     private final PaymentStatsService paymentStatsService;
 
     @PostMapping
-    public ResponseEntity<?> createEWallet(@RequestBody EwalletRequest request) {
+    public ResponseEntity<EWalletDto> createEWallet(@RequestBody EwalletRequest request) {
         log.info("Creating eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.createEWallet(request);
         return ResultResponses.ok(Result.success(eWallet));
     }
 
     @GetMapping
-    public ResponseEntity<?> getEWallet() {
+    public ResponseEntity<EWalletDto> getEWallet() {
         log.debug("Getting eWallet for authenticated user");
         EWalletDto eWallet = eWalletService.getEWalletByUserId();
         return ResultResponses.ok(Result.success(eWallet));
     }
 
     @PutMapping("/update/spending-warning")
-    public ResponseEntity<?> updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
+    public ResponseEntity<Void> updateSpendingWarning(@RequestBody BigDecimal newSpendingWarning){
         eWalletService.updateSpendingWarningLimit(newSpendingWarning);
         return ResultResponses.ok(Result.success());
     }
 
     @DeleteMapping("/update/spending-warning")
-    public ResponseEntity<?> removeSpendingWarning(){
+    public ResponseEntity<Void> removeSpendingWarning(){
         eWalletService.removeSpendingWarningLimit();
         return ResultResponses.ok(Result.success());
     }
 
     @PutMapping("/limits")
-    public ResponseEntity<?> updateLimits(
+    public ResponseEntity<EWalletDto> updateLimits(
             @RequestBody UpdateLimitRequest request) {
         log.info("Updating limits for authenticated user");
         EWalletDto eWallet = eWalletService.updateLimits(request);
@@ -66,7 +66,7 @@ public class EWalletController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<?> deposit(
+    public ResponseEntity<String> deposit(
             @RequestBody DepositRequest request,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
@@ -76,7 +76,7 @@ public class EWalletController {
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<?> withdraw(
+    public ResponseEntity<String> withdraw(
             @RequestBody WithdrawRequest request,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         log.info("Processing withdrawal for authenticated user");
@@ -86,7 +86,7 @@ public class EWalletController {
 
 
     @GetMapping("/balance/check")
-    public ResponseEntity<?> checkBalance(
+    public ResponseEntity<Boolean> checkBalance(
             @RequestParam BigDecimal amount) {
         log.debug("Checking balance for authenticated user");
         boolean hasBalance = eWalletService.hasSufficientBalance(amount);
@@ -94,7 +94,7 @@ public class EWalletController {
     }
 
     @GetMapping("/spending-warning/check")
-    public ResponseEntity<?> checkSpendingWarning(
+    public ResponseEntity<SpendingWarningCheckResponse> checkSpendingWarning(
             @RequestParam BigDecimal amount) {
         log.debug("Checking spending warning threshold for authenticated user");
         SpendingWarningCheckResponse response = eWalletService.checkSpendingWarning(amount);
@@ -102,7 +102,7 @@ public class EWalletController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<?> getTransactions(
+    public ResponseEntity<Page<PaymentDto>> getTransactions(
             @AuthenticationPrincipal User currentUser,
             @PageableDefault(size = 10, sort = "processedAt", direction = Sort.Direction.DESC) Pageable pageable) {
         log.info("Fetching eWallet transactions for user: {}", currentUser.getEmail());

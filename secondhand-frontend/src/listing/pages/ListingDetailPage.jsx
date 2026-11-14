@@ -46,11 +46,11 @@ const discountPercent = (original, sale) => {
 
 /* ── Sub-components ──────────────────────────────────────── */
 
-const CARD = 'rounded border border-border bg-background-primary';
+const CARD = 'rounded-lg border border-border-light bg-background-secondary/40';
 
 // Mirrors the final geometry: gallery + sections on the left, buy box + seller card on the right.
 const DetailSkeleton = () => (
-  <div className="min-h-screen bg-background-secondary pb-24">
+  <div className="min-h-screen bg-background-primary pb-24">
     <PageContainer className="pt-4">
       <Skeleton className="mb-4 h-5 w-64" />
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 xl:gap-8">
@@ -73,7 +73,7 @@ const DetailSkeleton = () => (
 const DetailError = ({ error }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background-secondary p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background-primary p-4">
       <div className={`${CARD} w-full max-w-md p-8 text-center`}>
         <AlertTriangle className="mx-auto mb-4 h-5 w-5 text-status-error" strokeWidth={1.5} aria-hidden />
         <h1 className="mb-2 text-lg font-semibold text-text-primary">
@@ -219,7 +219,7 @@ const ListingDetailPage = () => {
   const isPurchasableType = !NON_PURCHASABLE_TYPES.includes(listing.type);
   const isActive = listing.status === LISTING_STATUS.ACTIVE;
   const canPurchase = !isOwner && isPurchasableType && isActive;
-  const typeLabel = getListingTypeOptions().find(o => o.value === listing.type)?.label ?? listing.type;
+  const typeLabel = t(`category_${String(listing.type).toLowerCase()}`, getListingTypeOptions().find(o => o.value === listing.type)?.label ?? listing.type);
   const locationLabel = [listing.district, listing.city].filter(Boolean).join(', ') || t('location_not_specified', 'Konum belirtilmedi');
   const shouldClampDescription = listing.description?.length > DESCRIPTION_CLAMP_CHARS;
 
@@ -244,7 +244,7 @@ const ListingDetailPage = () => {
   const showMobileBar = !isOwner;
 
   return (
-    <div className={`min-h-screen bg-background-secondary text-text-primary ${showMobileBar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
+    <div className={`min-h-screen bg-background-primary text-text-primary ${showMobileBar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
       {isOfferModalOpen && (
         <Suspense fallback={null}>
           <MakeOfferModal isOpen={isOfferModalOpen} onClose={() => setIsOfferModalOpen(false)} listing={listing} />
@@ -269,7 +269,7 @@ const ListingDetailPage = () => {
               {t("all_listings", "İlanlar")}
             </Link>
             <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" strokeWidth={1.5} aria-hidden />
-            <span className="shrink-0 text-text-secondary">{typeLabel}</span>
+            <Link to={`${ROUTES.LISTINGS}?category=${listing.type}`} className="shrink-0 text-text-secondary transition-colors hover:text-text-primary">{typeLabel}</Link>
             <ChevronRight className="hidden h-4 w-4 shrink-0 text-text-muted md:block" strokeWidth={1.5} aria-hidden />
             <span className="hidden truncate text-text-secondary md:inline" aria-current="page">{listing.title}</span>
           </nav>
@@ -298,10 +298,9 @@ const ListingDetailPage = () => {
             <ListingGallery key={listing.id} images={images} title={listing.title} />
           </div>
 
-          <aside className="space-y-4 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-20">
+          <aside className="space-y-4 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-28">
             <ListingBuyBox
               listing={listing}
-              typeLabel={typeLabel}
               locationLabel={locationLabel}
               price={{ display: displayPrice, hasCampaign, discount }}
               isOwner={isOwner}
@@ -378,7 +377,7 @@ const ListingDetailPage = () => {
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background-primary px-4 py-3 lg:hidden">
           <div className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-semibold leading-tight tabular-nums text-text-price">
+              <p className="whitespace-nowrap text-base font-semibold leading-tight tabular-nums text-text-price">
                 {formatCurrency(displayPrice, listing.currency)}
               </p>
               {hasCampaign && (
@@ -390,10 +389,10 @@ const ListingDetailPage = () => {
             {canPurchase ? (
               <div className="flex shrink-0 items-center gap-2">
                 <ContactSellerButton listing={listing} variant="secondary" iconOnly className="h-11 w-11" />
-                <Button variant="secondary" className="h-11" onClick={openOffer}>
+                <Button variant="secondary" className="h-11 !px-3" onClick={openOffer}>
                   {t('make_offer', 'Teklif')}
                 </Button>
-                <Button className="h-11" onClick={handleCartClick} disabled={isAddingToCart}>
+                <Button className="h-11 !px-3" onClick={handleCartClick} disabled={isAddingToCart}>
                   {isAddingToCart ? t("adding_to_cart", "Ekleniyor...") : itemIsInCart ? t("go_to_cart_short", "Sepete git") : t("add_to_cart", "Sepete ekle")}
                 </Button>
               </div>

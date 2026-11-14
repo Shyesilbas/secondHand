@@ -16,7 +16,11 @@ public enum UserErrorCodes implements ErrorCode {
     EMAIL_ALREADY_IN_USE("EMAIL_ALREADY_IN_USE", "The email is already in use", HttpStatus.CONFLICT),
     NO_ACTIVE_VERIFICATION_CODE("NO_ACTIVE_VERIFICATION_CODE", "No active verification code found. Please request a new code", HttpStatus.BAD_REQUEST),
     INCORRECT_VERIFICATION_CODE("INCORRECT_VERIFICATION_CODE", "Incorrect verification code", HttpStatus.BAD_REQUEST),
-    INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS("INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS", "Incorrect verification code. Attempts left: %d", HttpStatus.BAD_REQUEST);
+    INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS("INCORRECT_VERIFICATION_CODE_WITH_ATTEMPTS", "Incorrect verification code. Attempts left: %d", HttpStatus.BAD_REQUEST),
+    CANNOT_BLOCK_SELF("CANNOT_BLOCK_SELF", "You cannot block yourself", HttpStatus.BAD_REQUEST),
+    USER_BLOCKED("USER_BLOCKED", "This action is not available between these users", HttpStatus.FORBIDDEN),
+    USER_BLOCKED_YOU("USER_BLOCKED_YOU", "This user has blocked you", HttpStatus.FORBIDDEN),
+    USER_BLOCKED_BY_YOU("USER_BLOCKED_BY_YOU", "You have blocked this user", HttpStatus.FORBIDDEN);
 
     private final String code;
     private final String message;

@@ -33,7 +33,8 @@ public class ChatRoomUpdater {
             return;
         }
 
-        room.setLastMessage(lastMessage.getContent());
+        // A moderated message keeps its time and sender but no text; clients show a system notice.
+        room.setLastMessage(lastMessage.isRemovedByModeration() ? null : lastMessage.getContent());
         room.setLastMessageTime(lastMessage.getCreatedAt());
         room.setLastMessageSenderId(lastMessage.getSender().getId());
     }

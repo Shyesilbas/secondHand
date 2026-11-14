@@ -16,12 +16,13 @@ import com.serhat.secondhand.order.entity.Order;
 import com.serhat.secondhand.order.entity.OrderItem;
 import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class OrderNotificationListener {
 
@@ -41,6 +41,22 @@ public class OrderNotificationListener {
     private final OrderMapper orderMapper;
     private final OrderLogService orderLog;
     private final OrderRepository orderRepository;
+    private final TransactionTemplate readOnlyTx;
+
+    public OrderNotificationListener(INotificationService notificationService,
+                                     NotificationTemplateCatalog notificationTemplateCatalog,
+                                     OrderMapper orderMapper,
+                                     OrderLogService orderLog,
+                                     OrderRepository orderRepository,
+                                     PlatformTransactionManager transactionManager) {
+        this.notificationService = notificationService;
+        this.notificationTemplateCatalog = notificationTemplateCatalog;
+        this.orderMapper = orderMapper;
+        this.orderLog = orderLog;
+        this.orderRepository = orderRepository;
+        this.readOnlyTx = new TransactionTemplate(transactionManager);
+        this.readOnlyTx.setReadOnly(true);
+    }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -49,10 +65,15 @@ public class OrderNotificationListener {
             return;
         }
         try {
-            OrderDto orderDto = orderMapper.toDto(event.order());
+            OrderDto orderDto = readOnlyTx.execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
+                    .map(orderMapper::toDto)
+                    .orElseGet(() -> orderMapper.toDto(event.order())));
+            if (orderDto == null) {
+                return;
+            }
             sendBuyerInAppNotification(event.buyer().getId(), orderDto);
             sendSellerInAppNotifications(orderDto);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCreatedInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -100,7 +121,7 @@ public class OrderNotificationListener {
                     orderLog.logNotificationFailed("orderCancelledCounterpartyInApp", order.getOrderNumber(), cr.getMessage());
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCancelledInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -126,7 +147,7 @@ public class OrderNotificationListener {
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderCompletedInApp", order.getOrderNumber(), result.getMessage());
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCompletedInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -152,7 +173,7 @@ public class OrderNotificationListener {
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderRefundedInApp", order.getOrderNumber(), result.getMessage());
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderRefundedInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -182,7 +203,7 @@ public class OrderNotificationListener {
             if (result.isError()) {
                 orderLog.logNotificationFailed("orderStatusChangedInApp", order.getOrderNumber(), result.getMessage());
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderStatusChangedInApp", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -211,7 +232,7 @@ public class OrderNotificationListener {
                     orderLog.logNotificationFailed("orderSystemCancelledInApp", orderNumber, result.getMessage());
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderSystemCancelledInApp", orderNumber, e.getMessage());
         }
     }

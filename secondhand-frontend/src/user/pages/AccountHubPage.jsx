@@ -30,6 +30,7 @@ import { orderService } from '../../order/services/orderService.js';
 import { formatCurrency, formatDate, formatLongDate } from '../../common/formatters.js';
 import MyShowcasesPanel from '../../showcase/components/MyShowcasesPanel.jsx';
 import { useMyShowcases } from '../../showcase/hooks/useMyShowcases.js';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 
 const getInitials = (name) => {
   const value = (name || '').trim();
@@ -90,6 +91,7 @@ const DetailRow = ({ label, value, hint }) => (
 
 const AccountHubPage = () => {
   const { t, i18n } = useTranslation();
+  const restrictionFlags = useRestrictionFlags();
   const isTr = Boolean(i18n?.language?.startsWith('tr'));
   const trEn = (trText, enText) => (isTr ? trText : enText);
 
@@ -358,10 +360,17 @@ const AccountHubPage = () => {
                   {t('your_personal_secondhand_space')}
                 </p>
               </div>
-              <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses()} shrink-0`}>
-                <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-                <span>{t('new_listing', 'New Listing')}</span>
-              </Link>
+              {restrictionFlags.canCreateListings ? (
+                <Link to={ROUTES.CREATE_LISTING} className={`${buttonClasses()} shrink-0`}>
+                  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>{t('new_listing', 'New Listing')}</span>
+                </Link>
+              ) : (
+                <button type="button" disabled title="Hesabınızdaki kısıtlama nedeniyle ilan oluşturamazsınız" className={`${buttonClasses()} shrink-0 disabled:cursor-not-allowed disabled:opacity-50`}>
+                  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+                  <span>{t('new_listing', 'New Listing')}</span>
+                </button>
+              )}
             </div>
 
             {/* Quick Links Strip */}

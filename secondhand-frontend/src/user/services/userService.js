@@ -1,4 +1,4 @@
-import { get, put, post, del } from '../../common/services/api/request.js';
+import { get, put, post, patch, del } from '../../common/services/api/request.js';
 import { API_ENDPOINTS } from '../../common/constants/apiEndpoints.js';
 import { 
  createUpdatePhoneRequest,
@@ -9,6 +9,13 @@ export const userService = {
  getUserById: async (userId) => {
  return get(API_ENDPOINTS.USER.BY_ID(userId));
  },
+
+ getSettings: async () => get(API_ENDPOINTS.USER.SETTINGS),
+ updateSettings: async (settings) => patch(API_ENDPOINTS.USER.SETTINGS, settings),
+ getBlockedUsers: async () => get(API_ENDPOINTS.USER.BLOCKED_USERS),
+ getBlockStatus: async (userId) => get(API_ENDPOINTS.USER.BLOCK_STATUS(userId)),
+ blockUser: async (userId) => post(API_ENDPOINTS.USER.BLOCK(userId)),
+ unblockUser: async (userId) => del(API_ENDPOINTS.USER.BLOCK(userId)),
 
  getGreatSellerStatus: async (userId) => {
  return get(API_ENDPOINTS.USER.GREAT_SELLER_STATUS(userId));

@@ -2,11 +2,9 @@ package com.serhat.secondhand.listing.application.generator;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.listing.application.realestate.RealEstateListingService;
 import com.serhat.secondhand.listing.domain.dto.request.common.BaseListingCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.realestate.RealEstateCreateRequest;
-import com.serhat.secondhand.listing.domain.entity.enums.base.Currency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -166,9 +164,8 @@ class RealEstateListingGenerator {
                 : random.chance(0.55) ? "AGENCY" : "OWNER";
 
         String title = title(kind, rent, s, place);
-        BaseListingCreateRequest base = new BaseListingCreateRequest(title, description(kind, rent, s, place),
-                asking, Currency.TRY, place.cityLabel(), place.districtLabel(), place.cityKey(), place.districtKey(),
-                place.neighborhoodKey(), null, false);
+        BaseListingCreateRequest base = ListingGeneratorSupport.baseRequest(
+                title, description(kind, rent, s, place), asking, place, null, false);
         RealEstateCreateRequest request = new RealEstateCreateRequest(base,
                 catalog.adTypes().get(rent ? "FOR_RENT" : "FOR_SALE"), catalog.types().get(kind.type()),
                 s.heating == null ? null : catalog.heating().get(s.heating), catalog.owners().get(owner),
@@ -176,12 +173,10 @@ class RealEstateListingGenerator {
                 s.furnished, s.balcony, s.elevator, s.parking, s.monthlyFee, s.inSite, s.siteName, s.garden, null,
                 s.pool, s.zoning, null, null, null, s.kaks, s.gabari, s.roadFrontage, s.infrastructure,
                 s.electricity, s.roadAccess, random.chance(0.08), attributes);
-        Result<UUID> result = realEstateListingService.createRealEstateListing(request, sellerId);
-        if (result.isError()) {
-            throw new IllegalStateException("Generated real estate listing rejected (" + kind.type() + ", " + title + "): "
-                    + result.getErrorCode() + " " + result.getMessage());
-        }
-        return result.getData();
+        return ListingGeneratorSupport.requireCreated(
+                realEstateListingService.createRealEstateListing(request, sellerId),
+                "real estate",
+                kind.type() + ", " + title);
     }
 
     /** The listing fields a generated property fills; null = not asked for its type. */
@@ -419,14 +414,9 @@ class RealEstateListingGenerator {
         return d.toString();
     }
 
-    /** Insertion-ordered weights (Map.of order changes between JVM runs, which would break the seed). */
-    @SuppressWarnings("unchecked")
+    /** Insertion-ordered weights delegating to shared deterministic helper. */
     private static <T> Map<T, Integer> w(Object... keyWeightPairs) {
-        Map<T, Integer> weights = new LinkedHashMap<>();
-        for (int i = 0; i < keyWeightPairs.length; i += 2) {
-            weights.put((T) keyWeightPairs[i], (Integer) keyWeightPairs[i + 1]);
-        }
-        return weights;
+        return GeneratorRandom.weights(keyWeightPairs);
     }
 
     /** "Kadıköy" -> "Kadıköy'de", "Çankaya" -> "Çankaya'da", "Konak" -> "Konak'ta". */

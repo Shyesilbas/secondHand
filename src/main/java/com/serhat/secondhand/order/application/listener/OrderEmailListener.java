@@ -20,12 +20,13 @@ import com.serhat.secondhand.order.mapper.OrderMapper;
 import com.serhat.secondhand.order.repository.OrderRepository;
 import com.serhat.secondhand.user.application.IUserService;
 import com.serhat.secondhand.user.domain.entity.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
@@ -35,7 +36,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class OrderEmailListener {
 
@@ -45,6 +45,24 @@ public class OrderEmailListener {
     private final IUserService userService;
     private final OrderLogService orderLog;
     private final OrderRepository orderRepository;
+    private final TransactionTemplate readOnlyTx;
+
+    public OrderEmailListener(EmailEventPublisher emailEventPublisher,
+                              EmailConfig emailConfig,
+                              OrderMapper orderMapper,
+                              IUserService userService,
+                              OrderLogService orderLog,
+                              OrderRepository orderRepository,
+                              PlatformTransactionManager transactionManager) {
+        this.emailEventPublisher = emailEventPublisher;
+        this.emailConfig = emailConfig;
+        this.orderMapper = orderMapper;
+        this.userService = userService;
+        this.orderLog = orderLog;
+        this.orderRepository = orderRepository;
+        this.readOnlyTx = new TransactionTemplate(transactionManager);
+        this.readOnlyTx.setReadOnly(true);
+    }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -53,11 +71,16 @@ public class OrderEmailListener {
             return;
         }
         try {
-            OrderDto orderDto = orderMapper.toDto(event.order());
+            OrderDto orderDto = readOnlyTx.execute(status -> orderRepository.findByIdWithFullDetails(event.order().getId())
+                    .map(orderMapper::toDto)
+                    .orElseGet(() -> orderMapper.toDto(event.order())));
+            if (orderDto == null) {
+                return;
+            }
             sendCustomerConfirmationEmail(event.buyer(), orderDto);
             sendSellerNotificationEmails(orderDto);
             orderLog.logNotificationSent("orderCreatedEmail", event.order().getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCreatedEmail", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -124,7 +147,7 @@ public class OrderEmailListener {
             }
 
             orderLog.logNotificationSent("orderCancelledEmail", order.getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCancelledEmail", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -146,7 +169,7 @@ public class OrderEmailListener {
             emailEventPublisher.publish(
                     new OrderCompletedEmailEvent(event.buyer(), emailConfig.getOrder().getCompletedSubject(), data));
             orderLog.logNotificationSent("orderCompletedEmail", order.getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderCompletedEmail", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -167,7 +190,7 @@ public class OrderEmailListener {
             emailEventPublisher.publish(
                     new OrderRefundedEmailEvent(event.buyer(), emailConfig.getOrder().getRefundedSubject(), data));
             orderLog.logNotificationSent("orderRefundedEmail", order.getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("orderRefundedEmail", event.order().getOrderNumber(), e.getMessage());
         }
     }
@@ -217,7 +240,7 @@ public class OrderEmailListener {
 
             emailEventPublisher.publish(new OrderConfirmationEmailEvent(customer, subject, data));
             orderLog.logNotificationSent("customerConfirmationEmail", orderDto.getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("customerConfirmationEmail", orderDto.getOrderNumber(), e.getMessage());
         }
     }
@@ -286,7 +309,7 @@ public class OrderEmailListener {
 
             emailEventPublisher.publish(new SaleNotificationEmailEvent(seller, subject, data));
             orderLog.logNotificationSent("sellerSaleEmail", orderDto.getOrderNumber());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             orderLog.logNotificationFailed("sellerSaleEmail", orderDto.getOrderNumber(), e.getMessage());
         }
     }

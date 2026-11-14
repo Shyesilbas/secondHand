@@ -7,6 +7,7 @@ import ChatWindow from './ChatWindow.jsx';
 import { sameChatId } from '../chatIdUtils.js';
 import { buttonClasses } from '../../common/components/ui/Button.jsx';
 import { useLoginPrompt } from '../../auth/hooks/useLoginPrompt.js';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 const ContactSellerButton = ({
  listing,
@@ -27,6 +28,7 @@ const ContactSellerButton = ({
  }
  } = useAuth();
  const [isChatOpen, setIsChatOpen] = useState(false);
+ const { canSendMessages } = useRestrictionFlags();
  const promptLogin = useLoginPrompt();
  const { showError } = useNotification();
  const {
@@ -48,6 +50,10 @@ const ContactSellerButton = ({
  if (sameChatId(targetUserId, user?.id)) {
  return null;
  }
+ const messagingOff = listing.canSendMessage === false;
+ let disabledTitle = null;
+ if (!canSendMessages) disabledTitle = 'Hesabınızdaki kısıtlama nedeniyle mesaj gönderemezsiniz';
+ else if (messagingOff) disabledTitle = isDirectChat ? 'Bu kullanıcı mesaj almıyor.' : 'Bu ilan için mesajlaşma kapatıldı.';
  const handleContactSeller = async () => {
  if (!isAuthenticated) {
  promptLogin();
@@ -67,7 +73,7 @@ const ContactSellerButton = ({
  }
  };
  return <>
- <button type="button" onClick={handleContactSeller} className={`${buttonClasses(variant, size)} ${iconOnly ? '!px-0 w-10' : ''} ${className}`} title={t("contact_seller")} aria-label={iconOnly ? t("contact_seller") : undefined}>
+ <button type="button" onClick={handleContactSeller} className={`${buttonClasses(variant, size)} disabled:cursor-not-allowed disabled:opacity-50 ${iconOnly ? '!px-0 w-10' : ''} ${className}`} disabled={Boolean(disabledTitle)} title={disabledTitle || t("contact_seller")} aria-label={iconOnly ? t("contact_seller") : undefined}>
  <ChatBubbleLeftRightIcon className="h-4 w-4" strokeWidth={1.5} aria-hidden />{iconOnly ? null : label || t("contact_seller")}</button>
 
  {isChatOpen && <ChatWindow isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} selectedChatRoom={selectedChatRoom} messages={messages} onSendMessage={sendMessage} onDeleteMessage={deleteMessage} onDeleteConversation={deleteConversation} onConversationDeleted={() => setIsChatOpen(false)} isLoadingMessages={isLoadingMessages} isConnected={isConnected} />}

@@ -37,7 +37,7 @@ public class OfferStockHoldService {
         } catch (BusinessException e) {
             log.warn("Offer {} accept: stock hold refused for listing {}: {}", offer.getId(), listingId, e.getMessage());
             return Result.error(e.getMessage(), e.getErrorCode());
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataAccessException | org.springframework.data.redis.serializer.SerializationException e) {
             log.error("Offer {} accept: stock hold failed for listing {}", offer.getId(), listingId, e);
             return Result.error(OfferErrorCodes.OFFER_STOCK_HOLD_FAILED);
         }
@@ -78,7 +78,7 @@ public class OfferStockHoldService {
     private void releaseNow(Long buyerId, UUID listingId) {
         try {
             inventoryReservation.cancelUserReservation(buyerId, listingId);
-        } catch (Exception e) {
+        } catch (org.springframework.dao.DataAccessException | org.springframework.data.redis.serializer.SerializationException e) {
             // The reservation key keeps its TTL (the payment deadline), so the units come back at the latest then.
             log.error("Failed to release offer stock hold of buyer {} on listing {}", buyerId, listingId, e);
         }

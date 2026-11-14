@@ -5,8 +5,10 @@ import com.serhat.secondhand.core.result.ResultResponses;
 
 import com.serhat.secondhand.core.security.PublicEndpoint;
 import com.serhat.secondhand.core.audit.service.AuditLogService;
+import com.serhat.secondhand.listing.application.common.ListingSocialProofService;
 import com.serhat.secondhand.listing.application.common.ListingViewService;
 import com.serhat.secondhand.listing.domain.dto.request.TrackViewRequest;
+import com.serhat.secondhand.listing.domain.dto.response.listing.ListingSocialProofDto;
 import com.serhat.secondhand.listing.domain.dto.response.listing.ListingViewStatsDto;
 import com.serhat.secondhand.listing.util.ListingBusinessConstants;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -21,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -32,12 +35,12 @@ public class ListingViewController {
 
     private final ListingViewService listingViewService;
     private final AuditLogService auditLogService;
-    private final com.serhat.secondhand.listing.application.common.ListingSocialProofService socialProofService;
+    private final ListingSocialProofService socialProofService;
 
     @PublicEndpoint
     @PostMapping("/{id}/view")
     @Operation(summary = "Track a listing view", description = "Public endpoint to track when a listing is viewed. Supports both authenticated and anonymous users.")
-    public ResponseEntity<?> trackView(
+    public ResponseEntity<Void> trackView(
             @PathVariable UUID id,
             @RequestBody(required = false) TrackViewRequest request,
             @AuthenticationPrincipal User currentUser,
@@ -55,7 +58,7 @@ public class ListingViewController {
 
     @GetMapping("/{id}/view-stats")
     @Operation(summary = "Get listing view statistics", description = "Get view statistics for a listing. Only accessible by the listing owner.")
-    public ResponseEntity<?> getViewStatistics(
+    public ResponseEntity<ListingViewStatsDto> getViewStatistics(
             @PathVariable UUID id,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
@@ -71,15 +74,15 @@ public class ListingViewController {
     @PublicEndpoint
     @GetMapping("/{id}/active-viewers")
     @Operation(summary = "Get active viewers count", description = "Get the number of unique active viewers in the last 24 hours")
-    public ResponseEntity<?> getActiveViewers(@PathVariable UUID id) {
+    public ResponseEntity<Map<String, Integer>> getActiveViewers(@PathVariable UUID id) {
         int count = listingViewService.getActiveViewerCount(id);
-        return ResultResponses.okWithBody(Result.success(), java.util.Map.of("count", count));
+        return ResultResponses.okWithBody(Result.success(), Map.of("count", count));
     }
 
     @PublicEndpoint
     @GetMapping("/{id}/social-proof")
     @Operation(summary = "Get unified social proof metrics", description = "Get active viewers in 24h, distinct users with listing in cart, and favorite count")
-    public ResponseEntity<?> getSocialProof(@PathVariable UUID id) {
+    public ResponseEntity<ListingSocialProofDto> getSocialProof(@PathVariable UUID id) {
         var socialProof = socialProofService.getSocialProof(id);
         return ResultResponses.ok(Result.success(socialProof));
     }

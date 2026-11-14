@@ -82,7 +82,7 @@ public class BannedSellerOrderCancellationListener {
                 return true;
             });
             return Boolean.TRUE.equals(ok);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Cancelling order {} of banned seller {} failed", orderId, sellerId, e);
             return false;
         }

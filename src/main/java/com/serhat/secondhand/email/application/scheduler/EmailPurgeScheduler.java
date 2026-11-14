@@ -3,6 +3,7 @@ package com.serhat.secondhand.email.application.scheduler;
 import com.serhat.secondhand.email.domain.repository.EmailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ public class EmailPurgeScheduler {
     private final EmailRepository emailRepository;
 
     @Scheduled(cron = "0 0 2 * * *") // Daily at 2:00 AM
+    @SchedulerLock(name = "emailPurgeScheduler", lockAtMostFor = "PT30M", lockAtLeastFor = "PT1M")
     @Transactional
     public void purgeOldEmails() {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(30);

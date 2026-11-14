@@ -14,6 +14,9 @@ Provides real-time 1-on-1 buyer-seller messaging (`chat_rooms` and `messages` ta
 - **Durable Persistence Before Broadcast:** Every message (REST or STOMP `/app/chat.send`) is persisted to `messages` (`is_read = false`) and updates `chat_rooms.last_message_at` before broadcasting over Redis Pub/Sub and STOMP (`/topic/room.{roomId}`, `/user/queue/messages`) and triggering `ChatNotificationService`.
 - **In-Chat Offer Integration:** `POST /api/v1/chats/rooms/{roomId}/offers` (`SendInChatOfferRequest`) creates an `Offer` in `offers` and attaches `offer_id` to a chat message in the room transcript.
 
+- **Messaging lock:** `ChatService` refuses rooms, messages and in-chat offers when a user block exists (`USER_BLOCKED`), when `listings.can_send_message` is false for a listing room (`CHAT_DISABLED_BY_SELLER`), or when the recipient's `users.can_send_message` is false in a direct room (`CHAT_DISABLED_BY_USER`). Existing rooms lock too; `ChatRoomDto.messagingDisabled` carries the reason to the UI.
+- **Moderation tombstone:** a penalty on a complaint with `reportedMessageId` sets `messages.removed_by_moderation`; `ChatMessageMapper` then nulls the content for clients while the row keeps its text for appeal review. An approved appeal restores it (`SanctionExecutor`).
+
 ## WebSocket & Redis
 - STOMP endpoint: `/ws` (SockJS, authenticated on `CONNECT` via `access_token` cookie or Bearer JWT in `WebSocketSecurityConfig`).
 - Inbound destination: `/app/chat.send` (`ChatMessageDto`). Outbound: `/topic/room.{roomId}` and `/user/queue/messages` (backed by Redis Pub/Sub).

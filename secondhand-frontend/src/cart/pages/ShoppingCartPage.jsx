@@ -233,7 +233,7 @@ const ShoppingCartPage = () => {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition mb-2"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary transition mb-2"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>{t("continue_shopping", "Alışverişe Devam Et")}</span>
@@ -243,7 +243,7 @@ const ShoppingCartPage = () => {
                 {t("shopping_cart", "Alışveriş Sepeti")}
               </h1>
               {cartCount > 0 && (
-                <span className="rounded-sm border border-border-light bg-background-primary px-2.5 py-0.5 text-xs font-medium tabular-nums text-text-secondary">
+                <span className="rounded-sm border border-border-light bg-background-primary px-2.5 py-0.5 text-sm font-medium tabular-nums text-text-secondary">
                   {cartCount} {cartCount === 1 ? t("item", "ürün") : t("items", "ürün")}
                 </span>
               )}
@@ -254,7 +254,7 @@ const ShoppingCartPage = () => {
             <button
               type="button"
               onClick={() => setShowClearModal(true)}
-              className="text-xs font-medium text-text-secondary hover:text-status-error transition self-start sm:self-auto"
+              className="text-sm font-medium text-text-secondary hover:text-status-error transition self-start sm:self-auto"
             >
               {t("clear_all", "Sepeti Temizle")}
             </button>
@@ -294,11 +294,11 @@ const ShoppingCartPage = () => {
                     <h2 className="text-sm font-semibold text-text-primary">
                       {CART_MESSAGES.EMPTY_CART_FAVORITES_TITLE}
                     </h2>
-                    <p className="mt-0.5 text-xs text-text-secondary">
+                    <p className="mt-0.5 text-sm text-text-secondary">
                       {CART_MESSAGES.EMPTY_CART_FAVORITES_SUB}
                     </p>
                   </div>
-                  <Link to={ROUTES.FAVORITES} className="text-xs font-medium text-text-primary hover:underline">
+                  <Link to={ROUTES.FAVORITES} className="text-sm font-medium text-text-primary hover:underline">
                     {CART_MESSAGES.EMPTY_CART_SEE_ALL_FAVORITES} →
                   </Link>
                 </div>
@@ -318,14 +318,14 @@ const ShoppingCartPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="rounded border border-dashed border-border-light py-8 text-center text-xs text-text-secondary">
+                  <p className="rounded border border-dashed border-border-light py-8 text-center text-sm text-text-secondary">
                     {t("no_favorites_yet_tap_the_heart_on_a_list")}
                   </p>
                 )}
               </section>
             ) : (
               <div className="overflow-hidden rounded-md border border-border bg-background-primary shadow-sm flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs text-text-secondary">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
+                <p className="text-sm text-text-secondary">{CART_MESSAGES.EMPTY_CART_GUEST_FAVORITES}</p>
                 <Link to={ROUTES.LOGIN} className={`${buttonClasses()} shrink-0`}>
                   {CART_MESSAGES.EMPTY_CART_SIGN_IN}
                 </Link>
@@ -340,7 +340,7 @@ const ShoppingCartPage = () => {
               {(hasExpiredReservations || hasExpiringReservations) && (
                 <div
                   role="alert"
-                  className="flex items-start gap-3 rounded-md border border-border bg-background-primary p-3.5 text-xs text-text-secondary shadow-sm"
+                  className="flex items-start gap-3 rounded-md border border-border bg-background-primary p-3.5 text-sm text-text-secondary shadow-sm"
                 >
                   <AlertTriangle
                     className={`h-4 w-4 shrink-0 mt-0.5 ${hasExpiredReservations ? 'text-status-error' : 'text-status-warning'
@@ -367,7 +367,7 @@ const ShoppingCartPage = () => {
                   {unlockedBundles.map((a) => (
                     <div
                       key={a.campaignId}
-                      className="flex items-center justify-between gap-3 rounded-md border border-border bg-background-primary p-3.5 text-xs shadow-sm"
+                      className="flex items-center justify-between gap-3 rounded-md border border-border bg-background-primary p-3.5 text-sm shadow-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Check className="h-4 w-4 text-status-success-icon shrink-0" strokeWidth={2} />
@@ -383,7 +383,7 @@ const ShoppingCartPage = () => {
                       <button
                         type="button"
                         onClick={() => navigate(ROUTES.USER_PROFILE(a.sellerId))}
-                        className="text-xs font-medium text-text-secondary hover:text-text-primary hover:underline shrink-0"
+                        className="text-sm font-medium text-text-secondary hover:text-text-primary hover:underline shrink-0"
                       >
                         {t("view_seller", "Satıcıyı Gör")}
                       </button>
@@ -405,7 +405,7 @@ const ShoppingCartPage = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                              <span className="text-sm font-semibold uppercase tracking-wider text-text-secondary">
                                 {t("exclusive_bundle_from", "Özel Satıcı Paketi:")}{' '}
                                 <button
                                   type="button"
@@ -417,7 +417,7 @@ const ShoppingCartPage = () => {
                               </span>
                             </div>
 
-                            <p className="mt-1.5 text-xs text-text-secondary">
+                            <p className="mt-1.5 text-sm text-text-secondary">
                               {t("add", "Ekle:")}{' '}
                               <strong className="text-text-primary">
                                 {s.remainingQuantity} {t("more_item", "ürün daha")}
@@ -436,7 +436,7 @@ const ShoppingCartPage = () => {
                                   style={{ width: `${Math.min(100, progress)}%` }}
                                 />
                               </div>
-                              <div className="flex justify-between text-xs text-text-muted tabular-nums">
+                              <div className="flex justify-between text-sm text-text-muted tabular-nums">
                                 <span>{s.qualifyingQuantity} {t("items_in_cart", "ürün sepette")}</span>
                                 <span>Hedef: {s.minQuantity} {t("items", "ürün")}</span>
                               </div>
@@ -446,7 +446,7 @@ const ShoppingCartPage = () => {
                           <button
                             type="button"
                             onClick={() => navigate(ROUTES.USER_PROFILE(s.sellerId))}
-                            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background-primary px-3.5 py-2 text-xs font-semibold text-text-primary transition hover:bg-background-secondary shrink-0 self-start sm:self-center"
+                            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background-primary px-3.5 py-2 text-sm font-semibold text-text-primary transition hover:bg-background-secondary shrink-0 self-start sm:self-center"
                           >
                             <ShoppingBag className="h-3.5 w-3.5 text-text-secondary" />
                             <span>{t("complete_bundle", "Paketi Tamamla")}</span>
@@ -464,7 +464,7 @@ const ShoppingCartPage = () => {
                   <h2 className="text-sm font-semibold text-text-primary">
                     {t("your_items", "Ürünleriniz")} ({cartCount})
                   </h2>
-                  <span className="text-xs text-text-muted">
+                  <span className="text-sm text-text-muted">
                     Güvenli rezervasyon
                   </span>
                 </div>

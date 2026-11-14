@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  Ban as BanIcon,
   MapPin as MapPinIcon,
   ShieldCheck as ShieldCheckIcon,
   User as UserIcon
@@ -13,9 +14,10 @@ import ProfileHeader from '../components/ProfileHeader.jsx';
 import ProfilePersonalInfo from '../components/ProfilePersonalInfo.jsx';
 import ProfileAccountStatus from '../components/ProfileAccountStatus.jsx';
 import AddressList from '../components/AddressList.jsx';
+import BlockedUsersList from '../components/BlockedUsersList.jsx';
 
 // Unknown values, including the retired `actions` tab, fall back to the personal tab.
-const VALID_TABS = new Set(['personal', 'addresses', 'security']);
+const VALID_TABS = new Set(['personal', 'addresses', 'security', 'blocked']);
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -49,6 +51,11 @@ const ProfilePage = () => {
       key: 'security',
       label: t('account_and_security', 'Hesap & Güvenlik'),
       icon: ShieldCheckIcon
+    },
+    {
+      key: 'blocked',
+      label: t('blocked_users', 'Engellediğim Kullanıcılar'),
+      icon: BanIcon
     }
   ];
 
@@ -118,6 +125,9 @@ const ProfilePage = () => {
             )}
             {activeTab === 'security' && (
               <ProfileAccountStatus user={user} />
+            )}
+            {activeTab === 'blocked' && (
+              <BlockedUsersList isActive={activeTab === 'blocked'} />
             )}
           </main>
         </div>

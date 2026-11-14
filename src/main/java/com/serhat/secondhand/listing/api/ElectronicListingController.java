@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +36,7 @@ public class ElectronicListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new electronic listing")
-    public ResponseEntity<?> createElectronicListings(
+    public ResponseEntity<Map<String, UUID>> createElectronicListings(
             @Valid @RequestBody ElectronicCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -46,7 +47,7 @@ public class ElectronicListingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a electronic listing")
-    public ResponseEntity<?> updateElectronicListing(
+    public ResponseEntity<Void> updateElectronicListing(
             @PathVariable UUID id,
             @Valid @RequestBody ElectronicUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -59,7 +60,7 @@ public class ElectronicListingController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get electronic listing details")
-    public ResponseEntity<?> getElectronicDetails(@PathVariable UUID id) {
+    public ResponseEntity<ElectronicListingDto> getElectronicDetails(@PathVariable UUID id) {
         ElectronicListingDto electronic = electronicListingService.getElectronicDetails(id);
         return ResultResponses.ok(Result.success(electronic));
     }
@@ -67,7 +68,7 @@ public class ElectronicListingController {
     @PublicEndpoint
     @GetMapping("/electronic-types/{electronic-type-id}")
     @Operation(summary = "Find electronics by type")
-    public ResponseEntity<?> findByElectronicType(
+    public ResponseEntity<Page<ElectronicListingDto>> findByElectronicType(
             @PathVariable("electronic-type-id") UUID electronicType,
             Pageable pageable) {
         Page<ElectronicListingDto> electronicDto = electronicListingService.findByElectronicType(electronicType, pageable);
@@ -77,7 +78,7 @@ public class ElectronicListingController {
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter electronics listings with advanced criteria")
-    public ResponseEntity<?> filterElectronics(@RequestBody ElectronicListingFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterElectronics(@RequestBody ElectronicListingFilterDto filters) {
         log.info("Filtering electronics with criteria: {}", filters);
         Page<ListingDto> result = electronicListingService.filterElectronics(filters);
         return ResultResponses.ok(Result.success(result));

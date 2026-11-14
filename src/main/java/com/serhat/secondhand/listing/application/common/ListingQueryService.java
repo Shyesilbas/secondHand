@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -46,6 +47,7 @@ public class ListingQueryService {
     private final IReviewService reviewService;
     private final Executor taskExecutor;
     private final ListingQueryService self;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     public ListingQueryService(ListingRepository listingRepository,
                                ListingMapper listingMapper,
@@ -53,7 +55,9 @@ public class ListingQueryService {
                                ListingViewService listingViewService,
                                IReviewService reviewService,
                                @Qualifier("taskExecutor") Executor taskExecutor,
-                               @Lazy ListingQueryService self) {
+                               @Lazy ListingQueryService self,
+                               com.serhat.secondhand.user.application.UserBlockService userBlockService) {
+        this.userBlockService = userBlockService;
         this.listingRepository = listingRepository;
         this.listingMapper = listingMapper;
         this.enrichmentService = enrichmentService;
@@ -74,8 +78,33 @@ public class ListingQueryService {
 
     public Optional<ListingDto> findByIdAsDto(UUID id, Long currentUserId, Long userId) {
         return listingRepository.findByIdWithSeller(id)
-                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
+                .filter(listing -> isVisibleToViewer(listing, currentUserId))
+                .map(listing -> requireNotBlocked(listing, currentUserId))
                 .map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
+    }
+
+    private boolean isVisibleToViewer(Listing listing, Long viewerId) {
+        ListingStatus status = listing.getStatus();
+        if (status == ListingStatus.DELETED) {
+            return false;
+        }
+        if (PUBLIC_BROWSABLE_STATUSES.contains(status)) {
+            return true;
+        }
+        return viewerId != null && listing.getSeller() != null && viewerId.equals(listing.getSeller().getId());
+    }
+
+    private boolean isBlockedBetween(Listing listing, Long viewerId) {
+        return viewerId != null && listing.getSeller() != null
+                && userBlockService.isBlockedEitherWay(viewerId, listing.getSeller().getId());
+    }
+
+    private Listing requireNotBlocked(Listing listing, Long viewerId) {
+        if (isBlockedBetween(listing, viewerId)) {
+            throw new com.serhat.secondhand.core.exception.BusinessException(
+                    ListingErrorCodes.LISTING_ACCESS_DENIED_BLOCKED);
+        }
+        return listing;
     }
 
     /** İlan numarası (ör. Z4ZW3EQZ) ile; listing_no tekil. */
@@ -84,7 +113,8 @@ public class ListingQueryService {
             return Optional.empty();
         }
         return listingRepository.findByListingNoWithSeller(listingNo.trim())
-                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
+                .filter(listing -> isVisibleToViewer(listing, currentUserId))
+                .map(listing -> requireNotBlocked(listing, currentUserId))
                 .map(listing -> toDtoWithEnrichment(listing, currentUserId, userId));
     }
 
@@ -130,9 +160,21 @@ public class ListingQueryService {
 
     public List<ListingDto> findByIds(List<UUID> ids, Long userId) {
         if (ids == null || ids.isEmpty()) return List.of();
-        List<Listing> listings = listingRepository.findAllByIdIn(ids);
+        if (ids.size() > ListingBusinessConstants.MAX_BULK_LISTING_IDS) {
+            throw new com.serhat.secondhand.core.exception.BusinessException(
+                    ListingErrorCodes.BULK_LISTING_LIMIT_EXCEEDED);
+        }
+        List<UUID> uniqueIds = ids.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (uniqueIds.isEmpty()) {
+            return List.of();
+        }
+        List<Listing> listings = listingRepository.findAllByIdIn(uniqueIds);
         List<ListingDto> dtos = listings.stream()
-                .filter(listing -> listing.getStatus() != ListingStatus.DELETED)
+                .filter(listing -> isVisibleToViewer(listing, userId))
+                .filter(listing -> !isBlockedBetween(listing, userId))
                 .map(listingMapper::toDynamicDto)
                 .collect(Collectors.toList());
         return enrichList(dtos, userId);

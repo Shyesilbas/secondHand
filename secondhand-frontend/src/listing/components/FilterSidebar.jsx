@@ -75,7 +75,7 @@ const FilterSidebar = ({
   }
   return <>
     {isOpen && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={onClose} />}
-    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light bg-background-secondary shadow-md
+    <aside className={`fixed left-0 top-0 z-50 flex h-dvh w-80 max-w-[calc(100vw-1.25rem)] flex-col border-r border-border-light bg-background-primary shadow-md
  transform transition-transform duration-300 ease-out
  ${isOpen ? 'translate-x-0' : '-translate-x-full'}
  `} aria-labelledby="listing-filters-title">
@@ -85,7 +85,7 @@ const FilterSidebar = ({
           <div className="flex min-w-0 items-center gap-2">
             <div className="min-w-0">
               <h2 id="listing-filters-title" className="text-lg font-semibold text-text-primary truncate tracking-tight">{t("filters")}</h2>
-              <p className="text-xs font-medium text-text-muted">{t("refine_listings_then_apply")}</p>
+              <p className="text-sm text-text-tertiary">{t("refine_listings_then_apply")}</p>
             </div>
           </div>
           <button type="button" onClick={onClose} className="shrink-0 rounded border border-transparent p-2 text-text-muted transition-colors hover:bg-secondary-light hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 lg:hidden" aria-label={t("close_filters")}>
@@ -95,8 +95,8 @@ const FilterSidebar = ({
       </header>
 
       {/* Scrollable */}
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-        <div className="flex flex-col gap-3">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5">
+        <div className="flex flex-col gap-5">
           {mode === 'mine' ? (/* Mine mode: tabs for category/status */
             <div>
               <div className="mb-3 flex gap-1 rounded bg-secondary-light p-1">
@@ -127,7 +127,7 @@ const FilterSidebar = ({
             </FilterSection>}
 
             {/* Active category label (when category is locked) */}
-            {selectedCategory && <div className="flex items-center justify-between rounded border border-border-light bg-background-primary px-3 py-2.5">
+            {selectedCategory && <div className="flex items-center justify-between rounded bg-background-secondary px-3 py-2.5">
               <span className="text-sm font-semibold tracking-tight text-text-primary">
                 {getListingTypeLabel(selectedCategory) || selectedCategory}
               </span>
@@ -167,12 +167,10 @@ const FilterSection = ({
   title,
   description,
   children
-}) => <section className="overflow-hidden rounded-md border border-border-light bg-background-primary">
-    <div className="border-b border-border-light bg-background-secondary px-4 py-3">
-      <h3 className="text-sm font-medium text-text-primary tracking-tight">{title}</h3>
-      {description ? <p className="mt-0.5 text-xs font-medium leading-relaxed text-text-muted">{description}</p> : null}
-    </div>
-    <div className="p-4">{children}</div>
+}) => <section className="border-b border-border-light pb-5 last:border-b-0 last:pb-0">
+    <h3 className="text-sm font-semibold text-text-primary">{title}</h3>
+    {description ? <p className="mt-0.5 text-sm text-text-tertiary">{description}</p> : null}
+    <div className="mt-3">{children}</div>
   </section>;
 const OptionRow = ({
   label,

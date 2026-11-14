@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { CheckCircle2, Clock, ImageOff, ShoppingCart, XCircle } from 'lucide-react';
 import { formatCurrency, formatDateTime } from '../../common/formatters.js';
 import { OFFER_DEFAULTS, OFFER_STATUSES, OFFER_TABS } from '../offerConstants.js';
@@ -56,6 +57,7 @@ const OfferTrackingCard = ({
  const {
  t
  } = useTranslation();
+ const { canMakeOffers, canCheckout: canCheckoutNow } = useRestrictionFlags();
  const isExpired = o.status === OFFER_STATUSES.EXPIRED;
  const canActAsSeller = !isExpired && activeTab === OFFER_TABS.RECEIVED && o.status === OFFER_STATUSES.PENDING;
  const canCheckout = !isExpired && activeTab === OFFER_TABS.MADE && o.status === OFFER_STATUSES.ACCEPTED;
@@ -131,6 +133,7 @@ const OfferTrackingCard = ({
  <button
  type="button"
  onClick={() => onCheckout(o.id)}
+ disabled={!canCheckoutNow}
  className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3"
  >
  <ShoppingCart className="h-3.5 w-3.5" />
@@ -149,7 +152,8 @@ const OfferTrackingCard = ({
  <button
  type="button"
  onClick={() => onCounter(o)}
- className="inline-flex items-center gap-1.5 rounded border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition"
+ disabled={!canMakeOffers}
+ className="inline-flex items-center gap-1.5 rounded border border-border-light bg-card-bg px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-background-secondary transition disabled:cursor-not-allowed disabled:opacity-50"
  >
  {t("counter")}
  </button>

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { memo, useState, useRef, useLayoutEffect } from 'react';
-import { Flag, Trash2 as TrashIcon } from 'lucide-react';
+import { Flag, ShieldAlert, Trash2 as TrashIcon } from 'lucide-react';
 import { formatRelativeTime } from '../../common/utils/dateFormat.js';
 import { sameChatId } from '../chatIdUtils.js';
 import { InChatOfferCard } from './InChatOfferCard.jsx';
@@ -18,6 +18,17 @@ const MessageBubble = memo(({
  const handleDeleteClick = () => {
  onDeleteMessage(message.id);
  };
+
+ if (message.removedByModeration) {
+ return (
+ <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-3`}>
+ <div className="flex max-w-xs items-start gap-2 rounded border border-border-light bg-background-secondary px-3 py-2 text-xs text-text-tertiary lg:max-w-md">
+ <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+ <p>{t('message_removed_by_moderation', 'Bu mesaj topluluk kuralları ihlali nedeniyle sistem tarafından silindi.')}</p>
+ </div>
+ </div>
+ );
+ }
 
  if (message.messageType === 'OFFER') {
  return (

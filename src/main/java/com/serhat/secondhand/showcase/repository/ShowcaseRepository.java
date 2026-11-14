@@ -36,6 +36,19 @@ public interface ShowcaseRepository extends JpaRepository<Showcase, UUID> {
             @Param("currentTime") LocalDateTime currentTime,
             Pageable pageable
     );
+
+    @Query(
+            value = "SELECT s FROM Showcase s WHERE s.status = :status AND s.endDate > :currentTime "
+                    + "AND s.listing.seller.id NOT IN :hiddenSellerIds ORDER BY s.createdAt DESC",
+            countQuery = "SELECT COUNT(s) FROM Showcase s WHERE s.status = :status AND s.endDate > :currentTime "
+                    + "AND s.listing.seller.id NOT IN :hiddenSellerIds"
+    )
+    Page<Showcase> findActiveShowcasesPageExcludingSellers(
+            @Param("hiddenSellerIds") java.util.Collection<Long> hiddenSellerIds,
+            @Param("status") ShowcaseStatus status,
+            @Param("currentTime") LocalDateTime currentTime,
+            Pageable pageable
+    );
     
     @Query("SELECT s FROM Showcase s WHERE s.listing.id = :listingId AND s.status = :status")
     List<Showcase> findByListingIdAndStatus(@Param("listingId") UUID listingId, @Param("status") ShowcaseStatus status);

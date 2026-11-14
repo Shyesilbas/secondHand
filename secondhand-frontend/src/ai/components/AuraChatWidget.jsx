@@ -108,7 +108,9 @@ const AuraChatWidgetPanel = () => {
         if (messages.length > 0) return;
         ensureGreeting();
     }, [ensureGreeting, isOpen, messages.length]);
-    return <div className="fixed bottom-5 right-5 z-modal">
+    // Listing pages have a fixed purchase bar on mobile; sit above it instead of covering its buttons.
+    const overPurchaseBar = /^\/listings\/(?!prefilter|create)[^/]+$/.test(location.pathname);
+    return <div className={`fixed right-5 z-modal ${overPurchaseBar ? 'bottom-24 lg:bottom-5' : 'bottom-5'}`}>
         <div className={`absolute bottom-16 right-0 origin-bottom-right transition-all duration-300 ease-out ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
             <div className="w-96 max-w-[calc(100vw-1.5rem)] h-[min(580px,calc(100vh-6rem))] rounded-md border border-border-light bg-background-primary overflow-hidden flex flex-col">
                 {/* Header */}

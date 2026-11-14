@@ -4,7 +4,6 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 import org.springframework.http.ResponseEntity;
 
-import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,11 +32,8 @@ public final class CategoryListingControllerSupport {
      * @param basePath the base path of the resource collection, e.g. {@code "/api/v1/electronics"}
      * @return an appropriate {@link ResponseEntity}
      */
-    public static ResponseEntity<?> buildCreateResponse(Result<UUID> result, String basePath) {
-        if (result.isError()) {
-            return ResultResponses.ok(result);
-        }
-        URI location = URI.create(basePath + "/" + result.getData());
-        return ResultResponses.created(Result.success(Map.of("id", result.getData())));
+    public static ResponseEntity<Map<String, UUID>> buildCreateResponse(Result<UUID> result, String basePath) {
+        UUID listingId = ResultResponses.unwrap(result);
+        return ResultResponses.created(Result.success(Map.of("id", listingId)));
     }
 }

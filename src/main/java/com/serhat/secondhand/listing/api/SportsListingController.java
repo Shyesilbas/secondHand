@@ -4,7 +4,6 @@ import com.serhat.secondhand.core.result.Result;
 import com.serhat.secondhand.core.result.ResultResponses;
 
 import com.serhat.secondhand.core.security.PublicEndpoint;
-import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.listing.api.support.CategoryListingControllerSupport;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsCreateRequest;
 import com.serhat.secondhand.listing.domain.dto.request.sports.SportsUpdateRequest;
@@ -23,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,7 +36,7 @@ public class SportsListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new sports listing")
-    public ResponseEntity<?> createSportsListing(
+    public ResponseEntity<Map<String, UUID>> createSportsListing(
             @Valid @RequestBody SportsCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -47,7 +47,7 @@ public class SportsListingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a sports listing")
-    public ResponseEntity<?> updateSportsListing(
+    public ResponseEntity<Void> updateSportsListing(
             @PathVariable UUID id,
             @Valid @RequestBody SportsUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -60,7 +60,7 @@ public class SportsListingController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get sports listing details")
-    public ResponseEntity<?> getSportsDetails(@PathVariable UUID id) {
+    public ResponseEntity<SportsListingDto> getSportsDetails(@PathVariable UUID id) {
         SportsListingDto dto = sportsListingService.getSportsDetails(id);
         return ResultResponses.ok(Result.success(dto));
     }
@@ -68,7 +68,7 @@ public class SportsListingController {
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter sports listings")
-    public ResponseEntity<?> filterSports(@RequestBody SportsListingFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterSports(@RequestBody SportsListingFilterDto filters) {
         Page<ListingDto> page = sportsListingService.filterSports(filters);
         return ResultResponses.ok(Result.success(page));
     }

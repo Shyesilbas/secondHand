@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -45,13 +46,13 @@ public class RealEstateSpecCatalogService {
         try {
             loadCatalog();
             log.info("Real Estate specs catalog loaded successfully");
-        } catch (Exception e) {
+        } catch (IOException | IllegalStateException e) {
             log.error("Failed to load Real Estate specs catalog from: {}", CATALOG_PATH, e);
-            throw new RuntimeException("Real Estate specs catalog initialization failed", e);
+            throw new IllegalStateException("Real Estate specs catalog initialization failed", e);
         }
     }
 
-    private void loadCatalog() throws Exception {
+    private void loadCatalog() throws IOException {
         try (InputStream is = new ClassPathResource(CATALOG_PATH).getInputStream()) {
             JsonNode root = objectMapper.readTree(is);
             parseSpecNode(root.get("roomConfigs"), roomConfigs, validRoomConfigKeys);

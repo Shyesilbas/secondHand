@@ -23,21 +23,21 @@ public class SellerFollowController {
     private final SellerFollowService sellerFollowService;
 
     @PostMapping("/{user-id}")
-    public ResponseEntity<?> follow(
+    public ResponseEntity<SellerFollowDto> follow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("user-id") Long userId) {
         return ResultResponses.ok(sellerFollowService.follow(currentUser, userId));
     }
 
     @DeleteMapping("/{user-id}")
-    public ResponseEntity<?> unfollow(
+    public ResponseEntity<Void> unfollow(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("user-id") Long userId) {
         return ResultResponses.noContent(sellerFollowService.unfollow(currentUser, userId));
     }
 
     @PatchMapping("/{user-id}/notifications")
-    public ResponseEntity<?> toggleNotifications(
+    public ResponseEntity<SellerFollowDto> toggleNotifications(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("user-id") Long userId) {
         return ResultResponses.ok(sellerFollowService.toggleNotifications(currentUser, userId));

@@ -2451,6 +2451,8 @@
     "promotions": "Tanıtımlar & Kampanyalar"
   },
   "hero": {
+    "search_placeholder": "Ne arıyorsun? Telefon, bisiklet, kitap...",
+    "sell_prompt": "Kullanmadığın bir şey mi var?",
     "subtitle_short": "Ödemen, ürünü teslim aldığını onaylayana kadar güvencede kalır.",
     "title": "Doğrudan alıcı ve satıcıdan ikinci el."
   },
@@ -2492,5 +2494,13 @@
   "filter_category_desc": "Filtreleri özelleştirmek için bir ilan türü seçin",
   "filter_budget_desc": "Fiyat aralığı ve il / ilçe",
   "in_all_pages": " tüm sayfalarda",
-  "compare_category": "{{category}} Karşılaştır"
+  "compare_category": "{{category}} Karşılaştır",
+  "search_action": "Ara",
+  "home_categories_title": "Kategoriler",
+  "search_users_placeholder": "Kullanıcı ara...",
+  "search_listings_placeholder": "İlan ara...",
+  "no_listings_for_criteria": "Bu kriterlere uygun ilan bulunamadı.",
+  "sort_newest": "En yeni",
+  "sort_price_asc": "En ucuz",
+  "sort_price_desc": "En pahalı"
 }

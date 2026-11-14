@@ -4,6 +4,9 @@ import { EllipsisVertical as EllipsisVerticalIcon, Trash2 as TrashIcon, X as XMa
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '../../notification/NotificationContext.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
+import { useBlockUser } from '../../user/hooks/useBlocking.js';
+import { Ban } from 'lucide-react';
 import { CHAT_DEFAULTS, CHAT_MESSAGES } from '../chatConstants.js';
 const ChatHeader = ({
  selectedChatRoom,
@@ -19,6 +22,15 @@ const ChatHeader = ({
  const navigate = useNavigate();
  const notification = useNotification();
  const [showOptions, setShowOptions] = useState(false);
+ const { canMakeOffers } = useRestrictionFlags();
+ const blockMutation = useBlockUser();
+ const handleBlockUser = () => {
+ if (!selectedChatRoom?.otherParticipantId) return;
+ notification.showConfirmation('Kullanıcıyı Engelle', 'Bu kullanıcıyı engellemek istiyor musunuz? İki taraf da birbirinin ilanlarını göremez, mesaj ve teklif gönderemez.', () => {
+ blockMutation.mutate(selectedChatRoom.otherParticipantId, { onSuccess: onClose });
+ });
+ setShowOptions(false);
+ };
  const handleListingTitleClick = () => {
  if (selectedChatRoom?.listingId) {
  navigate(ROUTES.LISTING_DETAIL(selectedChatRoom.listingId));
@@ -67,21 +79,26 @@ const ChatHeader = ({
  <button
  type="button"
  onClick={onOpenOfferModal}
+ disabled={!canMakeOffers || selectedChatRoom?.messagingDisabled}
  className="flex items-center gap-1 px-3 py-1.5 bg-background-tertiary hover:bg-secondary-200 text-text-primary font-semibold text-xs rounded border border-card-border-hover transition-all"
  title={t("make_offer")}
  >
  {t("offer")}
  </button>
  )}
- {onDeleteConversation && <div className="relative">
+ {(onDeleteConversation || profileId) && <div className="relative">
  <button type="button" onClick={() => setShowOptions(!showOptions)} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary/50 transition-all duration-300 ease-in-out p-2 rounded" title={t("options")}>
  <EllipsisVerticalIcon className="w-5 h-5" />
  </button>
  {showOptions && <div className="absolute right-0 top-full mt-1 bg-background-primary border border-border-light rounded shadow-md z-10 min-w-36">
- <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
+ {profileId && <button type="button" onClick={handleBlockUser} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
+ <Ban className="w-4 h-4" />
+ <span>{t('block_user', 'Kullanıcıyı Engelle')}</span>
+ </button>}
+ {onDeleteConversation && <button type="button" onClick={handleDeleteConversation} className="flex items-center space-x-2 w-full px-4 py-2.5 text-sm text-status-error-text hover:bg-background-secondary transition-all duration-300 ease-in-out rounded mx-1 my-1 tracking-tight">
  <TrashIcon className="w-4 h-4" />
  <span>{t("delete_chat")}</span>
- </button>
+ </button>}
  </div>}
  </div>}
  <button type="button" onClick={onClose} className="text-text-secondary hover:text-text-primary hover:bg-background-tertiary/50 transition-all duration-300 ease-in-out p-2 rounded">

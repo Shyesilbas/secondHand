@@ -24,13 +24,13 @@ public class PriceHistoryController {
     private final PriceHistoryService priceHistoryService;
 
     @GetMapping("/listing/{listing-id}")
-    public ResponseEntity<?> getPriceHistory(@PathVariable("listing-id") UUID listingId) {
+    public ResponseEntity<List<PriceHistoryDto>> getPriceHistory(@PathVariable("listing-id") UUID listingId) {
         List<PriceHistoryDto> priceHistory = priceHistoryService.getPriceHistoryByListingId(listingId);
         return ResultResponses.ok(Result.success(priceHistory));
     }
 
     @GetMapping("/listing/{listing-id}/latest")
-    public ResponseEntity<?> getLatestPriceChange(@PathVariable("listing-id") UUID listingId) {
+    public ResponseEntity<PriceHistoryDto> getLatestPriceChange(@PathVariable("listing-id") UUID listingId) {
         PriceHistoryDto latestChange = priceHistoryService.getLatestPriceChange(listingId);
         if (latestChange == null) {
             return ResponseEntity.notFound().build();
@@ -39,7 +39,7 @@ public class PriceHistoryController {
     }
 
     @GetMapping("/listing/{listing-id}/exists")
-    public ResponseEntity<?> hasPriceHistory(@PathVariable("listing-id") UUID listingId) {
+    public ResponseEntity<Boolean> hasPriceHistory(@PathVariable("listing-id") UUID listingId) {
         boolean hasHistory = priceHistoryService.hasPriceHistory(listingId);
         return ResultResponses.ok(Result.success(hasHistory));
     }

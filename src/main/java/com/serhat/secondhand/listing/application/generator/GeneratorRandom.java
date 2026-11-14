@@ -2,6 +2,7 @@ package com.serhat.secondhand.listing.application.generator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -52,5 +53,15 @@ final class GeneratorRandom {
     static BigDecimal roundPrice(double price) {
         double step = price >= 1_000_000 ? 5_000 : price >= 100_000 ? 1_000 : price >= 10_000 ? 250 : 50;
         return BigDecimal.valueOf(Math.max(step, Math.round(price / step) * step)).setScale(2, RoundingMode.UNNECESSARY);
+    }
+
+    /** Insertion-ordered weight map (deterministic across JVM runs, unlike Map.of). */
+    @SuppressWarnings("unchecked")
+    static <T> Map<T, Integer> weights(Object... keyWeightPairs) {
+        Map<T, Integer> map = new LinkedHashMap<>();
+        for (int i = 0; i < keyWeightPairs.length; i += 2) {
+            map.put((T) keyWeightPairs[i], (Integer) keyWeightPairs[i + 1]);
+        }
+        return map;
     }
 }

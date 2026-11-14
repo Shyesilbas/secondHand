@@ -51,6 +51,7 @@ public class ListingSearchService {
     private final EntityManager entityManager;
     private final ListingMapper listingMapper;
     private final ListingEnrichmentService enrichmentService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     @Lazy
     private final BooksListingService booksListingService;
@@ -82,6 +83,7 @@ public class ListingSearchService {
     public Page<ListingDto> filterByCategory(ListingFilterDto filters, Long userId) {
         Function<ListingFilterDto, Page<ListingDto>> strategy = filterStrategyMap.get(filters.getClass());
         if (strategy == null) return Page.empty();
+        filters.setExcludedSellerIds(userBlockService.getMutuallyHiddenUserIds(userId));
         Page<ListingDto> result = strategy.apply(filters);
         return enrichPage(result, userId);
     }
@@ -108,6 +110,8 @@ public class ListingSearchService {
                 )
         );
 
+        Set<Long> hiddenSellerIds = userBlockService.getMutuallyHiddenUserIds(userId);
+
         forceCustomPlanForThisTransaction();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -116,7 +120,7 @@ public class ListingSearchService {
         Root<Listing> dataRoot = dataQuery.from(Listing.class);
         dataRoot.fetch("seller", JoinType.LEFT);
 
-        List<Predicate> dataPredicates = buildSearchPredicates(cb, dataRoot, activeTokens);
+        List<Predicate> dataPredicates = buildSearchPredicates(cb, dataRoot, activeTokens, hiddenSellerIds);
         dataQuery.select(dataRoot)
                 .where(dataPredicates.toArray(new Predicate[0]))
                 .orderBy(
@@ -131,7 +135,7 @@ public class ListingSearchService {
 
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Listing> countRoot = countQuery.from(Listing.class);
-        List<Predicate> countPredicates = buildSearchPredicates(cb, countRoot, activeTokens);
+        List<Predicate> countPredicates = buildSearchPredicates(cb, countRoot, activeTokens, hiddenSellerIds);
         countQuery.select(cb.count(countRoot))
                 .where(countPredicates.toArray(new Predicate[0]));
         long totalMatches = entityManager.createQuery(countQuery).getSingleResult();
@@ -180,9 +184,13 @@ public class ListingSearchService {
                 .toList();
     }
 
-    private static List<Predicate> buildSearchPredicates(CriteriaBuilder cb, Root<Listing> root, List<String> tokens) {
+    private static List<Predicate> buildSearchPredicates(CriteriaBuilder cb, Root<Listing> root, List<String> tokens,
+                                                     Set<Long> hiddenSellerIds) {
         List<Predicate> predicates = new ArrayList<>(tokens.size() + 1);
         predicates.add(cb.equal(root.get("status"), ListingStatus.ACTIVE));
+        if (!hiddenSellerIds.isEmpty()) {
+            predicates.add(cb.not(root.get("seller").get("id").in(hiddenSellerIds)));
+        }
 
         for (String token : tokens) {
             String pattern = "%" + escapeLikeWildcards(token) + "%";

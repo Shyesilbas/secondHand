@@ -47,11 +47,14 @@ class ListingSearchServiceEmptyResultTest {
     private final EntityManager entityManager = mock(EntityManager.class);
     private final ListingMapper listingMapper = mock(ListingMapper.class);
     private final ListingEnrichmentService enrichmentService = mock(ListingEnrichmentService.class);
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService =
+            mock(com.serhat.secondhand.user.application.UserBlockService.class);
 
     private final ListingSearchService service = new ListingSearchService(
             entityManager,
             listingMapper,
             enrichmentService,
+            userBlockService,
             mock(BooksListingService.class),
             mock(ClothingListingService.class),
             mock(ElectronicListingService.class),

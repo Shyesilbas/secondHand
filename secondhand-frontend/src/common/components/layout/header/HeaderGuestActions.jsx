@@ -9,7 +9,7 @@ const HeaderGuestActions = () => {
  <div className="flex items-center gap-2">
  <Link
  to={ROUTES.LOGIN}
- className="text-xs font-semibold text-secondary-300 hover:text-white px-3.5 py-2 rounded hover:bg-primary-hover/80 transition-all"
+ className="rounded px-3 py-2 text-sm font-medium text-text-secondary transition-colors duration-150 hover:bg-background-tertiary hover:text-text-primary"
  >
  {t('common.login')}
  </Link>

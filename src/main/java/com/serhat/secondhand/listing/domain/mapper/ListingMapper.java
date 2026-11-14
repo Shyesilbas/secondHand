@@ -169,6 +169,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract RealEstateListing toRealEstateEntity(RealEstateCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -192,6 +193,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract VehicleListing toVehicleEntity(VehicleCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -218,6 +220,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract ElectronicListing toElectronicEntity(ElectronicCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -242,6 +245,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract ClothingListing toClothingEntity(ClothingCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -268,6 +272,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract BooksListing toBooksEntity(BooksCreateRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -291,6 +296,7 @@ public abstract class ListingMapper {
     @Mapping(target = "neighborhoodKey", source = "base.neighborhoodKey")
     @Mapping(target = "imageUrl", source = "base.imageUrl")
     @Mapping(target = "allowMeetup", source = "base.allowMeetup")
+    @Mapping(target = "canSendMessage", expression = "java(request.base().canSendMessage() == null || request.base().canSendMessage())")
     public abstract SportsListing toSportsEntity(SportsCreateRequest request);
 
     // ──────────────────────────────────────────────
@@ -461,6 +467,7 @@ public abstract class ListingMapper {
         if (base.neighborhoodKey() != null) base.neighborhoodKey().ifPresent(entity::setNeighborhoodKey);
         if (base.imageUrl() != null) base.imageUrl().ifPresent(entity::setImageUrl);
         if (base.allowMeetup() != null) entity.setAllowMeetup(base.allowMeetup());
+        if (base.canSendMessage() != null) entity.setCanSendMessage(base.canSendMessage());
     }
 
     // ──────────────────────────────────────────────

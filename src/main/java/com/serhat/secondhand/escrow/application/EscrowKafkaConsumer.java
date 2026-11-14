@@ -56,7 +56,7 @@ public class EscrowKafkaConsumer {
             walletService.creditWalletQuietly(seller, event.amount());
             log.info("Successfully credited {} to seller {} wallet asynchronously via Kafka.",
                     event.amount(), seller.getEmail());
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.error("Failed to credit seller wallet for escrowId: {}, sellerId: {}",
                     event.escrowId(), event.sellerId(), ex);
             throw ex;

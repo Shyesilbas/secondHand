@@ -34,7 +34,12 @@ public class ChatMessageMapper {
         dto.setChatRoomId(message.getChatRoomId());
         dto.setSenderId(message.getSender().getId());
         dto.setRecipientId(message.getRecipient().getId());
-        dto.setContent(message.getContent());
+        if (message.isRemovedByModeration()) {
+            dto.setRemovedByModeration(true);
+            dto.setContent(null);
+        } else {
+            dto.setContent(message.getContent());
+        }
         dto.setMessageType(message.getMessageType() != null ? message.getMessageType().name() : "TEXT");
         dto.setOfferId(message.getOfferId());
         dto.setRead(message.getIsRead());

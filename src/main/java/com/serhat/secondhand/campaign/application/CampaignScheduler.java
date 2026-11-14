@@ -3,6 +3,7 @@ package com.serhat.secondhand.campaign.application;
 import com.serhat.secondhand.campaign.repository.CampaignRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ public class CampaignScheduler {
     private final CampaignRepository campaignRepository;
 
     @Scheduled(fixedDelayString = "#{@campaignConfigProperties.schedulerDeactivateFixedDelayMs}")
+    @SchedulerLock(name = "campaignExpirationScheduler", lockAtMostFor = "PT9M", lockAtLeastFor = "PT10S")
     @Transactional
     public void deactivateExpiredCampaigns() {
         LocalDateTime now = LocalDateTime.now();

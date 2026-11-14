@@ -3,7 +3,7 @@
 Bu doküman, **secondHand** platformunun yerel geliştirme altyapısını, Docker yapılandırmasını, ortam değişkenlerini (`.env`), `prod` profili güvenlik kontrollerini ve observability ayarlarını açıklar.
 
 > [!NOTE]
-> Repoda CI workflow dosyası (`.github/workflows`) yoktur; build/test/deploy otomasyonu repo içinde tanımlı değildir. Aşağıdakiler yalnızca repodaki `docker-compose.yml`, `scripts/start_all.sh` ve Spring config dosyalarını kapsar.
+> CI workflow'u ([`ci.yml`](../.github/workflows/ci.yml)) backend birim testleri + JaCoCo kapsama raporunu (`mvn -B verify`), frontend build (`npm run build`) ve [`verify.sh`](../scripts/verify.sh) kontrollerini çalıştırır. `*IntegrationTest` sınıfları Docker altyapısı gerektirdiği için varsayılan `mvn test` dışında tutulur (`-Pintegration-tests` ile çalıştırılır). Aşağıdakiler yerel altyapı, env ve security guard ayarlarını kapsar.
 
 ---
 

@@ -29,16 +29,16 @@ const statusMeta = {
 export const ThreadCardSkeleton = () => (
  <div className="rounded border border-border-light bg-background-primary p-4 animate-pulse">
  <div className="flex items-center gap-2 mb-3">
- <div className="h-5 w-16 bg-tertiary rounded-full" />
- <div className="h-4 w-12 bg-tertiary rounded" />
+ <div className="h-5 w-16 bg-background-tertiary rounded-full" />
+ <div className="h-4 w-12 bg-background-tertiary rounded" />
  </div>
- <div className="h-5 bg-tertiary rounded w-5/6 mb-2" />
- <div className="h-4 bg-tertiary rounded w-full mb-1" />
- <div className="h-4 bg-tertiary rounded w-3/4" />
+ <div className="h-5 bg-background-tertiary rounded w-5/6 mb-2" />
+ <div className="h-4 bg-background-tertiary rounded w-full mb-1" />
+ <div className="h-4 bg-background-tertiary rounded w-3/4" />
  <div className="mt-4 flex items-center gap-4">
- <div className="h-4 w-10 bg-tertiary rounded" />
- <div className="h-4 w-10 bg-tertiary rounded" />
- <div className="h-4 w-16 bg-tertiary rounded ml-auto" />
+ <div className="h-4 w-10 bg-background-tertiary rounded" />
+ <div className="h-4 w-10 bg-background-tertiary rounded" />
+ <div className="h-4 w-16 bg-background-tertiary rounded ml-auto" />
  </div>
  </div>
 );

@@ -40,6 +40,31 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate < :now")
     List<User> findExpiredPremiumUsers(@Param("now") java.time.LocalDateTime now);
 
+    @Query("SELECT u.id FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate < :now")
+    List<Long> findExpiredPremiumUserIds(@Param("now") java.time.LocalDateTime now);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE User u
+               SET u.aiListingQuota = CASE
+                   WHEN u.plan = com.serhat.secondhand.user.domain.entity.enums.MembershipPlan.PREMIUM
+                        AND u.expirationDate IS NOT NULL
+                        AND u.expirationDate >= :now
+                   THEN :premiumQuota
+                   ELSE :freeQuota
+               END
+             WHERE u.aiListingQuota <> CASE
+                   WHEN u.plan = com.serhat.secondhand.user.domain.entity.enums.MembershipPlan.PREMIUM
+                        AND u.expirationDate IS NOT NULL
+                        AND u.expirationDate >= :now
+                   THEN :premiumQuota
+                   ELSE :freeQuota
+               END
+            """)
+    int resetMonthlyAiListingQuotas(@Param("now") java.time.LocalDateTime now,
+                                    @Param("premiumQuota") int premiumQuota,
+                                    @Param("freeQuota") int freeQuota);
+
     @Query("SELECT u FROM User u WHERE u.plan = 'PREMIUM' AND u.expirationDate >= :now")
     List<User> findActivePremiumUsers(@Param("now") java.time.LocalDateTime now);
 

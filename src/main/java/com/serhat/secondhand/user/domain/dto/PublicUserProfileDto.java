@@ -13,10 +13,11 @@ public record PublicUserProfileDto(
         String name,
         String surname,
         @JsonFormat(pattern = "dd/MM/yyyy") LocalDate accountCreationDate,
-        boolean accountVerified) {
+        boolean accountVerified,
+        boolean canSendMessage) {
 
     public static PublicUserProfileDto from(UserDto user) {
         return new PublicUserProfileDto(user.id(), user.name(), user.surname(),
-                user.accountCreationDate(), user.accountVerified());
+                user.accountCreationDate(), user.accountVerified(), user.canSendMessage());
     }
 }

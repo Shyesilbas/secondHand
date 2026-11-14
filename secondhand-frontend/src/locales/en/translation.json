@@ -2451,6 +2451,8 @@
     "promotions": "Promotions & Campaigns"
   },
   "hero": {
+    "search_placeholder": "What are you looking for? Phone, bike, book...",
+    "sell_prompt": "Have something you no longer use?",
     "subtitle_short": "Your payment stays protected until you confirm delivery.",
     "title": "Second-hand directly between buyers and sellers."
   },
@@ -2492,5 +2494,13 @@
   "filter_category_desc": "Pick a listing type to unlock specific filters",
   "filter_budget_desc": "Amounts and Turkish city / district",
   "in_all_pages": " in all pages",
-  "compare_category": "Compare {{category}}"
+  "compare_category": "Compare {{category}}",
+  "search_action": "Search",
+  "home_categories_title": "Categories",
+  "search_users_placeholder": "Search users...",
+  "search_listings_placeholder": "Search listings...",
+  "no_listings_for_criteria": "No listings match these criteria.",
+  "sort_newest": "Newest",
+  "sort_price_asc": "Lowest price",
+  "sort_price_desc": "Highest price"
 }

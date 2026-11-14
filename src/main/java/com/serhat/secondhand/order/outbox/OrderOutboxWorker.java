@@ -1,5 +1,6 @@
 package com.serhat.secondhand.order.outbox;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.serhat.secondhand.order.application.OrderKafkaProducer;
 import com.serhat.secondhand.order.contract.OrderCancelledKafkaEvent;
@@ -14,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -59,19 +62,27 @@ public class OrderOutboxWorker {
                 event.setLastError(null);
                 orderOutboxRepository.save(event);
                 log.info("Successfully dispatched order outbox event: id={}, type={}", event.getId(), event.getEventType());
-            } catch (Exception ex) {
-                log.error("Failed to dispatch order outbox event: id={}", event.getId(), ex);
-                event.setAttemptCount(event.getAttemptCount() + 1);
-                event.setLastError(ex.getMessage());
-
-                if (event.getAttemptCount() >= event.getMaxAttempts()) {
-                    event.setStatus(OutboxStatus.FAILED);
-                } else {
-                    long backoffSeconds = (long) Math.pow(2, event.getAttemptCount());
-                    event.setNextAttemptAt(LocalDateTime.now().plusSeconds(backoffSeconds));
-                }
-                orderOutboxRepository.save(event);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                recordFailure(event, ex);
+                break;
+            } catch (JsonProcessingException | ExecutionException | TimeoutException | RuntimeException ex) {
+                recordFailure(event, ex);
             }
         }
+    }
+
+    private void recordFailure(OrderOutboxEvent event, Exception ex) {
+        log.error("Failed to dispatch order outbox event: id={}", event.getId(), ex);
+        event.setAttemptCount(event.getAttemptCount() + 1);
+        event.setLastError(ex.getMessage());
+
+        if (event.getAttemptCount() >= event.getMaxAttempts()) {
+            event.setStatus(OutboxStatus.FAILED);
+        } else {
+            long backoffSeconds = (long) Math.pow(2, event.getAttemptCount());
+            event.setNextAttemptAt(LocalDateTime.now().plusSeconds(backoffSeconds));
+        }
+        orderOutboxRepository.save(event);
     }
 }

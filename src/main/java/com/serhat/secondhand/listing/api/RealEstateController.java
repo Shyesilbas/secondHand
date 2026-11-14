@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,7 +37,7 @@ public class RealEstateController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new real estate listing")
-    public ResponseEntity<?> createRealEstateListing(
+    public ResponseEntity<Map<String, UUID>> createRealEstateListing(
             @Valid @RequestBody RealEstateCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -48,7 +49,7 @@ public class RealEstateController {
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter Real Estate listings")
-    public ResponseEntity<?> filterRealEstates(@RequestBody RealEstateFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterRealEstates(@RequestBody RealEstateFilterDto filters) {
         log.info("Filtering real estate with criteria: {}", filters);
         Page<ListingDto> result = realEstateListingService.filterRealEstate(filters);
         return ResultResponses.ok(Result.success(result));
@@ -56,7 +57,7 @@ public class RealEstateController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a real estate listing")
-    public ResponseEntity<?> updateRealEstateListing(
+    public ResponseEntity<Void> updateRealEstateListing(
             @PathVariable UUID id,
             @Valid @RequestBody RealEstateUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -69,7 +70,7 @@ public class RealEstateController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get real estate listing details")
-    public ResponseEntity<?> getRealEstateDetails(@PathVariable UUID id) {
+    public ResponseEntity<RealEstateListingDto> getRealEstateDetails(@PathVariable UUID id) {
         RealEstateListingDto realEstateListingDto = realEstateListingService.getRealEstateDetails(id);
         return ResultResponses.ok(Result.success(realEstateListingDto));
     }

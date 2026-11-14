@@ -15,6 +15,7 @@ public class ChatRoomEnricher {
             ChatRoomDto dto
     ) {
         dto.setUnreadCount(context.getUnreadCount(room.getId()));
+        dto.setLastMessageRemoved(room.getLastMessage() == null && room.getLastMessageTime() != null);
 
         resolveOtherParticipant(room, currentUserId, context, dto);
         resolveLastMessageSender(room, context, dto);

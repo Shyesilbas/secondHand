@@ -65,6 +65,9 @@ public final class ListingBusinessConstants {
 
     public static final RoundingMode FEE_TAX_ROUNDING_MODE = RoundingMode.HALF_UP;
 
+    /** Maximum number of listing IDs accepted in a single bulk lookup request. */
+    public static final int MAX_BULK_LISTING_IDS = 100;
+
     /** Floor for non-negative listing price validation. */
     public static final BigDecimal MIN_NON_NEGATIVE_PRICE = BigDecimal.ZERO;
 }

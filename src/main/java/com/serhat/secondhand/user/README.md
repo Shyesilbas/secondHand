@@ -18,8 +18,11 @@ Manages user accounts (`users` table), sanitized public vs. private profiles, sh
 - **Moderation restrictions (`UserRestrictionService`):** a ban is active while `acc_status = BLOCKED` or `banned_until` is in the future; leftover flags after expiry do nothing. `RestrictedAction` guards chat send, listing create/publish/reactivate, offers and checkout (`RestrictionErrorCodes`, 403). State is cached under `KEY_PREFIX` (restricted until the ban ends, unrestricted for `UNRESTRICTED_TTL`); a miss or Redis outage reads PostgreSQL. Withdrawals, order tracking, delivery and refunds are never restricted.
 - **Change rule:** anything that changes ban fields must call `UserRestrictionService.invalidate` after commit; a new ban publishes `UserBannedEvent`.
 
+- **User blocking (`UserBlockService`, `user_blocks`):** hides both users from each other and closes chat, offers, cart and new checkout (`USER_BLOCKED`); running orders are untouched. Profile reads return `USER_BLOCKED_YOU` or `USER_BLOCKED_BY_YOU` (403).
+- **`users.can_send_message`:** default `TRUE`; seeds the create-form default of `listings.can_send_message`.
+
 ## API
-- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`).
+- **Profile (`UserController`, `/api/v1/users`):** `GET /me` · `GET /{id}` · `GET /{id}/listings` · `PUT /email` · `PUT /phone` · `GET /great-sellers` · `GET /{id}/great-seller-status` · `GET /me/restriction` (`RestrictionStatusDto`) · `GET|PATCH /me/settings` (`canSendMessage`) · `GET /me/blocked-users` · `POST|DELETE /{id}/block` · `GET /{id}/block-status`.
 - **Addresses (`AddressController`, `/api/v1/users/addresses`):** `GET /` · `POST /` · `PUT /{id}` · `DELETE /{id}` · `POST /{id}/main`.
 - **Memberships (`MembershipController`, `/api/v1/memberships`):** `GET /status` · `GET /quote` (`MembershipQuoteDto`: premium price and eWallet balance check) · `POST /upgrade` (`MembershipUpgradeRequest`) · `POST /cancel` · `POST /toggle-auto-renew`.
 - **Badges (`UserBadgesController`, `/api/v1/user/badges`):** `GET /`.

@@ -43,7 +43,7 @@ public class ForumController {
     }
 
     @GetMapping("/threads/{thread-id}")
-    public ResponseEntity<?> getThread(
+    public ResponseEntity<ForumThreadDto> getThread(
             @PathVariable("thread-id") Long threadId,
             @AuthenticationPrincipal User currentUser
     ) {
@@ -52,7 +52,7 @@ public class ForumController {
     }
 
     @PostMapping("/threads")
-    public ResponseEntity<?> publishThread(
+    public ResponseEntity<ForumThreadDto> publishThread(
             @AuthenticationPrincipal User currentUser,
             @RequestBody @Valid CreateForumThreadRequest req
     ) {
@@ -60,7 +60,7 @@ public class ForumController {
     }
 
     @PatchMapping("/threads/{thread-id}")
-    public ResponseEntity<?> modifyThreadContent(
+    public ResponseEntity<ForumThreadDto> modifyThreadContent(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId,
             @RequestBody @Valid UpdateForumThreadRequest req
@@ -69,7 +69,7 @@ public class ForumController {
     }
 
     @PatchMapping("/threads/{thread-id}/status")
-    public ResponseEntity<?> changeThreadStatus(
+    public ResponseEntity<ForumThreadDto> changeThreadStatus(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId,
             @RequestBody @Valid ChangeForumThreadStatusRequest req
@@ -78,7 +78,7 @@ public class ForumController {
     }
 
     @DeleteMapping("/threads/{thread-id}")
-    public ResponseEntity<?> deleteThread(
+    public ResponseEntity<Void> deleteThread(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId
     ) {
@@ -86,7 +86,7 @@ public class ForumController {
     }
 
     @PostMapping("/threads/{thread-id}/reaction")
-    public ResponseEntity<?> reactToThread(
+    public ResponseEntity<ForumThreadDto> reactToThread(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId,
             @RequestBody @Valid ForumReactionRequest req
@@ -106,7 +106,7 @@ public class ForumController {
     }
 
     @PostMapping("/threads/{thread-id}/comments")
-    public ResponseEntity<?> addComment(
+    public ResponseEntity<ForumCommentDto> addComment(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId,
             @RequestBody @Valid CreateForumCommentRequest req
@@ -115,7 +115,7 @@ public class ForumController {
     }
 
     @PostMapping("/threads/{thread-id}/comments/{comment-id}/reaction")
-    public ResponseEntity<?> reactToComment(
+    public ResponseEntity<ForumCommentDto> reactToComment(
             @AuthenticationPrincipal User currentUser,
             @PathVariable("thread-id") Long threadId,
             @PathVariable("comment-id") Long commentId,

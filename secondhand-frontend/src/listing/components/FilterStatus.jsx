@@ -300,18 +300,20 @@ const FilterStatus = ({
           </div>
           <div className="flex items-center bg-background-tertiary rounded p-0.5 gap-0.5 border border-border-light">
             {[
-              { key: LISTING_SORT_FIELDS.DATE, label: t("sort_date", "Tarih") },
-              { key: LISTING_SORT_FIELDS.PRICE, label: t("sort_price", "Fiyat") }
-            ].map(({ key, label }) => (
+              { key: LISTING_SORT_FIELDS.DATE, direction: LISTING_DEFAULTS.SORT_DIRECTION, label: t("sort_newest", "En yeni") },
+              { key: LISTING_SORT_FIELDS.PRICE, direction: 'ASC', label: t("sort_price_asc", "En ucuz") },
+              { key: LISTING_SORT_FIELDS.PRICE, direction: 'DESC', label: t("sort_price_desc", "En pahalı") }
+            ].map(({ key, direction, label }) => (
               <button
-                key={key}
+                key={`${key}-${direction}`}
                 type="button"
+                aria-pressed={filters.sortBy === key && (filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION) === direction}
                 onClick={() => updateFilters({
                   sortBy: key,
-                  sortDirection: LISTING_DEFAULTS.SORT_DIRECTION
+                  sortDirection: direction
                 })}
-                className={`px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
-                  filters.sortBy === key ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
+                className={`px-2.5 py-1 rounded text-sm font-medium transition-colors cursor-pointer ${
+                  filters.sortBy === key && (filters.sortDirection || LISTING_DEFAULTS.SORT_DIRECTION) === direction ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-tertiary hover:text-text-primary'
                 }`}
               >
                 {label}

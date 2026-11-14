@@ -4,6 +4,7 @@ import com.serhat.secondhand.cart.config.CartConfig;
 import com.serhat.secondhand.cart.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class CartReservationScheduler {
     private final CartSocialMetricService cartSocialMetricService;
 
     @Scheduled(fixedRateString = "${app.cart.scheduler.cleanup-fixed-rate-ms:60000}")
+    @SchedulerLock(name = "cartReservationCleanupScheduler", lockAtMostFor = "PT55S", lockAtLeastFor = "PT10S")
     @Transactional
     public void cleanupExpiredReservations() {
         if (!cartConfig.getReservation().isEnabled()) {

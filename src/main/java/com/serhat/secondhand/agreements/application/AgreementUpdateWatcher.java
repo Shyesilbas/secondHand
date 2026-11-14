@@ -6,6 +6,7 @@ import com.serhat.secondhand.agreements.entity.enums.AgreementType;
 import com.serhat.secondhand.agreements.repository.AgreementUpdateEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class AgreementUpdateWatcher {
     private final AgreementEmailNotificationService agreementEmailNotificationService;
 
     @Scheduled(fixedDelay = CHECK_INTERVAL_MS)
+    @SchedulerLock(name = "agreementUpdateWatcher", lockAtMostFor = "PT25M", lockAtLeastFor = "PT1M")
     public void checkAndNotifyAgreementUpdates() {
         List<AgreementType> requiredTypes = agreementRequirementService.getAllRequiredAgreementTypes();
         if (requiredTypes.isEmpty()) {

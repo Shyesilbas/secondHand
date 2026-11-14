@@ -50,7 +50,7 @@ public class PaymentKafkaProducer {
                         payment.getId(), result.getRecordMetadata().offset()))
                 .exceptionally(ex -> {
                     log.error("Failed to send PaymentCompletedKafkaEvent for paymentId: {}", payment.getId(), ex);
-                    throw new RuntimeException("Kafka publish failed for payment completed", ex);
+                    throw new IllegalStateException("Kafka publish failed for payment completed", ex);
                 });
     }
 }

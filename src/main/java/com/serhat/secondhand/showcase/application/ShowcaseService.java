@@ -55,6 +55,7 @@ public class ShowcaseService implements IShowcaseService {
     private final ShowcaseRedisManagerService showcaseRedisManagerService;
     private final ShowcasePricingCalculator showcasePricingCalculator;
     private final IEWalletService eWalletService;
+    private final com.serhat.secondhand.user.application.UserBlockService userBlockService;
 
     private <T> Result<T> validateShowcaseDays(int days) {
         Result<Void> validationResult = showcaseValidator.validateDaysCount(days);
@@ -115,11 +116,18 @@ public class ShowcaseService implements IShowcaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ShowcaseDto> getActiveShowcases(int page, int size) {
+    public Page<ShowcaseDto> getActiveShowcases(int page, int size, Long viewerId) {
         log.info("Fetching active showcases from database | page={}, size={}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<Showcase> activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE,
-                LocalDateTime.now(), pageable);
+        java.util.Set<Long> hidden = new java.util.HashSet<>(userBlockService.getMutuallyHiddenUserIds(viewerId));
+        Page<Showcase> activeShowcases;
+        if (hidden.isEmpty()) {
+            activeShowcases = showcaseRepository.findActiveShowcasesPage(ShowcaseStatus.ACTIVE,
+                    LocalDateTime.now(), pageable);
+        } else {
+            activeShowcases = showcaseRepository.findActiveShowcasesPageExcludingSellers(hidden, ShowcaseStatus.ACTIVE,
+                    LocalDateTime.now(), pageable);
+        }
         List<ShowcaseDto> dtoList = showcaseMapper.toDtos(activeShowcases.getContent(), null);
 
 

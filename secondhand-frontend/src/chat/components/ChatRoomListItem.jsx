@@ -79,7 +79,7 @@ const ChatRoomListItem = ({
  </div>}
 
  <p className={`text-xs line-clamp-2 break-words tracking-tight ${isSelected ? 'text-text-secondary' : 'text-text-tertiary'}`}>
- {room.lastMessage ? <span>
+ {room.lastMessageRemoved ? <span className="italic">{t('last_message_removed_by_moderation', 'Bu mesaj sistem tarafından silindi.')}</span> : room.lastMessage ? <span>
  <span className="font-semibold">
  {getLastMessageSenderName()}:
  </span>{' '}

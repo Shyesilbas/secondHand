@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,7 +35,7 @@ public class VehicleListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new vehicle listing")
-    public ResponseEntity<?> createVehicleListing(
+    public ResponseEntity<Map<String, UUID>> createVehicleListing(
             @Valid @RequestBody VehicleCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -45,7 +46,7 @@ public class VehicleListingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a vehicle listing")
-    public ResponseEntity<?> updateVehicleListing(
+    public ResponseEntity<Void> updateVehicleListing(
             @PathVariable UUID id,
             @Valid @RequestBody VehicleUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -57,14 +58,14 @@ public class VehicleListingController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get vehicle listing details")
-    public ResponseEntity<?> getVehicleDetails(@PathVariable UUID id) {
+    public ResponseEntity<VehicleListingDto> getVehicleDetails(@PathVariable UUID id) {
         VehicleListingDto vehicle = vehicleListingService.getVehicleDetails(id);
         return ResultResponses.ok(Result.success(vehicle));
     }
 
     @GetMapping("/brand/{brand-id}/model/{model-id}")
     @Operation(summary = "Find vehicles by brand and model")
-    public ResponseEntity<?> findByBrandAndModel(
+    public ResponseEntity<Page<VehicleListingDto>> findByBrandAndModel(
             @PathVariable("brand-id") UUID brandId,
             @PathVariable("model-id") UUID modelId,
             Pageable pageable) {
@@ -74,7 +75,7 @@ public class VehicleListingController {
 
     @PostMapping("/filter")
     @Operation(summary = "Filter vehicle listings with advanced criteria")
-    public ResponseEntity<?> filterVehicles(@RequestBody VehicleListingFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterVehicles(@RequestBody VehicleListingFilterDto filters) {
         log.info("Filtering vehicles with criteria: {}", filters);
         Page<ListingDto> result = vehicleListingService.filterVehicles(filters);
         return ResultResponses.ok(Result.success(result));

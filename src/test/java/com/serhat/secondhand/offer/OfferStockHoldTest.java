@@ -43,7 +43,7 @@ class OfferStockHoldTest {
     private final OfferStockHoldService stockHold = new OfferStockHoldService(inventory);
 
     private final OfferService offerService = new OfferService(offerRepository, listingService, userService,
-            notifications, validator, mock(OfferMapper.class), stockHold, config, com.serhat.secondhand.user.RestrictionTestSupport.allowAll());
+            notifications, validator, mock(OfferMapper.class), stockHold, config, com.serhat.secondhand.user.RestrictionTestSupport.allowAll(), mock(com.serhat.secondhand.user.application.UserBlockService.class));
     private final OfferScheduler scheduler = new OfferScheduler(offerRepository, notifications, stockHold);
 
     private static Offer offer(OfferStatus status, LocalDateTime expiresAt) {

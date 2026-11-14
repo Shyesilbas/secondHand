@@ -56,17 +56,17 @@ class ErrorBoundary extends React.Component {
  {/* Action Buttons */}
  <div className="mt-6 flex gap-3">
  <button onClick={this.handleRefresh} className="inline-flex items-center justify-center gap-2 rounded text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-white hover:bg-primary-hover h-9 px-3 flex-1">{t("refresh_page")}</button>
- <button onClick={this.handleGoHome} className="flex-1 bg-tertiary text-text-secondary px-4 py-2 rounded-md hover:bg-secondary-300 transition-colors">{t("go_home")}</button>
+ <button onClick={this.handleGoHome} className="flex-1 bg-background-tertiary text-text-secondary px-4 py-2 rounded-md hover:bg-secondary-300 transition-colors">{t("go_home")}</button>
  </div>
 
  {/* Development Error Details */}
  {import.meta.env.DEV && this.state.error && <details className="mt-4">
  <summary className="text-sm text-text-secondary cursor-pointer hover:text-text-primary">{t("error_details_development_only")}</summary>
  <div className="mt-2 space-y-2">
- <pre className="text-xs bg-tertiary p-2 rounded overflow-auto max-h-40">
+ <pre className="text-xs bg-background-tertiary p-2 rounded overflow-auto max-h-40">
  {this.state.error.toString()}
  </pre>
- {this.state.errorInfo && <pre className="text-xs bg-tertiary p-2 rounded overflow-auto max-h-40">
+ {this.state.errorInfo && <pre className="text-xs bg-background-tertiary p-2 rounded overflow-auto max-h-40">
  {this.state.errorInfo.componentStack}
  </pre>}
  </div>

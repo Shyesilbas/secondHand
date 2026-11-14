@@ -27,7 +27,7 @@ public class OrderKafkaProducer {
                         ORDER_CANCELLED_TOPIC, event.orderId()))
                 .exceptionally(ex -> {
                     log.error("Failed to publish OrderCancelledKafkaEvent to Kafka for orderId: {}", event.orderId(), ex);
-                    throw new RuntimeException("Kafka publish failed for order cancelled event", ex);
+                    throw new IllegalStateException("Kafka publish failed for order cancelled event", ex);
                 });
     }
 
@@ -39,7 +39,7 @@ public class OrderKafkaProducer {
                         ORDER_REFUNDED_TOPIC, event.orderId()))
                 .exceptionally(ex -> {
                     log.error("Failed to publish OrderRefundedKafkaEvent to Kafka for orderId: {}", event.orderId(), ex);
-                    throw new RuntimeException("Kafka publish failed for order refunded event", ex);
+                    throw new IllegalStateException("Kafka publish failed for order refunded event", ex);
                 });
     }
 }

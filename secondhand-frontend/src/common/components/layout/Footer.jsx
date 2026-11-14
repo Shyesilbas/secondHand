@@ -34,14 +34,14 @@ const Footer = () => {
                 {t("secondhand")}
               </span>
             </div>
-            <p className="text-xs text-text-muted leading-relaxed max-w-sm font-normal">
+            <p className="text-sm text-text-muted leading-relaxed max-w-sm font-normal">
               {t("about_secondhand_desc")}
             </p>
           </div>
 
           {/* About Section */}
           <div className="lg:col-span-2 space-y-2">
-            <h3 className="text-xs font-semibold text-white mb-2 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5 text-text-secondary" />
               <span>{t("about")}</span>
             </h3>
@@ -49,7 +49,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => navigate(ROUTES.ABOUT)}
-                  className="text-xs text-text-muted hover:text-white transition-colors tracking-tight font-medium inline-flex items-center"
+                  className="text-sm text-text-muted hover:text-white transition-colors tracking-tight font-medium inline-flex items-center"
                 >
                   {t("about_secondhand")}
                 </button>
@@ -59,7 +59,7 @@ const Footer = () => {
 
           {/* Support Section */}
           <div className="lg:col-span-2 space-y-2">
-            <h3 className="text-xs font-semibold text-white mb-2 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
               <MessageSquare className="w-3.5 h-3.5 text-text-tertiary" />
               <span>{t("support")}</span>
             </h3>
@@ -67,7 +67,7 @@ const Footer = () => {
               <li>
                 <button
                   onClick={() => navigate(ROUTES.FORUM)}
-                  className="text-xs text-text-muted hover:text-white transition-colors tracking-tight font-medium inline-flex items-center text-left"
+                  className="text-sm text-text-muted hover:text-white transition-colors tracking-tight font-medium inline-flex items-center text-left"
                 >
                   {t("forum_community")}
                 </button>
@@ -77,7 +77,7 @@ const Footer = () => {
 
           {/* Legal Section */}
           <div className="lg:col-span-2 space-y-2">
-            <h3 className="text-xs font-semibold text-white mb-2 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
               <Scale className="w-3.5 h-3.5 text-text-tertiary" />
               <span>{t("legal")}</span>
             </h3>
@@ -86,7 +86,7 @@ const Footer = () => {
                 <li>
                   <button
                     onClick={() => navigate(ROUTES.AGREEMENTS_ALL)}
-                    className="text-xs text-text-muted hover:text-white transition-colors tracking-tight font-medium text-left"
+                    className="text-sm text-text-muted hover:text-white transition-colors tracking-tight font-medium text-left"
                   >
                     {t("my_agreements")}
                   </button>
@@ -97,7 +97,7 @@ const Footer = () => {
                 {!loadAgreements ? (
                   <button
                     onClick={() => setLoadAgreements(true)}
-                    className="inline-flex items-center gap-1.5 rounded border border-white/10 px-2 py-0.5 text-xs font-medium tracking-tight text-secondary-200 transition-colors hover:border-white/20 hover:bg-white/[0.04]"
+                    className="inline-flex items-center gap-1.5 rounded border border-white/10 px-2 py-0.5 text-sm font-medium tracking-tight text-secondary-200 transition-colors hover:border-white/20 hover:bg-white/[0.04]"
                   >
                     <span>{t("load_legal_documents")}</span>
                   </button>
@@ -134,7 +134,7 @@ const Footer = () => {
                             `);
                             newWindow.document.close();
                           }}
-                          className="w-full text-left text-xs text-text-muted hover:text-white transition-colors tracking-tight"
+                          className="w-full text-left text-sm text-text-muted hover:text-white transition-colors tracking-tight"
                         >
                           <span>{agreement.agreementType.replace(/_/g, ' ')}</span>
                         </button>
@@ -145,7 +145,7 @@ const Footer = () => {
                   <ul className="space-y-1">
                     {['Terms of Service', 'Privacy Policy', 'KVKK'].map((item) => (
                       <li key={item}>
-                        <span className="text-xs text-text-muted tracking-tight">{item}</span>
+                        <span className="text-sm text-text-muted tracking-tight">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -156,13 +156,13 @@ const Footer = () => {
 
           {/* Pricing Section */}
           <div className="sm:col-span-2 lg:col-span-2 space-y-2">
-            <h3 className="text-xs font-semibold text-white mb-2 flex items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-1.5">
               <Coins className="w-3.5 h-3.5 text-status-warning" />
               <span>{t("pricing")}</span>
             </h3>
             <button
               onClick={() => setShowPricing(!showPricing)}
-              className="flex items-center gap-2 text-xs text-text-muted hover:text-white transition-colors tracking-tight font-medium border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] rounded px-2.5 py-1 w-full justify-between"
+              className="flex items-center gap-2 text-sm text-text-muted hover:text-white transition-colors tracking-tight font-medium border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] rounded px-2.5 py-1 w-full justify-between"
             >
               <span>{showPricing ? t("hide_pricing") : t("show_pricing")}</span>
               {showPricing ? <ChevronUp className="w-3.5 h-3.5 text-text-tertiary" /> : <ChevronDown className="w-3.5 h-3.5 text-text-tertiary" />}
@@ -178,9 +178,9 @@ const Footer = () => {
                 ) : (
                   <>
                     <div className="space-y-1">
-                      <div className="text-xs font-semibold text-text-secondary">{t("listing_fee")}</div>
+                      <div className="text-sm font-semibold text-text-secondary">{t("listing_fee")}</div>
                       {feeConfig && (
-                        <div className="space-y-0.5 text-xs text-secondary-300">
+                        <div className="space-y-0.5 text-sm text-secondary-300">
                           <div className="flex items-center justify-between">
                             <span className="tracking-tight text-text-muted">{t("creation")}</span>
                             <span className="text-secondary-100">{formatCurrency(feeConfig.creationFee, 'TRY')}</span>
@@ -198,9 +198,9 @@ const Footer = () => {
                     </div>
 
                     <div className="space-y-1 border-t border-white/10 pt-1.5">
-                      <div className="text-xs font-semibold text-status-warning">{t("showcase")}</div>
+                      <div className="text-sm font-semibold text-status-warning">{t("showcase")}</div>
                       {showcasePricing && (
-                        <div className="space-y-0.5 text-xs text-secondary-300">
+                        <div className="space-y-0.5 text-sm text-secondary-300">
                           <div className="flex items-center justify-between">
                             <span className="tracking-tight text-text-muted">{t("daily_cost")}</span>
                             <span className="text-secondary-100">{formatCurrency(showcasePricing.dailyCost, 'TRY')}</span>
@@ -224,7 +224,7 @@ const Footer = () => {
         </div>
 
         {/* Footer Bottom */}
-        <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-tertiary">
+        <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-text-tertiary">
           <p>
             &copy; {new Date().getFullYear()} <span className="font-semibold text-secondary-300">{t("secondhand")}</span>. {t("all_rights_reserved")}
           </p>

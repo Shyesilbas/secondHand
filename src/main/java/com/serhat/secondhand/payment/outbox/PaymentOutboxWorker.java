@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.UUID;
 
 @Component
@@ -48,6 +50,9 @@ public class PaymentOutboxWorker {
                 );
 
         for (PaymentOutboxEvent event : events) {
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             self.processEvent(event.getId());
         }
     }
@@ -71,14 +76,21 @@ public class PaymentOutboxWorker {
             event.setProcessedAt(LocalDateTime.now());
             event.setLastError(null);
             paymentOutboxRepository.save(event);
-        } catch (Exception ex) {
-            int newAttempt = event.getAttemptCount() + 1;
-            event.setAttemptCount(newAttempt);
-            event.setLastError(ex.getMessage());
-            event.setNextAttemptAt(LocalDateTime.now().plusSeconds(Math.min(300, newAttempt * 10L)));
-            event.setStatus(newAttempt >= event.getMaxAttempts() ? OutboxStatus.FAILED : OutboxStatus.PENDING);
-            paymentOutboxRepository.save(event);
-            log.error("Payment outbox processing failed for event {}", eventId, ex);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            recordFailure(event, eventId, ex);
+        } catch (ExecutionException | TimeoutException | RuntimeException ex) {
+            recordFailure(event, eventId, ex);
         }
+    }
+
+    private void recordFailure(PaymentOutboxEvent event, UUID eventId, Exception ex) {
+        int newAttempt = event.getAttemptCount() + 1;
+        event.setAttemptCount(newAttempt);
+        event.setLastError(ex.getMessage());
+        event.setNextAttemptAt(LocalDateTime.now().plusSeconds(Math.min(300, newAttempt * 10L)));
+        event.setStatus(newAttempt >= event.getMaxAttempts() ? OutboxStatus.FAILED : OutboxStatus.PENDING);
+        paymentOutboxRepository.save(event);
+        log.error("Payment outbox processing failed for event {}", eventId, ex);
     }
 }

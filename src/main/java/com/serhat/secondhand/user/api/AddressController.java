@@ -25,25 +25,25 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addAddress(@RequestBody AddressDto addressDto, @AuthenticationPrincipal User user) {
+    public ResponseEntity<AddressDto> addAddress(@RequestBody AddressDto addressDto, @AuthenticationPrincipal User user) {
         return ResultResponses.ok(addressService.addAddress(user.getId(), addressDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAddress(@PathVariable Long id,
+    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long id,
                                            @RequestBody AddressDto addressDto,
                                            @AuthenticationPrincipal User user) {
         return ResultResponses.ok(addressService.updateAddress(id, user.getId(), addressDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAddress(@PathVariable Long id,
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long id,
                                            @AuthenticationPrincipal User user) {
         return ResultResponses.noContent(addressService.deleteAddress(id, user.getId()));
     }
 
     @PostMapping("/{id}/main")
-    public ResponseEntity<?> setMainAddress(@PathVariable Long id,
+    public ResponseEntity<Void> setMainAddress(@PathVariable Long id,
                                             @AuthenticationPrincipal User user) {
         return ResultResponses.ok(addressService.setMainAddress(id, user.getId()));
     }

@@ -61,7 +61,7 @@ const FavoriteListCard = ({
  </div>}
  
  <div className="absolute top-3 left-3">
- <div className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium ${list.isPublic ? 'bg-background-secondary text-status-success-text' : 'bg-tertiary text-text-secondary'}`}>
+ <div className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium ${list.isPublic ? 'bg-background-secondary text-status-success-text' : 'bg-background-tertiary text-text-secondary'}`}>
  {list.isPublic ? <>
  <Globe className="w-3 h-3" />{t("public")}</> : <>
  <Lock className="w-3 h-3" />{t("private")}</>}

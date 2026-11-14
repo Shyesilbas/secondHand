@@ -25,5 +25,6 @@ public class ChatMessageDto {
     private String offerStatus;
     private LocalDateTime offerExpiresAt;
     private Boolean read;
+    private boolean removedByModeration;
     private LocalDateTime createdAt;
 }

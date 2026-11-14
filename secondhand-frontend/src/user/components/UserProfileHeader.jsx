@@ -4,10 +4,12 @@ import ContactSellerButton from '../../chat/components/ContactSellerButton.jsx';
 import ComplaintButton from '../../complaint/components/ComplaintButton.jsx';
 import { FollowButton, FollowStats } from '../../follow/index.js';
 import { formatDate } from '../../common/formatters.js';
-import { buttonClasses } from '../../common/components/ui/Button.jsx';
+import Button, { buttonClasses } from '../../common/components/ui/Button.jsx';
 import Skeleton from '../../common/components/ui/Skeleton.jsx';
 import { ROUTES } from '../../common/constants/routes.js';
-import { Award, Plus, Settings, ShieldCheck, Star } from 'lucide-react';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
+import { useBlockUser } from '../../user/hooks/useBlocking.js';
+import { Ban, Award, Plus, Settings, ShieldCheck, Star } from 'lucide-react';
 
 const Stat = ({ label, children }) => (
  <div className="min-w-0 px-4 py-3 first:pl-0 sm:px-5">
@@ -88,6 +90,8 @@ export const UserProfileHeaderSkeleton = () => (
 
 const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activeListingCount }) => {
  const { t } = useTranslation();
+ const { canCreateListings } = useRestrictionFlags();
+ const blockMutation = useBlockUser();
  const name = user?.name || '';
  const surname = user?.surname || '';
  const initials = `${name[0] || ''}${surname[0] || ''}`.toUpperCase() || 'U';
@@ -135,10 +139,13 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  <Settings className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  {t('account_settings', 'Hesap ayarları')}
  </Link>
- <Link to={ROUTES.CREATE_LISTING} className={buttonClasses('primary', 'sm')}>
+ {canCreateListings ? <Link to={ROUTES.CREATE_LISTING} className={buttonClasses('primary', 'sm')}>
  <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
  {t('create_listing', 'İlan oluştur')}
- </Link>
+ </Link> : <button type="button" disabled title="Hesabınızdaki kısıtlama nedeniyle ilan oluşturamazsınız" className={`${buttonClasses('primary', 'sm')} disabled:cursor-not-allowed disabled:opacity-50`}>
+ <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ {t('create_listing', 'İlan oluştur')}
+ </button>}
  </>
  ) : (
  <>
@@ -148,7 +155,8 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  title: `${t('chat_with', 'Sohbet:')} ${fullName}`,
  sellerId: user.id,
  sellerName: name,
- sellerSurname: surname
+ sellerSurname: surname,
+ canSendMessage: user.canSendMessage
  }}
  isDirectChat
  variant="primary"
@@ -156,6 +164,10 @@ const UserProfileHeader = ({ user, isOwnProfile, reviewStats, greatSeller, activ
  className="h-9 px-3"
  />
  <FollowButton userId={user.id} size="sm" />
+ <Button variant="ghost" size="sm" disabled={blockMutation.isPending} onClick={() => blockMutation.mutate(user.id)}>
+ <Ban className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+ {t('block_user', 'Kullanıcıyı Engelle')}
+ </Button>
  <ComplaintButton targetUserId={user.id} targetUserName={fullName} targetUser={user} variant="ghost" />
  </>
  )}

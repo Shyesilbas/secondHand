@@ -7,6 +7,7 @@ import com.serhat.secondhand.payment.outbox.OutboxStatus;
 import com.serhat.secondhand.payment.outbox.PaymentOutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ public class OutboxHousekeepingScheduler {
     private int retentionDays;
 
     @Scheduled(cron = "${app.outbox.cleanup.cron:0 0 3 * * ?}")
+    @SchedulerLock(name = "outboxHousekeepingScheduler", lockAtMostFor = "PT30M", lockAtLeastFor = "PT1M")
     @Transactional
     public void purgeProcessedOutboxEvents() {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(retentionDays);

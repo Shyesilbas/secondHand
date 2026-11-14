@@ -28,23 +28,20 @@ public class CheckoutReservationController {
     @PostMapping("/initiate")
     @Operation(summary = "Initiate checkout stock reservation", description = "Reserves user's cart items in Redis with 15-min TTL upon entering checkout")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> initiateReservation(@AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<Map<String, Object>> initiateReservation(@AuthenticationPrincipal User currentUser) {
         log.info("User {} initiating checkout stock reservation", currentUser.getId());
-        Result<Map<UUID, Integer>> reserveResult = stockReservationService.reserveUserCartStock(currentUser.getId());
-        if (reserveResult.isError()) {
-            return ResultResponses.ok(reserveResult);
-        }
+        Map<UUID, Integer> reserved = ResultResponses.unwrap(stockReservationService.reserveUserCartStock(currentUser.getId()));
         long remainingTtl = stockReservationService.getRemainingTtlForUser(currentUser.getId());
-        return ResultResponses.ok(Result.success(Map.of(
-                "reserved", reserveResult.getData(),
+        return ResponseEntity.ok(Map.of(
+                "reserved", reserved,
                 "remainingTtlSeconds", remainingTtl
-        )));
+        ));
     }
 
     @DeleteMapping("/reservation/{listingId}")
     @Operation(summary = "Cancel stock reservation", description = "Explicitly releases held stock in Redis if user navigates away or removes item")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> cancelReservation(
+    public ResponseEntity<String> cancelReservation(
             @PathVariable UUID listingId,
             @AuthenticationPrincipal User currentUser) {
         log.info("User {} cancelling stock reservation for listing {}", currentUser.getId(), listingId);

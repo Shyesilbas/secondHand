@@ -3,6 +3,7 @@ package com.serhat.secondhand.review.api;
 import com.serhat.secondhand.core.exception.BusinessException;
 import com.serhat.secondhand.core.result.ResultResponses;
 import com.serhat.secondhand.review.dto.CreateReviewRequest;
+import com.serhat.secondhand.review.dto.ReviewDto;
 import com.serhat.secondhand.review.application.IReviewService;
 import com.serhat.secondhand.review.util.ReviewErrorCodes;
 import com.serhat.secondhand.user.domain.entity.User;
@@ -28,7 +29,7 @@ public class ReviewController {
     private final IReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<?> createReview(
+    public ResponseEntity<ReviewDto> createReview(
             @Valid @RequestBody CreateReviewRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -37,7 +38,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getReviewsByOrderItems(
+    public ResponseEntity<List<ReviewDto>> getReviewsByOrderItems(
             @RequestParam("orderItemIds") String orderItemIdsParam,
             @AuthenticationPrincipal User currentUser) {
         if (orderItemIdsParam == null || orderItemIdsParam.isBlank()) {

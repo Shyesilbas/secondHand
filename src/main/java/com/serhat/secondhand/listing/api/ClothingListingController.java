@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +36,7 @@ public class ClothingListingController {
 
     @PostMapping("/create-listing")
     @Operation(summary = "Create a new clothing listing")
-    public ResponseEntity<?> createClothingListing(
+    public ResponseEntity<Map<String, UUID>> createClothingListing(
             @Valid @RequestBody ClothingCreateRequest request,
             @AuthenticationPrincipal User currentUser) {
 
@@ -46,7 +47,7 @@ public class ClothingListingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a clothing listing")
-    public ResponseEntity<?> updateClothingListing(
+    public ResponseEntity<Void> updateClothingListing(
             @PathVariable UUID id,
             @Valid @RequestBody ClothingUpdateRequest request,
             @AuthenticationPrincipal User currentUser) {
@@ -59,7 +60,7 @@ public class ClothingListingController {
     @PublicEndpoint
     @GetMapping("/{id}")
     @Operation(summary = "Get clothing listing details")
-    public ResponseEntity<?> getClothingDetails(@PathVariable UUID id) {
+    public ResponseEntity<ClothingListingDto> getClothingDetails(@PathVariable UUID id) {
         ClothingListingDto clothing = clothingListingService.getClothingDetails(id);
         return ResultResponses.ok(Result.success(clothing));
     }
@@ -67,7 +68,7 @@ public class ClothingListingController {
     @PublicEndpoint
     @GetMapping("/brands/{brand-id}/types/{clothing-type-id}")
     @Operation(summary = "Find clothing by brand and type")
-    public ResponseEntity<?> findByBrandAndClothingType(
+    public ResponseEntity<Page<ClothingListingDto>> findByBrandAndClothingType(
             @PathVariable("brand-id") UUID brand,
             @PathVariable("clothing-type-id") UUID clothingType,
             Pageable pageable) {
@@ -78,7 +79,7 @@ public class ClothingListingController {
     @PublicEndpoint
     @PostMapping("/filter")
     @Operation(summary = "Filter clothing listings with advanced criteria")
-    public ResponseEntity<?> filterClothing(@RequestBody ClothingListingFilterDto filters) {
+    public ResponseEntity<Page<ListingDto>> filterClothing(@RequestBody ClothingListingFilterDto filters) {
         log.info("Filtering clothing with criteria: {}", filters);
         Page<ListingDto> result = clothingListingService.filterClothing(filters);
         return ResultResponses.ok(Result.success(result));

@@ -44,7 +44,7 @@ class CheckoutOfferHoldTest {
     private final CheckoutOrchestrator orchestrator = new CheckoutOrchestrator(mock(CartRepository.class),
             orderCreationService, mock(OrderPaymentService.class), mock(OrderRepository.class), mock(OrderMapper.class),
             mock(CouponService.class), mock(IOfferService.class), mock(EscrowService.class), pricingContextFactory,
-            stockReservation, mock(ApplicationEventPublisher.class), com.serhat.secondhand.user.RestrictionTestSupport.allowAll());
+            stockReservation, mock(ApplicationEventPublisher.class), com.serhat.secondhand.user.RestrictionTestSupport.allowAll(), mock(com.serhat.secondhand.user.application.UserBlockService.class));
 
     @Test
     void failedOfferCheckout_keepsOfferHold() {

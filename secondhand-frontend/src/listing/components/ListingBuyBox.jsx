@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRestrictionFlags } from '../../complaint/hooks/useComplaints.js';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronRight, MapPin, Share2, ShieldCheck } from 'lucide-react';
 import Button from '../../common/components/ui/Button.jsx';
@@ -25,7 +26,6 @@ const OwnerStat = ({ label, value }) => (
 // Owners see listing stats and management actions in the same place instead of buy actions.
 const ListingBuyBox = ({
   listing,
-  typeLabel,
   locationLabel,
   price,
   isOwner,
@@ -41,27 +41,46 @@ const ListingBuyBox = ({
   onChanged
 }) => {
   const { t } = useTranslation();
+  const { canMakeOffers, canCheckout } = useRestrictionFlags();
   const [isSafetyOpen, setIsSafetyOpen] = useState(false);
   const viewCount = listing.viewCount ?? listing.viewStats?.totalViews ?? 0;
 
   return (
-    <section className="rounded border border-border bg-background-primary p-5" aria-label={t('listing_summary', 'İlan özeti')}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-2 pt-2 text-sm text-text-tertiary">
-          <span>{typeLabel}</span>
+    <section className="rounded-lg border border-border bg-background-secondary/60 p-5" aria-label={t('listing_summary', 'İlan özeti')}>
+      <h1 className="text-xl font-semibold leading-snug text-text-primary sm:text-2xl">{listing.title}</h1>
+
+      <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="text-3xl font-semibold tabular-nums tracking-tight text-text-price">
+          {formatCurrency(price.display, listing.currency)}
+        </span>
+        {price.hasCampaign && (
+          <span className="text-base tabular-nums text-text-tertiary line-through">
+            {formatCurrency(listing.price, listing.currency)}
+          </span>
+        )}
+        {price.hasCampaign && (
+          <span className="rounded-sm border border-status-error-border bg-status-error-bg px-2 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
+            {listing.campaignName || t('discount', 'İndirim')}
+            {price.discount ? ` −%${price.discount}` : ''}
+          </span>
+        )}
+      </p>
+
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border-light pt-4">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+            {locationLabel}
+          </span>
+          <span aria-hidden>·</span>
+          <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
           {listing.listingNo && (
             <>
               <span aria-hidden>·</span>
-              <span className="tabular-nums text-text-muted">#{listing.listingNo}</span>
+              <span className="tabular-nums">#{listing.listingNo}</span>
             </>
           )}
-          {price.hasCampaign && (
-            <span className="rounded-full border border-status-error-border bg-status-error-bg px-2 py-0.5 text-xs font-medium tabular-nums text-status-error-text">
-              {listing.campaignName || t('discount', 'İndirim')}
-              {price.discount ? ` −%${price.discount}` : ''}
-            </span>
-          )}
-        </div>
+        </p>
         <div className="flex shrink-0 items-center gap-1.5">
           {!isOwner && (
             <FavoriteButton listingId={listing.id} listing={listing} size="md" showCount={false} className={ICON_BUTTON} />
@@ -86,28 +105,7 @@ const ListingBuyBox = ({
         </div>
       </div>
 
-      <h1 className="mt-3 text-xl font-semibold leading-snug text-text-primary">{listing.title}</h1>
-      <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text-tertiary">
-        <span className="inline-flex items-center gap-1">
-          <MapPin className="h-4 w-4 text-text-muted" strokeWidth={1.5} aria-hidden />
-          {locationLabel}
-        </span>
-        <span aria-hidden>·</span>
-        <span className="tabular-nums">{formatDateTime(listing.createdAt)}</span>
-      </p>
-
-      <div className="mt-5 border-t border-border-light pt-5">
-        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="text-2xl font-semibold tabular-nums text-text-price">
-            {formatCurrency(price.display, listing.currency)}
-          </span>
-          {price.hasCampaign && (
-            <span className="text-sm tabular-nums text-text-muted line-through">
-              {formatCurrency(listing.price, listing.currency)}
-            </span>
-          )}
-        </p>
-
+      <div>
         {(stock || socialProof.length > 0) && (
           <ul className="mt-3 space-y-1 text-sm text-text-secondary">
             {stock && (
@@ -139,7 +137,7 @@ const ListingBuyBox = ({
         <div className="mt-5 space-y-2">
           {canPurchase ? (
             <>
-              <Button className="w-full" onClick={cart.onClick} disabled={cart.isAdding}>
+              <Button className="w-full" onClick={cart.onClick} disabled={cart.isAdding || !canCheckout} title={canCheckout ? undefined : 'Hesabınızdaki kısıtlama nedeniyle satın alma yapamazsınız'}>
                 {cart.isInCart && !cart.isAdding && <Check className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
                 <span>
                   {cart.isAdding
@@ -150,7 +148,7 @@ const ListingBuyBox = ({
                 </span>
               </Button>
               <div className="grid grid-cols-2 gap-2">
-                <Button variant="secondary" onClick={onMakeOffer}>
+                <Button variant="secondary" onClick={onMakeOffer} disabled={!canMakeOffers} title={canMakeOffers ? undefined : 'Hesabınızdaki kısıtlama nedeniyle teklif veremezsiniz'}>
                   {t('make_an_offer', 'Teklif ver')}
                 </Button>
                 <ContactSellerButton listing={listing} variant="secondary" label={t('send_message', 'Mesaj gönder')} />
